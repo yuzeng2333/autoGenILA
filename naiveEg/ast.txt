@@ -1,0 +1,125 @@
+1. Executing Verilog-2005 frontend.
+Parsing Verilog input from `mult.v' to AST representation.
+Generating RTLIL representation for module `\mult'.
+Dumping Verilog AST before simplification:
+    AST_MODULE <mult.v:5> [0x1d7aa10] str='\mult'
+      AST_WIRE <mult.v:6> [0x1d78930] str='\clk' input port=1
+      AST_WIRE <mult.v:6> [0x1d78a80] str='\rstn' input port=2
+      AST_WIRE <mult.v:7> [0x1d78f40] str='\func' input port=3
+        AST_RANGE <mult.v:7> [0x1d79050]
+          AST_CONSTANT <mult.v:7> [0x1d79160] bits='00000000000000000000000000000001'(32) signed range=[31:0] int=1
+          AST_CONSTANT <mult.v:7> [0x1d79270] bits='00000000000000000000000000000000'(32) signed range=[31:0]
+      AST_WIRE <mult.v:8> [0x1d79510] str='\num' input port=4
+        AST_RANGE <mult.v:8> [0x1d79620]
+          AST_CONSTANT <mult.v:8> [0x1d79730] bits='00000000000000000000000000001000'(32) signed range=[31:0] int=8
+          AST_CONSTANT <mult.v:8> [0x1d79840] bits='00000000000000000000000000000000'(32) signed range=[31:0]
+      AST_WIRE <mult.v:9> [0x1d799a0] str='\result' output reg port=5
+        AST_RANGE <mult.v:9> [0x1d79ab0]
+          AST_CONSTANT <mult.v:9> [0x1d79bc0] bits='00000000000000000000000000001000'(32) signed range=[31:0] int=8
+          AST_CONSTANT <mult.v:9> [0x1d79cd0] bits='00000000000000000000000000000000'(32) signed range=[31:0]
+      AST_WIRE <mult.v:11> [0x1d79e30] str='\remain' reg
+        AST_RANGE <mult.v:11> [0x1d79f40]
+          AST_CONSTANT <mult.v:11> [0x1d7a050] bits='00000000000000000000000000001000'(32) signed range=[31:0] int=8
+          AST_CONSTANT <mult.v:11> [0x1d7a160] bits='00000000000000000000000000000000'(32) signed range=[31:0]
+      AST_WIRE <mult.v:12> [0x1d7a2c0] str='\multiplier' reg
+        AST_RANGE <mult.v:12> [0x1d7b2d0]
+          AST_CONSTANT <mult.v:12> [0x1d7b3e0] bits='00000000000000000000000000001000'(32) signed range=[31:0] int=8
+          AST_CONSTANT <mult.v:12> [0x1d7b4f0] bits='00000000000000000000000000000000'(32) signed range=[31:0]
+      AST_WIRE <mult.v:13> [0x1d7b740] str='\multiplicand' reg
+        AST_RANGE <mult.v:13> [0x1d7b850]
+          AST_CONSTANT <mult.v:13> [0x1d7b960] bits='00000000000000000000000000001000'(32) signed range=[31:0] int=8
+          AST_CONSTANT <mult.v:13> [0x1d7ba70] bits='00000000000000000000000000000000'(32) signed range=[31:0]
+      AST_WIRE <mult.v:15> [0x1d78e30] str='\multiplicand_next'
+      AST_ASSIGN <mult.v:16> [0x1d7ca20]
+        AST_IDENTIFIER <mult.v:16> [0x1d7c8e0] str='\multiplicand_next'
+        AST_TERNARY <mult.v:16> [0x1d7c7d0]
+          AST_EQ <mult.v:15> [0x1d7bc90]
+            AST_IDENTIFIER <mult.v:15> [0x1d7b630] str='\func'
+            AST_CONSTANT <mult.v:15> [0x1d7bb80] bits='00000000000000000000000000000001'(32) signed range=[31:0] int=1
+          AST_IDENTIFIER <mult.v:15> [0x1d7bda0] str='\multiplicand'
+          AST_TERNARY <mult.v:16> [0x1d7c6a0]
+            AST_GT <mult.v:16> [0x1d7c0d0]
+              AST_IDENTIFIER <mult.v:16> [0x1d7beb0] str='\remain'
+              AST_CONSTANT <mult.v:16> [0x1d7bfc0] bits='00000000000000000000000000000000'(32) signed range=[31:0]
+            AST_ADD <mult.v:16> [0x1d7c460]
+              AST_IDENTIFIER <mult.v:16> [0x1d7c200] str='\multiplicand'
+              AST_IDENTIFIER <mult.v:16> [0x1d7c350] str='\multiplier'
+            AST_IDENTIFIER <mult.v:16> [0x1d7c590] str='\multiplicand'
+      AST_WIRE <mult.v:18> [0x1d7cb60] str='\remain_next'
+      AST_ASSIGN <mult.v:19> [0x1d7da20]
+        AST_IDENTIFIER <mult.v:19> [0x1d7d910] str='\remain_next'
+        AST_TERNARY <mult.v:19> [0x1d7d800]
+          AST_EQ <mult.v:18> [0x1d7cf30]
+            AST_IDENTIFIER <mult.v:18> [0x1d7cc70] str='\func'
+            AST_CONSTANT <mult.v:18> [0x1d7cdf0] bits='00000000000000000000000000000010'(32) signed range=[31:0] int=2
+          AST_IDENTIFIER <mult.v:18> [0x1d7d040] str='\num'
+          AST_TERNARY <mult.v:19> [0x1d7d6d0]
+            AST_IDENTIFIER <mult.v:19> [0x1d7d150] str='\remain'
+            AST_SUB <mult.v:19> [0x1d7d4b0]
+              AST_IDENTIFIER <mult.v:19> [0x1d7d260] str='\remain'
+              AST_CONSTANT <mult.v:19> [0x1d7d370] bits='00000000000000000000000000000001'(32) signed range=[31:0] int=1
+            AST_IDENTIFIER <mult.v:19> [0x1d7d5c0] str='\remain'
+      AST_WIRE <mult.v:21> [0x1d7db60] str='\result_next'
+      AST_ASSIGN <mult.v:21> [0x1d7e480]
+        AST_IDENTIFIER <mult.v:21> [0x1d7e370] str='\result_next'
+        AST_TERNARY <mult.v:21> [0x1d7e240]
+          AST_EQ <mult.v:21> [0x1d7df10]
+            AST_IDENTIFIER <mult.v:21> [0x1d7dc70] str='\func'
+            AST_CONSTANT <mult.v:21> [0x1d7ddd0] bits='00000000000000000000000000000001'(32) signed range=[31:0] int=1
+          AST_IDENTIFIER <mult.v:21> [0x1d7e020] str='\multiplicand'
+          AST_IDENTIFIER <mult.v:21> [0x1d7e130] str='\result'
+      AST_WIRE <mult.v:23> [0x1d7e5c0] str='\multiplier_next'
+      AST_ASSIGN <mult.v:23> [0x1d7ef10]
+        AST_IDENTIFIER <mult.v:23> [0x1d7ee00] str='\multiplier_next'
+        AST_TERNARY <mult.v:23> [0x1d7ecf0]
+          AST_EQ <mult.v:23> [0x1d7e970]
+            AST_IDENTIFIER <mult.v:23> [0x1d7e700] str='\func'
+            AST_CONSTANT <mult.v:23> [0x1d7e830] bits='00000000000000000000000000000001'(32) signed range=[31:0] int=1
+          AST_CONSTANT <mult.v:23> [0x1d7eaa0] bits='00000000000000000000000000000000'(32) signed range=[31:0]
+          AST_IDENTIFIER <mult.v:23> [0x1d7ebe0] str='\multiplicand'
+      AST_ALWAYS <mult.v:26> [0x1d78820]
+        AST_EDGE <mult.v:26> [0x1d7f240]
+          AST_IDENTIFIER <mult.v:26> [0x1d7f130] str='\clk'
+        AST_BLOCK <mult.v:26> [0x1d7f350]
+          AST_BLOCK <mult.v:27> [0x1d7f460]
+            AST_CASE <mult.v:27> [0x1d7f7b0]
+              AST_REDUCE_BOOL <mult.v:27> [0x1d7fc50]
+                AST_LOGIC_NOT <mult.v:27> [0x1d7f680]
+                  AST_IDENTIFIER <mult.v:27> [0x1d7f570] str='\rstn'
+              AST_COND <mult.v:27> [0x1d7f9d0]
+                AST_CONSTANT <mult.v:27> [0x1d7fae0] bits='1'(1) range=[0:0] int=1
+                AST_BLOCK <mult.v:27> [0x1d7f8c0]
+                  AST_BLOCK <mult.v:28> [0x1d7fdc0]
+                    AST_ASSIGN_LE <mult.v:28> [0x1d80160]
+                      AST_IDENTIFIER <mult.v:28> [0x1d7fed0] str='\remain'
+                      AST_CONSTANT <mult.v:28> [0x1d80020] bits='00000000000000000000000000000000'(32) signed range=[31:0]
+                    AST_ASSIGN_LE <mult.v:29> [0x1d80500]
+                      AST_IDENTIFIER <mult.v:29> [0x1d80270] str='\result'
+                      AST_CONSTANT <mult.v:29> [0x1d803c0] bits='00000000000000000000000000000000'(32) signed range=[31:0]
+                    AST_ASSIGN_LE <mult.v:30> [0x1d80880]
+                      AST_IDENTIFIER <mult.v:30> [0x1d80610] str='\multiplicand'
+                      AST_CONSTANT <mult.v:30> [0x1d80740] bits='00000000000000000000000000000001'(32) signed range=[31:0] int=1
+                    AST_ASSIGN_LE <mult.v:31> [0x1d80c10]
+                      AST_IDENTIFIER <mult.v:31> [0x1d80990] str='\multiplier'
+                      AST_CONSTANT <mult.v:31> [0x1d80ad0] bits='00000000000000000000000000000000'(32) signed range=[31:0]
+              AST_COND <mult.v:33> [0x1d80e30]
+                AST_DEFAULT <mult.v:33> [0x1d80f40]
+                AST_BLOCK <mult.v:33> [0x1d80d20]
+                  AST_BLOCK <mult.v:34> [0x1d81070]
+                    AST_ASSIGN_LE <mult.v:34> [0x1d813a0]
+                      AST_IDENTIFIER <mult.v:34> [0x1d81180] str='\remain'
+                      AST_IDENTIFIER <mult.v:34> [0x1d81290] str='\remain_next'
+                    AST_ASSIGN_LE <mult.v:35> [0x1d816f0]
+                      AST_IDENTIFIER <mult.v:35> [0x1d814d0] str='\result'
+                      AST_IDENTIFIER <mult.v:35> [0x1d815e0] str='\result_next'
+                    AST_ASSIGN_LE <mult.v:36> [0x1d81ac0]
+                      AST_IDENTIFIER <mult.v:36> [0x1d81840] str='\multiplicand'
+                      AST_IDENTIFIER <mult.v:36> [0x1d81980] str='\multiplicand_next'
+                    AST_ASSIGN_LE <mult.v:37> [0x1d81e70]
+                      AST_IDENTIFIER <mult.v:37> [0x1d81bf0] str='\multiplier'
+                      AST_IDENTIFIER <mult.v:37> [0x1d81d30] str='\multiplier_next'
+--- END OF AST DUMP ---
+Note: Assuming pure combinatorial block at mult.v:26 in
+compliance with IEC 62142(E):2005 / IEEE Std. 1364.1(E):2002. Recommending
+use of @* instead of @(...) for better match of synthesis and simulation.
+Successfully finished Verilog frontend.
