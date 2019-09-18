@@ -1,0 +1,3 @@
+1: rstn = 0, in = A
+2: rstn = 1, in = A
+

@@ -1,0 +1,649 @@
+{
+  "creator": "Yosys 0.8 (git sha1 UNKNOWN, clang 9.0.0 -fPIC -Os)",
+  "modules": {
+    "mult": {
+      "attributes": {
+        "top": 1,
+        "src": "mult.v:5"
+      },
+      "ports": {
+        "clk": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "rstn": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "func": {
+          "direction": "input",
+          "bits": [ 4, 5 ]
+        },
+        "num": {
+          "direction": "input",
+          "bits": [ 6, 7, 8, 9, 10, 11, 12, 13, 14 ]
+        },
+        "result": {
+          "direction": "output",
+          "bits": [ 15, 16, 17, 18, 19, 20, 21, 22, 23 ]
+        }
+      },
+      "cells": {
+        "$add$mult.v:16$3": {
+          "hide_name": 1,
+          "type": "$add",
+          "parameters": {
+            "A_SIGNED": 0,
+            "A_WIDTH": 9,
+            "B_SIGNED": 0,
+            "B_WIDTH": 9,
+            "Y_WIDTH": 9
+          },
+          "attributes": {
+            "src": "mult.v:16"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 24, 25, 26, 27, 28, 29, 30, 31, 32 ],
+            "B": [ 33, 34, 35, 36, 37, 38, 39, 40, 41 ],
+            "Y": [ 42, 43, 44, 45, 46, 47, 48, 49, 50 ]
+          }
+        },
+        "$eq$mult.v:15$1": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": 0,
+            "A_WIDTH": 2,
+            "B_SIGNED": 0,
+            "B_WIDTH": 1,
+            "Y_WIDTH": 1
+          },
+          "attributes": {
+            "src": "mult.v:15"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5 ],
+            "B": [ "1" ],
+            "Y": [ 51 ]
+          }
+        },
+        "$eq$mult.v:18$6": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": 0,
+            "A_WIDTH": 2,
+            "B_SIGNED": 0,
+            "B_WIDTH": 2,
+            "Y_WIDTH": 1
+          },
+          "attributes": {
+            "src": "mult.v:18"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5 ],
+            "B": [ "0", "1" ],
+            "Y": [ 52 ]
+          }
+        },
+        "$gt$mult.v:16$2": {
+          "hide_name": 1,
+          "type": "$gt",
+          "parameters": {
+            "A_SIGNED": 0,
+            "A_WIDTH": 9,
+            "B_SIGNED": 0,
+            "B_WIDTH": 1,
+            "Y_WIDTH": 1
+          },
+          "attributes": {
+            "src": "mult.v:16"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 53, 54, 55, 56, 57, 58, 59, 60, 61 ],
+            "B": [ "0" ],
+            "Y": [ 62 ]
+          }
+        },
+        "$procdff$32": {
+          "hide_name": 1,
+          "type": "$dff",
+          "parameters": {
+            "CLK_POLARITY": 1,
+            "WIDTH": 9
+          },
+          "attributes": {
+            "src": "mult.v:26"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "CLK": [ 2 ],
+            "D": [ 63, 64, 65, 66, 67, 68, 69, 70, 71 ],
+            "Q": [ 15, 16, 17, 18, 19, 20, 21, 22, 23 ]
+          }
+        },
+        "$procdff$33": {
+          "hide_name": 1,
+          "type": "$dff",
+          "parameters": {
+            "CLK_POLARITY": 1,
+            "WIDTH": 9
+          },
+          "attributes": {
+            "src": "mult.v:26"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "CLK": [ 2 ],
+            "D": [ 72, 73, 74, 75, 76, 77, 78, 79, 80 ],
+            "Q": [ 53, 54, 55, 56, 57, 58, 59, 60, 61 ]
+          }
+        },
+        "$procdff$34": {
+          "hide_name": 1,
+          "type": "$dff",
+          "parameters": {
+            "CLK_POLARITY": 1,
+            "WIDTH": 9
+          },
+          "attributes": {
+            "src": "mult.v:26"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "CLK": [ 2 ],
+            "D": [ 81, 82, 83, 84, 85, 86, 87, 88, 89 ],
+            "Q": [ 33, 34, 35, 36, 37, 38, 39, 40, 41 ]
+          }
+        },
+        "$procdff$35": {
+          "hide_name": 1,
+          "type": "$dff",
+          "parameters": {
+            "CLK_POLARITY": 1,
+            "WIDTH": 9
+          },
+          "attributes": {
+            "src": "mult.v:26"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "CLK": [ 2 ],
+            "D": [ 90, 91, 92, 93, 94, 95, 96, 97, 98 ],
+            "Q": [ 24, 25, 26, 27, 28, 29, 30, 31, 32 ]
+          }
+        },
+        "$procmux$21": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": 9
+          },
+          "attributes": {
+            "src": "mult.v:27"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "1", "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "B": [ 99, 100, 101, 102, 103, 104, 105, 106, 107 ],
+            "S": [ 3 ],
+            "Y": [ 90, 91, 92, 93, 94, 95, 96, 97, 98 ]
+          }
+        },
+        "$procmux$24": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": 9
+          },
+          "attributes": {
+            "src": "mult.v:27"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "B": [ 108, 109, 110, 111, 112, 113, 114, 115, 116 ],
+            "S": [ 3 ],
+            "Y": [ 81, 82, 83, 84, 85, 86, 87, 88, 89 ]
+          }
+        },
+        "$procmux$27": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": 9
+          },
+          "attributes": {
+            "src": "mult.v:27"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "B": [ 117, 118, 119, 120, 121, 122, 123, 124, 125 ],
+            "S": [ 3 ],
+            "Y": [ 72, 73, 74, 75, 76, 77, 78, 79, 80 ]
+          }
+        },
+        "$procmux$30": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": 9
+          },
+          "attributes": {
+            "src": "mult.v:27"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "B": [ 126, 127, 128, 129, 130, 131, 132, 133, 134 ],
+            "S": [ 3 ],
+            "Y": [ 63, 64, 65, 66, 67, 68, 69, 70, 71 ]
+          }
+        },
+        "$reduce_bool$mult.v:19$8": {
+          "hide_name": 1,
+          "type": "$reduce_bool",
+          "parameters": {
+            "A_SIGNED": 0,
+            "A_WIDTH": 9,
+            "Y_WIDTH": 1
+          },
+          "attributes": {
+            "src": "mult.v:19"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 53, 54, 55, 56, 57, 58, 59, 60, 61 ],
+            "Y": [ 135 ]
+          }
+        },
+        "$sub$mult.v:19$7": {
+          "hide_name": 1,
+          "type": "$sub",
+          "parameters": {
+            "A_SIGNED": 0,
+            "A_WIDTH": 9,
+            "B_SIGNED": 0,
+            "B_WIDTH": 1,
+            "Y_WIDTH": 9
+          },
+          "attributes": {
+            "src": "mult.v:19"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 53, 54, 55, 56, 57, 58, 59, 60, 61 ],
+            "B": [ "1" ],
+            "Y": [ 136, 137, 138, 139, 140, 141, 142, 143, 144 ]
+          }
+        },
+        "$ternary$mult.v:16$4": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": 9
+          },
+          "attributes": {
+            "src": "mult.v:16"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 24, 25, 26, 27, 28, 29, 30, 31, 32 ],
+            "B": [ 42, 43, 44, 45, 46, 47, 48, 49, 50 ],
+            "S": [ 62 ],
+            "Y": [ 145, 146, 147, 148, 149, 150, 151, 152, 153 ]
+          }
+        },
+        "$ternary$mult.v:16$5": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": 9
+          },
+          "attributes": {
+            "src": "mult.v:16"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 145, 146, 147, 148, 149, 150, 151, 152, 153 ],
+            "B": [ 24, 25, 26, 27, 28, 29, 30, 31, 32 ],
+            "S": [ 51 ],
+            "Y": [ 99, 100, 101, 102, 103, 104, 105, 106, 107 ]
+          }
+        },
+        "$ternary$mult.v:19$10": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": 9
+          },
+          "attributes": {
+            "src": "mult.v:19"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 53, 54, 55, 56, 57, 58, 59, 60, 61 ],
+            "B": [ 136, 137, 138, 139, 140, 141, 142, 143, 144 ],
+            "S": [ 135 ],
+            "Y": [ 154, 155, 156, 157, 158, 159, 160, 161, 162 ]
+          }
+        },
+        "$ternary$mult.v:19$12": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": 9
+          },
+          "attributes": {
+            "src": "mult.v:19"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 154, 155, 156, 157, 158, 159, 160, 161, 162 ],
+            "B": [ 6, 7, 8, 9, 10, 11, 12, 13, 14 ],
+            "S": [ 52 ],
+            "Y": [ 117, 118, 119, 120, 121, 122, 123, 124, 125 ]
+          }
+        },
+        "$ternary$mult.v:21$14": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": 9
+          },
+          "attributes": {
+            "src": "mult.v:21"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 15, 16, 17, 18, 19, 20, 21, 22, 23 ],
+            "B": [ 24, 25, 26, 27, 28, 29, 30, 31, 32 ],
+            "S": [ 51 ],
+            "Y": [ 126, 127, 128, 129, 130, 131, 132, 133, 134 ]
+          }
+        },
+        "$ternary$mult.v:23$17": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": 9
+          },
+          "attributes": {
+            "src": "mult.v:23"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 24, 25, 26, 27, 28, 29, 30, 31, 32 ],
+            "B": [ "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "S": [ 51 ],
+            "Y": [ 108, 109, 110, 111, 112, 113, 114, 115, 116 ]
+          }
+        }
+      },
+      "netnames": {
+        "$0\\multiplicand[8:0]": {
+          "hide_name": 1,
+          "bits": [ 90, 91, 92, 93, 94, 95, 96, 97, 98 ],
+          "attributes": {
+            "src": "mult.v:26"
+          }
+        },
+        "$0\\multiplier[8:0]": {
+          "hide_name": 1,
+          "bits": [ 81, 82, 83, 84, 85, 86, 87, 88, 89 ],
+          "attributes": {
+            "src": "mult.v:26"
+          }
+        },
+        "$0\\remain[8:0]": {
+          "hide_name": 1,
+          "bits": [ 72, 73, 74, 75, 76, 77, 78, 79, 80 ],
+          "attributes": {
+            "src": "mult.v:26"
+          }
+        },
+        "$0\\result[8:0]": {
+          "hide_name": 1,
+          "bits": [ 63, 64, 65, 66, 67, 68, 69, 70, 71 ],
+          "attributes": {
+            "src": "mult.v:26"
+          }
+        },
+        "$add$mult.v:16$3_Y": {
+          "hide_name": 1,
+          "bits": [ 42, 43, 44, 45, 46, 47, 48, 49, 50 ],
+          "attributes": {
+            "src": "mult.v:16"
+          }
+        },
+        "$auto$wreduce.cc:347:run$36": {
+          "hide_name": 1,
+          "bits": [ 136, 137, 138, 139, 140, 141, 142, 143, 144, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185 ],
+          "attributes": {
+            "src": "mult.v:19"
+          }
+        },
+        "$eq$mult.v:15$1_Y": {
+          "hide_name": 1,
+          "bits": [ 51 ],
+          "attributes": {
+            "src": "mult.v:15"
+          }
+        },
+        "$eq$mult.v:18$6_Y": {
+          "hide_name": 1,
+          "bits": [ 52 ],
+          "attributes": {
+            "src": "mult.v:18"
+          }
+        },
+        "$gt$mult.v:16$2_Y": {
+          "hide_name": 1,
+          "bits": [ 62 ],
+          "attributes": {
+            "src": "mult.v:16"
+          }
+        },
+        "$reduce_bool$mult.v:19$8_Y": {
+          "hide_name": 1,
+          "bits": [ 135 ],
+          "attributes": {
+            "src": "mult.v:19"
+          }
+        },
+        "$ternary$mult.v:16$4_Y": {
+          "hide_name": 1,
+          "bits": [ 145, 146, 147, 148, 149, 150, 151, 152, 153 ],
+          "attributes": {
+            "src": "mult.v:16"
+          }
+        },
+        "$ternary$mult.v:19$10_Y": {
+          "hide_name": 1,
+          "bits": [ 154, 155, 156, 157, 158, 159, 160, 161, 162, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208 ],
+          "attributes": {
+            "src": "mult.v:19"
+          }
+        },
+        "clk": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "mult.v:6"
+          }
+        },
+        "func": {
+          "hide_name": 0,
+          "bits": [ 4, 5 ],
+          "attributes": {
+            "src": "mult.v:7"
+          }
+        },
+        "multiplicand": {
+          "hide_name": 0,
+          "bits": [ 24, 25, 26, 27, 28, 29, 30, 31, 32 ],
+          "attributes": {
+            "src": "mult.v:13"
+          }
+        },
+        "multiplicand_next": {
+          "hide_name": 0,
+          "bits": [ 99, 100, 101, 102, 103, 104, 105, 106, 107 ],
+          "attributes": {
+            "src": "mult.v:15"
+          }
+        },
+        "multiplier": {
+          "hide_name": 0,
+          "bits": [ 33, 34, 35, 36, 37, 38, 39, 40, 41 ],
+          "attributes": {
+            "src": "mult.v:12"
+          }
+        },
+        "multiplier_next": {
+          "hide_name": 0,
+          "bits": [ 108, 109, 110, 111, 112, 113, 114, 115, 116 ],
+          "attributes": {
+            "src": "mult.v:23"
+          }
+        },
+        "num": {
+          "hide_name": 0,
+          "bits": [ 6, 7, 8, 9, 10, 11, 12, 13, 14 ],
+          "attributes": {
+            "src": "mult.v:8"
+          }
+        },
+        "remain": {
+          "hide_name": 0,
+          "bits": [ 53, 54, 55, 56, 57, 58, 59, 60, 61 ],
+          "attributes": {
+            "src": "mult.v:11"
+          }
+        },
+        "remain_next": {
+          "hide_name": 0,
+          "bits": [ 117, 118, 119, 120, 121, 122, 123, 124, 125 ],
+          "attributes": {
+            "src": "mult.v:18"
+          }
+        },
+        "result": {
+          "hide_name": 0,
+          "bits": [ 15, 16, 17, 18, 19, 20, 21, 22, 23 ],
+          "attributes": {
+            "src": "mult.v:9"
+          }
+        },
+        "result_next": {
+          "hide_name": 0,
+          "bits": [ 126, 127, 128, 129, 130, 131, 132, 133, 134 ],
+          "attributes": {
+            "src": "mult.v:21"
+          }
+        },
+        "rstn": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "mult.v:6"
+          }
+        }
+      }
+    }
+  }
+}
