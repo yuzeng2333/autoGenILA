@@ -9,24 +9,42 @@ extern std::vector<int> archState;
  * should be initialized every time
  * Elements in all vectors correspond those in the states vector
  */
-struct StateRWTable {
-  std::vector<bool> isOld;
-  std::vector<uint32_t> firstWriteCycle;
-  std::vector<uint32_t> firstReadCycle;
+struct StateRWTableEntry {
+  bool isOld;
+  uint32_t firstWriteCycle;
+  uint32_t firstReadCycle;
+  StateRWTableEntry(): isOld(true) {};
+};
+
+
+class StateRWTable {
+private:
+  std::map<NodeIdx, StateRWTableEntry> entries;
+
+public:
   stateRWTable() {
-    for (auto it = globalStates.begin(); it != state.end(); ++it) {
-      isOld.push_back(true);  
+    for (auto it = globalStates.begin(); it != globalStates.end(); ++it) {
+      entries.insert(std::make_pair(*it, StateRWTableEntry entry));
     }
   }
+
   void flush_table() {
-    assert(isOld.size() ==  globalStates.size());
-    for (auto it = globalStates.begin(); it != state.end(); ++it) {
-      isOld[i] = true;
+    for (auto it = entries.begin(); it != entries.end(); ++it) {
+      it->second.isOld = true;
+      it->second.firstWriteCycle = 0;
+      it->second.firstWriteCycle = 0;      
     }
-    firstWriteCycle.clear();
-    firstReadCycle.cear();
+  }
+
+  void set_new(NodeIdx idx) {
+    entries[idx].isOld = false;
   }
 };
+
+
+/* For each node, record its numerical value if it has */
+extern std::map<NodeIdx, uint32_t> valueTable;
+
 
 /* state utiliztion table
  * record each state is written and read by which instructions
@@ -37,7 +55,15 @@ struct StateUtilTable {
   std::vector<uint32_t> writeInstr;
 };
 
-// main function for finding architectural state
+
+/* main function for finding architectural state */
 void find_arch_state();
 
+
+/* for each instruction, fill out the StateRWTable */
 void analyze_one_instruction(uint32_t instrIdx);
+
+
+/* for each input/state, update the states that directly connected to it */
+void update_states(NodeIdx persistIdx, std::vector<NodeIdx> &targetOutputs);
+

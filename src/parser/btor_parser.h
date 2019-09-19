@@ -96,6 +96,7 @@ union Btor_sort {
 
 typedef union Btor_sort Btor_sort;
 
+
 struct Features {
   std::string name;
   Btor_type type;
@@ -126,8 +127,8 @@ std::map<std::string, Btor_type> keywordTable = {
   {"eq"          ,  Btor_type_eq         },   
   {"fair"        ,  Btor_type_fair       }, 
   {"iff"         ,  Btor_type_iff        }, 
-  {"implies"     ,  Btor_type_implies    },       
-  {"inc"         ,  Btor_type_inc        },         
+  {"implies"     ,  Btor_type_implies    },
+  {"inc"         ,  Btor_type_inc        },
   {"init"        ,  Btor_type_init       }, 
   {"input"       ,  Btor_type_input      }, 
   {"ite"         ,  Btor_type_ite        }, 
@@ -135,8 +136,8 @@ std::map<std::string, Btor_type> keywordTable = {
   {"mul"         ,  Btor_type_mul        }, 
   {"nand"        ,  Btor_type_nand       }, 
   {"neq"         ,  Btor_type_neq        }, 
-  {"neg"         ,  Btor_type_neg        },   
-  {"next"        ,  Btor_type_next       },   
+  {"neg"         ,  Btor_type_neg        },
+  {"next"        ,  Btor_type_next       },
   {"nor"         ,  Btor_type_nor        }, 
   {"not"         ,  Btor_type_not        }, 
   {"one"         ,  Btor_type_one        }, 

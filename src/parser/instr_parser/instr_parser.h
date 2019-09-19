@@ -8,7 +8,7 @@
 struct Instr {
   int idx;
   std::map<NodeIdx, uint32_t> portValue;
-  std::vector<NodeIdx> arbitraryPort;
+  std::vector<NodeIdx> dataPort;
 };
 
 typedef struct Instr Instr;
@@ -20,4 +20,3 @@ void print_instr();
 
 // main file
 int parse_instr(std::string fileName);
-//#endif

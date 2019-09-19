@@ -132,6 +132,7 @@ int parse_btor(std::string fileName) {
           assert(get_width(stateIdx) == localSort.bitvec.width);
           assert(get_width(nextIdx) == localSort.bitvec.width);
           nextTable.insert(std::make_pair(stateIdx, nextIdx));
+          add_output(nextIdx, stateIdx);
         }
         break;
 

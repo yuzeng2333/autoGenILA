@@ -31,8 +31,8 @@ int parse_instr(std::string fileName) {
     others = match.str(2);
     while( regex_search(others, match, valueRe) ) {
       //if( strcmp(match.str(2).front(), 'A') == 0 ) {
-      if( match.str(2).front() == 'A' ) {
-        in->arbitraryPort.push_back(match.str(1));
+      if( match.str(2).front() == 'D' ) {
+        in->dataPort.push_back(match.str(1));
       } else{
         in->portValue.insert(std::make_pair(match.str(1), std::stoi(match.str(2))));
       }
