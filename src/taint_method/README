@@ -1,0 +1,1 @@
+taint_gen_v0.cpp: the first version of taint_gen.cpp, the passing variables are _c, _i1, _i2, _j1, _j2, _r

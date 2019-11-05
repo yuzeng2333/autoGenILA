@@ -108,6 +108,7 @@ struct Features {
 
 extern std::map<NodeIdx, Features> nodeTable;
 extern std::map<NodeIdx, Btor_sort> sortTable;
+// NodeIdx for all the nodes
 extern std::vector<NodeIdx> globalStates;
 // first is state idx, second is update idx
 extern std::map<NodeIdx, NodeIdx> nextTable;
