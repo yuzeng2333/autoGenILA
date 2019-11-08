@@ -6,7 +6,7 @@ void input_taint_gen(std::smatch m, std::ofstream &output);
 
 void reg_taint_gen(std::smatch m, std::ofstream &output);
 
-void wire_taint_gen(std::string blank, std::string var, std::ofstream &output);
+void wire_taint_gen(std::smatch m, std::ofstream &output);
 
 void two_op_taint_gen(std::smatch m, std::ofstream &output);
  

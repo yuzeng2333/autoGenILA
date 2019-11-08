@@ -31,8 +31,9 @@ void reg_taint_gen(std::smatch m, std::ofstream &output) {
 }
 
 
-void wire_taint_gen(std::string blank, std::string var, std::ofstream &output) {
-  //std::string var = m.str(3);
+void wire_taint_gen(std::smatch m, std::ofstream &output) {
+  std::string var = m.str(3);
+  std::string blank = m.str(1);
   output << blank << "wire " + var + "_t;" << std::endl;
   output << blank << "wire " + var + "_r;" << std::endl;
   output << blank << "wire " + var + "_c;" << std::endl;

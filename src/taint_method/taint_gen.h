@@ -73,4 +73,3 @@ void add_module_name(std::string fileName);
 
 std::smatch parse_verilog_line(std::string line, int &choice);
 
-std::vector<string> match2vec(std::smatch m);

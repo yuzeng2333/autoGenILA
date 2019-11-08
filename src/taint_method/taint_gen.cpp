@@ -60,7 +60,7 @@ void add_line_taints(std::string line, std::ofstream &output) {
       reg_taint_gen(m, output);      
       break;
     case WIRE:  
-      wire_taint_gen(m.str(1), m.str(3), output);
+      wire_taint_gen(m, output);
       break;
     case TWO_OP:
       two_op_taint_gen(m, output);      
@@ -346,6 +346,3 @@ int main(int argc, char* argv[]) {
 }
 
 
-std::vector<string> match2vec(std::smatch m) {
-  std::vector
-}
