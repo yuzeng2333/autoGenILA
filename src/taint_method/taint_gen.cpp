@@ -89,33 +89,19 @@ void add_line_taints(std::string line, std::ofstream &output) {
     moduleName = m.str(2);
   }
   else if (std::regex_match(line, m, pInput)) {
-    std::string var = m.str(3);
-    moduleInputs.push_back(var);
-    if (var.compare( clockName) == 0)
-      return;
-    output << m.str(1) << "input " + var + "_t;" << std::endl;
+    input_taint_gen(m, output);
   }
   else if (std::regex_match(line, m, pOutput)) {
     std::string var = m.str(3);
     moduleOutputs.push_back(var);
   }
   else if (std::regex_match(line, m, pReg)) {
-    std::string var = m.str(3);
-    moduleOutputs.push_back(var+"_r_flag");
-    moduleRegs.push_back(var);    
-    output << m.str(1) << "reg " + var + "_t;" << std::endl;
-    output << m.str(1) << "reg " + var + "_t_flag;" << std::endl;
-    output << m.str(1) << "output reg " + var + "_r_flag;" << std::endl;
-    output << m.str(1) << "wire " + var + "_r;" << std::endl;
-    output << m.str(1) << "wire " + var + "_x;" << std::endl;
+    reg_taint_gen(m, output);
   }
   /* every wire type also needs _t and _r, both are wires */
   /* The reason why these wires are named _t, _r not _t_ */
   else if (std::regex_match(line, m, pWire)) {
-    std::string var = m.str(3);
-    output << m.str(1) << "wire " + var + "_t;" << std::endl;
-    output << m.str(1) << "wire " + var + "_r;" << std::endl;
-    output << m.str(1) << "wire " + var + "_c;" << std::endl;
+    wire_taint_gen(m, output);
   }
   /* 2-operator assignment */
   else if (std::regex_match(line, m, pAdd)
@@ -144,23 +130,8 @@ void add_line_taints(std::string line, std::ofstream &output) {
     if (!op1IsNum && !op2IsNum) { // 2-op
       /* Assgin new versions */
       uint32_t sndVerNum, thdVerNum;
-      if ( nextVersion.find(m.str(3)) == nextVersion.end() ) {
-        sndVerNum = 0;
-        nextVersion.insert( std::make_pair(m.str(3), 1) );
-      }
-      else {
-        sndVerNum = nextVersion[m.str(3)];
-        nextVersion[m.str(3)]++;
-      }
-
-      if ( nextVersion.find(op2) == nextVersion.end() ) {
-        thdVerNum = 0;
-        nextVersion.insert( std::make_pair(op2, 1) );
-      }
-      else {
-        thdVerNum = nextVersion[op2];
-        nextVersion[op2]++;
-      }
+      sndVerNum = find_version_num(op1);
+      thdVerNum = find_version_num(op2);
   
       std::string sndVer = std::to_string(sndVerNum);
       std::string thdVer = std::to_string(thdVerNum);
@@ -197,16 +168,7 @@ void add_line_taints(std::string line, std::ofstream &output) {
       }
     } 
     else if (!op1IsNum && op2IsNum) { // 2-op
-      uint32_t sndVerNum;
-      if ( nextVersion.find(op1) == nextVersion.end() ) {
-        sndVerNum = 0;
-        nextVersion.insert( std::make_pair(op1, 1) );
-      }
-      else {
-        sndVerNum = nextVersion[op1];
-        nextVersion[op1]++;
-      }
-
+      uint32_t sndVerNum = find_version_num(op1);
       std::string sndVer = std::to_string(sndVerNum);
 
       /* declare new wires */
@@ -227,16 +189,7 @@ void add_line_taints(std::string line, std::ofstream &output) {
       }
     }
     else if (op1IsNum && !op2IsNum) { // 2-op
-      uint32_t thdVerNum;
-      if ( nextVersion.find(op2) == nextVersion.end() ) {
-        thdVerNum = 0;
-        nextVersion.insert( std::make_pair(op2, 1) );
-      }
-      else {
-        thdVerNum = nextVersion[op2];
-        nextVersion[op2]++;
-      }
-
+      uint32_t thdVerNum = find_version_num(op2);
       std::string thdVer = std::to_string(thdVerNum);
 
       /* declare new wires */
@@ -269,16 +222,7 @@ void add_line_taints(std::string line, std::ofstream &output) {
     std::string dest = remove_bracket(m.str(2));
     std::string op1 = remove_bracket(m.str(3));
 
-    uint32_t sndVerNum;
-    if ( nextVersion.find(op1) == nextVersion.end() ) {
-      sndVerNum = 0;
-      nextVersion.insert( std::make_pair(op1, 1) );
-    }
-    else {
-      sndVerNum = nextVersion[op1];
-      nextVersion[op1]++;
-    }
-
+    uint32_t sndVerNum = find_version_num(op1);
     std::string sndVer = std::to_string(sndVerNum);
 
     /* declare new wires */
@@ -310,17 +254,9 @@ void add_line_taints(std::string line, std::ofstream &output) {
     bool op1IsNum = isNum(m.str(4));
     bool op2IsNum = isNum(m.str(5));
 
-    uint32_t condVerNum;
-    // for the condition variable
-    if ( nextVersion.find(cond) == nextVersion.end() ) {
-      condVerNum = 0;
-      nextVersion.insert( std::make_pair(cond, 1) );
-    }
-    else {
-      condVerNum = nextVersion[cond];
-      nextVersion[cond]++;
-    }
+    uint32_t condVerNum = find_version_num(cond);
     std::string condVer = std::to_string(condVerNum);
+
     output << blank << "wire " + cond + "_c" + condVer + ";" << std::endl;
     output << blank << "wire " + cond + "_r" + condVer + ";" << std::endl;
     output << blank << "wire " + cond + "_x" + condVer + ";" << std::endl;
@@ -332,118 +268,56 @@ void add_line_taints(std::string line, std::ofstream &output) {
       output << blank << "assign " + dest + "_t = " + cond + " ? (" + cond + "_t | " + op1 + "_t) : (" + cond + "_t | " + op2 + "_t);" << std::endl;
       output << blank << "assign " + cond + "_r" + condVer + " = " + dest + "_r | (" + cond + " & " + op1 + "_t | !" + cond + " & " + op2 + "_t);" << std::endl;
 
-      std::string targetReg;
-      bool skipOp1 = false; // TODO: these skip vars can be removed
-      bool skipOp2 = false;
-      if ( update_reg.find(dest) != update_reg.end() ) {
-        targetReg = update_reg[dest];
-        if (targetReg == op1) {
-          skipOp1 = true;
-        }
-        else if (targetReg == op2) {
-          skipOp2 = true;
-        }
-      }
-
       uint32_t thdVerNum, fthVerNum;
       std::string thdVer;
       std::string fthVer;
-      if (!skipOp1) {
-        if ( nextVersion.find(op1) == nextVersion.end() ) {
-          thdVerNum = 0;
-          nextVersion.insert( std::make_pair(op1, 1) );
-        }
-        else {
-          thdVerNum = nextVersion[op1];
-          nextVersion[op1]++;
-        }
-        thdVer = std::to_string(thdVerNum);        
-        output << blank << "wire " + op1 + "_c" + thdVer + ";" << std::endl;
-        output << blank << "wire " + op1 + "_r" + thdVer + ";" << std::endl;
-        output << blank << "wire " + op1 + "_x" + thdVer + ";" << std::endl;
-        output << blank << "assign " + op1 + "_c" + thdVer + " = " + cond + ";" << std::endl;
-        output << blank << "assign " + op1 + "_r" + thdVer + " = " + cond + " & (" + cond + "_t | " + dest + "_r);" << std::endl;
-        output << blank << "assign " + op1 + "_x" + thdVer + " = " + dest + "_x;" << std::endl;        
-      }
+      thdVerNum = find_version_num(op1);
+      thdVer = std::to_string(thdVerNum);        
+      output << blank << "wire " + op1 + "_c" + thdVer + ";" << std::endl;
+      output << blank << "wire " + op1 + "_r" + thdVer + ";" << std::endl;
+      output << blank << "wire " + op1 + "_x" + thdVer + ";" << std::endl;
+      output << blank << "assign " + op1 + "_c" + thdVer + " = " + cond + ";" << std::endl;
+      output << blank << "assign " + op1 + "_r" + thdVer + " = " + cond + " & (" + cond + "_t | " + dest + "_r);" << std::endl;
+      output << blank << "assign " + op1 + "_x" + thdVer + " = " + dest + "_x;" << std::endl;        
 
-      if (!skipOp2) {
-        if ( nextVersion.find(op2) == nextVersion.end() ) {
-          fthVerNum = 0;
-          nextVersion.insert( std::make_pair(op2, 1) );
-        }
-        else {
-          fthVerNum = nextVersion[op2];
-          nextVersion[op2]++;
-        }
-        fthVer = std::to_string(fthVerNum);
-        output << blank << "wire " + op2 + "_c" + fthVer + ";" << std::endl;
-        output << blank << "wire " + op2 + "_r" + fthVer + ";" << std::endl;
-        output << blank << "wire " + op2 + "_x" + thdVer + ";" << std::endl;        
-        output << blank << "assign " + op2 + "_c" + fthVer + " = !" + cond + ";" << std::endl;
-        output << blank << "assign " + op2 + "_r" + fthVer + " = !" + cond + " & (" + cond + "_t | " + dest + "_r);" << std::endl; 
-        output << blank << "assign " + op2 + "_x" + fthVer + " = " + dest + "_x;" << std::endl;        
-      }
+      fthVerNum = find_version_num(op2);
+      fthVer = std::to_string(fthVerNum);
+      output << blank << "wire " + op2 + "_c" + fthVer + ";" << std::endl;
+      output << blank << "wire " + op2 + "_r" + fthVer + ";" << std::endl;
+      output << blank << "wire " + op2 + "_x" + thdVer + ";" << std::endl;        
+      output << blank << "assign " + op2 + "_c" + fthVer + " = !" + cond + ";" << std::endl;
+      output << blank << "assign " + op2 + "_r" + fthVer + " = !" + cond + " & (" + cond + "_t | " + dest + "_r);" << std::endl; 
+      output << blank << "assign " + op2 + "_x" + fthVer + " = " + dest + "_x;" << std::endl;        
     } 
     else if (!op1IsNum && op2IsNum) { // ite
       uint32_t thdVerNum;
-      std::string targetReg;
-      bool skipOp1 = false;
-      if ( update_reg.find(dest) != update_reg.end() ) {
-        targetReg = update_reg[dest];
-        if (targetReg == op1) 
-          skipOp1 = true;
-      }
 
-      if (!skipOp1) {
-        if ( nextVersion.find(op1) == nextVersion.end() ) {
-          thdVerNum = 0;
-          nextVersion.insert( std::make_pair(op1, 1) );
-        }
-        else {
-          thdVerNum = nextVersion[op1];
-          nextVersion[op1]++;
-        }
-        std::string thdVer = std::to_string(thdVerNum);
-        /* declare new wires */
-        output << blank << "wire " + op1 + "_c" + thdVer + ";" << std::endl;
-        output << blank << "wire " + op1 + "_r" + thdVer + ";" << std::endl;
-        output << blank << "wire " + op1 + "_x" + thdVer + ";" << std::endl;        
-        output << blank << "assign " + op1 + "_c" + thdVer + " = " + cond + ";" << std::endl;
-        output << blank << "assign " + op1 + "_r" + thdVer + " = " + cond + " & (" + cond + "_t | " + dest + "_r);" << std::endl;
-        output << blank << "assign " + op1 + "_x" + thdVer + " = " + dest + "_x;" << std::endl;                
-      }
+      thdVerNum = find_version_num(op1);
+      std::string thdVer = std::to_string(thdVerNum);
+      /* declare new wires */
+      output << blank << "wire " + op1 + "_c" + thdVer + ";" << std::endl;
+      output << blank << "wire " + op1 + "_r" + thdVer + ";" << std::endl;
+      output << blank << "wire " + op1 + "_x" + thdVer + ";" << std::endl;        
+      output << blank << "assign " + op1 + "_c" + thdVer + " = " + cond + ";" << std::endl;
+      output << blank << "assign " + op1 + "_r" + thdVer + " = " + cond + " & (" + cond + "_t | " + dest + "_r);" << std::endl;
+      output << blank << "assign " + op1 + "_x" + thdVer + " = " + dest + "_x;" << std::endl;
+
       output << blank << "assign " + dest + "_t = " + cond + " ? (" + cond + "_t | " + op1 + "_t) : " + cond + "_t;" << std::endl;
       output << blank << "assign " + cond + "_r" + condVer + " = " + dest + "_r | (" + cond + " & " + op1 + "_t);" << std::endl;
     }
     else if (op1IsNum && !op2IsNum) { // ite
       uint32_t fthVerNum;
-      std::string targetReg;
-      bool skipOp2 = false;
-      if ( update_reg.find(dest) != update_reg.end() ) {
-        targetReg = update_reg[dest];
-        if (targetReg == op2) 
-          skipOp2 = true;
-      }
       
-      if (!skipOp2) {
-        if ( nextVersion.find(op2) == nextVersion.end() ) {
-          fthVerNum = 0;
-          nextVersion.insert( std::make_pair(op2, 1) );
-        }
-        else {
-          fthVerNum = nextVersion[op2];
-          nextVersion[op2]++;
-        }
+      fthVerNum = find_version_num(op2);
+      std::string fthVer = std::to_string(fthVerNum);
 
-        std::string fthVer = std::to_string(fthVerNum);
+      output << blank << "wire " + op2 + "_c" + fthVer + ";" << std::endl;
+      output << blank << "wire " + op2 + "_r" + fthVer + ";" << std::endl;
+      output << blank << "wire " + op2 + "_x" + fthVer + ";" << std::endl;                
+      output << blank << "assign " + op2 + "_c" + fthVer + " = !" + cond + ";" << std::endl;
+      output << blank << "assign " + op2 + "_r" + fthVer + " = !" + cond + " & (" + cond + "_t | " + dest + "_r);" << std::endl; 
+      output << blank << "assign " + op2 + "_x" + fthVer + " = " + dest + "_x;" << std::endl;        
 
-        output << blank << "wire " + op2 + "_c" + fthVer + ";" << std::endl;
-        output << blank << "wire " + op2 + "_r" + fthVer + ";" << std::endl;
-        output << blank << "wire " + op2 + "_x" + fthVer + ";" << std::endl;                
-        output << blank << "assign " + op2 + "_c" + fthVer + " = !" + cond + ";" << std::endl;
-        output << blank << "assign " + op2 + "_r" + fthVer + " = !" + cond + " & (" + cond + "_t | " + dest + "_r);" << std::endl; 
-        output << blank << "assign " + op2 + "_x" + fthVer + " = " + dest + "_x;" << std::endl;        
-      }
       output << blank << "assign " + dest + "_t = " + cond + " ? " + cond + "_t : (" + cond + "_t | " + op2 + "_t);" << std::endl;  
       output << blank << "assign " + cond + "_r" + condVer + " = " + dest + "_r | (" + cond + " & " + op2 + "_t);" << std::endl;      
     }
@@ -628,49 +502,3 @@ int main(int argc, char* argv[]) {
 }
 
 
-/* help functions */
-/* decide if the NAME is a number */
-bool isNum(std::string name) {
-  std::regex p("^\\d+'h\\d+$");
-  std::smatch m;
-  return std::regex_match(name, m, p);
-}
-
-
-bool isOutput(std::string var) {
-  auto it = std::find( moduleOutputs.begin(), moduleOutputs.end(), var );
-  return it != moduleOutputs.end();
-}
-
-
-bool isReg(std::string var) {
-  auto it = std::find( moduleRegs.begin(), moduleRegs.end(), var );
-  return it != moduleRegs.end();
-}
-
-
-std::string to_re(std::string input) {
-  std::regex pName("NAME");
-  std::string regexName("[a-zA-Z0-9_.:'\\[\\]]+");
-  auto res = std::regex_replace(input, pName, regexName);
-  std::regex pNum("NUM");
-  std::string regexNum("\\d+'h\\d+");
-  res = std::regex_replace(res, pNum, regexNum);
-  std::regex pInt("INT");
-  std::string regexInt("\\d+");
-  res = std::regex_replace(res, pInt, regexInt);
-  //std::cout << res << std::endl;
-  return res;
-}
-
-
-std::string remove_bracket(std::string name) {
-  std::regex pName("^([a-zA-Z0-9_.]+)\\[(\\d+)\\:(\\d+)\\]$");
-  std::smatch match;
-  if (std::regex_match(name, match, pName)) {
-    // FIXME: how to deal with this more appropriately?
-    //return match.str(1) + "_" + match.str(2) + "_" + match.str(3);
-    return match.str(1);
-  }
-  return name;
-}

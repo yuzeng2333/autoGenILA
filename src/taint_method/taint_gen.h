@@ -1,5 +1,7 @@
 #include <string>
 #include <iostream>
+#include "helper.h"
+#include "op_taint_gen.h"
 
 void clean_file_comments(std::string fileName);
 

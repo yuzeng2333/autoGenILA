@@ -1,5 +1,5 @@
 all:
-	g++ taint_gen.cpp
+	g++ taint_gen.cpp helper.cpp op_taint_gen.cpp
 
 adder:
 	./a.out /workspace/research/ILA/autoGenILA/naiveEg/word_adder/word_adder_yosys.v
