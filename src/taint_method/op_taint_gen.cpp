@@ -10,7 +10,9 @@
 #include "op_taint_gen.h"
 
 
-void input_taint_gen(std::smatch m, std::ofstream &output) {
+void input_taint_gen(std::string line, std::ofstream &output) {
+  std::smatch m;
+  std::regex_match(line, m, pInput);
   std::string var = m.str(3);
   moduleInputs.push_back(var);
   if (var.compare( clockName) == 0)
@@ -19,7 +21,9 @@ void input_taint_gen(std::smatch m, std::ofstream &output) {
 }
 
 
-void reg_taint_gen(std::smatch m, std::ofstream &output) {
+void reg_taint_gen(std::string line, std::ofstream &output) {
+  std::smatch m;
+  std::regex_match(line, m, pReg);
   std::string var = m.str(3);
   moduleOutputs.push_back(var+"_r_flag");
   moduleRegs.push_back(var);    
@@ -31,15 +35,37 @@ void reg_taint_gen(std::smatch m, std::ofstream &output) {
 }
 
 
-void wire_taint_gen(std::smatch m, std::ofstream &output) {
+void wire_taint_gen(std::string line, std::ofstream &output) {
+  std::smatch m;
+  std::regex_match(line, m, pWire);
   std::string var = m.str(3);
+  std::string blank = m.str(1);
   output << blank << "wire " + var + "_t;" << std::endl;
   output << blank << "wire " + var + "_r;" << std::endl;
   output << blank << "wire " + var + "_c;" << std::endl;
 }
 
 
-void two_op_taint_gen(std::smatch m, std::ofstream &output) {
+void two_op_taint_gen(std::string line, std::ofstream &output) {
+  std::smatch m;  
+  if (std::regex_match(line, m, pAdd)
+            || std::regex_match(line, m, pSub)
+            || std::regex_match(line, m, pMult)
+            || std::regex_match(line, m, pEq)
+            || std::regex_match(line, m, pLt)
+            || std::regex_match(line, m, pLe)
+            || std::regex_match(line, m, pSt)
+            || std::regex_match(line, m, pSe)
+            || std::regex_match(line, m, pAnd)
+            || std::regex_match(line, m, pOr)
+            || std::regex_match(line, m, pBitOr)
+            || std::regex_match(line, m, pSel1)
+            || std::regex_match(line, m, pSel2)
+            || std::regex_match(line, m, pSel3)
+            || std::regex_match(line, m, pSel4) 
+            || std::regex_match(line, m, pConcat) ){}
+  else
+    return;
   bool op1IsNum = isNum(m.str(3));
   bool op2IsNum = isNum(m.str(4));
   std::string blank = m.str(1);
@@ -136,7 +162,12 @@ void two_op_taint_gen(std::smatch m, std::ofstream &output) {
 }
 
 
-void one_op_taint_gen(std::smatch m, std::ofstream &output) {
+void one_op_taint_gen(std::string line, std::ofstream &output) {
+  std::smatch m;
+  if (std::regex_match(line, m, pNot) 
+            || std::regex_match(line, m, pNone)){}
+  else 
+    return;
   std::string blank = m.str(1);
   std::string dest = remove_bracket(m.str(2));
   std::string op1 = remove_bracket(m.str(3));
@@ -164,7 +195,9 @@ void one_op_taint_gen(std::smatch m, std::ofstream &output) {
 }
 
 
-void ite_taint_gen(std::smatch m, std::ofstream &output) {
+void ite_taint_gen(std::string line, std::ofstream &output) {
+  std::smatch m;
+  std::regex_match(line, m, pIte);
   std::string blank = m.str(1);
   std::string dest = remove_bracket(m.str(2));
   std::string cond = remove_bracket(m.str(3));
@@ -243,7 +276,9 @@ void ite_taint_gen(std::smatch m, std::ofstream &output) {
 }
 
 
-void nonblock_taint_gen(std::smatch m, std::ofstream &output) {
+void nonblock_taint_gen(std::string line, std::ofstream &output) {
+  std::smatch m;
+  std::regex_match(line, m, pNonblock);
   std::string blank = m.str(1);
   std::string dest = remove_bracket(m.str(2));
   std::string op1 = remove_bracket(m.str(3));
@@ -258,7 +293,9 @@ void nonblock_taint_gen(std::smatch m, std::ofstream &output) {
 }
 
 
-void nonblockconcat_taint_gen(std::smatch m, std::ofstream &output) {
+void nonblockconcat_taint_gen(std::string line, std::ofstream &output) {
+  std::smatch m;
+  std::regex_match(line, m, pNonblockConcat);
   std::string blank = m.str(1);
   std::string dest = remove_bracket(m.str(2));
   std::string update = m.str(3);

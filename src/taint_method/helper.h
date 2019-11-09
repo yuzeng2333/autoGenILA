@@ -1,3 +1,6 @@
+#ifndef HELPER
+#define HELPER
+
 #include <string>
 #include "global_data.h"
 
@@ -12,3 +15,5 @@ std::string to_re(std::string input);
 std::string remove_bracket(std::string name);
 
 uint32_t find_version_num(std::string op);
+
+#endif

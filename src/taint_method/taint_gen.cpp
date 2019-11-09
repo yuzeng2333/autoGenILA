@@ -82,26 +82,64 @@ void clean_file_comments(std::string fileName) {
 }
 
 
-// FIXME: maybe set t-taint and r-taint to clear if reg value is not changed
 void add_line_taints(std::string line, std::ofstream &output) {
   std::smatch m;
+  int choice = parse_verilog_line(line, m);
+  switch( choice ) {
+    case INPUT:
+      input_taint_gen(line, output);
+      break;
+    case REG:      
+      reg_taint_gen(line, output);      
+      break;
+    case WIRE:  
+      wire_taint_gen(line, output);
+      break;
+    case TWO_OP:
+      two_op_taint_gen(line, output);      
+      break;
+    case ONE_OP:
+      one_op_taint_gen(line, output);      
+      break;
+    case ITE:
+      ite_taint_gen(line, output);      
+      break;
+    case NONBLOCK:
+      nonblock_taint_gen(line, output);      
+      break;
+    case NONBLOCKCONCAT:
+      nonblockconcat_taint_gen(line, output);
+      break;
+    case UNSUPPORT:
+      output << "!!! Unsupported operator !!!" << std::endl;
+      break;
+    default:
+      break;
+  }
+}
+
+
+// FIXME: maybe set t-taint and r-taint to clear if reg value is not changed
+int parse_verilog_line(std::string line, std::smatch &m) {
   if ( std::regex_match(line, m, pModule) ) {
     moduleName = m.str(2);
+    return NONE;
   }
   else if (std::regex_match(line, m, pInput)) {
-    input_taint_gen(m, output);
+    return INPUT;
   }
   else if (std::regex_match(line, m, pOutput)) {
     std::string var = m.str(3);
     moduleOutputs.push_back(var);
+    return NONE;
   }
   else if (std::regex_match(line, m, pReg)) {
-    reg_taint_gen(m, output);
+    return REG;
   }
   /* every wire type also needs _t and _r, both are wires */
   /* The reason why these wires are named _t, _r not _t_ */
   else if (std::regex_match(line, m, pWire)) {
-    wire_taint_gen(m, output);
+    return WIRE;
   }
   /* 2-operator assignment */
   else if (std::regex_match(line, m, pAdd)
@@ -120,246 +158,29 @@ void add_line_taints(std::string line, std::ofstream &output) {
             || std::regex_match(line, m, pSel3)
             || std::regex_match(line, m, pSel4) 
             || std::regex_match(line, m, pConcat) ) {
-    bool op1IsNum = isNum(m.str(3));
-    bool op2IsNum = isNum(m.str(4));
-    std::string blank = m.str(1);
-    std::string dest = remove_bracket(m.str(2));
-    std::string op1 = remove_bracket(m.str(3));
-    std::string op2 = remove_bracket(m.str(4));
-
-    if (!op1IsNum && !op2IsNum) { // 2-op
-      /* Assgin new versions */
-      uint32_t sndVerNum, thdVerNum;
-      sndVerNum = find_version_num(op1);
-      thdVerNum = find_version_num(op2);
-  
-      std::string sndVer = std::to_string(sndVerNum);
-      std::string thdVer = std::to_string(thdVerNum);
-
-
-      /* delcare new wires */
-      output << blank << "wire " + op1 + "_c" + sndVer + ";" << std::endl;
-      output << blank << "wire " + op1 + "_r" + sndVer + ";" << std::endl;
-      output << blank << "wire " + op1 + "_x" + sndVer + ";" << std::endl;
-      
-      output << blank << "wire " + op2 + "_c" + thdVer + ";" << std::endl;
-      output << blank << "wire " + op2 + "_r" + thdVer + ";" << std::endl;
-      output << blank << "wire " + op2 + "_x" + thdVer + ";" << std::endl;
-
-      /* make assignme1ts */
-      output << blank << "assign " + dest + "_t = " + op1 + "_t |" + op2 + "_t;" << std::endl;
-      if ( isOutput(dest) ) {
-        output << blank << "assign " + op1 + "_c" + sndVer + " = 0;" << std::endl;
-        output << blank << "assign " + op1 + "_r" + sndVer + " = 0;" << std::endl;
-        output << blank << "assign " + op1 + "_x" + sndVer + " = 1;" << std::endl;
-          
-        output << blank << "assign " + op2 + "_c" + thdVer + " = 0;" << std::endl;
-        output << blank << "assign " + op2 + "_r" + thdVer + " = 0;" << std::endl;
-        output << blank << "assign " + op2 + "_x" + thdVer + " = 1;" << std::endl;
-      }
-      else {
-        output << blank << "assign " + op1 + "_c" + sndVer + " = " + dest + "_c;" << std::endl;
-        output << blank << "assign " + op1 + "_r" + sndVer + " = " + dest + "_r | (" + dest + "_c & " + op2 + "_t);" << std::endl;
-        output << blank << "assign " + op1 + "_x" + sndVer + " = " + dest + "_x;" << std::endl;
-          
-        output << blank << "assign " + op2 + "_c" + thdVer + " = " + dest + "_c;" << std::endl;
-        output << blank << "assign " + op2 + "_r" + thdVer + " = " + dest + "_r | (" + dest + "_c & " + op1 + "_t);" << std::endl;
-        output << blank << "assign " + op2 + "_x" + thdVer + " = " + dest + "_x;" << std::endl;
-      }
-    } 
-    else if (!op1IsNum && op2IsNum) { // 2-op
-      uint32_t sndVerNum = find_version_num(op1);
-      std::string sndVer = std::to_string(sndVerNum);
-
-      /* declare new wires */
-      output << blank << "wire " + op1 + "_c" + sndVer + ";" << std::endl;
-      output << blank << "wire " + op1 + "_r" + sndVer + ";" << std::endl;
-      output << blank << "wire " + op1 + "_x" + sndVer + ";" << std::endl;
-
-      output << blank << "assign " + dest + "_t = " + op1 + "_t;" << std::endl;
-      if ( isOutput(dest) ) {
-        output << blank << "assign " + op1 + "_c" + sndVer + " = 0;" << std::endl;
-        output << blank << "assign " + op1 + "_x" + sndVer + " = 1;" << std::endl;
-        output << blank << "assign " + op1 + "_r" + sndVer + " = 0;" << std::endl;
-      }
-      else {
-        output << blank << "assign " + op1 + "_c" + sndVer + " = " + dest + "_c;" << std::endl;
-        output << blank << "assign " + op1 + "_r" + sndVer + " = " + dest + "_r;" << std::endl;
-        output << blank << "assign " + op1 + "_x" + sndVer + " = " + dest + "_x;" << std::endl;        
-      }
-    }
-    else if (op1IsNum && !op2IsNum) { // 2-op
-      uint32_t thdVerNum = find_version_num(op2);
-      std::string thdVer = std::to_string(thdVerNum);
-
-      /* declare new wires */
-      output << blank << "wire " + op2 + "_c" + thdVer + ";" << std::endl;
-      output << blank << "wire " + op2 + "_r" + thdVer + ";" << std::endl;
-      output << blank << "wire " + op2 + "_x" + thdVer + ";" << std::endl;      
-
-      output << blank << "assign " + dest + "_t = " + op2 + "_t;" << std::endl;
-      if ( isOutput(dest) ) {
-        output << blank << "assign " + op2 + "_c" + thdVer + " = 0;" << std::endl;
-        output << blank << "assign " + op2 + "_r" + thdVer + " = 0;" << std::endl;
-        output << blank << "assign " + op2 + "_x" + thdVer + " = 1;" << std::endl;
-      }
-      else {
-        output << blank << "assign " + op2 + "_c" + thdVer + " = " + dest + "_c;" << std::endl;
-        output << blank << "assign " + op2 + "_r" + thdVer + " = " + dest + "_r;" << std::endl;
-        output << blank << "assign " + op2 + "_x" + thdVer + " = " + dest + "_x;" << std::endl;
-      }
-      // FIXME: the local _r seems useless, because they never appear on the RHS of statements.
-    }
-    else {
-      std::cout << "!!! Warning: both two operators are constants" << std::endl;
-    }
+    return TWO_OP;
   } // end of 2-operator
   /* 1-operator assignment */
   else if (std::regex_match(line, m, pNot) 
             || std::regex_match(line, m, pNone)) {
-    assert(!isNum(m.str(3)));// std::string("input for 1-operator should not be number"));    
-    std::string blank = m.str(1);
-    std::string dest = remove_bracket(m.str(2));
-    std::string op1 = remove_bracket(m.str(3));
-
-    uint32_t sndVerNum = find_version_num(op1);
-    std::string sndVer = std::to_string(sndVerNum);
-
-    /* declare new wires */
-    output << blank << "wire " + op1 + "_c" + sndVer + ";" << std::endl;
-    output << blank << "wire " + op1 + "_r" + sndVer + ";" << std::endl;
-    output << blank << "wire " + op1 + "_x" + sndVer + ";" << std::endl;    
-
-    output << blank << "assign " + dest + "_t = " + op1 + "_t;" << std::endl;
-    if ( isOutput(dest) ) {
-        output << blank << "assign " + op1 + "_c" + sndVer + " = 0;" << std::endl;
-        output << blank << "assign " + op1 + "_r" + sndVer + " = 0;" << std::endl;
-        // FIXME: because output is floating, it is always changed??
-        output << blank << "assign " + op1 + "_x" + sndVer + " = 1;" << std::endl;
-    }
-    else {
-      output << blank << "assign " + op1 + "_c" + sndVer + " = " + dest + "_c;" << std::endl;
-      output << blank << "assign " + op1 + "_r" + sndVer + " = " + dest + "_r;" << std::endl;
-      output << blank << "assign " + op1 + "_x" + sndVer + " = " + dest + "_x;" << std::endl;
-    }
+    return ONE_OP;
   }
   else if (std::regex_match(line, m, pIte)) { // if cond is rst, then does not add any taint
-    assert(!isNum(m.str(3)));// std::string("condition for ite should not be number"));
-    std::string blank = m.str(1);
-    std::string dest = remove_bracket(m.str(2));
-    std::string cond = remove_bracket(m.str(3));
-    std::string op1 = remove_bracket(m.str(4));
-    std::string op2 = remove_bracket(m.str(5));
-
-    bool op1IsNum = isNum(m.str(4));
-    bool op2IsNum = isNum(m.str(5));
-
-    uint32_t condVerNum = find_version_num(cond);
-    std::string condVer = std::to_string(condVerNum);
-
-    output << blank << "wire " + cond + "_c" + condVer + ";" << std::endl;
-    output << blank << "wire " + cond + "_r" + condVer + ";" << std::endl;
-    output << blank << "wire " + cond + "_x" + condVer + ";" << std::endl;
-    output << blank << "assign " + cond + "_c" + condVer + " = 1;" << std::endl;
-    output << blank << "assign " + cond + "_x" + condVer + " = " + dest + "_x;" << std::endl;
-
-    if (!op1IsNum && !op2IsNum) { // ite
-      /* Assgin new versions */
-      output << blank << "assign " + dest + "_t = " + cond + " ? (" + cond + "_t | " + op1 + "_t) : (" + cond + "_t | " + op2 + "_t);" << std::endl;
-      output << blank << "assign " + cond + "_r" + condVer + " = " + dest + "_r | (" + cond + " & " + op1 + "_t | !" + cond + " & " + op2 + "_t);" << std::endl;
-
-      uint32_t thdVerNum, fthVerNum;
-      std::string thdVer;
-      std::string fthVer;
-      thdVerNum = find_version_num(op1);
-      thdVer = std::to_string(thdVerNum);        
-      output << blank << "wire " + op1 + "_c" + thdVer + ";" << std::endl;
-      output << blank << "wire " + op1 + "_r" + thdVer + ";" << std::endl;
-      output << blank << "wire " + op1 + "_x" + thdVer + ";" << std::endl;
-      output << blank << "assign " + op1 + "_c" + thdVer + " = " + cond + ";" << std::endl;
-      output << blank << "assign " + op1 + "_r" + thdVer + " = " + cond + " & (" + cond + "_t | " + dest + "_r);" << std::endl;
-      output << blank << "assign " + op1 + "_x" + thdVer + " = " + dest + "_x;" << std::endl;        
-
-      fthVerNum = find_version_num(op2);
-      fthVer = std::to_string(fthVerNum);
-      output << blank << "wire " + op2 + "_c" + fthVer + ";" << std::endl;
-      output << blank << "wire " + op2 + "_r" + fthVer + ";" << std::endl;
-      output << blank << "wire " + op2 + "_x" + thdVer + ";" << std::endl;        
-      output << blank << "assign " + op2 + "_c" + fthVer + " = !" + cond + ";" << std::endl;
-      output << blank << "assign " + op2 + "_r" + fthVer + " = !" + cond + " & (" + cond + "_t | " + dest + "_r);" << std::endl; 
-      output << blank << "assign " + op2 + "_x" + fthVer + " = " + dest + "_x;" << std::endl;        
-    } 
-    else if (!op1IsNum && op2IsNum) { // ite
-      uint32_t thdVerNum;
-
-      thdVerNum = find_version_num(op1);
-      std::string thdVer = std::to_string(thdVerNum);
-      /* declare new wires */
-      output << blank << "wire " + op1 + "_c" + thdVer + ";" << std::endl;
-      output << blank << "wire " + op1 + "_r" + thdVer + ";" << std::endl;
-      output << blank << "wire " + op1 + "_x" + thdVer + ";" << std::endl;        
-      output << blank << "assign " + op1 + "_c" + thdVer + " = " + cond + ";" << std::endl;
-      output << blank << "assign " + op1 + "_r" + thdVer + " = " + cond + " & (" + cond + "_t | " + dest + "_r);" << std::endl;
-      output << blank << "assign " + op1 + "_x" + thdVer + " = " + dest + "_x;" << std::endl;
-
-      output << blank << "assign " + dest + "_t = " + cond + " ? (" + cond + "_t | " + op1 + "_t) : " + cond + "_t;" << std::endl;
-      output << blank << "assign " + cond + "_r" + condVer + " = " + dest + "_r | (" + cond + " & " + op1 + "_t);" << std::endl;
-    }
-    else if (op1IsNum && !op2IsNum) { // ite
-      uint32_t fthVerNum;
-      
-      fthVerNum = find_version_num(op2);
-      std::string fthVer = std::to_string(fthVerNum);
-
-      output << blank << "wire " + op2 + "_c" + fthVer + ";" << std::endl;
-      output << blank << "wire " + op2 + "_r" + fthVer + ";" << std::endl;
-      output << blank << "wire " + op2 + "_x" + fthVer + ";" << std::endl;                
-      output << blank << "assign " + op2 + "_c" + fthVer + " = !" + cond + ";" << std::endl;
-      output << blank << "assign " + op2 + "_r" + fthVer + " = !" + cond + " & (" + cond + "_t | " + dest + "_r);" << std::endl; 
-      output << blank << "assign " + op2 + "_x" + fthVer + " = " + dest + "_x;" << std::endl;        
-
-      output << blank << "assign " + dest + "_t = " + cond + " ? " + cond + "_t : (" + cond + "_t | " + op2 + "_t);" << std::endl;  
-      output << blank << "assign " + cond + "_r" + condVer + " = " + dest + "_r | (" + cond + " & " + op2 + "_t);" << std::endl;      
-    }
-    else {
-      /* when both inputs are constants */
-      output << blank << "assign " + dest + "_t = " + cond + "_t;" << std::endl;
-    }
+    return ITE;
   } // end of ite
   else if( std::regex_match(line, m, pAlways) 
             || std::regex_match(line, m, pEnd)
             || std::regex_match(line, m, pEndmodule) ){
-    return;
+    return NONE;
   }
   else if( std::regex_match(line, m, pNonblock) ) {
-    std::string blank = m.str(1);
-    std::string dest = remove_bracket(m.str(2));
-    std::string op1 = remove_bracket(m.str(3));
-
-    output << blank.substr(0, blank.length()-4) + "wire " + op1 + "_x = " + dest + " != " + op1 + ";" << std::endl;
-    output << blank.substr(0, blank.length()-4) + "always @(posedge " + clockName + ")" << std::endl;
-    output << blank + dest + "_t \t\t<= " + resetName + " ? 0 : " + op1 +"_t & " + dest + "_x;" << std::endl;
-    output << blank.substr(0, blank.length()-4) + "always @(posedge " + clockName + ")" << std::endl;
-    output << blank + dest + "_t_flag \t<= " + resetName + " ? 0 : " + dest + "_t_flag ? 1 : " + op1 + "_t;" << std::endl;
-    output << blank.substr(0, blank.length()-4) + "always @(posedge " + clockName + ")" << std::endl;
-    output << blank + dest + "_r_flag \t<= " + resetName + " ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : " + dest + "_r;" << std::endl;
+    return NONBLOCK;
   }
   else if( std::regex_match(line, m, pNonblockConcat) ) {
-    std::string blank = m.str(1);
-    std::string dest = remove_bracket(m.str(2));
-    std::string update = m.str(3);
-    std::string op1 = remove_bracket(m.str(4));
-
-    output << blank.substr(0, blank.length()-4) + "wire " + op1 + "_x = " + dest + " != " + update + ";" << std::endl;
-    output << blank.substr(0, blank.length()-4) + "always @(posedge " + clockName + ")" << std::endl;
-    output << blank + dest + "_t \t\t<= " + resetName + " ? 0 : " + op1 +"_t & " + dest + "_x;" << std::endl;
-    output << blank.substr(0, blank.length()-4) + "always @(posedge " + clockName + ")" << std::endl;
-    output << blank + dest + "_t_flag \t<= " + resetName + " ? 0 : " + dest + "_t_flag ? 1 : " + op1 + "_t;" << std::endl;
-    output << blank.substr(0, blank.length()-4) + "always @(posedge " + clockName + ")" << std::endl;
-    output << blank + dest + "_r_flag \t<= " + resetName + " ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : " + dest + "_r;" << std::endl;
+    return NONBLOCKCONCAT;
   }
   else {
-    output << "!! Unsupported pattern: " << line << std::endl;
+    return NONE;
   }
 }
 
