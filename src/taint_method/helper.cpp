@@ -11,7 +11,7 @@
 /* help functions */
 
 bool isNum(std::string name) {
-  std::regex p("^\\d+'h\\d+$");
+  std::regex p("^\\d+'h[\\dabcdef]+$");
   std::smatch m;
   return std::regex_match(name, m, p);
 }
@@ -49,22 +49,39 @@ std::string remove_bracket(std::string name) {
   std::smatch match;
   if (std::regex_match(name, match, pName)) {
     // FIXME: how to deal with this more appropriately?
-    //return match.str(1) + "_" + match.str(2) + "_" + match.str(3);
-    return match.str(1);
+    return match.str(1) + "_" + match.str(2) + "t" + match.str(3);
+    //return match.str(1);
   }
   return name;
 }
 
 
-uint32_t find_version_num(std::string op) {
+uint32_t find_version_num(std::string op, std::unordered_map<std::string, uint32_t> &versionMap) {
   uint32_t verNum;
-  if ( nextVersion.find(op) == nextVersion.end() ) {
+  if ( versionMap.find(op) == versionMap.end() ) {
     verNum = 0;
-    nextVersion.insert( std::make_pair(op, 1) );
+    versionMap.insert( std::make_pair(op, 1) );
   }
   else {
-    verNum = nextVersion[op];
-    nextVersion[op]++;
+    verNum = versionMap[op];
+    versionMap[op]++;
   }
   return verNum;
+}
+
+
+// taintBits include t,r,x,c
+void parse_taintBits(std::string taintBits, bool &tExist, bool &rExist, bool &xExist, bool &cExist) {
+  for(int i = 0; i < taintBits.length(); i++) {
+    if( taintBits.compare(i, 1, "t") == 0 )
+        tExist = true;
+    else if ( taintBits.compare(i, 1, "r") == 0 ) 
+      rExist = true;
+    else if ( taintBits.compare(i, 1, "x") == 0 ) 
+      xExist = true;
+    else if ( taintBits.compare(i, 1, "c") == 0 ) 
+      cExist = true;
+    else
+        std::cout << "Error: wrong taintBits!!" << std::endl;
+  }
 }

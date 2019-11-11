@@ -14,6 +14,7 @@ std::string to_re(std::string input);
 
 std::string remove_bracket(std::string name);
 
-uint32_t find_version_num(std::string op);
+uint32_t find_version_num(std::string op, std::unordered_map<std::string, uint32_t> &versionMap = nextVersion);
 
+void parse_taintBits(std::string taintBits, bool &tExist, bool &rExist, bool &xExist, bool &cExist);
 #endif

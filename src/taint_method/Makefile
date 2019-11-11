@@ -9,3 +9,6 @@ naive:
 
 two:
 	./a.out /workspace/research/ILA/autoGenILA/naiveEg/two_reg/two_reg_yosys.v
+
+bound:
+	./a.out /workspace/research/ILA/autoGenILA/naiveEg/bound_test/bound_test_yosys.v

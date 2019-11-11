@@ -50,6 +50,15 @@ std::regex pEndmodule ("^(\\s*)endmodule$");
 /* non-blocking assignment */
 std::regex pNonblock  (to_re("^(\\s*)(NAME) <= (NAME);$"));
 std::regex pNonblockConcat    (to_re("^(\\s*)(NAME) <= (\\{ NUM, (NAME) \\});$"));
+/* function */
+std::regex pFunctionDef   (to_re("^(\\s*)function (\\[\\d+:0\\] )?(NAME)$"));
+std::regex pEndfunction   (to_re("^(\\s*)endfunction$"));
+std::regex pFunctionCall  (to_re("^(\\s*)assign (NAME) = (NAME)\\(\\.*\\);$"));
+/* case */
+std::regex pCase      (to_re("^(\\s*)case(\\S)? \\((NAME)\\)$"));
+std::regex pEndcase   (to_re("^(\\s*)endcase$"));
+std::regex pDefault   (to_re("^(\\s*)default:$"));
+std::regex pBlock     (to_re("^(\\s*)(NAME) = (NAME);$"));
 
 /* Global data */
 std::string moduleName;
@@ -83,8 +92,7 @@ void clean_file_comments(std::string fileName) {
 
 
 void add_line_taints(std::string line, std::ofstream &output) {
-  std::smatch m;
-  int choice = parse_verilog_line(line, m);
+  int choice = parse_verilog_line(line);
   switch( choice ) {
     case INPUT:
       input_taint_gen(line, output);
@@ -120,7 +128,8 @@ void add_line_taints(std::string line, std::ofstream &output) {
 
 
 // FIXME: maybe set t-taint and r-taint to clear if reg value is not changed
-int parse_verilog_line(std::string line, std::smatch &m) {
+int parse_verilog_line(std::string line) {
+  std::smatch m;
   if ( std::regex_match(line, m, pModule) ) {
     moduleName = m.str(2);
     return NONE;
@@ -131,7 +140,7 @@ int parse_verilog_line(std::string line, std::smatch &m) {
   else if (std::regex_match(line, m, pOutput)) {
     std::string var = m.str(3);
     moduleOutputs.push_back(var);
-    return NONE;
+    return OUTPUT;
   }
   else if (std::regex_match(line, m, pReg)) {
     return REG;
@@ -211,7 +220,17 @@ void add_file_taints(std::string fileName) {
     if ( !std::regex_match(line, match, pModule) 
         && !std::regex_match(line, match, pEndmodule) )
       output << line << std::endl;
-    add_line_taints(line, output);  
+    //if ( std::regex_match(line, match, pFunctionDef) ) {
+    //  add_func_taints(input, output, line);
+    //}
+    //else if ( std::regex_match(line, match, pCase) ) {
+    //  add_case_taints(input, output, line);
+    //}
+    //else if ( std::regex_match(line, match, pFunctionCall) ) {
+    //  add_func_taints_call(line, output);
+    //}
+    //else
+      add_line_taints(line, output);  
   }
   input.close();
   output.close();
@@ -309,6 +328,157 @@ void fill_update(std::string fileName) {
     std::string reg = new_reg[m.str(2)];
     update_reg.insert( std::make_pair(m.str(5), reg) );
   }
+}
+
+
+void add_func_taints(std::ifstream &input, std::ofstream &output, std::string funcDefinition) {
+  std::smatch m;
+  if ( !std::regex_match(funcDefinition, m, pFunctionDef) ) {
+    std::cout << "!!! Error when deal with function !!!" << std::endl;
+  }
+  // function related data
+  std::string funcBlank = m.str(1);
+  std::string funcName = m.str(3);
+  std::vector<std::string> funcInputs;
+  std::string line;
+
+  // first, print out the definition of function
+  auto funcBegin = input.tellg();
+  while ( std::getline(input, line) && !std::regex_match(line, m, pEndfunction) ) {
+    output << line << std::endl;
+  }
+  std::getline(input, line); // print endfunction
+  output << line << std::endl << std::endl;
+
+  // next, contruct the _t , _r and _x function
+  output << funcBlank + "function " + funcName + "_t;" << std::endl;
+  input.seekg(funcBegin);
+  std::unordered_map<std::string, uint32_t> localVersionMap;  
+  while ( std::getline(input, line) && !std::regex_match(line, m, pEndfunction) ) {
+    int choice = parse_verilog_line(line);
+    std::smatch m;
+    switch (choice) {
+      case INPUT:
+        input_taint_gen(line, output);
+        std::regex_match(line, m, pInput);
+        funcInputs.push_back(m.str(3));
+        break;
+      case REG:
+        reg_taint_gen_func(line, output, "t");
+        break;
+      case WIRE: 
+        wire_taint_gen_func(line, output, "t");
+        break;
+      case TWO_OP:
+        two_op_taint_gen_func(line, output, localVersionMap, "t");      
+        break;
+      case ONE_OP:
+        one_op_taint_gen_func(line, output, localVersionMap, "t");
+        break;
+      case ITE:
+        ite_taint_gen_func(line, output, localVersionMap, "t"); 
+        break;
+      case NONBLOCK:
+        output << "!!! ERROR: function contains blocking !!!" << std::endl;     
+        break;
+      case NONBLOCKCONCAT:
+        output << "!!! ERROR: function contains blocking !!!" << std::endl;        
+        break;
+      case UNSUPPORT:
+        output << "!!! Unsupported operator !!!" << std::endl;
+        break;
+      default:
+        break;
+    }
+  }
+  output << line << std::endl << std::endl;
+
+  std::vector<std::string> localTaints{"x", "r", "c"};
+  //_x taint
+  for (std::string funcIn: funcInputs) {
+    for (std::string taintBit: localTaints) {
+      std::unordered_map<std::string, uint32_t> localVersionMap;
+      output << funcBlank + "function " + funcIn + "_"+ taintBit + ";" << std::endl;
+      output << funcBlank + "  input " + funcName + "_" + taintBit + ";" << std::endl;
+      input.seekg(funcBegin);
+      while ( std::getline(input, line) && !std::regex_match(line, m, pEndfunction) ) { // the matched line must contain the input
+        int choice = parse_verilog_line(line);
+        switch (choice) {
+          case INPUT:
+            break;
+          case REG:
+            reg_taint_gen_func(line, output, taintBit);
+            break;
+          case WIRE: 
+            wire_taint_gen_func(line, output, taintBit);
+            break;
+          case TWO_OP:
+            two_op_taint_gen_func(line, output, localVersionMap, taintBit);
+            break;
+          case ONE_OP:
+            one_op_taint_gen_func(line, output, localVersionMap, taintBit);
+            break;
+          case ITE:
+            ite_taint_gen_func(line, output, localVersionMap, taintBit);
+            break;
+          case NONBLOCK:
+            output << "!!! ERROR: function contains blocking !!!" << std::endl;     
+            break;
+          case NONBLOCKCONCAT:
+            output << "!!! ERROR: function contains blocking !!!" << std::endl;        
+            break;
+          case UNSUPPORT:
+            output << "!!! Unsupported operator !!!" << std::endl;
+            break;
+          default:
+            break;
+        }
+      }
+    }
+    output << line << std::endl << std::endl;
+  }
+}
+
+
+// ATTENTION: the "case" may have slice of a vector 
+void add_case_taints(std::ifstream input, std::ofstream output, std::string firstLine, std::string taintBits) {
+  std::smatch m;
+  bool tExist = false;
+  bool rExist = false;
+  bool xExist = false;
+  bool cExist = false;
+  parse_taintBits(taintBits, tExist, rExist, xExist, cExist);
+  if ( !std::regex_match(firstLine, m, pCase) )
+    return;
+  std::string cond = m.str(3);
+  std::string line;
+  bool readSwitchValue = true;
+  while( std::getline(input, line) && !std::regex_match(line, m, pDefault) ) {
+    if( tExist ) {
+      if ( readSwitchValue ) {
+        output << line << std::endl;
+      }
+      else {
+        std::regex_match(line, m, pBlock);
+        std::string blank = m.str(1);
+        std::string dest = m.str(2);
+        std::string src = m.str(3);
+        output << blank + "_t = " + src + "_t;" << std::endl;
+      }
+    }
+  }
+}
+
+
+void add_func_taints_call(std::string line, std::ofstream &output) {
+  std::smatch m;
+  if( !std::regex_match(line, m, pFunctionCall) )
+    return;
+  std::string blank = m.str(1);
+  std::string returnValue = m.str(2);
+  std::string funcName = m.str(3);
+  std::string arguments = m.str(4);
+  // TODO
 }
 
 

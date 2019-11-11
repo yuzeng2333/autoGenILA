@@ -15,6 +15,7 @@
 #define ITE             2
 #define NONBLOCK        4
 #define NONBLOCKCONCAT  5
+#define OUTPUT          6
 #define UNSUPPORT       99
 #define NONE            100
 
@@ -36,8 +37,9 @@ bool isReg(std::string var);
 
 std::string to_re(std::string input);
 
-std::string remove_bracket(std::string name);
+int parse_verilog_line(std::string line);
 
-int parse_verilog_line(std::string line, std::smatch &m);
+void add_func_taints(std::ifstream &input, std::ofstream &output, std::string funcDefinition);
 
+void add_case_taints(std::ifstream input, std::ofstream output, std::string firstLine);
 #endif
