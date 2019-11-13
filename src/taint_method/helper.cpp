@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <unordered_map>
 #include "helper.h"
+#include <algorithm>
 /* help functions */
 
 bool isNum(std::string name) {
@@ -55,6 +56,56 @@ std::string remove_bracket(std::string name) {
   return name;
 }
 
+uint32_t cut_pos(std::string name) {
+  for (uint32_t i = 0; i < name.length(); ++i) {
+    if (name.substr(i, 1).compare("[") == 0)
+      return i;
+  }
+  return name.length();
+}
+
+
+bool split_slice(std::string slicedName, std::string &name, std::string &slice) {
+  uint32_t pos = cut_pos(slicedName);
+  if (pos == slicedName.length()) {
+    name = slicedName;
+    slice = "";
+    return false;
+  }
+  else {
+    name = slicedName.substr(0, pos);
+    slice = slicedName.substr(pos);
+    return true;
+  }
+}
+
+
+uint32_t get_width(std::string slice) {
+  std::regex pSlice("^\\[(\\d+)\\:(\\d+)\\](\\s)?$");
+  std::smatch m;
+  if (slice.empty())
+    return 1;
+  if( !std::regex_match(slice, m, pSlice))
+    std::cout << "Wrong input:|" + slice << "|" << std::endl;
+  return std::stoi(m.str(1)) - std::stoi(m.str(2));
+}
+
+
+uint32_t get_begin(std::string slice) {
+  std::regex pSlice("\\[(\\d+)\\:(\\d+)\\]\\s");
+  std::smatch m;
+  std::regex_match(slice, m, pSlice);
+  return std::stoi(m.str(2));
+}
+
+
+uint32_t get_end(std::string slice) {
+  std::regex pSlice("\\[(\\d+)\\:(\\d+)\\]\\s");
+  std::smatch m;
+  std::regex_match(slice, m, pSlice);
+  return std::stoi(m.str(1));
+}
+
 
 uint32_t find_version_num(std::string op, std::unordered_map<std::string, uint32_t> &versionMap) {
   uint32_t verNum;
@@ -82,6 +133,26 @@ void parse_taintBits(std::string taintBits, bool &tExist, bool &rExist, bool &xE
     else if ( taintBits.compare(i, 1, "c") == 0 ) 
       cExist = true;
     else
-        std::cout << "Error: wrong taintBits!!" << std::endl;
+      std::cout << "Error: wrong taintBits!!" << std::endl;
   }
+}
+
+
+void collapse_bits(std::string varName, uint32_t bound1, uint32_t bound2, std::ofstream &output) {
+  uint32_t begin = std::min(bound1, bound2);
+  uint32_t end = std::max(bound1, bound2);
+  for (uint32_t i = begin; i < end - 1; ++i) {
+    output << varName + "[" + std::to_string(i) + "] | ";
+  }
+  output << varName + "[" + std::to_string(end-1) + "];" << std::endl;
+}
+
+
+std::string extend(std::string in, uint32_t length) {
+  return "{" + std::to_string(length) + "{" + in + "}}";
+}
+
+
+void debug_line(std::string line) {
+  std::cout << "get_width() for " + line << std::endl;
 }

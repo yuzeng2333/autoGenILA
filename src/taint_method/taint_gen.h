@@ -42,4 +42,6 @@ int parse_verilog_line(std::string line);
 void add_func_taints(std::ifstream &input, std::ofstream &output, std::string funcDefinition);
 
 void add_case_taints(std::ifstream input, std::ofstream output, std::string firstLine);
+
+void merge_taints(std::string fileName);
 #endif

@@ -17,10 +17,10 @@
 
 /* declarations */
 std::regex pModule    (to_re("^(\\s*)module (NAME)\\(.+\\);$"));
-std::regex pInput     (to_re("^(\\s*)input (\\[\\d+:0\\] )?(NAME);$"));
-std::regex pOutput    (to_re("^(\\s*)output (\\[\\d+:0\\] )?(NAME);$"));
-std::regex pReg       (to_re("^(\\s*)reg (\\[\\d+:0\\] )?(NAME);$"));
-std::regex pWire      (to_re("^(\\s*)wire (\\[\\d+:0\\] )?(NAME);$"));
+std::regex pInput     (to_re("^(\\s*)input (\\[\\d+\\:0\\] )?(NAME);$"));
+std::regex pOutput    (to_re("^(\\s*)output (\\[\\d+\\:0\\] )?(NAME);$"));
+std::regex pReg       (to_re("^(\\s*)reg (\\[\\d+\\:0\\] )?(NAME);$"));
+std::regex pWire      (to_re("^(\\s*)wire (\\[\\d+\\:0\\] )?(NAME);$"));
 /* 2 operators */
 std::regex pAdd       (to_re("^(\\s*)assign (NAME) = (NAME) \\+ (NAME);$"));
 std::regex pSub       (to_re("^(\\s*)assign (NAME) = (NAME) - (NAME);$"));
@@ -51,13 +51,13 @@ std::regex pEndmodule ("^(\\s*)endmodule$");
 std::regex pNonblock  (to_re("^(\\s*)(NAME) <= (NAME);$"));
 std::regex pNonblockConcat    (to_re("^(\\s*)(NAME) <= (\\{ NUM, (NAME) \\});$"));
 /* function */
-std::regex pFunctionDef   (to_re("^(\\s*)function (\\[\\d+:0\\] )?(NAME)$"));
+std::regex pFunctionDef   (to_re("^(\\s*)function (\\[\\d+\\:0\\] )?(NAME)$"));
 std::regex pEndfunction   (to_re("^(\\s*)endfunction$"));
 std::regex pFunctionCall  (to_re("^(\\s*)assign (NAME) = (NAME)\\(\\.*\\);$"));
 /* case */
 std::regex pCase      (to_re("^(\\s*)case(\\S)? \\((NAME)\\)$"));
 std::regex pEndcase   (to_re("^(\\s*)endcase$"));
-std::regex pDefault   (to_re("^(\\s*)default:$"));
+std::regex pDefault   (to_re("^(\\s*)default\\:$"));
 std::regex pBlock     (to_re("^(\\s*)(NAME) = (NAME);$"));
 
 /* Global data */
@@ -72,6 +72,7 @@ std::unordered_map<std::string, uint32_t> nextVersion;
 std::unordered_map<std::string, std::string> new_reg;
 std::unordered_map<std::string, std::string> new_next;
 std::unordered_map<std::string, std::string> update_reg;
+std::unordered_map<std::string, uint32_t> varWidth;
 
 void clean_file_comments(std::string fileName) {
   std::ifstream input(fileName);
@@ -238,7 +239,7 @@ void add_file_taints(std::string fileName) {
 
 
 /* merge _c, _r, _x */
-void merge_ites(std::string fileName) {
+void merge_taints(std::string fileName) {
   std::ofstream output(fileName, std::fstream::app);
   std::vector<std::string> appendix{"_c", "_x"};
   for (std::string app : appendix) {  
@@ -251,18 +252,13 @@ void merge_ites(std::string fileName) {
   }
 
   for ( auto it = nextVersion.begin(); it != nextVersion.end(); ++it ) {
-    if ( isReg(it->first) ) {
-      output << "  assign " + it->first + "_r = " + it->first + "_x & ((";
-      for (int i = 0; i < it->second - 1; i++)
-        output << it->first + "_r" + std::to_string(i) + ") | (";
-      output << it->first + "_r" + std::to_string(it->second - 1) + "));" << std::endl;
+    output << "  assign " + it->first + "_r = (";
+    for (int i = 0; i < it->second - 1; i++) {
+      output << it->first + "_x" + std::to_string(i) + "&";
+      output << it->first + "_r" + std::to_string(i) + ") | (";
     }
-    else {
-      output << "  assign " + it->first + "_r = (";
-      for (int i = 0; i < it->second - 1; i++)
-        output << it->first + "_r" + std::to_string(i) + ") | (";
-      output << it->first + "_r" + std::to_string(it->second - 1) + ");" << std::endl;
-    }
+    output << it->first + "_x" + std::to_string(it->second - 1) + "&";
+    output << it->first + "_r" + std::to_string(it->second - 1) + ");" << std::endl;
   }
 
   for (auto reg : moduleRegs) {
@@ -488,7 +484,7 @@ int main(int argc, char* argv[]) {
   read_in_clkrst(fileName + ".clkrst");
   fill_update(fileName + ".clean");  
   add_file_taints(fileName + ".clean");
-  merge_ites(fileName + ".clean.tainted");
+  merge_taints(fileName + ".clean.tainted");
   add_module_name(fileName + ".clean.tainted");
 }
 
