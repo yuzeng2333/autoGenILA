@@ -12,3 +12,9 @@ two:
 
 bound:
 	./a.out /workspace/research/ILA/autoGenILA/naiveEg/bound_test/bound_test_yosys.v
+
+case:
+	./a.out /workspace/research/ILA/autoGenILA/naiveEg/case/case_yosys.v
+
+aes:
+	./a.out /workspace/research/ILA/autoGenILA/AES/Verilog/aes_top_simp.v

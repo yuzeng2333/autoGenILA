@@ -16,10 +16,11 @@
 #define NONBLOCK        4
 #define NONBLOCKCONCAT  5
 #define OUTPUT          6
+#define CASE            9
 #define UNSUPPORT       99
 #define NONE            100
 
-void clean_file_comments(std::string fileName);
+void clean_file(std::string fileName);
 
 void add_line_taints(std::string line, std::ofstream &output);
 
@@ -41,7 +42,12 @@ int parse_verilog_line(std::string line);
 
 void add_func_taints(std::ifstream &input, std::ofstream &output, std::string funcDefinition);
 
-void add_case_taints(std::ifstream input, std::ofstream output, std::string firstLine);
+// The goal of this function: given the firstLine, generate a new fucntion which outputs the taint specified with taintBits. The original function does not need to be printed
+void add_case_taints(std::ifstream &input, std::ofstream &output, std::string firstLine, std::string taintBits);
+
+void add_func_taints_limited(std::ifstream &input, std::ofstream &output, std::string firstLine);
+
+void add_func_taints_call_limited(std::string line, std::ofstream &output);
 
 void merge_taints(std::string fileName);
 #endif

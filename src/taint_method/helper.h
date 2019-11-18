@@ -8,6 +8,8 @@ bool isNum(std::string name);
 
 bool isOutput(std::string var);
 
+bool isInput(std::string var);
+
 bool isReg(std::string var);
 
 std::string to_re(std::string input);
@@ -33,4 +35,8 @@ void collapse_bits(std::string varName, uint32_t bound1, uint32_t bound2, std::o
 std::string extend(std::string in, uint32_t length);
 
 void debug_line(std::string line);
+
+void ground_wires(std::string wireName, uint32_t width, std::string slice, std::string blank, std::ofstream &output);
+
+void parse_var_list(std::string list, std::vector<std::string> &vec);
 #endif

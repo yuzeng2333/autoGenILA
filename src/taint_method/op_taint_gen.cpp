@@ -40,6 +40,7 @@ void reg_taint_gen(std::string line, std::ofstream &output) {
   output << m.str(1) << "output reg " + var + "_r_flag;" << std::endl;
   output << m.str(1) << "wire " + var + "_r;" << std::endl;
   output << m.str(1) << "wire " + var + "_x;" << std::endl;
+  output << m.str(1) << "wire " + var + "_c;" << std::endl;
 }
 
 
@@ -65,6 +66,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
             || std::regex_match(line, m, pSub)
             || std::regex_match(line, m, pMult)
             || std::regex_match(line, m, pEq)
+            || std::regex_match(line, m, pNeq)
             || std::regex_match(line, m, pLt)
             || std::regex_match(line, m, pLe)
             || std::regex_match(line, m, pSt)
@@ -72,10 +74,12 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
             || std::regex_match(line, m, pAnd)
             || std::regex_match(line, m, pOr)
             || std::regex_match(line, m, pBitOr)
+            || std::regex_match(line, m, pBitExOr)
             || std::regex_match(line, m, pSel1)
             || std::regex_match(line, m, pSel2)
             || std::regex_match(line, m, pSel3)
             || std::regex_match(line, m, pSel4) 
+            || std::regex_match(line, m, pBitOrRed2) 
             || std::regex_match(line, m, pConcat) ){}
   else
     return;
@@ -115,15 +119,16 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
     output << blank << "wire [" + op2Width + "-1:0] " + op2 + "_x" + thdVer + ";" << std::endl;
 
     /* make assignme1ts */
+    /* FIXME: the width of op1/op2 and dest are not necessarily the same */
     output << blank << "assign " + dest + "_t" + destSlice + " = " + op1 + "_t" + op1Slice + " | " + op2 + "_t" + op2Slice + ";" << std::endl;
     if ( isOutput(dest) ) {
       output << blank << "assign " + op1 + "_c" + sndVer + op1Slice + " = 0;" << std::endl;
       output << blank << "assign " + op1 + "_r" + sndVer + op1Slice + " = 0;" << std::endl;
-      output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + std::to_string(std::pow(2, op1WidthNum) - 1) + ";" << std::endl;
+      output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + std::to_string(std::pow(2, get_width(op1Slice)) - 1) + ";" << std::endl;
         
       output << blank << "assign " + op2 + "_c" + thdVer + op2Slice + " = 0;" << std::endl;
       output << blank << "assign " + op2 + "_r" + thdVer + op2Slice + " = 0;" << std::endl;
-      output << blank << "assign " + op2 + "_x" + thdVer + op2Slice + " = " + std::to_string(std::pow(2, op2WidthNum) - 1) + ";" << std::endl;
+      output << blank << "assign " + op2 + "_x" + thdVer + op2Slice + " = " + std::to_string(std::pow(2, get_width(op2Slice)) - 1) + ";" << std::endl;
     }
     else {
       output << blank << "assign " + op1 + "_c" + sndVer + op1Slice + " = " + dest + "_c" + destSlice + ";" << std::endl;
@@ -134,6 +139,14 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
       output << blank << "assign " + op2 + "_r" + thdVer + op2Slice + " = " + dest + "_r" + destSlice + " | (" + dest + "_c" + destSlice + " & " + op1 + "_t" + op1Slice + ");" << std::endl;
       output << blank << "assign " + op2 + "_x" + thdVer + op2Slice + " = " + dest + "_x" + destSlice + ";" << std::endl;
     }
+    /* ground all the floating wires */
+    ground_wires(op1+"_c"+sndVer, op1WidthNum, op1Slice, blank, output);
+    ground_wires(op1+"_r"+sndVer, op1WidthNum, op1Slice, blank, output);
+    ground_wires(op1+"_x"+sndVer, op1WidthNum, op1Slice, blank, output);
+
+    ground_wires(op2+"_c"+thdVer, op2WidthNum, op2Slice, blank, output);
+    ground_wires(op2+"_r"+thdVer, op2WidthNum, op2Slice, blank, output);
+    ground_wires(op2+"_x"+thdVer, op2WidthNum, op2Slice, blank, output);
   } 
   else if (!op1IsNum && op2IsNum) { // 2-op
     uint32_t sndVerNum = find_version_num(op1);
@@ -147,7 +160,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
     output << blank << "assign " + dest + "_t" + destSlice + " = " + op1 + "_t" + op1Slice + ";" << std::endl;
     if ( isOutput(dest) ) {
       output << blank << "assign " + op1 + "_c" + sndVer + op1Slice + " = 0;" << std::endl;
-      output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + std::to_string(std::pow(2, op1WidthNum) - 1) + ";" << std::endl;
+      output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + std::to_string(std::pow(2, get_width(op1Slice)) - 1) + ";" << std::endl;
       output << blank << "assign " + op1 + "_r" + sndVer + op1Slice + " = 0;" << std::endl;
     }
     else {
@@ -155,6 +168,9 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
       output << blank << "assign " + op1 + "_r" + sndVer + op1Slice + " = " + dest + "_r" + destSlice + ";" << std::endl;
       output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + dest + "_x" + destSlice + ";" << std::endl;        
     }
+    ground_wires(op1+"_c"+sndVer, op1WidthNum, op1Slice, blank, output);
+    ground_wires(op1+"_r"+sndVer, op1WidthNum, op1Slice, blank, output);
+    ground_wires(op1+"_x"+sndVer, op1WidthNum, op1Slice, blank, output);
   }
   else if (op1IsNum && !op2IsNum) { // 2-op
     uint32_t thdVerNum = find_version_num(op2);
@@ -169,13 +185,16 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
     if ( isOutput(dest) ) {
       output << blank << "assign " + op2 + "_c" + thdVer + op2Slice + " = 0;" << std::endl;
       output << blank << "assign " + op2 + "_r" + thdVer + op2Slice + " = 0;" << std::endl;
-      output << blank << "assign " + op2 + "_x" + thdVer + op2Slice + " = " + std::to_string(std::pow(2, op2WidthNum) - 1) + ";" << std::endl;
+      output << blank << "assign " + op2 + "_x" + thdVer + op2Slice + " = " + std::to_string(std::pow(2, get_width(op2Slice)) - 1) + ";" << std::endl;
     }
     else {
       output << blank << "assign " + op2 + "_c" + thdVer + op2Slice + " = " + dest + "_c" + destSlice + ";" << std::endl;
       output << blank << "assign " + op2 + "_r" + thdVer + op2Slice + " = " + dest + "_r" + destSlice + ";" << std::endl;
       output << blank << "assign " + op2 + "_x" + thdVer + op2Slice + " = " + dest + "_x" + destSlice + ";" << std::endl;
     }
+    ground_wires(op2+"_c"+thdVer, op2WidthNum, op2Slice, blank, output);
+    ground_wires(op2+"_r"+thdVer, op2WidthNum, op2Slice, blank, output);
+    ground_wires(op2+"_x"+thdVer, op2WidthNum, op2Slice, blank, output);
     // FIXME: the local _r seems useless, because they never appear on the RHS of statements.
   }
   else {
@@ -187,7 +206,8 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
 void one_op_taint_gen(std::string line, std::ofstream &output) {
   std::smatch m;
   if (std::regex_match(line, m, pNot) 
-            || std::regex_match(line, m, pNone)){}
+            || std::regex_match(line, m, pNone)
+            || std::regex_match(line, m, pBitOrRed1)){}
   else 
     return;
   std::string blank = m.str(1);
@@ -211,7 +231,7 @@ void one_op_taint_gen(std::string line, std::ofstream &output) {
   if ( isOutput(dest) ) {
       output << blank << "assign " + op1 + "_c" + sndVer + op1Slice + " = 0;" << std::endl;
       output << blank << "assign " + op1 + "_r" + sndVer + op1Slice + " = 0;" << std::endl;
-      output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + std::to_string(std::pow(2, op1WidthNum) - 1) + ";" << std::endl;
+      output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + std::to_string(std::pow(2, get_width(op1Slice)) - 1) + ";" << std::endl;
       // FIXME: because output is floating, it is always changed??      
   }
   else {
@@ -219,6 +239,9 @@ void one_op_taint_gen(std::string line, std::ofstream &output) {
     output << blank << "assign " + op1 + "_r" + sndVer + op1Slice + " = " + dest + "_r" + destSlice + ";" << std::endl;
     output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + dest + "_x" + destSlice + ";" << std::endl;
   }
+  ground_wires(op1+"_c"+sndVer, op1WidthNum, op1Slice, blank, output);
+  ground_wires(op1+"_r"+sndVer, op1WidthNum, op1Slice, blank, output);
+  ground_wires(op1+"_x"+sndVer, op1WidthNum, op1Slice, blank, output);
 }
 
 
@@ -226,8 +249,8 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
   std::smatch m;
   if ( !std::regex_match(line, m, pIte) )
     return;
-  std::string blank = m.str(1);
 
+  std::string blank = m.str(1);
   std::string dest, destSlice;
   std::string cond = m.str(3);
   std::string op1, op1Slice;
@@ -273,8 +296,8 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
 
   if (!op1IsNum && !op2IsNum) { // ite
     /* Assgin new versions */
-    output << blank << "assign " + dest + "_t = " + cond + " ? (" + extend(cond+"_t", localWidthNum) + " | " + op1 + "_t) : (" + extend(cond+"_t", localWidthNum) + " | " + op2 + "_t);" << std::endl;
-    output << blank << "assign " + cond + "_r" + condVer + "_tmp = " + dest + "_r | (" + extend(cond, localWidthNum) + " & " + op1 + "_t | " + extend("!"+cond, localWidthNum) + " & " + op2 + "_t);" << std::endl;
+    output << blank << "assign " + dest + "_t" + destSlice + " = " + cond + " ? (" + extend(cond+"_t", localWidthNum) + " | " + op1 + "_t" + op1Slice + ") : (" + extend(cond+"_t", localWidthNum) + " | " + op2 + "_t" + op2Slice + ");" << std::endl;
+    output << blank << "assign " + cond + "_r" + condVer + "_tmp = " + dest + "_r" + destSlice + " | (" + extend(cond, localWidthNum) + " & " + op1 + "_t" + op1Slice + " | " + extend("!"+cond, localWidthNum) + " & " + op2 + "_t" + op2Slice + ");" << std::endl;
 
     uint32_t thdVerNum, fthVerNum;
     thdVerNum = find_version_num(op1);
@@ -285,16 +308,24 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
     output << blank << "wire [" + op1Width + "-1:0] " + op1 + "_c" + thdVer + ";" << std::endl;
     output << blank << "wire [" + op1Width + "-1:0] " + op1 + "_r" + thdVer + ";" << std::endl;
     output << blank << "wire [" + op1Width + "-1:0] " + op1 + "_x" + thdVer + ";" << std::endl;
-    output << blank << "assign " + op1 + "_c" + thdVer + " = " + extend(cond, localWidthNum) + ";" << std::endl;
-    output << blank << "assign " + op1 + "_r" + thdVer + " = " + extend(cond, localWidthNum) + " & (" + extend(cond+"_t", localWidthNum) + " | " + dest + "_r);" << std::endl;
-    output << blank << "assign " + op1 + "_x" + thdVer + " = " + dest + "_x;" << std::endl;        
+    output << blank << "assign " + op1 + "_c" + thdVer + op1Slice + " = " + extend(cond, localWidthNum) + ";" << std::endl;
+    output << blank << "assign " + op1 + "_r" + thdVer + op1Slice + " = " + extend(cond, localWidthNum) + " & (" + extend(cond+"_t", localWidthNum) + " | " + dest + "_r" + destSlice + ");" << std::endl;
+    output << blank << "assign " + op1 + "_x" + thdVer + op1Slice + " = " + dest + "_x" + destSlice + ";" << std::endl;        
 
     output << blank << "wire [" + op2Width + "-1:0] " + op2 + "_c" + fthVer + ";" << std::endl;
     output << blank << "wire [" + op2Width + "-1:0] " + op2 + "_r" + fthVer + ";" << std::endl;
     output << blank << "wire [" + op2Width + "-1:0] " + op2 + "_x" + fthVer + ";" << std::endl;        
-    output << blank << "assign " + op2 + "_c" + fthVer + " = " + extend("!"+cond, localWidthNum) + ";" << std::endl;
-    output << blank << "assign " + op2 + "_r" + fthVer + " = " + extend("!"+cond, localWidthNum) + " & (" + extend(cond+"_t", localWidthNum) + " | " + dest + "_r);" << std::endl; 
-    output << blank << "assign " + op2 + "_x" + fthVer + " = " + dest + "_x;" << std::endl;        
+    output << blank << "assign " + op2 + "_c" + fthVer + op2Slice + " = " + extend("!"+cond, localWidthNum) + ";" << std::endl;
+    output << blank << "assign " + op2 + "_r" + fthVer + op2Slice + " = " + extend("!"+cond, localWidthNum) + " & (" + extend(cond+"_t", localWidthNum) + " | " + dest + "_r" + destSlice + ");" << std::endl; 
+    output << blank << "assign " + op2 + "_x" + fthVer + op2Slice + " = " + dest + "_x" + destSlice + ";" << std::endl;
+
+    ground_wires(op1+"_c"+thdVer, op1WidthNum, op1Slice, blank, output);
+    ground_wires(op1+"_r"+thdVer, op1WidthNum, op1Slice, blank, output);
+    ground_wires(op1+"_x"+thdVer, op1WidthNum, op1Slice, blank, output);
+
+    ground_wires(op2+"_c"+fthVer, op2WidthNum, op2Slice, blank, output);
+    ground_wires(op2+"_r"+fthVer, op2WidthNum, op2Slice, blank, output);
+    ground_wires(op2+"_x"+fthVer, op2WidthNum, op2Slice, blank, output);
   } 
   else if (!op1IsNum && op2IsNum) { // ite
     uint32_t thdVerNum = find_version_num(op1);
@@ -303,12 +334,16 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
     output << blank << "wire [" + op1Width + "-1:0] " + op1 + "_c" + thdVer + ";" << std::endl;
     output << blank << "wire [" + op1Width + "-1:0] " + op1 + "_r" + thdVer + ";" << std::endl;
     output << blank << "wire [" + op1Width + "-1:0] " + op1 + "_x" + thdVer + ";" << std::endl;        
-    output << blank << "assign " + op1 + "_c" + thdVer + " = " + extend(cond, localWidthNum) + ";" << std::endl;
-    output << blank << "assign " + op1 + "_r" + thdVer + " = " + extend(cond, localWidthNum) + " & (" + extend(cond+"_t", localWidthNum) + " | " + dest + "_r);" << std::endl;
-    output << blank << "assign " + op1 + "_x" + thdVer + " = " + dest + "_x;" << std::endl;
+    output << blank << "assign " + op1 + "_c" + thdVer + op1Slice + " = " + extend(cond, localWidthNum) + ";" << std::endl;
+    output << blank << "assign " + op1 + "_r" + thdVer + op1Slice + " = " + extend(cond, localWidthNum) + " & (" + extend(cond+"_t", localWidthNum) + " | " + dest + "_r" + destSlice + ");" << std::endl;
+    output << blank << "assign " + op1 + "_x" + thdVer + op1Slice + " = " + dest + "_x" + destSlice + ";" << std::endl;
 
-    output << blank << "assign " + dest + "_t = " + cond + " ? (" + extend(cond+"_t", localWidthNum) + " | " + op1 + "_t) : " + extend(cond+"_t", localWidthNum) + ";" << std::endl;
-    output << blank << "assign " + cond + "_r" + condVer + "_tmp = " + dest + "_r | (" + extend(cond, localWidthNum) + " & " + op1 + "_t);" << std::endl;
+    output << blank << "assign " + dest + "_t" + destSlice + " = " + cond + " ? (" + extend(cond+"_t", localWidthNum) + " | " + op1 + "_t" + op1Slice + ") : " + extend(cond+"_t", localWidthNum) + ";" << std::endl;
+    output << blank << "assign " + cond + "_r" + condVer + "_tmp = " + dest + "_r" + destSlice + " | (" + extend(cond, localWidthNum) + " & " + op1 + "_t" + op1Slice + ");" << std::endl;
+
+    ground_wires(op1+"_c"+thdVer, op1WidthNum, op1Slice, blank, output);
+    ground_wires(op1+"_r"+thdVer, op1WidthNum, op1Slice, blank, output);
+    ground_wires(op1+"_x"+thdVer, op1WidthNum, op1Slice, blank, output);
   }
   else if (op1IsNum && !op2IsNum) { // ite
     uint32_t fthVerNum = find_version_num(op2);
@@ -317,12 +352,16 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
     output << blank << "wire [" + op2Width + "-1:0] " + op2 + "_c" + fthVer + ";" << std::endl;
     output << blank << "wire [" + op2Width + "-1:0] " + op2 + "_r" + fthVer + ";" << std::endl;
     output << blank << "wire [" + op2Width + "-1:0] " + op2 + "_x" + fthVer + ";" << std::endl;                
-    output << blank << "assign " + op2 + "_c" + fthVer + " = " + extend("!"+cond, localWidthNum) + ";" << std::endl;
-    output << blank << "assign " + op2 + "_r" + fthVer + " = " + extend("!"+cond, localWidthNum) + " & (" + extend(cond+"_t", localWidthNum) + " | " + dest + "_r);" << std::endl; 
-    output << blank << "assign " + op2 + "_x" + fthVer + " = " + dest + "_x;" << std::endl;
+    output << blank << "assign " + op2 + "_c" + fthVer + op2Slice + " = " + extend("!"+cond, localWidthNum) + ";" << std::endl;
+    output << blank << "assign " + op2 + "_r" + fthVer + op2Slice + " = " + extend("!"+cond, localWidthNum) + " & (" + extend(cond+"_t", localWidthNum) + " | " + dest + "_r" + destSlice + ");" << std::endl; 
+    output << blank << "assign " + op2 + "_x" + fthVer + op2Slice + " = " + dest + "_x" + destSlice + ";" << std::endl;
 
-    output << blank << "assign " + dest + "_t = " + cond + " ? " + extend(cond+"_t", localWidthNum) + " : (" + extend(cond+"_t", localWidthNum) + " | " + op2 + "_t);" << std::endl;  
-    output << blank << "assign " + cond + "_r" + condVer + "_tmp = " + dest + "_r | (" + extend(cond, localWidthNum) + " & " + op2 + "_t);" << std::endl;      
+    output << blank << "assign " + dest + "_t" + destSlice + " = " + cond + " ? " + extend(cond+"_t", localWidthNum) + " : (" + extend(cond+"_t", localWidthNum) + " | " + op2 + "_t" + op2Slice + ");" << std::endl;  
+    output << blank << "assign " + cond + "_r" + condVer + "_tmp = " + dest + "_r" + destSlice + " | (" + extend(cond, localWidthNum) + " & " + op2 + "_t" + op2Slice + ");" << std::endl;
+
+    ground_wires(op2+"_c"+fthVer, op2WidthNum, op2Slice, blank, output);
+    ground_wires(op2+"_r"+fthVer, op2WidthNum, op2Slice, blank, output);
+    ground_wires(op2+"_x"+fthVer, op2WidthNum, op2Slice, blank, output);
   }
   else {
     /* when both inputs are constants */
@@ -368,12 +407,10 @@ void nonblockconcat_taint_gen(std::string line, std::ofstream &output) {
   if ( !std::regex_match(line, m, pNonblockConcat) )
     return;
   std::string blank = m.str(1);
-  std::string update = m.str(3);
+  std::string updateList = m.str(3);
 
   std::string dest, destSlice;
-  std::string op1, op1Slice;
   split_slice(m.str(2), dest, destSlice);
-  split_slice(m.str(4), op1, op1Slice);
 
   uint32_t localWidthNum;
   std::string localWidth;
@@ -386,12 +423,17 @@ void nonblockconcat_taint_gen(std::string line, std::ofstream &output) {
   }
   localWidth = std::to_string(localWidthNum);  
 
+  std::string updateXList = std::regex_replace(updateList, pVarName, "$1_x$3");
+  std::string updateTList = std::regex_replace(updateList, pVarName, "$1_t$3");
+  std::string updateRList = std::regex_replace(updateList, pVarName, "$1_r$3");
 
-  output << blank.substr(0, blank.length()-4) + "assign " + op1 + "_x = " + extend(dest+" != "+update, localWidthNum) + ";" << std::endl;
+  output << blank.substr(0, blank.length()-4) + "assign " + updateXList + " = " + extend(dest+" != "+updateList, localWidthNum) + ";" << std::endl;
+
+
   output << blank.substr(0, blank.length()-4) + "always @(posedge " + clockName + ")" << std::endl;
-  output << blank + dest + "_t \t\t<= " + resetName + " ? 0 : | (" + op1 +"_t & " + op1 + "_x);" << std::endl;
+  output << blank + dest + "_t \t\t<= " + resetName + " ? 0 : | (" + updateTList +" & " + updateXList + ");" << std::endl;
   output << blank.substr(0, blank.length()-4) + "always @(posedge " + clockName + ")" << std::endl;
-  output << blank + dest + "_t_flag \t<= " + resetName + " ? 0 : " + dest + "_t_flag ? 1 : | (" + op1 + "_t & " + op1 + "_x);" << std::endl;
+  output << blank + dest + "_t_flag \t<= " + resetName + " ? 0 : " + dest + "_t_flag ? 1 : | (" + updateTList + " & " + updateXList + ");" << std::endl;
   output << blank.substr(0, blank.length()-4) + "always @(posedge " + clockName + ")" << std::endl;
   output << blank + dest + "_r_flag \t<= " + resetName + " ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + "_r;" << std::endl;
 }
@@ -424,12 +466,13 @@ void wire_taint_gen_func(std::string line, std::ofstream &output, std::string ta
 
   std::smatch m;
   std::regex_match(line, m, pWire);
+  std::string blank = m.str(1);  
+  std::string slice = m.str(2);
   std::string var = m.str(3);
-  std::string blank = m.str(1);
-  if (tExist) output << blank << "wire " + var + "_t;" << std::endl;
-  if (xExist) output << blank << "wire " + var + "_x;" << std::endl;  
-  if (rExist) output << blank << "wire " + var + "_r;" << std::endl;  
-  if (cExist) output << blank << "wire " + var + "_c;" << std::endl;  
+  if (tExist) output << blank << "wire " + slice + var + "_t;" << std::endl;
+  if (xExist) output << blank << "wire " + slice + var + "_x;" << std::endl;  
+  if (rExist) output << blank << "wire " + slice + var + "_r;" << std::endl;  
+  if (cExist) output << blank << "wire " + slice + var + "_c;" << std::endl;  
 }
 
 
@@ -462,13 +505,20 @@ void two_op_taint_gen_func(std::string line, std::ofstream &output, std::unorder
   bool op1IsNum = isNum(m.str(3));
   bool op2IsNum = isNum(m.str(4));
   std::string blank = m.str(1);
-  std::string dest = remove_bracket(m.str(2));
-  std::string op1 = remove_bracket(m.str(3));
-  std::string op2 = remove_bracket(m.str(4));
+  std::string dest, destSlice;
+  std::string op1, op1Slice;
+  std::string op2, op2Slice;
+  split_slice(m.str(2), dest, destSlice);
+  split_slice(m.str(3), op1, op1Slice);
+  split_slice(m.str(4), op2, op2Slice);
+
+  uint32_t op1WidthNum = varWidth[op1];
+  uint32_t op2WidthNum = varWidth[op2];
+  std::string op1Width = std::to_string(op1WidthNum);
+  std::string op2Width = std::to_string(op2WidthNum);
 
   if (!op1IsNum && !op2IsNum) { // 2-op
-    /* make assignme1ts */
-    if(tExist) output << blank << "assign " + dest + "_t = " + op1 + "_t |" + op2 + "_t;" << std::endl;
+    if(tExist) output << blank << "assign " + dest + "_t" + destSlice + " = " + op1 + "_t" + op1Slice + " | " + op2 + "_t" + op2Slice + ";" << std::endl;
 
     std::string sndVer;
     std::string thdVer;
@@ -482,27 +532,27 @@ void two_op_taint_gen_func(std::string line, std::ofstream &output, std::unorder
     }
 
     if (xExist) {
-      output << blank << "wire " + op1 + "_x" + sndVer + ";" << std::endl;
-      output << blank << "wire " + op2 + "_x" + thdVer + ";" << std::endl;
+      output << blank << "wire [" + op1Width + "-1:0] " + op1 + "_x" + sndVer + ";" << std::endl;
+      output << blank << "wire [" + op2Width + "-1:0] " + op2 + "_x" + thdVer + ";" << std::endl;
 
-      output << blank << "assign " + op1 + "_x" + sndVer + " = " + dest + "_x;" << std::endl;
-      output << blank << "assign " + op2 + "_x" + thdVer + " = " + dest + "_x;" << std::endl;
+      output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + dest + "_x" + destSlice + ";" << std::endl;
+      output << blank << "assign " + op2 + "_x" + thdVer + op2Slice + " = " + dest + "_x" + destSlice + ";" << std::endl;
     }
 
     if (rExist) {
-      output << blank << "wire " + op1 + "_r" + sndVer + ";" << std::endl;
-      output << blank << "wire " + op2 + "_r" + thdVer + ";" << std::endl;
+      output << blank << "wire [" + op1Width + "-1:0] " + op1 + "_r" + sndVer + ";" << std::endl;
+      output << blank << "wire [" + op2Width + "-1:0] " + op2 + "_r" + thdVer + ";" << std::endl;
     
-      output << blank << "assign " + op1 + "_r" + sndVer + " = " + dest + "_r | (" + dest + "_c & " + op2 + "_t);" << std::endl;
-      output << blank << "assign " + op2 + "_r" + thdVer + " = " + dest + "_r | (" + dest + "_c & " + op1 + "_t);" << std::endl;      
+      output << blank << "assign " + op1 + "_r" + sndVer + op1Slice + " = " + dest + "_r" + destSlice + " | (" + dest + "_c" + destSlice + " & " + op2 + "_t" + op2Slice + ");" << std::endl;
+      output << blank << "assign " + op2 + "_r" + thdVer + op2Slice + " = " + dest + "_r" + destSlice + " | (" + dest + "_c" + destSlice + " & " + op1 + "_t" + op1Slice + ");" << std::endl;
     }
 
     if (cExist) {
-      output << blank << "wire " + op1 + "_c" + sndVer + ";" << std::endl;
-      output << blank << "wire " + op2 + "_c" + thdVer + ";" << std::endl;
+      output << blank << "wire [" + op1Width + "-1:0] " + op1 + "_c" + sndVer + ";" << std::endl;
+      output << blank << "wire [" + op2Width + "-1:0] " + op2 + "_c" + thdVer + ";" << std::endl;
 
-      output << blank << "assign " + op1 + "_c" + sndVer + " = " + dest + "_c;" << std::endl;
-      output << blank << "assign " + op2 + "_c" + thdVer + " = " + dest + "_c;" << std::endl;
+      output << blank << "assign " + op1 + "_c" + sndVer + op1Slice + " = " + dest + "_c" + destSlice + ";" << std::endl;
+      output << blank << "assign " + op2 + "_c" + thdVer + op2Slice + " = " + dest + "_c" + destSlice + ";" << std::endl;
     }
   } 
   else if (!op1IsNum && op2IsNum) { // 2-op
@@ -515,18 +565,18 @@ void two_op_taint_gen_func(std::string line, std::ofstream &output, std::unorder
     }
 
     if (xExist) {
-      output << blank << "wire " + op1 + "_x" + sndVer + ";" << std::endl;
-      output << blank << "assign " + op1 + "_x" + sndVer + " = " + dest + "_x;" << std::endl; 
+      output << blank << "wire [" + op1Width + "-1:0] " + op1 + "_x" + sndVer + ";" << std::endl;
+      output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + dest + "_x" + destSlice + ";" << std::endl;        
     }
 
     if (rExist) {
-      output << blank << "wire " + op1 + "_r" + sndVer + ";" << std::endl;
-      output << blank << "assign " + op1 + "_r" + sndVer + " = " + dest + "_r;" << std::endl;
+      output << blank << "wire [" + op1Width + "-1:0] " + op1 + "_r" + sndVer + ";" << std::endl;
+      output << blank << "assign " + op1 + "_r" + sndVer + op1Slice + " = " + dest + "_r" + destSlice + ";" << std::endl;
     }
 
     if (cExist) {
-      output << blank << "wire " + op1 + "_c" + sndVer + ";" << std::endl;
-      output << blank << "assign " + op1 + "_c" + sndVer + " = " + dest + "_c;" << std::endl;
+      output << blank << "wire [" + op1Width + "-1:0] " + op1 + "_c" + sndVer + ";" << std::endl;
+      output << blank << "assign " + op1 + "_c" + sndVer + op1Slice + " = " + dest + "_c" + destSlice + ";" << std::endl;
     }
   }
   else if (op1IsNum && !op2IsNum) { // 2-op
@@ -539,18 +589,18 @@ void two_op_taint_gen_func(std::string line, std::ofstream &output, std::unorder
     }
 
     if (xExist) {
-      output << blank << "wire " + op2 + "_x" + thdVer + ";" << std::endl;      
-      output << blank << "assign " + op2 + "_x" + thdVer + " = " + dest + "_x;" << std::endl;
+      output << blank << "wire [" + op2Width + "-1:0] " + op2 + "_x" + thdVer + ";" << std::endl;   
+      output << blank << "assign " + op2 + "_x" + thdVer + op2Slice + " = " + dest + "_x" + destSlice + ";" << std::endl;
     }
 
     if (rExist) {
-      output << blank << "wire " + op2 + "_r" + thdVer + ";" << std::endl;
-      output << blank << "assign " + op2 + "_r" + thdVer + " = " + dest + "_r;" << std::endl;
+      output << blank << "wire [" + op2Width + "-1:0] " + op2 + "_r" + thdVer + ";" << std::endl;
+      output << blank << "assign " + op2 + "_r" + thdVer + op2Slice + " = " + dest + "_r" + destSlice + ";" << std::endl;
     }
 
     if(cExist) {
-      output << blank << "wire " + op2 + "_c" + thdVer + ";" << std::endl;
-      output << blank << "assign " + op2 + "_c" + thdVer + " = " + dest + "_c;" << std::endl;
+      output << blank << "wire [" + op2Width + "-1:0] " + op2 + "_c" + thdVer + ";" << std::endl;
+      output << blank << "assign " + op2 + "_c" + thdVer + op2Slice + " = " + dest + "_c" + destSlice + ";" << std::endl;
     }
   }
   else {
@@ -572,10 +622,17 @@ void one_op_taint_gen_func(std::string line, std::ofstream &output, std::unorder
   parse_taintBits(taintBits, tExist, rExist, xExist, cExist);
 
   std::string blank = m.str(1);
-  std::string dest = remove_bracket(m.str(2));
-  std::string op1 = remove_bracket(m.str(3));
+  std::string dest, destSlice;
+  std::string op1, op1Slice;
+  split_slice(m.str(2), dest, destSlice);
+  split_slice(m.str(3), op1, op1Slice);
 
-  if (tExist) output << blank << "assign " + dest + "_t = " + op1 + "_t;" << std::endl;
+  uint32_t op1WidthNum = varWidth[op1];
+  std::string op1Width = std::to_string(op1WidthNum);
+
+  if (tExist) { 
+    output << blank << "assign " + dest + "_t" + destSlice + " = " + op1 + "_t" + op1Slice + ";" << std::endl;
+  }
 
   std::string sndVer;
   if(rExist | xExist | cExist) {
@@ -584,18 +641,18 @@ void one_op_taint_gen_func(std::string line, std::ofstream &output, std::unorder
   }
 
   if (xExist) {
-    output << blank << "wire " + op1 + "_x" + sndVer + ";" << std::endl;    
-    output << blank << "assign " + op1 + "_x" + sndVer + " = " + dest + "_x;" << std::endl;
+    output << blank << "wire [" + op1Width + "-1:0] " + op1 + "_x" + sndVer + ";" << std::endl;    
+    output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + dest + "_x" + destSlice + ";" << std::endl;
   }
 
   if (rExist) {
-    output << blank << "wire " + op1 + "_r" + sndVer + ";" << std::endl;
-    output << blank << "assign " + op1 + "_r" + sndVer + " = " + dest + "_r;" << std::endl;
+    output << blank << "wire [" + op1Width + "-1:0] " + op1 + "_r" + sndVer + ";" << std::endl;
+    output << blank << "assign " + op1 + "_r" + sndVer + op1Slice + " = " + dest + "_r" + destSlice + ";" << std::endl;
   }
 
   if (cExist) {
-    output << blank << "wire " + op1 + "_c" + sndVer + ";" << std::endl;
-    output << blank << "assign " + op1 + "_c" + sndVer + " = " + dest + "_c;" << std::endl;
+    output << blank << "wire [" + op1Width + "-1:0] " + op1 + "_c" + sndVer + ";" << std::endl;
+    output << blank << "assign " + op1 + "_c" + sndVer + op1Slice + " = " + dest + "_c" + destSlice + ";" << std::endl;
   }
 }
 
@@ -610,10 +667,28 @@ void ite_taint_gen_func(std::string line, std::ofstream &output, std::unordered_
   std::smatch m;
   std::regex_match(line, m, pIte);
   std::string blank = m.str(1);
-  std::string dest = remove_bracket(m.str(2));
-  std::string cond = remove_bracket(m.str(3));
-  std::string op1 = remove_bracket(m.str(4));
-  std::string op2 = remove_bracket(m.str(5));
+
+  std::string dest, destSlice;
+  std::string cond = m.str(3);
+  std::string op1, op1Slice;
+  std::string op2, op2Slice;
+  
+  split_slice(m.str(4), op1, op1Slice);
+  split_slice(m.str(5), op2, op2Slice);
+  std::string op1Width = std::to_string(varWidth[op1]);
+  std::string op2Width = std::to_string(varWidth[op2]);
+  std::string condWidth = "1";
+
+  uint32_t localWidthNum;
+  std::string localWidth;
+  if(split_slice(m.str(2), dest, destSlice)) {
+    localWidthNum = get_width(destSlice);
+  }
+  // if no slice found, use the vector whole width
+  else {
+    localWidthNum = varWidth[dest];
+  }
+  localWidth = std::to_string(localWidthNum);
 
   bool op1IsNum = isNum(m.str(4));
   bool op2IsNum = isNum(m.str(5));
@@ -625,22 +700,26 @@ void ite_taint_gen_func(std::string line, std::ofstream &output, std::unordered_
   }
 
   if(xExist) {
-    output << blank << "wire " + cond + "_x" + condVer + ";" << std::endl;
-    output << blank << "assign " + cond + "_x" + condVer + " = " + dest + "_x;" << std::endl;
+    output << blank << "wire [" + condWidth + "-1:0] " + cond + "_x" + condVer + ";" << std::endl;
+    output << blank << "assign " + cond + "_x" + condVer + " = | " + dest + "_x" + destSlice + ";" << std::endl;
   }
 
   if(rExist) {
-    output << blank << "wire " + cond + "_r" + condVer + ";" << std::endl;
+    output << blank << "wire [" + condWidth + "-1:0] " + cond + "_r" + condVer + ";" << std::endl;
+    output << blank << "wire [" + localWidth + "-1:0] " + cond + "_r" + condVer + "_tmp;" << std::endl;
+    output << blank << "assign " + cond + "_r" + condVer + " = | " + cond + "_r" + condVer + "_tmp;" << std::endl;  
   }
 
   if(cExist) {
-    output << blank << "wire " + cond + "_c" + condVer + ";" << std::endl;
+    output << blank << "wire [" + condWidth + "-1:0] " + cond + "_c" + condVer + ";" << std::endl;
     output << blank << "assign " + cond + "_c" + condVer + " = 1;" << std::endl;
   }
 
   if (!op1IsNum && !op2IsNum) { // ite
     /* Assgin new versions */
-    if(tExist) output << blank << "assign " + dest + "_t = " + cond + " ? (" + cond + "_t | " + op1 + "_t) : (" + cond + "_t | " + op2 + "_t);" << std::endl;
+    if(tExist) {
+    output << blank << "assign " + dest + "_t" + destSlice + " = " + cond + " ? (" + extend(cond+"_t", localWidthNum) + " | " + op1 + "_t" + op1Slice + ") : (" + extend(cond+"_t", localWidthNum) + " | " + op2 + "_t" + op2Slice + ");" << std::endl;
+    }
 
     std::string thdVer;
     std::string fthVer;
@@ -653,31 +732,35 @@ void ite_taint_gen_func(std::string line, std::ofstream &output, std::unordered_
     }
 
     if (xExist) {
-      output << blank << "wire " + op1 + "_x" + thdVer + ";" << std::endl;
-      output << blank << "wire " + op2 + "_x" + thdVer + ";" << std::endl;
+    output << blank << "wire [" + op1Width + "-1:0] " + op1 + "_x" + thdVer + ";" << std::endl;
+    output << blank << "wire [" + op2Width + "-1:0] " + op2 + "_x" + fthVer + ";" << std::endl;        
 
-      output << blank << "assign " + op1 + "_x" + thdVer + " = " + dest + "_x;" << std::endl;       
-      output << blank << "assign " + op2 + "_x" + fthVer + " = " + dest + "_x;" << std::endl;
+    output << blank << "assign " + op1 + "_x" + thdVer + op1Slice + " = " + dest + "_x" + destSlice + ";" << std::endl;        
+    output << blank << "assign " + op2 + "_x" + fthVer + op2Slice + " = " + dest + "_x" + destSlice + ";" << std::endl;        
     }
 
     if (rExist) {
-      output << blank << "wire " + op1 + "_r" + thdVer + ";" << std::endl;
-      output << blank << "wire " + op2 + "_r" + fthVer + ";" << std::endl;
+      output << blank << "assign " + cond + "_r" + condVer + "_tmp = " + dest + "_r" + destSlice + " | (" + extend(cond, localWidthNum) + " & " + op1 + "_t" + op1Slice + " | " + extend("!"+cond, localWidthNum) + " & " + op2 + "_t" + op2Slice + ");" << std::endl;
       
-      output << blank << "assign " + op1 + "_r" + thdVer + " = " + cond + " & (" + cond + "_t | " + dest + "_r);" << std::endl;
-      output << blank << "assign " + op2 + "_r" + fthVer + " = !" + cond + " & (" + cond + "_t | " + dest + "_r);" << std::endl; 
+    output << blank << "wire [" + op1Width + "-1:0] " + op1 + "_r" + thdVer + ";" << std::endl;
+    output << blank << "wire [" + op2Width + "-1:0] " + op2 + "_r" + fthVer + ";" << std::endl;
+      
+      output << blank << "assign " + op1 + "_r" + thdVer + op1Slice + " = " + extend(cond, localWidthNum) + " & (" + extend(cond+"_t", localWidthNum) + " | " + dest + "_r" + destSlice + ");" << std::endl;
+      output << blank << "assign " + op2 + "_r" + fthVer + op2Slice + " = " + extend("!"+cond, localWidthNum) + " & (" + extend(cond+"_t", localWidthNum) + " | " + dest + "_r" + destSlice + ");" << std::endl; 
     }
 
     if (cExist) {
-    output << blank << "wire " + op1 + "_c" + thdVer + ";" << std::endl;
-    output << blank << "wire " + op2 + "_c" + fthVer + ";" << std::endl;
+    output << blank << "wire [" + op1Width + "-1:0] " + op1 + "_c" + thdVer + ";" << std::endl;
+    output << blank << "wire [" + op2Width + "-1:0] " + op2 + "_c" + fthVer + ";" << std::endl;
 
-    output << blank << "assign " + op1 + "_c" + thdVer + " = " + cond + ";" << std::endl;
-    output << blank << "assign " + op2 + "_c" + fthVer + " = !" + cond + ";" << std::endl;
+    output << blank << "assign " + op1 + "_c" + thdVer + op1Slice + " = " + extend(cond, localWidthNum) + ";" << std::endl;
+    output << blank << "assign " + op2 + "_c" + fthVer + op2Slice + " = " + extend("!"+cond, localWidthNum) + ";" << std::endl;
     }
   } 
   else if (!op1IsNum && op2IsNum) {
-    if (tExist) output << blank << "assign " + dest + "_t = " + cond + " ? (" + cond + "_t | " + op1 + "_t) : " + cond + "_t;" << std::endl;
+    if (tExist) {
+      output << blank << "assign " + dest + "_t" + destSlice + " = " + cond + " ? (" + extend(cond+"_t", localWidthNum) + " | " + op1 + "_t" + op1Slice + ") : " + extend(cond+"_t", localWidthNum) + ";" << std::endl;
+    }
 
     std::string thdVer;
     if(rExist | xExist | cExist) {    
@@ -686,23 +769,25 @@ void ite_taint_gen_func(std::string line, std::ofstream &output, std::unordered_
     }
 
     if(xExist) {
-      output << blank << "wire " + op1 + "_x" + thdVer + ";" << std::endl;        
-      output << blank << "assign " + op1 + "_x" + thdVer + " = " + dest + "_x;" << std::endl;
+      output << blank << "wire [" + op1Width + "-1:0] " + op1 + "_x" + thdVer + ";" << std::endl;        
+      output << blank << "assign " + op1 + "_x" + thdVer + op1Slice + " = " + dest + "_x" + destSlice + ";" << std::endl;
     }
 
     if(rExist) {
-      output << blank << "wire " + op1 + "_r" + thdVer + ";" << std::endl;
-      output << blank << "assign " + op1 + "_r" + thdVer + " = " + cond + " & (" + cond + "_t | " + dest + "_r);" << std::endl;
-      output << blank << "assign " + cond + "_r" + condVer + " = " + dest + "_r | (" + cond + " & " + op1 + "_t);" << std::endl;
+      output << blank << "wire [" + op1Width + "-1:0] " + op1 + "_r" + thdVer + ";" << std::endl;
+      output << blank << "assign " + op1 + "_r" + thdVer + op1Slice + " = " + extend(cond, localWidthNum) + " & (" + extend(cond+"_t", localWidthNum) + " | " + dest + "_r" + destSlice + ");" << std::endl;
+      output << blank << "assign " + cond + "_r" + condVer + "_tmp = " + dest + "_r" + destSlice + " | (" + extend(cond, localWidthNum) + " & " + op1 + "_t" + op1Slice + ");" << std::endl;
     }
 
     if(cExist) {
-      output << blank << "wire " + op1 + "_c" + thdVer + ";" << std::endl;
-      output << blank << "assign " + op1 + "_c" + thdVer + " = " + cond + ";" << std::endl;
+      output << blank << "wire [" + op1Width + "-1:0] " + op1 + "_c" + thdVer + ";" << std::endl;
+      output << blank << "assign " + op1 + "_c" + thdVer + op1Slice + " = " + extend(cond, localWidthNum) + ";" << std::endl;
     }
-  }
+  } // TODO: continue
   else if (op1IsNum && !op2IsNum) { // ite
-    if(tExist) output << blank << "assign " + dest + "_t = " + cond + " ? " + cond + "_t : (" + cond + "_t | " + op2 + "_t);" << std::endl;  
+    if(tExist) {
+      output << blank << "assign " + dest + "_t" + destSlice + " = " + cond + " ? " + extend(cond+"_t", localWidthNum) + " : (" + extend(cond+"_t", localWidthNum) + " | " + op2 + "_t" + op2Slice + ");" << std::endl;
+    }
     std::string fthVer;
     if(rExist | xExist | cExist) {        
       uint32_t fthVerNum = find_version_num(op2, versionMap);
@@ -710,23 +795,25 @@ void ite_taint_gen_func(std::string line, std::ofstream &output, std::unordered_
     }
 
     if(xExist) {    
-      output << blank << "wire " + op2 + "_x" + fthVer + ";" << std::endl;                
-      output << blank << "assign " + op2 + "_x" + fthVer + " = " + dest + "_x;" << std::endl;
+      output << blank << "wire [" + op2Width + "-1:0] " + op2 + "_x" + fthVer + ";" << std::endl;                
+      output << blank << "assign " + op2 + "_x" + fthVer + op2Slice + " = " + dest + "_x" + destSlice + ";" << std::endl;
     }
 
     if(rExist) {
-      output << blank << "wire " + op2 + "_r" + fthVer + ";" << std::endl;
-      output << blank << "assign " + cond + "_r" + condVer + " = " + dest + "_r | (" + cond + " & " + op2 + "_t);" << std::endl;      
-      output << blank << "assign " + op2 + "_r" + fthVer + " = !" + cond + " & (" + cond + "_t | " + dest + "_r);" << std::endl; 
+      output << blank << "wire [" + op2Width + "-1:0] " + op2 + "_r" + fthVer + ";" << std::endl;
+      output << blank << "assign " + cond + "_r" + condVer + "_tmp = " + dest + "_r" + destSlice + " | (" + extend(cond, localWidthNum) + " & " + op2 + "_t" + op2Slice + ");" << std::endl;      
+      output << blank << "assign " + op2 + "_r" + fthVer + op2Slice + " = " + extend("!"+cond, localWidthNum) + " & (" + extend(cond+"_t", localWidthNum) + " | " + dest + "_r" + destSlice + ");" << std::endl;
     }
 
     if(cExist) {
-      output << blank << "wire " + op2 + "_c" + fthVer + ";" << std::endl;
-      output << blank << "assign " + op2 + "_c" + fthVer + " = !" + cond + ";" << std::endl;
+      output << blank << "wire [" + op2Width + "-1:0] " + op2 + "_c" + fthVer + ";" << std::endl;
+      output << blank << "assign " + op2 + "_c" + fthVer + op2Slice + " = " + extend("!"+cond, localWidthNum) + ";" << std::endl;
     }
   }
   else {
     /* when both inputs are constants */
-    if(tExist) output << blank << "assign " + dest + "_t = " + cond + "_t;" << std::endl;
+    if(tExist) {
+      output << blank << "assign " + dest + "_t = " + extend(cond+"_t", localWidthNum) + ";" << std::endl;
+    }
   }
 }

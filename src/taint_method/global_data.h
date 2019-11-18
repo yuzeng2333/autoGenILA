@@ -27,6 +27,7 @@ extern std::regex pAdd;
 extern std::regex pSub;      
 extern std::regex pMult;      
 extern std::regex pEq;     
+extern std::regex pNeq;     
 extern std::regex pLt;       
 extern std::regex pLe;       
 extern std::regex pSt;       
@@ -34,14 +35,17 @@ extern std::regex pSe;
 extern std::regex pAnd;       
 extern std::regex pOr;      
 extern std::regex pBitOr;     
+extern std::regex pBitExOr;     
 extern std::regex pConcat;    
 extern std::regex pSel1;   
 extern std::regex pSel2;     
 extern std::regex pSel3;     
-extern std::regex pSel4;     
+extern std::regex pSel4;
+extern std::regex pBitOrRed2;
 /* 1 operator */
 extern std::regex pNot;     
-extern std::regex pNone;      
+extern std::regex pNone;     
+extern std::regex pBitOrRed1;
 /* ite */
 extern std::regex pIte;     
 /* do not add anything */
@@ -51,5 +55,6 @@ extern std::regex pEndmodule;
 /* non-blocking assignment */
 extern std::regex pNonblock;
 extern std::regex pNonblockConcat;    
-
+/* milicious */
+extern std::regex pVarName;
 #endif
