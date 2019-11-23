@@ -39,4 +39,10 @@ void debug_line(std::string line);
 void ground_wires(std::string wireName, uint32_t width, std::string slice, std::string blank, std::ofstream &output);
 
 void parse_var_list(std::string list, std::vector<std::string> &vec);
+
+uint32_t get_var_slice_width(std::string varSlice);
+
+std::string get_taint_list(std::vector<std::string> &updateVec, std::string taint);
+
+int str2int(std::string str, std::string info);
 #endif

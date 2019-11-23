@@ -14,9 +14,8 @@
 #define toStr(a) std::to_string(a)
 
 bool isNum(std::string name) {
-  std::regex p("^\\d+'h[\\dabcdef]+$");
   std::smatch m;
-  return std::regex_match(name, m, p);
+  return std::regex_match(name, m, pNum);
 }
 
 
@@ -40,11 +39,11 @@ bool isReg(std::string var) {
 
 std::string to_re(std::string input) {
   std::regex pName("NAME");
-  std::string varName("[\aa-zA-Z0-9_\\.:\\\\']+(\\s*)(\\[\\d+(\\:\\d+)?\\])?");
+  std::string varName("[\aa-zA-Z0-9_\\.:\\\\']+(?:\\s*)?(?:\\[\\d+(?:\\:\\d+)?\\])?");
   auto res = std::regex_replace(input, pName, varName);
-  std::regex pNum("NUM");
-  std::string regexNum("\\d+'h\\d+");
-  res = std::regex_replace(res, pNum, regexNum);
+  std::regex pNUM("NUM");
+  std::string regexNum("\\d+'h[\\dabcdef]+");
+  res = std::regex_replace(res, pNUM, regexNum);
   std::regex pInt("INT");
   std::string regexInt("\\d+");
   res = std::regex_replace(res, pInt, regexInt);
@@ -74,14 +73,20 @@ uint32_t cut_pos(std::string name) {
 
 
 bool split_slice(std::string slicedName, std::string &name, std::string &slice) {
+  std::regex pLocal("^(\\s*)(\\S+)(\\s*)$");
+  std::smatch m;
   uint32_t pos = cut_pos(slicedName);
   if (pos == slicedName.length()) {
     name = slicedName;
+    std::regex_match(name, m, pLocal);
+    name = m.str(2);
     slice = "";
     return false;
   }
   else {
     name = slicedName.substr(0, pos);
+    std::regex_match(name, m, pLocal);
+    name = m.str(2);
     slice = slicedName.substr(pos);
     return true;
   }
@@ -95,23 +100,25 @@ uint32_t get_width(std::string slice) {
     return 1;
   if( !std::regex_match(slice, m, pSlice))
     std::cout << "Wrong input:|" + slice << "|" << std::endl;
-  return std::stoi(m.str(1)) - std::stoi(m.str(2)) + 1;
+  return str2int(m.str(1), "get_width 1st("+slice+")") - str2int(m.str(2), "get_width 2rd("+slice+")") + 1;
 }
 
 
 uint32_t get_begin(std::string slice) {
-  std::regex pSlice("^\\[(\\d+)\\:(\\d+)\\](\\s)?$");
+  std::regex pSlice("^\\[(?:(\\d+)\\:)?(\\d+)\\](\\s)?$");
   std::smatch m;
-  std::regex_match(slice, m, pSlice);
-  return std::stoi(m.str(2));
+  if( !std::regex_match(slice, m, pSlice) )
+    std::cout << "Wrong input:|" + slice << "|" << std::endl;
+  return str2int(m.str(2), "get_begin("+slice+")");
 }
 
 
 uint32_t get_end(std::string slice) {
-  std::regex pSlice("^\\[(\\d+)\\:(\\d+)\\](\\s)?$");
+  std::regex pSlice("^\\[(\\d+)(?:\\:(\\d+))?\\](\\s)?$");
   std::smatch m;
-  std::regex_match(slice, m, pSlice);
-  return std::stoi(m.str(1));
+  if( !std::regex_match(slice, m, pSlice) )
+    std::cout << "Wrong input:|" + slice << "|" << std::endl;
+  return str2int(m.str(1), "get_end("+slice+")");
 }
 
 
@@ -186,6 +193,7 @@ void ground_wires(std::string wireName, uint32_t width, std::string slice, std::
 
 // assume the input is a list of vars, separated by comma.
 // Aslo, the vars might contain numbers
+// But blanks at the front and back are removed
 void parse_var_list(std::string list, std::vector<std::string> &vec) {
   assert(vec.size() == 0);
   int previous = -1;
@@ -195,9 +203,80 @@ void parse_var_list(std::string list, std::vector<std::string> &vec) {
   // collect all non-numerical args in vector args
   while( current != std::string::npos ) {
     current = list.find(delim, previous + 1);
-    arg = list.substr(previous+1, current-1);
-    if ( !isNum(arg) )
-      vec.push_back(arg);
+    arg = list.substr(previous+1, current-previous-1);
+    //std::regex pLocal("^(\\s)*(\\S+)(\\s)*$");
+    std::regex pLocal("^(?:\\s)*([\aa-zA-Z0-9_\\.:\\\\']+(?:\\s*)?(?:\\[\\d+(?:\\:\\d+)?\\])?)(?:\\s)*$");
+    std::smatch m;
+    std::regex_match(arg, m, pLocal);
+    vec.push_back(m.str(1));
     previous = current;
   }
+}
+
+
+uint32_t get_var_slice_width(std::string varAndSlice) {
+  if(isNum(varAndSlice)) {
+    std::smatch m;
+    std::regex_match(varAndSlice, m, pNum);
+    uint32_t width = str2int(m.str(1), "get_var_slice width("+varAndSlice+")");
+    return width;
+  }
+  std::regex pSlice("\\[(\\d+)(:)?(\\d+)?\\]");
+  std::smatch m;
+  std::string var, varSlice;
+  split_slice(varAndSlice, var, varSlice);
+  std::regex pName("(\\s*)(\\S+)(\\s*)");
+  std::regex_match(var, m, pName);
+  var = m.str(2);
+  uint32_t totalWidth = 0;
+  if(std::regex_search(varAndSlice, m, pSlice)) {
+    if(m.str(2).empty())
+      totalWidth += 1;
+    else {
+      int d1 = str2int(m.str(1), "get_var_slice d1("+varAndSlice+")");
+      int d2 = str2int(m.str(3), "get_var_slice d2("+varAndSlice+")");
+      totalWidth += std::abs(d1 - d2) + 1;
+    }
+  }
+  else {
+    //std::cout << "varWdith:" + varWidth[var] << std::endl;
+    auto v = varWidth.get_from_var_width(var, varAndSlice);
+    totalWidth += v;
+  }
+  return totalWidth;
+}
+
+
+std::string get_taint_list(std::vector<std::string> &updateVec, std::string taint) {
+  std::vector<std::string> taintVec;
+  std::smatch m;
+  std::string updateTaint;
+  for(std::string singleUpdate : updateVec) {
+    if(!isNum(singleUpdate)) {
+      std::regex_match(singleUpdate, m, pVarNameGroup);
+      //std::string toReplace = m.str(1)+taint+m.str(3);
+      singleUpdate = std::regex_replace(singleUpdate, pVarNameGroup, "$1"+taint+"$3");
+    }
+    taintVec.push_back(singleUpdate);    
+  }
+  std::string returnList = " ";
+  for (auto it = taintVec.begin(); it < taintVec.end() - 1; ++it) {
+    returnList = returnList + *it + ", ";
+  }
+  returnList = returnList + taintVec.back() + " ";
+  return returnList;
+}
+
+
+int str2int(std::string str, std::string info) {
+  int res;
+  try{
+    res = std::stoi(str);
+  }
+  catch(std::invalid_argument arg) {
+    std::cout << "Wrong input to stoi:" + str << std::endl;
+    std::cout << "Info:" + info << std::endl;
+    abort();
+  }
+  return res;
 }

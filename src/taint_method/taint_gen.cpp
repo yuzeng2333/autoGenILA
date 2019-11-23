@@ -4,6 +4,7 @@
 #include <fstream>
 #include <regex>
 #include <vector>
+#include <queue>
 #include <utility>
 #include <assert.h>
 #include <unordered_map>
@@ -36,6 +37,7 @@ std::regex pAnd       (to_re("^(\\s*)assign (NAME) = (NAME) && (NAME)(\\s*)?;$")
 std::regex pOr        (to_re("^(\\s*)assign (NAME) = (NAME) \\|\\| (NAME)(\\s*)?;$"));
 std::regex pBitOr     (to_re("^(\\s*)assign (NAME) = (NAME) \\| (NAME)(\\s*)?;$"));
 std::regex pBitExOr   (to_re("^(\\s*)assign (NAME) = (NAME) \\^ (NAME)(\\s*)?;$"));
+//TODO: merge pConcat and pPureConcat
 std::regex pConcat    (to_re("^(\\s*)assign (NAME) = \\{ (NAME), (NAME) \\}(\\s*)?;$"));
 std::regex pSel1      (to_re("^(\\s*)assign (NAME) = (NAME)\\[\\$signed\\((NAME)\\) \\+\\: INT\\](\\s*)?;$"));
 std::regex pSel2      (to_re("^(\\s*)assign (NAME) = (NAME)\\[(NAME) \\+\\: INT\\](\\s*)?;$"));
@@ -65,9 +67,16 @@ std::regex pCase      (to_re("^(\\s*)case(\\S)? \\((NAME)\\)$"));
 std::regex pEndcase   (to_re("^(\\s*)endcase$"));
 std::regex pDefault   (to_re("^(\\s*)default\\:$"));
 std::regex pBlock     (to_re("^(\\s*)(NAME) = (NAME)(\\s*)?;$"));
+/* multiple/un-certain # of ops */
+//std::regex pBitExOrConcat (to_re("^(\\s*)assign (NAME) = \\{\\} \\^ (NAME)(\\s*)?;$"));
+std::regex pSrcConcat(to_re("^(\\s*)assign (NAME) = \\{(.+)\\}(\\s*)?;$"));
+std::regex pSrcDestBothConcat(to_re("^(\\s*)assign \\{(.+)\\} = \\{(.+)\\}(\\s*)?;$"));
 
 /* Milicious */
-std::regex pVarName("([\aa-zA-Z0-9_\\.:\\\\']+)(\\s*)(\\[\\d+(\\:\\d+)?\\])?");
+std::regex pVarName("([\aa-zA-Z0-9_\\.:\\\\']+)(?:\\s*)?(?:\\[\\d+(\\:\\d+)?\\])?");
+std::regex pVarNameGroup("([\aa-zA-Z0-9_\\.:\\\\']+)(\\s*)?(\\[\\d+(\\:\\d+)?\\])?");
+std::regex pNum("^(\\d+)'h[\\dabcdef]+$");
+
 
 /* Global data */
 std::string moduleName;
@@ -81,11 +90,15 @@ std::unordered_map<std::string, uint32_t> nextVersion;
 std::unordered_map<std::string, std::string> new_reg;
 std::unordered_map<std::string, std::string> new_next;
 std::unordered_map<std::string, std::string> update_reg;
-std::unordered_map<std::string, uint32_t> varWidth;
+VarWidth varWidth;
+VarWidth funcVarWidth;
+unsigned long int NEW_VAR = 0;
+bool did_clean_file = false;
 
 
-// remove comments
-// remove redundent blanks
+/*remove comments
+  remove redundent blanks 
+  extract concatenants */
 void clean_file(std::string fileName) {
   std::ifstream input(fileName);
   std::ofstream output(fileName + ".clean");
@@ -96,14 +109,107 @@ void clean_file(std::string fileName) {
   std::regex partialComment("\\(\\*.*\\*\\) ");
   std::regex redundentBlank("(\\S)(\\s+)(\\S)");
   std::regex extraBlank("([a-zA-Z0-9_\\.'])(\\s)(\\[)");
+  bool inFunc = false;
   while( std::getline(input, line) ) {
     if(std::regex_match(line, match, pureComment) || line.substr(0,2) == "/*" || line.empty())
       continue;
-    cleanLine = std::regex_replace(line, partialComment, "");
-    cleanLine = std::regex_replace(cleanLine, redundentBlank, "$1 $3");
-    output << cleanLine << std::endl;
+    line = std::regex_replace(line, partialComment, "");
+    cleanLine = std::regex_replace(line, redundentBlank, "$1 $3");
+    // store the width of wires and regs in varWidth
+    uint32_t choice = parse_verilog_line(cleanLine, true);
+    std::smatch m;
+    switch (choice) {
+      case INPUT:
+        {
+          std::regex_match(line, m, pInput);
+          std::string slice = m.str(2);
+          std::string var = m.str(3);
+          //varWidth.insert( std::make_pair(var, get_width(slice)) );
+          bool insertDone;
+          if(!inFunc)
+            insertDone = varWidth.var_width_insert(var, get_width(slice));
+          else
+            insertDone = funcVarWidth.force_insert(var, get_width(slice));            
+          if (!insertDone) {
+            std::cout << "insert failed in input case:" + line << std::endl;
+            std::cout << "m.str(2):" + m.str(2) << std::endl;
+            std::cout << "m.str(3):" + m.str(3) << std::endl;
+          }
+        }
+        break;
+      case REG:
+        {
+          std::regex_match(line, m, pReg);
+          std::string slice = m.str(2);
+          std::string var = m.str(3);
+          //varWidth.insert( std::make_pair(var, get_width(slice)) );
+          bool insertDone;
+          if(!inFunc)
+            insertDone = varWidth.var_width_insert(var, get_width(slice));
+          else
+            insertDone = funcVarWidth.force_insert(var, get_width(slice));
+          if (!insertDone) {
+            std::cout << "insert failed in reg case:" + line << std::endl;
+            std::cout << "m.str(2):" + m.str(2) << std::endl;
+            std::cout << "m.str(3):" + m.str(3) << std::endl;
+          }
+        }
+        break;
+      case WIRE:
+        {
+          std::regex_match(line, m, pWire);
+          std::string slice = m.str(2);
+          std::string var = m.str(3);
+          //varWidth.insert( std::make_pair(var, get_width(slice)) );
+          bool insertDone;
+          if(!inFunc)
+            insertDone = varWidth.var_width_insert(var, get_width(slice));
+          else
+            insertDone = funcVarWidth.force_insert(var, get_width(slice));
+          if (!insertDone) {
+            std::cout << "insert failed in wire case:" + line << std::endl;
+            std::cout << "m.str(2):" + m.str(2) << std::endl;
+            std::cout << "m.str(3):" + m.str(3) << std::endl;
+          }
+        }
+        break;
+      case OUTPUT:
+        {
+          std::regex_match(line, m, pOutput);
+          std::string slice = m.str(2);
+          std::string var = m.str(3);
+          //varWidth.insert( std::make_pair(var, get_width(slice)) );
+          bool insertDone;
+          if(!inFunc)
+            insertDone = varWidth.var_width_insert(var, get_width(slice));
+          else
+            insertDone = funcVarWidth.force_insert(var, get_width(slice));
+          if (!insertDone) {
+            std::cout << "insert failed in output case:" + line << std::endl;
+            std::cout << "m.str(2):" + m.str(2) << std::endl;
+            std::cout << "m.str(3):" + m.str(3) << std::endl;
+          }
+        }
+        break;
+      case FUNCDEF:
+        {
+          inFunc = true;
+        }
+        break;
+      case FUNCEND:
+        {
+          inFunc = false;
+        }
+        break;
+      default:
+        break;
+    }
+    bool noConcat = extract_concat(line, output);
+    if (noConcat)
+      output << cleanLine << std::endl;
   }
   output.close();
+  did_clean_file = true;
 }
 
 
@@ -125,6 +231,12 @@ void add_line_taints(std::string line, std::ofstream &output) {
     case ONE_OP:
       one_op_taint_gen(line, output);      
       break;
+    case MULT:
+      mult_op_taint_gen(line, output);
+      break;
+    case BOTHCONCAT:
+      both_concat_op_taint_gen(line, output);
+      break;
     case ITE:
       ite_taint_gen(line, output);      
       break;
@@ -144,7 +256,7 @@ void add_line_taints(std::string line, std::ofstream &output) {
 
 
 // FIXME: maybe set t-taint and r-taint to clear if reg value is not changed
-int parse_verilog_line(std::string line) {
+int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   std::smatch m;
   if ( std::regex_match(line, m, pModule) ) {
     moduleName = m.str(2);
@@ -184,7 +296,6 @@ int parse_verilog_line(std::string line) {
             || std::regex_match(line, m, pSel2)
             || std::regex_match(line, m, pSel3)
             || std::regex_match(line, m, pSel4) 
-            || std::regex_match(line, m, pConcat)
             || std::regex_match(line, m, pBitOrRed2) ) {
     return TWO_OP;
   } // end of 2-operator
@@ -193,6 +304,12 @@ int parse_verilog_line(std::string line) {
             || std::regex_match(line, m, pBitOrRed1)
             || std::regex_match(line, m, pNone)) {
     return ONE_OP;
+  }
+  else if (std::regex_match(line, m, pSrcConcat)) {
+    return MULT;
+  }
+  else if (std::regex_match(line, m, pSrcDestBothConcat)) {
+    return BOTHCONCAT;
   }
   else if (std::regex_match(line, m, pIte)) { // if cond is rst, then does not add any taint
     return ITE;
@@ -211,9 +328,17 @@ int parse_verilog_line(std::string line) {
   else if( std::regex_match(line, m, pCase) ) {
     return CASE;
   }
+  else if( std::regex_match(line, m, pFunctionDef) ) {
+    return FUNCDEF;
+  }
+  else if( std::regex_match(line, m, pEndfunction) ) {
+    return FUNCEND;
+  }
   else {
-    std::cout << "!! Unsupported operator:" + line << std::endl;
-    abort();
+    if(!ignoreWrongOp) {
+      std::cout << "!! Unsupported operator:" + line << std::endl;
+      abort();
+    }
     return NONE;
   }
 }
@@ -239,12 +364,15 @@ void read_in_clkrst(std::string fileName) {
 
 
 void add_file_taints(std::string fileName) {
+  long long int lineNo = 0;
   std::ifstream input(fileName);
   std::ofstream output(fileName + ".tainted");
   std::string line;
   std::smatch match;
   // Reserve first line for module declaration
   while( std::getline(input, line) ) {
+    lineNo++;
+    //if(lineN0)
     if ( !std::regex_match(line, match, pModule) 
         && !std::regex_match(line, match, pEndmodule) )
       output << line << std::endl;
@@ -568,7 +696,7 @@ void add_case_taints(std::ifstream &input, std::ofstream &output, std::string fi
   std::string blank = m.str(1);
   std::string postfix = m.str(2);
   std::string condName = m.str(3);
-  uint32_t condWidthNum = varWidth[condName];
+  uint32_t condWidthNum = varWidth.get_from_var_width(condName, firstLine);
   
   /* read the whole case and get all the RHS */
   std::string line;  
@@ -616,7 +744,7 @@ void add_case_taints(std::ifstream &input, std::ofstream &output, std::string fi
     for( std::string rhs: allRhs ) {
       std::string rhsName, rhsSlice;
       split_slice(rhs, rhsName, rhsSlice);
-      output << blank + "wire [" + toStr(varWidth[rhsName]) + "-1:0] " + rhsName + "_r" + localVer[rhsName] + ";" << std::endl;
+      output << blank + "wire [" + toStr(varWidth.get_from_var_width(rhsName, firstLine)) + "-1:0] " + rhsName + "_r" + localVer[rhsName] + ";" << std::endl;
     }
   }
 
@@ -624,7 +752,7 @@ void add_case_taints(std::ifstream &input, std::ofstream &output, std::string fi
     for( std::string rhs: allRhs ) {
       std::string rhsName, rhsSlice;
       split_slice(rhs, rhsName, rhsSlice);
-      output << blank + "wire [" + toStr(varWidth[rhsName]) + "-1:0] " + rhsName + "_x" + localVer[rhsName] + ";" << std::endl;
+      output << blank + "wire [" + toStr(varWidth.get_from_var_width(rhsName, firstLine)) + "-1:0] " + rhsName + "_x" + localVer[rhsName] + ";" << std::endl;
     }
   }
 
@@ -632,7 +760,7 @@ void add_case_taints(std::ifstream &input, std::ofstream &output, std::string fi
     for( std::string rhs: allRhs ) {
       std::string rhsName, rhsSlice;
       split_slice(rhs, rhsName, rhsSlice);
-      output << blank + "wire [" + toStr(varWidth[rhsName]) + "-1:0] " + rhsName + "_c" + localVer[rhsName] + ";" << std::endl;
+      output << blank + "wire [" + toStr(varWidth.get_from_var_width(rhsName, firstLine)) + "-1:0] " + rhsName + "_c" + localVer[rhsName] + ";" << std::endl;
     }
   }
 
@@ -656,7 +784,7 @@ void add_case_taints(std::ifstream &input, std::ofstream &output, std::string fi
         localWidthNum = get_width(destSlice);
       }
       else {
-        localWidthNum = varWidth[dest];
+        localWidthNum = varWidth.get_from_var_width(dest, line);
       }
 
       if( tExist ) {
@@ -668,17 +796,17 @@ void add_case_taints(std::ifstream &input, std::ofstream &output, std::string fi
        * how to deal with floating wires? */
       if( rExist ) {
         output << blank + src + "_r" + localVer[src] + srcSlice + " = " + dest + "_r" + destSlice + " | " + extend(condName+"_t_1bit", localWidthNum) + ";" << std::endl;
-        ground_wires(src+"_r"+localVer[src], varWidth[src], srcSlice, blank, output);
+        ground_wires(src+"_r"+localVer[src], varWidth.get_from_var_width(src, line), srcSlice, blank, output);
       }
 
       if( xExist ) {
         output << blank + src + "_x" + localVer[src] + srcSlice + " = " + dest + "_x" + destSlice + ";" << std::endl;
-        ground_wires(src+"_x"+localVer[src], varWidth[src], srcSlice, blank, output);
+        ground_wires(src+"_x"+localVer[src], varWidth.get_from_var_width(src, line), srcSlice, blank, output);
       }
 
       if( cExist ) {
         output << blank + src + "_c" + localVer[src] + srcSlice + " = " + extend("1", localWidthNum) + ";" << std::endl;
-        ground_wires(src+"_c"+localVer[src], varWidth[src], srcSlice, blank, output);
+        ground_wires(src+"_c"+localVer[src], varWidth.get_from_var_width(src, line), srcSlice, blank, output);
       }
       readSwitchValue = true;        
     }
@@ -746,8 +874,10 @@ void add_func_taints_call_limited(std::string line, std::ofstream &output) {
   // print the func call
   output << line << std::endl;
   std::regex pArgComb("\\{.*\\}");
-  if( !std::regex_search(line, m, pArgComb) )
+  if( !std::regex_search(line, m, pArgComb) ) {
     std::cout << "!! Error in parsing func args !!" << std::endl;
+    abort();
+  }
   std::string varArgs = m.str(0);
 
   std::regex pArg("_\\d+_");
@@ -756,21 +886,126 @@ void add_func_taints_call_limited(std::string line, std::ofstream &output) {
   std::string argX = std::regex_replace(varArgs, pArg, "$0_x");
   std::string argC = std::regex_replace(varArgs, pArg, "$0_c");
 
-  output << blank + "assign " + returnArg + "_t" + " = " + funcName + "_t(" + argT + ");" << std::endl;
+  output << blank + "assign " + returnArg + "_t = " + funcName + "_t(" + argT + ");" << std::endl;
   output << blank + "assign " + argR + " = " + funcName + "_r(" + returnArg + "_r" + ");" << std::endl;
   output << blank + "assign " + argX + " = " + funcName + "_x(" + returnArg + "_x" + ");" << std::endl;
   output << blank + "assign " + argC + " = " + funcName + "_c(" + returnArg + "_c" + ");" << std::endl;
 }
 
 
-int main(int argc, char* argv[]) {
-  std::string fileName = argv[1];
-  clean_file(fileName);
-  read_in_clkrst(fileName + ".clkrst");
-  fill_update(fileName + ".clean");  
-  add_file_taints(fileName + ".clean");
-  merge_taints(fileName + ".clean.tainted");
-  add_module_name(fileName + ".clean.tainted");
+/* if a basic operator contains concatenated input, 
+ * declare a new variable representing the concatenated input*/
+bool extract_concat(std::string line, std::ofstream &output) {
+  std::smatch m;
+  int blankNo = line.find('a', 0);  
+  std::regex pAssign("assign ");
+  std::regex pBraces("\\{(.+)\\}");
+  std::regex pSlice("\\[(\\d+)(:)?(\\d+)?\\]");
+
+  std::regex_token_iterator<std::string::iterator> rend;
+  std::regex_token_iterator<std::string::iterator> it(line.begin(), line.end(), pBraces, 1);
+
+  std::string varList;
+  std::string newLine;
+  std::vector<std::string> allVarList;
+  std::queue<std::string> newVarQueue;
+  if (std::regex_search(line, m, pAssign)
+      && !std::regex_match(line, m, pSrcConcat)
+      && !std::regex_match(line, m, pSrcDestBothConcat)
+      && std::regex_search(line, m, pBraces)) {
+    // iterate over all matches
+    while( it != rend ) {
+      varList = *it++;
+      allVarList.push_back(varList);
+      int localIdxNum = NEW_VAR++;
+      std::string localIdx = std::to_string(localIdxNum);
+      uint32_t totalWidth = 0;
+      std::vector<std::string> varVec;
+      parse_var_list(varList, varVec);
+      for(std::string var: varVec) {
+        uint32_t localWidth = get_var_slice_width(var);
+        totalWidth += localWidth;
+      }
+      if(totalWidth > 4294967290) {
+        std::cout << "!! Error in getting total width for this line:" << std::endl;
+        std::cout << line << std::endl;
+        abort();
+      }
+      bool insertDone = varWidth.var_width_insert("yuzeng"+localIdx, totalWidth);
+      if (!insertDone) {
+        std::cout << "insert failed for this line:" + line << std::endl;
+        std::cout << "m.str(2):" + m.str(2) << std::endl;
+        std::cout << "m.str(3):" + m.str(3) << std::endl;
+      }
+      output << std::string(blankNo, ' ') + "wire [" + toStr(totalWidth-1) + ":0] " + "yuzeng" + localIdx + ";" << std::endl;
+      output << std::string(blankNo, ' ') + "assign yuzeng" + localIdx + " = {" + varList + "};" << std::endl;
+      newVarQueue.push("yuzeng"+localIdx);
+    }
+    char openBrace = '{';
+    char closeBrace = '}';
+    int openBracePos, closeBracePos = -1;
+    /* if state=0, searching for openBrace
+     * if state=1, searching for closeBrace */
+    int state = 0;
+    std::string part;
+    // Assumption: the last search must be for openBrace
+    while( openBracePos != std::string::npos ) {
+      if (state == 0) {
+        openBracePos = line.find(openBrace, closeBracePos+1);
+        part = line.substr(closeBracePos+1, openBracePos - closeBracePos - 1);
+        state = 1;
+      }
+      else if (state == 1) {
+        closeBracePos = line.find(closeBrace, openBracePos+1);
+        part = line.substr(openBracePos, closeBracePos - openBracePos + 1);
+        state = 0;
+      }
+      else
+        abort();
+      if(state == 1) {// just find openBrace
+        output << part;
+      }
+      else { // just find closeBrace
+        auto newVar = newVarQueue.front();
+        output << newVar;
+        newVarQueue.pop();
+      }
+    }
+    output << std::endl;
+    return false;
+  } // end of if
+  return true;
 }
 
-
+int main(int argc, char* argv[]) {
+  std::string fileName = argv[1];
+  if(argc <= 2 ) {
+    std::cout << "Not enough arguments!" << std::endl;
+    abort();
+  }
+  int stage = str2int(argv[2], "main: stage");
+  if (stage <= 0) {
+    std::cout << "Begin cleaning!" << std::endl; //0
+    clean_file(fileName);
+  }
+  if (stage <= 1) {  
+    std::cout << "Begin read in clkrst!" << std::endl; //1
+    read_in_clkrst(fileName + ".clkrst");
+  }
+  if (stage <= 2) {  
+    std::cout << "Begin fill update!" << std::endl; //2
+    fill_update(fileName + ".clean");
+  }
+  if (stage <= 3) {  
+    std::cout << "Begin add file taints!" << std::endl; //3
+    add_file_taints(fileName + ".clean");
+  }
+  if (stage <= 4) {  
+    std::cout << "Begin merge taints!" << std::endl; //4
+    merge_taints(fileName + ".clean.tainted");
+  }
+  if (stage <= 5) {  
+    std::cout << "Begin add module name!" << std::endl; //5
+    add_module_name(fileName + ".clean.tainted");
+  }
+}

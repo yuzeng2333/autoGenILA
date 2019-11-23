@@ -1,6 +1,10 @@
 #ifndef GLOBAL
 #define GLOBAL
-#include "helper.h"
+#include "VarWidth.h"
+#include <vector>
+#include <string>
+#include <unordered_map>
+#include <regex>
 
 /* Global data */
 extern std::string moduleName;
@@ -14,7 +18,7 @@ extern std::unordered_map<std::string, uint32_t> nextVersion;
 extern std::unordered_map<std::string, std::string> new_reg;
 extern std::unordered_map<std::string, std::string> new_next;
 extern std::unordered_map<std::string, std::string> update_reg;
-extern std::unordered_map<std::string, uint32_t> varWidth;
+extern VarWidth varWidth; 
 
 /* declarations */
 extern std::regex pModule;
@@ -54,7 +58,23 @@ extern std::regex pEnd;
 extern std::regex pEndmodule; 
 /* non-blocking assignment */
 extern std::regex pNonblock;
-extern std::regex pNonblockConcat;    
-/* milicious */
+extern std::regex pNonblockConcat;   
+
+extern std::regex pFunctionDef;
+extern std::regex pEndfunction;
+extern std::regex pFunctionCall;
+
+extern std::regex pCase;
+extern std::regex pEndcase;
+extern std::regex pDefault;
+extern std::regex pBlock;
+extern std::regex pSrcConcat;
+extern std::regex pSrcDestBothConcat;
+
 extern std::regex pVarName;
+extern std::regex pVarNameGroup;
+extern std::regex pNum;
+
+extern unsigned long int NEW_VAR;
+extern bool did_clean_file;
 #endif

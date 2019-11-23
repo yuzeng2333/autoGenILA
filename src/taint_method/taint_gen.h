@@ -6,19 +6,24 @@
 #include "helper.h"
 #include "op_taint_gen.h"
 #include "global_data.h"
+#include "VarWidth.h"
 
-#define INPUT           6
-#define REG             7
-#define WIRE            8
-#define TWO_OP          0
-#define ONE_OP          1
-#define ITE             2
-#define NONBLOCK        4
-#define NONBLOCKCONCAT  5
-#define OUTPUT          6
-#define CASE            9
-#define UNSUPPORT       99
-#define NONE            100
+#define INPUT          1 
+#define REG            2
+#define WIRE           3
+#define TWO_OP         4
+#define ONE_OP         5
+#define ITE            6
+#define NONBLOCK       7
+#define NONBLOCKCONCAT 8
+#define OUTPUT         9
+#define CASE           10
+#define MULT           11
+#define FUNCDEF        12
+#define FUNCEND        13
+#define BOTHCONCAT     14
+#define UNSUPPORT      99
+#define NONE           100
 
 void clean_file(std::string fileName);
 
@@ -38,7 +43,7 @@ bool isReg(std::string var);
 
 std::string to_re(std::string input);
 
-int parse_verilog_line(std::string line);
+int parse_verilog_line(std::string line, bool ignoreWrongOp=false);
 
 void add_func_taints(std::ifstream &input, std::ofstream &output, std::string funcDefinition);
 
@@ -50,4 +55,6 @@ void add_func_taints_limited(std::ifstream &input, std::ofstream &output, std::s
 void add_func_taints_call_limited(std::string line, std::ofstream &output);
 
 void merge_taints(std::string fileName);
+
+bool extract_concat(std::string line, std::ofstream &output);
 #endif

@@ -3,6 +3,7 @@
 
 #include <regex>
 #include "helper.h"
+#include "VarWidth.h"
 
 void input_taint_gen(std::string line, std::ofstream &output);
 
@@ -13,6 +14,10 @@ void wire_taint_gen(std::string line, std::ofstream &output);
 void two_op_taint_gen(std::string line, std::ofstream &output);
  
 void one_op_taint_gen(std::string line, std::ofstream &output);
+
+void mult_op_taint_gen(std::string line, std::ofstream &output);
+
+void both_concat_op_taint_gen(std::string line, std::ofstream &output);
 
 void ite_taint_gen(std::string line, std::ofstream &output);
 

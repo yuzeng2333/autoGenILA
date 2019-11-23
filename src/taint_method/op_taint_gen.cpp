@@ -9,7 +9,10 @@
 #include <unordered_map>
 #include "op_taint_gen.h"
 #include <math.h>
+#include <assert.h>
 #include "global_data.h"
+
+#define toStr(a) std::to_string(a)
 
 void input_taint_gen(std::string line, std::ofstream &output) {
   std::smatch m;
@@ -21,8 +24,16 @@ void input_taint_gen(std::string line, std::ofstream &output) {
   if (var.compare( clockName) == 0)
     return;
   //debug_line(line);
-  varWidth.insert( std::make_pair(var, get_width(slice)) );
   output << m.str(1) << "input " + slice + var + "_t;" << std::endl;
+
+  if (!did_clean_file) {
+    bool insertDone = varWidth.var_width_insert(var, get_width(slice));
+    if (!insertDone) {
+      std::cout << "insert failed in input case:" + line << std::endl;
+      std::cout << "m.str(2):" + m.str(2) << std::endl;
+      std::cout << "m.str(3):" + m.str(3) << std::endl;
+    }
+  }
 }
 
 
@@ -34,13 +45,21 @@ void reg_taint_gen(std::string line, std::ofstream &output) {
   std::string var = m.str(3);
   moduleOutputs.push_back(var+"_r_flag");
   moduleRegs.push_back(var);
-  varWidth.insert( std::make_pair(var, get_width(slice)) );  
   output << m.str(1) << "reg " + var + "_t;" << std::endl;
   output << m.str(1) << "reg " + var + "_t_flag;" << std::endl;
   output << m.str(1) << "output reg " + var + "_r_flag;" << std::endl;
   output << m.str(1) << "wire " + var + "_r;" << std::endl;
   output << m.str(1) << "wire " + var + "_x;" << std::endl;
   output << m.str(1) << "wire " + var + "_c;" << std::endl;
+
+  if (!did_clean_file) {
+    bool insertDone = varWidth.var_width_insert(var, get_width(slice));
+    if (!insertDone) {
+      std::cout << "insert failed in input case:" + line << std::endl;
+      std::cout << "m.str(2):" + m.str(2) << std::endl;
+      std::cout << "m.str(3):" + m.str(3) << std::endl;
+    }
+  }
 }
 
 
@@ -52,11 +71,19 @@ void wire_taint_gen(std::string line, std::ofstream &output) {
   std::string var = m.str(3);
   std::string blank = m.str(1);
   //debug_line(line);  
-  varWidth.insert( std::make_pair(var, get_width(slice)) );  
   output << blank << "wire " + slice + var + "_t;" << std::endl;
   output << blank << "wire " + slice + var + "_r;" << std::endl;
   output << blank << "wire " + slice + var + "_c;" << std::endl;
   output << blank << "wire " + slice + var + "_x;" << std::endl;
+
+  if (!did_clean_file) {
+    bool insertDone = varWidth.var_width_insert(var, get_width(slice));
+    if (!insertDone) {
+      std::cout << "insert failed in input case:" + line << std::endl;
+      std::cout << "m.str(2):" + m.str(2) << std::endl;
+      std::cout << "m.str(3):" + m.str(3) << std::endl;
+    }
+  }
 }
 
 
@@ -79,23 +106,27 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
             || std::regex_match(line, m, pSel2)
             || std::regex_match(line, m, pSel3)
             || std::regex_match(line, m, pSel4) 
-            || std::regex_match(line, m, pBitOrRed2) 
-            || std::regex_match(line, m, pConcat) ){}
+            || std::regex_match(line, m, pBitOrRed2) ) {} 
   else
     return;
+  assert(!m.str(3).empty());
+  assert(!m.str(4).empty());
   bool op1IsNum = isNum(m.str(3));
   bool op2IsNum = isNum(m.str(4));
   std::string blank = m.str(1);
   std::string dest, destSlice;
   std::string op1, op1Slice;
   std::string op2, op2Slice;
-  split_slice(m.str(2), dest, destSlice);
+  std::string destAndSlice = m.str(2);
+  std::string op1AndSlice = m.str(3);
+  std::string op2AndSlice = m.str(4);
+  split_slice(destAndSlice, dest, destSlice);
   // !! Attention: op1 is just var name, op1Slice is its slice
-  split_slice(m.str(3), op1, op1Slice);
-  split_slice(m.str(4), op2, op2Slice);
+  split_slice(op1AndSlice, op1, op1Slice);
+  split_slice(op2AndSlice, op2, op2Slice);
 
-  uint32_t op1WidthNum = varWidth[op1];
-  uint32_t op2WidthNum = varWidth[op2];
+  uint32_t op1WidthNum = varWidth.get_from_var_width(op1, line);
+  uint32_t op2WidthNum = varWidth.get_from_var_width(op2, line);
   std::string op1Width = std::to_string(op1WidthNum);
   std::string op2Width = std::to_string(op2WidthNum);
 
@@ -124,11 +155,11 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
     if ( isOutput(dest) ) {
       output << blank << "assign " + op1 + "_c" + sndVer + op1Slice + " = 0;" << std::endl;
       output << blank << "assign " + op1 + "_r" + sndVer + op1Slice + " = 0;" << std::endl;
-      output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + std::to_string(std::pow(2, get_width(op1Slice)) - 1) + ";" << std::endl;
+      output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + std::to_string(std::pow(2, get_var_slice_width(op1AndSlice)) - 1) + ";" << std::endl;
         
       output << blank << "assign " + op2 + "_c" + thdVer + op2Slice + " = 0;" << std::endl;
       output << blank << "assign " + op2 + "_r" + thdVer + op2Slice + " = 0;" << std::endl;
-      output << blank << "assign " + op2 + "_x" + thdVer + op2Slice + " = " + std::to_string(std::pow(2, get_width(op2Slice)) - 1) + ";" << std::endl;
+      output << blank << "assign " + op2 + "_x" + thdVer + op2Slice + " = " + std::to_string(std::pow(2, get_var_slice_width(op2AndSlice)) - 1) + ";" << std::endl;
     }
     else {
       output << blank << "assign " + op1 + "_c" + sndVer + op1Slice + " = " + dest + "_c" + destSlice + ";" << std::endl;
@@ -160,7 +191,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
     output << blank << "assign " + dest + "_t" + destSlice + " = " + op1 + "_t" + op1Slice + ";" << std::endl;
     if ( isOutput(dest) ) {
       output << blank << "assign " + op1 + "_c" + sndVer + op1Slice + " = 0;" << std::endl;
-      output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + std::to_string(std::pow(2, get_width(op1Slice)) - 1) + ";" << std::endl;
+      output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + std::to_string(std::pow(2, get_var_slice_width(op1AndSlice)) - 1) + ";" << std::endl;
       output << blank << "assign " + op1 + "_r" + sndVer + op1Slice + " = 0;" << std::endl;
     }
     else {
@@ -185,7 +216,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
     if ( isOutput(dest) ) {
       output << blank << "assign " + op2 + "_c" + thdVer + op2Slice + " = 0;" << std::endl;
       output << blank << "assign " + op2 + "_r" + thdVer + op2Slice + " = 0;" << std::endl;
-      output << blank << "assign " + op2 + "_x" + thdVer + op2Slice + " = " + std::to_string(std::pow(2, get_width(op2Slice)) - 1) + ";" << std::endl;
+      output << blank << "assign " + op2 + "_x" + thdVer + op2Slice + " = " + std::to_string(std::pow(2, get_var_slice_width(op2AndSlice)) - 1) + ";" << std::endl;
     }
     else {
       output << blank << "assign " + op2 + "_c" + thdVer + op2Slice + " = " + dest + "_c" + destSlice + ";" << std::endl;
@@ -210,13 +241,17 @@ void one_op_taint_gen(std::string line, std::ofstream &output) {
             || std::regex_match(line, m, pBitOrRed1)){}
   else 
     return;
+  assert(!m.str(2).empty());
+  assert(!m.str(3).empty());
+  
   std::string blank = m.str(1);
   std::string dest, destSlice;
   std::string op1, op1Slice;
+  std::string op1AndSlice = m.str(3);
   split_slice(m.str(2), dest, destSlice);
-  split_slice(m.str(3), op1, op1Slice);
+  split_slice(op1AndSlice, op1, op1Slice);
   
-  uint32_t op1WidthNum = varWidth[op1];
+  uint32_t op1WidthNum = varWidth.get_from_var_width(op1, line);
   std::string op1Width = std::to_string(op1WidthNum);
 
   uint32_t sndVerNum = find_version_num(op1);
@@ -231,7 +266,7 @@ void one_op_taint_gen(std::string line, std::ofstream &output) {
   if ( isOutput(dest) ) {
       output << blank << "assign " + op1 + "_c" + sndVer + op1Slice + " = 0;" << std::endl;
       output << blank << "assign " + op1 + "_r" + sndVer + op1Slice + " = 0;" << std::endl;
-      output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + std::to_string(std::pow(2, get_width(op1Slice)) - 1) + ";" << std::endl;
+      output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + std::to_string(std::pow(2, get_var_slice_width(op1AndSlice)) - 1) + ";" << std::endl;
       // FIXME: because output is floating, it is always changed??      
   }
   else {
@@ -245,10 +280,137 @@ void one_op_taint_gen(std::string line, std::ofstream &output) {
 }
 
 
+void mult_op_taint_gen(std::string line, std::ofstream &output) {
+  std::smatch m;
+  if( !std::regex_match(line, m, pSrcConcat) )
+    abort();
+
+  std::string blank = m.str(1);
+  std::string dest, destSlice;
+  split_slice(m.str(2), dest, destSlice);
+  assert(destSlice.empty());
+  std::string updateList = m.str(3);
+
+  std::vector<std::string> updateVec;
+  parse_var_list(updateList, updateVec);
+  uint32_t destWidthNum = 0;
+  for(auto v : updateVec) {
+    destWidthNum += get_var_slice_width(v);
+  }
+
+  std::string updateTList = get_taint_list(updateVec, "_t");
+  //std::string updateRlist = get_taint_list(updateVec, "_r");
+  //std::string updateXlist = get_taint_list(updateVec, "_x");
+  //std::string updateClist = get_taint_list(updateVec, "_c");
+  // _t
+  std::string destWidth = std::to_string(destWidthNum);
+  output << blank + "wire [" + destWidth + "-1:0] " + dest + "_t;" << std::endl;
+  output << blank + "assign " + dest + "_t = {" + updateTList + "};" << std::endl;
+  // _r
+  uint32_t startIdxNum = destWidthNum-1;
+  for (std::string updateAndSlice: updateVec) {
+    std::string update, updateSlice;
+    split_slice(updateAndSlice, update, updateSlice);
+    uint32_t updateSliceWidthNum = get_var_slice_width(updateAndSlice);
+
+    std::string startIdx = toStr(startIdxNum);
+    std::string endIdx = toStr(startIdxNum - updateSliceWidthNum + 1);
+
+    if(!isNum(update)) {
+      uint32_t updateWidthNum = varWidth.get_from_var_width(update, line);
+      std::string updateWidth = std::to_string(updateWidthNum);
+
+      uint32_t localVerNum = find_version_num(update);
+      std::string localVer = std::to_string(localVerNum); 
+
+      output << blank + "wire [" + updateWidth + "-1:0] " + update + "_r;" << std::endl;
+      output << blank + "wire [" + updateWidth + "-1:0] " + update + "_x;" << std::endl;
+      output << blank + "wire [" + updateWidth + "-1:0] " + update + "_c;" << std::endl;
+      output << blank + "assign " + update + "_r" + localVer + updateSlice + " = " + dest + "_r[" + startIdx + ":" + endIdx + "];" << std::endl;
+      output << blank + "assign " + update + "_x" + localVer + updateSlice + " = " + dest + "_x[" + startIdx + ":" + endIdx + "];" << std::endl;
+      output << blank + "assign " + update + "_c" + localVer + updateSlice + " = " + dest + "_c[" + startIdx + ":" + endIdx + "];" << std::endl;
+
+      ground_wires(update+"_r"+localVer, updateWidthNum, updateSlice, blank, output);
+      ground_wires(update+"_x"+localVer, updateWidthNum, updateSlice, blank, output);
+      ground_wires(update+"_c"+localVer, updateWidthNum, updateSlice, blank, output);
+    } 
+    startIdxNum -= updateSliceWidthNum;
+  }
+}
+
+
+void both_concat_op_taint_gen(std::string line, std::ofstream &output) {
+  std::smatch m;
+  if( !std::regex_match(line, m, pSrcDestBothConcat) )
+    abort();
+
+  std::string blank = m.str(1);
+  std::string destList = m.str(2);
+  std::string srcList = m.str(3);
+
+  std::vector<std::string> destVec;
+  parse_var_list(destList, destVec);
+  std::vector<std::string> srcVec;
+  parse_var_list(srcList, srcVec);
+
+  std::string destTList = std::regex_replace(destList, pVarNameGroup, "$1_t$3");
+  std::string srcTList = get_taint_list(srcVec, "_t");
+  output << blank + "assign {" + destTList + "} = {" + srcTList + "};" << std::endl;
+  
+  // declare new taint wires for dests
+  uint32_t destTotalWidthNum = 0;
+  uint32_t yuzengIdx = NEW_VAR++;
+  std::string yuzengIdxStr = toStr(yuzengIdx);
+  for(std::string destAndSlice: destVec) {
+    if(isNum(destAndSlice))
+      abort();
+    destTotalWidthNum += get_var_slice_width(destAndSlice);
+  }
+  std::string destTotalWidth = toStr(destTotalWidthNum);
+  output << blank + "wire [" + destTotalWidth + "-1:0] yuzeng" + yuzengIdxStr + "_r;" << std::endl;
+  output << blank + "wire [" + destTotalWidth + "-1:0] yuzeng" + yuzengIdxStr + "_x;" << std::endl;
+  output << blank + "wire [" + destTotalWidth + "-1:0] yuzeng" + yuzengIdxStr + "_c;" << std::endl;
+
+  std::string destRList = std::regex_replace(destList, pVarNameGroup, "$1_r$3");
+  std::string destXList = std::regex_replace(destList, pVarNameGroup, "$1_x$3");
+  std::string destCList = std::regex_replace(destList, pVarNameGroup, "$1_c$3");
+  output << blank + "assign yuzeng" + yuzengIdxStr + "_r = {" + destRList + "};" << std::endl;
+  output << blank + "assign yuzeng" + yuzengIdxStr + "_x = {" + destXList + "};" << std::endl;
+  output << blank + "assign yuzeng" + yuzengIdxStr + "_c = {" + destCList + "};" << std::endl;
+  
+  uint32_t startIdx = destTotalWidthNum - 1;
+  uint32_t endIdx;
+  // declare taint wires
+  std::string src, srcSlice;
+  for (std::string srcAndSlice: srcVec) {
+    uint32_t srcLocalWidthNum = get_var_slice_width(srcAndSlice);
+    endIdx = startIdx - srcLocalWidthNum + 1;
+    if(!isNum(srcAndSlice)) {
+      split_slice(srcAndSlice, src, srcSlice);
+
+      uint32_t srcTotalWidthNum = varWidth.get_from_var_width(src, line);
+      std::string srcTotalWidth = toStr(srcTotalWidthNum);
+      std::string srcVer = toStr(find_version_num(src));
+      output << blank + "wire [" + srcTotalWidth + "-1:0] " + src + "_r" + srcVer + ";" << std::endl;
+      output << blank + "wire [" + srcTotalWidth + "-1:0] " + src + "_x" + srcVer + ";" << std::endl;
+      output << blank + "wire [" + srcTotalWidth + "-1:0] " + src + "_c" + srcVer + ";" << std::endl;
+
+      output << blank + "assign " + src + "_r" + srcVer + srcSlice + " = yuzeng" + yuzengIdxStr + "_r[" + toStr(startIdx) + ":" + toStr(endIdx) + "];" << std::endl;
+      output << blank + "assign " + src + "_x" + srcVer + srcSlice + " = yuzeng" + yuzengIdxStr + "_x[" + toStr(startIdx) + ":" + toStr(endIdx) + "];" << std::endl;
+      output << blank + "assign " + src + "_c" + srcVer + srcSlice + " = yuzeng" + yuzengIdxStr + "_c[" + toStr(startIdx) + ":" + toStr(endIdx) + "];" << std::endl;
+    }
+    startIdx = endIdx - 1;
+  }
+}
+
+
 void ite_taint_gen(std::string line, std::ofstream &output) {
   std::smatch m;
   if ( !std::regex_match(line, m, pIte) )
     return;
+  assert(!m.str(3).empty());
+  assert(!m.str(4).empty());
+  assert(!m.str(5).empty());
 
   std::string blank = m.str(1);
   std::string dest, destSlice;
@@ -263,17 +425,17 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
   }
   // if no slice found, use the vector whole width
   else {
-    localWidthNum = varWidth[dest];
+    localWidthNum = varWidth.get_from_var_width(dest, line);
   }
   localWidth = std::to_string(localWidthNum);
 
   split_slice(m.str(4), op1, op1Slice);
   split_slice(m.str(5), op2, op2Slice);
 
-  uint32_t destWidthNum = varWidth[dest];
-  uint32_t condWidthNum = varWidth[cond];
-  uint32_t op1WidthNum = varWidth[op1];
-  uint32_t op2WidthNum = varWidth[op2];
+  uint32_t destWidthNum = varWidth.get_from_var_width(dest, line);
+  uint32_t condWidthNum = varWidth.get_from_var_width(cond, line);
+  uint32_t op1WidthNum = varWidth.get_from_var_width(op1, line);
+  uint32_t op2WidthNum = varWidth.get_from_var_width(op2, line);
   std::string destWidth = std::to_string(destWidthNum);
   std::string condWidth = std::to_string(condWidthNum);
   std::string op1Width = std::to_string(op1WidthNum);
@@ -387,7 +549,7 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
   }
   // if no slice found, use the vector whole width
   else {
-    localWidthNum = varWidth[dest];
+    localWidthNum = varWidth.get_from_var_width(dest, line);
   }
   localWidth = std::to_string(localWidthNum);  
 
@@ -419,13 +581,13 @@ void nonblockconcat_taint_gen(std::string line, std::ofstream &output) {
   }
   // if no slice found, use the vector whole width
   else {
-    localWidthNum = varWidth[dest];
+    localWidthNum = varWidth.get_from_var_width(dest, line);
   }
   localWidth = std::to_string(localWidthNum);  
 
-  std::string updateXList = std::regex_replace(updateList, pVarName, "$1_x$3");
-  std::string updateTList = std::regex_replace(updateList, pVarName, "$1_t$3");
-  std::string updateRList = std::regex_replace(updateList, pVarName, "$1_r$3");
+  std::string updateXList = std::regex_replace(updateList, pVarNameGroup, "$1_x$3");
+  std::string updateTList = std::regex_replace(updateList, pVarNameGroup, "$1_t$3");
+  std::string updateRList = std::regex_replace(updateList, pVarNameGroup, "$1_r$3");
 
   output << blank.substr(0, blank.length()-4) + "assign " + updateXList + " = " + extend(dest+" != "+updateList, localWidthNum) + ";" << std::endl;
 
@@ -492,8 +654,7 @@ void two_op_taint_gen_func(std::string line, std::ofstream &output, std::unorder
             || std::regex_match(line, m, pSel1)
             || std::regex_match(line, m, pSel2)
             || std::regex_match(line, m, pSel3)
-            || std::regex_match(line, m, pSel4) 
-            || std::regex_match(line, m, pConcat) ){}
+            || std::regex_match(line, m, pSel4) ) {} 
   else
     return;
   bool tExist = false;
@@ -512,8 +673,8 @@ void two_op_taint_gen_func(std::string line, std::ofstream &output, std::unorder
   split_slice(m.str(3), op1, op1Slice);
   split_slice(m.str(4), op2, op2Slice);
 
-  uint32_t op1WidthNum = varWidth[op1];
-  uint32_t op2WidthNum = varWidth[op2];
+  uint32_t op1WidthNum = varWidth.get_from_var_width(op1, line);
+  uint32_t op2WidthNum = varWidth.get_from_var_width(op2, line);
   std::string op1Width = std::to_string(op1WidthNum);
   std::string op2Width = std::to_string(op2WidthNum);
 
@@ -627,7 +788,7 @@ void one_op_taint_gen_func(std::string line, std::ofstream &output, std::unorder
   split_slice(m.str(2), dest, destSlice);
   split_slice(m.str(3), op1, op1Slice);
 
-  uint32_t op1WidthNum = varWidth[op1];
+  uint32_t op1WidthNum = varWidth.get_from_var_width(op1, line);
   std::string op1Width = std::to_string(op1WidthNum);
 
   if (tExist) { 
@@ -675,8 +836,8 @@ void ite_taint_gen_func(std::string line, std::ofstream &output, std::unordered_
   
   split_slice(m.str(4), op1, op1Slice);
   split_slice(m.str(5), op2, op2Slice);
-  std::string op1Width = std::to_string(varWidth[op1]);
-  std::string op2Width = std::to_string(varWidth[op2]);
+  std::string op1Width = std::to_string(varWidth.get_from_var_width(op1, line));
+  std::string op2Width = std::to_string(varWidth.get_from_var_width(op2, line));
   std::string condWidth = "1";
 
   uint32_t localWidthNum;
@@ -686,7 +847,7 @@ void ite_taint_gen_func(std::string line, std::ofstream &output, std::unordered_
   }
   // if no slice found, use the vector whole width
   else {
-    localWidthNum = varWidth[dest];
+    localWidthNum = varWidth.get_from_var_width(dest, line);
   }
   localWidth = std::to_string(localWidthNum);
 

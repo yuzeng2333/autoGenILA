@@ -1,5 +1,8 @@
 all:
-	g++ taint_gen.cpp helper.cpp op_taint_gen.cpp
+	g++ taint_gen.cpp helper.cpp op_taint_gen.cpp VarWidth.cpp
+
+debug:
+	g++ -g taint_gen.cpp helper.cpp op_taint_gen.cpp VarWidth.cpp
 
 adder:
 	./a.out /workspace/research/ILA/autoGenILA/naiveEg/word_adder/word_adder_yosys.v
@@ -17,4 +20,7 @@ case:
 	./a.out /workspace/research/ILA/autoGenILA/naiveEg/case/case_yosys.v
 
 aes:
-	./a.out /workspace/research/ILA/autoGenILA/AES/Verilog/aes_top_simp.v
+	./a.out /workspace/research/ILA/autoGenILA/AES/Verilog/aes_top_simp.v 1
+
+exp:
+	./a.out ./experiment/experiment.v 0
