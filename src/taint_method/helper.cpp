@@ -39,7 +39,7 @@ bool isReg(std::string var) {
 
 std::string to_re(std::string input) {
   std::regex pName("NAME");
-  std::string varName("[\aa-zA-Z0-9_\\.:\\\\']+(?:\\s*)?(?:\\[\\d+(?:\\:\\d+)?\\])?");
+  std::string varName("[\aa-zA-Z0-9_\\.:\\\\']+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?");
   auto res = std::regex_replace(input, pName, varName);
   std::regex pNUM("NUM");
   std::string regexNum("\\d+'h[\\dabcdef]+");
@@ -205,7 +205,7 @@ void parse_var_list(std::string list, std::vector<std::string> &vec) {
     current = list.find(delim, previous + 1);
     arg = list.substr(previous+1, current-previous-1);
     //std::regex pLocal("^(\\s)*(\\S+)(\\s)*$");
-    std::regex pLocal("^(?:\\s)*([\aa-zA-Z0-9_\\.:\\\\']+(?:\\s*)?(?:\\[\\d+(?:\\:\\d+)?\\])?)(?:\\s)*$");
+    std::regex pLocal("^(?:\\s)*([\aa-zA-Z0-9_\\.:\\\\']+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?)(?:\\s)*$");
     std::smatch m;
     std::regex_match(arg, m, pLocal);
     vec.push_back(m.str(1));
@@ -247,15 +247,20 @@ uint32_t get_var_slice_width(std::string varAndSlice) {
 }
 
 
-std::string get_taint_list(std::vector<std::string> &updateVec, std::string taint) {
+std::string get_rhs_taint_list(std::vector<std::string> &updateVec, std::string taint) {
   std::vector<std::string> taintVec;
   std::smatch m;
-  std::string updateTaint;
   for(std::string singleUpdate : updateVec) {
     if(!isNum(singleUpdate)) {
       std::regex_match(singleUpdate, m, pVarNameGroup);
-      //std::string toReplace = m.str(1)+taint+m.str(3);
       singleUpdate = std::regex_replace(singleUpdate, pVarNameGroup, "$1"+taint+"$3");
+    }
+    else { // if isNum
+      if( !std::regex_match(singleUpdate, m, pNum)) {
+        std::cout << "!! Error in matching number !!" << std::endl;
+      }
+      std::string numWidth = m.str(1);
+      singleUpdate = numWidth + "'h0";
     }
     taintVec.push_back(singleUpdate);    
   }
@@ -265,6 +270,81 @@ std::string get_taint_list(std::vector<std::string> &updateVec, std::string tain
   }
   returnList = returnList + taintVec.back() + " ";
   return returnList;
+}
+
+
+std::string get_rhs_taint_list(std::string updateList, std::string taint) {
+  std::vector<std::string> updateVec;
+  parse_var_list(updateList, updateVec);
+  return get_rhs_taint_list(updateVec, taint);
+}
+
+
+// assume the updateVec does not contain numbers
+std::string get_lhs_ver_taint_list(std::vector<std::string> &updateVec, std::string taint, std::ofstream &output) {
+  std::vector<std::string> taintVec;
+  std::smatch m;
+  std::string update;
+  std::string updateSlice;
+  for(std::string updateAndSlice : updateVec) {
+    split_slice(updateAndSlice, update, updateSlice);
+    std::string updateWidth = toStr(varWidth.get_from_var_width(update, updateAndSlice));
+    std::string localVer = toStr(find_version_num(update));
+    output << "  wire [" + updateWidth + "-1:0] " + update + taint + localVer + ";" << std::endl;
+
+    if(!isNum(updateAndSlice)) {
+      std::regex_match(updateAndSlice, m, pVarNameGroup);
+      updateAndSlice = std::regex_replace(updateAndSlice, pVarNameGroup, "$1"+taint+localVer+"$3");
+    }
+    else { // if isNum
+        std::cout << "!! Error in matching number :" + updateAndSlice << std::endl;
+        abort();
+    }
+    taintVec.push_back(updateAndSlice);    
+  }
+  std::string returnList = " ";
+  for (auto it = taintVec.begin(); it < taintVec.end() - 1; ++it) {
+    returnList = returnList + *it + ", ";
+  }
+  returnList = returnList + taintVec.back() + " ";
+  return returnList;
+}
+
+
+
+std::string get_lhs_taint_list(std::vector<std::string> &destVec, std::string taint, std::ofstream &output) {
+  std::vector<std::string> taintVec;
+  std::smatch m;
+  for(std::string singleDest : destVec) {
+    if(!isNum(singleDest)) {
+      std::regex_match(singleDest, m, pVarNameGroup);
+      singleDest = std::regex_replace(singleDest, pVarNameGroup, "$1"+taint+"$3");
+    }
+    else { // if isNum
+      if( !std::regex_match(singleDest, m, pNum)) {
+        std::cout << "!! Error in matching number !!" << std::endl;
+      }
+      std::string numWidth = m.str(1);
+      int localIdx = USELESS_VAR++;
+      // declare a dummy wire, just for being assigned
+      output << "  wire [" + numWidth + "-1:0] nouse" + toStr(localIdx) << std::endl;
+      singleDest = "nouse" + toStr(localIdx);
+    }
+    taintVec.push_back(singleDest);    
+  }
+  std::string returnList = " ";
+  for (auto it = taintVec.begin(); it < taintVec.end() - 1; ++it) {
+    returnList = returnList + *it + ", ";
+  }
+  returnList = returnList + taintVec.back() + " ";
+  return returnList;
+}
+
+
+std::string get_lhs_taint_list(std::string destList, std::string taint, std::ofstream &output) {
+  std::vector<std::string> destVec;
+  parse_var_list(destList, destVec);
+  return get_lhs_taint_list(destVec, taint, output);
 }
 
 

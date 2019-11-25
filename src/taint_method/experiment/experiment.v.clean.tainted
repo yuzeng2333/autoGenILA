@@ -1,36 +1,45 @@
-  wire _000032_;
-  wire _000032__t;
-  wire _000032__r;
-  wire _000032__c;
-  wire _000032__x;
-  wire wren;
-  wire wren_t;
-  wire wren_r;
-  wire wren_c;
-  wire wren_x;
-  wire reset_byte_counter;
-  wire reset_byte_counter_t;
-  wire reset_byte_counter_r;
-  wire reset_byte_counter_c;
-  wire reset_byte_counter_x;
-  assign reset_byte_counter = _000032_ && wren;
-  wire [1-1:0] _000032__c0;
-  wire [1-1:0] _000032__r0;
-  wire [1-1:0] _000032__x0;
-  wire [1-1:0] wren_c0;
-  wire [1-1:0] wren_r0;
-  wire [1-1:0] wren_x0;
-  assign reset_byte_counter_t = _000032__t | wren_t;
-  assign _000032__c0 = reset_byte_counter_c;
-  assign _000032__r0 = reset_byte_counter_r | (reset_byte_counter_c & wren_t);
-  assign _000032__x0 = reset_byte_counter_x;
-  assign wren_c0 = reset_byte_counter_c;
-  assign wren_r0 = reset_byte_counter_r | (reset_byte_counter_c & _000032__t);
-  assign wren_x0 = reset_byte_counter_x;
-  assign wren_c = (wren_c0);
-  assign _000032__c = (_000032__c0);
-  assign wren_x = (wren_x0);
-  assign _000032__x = (_000032__x0);
-  assign wren_r = (wren_x0&wren_r0);
-  assign _000032__r = (_000032__x0&_000032__r0);
+  input clk;
+  input clk_t;
+  wire \aes_128_i.r8.z0;
+  wire \aes_128_i.r8.z0_t;
+  wire \aes_128_i.r8.z0_r;
+  wire \aes_128_i.r8.z0_c;
+  wire \aes_128_i.r8.z0_x;
+  wire \aes_128_i.r8.z1;
+  wire \aes_128_i.r8.z1_t;
+  wire \aes_128_i.r8.z1_r;
+  wire \aes_128_i.r8.z1_c;
+  wire \aes_128_i.r8.z1_x;
+  wire \aes_128_i.r8.z2;
+  wire \aes_128_i.r8.z2_t;
+  wire \aes_128_i.r8.z2_r;
+  wire \aes_128_i.r8.z2_c;
+  wire \aes_128_i.r8.z2_x;
+  wire [1:0] \aes_128_i.r8.z3;
+  wire [1:0] \aes_128_i.r8.z3_t;
+  wire [1:0] \aes_128_i.r8.z3_r;
+  wire [1:0] \aes_128_i.r8.z3_c;
+  wire [1:0] \aes_128_i.r8.z3_x;
+  wire [4:0] \aes_128_i.r8.state_out;
+  wire [4:0] \aes_128_i.r8.state_out_t;
+  wire [4:0] \aes_128_i.r8.state_out_r;
+  wire [4:0] \aes_128_i.r8.state_out_c;
+  wire [4:0] \aes_128_i.r8.state_out_x;
+  always @(posedge clk)
+      \aes_128_i.r8.state_out <= { \aes_128_i.r8.z0 , \aes_128_i.r8.z1 , \aes_128_i.r8.z2 , \aes_128_i.r8.z3[1:0] };
+
+  assign { \aes_128_i.r8.z0_x, \aes_128_i.r8.z1_x, \aes_128_i.r8.z2_x, \aes_128_i.r8.z3_x[1:0] } = {5{\aes_128_i.r8.state_out != { \aes_128_i.r8.z0 , \aes_128_i.r8.z1 , \aes_128_i.r8.z2 , \aes_128_i.r8.z3[1:0] }}};
+
+  always @(posedge clk)
+      \aes_128_i.r8.state_out_t 		<= rst ? 0 : | ({ \aes_128_i.r8.z0_t, \aes_128_i.r8.z1_t, \aes_128_i.r8.z2_t, \aes_128_i.r8.z3_t[1:0] } & { \aes_128_i.r8.z0_x, \aes_128_i.r8.z1_x, \aes_128_i.r8.z2_x, \aes_128_i.r8.z3_x[1:0] });
+
+  always @(posedge clk)
+      \aes_128_i.r8.state_out_t_flag 	<= rst ? 0 : \aes_128_i.r8.state_out_t_flag ? 1 : | ({ \aes_128_i.r8.z0_t, \aes_128_i.r8.z1_t, \aes_128_i.r8.z2_t, \aes_128_i.r8.z3_t[1:0] } & { \aes_128_i.r8.z0_x, \aes_128_i.r8.z1_x, \aes_128_i.r8.z2_x, \aes_128_i.r8.z3_x[1:0] });
+
+  always @(posedge clk)
+      \aes_128_i.r8.state_out_r_flag 	<= rst ? 0 : \aes_128_i.r8.state_out_r_flag ? 1 : \aes_128_i.r8.state_out_t_flag ? 0 : | \aes_128_i.r8.state_out_r;
+  assign \aes_128_i.r8.z3_r[1:0] = 0;
+  assign \aes_128_i.r8.z0_r = 0;
+  assign \aes_128_i.r8.z2_r = 0;
+  assign \aes_128_i.r8.z1_r = 0;
 endmodule

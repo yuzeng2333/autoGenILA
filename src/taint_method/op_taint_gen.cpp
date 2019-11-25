@@ -21,8 +21,8 @@ void input_taint_gen(std::string line, std::ofstream &output) {
   std::string slice = m.str(2);
   std::string var = m.str(3);
   moduleInputs.push_back(var);
-  if (var.compare( clockName) == 0)
-    return;
+  //if (var.compare( clockName) == 0)
+  //  return;
   //debug_line(line);
   output << m.str(1) << "input " + slice + var + "_t;" << std::endl;
 
@@ -75,6 +75,25 @@ void wire_taint_gen(std::string line, std::ofstream &output) {
   output << blank << "wire " + slice + var + "_r;" << std::endl;
   output << blank << "wire " + slice + var + "_c;" << std::endl;
   output << blank << "wire " + slice + var + "_x;" << std::endl;
+
+  if (!did_clean_file) {
+    bool insertDone = varWidth.var_width_insert(var, get_width(slice));
+    if (!insertDone) {
+      std::cout << "insert failed in input case:" + line << std::endl;
+      std::cout << "m.str(2):" + m.str(2) << std::endl;
+      std::cout << "m.str(3):" + m.str(3) << std::endl;
+    }
+  }
+}
+
+
+void output_insert_map(std::string line, std::ofstream &output) {
+  std::smatch m;
+  if ( !std::regex_match(line, m, pOutput) )
+    return;
+  std::string slice = m.str(2);  
+  std::string var = m.str(3);
+  std::string blank = m.str(1);
 
   if (!did_clean_file) {
     bool insertDone = varWidth.var_width_insert(var, get_width(slice));
@@ -238,6 +257,7 @@ void one_op_taint_gen(std::string line, std::ofstream &output) {
   std::smatch m;
   if (std::regex_match(line, m, pNot) 
             || std::regex_match(line, m, pNone)
+            || std::regex_match(line, m, pInvert)
             || std::regex_match(line, m, pBitOrRed1)){}
   else 
     return;
@@ -288,7 +308,7 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
   std::string blank = m.str(1);
   std::string dest, destSlice;
   split_slice(m.str(2), dest, destSlice);
-  assert(destSlice.empty());
+  //assert(destSlice.empty());
   std::string updateList = m.str(3);
 
   std::vector<std::string> updateVec;
@@ -298,16 +318,24 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
     destWidthNum += get_var_slice_width(v);
   }
 
-  std::string updateTList = get_taint_list(updateVec, "_t");
+  std::string updateTList = get_rhs_taint_list(updateVec, "_t");
   //std::string updateRlist = get_taint_list(updateVec, "_r");
   //std::string updateXlist = get_taint_list(updateVec, "_x");
   //std::string updateClist = get_taint_list(updateVec, "_c");
   // _t
   std::string destWidth = std::to_string(destWidthNum);
   output << blank + "wire [" + destWidth + "-1:0] " + dest + "_t;" << std::endl;
-  output << blank + "assign " + dest + "_t = {" + updateTList + "};" << std::endl;
-  // _r
-  uint32_t startIdxNum = destWidthNum-1;
+  output << blank + "assign " + dest + "_t" + destSlice + " = {" + updateTList + "};" << std::endl;
+
+  // other taints
+  uint32_t startIdxNum;
+  if(destSlice.empty()) {
+    startIdxNum = destWidthNum-1;
+  }
+  else {
+    startIdxNum = get_end(destSlice);
+  }
+  // TODO: using get_lhs_taint_wire to replace this loop
   for (std::string updateAndSlice: updateVec) {
     std::string update, updateSlice;
     split_slice(updateAndSlice, update, updateSlice);
@@ -354,7 +382,7 @@ void both_concat_op_taint_gen(std::string line, std::ofstream &output) {
   parse_var_list(srcList, srcVec);
 
   std::string destTList = std::regex_replace(destList, pVarNameGroup, "$1_t$3");
-  std::string srcTList = get_taint_list(srcVec, "_t");
+  std::string srcTList = get_rhs_taint_list(srcVec, "_t");
   output << blank + "assign {" + destTList + "} = {" + srcTList + "};" << std::endl;
   
   // declare new taint wires for dests
@@ -380,8 +408,28 @@ void both_concat_op_taint_gen(std::string line, std::ofstream &output) {
   
   uint32_t startIdx = destTotalWidthNum - 1;
   uint32_t endIdx;
+
+  // check if there is number in the vec
+  bool numExist = false;
+  for (std::string srcAndSlice: srcVec) {
+    if(isNum(srcAndSlice))
+      numExist = true;
+  }
+
   // declare taint wires
   std::string src, srcSlice;
+  if(!numExist) {
+    std::string srcRList = get_lhs_ver_taint_list(srcVec, "_r", output);
+    std::string srcXList = get_lhs_ver_taint_list(srcVec, "_x", output);
+    std::string srcCList = get_lhs_ver_taint_list(srcVec, "_c", output);
+
+    output << blank + "assign " + srcRList + " = yuzeng" + yuzengIdxStr + "_r;" << std::endl;
+    output << blank + "assign " + srcXList + " = yuzeng" + yuzengIdxStr + "_r;" << std::endl;
+    output << blank + "assign " + srcCList + " = yuzeng" + yuzengIdxStr + "_r;" << std::endl;
+    return;
+  }
+
+  // if there is number in the list
   for (std::string srcAndSlice: srcVec) {
     uint32_t srcLocalWidthNum = get_var_slice_width(srcAndSlice);
     endIdx = startIdx - srcLocalWidthNum + 1;
@@ -414,7 +462,7 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
 
   std::string blank = m.str(1);
   std::string dest, destSlice;
-  std::string cond = m.str(3);
+  std::string cond, condSlice;
   std::string op1, op1Slice;
   std::string op2, op2Slice;
 
@@ -429,6 +477,7 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
   }
   localWidth = std::to_string(localWidthNum);
 
+  split_slice(m.str(3), cond, condSlice);
   split_slice(m.str(4), op1, op1Slice);
   split_slice(m.str(5), op2, op2Slice);
 
@@ -452,9 +501,13 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
   output << blank << "wire [" + condWidth + "-1:0] " + cond + "_x" + condVer + ";" << std::endl;
   output << blank << "wire [" + localWidth + "-1:0] " + cond + "_r" + condVer + "_tmp;" << std::endl;
   
-  output << blank << "assign " + cond + "_c" + condVer + " = 1;" << std::endl;
-  output << blank << "assign " + cond + "_x" + condVer + " = | " + dest + "_x" + destSlice + ";" << std::endl;
-  output << blank << "assign " + cond + "_r" + condVer + " = | " + cond + "_r" + condVer + "_tmp;" << std::endl;
+  output << blank << "assign " + cond + "_c" + condVer + condSlice + " = 1;" << std::endl;
+  output << blank << "assign " + cond + "_x" + condVer + condSlice + " = | " + dest + "_x" + destSlice + ";" << std::endl;
+  output << blank << "assign " + cond + "_r" + condVer + condSlice + " = | " + cond + "_r" + condVer + "_tmp;" << std::endl;
+
+  ground_wires(cond+"_c"+condVer, condWidthNum, condSlice, blank, output);
+  ground_wires(cond+"_x"+condVer, condWidthNum, condSlice, blank, output);
+  ground_wires(cond+"_r"+condVer, condWidthNum, condSlice, blank, output);
 
   if (!op1IsNum && !op2IsNum) { // ite
     /* Assgin new versions */
@@ -589,13 +642,13 @@ void nonblockconcat_taint_gen(std::string line, std::ofstream &output) {
   std::string updateTList = std::regex_replace(updateList, pVarNameGroup, "$1_t$3");
   std::string updateRList = std::regex_replace(updateList, pVarNameGroup, "$1_r$3");
 
-  output << blank.substr(0, blank.length()-4) + "assign " + updateXList + " = " + extend(dest+" != "+updateList, localWidthNum) + ";" << std::endl;
+  output << blank.substr(0, blank.length()-4) + "assign {" + updateXList + "} = " + extend(dest+" != {"+updateList+"}", localWidthNum) + ";" << std::endl;
 
 
   output << blank.substr(0, blank.length()-4) + "always @(posedge " + clockName + ")" << std::endl;
-  output << blank + dest + "_t \t\t<= " + resetName + " ? 0 : | (" + updateTList +" & " + updateXList + ");" << std::endl;
+  output << blank + dest + "_t \t\t<= " + resetName + " ? 0 : | ({" + updateTList +"} & {" + updateXList + "});" << std::endl;
   output << blank.substr(0, blank.length()-4) + "always @(posedge " + clockName + ")" << std::endl;
-  output << blank + dest + "_t_flag \t<= " + resetName + " ? 0 : " + dest + "_t_flag ? 1 : | (" + updateTList + " & " + updateXList + ");" << std::endl;
+  output << blank + dest + "_t_flag \t<= " + resetName + " ? 0 : " + dest + "_t_flag ? 1 : | ({" + updateTList + "} & {" + updateXList + "});" << std::endl;
   output << blank.substr(0, blank.length()-4) + "always @(posedge " + clockName + ")" << std::endl;
   output << blank + dest + "_r_flag \t<= " + resetName + " ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + "_r;" << std::endl;
 }

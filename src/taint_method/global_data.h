@@ -50,6 +50,7 @@ extern std::regex pBitOrRed2;
 extern std::regex pNot;     
 extern std::regex pNone;     
 extern std::regex pBitOrRed1;
+extern std::regex pInvert;
 /* ite */
 extern std::regex pIte;     
 /* do not add anything */
@@ -76,5 +77,6 @@ extern std::regex pVarNameGroup;
 extern std::regex pNum;
 
 extern unsigned long int NEW_VAR;
+extern unsigned long int USELESS_VAR;
 extern bool did_clean_file;
 #endif

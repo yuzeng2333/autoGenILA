@@ -5,7 +5,7 @@
 
 class VarWidth {
 private:
-  std::unordered_map<std::string, uint32_t> varWidth;
+  std::unordered_map<std::string, uint32_t> internalVarWidth;
   
 public:
   VarWidth(){}

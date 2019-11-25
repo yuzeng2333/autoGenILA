@@ -42,7 +42,15 @@ void parse_var_list(std::string list, std::vector<std::string> &vec);
 
 uint32_t get_var_slice_width(std::string varSlice);
 
-std::string get_taint_list(std::vector<std::string> &updateVec, std::string taint);
+std::string get_rhs_taint_list(std::vector<std::string> &updateVec, std::string taint);
+
+std::string get_rhs_taint_list(std::string updateList, std::string taint);
+
+std::string get_lhs_ver_taint_list(std::vector<std::string> &updateVec, std::string taint, std::ofstream &output);
+
+std::string get_lhs_taint_list(std::vector<std::string> &destVec, std::string taint, std::ofstream &output);
+
+std::string get_lhs_taint_list(std::string destList, std::string taint, std::ofstream &output);
 
 int str2int(std::string str, std::string info);
 #endif

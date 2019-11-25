@@ -16,7 +16,6 @@
  *  Now I just do not distinguish slice and the whole word.
  * */
 
-
 /* declarations */
 std::regex pModule    (to_re("^(\\s*)module (NAME)\\(.+\\);$"));
 std::regex pInput     (to_re("^(\\s*)input (\\[\\d+\\:0\\] )?(NAME)(\\s*)?;$"));
@@ -49,6 +48,7 @@ std::regex pBitOrRed2 (to_re("^(\\s*)assign (NAME) = \\| \\{ (NAME), (NAME) \\}(
 std::regex pNot       (to_re("^(\\s*)assign (NAME) = ! (NAME)(\\s*)?;$"));
 std::regex pNone      (to_re("^(\\s*)assign (NAME) = (NAME)(\\s*)?;$"));
 std::regex pBitOrRed1 (to_re("^(\\s*)assign (NAME) = \\| (NAME)(\\s*)?;$"));
+std::regex pInvert    (to_re("^(\\s*)assign (NAME) = \\~ (NAME)(\\s*)?;$"));
 /* ite */
 std::regex pIte       (to_re("^(\\s*)assign (NAME) = (NAME) \\? (NAME) \\: (NAME)(\\s*)?;$"));
 /* do not add anything */
@@ -69,11 +69,11 @@ std::regex pDefault   (to_re("^(\\s*)default\\:$"));
 std::regex pBlock     (to_re("^(\\s*)(NAME) = (NAME)(\\s*)?;$"));
 /* multiple/un-certain # of ops */
 //std::regex pBitExOrConcat (to_re("^(\\s*)assign (NAME) = \\{\\} \\^ (NAME)(\\s*)?;$"));
-std::regex pSrcConcat(to_re("^(\\s*)assign (NAME) = \\{(.+)\\}(\\s*)?;$"));
-std::regex pSrcDestBothConcat(to_re("^(\\s*)assign \\{(.+)\\} = \\{(.+)\\}(\\s*)?;$"));
+std::regex pSrcConcat(to_re("^(\\s*)assign (NAME) = \\{ ((?:NAME(?:\\s)?, )+NAME) \\}(\\s*)?;$"));
+std::regex pSrcDestBothConcat(to_re("^(\\s*)assign \\{ ((?:NAME(?:\\s)?, )+NAME) \\} = \\{ ((?:NAME(?:\\s)?, )+NAME) \\}(\\s*)?;$"));
 
 /* Milicious */
-std::regex pVarName("([\aa-zA-Z0-9_\\.:\\\\']+)(?:\\s*)?(?:\\[\\d+(\\:\\d+)?\\])?");
+std::regex pVarName("([\aa-zA-Z0-9_\\.:\\\\']+)(?:\\s*\\[\\d+(\\:\\d+)?\\])?");
 std::regex pVarNameGroup("([\aa-zA-Z0-9_\\.:\\\\']+)(\\s*)?(\\[\\d+(\\:\\d+)?\\])?");
 std::regex pNum("^(\\d+)'h[\\dabcdef]+$");
 
@@ -93,7 +93,10 @@ std::unordered_map<std::string, std::string> update_reg;
 VarWidth varWidth;
 VarWidth funcVarWidth;
 unsigned long int NEW_VAR = 0;
+unsigned long int USELESS_VAR = 0;
 bool did_clean_file = false;
+//std::vector<std::string> clkGroup;
+//std::vector<std::string> rstGroup;
 
 
 /*remove comments
@@ -124,8 +127,7 @@ void clean_file(std::string fileName) {
           std::regex_match(line, m, pInput);
           std::string slice = m.str(2);
           std::string var = m.str(3);
-          //varWidth.insert( std::make_pair(var, get_width(slice)) );
-          bool insertDone;
+          bool insertDone = false;
           if(!inFunc)
             insertDone = varWidth.var_width_insert(var, get_width(slice));
           else
@@ -142,8 +144,7 @@ void clean_file(std::string fileName) {
           std::regex_match(line, m, pReg);
           std::string slice = m.str(2);
           std::string var = m.str(3);
-          //varWidth.insert( std::make_pair(var, get_width(slice)) );
-          bool insertDone;
+          bool insertDone = false;
           if(!inFunc)
             insertDone = varWidth.var_width_insert(var, get_width(slice));
           else
@@ -160,8 +161,7 @@ void clean_file(std::string fileName) {
           std::regex_match(line, m, pWire);
           std::string slice = m.str(2);
           std::string var = m.str(3);
-          //varWidth.insert( std::make_pair(var, get_width(slice)) );
-          bool insertDone;
+          bool insertDone = false;
           if(!inFunc)
             insertDone = varWidth.var_width_insert(var, get_width(slice));
           else
@@ -178,8 +178,7 @@ void clean_file(std::string fileName) {
           std::regex_match(line, m, pOutput);
           std::string slice = m.str(2);
           std::string var = m.str(3);
-          //varWidth.insert( std::make_pair(var, get_width(slice)) );
-          bool insertDone;
+          bool insertDone = false;
           if(!inFunc)
             insertDone = varWidth.var_width_insert(var, get_width(slice));
           else
@@ -204,7 +203,7 @@ void clean_file(std::string fileName) {
       default:
         break;
     }
-    bool noConcat = extract_concat(line, output);
+    bool noConcat = extract_concat(cleanLine, output);
     if (noConcat)
       output << cleanLine << std::endl;
   }
@@ -225,16 +224,19 @@ void add_line_taints(std::string line, std::ofstream &output) {
     case WIRE:  
       wire_taint_gen(line, output);
       break;
+    case OUTPUT:
+      output_insert_map(line, output);
+      break;
     case TWO_OP:
       two_op_taint_gen(line, output);      
       break;
     case ONE_OP:
       one_op_taint_gen(line, output);      
       break;
-    case MULT:
+    case SRC_CONCAT:
       mult_op_taint_gen(line, output);
       break;
-    case BOTHCONCAT:
+    case BOTH_CONCAT:
       both_concat_op_taint_gen(line, output);
       break;
     case ITE:
@@ -302,14 +304,15 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   /* 1-operator assignment */
   else if (std::regex_match(line, m, pNot) 
             || std::regex_match(line, m, pBitOrRed1)
+            || std::regex_match(line, m, pInvert)
             || std::regex_match(line, m, pNone)) {
     return ONE_OP;
   }
   else if (std::regex_match(line, m, pSrcConcat)) {
-    return MULT;
+    return SRC_CONCAT;
   }
   else if (std::regex_match(line, m, pSrcDestBothConcat)) {
-    return BOTHCONCAT;
+    return BOTH_CONCAT;
   }
   else if (std::regex_match(line, m, pIte)) { // if cond is rst, then does not add any taint
     return ITE;
@@ -434,7 +437,9 @@ void merge_taints(std::string fileName) {
   }
 
   for (auto it = new_reg.begin(); it != new_reg.end(); ++it) {
-    output << "  assign " + it->first + "_r = 0;" << std::endl;
+    std::string reg, regSlice;
+    split_slice(it->first, reg, regSlice);
+    output << "  assign " + reg + "_r" + regSlice + " = 0;" << std::endl;
   }
   output << "endmodule";
   output.close();
@@ -871,9 +876,7 @@ void add_func_taints_call_limited(std::string line, std::ofstream &output) {
   std::string funcName = m.str(3);
   std::string arguments = m.str(4);
 
-  // print the func call
-  output << line << std::endl;
-  std::regex pArgComb("\\{.*\\}");
+  std::regex pArgComb("\\(.*\\)");
   if( !std::regex_search(line, m, pArgComb) ) {
     std::cout << "!! Error in parsing func args !!" << std::endl;
     abort();
@@ -881,15 +884,15 @@ void add_func_taints_call_limited(std::string line, std::ofstream &output) {
   std::string varArgs = m.str(0);
 
   std::regex pArg("_\\d+_");
-  std::string argT = std::regex_replace(varArgs, pArg, "$0_t");
-  std::string argR = std::regex_replace(varArgs, pArg, "$0_r");
-  std::string argX = std::regex_replace(varArgs, pArg, "$0_x");
-  std::string argC = std::regex_replace(varArgs, pArg, "$0_c");
+  std::string argT = get_rhs_taint_list(varArgs, "_t");
+  std::string argR = get_lhs_taint_list(varArgs, "_r", output);
+  std::string argX = get_lhs_taint_list(varArgs, "_x", output);
+  std::string argC = get_lhs_taint_list(varArgs, "_c", output);
 
   output << blank + "assign " + returnArg + "_t = " + funcName + "_t(" + argT + ");" << std::endl;
-  output << blank + "assign " + argR + " = " + funcName + "_r(" + returnArg + "_r" + ");" << std::endl;
-  output << blank + "assign " + argX + " = " + funcName + "_x(" + returnArg + "_x" + ");" << std::endl;
-  output << blank + "assign " + argC + " = " + funcName + "_c(" + returnArg + "_c" + ");" << std::endl;
+  output << blank + "assign " + argR + " = " + funcName + "_r(" + returnArg + "_r);" << std::endl;
+  output << blank + "assign " + argX + " = " + funcName + "_x(" + returnArg + "_x);" << std::endl;
+  output << blank + "assign " + argC + " = " + funcName + "_c(" + returnArg + "_c);" << std::endl;
 }
 
 
@@ -899,7 +902,7 @@ bool extract_concat(std::string line, std::ofstream &output) {
   std::smatch m;
   int blankNo = line.find('a', 0);  
   std::regex pAssign("assign ");
-  std::regex pBraces("\\{(.+)\\}");
+  std::regex pBraces(to_re("\\{ ((?:NAME(?:\\s)?, )+NAME) \\}"));
   std::regex pSlice("\\[(\\d+)(:)?(\\d+)?\\]");
 
   std::regex_token_iterator<std::string::iterator> rend;
@@ -937,8 +940,8 @@ bool extract_concat(std::string line, std::ofstream &output) {
         std::cout << "m.str(2):" + m.str(2) << std::endl;
         std::cout << "m.str(3):" + m.str(3) << std::endl;
       }
-      output << std::string(blankNo, ' ') + "wire [" + toStr(totalWidth-1) + ":0] " + "yuzeng" + localIdx + ";" << std::endl;
-      output << std::string(blankNo, ' ') + "assign yuzeng" + localIdx + " = {" + varList + "};" << std::endl;
+      output << std::string(blankNo, ' ') + "wire [" + toStr(totalWidth-1) + ":0] yuzeng" + localIdx + ";" << std::endl;
+      output << std::string(blankNo, ' ') + "assign yuzeng" + localIdx + " = { " + varList + " };" << std::endl;
       newVarQueue.push("yuzeng"+localIdx);
     }
     char openBrace = '{';

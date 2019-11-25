@@ -18,10 +18,10 @@
 #define NONBLOCKCONCAT 8
 #define OUTPUT         9
 #define CASE           10
-#define MULT           11
+#define SRC_CONCAT     11
 #define FUNCDEF        12
 #define FUNCEND        13
-#define BOTHCONCAT     14
+#define BOTH_CONCAT    14
 #define UNSUPPORT      99
 #define NONE           100
 

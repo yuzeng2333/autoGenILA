@@ -11,6 +11,8 @@ void reg_taint_gen(std::string line, std::ofstream &output);
 
 void wire_taint_gen(std::string line, std::ofstream &output);
 
+void output_insert_map(std::string line, std::ofstream &output);
+
 void two_op_taint_gen(std::string line, std::ofstream &output);
  
 void one_op_taint_gen(std::string line, std::ofstream &output);
