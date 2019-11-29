@@ -27,6 +27,8 @@ void nonblock_taint_gen(std::string line, std::ofstream &output);
 
 void nonblockconcat_taint_gen(std::string line, std::ofstream &output);
 
+void always_clkrst_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream &output);
+
 // function operators
 void reg_taint_gen_func(std::string line, std::ofstream &output, std::string taintBits);
 

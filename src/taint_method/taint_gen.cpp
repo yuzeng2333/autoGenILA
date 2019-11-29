@@ -20,12 +20,12 @@
 std::regex pModule    (to_re("^(\\s*)module (NAME)\\(.+\\);$"));
 std::regex pInput     (to_re("^(\\s*)input (\\[\\d+\\:0\\] )?(NAME)(\\s*)?;$"));
 std::regex pOutput    (to_re("^(\\s*)output (\\[\\d+\\:0\\] )?(NAME)(\\s*)?;$"));
-std::regex pReg       (to_re("^(\\s*)reg (\\[\\d+\\:0\\] )?(NAME)(\\s*)?;$"));
-std::regex pWire      (to_re("^(\\s*)wire (\\[\\d+\\:0\\] )?(NAME)(\\s*)?;$"));
+std::regex pReg       (to_re("^(\\s*)reg (\\[\\d+\\:\\d+\\] )?(NAME)(\\s*)?;$"));
+std::regex pWire      (to_re("^(\\s*)wire (\\[\\d+\\:\\d+\\] )?(NAME)(\\s*)?;$"));
 /* 2 operators */
-std::regex pAdd       (to_re("^(\\s*)assign (NAME) = (NAME) \\+ (NAME)(\\s*)?;$"));
+std::regex pAdd       (to_re("^(\\s*)assign (NAME) = (NAME) \\\\+ (NAME)(\\s*)?;$"));
 std::regex pSub       (to_re("^(\\s*)assign (NAME) = (NAME) - (NAME)(\\s*)?;$"));
-std::regex pMult      (to_re("^(\\s*)assign (NAME) = (NAME) * (NAME)(\\s*)?;$"));
+std::regex pMult      (to_re("^(\\s*)assign (NAME) = (NAME) \\\\* (NAME)(\\s*)?;$"));
 std::regex pEq        (to_re("^(\\s*)assign (NAME) = (NAME) == (NAME)(\\s*)?;$"));
 std::regex pNeq       (to_re("^(\\s*)assign (NAME) = (NAME) != (NAME)(\\s*)?;$"));
 std::regex pLt        (to_re("^(\\s*)assign (NAME) = (NAME) > (NAME)(\\s*)?;$"));
@@ -36,6 +36,7 @@ std::regex pAnd       (to_re("^(\\s*)assign (NAME) = (NAME) && (NAME)(\\s*)?;$")
 std::regex pOr        (to_re("^(\\s*)assign (NAME) = (NAME) \\|\\| (NAME)(\\s*)?;$"));
 std::regex pBitOr     (to_re("^(\\s*)assign (NAME) = (NAME) \\| (NAME)(\\s*)?;$"));
 std::regex pBitExOr   (to_re("^(\\s*)assign (NAME) = (NAME) \\^ (NAME)(\\s*)?;$"));
+std::regex pBitAnd    (to_re("^(\\s*)assign (NAME) = (NAME) & (NAME)(\\s*)?;$"));
 //TODO: merge pConcat and pPureConcat
 std::regex pConcat    (to_re("^(\\s*)assign (NAME) = \\{ (NAME), (NAME) \\}(\\s*)?;$"));
 std::regex pSel1      (to_re("^(\\s*)assign (NAME) = (NAME)\\[\\$signed\\((NAME)\\) \\+\\: INT\\](\\s*)?;$"));
@@ -52,7 +53,9 @@ std::regex pInvert    (to_re("^(\\s*)assign (NAME) = \\~ (NAME)(\\s*)?;$"));
 /* ite */
 std::regex pIte       (to_re("^(\\s*)assign (NAME) = (NAME) \\? (NAME) \\: (NAME)(\\s*)?;$"));
 /* do not add anything */
-std::regex pAlways    (to_re("^(\\s*)always @\\(posedge NAME\\)( begin)?$"));
+// Assume: always comes with posedge or negedge
+std::regex pAlwaysClk (to_re("^(\\s*)always @\\(posedge (NAME)\\)$"));
+std::regex pAlwaysClkRst  (to_re("^(\\s*)always @\\(posedge (NAME) or (?:posedge|negedge) (NAME)(\\s?)\\)$"));
 std::regex pEnd       ("^(\\s*)end$");
 std::regex pEndmodule ("^(\\s*)endmodule$");
 /* non-blocking assignment */
@@ -62,20 +65,25 @@ std::regex pNonblockConcat    (to_re("^(\\s*)(NAME) <= \\{(.+)\\}(\\s*)?;$"));
 std::regex pFunctionDef   (to_re("^(\\s*)function (\\[\\d+\\:0\\] )?(NAME)(\\s*)?;$"));
 std::regex pEndfunction   (to_re("^(\\s*)endfunction$"));
 std::regex pFunctionCall  (to_re("^(\\s*)assign (NAME) = (NAME)\\((.*)\\)(\\s*)?;$"));
-/* case */
+/* control keywords */
+// case
 std::regex pCase      (to_re("^(\\s*)case(\\S)? \\((NAME)\\)$"));
 std::regex pEndcase   (to_re("^(\\s*)endcase$"));
 std::regex pDefault   (to_re("^(\\s*)default\\:$"));
 std::regex pBlock     (to_re("^(\\s*)(NAME) = (NAME)(\\s*)?;$"));
+// if else
+std::regex pIf        (to_re("^(\\s*)if \\(.*\\)$"));
+std::regex pElse      (to_re("^(\\s*)else$"));
 /* multiple/un-certain # of ops */
 //std::regex pBitExOrConcat (to_re("^(\\s*)assign (NAME) = \\{\\} \\^ (NAME)(\\s*)?;$"));
 std::regex pSrcConcat(to_re("^(\\s*)assign (NAME) = \\{ ((?:NAME(?:\\s)?, )+NAME) \\}(\\s*)?;$"));
 std::regex pSrcDestBothConcat(to_re("^(\\s*)assign \\{ ((?:NAME(?:\\s)?, )+NAME) \\} = \\{ ((?:NAME(?:\\s)?, )+NAME) \\}(\\s*)?;$"));
 
 /* Milicious */
-std::regex pVarName("([\aa-zA-Z0-9_\\.:\\\\']+)(?:\\s*\\[\\d+(\\:\\d+)?\\])?");
-std::regex pVarNameGroup("([\aa-zA-Z0-9_\\.:\\\\']+)(\\s*)?(\\[\\d+(\\:\\d+)?\\])?");
-std::regex pNum("^(\\d+)'h[\\dabcdef]+$");
+/* pVarName also exists in to_re(), and parse_var_list() */
+std::regex pVarName("([\aa-zA-Z0-9_\\.\\$\\\\'\\[\\]]+)(?:\\s*\\[\\d+(\\:\\d+)?\\])?");
+std::regex pVarNameGroup("([\aa-zA-Z0-9_\\.\\$\\\\'\\[\\]]+)(?:(\\s*)(\\[\\d+(\\:\\d+)?\\]))?");
+std::regex pNum("^(\\d+)'(h|d|b)[\\dabcdef]+$");
 
 
 /* Global data */
@@ -93,6 +101,7 @@ std::unordered_map<std::string, std::string> update_reg;
 VarWidth varWidth;
 VarWidth funcVarWidth;
 unsigned long int NEW_VAR = 0;
+unsigned long int NEW_FANGYUAN = 0;
 unsigned long int USELESS_VAR = 0;
 bool did_clean_file = false;
 //std::vector<std::string> clkGroup;
@@ -212,7 +221,7 @@ void clean_file(std::string fileName) {
 }
 
 
-void add_line_taints(std::string line, std::ofstream &output) {
+void add_line_taints(std::string line, std::ofstream &output, std::ifstream &input) {
   int choice = parse_verilog_line(line);
   switch( choice ) {
     case INPUT:
@@ -243,13 +252,16 @@ void add_line_taints(std::string line, std::ofstream &output) {
       ite_taint_gen(line, output);      
       break;
     case NONBLOCK:
-      nonblock_taint_gen(line, output);      
+        nonblock_taint_gen(line, output);
       break;
     case NONBLOCKCONCAT:
       nonblockconcat_taint_gen(line, output);
       break;
+    case ALWAYS_CLKRST:
+      always_clkrst_taint_gen(line, input, output);
+      break;
     case UNSUPPORT:
-      output << "!!! Unsupported operator !!!" << std::endl;
+      std::cout << "!!! Unsupported operator in: "+ line + "|" << std::endl;
       break;
     default:
       break;
@@ -269,6 +281,9 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   }
   else if (std::regex_match(line, m, pOutput)) {
     std::string var = m.str(3);
+    if(isOutput(var)) {
+      std::cout << "!! Duplicate output find: " + line << std::endl;
+    }
     moduleOutputs.push_back(var);
     return OUTPUT;
   }
@@ -294,6 +309,7 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
             || std::regex_match(line, m, pOr)
             || std::regex_match(line, m, pBitOr)
             || std::regex_match(line, m, pBitExOr)
+            || std::regex_match(line, m, pBitAnd)
             || std::regex_match(line, m, pSel1)
             || std::regex_match(line, m, pSel2)
             || std::regex_match(line, m, pSel3)
@@ -317,10 +333,13 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   else if (std::regex_match(line, m, pIte)) { // if cond is rst, then does not add any taint
     return ITE;
   } // end of ite
-  else if( std::regex_match(line, m, pAlways) 
+  else if( std::regex_match(line, m, pAlwaysClk) 
             || std::regex_match(line, m, pEnd)
             || std::regex_match(line, m, pEndmodule) ){
     return NONE;
+  }
+  else if( std::regex_match(line, m, pAlwaysClkRst) ) {
+    return ALWAYS_CLKRST;
   }
   else if( std::regex_match(line, m, pNonblock) ) {
     return NONBLOCK;
@@ -389,7 +408,7 @@ void add_file_taints(std::string fileName) {
       add_func_taints_call_limited(line, output);
     }
     else
-      add_line_taints(line, output);  
+      add_line_taints(line, output, input);  
 
   }
   input.close();
@@ -405,38 +424,46 @@ void merge_taints(std::string fileName) {
     for ( auto it = nextVersion.begin(); it != nextVersion.end(); ++it ) {
       if ( isInput(it->first) ) continue;
       if ( isReg(it->first) )
-        output << "  assign " + it->first + app + " = | ((";
+        output << "  assign " + it->first + app + " = | (( ";
       else
-        output << "  assign " + it->first + app + " = (";
+        output << "  assign " + it->first + app + " = ( ";
 
       for (int i = 0; i < it->second - 1; i++)
-        output << it->first + app + std::to_string(i) + ") | (";
+        output << it->first + app + std::to_string(i) + " ) | ( ";
 
       if ( isReg(it->first) )
-        output << it->first + app + std::to_string(it->second - 1) + "));" << std::endl;
+        output << it->first + app + std::to_string(it->second - 1) + " ));" << std::endl;
       else
-        output << it->first + app + std::to_string(it->second - 1) + ");" << std::endl;
+        output << it->first + app + std::to_string(it->second - 1) + " );" << std::endl;
     }
   }
 
   for ( auto it = nextVersion.begin(); it != nextVersion.end(); ++it ) {
     if ( isInput(it->first) ) continue;    
-    output << "  assign " + it->first + "_r = (";
+    output << "  assign " + it->first + "_r = ( ";
     for (int i = 0; i < it->second - 1; i++) {
-      output << it->first + "_x" + std::to_string(i) + "&";
-      output << it->first + "_r" + std::to_string(i) + ") | (";
+      output << it->first + "_x" + std::to_string(i) + " & ";
+      output << it->first + "_r" + std::to_string(i) + " ) | ( ";
     }
-    output << it->first + "_x" + std::to_string(it->second - 1) + "&";
-    output << it->first + "_r" + std::to_string(it->second - 1) + ");" << std::endl;
+    output << it->first + "_x" + std::to_string(it->second - 1) + " & ";
+    output << it->first + "_r" + std::to_string(it->second - 1) + " );" << std::endl;
   }
 
   for (auto reg : moduleRegs) {
+    if ( isNum(reg) ) {
+      std::cout << "find num in nextVersion: " + reg << std::endl;
+      continue;
+    }
     if ( nextVersion.find(reg) == nextVersion.end() ) {
       output << "  assign " + reg + "_r = 0;" << std::endl;      
     }
   }
 
   for (auto it = new_reg.begin(); it != new_reg.end(); ++it) {
+    if ( isNum(it->first) ) {
+      std::cout << "find num in new_reg: " + it->first << std::endl;
+      continue;
+    }
     std::string reg, regSlice;
     split_slice(it->first, reg, regSlice);
     output << "  assign " + reg + "_r" + regSlice + " = 0;" << std::endl;
@@ -451,19 +478,19 @@ void add_module_name(std::string fileName) {
   std::ofstream out(fileName + ".final");
   std::string line;
   std::smatch match;
-  out << "module " + moduleName + "(";
+  out << "module " + moduleName + "( ";
   for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) {
-    out << *it + ", ";
+    out << *it + " , ";
   }
   for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) {
-    if (*it ==  clockName)
-      continue;
-    out << *it + "_t, ";
+    //if (*it ==  clockName)
+    //  continue;
+    out << *it + "_t , ";
   }
   for (auto it = moduleOutputs.begin(); it != moduleOutputs.end() - 1; ++it) {
-    out << *it + ", ";
+    out << *it + " , ";
   }
-  out << moduleOutputs.back() + ");" << std::endl;
+  out << moduleOutputs.back() + " );" << std::endl;
   while( std::getline(in, line) ) {
     out << line << std::endl;
   }
@@ -480,9 +507,9 @@ void fill_update(std::string fileName) {
     if ( std::regex_match(line, m, pNonblock) )
       new_reg.insert(std::make_pair(m.str(3), m.str(2)));
     else if ( std::regex_match(line, m, pNonblockConcat) ) {
-      std::vector<std::string> updateList;
-      parse_var_list(m.str(3), updateList);
-      for (std::string update: updateList) {
+      std::vector<std::string> updateVec;
+      parse_var_list(m.str(3), updateVec);
+      for (std::string update: updateVec) {
         new_reg.insert(std::make_pair(update, m.str(2)));
       }
     }
@@ -556,13 +583,13 @@ void add_func_taints(std::ifstream &input, std::ofstream &output, std::string fu
         output << "!!! ERROR: function contains blocking !!!" << std::endl;     
         break;
       case NONBLOCKCONCAT:
-        output << "!!! ERROR: function contains blocking !!!" << std::endl;        
+        output << "!!! ERROR: function contains blocking !!!" << std::endl;
         break;
       case CASE:
         add_case_taints(input, output, line, "t");
         break;
       case UNSUPPORT:
-        output << "!!! Unsupported operator !!!" << std::endl;
+        output << "!!! Unsupported operator in func:" + line << std::endl;
         break;
       default:
         break;
@@ -608,7 +635,7 @@ void add_func_taints(std::ifstream &input, std::ofstream &output, std::string fu
             add_case_taints(input, output, line, taintBit);
             break;
           case UNSUPPORT:
-            output << "!!! Unsupported operator !!!" << std::endl;
+            output << "!!! Unsupported operator in func:" + line << std::endl;
             break;
           default:
             break;
@@ -650,39 +677,39 @@ void add_func_taints_limited(std::ifstream &input, std::ofstream &output, std::s
   //input.seekg(funcBegin);
 
   // print _t function
-  output << blank + "function " + funcSlice + funcName + "_t;" << std::endl;
-  output << blank + "  input [" + toStr(condWidthNum-1) + ":0] cond_t;" << std::endl; 
-  output << blank + "  reg cond_t_1bit;" << std::endl;
+  output << blank + "function " + funcSlice + funcName + "_t ;" << std::endl;
+  output << blank + "  input [" + toStr(condWidthNum-1) + ":0] cond_t ;" << std::endl; 
+  output << blank + "  reg cond_t_1bit ;" << std::endl;
   output << blank + "  begin" << std::endl;
-  output << blank + "    cond_t_1bit = | cond_t;" << std::endl;  
-  output << blank + "    " + funcName + "_t = " + extend("cond_t_1bit", get_width(funcSlice)) + ";" << std::endl;
+  output << blank + "    cond_t_1bit = | cond_t ;" << std::endl;  
+  output << blank + "    " + funcName + "_t = " + extend("cond_t_1bit", get_width(funcSlice)) + " ;" << std::endl;
   output << blank + "  end" << std::endl;
   output << blank + "endfunction" << std::endl << std::endl;
 
   // print _r function, only the condition has _r taint, assume all the bits are the same.
-  output << blank + "function [" + toStr(condWidthNum-1) + ":0] " + funcName + "_r;" << std::endl;
-  output << blank + "  input " + funcSlice + "dest_r;" << std::endl;
-  output << blank + "  reg dest_r_1bit;" << std::endl;
+  output << blank + "function [" + toStr(condWidthNum-1) + ":0] " + funcName + "_r ;" << std::endl;
+  output << blank + "  input " + funcSlice + "dest_r ;" << std::endl;
+  output << blank + "  reg dest_r_1bit ;" << std::endl;
   output << blank + "  begin" << std::endl;
-  output << blank + "    dest_r_1bit = | dest_r;" << std::endl;  
-  output << blank + "    " + funcName + "_r = " + extend("dest_r_1bit", condWidthNum) + ";" << std::endl;
+  output << blank + "    dest_r_1bit = | dest_r ;" << std::endl;  
+  output << blank + "    " + funcName + "_r = " + extend("dest_r_1bit", condWidthNum) + " ;" << std::endl;
   output << blank + "  end" << std::endl;
   output << blank + "endfunction" << std::endl << std::endl;
 
   // print _x function, only the condition has _x taint, assume all the bits are the same.
-  output << blank + "function [" + toStr(condWidthNum-1) + ":0] " + funcName + "_x;" << std::endl;
-  output << blank + "  input " + funcSlice + "dest_x;" << std::endl;
-  output << blank + "  reg dest_x_1bit;" << std::endl;
+  output << blank + "function [" + toStr(condWidthNum-1) + ":0] " + funcName + "_x ;" << std::endl;
+  output << blank + "  input " + funcSlice + "dest_x ;" << std::endl;
+  output << blank + "  reg dest_x_1bit ;" << std::endl;
   output << blank + "  begin" << std::endl;
-  output << blank + "    dest_x_1bit = | dest_x;" << std::endl;  
-  output << blank + "    " + funcName + "_x = " + extend("dest_x_1bit", condWidthNum) + ";" << std::endl;
+  output << blank + "    dest_x_1bit = | dest_x ;" << std::endl;  
+  output << blank + "    " + funcName + "_x = " + extend("dest_x_1bit", condWidthNum) + " ;" << std::endl;
   output << blank + "  end" << std::endl;
   output << blank + "endfunction" << std::endl << std::endl;
 
   // print _x function, only the condition has _x taint, assume all the bits are the same.
-  output << blank + "function [" + toStr(condWidthNum-1) + ":0] " + funcName + "_c;" << std::endl;
+  output << blank + "function [" + toStr(condWidthNum-1) + ":0] " + funcName + "_c ;" << std::endl;
   output << blank + "  begin" << std::endl;
-  output << blank + "    " + funcName + "_c = " + extend("1", condWidthNum) + ";" << std::endl;
+  output << blank + "    " + funcName + "_c = " + extend("1", condWidthNum) + " ;" << std::endl;
   output << blank + "  end" << std::endl;
   output << blank + "endfunction" << std::endl << std::endl;
 }
@@ -741,7 +768,7 @@ void add_case_taints(std::ifstream &input, std::ofstream &output, std::string fi
 
   // taint wire declaration
   if (tExist) {
-    output << blank + "wire " + condName + "_t_1bit = | " + condName + "_t;" << std::endl;
+    output << blank + "wire " + condName + "_t_1bit = | " + condName + "_t ;" << std::endl;
   }
 
   if (rExist) {
@@ -749,7 +776,7 @@ void add_case_taints(std::ifstream &input, std::ofstream &output, std::string fi
     for( std::string rhs: allRhs ) {
       std::string rhsName, rhsSlice;
       split_slice(rhs, rhsName, rhsSlice);
-      output << blank + "wire [" + toStr(varWidth.get_from_var_width(rhsName, firstLine)) + "-1:0] " + rhsName + "_r" + localVer[rhsName] + ";" << std::endl;
+      output << blank + "wire [" + toStr(varWidth.get_from_var_width(rhsName, firstLine)) + "-1:0] " + rhsName + "_r" + localVer[rhsName] + " ;" << std::endl;
     }
   }
 
@@ -757,7 +784,7 @@ void add_case_taints(std::ifstream &input, std::ofstream &output, std::string fi
     for( std::string rhs: allRhs ) {
       std::string rhsName, rhsSlice;
       split_slice(rhs, rhsName, rhsSlice);
-      output << blank + "wire [" + toStr(varWidth.get_from_var_width(rhsName, firstLine)) + "-1:0] " + rhsName + "_x" + localVer[rhsName] + ";" << std::endl;
+      output << blank + "wire [" + toStr(varWidth.get_from_var_width(rhsName, firstLine)) + "-1:0] " + rhsName + "_x" + localVer[rhsName] + " ;" << std::endl;
     }
   }
 
@@ -765,7 +792,7 @@ void add_case_taints(std::ifstream &input, std::ofstream &output, std::string fi
     for( std::string rhs: allRhs ) {
       std::string rhsName, rhsSlice;
       split_slice(rhs, rhsName, rhsSlice);
-      output << blank + "wire [" + toStr(varWidth.get_from_var_width(rhsName, firstLine)) + "-1:0] " + rhsName + "_c" + localVer[rhsName] + ";" << std::endl;
+      output << blank + "wire [" + toStr(varWidth.get_from_var_width(rhsName, firstLine)) + "-1:0] " + rhsName + "_c" + localVer[rhsName] + " ;" << std::endl;
     }
   }
 
@@ -793,24 +820,24 @@ void add_case_taints(std::ifstream &input, std::ofstream &output, std::string fi
       }
 
       if( tExist ) {
-        output << blank + dest + "_t" + destSlice + " = " + src + "_t" + srcSlice + " | " + extend(condName+"_t_1bit", localWidthNum) + ";" << std::endl;
+        output << blank + dest + "_t" + destSlice + " = " + src + "_t" + srcSlice + " | " + extend(condName+"_t_1bit", localWidthNum) + " ;" << std::endl;
       }
 
       /* some notes:
        * For the _r taint, in each case, only part of the taint will be assigned. To deal with the remaining part, 
        * how to deal with floating wires? */
       if( rExist ) {
-        output << blank + src + "_r" + localVer[src] + srcSlice + " = " + dest + "_r" + destSlice + " | " + extend(condName+"_t_1bit", localWidthNum) + ";" << std::endl;
+        output << blank + src + "_r" + localVer[src] + srcSlice + " = " + dest + "_r" + destSlice + " | " + extend(condName+"_t_1bit", localWidthNum) + " ;" << std::endl;
         ground_wires(src+"_r"+localVer[src], varWidth.get_from_var_width(src, line), srcSlice, blank, output);
       }
 
       if( xExist ) {
-        output << blank + src + "_x" + localVer[src] + srcSlice + " = " + dest + "_x" + destSlice + ";" << std::endl;
+        output << blank + src + "_x" + localVer[src] + srcSlice + " = " + dest + "_x" + destSlice + " ;" << std::endl;
         ground_wires(src+"_x"+localVer[src], varWidth.get_from_var_width(src, line), srcSlice, blank, output);
       }
 
       if( cExist ) {
-        output << blank + src + "_c" + localVer[src] + srcSlice + " = " + extend("1", localWidthNum) + ";" << std::endl;
+        output << blank + src + "_c" + localVer[src] + srcSlice + " = " + extend("1", localWidthNum) + " ;" << std::endl;
         ground_wires(src+"_c"+localVer[src], varWidth.get_from_var_width(src, line), srcSlice, blank, output);
       }
       readSwitchValue = true;        
@@ -883,16 +910,20 @@ void add_func_taints_call_limited(std::string line, std::ofstream &output) {
   }
   std::string varArgs = m.str(0);
 
-  std::regex pArg("_\\d+_");
-  std::string argT = get_rhs_taint_list(varArgs, "_t");
-  std::string argR = get_lhs_taint_list(varArgs, "_r", output);
-  std::string argX = get_lhs_taint_list(varArgs, "_x", output);
-  std::string argC = get_lhs_taint_list(varArgs, "_c", output);
+  std::string returnArgT = get_lhs_taint_list(returnArg, "_t", output);
+  std::string returnArgR = get_rhs_taint_list(returnArg, "_r");
+  std::string returnArgX = get_rhs_taint_list(returnArg, "_x");
+  std::string returnArgC = get_rhs_taint_list(returnArg, "_c");
 
-  output << blank + "assign " + returnArg + "_t = " + funcName + "_t(" + argT + ");" << std::endl;
-  output << blank + "assign " + argR + " = " + funcName + "_r(" + returnArg + "_r);" << std::endl;
-  output << blank + "assign " + argX + " = " + funcName + "_x(" + returnArg + "_x);" << std::endl;
-  output << blank + "assign " + argC + " = " + funcName + "_c(" + returnArg + "_c);" << std::endl;
+  std::string argTList = get_rhs_taint_list(varArgs, "_t");
+  std::string argRList = get_lhs_taint_list(varArgs, "_r", output);
+  std::string argXList = get_lhs_taint_list(varArgs, "_x", output);
+  std::string argCList = get_lhs_taint_list(varArgs, "_c", output);
+
+  output << blank + "assign " + returnArgT + " = " + funcName + "_t(" + argTList + ");" << std::endl;
+  output << blank + "assign { " + argRList + " } = " + funcName + "_r(" + returnArgR + ");" << std::endl;
+  output << blank + "assign { " + argXList + " } = " + funcName + "_x(" + returnArgX + ");" << std::endl;
+  output << blank + "assign { " + argCList + " } = " + funcName + "_c(" + returnArgC + ");" << std::endl;
 }
 
 
@@ -920,13 +951,16 @@ bool extract_concat(std::string line, std::ofstream &output) {
     while( it != rend ) {
       varList = *it++;
       allVarList.push_back(varList);
-      int localIdxNum = NEW_VAR++;
+      int localIdxNum = NEW_FANGYUAN++;
       std::string localIdx = std::to_string(localIdxNum);
       uint32_t totalWidth = 0;
       std::vector<std::string> varVec;
       parse_var_list(varList, varVec);
       for(std::string var: varVec) {
         uint32_t localWidth = get_var_slice_width(var);
+        if(localWidth == 0) {
+          abort();
+        }
         totalWidth += localWidth;
       }
       if(totalWidth > 4294967290) {
@@ -934,15 +968,15 @@ bool extract_concat(std::string line, std::ofstream &output) {
         std::cout << line << std::endl;
         abort();
       }
-      bool insertDone = varWidth.var_width_insert("yuzeng"+localIdx, totalWidth);
+      bool insertDone = varWidth.var_width_insert("fangyuan"+localIdx, totalWidth);
       if (!insertDone) {
         std::cout << "insert failed for this line:" + line << std::endl;
         std::cout << "m.str(2):" + m.str(2) << std::endl;
         std::cout << "m.str(3):" + m.str(3) << std::endl;
       }
-      output << std::string(blankNo, ' ') + "wire [" + toStr(totalWidth-1) + ":0] yuzeng" + localIdx + ";" << std::endl;
-      output << std::string(blankNo, ' ') + "assign yuzeng" + localIdx + " = { " + varList + " };" << std::endl;
-      newVarQueue.push("yuzeng"+localIdx);
+      output << std::string(blankNo, ' ') + "wire [" + toStr(totalWidth-1) + ":0] fangyuan" + localIdx + ";" << std::endl;
+      output << std::string(blankNo, ' ') + "assign fangyuan" + localIdx + " = { " + varList + " };" << std::endl;
+      newVarQueue.push("fangyuan"+localIdx);
     }
     char openBrace = '{';
     char closeBrace = '}';

@@ -14,8 +14,22 @@
 #define toStr(a) std::to_string(a)
 
 bool isNum(std::string name) {
+  size_t bracePos = name.find('{');
   std::smatch m;
-  return std::regex_match(name, m, pNum);
+  if (bracePos == name.npos)
+    return std::regex_match(name, m, pNum);
+  else {
+    bool allAreNum = true;
+    std::string singleVar;
+    std::regex_token_iterator<std::string::iterator> rend;
+    std::regex_token_iterator<std::string::iterator> it(name.begin(), name.end(), pVarName, 0);
+    while( it != rend ) {
+      singleVar = *it++;
+      if(!isNum(singleVar))
+        return false;
+    }
+    return true;
+  }
 }
 
 
@@ -39,7 +53,7 @@ bool isReg(std::string var) {
 
 std::string to_re(std::string input) {
   std::regex pName("NAME");
-  std::string varName("[\aa-zA-Z0-9_\\.:\\\\']+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?");
+  std::string varName("[\aa-zA-Z0-9_\\.\\$\\\\'\\[\\]]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?");
   auto res = std::regex_replace(input, pName, varName);
   std::regex pNUM("NUM");
   std::string regexNum("\\d+'h[\\dabcdef]+");
@@ -63,12 +77,30 @@ std::string remove_bracket(std::string name) {
   return name;
 }
 
+
 uint32_t cut_pos(std::string name) {
-  for (uint32_t i = 0; i < name.length(); ++i) {
-    if (name.substr(i, 1).compare("[") == 0)
-      return i;
+  std::regex pOpenBackSlash("^(\\s*)\\\\");
+  std::smatch m;
+  if(std::regex_search(name, m, pOpenBackSlash)) {
+    bool nameStart = false;
+    bool nameEnd = false;
+    for(size_t i = 0; i < name.length(); ++i) {
+      if(name.substr(i,1).compare("\\") == 0)
+        nameStart = true;
+      if(nameStart && name.substr(i,1).compare(" ") == 0)
+        nameEnd = true;
+      if(nameEnd && name.substr(i, 1).compare("[") == 0)
+        return i;
+    }
+    return name.length();
   }
-  return name.length();
+  else {
+    for (uint32_t i = 0; i < name.length(); ++i) {
+      if (name.substr(i, 1).compare("[") == 0)
+        return i;
+    }
+    return name.length();
+  }
 }
 
 
@@ -164,7 +196,7 @@ void collapse_bits(std::string varName, uint32_t bound1, uint32_t bound2, std::o
 
 
 std::string extend(std::string in, uint32_t length) {
-  return "{" + std::to_string(length) + "{" + in + "}}";
+  return "{ " + std::to_string(length) + "{ " + in + " }}";
 }
 
 
@@ -196,7 +228,12 @@ void ground_wires(std::string wireName, uint32_t width, std::string slice, std::
 // But blanks at the front and back are removed
 void parse_var_list(std::string list, std::vector<std::string> &vec) {
   assert(vec.size() == 0);
+  // remove the last char since it is )
   int previous = -1;
+  if(list.front() == '(') {
+    list.pop_back();
+    previous = 0;
+  }
   int current = 0;
   char delim = ',';
   std::string arg;
@@ -205,7 +242,7 @@ void parse_var_list(std::string list, std::vector<std::string> &vec) {
     current = list.find(delim, previous + 1);
     arg = list.substr(previous+1, current-previous-1);
     //std::regex pLocal("^(\\s)*(\\S+)(\\s)*$");
-    std::regex pLocal("^(?:\\s)*([\aa-zA-Z0-9_\\.:\\\\']+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?)(?:\\s)*$");
+    std::regex pLocal("^(?:\\s)*([\aa-zA-Z0-9_\\.:\\\\'\\[\\]]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?)(?:\\s)*$");
     std::smatch m;
     std::regex_match(arg, m, pLocal);
     vec.push_back(m.str(1));
@@ -215,6 +252,8 @@ void parse_var_list(std::string list, std::vector<std::string> &vec) {
 
 
 uint32_t get_var_slice_width(std::string varAndSlice) {
+  if( varAndSlice.empty() )
+    return 0;
   if(isNum(varAndSlice)) {
     std::smatch m;
     std::regex_match(varAndSlice, m, pNum);
@@ -241,6 +280,9 @@ uint32_t get_var_slice_width(std::string varAndSlice) {
   else {
     //std::cout << "varWdith:" + varWidth[var] << std::endl;
     auto v = varWidth.get_from_var_width(var, varAndSlice);
+    if (v == 0) {
+      abort();
+    }
     totalWidth += v;
   }
   return totalWidth;
@@ -252,8 +294,10 @@ std::string get_rhs_taint_list(std::vector<std::string> &updateVec, std::string 
   std::smatch m;
   for(std::string singleUpdate : updateVec) {
     if(!isNum(singleUpdate)) {
-      std::regex_match(singleUpdate, m, pVarNameGroup);
-      singleUpdate = std::regex_replace(singleUpdate, pVarNameGroup, "$1"+taint+"$3");
+      std::string update, updateSlice;
+      split_slice(singleUpdate, update, updateSlice);
+      singleUpdate = update+taint+updateSlice;
+      //singleUpdate = std::regex_replace(singleUpdate, pVarNameGroup, "$1"+taint+"$3");
     }
     else { // if isNum
       if( !std::regex_match(singleUpdate, m, pNum)) {
@@ -266,7 +310,7 @@ std::string get_rhs_taint_list(std::vector<std::string> &updateVec, std::string 
   }
   std::string returnList = " ";
   for (auto it = taintVec.begin(); it < taintVec.end() - 1; ++it) {
-    returnList = returnList + *it + ", ";
+    returnList = returnList + *it + " , ";
   }
   returnList = returnList + taintVec.back() + " ";
   return returnList;
@@ -290,26 +334,28 @@ std::string get_lhs_ver_taint_list(std::vector<std::string> &updateVec, std::str
     split_slice(updateAndSlice, update, updateSlice);
     std::string updateWidth = toStr(varWidth.get_from_var_width(update, updateAndSlice));
     std::string localVer = toStr(find_version_num(update));
-    output << "  wire [" + updateWidth + "-1:0] " + update + taint + localVer + ";" << std::endl;
-
+    output << "  wire [" + updateWidth + "-1:0] " + update + taint + localVer + " ;" << std::endl;
+    std::string updateTaintSlice;
     if(!isNum(updateAndSlice)) {
-      std::regex_match(updateAndSlice, m, pVarNameGroup);
-      updateAndSlice = std::regex_replace(updateAndSlice, pVarNameGroup, "$1"+taint+localVer+"$3");
+      std::string update, updateSlice;
+      split_slice(updateAndSlice, update, updateSlice);
+      updateTaintSlice = update+taint+localVer+updateSlice;
+      //std::regex_match(updateAndSlice, m, pVarNameGroup);
+      //updateTaintSlice = std::regex_replace(updateAndSlice, pVarNameGroup, "$1"+taint+localVer+"$3");
     }
     else { // if isNum
-        std::cout << "!! Error in matching number :" + updateAndSlice << std::endl;
-        abort();
+      std::cout << "!! Error in matching number :" + updateAndSlice << std::endl;
+      abort();
     }
-    taintVec.push_back(updateAndSlice);    
+    taintVec.push_back(updateTaintSlice);    
   }
   std::string returnList = " ";
   for (auto it = taintVec.begin(); it < taintVec.end() - 1; ++it) {
-    returnList = returnList + *it + ", ";
+    returnList = returnList + *it + " , ";
   }
   returnList = returnList + taintVec.back() + " ";
   return returnList;
 }
-
 
 
 std::string get_lhs_taint_list(std::vector<std::string> &destVec, std::string taint, std::ofstream &output) {
@@ -317,8 +363,11 @@ std::string get_lhs_taint_list(std::vector<std::string> &destVec, std::string ta
   std::smatch m;
   for(std::string singleDest : destVec) {
     if(!isNum(singleDest)) {
-      std::regex_match(singleDest, m, pVarNameGroup);
-      singleDest = std::regex_replace(singleDest, pVarNameGroup, "$1"+taint+"$3");
+      //std::regex_match(singleDest, m, pVarNameGroup);
+      //singleDest = std::regex_replace(singleDest, pVarNameGroup, "$1"+taint+"$3");
+      std::string dest, destSlice;
+      split_slice(singleDest, dest, destSlice);
+      singleDest = dest+taint+destSlice;
     }
     else { // if isNum
       if( !std::regex_match(singleDest, m, pNum)) {
@@ -327,14 +376,14 @@ std::string get_lhs_taint_list(std::vector<std::string> &destVec, std::string ta
       std::string numWidth = m.str(1);
       int localIdx = USELESS_VAR++;
       // declare a dummy wire, just for being assigned
-      output << "  wire [" + numWidth + "-1:0] nouse" + toStr(localIdx) << std::endl;
+      output << "  wire [" + numWidth + "-1:0] nouse" + toStr(localIdx) + " ;" << std::endl;
       singleDest = "nouse" + toStr(localIdx);
     }
     taintVec.push_back(singleDest);    
   }
   std::string returnList = " ";
   for (auto it = taintVec.begin(); it < taintVec.end() - 1; ++it) {
-    returnList = returnList + *it + ", ";
+    returnList = returnList + *it + " , ";
   }
   returnList = returnList + taintVec.back() + " ";
   return returnList;

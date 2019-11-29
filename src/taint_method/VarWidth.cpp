@@ -34,14 +34,14 @@ uint32_t VarWidth::get_from_var_width(std::string var, std::string line) {
     if(!std::regex_match(var, m, pName)) {
       std::cout << "Not a valid key for read:" + var << std::endl;
       std::cout << "The line is: " + line << std::endl;      
-      abort();
+      return 0;
     }
     var = m.str(2);
   }
   if ( internalVarWidth.find(var) == internalVarWidth.end() ) {
     std::cout << "The key is not in map: " + var << std::endl;
     std::cout << "The line is: " + line << std::endl;
-    abort();
+    return 0;
   }
   auto res = internalVarWidth[var];
   return res;

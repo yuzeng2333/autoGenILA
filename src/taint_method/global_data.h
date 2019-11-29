@@ -40,6 +40,7 @@ extern std::regex pAnd;
 extern std::regex pOr;      
 extern std::regex pBitOr;     
 extern std::regex pBitExOr;     
+extern std::regex pBitAnd;     
 extern std::regex pConcat;    
 extern std::regex pSel1;   
 extern std::regex pSel2;     
@@ -54,7 +55,8 @@ extern std::regex pInvert;
 /* ite */
 extern std::regex pIte;     
 /* do not add anything */
-extern std::regex pAlways;   
+extern std::regex pAlwaysClk;
+extern std::regex pAlwaysClkRst;
 extern std::regex pEnd;   
 extern std::regex pEndmodule; 
 /* non-blocking assignment */
@@ -69,6 +71,9 @@ extern std::regex pCase;
 extern std::regex pEndcase;
 extern std::regex pDefault;
 extern std::regex pBlock;
+extern std::regex pIf;
+extern std::regex pElse;
+
 extern std::regex pSrcConcat;
 extern std::regex pSrcDestBothConcat;
 

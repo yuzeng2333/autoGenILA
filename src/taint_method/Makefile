@@ -27,3 +27,9 @@ aes1:
 
 exp:
 	./a.out ./experiment/experiment.v 0
+
+pid0:
+	./a.out /workspace/research/ILA/autoGenILA/PID/SYN/PID_simp.v 0
+
+pid1:
+	./a.out /workspace/research/ILA/autoGenILA/PID/SYN/PID_simp.v 1

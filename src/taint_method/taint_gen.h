@@ -22,12 +22,13 @@
 #define FUNCDEF        12
 #define FUNCEND        13
 #define BOTH_CONCAT    14
+#define ALWAYS_CLKRST  15
 #define UNSUPPORT      99
 #define NONE           100
 
 void clean_file(std::string fileName);
 
-void add_line_taints(std::string line, std::ofstream &output);
+void add_line_taints(std::string line, std::ofstream &output, std::ifstream &input);
 
 void read_in_clkrst(std::string fileName);
 
