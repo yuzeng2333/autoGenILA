@@ -8,23 +8,25 @@
 #include "global_data.h"
 #include "VarWidth.h"
 
-#define INPUT          1 
-#define REG            2
-#define WIRE           3
-#define TWO_OP         4
-#define ONE_OP         5
-#define ITE            6
-#define NONBLOCK       7
-#define NONBLOCKCONCAT 8
-#define OUTPUT         9
-#define CASE           10
-#define SRC_CONCAT     11
-#define FUNCDEF        12
-#define FUNCEND        13
-#define BOTH_CONCAT    14
-#define ALWAYS_CLKRST  15
-#define UNSUPPORT      99
-#define NONE           100
+#define INPUT           1 
+#define REG             2
+#define WIRE            3
+#define TWO_OP          4
+#define ONE_OP          5
+#define ITE             6
+#define NONBLOCK        7
+#define NONBLOCKCONCAT  8
+#define OUTPUT          9
+#define CASE            10
+#define SRC_CONCAT      11
+#define FUNCDEF         12
+#define FUNCEND         13
+#define BOTH_CONCAT     14
+#define ALWAYS_CLKRST   15
+#define ALWAYS          16
+#define REDUCE1         17
+#define UNSUPPORT       99
+#define NONE            100
 
 void clean_file(std::string fileName);
 

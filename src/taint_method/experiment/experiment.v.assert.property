@@ -1,0 +1,2 @@
+  assert property(disable iff(rst) RS_r_flag == 0 );
+  assert property(disable iff(rst) RS_r_flag == 0 );

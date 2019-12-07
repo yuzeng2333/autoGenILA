@@ -26,14 +26,14 @@ std::regex pWire      (to_re("^(\\s*)wire (\\[\\d+\\:\\d+\\] )?(NAME)(\\s*)?;$")
 std::regex pAdd       (to_re("^(\\s*)assign (NAME) = (NAME) \\\\+ (NAME)(\\s*)?;$"));
 std::regex pSub       (to_re("^(\\s*)assign (NAME) = (NAME) - (NAME)(\\s*)?;$"));
 std::regex pMult      (to_re("^(\\s*)assign (NAME) = (NAME) \\\\* (NAME)(\\s*)?;$"));
+std::regex pAnd       (to_re("^(\\s*)assign (NAME) = (NAME) && (NAME)(\\s*)?;$"));
+std::regex pOr        (to_re("^(\\s*)assign (NAME) = (NAME) \\|\\| (NAME)(\\s*)?;$"));
 std::regex pEq        (to_re("^(\\s*)assign (NAME) = (NAME) == (NAME)(\\s*)?;$"));
 std::regex pNeq       (to_re("^(\\s*)assign (NAME) = (NAME) != (NAME)(\\s*)?;$"));
 std::regex pLt        (to_re("^(\\s*)assign (NAME) = (NAME) > (NAME)(\\s*)?;$"));
 std::regex pLe        (to_re("^(\\s*)assign (NAME) = (NAME) >= (NAME)(\\s*)?;$"));
 std::regex pSt        (to_re("^(\\s*)assign (NAME) = (NAME) < (NAME)(\\s*)?;$"));
 std::regex pSe        (to_re("^(\\s*)assign (NAME) = (NAME) <= (NAME)(\\s*)?;$"));
-std::regex pAnd       (to_re("^(\\s*)assign (NAME) = (NAME) && (NAME)(\\s*)?;$"));
-std::regex pOr        (to_re("^(\\s*)assign (NAME) = (NAME) \\|\\| (NAME)(\\s*)?;$"));
 std::regex pBitOr     (to_re("^(\\s*)assign (NAME) = (NAME) \\| (NAME)(\\s*)?;$"));
 std::regex pBitExOr   (to_re("^(\\s*)assign (NAME) = (NAME) \\^ (NAME)(\\s*)?;$"));
 std::regex pBitAnd    (to_re("^(\\s*)assign (NAME) = (NAME) & (NAME)(\\s*)?;$"));
@@ -48,8 +48,14 @@ std::regex pBitOrRed2 (to_re("^(\\s*)assign (NAME) = \\| \\{ (NAME), (NAME) \\}(
 /* 1 operator */
 std::regex pNot       (to_re("^(\\s*)assign (NAME) = ! (NAME)(\\s*)?;$"));
 std::regex pNone      (to_re("^(\\s*)assign (NAME) = (NAME)(\\s*)?;$"));
-std::regex pBitOrRed1 (to_re("^(\\s*)assign (NAME) = \\| (NAME)(\\s*)?;$"));
 std::regex pInvert    (to_re("^(\\s*)assign (NAME) = \\~ (NAME)(\\s*)?;$"));
+/* reduce 1 op */
+std::regex pRedOr     (to_re("^(\\s*)assign (NAME) = \\| (NAME)(\\s*)?;$"));
+std::regex pRedAnd    (to_re("^(\\s*)assign (NAME) = & (NAME)(\\s*)?;$"));
+std::regex pRedNand   (to_re("^(\\s*)assign (NAME) = \\~& (NAME)(\\s*)?;$"));
+std::regex pRedNor    (to_re("^(\\s*)assign (NAME) = \\~\\| (NAME)(\\s*)?;$"));
+std::regex pRedXor    (to_re("^(\\s*)assign (NAME) = \\^ (NAME)(\\s*)?;$"));
+std::regex pRedXnor   (to_re("^(\\s*)assign (NAME) = \\~\\^ (NAME)(\\s*)?;$"));
 /* ite */
 std::regex pIte       (to_re("^(\\s*)assign (NAME) = (NAME) \\? (NAME) \\: (NAME)(\\s*)?;$"));
 /* do not add anything */
@@ -104,6 +110,8 @@ unsigned long int NEW_VAR = 0;
 unsigned long int NEW_FANGYUAN = 0;
 unsigned long int USELESS_VAR = 0;
 bool did_clean_file = false;
+std::string g_recentClk;
+std::string g_recentRst;
 //std::vector<std::string> clkGroup;
 //std::vector<std::string> rstGroup;
 
@@ -137,10 +145,18 @@ void clean_file(std::string fileName) {
           std::string slice = m.str(2);
           std::string var = m.str(3);
           bool insertDone = false;
-          if(!inFunc)
-            insertDone = varWidth.var_width_insert(var, get_width(slice));
-          else
-            insertDone = funcVarWidth.force_insert(var, get_width(slice));            
+          if(!inFunc) {
+            if(!slice.empty())
+              insertDone = varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+            else
+              insertDone = varWidth.var_width_insert(var, 0, 0);
+          }
+          else {
+            if(!slice.empty())
+              insertDone = funcVarWidth.force_insert(var, get_end(slice), get_begin(slice));
+            else
+              insertDone = funcVarWidth.force_insert(var, 0, 0);
+          }     
           if (!insertDone) {
             std::cout << "insert failed in input case:" + line << std::endl;
             std::cout << "m.str(2):" + m.str(2) << std::endl;
@@ -154,10 +170,18 @@ void clean_file(std::string fileName) {
           std::string slice = m.str(2);
           std::string var = m.str(3);
           bool insertDone = false;
-          if(!inFunc)
-            insertDone = varWidth.var_width_insert(var, get_width(slice));
-          else
-            insertDone = funcVarWidth.force_insert(var, get_width(slice));
+          if(!inFunc) {
+            if(!slice.empty())
+              insertDone = varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+            else
+              insertDone = varWidth.var_width_insert(var, 0, 0);
+          }
+          else {
+            if(!slice.empty())
+              insertDone = funcVarWidth.force_insert(var, get_end(slice), get_begin(slice));
+            else
+              insertDone = funcVarWidth.force_insert(var, 0, 0);
+          }
           if (!insertDone) {
             std::cout << "insert failed in reg case:" + line << std::endl;
             std::cout << "m.str(2):" + m.str(2) << std::endl;
@@ -171,10 +195,18 @@ void clean_file(std::string fileName) {
           std::string slice = m.str(2);
           std::string var = m.str(3);
           bool insertDone = false;
-          if(!inFunc)
-            insertDone = varWidth.var_width_insert(var, get_width(slice));
-          else
-            insertDone = funcVarWidth.force_insert(var, get_width(slice));
+          if(!inFunc) {
+            if(!slice.empty())
+              insertDone = varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+            else
+              insertDone = varWidth.var_width_insert(var, 0, 0);
+          }
+          else {
+            if(!slice.empty())
+              insertDone = funcVarWidth.force_insert(var, get_end(slice), get_begin(slice));
+            else
+              insertDone = funcVarWidth.force_insert(var, 0, 0);
+          }
           if (!insertDone) {
             std::cout << "insert failed in wire case:" + line << std::endl;
             std::cout << "m.str(2):" + m.str(2) << std::endl;
@@ -188,10 +220,18 @@ void clean_file(std::string fileName) {
           std::string slice = m.str(2);
           std::string var = m.str(3);
           bool insertDone = false;
-          if(!inFunc)
-            insertDone = varWidth.var_width_insert(var, get_width(slice));
-          else
-            insertDone = funcVarWidth.force_insert(var, get_width(slice));
+          if(!inFunc) {
+            if(!slice.empty())
+              insertDone = varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+            else
+              insertDone = varWidth.var_width_insert(var, 0, 0);
+          }
+          else {
+            if(!slice.empty())
+              insertDone = funcVarWidth.force_insert(var, get_end(slice), get_begin(slice));
+            else
+              insertDone = funcVarWidth.force_insert(var, 0, 0);
+          }
           if (!insertDone) {
             std::cout << "insert failed in output case:" + line << std::endl;
             std::cout << "m.str(2):" + m.str(2) << std::endl;
@@ -211,7 +251,7 @@ void clean_file(std::string fileName) {
         break;
       default:
         break;
-    }
+    } // end of switch
     bool noConcat = extract_concat(cleanLine, output);
     if (noConcat)
       output << cleanLine << std::endl;
@@ -234,13 +274,16 @@ void add_line_taints(std::string line, std::ofstream &output, std::ifstream &inp
       wire_taint_gen(line, output);
       break;
     case OUTPUT:
-      output_insert_map(line, output);
+      output_insert_map(line, output, input);
       break;
     case TWO_OP:
       two_op_taint_gen(line, output);      
       break;
     case ONE_OP:
       one_op_taint_gen(line, output);      
+      break;
+    case REDUCE1:
+      reduce_one_op_taint_gen(line, output);
       break;
     case SRC_CONCAT:
       mult_op_taint_gen(line, output);
@@ -252,10 +295,13 @@ void add_line_taints(std::string line, std::ofstream &output, std::ifstream &inp
       ite_taint_gen(line, output);      
       break;
     case NONBLOCK:
-        nonblock_taint_gen(line, output);
+      nonblock_taint_gen(line, output);
       break;
     case NONBLOCKCONCAT:
       nonblockconcat_taint_gen(line, output);
+      break;
+    case ALWAYS:
+      always_taint_gen(line, input, output);
       break;
     case ALWAYS_CLKRST:
       always_clkrst_taint_gen(line, input, output);
@@ -271,6 +317,10 @@ void add_line_taints(std::string line, std::ofstream &output, std::ifstream &inp
 
 // FIXME: maybe set t-taint and r-taint to clear if reg value is not changed
 int parse_verilog_line(std::string line, bool ignoreWrongOp) {
+  if(line.substr(0, 1) == "X") {
+    toCout("begin debug");
+    ignoreWrongOp = true;
+  }
   std::smatch m;
   if ( std::regex_match(line, m, pModule) ) {
     moduleName = m.str(2);
@@ -299,13 +349,13 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   else if (std::regex_match(line, m, pAdd)
             || std::regex_match(line, m, pSub)
             || std::regex_match(line, m, pMult)
+            || std::regex_match(line, m, pAnd)
             || std::regex_match(line, m, pEq)
             || std::regex_match(line, m, pNeq)
             || std::regex_match(line, m, pLt)
             || std::regex_match(line, m, pLe)
             || std::regex_match(line, m, pSt)
             || std::regex_match(line, m, pSe)
-            || std::regex_match(line, m, pAnd)
             || std::regex_match(line, m, pOr)
             || std::regex_match(line, m, pBitOr)
             || std::regex_match(line, m, pBitExOr)
@@ -319,10 +369,17 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   } // end of 2-operator
   /* 1-operator assignment */
   else if (std::regex_match(line, m, pNot) 
-            || std::regex_match(line, m, pBitOrRed1)
             || std::regex_match(line, m, pInvert)
             || std::regex_match(line, m, pNone)) {
     return ONE_OP;
+  }
+  else if ( std::regex_match(line, m, pRedOr)
+            || std::regex_match(line, m, pRedAnd)
+            || std::regex_match(line, m, pRedNand)
+            || std::regex_match(line, m, pRedNor)
+            || std::regex_match(line, m, pRedXor)
+            || std::regex_match(line, m, pRedXnor) ) {
+    return REDUCE1;
   }
   else if (std::regex_match(line, m, pSrcConcat)) {
     return SRC_CONCAT;
@@ -337,6 +394,9 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
             || std::regex_match(line, m, pEnd)
             || std::regex_match(line, m, pEndmodule) ){
     return NONE;
+  }
+  else if( std::regex_match(line, m, pAlwaysClk) ) {
+    return ALWAYS;
   }
   else if( std::regex_match(line, m, pAlwaysClkRst) ) {
     return ALWAYS_CLKRST;
@@ -370,6 +430,8 @@ void read_in_clkrst(std::string fileName) {
   // set default name for these two variables
   clockName = "clk";
   resetName = "rst";
+  g_recentClk = clockName;
+  g_recentRst = resetName;
   std::ifstream in(fileName);
   std::string line;
   std::smatch match;
@@ -419,10 +481,17 @@ void add_file_taints(std::string fileName) {
 /* merge _c, _r, _x */
 void merge_taints(std::string fileName) {
   std::ofstream output(fileName, std::fstream::app);
+
+  // assign _t_1bit  
+  for(auto reg : moduleRegs) {
+    output << "  assign " + reg + "_t_1bit = | " + reg + "_t ;" << std::endl;
+  }
+
+  // assign _c, _x
   std::vector<std::string> appendix{"_c", "_x"};
   for (std::string app : appendix) {  
     for ( auto it = nextVersion.begin(); it != nextVersion.end(); ++it ) {
-      if ( isInput(it->first) ) continue;
+      if ( isInput(it->first) || isNum(it->first) ) continue;
       if ( isReg(it->first) )
         output << "  assign " + it->first + app + " = | (( ";
       else
@@ -709,7 +778,7 @@ void add_func_taints_limited(std::ifstream &input, std::ofstream &output, std::s
   // print _x function, only the condition has _x taint, assume all the bits are the same.
   output << blank + "function [" + toStr(condWidthNum-1) + ":0] " + funcName + "_c ;" << std::endl;
   output << blank + "  begin" << std::endl;
-  output << blank + "    " + funcName + "_c = " + extend("1", condWidthNum) + " ;" << std::endl;
+  output << blank + "    " + funcName + "_c = " + extend("1'b1", condWidthNum) + " ;" << std::endl;
   output << blank + "  end" << std::endl;
   output << blank + "endfunction" << std::endl << std::endl;
 }
@@ -828,17 +897,17 @@ void add_case_taints(std::ifstream &input, std::ofstream &output, std::string fi
        * how to deal with floating wires? */
       if( rExist ) {
         output << blank + src + "_r" + localVer[src] + srcSlice + " = " + dest + "_r" + destSlice + " | " + extend(condName+"_t_1bit", localWidthNum) + " ;" << std::endl;
-        ground_wires(src+"_r"+localVer[src], varWidth.get_from_var_width(src, line), srcSlice, blank, output);
+        ground_wires(src+"_r"+localVer[src], varWidth.get_idx_pair(src, line), srcSlice, blank, output);
       }
 
       if( xExist ) {
         output << blank + src + "_x" + localVer[src] + srcSlice + " = " + dest + "_x" + destSlice + " ;" << std::endl;
-        ground_wires(src+"_x"+localVer[src], varWidth.get_from_var_width(src, line), srcSlice, blank, output);
+        ground_wires(src+"_x"+localVer[src], varWidth.get_idx_pair(src, line), srcSlice, blank, output);
       }
 
       if( cExist ) {
-        output << blank + src + "_c" + localVer[src] + srcSlice + " = " + extend("1", localWidthNum) + " ;" << std::endl;
-        ground_wires(src+"_c"+localVer[src], varWidth.get_from_var_width(src, line), srcSlice, blank, output);
+        output << blank + src + "_c" + localVer[src] + srcSlice + " = " + extend("1'b1", localWidthNum) + " ;" << std::endl;
+        ground_wires(src+"_c"+localVer[src], varWidth.get_idx_pair(src, line), srcSlice, blank, output);
       }
       readSwitchValue = true;        
     }
@@ -909,21 +978,25 @@ void add_func_taints_call_limited(std::string line, std::ofstream &output) {
     abort();
   }
   std::string varArgs = m.str(0);
+  std::string condArgForFunc = get_nth_var_in_list(varArgs, 3);
 
   std::string returnArgT = get_lhs_taint_list(returnArg, "_t", output);
   std::string returnArgR = get_rhs_taint_list(returnArg, "_r");
   std::string returnArgX = get_rhs_taint_list(returnArg, "_x");
   std::string returnArgC = get_rhs_taint_list(returnArg, "_c");
 
-  std::string argTList = get_rhs_taint_list(varArgs, "_t");
-  std::string argRList = get_lhs_taint_list(varArgs, "_r", output);
-  std::string argXList = get_lhs_taint_list(varArgs, "_x", output);
-  std::string argCList = get_lhs_taint_list(varArgs, "_c", output);
+  std::string argTList = get_rhs_taint_list(condArgForFunc, "_t");
+
+  std::vector<uint32_t> verVec;
+  get_ver_vec(varArgs, verVec);
+  std::string argRList = get_lhs_ver_taint_list(varArgs, "_r", output, verVec);
+  std::string argXList = get_lhs_ver_taint_list(varArgs, "_x", output, verVec);
+  std::string argCList = get_lhs_ver_taint_list(varArgs, "_c", output, verVec);
 
   output << blank + "assign " + returnArgT + " = " + funcName + "_t(" + argTList + ");" << std::endl;
   output << blank + "assign { " + argRList + " } = " + funcName + "_r(" + returnArgR + ");" << std::endl;
   output << blank + "assign { " + argXList + " } = " + funcName + "_x(" + returnArgX + ");" << std::endl;
-  output << blank + "assign { " + argCList + " } = " + funcName + "_c(" + returnArgC + ");" << std::endl;
+  output << blank + "assign { " + argCList + " } = " + funcName + "_c();" << std::endl;
 }
 
 
@@ -959,6 +1032,7 @@ bool extract_concat(std::string line, std::ofstream &output) {
       for(std::string var: varVec) {
         uint32_t localWidth = get_var_slice_width(var);
         if(localWidth == 0) {
+          toCout("0 width found!!");
           abort();
         }
         totalWidth += localWidth;
@@ -968,7 +1042,7 @@ bool extract_concat(std::string line, std::ofstream &output) {
         std::cout << line << std::endl;
         abort();
       }
-      bool insertDone = varWidth.var_width_insert("fangyuan"+localIdx, totalWidth);
+      bool insertDone = varWidth.var_width_insert("fangyuan"+localIdx, totalWidth-1, 0);
       if (!insertDone) {
         std::cout << "insert failed for this line:" + line << std::endl;
         std::cout << "m.str(2):" + m.str(2) << std::endl;
@@ -997,8 +1071,10 @@ bool extract_concat(std::string line, std::ofstream &output) {
         part = line.substr(openBracePos, closeBracePos - openBracePos + 1);
         state = 0;
       }
-      else
+      else {
+        toCout("Error!");
         abort();
+      }
       if(state == 1) {// just find openBrace
         output << part;
       }
@@ -1013,6 +1089,19 @@ bool extract_concat(std::string line, std::ofstream &output) {
   } // end of if
   return true;
 }
+
+
+void gen_assert_property(std::string fileName) {
+  std::ofstream output(fileName, std::fstream::app);
+  std::regex pRFlag("r_flag");
+  std::smatch m;
+  for(std::string out: moduleOutputs) {
+    if(std::regex_search(out, m, pRFlag))
+      output << "  assert property(disable iff(" + resetName + ") " + out + " == 0 );" << std::endl;
+  }
+  output.close();
+}
+
 
 int main(int argc, char* argv[]) {
   std::string fileName = argv[1];
@@ -1033,7 +1122,7 @@ int main(int argc, char* argv[]) {
     std::cout << "Begin fill update!" << std::endl; //2
     fill_update(fileName + ".clean");
   }
-  if (stage <= 3) {  
+  if (stage <= 3) {
     std::cout << "Begin add file taints!" << std::endl; //3
     add_file_taints(fileName + ".clean");
   }
@@ -1044,5 +1133,9 @@ int main(int argc, char* argv[]) {
   if (stage <= 5) {  
     std::cout << "Begin add module name!" << std::endl; //5
     add_module_name(fileName + ".clean.tainted");
+  }
+  if (stage <= 6) {
+    std::cout << "Generate the assert property!" << std::endl; //6
+    gen_assert_property(fileName + ".assert.property");
   }
 }

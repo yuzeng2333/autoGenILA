@@ -104,6 +104,7 @@ uint32_t cut_pos(std::string name) {
 }
 
 
+// the returned name and slice may contain blanks
 bool split_slice(std::string slicedName, std::string &name, std::string &slice) {
   std::regex pLocal("^(\\s*)(\\S+)(\\s*)$");
   std::smatch m;
@@ -120,13 +121,14 @@ bool split_slice(std::string slicedName, std::string &name, std::string &slice) 
     std::regex_match(name, m, pLocal);
     name = m.str(2);
     slice = slicedName.substr(pos);
+    slice = " " + slice;
     return true;
   }
 }
 
 
 uint32_t get_width(std::string slice) {
-  std::regex pSlice("^\\[(\\d+)\\:(\\d+)\\](\\s)?$");
+  std::regex pSlice("^(?:\\s?)\\[(\\d+)\\:(\\d+)\\](\\s)?$");
   std::smatch m;
   if (slice.empty())
     return 1;
@@ -136,8 +138,9 @@ uint32_t get_width(std::string slice) {
 }
 
 
+// return low index
 uint32_t get_begin(std::string slice) {
-  std::regex pSlice("^\\[(?:(\\d+)\\:)?(\\d+)\\](\\s)?$");
+  std::regex pSlice("^(?:\\s?)\\[(?:(\\d+)\\:)?(\\d+)\\](\\s)?$");
   std::smatch m;
   if( !std::regex_match(slice, m, pSlice) )
     std::cout << "Wrong input:|" + slice << "|" << std::endl;
@@ -145,8 +148,9 @@ uint32_t get_begin(std::string slice) {
 }
 
 
+// return the high index
 uint32_t get_end(std::string slice) {
-  std::regex pSlice("^\\[(\\d+)(?:\\:(\\d+))?\\](\\s)?$");
+  std::regex pSlice("^(?:\\s?)\\[(\\d+)(?:\\:(\\d+))?\\](\\s)?$");
   std::smatch m;
   if( !std::regex_match(slice, m, pSlice) )
     std::cout << "Wrong input:|" + slice << "|" << std::endl;
@@ -206,19 +210,24 @@ void debug_line(std::string line) {
 
 
 // input slice might be empty
-void ground_wires(std::string wireName, uint32_t width, std::string slice, std::string blank, std::ofstream &output) {
+void ground_wires(std::string wireName, std::pair<uint32_t, uint32_t> idxPair, std::string slice, std::string blank, std::ofstream &output) {
   if (slice.empty())
     return;
   uint32_t sliceBegin = get_begin(slice);
   uint32_t sliceEnd = get_end(slice);
   uint32_t smallIdx = std::min(sliceBegin, sliceEnd);
   uint32_t bigIdx = std::max(sliceBegin, sliceEnd);
+
+  uint32_t highIdx = idxPair.first;
+  uint32_t lowIdx = idxPair.second;
+  uint32_t highBound = std::max(highIdx, lowIdx);
+  uint32_t lowBound = std::min(highIdx, lowIdx);
   
-  if ( bigIdx < width - 1 ) {
-    output << blank + "assign " + wireName + "[" + toStr(width-1) + ":" + toStr(bigIdx+1) + "] = 0;" << std::endl;
+  if ( bigIdx < highBound ) {
+    output << blank + "assign " + wireName + "[" + toStr(highBound) + ":" + toStr(bigIdx+1) + "] = 0;" << std::endl;
   }
-  if ( smallIdx > 0 ) {
-    output << blank + "assign " + wireName + "[" + toStr(smallIdx-1) + ":0] = 0;" << std::endl;
+  if ( smallIdx > lowBound ) {
+    output << blank + "assign " + wireName + "[" + toStr(smallIdx-1) + ":" + toStr(lowBound) + "] = 0;" << std::endl;
   }
 }
 
@@ -226,7 +235,8 @@ void ground_wires(std::string wireName, uint32_t width, std::string slice, std::
 // assume the input is a list of vars, separated by comma.
 // Aslo, the vars might contain numbers
 // But blanks at the front and back are removed
-void parse_var_list(std::string list, std::vector<std::string> &vec) {
+// ATTENTION: by default the retuen vector contans slices!
+void parse_var_list(std::string list, std::vector<std::string> &vec, bool noSlice) {
   assert(vec.size() == 0);
   // remove the last char since it is )
   int previous = -1;
@@ -242,10 +252,46 @@ void parse_var_list(std::string list, std::vector<std::string> &vec) {
     current = list.find(delim, previous + 1);
     arg = list.substr(previous+1, current-previous-1);
     //std::regex pLocal("^(\\s)*(\\S+)(\\s)*$");
+    std::smatch m;
+    std::regex pLocal;
+    if(!noSlice) {
+      pLocal.assign("^(?:\\s)*([\aa-zA-Z0-9_\\.:\\\\'\\[\\]]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?)(?:\\s)*$");
+      std::regex_match(arg, m, pLocal);
+      vec.push_back(m.str(1));
+    }
+    else {
+      //pLocal.assign("^(?:\\s)*([\aa-zA-Z0-9_\\.:\\\\'\\[\\]]+)(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?(?:\\s)*$");
+      std::string var, varSlice;
+      split_slice(arg, var, varSlice);
+      vec.push_back(var);
+    }
+    previous = current;
+  }
+}
+
+
+// the first idx is 1 instead of 0.
+std::string get_nth_var_in_list(std::string list, uint32_t idx) {
+  int previous = -1;
+  if(list.front() == '(') {
+    list.pop_back();
+    previous = 0;
+  }
+  int current = 0;
+  char delim = ',';
+  std::string arg;
+  uint32_t i = 0;
+  // collect all non-numerical args in vector args
+  while( current != std::string::npos ) {
+    current = list.find(delim, previous + 1);
+    arg = list.substr(previous+1, current-previous-1);
+    i++;
+    //std::regex pLocal("^(\\s)*(\\S+)(\\s)*$");
     std::regex pLocal("^(?:\\s)*([\aa-zA-Z0-9_\\.:\\\\'\\[\\]]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?)(?:\\s)*$");
     std::smatch m;
     std::regex_match(arg, m, pLocal);
-    vec.push_back(m.str(1));
+    if(i == idx)
+      return m.str(1);
     previous = current;
   }
 }
@@ -268,19 +314,17 @@ uint32_t get_var_slice_width(std::string varAndSlice) {
   std::regex_match(var, m, pName);
   var = m.str(2);
   uint32_t totalWidth = 0;
-  if(std::regex_search(varAndSlice, m, pSlice)) {
-    if(m.str(2).empty())
+  if(!varSlice.empty()) {
+    if(isSingleBit(varSlice))
       totalWidth += 1;
-    else {
-      int d1 = str2int(m.str(1), "get_var_slice d1("+varAndSlice+")");
-      int d2 = str2int(m.str(3), "get_var_slice d2("+varAndSlice+")");
-      totalWidth += std::abs(d1 - d2) + 1;
-    }
+    else
+      totalWidth += get_width(varSlice);
   }
   else {
     //std::cout << "varWdith:" + varWidth[var] << std::endl;
     auto v = varWidth.get_from_var_width(var, varAndSlice);
     if (v == 0) {
+      toCout("0 width found!");
       abort();
     }
     totalWidth += v;
@@ -324,28 +368,40 @@ std::string get_rhs_taint_list(std::string updateList, std::string taint) {
 }
 
 
+/* The reason that here we have _ver version and non-ver version
+ * is: for _t taint, version is not needed. But for _r, _x, _c 
+ * taint, version is necessary */
+
 // assume the updateVec does not contain numbers
-std::string get_lhs_ver_taint_list(std::vector<std::string> &updateVec, std::string taint, std::ofstream &output) {
+std::string get_lhs_ver_taint_list(std::vector<std::string> &updateVec, std::string taint, std::ofstream &output, std::vector<uint32_t> verVec) {
+  assert(updateVec.size() == verVec.size());
   std::vector<std::string> taintVec;
   std::smatch m;
   std::string update;
   std::string updateSlice;
+  uint32_t i = 0;
   for(std::string updateAndSlice : updateVec) {
-    split_slice(updateAndSlice, update, updateSlice);
-    std::string updateWidth = toStr(varWidth.get_from_var_width(update, updateAndSlice));
-    std::string localVer = toStr(find_version_num(update));
-    output << "  wire [" + updateWidth + "-1:0] " + update + taint + localVer + " ;" << std::endl;
     std::string updateTaintSlice;
     if(!isNum(updateAndSlice)) {
-      std::string update, updateSlice;
       split_slice(updateAndSlice, update, updateSlice);
+      uint32_t updateWidthNum = varWidth.get_from_var_width(update, updateAndSlice);
+      auto updateBoundPair = varWidth.get_idx_pair(update, "get_lhs_ver_taint_list");
+      std::string updateWidth = toStr(updateWidthNum);
+      std::string localVer = toStr(verVec[i++]);
+      output << "  wire [" + updateWidth + "-1:0] " + update + taint + localVer + " ;" << std::endl;
+      ground_wires(update+taint+localVer, updateBoundPair, updateSlice, "  ", output);
       updateTaintSlice = update+taint+localVer+updateSlice;
-      //std::regex_match(updateAndSlice, m, pVarNameGroup);
-      //updateTaintSlice = std::regex_replace(updateAndSlice, pVarNameGroup, "$1"+taint+localVer+"$3");
     }
     else { // if isNum
-      std::cout << "!! Error in matching number :" + updateAndSlice << std::endl;
-      abort();
+      if( !std::regex_match(updateAndSlice, m, pNum)) {
+        std::cout << "!! Error in matching number : " + updateAndSlice << std::endl;
+        abort();
+      }
+      std::string numWidth = m.str(1);
+      int localIdx = USELESS_VAR++;
+      // declare a dummy wire, just for being assigned
+      output << "  wire [" + numWidth + "-1:0] nouse" + toStr(localIdx) + " ;" << std::endl;
+      updateTaintSlice = "nouse" + toStr(localIdx);
     }
     taintVec.push_back(updateTaintSlice);    
   }
@@ -355,6 +411,31 @@ std::string get_lhs_ver_taint_list(std::vector<std::string> &updateVec, std::str
   }
   returnList = returnList + taintVec.back() + " ";
   return returnList;
+}
+
+
+std::string get_lhs_ver_taint_list(std::string list, std::string taint, std::ofstream &output, std::vector<uint32_t> localVer) {
+  std::vector<std::string> vec;
+  parse_var_list(list, vec);
+  return get_lhs_ver_taint_list(vec, taint, output, localVer);
+}
+
+
+void get_ver_vec(std::vector<std::string> varVec, std::vector<uint32_t> &verVec) {
+  assert(verVec.empty());
+  for(std::string var : varVec) {
+    if(!isNum(var))
+      verVec.push_back( find_version_num(var) );
+    else
+      verVec.push_back( 0 );
+  }
+}
+
+
+void get_ver_vec(std::string list, std::vector<uint32_t> &verVec) {
+  std::vector<std::string> vec;
+  parse_var_list(list, vec, true);
+  return get_ver_vec(vec, verVec);
 }
 
 
@@ -371,7 +452,8 @@ std::string get_lhs_taint_list(std::vector<std::string> &destVec, std::string ta
     }
     else { // if isNum
       if( !std::regex_match(singleDest, m, pNum)) {
-        std::cout << "!! Error in matching number !!" << std::endl;
+        std::cout << "!! Error in matching number: " + singleDest << std::endl;
+        abort();
       }
       std::string numWidth = m.str(1);
       int localIdx = USELESS_VAR++;
@@ -408,4 +490,17 @@ int str2int(std::string str, std::string info) {
     abort();
   }
   return res;
+}
+
+void toCout(std::string line) {
+  std::cout << line << std::endl;
+}
+
+bool isSingleBit(std::string slice) {
+  std::regex pSingleBit("\\[\\d+\\]");
+  std::smatch m;
+  if(std::regex_search( slice, m, pSingleBit ))
+    return true;
+  else
+    return false;
 }

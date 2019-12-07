@@ -50,8 +50,14 @@ extern std::regex pBitOrRed2;
 /* 1 operator */
 extern std::regex pNot;     
 extern std::regex pNone;     
-extern std::regex pBitOrRed1;
 extern std::regex pInvert;
+/* reduce 1 op */
+extern std::regex pRedOr   ; 
+extern std::regex pRedAnd  ; 
+extern std::regex pRedNand ; 
+extern std::regex pRedNor  ; 
+extern std::regex pRedXor  ; 
+extern std::regex pRedXnor ; 
 /* ite */
 extern std::regex pIte;     
 /* do not add anything */
@@ -84,4 +90,7 @@ extern std::regex pNum;
 extern unsigned long int NEW_VAR;
 extern unsigned long int USELESS_VAR;
 extern bool did_clean_file;
+
+extern std::string g_recentClk;
+extern std::string g_recentRst;
 #endif

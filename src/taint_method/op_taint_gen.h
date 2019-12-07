@@ -11,11 +11,13 @@ void reg_taint_gen(std::string line, std::ofstream &output);
 
 void wire_taint_gen(std::string line, std::ofstream &output);
 
-void output_insert_map(std::string line, std::ofstream &output);
+void output_insert_map(std::string line, std::ofstream &output, std::ifstream &input);
 
 void two_op_taint_gen(std::string line, std::ofstream &output);
  
 void one_op_taint_gen(std::string line, std::ofstream &output);
+
+void reduce_one_op_taint_gen(std::string line, std::ofstream &output);
 
 void mult_op_taint_gen(std::string line, std::ofstream &output);
 
@@ -26,6 +28,8 @@ void ite_taint_gen(std::string line, std::ofstream &output);
 void nonblock_taint_gen(std::string line, std::ofstream &output);
 
 void nonblockconcat_taint_gen(std::string line, std::ofstream &output);
+
+void always_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream &output);
 
 void always_clkrst_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream &output);
 

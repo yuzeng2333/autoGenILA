@@ -36,9 +36,11 @@ std::string extend(std::string in, uint32_t length);
 
 void debug_line(std::string line);
 
-void ground_wires(std::string wireName, uint32_t width, std::string slice, std::string blank, std::ofstream &output);
+void ground_wires(std::string wireName, std::pair<uint32_t, uint32_t> idxPair, std::string slice, std::string blank, std::ofstream &output);
 
-void parse_var_list(std::string list, std::vector<std::string> &vec);
+void parse_var_list(std::string list, std::vector<std::string> &vec, bool noSlice = false);
+
+std::string get_nth_var_in_list(std::string list, uint32_t idx);
 
 uint32_t get_var_slice_width(std::string varSlice);
 
@@ -46,11 +48,21 @@ std::string get_rhs_taint_list(std::vector<std::string> &updateVec, std::string 
 
 std::string get_rhs_taint_list(std::string updateList, std::string taint);
 
-std::string get_lhs_ver_taint_list(std::vector<std::string> &updateVec, std::string taint, std::ofstream &output);
+std::string get_lhs_ver_taint_list(std::vector<std::string> &updateVec, std::string taint, std::ofstream &output, std::vector<uint32_t> localVer);
+
+std::string get_lhs_ver_taint_list(std::string list, std::string taint, std::ofstream &output, std::vector<uint32_t> localVer);
 
 std::string get_lhs_taint_list(std::vector<std::string> &destVec, std::string taint, std::ofstream &output);
+
+void get_ver_vec(std::vector<std::string> varVec, std::vector<uint32_t> &verVec);
+
+void get_ver_vec(std::string list, std::vector<uint32_t> &verVec);
 
 std::string get_lhs_taint_list(std::string destList, std::string taint, std::ofstream &output);
 
 int str2int(std::string str, std::string info);
+
+void toCout(std::string line);
+
+bool isSingleBit(std::string slice);
 #endif
