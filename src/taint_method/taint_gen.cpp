@@ -8,6 +8,7 @@
 #include <utility>
 #include <assert.h>
 #include <unordered_map>
+#include <set>
 #include "taint_gen.h"
 
 #define toStr(a) std::to_string(a)
@@ -21,14 +22,16 @@ std::regex pModule    (to_re("^(\\s*)module (NAME)\\(.+\\);$"));
 std::regex pInput     (to_re("^(\\s*)input (\\[\\d+\\:0\\] )?(NAME)(\\s*)?;$"));
 std::regex pOutput    (to_re("^(\\s*)output (\\[\\d+\\:0\\] )?(NAME)(\\s*)?;$"));
 std::regex pReg       (to_re("^(\\s*)reg (\\[\\d+\\:\\d+\\] )?(NAME)(\\s*)?;$"));
+std::regex pRegConst  (to_re("^(\\s*)reg (\\[\\d+\\:\\d+\\] )?(NAME) = (NUM)(\\s*)?;$"));
 std::regex pWire      (to_re("^(\\s*)wire (\\[\\d+\\:\\d+\\] )?(NAME)(\\s*)?;$"));
 /* 2 operators */
-std::regex pAdd       (to_re("^(\\s*)assign (NAME) = (NAME) \\\\+ (NAME)(\\s*)?;$"));
+std::regex pAdd       (to_re("^(\\s*)assign (NAME) = (NAME) \\+ (NAME)(\\s*)?;$"));
 std::regex pSub       (to_re("^(\\s*)assign (NAME) = (NAME) - (NAME)(\\s*)?;$"));
-std::regex pMult      (to_re("^(\\s*)assign (NAME) = (NAME) \\\\* (NAME)(\\s*)?;$"));
+std::regex pMult      (to_re("^(\\s*)assign (NAME) = (NAME) \\* (NAME)(\\s*)?;$"));
 std::regex pAnd       (to_re("^(\\s*)assign (NAME) = (NAME) && (NAME)(\\s*)?;$"));
 std::regex pOr        (to_re("^(\\s*)assign (NAME) = (NAME) \\|\\| (NAME)(\\s*)?;$"));
 std::regex pEq        (to_re("^(\\s*)assign (NAME) = (NAME) == (NAME)(\\s*)?;$"));
+std::regex pEq3       (to_re("^(\\s*)assign (NAME) = (NAME) === (NAME)(\\s*)?;$"));
 std::regex pNeq       (to_re("^(\\s*)assign (NAME) = (NAME) != (NAME)(\\s*)?;$"));
 std::regex pLt        (to_re("^(\\s*)assign (NAME) = (NAME) > (NAME)(\\s*)?;$"));
 std::regex pLe        (to_re("^(\\s*)assign (NAME) = (NAME) >= (NAME)(\\s*)?;$"));
@@ -97,11 +100,12 @@ std::string moduleName;
 std::vector<std::string> moduleInputs;
 std::vector<std::string> moduleOutputs;
 std::vector<std::string> moduleRegs;
+std::set<std::string> moduleWires;
 std::string clockName;
 std::string resetName;
 std::vector<std::string> rTaints;
 std::unordered_map<std::string, uint32_t> nextVersion;
-std::unordered_map<std::string, std::string> new_reg;
+std::set<std::string> g_wire2reg;
 std::unordered_map<std::string, std::string> new_next;
 std::unordered_map<std::string, std::string> update_reg;
 VarWidth varWidth;
@@ -112,8 +116,9 @@ unsigned long int USELESS_VAR = 0;
 bool did_clean_file = false;
 std::string g_recentClk;
 std::string g_recentRst;
-//std::vector<std::string> clkGroup;
-//std::vector<std::string> rstGroup;
+bool g_recentRst_positive = true;
+//std::vector<std::string> g_clkGroup;
+std::set<std::string> g_rstGroup;
 
 
 /*remove comments
@@ -262,6 +267,7 @@ void clean_file(std::string fileName) {
 
 
 void add_line_taints(std::string line, std::ofstream &output, std::ifstream &input) {
+  line = further_clean_line(line);
   int choice = parse_verilog_line(line);
   switch( choice ) {
     case INPUT:
@@ -334,10 +340,12 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
     if(isOutput(var)) {
       std::cout << "!! Duplicate output find: " + line << std::endl;
     }
-    moduleOutputs.push_back(var);
+    else 
+      moduleOutputs.push_back(var);
     return OUTPUT;
   }
-  else if (std::regex_match(line, m, pReg)) {
+  else if (std::regex_match(line, m, pReg)
+            || std::regex_match(line, m, pRegConst)) {
     return REG;
   }
   /* every wire type also needs _t and _r, both are wires */
@@ -351,6 +359,7 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
             || std::regex_match(line, m, pMult)
             || std::regex_match(line, m, pAnd)
             || std::regex_match(line, m, pEq)
+            || std::regex_match(line, m, pEq3)
             || std::regex_match(line, m, pNeq)
             || std::regex_match(line, m, pLt)
             || std::regex_match(line, m, pLe)
@@ -390,8 +399,7 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   else if (std::regex_match(line, m, pIte)) { // if cond is rst, then does not add any taint
     return ITE;
   } // end of ite
-  else if( std::regex_match(line, m, pAlwaysClk) 
-            || std::regex_match(line, m, pEnd)
+  else if( std::regex_match(line, m, pEnd)
             || std::regex_match(line, m, pEndmodule) ){
     return NONE;
   }
@@ -432,6 +440,7 @@ void read_in_clkrst(std::string fileName) {
   resetName = "rst";
   g_recentClk = clockName;
   g_recentRst = resetName;
+  g_rstGroup.insert(g_recentRst);  
   std::ifstream in(fileName);
   std::string line;
   std::smatch match;
@@ -466,12 +475,12 @@ void add_file_taints(std::string fileName) {
     else if ( std::regex_match(line, match, pCase) ) {
       add_case_taints(input, output, line, "trxc");
     }
-    else if ( std::regex_match(line, match, pFunctionCall) ) {
+    else if ( std::regex_match(line, match, pFunctionCall) 
+                && match.str(3).compare("$signed") != 0 ) {
       add_func_taints_call_limited(line, output);
     }
     else
       add_line_taints(line, output, input);  
-
   }
   input.close();
   output.close();
@@ -492,7 +501,7 @@ void merge_taints(std::string fileName) {
   for (std::string app : appendix) {  
     for ( auto it = nextVersion.begin(); it != nextVersion.end(); ++it ) {
       if ( isInput(it->first) || isNum(it->first) ) continue;
-      if ( isReg(it->first) )
+      if ( isReg(it->first) && app == "_x" )
         output << "  assign " + it->first + app + " = | (( ";
       else
         output << "  assign " + it->first + app + " = ( ";
@@ -500,7 +509,7 @@ void merge_taints(std::string fileName) {
       for (int i = 0; i < it->second - 1; i++)
         output << it->first + app + std::to_string(i) + " ) | ( ";
 
-      if ( isReg(it->first) )
+      if ( isReg(it->first) && app == "_x")
         output << it->first + app + std::to_string(it->second - 1) + " ));" << std::endl;
       else
         output << it->first + app + std::to_string(it->second - 1) + " );" << std::endl;
@@ -518,25 +527,53 @@ void merge_taints(std::string fileName) {
     output << it->first + "_r" + std::to_string(it->second - 1) + " );" << std::endl;
   }
 
+  // ground taints for floating regs
   for (auto reg : moduleRegs) {
     if ( isNum(reg) ) {
       std::cout << "find num in nextVersion: " + reg << std::endl;
       continue;
     }
     if ( nextVersion.find(reg) == nextVersion.end() ) {
-      output << "  assign " + reg + "_r = 0;" << std::endl;      
+      output << "  assign " + reg + "_r = 0;" << std::endl;  
+      output << "  assign " + reg + "_c = 0;" << std::endl;  
+      output << "  assign " + reg + "_x = 0;" << std::endl;  
     }
   }
 
-  for (auto it = new_reg.begin(); it != new_reg.end(); ++it) {
-    if ( isNum(it->first) ) {
-      std::cout << "find num in new_reg: " + it->first << std::endl;
+  for (auto wire : moduleWires) {
+    if ( isNum(wire) ) {
+      std::cout << "find num in nextVersion: " + wire << std::endl;
+      continue;
+    }
+    if ( nextVersion.find(wire) == nextVersion.end() ) {
+      output << "  assign " + wire + "_r = 0;" << std::endl;  
+      output << "  assign " + wire + "_c = 0;" << std::endl;
+      if( g_wire2reg.find(wire) == g_wire2reg.end() )
+        output << "  assign " + wire + "_x = 0;" << std::endl;
+    }
+  }
+
+  // wires giving value to regs should have taints grounded.
+  for (auto it = g_wire2reg.begin(); it != g_wire2reg.end(); ++it) {
+    if ( isNum(*it) || nextVersion.find(*it) != nextVersion.end() ) {
       continue;
     }
     std::string reg, regSlice;
-    split_slice(it->first, reg, regSlice);
+    split_slice(*it, reg, regSlice);
     output << "  assign " + reg + "_r" + regSlice + " = 0;" << std::endl;
+    output << "  assign " + reg + "_c" + regSlice + " = 0;" << std::endl;
   }
+
+  // declare _r taints for wire-type outputs
+  // Assume: the original outputs do not end with "_r_flag"
+  for(std::string out: moduleOutputs) {
+    if( !isReg(out) && !isRFlag(out) ) {
+      auto idxPair = varWidth.get_idx_pair(out);
+      output << "  input [" + toStr(idxPair.first) + ":" + toStr(idxPair.second) + "] " + out + "_r ;" << std::endl;
+      moduleInputs.push_back(out+"_r");
+    }
+  }
+
   output << "endmodule";
   output.close();
 }
@@ -550,11 +587,6 @@ void add_module_name(std::string fileName) {
   out << "module " + moduleName + "( ";
   for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) {
     out << *it + " , ";
-  }
-  for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) {
-    //if (*it ==  clockName)
-    //  continue;
-    out << *it + "_t , ";
   }
   for (auto it = moduleOutputs.begin(); it != moduleOutputs.end() - 1; ++it) {
     out << *it + " , ";
@@ -572,29 +604,17 @@ void fill_update(std::string fileName) {
   std::ifstream in(fileName);
   std::string line;
   std::smatch m;
+  // push all the vars on RHS of nonblocking to new_reg
   while( std::getline(in, line) ) {
     if ( std::regex_match(line, m, pNonblock) )
-      new_reg.insert(std::make_pair(m.str(3), m.str(2)));
+      g_wire2reg.insert( m.str(3) );
     else if ( std::regex_match(line, m, pNonblockConcat) ) {
       std::vector<std::string> updateVec;
       parse_var_list(m.str(3), updateVec);
       for (std::string update: updateVec) {
-        new_reg.insert(std::make_pair(update, m.str(2)));
+        g_wire2reg.insert( update );
       }
     }
-  }
-  in.clear();
-  in.seekg(0, in.beg);
-  while( std::getline(in, line) ) {
-    if (!std::regex_match(line, m, pIte))
-      continue;
-    if(m.str(3) != resetName)
-      continue;
-    // FIXME: now assume all reset are high effective
-    if ( new_reg.find(m.str(2)) == new_reg.end() )
-      continue;
-    std::string reg = new_reg[m.str(2)];
-    update_reg.insert( std::make_pair(m.str(5), reg) );
   }
 }
 
@@ -1092,7 +1112,7 @@ bool extract_concat(std::string line, std::ofstream &output) {
 
 
 void gen_assert_property(std::string fileName) {
-  std::ofstream output(fileName, std::fstream::app);
+  std::ofstream output(fileName);
   std::regex pRFlag("r_flag");
   std::smatch m;
   for(std::string out: moduleOutputs) {
@@ -1100,6 +1120,24 @@ void gen_assert_property(std::string fileName) {
       output << "  assert property(disable iff(" + resetName + ") " + out + " == 0 );" << std::endl;
   }
   output.close();
+}
+
+
+void gen_reg_output(std::string fileName) {
+  std::ofstream output(fileName);
+  for( std::string out: moduleOutputs ) {
+    if( isReg(out) && !isRFlag(out) ) 
+      output << out << std::endl;
+  }
+}
+
+
+void gen_wire_output(std::string fileName) {
+  std::ofstream output(fileName);
+  for( std::string out: moduleOutputs ) {
+    if( !isReg(out) && !isRFlag(out) ) 
+      output << out << std::endl;
+  }
 }
 
 
@@ -1131,11 +1169,16 @@ int main(int argc, char* argv[]) {
     merge_taints(fileName + ".clean.tainted");
   }
   if (stage <= 5) {  
-    std::cout << "Begin add module name!" << std::endl; //5
+    std::cout << "Begin add module name!" << std::endl; //6
     add_module_name(fileName + ".clean.tainted");
   }
   if (stage <= 6) {
-    std::cout << "Generate the assert property!" << std::endl; //6
+    std::cout << "Generate the assert property!" << std::endl; //7
     gen_assert_property(fileName + ".assert.property");
+  }
+  if (stage <= 7) {
+    std::cout << "Generate info about outputs!" << std::endl; //7
+    gen_reg_output(fileName + ".reg_output");
+    gen_wire_output(fileName + ".wire_output");
   }
 }

@@ -21,6 +21,7 @@ void input_taint_gen(std::string line, std::ofstream &output) {
   std::string slice = m.str(2);
   std::string var = m.str(3);
   moduleInputs.push_back(var);
+  moduleInputs.push_back(var+"_t");
   //if (var.compare( clockName) == 0)
   //  return;
   //debug_line(line);
@@ -43,20 +44,23 @@ void input_taint_gen(std::string line, std::ofstream &output) {
 
 void reg_taint_gen(std::string line, std::ofstream &output) {
   std::smatch m;
-  if ( !std::regex_match(line, m, pReg) )
+  if ( !std::regex_match(line, m, pReg) 
+        && !std::regex_match(line, m, pRegConst) )
     return;
   std::string blank = m.str(1);
   std::string slice = m.str(2);  
   std::string var = m.str(3);
+  std::string num = m.str(4);
+
   moduleOutputs.push_back(var+"_r_flag");
   moduleRegs.push_back(var);
   output << blank << "reg " + slice + " " + var + "_t ;" << std::endl;
   output << blank << "reg " + var + "_t_1bit ;" << std::endl;
   output << blank << "reg " + var + "_t_flag ;" << std::endl;
   output << blank << "output reg " + var + "_r_flag ;" << std::endl;
-  output << blank << "wire " + var + "_r ;" << std::endl;
+  output << blank << "wire " + slice + " " + var + "_r ;" << std::endl;
   output << blank << "wire " + var + "_x ;" << std::endl;
-  output << blank << "wire " + var + "_c ;" << std::endl;
+  output << blank << "wire " + slice + " " + var + "_c ;" << std::endl;
 
   if (!did_clean_file) {
     bool insertDone;
@@ -80,6 +84,7 @@ void wire_taint_gen(std::string line, std::ofstream &output) {
   std::string slice = m.str(2);  
   std::string var = m.str(3);
   std::string blank = m.str(1);
+  moduleWires.insert(var);  
   //debug_line(line);  
   output << blank << "wire " + slice + var + "_t ;" << std::endl;
   output << blank << "wire " + slice + var + "_r ;" << std::endl;
@@ -162,6 +167,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
             || std::regex_match(line, m, pSel4) 
             || std::regex_match(line, m, pBitOrRed2) ) {} 
   else if ( std::regex_match(line, m, pEq)
+              || std::regex_match(line, m, pEq3)
               || std::regex_match(line, m, pNeq)
               || std::regex_match(line, m, pLt)
               || std::regex_match(line, m, pLe)
@@ -227,16 +233,21 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
     // !!TODO: re-think the following part 
     if ( isOutput(dest) ) {
       output << blank << "assign " + op1 + "_c" + sndVer + op1Slice + " = 0 ;" << std::endl;
-      output << blank << "assign " + op1 + "_r" + sndVer + op1Slice + " = 0 ;" << std::endl;
       uint32_t exp = get_var_slice_width(op1AndSlice);
       uint32_t pow2 = uint32_t(std::pow(2, exp));
       output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + std::to_string(pow2 - 1) + " ;" << std::endl;
-        
       output << blank << "assign " + op2 + "_c" + thdVer + op2Slice + " = 0 ;" << std::endl;
-      output << blank << "assign " + op2 + "_r" + thdVer + op2Slice + " = 0 ;" << std::endl;
       exp = get_var_slice_width(op2AndSlice);
       pow2 = uint32_t(std::pow(2, exp)); 
       output << blank << "assign " + op2 + "_x" + thdVer + op2Slice + " = " + std::to_string(pow2 - 1) + " ;" << std::endl;
+      if(!isReduceOp) {
+        output << blank << "assign " + op1 + "_r" + sndVer + op1Slice + " = " + dest + "_r" + destSlice + " ;" << std::endl;
+        output << blank << "assign " + op2 + "_r" + thdVer + op2Slice + " = " + dest + "_r" + destSlice + " ;" << std::endl;  
+      }
+      else {
+        output << blank << "assign " + op1 + "_r" + sndVer + op1Slice + " = " + extend(dest+"_r"+destSlice, op1LocalWidthNum) +  " ;" << std::endl;
+        output << blank << "assign " + op2 + "_r" + thdVer + op2Slice + " = " + extend(dest+"_c"+destSlice, op2LocalWidthNum) +  " ;" << std::endl;
+      }
     }
     else if (!isReduceOp){
       output << blank << "assign " + op1 + "_c" + sndVer + op1Slice + " = " + dest + "_c" + destSlice + " ;" << std::endl;
@@ -280,7 +291,12 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
       uint32_t exp = get_var_slice_width(op1AndSlice);
       uint32_t pow2 = uint32_t(std::pow(2, exp));
       output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + std::to_string(pow2 - 1) + " ;" << std::endl;
-      output << blank << "assign " + op1 + "_r" + sndVer + op1Slice + " = 0 ;" << std::endl;
+      if(!isReduceOp) {
+        output << blank << "assign " + op1 + "_r" + sndVer + op1Slice + " = " + dest + "_r" + destSlice + " ;" << std::endl;
+      }
+      else {
+        output << blank << "assign " + op1 + "_r" + sndVer + op1Slice + " = " + extend(dest+"_r"+destSlice, op1LocalWidthNum) +  " ;" << std::endl;
+      }
     }
     else if(!isReduceOp){
       output << blank << "assign " + op1 + "_c" + sndVer + op1Slice + " = " + dest + "_c" + destSlice + " ;" << std::endl;
@@ -309,10 +325,15 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
     output << blank << "assign " + dest + "_t" + destSlice + " = " + op2 + "_t" + op2Slice + " ;" << std::endl;
     if ( isOutput(dest) ) {
       output << blank << "assign " + op2 + "_c" + thdVer + op2Slice + " = 0 ;" << std::endl;
-      output << blank << "assign " + op2 + "_r" + thdVer + op2Slice + " = 0 ;" << std::endl;
       uint32_t exp = get_var_slice_width(op2AndSlice);
       uint32_t pow2 = uint32_t(std::pow(2, exp));
       output << blank << "assign " + op2 + "_x" + thdVer + op2Slice + " = " + std::to_string(pow2 - 1) + " ;" << std::endl;
+      if(!isReduceOp) {
+        output << blank << "assign " + op2 + "_r" + thdVer + op2Slice + " = " + dest + "_r" + destSlice + " ;" << std::endl;  
+      }
+      else {
+        output << blank << "assign " + op2 + "_r" + thdVer + op2Slice + " = " + extend(dest+"_c"+destSlice, op2LocalWidthNum) +  " ;" << std::endl;
+      }
     }
     else if(!isReduceOp) {
       output << blank << "assign " + op2 + "_c" + thdVer + op2Slice + " = " + dest + "_c" + destSlice + " ;" << std::endl;
@@ -344,7 +365,7 @@ void one_op_taint_gen(std::string line, std::ofstream &output) {
     return;
   assert(!m.str(2).empty());
   assert(!m.str(3).empty());
-  
+ 
   std::string blank = m.str(1);
   std::string dest, destSlice;
   std::string op1, op1Slice;
@@ -352,6 +373,11 @@ void one_op_taint_gen(std::string line, std::ofstream &output) {
   split_slice(m.str(2), dest, destSlice);
   split_slice(op1AndSlice, op1, op1Slice);
   
+  if( isNum(op1) ) {
+    output << blank << "assign " + dest + "_t" + destSlice + " = 0 ;" << std::endl;
+    return;
+  }
+
   uint32_t op1WidthNum = varWidth.get_from_var_width(op1, line);
   std::string op1Width = std::to_string(op1WidthNum);
   auto op1BoundPair = varWidth.get_idx_pair(op1, line);
@@ -367,7 +393,7 @@ void one_op_taint_gen(std::string line, std::ofstream &output) {
   output << blank << "assign " + dest + "_t" + destSlice + " = " + op1 + "_t" + op1Slice + " ;" << std::endl;
   if ( isOutput(dest) ) {
       output << blank << "assign " + op1 + "_c" + sndVer + op1Slice + " = 0 ;" << std::endl;
-      output << blank << "assign " + op1 + "_r" + sndVer + op1Slice + " = 0 ;" << std::endl;
+      output << blank << "assign " + op1 + "_r" + sndVer + op1Slice + " = " + dest + "_r" + destSlice + " ;" << std::endl;
       uint32_t exp = get_var_slice_width(op1AndSlice);
       uint32_t pow2 = uint32_t(std::pow(2, exp));
       output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + std::to_string(pow2 - 1) + " ;" << std::endl;
@@ -421,7 +447,7 @@ void reduce_one_op_taint_gen(std::string line, std::ofstream &output) {
   output << blank << "assign " + dest + "_t" + destSlice + " = | " + op1 + "_t" + op1Slice + " ;" << std::endl;
   if ( isOutput(dest) ) {
       output << blank << "assign " + op1 + "_c" + sndVer + op1Slice + " = 0 ;" << std::endl;
-      output << blank << "assign " + op1 + "_r" + sndVer + op1Slice + " = 0 ;" << std::endl;
+      output << blank << "assign " + op1 + "_r" + sndVer + op1Slice + " = " + extend(dest+"_r"+destSlice, op1WidthNum) + " ;" << std::endl;
       uint32_t exp = get_var_slice_width(op1AndSlice);
       uint32_t pow2 = uint32_t(std::pow(2, exp));
       output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + std::to_string(pow2 - 1) + " ;" << std::endl;
@@ -762,12 +788,12 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
 
   output << blank.substr(0, blank.length()-4) + "assign " + op1 + "_x = " + extend(dest+" != "+op1, localWidthNum) + " ;" << std::endl;
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
-  output << blank + dest + "_t \t\t<= " + g_recentRst + " ? 0 : | ( " + op1 + "_t & " + op1 + "_x );" << std::endl;
+  output << blank + dest + "_t \t\t<= " + get_recent_rst() + " ? 0 : | ( " + op1 + "_t & " + op1 + "_x );" << std::endl;
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
   // !!! FIXME: why dest_x is not used here?
-  output << blank + dest + "_t_flag \t<= " + g_recentRst + " ? 0 : " + dest + "_t_flag ? 1 : | ( " + op1 + "_t & " + op1 + "_x );" << std::endl;
+  output << blank + dest + "_t_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_t_flag ? 1 : | ( " + op1 + "_t & " + op1 + "_x );" << std::endl;
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
-  output << blank + dest + "_r_flag \t<= " + g_recentRst + " ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + "_r ;" << std::endl;
+  output << blank + dest + "_r_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + "_r ;" << std::endl;
 }
 
 
@@ -840,6 +866,15 @@ void always_clkrst_taint_gen(std::string firstLine, std::ifstream &input, std::o
   }
   g_recentClk = m.str(2);
   g_recentRst = m.str(3);
+  g_rstGroup.insert(g_recentRst);
+
+  std::regex pNeg("negedge");
+  // assume clock is always positive edge
+  if( std::regex_search(firstLine, m, pNeg) ) 
+    g_recentRst_positive = false;
+  else
+    g_recentRst_positive = true;
+
 
   // parse if
   std::string line;

@@ -53,7 +53,7 @@ bool isReg(std::string var) {
 
 std::string to_re(std::string input) {
   std::regex pName("NAME");
-  std::string varName("[\aa-zA-Z0-9_\\.\\$\\\\'\\[\\]]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?");
+  std::string varName("[\aa-zA-Z0-9_\\.\\$\\\\'\\[\\]\\(]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?(?: \\))?");
   auto res = std::regex_replace(input, pName, varName);
   std::regex pNUM("NUM");
   std::string regexNum("\\d+'h[\\dabcdef]+");
@@ -128,13 +128,19 @@ bool split_slice(std::string slicedName, std::string &name, std::string &slice) 
 
 
 uint32_t get_width(std::string slice) {
-  std::regex pSlice("^(?:\\s?)\\[(\\d+)\\:(\\d+)\\](\\s)?$");
+  std::regex pSlice("^(?:\\s?)\\[(\\d+)\\:(\\d+)\\](?:\\s)?$");
+  std::regex pSingleBit("^(?:\\s)?\\[\\d+\\](?:\\s)?$");
   std::smatch m;
   if (slice.empty())
     return 1;
-  if( !std::regex_match(slice, m, pSlice))
+  if( !std::regex_match(slice, m, pSlice) && !std::regex_match(slice, m, pSingleBit) )
     std::cout << "Wrong input:|" + slice << "|" << std::endl;
-  return str2int(m.str(1), "get_width 1st("+slice+")") - str2int(m.str(2), "get_width 2rd("+slice+")") + 1;
+  if( std::regex_match(slice, m, pSingleBit) )
+    return 1;
+  else {
+    std::regex_match(slice, m, pSlice);
+    return str2int(m.str(1), "get_width 1st("+slice+")") - str2int(m.str(2), "get_width 2rd("+slice+")") + 1;
+  }
 }
 
 
@@ -224,10 +230,10 @@ void ground_wires(std::string wireName, std::pair<uint32_t, uint32_t> idxPair, s
   uint32_t lowBound = std::min(highIdx, lowIdx);
   
   if ( bigIdx < highBound ) {
-    output << blank + "assign " + wireName + "[" + toStr(highBound) + ":" + toStr(bigIdx+1) + "] = 0;" << std::endl;
+    output << blank + "assign " + wireName + " [" + toStr(highBound) + ":" + toStr(bigIdx+1) + "] = 0;" << std::endl;
   }
   if ( smallIdx > lowBound ) {
-    output << blank + "assign " + wireName + "[" + toStr(smallIdx-1) + ":" + toStr(lowBound) + "] = 0;" << std::endl;
+    output << blank + "assign " + wireName + " [" + toStr(smallIdx-1) + ":" + toStr(lowBound) + "] = 0;" << std::endl;
   }
 }
 
@@ -492,9 +498,11 @@ int str2int(std::string str, std::string info) {
   return res;
 }
 
+
 void toCout(std::string line) {
   std::cout << line << std::endl;
 }
+
 
 bool isSingleBit(std::string slice) {
   std::regex pSingleBit("\\[\\d+\\]");
@@ -503,4 +511,56 @@ bool isSingleBit(std::string slice) {
     return true;
   else
     return false;
+}
+
+
+std::string further_clean_line(std::string line) {
+  std::regex pSigned("\\$signed");
+  std::smatch m;
+  if( !std::regex_search(line, m, pSigned) )
+    return line;
+  uint32_t i;
+  size_t lineLen = line.length();
+  int cur = line.find('$', 0);
+  int closeBracePos = -1;
+  while( cur != std::string::npos ) {
+    assert( line.substr(cur, 8).compare("$signed(") == 0 );
+    line.replace(cur, 8, "");
+    int closeBracesExpected = 0;
+    for( i = cur; i < lineLen; ++i ) {
+      if( line.substr(i, 1) == "(" ) {
+        closeBracesExpected++;
+      }
+      else if( line.substr(i, 1) == ")" && closeBracesExpected == 0 ) {
+        closeBracePos = i;
+        break;
+      }
+      else if( line.substr(i, 1) == ")" && closeBracesExpected > 0 ) {
+        closeBracesExpected--;
+      }
+      else if( line.substr(i, 1) == ")" && closeBracesExpected < 0 ) {
+        toCout("!! Error in searching for closed braces");
+      }
+    }
+    line.replace(closeBracePos, 1, "");
+    cur = line.find('$', cur);
+  }
+  std::regex pBlanks("( )+");
+  line = std::regex_replace(line, pBlanks, " " );
+  return line;
+}
+
+
+std::string get_recent_rst() {
+  if(g_recentRst_positive)
+    return g_recentRst;
+  else
+    return "!"+g_recentRst;
+}
+
+
+bool isRFlag(std::string var) {
+  std::regex pRFlag("_r_flag");
+  std::smatch m;
+  return std::regex_search(var, m, pRFlag);
 }

@@ -5,12 +5,14 @@
 #include <string>
 #include <unordered_map>
 #include <regex>
+#include <set>
 
 /* Global data */
 extern std::string moduleName;
 extern std::vector<std::string> moduleInputs;
 extern std::vector<std::string> moduleOutputs;
 extern std::vector<std::string> moduleRegs;
+extern std::set<std::string> moduleWires;
 extern std::string clockName;
 extern std::string resetName;
 extern std::vector<std::string> rTaints;
@@ -25,12 +27,14 @@ extern std::regex pModule;
 extern std::regex pInput;
 extern std::regex pOutput;
 extern std::regex pReg;
+extern std::regex pRegConst;
 extern std::regex pWire;
 /* 2 operators */
 extern std::regex pAdd;
 extern std::regex pSub;      
 extern std::regex pMult;      
 extern std::regex pEq;     
+extern std::regex pEq3;
 extern std::regex pNeq;     
 extern std::regex pLt;       
 extern std::regex pLe;       
@@ -93,4 +97,6 @@ extern bool did_clean_file;
 
 extern std::string g_recentClk;
 extern std::string g_recentRst;
+extern std::set<std::string> g_rstGroup;
+extern bool g_recentRst_positive;
 #endif
