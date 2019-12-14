@@ -71,4 +71,8 @@ std::string further_clean_line(std::string line);
 std::string get_recent_rst();
 
 bool isRFlag(std::string var);
+
+void parse_func_statements(std::vector<std::pair<std::string, std::string>> &caseAssignPairs, std::vector<std::string> &inputWidth, std::ifstream &input);
+
+std::string pairVec2taintString( std::vector<std::pair<std::string, std::string>> &pairVec, std::string notIncluded, std::string taint, std::ofstream &output );
 #endif

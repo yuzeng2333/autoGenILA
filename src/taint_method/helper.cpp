@@ -564,3 +564,65 @@ bool isRFlag(std::string var) {
   std::smatch m;
   return std::regex_search(var, m, pRFlag);
 }
+
+
+/* ASSUME: the first line is either case or function
+ * caseAssignPairs are the pairs of (caseValue, case assignment),
+ * the input is recovered at the end */
+void parse_func_statements(std::vector<std::pair<std::string, std::string>> &caseAssignPairs, std::vector<std::string> &inputWidth, std::ifstream &input) {
+  auto funcBegin = input.tellg();
+  std::string line;
+  std::smatch m;
+  // the first line might be case or function definition
+  for(int i = 0; i < 3; i++) {
+    std::getline(input, line);
+    std::regex_match(line, m, pInput);
+    inputWidth.push_back(m.str(2));
+  }
+  std::getline(input, line);
+  assert( std::regex_search(line, m, pCase) );  
+  bool readSwitchValue = true;
+  std::string pairValue;
+  std::string pairAssign;
+  while( std::getline(input, line) && !std::regex_match(line, m, pDefault) ) {
+    if( readSwitchValue ) {
+      readSwitchValue = false;
+      if(std::regex_search(line, m, pNumExist)) {
+        pairValue = m[0];        
+      }
+      else {
+        pairValue = "default";
+      }
+    }
+    else {
+      readSwitchValue = true;
+      if( !std::regex_match(line, m, pBlock) ) {
+        std::cout << "!! Error in parsing case !!" << std::endl;
+      }
+      pairAssign = m.str(3);
+      caseAssignPairs.emplace_back(pairValue, pairAssign);      
+    }
+  }
+  std::getline(input, line);
+  pairValue = "default";
+  if( !std::regex_match(line, m, pBlock) ) {
+    std::cout << "!! Error in parsing case !!" << std::endl;
+  }
+  pairAssign = m.str(3);
+  caseAssignPairs.emplace_back(pairValue, pairAssign);
+  input.seekg(funcBegin);
+}
+
+
+std::string pairVec2taintString( std::vector<std::pair<std::string, std::string>> &pairVec, std::string notIncluded, std::string taint, std::ofstream &output ) {
+  assert(pairVec.size() >= 2);
+  std::vector<std::string> rhsVec;
+  for(auto singlePair : pairVec) {
+    if( singlePair.second.compare(notIncluded) == 0 )
+      continue;
+    rhsVec.push_back(singlePair.second);
+  }
+  std::string res = get_lhs_taint_list(rhsVec, taint, output);
+  res = "{" + res + "}";
+  return res;
+}

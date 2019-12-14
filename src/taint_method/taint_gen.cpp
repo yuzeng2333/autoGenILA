@@ -92,7 +92,8 @@ std::regex pSrcDestBothConcat(to_re("^(\\s*)assign \\{ ((?:NAME(?:\\s)?, )+NAME)
 /* pVarName also exists in to_re(), and parse_var_list() */
 std::regex pVarName("([\aa-zA-Z0-9_\\.\\$\\\\'\\[\\]]+)(?:\\s*\\[\\d+(\\:\\d+)?\\])?");
 std::regex pVarNameGroup("([\aa-zA-Z0-9_\\.\\$\\\\'\\[\\]]+)(?:(\\s*)(\\[\\d+(\\:\\d+)?\\]))?");
-std::regex pNum("^(\\d+)'(h|d|b)[\\dabcdef]+$");
+std::regex pNum("^(\\d+)'(h|d|b)[\\dabcdef\\?]+$");
+std::regex pNumExist("(\\d+)'(h|d|b)[\\dabcdef\\?]+");
 
 
 /* Global data */
@@ -566,13 +567,13 @@ void merge_taints(std::string fileName) {
 
   // declare _r taints for wire-type outputs
   // Assume: the original outputs do not end with "_r_flag"
-  for(std::string out: moduleOutputs) {
-    if( !isReg(out) && !isRFlag(out) ) {
-      auto idxPair = varWidth.get_idx_pair(out);
-      output << "  input [" + toStr(idxPair.first) + ":" + toStr(idxPair.second) + "] " + out + "_r ;" << std::endl;
-      moduleInputs.push_back(out+"_r");
-    }
-  }
+  //for(std::string out: moduleOutputs) {
+  //  if( !isReg(out) && !isRFlag(out) ) {
+  //    auto idxPair = varWidth.get_idx_pair(out);
+  //    output << "  input [" + toStr(idxPair.first) + ":" + toStr(idxPair.second) + "] " + out + "_r ;" << std::endl;
+  //    moduleInputs.push_back(out+"_r");
+  //  }
+  //}
 
   output << "endmodule";
   output.close();
@@ -748,8 +749,12 @@ void add_func_taints_limited(std::ifstream &input, std::ofstream &output, std::s
   std::string funcName = m.str(3);
   uint32_t condWidthNum;
   
+  // extract the (caseValue, caseAssign) pair from the case
+  std::vector<std::pair<std::string, std::string>> caseAssignPairs;
+  std::vector<std::string> inputSlice;
+  parse_func_statements(caseAssignPairs, inputSlice, input);
+
   // print the original function
-  //auto funcBegin = input.tellg();
   std::string line;
   uint32_t lineNo = 0;
   while ( std::getline(input, line) && !std::regex_match(line, m, pEndfunction) ) {
@@ -763,43 +768,113 @@ void add_func_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     }
   }
   output << line << std::endl << std::endl;
-  //input.seekg(funcBegin);
 
+  std::string rhs, rhsSlice;
+  uint32_t destWidth = get_width(inputSlice[0]);
+  assert( destWidth == get_width(funcSlice) );
+  uint32_t aWidth = destWidth;
+  uint32_t bWidth = get_width(inputSlice[1]);
+  uint32_t sWidth = get_width(inputSlice[2]);
+  uint32_t allInputWidth = destWidth + bWidth + sWidth;
   // print _t function
   output << blank + "function " + funcSlice + funcName + "_t ;" << std::endl;
-  output << blank + "  input [" + toStr(condWidthNum-1) + ":0] cond_t ;" << std::endl; 
-  output << blank + "  reg cond_t_1bit ;" << std::endl;
+  output << blank + "  input " + inputSlice[0] + " a_t ;" << std::endl;
+  output << blank + "  input " + inputSlice[1] + " b_t ;" << std::endl;
+  output << blank + "  input " + inputSlice[2] + " s_t ;" << std::endl;
+  output << blank + "  input " + inputSlice[2] + " s ;" << std::endl;
+  output << blank + "  reg s_t_1bit ;" << std::endl;
+  output << blank + "  reg " + inputSlice[0] + " s_t_full ;"<< std::endl;
   output << blank + "  begin" << std::endl;
-  output << blank + "    cond_t_1bit = | cond_t ;" << std::endl;  
-  output << blank + "    " + funcName + "_t = " + extend("cond_t_1bit", get_width(funcSlice)) + " ;" << std::endl;
+  output << blank + "    s_t_1bit = | s_t ;" << std::endl;  
+  output << blank + "    s_t_full = " + extend("s_t_1bit", destWidth) + " ;" << std::endl;
   output << blank + "  end" << std::endl;
+  output << blank + "  casez (s) " << std::endl;
+  for(auto localPair: caseAssignPairs) {
+    split_slice(localPair.second, rhs, rhsSlice);
+    output << blank + "  " + localPair.first + " :" << std::endl;
+    output << blank + "    " + funcName + "_t = s_t_full | " + rhs + "_t " + rhsSlice + ";" << std::endl;
+  }
+  output << blank + "  endcase" << std::endl;
   output << blank + "endfunction" << std::endl << std::endl;
 
-  // print _r function, only the condition has _r taint, assume all the bits are the same.
-  output << blank + "function [" + toStr(condWidthNum-1) + ":0] " + funcName + "_r ;" << std::endl;
+  // TODO: needs to be modified
+  // print _r function, output is (a_r, b_r, s_r), input is (dest_r, s)
+  output << blank + "function [" + toStr(allInputWidth-1) + ":0] " + funcName + "_r ;" << std::endl;
   output << blank + "  input " + funcSlice + "dest_r ;" << std::endl;
+  output << blank + "  input " + inputSlice[2] + " s ;" << std::endl;  
   output << blank + "  reg dest_r_1bit ;" << std::endl;
+  output << blank + "  reg " + inputSlice[0] + " a_r ;" << std::endl; 
+  output << blank + "  reg " + inputSlice[1] + " b_r ;" << std::endl; 
+  output << blank + "  reg " + inputSlice[2] + " s_r ;" << std::endl;
+  output << blank + "  reg " + inputSlice[2] + " s_r_tmp ;" << std::endl;
   output << blank + "  begin" << std::endl;
   output << blank + "    dest_r_1bit = | dest_r ;" << std::endl;  
-  output << blank + "    " + funcName + "_r = " + extend("dest_r_1bit", condWidthNum) + " ;" << std::endl;
+  output << blank + "    s_r = " + extend("dest_r_1bit", sWidth) + " | s_r_tmp;" << std::endl;
+  output << blank + "    " + funcName + "_r = {a_r, b_r, s_r};" << std::endl;
   output << blank + "  end" << std::endl;
+  output << blank + "  casez (s) " << std::endl;
+  uint32_t i = 0;
+  for(auto localPair: caseAssignPairs) {
+    std::string taintString = pairVec2taintString(caseAssignPairs, localPair.second, "_r", output);
+    split_slice(localPair.second, rhs, rhsSlice);
+    output << blank + "  " + localPair.first + " : begin" << std::endl;
+    output << blank + "    " + rhs + "_r " + rhsSlice + " = dest_r ;" << std::endl;
+    output << blank + "    " + taintString + " = 0 ;" << std::endl;
+    output << blank + "    s_r_tmp [" + toStr(i) + ":0] = " + extend("|(dest_r | "+rhs+"_r"+rhsSlice+")", i+1) + " ;" << std::endl;
+    if(i+1 <= sWidth - 1)
+    output << blank + "    s_r_tmp [" + toStr(sWidth-1) + ":" + toStr(i+1) + "] = 0 ;" << std::endl;
+    output << blank + "  end" << std::endl;
+    i = std::min(i + 1, sWidth-1);
+  }
+  output << blank + "  endcase" << std::endl;
   output << blank + "endfunction" << std::endl << std::endl;
 
-  // print _x function, only the condition has _x taint, assume all the bits are the same.
-  output << blank + "function [" + toStr(condWidthNum-1) + ":0] " + funcName + "_x ;" << std::endl;
+  // print _x function, output is (a_x, b_x, s_x), input is (dest_x, s)
+  output << blank + "function [" + toStr(allInputWidth-1) + ":0] " + funcName + "_x ;" << std::endl;
   output << blank + "  input " + funcSlice + "dest_x ;" << std::endl;
+  output << blank + "  input " + inputSlice[2] + " s ;" << std::endl;  
   output << blank + "  reg dest_x_1bit ;" << std::endl;
+  output << blank + "  reg " + inputSlice[0] + " a_x ;" << std::endl; 
+  output << blank + "  reg " + inputSlice[1] + " b_x ;" << std::endl; 
+  output << blank + "  reg " + inputSlice[2] + " s_x ;" << std::endl; 
   output << blank + "  begin" << std::endl;
   output << blank + "    dest_x_1bit = | dest_x ;" << std::endl;  
-  output << blank + "    " + funcName + "_x = " + extend("dest_x_1bit", condWidthNum) + " ;" << std::endl;
+  output << blank + "    s_x = " + extend("dest_x_1bit", sWidth) + " ;" << std::endl;
+  output << blank + "    " + funcName + "_x = {a_x, b_x, s_x};" << std::endl;
   output << blank + "  end" << std::endl;
+  output << blank + "  casez (s) " << std::endl;
+  for(auto localPair: caseAssignPairs) {
+    std::string taintString = pairVec2taintString(caseAssignPairs, localPair.second, "_x", output);
+    split_slice(localPair.second, rhs, rhsSlice);
+    output << blank + "  " + localPair.first + " : begin" << std::endl;
+    output << blank + "    " + rhs + "_x " + rhsSlice + " = dest_x ;" << std::endl;
+    output << blank + "    " + taintString + " = 0 ;" << std::endl;
+    output << blank + "  end" << std::endl;    
+  }
+  output << blank + "  endcase" << std::endl;
   output << blank + "endfunction" << std::endl << std::endl;
 
-  // print _x function, only the condition has _x taint, assume all the bits are the same.
-  output << blank + "function [" + toStr(condWidthNum-1) + ":0] " + funcName + "_c ;" << std::endl;
+  // print _c function, output is (a_c, b_c, s_c), input is (dest_c, s)
+  output << blank + "function [" + toStr(allInputWidth-1) + ":0] " + funcName + "_c ;" << std::endl;
+  output << blank + "  input " + funcSlice + "dest_c ;" << std::endl;
+  output << blank + "  input " + inputSlice[2] + " s ;" << std::endl;  
+  output << blank + "  reg " + inputSlice[0] + " a_c ;" << std::endl; 
+  output << blank + "  reg " + inputSlice[1] + " b_c ;" << std::endl; 
+  output << blank + "  reg " + inputSlice[2] + " s_c ;" << std::endl; 
   output << blank + "  begin" << std::endl;
-  output << blank + "    " + funcName + "_c = " + extend("1'b1", condWidthNum) + " ;" << std::endl;
+  output << blank + "    s_c = " + extend("1'b1", sWidth) + " ;" << std::endl;
+  output << blank + "    " + funcName + "_c = {a_c, b_c, s_c};" << std::endl;
   output << blank + "  end" << std::endl;
+  output << blank + "  casez (s) " << std::endl;
+  for(auto localPair: caseAssignPairs) {
+    std::string taintString = pairVec2taintString(caseAssignPairs, localPair.second, "_c", output);
+    split_slice(localPair.second, rhs, rhsSlice);
+    output << blank + "  " + localPair.first + " : begin" << std::endl;
+    output << blank + "    " + rhs + "_c " + rhsSlice + " = dest_c ;" << std::endl;
+    output << blank + "    " + taintString + " = 0 ;" << std::endl;
+    output << blank + "  end" << std::endl;    
+  }
+  output << blank + "  endcase" << std::endl;
   output << blank + "endfunction" << std::endl << std::endl;
 }
 
@@ -1005,7 +1080,7 @@ void add_func_taints_call_limited(std::string line, std::ofstream &output) {
   std::string returnArgX = get_rhs_taint_list(returnArg, "_x");
   std::string returnArgC = get_rhs_taint_list(returnArg, "_c");
 
-  std::string argTList = get_rhs_taint_list(condArgForFunc, "_t");
+  std::string argTList = get_rhs_taint_list(varArgs, "_t");
 
   std::vector<uint32_t> verVec;
   get_ver_vec(varArgs, verVec);
@@ -1013,10 +1088,10 @@ void add_func_taints_call_limited(std::string line, std::ofstream &output) {
   std::string argXList = get_lhs_ver_taint_list(varArgs, "_x", output, verVec);
   std::string argCList = get_lhs_ver_taint_list(varArgs, "_c", output, verVec);
 
-  output << blank + "assign " + returnArgT + " = " + funcName + "_t(" + argTList + ");" << std::endl;
-  output << blank + "assign { " + argRList + " } = " + funcName + "_r(" + returnArgR + ");" << std::endl;
-  output << blank + "assign { " + argXList + " } = " + funcName + "_x(" + returnArgX + ");" << std::endl;
-  output << blank + "assign { " + argCList + " } = " + funcName + "_c();" << std::endl;
+  output << blank + "assign " + returnArgT + " = " + funcName + "_t(" + argTList + ", " + condArgForFunc + ");" << std::endl;
+  output << blank + "assign { " + argRList + " } = " + funcName + "_r(" + returnArgR + ", " + condArgForFunc + ");" << std::endl;
+  output << blank + "assign { " + argXList + " } = " + funcName + "_x(" + returnArgX + ", " + condArgForFunc + ");" << std::endl;
+  output << blank + "assign { " + argCList + " } = " + funcName + "_c(" + returnArgC + ", " + condArgForFunc + ");" << std::endl;
 }
 
 

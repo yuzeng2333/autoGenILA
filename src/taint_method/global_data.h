@@ -90,6 +90,7 @@ extern std::regex pSrcDestBothConcat;
 extern std::regex pVarName;
 extern std::regex pVarNameGroup;
 extern std::regex pNum;
+extern std::regex pNumExist;
 
 extern unsigned long int NEW_VAR;
 extern unsigned long int USELESS_VAR;
