@@ -626,3 +626,18 @@ std::string pairVec2taintString( std::vector<std::pair<std::string, std::string>
   res = "{" + res + "}";
   return res;
 }
+
+
+std::string max_num(uint32_t width) {
+  std::string res = toStr(width)+"'b";
+  for(uint32_t i = 0; i < width; i++) {
+    res += "1";
+  }
+  return res;
+}
+
+
+std::string max_num(std::string widthStr) {
+  uint32_t width = std::stoi(widthStr);
+  return max_num(width);
+}

@@ -813,20 +813,20 @@ void add_func_taints_limited(std::ifstream &input, std::ofstream &output, std::s
   output << blank + "    s_r = " + extend("dest_r_1bit", sWidth) + " | s_r_tmp;" << std::endl;
   output << blank + "    " + funcName + "_r = {a_r, b_r, s_r};" << std::endl;
   output << blank + "    " + taintString + " = 0 ;" << std::endl;
-  output << blank + "  end" << std::endl;
-  output << blank + "  casez (s) " << std::endl;
+  output << blank + "    casez (s) " << std::endl;
   uint32_t i = 0;
   for(auto localPair: caseAssignPairs) {
     split_slice(localPair.second, rhs, rhsSlice);
-    output << blank + "  " + localPair.first + " : begin" << std::endl;
-    output << blank + "    " + rhs + "_r " + rhsSlice + " = dest_r ;" << std::endl;
-    output << blank + "    s_r_tmp [" + toStr(i) + ":0] = " + extend("|(dest_r | "+rhs+"_r"+rhsSlice+")", i+1) + " ;" << std::endl;
+    output << blank + "    " + localPair.first + " : begin" << std::endl;
+    output << blank + "      " + rhs + "_r " + rhsSlice + " = dest_r ;" << std::endl;
+    output << blank + "      s_r_tmp [" + toStr(i) + ":0] = " + extend("|(dest_r | "+rhs+"_r"+rhsSlice+")", i+1) + " ;" << std::endl;
     if(i+1 <= sWidth - 1)
-    output << blank + "    s_r_tmp [" + toStr(sWidth-1) + ":" + toStr(i+1) + "] = 0 ;" << std::endl;
-    output << blank + "  end" << std::endl;
+    output << blank + "      s_r_tmp [" + toStr(sWidth-1) + ":" + toStr(i+1) + "] = 0 ;" << std::endl;
+    output << blank + "    end" << std::endl;
     i = std::min(i + 1, sWidth-1);
   }
-  output << blank + "  endcase" << std::endl;
+  output << blank + "    endcase" << std::endl;
+  output << blank + "  end" << std::endl;  
   output << blank + "endfunction" << std::endl << std::endl;
 
   // print _x function, output is (a_x, b_x, s_x), input is (dest_x, s)
@@ -843,15 +843,15 @@ void add_func_taints_limited(std::ifstream &input, std::ofstream &output, std::s
   output << blank + "    s_x = " + extend("dest_x_1bit", sWidth) + " ;" << std::endl;
   output << blank + "    " + funcName + "_x = {a_x, b_x, s_x};" << std::endl;
   output << blank + "    " + taintString + " = 0 ;" << std::endl;
-  output << blank + "  end" << std::endl;
-  output << blank + "  casez (s) " << std::endl;
+  output << blank + "    casez (s) " << std::endl;
   for(auto localPair: caseAssignPairs) {
     split_slice(localPair.second, rhs, rhsSlice);
-    output << blank + "  " + localPair.first + " : begin" << std::endl;
-    output << blank + "    " + rhs + "_x " + rhsSlice + " = dest_x ;" << std::endl;
-    output << blank + "  end" << std::endl;    
+    output << blank + "    " + localPair.first + " : begin" << std::endl;
+    output << blank + "      " + rhs + "_x " + rhsSlice + " = dest_x ;" << std::endl;
+    output << blank + "    end" << std::endl;    
   }
-  output << blank + "  endcase" << std::endl;
+  output << blank + "    endcase" << std::endl;
+  output << blank + "  end" << std::endl;  
   output << blank + "endfunction" << std::endl << std::endl;
 
   // print _c function, output is (a_c, b_c, s_c), input is (dest_c, s)
@@ -866,15 +866,15 @@ void add_func_taints_limited(std::ifstream &input, std::ofstream &output, std::s
   output << blank + "    s_c = " + extend("1'b1", sWidth) + " ;" << std::endl;
   output << blank + "    " + funcName + "_c = {a_c, b_c, s_c};" << std::endl;
   output << blank + "    " + taintString + " = 0 ;" << std::endl;
-  output << blank + "  end" << std::endl;
-  output << blank + "  casez (s) " << std::endl;
+  output << blank + "    casez (s) " << std::endl;
   for(auto localPair: caseAssignPairs) {
     split_slice(localPair.second, rhs, rhsSlice);
-    output << blank + "  " + localPair.first + " : begin" << std::endl;
-    output << blank + "    " + rhs + "_c " + rhsSlice + " = dest_c ;" << std::endl;
-    output << blank + "  end" << std::endl;    
+    output << blank + "    " + localPair.first + " : begin" << std::endl;
+    output << blank + "      " + rhs + "_c " + rhsSlice + " = dest_c ;" << std::endl;
+    output << blank + "    end" << std::endl;    
   }
-  output << blank + "  endcase" << std::endl;
+  output << blank + "    endcase" << std::endl;
+  output << blank + "  end" << std::endl;  
   output << blank + "endfunction" << std::endl << std::endl;
 }
 

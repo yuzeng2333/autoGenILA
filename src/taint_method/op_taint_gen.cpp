@@ -142,7 +142,7 @@ void output_insert_map(std::string line, std::ofstream &output, std::ifstream &i
   output << blank << "wire " + slice + var + "_r ;" << std::endl;
   output << blank << "wire " + slice + var + "_c ;" << std::endl;
   output << blank << "wire " + slice + var + "_x ;" << std::endl;
-
+  output << blank << "assign " + var + "_x = " + max_num(get_width(slice)) + " ;" << std::endl;
   // TODO: how to deal with the taints of output?
   // It seems to me, the _r taints should only be high 
   // when the output is valid to be read
