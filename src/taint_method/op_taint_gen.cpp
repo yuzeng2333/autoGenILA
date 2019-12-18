@@ -785,13 +785,17 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
     localWidthNum = varWidth.get_from_var_width(dest, line);
   }
   localWidth = std::to_string(localWidthNum);  
+  uint32_t op1VerNum = find_version_num(op1);
+  std::string op1Ver = toStr(op1VerNum);
 
-  output << blank.substr(0, blank.length()-4) + "assign " + op1 + "_x = " + extend(dest+" != "+op1, localWidthNum) + " ;" << std::endl;
+  output << blank.substr(0, blank.length()-4) + "assign " + op1 + "_x" + op1Ver + " = " + extend(dest+" != "+op1, localWidthNum) + " ;" << std::endl;
+  output << blank.substr(0, blank.length()-4) + "assign " + op1 + "_r" + op1Ver + " = 0 ;" << std::endl;
+  output << blank.substr(0, blank.length()-4) + "assign " + op1 + "_c" + op1Ver + " = 0 ;" << std::endl;
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
-  output << blank + dest + "_t \t\t<= " + get_recent_rst() + " ? 0 : | ( " + op1 + "_t & " + op1 + "_x );" << std::endl;
+  output << blank + dest + "_t \t\t<= " + get_recent_rst() + " ? 0 : | ( " + op1 + "_t & " + op1 + "_x" + op1Ver + " );" << std::endl;
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
   // !!! FIXME: why dest_x is not used here?
-  output << blank + dest + "_t_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_t_flag ? 1 : | ( " + op1 + "_t & " + op1 + "_x );" << std::endl;
+  output << blank + dest + "_t_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_t_flag ? 1 : | ( " + op1 + "_t & " + op1 + "_x" + op1Ver + " );" << std::endl;
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
   output << blank + dest + "_r_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + "_r ;" << std::endl;
 }
