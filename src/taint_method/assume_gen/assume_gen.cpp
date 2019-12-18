@@ -12,9 +12,12 @@
 /* Format of input file
  * 1st line, reset_t
  * 2rd line, input data
- * 3th line, input control in1, in2, in3, ...  
- * 4th line, output-related input taints
- * 5th line, input combinations and timing relation with output-related input
+ * 3rd line, input data width
+ * 4th line, input control in1, in2, in3, ...  
+ * 5th line, width of input controls
+ * 6th line, output-related input taints
+ * 7th line, width of output-related input taints
+ * 8th line, input combinations and timing relation with output-related input
  * */
 
 #define toStr(a) std::to_string(a)
@@ -22,6 +25,10 @@
 std::vector<std::string> inputDataPorts;
 std::vector<std::string> inputCtrlPorts;
 std::vector<std::string> outputReadPorts;
+
+std::vector<std::string> inputDataWidth;
+std::vector<std::string> inputCtrlWidth;
+std::vector<std::string> outputReadWidth;
 //ToOutput toOut;
 
 int main(int argc, char* argv[]) {
@@ -43,15 +50,27 @@ int main(int argc, char* argv[]) {
   std::getline(input, line);
   parse_var_list(line, inputDataPorts, false);
 
-  // 3rd line, input ctrl ports:
+  // 3rd line, input data width
+  std::getline(input, line);
+  parse_var_list(line, inputDataWidth, false);
+
+  // 4th line, input ctrl ports:
   std::getline(input, line);
   parse_var_list(line, inputCtrlPorts, false);
 
-  // 4th line, output-related input taints:
+  // 5th line, width of input controls
+  std::getline(input, line);
+  parse_var_list(line, inputCtrlWidth, false);
+    
+  // 6th line, output-related input taints:
   std::getline(input, line);
   parse_var_list(line, outputReadPorts, false);
 
-  // 5th line, input combinations
+  // 7th line, width of output-related input taints
+  std::getline(input, line);
+  parse_var_list(line, outputReadWidth, false);
+
+  // 8th line, input combinations
   std::vector<std::pair<std::vector<std::string>, std::vector<std::string>>> inOutPair;
   std::vector<std::vector<std::string>> outRead;
   std::vector<std::vector<std::string>> inputComb;
@@ -135,7 +154,8 @@ std::string in_out_formula(std::pair<std::vector<std::string>, std::vector<std::
   for(size_t i = 0; i < singlePair.second.size(); i++) {
     if(i != 0)
       secondPart += " && ";
-    secondPart += ( interested && singlePair.second[i] == "1") ? outputReadPorts[i] : "!"+outputReadPorts[i] ;
+    std::string maxNum = max_num(outputReadWidth[i]);
+    secondPart += ( interested && singlePair.second[i] == "1") ? outputReadPorts[i]+"=="+maxNum : outputReadPorts[i]+"==0" ;
   }
   return firstPart + " |-> " + secondPart;
 }
@@ -167,12 +187,14 @@ std::string in_taint_formula(std::vector<std::string> inputValVec, bool interest
   for(size_t i = 0; i < inputValVec.size(); i++) {
     if(i != 0)
       secondPart += " && ";
-    secondPart += interested ? inputCtrlPorts[i]+"_t" : "!"+inputCtrlPorts[i]+"_t" ;
+    std::string maxNum = max_num(inputCtrlWidth[i]);
+    secondPart += interested ? inputCtrlPorts[i]+"_t=="+maxNum : inputCtrlPorts[i]+"_t==0" ;
   }
 
   for(size_t i = 0; i < inputDataPorts.size(); i++) {
     secondPart += " && ";
-    secondPart += interested ? inputDataPorts[i]+"_t" : "!"+inputDataPorts[i]+"_t" ;
+    std::string maxNum = max_num(inputCtrlWidth[i]);    
+    secondPart += interested ? inputDataPorts[i]+"_t=="+maxNum : inputDataPorts[i]+"_t==0" ;
   }
 
   return firstPart + " |-> " + secondPart;
@@ -299,4 +321,13 @@ void gen_end(std::ofstream &output) {
   output << "`include \"../properties/PID_simp.v.assert.property\";" << std::endl;
   output << std::endl;
   output << "endmodule" << std::endl;
+}
+
+std::string max_num(std::string widthStr) {
+  uint32_t width = std::stoi(widthStr);
+  std::string res = widthStr+"'b";
+  for(uint32_t i = 0; i < width; i++) {
+    res += "1";
+  }
+  return res;
 }

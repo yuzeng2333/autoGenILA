@@ -26,6 +26,8 @@ bool split_slice(std::string slicedName, std::string &name, std::string &slice);
 uint32_t cut_pos(std::string name);
 
 void gen_end(std::ofstream &output);
+
+std::string max_num(std::string widthStr);
 //struct ToOutput {
 //  ToOutput(std::ios_base s) : {}
 //  void operator()(const std::string str) {

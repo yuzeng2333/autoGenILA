@@ -4,147 +4,147 @@
   endproperty
 
   property input1;
-    i_wb_cyc == 0 && i_wb_adr == 32'h00000000 && i_wb_stb == 0 && i_wb_we == 1 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;
+    i_wb_cyc == 0 && i_wb_adr == 32'h00000000 && i_wb_stb == 0 && i_wb_we == 1 |-> o_wb_data_r==0 && o_un_r==0 && o_valid_r==0 && o_wb_ack_r==0 ;
   endproperty
 
   property input2;
-    i_wb_cyc == 0 && i_wb_adr == 32'h00000004 && i_wb_stb == 0 && i_wb_we == 1 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;
+    i_wb_cyc == 0 && i_wb_adr == 32'h00000004 && i_wb_stb == 0 && i_wb_we == 1 |-> o_wb_data_r==0 && o_un_r==0 && o_valid_r==0 && o_wb_ack_r==0 ;
   endproperty
 
   property input3;
-    i_wb_cyc == 0 && i_wb_adr == 32'h00000008 && i_wb_stb == 0 && i_wb_we == 1 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;
+    i_wb_cyc == 0 && i_wb_adr == 32'h00000008 && i_wb_stb == 0 && i_wb_we == 1 |-> o_wb_data_r==0 && o_un_r==0 && o_valid_r==0 && o_wb_ack_r==0 ;
   endproperty
 
   property input4;
-    i_wb_cyc == 0 && i_wb_adr == 32'h0000000c && i_wb_stb == 0 && i_wb_we == 1 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;
+    i_wb_cyc == 0 && i_wb_adr == 32'h0000000c && i_wb_stb == 0 && i_wb_we == 1 |-> o_wb_data_r==0 && o_un_r==0 && o_valid_r==0 && o_wb_ack_r==0 ;
   endproperty
 
   property input5;
-    i_wb_cyc == 0 && i_wb_adr == 32'h00000010 && i_wb_stb == 0 && i_wb_we == 1 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;
+    i_wb_cyc == 0 && i_wb_adr == 32'h00000010 && i_wb_stb == 0 && i_wb_we == 1 |-> o_wb_data_r==0 && o_un_r==0 && o_valid_r==0 && o_wb_ack_r==0 ;
   endproperty
 
   property input6;
-    i_wb_cyc == 1 && i_wb_adr == 32'h00000000 && i_wb_stb == 1 && i_wb_we == 0 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000000 && i_wb_stb == 1 && i_wb_we == 0 |-> o_wb_data_r==0 && o_un_r==0 && o_valid_r==0 && o_wb_ack_r==0 ;
   endproperty
 
   property input7;
-    i_wb_cyc == 1 && i_wb_adr == 32'h00000004 && i_wb_stb == 1 && i_wb_we == 0 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000004 && i_wb_stb == 1 && i_wb_we == 0 |-> o_wb_data_r==0 && o_un_r==0 && o_valid_r==0 && o_wb_ack_r==0 ;
   endproperty
 
   property input8;
-    i_wb_cyc == 1 && i_wb_adr == 32'h00000008 && i_wb_stb == 1 && i_wb_we == 0 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000008 && i_wb_stb == 1 && i_wb_we == 0 |-> o_wb_data_r==0 && o_un_r==0 && o_valid_r==0 && o_wb_ack_r==0 ;
   endproperty
 
   property input9;
-    i_wb_cyc == 1 && i_wb_adr == 32'h0000000c && i_wb_stb == 1 && i_wb_we == 0 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;
+    i_wb_cyc == 1 && i_wb_adr == 32'h0000000c && i_wb_stb == 1 && i_wb_we == 0 |-> o_wb_data_r==0 && o_un_r==0 && o_valid_r==0 && o_wb_ack_r==0 ;
   endproperty
 
   property input10;
-    i_wb_cyc == 1 && i_wb_adr == 32'h00000010 && i_wb_stb == 1 && i_wb_we == 0 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000010 && i_wb_stb == 1 && i_wb_we == 0 |-> o_wb_data_r==0 && o_un_r==0 && o_valid_r==0 && o_wb_ack_r==0 ;
   endproperty
 
   property input11;
-    i_wb_cyc == 1 && i_wb_adr == 32'h00000014 && i_wb_stb == 1 && i_wb_we == 0 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000014 && i_wb_stb == 1 && i_wb_we == 0 |-> o_wb_data_r==0 && o_un_r==0 && o_valid_r==0 && o_wb_ack_r==0 ;
   endproperty
 
   property input12;
-    i_wb_cyc == 1 && i_wb_adr == 32'h00000018 && i_wb_stb == 1 && i_wb_we == 0 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000018 && i_wb_stb == 1 && i_wb_we == 0 |-> o_wb_data_r==0 && o_un_r==0 && o_valid_r==0 && o_wb_ack_r==0 ;
   endproperty
 
   property input13;
-    i_wb_cyc == 1 && i_wb_adr == 32'h0000001c && i_wb_stb == 1 && i_wb_we == 0 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;
+    i_wb_cyc == 1 && i_wb_adr == 32'h0000001c && i_wb_stb == 1 && i_wb_we == 0 |-> o_wb_data_r==0 && o_un_r==0 && o_valid_r==0 && o_wb_ack_r==0 ;
   endproperty
 
   property input14;
-    i_wb_cyc == 1 && i_wb_adr == 32'h00000020 && i_wb_stb == 1 && i_wb_we == 0 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000020 && i_wb_stb == 1 && i_wb_we == 0 |-> o_wb_data_r==0 && o_un_r==0 && o_valid_r==0 && o_wb_ack_r==0 ;
   endproperty
 
   property input15;
-    i_wb_cyc == 1 && i_wb_adr == 32'h00000024 && i_wb_stb == 1 && i_wb_we == 0 |-> o_wb_data_r && !o_un_r && !o_valid_r && o_wb_ack_r ;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000024 && i_wb_stb == 1 && i_wb_we == 0 |-> o_wb_data_r==32'b11111111111111111111111111111111 && o_un_r==0 && o_valid_r==0 && o_wb_ack_r==1'b1 ;
   endproperty
 
   property input16;
-    i_wb_cyc == 1 && i_wb_adr == 32'h00000028 && i_wb_stb == 1 && i_wb_we == 0 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000028 && i_wb_stb == 1 && i_wb_we == 0 |-> o_wb_data_r==0 && o_un_r==0 && o_valid_r==0 && o_wb_ack_r==0 ;
   endproperty
 
   property input17;
-    i_wb_cyc == 1 && i_wb_adr == 32'h0000002c && i_wb_stb == 1 && i_wb_we == 0 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;
+    i_wb_cyc == 1 && i_wb_adr == 32'h0000002c && i_wb_stb == 1 && i_wb_we == 0 |-> o_wb_data_r==0 && o_un_r==0 && o_valid_r==0 && o_wb_ack_r==0 ;
   endproperty
 
   property input18;
-    i_wb_cyc == 0 && i_wb_adr == 32'h0000002c && i_wb_stb == 0 && i_wb_we == 1 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;
+    i_wb_cyc == 0 && i_wb_adr == 32'h0000002c && i_wb_stb == 0 && i_wb_we == 1 |-> o_wb_data_r==0 && o_un_r==0 && o_valid_r==0 && o_wb_ack_r==0 ;
   endproperty
 
   property input19;
-    i_wb_cyc == 0 && i_wb_adr == 32'h00000000 && i_wb_stb == 0 && i_wb_we == 1 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t ;
+    i_wb_cyc == 0 && i_wb_adr == 32'h00000000 && i_wb_stb == 0 && i_wb_we == 1 |-> i_wb_cyc_t==0 && i_wb_adr_t==0 && i_wb_stb_t==0 && i_wb_we_t==0 && i_wb_data_t==0 ;
   endproperty
 
   property input20;
-    i_wb_cyc == 0 && i_wb_adr == 32'h00000004 && i_wb_stb == 0 && i_wb_we == 1 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t ;
+    i_wb_cyc == 0 && i_wb_adr == 32'h00000004 && i_wb_stb == 0 && i_wb_we == 1 |-> i_wb_cyc_t==0 && i_wb_adr_t==0 && i_wb_stb_t==0 && i_wb_we_t==0 && i_wb_data_t==0 ;
   endproperty
 
   property input21;
-    i_wb_cyc == 0 && i_wb_adr == 32'h00000008 && i_wb_stb == 0 && i_wb_we == 1 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t ;
+    i_wb_cyc == 0 && i_wb_adr == 32'h00000008 && i_wb_stb == 0 && i_wb_we == 1 |-> i_wb_cyc_t==0 && i_wb_adr_t==0 && i_wb_stb_t==0 && i_wb_we_t==0 && i_wb_data_t==0 ;
   endproperty
 
   property input22;
-    i_wb_cyc == 0 && i_wb_adr == 32'h0000000c && i_wb_stb == 0 && i_wb_we == 1 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t ;
+    i_wb_cyc == 0 && i_wb_adr == 32'h0000000c && i_wb_stb == 0 && i_wb_we == 1 |-> i_wb_cyc_t==0 && i_wb_adr_t==0 && i_wb_stb_t==0 && i_wb_we_t==0 && i_wb_data_t==0 ;
   endproperty
 
   property input23;
-    i_wb_cyc == 0 && i_wb_adr == 32'h00000010 && i_wb_stb == 0 && i_wb_we == 1 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t ;
+    i_wb_cyc == 0 && i_wb_adr == 32'h00000010 && i_wb_stb == 0 && i_wb_we == 1 |-> i_wb_cyc_t==0 && i_wb_adr_t==0 && i_wb_stb_t==0 && i_wb_we_t==0 && i_wb_data_t==0 ;
   endproperty
 
   property input24;
-    i_wb_cyc == 1 && i_wb_adr == 32'h00000000 && i_wb_stb == 1 && i_wb_we == 0 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t ;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000000 && i_wb_stb == 1 && i_wb_we == 0 |-> i_wb_cyc_t==0 && i_wb_adr_t==0 && i_wb_stb_t==0 && i_wb_we_t==0 && i_wb_data_t==0 ;
   endproperty
 
   property input25;
-    i_wb_cyc == 1 && i_wb_adr == 32'h00000004 && i_wb_stb == 1 && i_wb_we == 0 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t ;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000004 && i_wb_stb == 1 && i_wb_we == 0 |-> i_wb_cyc_t==0 && i_wb_adr_t==0 && i_wb_stb_t==0 && i_wb_we_t==0 && i_wb_data_t==0 ;
   endproperty
 
   property input26;
-    i_wb_cyc == 1 && i_wb_adr == 32'h00000008 && i_wb_stb == 1 && i_wb_we == 0 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t ;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000008 && i_wb_stb == 1 && i_wb_we == 0 |-> i_wb_cyc_t==0 && i_wb_adr_t==0 && i_wb_stb_t==0 && i_wb_we_t==0 && i_wb_data_t==0 ;
   endproperty
 
   property input27;
-    i_wb_cyc == 1 && i_wb_adr == 32'h0000000c && i_wb_stb == 1 && i_wb_we == 0 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t ;
+    i_wb_cyc == 1 && i_wb_adr == 32'h0000000c && i_wb_stb == 1 && i_wb_we == 0 |-> i_wb_cyc_t==0 && i_wb_adr_t==0 && i_wb_stb_t==0 && i_wb_we_t==0 && i_wb_data_t==0 ;
   endproperty
 
   property input28;
-    i_wb_cyc == 1 && i_wb_adr == 32'h00000010 && i_wb_stb == 1 && i_wb_we == 0 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t ;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000010 && i_wb_stb == 1 && i_wb_we == 0 |-> i_wb_cyc_t==0 && i_wb_adr_t==0 && i_wb_stb_t==0 && i_wb_we_t==0 && i_wb_data_t==0 ;
   endproperty
 
   property input29;
-    i_wb_cyc == 1 && i_wb_adr == 32'h00000014 && i_wb_stb == 1 && i_wb_we == 0 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t ;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000014 && i_wb_stb == 1 && i_wb_we == 0 |-> i_wb_cyc_t==0 && i_wb_adr_t==0 && i_wb_stb_t==0 && i_wb_we_t==0 && i_wb_data_t==0 ;
   endproperty
 
   property input30;
-    i_wb_cyc == 1 && i_wb_adr == 32'h00000018 && i_wb_stb == 1 && i_wb_we == 0 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t ;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000018 && i_wb_stb == 1 && i_wb_we == 0 |-> i_wb_cyc_t==0 && i_wb_adr_t==0 && i_wb_stb_t==0 && i_wb_we_t==0 && i_wb_data_t==0 ;
   endproperty
 
   property input31;
-    i_wb_cyc == 1 && i_wb_adr == 32'h0000001c && i_wb_stb == 1 && i_wb_we == 0 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t ;
+    i_wb_cyc == 1 && i_wb_adr == 32'h0000001c && i_wb_stb == 1 && i_wb_we == 0 |-> i_wb_cyc_t==0 && i_wb_adr_t==0 && i_wb_stb_t==0 && i_wb_we_t==0 && i_wb_data_t==0 ;
   endproperty
 
   property input32;
-    i_wb_cyc == 1 && i_wb_adr == 32'h00000020 && i_wb_stb == 1 && i_wb_we == 0 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t ;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000020 && i_wb_stb == 1 && i_wb_we == 0 |-> i_wb_cyc_t==0 && i_wb_adr_t==0 && i_wb_stb_t==0 && i_wb_we_t==0 && i_wb_data_t==0 ;
   endproperty
 
   property input33;
-    i_wb_cyc == 1 && i_wb_adr == 32'h00000024 && i_wb_stb == 1 && i_wb_we == 0 |-> i_wb_cyc_t && i_wb_adr_t && i_wb_stb_t && i_wb_we_t && i_wb_data_t ;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000024 && i_wb_stb == 1 && i_wb_we == 0 |-> i_wb_cyc_t==1'b1 && i_wb_adr_t==16'b1111111111111111 && i_wb_stb_t==1'b1 && i_wb_we_t==1'b1 && i_wb_data_t==1'b1 ;
   endproperty
 
   property input34;
-    i_wb_cyc == 1 && i_wb_adr == 32'h00000028 && i_wb_stb == 1 && i_wb_we == 0 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t ;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000028 && i_wb_stb == 1 && i_wb_we == 0 |-> i_wb_cyc_t==0 && i_wb_adr_t==0 && i_wb_stb_t==0 && i_wb_we_t==0 && i_wb_data_t==0 ;
   endproperty
 
   property input35;
-    i_wb_cyc == 1 && i_wb_adr == 32'h0000002c && i_wb_stb == 1 && i_wb_we == 0 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t ;
+    i_wb_cyc == 1 && i_wb_adr == 32'h0000002c && i_wb_stb == 1 && i_wb_we == 0 |-> i_wb_cyc_t==0 && i_wb_adr_t==0 && i_wb_stb_t==0 && i_wb_we_t==0 && i_wb_data_t==0 ;
   endproperty
 
   property input36;
-    i_wb_cyc == 0 && i_wb_adr == 32'h0000002c && i_wb_stb == 0 && i_wb_we == 1 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t ;
+    i_wb_cyc == 0 && i_wb_adr == 32'h0000002c && i_wb_stb == 0 && i_wb_we == 1 |-> i_wb_cyc_t==0 && i_wb_adr_t==0 && i_wb_stb_t==0 && i_wb_we_t==0 && i_wb_data_t==0 ;
   endproperty
 
   property input37;

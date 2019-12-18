@@ -3,3 +3,6 @@ all:
 
 debug:
 	g++ -g assume_gen.cpp
+
+pid:
+	./a.out PID_operation.txt

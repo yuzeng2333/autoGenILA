@@ -1,7 +1,10 @@
 i_rst_t
 i_wb_data
+32
 i_wb_cyc, i_wb_adr, i_wb_stb, i_wb_we
+1, 16, 1, 1
 o_wb_data_r, o_un_r, o_valid_r, o_wb_ack_r
+32, 32, 1, 1
 0, 32'h00000000, 0, 1 => 0, 0, 0, 0
 0, 32'h00000004, 0, 1 => 0, 0, 0, 0
 0, 32'h00000008, 0, 1 => 0, 0, 0, 0
