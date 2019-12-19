@@ -777,53 +777,47 @@ void add_func_taints_limited(std::ifstream &input, std::ofstream &output, std::s
   uint32_t sWidth = get_width(inputSlice[2]);
   uint32_t allInputWidth = destWidth + bWidth + sWidth;
   // print _t function
-  output << blank + "function " + funcSlice + funcName + "_t ;" << std::endl;
+  output << blank + "function automatic" + funcSlice + funcName + "_t ;" << std::endl;
   output << blank + "  input " + inputSlice[0] + " a_t ;" << std::endl;
   output << blank + "  input " + inputSlice[1] + " b_t ;" << std::endl;
   output << blank + "  input " + inputSlice[2] + " s_t ;" << std::endl;
   output << blank + "  input " + inputSlice[2] + " s ;" << std::endl;
-  output << blank + "  automatic reg s_t_1bit = 0;" << std::endl;
-  output << blank + "  automatic reg " + inputSlice[0] + " s_t_full = 0;"<< std::endl;
+  output << blank + "  reg s_t_1bit = 0;" << std::endl;
+  output << blank + "  reg " + inputSlice[0] + " s_t_full = 0;"<< std::endl;
   output << blank + "  begin" << std::endl;
   output << blank + "    s_t_1bit = | s_t ;" << std::endl;  
   output << blank + "    s_t_full = " + extend("s_t_1bit", destWidth) + " ;" << std::endl;
-  output << blank + "  end" << std::endl;
-  output << blank + "  casez (s) " << std::endl;
+  output << blank + "    casez (s) " << std::endl;
   for(auto localPair: caseAssignPairs) {
     split_slice(localPair.second, rhs, rhsSlice);
-    output << blank + "  " + localPair.first + " :" << std::endl;
-    output << blank + "    " + funcName + "_t = s_t_full | " + rhs + "_t " + rhsSlice + ";" << std::endl;
+    output << blank + "    " + localPair.first + " :" << std::endl;
+    output << blank + "      " + funcName + "_t = s_t_full | " + rhs + "_t " + rhsSlice + ";" << std::endl;
   }
-  output << blank + "  endcase" << std::endl;
+  output << blank + "    endcase" << std::endl;
+  output << blank + "  end" << std::endl;  
   output << blank + "endfunction" << std::endl << std::endl;
 
   // TODO: needs to be modified
   // print _r function, output is (a_r, b_r, s_r), input is (dest_r, s)
   std::string taintString = pairVec2taintString(caseAssignPairs, "no_reg_is_excluded_2333", "_r", output);
-  output << blank + "function [" + toStr(allInputWidth-1) + ":0] " + funcName + "_r ;" << std::endl;
+  output << blank + "function automatic [" + toStr(allInputWidth-1) + ":0] " + funcName + "_r ;" << std::endl;
   output << blank + "  input " + funcSlice + "dest_r ;" << std::endl;
   output << blank + "  input " + inputSlice[2] + " s ;" << std::endl;  
-  output << blank + "  automatic reg dest_r_1bit = 0;" << std::endl;
-  output << blank + "  automatic reg " + inputSlice[0] + " a_r = 0;" << std::endl; 
-  output << blank + "  automatic reg " + inputSlice[1] + " b_r = 0;" << std::endl; 
-  output << blank + "  automatic reg " + inputSlice[2] + " s_r = 0;" << std::endl;
-  output << blank + "  automatic reg " + inputSlice[2] + " s_r_tmp  = 0;" << std::endl;
+  output << blank + "  reg dest_r_1bit = 0;" << std::endl;
+  output << blank + "  reg " + inputSlice[0] + " a_r = 0;" << std::endl; 
+  output << blank + "  reg " + inputSlice[1] + " b_r = 0;" << std::endl; 
+  output << blank + "  reg " + inputSlice[2] + " s_r = 0;" << std::endl;
   output << blank + "  begin" << std::endl;
   output << blank + "    dest_r_1bit = | dest_r ;" << std::endl;  
-  output << blank + "    s_r = " + extend("dest_r_1bit", sWidth) + " | s_r_tmp;" << std::endl;
+  output << blank + "    s_r = " + extend("dest_r_1bit", sWidth) + " ;" << std::endl;
   output << blank + "    " + funcName + "_r = {a_r, b_r, s_r};" << std::endl;
-  output << blank + "    " + taintString + " = 0 ;" << std::endl;
+  output << blank + "    b_r = 0 ;" << std::endl;
+  output << blank + "    a_r = 0 ;" << std::endl;
   output << blank + "    casez (s) " << std::endl;
-  uint32_t i = 0;
   for(auto localPair: caseAssignPairs) {
     split_slice(localPair.second, rhs, rhsSlice);
-    output << blank + "    " + localPair.first + " : begin" << std::endl;
+    output << blank + "    " + localPair.first + " :" << std::endl;
     output << blank + "      " + rhs + "_r " + rhsSlice + " = dest_r ;" << std::endl;
-    output << blank + "      s_r_tmp [" + toStr(i) + ":0] = " + extend("|(dest_r | "+rhs+"_r"+rhsSlice+")", i+1) + " ;" << std::endl;
-    if(i+1 <= sWidth - 1)
-    output << blank + "      s_r_tmp [" + toStr(sWidth-1) + ":" + toStr(i+1) + "] = 0 ;" << std::endl;
-    output << blank + "    end" << std::endl;
-    i = std::min(i + 1, sWidth-1);
   }
   output << blank + "    endcase" << std::endl;
   output << blank + "  end" << std::endl;  
@@ -831,24 +825,24 @@ void add_func_taints_limited(std::ifstream &input, std::ofstream &output, std::s
 
   // print _x function, output is (a_x, b_x, s_x), input is (dest_x, s)
   taintString = pairVec2taintString(caseAssignPairs, "no_reg_is_excluded_2333", "_x", output);  
-  output << blank + "function [" + toStr(allInputWidth-1) + ":0] " + funcName + "_x ;" << std::endl;
+  output << blank + "function automatic [" + toStr(allInputWidth-1) + ":0] " + funcName + "_x ;" << std::endl;
   output << blank + "  input " + funcSlice + "dest_x ;" << std::endl;
   output << blank + "  input " + inputSlice[2] + " s ;" << std::endl;  
-  output << blank + "  automatic reg dest_x_1bit = 0;" << std::endl;
-  output << blank + "  automatic reg " + inputSlice[0] + " a_x = 0;" << std::endl; 
-  output << blank + "  automatic reg " + inputSlice[1] + " b_x = 0;" << std::endl; 
-  output << blank + "  automatic reg " + inputSlice[2] + " s_x = 0;" << std::endl; 
+  output << blank + "  reg dest_x_1bit = 0;" << std::endl;
+  output << blank + "  reg " + inputSlice[0] + " a_x = 0;" << std::endl; 
+  output << blank + "  reg " + inputSlice[1] + " b_x = 0;" << std::endl; 
+  output << blank + "  reg " + inputSlice[2] + " s_x = 0;" << std::endl; 
   output << blank + "  begin" << std::endl;
   output << blank + "    dest_x_1bit = | dest_x ;" << std::endl;  
   output << blank + "    s_x = " + extend("dest_x_1bit", sWidth) + " ;" << std::endl;
   output << blank + "    " + funcName + "_x = {a_x, b_x, s_x};" << std::endl;
-  output << blank + "    " + taintString + " = 0 ;" << std::endl;
+  output << blank + "    b_x = 0 ;" << std::endl;
+  output << blank + "    a_x = 0 ;" << std::endl;
   output << blank + "    casez (s) " << std::endl;
   for(auto localPair: caseAssignPairs) {
     split_slice(localPair.second, rhs, rhsSlice);
-    output << blank + "    " + localPair.first + " : begin" << std::endl;
+    output << blank + "    " + localPair.first + " :" << std::endl;
     output << blank + "      " + rhs + "_x " + rhsSlice + " = dest_x ;" << std::endl;
-    output << blank + "    end" << std::endl;    
   }
   output << blank + "    endcase" << std::endl;
   output << blank + "  end" << std::endl;  
@@ -856,22 +850,22 @@ void add_func_taints_limited(std::ifstream &input, std::ofstream &output, std::s
 
   // print _c function, output is (a_c, b_c, s_c), input is (dest_c, s)
   taintString = pairVec2taintString(caseAssignPairs, "no_reg_is_excluded_2333", "_c", output);
-  output << blank + "function [" + toStr(allInputWidth-1) + ":0] " + funcName + "_c ;" << std::endl;
+  output << blank + "function automatic [" + toStr(allInputWidth-1) + ":0] " + funcName + "_c ;" << std::endl;
   output << blank + "  input " + funcSlice + "dest_c ;" << std::endl;
   output << blank + "  input " + inputSlice[2] + " s ;" << std::endl;  
-  output << blank + "  automatic reg " + inputSlice[0] + " a_c = 0;" << std::endl; 
-  output << blank + "  automatic reg " + inputSlice[1] + " b_c = 0;" << std::endl; 
-  output << blank + "  automatic reg " + inputSlice[2] + " s_c = 0;" << std::endl; 
+  output << blank + "  reg " + inputSlice[0] + " a_c = 0;" << std::endl; 
+  output << blank + "  reg " + inputSlice[1] + " b_c = 0;" << std::endl; 
+  output << blank + "  reg " + inputSlice[2] + " s_c = 0;" << std::endl; 
   output << blank + "  begin" << std::endl;
   output << blank + "    s_c = " + extend("1'b1", sWidth) + " ;" << std::endl;
   output << blank + "    " + funcName + "_c = {a_c, b_c, s_c};" << std::endl;
-  output << blank + "    " + taintString + " = 0 ;" << std::endl;
+  output << blank + "    b_c = 0 ;" << std::endl;
+  output << blank + "    a_c = 0 ;" << std::endl;
   output << blank + "    casez (s) " << std::endl;
   for(auto localPair: caseAssignPairs) {
     split_slice(localPair.second, rhs, rhsSlice);
-    output << blank + "    " + localPair.first + " : begin" << std::endl;
+    output << blank + "    " + localPair.first + " :" << std::endl;
     output << blank + "      " + rhs + "_c " + rhsSlice + " = dest_c ;" << std::endl;
-    output << blank + "    end" << std::endl;    
   }
   output << blank + "    endcase" << std::endl;
   output << blank + "  end" << std::endl;  
