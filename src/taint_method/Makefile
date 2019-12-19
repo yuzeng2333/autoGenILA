@@ -39,3 +39,6 @@ gb0:
 
 gb1:
 	./a.out /workspace/research/ILA/autoGenILA/GB/SYN/gb_yosys.v 1
+
+csimple:
+	./a.out /workspace/research/ILA/autoGenILA/naiveEg/case_simple/case.v 0
