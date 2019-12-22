@@ -66,7 +66,7 @@ std::regex pIte       (to_re("^(\\s*)assign (NAME) = (NAME) \\? (NAME) \\: (NAME
 // Assume: always comes with posedge or negedge
 std::regex pAlwaysClk (to_re("^(\\s*)always @\\(posedge (NAME)\\)$"));
 std::regex pAlwaysClkRst  (to_re("^(\\s*)always @\\(posedge (NAME) or (?:posedge|negedge) (NAME)(\\s?)\\)$"));
-std::regex pAlwaysComb(to_re("^(\\s*)always @\\(\\S+ or \\S+ or \\S+\\) begin$"));
+std::regex pAlwaysComb(to_re("^(\\s*)always @\\(\\S+ or \\S+(?: or \\S+)?\\) begin$"));
 std::regex pEnd       ("^(\\s*)end$");
 std::regex pEndmodule ("^(\\s*)endmodule$");
 /* non-blocking assignment */
@@ -291,7 +291,21 @@ void remove_functions(std::string fileName) {
 
 void add_line_taints(std::string line, std::ofstream &output, std::ifstream &input) {
   line = further_clean_line(line);
+  std::string printedLine = line;
   int choice = parse_verilog_line(line);
+  if(choice == REG) {
+    int pos = printedLine.find("reg", 0);
+    printedLine.replace(pos, 3, "logic");
+  }
+  else if (choice == WIRE) {
+    int pos = printedLine.find("wire", 0);
+    printedLine.replace(pos, 4, "logic");
+  }
+  std::smatch m;
+  if ( !std::regex_match(line, m, pModule) 
+      && !std::regex_match(line, m, pEndmodule) )
+    output << printedLine << std::endl;
+
   switch( choice ) {
     case INPUT:
       input_taint_gen(line, output);
@@ -496,9 +510,9 @@ void add_file_taints(std::string fileName) {
   while( std::getline(input, line) ) {
     lineNo++;
     //if(lineN0)
-    if ( !std::regex_match(line, match, pModule) 
-        && !std::regex_match(line, match, pEndmodule) )
-      output << line << std::endl;
+    //if ( !std::regex_match(line, match, pModule) 
+    //    && !std::regex_match(line, match, pEndmodule) )
+    //  output << line << std::endl;
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       add_case_taints_limited(input, output, line);
     }
@@ -860,10 +874,12 @@ void remove_function_wrapper(std::string firstLine, std::ifstream &input, std::o
       uint32_t lowIdx = get_begin(rhsSlice);
       uint32_t highIdx = get_end(rhsSlice);
       wholeNum = wholeNum >> lowIdx;
-      uint32_t selectedBits = wholeNum & (1<<(highIdx-lowIdx+1)-1);
+      uint32_t selectedBits = wholeNum & ((1<<(highIdx-lowIdx+1))-1);
       std::string binNum = dec2bin(selectedBits);
       std::string binWidth = toStr(binNum.length());
-      output << blank + "      " + result + " = " + binWidth + "'b" + binNum + " ;" << std::endl;
+      //std::string rhsNum = (selectedBits == 0) ? "0" : (binWidth + "'b" + binNum);
+      std::string rhsNum = binWidth + "'b" + binNum;
+      output << blank + "      " + result + " = " + rhsNum + " ;" << std::endl;
     }
     output << blank + "    default:" << std::endl;
     output << blank + "      " + result + " = " + a + " ;" << std::endl;
@@ -1007,6 +1023,7 @@ void add_case_taints(std::ifstream &input, std::ofstream &output, std::string fi
 
 
 void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::string alwaysFirstLine) {
+  output << alwaysFirstLine << std::endl;
   toCout("Do: add_case_taints_limited");
   std::smatch m;
   std::string caseFirstLine;
@@ -1042,14 +1059,13 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
   // declare necessaey variables
   uint32_t destWidthNum, sWidthNum, aWidthNum, bWidthNum;
   std::string sWidth, aWidth, bWidth;
-  std::string sVer, aVer, bVer, destVer;
+  std::string sVer, aVer, bVer;
 
   bool aIsNum = isNum(a);
   bool bIsNum = isNum(b);
 
   // assignmen for dest and s variables
   destWidthNum = get_var_slice_width(destAndSlice);
-  destVer = toStr(find_version_num(dest));  
   sWidthNum = get_var_slice_width(sAndSlice);
   sWidth = toStr(sWidthNum);
   sVer = toStr(find_version_num(s));
@@ -1077,7 +1093,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     output << blank + "    default :" << std::endl;
     output << blank + "      " + dest+"_t"+destSlice+" = " + a + "_t" + aSlice + " | " + extend("| "+s+"_t"+sSlice, destWidthNum) + ";" << std::endl;
     output << blank + "  endcase" << std::endl;
-    output << blank + "end" << std::endl << std::endl;
+    output << blank + "end" << std::endl;
     //auto destBoundPair = varWidth.get_idx_pair(dest, line);
     //ground(dest+"_t", destBoundPair, destSlice, blank, output);
 
@@ -1166,18 +1182,18 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     output << blank + "    default:" << std::endl;
     output << blank + "      " +  dest+"_t"+destSlice+" = " + a + "_t " + aSlice + " | " + extend("| "+s+"_t"+sSlice, destWidthNum) + " ;" << std::endl;
     output << blank + "  endcase" << std::endl;
-    output << blank + "end" << std::endl << std::endl;
+    output << blank + "end" << std::endl;
     //auto destBoundPair = varWidth.get_idx_pair(dest, line);
     //ground(dest+"_t", destBoundPair, destSlice, blank, output);
 
     // print _r function
-    output << blank + "reg [" + sWidth + "-1:0] " + s + "r" + sVer + " ;" << std::endl;
-    output << blank + "reg [" + sWidth + "-1:0] " + s + "x" + sVer + " ;" << std::endl;
-    output << blank + "reg [" + sWidth + "-1:0] " + s + "c" + sVer + " ;" << std::endl;
+    output << blank + "reg [" + sWidth + "-1:0] " + s + "_r" + sVer + " ;" << std::endl;
+    output << blank + "reg [" + sWidth + "-1:0] " + s + "_x" + sVer + " ;" << std::endl;
+    output << blank + "reg [" + sWidth + "-1:0] " + s + "_c" + sVer + " ;" << std::endl;
 
-    output << blank + "reg [" + aWidth + "-1:0] " + a + "r" + aVer + " ;" << std::endl;
-    output << blank + "reg [" + aWidth + "-1:0] " + a + "x" + aVer + " ;" << std::endl;
-    output << blank + "reg [" + aWidth + "-1:0] " + a + "c" + aVer + " ;" << std::endl;
+    output << blank + "reg [" + aWidth + "-1:0] " + a + "_r" + aVer + " ;" << std::endl;
+    output << blank + "reg [" + aWidth + "-1:0] " + a + "_x" + aVer + " ;" << std::endl;
+    output << blank + "reg [" + aWidth + "-1:0] " + a + "_c" + aVer + " ;" << std::endl;
 
     output << blank + "always @( "+dest+"_r"+destSlice+" or "+s+" ) begin" << std::endl;
     output << blank + "  "+s+"_r"+sVer+sSlice+" = " + extend("| "+dest+"_r"+destSlice, sWidthNum) + " ;" << std::endl;
@@ -1231,13 +1247,13 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     //ground(dest+"_t", destBoundPair, destSlice, blank, output);
 
     // print _r function
-    output << blank + "reg [" + sWidth + "-1:0] " + s + "r" + sVer + " ;" << std::endl;
-    output << blank + "reg [" + sWidth + "-1:0] " + s + "x" + sVer + " ;" << std::endl;
-    output << blank + "reg [" + sWidth + "-1:0] " + s + "c" + sVer + " ;" << std::endl;
+    output << blank + "reg [" + sWidth + "-1:0] " + s + "_r" + sVer + " ;" << std::endl;
+    output << blank + "reg [" + sWidth + "-1:0] " + s + "_x" + sVer + " ;" << std::endl;
+    output << blank + "reg [" + sWidth + "-1:0] " + s + "_c" + sVer + " ;" << std::endl;
 
-    output << blank + "reg [" + bWidth + "-1:0] " + b + "r" + bVer + " ;" << std::endl;
-    output << blank + "reg [" + bWidth + "-1:0] " + b + "x" + bVer + " ;" << std::endl;
-    output << blank + "reg [" + bWidth + "-1:0] " + b + "c" + bVer + " ;" << std::endl;
+    output << blank + "reg [" + bWidth + "-1:0] " + b + "_r" + bVer + " ;" << std::endl;
+    output << blank + "reg [" + bWidth + "-1:0] " + b + "_x" + bVer + " ;" << std::endl;
+    output << blank + "reg [" + bWidth + "-1:0] " + b + "_c" + bVer + " ;" << std::endl;
 
     output << blank + "always @( "+dest+"_r"+destSlice+" or "+s+" ) begin" << std::endl;
     output << blank + "  "+s+"_r"+sVer+sSlice+" = " + extend("| "+dest+"_r"+destSlice, sWidthNum) + " ;" << std::endl;
