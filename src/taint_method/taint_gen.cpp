@@ -9,6 +9,7 @@
 #include <assert.h>
 #include <unordered_map>
 #include <set>
+#include <bitset>
 #include "taint_gen.h"
 
 #define toStr(a) std::to_string(a)
@@ -65,6 +66,7 @@ std::regex pIte       (to_re("^(\\s*)assign (NAME) = (NAME) \\? (NAME) \\: (NAME
 // Assume: always comes with posedge or negedge
 std::regex pAlwaysClk (to_re("^(\\s*)always @\\(posedge (NAME)\\)$"));
 std::regex pAlwaysClkRst  (to_re("^(\\s*)always @\\(posedge (NAME) or (?:posedge|negedge) (NAME)(\\s?)\\)$"));
+std::regex pAlwaysComb(to_re("^(\\s*)always @\\(\\S+ or \\S+ or \\S+\\) begin$"));
 std::regex pEnd       ("^(\\s*)end$");
 std::regex pEndmodule ("^(\\s*)endmodule$");
 /* non-blocking assignment */
@@ -94,6 +96,7 @@ std::regex pVarName("([\aa-zA-Z0-9_\\.\\$\\\\'\\[\\]]+)(?:\\s*\\[\\d+(\\:\\d+)?\
 std::regex pVarNameGroup("([\aa-zA-Z0-9_\\.\\$\\\\'\\[\\]]+)(?:(\\s*)(\\[\\d+(\\:\\d+)?\\]))?");
 std::regex pNum("^(\\d+)'(h|d|b)[\\dabcdef\\?]+$");
 std::regex pNumExist("(\\d+)'(h|d|b)[\\dabcdef\\?]+");
+std::regex pBin("(\\d+)'b([01]+)");
 
 
 /* Global data */
@@ -124,10 +127,11 @@ std::set<std::string> g_rstGroup;
 
 /*remove comments
   remove redundent blanks 
-  extract concatenants */
+  extract concatenants 
+  remove functions wrapping cases */
 void clean_file(std::string fileName) {
   std::ifstream input(fileName);
-  std::ofstream output(fileName + ".clean");
+  std::ofstream output(fileName + ".nocomment");
   std::string line;
   std::string cleanLine;
   std::smatch match;
@@ -144,6 +148,7 @@ void clean_file(std::string fileName) {
     // store the width of wires and regs in varWidth
     uint32_t choice = parse_verilog_line(cleanLine, true);
     std::smatch m;
+    bool passExtractConcat = false;
     switch (choice) {
       case INPUT:
         {
@@ -258,12 +263,29 @@ void clean_file(std::string fileName) {
       default:
         break;
     } // end of switch
-    bool noConcat = extract_concat(cleanLine, output);
+    bool noConcat=true;
+    std::string nullStr;
+    noConcat = extract_concat(cleanLine, output, nullStr);
     if (noConcat)
       output << cleanLine << std::endl;
   }
   output.close();
   did_clean_file = true;
+}
+
+
+void remove_functions(std::string fileName) {
+  std::ifstream input(fileName+".nocomment");
+  std::ofstream output(fileName + ".clean");
+  std::string line;
+  while( std::getline(input, line) ) {
+    uint32_t choice = parse_verilog_line(line, true);
+    if ( choice == FUNCDEF ) {
+      remove_function_wrapper(line, input, output);
+    }
+    else
+      output << line << std::endl;
+  }
 }
 
 
@@ -313,10 +335,15 @@ void add_line_taints(std::string line, std::ofstream &output, std::ifstream &inp
     case ALWAYS_CLKRST:
       always_clkrst_taint_gen(line, input, output);
       break;
+    case FUNCDEF:
+      break;
+    case NONE:
+      break;
     case UNSUPPORT:
       std::cout << "!!! Unsupported operator in: "+ line + "|" << std::endl;
       break;
     default:
+      toCout("Unexpected operations found: "+line);
       break;
   }
 }
@@ -324,6 +351,8 @@ void add_line_taints(std::string line, std::ofstream &output, std::ifstream &inp
 
 // FIXME: maybe set t-taint and r-taint to clear if reg value is not changed
 int parse_verilog_line(std::string line, bool ignoreWrongOp) {
+  if(line.empty())
+    return NONE;
   if(line.substr(0, 1) == "X") {
     toCout("begin debug");
     ignoreWrongOp = true;
@@ -430,7 +459,7 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
       std::cout << "!! Unsupported operator:" + line << std::endl;
       abort();
     }
-    return NONE;
+    return UNSUPPORT;
   }
 }
 
@@ -470,15 +499,15 @@ void add_file_taints(std::string fileName) {
     if ( !std::regex_match(line, match, pModule) 
         && !std::regex_match(line, match, pEndmodule) )
       output << line << std::endl;
-    if ( std::regex_match(line, match, pFunctionDef) ) {
-      add_func_taints_limited(input, output, line);
-    }
-    else if ( std::regex_match(line, match, pCase) ) {
-      add_case_taints(input, output, line, "trxc");
+    if ( std::regex_match(line, match, pAlwaysComb) ) {
+      add_case_taints_limited(input, output, line);
     }
     else if ( std::regex_match(line, match, pFunctionCall) 
+        // TODO: remove this if statement
                 && match.str(3).compare("$signed") != 0 ) {
-      add_func_taints_call_limited(line, output);
+      //add_func_taints_call_limited(line, output);
+      toCout("!! Error: function found!");
+      abort();
     }
     else
       add_line_taints(line, output, input);  
@@ -491,7 +520,6 @@ void add_file_taints(std::string fileName) {
 /* merge _c, _r, _x */
 void merge_taints(std::string fileName) {
   std::ofstream output(fileName, std::fstream::app);
-
   // assign _t_1bit  
   for(auto reg : moduleRegs) {
     output << "  assign " + reg + "_t_1bit = | " + reg + "_t ;" << std::endl;
@@ -616,123 +644,6 @@ void fill_update(std::string fileName) {
         g_wire2reg.insert( update );
       }
     }
-  }
-}
-
-
-void add_func_taints(std::ifstream &input, std::ofstream &output, std::string funcDefinition) {
-  std::cout << "DO: add_func_taints" << std::endl;
-  std::smatch m;
-  if ( !std::regex_match(funcDefinition, m, pFunctionDef) ) {
-    std::cout << "!!! Error when deal with function !!!" << std::endl;
-  }
-  // function related data
-  std::string funcBlank = m.str(1);
-  std::string funcSlice = m.str(2);
-  std::string funcName = m.str(3);
-  std::vector<std::pair<std::string, std::string>> funcInputs;
-  std::string line;
-
-  // first, print out the definition of function
-  auto funcBegin = input.tellg();
-  while ( std::getline(input, line) && !std::regex_match(line, m, pEndfunction) ) {
-    output << line << std::endl;
-  }
-  std::getline(input, line); // print endfunction
-  output << line << std::endl << std::endl;
-
-  // next, contruct the _t , _r and _x function
-  output << funcBlank + "function " + funcSlice + funcName + "_t;" << std::endl;
-  input.seekg(funcBegin);
-  std::unordered_map<std::string, uint32_t> localVersionMap;  
-  while ( std::getline(input, line) && !std::regex_match(line, m, pEndfunction) ) {
-    int choice = parse_verilog_line(line);
-    std::smatch m;
-    switch (choice) {
-      case INPUT:
-        input_taint_gen(line, output);
-        std::regex_match(line, m, pInput);
-        funcInputs.push_back(std::make_pair(m.str(3), m.str(2)));
-        break;
-      case REG:
-        reg_taint_gen_func(line, output, "t");
-        break;
-      case WIRE: 
-        wire_taint_gen_func(line, output, "t");
-        break;
-      case TWO_OP:
-        two_op_taint_gen_func(line, output, localVersionMap, "t");      
-        break;
-      case ONE_OP:
-        one_op_taint_gen_func(line, output, localVersionMap, "t");
-        break;
-      case ITE:
-        ite_taint_gen_func(line, output, localVersionMap, "t"); 
-        break;
-      case NONBLOCK:
-        output << "!!! ERROR: function contains blocking !!!" << std::endl;     
-        break;
-      case NONBLOCKCONCAT:
-        output << "!!! ERROR: function contains blocking !!!" << std::endl;
-        break;
-      case CASE:
-        add_case_taints(input, output, line, "t");
-        break;
-      case UNSUPPORT:
-        output << "!!! Unsupported operator in func:" + line << std::endl;
-        break;
-      default:
-        break;
-    }
-  }
-  output << line << std::endl << std::endl;
-
-  std::vector<std::string> localTaints{"x", "r", "c"};
-  //_x taint
-  for (auto funcIn: funcInputs) {
-    for (std::string taintBit: localTaints) {
-      std::unordered_map<std::string, uint32_t> localVersionMap;
-      output << funcBlank + "function " + funcIn.second + funcIn.first + "_"+ taintBit + ";" << std::endl;
-      output << funcBlank + "  input " + funcSlice + funcName + "_" + taintBit + ";" << std::endl;
-      input.seekg(funcBegin);
-      while ( std::getline(input, line) && !std::regex_match(line, m, pEndfunction) ) { // the matched line must contain the input
-        int choice = parse_verilog_line(line);
-        switch (choice) {
-          case INPUT:
-            break;
-          case REG:
-            reg_taint_gen_func(line, output, taintBit);
-            break;
-          case WIRE: 
-            wire_taint_gen_func(line, output, taintBit);
-            break;
-          case TWO_OP:
-            two_op_taint_gen_func(line, output, localVersionMap, taintBit);
-            break;
-          case ONE_OP:
-            one_op_taint_gen_func(line, output, localVersionMap, taintBit);
-            break;
-          case ITE:
-            ite_taint_gen_func(line, output, localVersionMap, taintBit);
-            break;
-          case NONBLOCK:
-            output << "!!! ERROR: function contains blocking !!!" << std::endl;     
-            break;
-          case NONBLOCKCONCAT:
-            output << "!!! ERROR: function contains blocking !!!" << std::endl;        
-            break;
-          case CASE:
-            add_case_taints(input, output, line, taintBit);
-            break;
-          case UNSUPPORT:
-            output << "!!! Unsupported operator in func:" + line << std::endl;
-            break;
-          default:
-            break;
-        }
-      }
-    }
-    output << line << std::endl << std::endl;
   }
 }
 
@@ -873,6 +784,95 @@ void add_func_taints_limited(std::ifstream &input, std::ofstream &output, std::s
 }
 
 
+/* firstLine is the function definition */
+void remove_function_wrapper(std::string firstLine, std::ifstream &input, std::ofstream &output) {
+  std::smatch m;
+  if ( !std::regex_match(firstLine, m, pFunctionDef) )
+    return;
+  std::string blank = m.str(1);
+  std::string funcSlice = m.str(2);
+  std::string funcName = m.str(3);
+
+  // extract the (caseValue, caseAssign) pair from the case
+  std::vector<std::pair<std::string, std::string>> caseAssignPairs;
+  std::vector<std::string> inputSlice;
+  parse_func_statements(caseAssignPairs, inputSlice, input, true);
+  // pop out the last, which is default assignment
+  caseAssignPairs.pop_back();
+
+  // the next line can be wire declarations or function calls
+  std::string line;
+  std::getline(input, line);
+  uint32_t i = 0;
+  while( !std::regex_match(line, m, pFunctionCall) ) {
+    output << line << std::endl;
+    std::getline(input, line);
+    if(++i > 7) {
+      toCout("!! Error in searching function calls");
+      abort();
+    }
+  }
+
+  std::string a,b,s; // used in function.
+  std::string lineForParsing = line;
+  if( !std::regex_match(lineForParsing, m, pFunctionCall) ) {
+    toCout("Error in parsing function call");
+    abort();
+  }
+  std::string result = m.str(2);
+  std::string callFuncName = m.str(3);
+  std::string arguments = m.str(4);
+  std::vector<std::string> argVec;
+  parse_var_list(arguments, argVec);
+  a = argVec[0];
+  b = argVec[1];
+  s = argVec[2];
+ 
+  bool bIsNum = isNum(b);
+  bool aIsNum = isNum(a);
+
+  if(!bIsNum) {
+    // begin to print the new case
+    output << blank + "always @("+a+" or "+b+" or "+s+") begin" << std::endl;
+    output << blank + "  casez ("+s+")" << std::endl;
+    std::string rhs, rhsSlice;
+    for(auto localPair: caseAssignPairs) {
+      split_slice(localPair.second, rhs, rhsSlice);
+      output << blank + "    " + localPair.first + " :" << std::endl;
+      output << blank + "      " + result + " = " + b + rhsSlice + " ;" << std::endl;
+    }
+    output << blank + "    default:" << std::endl;
+    output << blank + "      " + result + " = " + a + " ;" << std::endl;
+    output << blank + "  endcase" << std::endl;
+    output << blank + "end" << std::endl;
+  }
+  else {
+    output << blank + "always @("+a+" or "+s+") begin" << std::endl;
+    output << blank + "  casez ("+s+")" << std::endl;
+    std::string rhs, rhsSlice;
+    for(auto localPair: caseAssignPairs) {
+      split_slice(localPair.second, rhs, rhsSlice);
+      output << blank + "    " + localPair.first + " :" << std::endl;
+      // extract the bits from number
+      std::smatch m;
+      std::regex_search(b, m, pBin);
+      int wholeNum = std::stoi(m.str(2), 0, 2);
+      uint32_t lowIdx = get_begin(rhsSlice);
+      uint32_t highIdx = get_end(rhsSlice);
+      wholeNum = wholeNum >> lowIdx;
+      uint32_t selectedBits = wholeNum & (1<<(highIdx-lowIdx+1)-1);
+      std::string binNum = dec2bin(selectedBits);
+      std::string binWidth = toStr(binNum.length());
+      output << blank + "      " + result + " = " + binWidth + "'b" + binNum + " ;" << std::endl;
+    }
+    output << blank + "    default:" << std::endl;
+    output << blank + "      " + result + " = " + a + " ;" << std::endl;
+    output << blank + "  endcase" << std::endl;
+    output << blank + "end" << std::endl;
+  }
+}
+
+
 // add _t, _x, _r, _c taint for function
 void add_case_taints(std::ifstream &input, std::ofstream &output, std::string firstLine, std::string taintBits) {
   std::smatch m;
@@ -886,7 +886,7 @@ void add_case_taints(std::ifstream &input, std::ofstream &output, std::string fi
   std::string blank = m.str(1);
   std::string postfix = m.str(2);
   std::string condName = m.str(3);
-  uint32_t condWidthNum = varWidth.get_from_var_width(condName, firstLine);
+  uint32_t condWidthNum = get_var_slice_width(condName);
   
   /* read the whole case and get all the RHS */
   std::string line;  
@@ -1006,6 +1006,290 @@ void add_case_taints(std::ifstream &input, std::ofstream &output, std::string fi
 }
 
 
+void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::string alwaysFirstLine) {
+  toCout("Do: add_case_taints_limited");
+  std::smatch m;
+  std::string caseFirstLine;
+  std::getline(input, caseFirstLine);
+  output << caseFirstLine << std::endl;
+  if ( !std::regex_match(caseFirstLine, m, pCase) )
+    return;
+  std::string blank = m.str(1);
+  std::string sAndSlice = m.str(3);
+  std::vector<std::pair<std::string, std::string>> caseAssignPairs;
+  std::vector<std::string> inputSlice;
+  std::string destAndSlice = parse_case_statements(caseAssignPairs, input, true);
+  // print the case statements
+  std::string line;
+  std::getline(input, line);
+  while(line.find("endcase", 0) == std::string::npos ) {
+    output << line << std::endl;
+    std::getline(input, line);    
+  }
+  // print endcase
+  output << line << std::endl;
+  std::getline(input, line);
+  // print end
+  output << line << std::endl;
+  std::string dest, destSlice;
+  std::string a, aSlice;
+  std::string b, bSlice;
+  std::string s, sSlice;
+  split_slice(destAndSlice, dest, destSlice);
+  split_slice(caseAssignPairs[0].second, b, bSlice);
+  split_slice(caseAssignPairs.back().second, a, aSlice);
+  split_slice(sAndSlice, s, sSlice);
+  // declare necessaey variables
+  uint32_t destWidthNum, sWidthNum, aWidthNum, bWidthNum;
+  std::string sWidth, aWidth, bWidth;
+  std::string sVer, aVer, bVer, destVer;
+
+  bool aIsNum = isNum(a);
+  bool bIsNum = isNum(b);
+
+  // assignmen for dest and s variables
+  destWidthNum = get_var_slice_width(destAndSlice);
+  destVer = toStr(find_version_num(dest));  
+  sWidthNum = get_var_slice_width(sAndSlice);
+  sWidth = toStr(sWidthNum);
+  sVer = toStr(find_version_num(s));
+
+  if(!aIsNum && !bIsNum) {
+    aWidthNum = get_var_slice_width(a);
+    bWidthNum = get_var_slice_width(b);
+
+    aWidth = toStr(aWidthNum);
+    bWidth = toStr(bWidthNum);
+
+    aVer = toStr(find_version_num(a));
+    bVer = toStr(find_version_num(b));
+
+    // print _t function
+    output << blank + "always @( "+a+"_t or "+b+"_t or "+s+"_t or "+s+" ) begin" << std::endl;
+    output << blank + "  casez ("+sAndSlice+")" << std::endl;
+    std::string rhs, rhsSlice;
+    caseAssignPairs.pop_back();
+    for(auto localPair: caseAssignPairs) {
+      split_slice(localPair.second, rhs, rhsSlice);
+      output << blank + "    " + localPair.first + " :" << std::endl;
+      output << blank + "      " + dest+"_t"+destSlice+" = " + rhs + "_t" + rhsSlice + " | " + extend("| "+s+"_t"+sSlice, destWidthNum) + ";" << std::endl;
+    }
+    output << blank + "    default :" << std::endl;
+    output << blank + "      " + dest+"_t"+destSlice+" = " + a + "_t" + aSlice + " | " + extend("| "+s+"_t"+sSlice, destWidthNum) + ";" << std::endl;
+    output << blank + "  endcase" << std::endl;
+    output << blank + "end" << std::endl << std::endl;
+    //auto destBoundPair = varWidth.get_idx_pair(dest, line);
+    //ground(dest+"_t", destBoundPair, destSlice, blank, output);
+
+    // print _r function
+    output << blank + "reg [" + sWidth + "-1:0] " + s + "_r" + sVer + " ;" << std::endl;
+    output << blank + "reg [" + sWidth + "-1:0] " + s + "_x" + sVer + " ;" << std::endl;
+    output << blank + "reg [" + sWidth + "-1:0] " + s + "_c" + sVer + " ;" << std::endl;
+
+    output << blank + "reg [" + aWidth + "-1:0] " + a + "_r" + aVer + " ;" << std::endl;
+    output << blank + "reg [" + aWidth + "-1:0] " + a + "_x" + aVer + " ;" << std::endl;
+    output << blank + "reg [" + aWidth + "-1:0] " + a + "_c" + aVer + " ;" << std::endl;
+
+    output << blank + "reg [" + bWidth + "-1:0] " + b + "_r" + bVer + " ;" << std::endl;
+    output << blank + "reg [" + bWidth + "-1:0] " + b + "_x" + bVer + " ;" << std::endl;
+    output << blank + "reg [" + bWidth + "-1:0] " + b + "_c" + bVer + " ;" << std::endl;
+
+    output << blank + "always @( "+dest+"_r"+destSlice+" or "+s+" ) begin" << std::endl;
+    output << blank + "  "+s+"_r"+sVer+sSlice+" = " + extend("| "+dest+"_r"+destSlice, sWidthNum) + " ;" << std::endl;
+    output << blank + "  "+b+"_r"+bVer+" = 0 ;" << std::endl;
+    output << blank + "  "+a+"_r"+aVer+" = 0 ;" << std::endl;
+    output << blank + "  casez ("+sAndSlice+")" << std::endl;
+    for(auto localPair: caseAssignPairs) {
+      split_slice(localPair.second, rhs, rhsSlice);
+      output << blank + "    " + localPair.first + " :" << std::endl;
+      output << blank + "      " + rhs + "_r" + bVer + rhsSlice + " = " + dest + "_r" + destSlice + " ;" << std::endl;
+    }
+    output << blank + "    default :" << std::endl;
+    output << blank + "      " + a + "_r" + aVer + aSlice + " = " + dest + "_r" + destSlice + " ;" << std::endl;
+    output << blank + "  endcase" << std::endl;
+    output << blank + "end" << std::endl;  
+
+    // print _x function
+    output << blank + "always @( "+dest+"_x"+destSlice+" or "+s+" ) begin" << std::endl;  
+    output << blank + "  "+s+"_x"+sVer+sSlice+" = " + extend("| "+dest+"_x"+destSlice, sWidthNum) + " ;" << std::endl;
+    output << blank + "  "+b+"_x"+bVer+" = 0 ;" << std::endl;
+    output << blank + "  "+a+"_x"+aVer+" = 0 ;" << std::endl;
+    output << blank + "  casez ("+sAndSlice+")" << std::endl;
+    for(auto localPair: caseAssignPairs) {
+      split_slice(localPair.second, rhs, rhsSlice);
+      output << blank + "    " + localPair.first + " :" << std::endl;
+      output << blank + "      " + rhs + "_x" + bVer + rhsSlice + " = " + dest + "_x" + destSlice + " ;" << std::endl;
+    }
+    output << blank + "    default :" << std::endl;
+    output << blank + "      " + a + "_x" + aVer + aSlice + " = " + dest + "_x" + destSlice + " ;" << std::endl;
+    output << blank + "  endcase" << std::endl;
+    output << blank + "end" << std::endl;
+
+    // print _c function
+    output << blank + "always @( "+dest+"_c"+destSlice+" or "+s+" ) begin" << std::endl;  
+    output << blank + "  "+s+"_c"+sVer+sSlice+" = " + extend("1'b1", sWidthNum) + " ;" << std::endl;
+    output << blank + "  "+b+"_c"+bVer+" = 0 ;" << std::endl;
+    output << blank + "  "+a+"_c"+aVer+" = 0 ;" << std::endl;
+    output << blank + "  casez ("+sAndSlice+")" << std::endl;
+    for(auto localPair: caseAssignPairs) {
+      split_slice(localPair.second, rhs, rhsSlice);
+      output << blank + "    " + localPair.first + " :" << std::endl;
+      output << blank + "      " + rhs + "_c" + bVer + rhsSlice + " = " + dest + "_c" + destSlice + " ;" << std::endl;
+    }
+    output << blank + "    default :" << std::endl;
+    output << blank + "      " + a + "_c" + aVer + aSlice + " = " + dest + "_c" + destSlice + " ;" << std::endl;
+    output << blank + "  endcase" << std::endl;
+    output << blank + "end" << std::endl;
+
+    // ground other wires of s
+    auto sBoundPair = varWidth.get_idx_pair(s, alwaysFirstLine);
+    ground_wires(s+"_r"+sVer, sBoundPair, sSlice, blank, output);
+    ground_wires(s+"_x"+sVer, sBoundPair, sSlice, blank, output);
+    ground_wires(s+"_c"+sVer, sBoundPair, sSlice, blank, output);
+  } // end of !aIsNum && !bIsNum
+  else if(!aIsNum && bIsNum) {
+    aWidthNum = get_var_slice_width(a);
+    aWidth = toStr(aWidthNum);
+    aVer = toStr(find_version_num(a));
+
+    // print _t function
+    output << blank + "always @( "+a+"_t or "+s+"_t or "+s+" ) begin" << std::endl;
+    output << blank + "  casez ("+sAndSlice+")" << std::endl;
+    std::string rhs, rhsSlice;
+    // only the last one matters
+    auto lastPair = caseAssignPairs.back();
+    caseAssignPairs.pop_back();
+    for(auto localPair: caseAssignPairs) {
+      output << blank + "    " + localPair.first + " :" << std::endl;
+      output << blank + "      " + dest+"_t"+destSlice+" = " + extend("| "+s+"_t"+sSlice, destWidthNum) + " ;" << std::endl;
+    }
+    output << blank + "    default:" << std::endl;
+    output << blank + "      " +  dest+"_t"+destSlice+" = " + a + "_t " + aSlice + " | " + extend("| "+s+"_t"+sSlice, destWidthNum) + " ;" << std::endl;
+    output << blank + "  endcase" << std::endl;
+    output << blank + "end" << std::endl << std::endl;
+    //auto destBoundPair = varWidth.get_idx_pair(dest, line);
+    //ground(dest+"_t", destBoundPair, destSlice, blank, output);
+
+    // print _r function
+    output << blank + "reg [" + sWidth + "-1:0] " + s + "r" + sVer + " ;" << std::endl;
+    output << blank + "reg [" + sWidth + "-1:0] " + s + "x" + sVer + " ;" << std::endl;
+    output << blank + "reg [" + sWidth + "-1:0] " + s + "c" + sVer + " ;" << std::endl;
+
+    output << blank + "reg [" + aWidth + "-1:0] " + a + "r" + aVer + " ;" << std::endl;
+    output << blank + "reg [" + aWidth + "-1:0] " + a + "x" + aVer + " ;" << std::endl;
+    output << blank + "reg [" + aWidth + "-1:0] " + a + "c" + aVer + " ;" << std::endl;
+
+    output << blank + "always @( "+dest+"_r"+destSlice+" or "+s+" ) begin" << std::endl;
+    output << blank + "  "+s+"_r"+sVer+sSlice+" = " + extend("| "+dest+"_r"+destSlice, sWidthNum) + " ;" << std::endl;
+    output << blank + "  "+a+"_r"+aVer+" = 0 ;" << std::endl;
+    output << blank + "  if (" + sAndSlice + " == 0 )" << std::endl;
+    output << blank + "    "+a+"_r"+aVer+" = "+dest+"_r"+destSlice+" ;" << std::endl;
+    output << blank + "end" << std::endl;  
+
+    // print _x function
+    output << blank + "always @( "+dest+"_x"+destSlice+" or "+s+" ) begin" << std::endl;  
+    output << blank + "  "+s+"_x"+sVer+sSlice+" = " + extend("| "+dest+"_x"+destSlice, sWidthNum) + " ;" << std::endl;
+    output << blank + "  "+a+"_x"+aVer+" = 0 ;" << std::endl;
+    output << blank + "  if (" + sAndSlice + " == 0 )" << std::endl;
+    output << blank + "    "+a+"_x"+aVer+" = "+dest+"_x"+destSlice+" ;" << std::endl;
+    output << blank + "end" << std::endl;
+
+    // print _c function
+    output << blank + "always @( "+dest+"_c"+destSlice+" or "+s+" ) begin" << std::endl;  
+    output << blank + "  "+s+"_c"+sVer+sSlice+" = " + extend("1'b1", sWidthNum) + " ;" << std::endl;
+    output << blank + "  "+a+"_c"+aVer+" = 0 ;" << std::endl;
+    output << blank + "  if (" + sAndSlice + " == 0 )" << std::endl;
+    output << blank + "    "+a+"_c"+aVer+" = "+dest+"_c"+destSlice+" ;" << std::endl;
+    output << blank + "end" << std::endl;
+
+    // ground other wires of s
+    auto sBoundPair = varWidth.get_idx_pair(s, alwaysFirstLine);
+    ground_wires(s+"_r"+sVer, sBoundPair, sSlice, blank, output);
+    ground_wires(s+"_x"+sVer, sBoundPair, sSlice, blank, output);
+    ground_wires(s+"_c"+sVer, sBoundPair, sSlice, blank, output);
+  } // end of !aIsNum && bIsNum
+  else if(aIsNum && !bIsNum) {
+    bWidthNum = get_var_slice_width(b);
+    bWidth = toStr(bWidthNum);
+    bVer = toStr(find_version_num(b));
+
+    // print _t function
+    output << blank + "always @( "+b+"_t or "+s+"_t or "+s+" ) begin" << std::endl;
+    output << blank + "  casez ("+sAndSlice+")" << std::endl;
+    std::string rhs, rhsSlice;
+    caseAssignPairs.pop_back();
+    for(auto localPair: caseAssignPairs) {
+      split_slice(localPair.second, rhs, rhsSlice);
+      output << blank + "    " + localPair.first + " :" << std::endl;
+      output << blank + "      " + dest+"_t"+destSlice+" = " + rhs + "_t " + rhsSlice + " | " + extend("| "+s+"_t"+sSlice, destWidthNum) + " ;" << std::endl;
+    }
+    output << blank + "    default:" << std::endl;
+    output << blank + "      "+dest+"_t"+destSlice+" = "+ extend("| "+s+"_t"+sSlice, destWidthNum) + " ;" << std::endl;
+    output << blank + "  endcase" << std::endl;
+    output << blank + "end" << std::endl;
+    //auto destBoundPair = varWidth.get_idx_pair(dest, line);
+    //ground(dest+"_t", destBoundPair, destSlice, blank, output);
+
+    // print _r function
+    output << blank + "reg [" + sWidth + "-1:0] " + s + "r" + sVer + " ;" << std::endl;
+    output << blank + "reg [" + sWidth + "-1:0] " + s + "x" + sVer + " ;" << std::endl;
+    output << blank + "reg [" + sWidth + "-1:0] " + s + "c" + sVer + " ;" << std::endl;
+
+    output << blank + "reg [" + bWidth + "-1:0] " + b + "r" + bVer + " ;" << std::endl;
+    output << blank + "reg [" + bWidth + "-1:0] " + b + "x" + bVer + " ;" << std::endl;
+    output << blank + "reg [" + bWidth + "-1:0] " + b + "c" + bVer + " ;" << std::endl;
+
+    output << blank + "always @( "+dest+"_r"+destSlice+" or "+s+" ) begin" << std::endl;
+    output << blank + "  "+s+"_r"+sVer+sSlice+" = " + extend("| "+dest+"_r"+destSlice, sWidthNum) + " ;" << std::endl;
+    output << blank + "  "+b+"_r"+bVer+" = 0 ;" << std::endl;
+    output << blank + "  casez ("+sAndSlice+")" << std::endl;
+    for(auto localPair: caseAssignPairs) {
+      split_slice(localPair.second, rhs, rhsSlice);
+      output << blank + "    " + localPair.first + " :" << std::endl;
+      output << blank + "      " + rhs + "_r" + bVer + rhsSlice + " = "+dest+"_r"+destSlice+" ;" << std::endl;
+    }
+    output << blank + "  endcase" << std::endl;
+    output << blank + "end" << std::endl;  
+
+    // print _x function
+    output << blank + "always @( "+dest+"_x"+destSlice+" or "+s+" ) begin" << std::endl;  
+    output << blank + "  "+s+"_x"+sVer+sSlice+" = " + extend("| "+dest+"_x"+destSlice, sWidthNum) + " ;" << std::endl;
+    output << blank + "  "+b+"_x"+bVer+" = 0 ;" << std::endl;
+    output << blank + "  casez ("+sAndSlice+")" << std::endl;
+    for(auto localPair: caseAssignPairs) {
+      split_slice(localPair.second, rhs, rhsSlice);
+      output << blank + "    " + localPair.first + " :" << std::endl;
+      output << blank + "      " + rhs + "_x" + bVer + rhsSlice + " = "+dest+"_x"+destSlice+" ;" << std::endl;
+    }
+    output << blank + "  endcase" << std::endl;
+    output << blank + "end" << std::endl;
+
+    // print _c function
+    output << blank + "always @( "+dest+"_c"+destSlice+" or "+s+" ) begin" << std::endl;  
+    output << blank + "  "+s+"_c"+sVer+sSlice+" = " + extend("1'b1", sWidthNum) + " ;" << std::endl;
+    output << blank + "  "+b+"_c"+bVer+" = 0 ;" << std::endl;
+    output << blank + "  casez ("+sAndSlice+")" << std::endl;
+    for(auto localPair: caseAssignPairs) {
+      split_slice(localPair.second, rhs, rhsSlice);
+      output << blank + "    " + localPair.first + " :" << std::endl;
+      output << blank + "      " + rhs + "_c" + bVer + rhsSlice + " = "+dest+"_c"+destSlice+" ;" << std::endl;
+    }
+    output << blank + "  endcase" << std::endl;
+    output << blank + "end" << std::endl;
+
+    // ground other wires of s
+    auto sBoundPair = varWidth.get_idx_pair(s, alwaysFirstLine);
+    ground_wires(s+"_r"+sVer, sBoundPair, sSlice, blank, output);
+    ground_wires(s+"_x"+sVer, sBoundPair, sSlice, blank, output);
+    ground_wires(s+"_c"+sVer, sBoundPair, sSlice, blank, output);
+  } // end of aIsNum && !bIsNum
+  else {
+    toCout("!! Error: both inputs of case statements are numbers!");
+    abort();
+  }
+}
+
+
 /* first print this func call, then print all the taint calls */
 void add_func_taints_call(std::string line, std::ofstream &output) {
   std::smatch m;
@@ -1091,7 +1375,7 @@ void add_func_taints_call_limited(std::string line, std::ofstream &output) {
 
 /* if a basic operator contains concatenated input, 
  * declare a new variable representing the concatenated input*/
-bool extract_concat(std::string line, std::ofstream &output) {
+bool extract_concat(std::string line, std::ofstream &output, std::string &returnedStmt, bool isFuncCall) {
   std::smatch m;
   int blankNo = line.find('a', 0);  
   std::regex pAssign("assign ");
@@ -1165,18 +1449,24 @@ bool extract_concat(std::string line, std::ofstream &output) {
         abort();
       }
       if(state == 1) {// just find openBrace
-        output << part;
+        if(!isFuncCall)
+          output << part;
+        else 
+          returnedStmt += part;
       }
       else { // just find closeBrace
         auto newVar = newVarQueue.front();
-        output << newVar;
+        if(!isFuncCall)
+          output << newVar;
+        else
+          returnedStmt += newVar;
         newVarQueue.pop();
       }
     }
     output << std::endl;
     return false;
   } // end of if
-  return true;
+  return true; // true means no concatenation
 }
 
 
@@ -1220,6 +1510,10 @@ int main(int argc, char* argv[]) {
   if (stage <= 0) {
     std::cout << "Begin cleaning!" << std::endl; //0
     clean_file(fileName);
+  }
+  if (stage <= 1) {
+    std::cout << "Remove functions!" << std::endl;
+    remove_functions(fileName);
   }
   if (stage <= 1) {  
     std::cout << "Begin read in clkrst!" << std::endl; //1

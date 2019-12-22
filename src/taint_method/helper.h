@@ -72,11 +72,15 @@ std::string get_recent_rst();
 
 bool isRFlag(std::string var);
 
-void parse_func_statements(std::vector<std::pair<std::string, std::string>> &caseAssignPairs, std::vector<std::string> &inputWidth, std::ifstream &input);
+void parse_func_statements(std::vector<std::pair<std::string, std::string>> &caseAssignPairs, std::vector<std::string> &inputWidth, std::ifstream &input, bool goToEnd=false);
+
+std::string parse_case_statements(std::vector<std::pair<std::string, std::string>> &caseAssignPairs, std::ifstream &input, bool returnBegin=false);
 
 std::string pairVec2taintString( std::vector<std::pair<std::string, std::string>> &pairVec, std::string notIncluded, std::string taint, std::ofstream &output );
 
 std::string max_num(uint32_t width);
 
 std::string max_num(std::string widthStr);
+
+std::string dec2bin(uint32_t inNum);
 #endif

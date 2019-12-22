@@ -59,9 +59,13 @@ void add_func_taints_call_limited(std::string line, std::ofstream &output);
 
 void merge_taints(std::string fileName);
 
-bool extract_concat(std::string line, std::ofstream &output);
+bool extract_concat(std::string line, std::ofstream &output, std::string &returnedStmt, bool isFuncCall=false);
 
 void gen_reg_output(std::string fileName);
 
 void gen_wire_output(std::string fileName);
+
+void remove_function_wrapper(std::string firstLine, std::ifstream &input, std::ofstream &output);
+
+void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::string caseFirstLine);
 #endif

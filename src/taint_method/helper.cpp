@@ -568,8 +568,9 @@ bool isRFlag(std::string var) {
 
 /* ASSUME: the first line is either case or function
  * caseAssignPairs are the pairs of (caseValue, case assignment),
- * the input is recovered at the end */
-void parse_func_statements(std::vector<std::pair<std::string, std::string>> &caseAssignPairs, std::vector<std::string> &inputWidth, std::ifstream &input) {
+ * the input is recovered at the end 
+ * If goToEnd, input does not seek beginning */
+void parse_func_statements(std::vector<std::pair<std::string, std::string>> &caseAssignPairs, std::vector<std::string> &inputWidth, std::ifstream &input, bool goToEnd) {
   auto funcBegin = input.tellg();
   std::string line;
   std::smatch m;
@@ -580,10 +581,27 @@ void parse_func_statements(std::vector<std::pair<std::string, std::string>> &cas
     inputWidth.push_back(m.str(2));
   }
   std::getline(input, line);
-  assert( std::regex_search(line, m, pCase) );  
+  assert( std::regex_search(line, m, pCase) );
+  parse_case_statements(caseAssignPairs, input);
+  if( !goToEnd )
+    input.seekg(funcBegin);
+  else {
+    std::getline(input, line);
+    assert(line.find("endfunction", 0) != std::string::npos);
+  }
+}
+
+
+// returns the returnVar in case
+std::string parse_case_statements(std::vector<std::pair<std::string, std::string>> &caseAssignPairs, std::ifstream &input, bool returnBegin) {
+  auto caseBegin = input.tellg();  
+  std::string line;
+  std::smatch m;
+
   bool readSwitchValue = true;
   std::string pairValue;
   std::string pairAssign;
+  std::string returnVar;
   while( std::getline(input, line) && !std::regex_match(line, m, pDefault) ) {
     if( readSwitchValue ) {
       readSwitchValue = false;
@@ -609,8 +627,12 @@ void parse_func_statements(std::vector<std::pair<std::string, std::string>> &cas
     std::cout << "!! Error in parsing case !!" << std::endl;
   }
   pairAssign = m.str(3);
+  returnVar = m.str(2);
   caseAssignPairs.emplace_back(pairValue, pairAssign);
-  input.seekg(funcBegin);
+  std::getline(input, line);
+  assert(line.find("endcase", 0) != std::string::npos);
+  if(returnBegin) input.seekg(caseBegin);
+  return returnVar;
 }
 
 
@@ -640,4 +662,17 @@ std::string max_num(uint32_t width) {
 std::string max_num(std::string widthStr) {
   uint32_t width = std::stoi(widthStr);
   return max_num(width);
+}
+
+
+std::string dec2bin(uint32_t inNum) {
+  std::string res="";
+  while(inNum > 0) {
+    uint32_t bit = inNum % 2;
+    res = std::to_string(bit) + res;
+    inNum = inNum / 2;
+  }
+  if (res.empty())
+    res = "0";
+  return res;
 }

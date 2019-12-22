@@ -67,6 +67,7 @@ extern std::regex pIte;
 /* do not add anything */
 extern std::regex pAlwaysClk;
 extern std::regex pAlwaysClkRst;
+extern std::regex pAlwaysComb;
 extern std::regex pEnd;   
 extern std::regex pEndmodule; 
 /* non-blocking assignment */
