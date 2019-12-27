@@ -229,7 +229,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
     if(!isReduceOp)
       output << blank << "assign " + dest + "_t" + destSlice + " = " + op1 + "_t" + op1Slice + " | " + op2 + "_t" + op2Slice + " ;" << std::endl;
     else
-      output << blank << "assign " + dest + "_t" + destSlice + " = (| " + op1 + "_t" + op1Slice + ") | (|" + op2 + "_t" + op2Slice + ") ;" << std::endl;
+      output << blank << "assign " + dest + "_t" + destSlice + " = (| " + op1 + "_t" + op1Slice + " ) | (|" + op2 + "_t" + op2Slice + " ) ;" << std::endl;
     // !!TODO: re-think the following part 
     if ( isOutput(dest) ) {
       output << blank << "assign " + op1 + "_c" + sndVer + op1Slice + " = 0 ;" << std::endl;
@@ -752,7 +752,7 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
     output << blank << "assign " + op2 + "_x" + fthVer + op2Slice + " = " + dest + "_x" + destSlice + " ;" << std::endl;
 
     output << blank << "assign " + dest + "_t" + destSlice + " = " + cond + " ? " + extend(cond+"_t", localWidthNum) + " : ( " + extend(cond+"_t", localWidthNum) + " | " + op2 + "_t" + op2Slice + " );" << std::endl;  
-    output << blank << "assign " + cond + "_r" + condVer + "_tmp = " + dest + "_r" + destSlice + " | ( " + extend(cond, localWidthNum) + " & " + op2 + "_t" + op2Slice + " );" << std::endl;
+    output << blank << "assign " + cond + "_r" + condVer + "_tmp = " + dest + "_r" + destSlice + " | ( " + extend("!"+cond, localWidthNum) + " & " + op2 + "_t" + op2Slice + " );" << std::endl;
 
     ground_wires(op2+"_c"+fthVer, op2BoundPair, op2Slice, blank, output);
     ground_wires(op2+"_r"+fthVer, op2BoundPair, op2Slice, blank, output);

@@ -42,3 +42,9 @@ gb1:
 
 csimple:
 	./a.out /workspace/research/ILA/autoGenILA/naiveEg/case_simple/case.v 0
+
+sha0:
+	./a.out /workspace/research/ILA/autoGenILA/SHA/SYN/sha_simp.v 0
+
+sha1:
+	./a.out /workspace/research/ILA/autoGenILA/SHA/SYN/sha_simp.v 1

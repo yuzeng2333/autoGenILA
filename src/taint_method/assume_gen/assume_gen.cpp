@@ -98,6 +98,8 @@ int main(int argc, char* argv[]) {
     }
   }
 
+  // 9th, timing or signal constraints/dependencies.
+
   /* begin generate property files, one file for each instruction 
    * First, files for inOutPair */
   uint32_t instrIdx = 0;
