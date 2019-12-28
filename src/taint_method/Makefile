@@ -48,3 +48,6 @@ sha0:
 
 sha1:
 	./a.out /workspace/research/ILA/autoGenILA/SHA/SYN/sha_simp.v 1
+
+fake:
+	./a.out /workspace/research/ILA/autoGenILA/naiveEg/fake_aa/fake_aa_yosys.v 0

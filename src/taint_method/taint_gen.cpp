@@ -94,9 +94,10 @@ std::regex pSrcDestBothConcat(to_re("^(\\s*)assign \\{ ((?:NAME(?:\\s)?, )+NAME)
 /* pVarName also exists in to_re(), and parse_var_list() */
 std::regex pVarName("([\aa-zA-Z0-9_\\.\\$\\\\'\\[\\]]+)(?:\\s*\\[\\d+(\\:\\d+)?\\])?");
 std::regex pVarNameGroup("([\aa-zA-Z0-9_\\.\\$\\\\'\\[\\]]+)(?:(\\s*)(\\[\\d+(\\:\\d+)?\\]))?");
-std::regex pNum("^(\\d+)'(h|d|b)[\\dabcdef\\?]+$");
+std::regex pNum("^(\\d+)'(h|d|b)[\\dabcdefx\\?]+$");
 std::regex pNumExist("(\\d+)'(h|d|b)[\\dabcdef\\?]+");
 std::regex pBin("(\\d+)'b([01]+)");
+std::regex pHex("(\\d+)'h([01]+)");
 
 
 /* Global data */
@@ -869,7 +870,10 @@ void remove_function_wrapper(std::string firstLine, std::ifstream &input, std::o
       output << blank + "    " + localPair.first + " :" << std::endl;
       // extract the bits from number
       std::smatch m;
-      std::regex_search(b, m, pBin);
+      if(!std::regex_search(b, m, pBin)) {
+        toCout("Error: the number for case input is not binary!");
+        abort();
+      }
       int wholeNum = std::stoi(m.str(2), 0, 2);
       uint32_t lowIdx = get_begin(rhsSlice);
       uint32_t highIdx = get_end(rhsSlice);
