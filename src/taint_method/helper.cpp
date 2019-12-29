@@ -676,3 +676,11 @@ std::string dec2bin(uint32_t inNum) {
     res = "0";
   return res;
 }
+
+
+// input is a string of binary-format number
+std::string get_bits(std::string inNum, uint32_t highIdx, uint32_t lowIdx) {
+  // input number must be binary
+  uint32_t len = inNum.length();
+  return inNum.substr(len-highIdx-1, highIdx-lowIdx+1);
+}

@@ -83,4 +83,6 @@ std::string max_num(uint32_t width);
 std::string max_num(std::string widthStr);
 
 std::string dec2bin(uint32_t inNum);
+
+std::string get_bits(std::string inNum, uint32_t highIdx, uint32_t lowIdx);
 #endif

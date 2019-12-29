@@ -874,12 +874,13 @@ void remove_function_wrapper(std::string firstLine, std::ifstream &input, std::o
         toCout("Error: the number for case input is not binary!");
         abort();
       }
-      int wholeNum = std::stoi(m.str(2), 0, 2);
+      //int wholeNum = std::stoi(m.str(2), 0, 2);
       uint32_t lowIdx = get_begin(rhsSlice);
       uint32_t highIdx = get_end(rhsSlice);
-      wholeNum = wholeNum >> lowIdx;
-      uint32_t selectedBits = wholeNum & ((1<<(highIdx-lowIdx+1))-1);
-      std::string binNum = dec2bin(selectedBits);
+      //wholeNum = wholeNum >> lowIdx;
+      //uint32_t selectedBits = wholeNum & ((1<<(highIdx-lowIdx+1))-1);
+      //std::string binNum = dec2bin(selectedBits);
+      std::string binNum = get_bits(m.str(2), highIdx, lowIdx);
       std::string binWidth = toStr(binNum.length());
       //std::string rhsNum = (selectedBits == 0) ? "0" : (binWidth + "'b" + binNum);
       std::string rhsNum = binWidth + "'b" + binNum;
