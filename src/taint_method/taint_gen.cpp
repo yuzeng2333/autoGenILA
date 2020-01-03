@@ -9,6 +9,7 @@
 #include <assert.h>
 #include <unordered_map>
 #include <set>
+#include <map>
 #include <bitset>
 #include "taint_gen.h"
 
@@ -76,6 +77,10 @@ std::regex pNonblockConcat    (to_re("^(\\s*)(NAME) <= \\{(.+)\\}(\\s*)?;$"));
 std::regex pFunctionDef   (to_re("^(\\s*)function (\\[\\d+\\:0\\] )?(NAME)(\\s*)?;$"));
 std::regex pEndfunction   (to_re("^(\\s*)endfunction$"));
 std::regex pFunctionCall  (to_re("^(\\s*)assign (NAME) = (NAME)\\((.*)\\)(\\s*)?;$"));
+/* module instantiation */
+std::regex pModuleBegin   (to_re("^(\\s*)(NAME) (NAME) \\($"));
+std::regex pModulePort    (to_re("^(\\s*)\\.(NAME)\\((.+)\\),?$"));
+std::regex pModuleEnd     (to_re("^(\\s*)\\);$"));
 /* control keywords */
 // case
 std::regex pCase      (to_re("^(\\s*)case(\\S)? \\((NAME)\\)$"));
@@ -104,13 +109,16 @@ std::regex pHex("(\\d+)'h([01]+)");
 std::string moduleName;
 std::vector<std::string> moduleInputs;
 std::vector<std::string> moduleOutputs;
+std::vector<std::string> extendInputs;
+std::vector<std::string> extendOutputs;
+std::vector<std::string> flagOutputs;
 std::vector<std::string> moduleRegs;
 std::set<std::string> moduleWires;
 std::string clockName;
 std::string resetName;
 std::vector<std::string> rTaints;
-std::unordered_map<std::string, uint32_t> nextVersion;
 std::set<std::string> g_wire2reg;
+std::unordered_map<std::string, uint32_t> nextVersion;
 std::unordered_map<std::string, std::string> new_next;
 std::unordered_map<std::string, std::string> update_reg;
 VarWidth varWidth;
@@ -122,8 +130,37 @@ bool did_clean_file = false;
 std::string g_recentClk;
 std::string g_recentRst;
 bool g_recentRst_positive = true;
-//std::vector<std::string> g_clkGroup;
 std::set<std::string> g_rstGroup;
+bool isTop = false;
+
+/* clean all the global data */
+void clean_global_data() {
+  moduleName.clear();
+  moduleInputs.clear();
+  moduleOutputs.clear();
+  extendInputs.clear();
+  extendOutputs.clear();
+  flagOutputs.clear();
+  moduleRegs.clear();
+  moduleWires.clear();
+  clockName.clear();
+  resetName.clear();
+  rTaints.clear();
+  g_wire2reg.clear();
+  nextVersion.clear();
+  new_next.clear();
+  update_reg.clear();
+  varWidth.clear();
+  funcVarWidth.clear();
+  NEW_VAR = 0;
+  NEW_FANGYUAN = 0;
+  USELESS_VAR = 0;
+  did_clean_file = false;
+  g_recentClk.clear();
+  g_recentRst.clear();
+  g_recentRst_positive = true;
+  g_rstGroup.clear();
+}
 
 
 /*remove comments
@@ -303,8 +340,11 @@ void add_line_taints(std::string line, std::ofstream &output, std::ifstream &inp
     printedLine.replace(pos, 4, "logic");
   }
   std::smatch m;
+  // Do not print lines matching these patterns
+  // because they are treated separately
   if ( !std::regex_match(line, m, pModule) 
-      && !std::regex_match(line, m, pEndmodule) )
+      && !std::regex_match(line, m, pEndmodule)
+      && !std::regex_match(line, m, pModuleBegin))
     output << printedLine << std::endl;
 
   switch( choice ) {
@@ -381,12 +421,6 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
     return INPUT;
   }
   else if (std::regex_match(line, m, pOutput)) {
-    std::string var = m.str(3);
-    if(isOutput(var)) {
-      std::cout << "!! Duplicate output find: " + line << std::endl;
-    }
-    else 
-      moduleOutputs.push_back(var);
     return OUTPUT;
   }
   else if (std::regex_match(line, m, pReg)
@@ -469,6 +503,9 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   else if( std::regex_match(line, m, pEndfunction) ) {
     return FUNCEND;
   }
+  else if( std::regex_match(line, m, pModuleBegin) ) {
+    return MODULEBEGIN;
+  }
   else {
     if(!ignoreWrongOp) {
       std::cout << "!! Unsupported operator:" + line << std::endl;
@@ -501,7 +538,7 @@ void read_in_clkrst(std::string fileName) {
 }
 
 
-void add_file_taints(std::string fileName) {
+void add_file_taints(std::string fileName, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap, std::map<std::string, std::vector<std::string>> &moduleRFlagsMap) {
   long long int lineNo = 0;
   std::ifstream input(fileName);
   std::ofstream output(fileName + ".tainted");
@@ -510,10 +547,6 @@ void add_file_taints(std::string fileName) {
   // Reserve first line for module declaration
   while( std::getline(input, line) ) {
     lineNo++;
-    //if(lineN0)
-    //if ( !std::regex_match(line, match, pModule) 
-    //    && !std::regex_match(line, match, pEndmodule) )
-    //  output << line << std::endl;
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       add_case_taints_limited(input, output, line);
     }
@@ -523,6 +556,9 @@ void add_file_taints(std::string fileName) {
       //add_func_taints_call_limited(line, output);
       toCout("!! Error: function found!");
       abort();
+    }
+    else if ( std::regex_match(line, match, pModuleBegin) ) {
+      extend_module_instantiation(input, output, line, moduleInputsMap, moduleOutputsMap);
     }
     else
       add_line_taints(line, output, input);  
@@ -544,24 +580,15 @@ void merge_taints(std::string fileName) {
   std::vector<std::string> appendix{"_c", "_x"};
   for (std::string app : appendix) {  
     for ( auto it = nextVersion.begin(); it != nextVersion.end(); ++it ) {
-      if ( isInput(it->first) || isNum(it->first) ) continue;
-      if ( isReg(it->first) && app == "_x" )
-        output << "  assign " + it->first + app + " = | (( ";
-      else
+      if ( isNum(it->first) ) continue;
         output << "  assign " + it->first + app + " = ( ";
-
       for (int i = 0; i < it->second - 1; i++)
         output << it->first + app + std::to_string(i) + " ) | ( ";
-
-      if ( isReg(it->first) && app == "_x")
-        output << it->first + app + std::to_string(it->second - 1) + " ));" << std::endl;
-      else
-        output << it->first + app + std::to_string(it->second - 1) + " );" << std::endl;
+      output << it->first + app + std::to_string(it->second - 1) + " );" << std::endl;
     }
   }
 
   for ( auto it = nextVersion.begin(); it != nextVersion.end(); ++it ) {
-    if ( isInput(it->first) ) continue;    
     output << "  assign " + it->first + "_r = ( ";
     for (int i = 0; i < it->second - 1; i++) {
       output << it->first + "_x" + std::to_string(i) + " & ";
@@ -623,7 +650,7 @@ void merge_taints(std::string fileName) {
 }
 
 
-void add_module_name(std::string fileName) {
+void add_module_name(std::string fileName, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap, std::map<std::string, std::vector<std::string>> &moduleRFlagsMap, bool isTopIn) {
   std::ifstream in(fileName);
   std::ofstream out(fileName + ".final");
   std::string line;
@@ -632,12 +659,28 @@ void add_module_name(std::string fileName) {
   for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) {
     out << *it + " , ";
   }
-  for (auto it = moduleOutputs.begin(); it != moduleOutputs.end() - 1; ++it) {
+  for (auto it = extendInputs.begin(); it != extendInputs.end(); ++it) {
     out << *it + " , ";
   }
-  out << moduleOutputs.back() + " );" << std::endl;
+  for (auto it = moduleOutputs.begin(); it != moduleOutputs.end(); ++it) {
+    out << *it + " , ";
+  }
+  for (auto it = flagOutputs.begin(); it != flagOutputs.end(); ++it) {
+    out << *it + " , ";
+  }
+  for (auto it = extendOutputs.begin(); it != extendOutputs.end() - 1; ++it) {
+    out << *it + " , ";
+  }
+  out << extendOutputs.back() + " );" << std::endl;
   while( std::getline(in, line) ) {
     out << line << std::endl;
+  }
+  if(!isTopIn) {
+    moduleInputsMap.emplace(moduleName, moduleInputs);
+    moduleOutputsMap.emplace(moduleName, moduleOutputs);
+    moduleRFlagsMap.emplace(moduleName, flagOutputs);
+    //moduleInputsMap[moduleName].insert( moduleInputsMap[moduleName].end(), extendInputs.begin(), extendInputs.end() );
+    //moduleOutputsMap[moduleName].insert( moduleOutputsMap[moduleName].end(), extendOutputs.begin(), extendOutputs.end() );
   }
   in.close();
   out.close();
@@ -1394,6 +1437,131 @@ void add_func_taints_call_limited(std::string line, std::ofstream &output) {
 }
 
 
+void extend_module_instantiation(std::ifstream &input, std::ofstream &output, std::string moduleFirstLine, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap) {
+  std::smatch m;
+  if(!std::regex_match(moduleFirstLine, m, pModuleBegin)) {
+    toCout("Error in matching module definition!");
+    abort();
+  }
+  std::string moduleName = m.str(2);
+  std::string instanceName = m.str(3);
+  if( moduleInputsMap.find(moduleName) == moduleInputsMap.end() ) {
+    toCout("Error: IO ports of sub-modules not found!");
+    abort();
+  }
+  std::string line;
+  std::getline(input, line);
+  // store the module port and their connected signals in the instantiation
+  std::unordered_map<std::string, std::string> port2SignalMap;
+  while(!std::regex_match(line, m, pModuleEnd)) {
+    if(!std::regex_match(line, m, pModulePort)) {
+      toCout("Error in matching module ports");
+      abort();
+    }
+    port2SignalMap.emplace(m.str(2), m.str(3));
+    std::getline(input, line);    
+  }
+ 
+  // declare new logics for _r,_c,_x taints of inputs
+  // store the version for the taints of some signals, which are connected
+  // to input ports
+  std::unordered_map<std::string, std::vector<uint32_t>> input2SignalVerMap;
+  for(std::string input: moduleInputsMap[moduleName]) {
+    if(input.compare(g_recentClk) == 0)
+      continue;
+    std::string signalAndSliceList = port2SignalMap[input];
+    if(signalAndSliceList.empty()) {
+      toCout("Error: the module input has not been seen before!");
+      abort();
+    }
+    std::vector<std::string> signalAndSliceVec;
+    parse_var_list(signalAndSliceList, signalAndSliceVec);
+    std::vector<uint32_t> signalVerVec;
+    get_ver_vec(signalAndSliceVec, signalVerVec);
+
+    input2SignalVerMap.emplace(input, signalVerVec);
+
+    uint32_t i = 0;
+    for(std::string signalAndSlice : signalAndSliceVec) {
+      if(isNum(signalAndSlice)) {
+        i++;
+        continue;
+      }
+      std::string signal, signalSlice;
+      split_slice(signalAndSlice, signal, signalSlice);
+      std::string signalWidth = toStr(varWidth.get_from_var_width(signal, "extend_module_instantiation:1"));
+      output << "  logic [" + signalWidth + "-1:0] " + signal + "_r" + toStr(signalVerVec[i]) + " ;" << std::endl;
+      output << "  logic [" + signalWidth + "-1:0] " + signal + "_x" + toStr(signalVerVec[i]) + " ;" << std::endl;
+      output << "  logic [" + signalWidth + "-1:0] " + signal + "_c" + toStr(signalVerVec[i++]) + " ;" << std::endl;
+    }
+  }
+
+  // declare new logic for _r_flag
+  for(std::string reg_r_flag: flagOutputs) {
+    output << "  logic \\" + instanceName + "_" + reg_r_flag + " ;" << std::endl;
+  }
+
+  // printed extended module instantiation
+  output << moduleFirstLine << std::endl;
+  std::string newLogic;
+  std::vector<std::string> newLogicVec;
+  for(std::string inPort: moduleInputsMap[moduleName]) {
+    if(inPort.compare(g_recentClk) == 0)
+      continue;
+    std::vector<uint32_t> localVerVec = input2SignalVerMap[inPort];
+    output << "    ." + inPort + "_t ( " + get_rhs_taint_list(port2SignalMap[inPort], "_t") + " )," << std::endl;
+    output << "    ." + inPort + "_r ( " + get_lhs_ver_taint_list(port2SignalMap[inPort], "_r", newLogic, localVerVec) + " )," << std::endl;
+    newLogicVec.push_back(newLogic);
+    output << "    ." + inPort + "_x ( " + get_lhs_ver_taint_list(port2SignalMap[inPort], "_x", newLogic, localVerVec) + " )," << std::endl;
+    newLogicVec.push_back(newLogic);   
+    output << "    ." + inPort + "_c ( " + get_lhs_ver_taint_list(port2SignalMap[inPort], "_c", newLogic, localVerVec) + " )," << std::endl;
+    newLogicVec.push_back(newLogic);    
+  }
+  for(std::string outPort: moduleOutputsMap[moduleName]) {
+    output << "    ." + outPort + "_t ( " + get_lhs_taint_list(port2SignalMap[outPort], "_t", newLogic) + " )," << std::endl;
+    newLogicVec.push_back(newLogic);    
+    output << "    ." + outPort + "_r ( " + get_rhs_taint_list(port2SignalMap[outPort], "_r") + " )," << std::endl; 
+    output << "    ." + outPort + "_x ( " + get_rhs_taint_list(port2SignalMap[outPort], "_x") + " )," << std::endl; 
+    output << "    ." + outPort + "_c ( " + get_rhs_taint_list(port2SignalMap[outPort], "_c") + " )," << std::endl; 
+  }
+  // TODO: we cannot leave these _r_flags in the sub-modules,
+  //for(std::string reg_r_flag: flagOutputs) {
+  //  output << "    ." + reg_r_flag + " ( \\" + instanceName + "_" + reg_r_flag + " )," << std::endl;
+  //  flagOutputs.push_back( "\\"+instanceName+"_"+reg_r_flag );
+  //}
+  // original ports
+  std::string lineToPrint;
+  int i = 0;
+  for(auto it = port2SignalMap.begin(); it != port2SignalMap.end(); ++it) {
+    if(i++ > 0) output << lineToPrint << std::endl;
+    lineToPrint = "    ." + it->first + " ( " + it->second + " ),";
+  }
+  lineToPrint.pop_back();
+  output << lineToPrint << std::endl;
+  output << "  );" << std::endl;
+
+  for(std::string oneNewLogic: newLogicVec)
+    if(!oneNewLogic.empty())
+      output << oneNewLogic << std::endl;
+
+  for (auto it = input2SignalVerMap.begin(); it != input2SignalVerMap.end(); ++it) {
+    std::string signalList = port2SignalMap[it->first];
+    std::vector<uint32_t> localVerVec = input2SignalVerMap[it->first];
+    std::vector<std::string> signalVec;
+    parse_var_list(signalList, signalVec);
+    uint32_t i = 0;
+    for(auto localSignalAndSlice : signalVec) {
+      std::string localSignal, localSignalSlice;
+      split_slice(localSignalAndSlice, localSignal, localSignalSlice);
+      auto boundPair = varWidth.get_idx_pair(localSignal, "extend_module_instantiation:2");
+      ground_wires(localSignal+"_r"+toStr(localVerVec[i]), boundPair, localSignalSlice, "  ", output);
+      ground_wires(localSignal+"_x"+toStr(localVerVec[i]), boundPair, localSignalSlice, "  ", output);
+      ground_wires(localSignal+"_c"+toStr(localVerVec[i++]), boundPair, localSignalSlice, "  ", output);
+    }
+  }
+}
+
+
 /* if a basic operator contains concatenated input, 
  * declare a new variable representing the concatenated input*/
 bool extract_concat(std::string line, std::ofstream &output, std::string &returnedStmt, bool isFuncCall) {
@@ -1495,7 +1663,7 @@ void gen_assert_property(std::string fileName) {
   std::ofstream output(fileName);
   std::regex pRFlag("r_flag");
   std::smatch m;
-  for(std::string out: moduleOutputs) {
+  for(std::string out: flagOutputs) {
     if(std::regex_search(out, m, pRFlag))
       output << "  assert property(disable iff(" + resetName + ") " + out + " == 0 );" << std::endl;
   }
@@ -1521,14 +1689,11 @@ void gen_wire_output(std::string fileName) {
 }
 
 
-int main(int argc, char* argv[]) {
-  std::string fileName = argv[1];
-  if(argc <= 2 ) {
-    std::cout << "Not enough arguments!" << std::endl;
-    abort();
-  }
-  int stage = str2int(argv[2], "main: stage");
+int taint_gen(std::string fileName, uint32_t stage, bool isTopIn, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap, std::map<std::string, std::vector<std::string>> &moduleRFlagsMap) {
+  toCout("*** Begin add taint for module: "+fileName);  
   if (stage <= 0) {
+    toCout("Clear Global data!");
+    clean_global_data();
     std::cout << "Begin cleaning!" << std::endl; //0
     clean_file(fileName);
   }
@@ -1545,8 +1710,9 @@ int main(int argc, char* argv[]) {
     fill_update(fileName + ".clean");
   }
   if (stage <= 3) {
+    isTop = isTopIn;
     std::cout << "Begin add file taints!" << std::endl; //3
-    add_file_taints(fileName + ".clean");
+    add_file_taints(fileName + ".clean", moduleInputsMap, moduleOutputsMap, moduleRFlagsMap);
   }
   if (stage <= 4) {  
     std::cout << "Begin merge taints!" << std::endl; //4
@@ -1554,15 +1720,17 @@ int main(int argc, char* argv[]) {
   }
   if (stage <= 5) {  
     std::cout << "Begin add module name!" << std::endl; //6
-    add_module_name(fileName + ".clean.tainted");
+    add_module_name(fileName + ".clean.tainted", moduleInputsMap, moduleOutputsMap, moduleRFlagsMap, isTopIn);
   }
-  if (stage <= 6) {
+  if (stage <= 6 && isTopIn) {
     std::cout << "Generate the assert property!" << std::endl; //7
     gen_assert_property(fileName + ".assert.property");
   }
-  if (stage <= 7) {
+  if (stage <= 7 && isTopIn) {
     std::cout << "Generate info about outputs!" << std::endl; //7
     gen_reg_output(fileName + ".reg_output");
     gen_wire_output(fileName + ".wire_output");
   }
+  toCout("*** Finish add taint for module: "+fileName);  
+  return 0;
 }

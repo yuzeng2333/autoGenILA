@@ -35,7 +35,7 @@ bool isNum(std::string name) {
 
 bool isOutput(std::string var) {
   auto it = std::find( moduleOutputs.begin(), moduleOutputs.end(), var );
-  return it != moduleOutputs.end();
+  return isTop && it != moduleOutputs.end();
 }
 
 
@@ -164,8 +164,11 @@ uint32_t get_end(std::string slice) {
 }
 
 
-uint32_t find_version_num(std::string op, std::unordered_map<std::string, uint32_t> &versionMap) {
+// the input op may contain slices
+uint32_t find_version_num(std::string opAndSlice, std::unordered_map<std::string, uint32_t> &versionMap) {
   uint32_t verNum;
+  std::string op, opSlice;
+  split_slice(opAndSlice, op, opSlice);
   if ( versionMap.find(op) == versionMap.end() ) {
     verNum = 0;
     versionMap.insert( std::make_pair(op, 1) );
@@ -241,12 +244,16 @@ void ground_wires(std::string wireName, std::pair<uint32_t, uint32_t> idxPair, s
 // assume the input is a list of vars, separated by comma.
 // Aslo, the vars might contain numbers
 // But blanks at the front and back are removed
-// ATTENTION: by default the retuen vector contans slices!
+// ATTENTION: by default the return vector contains slices!
 void parse_var_list(std::string list, std::vector<std::string> &vec, bool noSlice) {
   assert(vec.size() == 0);
   // remove the last char since it is )
   int previous = -1;
   if(list.front() == '(') {
+    list.pop_back();
+    previous = 0;
+  } 
+  else if (list.front() == '{') {
     list.pop_back();
     previous = 0;
   }
@@ -370,14 +377,24 @@ std::string get_rhs_taint_list(std::vector<std::string> &updateVec, std::string 
 std::string get_rhs_taint_list(std::string updateList, std::string taint) {
   std::vector<std::string> updateVec;
   parse_var_list(updateList, updateVec);
-  return get_rhs_taint_list(updateVec, taint);
+  if (updateList.front() == '{')
+    return "{ "+get_rhs_taint_list(updateVec, taint)+" }";
+  else
+    return get_rhs_taint_list(updateVec, taint);
+}
+
+
+// used for output ports in module instantiation
+std::string insert_taint(std::string signalAndSlice, std::string taint, std::string ver) {
+  std::string signal, signalSlice;
+  split_slice(signalAndSlice, signal, signalSlice);
+  return signal + taint + ver + signalSlice;
 }
 
 
 /* The reason that here we have _ver version and non-ver version
  * is: for _t taint, version is not needed. But for _r, _x, _c 
  * taint, version is necessary */
-
 // assume the updateVec does not contain numbers
 std::string get_lhs_ver_taint_list(std::vector<std::string> &updateVec, std::string taint, std::ofstream &output, std::vector<uint32_t> verVec) {
   assert(updateVec.size() == verVec.size());
@@ -394,7 +411,7 @@ std::string get_lhs_ver_taint_list(std::vector<std::string> &updateVec, std::str
       auto updateBoundPair = varWidth.get_idx_pair(update, "get_lhs_ver_taint_list");
       std::string updateWidth = toStr(updateWidthNum);
       std::string localVer = toStr(verVec[i++]);
-      output << "  wire [" + updateWidth + "-1:0] " + update + taint + localVer + " ;" << std::endl;
+      output << "  logic [" + updateWidth + "-1:0] " + update + taint + localVer + " ;" << std::endl;
       ground_wires(update+taint+localVer, updateBoundPair, updateSlice, "  ", output);
       updateTaintSlice = update+taint+localVer+updateSlice;
     }
@@ -406,7 +423,7 @@ std::string get_lhs_ver_taint_list(std::vector<std::string> &updateVec, std::str
       std::string numWidth = m.str(1);
       int localIdx = USELESS_VAR++;
       // declare a dummy wire, just for being assigned
-      output << "  wire [" + numWidth + "-1:0] nouse" + toStr(localIdx) + " ;" << std::endl;
+      output << "  logic [" + numWidth + "-1:0] nouse" + toStr(localIdx) + " ;" << std::endl;
       updateTaintSlice = "nouse" + toStr(localIdx);
     }
     taintVec.push_back(updateTaintSlice);    
@@ -423,7 +440,63 @@ std::string get_lhs_ver_taint_list(std::vector<std::string> &updateVec, std::str
 std::string get_lhs_ver_taint_list(std::string list, std::string taint, std::ofstream &output, std::vector<uint32_t> localVer) {
   std::vector<std::string> vec;
   parse_var_list(list, vec);
-  return get_lhs_ver_taint_list(vec, taint, output, localVer);
+  if (list.front() == '{')
+    return "{ "+get_lhs_ver_taint_list(vec, taint, output, localVer)+" }";
+  else
+    return get_lhs_ver_taint_list(vec, taint, output, localVer);
+}
+
+
+// this function variant is created because sometines we do not want to create new nouse logic in the middle
+std::string get_lhs_ver_taint_list(std::vector<std::string> &updateVec, std::string taint, std::string &newLogic, std::vector<uint32_t> verVec) {
+  assert(updateVec.size() == verVec.size());
+  newLogic.clear();
+  std::vector<std::string> taintVec;
+  std::smatch m;
+  std::string update;
+  std::string updateSlice;
+  uint32_t i = 0;
+  for(std::string updateAndSlice : updateVec) {
+    std::string updateTaintSlice;
+    if(!isNum(updateAndSlice)) {
+      split_slice(updateAndSlice, update, updateSlice);
+      uint32_t updateWidthNum = varWidth.get_from_var_width(update, updateAndSlice);
+      auto updateBoundPair = varWidth.get_idx_pair(update, "get_lhs_ver_taint_list");
+      std::string updateWidth = toStr(updateWidthNum);
+      std::string localVer = toStr(verVec[i++]);
+      //output << "  logic [" + updateWidth + "-1:0] " + update + taint + localVer + " ;" << std::endl;
+      //ground_wires(update+taint+localVer, updateBoundPair, updateSlice, "  ", output);
+      updateTaintSlice = update+taint+localVer+updateSlice;
+    }
+    else { // if isNum
+      if( !std::regex_match(updateAndSlice, m, pNum)) {
+        std::cout << "!! Error in matching number : " + updateAndSlice << std::endl;
+        abort();
+      }
+      std::string numWidth = m.str(1);
+      int localIdx = USELESS_VAR++;
+      // declare a dummy wire, just for being assigned
+      newLogic = "  logic [" + numWidth + "-1:0] nouse" + toStr(localIdx) + " ;";
+      updateTaintSlice = "nouse" + toStr(localIdx);
+    }
+    taintVec.push_back(updateTaintSlice);    
+  }
+  std::string returnList = " ";
+  for (auto it = taintVec.begin(); it < taintVec.end() - 1; ++it) {
+    returnList = returnList + *it + " , ";
+  }
+  returnList = returnList + taintVec.back() + " ";
+  return returnList;
+}
+
+
+std::string get_lhs_ver_taint_list(std::string list, std::string taint, std::string &newLogic, std::vector<uint32_t> localVer) {
+  std::vector<std::string> vec;
+  parse_var_list(list, vec);
+  if (list.front() == '{')
+    return "{ "+get_lhs_ver_taint_list(vec, taint, newLogic, localVer)+" }";
+  else
+    return get_lhs_ver_taint_list(vec, taint, newLogic, localVer);
 }
 
 
@@ -481,7 +554,55 @@ std::string get_lhs_taint_list(std::vector<std::string> &destVec, std::string ta
 std::string get_lhs_taint_list(std::string destList, std::string taint, std::ofstream &output) {
   std::vector<std::string> destVec;
   parse_var_list(destList, destVec);
-  return get_lhs_taint_list(destVec, taint, output);
+  if (destList.front() == '{')
+    return "{ "+get_lhs_taint_list(destVec, taint, output)+" }";
+  else
+    return get_lhs_taint_list(destVec, taint, output);
+}
+
+
+std::string get_lhs_taint_list(std::vector<std::string> &destVec, std::string taint, std::string &newLogic) {
+  newLogic.clear();
+  std::vector<std::string> taintVec;
+  std::smatch m;
+  for(std::string singleDest : destVec) {
+    if(!isNum(singleDest)) {
+      //std::regex_match(singleDest, m, pVarNameGroup);
+      //singleDest = std::regex_replace(singleDest, pVarNameGroup, "$1"+taint+"$3");
+      std::string dest, destSlice;
+      split_slice(singleDest, dest, destSlice);
+      singleDest = dest+taint+destSlice;
+    }
+    else { // if isNum
+      if( !std::regex_match(singleDest, m, pNum)) {
+        std::cout << "!! Error in matching number: " + singleDest << std::endl;
+        abort();
+      }
+      std::string numWidth = m.str(1);
+      int localIdx = USELESS_VAR++;
+      // declare a dummy wire, just for being assigned
+      newLogic = "  logic [" + numWidth + "-1:0] nouse" + toStr(localIdx) + " ;";
+      singleDest = "nouse" + toStr(localIdx);
+    }
+    taintVec.push_back(singleDest);    
+  }
+  std::string returnList = " ";
+  for (auto it = taintVec.begin(); it < taintVec.end() - 1; ++it) {
+    returnList = returnList + *it + " , ";
+  }
+  returnList = returnList + taintVec.back() + " ";
+  return returnList;
+}
+
+
+std::string get_lhs_taint_list(std::string destList, std::string taint, std::string &newLogic) {
+  std::vector<std::string> destVec;
+  parse_var_list(destList, destVec);
+
+  if (destList.front() == '{')
+    return "{ "+get_lhs_taint_list(destVec, taint, newLogic)+" }";
+  else
+    return get_lhs_taint_list(destVec, taint, newLogic);
 }
 
 
@@ -684,3 +805,6 @@ std::string get_bits(std::string inNum, uint32_t highIdx, uint32_t lowIdx) {
   uint32_t len = inNum.length();
   return inNum.substr(len-highIdx-1, highIdx-lowIdx+1);
 }
+
+
+

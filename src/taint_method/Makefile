@@ -1,8 +1,8 @@
 all:
-	g++ taint_gen.cpp helper.cpp op_taint_gen.cpp VarWidth.cpp
+	g++ taint_gen.cpp helper.cpp op_taint_gen.cpp VarWidth.cpp main.cpp
 
 debug:
-	g++ -g taint_gen.cpp helper.cpp op_taint_gen.cpp VarWidth.cpp
+	g++ -g taint_gen.cpp helper.cpp op_taint_gen.cpp VarWidth.cpp main.cpp
 
 adder:
 	./a.out /workspace/research/ILA/autoGenILA/naiveEg/word_adder/word_adder_yosys.v 0
@@ -24,6 +24,9 @@ aes0:
 
 aes1:
 	./a.out /workspace/research/ILA/autoGenILA/AES/Verilog/aes_top_simp.v 1
+
+aes128:
+	./a.out /workspace/research/ILA/autoGenILA/AES/Verilog/aes_128_yosys.v 0
 
 exp:
 	./a.out ./experiment/experiment.v 0
@@ -51,3 +54,9 @@ sha1:
 
 fake:
 	./a.out /workspace/research/ILA/autoGenILA/naiveEg/fake_aa/fake_aa_yosys.v 0
+
+pids0:
+	./a.out /workspace/research/ILA/autoGenILA/PID/SYN/PID_short.v 0
+
+hie:
+	./a.out /workspace/research/ILA/autoGenILA/naiveEg/hierarchy/hierarchy_yosys.v 0

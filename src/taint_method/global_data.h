@@ -11,16 +11,29 @@
 extern std::string moduleName;
 extern std::vector<std::string> moduleInputs;
 extern std::vector<std::string> moduleOutputs;
+extern std::vector<std::string> extendInputs;
+extern std::vector<std::string> extendOutputs;
+extern std::vector<std::string> flagOutputs;
 extern std::vector<std::string> moduleRegs;
 extern std::set<std::string> moduleWires;
 extern std::string clockName;
 extern std::string resetName;
 extern std::vector<std::string> rTaints;
+extern std::set<std::string> g_wire2reg;
 extern std::unordered_map<std::string, uint32_t> nextVersion;
-extern std::unordered_map<std::string, std::string> new_reg;
 extern std::unordered_map<std::string, std::string> new_next;
 extern std::unordered_map<std::string, std::string> update_reg;
-extern VarWidth varWidth; 
+extern VarWidth varWidth;
+extern VarWidth funcVarWidth;
+extern unsigned long int NEW_VAR;
+extern unsigned long int NEW_FANGYUAN;
+extern unsigned long int USELESS_VAR;
+extern bool did_clean_file;
+extern std::string g_recentClk;
+extern std::string g_recentRst;
+extern bool g_recentRst_positive;
+extern std::set<std::string> g_rstGroup;
+extern bool isTop;
 
 /* declarations */
 extern std::regex pModule;
@@ -56,12 +69,12 @@ extern std::regex pNot;
 extern std::regex pNone;     
 extern std::regex pInvert;
 /* reduce 1 op */
-extern std::regex pRedOr   ; 
-extern std::regex pRedAnd  ; 
-extern std::regex pRedNand ; 
-extern std::regex pRedNor  ; 
-extern std::regex pRedXor  ; 
-extern std::regex pRedXnor ; 
+extern std::regex pRedOr; 
+extern std::regex pRedAnd; 
+extern std::regex pRedNand; 
+extern std::regex pRedNor; 
+extern std::regex pRedXor; 
+extern std::regex pRedXnor; 
 /* ite */
 extern std::regex pIte;     
 /* do not add anything */
@@ -78,6 +91,10 @@ extern std::regex pFunctionDef;
 extern std::regex pEndfunction;
 extern std::regex pFunctionCall;
 
+extern std::regex pModuleBegin;
+extern std::regex pModulePort;
+extern std::regex pModuleEnd;
+
 extern std::regex pCase;
 extern std::regex pEndcase;
 extern std::regex pDefault;
@@ -93,12 +110,4 @@ extern std::regex pVarNameGroup;
 extern std::regex pNum;
 extern std::regex pNumExist;
 
-extern unsigned long int NEW_VAR;
-extern unsigned long int USELESS_VAR;
-extern bool did_clean_file;
-
-extern std::string g_recentClk;
-extern std::string g_recentRst;
-extern std::set<std::string> g_rstGroup;
-extern bool g_recentRst_positive;
 #endif

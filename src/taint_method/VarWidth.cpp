@@ -69,7 +69,7 @@ uint32_t VarWidth::get_high_idx(std::string var, std::string line) {
     var = m.str(2);
   }
   if(!check_key(var, line)) {
-    toCout("check_key not passed");
+    toCout("check_key not passed for high_idx");
     abort();
   }
   uint32_t first = internalVarWidth[var].first;
@@ -99,7 +99,7 @@ uint32_t VarWidth::get_low_idx(std::string var, std::string line) {
     var = m.str(2);
   }
   if(!check_key(var, line)) {
-    toCout("check_key not passed");    
+    toCout("check_key not passed for low idx");    
     abort();
   }
   uint32_t first = internalVarWidth[var].first;
@@ -127,8 +127,8 @@ std::pair<uint32_t, uint32_t> VarWidth::get_idx_pair(std::string var, std::strin
     }
     var = m.str(2);
   }
-  if(!check_key(var)) {
-    toCout("check_key not passed");    
+  if(!check_key(var, line)) {
+    toCout("check_key not passed for idx pair");    
     abort();
   }
   return internalVarWidth[var];
@@ -157,5 +157,10 @@ bool VarWidth::check_key(std::string var, std::string line) {
     return false;
   }
   return true;
+}
+
+
+void VarWidth::clear() {
+  internalVarWidth.clear();
 }
 #endif

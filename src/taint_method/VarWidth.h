@@ -19,6 +19,7 @@ public:
   bool force_insert(std::string var, uint32_t begin, uint32_t end);
   bool check_key(std::string key, std::string line="");  
   std::pair<uint32_t, uint32_t> get_idx_pair(std::string var, std::string line="");
+  void clear();
 };
 
 #endif

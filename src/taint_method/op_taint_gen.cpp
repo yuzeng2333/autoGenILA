@@ -21,11 +21,17 @@ void input_taint_gen(std::string line, std::ofstream &output) {
   std::string slice = m.str(2);
   std::string var = m.str(3);
   moduleInputs.push_back(var);
-  moduleInputs.push_back(var+"_t");
+  extendInputs.push_back(var+"_t");
+  extendOutputs.push_back(var+"_r");
+  extendOutputs.push_back(var+"_x");
+  extendOutputs.push_back(var+"_c");
   //if (var.compare( clockName) == 0)
   //  return;
   //debug_line(line);
   output << m.str(1) << "input " + slice + var + "_t ;" << std::endl;
+  output << m.str(1) << "output " + slice + var + "_r ;" << std::endl;
+  output << m.str(1) << "output " + slice + var + "_x ;" << std::endl;
+  output << m.str(1) << "output " + slice + var + "_c ;" << std::endl;
 
   if (!did_clean_file) {
     bool insertDone;
@@ -52,7 +58,7 @@ void reg_taint_gen(std::string line, std::ofstream &output) {
   std::string var = m.str(3);
   std::string num = m.str(4);
 
-  moduleOutputs.push_back(var+"_r_flag");
+  flagOutputs.push_back(var+"_r_flag");
   moduleRegs.push_back(var);
   output << blank << "logic " + slice + " " + var + "_t ;" << std::endl;
   output << blank << "logic " + var + "_t_1bit ;" << std::endl;
@@ -115,6 +121,12 @@ void output_insert_map(std::string line, std::ofstream &output, std::ifstream &i
   std::string var = m.str(3);
   std::string blank = m.str(1);
 
+  if(isOutput(var)) {
+    std::cout << "!! Duplicate output find: " + line << std::endl;
+  }
+  else 
+    moduleOutputs.push_back(var);
+
   auto currentPos = input.tellg();
   std::string nextLine;
   std::getline(input, nextLine);
@@ -133,17 +145,23 @@ void output_insert_map(std::string line, std::ofstream &output, std::ifstream &i
     }
   }
 
-  // return only if the next line is the reg declaration of this
-  // output
+  // return only if the next line is the reg declaration of this output
   if( std::regex_match(nextLine, m, pReg) && var.compare(m.str(3)) ==0 )
     return;
 
   //TODO: continue
-  output << blank << "logic " + slice + var + "_t ;" << std::endl;
-  output << blank << "logic " + slice + var + "_r ;" << std::endl;
-  output << blank << "logic " + slice + var + "_c ;" << std::endl;
-  output << blank << "logic " + slice + var + "_x ;" << std::endl;
-  output << blank << "assign " + var + "_x = " + max_num(get_width(slice)) + " ;" << std::endl;
+  output << blank << "output " + slice + var + "_t ;" << std::endl;
+  output << blank << "input " + slice + var + "_r ;" << std::endl;
+  output << blank << "input " + slice + var + "_c ;" << std::endl;
+  output << blank << "input " + slice + var + "_x ;" << std::endl;
+
+  extendOutputs.push_back(var+"_t");
+  extendInputs.push_back(var+"_r");
+  extendInputs.push_back(var+"_c");
+  extendInputs.push_back(var+"_x");
+
+  if(isTop)
+    output << blank << "assign " + var + "_x = " + max_num(get_width(slice)) + " ;" << std::endl;
   // TODO: how to deal with the taints of output?
   // It seems to me, the _r taints should only be high 
   // when the output is valid to be read

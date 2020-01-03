@@ -25,6 +25,7 @@
 #define ALWAYS_CLKRST   15
 #define ALWAYS          16
 #define REDUCE1         17
+#define MODULEBEGIN     18
 #define UNSUPPORT       99
 #define NONE            100
 
@@ -34,9 +35,9 @@ void add_line_taints(std::string line, std::ofstream &output, std::ifstream &inp
 
 void read_in_clkrst(std::string fileName);
 
-void add_file_taints(std::string fileName);
+void add_file_taints(std::string fileName, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap, std::map<std::string, std::vector<std::string>> &moduleRFlagsMap);
 
-void add_module_name(std::string fileName);
+void add_module_name(std::string fileName, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap, std::map<std::string, std::vector<std::string>> &moduleRFlagsMap, bool isTopIn);
 
 bool isNum(std::string name);
 
@@ -57,6 +58,8 @@ void add_func_taints_limited(std::ifstream &input, std::ofstream &output, std::s
 
 void add_func_taints_call_limited(std::string line, std::ofstream &output);
 
+void extend_module_instantiation(std::ifstream &input, std::ofstream &output, std::string moduleFirstLine, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap);
+
 void merge_taints(std::string fileName);
 
 bool extract_concat(std::string line, std::ofstream &output, std::string &returnedStmt, bool isFuncCall=false);
@@ -68,4 +71,6 @@ void gen_wire_output(std::string fileName);
 void remove_function_wrapper(std::string firstLine, std::ifstream &input, std::ofstream &output);
 
 void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::string caseFirstLine);
+
+int taint_gen(std::string fileName, uint32_t stage, bool isTopIn, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap, std::map<std::string, std::vector<std::string>> &moduleRFlagsMap);
 #endif
