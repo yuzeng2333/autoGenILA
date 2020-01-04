@@ -64,6 +64,8 @@ void merge_taints(std::string fileName);
 
 bool extract_concat(std::string line, std::ofstream &output, std::string &returnedStmt, bool isFuncCall=false);
 
+void gen_assert_property(std::ofstream &output);
+
 void gen_reg_output(std::string fileName);
 
 void gen_wire_output(std::string fileName);

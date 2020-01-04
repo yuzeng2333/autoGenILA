@@ -646,6 +646,8 @@ void merge_taints(std::string fileName) {
   //  }
   //}
 
+  gen_assert_property(output);
+
   output << "endmodule";
   output.close();
 }
@@ -1551,15 +1553,13 @@ bool extract_concat(std::string line, std::ofstream &output, std::string &return
 }
 
 
-void gen_assert_property(std::string fileName) {
-  std::ofstream output(fileName);
+void gen_assert_property(std::ofstream &output) {
   std::regex pRFlag("r_flag");
   std::smatch m;
   for(std::string out: flagOutputs) {
     if(std::regex_search(out, m, pRFlag))
       output << "  assert property(disable iff(" + resetName + ") " + out + " == 0 );" << std::endl;
   }
-  output.close();
 }
 
 
@@ -1615,10 +1615,6 @@ int taint_gen(std::string fileName, uint32_t stage, bool isTopIn, std::map<std::
     add_module_name(fileName + ".clean.tainted", moduleInputsMap, moduleOutputsMap, moduleRFlagsMap, isTopIn);
   }
   if (stage <= 6 && isTopIn) {
-    std::cout << "Generate the assert property!" << std::endl; //7
-    gen_assert_property(fileName + ".assert.property");
-  }
-  if (stage <= 7 && isTopIn) {
     std::cout << "Generate info about outputs!" << std::endl; //7
     gen_reg_output(fileName + ".reg_output");
     gen_wire_output(fileName + ".wire_output");
