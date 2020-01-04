@@ -119,6 +119,7 @@ std::string resetName;
 std::vector<std::string> rTaints;
 std::set<std::string> g_wire2reg;
 std::unordered_map<std::string, uint32_t> nextVersion;
+std::unordered_map<std::string, std::vector<bool>> nxtVerBits;
 std::unordered_map<std::string, std::string> new_next;
 std::unordered_map<std::string, std::string> update_reg;
 VarWidth varWidth;
@@ -937,139 +938,6 @@ void remove_function_wrapper(std::string firstLine, std::ifstream &input, std::o
 }
 
 
-// add _t, _x, _r, _c taint for function
-void add_case_taints(std::ifstream &input, std::ofstream &output, std::string firstLine, std::string taintBits) {
-  std::smatch m;
-  bool tExist = false;
-  bool rExist = false;
-  bool xExist = false;
-  bool cExist = false;
-  parse_taintBits(taintBits, tExist, rExist, xExist, cExist);
-  if ( !std::regex_match(firstLine, m, pCase) )
-    return;
-  std::string blank = m.str(1);
-  std::string postfix = m.str(2);
-  std::string condName = m.str(3);
-  uint32_t condWidthNum = get_var_slice_width(condName);
-  
-  /* read the whole case and get all the RHS */
-  std::string line;  
-  std::vector<std::string> allRhs;
-  auto funcBegin = input.tellg();
-  bool readSwitchValue = true;
-  std::unordered_map<std::string, std::string> localVer;
-  if ( cExist | rExist | xExist ) {
-    while( std::getline(input, line) && !std::regex_match(line, m, pDefault) ) {
-      if( readSwitchValue ) {
-        readSwitchValue = false;
-        continue;
-      }
-      else {
-        readSwitchValue = true;
-        if( !std::regex_match(line, m, pBlock) ) {
-          std::cout << "!! Error in parsing case !!" << std::endl;
-        }
-        allRhs.push_back(m.str(3));
-      }
-    }
-    std::getline(input, line);
-    if( !std::regex_match(line, m, pBlock) ) {
-      std::cout << "!! Error in parsing case !!" << std::endl;
-    }
-    allRhs.push_back(m.str(3));
-    input.seekg(funcBegin);
-
-    for( std::string rhs: allRhs ) {
-      std::string rhsName, rhsSlice;
-      split_slice(rhs, rhsName, rhsSlice);
-      auto verNum = find_version_num(rhsName);
-      std::string ver = std::to_string(verNum);
-      localVer.insert( std::make_pair(rhsName, ver) );
-    }
-  }
-
-  // taint wire declaration
-  if (tExist) {
-    output << blank + "wire " + condName + "_t_1bit = | " + condName + "_t ;" << std::endl;
-  }
-
-  if (rExist) {
-    /* for each rhs, declare a new version */
-    for( std::string rhs: allRhs ) {
-      std::string rhsName, rhsSlice;
-      split_slice(rhs, rhsName, rhsSlice);
-      output << blank + "wire [" + toStr(varWidth.get_from_var_width(rhsName, firstLine)) + "-1:0] " + rhsName + "_r" + localVer[rhsName] + " ;" << std::endl;
-    }
-  }
-
-  if (xExist) {
-    for( std::string rhs: allRhs ) {
-      std::string rhsName, rhsSlice;
-      split_slice(rhs, rhsName, rhsSlice);
-      output << blank + "wire [" + toStr(varWidth.get_from_var_width(rhsName, firstLine)) + "-1:0] " + rhsName + "_x" + localVer[rhsName] + " ;" << std::endl;
-    }
-  }
-
-  if (cExist) {
-    for( std::string rhs: allRhs ) {
-      std::string rhsName, rhsSlice;
-      split_slice(rhs, rhsName, rhsSlice);
-      output << blank + "wire [" + toStr(varWidth.get_from_var_width(rhsName, firstLine)) + "-1:0] " + rhsName + "_c" + localVer[rhsName] + " ;" << std::endl;
-    }
-  }
-
-  output << blank + "case" + postfix + " (" + condName + ")" << std::endl;
-
-  readSwitchValue = true;
-  while( std::getline(input, line) && !std::regex_match(line, m, pEndcase) ) {
-    if ( readSwitchValue ) {
-      output << line << std::endl;
-      readSwitchValue = false;
-    }
-    else {
-      std::regex_match(line, m, pBlock);
-      std::string blank = m.str(1);
-      std::string dest, destSlice;
-      std::string src, srcSlice;
-      uint32_t localWidthNum;
-      split_slice(m.str(3), src, srcSlice);
-      
-      if ( split_slice(m.str(2), dest, destSlice) ) {
-        localWidthNum = get_width(destSlice);
-      }
-      else {
-        localWidthNum = varWidth.get_from_var_width(dest, line);
-      }
-
-      if( tExist ) {
-        output << blank + dest + "_t" + destSlice + " = " + src + "_t" + srcSlice + " | " + extend(condName+"_t_1bit", localWidthNum) + " ;" << std::endl;
-      }
-
-      /* some notes:
-       * For the _r taint, in each case, only part of the taint will be assigned. To deal with the remaining part, 
-       * how to deal with floating wires? */
-      if( rExist ) {
-        output << blank + src + "_r" + localVer[src] + srcSlice + " = " + dest + "_r" + destSlice + " | " + extend(condName+"_t_1bit", localWidthNum) + " ;" << std::endl;
-        ground_wires(src+"_r"+localVer[src], varWidth.get_idx_pair(src, line), srcSlice, blank, output);
-      }
-
-      if( xExist ) {
-        output << blank + src + "_x" + localVer[src] + srcSlice + " = " + dest + "_x" + destSlice + " ;" << std::endl;
-        ground_wires(src+"_x"+localVer[src], varWidth.get_idx_pair(src, line), srcSlice, blank, output);
-      }
-
-      if( cExist ) {
-        output << blank + src + "_c" + localVer[src] + srcSlice + " = " + extend("1'b1", localWidthNum) + " ;" << std::endl;
-        ground_wires(src+"_c"+localVer[src], varWidth.get_idx_pair(src, line), srcSlice, blank, output);
-      }
-      readSwitchValue = true;        
-    }
-  } // end of while
-  // print endcase
-  output << line << std::endl;
-}
-
-
 void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::string alwaysFirstLine) {
   output << alwaysFirstLine << std::endl;
   toCout("Do: add_case_taints_limited");
@@ -1108,6 +976,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
   uint32_t destWidthNum, sWidthNum, aWidthNum, bWidthNum;
   std::string sWidth, aWidth, bWidth;
   std::string sVer, aVer, bVer;
+  bool sIsNew, aIsNew, bIsNew;
 
   bool aIsNum = isNum(a);
   bool bIsNum = isNum(b);
@@ -1116,7 +985,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
   destWidthNum = get_var_slice_width(destAndSlice);
   sWidthNum = get_var_slice_width(sAndSlice);
   sWidth = toStr(sWidthNum);
-  sVer = toStr(find_version_num(s));
+  sVer = toStr(find_version_num(s, sIsNew));
 
   if(!aIsNum && !bIsNum) {
     aWidthNum = get_var_slice_width(a);
@@ -1125,8 +994,10 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     aWidth = toStr(aWidthNum);
     bWidth = toStr(bWidthNum);
 
-    aVer = toStr(find_version_num(a));
-    bVer = toStr(find_version_num(b));
+    aVer = toStr(find_version_num(a, aIsNew, true));
+    bVer = toStr(find_version_num(b, bIsNew, true));
+    assert(aIsNew);
+    assert(bIsNew);
 
     // print _t function
     output << blank + "always @( "+a+"_t or "+b+"_t or "+s+"_t or "+s+" ) begin" << std::endl;
@@ -1146,17 +1017,18 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     //ground(dest+"_t", destBoundPair, destSlice, blank, output);
 
     // print _r function
-    output << blank + "reg [" + sWidth + "-1:0] " + s + "_r" + sVer + " ;" << std::endl;
-    output << blank + "reg [" + sWidth + "-1:0] " + s + "_x" + sVer + " ;" << std::endl;
-    output << blank + "reg [" + sWidth + "-1:0] " + s + "_c" + sVer + " ;" << std::endl;
+    if(sIsNew) {
+    output << blank + "reg [" + sWidth + "-1:0] " + s + "_r" + sVer + " = 0;" << std::endl;
+    output << blank + "reg [" + sWidth + "-1:0] " + s + "_x" + sVer + " = 0;" << std::endl;
+    output << blank + "reg [" + sWidth + "-1:0] " + s + "_c" + sVer + " = 0;" << std::endl;
+    }
+    output << blank + "reg [" + aWidth + "-1:0] " + a + "_r" + aVer + " = 0;" << std::endl;
+    output << blank + "reg [" + aWidth + "-1:0] " + a + "_x" + aVer + " = 0;" << std::endl;
+    output << blank + "reg [" + aWidth + "-1:0] " + a + "_c" + aVer + " = 0;" << std::endl;
 
-    output << blank + "reg [" + aWidth + "-1:0] " + a + "_r" + aVer + " ;" << std::endl;
-    output << blank + "reg [" + aWidth + "-1:0] " + a + "_x" + aVer + " ;" << std::endl;
-    output << blank + "reg [" + aWidth + "-1:0] " + a + "_c" + aVer + " ;" << std::endl;
-
-    output << blank + "reg [" + bWidth + "-1:0] " + b + "_r" + bVer + " ;" << std::endl;
-    output << blank + "reg [" + bWidth + "-1:0] " + b + "_x" + bVer + " ;" << std::endl;
-    output << blank + "reg [" + bWidth + "-1:0] " + b + "_c" + bVer + " ;" << std::endl;
+    output << blank + "reg [" + bWidth + "-1:0] " + b + "_r" + bVer + " = 0;" << std::endl;
+    output << blank + "reg [" + bWidth + "-1:0] " + b + "_x" + bVer + " = 0;" << std::endl;
+    output << blank + "reg [" + bWidth + "-1:0] " + b + "_c" + bVer + " = 0;" << std::endl;
 
     output << blank + "always @( "+dest+"_r"+destSlice+" or "+s+" ) begin" << std::endl;
     output << blank + "  "+s+"_r"+sVer+sSlice+" = " + extend("| "+dest+"_r"+destSlice, sWidthNum) + " ;" << std::endl;
@@ -1207,14 +1079,18 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
 
     // ground other wires of s
     auto sBoundPair = varWidth.get_idx_pair(s, alwaysFirstLine);
-    ground_wires(s+"_r"+sVer, sBoundPair, sSlice, blank, output);
-    ground_wires(s+"_x"+sVer, sBoundPair, sSlice, blank, output);
-    ground_wires(s+"_c"+sVer, sBoundPair, sSlice, blank, output);
+    //if(sIsNew) {
+    //ground_wires(s+"_r"+sVer, sBoundPair, sSlice, blank, output);
+    //ground_wires(s+"_x"+sVer, sBoundPair, sSlice, blank, output);
+    //ground_wires(s+"_c"+sVer, sBoundPair, sSlice, blank, output);
+    //}
   } // end of !aIsNum && !bIsNum
   else if(!aIsNum && bIsNum) {
     aWidthNum = get_var_slice_width(a);
     aWidth = toStr(aWidthNum);
-    aVer = toStr(find_version_num(a));
+    bool aIsNew;
+    aVer = toStr(find_version_num(a, aIsNew, true));
+    assert(aIsNew);
 
     // print _t function
     output << blank + "always @( "+a+"_t or "+s+"_t or "+s+" ) begin" << std::endl;
@@ -1268,14 +1144,18 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
 
     // ground other wires of s
     auto sBoundPair = varWidth.get_idx_pair(s, alwaysFirstLine);
-    ground_wires(s+"_r"+sVer, sBoundPair, sSlice, blank, output);
-    ground_wires(s+"_x"+sVer, sBoundPair, sSlice, blank, output);
-    ground_wires(s+"_c"+sVer, sBoundPair, sSlice, blank, output);
+    //if(sIsNew) {
+    //ground_wires(s+"_r"+sVer, sBoundPair, sSlice, blank, output);
+    //ground_wires(s+"_x"+sVer, sBoundPair, sSlice, blank, output);
+    //ground_wires(s+"_c"+sVer, sBoundPair, sSlice, blank, output);
+    //}
   } // end of !aIsNum && bIsNum
   else if(aIsNum && !bIsNum) {
     bWidthNum = get_var_slice_width(b);
     bWidth = toStr(bWidthNum);
-    bVer = toStr(find_version_num(b));
+    bool bIsNew;
+    bVer = toStr(find_version_num(b, bIsNew, true));
+    assert(bIsNew);
 
     // print _t function
     output << blank + "always @( "+b+"_t or "+s+"_t or "+s+" ) begin" << std::endl;
@@ -1343,9 +1223,11 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
 
     // ground other wires of s
     auto sBoundPair = varWidth.get_idx_pair(s, alwaysFirstLine);
-    ground_wires(s+"_r"+sVer, sBoundPair, sSlice, blank, output);
-    ground_wires(s+"_x"+sVer, sBoundPair, sSlice, blank, output);
-    ground_wires(s+"_c"+sVer, sBoundPair, sSlice, blank, output);
+    //if(sIsNew) {
+    //ground_wires(s+"_r"+sVer, sBoundPair, sSlice, blank, output);
+    //ground_wires(s+"_x"+sVer, sBoundPair, sSlice, blank, output);
+    //ground_wires(s+"_c"+sVer, sBoundPair, sSlice, blank, output);
+    //}
   } // end of aIsNum && !bIsNum
   else {
     toCout("!! Error: both inputs of case statements are numbers!");
@@ -1466,6 +1348,8 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
   // store the version for the taints of some signals, which are connected
   // to input ports
   std::unordered_map<std::string, std::vector<uint32_t>> input2SignalVerMap;
+  std::unordered_map<std::string, std::vector<bool>> inputSignalIsNewMap;
+  
   for(std::string input: moduleInputsMap[moduleName]) {
     if(input.compare(g_recentClk) == 0)
       continue;
@@ -1477,9 +1361,12 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
     std::vector<std::string> signalAndSliceVec;
     parse_var_list(signalAndSliceList, signalAndSliceVec);
     std::vector<uint32_t> signalVerVec;
-    get_ver_vec(signalAndSliceVec, signalVerVec);
+    std::vector<bool> isNewVec;
+    get_ver_vec(signalAndSliceVec, signalVerVec, isNewVec);
+    assert(signalVerVec.size() == isNewVec.size());
 
     input2SignalVerMap.emplace(input, signalVerVec);
+    inputSignalIsNewMap.emplace(input, isNewVec);
 
     uint32_t i = 0;
     for(std::string signalAndSlice : signalAndSliceVec) {
@@ -1490,16 +1377,18 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
       std::string signal, signalSlice;
       split_slice(signalAndSlice, signal, signalSlice);
       std::string signalWidth = toStr(varWidth.get_from_var_width(signal, "extend_module_instantiation:1"));
-      output << "  logic [" + signalWidth + "-1:0] " + signal + "_r" + toStr(signalVerVec[i]) + " ;" << std::endl;
-      output << "  logic [" + signalWidth + "-1:0] " + signal + "_x" + toStr(signalVerVec[i]) + " ;" << std::endl;
-      output << "  logic [" + signalWidth + "-1:0] " + signal + "_c" + toStr(signalVerVec[i++]) + " ;" << std::endl;
+      if(isNewVec[i]) {
+        output << "  logic [" + signalWidth + "-1:0] " + signal + "_r" + toStr(signalVerVec[i])   + " = 0;" << std::endl;
+        output << "  logic [" + signalWidth + "-1:0] " + signal + "_x" + toStr(signalVerVec[i])   + " = 0;" << std::endl;
+        output << "  logic [" + signalWidth + "-1:0] " + signal + "_c" + toStr(signalVerVec[i++]) + " = 0;" << std::endl;
+      }
     }
   }
 
   // declare new logic for _r_flag
-  for(std::string reg_r_flag: flagOutputs) {
-    output << "  logic \\" + instanceName + "_" + reg_r_flag + " ;" << std::endl;
-  }
+  //for(std::string reg_r_flag: flagOutputs) {
+  //  output << "  logic \\" + instanceName + "_" + reg_r_flag + " ;" << std::endl;
+  //}
 
   // printed extended module instantiation
   output << moduleFirstLine << std::endl;
@@ -1546,7 +1435,8 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
 
   for (auto it = input2SignalVerMap.begin(); it != input2SignalVerMap.end(); ++it) {
     std::string signalList = port2SignalMap[it->first];
-    std::vector<uint32_t> localVerVec = input2SignalVerMap[it->first];
+    std::vector<bool> localIsNewVec = inputSignalIsNewMap[it->first];    
+    std::vector<uint32_t> localVerVec = it->second;
     std::vector<std::string> signalVec;
     parse_var_list(signalList, signalVec);
     uint32_t i = 0;
@@ -1554,9 +1444,11 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
       std::string localSignal, localSignalSlice;
       split_slice(localSignalAndSlice, localSignal, localSignalSlice);
       auto boundPair = varWidth.get_idx_pair(localSignal, "extend_module_instantiation:2");
-      ground_wires(localSignal+"_r"+toStr(localVerVec[i]), boundPair, localSignalSlice, "  ", output);
-      ground_wires(localSignal+"_x"+toStr(localVerVec[i]), boundPair, localSignalSlice, "  ", output);
-      ground_wires(localSignal+"_c"+toStr(localVerVec[i++]), boundPair, localSignalSlice, "  ", output);
+      //if(localIsNewVec[i]) {
+      //  ground_wires(localSignal+"_r"+toStr(localVerVec[i]), boundPair, localSignalSlice, "  ", output);
+      //  ground_wires(localSignal+"_x"+toStr(localVerVec[i]), boundPair, localSignalSlice, "  ", output);
+      //  ground_wires(localSignal+"_c"+toStr(localVerVec[i++]), boundPair, localSignalSlice, "  ", output);
+      //}
     }
   }
 }

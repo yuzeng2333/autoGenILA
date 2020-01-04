@@ -165,19 +165,96 @@ uint32_t get_end(std::string slice) {
 
 
 // the input op may contain slices
-uint32_t find_version_num(std::string opAndSlice, std::unordered_map<std::string, uint32_t> &versionMap) {
+uint32_t find_version_num(std::string opAndSlice, bool &isNew, bool forceNewVer, std::unordered_map<std::string, uint32_t> &versionMap) {
   uint32_t verNum;
   std::string op, opSlice;
   split_slice(opAndSlice, op, opSlice);
   if ( versionMap.find(op) == versionMap.end() ) {
     verNum = 0;
     versionMap.insert( std::make_pair(op, 1) );
+    nxtVerBits.emplace( op, std::vector<bool>{} );
+    isNew = true;
   }
   else {
-    verNum = versionMap[op];
-    versionMap[op]++;
+    verNum = versionMap[op];    
+    bool noConflict = check_bits(opSlice, nxtVerBits[op]);
+    if(!noConflict or forceNewVer) {
+      versionMap[op]++;
+      isNew = true;
+    }
+    else if(forceNewVer){
+      versionMap[op]++;
+      isNew = true;
+      nxtVerBits[op].clear();
+    }
+    else {
+      verNum--;
+      isNew = false;
+    }
   }
   return verNum;
+}
+
+
+// if return false, the bitVec is cleared
+// if return true, varSlice is merged to bitVec
+bool check_bits(std::string varSlice, std::vector<bool> &bitVec) {
+  // if varSlice is empty, must be conflict
+  if(varSlice.empty()) {
+    bitVec.clear();
+    return false;
+  }
+  std::regex pSlice("^(?:\\s*)\\[(\\d+)(?:\\:(\\d+))?\\](?:\\s*)$");
+  std::smatch m;
+  if(!std::regex_match(varSlice, m, pSlice)) {
+    toCout("Error: does not match slice: "+ varSlice);
+    abort();
+  }
+  uint32_t highIdx = str2int(m.str(1), "error for highIdx, Slice is: "+varSlice);
+  uint32_t lowIdx;
+  if(m.str(2).empty()) {
+    lowIdx = highIdx;
+  }
+  else {
+    lowIdx = str2int(m.str(2), "error for lowIdx, Slice is: "+varSlice);
+  }
+  size_t vecSize = bitVec.size();
+  if(vecSize > highIdx) {
+    for(long int i = highIdx; i >= lowIdx; i--) {
+      if(bitVec[i]) {
+        bitVec.clear();
+        return false;
+      }
+      else {
+        bitVec[i] = true;
+      }
+    } // end of for
+    return true;
+  }
+  else if(vecSize > lowIdx){
+    for(long int i = vecSize-1; i >= lowIdx; i--) {
+      if(bitVec[i]) {
+        bitVec.clear();
+        return false;
+      }
+      else {
+        bitVec[i] = true;
+      }
+    } // end of for
+    while(vecSize++ <= highIdx) {
+      bitVec.push_back(true);
+    }
+    return true;
+  }
+  else {
+    while(vecSize++ <= lowIdx) {
+      bitVec.push_back(false);
+    }
+    while(vecSize++ <= highIdx) {
+      bitVec.push_back(true);
+    }
+    return true;    
+  }
 }
 
 
@@ -411,8 +488,8 @@ std::string get_lhs_ver_taint_list(std::vector<std::string> &updateVec, std::str
       auto updateBoundPair = varWidth.get_idx_pair(update, "get_lhs_ver_taint_list");
       std::string updateWidth = toStr(updateWidthNum);
       std::string localVer = toStr(verVec[i++]);
-      output << "  logic [" + updateWidth + "-1:0] " + update + taint + localVer + " ;" << std::endl;
-      ground_wires(update+taint+localVer, updateBoundPair, updateSlice, "  ", output);
+      output << "  logic [" + updateWidth + "-1:0] " + update + taint + localVer + " = 0;" << std::endl;
+      //ground_wires(update+taint+localVer, updateBoundPair, updateSlice, "  ", output);
       updateTaintSlice = update+taint+localVer+updateSlice;
     }
     else { // if isNum
@@ -502,9 +579,10 @@ std::string get_lhs_ver_taint_list(std::string list, std::string taint, std::str
 
 void get_ver_vec(std::vector<std::string> varVec, std::vector<uint32_t> &verVec) {
   assert(verVec.empty());
+  bool pseudoIsNew;
   for(std::string var : varVec) {
     if(!isNum(var))
-      verVec.push_back( find_version_num(var) );
+      verVec.push_back( find_version_num(var, pseudoIsNew, true) );
     else
       verVec.push_back( 0 );
   }
@@ -515,6 +593,23 @@ void get_ver_vec(std::string list, std::vector<uint32_t> &verVec) {
   std::vector<std::string> vec;
   parse_var_list(list, vec, true);
   return get_ver_vec(vec, verVec);
+}
+
+
+void get_ver_vec(std::vector<std::string> varVec, std::vector<uint32_t> &verVec, std::vector<bool> &isNewVec) {
+  assert(verVec.empty());
+  assert(isNewVec.empty());
+  bool isNew;
+  for(std::string var : varVec) {
+    if(!isNum(var)) {
+      verVec.push_back( find_version_num(var, isNew) );
+      isNewVec.push_back(isNew);
+    }
+    else {
+      verVec.push_back( 0 );
+      isNewVec.push_back(isNew);
+    }
+  }
 }
 
 

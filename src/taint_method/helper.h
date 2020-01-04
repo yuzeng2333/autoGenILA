@@ -26,7 +26,9 @@ uint32_t get_begin(std::string slice);
 
 uint32_t get_end(std::string slice);
 
-uint32_t find_version_num(std::string op, std::unordered_map<std::string, uint32_t> &versionMap = nextVersion);
+uint32_t find_version_num(std::string opAndSlice, bool &isNew, bool forceNewVer=false, std::unordered_map<std::string, uint32_t> &versionMap=nextVersion);
+
+bool check_bits(std::string varSlice, std::vector<bool> &bitVec);
 
 void parse_taintBits(std::string taintBits, bool &tExist, bool &rExist, bool &xExist, bool &cExist);
 
@@ -69,6 +71,8 @@ std::string get_lhs_taint_list(std::string destList, std::string taint, std::str
 void get_ver_vec(std::vector<std::string> varVec, std::vector<uint32_t> &verVec);
 
 void get_ver_vec(std::string list, std::vector<uint32_t> &verVec);
+
+void get_ver_vec(std::vector<std::string> varVec, std::vector<uint32_t> &verVec, std::vector<bool> &isNewVec);
 
 int str2int(std::string str, std::string info);
 

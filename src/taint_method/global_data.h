@@ -21,6 +21,7 @@ extern std::string resetName;
 extern std::vector<std::string> rTaints;
 extern std::set<std::string> g_wire2reg;
 extern std::unordered_map<std::string, uint32_t> nextVersion;
+extern std::unordered_map<std::string, std::vector<bool>> nxtVerBits;
 extern std::unordered_map<std::string, std::string> new_next;
 extern std::unordered_map<std::string, std::string> update_reg;
 extern VarWidth varWidth;
