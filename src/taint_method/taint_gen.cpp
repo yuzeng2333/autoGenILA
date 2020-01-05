@@ -1378,11 +1378,13 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
       }
       std::string signal, signalSlice;
       split_slice(signalAndSlice, signal, signalSlice);
-      std::string signalWidth = toStr(varWidth.get_from_var_width(signal, "extend_module_instantiation:1"));
+      auto signalIdxPair = varWidth.get_idx_pair(signal, "extend_module_instantiation:get_idx_pair");
+      std::string signalHighIdx = toStr(signalIdxPair.first);
+      std::string signalLowIdx = toStr(signalIdxPair.second);
       if(isNewVec[i]) {
-        output << "  logic [" + signalWidth + "-1:0] " + signal + "_r" + toStr(signalVerVec[i])   + " = 0;" << std::endl;
-        output << "  logic [" + signalWidth + "-1:0] " + signal + "_x" + toStr(signalVerVec[i])   + " = 0;" << std::endl;
-        output << "  logic [" + signalWidth + "-1:0] " + signal + "_c" + toStr(signalVerVec[i++]) + " = 0;" << std::endl;
+        output << "  logic [" + signalHighIdx + ":" + signalLowIdx + "] " + signal + "_r" + toStr(signalVerVec[i])   + " = 0;" << std::endl;
+        output << "  logic [" + signalHighIdx + ":" + signalLowIdx + "] " + signal + "_x" + toStr(signalVerVec[i])   + " = 0;" << std::endl;
+        output << "  logic [" + signalHighIdx + ":" + signalLowIdx + "] " + signal + "_c" + toStr(signalVerVec[i++]) + " = 0;" << std::endl;
       }
     }
   }
@@ -1558,7 +1560,7 @@ void gen_assert_property(std::ofstream &output) {
   std::smatch m;
   for(std::string out: flagOutputs) {
     if(std::regex_search(out, m, pRFlag))
-      output << "  assert property(disable iff(" + resetName + ") " + out + " == 0 );" << std::endl;
+      output << "  assert property(" + out + " == 0 );" << std::endl;
   }
 }
 
