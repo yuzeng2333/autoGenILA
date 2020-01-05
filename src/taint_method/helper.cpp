@@ -165,25 +165,28 @@ uint32_t get_end(std::string slice) {
 
 
 // the input op may contain slices
-uint32_t find_version_num(std::string opAndSlice, bool &isNew, bool forceNewVer, std::unordered_map<std::string, uint32_t> &versionMap) {
+uint32_t find_version_num(std::string opAndSlice, bool &isNew, std::ofstream &output, bool forceNewVer) {
   uint32_t verNum;
   std::string op, opSlice;
   split_slice(opAndSlice, op, opSlice);
-  if ( versionMap.find(op) == versionMap.end() ) {
+  if ( nextVersion.find(op) == nextVersion.end() ) {
     verNum = 0;
-    versionMap.insert( std::make_pair(op, 1) );
+    nextVersion.insert( std::make_pair(op, 1) );
     nxtVerBits.emplace( op, std::vector<bool>{} );
     isNew = true;
   }
   else {
-    verNum = versionMap[op];    
+    verNum = nextVersion[op];    
     bool noConflict = check_bits(opSlice, nxtVerBits[op]);
     if(!noConflict or forceNewVer) {
-      versionMap[op]++;
+      // ground unassigned wires
+      std::string freeBits = free_bits(op);
+      output << "  assign "+freeBits+" = 0;" << std::endl;
+      nextVersion[op]++;
       isNew = true;
     }
     else if(forceNewVer){
-      versionMap[op]++;
+      nextVersion[op]++;
       isNew = true;
       nxtVerBits[op].clear();
     }
@@ -193,6 +196,41 @@ uint32_t find_version_num(std::string opAndSlice, bool &isNew, bool forceNewVer,
     }
   }
   return verNum;
+}
+
+
+std::string free_bits(std::string op) {
+  auto idxPairs = varWidth.get_idx_pair(op, "find_version_num for: "+op);
+  size_t usedVerBitsSize = nxtVerBits[op].size();
+  uint32_t lowIdx = idxPairs.second;
+  uint32_t highIdx = idxPairs.first;
+  std::string res = "{ ";  
+  if(usedVerBitsSize < lowIdx+1) {
+    // no bits are used before
+    return op;
+  }
+  else if(usedVerBitsSize < highIdx+1) {
+    // partial bits are used
+    for(uint32_t i = lowIdx; i < usedVerBitsSize; i++) {
+      if(nxtVerBits[op][i] == false) {
+        res += op+" ["+toStr(i)+"], ";
+      }
+    }
+    res += op+" ["+toStr(highIdx)+":"+toStr(usedVerBitsSize)+"] }";
+    return res;
+  }
+  else {
+    // all bits have been used
+    for(uint32_t i = lowIdx; i <= highIdx; i++) {
+      if(nxtVerBits[op][i] == false) {
+        res += op+" ["+toStr(i)+"], ";
+      }
+      res.pop_back();
+      res.pop_back();
+      res += " }";
+      return res;
+    }
+  }
 }
 
 
@@ -278,7 +316,7 @@ void parse_taintBits(std::string taintBits, bool &tExist, bool &rExist, bool &xE
 void collapse_bits(std::string varName, uint32_t bound1, uint32_t bound2, std::ofstream &output) {
   uint32_t begin = std::min(bound1, bound2);
   uint32_t end = std::max(bound1, bound2);
-  for (uint32_t i = begin; i < end - 1; ++i) {
+  for (uint32_t i = begin; i + 1 < end; ++i) {
     output << varName + "[" + std::to_string(i) + "] | ";
   }
   output << varName + "[" + std::to_string(end-1) + "];" << std::endl;
@@ -577,32 +615,32 @@ std::string get_lhs_ver_taint_list(std::string list, std::string taint, std::str
 }
 
 
-void get_ver_vec(std::vector<std::string> varVec, std::vector<uint32_t> &verVec) {
+void get_ver_vec(std::vector<std::string> varVec, std::vector<uint32_t> &verVec, std::ofstream &output) {
   assert(verVec.empty());
   bool pseudoIsNew;
   for(std::string var : varVec) {
     if(!isNum(var))
-      verVec.push_back( find_version_num(var, pseudoIsNew, true) );
+      verVec.push_back( find_version_num(var, pseudoIsNew, output, true) );
     else
       verVec.push_back( 0 );
   }
 }
 
 
-void get_ver_vec(std::string list, std::vector<uint32_t> &verVec) {
+void get_ver_vec(std::string list, std::vector<uint32_t> &verVec, std::ofstream &output) {
   std::vector<std::string> vec;
   parse_var_list(list, vec, true);
-  return get_ver_vec(vec, verVec);
+  return get_ver_vec(vec, verVec, output);
 }
 
 
-void get_ver_vec(std::vector<std::string> varVec, std::vector<uint32_t> &verVec, std::vector<bool> &isNewVec) {
+void get_ver_vec(std::vector<std::string> varVec, std::vector<uint32_t> &verVec, std::vector<bool> &isNewVec, std::ofstream &output) {
   assert(verVec.empty());
   assert(isNewVec.empty());
   bool isNew;
   for(std::string var : varVec) {
     if(!isNum(var)) {
-      verVec.push_back( find_version_num(var, isNew) );
+      verVec.push_back( find_version_num(var, isNew, output) );
       isNewVec.push_back(isNew);
     }
     else {

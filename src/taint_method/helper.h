@@ -26,7 +26,9 @@ uint32_t get_begin(std::string slice);
 
 uint32_t get_end(std::string slice);
 
-uint32_t find_version_num(std::string opAndSlice, bool &isNew, bool forceNewVer=false, std::unordered_map<std::string, uint32_t> &versionMap=nextVersion);
+uint32_t find_version_num(std::string opAndSlice, bool &isNew, std::ofstream &output, bool forceNewVer=false);
+
+std::string free_bits(std::string op);
 
 bool check_bits(std::string varSlice, std::vector<bool> &bitVec);
 
@@ -68,11 +70,11 @@ std::string get_lhs_taint_list(std::vector<std::string> &destVec, std::string ta
 
 std::string get_lhs_taint_list(std::string destList, std::string taint, std::string &newLogic);
 
-void get_ver_vec(std::vector<std::string> varVec, std::vector<uint32_t> &verVec);
+void get_ver_vec(std::vector<std::string> varVec, std::vector<uint32_t> &verVec, std::ofstream &output);
 
-void get_ver_vec(std::string list, std::vector<uint32_t> &verVec);
+void get_ver_vec(std::string list, std::vector<uint32_t> &verVec, std::ofstream &output);
 
-void get_ver_vec(std::vector<std::string> varVec, std::vector<uint32_t> &verVec, std::vector<bool> &isNewVec);
+void get_ver_vec(std::vector<std::string> varVec, std::vector<uint32_t> &verVec, std::vector<bool> &isNewVec, std::ofstream &output);
 
 int str2int(std::string str, std::string info);
 

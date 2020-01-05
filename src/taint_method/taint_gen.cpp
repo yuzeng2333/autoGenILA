@@ -987,7 +987,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
   destWidthNum = get_var_slice_width(destAndSlice);
   sWidthNum = get_var_slice_width(sAndSlice);
   sWidth = toStr(sWidthNum);
-  sVer = toStr(find_version_num(s, sIsNew));
+  sVer = toStr(find_version_num(s, sIsNew, output));
 
   if(!aIsNum && !bIsNum) {
     aWidthNum = get_var_slice_width(a);
@@ -996,8 +996,8 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     aWidth = toStr(aWidthNum);
     bWidth = toStr(bWidthNum);
 
-    aVer = toStr(find_version_num(a, aIsNew, true));
-    bVer = toStr(find_version_num(b, bIsNew, true));
+    aVer = toStr(find_version_num(a, aIsNew, output, true));
+    bVer = toStr(find_version_num(b, bIsNew, output, true));
     assert(aIsNew);
     assert(bIsNew);
 
@@ -1091,7 +1091,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     aWidthNum = get_var_slice_width(a);
     aWidth = toStr(aWidthNum);
     bool aIsNew;
-    aVer = toStr(find_version_num(a, aIsNew, true));
+    aVer = toStr(find_version_num(a, aIsNew, output, true));
     assert(aIsNew);
 
     // print _t function
@@ -1156,7 +1156,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     bWidthNum = get_var_slice_width(b);
     bWidth = toStr(bWidthNum);
     bool bIsNew;
-    bVer = toStr(find_version_num(b, bIsNew, true));
+    bVer = toStr(find_version_num(b, bIsNew, output, true));
     assert(bIsNew);
 
     // print _t function
@@ -1309,7 +1309,7 @@ void add_func_taints_call_limited(std::string line, std::ofstream &output) {
   std::string argTList = get_rhs_taint_list(varArgs, "_t");
 
   std::vector<uint32_t> verVec;
-  get_ver_vec(varArgs, verVec);
+  get_ver_vec(varArgs, verVec, output);
   std::string argRList = get_lhs_ver_taint_list(varArgs, "_r", output, verVec);
   std::string argXList = get_lhs_ver_taint_list(varArgs, "_x", output, verVec);
   std::string argCList = get_lhs_ver_taint_list(varArgs, "_c", output, verVec);
@@ -1364,7 +1364,7 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
     parse_var_list(signalAndSliceList, signalAndSliceVec);
     std::vector<uint32_t> signalVerVec;
     std::vector<bool> isNewVec;
-    get_ver_vec(signalAndSliceVec, signalVerVec, isNewVec);
+    get_ver_vec(signalAndSliceVec, signalVerVec, isNewVec, output);
     assert(signalVerVec.size() == isNewVec.size());
 
     input2SignalVerMap.emplace(input, signalVerVec);
