@@ -29,6 +29,15 @@ int main(int argc, char *argv[]) {
     bool isTop = (topModule.compare(module) == 0);
     add_taint_bottom_up(path, module, moduleReady, childModules, topModule, moduleInputsMap, moduleOutputsMap, moduleRFlagsMap);
   }
+
+  // in the file for top module, append "include" at the end
+  std::ofstream output(path+"/"+topModule+"_NEW.v.clean.tainted.final", std::ofstream::app);
+  for(std::string subModule: modules) {
+    if(subModule.compare(topModule) == 0)
+      continue;
+    output << "`include \"" + subModule + "_NEW.v.clean.tainted.final\"" << std::endl;
+  }
+  output.close();
   return 0;
 }
 
