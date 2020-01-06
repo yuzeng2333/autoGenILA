@@ -60,3 +60,6 @@ pids0:
 
 hie:
 	./a.out /workspace/research/ILA/autoGenILA/naiveEg/hierarchy/hierarchy_yosys.v 0
+
+ver:
+	./a.out /workspace/research/ILA/autoGenILA/naiveEg/find_version/find_version_yosys.v 0

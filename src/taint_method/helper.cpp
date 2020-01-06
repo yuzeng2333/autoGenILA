@@ -173,22 +173,31 @@ uint32_t find_version_num(std::string opAndSlice, bool &isNew, std::ofstream &ou
     verNum = 0;
     nextVersion.insert( std::make_pair(op, 1) );
     nxtVerBits.emplace( op, std::vector<bool>{} );
+    check_bits(op, opSlice, nxtVerBits[op]);
     isNew = true;
   }
   else {
     verNum = nextVersion[op];    
-    bool noConflict = check_bits(opSlice, nxtVerBits[op]);
+    bool noConflict = check_bits(op, opSlice, nxtVerBits[op]);
     if(!noConflict or forceNewVer) {
       // ground unassigned wires
-      std::string freeBits = free_bits(op);
-      output << "  assign "+freeBits+" = 0;" << std::endl;
+      std::vector<std::string> freeBitsVec;
+      free_bits(op, freeBitsVec);
+      if(freeBitsVec.size() > 0) {
+        output << "  assign "+add_taint(freeBitsVec, "_r"+toStr(verNum-1)) + " = 0;" << std::endl;
+        output << "  assign "+add_taint(freeBitsVec, "_x"+toStr(verNum-1)) + " = 0;" << std::endl;
+        output << "  assign "+add_taint(freeBitsVec, "_c"+toStr(verNum-1)) + " = 0;" << std::endl;
+      }
       nextVersion[op]++;
+      nxtVerBits[op].clear();
+      check_bits(op, opSlice, nxtVerBits[op]);
       isNew = true;
     }
     else if(forceNewVer){
       nextVersion[op]++;
       isNew = true;
       nxtVerBits[op].clear();
+      check_bits(op, opSlice, nxtVerBits[op]);      
     }
     else {
       verNum--;
@@ -199,81 +208,82 @@ uint32_t find_version_num(std::string opAndSlice, bool &isNew, std::ofstream &ou
 }
 
 
-std::string free_bits(std::string op) {
+void free_bits(std::string op, std::vector<std::string> &freeBitsVec) {
+  assert(freeBitsVec.empty());
   auto idxPairs = varWidth.get_idx_pair(op, "find_version_num for: "+op);
   size_t usedVerBitsSize = nxtVerBits[op].size();
   uint32_t lowIdx = idxPairs.second;
   uint32_t highIdx = idxPairs.first;
-  std::string res = "{ ";  
   if(usedVerBitsSize < lowIdx+1) {
     // no bits are used before
-    return op;
+    freeBitsVec.push_back(op);
+    return;
   }
   else if(usedVerBitsSize < highIdx+1) {
     // partial bits are used
     for(uint32_t i = lowIdx; i < usedVerBitsSize; i++) {
       if(nxtVerBits[op][i] == false) {
-        res += op+" ["+toStr(i)+"], ";
+        freeBitsVec.push_back(op+" ["+toStr(i)+"]");
       }
     }
-    res += op+" ["+toStr(highIdx)+":"+toStr(usedVerBitsSize)+"] }";
-    return res;
+    freeBitsVec.push_back(op+" ["+toStr(highIdx)+":"+toStr(usedVerBitsSize)+"]");
+    return;
   }
   else {
     // all bits have been used
     for(uint32_t i = lowIdx; i <= highIdx; i++) {
       if(nxtVerBits[op][i] == false) {
-        res += op+" ["+toStr(i)+"], ";
+        freeBitsVec.push_back(op+" ["+toStr(i)+"]");
       }
-      res.pop_back();
-      res.pop_back();
-      res += " }";
-      return res;
+      return;
     }
   }
 }
 
 
-// if return false, the bitVec is cleared
-// if return true, varSlice is merged to bitVec
-bool check_bits(std::string varSlice, std::vector<bool> &bitVec) {
-  // if varSlice is empty, must be conflict
-  if(varSlice.empty()) {
-    bitVec.clear();
-    return false;
-  }
-  std::regex pSlice("^(?:\\s*)\\[(\\d+)(?:\\:(\\d+))?\\](?:\\s*)$");
-  std::smatch m;
-  if(!std::regex_match(varSlice, m, pSlice)) {
-    toCout("Error: does not match slice: "+ varSlice);
-    abort();
-  }
-  uint32_t highIdx = str2int(m.str(1), "error for highIdx, Slice is: "+varSlice);
-  uint32_t lowIdx;
-  if(m.str(2).empty()) {
-    lowIdx = highIdx;
+// returns bool: noConflict
+// opSlice is merged to bitVec(although sometimes this is not 
+// needed, because the bitVec should be cleared)
+bool check_bits(std::string op, std::string opSlice, std::vector<bool> &bitVec) {
+  // if opSlice is empty, must be conflict
+  bool retVal = true;
+  uint32_t highIdx, lowIdx;
+  if(opSlice.empty()) {
+    auto idxPair = varWidth.get_idx_pair(op, "check_bits for: "+op);
+    highIdx = idxPair.first;
+    lowIdx = idxPair.second;
+    retVal = false;
   }
   else {
-    lowIdx = str2int(m.str(2), "error for lowIdx, Slice is: "+varSlice);
+    std::regex pSlice("^(?:\\s*)\\[(\\d+)(?:\\:(\\d+))?\\](?:\\s*)$");
+    std::smatch m;
+    if(!std::regex_match(opSlice, m, pSlice)) {
+      toCout("Error: does not match slice: "+ opSlice);
+      abort();
+    }
+    highIdx = str2int(m.str(1), "error for highIdx, Slice is: "+opSlice);
+    if(m.str(2).empty()) {
+      lowIdx = highIdx;
+    }
+    else {
+      lowIdx = str2int(m.str(2), "error for lowIdx, Slice is: "+opSlice);
+    }
   }
   size_t vecSize = bitVec.size();
   if(vecSize > highIdx) {
     for(long int i = highIdx; i >= lowIdx; i--) {
       if(bitVec[i]) {
-        bitVec.clear();
-        return false;
+        retVal = false;
       }
       else {
         bitVec[i] = true;
       }
     } // end of for
-    return true;
   }
   else if(vecSize > lowIdx){
     for(long int i = vecSize-1; i >= lowIdx; i--) {
       if(bitVec[i]) {
-        bitVec.clear();
-        return false;
+        retVal = false;
       }
       else {
         bitVec[i] = true;
@@ -282,17 +292,18 @@ bool check_bits(std::string varSlice, std::vector<bool> &bitVec) {
     while(vecSize++ <= highIdx) {
       bitVec.push_back(true);
     }
-    return true;
   }
   else {
-    while(vecSize++ <= lowIdx) {
+    while(vecSize < lowIdx) {
       bitVec.push_back(false);
+      vecSize++;
     }
-    while(vecSize++ <= highIdx) {
+    while(vecSize <= highIdx) {
       bitVec.push_back(true);
+      vecSize++;
     }
-    return true;    
   }
+  return retVal;
 }
 
 
@@ -526,7 +537,7 @@ std::string get_lhs_ver_taint_list(std::vector<std::string> &updateVec, std::str
       auto updateBoundPair = varWidth.get_idx_pair(update, "get_lhs_ver_taint_list");
       std::string updateWidth = toStr(updateWidthNum);
       std::string localVer = toStr(verVec[i++]);
-      output << "  logic [" + updateWidth + "-1:0] " + update + taint + localVer + " = 0;" << std::endl;
+      output << "  logic [" + updateWidth + "-1:0] " + update + taint + localVer + " ;" << std::endl;
       //ground_wires(update+taint+localVer, updateBoundPair, updateSlice, "  ", output);
       updateTaintSlice = update+taint+localVer+updateSlice;
     }
@@ -940,4 +951,13 @@ std::string get_bits(std::string inNum, uint32_t highIdx, uint32_t lowIdx) {
 }
 
 
-
+std::string add_taint(std::vector<std::string> &freeBitsVec, std::string taint) {
+  std::string res = "{ ";
+  for(std::string freeBits: freeBitsVec) {
+    res += insert_taint(freeBits, taint) + ", ";
+  }
+  res.pop_back();
+  res.pop_back();
+  res += " }";
+  return res;
+}

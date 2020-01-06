@@ -612,6 +612,7 @@ void merge_taints(std::string fileName) {
     }
   }
 
+  // these wires are never used as inputs
   for (auto wire : moduleWires) {
     if ( isNum(wire) ) {
       std::cout << "find num in nextVersion: " + wire << std::endl;
@@ -645,6 +646,19 @@ void merge_taints(std::string fileName) {
   //    moduleInputs.push_back(out+"_r");
   //  }
   //}
+
+  // some bits of taints are still floating
+  std::unordered_map<std::string, std::vector<bool>> nxtVerBits;
+  for(auto it = nxtVerBits.begin(); it != nxtVerBits.end(); ++it) {
+    uint32_t verNum = nextVersion[it->first];
+    std::vector<std::string> freeBitsVec;
+    free_bits(it->first, freeBitsVec);
+    if(freeBitsVec.size() > 0) {
+      output << "  assign "+add_taint(freeBitsVec, "_r"+toStr(verNum-1)) + " = 0;" << std::endl;
+      output << "  assign "+add_taint(freeBitsVec, "_x"+toStr(verNum-1)) + " = 0;" << std::endl;
+      output << "  assign "+add_taint(freeBitsVec, "_c"+toStr(verNum-1)) + " = 0;" << std::endl;
+    }
+  }
 
   gen_assert_property(output);
 
@@ -1382,9 +1396,9 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
       std::string signalHighIdx = toStr(signalIdxPair.first);
       std::string signalLowIdx = toStr(signalIdxPair.second);
       if(isNewVec[i]) {
-        output << "  logic [" + signalHighIdx + ":" + signalLowIdx + "] " + signal + "_r" + toStr(signalVerVec[i])   + " = 0;" << std::endl;
-        output << "  logic [" + signalHighIdx + ":" + signalLowIdx + "] " + signal + "_x" + toStr(signalVerVec[i])   + " = 0;" << std::endl;
-        output << "  logic [" + signalHighIdx + ":" + signalLowIdx + "] " + signal + "_c" + toStr(signalVerVec[i++]) + " = 0;" << std::endl;
+        output << "  logic [" + signalHighIdx + ":" + signalLowIdx + "] " + signal + "_r" + toStr(signalVerVec[i])   + " ;" << std::endl;
+        output << "  logic [" + signalHighIdx + ":" + signalLowIdx + "] " + signal + "_x" + toStr(signalVerVec[i])   + " ;" << std::endl;
+        output << "  logic [" + signalHighIdx + ":" + signalLowIdx + "] " + signal + "_c" + toStr(signalVerVec[i++]) + " ;" << std::endl;
       }
     }
   }

@@ -28,9 +28,9 @@ uint32_t get_end(std::string slice);
 
 uint32_t find_version_num(std::string opAndSlice, bool &isNew, std::ofstream &output, bool forceNewVer=false);
 
-std::string free_bits(std::string op);
+void free_bits(std::string op, std::vector<std::string> &freeBitsVec);
 
-bool check_bits(std::string varSlice, std::vector<bool> &bitVec);
+bool check_bits(std::string op, std::string opSlice, std::vector<bool> &bitVec);
 
 void parse_taintBits(std::string taintBits, bool &tExist, bool &rExist, bool &xExist, bool &cExist);
 
@@ -101,4 +101,6 @@ std::string max_num(std::string widthStr);
 std::string dec2bin(uint32_t inNum);
 
 std::string get_bits(std::string inNum, uint32_t highIdx, uint32_t lowIdx);
+
+std::string add_taint(std::vector<std::string> &freeBitsVec, std::string taint);
 #endif
