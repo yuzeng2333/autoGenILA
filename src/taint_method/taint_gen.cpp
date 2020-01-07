@@ -648,7 +648,7 @@ void merge_taints(std::string fileName) {
   //}
 
   // some bits of taints are still floating
-  std::unordered_map<std::string, std::vector<bool>> nxtVerBits;
+  //output << "// ground floating taints" << std::endl;
   for(auto it = nxtVerBits.begin(); it != nxtVerBits.end(); ++it) {
     uint32_t verNum = nextVersion[it->first];
     std::vector<std::string> freeBitsVec;

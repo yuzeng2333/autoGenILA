@@ -173,7 +173,6 @@ uint32_t find_version_num(std::string opAndSlice, bool &isNew, std::ofstream &ou
     verNum = 0;
     nextVersion.insert( std::make_pair(op, 1) );
     nxtVerBits.emplace( op, std::vector<bool>{} );
-    check_bits(op, opSlice, nxtVerBits[op]);
     isNew = true;
   }
   else {
@@ -190,20 +189,19 @@ uint32_t find_version_num(std::string opAndSlice, bool &isNew, std::ofstream &ou
       }
       nextVersion[op]++;
       nxtVerBits[op].clear();
-      check_bits(op, opSlice, nxtVerBits[op]);
       isNew = true;
     }
     else if(forceNewVer){
       nextVersion[op]++;
       isNew = true;
       nxtVerBits[op].clear();
-      check_bits(op, opSlice, nxtVerBits[op]);      
     }
     else {
       verNum--;
       isNew = false;
     }
   }
+  merge_bits(op, opSlice, nxtVerBits[op]);  
   return verNum;
 }
 
@@ -242,17 +240,11 @@ void free_bits(std::string op, std::vector<std::string> &freeBitsVec) {
 
 
 // returns bool: noConflict
-// opSlice is merged to bitVec(although sometimes this is not 
-// needed, because the bitVec should be cleared)
-bool check_bits(std::string op, std::string opSlice, std::vector<bool> &bitVec) {
+bool check_bits(std::string op, std::string opSlice, const std::vector<bool> &bitVec) {
   // if opSlice is empty, must be conflict
-  bool retVal = true;
   uint32_t highIdx, lowIdx;
   if(opSlice.empty()) {
-    auto idxPair = varWidth.get_idx_pair(op, "check_bits for: "+op);
-    highIdx = idxPair.first;
-    lowIdx = idxPair.second;
-    retVal = false;
+    return false;
   }
   else {
     std::regex pSlice("^(?:\\s*)\\[(\\d+)(?:\\:(\\d+))?\\](?:\\s*)$");
@@ -273,19 +265,60 @@ bool check_bits(std::string op, std::string opSlice, std::vector<bool> &bitVec) 
   if(vecSize > highIdx) {
     for(long int i = highIdx; i >= lowIdx; i--) {
       if(bitVec[i]) {
-        retVal = false;
-      }
-      else {
-        bitVec[i] = true;
+        return false;
       }
     } // end of for
   }
   else if(vecSize > lowIdx){
     for(long int i = vecSize-1; i >= lowIdx; i--) {
       if(bitVec[i]) {
-        retVal = false;
+        return false;
       }
-      else {
+    } // end of for
+  }
+  else {
+    return true;
+  }
+  return true;
+}
+
+
+// opSlice is merged to bitVec(although sometimes this is not 
+// needed, because the bitVec should be cleared)
+void merge_bits(std::string op, std::string opSlice, std::vector<bool> &bitVec) {
+  // if opSlice is empty, must be conflict
+  uint32_t highIdx, lowIdx;
+  if(opSlice.empty()) {
+    auto idxPair = varWidth.get_idx_pair(op, "check_bits for: "+op);
+    highIdx = idxPair.first;
+    lowIdx = idxPair.second;
+  }
+  else {
+    std::regex pSlice("^(?:\\s*)\\[(\\d+)(?:\\:(\\d+))?\\](?:\\s*)$");
+    std::smatch m;
+    if(!std::regex_match(opSlice, m, pSlice)) {
+      toCout("Error: does not match slice: "+ opSlice);
+      abort();
+    }
+    highIdx = str2int(m.str(1), "error for highIdx, Slice is: "+opSlice);
+    if(m.str(2).empty()) {
+      lowIdx = highIdx;
+    }
+    else {
+      lowIdx = str2int(m.str(2), "error for lowIdx, Slice is: "+opSlice);
+    }
+  }
+  size_t vecSize = bitVec.size();
+  if(vecSize > highIdx) {
+    for(long int i = highIdx; i >= lowIdx; i--) {
+      if(!bitVec[i]) {
+        bitVec[i] = true;
+      }
+    } // end of for
+  }
+  else if(vecSize > lowIdx){
+    for(long int i = vecSize-1; i >= lowIdx; i--) {
+      if(!bitVec[i]) {
         bitVec[i] = true;
       }
     } // end of for
@@ -303,7 +336,6 @@ bool check_bits(std::string op, std::string opSlice, std::vector<bool> &bitVec) 
       vecSize++;
     }
   }
-  return retVal;
 }
 
 

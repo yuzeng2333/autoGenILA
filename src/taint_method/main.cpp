@@ -31,11 +31,11 @@ int main(int argc, char *argv[]) {
   }
 
   // in the file for top module, append "include" at the end
-  std::ofstream output(path+"/"+topModule+"_NEW.v.clean.tainted.final", std::ofstream::app);
+  std::ofstream output(path+"/"+"include.final");
   for(std::string subModule: modules) {
     if(subModule.compare(topModule) == 0)
       continue;
-    output << "`include \"" + subModule + "_NEW.v.clean.tainted.final\"" << std::endl;
+    output << "`include \"../RTL/" + subModule + "_NEW.v.clean.tainted.final\"" << std::endl;
   }
   output.close();
   return 0;

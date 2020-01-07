@@ -2,7 +2,7 @@ all:
 	g++ taint_gen.cpp helper.cpp op_taint_gen.cpp VarWidth.cpp main.cpp
 
 debug:
-	g++ -g taint_gen.cpp helper.cpp op_taint_gen.cpp VarWidth.cpp main.cpp
+	g++ -D_GLIBCXX_USE_CXX11_ABI=0 -g taint_gen.cpp helper.cpp op_taint_gen.cpp VarWidth.cpp main.cpp
 
 adder:
 	./a.out /workspace/research/ILA/autoGenILA/naiveEg/word_adder/word_adder_yosys.v 0
@@ -61,5 +61,8 @@ pids0:
 hie:
 	./a.out /workspace/research/ILA/autoGenILA/naiveEg/hierarchy/hierarchy_yosys.v 0
 
-ver:
+ver0:
 	./a.out /workspace/research/ILA/autoGenILA/naiveEg/find_version/find_version_yosys.v 0
+
+ver1:
+	./a.out /workspace/research/ILA/autoGenILA/naiveEg/find_version/find_version_yosys.v 1

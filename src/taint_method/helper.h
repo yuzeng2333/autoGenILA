@@ -30,7 +30,9 @@ uint32_t find_version_num(std::string opAndSlice, bool &isNew, std::ofstream &ou
 
 void free_bits(std::string op, std::vector<std::string> &freeBitsVec);
 
-bool check_bits(std::string op, std::string opSlice, std::vector<bool> &bitVec);
+bool check_bits(std::string op, std::string opSlice, const std::vector<bool> &bitVec);
+
+void merge_bits(std::string op, std::string opSlice, std::vector<bool> &bitVec);
 
 void parse_taintBits(std::string taintBits, bool &tExist, bool &rExist, bool &xExist, bool &cExist);
 
