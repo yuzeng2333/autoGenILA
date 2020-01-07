@@ -128,7 +128,8 @@ std::pair<uint32_t, uint32_t> VarWidth::get_idx_pair(std::string var, std::strin
     var = m.str(2);
   }
   if(!check_key(var, line)) {
-    toCout("check_key not passed for idx pair");    
+    toCout("check_key not passed for idx pair, var:"+var);
+    toCout("info: "+line);
     abort();
   }
   return internalVarWidth[var];

@@ -149,6 +149,7 @@ void clean_global_data() {
   rTaints.clear();
   g_wire2reg.clear();
   nextVersion.clear();
+  nxtVerBits.clear();
   new_next.clear();
   update_reg.clear();
   varWidth.clear();
