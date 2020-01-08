@@ -169,6 +169,9 @@ uint32_t find_version_num(std::string opAndSlice, bool &isNew, std::ofstream &ou
   uint32_t verNum;
   std::string op, opSlice;
   split_slice(opAndSlice, op, opSlice);
+  if( op == "G5" ) {
+    toCout("G5 found in find_version");
+  }
   if ( nextVersion.find(op) == nextVersion.end() ) {
     verNum = 0;
     nextVersion.insert( std::make_pair(op, 1) );
@@ -233,8 +236,8 @@ void free_bits(std::string op, std::vector<std::string> &freeBitsVec) {
       if(nxtVerBits[op][i] == false) {
         freeBitsVec.push_back(op+" ["+toStr(i)+"]");
       }
-      return;
     }
+    return;    
   }
 }
 

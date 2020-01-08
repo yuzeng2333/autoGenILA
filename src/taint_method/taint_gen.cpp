@@ -1428,9 +1428,9 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
   for(std::string outPort: moduleOutputsMap[moduleName]) {
     output << "    ." + outPort + "_t ( " + get_lhs_taint_list(port2SignalMap[outPort], "_t", newLogic) + " )," << std::endl;
     newLogicVec.push_back(newLogic);    
-    output << "    ." + outPort + "_r ( " + get_rhs_taint_list(port2SignalMap[outPort], "_r") + " )," << std::endl; 
-    output << "    ." + outPort + "_x ( " + get_rhs_taint_list(port2SignalMap[outPort], "_x") + " )," << std::endl; 
-    output << "    ." + outPort + "_c ( " + get_rhs_taint_list(port2SignalMap[outPort], "_c") + " )," << std::endl; 
+    output << "    ." + outPort + "_r0 ( " + get_rhs_taint_list(port2SignalMap[outPort], "_r") + " )," << std::endl; 
+    output << "    ." + outPort + "_x0 ( " + get_rhs_taint_list(port2SignalMap[outPort], "_x") + " )," << std::endl; 
+    output << "    ." + outPort + "_c0 ( " + get_rhs_taint_list(port2SignalMap[outPort], "_c") + " )," << std::endl; 
   }
   // TODO: we cannot leave these _r_flags in the sub-modules,
   //for(std::string reg_r_flag: flagOutputs) {

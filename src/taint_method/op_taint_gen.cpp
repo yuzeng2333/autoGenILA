@@ -153,6 +153,7 @@ void output_insert_map(std::string line, std::ofstream &output, std::ifstream &i
   output << blank << "output " + slice + var + "_t ;" << std::endl;
   bool inTaintIsNew;
   uint32_t inVerNum = find_version_num(var, inTaintIsNew, output);
+  assert(inVerNum == 0);
   assert(inTaintIsNew);
   output << blank << "input " + slice + var + "_r" + toStr(inVerNum) + " ;" << std::endl;
   output << blank << "input " + slice + var + "_c" + toStr(inVerNum) + " ;" << std::endl;
@@ -161,6 +162,9 @@ void output_insert_map(std::string line, std::ofstream &output, std::ifstream &i
   else 
     output << blank << "wire " + slice + var + "_x" + toStr(inVerNum) + " ;" << std::endl;
 
+  output << blank << "wire " + slice + var + "_r ;" << std::endl;
+  output << blank << "wire " + slice + var + "_c ;" << std::endl;
+  output << blank << "wire " + slice + var + "_x ;" << std::endl;  
 
   extendOutputs.push_back(var+"_t");
   extendInputs.push_back(var+"_r"+toStr(inVerNum));
@@ -221,6 +225,9 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
   // !! Attention: op1 is just var name, op1Slice is its slice
   split_slice(op1AndSlice, op1, op1Slice);
   split_slice(op2AndSlice, op2, op2Slice);
+  if( op2 == "G5" ) {
+    toCout("G5 found in twp_op");
+  }
 
   auto op1IdxPair = varWidth.get_idx_pair(op1, line);
   auto op2IdxPair = varWidth.get_idx_pair(op2, line);
