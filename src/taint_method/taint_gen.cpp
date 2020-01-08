@@ -985,6 +985,8 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
   std::string a, aSlice;
   std::string b, bSlice;
   std::string s, sSlice;
+  std::string aAndSlice = caseAssignPairs.back().second;
+  std::string bAndSlice = caseAssignPairs[0].second;
   split_slice(destAndSlice, dest, destSlice);
   split_slice(caseAssignPairs[0].second, b, bSlice);
   split_slice(caseAssignPairs.back().second, a, aSlice);
@@ -1002,7 +1004,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
   destWidthNum = get_var_slice_width(destAndSlice);
   sWidthNum = get_var_slice_width(sAndSlice);
   sWidth = toStr(sWidthNum);
-  sVer = toStr(find_version_num(s, sIsNew, output));
+  sVer = toStr(find_version_num(sAndSlice, sIsNew, output));
 
   if(!aIsNum && !bIsNum) {
     aWidthNum = get_var_slice_width(a);
@@ -1011,8 +1013,8 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     aWidth = toStr(aWidthNum);
     bWidth = toStr(bWidthNum);
 
-    aVer = toStr(find_version_num(a, aIsNew, output, true));
-    bVer = toStr(find_version_num(b, bIsNew, output, true));
+    aVer = toStr(find_version_num(aAndSlice, aIsNew, output, true));
+    bVer = toStr(find_version_num(bAndSlice, bIsNew, output, true));
     assert(aIsNew);
     assert(bIsNew);
 
@@ -1106,7 +1108,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     aWidthNum = get_var_slice_width(a);
     aWidth = toStr(aWidthNum);
     bool aIsNew;
-    aVer = toStr(find_version_num(a, aIsNew, output, true));
+    aVer = toStr(find_version_num(aAndSlice, aIsNew, output, true));
     assert(aIsNew);
 
     // print _t function
@@ -1171,7 +1173,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     bWidthNum = get_var_slice_width(b);
     bWidth = toStr(bWidthNum);
     bool bIsNew;
-    bVer = toStr(find_version_num(b, bIsNew, output, true));
+    bVer = toStr(find_version_num(bAndSlice, bIsNew, output, true));
     assert(bIsNew);
 
     // print _t function
