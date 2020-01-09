@@ -169,9 +169,6 @@ uint32_t find_version_num(std::string opAndSlice, bool &isNew, std::ofstream &ou
   uint32_t verNum;
   std::string op, opSlice;
   split_slice(opAndSlice, op, opSlice);
-  if( op == "G2" ) {
-    toCout("G2 found in find_version");
-  }
   if ( nextVersion.find(op) == nextVersion.end() ) {
     verNum = 0;
     nextVersion.insert( std::make_pair(op, 1) );

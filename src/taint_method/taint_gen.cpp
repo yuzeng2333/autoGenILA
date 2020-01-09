@@ -1014,7 +1014,44 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     bWidth = toStr(bWidthNum);
 
     aVer = toStr(find_version_num(aAndSlice, aIsNew, output, true));
-    bVer = toStr(find_version_num(bAndSlice, bIsNew, output, true));
+
+    // collect all the indexes for b
+    // Assume: the index series are continuous
+    std::string bTotalSlice; 
+    std::string firstBSlice, lastBSlice;
+    split_slice(caseAssignPairs[0].second, b, firstBSlice);
+    split_slice(caseAssignPairs[caseAssignPairs.size()-2].second, b, lastBSlice);
+
+    uint32_t firstLeftIdx = get_end(firstBSlice);
+    uint32_t firstRightIdx = get_begin(firstBSlice);
+    uint32_t lastLeftIdx = get_end(lastBSlice);
+    uint32_t lastRightIdx = get_begin(lastBSlice);
+    if(firstLeftIdx > firstRightIdx) {
+      if(!(lastLeftIdx > lastRightIdx)) {
+        toCout("first b: "+caseAssignPairs[0].second);
+        toCout("last b: "+caseAssignPairs[caseAssignPairs.size()-2].second);
+      }
+      if(firstLeftIdx > lastLeftIdx) {
+        bTotalSlice = "["+toStr(firstLeftIdx)+":"+toStr(lastRightIdx)+"]";
+      }
+      else {
+        bTotalSlice = "["+toStr(lastLeftIdx)+":"+toStr(firstRightIdx)+"]";
+      }
+    }
+    else {
+      if(!(lastLeftIdx <= lastRightIdx)) {
+        toCout("first b: "+caseAssignPairs[0].second);
+        toCout("last b: "+caseAssignPairs[caseAssignPairs.size()-2].second);
+      }
+      if(firstRightIdx > lastRightIdx) {
+        bTotalSlice = "["+toStr(firstRightIdx)+":"+toStr(lastLeftIdx)+"]";
+      }
+      else {
+        bTotalSlice = "["+toStr(lastRightIdx)+":"+toStr(firstLeftIdx)+"]";
+      }
+    }
+    bVer = toStr(find_version_num(b+bTotalSlice, bIsNew, output, true));
+
     assert(aIsNew);
     assert(bIsNew);
 
@@ -1037,17 +1074,17 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
 
     // print _r function
     if(sIsNew) {
-    output << blank + "reg [" + sWidth + "-1:0] " + s + "_r" + sVer + " = 0;" << std::endl;
-    output << blank + "reg [" + sWidth + "-1:0] " + s + "_x" + sVer + " = 0;" << std::endl;
-    output << blank + "reg [" + sWidth + "-1:0] " + s + "_c" + sVer + " = 0;" << std::endl;
+    output << blank + "logic [" + sWidth + "-1:0] " + s + "_r" + sVer + " ;" << std::endl;
+    output << blank + "logic [" + sWidth + "-1:0] " + s + "_x" + sVer + " ;" << std::endl;
+    output << blank + "logic [" + sWidth + "-1:0] " + s + "_c" + sVer + " ;" << std::endl;
     }
-    output << blank + "reg [" + aWidth + "-1:0] " + a + "_r" + aVer + " = 0;" << std::endl;
-    output << blank + "reg [" + aWidth + "-1:0] " + a + "_x" + aVer + " = 0;" << std::endl;
-    output << blank + "reg [" + aWidth + "-1:0] " + a + "_c" + aVer + " = 0;" << std::endl;
+    output << blank + "logic [" + aWidth + "-1:0] " + a + "_r" + aVer + " ;" << std::endl;
+    output << blank + "logic [" + aWidth + "-1:0] " + a + "_x" + aVer + " ;" << std::endl;
+    output << blank + "logic [" + aWidth + "-1:0] " + a + "_c" + aVer + " ;" << std::endl;
 
-    output << blank + "reg [" + bWidth + "-1:0] " + b + "_r" + bVer + " = 0;" << std::endl;
-    output << blank + "reg [" + bWidth + "-1:0] " + b + "_x" + bVer + " = 0;" << std::endl;
-    output << blank + "reg [" + bWidth + "-1:0] " + b + "_c" + bVer + " = 0;" << std::endl;
+    output << blank + "logic [" + bWidth + "-1:0] " + b + "_r" + bVer + " ;" << std::endl;
+    output << blank + "logic [" + bWidth + "-1:0] " + b + "_x" + bVer + " ;" << std::endl;
+    output << blank + "logic [" + bWidth + "-1:0] " + b + "_c" + bVer + " ;" << std::endl;
 
     output << blank + "always @( "+dest+"_r"+destSlice+" or "+s+" ) begin" << std::endl;
     output << blank + "  "+s+"_r"+sVer+" "+sSlice+" = " + extend("| "+dest+"_r"+destSlice, sWidthNum) + " ;" << std::endl;
@@ -1173,7 +1210,34 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     bWidthNum = get_var_slice_width(b);
     bWidth = toStr(bWidthNum);
     bool bIsNew;
-    bVer = toStr(find_version_num(bAndSlice, bIsNew, output, true));
+    std::string bTotalSlice; 
+    std::string firstBSlice, lastBSlice;
+    split_slice(caseAssignPairs[0].second, b, firstBSlice);
+    split_slice(caseAssignPairs[caseAssignPairs.size()-2].second, b, lastBSlice);
+
+    uint32_t firstLeftIdx = get_end(firstBSlice);
+    uint32_t firstRightIdx = get_begin(firstBSlice);
+    uint32_t lastLeftIdx = get_end(lastBSlice);
+    uint32_t lastRightIdx = get_begin(lastBSlice);
+    if(firstLeftIdx > firstRightIdx) {
+      assert(lastLeftIdx > lastRightIdx);
+      if(firstLeftIdx > lastLeftIdx) {
+        bTotalSlice = "["+toStr(firstLeftIdx)+":"+toStr(lastRightIdx)+"]";
+      }
+      else {
+        bTotalSlice = "["+toStr(lastLeftIdx)+":"+toStr(firstRightIdx)+"]";
+      }
+    }
+    else {
+      assert(lastLeftIdx <= lastRightIdx);
+      if(firstRightIdx > lastRightIdx) {
+        bTotalSlice = "["+toStr(firstRightIdx)+":"+toStr(lastLeftIdx)+"]";
+      }
+      else {
+        bTotalSlice = "["+toStr(lastRightIdx)+":"+toStr(firstLeftIdx)+"]";
+      }
+    }
+    bVer = toStr(find_version_num(b+bTotalSlice, bIsNew, output, true));
     assert(bIsNew);
 
     // print _t function
