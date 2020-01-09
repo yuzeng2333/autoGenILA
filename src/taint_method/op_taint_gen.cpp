@@ -58,12 +58,35 @@ void reg_taint_gen(std::string line, std::ofstream &output) {
   std::string var = m.str(3);
   std::string num = m.str(4);
 
-  flagOutputs.push_back(var+"_r_flag");
+  //flagOutputs.push_back(var+"_r_flag");
   moduleRegs.push_back(var);
-  output << blank << "logic " + slice + " " + var + "_t ;" << std::endl;
+  if(!isOutput(var)) {
+    output << blank << "logic " + slice + " " + var + "_t ;" << std::endl;
+  }
+  else {
+    bool inTaintIsNew;    
+    uint32_t inVerNum = find_version_num(var, inTaintIsNew, output);
+    assert(inVerNum == 0);
+    assert(inTaintIsNew);    
+    output << blank << "output " + slice + " " + var + "_t ;" << std::endl;
+    output << blank << "input " + slice + " " + var + "_r" + toStr(inVerNum) + " ;" << std::endl;
+    output << blank << "input " + slice + " " + var + "_c" + toStr(inVerNum) + " ;" << std::endl;
+    if(!isTop) {
+      output << blank << "input " + slice + var + "_x" + toStr(inVerNum) + " ;" << std::endl;
+      extendInputs.push_back(var+"_x"+toStr(inVerNum));      
+    }
+    else {
+      output << blank << "wire " + slice + var + "_x" + toStr(inVerNum) + " ;" << std::endl;
+      output << blank << "assign " + var + "_x" + toStr(inVerNum) + " = " + max_num(get_width(slice)) + " ;" << std::endl;
+    }
+    extendOutputs.push_back(var+"_t");
+    extendInputs.push_back(var+"_r"+toStr(inVerNum));
+    extendInputs.push_back(var+"_c"+toStr(inVerNum));
+  }
+
   output << blank << "logic " + var + "_t_1bit ;" << std::endl;
   output << blank << "logic " + var + "_t_flag ;" << std::endl;
-  output << blank << "output logic " + var + "_r_flag ;" << std::endl;
+  output << blank << "logic " + var + "_r_flag ;" << std::endl;
   output << blank << "logic " + slice + " " + var + "_r ;" << std::endl;
   output << blank << "logic " + slice + " " + var + "_x ;" << std::endl;
   output << blank << "logic " + slice + " " + var + "_c ;" << std::endl;
@@ -162,9 +185,9 @@ void output_insert_map(std::string line, std::ofstream &output, std::ifstream &i
   else 
     output << blank << "wire " + slice + var + "_x" + toStr(inVerNum) + " ;" << std::endl;
 
-  output << blank << "wire " + slice + var + "_r ;" << std::endl;
-  output << blank << "wire " + slice + var + "_c ;" << std::endl;
-  output << blank << "wire " + slice + var + "_x ;" << std::endl;  
+  output << blank << "logic " + slice + var + "_r ;" << std::endl;
+  output << blank << "logic " + slice + var + "_c ;" << std::endl;
+  output << blank << "logic " + slice + var + "_x ;" << std::endl;  
 
   extendOutputs.push_back(var+"_t");
   extendInputs.push_back(var+"_r"+toStr(inVerNum));
