@@ -1050,9 +1050,9 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     output << blank + "reg [" + bWidth + "-1:0] " + b + "_c" + bVer + " = 0;" << std::endl;
 
     output << blank + "always @( "+dest+"_r"+destSlice+" or "+s+" ) begin" << std::endl;
-    output << blank + "  "+s+"_r"+sVer+sSlice+" = " + extend("| "+dest+"_r"+destSlice, sWidthNum) + " ;" << std::endl;
-    output << blank + "  "+b+"_r"+bVer+" = 0 ;" << std::endl;
-    output << blank + "  "+a+"_r"+aVer+" = 0 ;" << std::endl;
+    output << blank + "  "+s+"_r"+sVer+" "+sSlice+" = " + extend("| "+dest+"_r"+destSlice, sWidthNum) + " ;" << std::endl;
+    //output << blank + "  "+b+"_r"+bVer+" "+bSlice+" = 0 ;" << std::endl;
+    //output << blank + "  "+a+"_r"+aVer+" "+aSlice+" = 0 ;" << std::endl;
     output << blank + "  casez ("+sAndSlice+")" << std::endl;
     for(auto localPair: caseAssignPairs) {
       split_slice(localPair.second, rhs, rhsSlice);
@@ -1067,8 +1067,8 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     // print _x function
     output << blank + "always @( "+dest+"_x"+destSlice+" or "+s+" ) begin" << std::endl;  
     output << blank + "  "+s+"_x"+sVer+sSlice+" = " + extend("| "+dest+"_x"+destSlice, sWidthNum) + " ;" << std::endl;
-    output << blank + "  "+b+"_x"+bVer+" = 0 ;" << std::endl;
-    output << blank + "  "+a+"_x"+aVer+" = 0 ;" << std::endl;
+    //output << blank + "  "+b+"_x"+bVer+" = 0 ;" << std::endl;
+    //output << blank + "  "+a+"_x"+aVer+" = 0 ;" << std::endl;
     output << blank + "  casez ("+sAndSlice+")" << std::endl;
     for(auto localPair: caseAssignPairs) {
       split_slice(localPair.second, rhs, rhsSlice);
@@ -1083,8 +1083,8 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     // print _c function
     output << blank + "always @( "+dest+"_c"+destSlice+" or "+s+" ) begin" << std::endl;  
     output << blank + "  "+s+"_c"+sVer+sSlice+" = " + extend("1'b1", sWidthNum) + " ;" << std::endl;
-    output << blank + "  "+b+"_c"+bVer+" = 0 ;" << std::endl;
-    output << blank + "  "+a+"_c"+aVer+" = 0 ;" << std::endl;
+    //output << blank + "  "+b+"_c"+bVer+" = 0 ;" << std::endl;
+    //output << blank + "  "+a+"_c"+aVer+" = 0 ;" << std::endl;
     output << blank + "  casez ("+sAndSlice+")" << std::endl;
     for(auto localPair: caseAssignPairs) {
       split_slice(localPair.second, rhs, rhsSlice);
@@ -1140,7 +1140,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
 
     output << blank + "always @( "+dest+"_r"+destSlice+" or "+s+" ) begin" << std::endl;
     output << blank + "  "+s+"_r"+sVer+sSlice+" = " + extend("| "+dest+"_r"+destSlice, sWidthNum) + " ;" << std::endl;
-    output << blank + "  "+a+"_r"+aVer+" = 0 ;" << std::endl;
+    //output << blank + "  "+a+"_r"+aVer+" = 0 ;" << std::endl;
     output << blank + "  if (" + sAndSlice + " == 0 )" << std::endl;
     output << blank + "    "+a+"_r"+aVer+" = "+dest+"_r"+destSlice+" ;" << std::endl;
     output << blank + "end" << std::endl;  
@@ -1148,7 +1148,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     // print _x function
     output << blank + "always @( "+dest+"_x"+destSlice+" or "+s+" ) begin" << std::endl;  
     output << blank + "  "+s+"_x"+sVer+sSlice+" = " + extend("| "+dest+"_x"+destSlice, sWidthNum) + " ;" << std::endl;
-    output << blank + "  "+a+"_x"+aVer+" = 0 ;" << std::endl;
+    //output << blank + "  "+a+"_x"+aVer+" = 0 ;" << std::endl;
     output << blank + "  if (" + sAndSlice + " == 0 )" << std::endl;
     output << blank + "    "+a+"_x"+aVer+" = "+dest+"_x"+destSlice+" ;" << std::endl;
     output << blank + "end" << std::endl;
@@ -1156,7 +1156,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     // print _c function
     output << blank + "always @( "+dest+"_c"+destSlice+" or "+s+" ) begin" << std::endl;  
     output << blank + "  "+s+"_c"+sVer+sSlice+" = " + extend("1'b1", sWidthNum) + " ;" << std::endl;
-    output << blank + "  "+a+"_c"+aVer+" = 0 ;" << std::endl;
+    //output << blank + "  "+a+"_c"+aVer+" = 0 ;" << std::endl;
     output << blank + "  if (" + sAndSlice + " == 0 )" << std::endl;
     output << blank + "    "+a+"_c"+aVer+" = "+dest+"_c"+destSlice+" ;" << std::endl;
     output << blank + "end" << std::endl;
@@ -1204,7 +1204,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
 
     output << blank + "always @( "+dest+"_r"+destSlice+" or "+s+" ) begin" << std::endl;
     output << blank + "  "+s+"_r"+sVer+sSlice+" = " + extend("| "+dest+"_r"+destSlice, sWidthNum) + " ;" << std::endl;
-    output << blank + "  "+b+"_r"+bVer+" = 0 ;" << std::endl;
+    //output << blank + "  "+b+"_r"+bVer+" = 0 ;" << std::endl;
     output << blank + "  casez ("+sAndSlice+")" << std::endl;
     for(auto localPair: caseAssignPairs) {
       split_slice(localPair.second, rhs, rhsSlice);
@@ -1217,7 +1217,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     // print _x function
     output << blank + "always @( "+dest+"_x"+destSlice+" or "+s+" ) begin" << std::endl;  
     output << blank + "  "+s+"_x"+sVer+sSlice+" = " + extend("| "+dest+"_x"+destSlice, sWidthNum) + " ;" << std::endl;
-    output << blank + "  "+b+"_x"+bVer+" = 0 ;" << std::endl;
+    //output << blank + "  "+b+"_x"+bVer+" = 0 ;" << std::endl;
     output << blank + "  casez ("+sAndSlice+")" << std::endl;
     for(auto localPair: caseAssignPairs) {
       split_slice(localPair.second, rhs, rhsSlice);
@@ -1230,7 +1230,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     // print _c function
     output << blank + "always @( "+dest+"_c"+destSlice+" or "+s+" ) begin" << std::endl;  
     output << blank + "  "+s+"_c"+sVer+sSlice+" = " + extend("1'b1", sWidthNum) + " ;" << std::endl;
-    output << blank + "  "+b+"_c"+bVer+" = 0 ;" << std::endl;
+    //output << blank + "  "+b+"_c"+bVer+" = 0 ;" << std::endl;
     output << blank + "  casez ("+sAndSlice+")" << std::endl;
     for(auto localPair: caseAssignPairs) {
       split_slice(localPair.second, rhs, rhsSlice);
