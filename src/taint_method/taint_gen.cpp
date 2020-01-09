@@ -1476,6 +1476,7 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
   //}
 
   // printed extended module instantiation
+  output << "// module: "+moduleName << std::endl;
   output << moduleFirstLine << std::endl;
   std::string newLogic;
   std::vector<std::string> newLogicVec;
