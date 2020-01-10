@@ -58,7 +58,6 @@ void reg_taint_gen(std::string line, std::ofstream &output) {
   std::string var = m.str(3);
   std::string num = m.str(4);
 
-  //flagOutputs.push_back(var+"_r_flag");
   moduleRegs.push_back(var);
   if(!isOutput(var)) {
     output << blank << "logic " + slice + " " + var + "_t ;" << std::endl;
@@ -68,7 +67,7 @@ void reg_taint_gen(std::string line, std::ofstream &output) {
     uint32_t inVerNum = find_version_num(var, inTaintIsNew, output);
     assert(inVerNum == 0);
     assert(inTaintIsNew);    
-    output << blank << "output " + slice + " " + var + "_t ;" << std::endl;
+    output << blank << "output logic " + slice + " " + var + "_t ;" << std::endl;
     output << blank << "input " + slice + " " + var + "_r" + toStr(inVerNum) + " ;" << std::endl;
     output << blank << "input " + slice + " " + var + "_c" + toStr(inVerNum) + " ;" << std::endl;
     if(!isTop) {
@@ -91,6 +90,7 @@ void reg_taint_gen(std::string line, std::ofstream &output) {
   output << blank << "logic " + slice + " " + var + "_x ;" << std::endl;
   output << blank << "logic " + slice + " " + var + "_c ;" << std::endl;
   output << blank << "logic " + var + "_reset ;" << std::endl;
+  flagOutputs.push_back(var+"_r_flag");
 
   if (!did_clean_file) {
     bool insertDone;
@@ -162,7 +162,7 @@ void output_insert_map(std::string line, std::ofstream &output, std::ifstream &i
     else
       insertDone = varWidth.var_width_insert(var, 0, 0);
     if (!insertDone) {
-      std::cout << "insert failed in input case:" + line << std::endl;
+      std::cout << "insert failed in output case:" + line << std::endl;
       std::cout << "m.str(2):" + m.str(2) << std::endl;
       std::cout << "m.str(3):" + m.str(3) << std::endl;
     }
@@ -173,7 +173,7 @@ void output_insert_map(std::string line, std::ofstream &output, std::ifstream &i
     return;
 
   //TODO: continue
-  output << blank << "output " + slice + var + "_t ;" << std::endl;
+  output << blank << "output logic " + slice + var + "_t ;" << std::endl;
   bool inTaintIsNew;
   uint32_t inVerNum = find_version_num(var, inTaintIsNew, output);
   assert(inVerNum == 0);
@@ -294,8 +294,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
       output << blank << "assign " + dest + "_t" + destSlice + " = " + op1 + "_t" + op1Slice + " | " + op2 + "_t" + op2Slice + " ;" << std::endl;
     else
       output << blank << "assign " + dest + "_t" + destSlice + " = (| " + op1 + "_t" + op1Slice + " ) | (|" + op2 + "_t" + op2Slice + " ) ;" << std::endl;
-    // !!TODO: re-think the following part 
-    if ( isOutput(dest) ) {
+    if ( isOutput(dest) && isTop ) {
       output << blank << "assign " + op1 + "_c" + sndVer + op1Slice + " = 0 ;" << std::endl;
       uint32_t exp = get_var_slice_width(op1AndSlice);
       uint32_t pow2 = uint32_t(std::pow(2, exp));
@@ -356,8 +355,12 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
       output << blank << "logic [" + op1HighIdx + ":" + op1LowIdx + "] " + op1 + "_x" + sndVer + " ;" << std::endl;
     }
 
-    output << blank << "assign " + dest + "_t" + destSlice + " = " + op1 + "_t" + op1Slice + " ;" << std::endl;
-    if ( isOutput(dest) ) {
+    if(isReduceOp)
+      output << blank << "assign " + dest + "_t" + destSlice + " = | " + op1 + "_t" + op1Slice + " ;" << std::endl;
+    else
+      output << blank << "assign " + dest + "_t" + destSlice + " = " + op1 + "_t" + op1Slice + " ;" << std::endl;
+
+    if ( isOutput(dest) && isTop ) {
       output << blank << "assign " + op1 + "_c" + sndVer + op1Slice + " = 0 ;" << std::endl;
       uint32_t exp = get_var_slice_width(op1AndSlice);
       uint32_t pow2 = uint32_t(std::pow(2, exp));
@@ -397,8 +400,12 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
       output << blank << "logic [" + op2HighIdx + ":" + op2LowIdx + "] " + op2 + "_x" + thdVer + " ;" << std::endl;
     }
 
-    output << blank << "assign " + dest + "_t" + destSlice + " = " + op2 + "_t" + op2Slice + " ;" << std::endl;
-    if ( isOutput(dest) ) {
+    if(isReduceOp)    
+      output << blank << "assign " + dest + "_t" + destSlice + " = | " + op2 + "_t" + op2Slice + " ;" << std::endl;
+    else 
+      output << blank << "assign " + dest + "_t" + destSlice + " = " + op2 + "_t" + op2Slice + " ;" << std::endl;
+
+    if ( isOutput(dest) && isTop ) {
       output << blank << "assign " + op2 + "_c" + thdVer + op2Slice + " = 0 ;" << std::endl;
       uint32_t exp = get_var_slice_width(op2AndSlice);
       uint32_t pow2 = uint32_t(std::pow(2, exp));
@@ -471,7 +478,7 @@ void one_op_taint_gen(std::string line, std::ofstream &output) {
   }
 
   output << blank << "assign " + dest + "_t" + destSlice + " = " + op1 + "_t" + op1Slice + " ;" << std::endl;
-  if ( isOutput(dest) ) {
+  if ( isOutput(dest) && isTop ) {
       output << blank << "assign " + op1 + "_c" + sndVer + op1Slice + " = 0 ;" << std::endl;
       output << blank << "assign " + op1 + "_r" + sndVer + op1Slice + " = " + dest + "_r" + destSlice + " ;" << std::endl;
       uint32_t exp = get_var_slice_width(op1AndSlice);
@@ -532,7 +539,7 @@ void reduce_one_op_taint_gen(std::string line, std::ofstream &output) {
   }
 
   output << blank << "assign " + dest + "_t" + destSlice + " = | " + op1 + "_t" + op1Slice + " ;" << std::endl;
-  if ( isOutput(dest) ) {
+  if ( isOutput(dest) && isTop ) {
       output << blank << "assign " + op1 + "_c" + sndVer + op1Slice + " = 0 ;" << std::endl;
       output << blank << "assign " + op1 + "_r" + sndVer + op1Slice + " = " + extend(dest+"_r"+destSlice, op1WidthNum) + " ;" << std::endl;
       uint32_t exp = get_var_slice_width(op1AndSlice);
@@ -924,7 +931,10 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
   output << blank.substr(0, blank.length()-4) + "logic [" + op1TotalWidth + "-1:0] " + op1 + "_c" + op1Ver + " ;" << std::endl;
   }
 
-  output << blank.substr(0, blank.length()-4) + "assign " + op1 + "_x" + op1Ver + " = " + extend(dest+" != "+op1, localWidthNum) + " | " + extend(dest+"_reset", localWidthNum) + " ;" << std::endl;
+  if(USELESS_VAR)
+    output << blank.substr(0, blank.length()-4) + "assign " + op1 + "_x" + op1Ver + " = " + extend(dest+" != "+op1, localWidthNum) + " | " + extend(dest+"_reset", localWidthNum) + " ;" << std::endl;
+  else
+    output << blank.substr(0, blank.length()-4) + "assign " + op1 + "_x" + op1Ver + " = " + extend(dest+" != "+op1, localWidthNum) + " ;" << std::endl;
   output << blank.substr(0, blank.length()-4) + "assign " + op1 + "_r" + op1Ver + " = 0 ;" << std::endl;
   output << blank.substr(0, blank.length()-4) + "assign " + op1 + "_c" + op1Ver + " = 0 ;" << std::endl;
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;

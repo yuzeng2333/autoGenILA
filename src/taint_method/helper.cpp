@@ -35,7 +35,7 @@ bool isNum(std::string name) {
 
 bool isOutput(std::string var) {
   auto it = std::find( moduleOutputs.begin(), moduleOutputs.end(), var );
-  return isTop && it != moduleOutputs.end();
+  return it != moduleOutputs.end();
 }
 
 

@@ -14,6 +14,10 @@
 #include "taint_gen.h"
 
 #define toStr(a) std::to_string(a)
+
+// configurations:
+#define USE_RESET false
+
 /* TODO:
  *  1. If a slice of a word is used, how to define its _t, _r, ...?
  *  Now I just do not distinguish slice and the whole word.
@@ -683,9 +687,9 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
   for (auto it = moduleOutputs.begin(); it != moduleOutputs.end(); ++it) {
     out << *it + " , ";
   }
-  for (auto it = flagOutputs.begin(); it != flagOutputs.end(); ++it) {
-    out << *it + " , ";
-  }
+  //for (auto it = flagOutputs.begin(); it != flagOutputs.end(); ++it) {
+  //  out << *it + " , ";
+  //}
   for (auto it = extendOutputs.begin(); it != extendOutputs.end() - 1; ++it) {
     out << *it + " , ";
   }
