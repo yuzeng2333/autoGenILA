@@ -1017,44 +1017,45 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     aWidth = toStr(aWidthNum);
     bWidth = toStr(bWidthNum);
 
-    aVer = toStr(find_version_num(aAndSlice, aIsNew, output, true));
+    aVer = toStr(find_version_num(a, aIsNew, output, true));
 
     // collect all the indexes for b
     // Assume: the index series are continuous
-    std::string bTotalSlice; 
-    std::string firstBSlice, lastBSlice;
-    split_slice(caseAssignPairs[0].second, b, firstBSlice);
-    split_slice(caseAssignPairs[caseAssignPairs.size()-2].second, b, lastBSlice);
+    //std::string bTotalSlice; 
+    //std::string firstBSlice, lastBSlice;
+    //split_slice(caseAssignPairs[0].second, b, firstBSlice);
+    //split_slice(caseAssignPairs[caseAssignPairs.size()-2].second, b, lastBSlice);
 
-    uint32_t firstLeftIdx = get_end(firstBSlice);
-    uint32_t firstRightIdx = get_begin(firstBSlice);
-    uint32_t lastLeftIdx = get_end(lastBSlice);
-    uint32_t lastRightIdx = get_begin(lastBSlice);
-    if(firstLeftIdx > firstRightIdx) {
-      if(!(lastLeftIdx > lastRightIdx)) {
-        toCout("first b: "+caseAssignPairs[0].second);
-        toCout("last b: "+caseAssignPairs[caseAssignPairs.size()-2].second);
-      }
-      if(firstLeftIdx > lastLeftIdx) {
-        bTotalSlice = "["+toStr(firstLeftIdx)+":"+toStr(lastRightIdx)+"]";
-      }
-      else {
-        bTotalSlice = "["+toStr(lastLeftIdx)+":"+toStr(firstRightIdx)+"]";
-      }
-    }
-    else {
-      if(!(lastLeftIdx <= lastRightIdx)) {
-        toCout("first b: "+caseAssignPairs[0].second);
-        toCout("last b: "+caseAssignPairs[caseAssignPairs.size()-2].second);
-      }
-      if(firstRightIdx > lastRightIdx) {
-        bTotalSlice = "["+toStr(firstRightIdx)+":"+toStr(lastLeftIdx)+"]";
-      }
-      else {
-        bTotalSlice = "["+toStr(lastRightIdx)+":"+toStr(firstLeftIdx)+"]";
-      }
-    }
-    bVer = toStr(find_version_num(b+bTotalSlice, bIsNew, output, true));
+    //uint32_t firstLeftIdx = get_end(firstBSlice);
+    //uint32_t firstRightIdx = get_begin(firstBSlice);
+    //uint32_t lastLeftIdx = get_end(lastBSlice);
+    //uint32_t lastRightIdx = get_begin(lastBSlice);
+    //if(firstLeftIdx > firstRightIdx) {
+    //  if(!(lastLeftIdx > lastRightIdx)) {
+    //    toCout("first b: "+caseAssignPairs[0].second);
+    //    toCout("last b: "+caseAssignPairs[caseAssignPairs.size()-2].second);
+    //  }
+    //  if(firstLeftIdx > lastLeftIdx) {
+    //    bTotalSlice = "["+toStr(firstLeftIdx)+":"+toStr(lastRightIdx)+"]";
+    //  }
+    //  else {
+    //    bTotalSlice = "["+toStr(lastLeftIdx)+":"+toStr(firstRightIdx)+"]";
+    //  }
+    //}
+    //else {
+    //  if(!(lastLeftIdx <= lastRightIdx)) {
+    //    toCout("first b: "+caseAssignPairs[0].second);
+    //    toCout("last b: "+caseAssignPairs[caseAssignPairs.size()-2].second);
+    //  }
+    //  if(firstRightIdx > lastRightIdx) {
+    //    bTotalSlice = "["+toStr(firstRightIdx)+":"+toStr(lastLeftIdx)+"]";
+    //  }
+    //  else {
+    //    bTotalSlice = "["+toStr(lastRightIdx)+":"+toStr(firstLeftIdx)+"]";
+    //  }
+    //}
+    //bVer = toStr(find_version_num(b+bTotalSlice, bIsNew, output, true));
+    bVer = toStr(find_version_num(b, bIsNew, output, true));
 
     assert(aIsNew);
     assert(bIsNew);
@@ -1092,8 +1093,8 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
 
     output << blank + "always @( "+dest+"_r"+destSlice+" or "+s+" ) begin" << std::endl;
     output << blank + "  "+s+"_r"+sVer+" "+sSlice+" = " + extend("| "+dest+"_r"+destSlice, sWidthNum) + " ;" << std::endl;
-    //output << blank + "  "+b+"_r"+bVer+" "+bSlice+" = 0 ;" << std::endl;
-    //output << blank + "  "+a+"_r"+aVer+" "+aSlice+" = 0 ;" << std::endl;
+    output << blank + "  "+b+"_r"+bVer+" = 0 ;" << std::endl;
+    output << blank + "  "+a+"_r"+aVer+" = 0 ;" << std::endl;
     output << blank + "  casez ("+sAndSlice+")" << std::endl;
     for(auto localPair: caseAssignPairs) {
       split_slice(localPair.second, rhs, rhsSlice);
@@ -1108,8 +1109,8 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     // print _x function
     output << blank + "always @( "+dest+"_x"+destSlice+" or "+s+" ) begin" << std::endl;  
     output << blank + "  "+s+"_x"+sVer+sSlice+" = " + extend("| "+dest+"_x"+destSlice, sWidthNum) + " ;" << std::endl;
-    //output << blank + "  "+b+"_x"+bVer+" = 0 ;" << std::endl;
-    //output << blank + "  "+a+"_x"+aVer+" = 0 ;" << std::endl;
+    output << blank + "  "+b+"_x"+bVer+" = 0 ;" << std::endl;
+    output << blank + "  "+a+"_x"+aVer+" = 0 ;" << std::endl;
     output << blank + "  casez ("+sAndSlice+")" << std::endl;
     for(auto localPair: caseAssignPairs) {
       split_slice(localPair.second, rhs, rhsSlice);
@@ -1124,8 +1125,8 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     // print _c function
     output << blank + "always @( "+dest+"_c"+destSlice+" or "+s+" ) begin" << std::endl;  
     output << blank + "  "+s+"_c"+sVer+sSlice+" = " + extend("1'b1", sWidthNum) + " ;" << std::endl;
-    //output << blank + "  "+b+"_c"+bVer+" = 0 ;" << std::endl;
-    //output << blank + "  "+a+"_c"+aVer+" = 0 ;" << std::endl;
+    output << blank + "  "+b+"_c"+bVer+" = 0 ;" << std::endl;
+    output << blank + "  "+a+"_c"+aVer+" = 0 ;" << std::endl;
     output << blank + "  casez ("+sAndSlice+")" << std::endl;
     for(auto localPair: caseAssignPairs) {
       split_slice(localPair.second, rhs, rhsSlice);
@@ -1149,7 +1150,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     aWidthNum = get_var_slice_width(a);
     aWidth = toStr(aWidthNum);
     bool aIsNew;
-    aVer = toStr(find_version_num(aAndSlice, aIsNew, output, true));
+    aVer = toStr(find_version_num(a, aIsNew, output, true));
     assert(aIsNew);
 
     // print _t function
@@ -1181,7 +1182,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
 
     output << blank + "always @( "+dest+"_r"+destSlice+" or "+s+" ) begin" << std::endl;
     output << blank + "  "+s+"_r"+sVer+sSlice+" = " + extend("| "+dest+"_r"+destSlice, sWidthNum) + " ;" << std::endl;
-    //output << blank + "  "+a+"_r"+aVer+" = 0 ;" << std::endl;
+    output << blank + "  "+a+"_r"+aVer+" = 0 ;" << std::endl;
     output << blank + "  if (" + sAndSlice + " == 0 )" << std::endl;
     output << blank + "    "+a+"_r"+aVer+" = "+dest+"_r"+destSlice+" ;" << std::endl;
     output << blank + "end" << std::endl;  
@@ -1189,7 +1190,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     // print _x function
     output << blank + "always @( "+dest+"_x"+destSlice+" or "+s+" ) begin" << std::endl;  
     output << blank + "  "+s+"_x"+sVer+sSlice+" = " + extend("| "+dest+"_x"+destSlice, sWidthNum) + " ;" << std::endl;
-    //output << blank + "  "+a+"_x"+aVer+" = 0 ;" << std::endl;
+    output << blank + "  "+a+"_x"+aVer+" = 0 ;" << std::endl;
     output << blank + "  if (" + sAndSlice + " == 0 )" << std::endl;
     output << blank + "    "+a+"_x"+aVer+" = "+dest+"_x"+destSlice+" ;" << std::endl;
     output << blank + "end" << std::endl;
@@ -1197,7 +1198,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     // print _c function
     output << blank + "always @( "+dest+"_c"+destSlice+" or "+s+" ) begin" << std::endl;  
     output << blank + "  "+s+"_c"+sVer+sSlice+" = " + extend("1'b1", sWidthNum) + " ;" << std::endl;
-    //output << blank + "  "+a+"_c"+aVer+" = 0 ;" << std::endl;
+    output << blank + "  "+a+"_c"+aVer+" = 0 ;" << std::endl;
     output << blank + "  if (" + sAndSlice + " == 0 )" << std::endl;
     output << blank + "    "+a+"_c"+aVer+" = "+dest+"_c"+destSlice+" ;" << std::endl;
     output << blank + "end" << std::endl;
@@ -1213,36 +1214,34 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
   else if(aIsNum && !bIsNum) {
     bWidthNum = get_var_slice_width(b);
     bWidth = toStr(bWidthNum);
-    bool bIsNew;
-    std::string bTotalSlice; 
-    std::string firstBSlice, lastBSlice;
-    split_slice(caseAssignPairs[0].second, b, firstBSlice);
-    split_slice(caseAssignPairs[caseAssignPairs.size()-2].second, b, lastBSlice);
+    //std::string bTotalSlice; 
+    //std::string firstBSlice, lastBSlice;
+    //split_slice(caseAssignPairs[0].second, b, firstBSlice);
+    //split_slice(caseAssignPairs[caseAssignPairs.size()-2].second, b, lastBSlice);
 
-    uint32_t firstLeftIdx = get_end(firstBSlice);
-    uint32_t firstRightIdx = get_begin(firstBSlice);
-    uint32_t lastLeftIdx = get_end(lastBSlice);
-    uint32_t lastRightIdx = get_begin(lastBSlice);
-    if(firstLeftIdx > firstRightIdx) {
-      assert(lastLeftIdx > lastRightIdx);
-      if(firstLeftIdx > lastLeftIdx) {
-        bTotalSlice = "["+toStr(firstLeftIdx)+":"+toStr(lastRightIdx)+"]";
-      }
-      else {
-        bTotalSlice = "["+toStr(lastLeftIdx)+":"+toStr(firstRightIdx)+"]";
-      }
-    }
-    else {
-      assert(lastLeftIdx <= lastRightIdx);
-      if(firstRightIdx > lastRightIdx) {
-        bTotalSlice = "["+toStr(firstRightIdx)+":"+toStr(lastLeftIdx)+"]";
-      }
-      else {
-        bTotalSlice = "["+toStr(lastRightIdx)+":"+toStr(firstLeftIdx)+"]";
-      }
-    }
-    bVer = toStr(find_version_num(b+bTotalSlice, bIsNew, output, true));
-    assert(bIsNew);
+    //uint32_t firstLeftIdx = get_end(firstBSlice);
+    //uint32_t firstRightIdx = get_begin(firstBSlice);
+    //uint32_t lastLeftIdx = get_end(lastBSlice);
+    //uint32_t lastRightIdx = get_begin(lastBSlice);
+    //if(firstLeftIdx > firstRightIdx) {
+    //  assert(lastLeftIdx > lastRightIdx);
+    //  if(firstLeftIdx > lastLeftIdx) {
+    //    bTotalSlice = "["+toStr(firstLeftIdx)+":"+toStr(lastRightIdx)+"]";
+    //  }
+    //  else {
+    //    bTotalSlice = "["+toStr(lastLeftIdx)+":"+toStr(firstRightIdx)+"]";
+    //  }
+    //}
+    //else {
+    //  assert(lastLeftIdx <= lastRightIdx);
+    //  if(firstRightIdx > lastRightIdx) {
+    //    bTotalSlice = "["+toStr(firstRightIdx)+":"+toStr(lastLeftIdx)+"]";
+    //  }
+    //  else {
+    //    bTotalSlice = "["+toStr(lastRightIdx)+":"+toStr(firstLeftIdx)+"]";
+    //  }
+    //}
+    bVer = toStr(find_version_num(b, bIsNew, output, true));
 
     // print _t function
     output << blank + "always @( "+b+"_t or "+s+"_t or "+s+" ) begin" << std::endl;
@@ -1272,7 +1271,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
 
     output << blank + "always @( "+dest+"_r"+destSlice+" or "+s+" ) begin" << std::endl;
     output << blank + "  "+s+"_r"+sVer+sSlice+" = " + extend("| "+dest+"_r"+destSlice, sWidthNum) + " ;" << std::endl;
-    //output << blank + "  "+b+"_r"+bVer+" = 0 ;" << std::endl;
+    output << blank + "  "+b+"_r"+bVer+" = 0 ;" << std::endl;
     output << blank + "  casez ("+sAndSlice+")" << std::endl;
     for(auto localPair: caseAssignPairs) {
       split_slice(localPair.second, rhs, rhsSlice);
@@ -1285,7 +1284,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     // print _x function
     output << blank + "always @( "+dest+"_x"+destSlice+" or "+s+" ) begin" << std::endl;  
     output << blank + "  "+s+"_x"+sVer+sSlice+" = " + extend("| "+dest+"_x"+destSlice, sWidthNum) + " ;" << std::endl;
-    //output << blank + "  "+b+"_x"+bVer+" = 0 ;" << std::endl;
+    output << blank + "  "+b+"_x"+bVer+" = 0 ;" << std::endl;
     output << blank + "  casez ("+sAndSlice+")" << std::endl;
     for(auto localPair: caseAssignPairs) {
       split_slice(localPair.second, rhs, rhsSlice);
@@ -1298,7 +1297,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     // print _c function
     output << blank + "always @( "+dest+"_c"+destSlice+" or "+s+" ) begin" << std::endl;  
     output << blank + "  "+s+"_c"+sVer+sSlice+" = " + extend("1'b1", sWidthNum) + " ;" << std::endl;
-    //output << blank + "  "+b+"_c"+bVer+" = 0 ;" << std::endl;
+    output << blank + "  "+b+"_c"+bVer+" = 0 ;" << std::endl;
     output << blank + "  casez ("+sAndSlice+")" << std::endl;
     for(auto localPair: caseAssignPairs) {
       split_slice(localPair.second, rhs, rhsSlice);
