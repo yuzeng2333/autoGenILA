@@ -621,7 +621,7 @@ std::string get_lhs_ver_taint_list(std::vector<std::string> &updateVec, std::str
       uint32_t updateWidthNum = varWidth.get_from_var_width(update, updateAndSlice);
       auto updateBoundPair = varWidth.get_idx_pair(update, "get_lhs_ver_taint_list");
       std::string updateWidth = toStr(updateWidthNum);
-      std::string localVer = toStr(verVec[i++]);
+      std::string localVer = toStr(verVec[i]);
       //output << "  logic [" + updateWidth + "-1:0] " + update + taint + localVer + " ;" << std::endl;
       //ground_wires(update+taint+localVer, updateBoundPair, updateSlice, "  ", output);
       updateTaintSlice = update+taint+localVer+updateSlice;
@@ -637,7 +637,8 @@ std::string get_lhs_ver_taint_list(std::vector<std::string> &updateVec, std::str
       newLogic = "  logic [" + numWidth + "-1:0] nouse" + toStr(localIdx) + " ;";
       updateTaintSlice = "nouse" + toStr(localIdx);
     }
-    taintVec.push_back(updateTaintSlice);    
+    taintVec.push_back(updateTaintSlice);
+    i++;
   }
   std::string returnList = " ";
   for (auto it = taintVec.begin(); it < taintVec.end() - 1; ++it) {

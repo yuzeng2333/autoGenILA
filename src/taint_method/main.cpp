@@ -6,6 +6,7 @@
 #include <regex>
 #include <assert.h>
 #include <map>
+#include <unordered_set>
 #include "global_data.h"
 #include "helper.h"
 #include "main.h"
@@ -46,6 +47,7 @@ int main(int argc, char *argv[]) {
 // 2. analyze for each module, which sub-modules it uses
 // Return name of top module
 std::string separate_modules(std::string fileName, std::vector<std::string> &modules, std::map<std::string, std::vector<std::string>> &childModules) {
+  toCout("... Begin separating modules!");
   std::ifstream input(fileName);
   std::string line;
   std::smatch m;
@@ -60,8 +62,6 @@ std::string separate_modules(std::string fileName, std::vector<std::string> &mod
       // assume the first module encountered are top module
       inModule = true;
       moduleName = m.str(2);
-      if(topModule.empty())
-        topModule = moduleName;
       modules.push_back(moduleName);
       assert(!output.is_open());
       output.open(path+"/"+moduleName+"_NEW.v");
@@ -85,6 +85,26 @@ std::string separate_modules(std::string fileName, std::vector<std::string> &mod
       output << line << std::endl;
     }
   }
+  // find out the top module
+  std::unordered_set<std::string> childSet;
+  for(auto it = childModules.begin(); it != childModules.end(); ++it) {
+    for(std::string singleChildModule: it->second) {
+      childSet.emplace(singleChildModule);
+    }
+  }
+  for(std::string singleModule: modules) {
+    if(childSet.find(singleModule) == childSet.end()) {
+      if(!topModule.empty()) {
+        toCout("Two top modules found: "+topModule+" & "+singleModule);
+        abort();
+      }
+      else {
+        topModule = singleModule;
+      }
+    }
+  }
+
+  toCout("... Finished separating modules!");  
   return topModule;
 }
 

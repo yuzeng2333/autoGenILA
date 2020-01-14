@@ -1412,6 +1412,9 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
     abort();
   }
   std::string moduleName = m.str(2);
+  if(moduleName.compare("adder_32bit") == 0)
+    toCout("find adder_32bit!");
+
   std::string instanceName = m.str(3);
   if( moduleInputsMap.find(moduleName) == moduleInputsMap.end() ) {
     toCout("Error: IO ports of sub-modules not found!");
