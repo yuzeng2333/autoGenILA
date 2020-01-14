@@ -137,6 +137,7 @@ std::string g_recentRst;
 bool g_recentRst_positive = true;
 std::set<std::string> g_rstGroup;
 bool isTop = false;
+int g_hasRst;
 
 /* clean all the global data */
 void clean_global_data() {
@@ -677,6 +678,7 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
   std::ofstream out(fileName + ".final");
   std::string line;
   std::smatch match;
+  moduleInputs.push_back("rst_zy");
   out << "module " + moduleName + "( ";
   for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) {
     out << *it + " , ";
@@ -694,6 +696,8 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
     out << *it + " , ";
   }
   out << extendOutputs.back() + " );" << std::endl;
+  // if no reset, add a reset
+  out << "  input rst_zy;" << std::endl; 
   while( std::getline(in, line) ) {
     out << line << std::endl;
   }
@@ -1440,11 +1444,11 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
   std::unordered_map<std::string, std::vector<bool>> inputSignalIsNewMap;
   
   for(std::string input: moduleInputsMap[moduleName]) {
-    if(input.compare(g_recentClk) == 0)
+    if(input.compare(g_recentClk) == 0 || input.compare("rst_zy") == 0 )
       continue;
     std::string signalAndSliceList = port2SignalMap[input];
     if(signalAndSliceList.empty()) {
-      toCout("Error: the module input has not been seen before!");
+      toCout("Error: the module input has not been seen before: "+input);
       abort();
     }
     std::vector<std::string> signalAndSliceVec;
@@ -1489,6 +1493,10 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
   for(std::string inPort: moduleInputsMap[moduleName]) {
     if(inPort.compare(g_recentClk) == 0)
       continue;
+    if(inPort.compare("rst_zy") == 0) {
+      output << "    .rst_zy(rst_zy)," << std::endl;
+      continue;
+    }
     std::vector<uint32_t> localVerVec = input2SignalVerMap[inPort];
     output << "    ." + inPort + "_t ( " + get_rhs_taint_list(port2SignalMap[inPort], "_t") + " )," << std::endl;
     output << "    ." + inPort + "_r ( " + get_lhs_ver_taint_list(port2SignalMap[inPort], "_r", newLogic, localVerVec) + " )," << std::endl;

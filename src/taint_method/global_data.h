@@ -35,6 +35,7 @@ extern std::string g_recentRst;
 extern bool g_recentRst_positive;
 extern std::set<std::string> g_rstGroup;
 extern bool isTop;
+extern int g_hasRst;
 
 /* declarations */
 extern std::regex pModule;

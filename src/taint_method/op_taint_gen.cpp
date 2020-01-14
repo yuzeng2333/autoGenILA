@@ -938,16 +938,30 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
   output << blank.substr(0, blank.length()-4) + "assign " + op1 + "_r" + op1Ver + " = 0 ;" << std::endl;
   output << blank.substr(0, blank.length()-4) + "assign " + op1 + "_c" + op1Ver + " = 0 ;" << std::endl;
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
-  output << blank + dest + "_t \t\t<= " + get_recent_rst() + " ? 0 : | ( " + op1 + "_t & " + op1 + "_x" + op1Ver + " );" << std::endl;
+  if (g_hasRst)
+    output << blank + dest + "_t \t\t<= " + get_recent_rst() + " ? 0 : | ( " + op1 + "_t & " + op1 + "_x" + op1Ver + " );" << std::endl;
+  else 
+    output << blank + dest + "_t \t\t<= rst_zy ? 0 : | ( " + op1 + "_t & " + op1 + "_x" + op1Ver + " );" << std::endl;
+
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
-  // !!! FIXME: why dest_x is not used here?
-  output << blank + dest + "_t_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_t_flag ? 1 : | ( " + op1 + "_t & " + op1 + "_x" + op1Ver + " );" << std::endl;
+  if (g_hasRst)
+    output << blank + dest + "_t_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_t_flag ? 1 : | ( " + op1 + "_t & " + op1 + "_x" + op1Ver + " );" << std::endl;
+  else
+    output << blank + dest + "_t_flag \t<= rst_zy ? 0 : " + dest + "_t_flag ? 1 : | ( " + op1 + "_t & " + op1 + "_x" + op1Ver + " );" << std::endl;
+
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
-  //output << blank + dest + "_r_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : ((| " + dest + "_r ) & !" + dest + "_reset ) ;" << std::endl;
-  output << blank + dest + "_r_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + "_r ;" << std::endl;
+  if (g_hasRst)  
+    //output << blank + dest + "_r_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : ((| " + dest + "_r ) & !" + dest + "_reset ) ;" << std::endl;
+    output << blank + dest + "_r_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + "_r ;" << std::endl;
+  else
+    output << blank + dest + "_r_flag \t<= rst_zy ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + "_r ;" << std::endl;
+
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
   // _dest is clear either write taint arrives or the value for dest is changed.
-  output << blank + dest + "_reset \t<= " + get_recent_rst() + " ? 1 : ( " + op1 + "_t | " + op1 + "_x" + op1Ver + " ) ? 0 : " + dest + "_reset ;" << std::endl;
+  if (g_hasRst)
+    output << blank + dest + "_reset \t<= " + get_recent_rst() + " ? 1 : ( " + op1 + "_t | " + op1 + "_x" + op1Ver + " ) ? 0 : " + dest + "_reset ;" << std::endl;
+  else
+    output << blank + dest + "_reset \t<= rst_zy ? 1 : ( " + op1 + "_t | " + op1 + "_x" + op1Ver + " ) ? 0 : " + dest + "_reset ;" << std::endl;    
 }
 
 
@@ -980,11 +994,22 @@ void nonblockconcat_taint_gen(std::string line, std::ofstream &output) {
 
 
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
-  output << blank + dest + "_t \t\t<= " + g_recentRst + " ? 0 : | ({ " + updateTList +" } & { " + updateXListRight + " });" << std::endl;
+  if (g_hasRst)  
+    output << blank + dest + "_t \t\t<= " + g_recentRst + " ? 0 : | ({ " + updateTList +" } & { " + updateXListRight + " });" << std::endl;
+  else
+    output << blank + dest + "_t \t\t<= rst_zy ? 0 : | ({ " + updateTList +" } & { " + updateXListRight + " });" << std::endl;
+
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
-  output << blank + dest + "_t_flag \t<= " + g_recentRst + " ? 0 : " + dest + "_t_flag ? 1 : | ({ " + updateTList + " } & { " + updateXListRight + " });" << std::endl;
+  if (g_hasRst)    
+    output << blank + dest + "_t_flag \t<= " + g_recentRst + " ? 0 : " + dest + "_t_flag ? 1 : | ({ " + updateTList + " } & { " + updateXListRight + " });" << std::endl;
+  else
+    output << blank + dest + "_t_flag \t<= rst_zy ? 0 : " + dest + "_t_flag ? 1 : | ({ " + updateTList + " } & { " + updateXListRight + " });" << std::endl;    
+
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
-  output << blank + dest + "_r_flag \t<= " + g_recentRst + " ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + "_r ;" << std::endl;
+  if (g_hasRst)    
+    output << blank + dest + "_r_flag \t<= " + g_recentRst + " ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + "_r ;" << std::endl;
+  else
+    output << blank + dest + "_r_flag \t<= rst_zy ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + "_r ;" << std::endl;    
 }
 
 

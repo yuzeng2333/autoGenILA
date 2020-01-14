@@ -26,7 +26,7 @@ aes1:
 	./a.out /workspace/research/ILA/autoGenILA/AES/Verilog/aes_top_simp.v 1
 
 aes128:
-	./a.out /workspace/research/ILA/autoGenILA/AES/Verilog/aes_128_yosys.v 0
+	./a.out /workspace/research/ILA/autoGenILA/AES/Verilog/aes_128_yosys.v 0 0
 
 exp:
 	./a.out ./experiment/experiment.v 0
