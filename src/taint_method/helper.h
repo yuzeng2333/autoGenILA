@@ -12,6 +12,8 @@ bool isInput(std::string var);
 
 bool isReg(std::string var);
 
+bool isMem(std::string var);
+
 std::string to_re(std::string input);
 
 std::string remove_bracket(std::string name);
@@ -105,4 +107,6 @@ std::string dec2bin(uint32_t inNum);
 std::string get_bits(std::string inNum, uint32_t highIdx, uint32_t lowIdx);
 
 std::string add_taint(std::vector<std::string> &freeBitsVec, std::string taint);
+
+void assert_info(bool val, std::string info);
 #endif

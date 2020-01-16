@@ -1,5 +1,5 @@
 all:
-	g++ taint_gen.cpp helper.cpp op_taint_gen.cpp VarWidth.cpp main.cpp
+	g++ -W taint_gen.cpp helper.cpp op_taint_gen.cpp VarWidth.cpp main.cpp
 
 debug:
 	g++ -D_GLIBCXX_USE_CXX11_ABI=0 -g taint_gen.cpp helper.cpp op_taint_gen.cpp VarWidth.cpp main.cpp
@@ -66,3 +66,9 @@ ver0:
 
 ver1:
 	./a.out /workspace/research/ILA/autoGenILA/naiveEg/find_version/find_version_yosys.v 1
+
+rbm0:
+	./a.out /workspace/research/ILA/autoGenILA/RBM/SYN/rbm_yosys.v 0
+
+sram:
+	./a.out /workspace/research/ILA/autoGenILA/SHA/sram/reg32byte_yosys.v 0

@@ -15,8 +15,7 @@
 
 #define toStr(a) std::to_string(a)
 
-// configurations:
-#define USE_RESET false
+
 
 /* TODO:
  *  1. If a slice of a word is used, how to define its _t, _r, ...?
@@ -30,6 +29,7 @@ std::regex pOutput    (to_re("^(\\s*)output (\\[\\d+\\:0\\] )?(NAME)(\\s*)?;$"))
 std::regex pReg       (to_re("^(\\s*)reg (\\[\\d+\\:\\d+\\] )?(NAME)(\\s*)?;$"));
 std::regex pRegConst  (to_re("^(\\s*)reg (\\[\\d+\\:\\d+\\] )?(NAME) = (NUM)(\\s*)?;$"));
 std::regex pWire      (to_re("^(\\s*)wire (\\[\\d+\\:\\d+\\] )?(NAME)(\\s*)?;$"));
+std::regex pMem       (to_re("^(\\s*)reg (\\[\\d+\\:\\d+\\]) (NAME) (\\[\\d+\\:\\d+\\]);$"));
 /* 2 operators */
 std::regex pAdd       (to_re("^(\\s*)assign (NAME) = (NAME) \\+ (NAME)(\\s*)?;$"));
 std::regex pSub       (to_re("^(\\s*)assign (NAME) = (NAME) - (NAME)(\\s*)?;$"));
@@ -69,14 +69,16 @@ std::regex pRedXnor   (to_re("^(\\s*)assign (NAME) = \\~\\^ (NAME)(\\s*)?;$"));
 std::regex pIte       (to_re("^(\\s*)assign (NAME) = (NAME) \\? (NAME) \\: (NAME)(\\s*)?;$"));
 /* do not add anything */
 // Assume: always comes with posedge or negedge
-std::regex pAlwaysClk (to_re("^(\\s*)always @\\(posedge (NAME)\\)$"));
+std::regex pAlwaysClk (to_re("^(\\s*)always @\\(posedge (NAME)\\)(?: begin)?$"));
 std::regex pAlwaysClkRst  (to_re("^(\\s*)always @\\(posedge (NAME) or (?:posedge|negedge) (NAME)(\\s?)\\)$"));
-std::regex pAlwaysComb(to_re("^(\\s*)always @\\(\\S+ or \\S+(?: or \\S+)?\\) begin$"));
+std::regex pAlwaysComb(to_re("^(\\s*)always @\\(NAME or NAME(?: or NAME)?\\) begin$"));
+std::regex pAlwaysFake(to_re("^(\\s*)always @\\(negedge 1'bx\\)(?: begin)?$"));
 std::regex pEnd       ("^(\\s*)end$");
 std::regex pEndmodule ("^(\\s*)endmodule$");
 /* non-blocking assignment */
 std::regex pNonblock  (to_re("^(\\s*)(NAME) <= (NAME)(\\s*)?;$"));
 std::regex pNonblockConcat    (to_re("^(\\s*)(NAME) <= \\{(.+)\\}(\\s*)?;$"));
+std::regex pNonblockIf(to_re("^(\\s*)if \\((NAME)\\) (NAME) <= (NAME)(\\s*)?;$"));
 /* function */
 std::regex pFunctionDef   (to_re("^(\\s*)function (\\[\\d+\\:0\\] )?(NAME)(\\s*)?;$"));
 std::regex pEndfunction   (to_re("^(\\s*)endfunction$"));
@@ -117,6 +119,7 @@ std::vector<std::string> extendInputs;
 std::vector<std::string> extendOutputs;
 std::vector<std::string> flagOutputs;
 std::vector<std::string> moduleRegs;
+std::unordered_map<std::string, uint32_t> moduleMems;
 std::set<std::string> moduleWires;
 std::string clockName;
 std::string resetName;
@@ -364,6 +367,9 @@ void add_line_taints(std::string line, std::ofstream &output, std::ifstream &inp
     case WIRE:  
       wire_taint_gen(line, output);
       break;
+    case MEM:
+      mem_taint_gen(line, output);
+      break;
     case OUTPUT:
       output_insert_map(line, output, input);
       break;
@@ -397,6 +403,9 @@ void add_line_taints(std::string line, std::ofstream &output, std::ifstream &inp
     case ALWAYS_CLKRST:
       always_clkrst_taint_gen(line, input, output);
       break;
+    case ALWAYS_FAKE:
+      always_fake_taint_gen(line, input, output);
+      break;
     case FUNCDEF:
       break;
     case NONE:
@@ -429,6 +438,9 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   }
   else if (std::regex_match(line, m, pOutput)) {
     return OUTPUT;
+  }
+  else if (std::regex_match(line, m, pMem)) {
+    return MEM;
   }
   else if (std::regex_match(line, m, pReg)
             || std::regex_match(line, m, pRegConst)) {
@@ -494,6 +506,9 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   }
   else if( std::regex_match(line, m, pAlwaysClkRst) ) {
     return ALWAYS_CLKRST;
+  }
+  else if( std::regex_match(line, m, pAlwaysFake) ) {
+    return ALWAYS_FAKE;
   }
   else if( std::regex_match(line, m, pNonblock) ) {
     return NONBLOCK;
@@ -578,18 +593,13 @@ void add_file_taints(std::string fileName, std::map<std::string, std::vector<std
 /* merge _c, _r, _x */
 void merge_taints(std::string fileName) {
   std::ofstream output(fileName, std::fstream::app);
-  // assign _t_1bit  
-  for(auto reg : moduleRegs) {
-    output << "  assign " + reg + "_t_1bit = | " + reg + "_t ;" << std::endl;
-  }
-
   // assign _c, _x
   std::vector<std::string> appendix{"_c", "_x"};
   for (std::string app : appendix) {  
     for ( auto it = nextVersion.begin(); it != nextVersion.end(); ++it ) {
       if ( isNum(it->first) ) continue;
         output << "  assign " + it->first + app + " = ( ";
-      for (int i = 0; i < it->second - 1; i++)
+      for (uint32_t i = 0; i < it->second - 1; i++)
         output << it->first + app + std::to_string(i) + " ) | ( ";
       output << it->first + app + std::to_string(it->second - 1) + " );" << std::endl;
     }
@@ -597,7 +607,7 @@ void merge_taints(std::string fileName) {
 
   for ( auto it = nextVersion.begin(); it != nextVersion.end(); ++it ) {
     output << "  assign " + it->first + "_r = ( ";
-    for (int i = 0; i < it->second - 1; i++) {
+    for (uint32_t i = 0; i < it->second - 1; i++) {
       output << it->first + "_x" + std::to_string(i) + " & ";
       output << it->first + "_r" + std::to_string(i) + " ) | ( ";
     }
@@ -666,6 +676,17 @@ void merge_taints(std::string fileName) {
     }
   }
 
+  // _r_flag_top
+  for( auto it = moduleMems.begin(); it != moduleMems.end(); ++it ) {
+    std::string mem = it->first;
+    uint32_t len = it->second;
+    output << "  assign " + mem + "_r_flag_top  = "; 
+    for(uint32_t i = 0; i < len-1; i++) {
+      output << mem + "_r_flag [" + toStr(i) + "] | ";
+    }
+    output << mem + "_f_flag [" + toStr(len-1) + "] ;" << std::endl;
+  }
+
   gen_assert_property(output);
 
   output << "endmodule";
@@ -678,7 +699,8 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
   std::ofstream out(fileName + ".final");
   std::string line;
   std::smatch match;
-  moduleInputs.push_back("rst_zy");
+  if(!g_hasRst)
+    moduleInputs.push_back("rst_zy");
   out << "module " + moduleName + "( ";
   for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) {
     out << *it + " , ";
@@ -697,7 +719,8 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
   }
   out << extendOutputs.back() + " );" << std::endl;
   // if no reset, add a reset
-  out << "  input rst_zy;" << std::endl; 
+  if(!g_hasRst) 
+    out << "  input rst_zy;" << std::endl; 
   while( std::getline(in, line) ) {
     out << line << std::endl;
   }
@@ -1320,8 +1343,42 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     //}
   } // end of aIsNum && !bIsNum
   else {
-    toCout("!! Error: both inputs of case statements are numbers!");
-    abort();
+    // print _t function
+    output << blank + "always @( "+s+"_t or "+s+" ) begin" << std::endl;
+    output << blank + "  casez ("+sAndSlice+")" << std::endl;
+    std::string rhs, rhsSlice;
+    // only the last one matters
+    auto lastPair = caseAssignPairs.back();
+    caseAssignPairs.pop_back();
+    for(auto localPair: caseAssignPairs) {
+      output << blank + "    " + localPair.first + " :" << std::endl;
+      output << blank + "      " + dest+"_t"+destSlice+" = " + extend("| "+s+"_t"+sSlice, destWidthNum) + " ;" << std::endl;
+    }
+    output << blank + "    default:" << std::endl;
+    output << blank + "      " + dest+"_t"+destSlice+" = " + extend("| "+s+"_t"+sSlice, destWidthNum) + " ;" << std::endl;
+    output << blank + "  endcase" << std::endl;
+    output << blank + "end" << std::endl;
+    //auto destBoundPair = varWidth.get_idx_pair(dest, line);
+    //ground(dest+"_t", destBoundPair, destSlice, blank, output);
+
+    // print _r function
+    output << blank + "reg [" + sWidth + "-1:0] " + s + "_r" + sVer + " ;" << std::endl;
+    output << blank + "reg [" + sWidth + "-1:0] " + s + "_x" + sVer + " ;" << std::endl;
+    output << blank + "reg [" + sWidth + "-1:0] " + s + "_c" + sVer + " ;" << std::endl;
+
+    output << blank + "always @( "+dest+"_r"+destSlice+" or "+s+" ) begin" << std::endl;
+    output << blank + "  "+s+"_r"+sVer+sSlice+" = " + extend("| "+dest+"_r"+destSlice, sWidthNum) + " ;" << std::endl;
+    output << blank + "end" << std::endl;  
+
+    // print _x function
+    output << blank + "always @( "+dest+"_x"+destSlice+" or "+s+" ) begin" << std::endl;  
+    output << blank + "  "+s+"_x"+sVer+sSlice+" = " + extend("| "+dest+"_x"+destSlice, sWidthNum) + " ;" << std::endl;
+    output << blank + "end" << std::endl;
+
+    // print _c function
+    output << blank + "always @( "+dest+"_c"+destSlice+" or "+s+" ) begin" << std::endl;  
+    output << blank + "  "+s+"_c"+sVer+sSlice+" = " + extend("1'b1", sWidthNum) + " ;" << std::endl;
+    output << blank + "end" << std::endl;
   }
 }
 

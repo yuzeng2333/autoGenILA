@@ -15,6 +15,7 @@ extern std::vector<std::string> extendInputs;
 extern std::vector<std::string> extendOutputs;
 extern std::vector<std::string> flagOutputs;
 extern std::vector<std::string> moduleRegs;
+extern std::unordered_map<std::string, uint32_t> moduleMems;
 extern std::set<std::string> moduleWires;
 extern std::string clockName;
 extern std::string resetName;
@@ -44,6 +45,7 @@ extern std::regex pOutput;
 extern std::regex pReg;
 extern std::regex pRegConst;
 extern std::regex pWire;
+extern std::regex pMem;
 /* 2 operators */
 extern std::regex pAdd;
 extern std::regex pSub;      
@@ -88,6 +90,7 @@ extern std::regex pEndmodule;
 /* non-blocking assignment */
 extern std::regex pNonblock;
 extern std::regex pNonblockConcat;   
+extern std::regex pNonblockIf;
 
 extern std::regex pFunctionDef;
 extern std::regex pEndfunction;

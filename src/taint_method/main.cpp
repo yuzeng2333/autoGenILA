@@ -13,7 +13,7 @@
 
 int main(int argc, char *argv[]) {
   std::string fileName = argv[1];
-  int g_hasRst = 1;
+  g_hasRst = 1;
   if(argc == 4)
     g_hasRst = std::stoi(argv[3]);
   std::string path = extract_path(fileName);

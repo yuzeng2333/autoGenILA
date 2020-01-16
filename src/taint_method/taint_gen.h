@@ -26,6 +26,8 @@
 #define ALWAYS          16
 #define REDUCE1         17
 #define MODULEBEGIN     18
+#define MEM             19
+#define ALWAYS_FAKE     20
 #define UNSUPPORT       99
 #define NONE            100
 

@@ -51,6 +51,14 @@ bool isReg(std::string var) {
 }
 
 
+bool isMem(std::string varAndSlice) {
+  std::string var, varSlice;
+  split_slice(varAndSlice, var, varSlice);
+  //auto it = std::find( moduleMems.begin(), moduleMems.end(), var );
+  return moduleMems.find(var) != moduleMems.end();
+}
+
+
 std::string to_re(std::string input) {
   std::regex pName("NAME");
   std::string varName("[\aa-zA-Z0-9_\\.\\$\\\\'\\[\\]\\(]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?(?: \\))?");
@@ -468,6 +476,7 @@ std::string get_nth_var_in_list(std::string list, uint32_t idx) {
 }
 
 
+// the most general function for getting width
 uint32_t get_var_slice_width(std::string varAndSlice) {
   if( varAndSlice.empty() )
     return 0;
@@ -993,4 +1002,10 @@ std::string add_taint(std::vector<std::string> &freeBitsVec, std::string taint) 
   res.pop_back();
   res += " }";
   return res;
+}
+
+void assert_info(bool val, std::string info) {
+  if(val) return;
+  toCout(info);
+  abort();
 }
