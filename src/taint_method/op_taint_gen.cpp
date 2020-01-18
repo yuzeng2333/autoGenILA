@@ -22,6 +22,13 @@ void input_taint_gen(std::string line, std::ofstream &output) {
     return;
   std::string slice = m.str(2);
   std::string var = m.str(3);
+  if(!g_hasRst) {
+    if(var.compare("rst") == 0
+        || var.compare("reset") == 0
+        || var.compare("reset_n") == 0
+        || var.compare("reset") == 0)
+      g_hasRst = true;
+  }
   moduleInputs.push_back(var);
   extendInputs.push_back(var+"_t");
   extendOutputs.push_back(var+"_r");
@@ -181,7 +188,8 @@ void output_insert_map(std::string line, std::ofstream &output, std::ifstream &i
   std::string slice = m.str(2);  
   std::string var = m.str(3);
   std::string blank = m.str(1);
-
+  output << blank + "logic " + slice + var + " ;" << std::endl;
+    
   if(isOutput(var)) {
     std::cout << "!! Duplicate output find: " + line << std::endl;
   }
@@ -499,10 +507,12 @@ void one_op_taint_gen(std::string line, std::ofstream &output) {
   // also assume each memory slice is used only once
   if(isMem(op1)) {
     assert(std::regex_match(line, m, pNone));
-    output << blank << "assign " + dest + "_t" + destSlice + " = " + op1 + "_t" + op1Slice + " ;" << std::endl;
-    output << blank << "assign " + op1 + "_c" + op1Slice + " = " + dest + "_c" + destSlice + " ;" << std::endl;
-    output << blank << "assign " + op1 + "_r" + op1Slice + " = " + dest + "_r" + destSlice + " ;" << std::endl;
-    output << blank << "assign " + op1 + "_x" + op1Slice + " = " + dest + "_x" + destSlice + " ;" << std::endl;
+    output << blank + "assign " + dest + "_t" + destSlice + " = " + op1 + "_t" + op1Slice + " ;" << std::endl;
+    output << blank + "always @(*) begin" << std::endl;
+    output << blank + "  " + op1 + "_c" + op1Slice + " = " + dest + "_c" + destSlice + " ;" << std::endl;
+    output << blank + "  " + op1 + "_r" + op1Slice + " = " + dest + "_r" + destSlice + " ;" << std::endl;
+    output << blank + "  " + op1 + "_x" + op1Slice + " = " + dest + "_x" + destSlice + " ;" << std::endl;
+    output << blank + "end" << std::endl;    
     return;
   }
 

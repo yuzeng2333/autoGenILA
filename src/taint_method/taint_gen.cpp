@@ -151,6 +151,7 @@ void clean_global_data() {
   extendOutputs.clear();
   flagOutputs.clear();
   moduleRegs.clear();
+  moduleMems.clear();
   moduleWires.clear();
   clockName.clear();
   resetName.clear();
@@ -170,6 +171,7 @@ void clean_global_data() {
   g_recentRst.clear();
   g_recentRst_positive = true;
   g_rstGroup.clear();
+  g_hasRst = false;
 }
 
 
@@ -684,12 +686,11 @@ void merge_taints(std::string fileName) {
     for(uint32_t i = 0; i < len-1; i++) {
       output << mem + "_r_flag [" + toStr(i) + "] | ";
     }
-    output << mem + "_f_flag [" + toStr(len-1) + "] ;" << std::endl;
+    output << mem + "_r_flag [" + toStr(len-1) + "] ;" << std::endl;
   }
 
   gen_assert_property(output);
-
-  output << "endmodule";
+  output << "endmodule" << std::endl;
   output.close();
 }
 
@@ -699,8 +700,10 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
   std::ofstream out(fileName + ".final");
   std::string line;
   std::smatch match;
-  if(!g_hasRst)
+  if(!g_hasRst) {
     moduleInputs.push_back("rst_zy");
+    toCout("No reset signal found in "+moduleName+", check it!!");
+  }
   out << "module " + moduleName + "( ";
   for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) {
     out << *it + " , ";
