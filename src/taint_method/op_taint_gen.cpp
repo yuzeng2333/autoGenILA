@@ -123,6 +123,7 @@ void mem_taint_gen(std::string line, std::ofstream &output) {
   std::string slice = m.str(2);  
   std::string var = m.str(3);
   std::string sliceTop = m.str(4);
+  memDims.emplace(var, std::make_pair(slice, sliceTop));
   
   uint32_t varLen = get_end(sliceTop) + 1;
   moduleMems.emplace(var, varLen);
@@ -334,7 +335,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
       output << blank << "logic [" + op2HighIdx + ":" + op2LowIdx + "] " + op2 + "_x" + thdVer + " ;" << std::endl;
     }
 
-    /* make assignme1ts */
+    /* make assignments */
     /* FIXME: the width of op1/op2 and dest are not necessarily the same */
     if(!isReduceOp)
       output << blank << "assign " + dest + "_t" + destSlice + " = " + op1 + "_t" + op1Slice + " | " + op2 + "_t" + op2Slice + " ;" << std::endl;
@@ -488,9 +489,8 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
 
 void one_op_taint_gen(std::string line, std::ofstream &output) {
   std::smatch m;
-  if (std::regex_match(line, m, pNot) 
-            || std::regex_match(line, m, pNone)
-            || std::regex_match(line, m, pInvert)){}
+  if (std::regex_match(line, m, pNone) 
+        || std::regex_match(line, m, pInvert)){}
   else 
     return;
   assert(!m.str(2).empty());
@@ -502,16 +502,42 @@ void one_op_taint_gen(std::string line, std::ofstream &output) {
   std::string op1AndSlice = m.str(3);
   split_slice(m.str(2), dest, destSlice);
   split_slice(op1AndSlice, op1, op1Slice);
+  std::string sndVer;
 
   // assume memory slices can only be used in simple assignment statements11
   // also assume each memory slice is used only once
   if(isMem(op1)) {
     assert(std::regex_match(line, m, pNone));
+    if( nextVersion.find(op1) == nextVersion.end() ) {
+      sndVer = toStr(0);
+      nextVersion.emplace(op1, 1);
+    }
+    else {
+      sndVer = toStr(nextVersion[op1]);
+    }
+    // declare new _r, _c, _x taints
+    auto slicePair = memDims[op1];
+    std::string slice = slicePair.first;
+    std::string sliceTop = slicePair.second;
+    std::string highIdx = toStr(get_end(sliceTop));
+    output << blank + "logic " + slice + " " + op1 + "_r" + sndVer + sliceTop + " ;" << std::endl;
+    output << blank + "logic " + slice + " " + op1 + "_c" + sndVer + sliceTop + " ;" << std::endl;
+    output << blank + "logic " + slice + " " + op1 + "_x" + sndVer + sliceTop + " ;" << std::endl;
+
+    output << blank + "integer i;" << std::endl;
+    output << blank + "always @(*) begin" << std::endl;
+    output << blank + "  for(i = 0; i <= "+highIdx+"; i = i + 1) begin" << std::endl;
+    output << blank + "    "+op1+"_r"+sndVer+" [i] = 0;" << std::endl;
+    output << blank + "    "+op1+"_c"+sndVer+" [i] = 0;" << std::endl;
+    output << blank + "    "+op1+"_x"+sndVer+" [i] = 0;" << std::endl;
+    output << blank + "  end" << std::endl;
+    output << blank + "end" << std::endl;
+
     output << blank + "assign " + dest + "_t" + destSlice + " = " + op1 + "_t" + op1Slice + " ;" << std::endl;
     output << blank + "always @(*) begin" << std::endl;
-    output << blank + "  " + op1 + "_c" + op1Slice + " = " + dest + "_c" + destSlice + " ;" << std::endl;
-    output << blank + "  " + op1 + "_r" + op1Slice + " = " + dest + "_r" + destSlice + " ;" << std::endl;
-    output << blank + "  " + op1 + "_x" + op1Slice + " = " + dest + "_x" + destSlice + " ;" << std::endl;
+    output << blank + "  " + op1 + "_c" + sndVer + op1Slice + " = " + dest + "_c" + destSlice + " ;" << std::endl;
+    output << blank + "  " + op1 + "_r" + sndVer + op1Slice + " = " + dest + "_r" + destSlice + " ;" << std::endl;
+    output << blank + "  " + op1 + "_x" + sndVer + op1Slice + " = " + dest + "_x" + destSlice + " ;" << std::endl;
     output << blank + "end" << std::endl;    
     return;
   }
@@ -527,7 +553,7 @@ void one_op_taint_gen(std::string line, std::ofstream &output) {
 
   bool op1IsNew;
   uint32_t sndVerNum = find_version_num(op1AndSlice, op1IsNew, output);
-  std::string sndVer = std::to_string(sndVerNum);
+  sndVer = std::to_string(sndVerNum);
 
   /* declare new wires */
   if(op1IsNew) {
@@ -559,9 +585,148 @@ void one_op_taint_gen(std::string line, std::ofstream &output) {
 }
 
 
+void sel_op_taint_gen(std::string line, std::ofstream &output) {
+  std::smatch m;
+  if (std::regex_match(line, m, pSel1)
+        || std::regex_match(line, m, pSel2)
+        || std::regex_match(line, m, pSel3)
+        || std::regex_match(line, m, pSel4)) {}
+  else 
+    return;
+
+  assert(!m.str(2).empty());
+  assert(!m.str(3).empty());
+  assert(!m.str(4).empty());
+  assert(!m.str(5).empty());
+  assert(!m.str(6).empty());
+ 
+  std::string blank = m.str(1);
+  std::string destAndSlice = m.str(2);
+  std::string op1AndSlice = m.str(3);
+  std::string slice = m.str(4);
+  std::string op2AndSlice = m.str(5);
+  std::string lowIdx = m.str(6);
+  std::string dest, destSlice;
+  std::string op1, op1Slice;
+  std::string op2, op2Slice;
+  split_slice(destAndSlice, dest, destSlice);
+  split_slice(op1AndSlice, op1, op1Slice);
+  split_slice(op2AndSlice, op2, op2Slice);
+  op1Slice.empty();
+
+  assert_info(!isNum(op1), "Error: the var to be selected are numbers!");
+  uint32_t localWidth = get_var_slice_width(destAndSlice);
+  uint32_t op2Width = get_var_slice_width(op2AndSlice);
+  std::string sndVer;
+
+  if(!isMem(op1)) {
+    auto op1IdxPair = varWidth.get_idx_pair(op1, line);
+    std::string op1HighIdx  = toStr(op1IdxPair.first);
+    std::string op1LowIdx   = toStr(op1IdxPair.second);
+
+    bool op1IsNew;
+    uint32_t sndVerNum = find_version_num(op1AndSlice, op1IsNew, output);
+    sndVer = std::to_string(sndVerNum);
+
+    if(op1IsNew) {
+      output << blank << "logic [" + op1HighIdx + ":" + op1LowIdx + "] " + op1 + "_c" + sndVer + " ;" << std::endl;
+      output << blank << "logic [" + op1HighIdx + ":" + op1LowIdx + "] " + op1 + "_r" + sndVer + " ;" << std::endl;
+      output << blank << "logic [" + op1HighIdx + ":" + op1LowIdx + "] " + op1 + "_x" + sndVer + " ;" << std::endl;
+    }
+  }
+  else { //op1 is mem
+    if( nextVersion.find(op1) == nextVersion.end() ) {
+      sndVer = toStr(0);
+      nextVersion.emplace(op1, 1);
+    }
+    else {
+      sndVer = toStr(nextVersion[op1]);
+    }
+    // declare new _r, _c, _x taints, and set default value to 0
+    auto slicePair = memDims[op1];
+    std::string slice = slicePair.first;
+    std::string sliceTop = slicePair.second;
+    std::string highIdx = toStr(get_end(sliceTop));
+    output << blank + "logic " + slice + " " + op1 + "_r" + sndVer + sliceTop + " ;" << std::endl;
+    output << blank + "logic " + slice + " " + op1 + "_c" + sndVer + sliceTop + " ;" << std::endl;
+    output << blank + "logic " + slice + " " + op1 + "_x" + sndVer + sliceTop + " ;" << std::endl;
+    output << blank + "integer i;" << std::endl;
+    output << blank + "always @(*) begin" << std::endl;
+    output << blank + "  for(i = 0; i < "+highIdx+"; i = i + 1) begin" << std::endl;
+    output << blank + "    "+op1+"_r"+sndVer+" [i] = 0;" << std::endl;
+    output << blank + "    "+op1+"_c"+sndVer+" [i] = 0;" << std::endl;
+    output << blank + "    "+op1+"_x"+sndVer+" [i] = 0;" << std::endl;
+    output << blank + "  end" << std::endl;
+    output << blank + "end" << std::endl;
+  }
+  
+  if(!isNum(op2)) {
+    auto op2IdxPair = varWidth.get_idx_pair(op2, line);
+    std::string op2HighIdx  = toStr(op2IdxPair.first);
+    std::string op2LowIdx   = toStr(op2IdxPair.second);
+
+    bool op2IsNew;
+    uint32_t thdVerNum = find_version_num(op2AndSlice, op2IsNew, output);
+    std::string thdVer = std::to_string(thdVerNum);
+
+    /* declare new wires */
+    if(op2IsNew) {
+      output << blank << "logic [" + op2HighIdx + ":" + op2LowIdx + "] " + op2 + "_c" + thdVer + " ;" << std::endl;
+      output << blank << "logic [" + op2HighIdx + ":" + op2LowIdx + "] " + op2 + "_r" + thdVer + " ;" << std::endl;
+      output << blank << "logic [" + op2HighIdx + ":" + op2LowIdx + "] " + op2 + "_x" + thdVer + " ;" << std::endl;
+    }
+
+    output << blank + "assign " + dest + "_t" + destSlice + " = " + op1 + "_t" + slice + " | " + extend("|"+op2+"_t"+op2Slice, localWidth) + " ;" << std::endl;  
+
+    if ( isOutput(dest) && isTop ) {
+      output << blank << "assign " + op1 + "_c" + sndVer + slice + " = 0 ;" << std::endl;
+      output << blank << "assign " + op1 + "_r" + sndVer + slice + " = " + dest + "_r" + destSlice + " ;" << std::endl;
+      uint32_t exp = get_var_slice_width(op1AndSlice);
+      uint32_t pow2 = uint32_t(std::pow(2, exp));
+      output << blank << "assign " + op1 + "_x" + sndVer + slice + " = " + std::to_string(pow2 - 1) + " ;" << std::endl;
+
+      output << blank << "assign " + op2 + "_c" + thdVer + op2Slice + " = 0 ;" << std::endl;
+      output << blank << "assign " + op2 + "_r" + thdVer + op2Slice + " = " + extend("|"+dest+"_r"+destSlice, op2Width) + " ;" << std::endl;
+      exp = get_var_slice_width(op2AndSlice);
+      pow2 = uint32_t(std::pow(2, exp));
+      output << blank << "assign " + op2 + "_x" + thdVer + op2Slice + " = " + std::to_string(pow2 - 1) + " ;" << std::endl;
+      return;
+    }
+
+    // assume memory slices can only be used in simple assignment statements11
+    // also assume each memory slice is used only once
+    output << blank + "always @(*) begin" << std::endl;
+    output << blank + "  " + op1 + "_c" + sndVer + slice + " = " + dest + "_c" + destSlice + " ;" << std::endl;
+    output << blank + "  " + op1 + "_r" + sndVer + slice + " = " + dest + "_r" + destSlice + " ;" << std::endl;
+    output << blank + "  " + op1 + "_x" + sndVer + slice + " = " + dest + "_x" + destSlice + " ;" << std::endl;
+    output << blank + "  " + op2 + "_c" + thdVer + op2Slice + " = " + extend("|"+dest+"_c"+destSlice, op2Width) + " ;" << std::endl;
+    output << blank + "  " + op2 + "_r" + thdVer + op2Slice + " = " + extend("|"+dest+"_r"+destSlice, op2Width) + " ;" << std::endl;
+    output << blank + "  " + op2 + "_x" + thdVer + op2Slice + " = " + extend("|"+dest+"_x"+destSlice, op2Width) + " ;" << std::endl;
+    output << blank + "end" << std::endl;    
+  }
+  else { // isNum(op2)
+    output << blank + "assign " + dest + "_t" + destSlice + " = " + op1 + "_t" + slice + " ;" << std::endl;  
+    if ( isOutput(dest) && isTop ) {
+      output << blank << "assign " + op1 + "_c" + sndVer + slice + " = 0 ;" << std::endl;
+      output << blank << "assign " + op1 + "_r" + sndVer + slice + " = " + dest + "_r" + destSlice + " ;" << std::endl;
+      uint32_t exp = get_var_slice_width(op1AndSlice);
+      uint32_t pow2 = uint32_t(std::pow(2, exp));
+      output << blank << "assign " + op1 + "_x" + sndVer + slice + " = " + std::to_string(pow2 - 1) + " ;" << std::endl;
+      return;
+    }
+    output << blank + "always @(*) begin" << std::endl;
+    output << blank + "  " + op1 + "_c" + sndVer + slice + " = " + dest + "_c" + destSlice + " ;" << std::endl;
+    output << blank + "  " + op1 + "_r" + sndVer + slice + " = " + dest + "_r" + destSlice + " ;" << std::endl;
+    output << blank + "  " + op1 + "_x" + sndVer + slice + " = " + dest + "_x" + destSlice + " ;" << std::endl;
+    output << blank + "end" << std::endl;    
+  }
+}
+
+
 void reduce_one_op_taint_gen(std::string line, std::ofstream &output) {
   std::smatch m;
   if ( std::regex_match(line, m, pRedOr)
+         || std::regex_match(line, m, pNot)
          || std::regex_match(line, m, pRedAnd)
          || std::regex_match(line, m, pRedNand)
          || std::regex_match(line, m, pRedNor)
@@ -870,8 +1035,8 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
 
   if (!op1IsNum && !op2IsNum) { // ite
     /* Assgin new versions */
-    output << blank << "assign " + dest + "_t" + destSlice + " = " + cond + " ? ( " + extend(cond+"_t", localWidthNum) + " | " + op1 + "_t" + op1Slice + " ) : ( " + extend(cond+"_t", localWidthNum) + " | " + op2 + "_t" + op2Slice + " );" << std::endl;
-    output << blank << "assign " + cond + "_r" + condVer + condSlice + " = " + extend("| ("+dest+"_r"+destSlice+" | ( "+extend(cond, localWidthNum)+" & "+op1+"_t"+op1Slice+" | "+extend("!"+cond, localWidthNum)+" & "+op2+"_t"+op2Slice+" ))", condSliceWidth) + " ;" << std::endl;
+    output << blank << "assign " + dest + "_t" + destSlice + " = " + condAndSlice + " ? ( " + extend(cond+"_t "+condSlice, localWidthNum) + " | " + op1 + "_t" + op1Slice + " ) : ( " + extend(cond+"_t "+condSlice, localWidthNum) + " | " + op2 + "_t" + op2Slice + " );" << std::endl;
+    output << blank << "assign " + cond + "_r" + condVer + condSlice + " = " + extend("| ("+dest+"_r"+destSlice+" | ( "+extend(condAndSlice, localWidthNum)+" & "+op1+"_t"+op1Slice+" | "+extend("!"+condAndSlice, localWidthNum)+" & "+op2+"_t"+op2Slice+" ))", condSliceWidth) + " ;" << std::endl;
 
     uint32_t thdVerNum, fthVerNum;
     bool op1IsNew, op2IsNew;
@@ -885,8 +1050,8 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
     output << blank << "logic [" + op1HighIdx + ":" + op1LowIdx + "] " + op1 + "_r" + thdVer + " ;" << std::endl;
     output << blank << "logic [" + op1HighIdx + ":" + op1LowIdx + "] " + op1 + "_x" + thdVer + " ;" << std::endl;
     }
-    output << blank << "assign " + op1 + "_c" + thdVer + op1Slice + " = " + extend(cond, localWidthNum) + ";" << std::endl;
-    output << blank << "assign " + op1 + "_r" + thdVer + op1Slice + " = " + extend(cond, localWidthNum) + " & " + dest + "_r" + destSlice + " ;" << std::endl;
+    output << blank << "assign " + op1 + "_c" + thdVer + op1Slice + " = " + extend(condAndSlice, localWidthNum) + ";" << std::endl;
+    output << blank << "assign " + op1 + "_r" + thdVer + op1Slice + " = " + extend(condAndSlice, localWidthNum) + " & " + dest + "_r" + destSlice + " ;" << std::endl;
     output << blank << "assign " + op1 + "_x" + thdVer + op1Slice + " = " + dest + "_x" + destSlice + " ;" << std::endl;        
 
     if(op2IsNew) {
@@ -895,8 +1060,8 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
     output << blank << "logic [" + op2HighIdx + ":" + op2LowIdx + "] " + op2 + "_x" + fthVer + " ;" << std::endl;
     }
 
-    output << blank << "assign " + op2 + "_c" + fthVer + op2Slice + " = " + extend("!"+cond, localWidthNum) + " ;" << std::endl;
-    output << blank << "assign " + op2 + "_r" + fthVer + op2Slice + " = " + extend("!"+cond, localWidthNum) + " & " + dest + "_r" + destSlice + " ;" << std::endl; 
+    output << blank << "assign " + op2 + "_c" + fthVer + op2Slice + " = " + extend("!"+condAndSlice, localWidthNum) + " ;" << std::endl;
+    output << blank << "assign " + op2 + "_r" + fthVer + op2Slice + " = " + extend("!"+condAndSlice, localWidthNum) + " & " + dest + "_r" + destSlice + " ;" << std::endl; 
     output << blank << "assign " + op2 + "_x" + fthVer + op2Slice + " = " + dest + "_x" + destSlice + " ;" << std::endl;
 
     //if(op1IsNew) {
@@ -921,12 +1086,12 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
     output << blank << "logic [" + op1HighIdx + ":" + op1LowIdx + "] " + op1 + "_r" + thdVer + " ;" << std::endl;
     output << blank << "logic [" + op1HighIdx + ":" + op1LowIdx + "] " + op1 + "_x" + thdVer + " ;" << std::endl;
     }
-    output << blank << "assign " + op1 + "_c" + thdVer + op1Slice + " = " + extend(cond, localWidthNum) + " ;" << std::endl;
-    output << blank << "assign " + op1 + "_r" + thdVer + op1Slice + " = " + extend(cond, localWidthNum) + " & " + dest + "_r" + destSlice + " ;" << std::endl;
+    output << blank << "assign " + op1 + "_c" + thdVer + op1Slice + " = " + extend(condAndSlice, localWidthNum) + " ;" << std::endl;
+    output << blank << "assign " + op1 + "_r" + thdVer + op1Slice + " = " + extend(condAndSlice, localWidthNum) + " & " + dest + "_r" + destSlice + " ;" << std::endl;
     output << blank << "assign " + op1 + "_x" + thdVer + op1Slice + " = " + dest + "_x" + destSlice + " ;" << std::endl;
 
-    output << blank << "assign " + dest + "_t" + destSlice + " = " + cond + " ? ( " + extend("| "+cond+"_t", localWidthNum) + " | " + op1 + "_t" + op1Slice + " ) : " + extend("| "+cond+"_t", localWidthNum) + ";" << std::endl;
-    output << blank << "assign " + cond + "_r" + condVer + condSlice + " = " + extend("| ("+dest+"_r"+destSlice+" | ( "+extend(cond, localWidthNum)+" & "+op1+"_t"+op1Slice+" ))", condSliceWidth) + " ;" << std::endl;
+    output << blank << "assign " + dest + "_t" + destSlice + " = " + condAndSlice + " ? ( " + extend("| "+cond+"_t "+condSlice, localWidthNum) + " | " + op1 + "_t" + op1Slice + " ) : " + extend("| "+cond+"_t "+condSlice, localWidthNum) + ";" << std::endl;
+    output << blank << "assign " + cond + "_r" + condVer + condSlice + " = " + extend("| ("+dest+"_r"+destSlice+" | ( "+extend(condAndSlice, localWidthNum)+" & "+op1+"_t"+op1Slice+" ))", condSliceWidth) + " ;" << std::endl;
 
     //if(op1IsNew) {    
     //ground_wires(op1+"_c"+thdVer, op1BoundPair, op1Slice, blank, output);
@@ -944,12 +1109,12 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
     output << blank << "logic [" + op2HighIdx + ":" + op2LowIdx + "] " + op2 + "_r" + fthVer + " ;" << std::endl;
     output << blank << "logic [" + op2HighIdx + ":" + op2LowIdx + "] " + op2 + "_x" + fthVer + " ;" << std::endl;
     }
-    output << blank << "assign " + op2 + "_c" + fthVer + op2Slice + " = " + extend("!"+cond, localWidthNum) + ";" << std::endl;
-    output << blank << "assign " + op2 + "_r" + fthVer + op2Slice + " = " + extend("!"+cond, localWidthNum) + " & " + dest + "_r" + destSlice + " ;" << std::endl; 
+    output << blank << "assign " + op2 + "_c" + fthVer + op2Slice + " = " + extend("!"+condAndSlice, localWidthNum) + ";" << std::endl;
+    output << blank << "assign " + op2 + "_r" + fthVer + op2Slice + " = " + extend("!"+condAndSlice, localWidthNum) + " & " + dest + "_r" + destSlice + " ;" << std::endl; 
     output << blank << "assign " + op2 + "_x" + fthVer + op2Slice + " = " + dest + "_x" + destSlice + " ;" << std::endl;
 
-    output << blank << "assign " + dest + "_t" + destSlice + " = " + cond + " ? " + extend("| "+cond+"_t", localWidthNum) + " : ( " + extend("| "+cond+"_t", localWidthNum) + " | " + op2 + "_t" + op2Slice + " );" << std::endl;  
-    output << blank << "assign " + cond + "_r" + condVer + condSlice + " = " + extend("| ("+dest+"_r"+destSlice+" | ( "+extend("!"+cond, localWidthNum)+" & "+op2+"_t"+op2Slice+" ))", condSliceWidth) + " ;" << std::endl;
+    output << blank << "assign " + dest + "_t" + destSlice + " = " + condAndSlice + " ? " + extend("| "+cond+"_t "+condSlice, localWidthNum) + " : ( " + extend("| "+cond+"_t "+condSlice, localWidthNum) + " | " + op2 + "_t" + op2Slice + " );" << std::endl;  
+    output << blank << "assign " + cond + "_r" + condVer + condSlice + " = " + extend("| ("+dest+"_r"+destSlice+" | ( "+extend("!"+condAndSlice, localWidthNum)+" & "+op2+"_t"+op2Slice+" ))", condSliceWidth) + " ;" << std::endl;
 
     //if(op2IsNew) {
     //ground_wires(op2+"_c"+fthVer, op2BoundPair, op2Slice, blank, output);
@@ -959,7 +1124,7 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
   }
   else {
     /* when both inputs are constants */
-    output << blank << "assign " + dest + "_t = " + extend(cond+"_t", localWidthNum) + " ;" << std::endl;
+    output << blank << "assign " + dest + "_t = " + extend(cond+"_t "+condSlice, localWidthNum) + " ;" << std::endl;
     output << blank << "assign " + cond + "_r" + condVer + condSlice + " = " + extend("| "+dest+"_r"+destSlice, condSliceWidth) + " ;" << std::endl;
   }
 }

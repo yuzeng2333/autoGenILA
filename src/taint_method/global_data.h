@@ -25,6 +25,7 @@ extern std::unordered_map<std::string, uint32_t> nextVersion;
 extern std::unordered_map<std::string, std::vector<bool>> nxtVerBits;
 extern std::unordered_map<std::string, std::string> new_next;
 extern std::unordered_map<std::string, std::string> update_reg;
+extern std::unordered_map<std::string, std::pair<std::string, std::string>> memDims;
 extern VarWidth varWidth;
 extern VarWidth funcVarWidth;
 extern unsigned long int NEW_VAR;

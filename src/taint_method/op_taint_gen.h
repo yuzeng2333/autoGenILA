@@ -19,6 +19,8 @@ void two_op_taint_gen(std::string line, std::ofstream &output);
  
 void one_op_taint_gen(std::string line, std::ofstream &output);
 
+void sel_op_taint_gen(std::string line, std::ofstream &output);
+
 void reduce_one_op_taint_gen(std::string line, std::ofstream &output);
 
 void mult_op_taint_gen(std::string line, std::ofstream &output);

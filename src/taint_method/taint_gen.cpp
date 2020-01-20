@@ -48,17 +48,17 @@ std::regex pBitExOr   (to_re("^(\\s*)assign (NAME) = (NAME) \\^ (NAME)(\\s*)?;$"
 std::regex pBitAnd    (to_re("^(\\s*)assign (NAME) = (NAME) & (NAME)(\\s*)?;$"));
 //TODO: merge pConcat and pPureConcat
 std::regex pConcat    (to_re("^(\\s*)assign (NAME) = \\{ (NAME), (NAME) \\}(\\s*)?;$"));
-std::regex pSel1      (to_re("^(\\s*)assign (NAME) = (NAME)\\[\\$signed\\((NAME)\\) \\+\\: INT\\](\\s*)?;$"));
-std::regex pSel2      (to_re("^(\\s*)assign (NAME) = (NAME)\\[(NAME) \\+\\: INT\\](\\s*)?;$"));
-std::regex pSel3      (to_re("^(\\s*)assign (NAME) = (NAME)\\[\\$signed\\((NAME)\\) \\-\\: INT\\](\\s*)?;$"));
-std::regex pSel4      (to_re("^(\\s*)assign (NAME) = (NAME)\\[(NAME) \\-\\: INT\\](\\s*)?;$"));
+std::regex pSel1      (to_re("^(\\s*)assign (NAME) = (NAME)(\\[\\$signed\\((NAME)\\) \\+\\: (INT)\\])(\\s*)?;$"));
+std::regex pSel2      (to_re("^(\\s*)assign (NAME) = (NAME)(\\[(NAME) \\+\\: (INT)\\])(\\s*)?;$"));
+std::regex pSel3      (to_re("^(\\s*)assign (NAME) = (NAME)(\\[\\$signed\\((NAME)\\) \\-\\: (INT)\\])(\\s*)?;$"));
+std::regex pSel4      (to_re("^(\\s*)assign (NAME) = (NAME)(\\[(NAME) \\-\\: (INT)\\])(\\s*)?;$"));
 
 std::regex pBitOrRed2 (to_re("^(\\s*)assign (NAME) = \\| \\{ (NAME), (NAME) \\}(\\s*)?;$"));
 /* 1 operator */
-std::regex pNot       (to_re("^(\\s*)assign (NAME) = ! (NAME)(\\s*)?;$"));
 std::regex pNone      (to_re("^(\\s*)assign (NAME) = (NAME)(\\s*)?;$"));
 std::regex pInvert    (to_re("^(\\s*)assign (NAME) = \\~ (NAME)(\\s*)?;$"));
 /* reduce 1 op */
+std::regex pNot       (to_re("^(\\s*)assign (NAME) = ! (NAME)(\\s*)?;$"));
 std::regex pRedOr     (to_re("^(\\s*)assign (NAME) = \\| (NAME)(\\s*)?;$"));
 std::regex pRedAnd    (to_re("^(\\s*)assign (NAME) = & (NAME)(\\s*)?;$"));
 std::regex pRedNand   (to_re("^(\\s*)assign (NAME) = \\~& (NAME)(\\s*)?;$"));
@@ -129,6 +129,7 @@ std::unordered_map<std::string, uint32_t> nextVersion;
 std::unordered_map<std::string, std::vector<bool>> nxtVerBits;
 std::unordered_map<std::string, std::string> new_next;
 std::unordered_map<std::string, std::string> update_reg;
+std::unordered_map<std::string, std::pair<std::string, std::string>> memDims;
 VarWidth varWidth;
 VarWidth funcVarWidth;
 unsigned long int NEW_VAR = 0;
@@ -161,6 +162,7 @@ void clean_global_data() {
   nxtVerBits.clear();
   new_next.clear();
   update_reg.clear();
+  memDims.clear();
   varWidth.clear();
   funcVarWidth.clear();
   NEW_VAR = 0;
@@ -384,6 +386,9 @@ void add_line_taints(std::string line, std::ofstream &output, std::ifstream &inp
     case REDUCE1:
       reduce_one_op_taint_gen(line, output);
       break;
+    case SEL:
+      sel_op_taint_gen(line, output);
+      break;
     case SRC_CONCAT:
       mult_op_taint_gen(line, output);
       break;
@@ -469,26 +474,28 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
             || std::regex_match(line, m, pBitOr)
             || std::regex_match(line, m, pBitExOr)
             || std::regex_match(line, m, pBitAnd)
-            || std::regex_match(line, m, pSel1)
-            || std::regex_match(line, m, pSel2)
-            || std::regex_match(line, m, pSel3)
-            || std::regex_match(line, m, pSel4) 
             || std::regex_match(line, m, pBitOrRed2) ) {
     return TWO_OP;
   } // end of 2-operator
   /* 1-operator assignment */
-  else if (std::regex_match(line, m, pNot) 
-            || std::regex_match(line, m, pInvert)
+  else if (std::regex_match(line, m, pInvert) 
             || std::regex_match(line, m, pNone)) {
     return ONE_OP;
   }
   else if ( std::regex_match(line, m, pRedOr)
+            || std::regex_match(line, m, pNot)
             || std::regex_match(line, m, pRedAnd)
             || std::regex_match(line, m, pRedNand)
             || std::regex_match(line, m, pRedNor)
             || std::regex_match(line, m, pRedXor)
             || std::regex_match(line, m, pRedXnor) ) {
     return REDUCE1;
+  }
+  else if (std::regex_match(line, m, pSel1)
+            || std::regex_match(line, m, pSel2)
+            || std::regex_match(line, m, pSel3)
+            || std::regex_match(line, m, pSel4)) {
+    return SEL;
   }
   else if (std::regex_match(line, m, pSrcConcat)) {
     return SRC_CONCAT;
@@ -608,13 +615,31 @@ void merge_taints(std::string fileName) {
   }
 
   for ( auto it = nextVersion.begin(); it != nextVersion.end(); ++it ) {
-    output << "  assign " + it->first + "_r = ( ";
-    for (uint32_t i = 0; i < it->second - 1; i++) {
-      output << it->first + "_x" + std::to_string(i) + " & ";
-      output << it->first + "_r" + std::to_string(i) + " ) | ( ";
+    if(isMem(it->first)) {
+      auto slicePair = memDims[it->first];
+      std::string sliceTop = slicePair.second;
+      std::string highIdx = toStr(get_end(sliceTop));
+      output << "  always @(*) begin" << std::endl;
+      output << "    for(i = 0; i < "+highIdx+"; i = i + 1) begin" << std::endl;
+      output << "      "+it->first+"_r [i] = (";
+      for (uint32_t i = 0; i < it->second - 1; i++) {
+        output << it->first + "_x" + std::to_string(i) + " [i] & ";
+        output << it->first + "_r" + std::to_string(i) + " [i] ) | ( ";
+      }
+      output << it->first + "_x" + std::to_string(it->second - 1) + " [i] & ";
+      output << it->first + "_r" + std::to_string(it->second - 1) + " [i] );" << std::endl;
+      output << "    end" << std::endl;
+      output << "  end" << std::endl;
     }
-    output << it->first + "_x" + std::to_string(it->second - 1) + " & ";
-    output << it->first + "_r" + std::to_string(it->second - 1) + " );" << std::endl;
+    else {
+      output << "  assign " + it->first + "_r = ( ";
+      for (uint32_t i = 0; i < it->second - 1; i++) {
+        output << it->first + "_x" + std::to_string(i) + " & ";
+        output << it->first + "_r" + std::to_string(i) + " ) | ( ";
+      }
+      output << it->first + "_x" + std::to_string(it->second - 1) + " & ";
+      output << it->first + "_r" + std::to_string(it->second - 1) + " );" << std::endl;
+    }
   }
 
   // ground taints for floating regs
@@ -723,7 +748,8 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
   out << extendOutputs.back() + " );" << std::endl;
   // if no reset, add a reset
   if(!g_hasRst) 
-    out << "  input rst_zy;" << std::endl; 
+    out << "  input rst_zy;" << std::endl;
+  out << "  integer i;" << std::endl;
   while( std::getline(in, line) ) {
     out << line << std::endl;
   }
