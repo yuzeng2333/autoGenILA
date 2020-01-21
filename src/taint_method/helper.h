@@ -109,4 +109,6 @@ std::string get_bits(std::string inNum, uint32_t highIdx, uint32_t lowIdx);
 std::string add_taint(std::vector<std::string> &freeBitsVec, std::string taint);
 
 void assert_info(bool val, std::string info);
+
+void merge_vec(std::vector<std::string> &srcVec, std::vector<std::string> &destVec);
 #endif

@@ -135,6 +135,7 @@ bool split_slice(std::string slicedName, std::string &name, std::string &slice) 
 }
 
 
+// no matter leftIdx or rightIdx is bigger, always return a positive width
 uint32_t get_width(std::string slice) {
   std::regex pSlice("^(?:\\s?)\\[(\\d+)\\:(\\d+)\\](?:\\s)?$");
   std::regex pSingleBit("^(?:\\s)?\\[\\d+\\](?:\\s)?$");
@@ -147,7 +148,12 @@ uint32_t get_width(std::string slice) {
     return 1;
   else {
     std::regex_match(slice, m, pSlice);
-    return str2int(m.str(1), "get_width 1st("+slice+")") - str2int(m.str(2), "get_width 2rd("+slice+")") + 1;
+    uint32_t leftIdx = str2int(m.str(1), "get_width 1st("+slice+")");
+    uint32_t rightIdx = str2int(m.str(2), "get_width 2rd("+slice+")");
+    if(leftIdx > rightIdx)
+      return leftIdx - rightIdx + 1;
+    else
+      return rightIdx - leftIdx + 1;
   }
 }
 
@@ -496,9 +502,9 @@ uint32_t get_var_slice_width(std::string varAndSlice) {
   uint32_t totalWidth = 0;
   if(!varSlice.empty()) {
     if(isSingleBit(varSlice))
-      totalWidth += 1;
+      totalWidth = 1;
     else
-      totalWidth += get_width(varSlice);
+      totalWidth = get_width(varSlice);
   }
   else {
     //std::cout << "varWdith:" + varWidth[var] << std::endl;
@@ -507,7 +513,7 @@ uint32_t get_var_slice_width(std::string varAndSlice) {
       toCout("0 width found!");
       abort();
     }
-    totalWidth += v;
+    totalWidth = v;
   }
   return totalWidth;
 }
@@ -1004,8 +1010,94 @@ std::string add_taint(std::vector<std::string> &freeBitsVec, std::string taint) 
   return res;
 }
 
+
 void assert_info(bool val, std::string info) {
   if(val) return;
   toCout(info);
   abort();
+}
+
+
+// in RHS of concatenation expressions, there might be one variable with different slices.
+// They can be merged into one variable with a longer slice.
+void merge_vec(std::vector<std::string> &srcVec, std::vector<std::string> &destVec) {
+  std::string prevVar = "";
+  std::string var, varSlice;
+  // if useAllSlice = true, then current var should not be merged with next var
+  bool useAllSlice = true;
+  // if last is not pushed, it is waiting to be merged
+  bool lastPushed = true;
+  bool cannotMerge;
+  uint32_t leftIdx, rightIdx;   // global index
+  uint32_t highIdx, lowIdx;     // local index
+  assert(destVec.size() == 0);
+  for( std::string varAndSlice : srcVec ) {
+    split_slice(varAndSlice, var, varSlice);
+    if(varSlice.empty()) { // if see a whole var, it cannot be merged with anything
+      if(lastPushed) { // if last is pushed, just push the current one
+        destVec.push_back(varAndSlice);
+        lastPushed = true;
+      }
+      else{ // if last not pushed, push both the last and current one
+        destVec.push_back(prevVar+" ["+toStr(leftIdx)+":"+toStr(rightIdx)+"]");
+        destVec.push_back(varAndSlice);
+        lastPushed = true;        
+      }
+      continue;
+    }
+
+    // if current contains slices
+ 
+    if(lastPushed) {
+      prevVar = var;
+      leftIdx = get_end(varSlice);
+      rightIdx = get_begin(varSlice);
+      lastPushed = false;
+      continue;
+    }
+    
+    // if last is not pushed and current one contains slice, check if they can be merged
+
+    if(prevVar.compare(var) != 0) { // if var name does not match, cannot merge
+      destVec.push_back(prevVar+" ["+toStr(leftIdx)+":"+toStr(rightIdx)+"]");
+      prevVar = var;
+      leftIdx = get_end(varSlice);
+      rightIdx = get_begin(varSlice);
+      lastPushed = false;
+      continue;
+    }
+    else { 
+      highIdx = get_end(varSlice);
+      lowIdx = get_begin(varSlice);
+      if(leftIdx > rightIdx) {
+        if(highIdx >= lowIdx && rightIdx == highIdx + 1) {
+          rightIdx = lowIdx;
+          lastPushed = false;
+        }
+        else {
+          destVec.push_back(prevVar+" ["+toStr(leftIdx)+":"+toStr(rightIdx)+"]");
+          prevVar = var;
+          leftIdx = get_end(varSlice);
+          rightIdx = get_begin(varSlice);
+          lastPushed = false;
+        }
+      }
+      else {
+        if(highIdx <= lowIdx && rightIdx == highIdx - 1) {
+          rightIdx = lowIdx;
+          lastPushed = false;
+        }
+        else {
+          destVec.push_back(prevVar+" ["+toStr(leftIdx)+":"+toStr(rightIdx)+"]");
+          prevVar = var;
+          leftIdx = get_end(varSlice);
+          rightIdx = get_begin(varSlice);
+          lastPushed = false;
+        }
+      }
+    }
+  }
+  // push the last
+  if(!lastPushed)
+    destVec.push_back(prevVar+" ["+toStr(leftIdx)+":"+toStr(rightIdx)+"]");
 }

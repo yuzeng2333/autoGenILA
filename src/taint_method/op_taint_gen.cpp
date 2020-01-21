@@ -747,7 +747,8 @@ void reduce_one_op_taint_gen(std::string line, std::ofstream &output) {
   assert(get_var_slice_width(destAndSlice) == 1);
   assert(!isMem(op1));
 
-  uint32_t op1WidthNum = varWidth.get_from_var_width(op1, line);
+  //uint32_t op1WidthNum = varWidth.get_from_var_width(op1, line);
+  uint32_t op1WidthNum = get_var_slice_width(op1AndSlice);
   auto op1IdxPair = varWidth.get_idx_pair(op1, line);
   std::string op1HighIdx  = toStr(op1IdxPair.first);
   std::string op1LowIdx   = toStr(op1IdxPair.second);
@@ -797,8 +798,10 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
   //assert(destSlice.empty());
   std::string updateList = m.str(3);
 
+  std::vector<std::string> updateSparseVec;
   std::vector<std::string> updateVec;
-  parse_var_list(updateList, updateVec);
+  parse_var_list(updateList, updateSparseVec);
+  merge_vec(updateSparseVec, updateVec);
   uint32_t destWidthNum = 0;
   for(auto v : updateVec) {
     assert(!isMem(v));
@@ -828,6 +831,7 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
     startIdxNum = get_end(destSlice);
   }
   // TODO: using get_lhs_taint_list to replace this loop
+  std::vector<std::string> collapsedVec;
   for (std::string updateAndSlice: updateVec) {
     std::string update, updateSlice;
     split_slice(updateAndSlice, update, updateSlice);
@@ -971,6 +975,7 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
   assert(!m.str(5).empty());
 
   std::string blank = m.str(1);
+  std::string destAndSlice = m.str(2);
   std::string dest, destSlice;
   std::string cond, condSlice;
   std::string op1, op1Slice;
@@ -980,18 +985,20 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
 
   uint32_t localWidthNum;
   std::string localWidth;
-  if(split_slice(m.str(2), dest, destSlice)) {
-    localWidthNum = get_width(destSlice);
-  }
-  // if no slice found, use the vector whole width
-  else {
-    localWidthNum = varWidth.get_from_var_width(dest, line);
-  }
+  localWidthNum = get_var_slice_width(destAndSlice);
+  //if(split_slice(m.str(2), dest, destSlice)) {
+  //  localWidthNum = get_width(destSlice);
+  //}
+  //// if no slice found, use the vector whole width
+  //else {
+  //  localWidthNum = varWidth.get_from_var_width(dest, line);
+  //}
   localWidth = std::to_string(localWidthNum);
 
   std::string condAndSlice = m.str(3);
   std::string op1AndSlice = m.str(4);
   std::string op2AndSlice = m.str(5);
+  split_slice(destAndSlice, dest, destSlice);
   split_slice(condAndSlice, cond, condSlice);
   split_slice(op1AndSlice , op1, op1Slice);
   split_slice(op2AndSlice , op2, op2Slice);
