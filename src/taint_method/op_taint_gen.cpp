@@ -219,7 +219,6 @@ void output_insert_map(std::string line, std::ofstream &output, std::ifstream &i
   if( std::regex_match(nextLine, m, pReg) && var.compare(m.str(3)) ==0 )
     return;
 
-  //TODO: continue
   output << blank << "output logic " + slice + var + "_t ;" << std::endl;
   bool inTaintIsNew;
   uint32_t inVerNum = find_version_num(var, inTaintIsNew, output);
@@ -798,10 +797,8 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
   //assert(destSlice.empty());
   std::string updateList = m.str(3);
 
-  std::vector<std::string> updateSparseVec;
   std::vector<std::string> updateVec;
-  parse_var_list(updateList, updateSparseVec);
-  merge_vec(updateSparseVec, updateVec);
+  parse_var_list(updateList, updateVec);
   uint32_t destWidthNum = 0;
   for(auto v : updateVec) {
     assert(!isMem(v));
@@ -832,7 +829,8 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
   }
   // TODO: using get_lhs_taint_list to replace this loop
   std::vector<std::string> collapsedVec;
-  for (std::string updateAndSlice: updateVec) {
+  merge_vec(updateVec, collapsedVec);
+  for (std::string updateAndSlice: collapsedVec) {
     std::string update, updateSlice;
     split_slice(updateAndSlice, update, updateSlice);
     uint32_t updateSliceWidthNum = get_var_slice_width(updateAndSlice);

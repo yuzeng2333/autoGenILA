@@ -16,7 +16,6 @@
 #define toStr(a) std::to_string(a)
 
 
-
 /* TODO:
  *  1. If a slice of a word is used, how to define its _t, _r, ...?
  *  Now I just do not distinguish slice and the whole word.
@@ -103,7 +102,7 @@ std::regex pSrcDestBothConcat(to_re("^(\\s*)assign \\{ ((?:NAME(?:\\s)?, )+NAME)
 
 /* Milicious */
 /* pVarName also exists in to_re(), and parse_var_list() */
-std::regex pVarName("([\aa-zA-Z0-9_\\.\\$\\\\'\\[\\]]+)(?:\\s*\\[\\d+(\\:\\d+)?\\])?");
+std::regex pVarName("([\aa-zA-Z0-9_\\.\\$\\\\'\\[\\]]+)(\\s*\\[\\d+(\\:\\d+)?\\])?");
 std::regex pVarNameGroup("([\aa-zA-Z0-9_\\.\\$\\\\'\\[\\]]+)(?:(\\s*)(\\[\\d+(\\:\\d+)?\\]))?");
 std::regex pNum("^(\\d+)'(h|d|b)[\\dabcdefx\\?]+$");
 std::regex pNumExist("(\\d+)'(h|d|b)[\\dabcdef\\?]+");
@@ -518,6 +517,9 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   }
   else if( std::regex_match(line, m, pAlwaysFake) ) {
     return ALWAYS_FAKE;
+  }
+  else if( std::regex_match(line, m, pNonblockIf) ) {
+    return NONBLOCKIF;
   }
   else if( std::regex_match(line, m, pNonblock) ) {
     return NONBLOCK;

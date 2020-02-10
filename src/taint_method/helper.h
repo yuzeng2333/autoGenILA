@@ -12,6 +12,8 @@ bool isInput(std::string var);
 
 bool isReg(std::string var);
 
+bool isWire(std::string var);
+
 bool isMem(std::string var);
 
 std::string to_re(std::string input);
@@ -101,6 +103,8 @@ std::string pairVec2taintString( std::vector<std::pair<std::string, std::string>
 std::string max_num(uint32_t width);
 
 std::string max_num(std::string widthStr);
+
+uint32_t max_num_dec(uint32_t width);
 
 std::string dec2bin(uint32_t inNum);
 

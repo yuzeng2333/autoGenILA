@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include "helper.h"
 #include <algorithm>
+#include <math>
 /* help functions */
 
 #define toStr(a) std::to_string(a)
@@ -48,6 +49,12 @@ bool isInput(std::string var) {
 bool isReg(std::string var) {
   auto it = std::find( moduleRegs.begin(), moduleRegs.end(), var );
   return it != moduleRegs.end();
+}
+
+
+bool isWire(std::string var) {
+  auto it = std::find( moduleWires.begin(), moduleWires.end(), var );
+  return it != moduleWires.end();
 }
 
 
@@ -975,6 +982,11 @@ std::string max_num(uint32_t width) {
 std::string max_num(std::string widthStr) {
   uint32_t width = std::stoi(widthStr);
   return max_num(width);
+}
+
+
+uint32_t max_num_dec(uint32_t width) {
+  return (uint32_t)(pow(2, width)-1);
 }
 
 
