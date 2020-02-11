@@ -1,20 +1,7 @@
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <regex>
-#include <vector>
-#include <unordered_map>
+#include "expr.h"
+#include "parse_fill.h"
 
-void single_line_expr(std::string line) {
-  std::smatch m;
-  if( !std::regex_match(line, m, pSingleLine) ) {
-    toCout("Error in matching single line expression: "+line);
-    return;
-  }
-  auto ret = g_ssaTable.emplace(m.str(2), line);
-  if(!ret.second)
-    toCout("Error in inserting ssaTable for key: "+m.str(2));
-}
+#define toStr(a) std::to_string(a)
 
 
 void input_expr(std::string line) {
@@ -39,7 +26,7 @@ void input_expr(std::string line) {
 }
 
 
-void reg_taint_gen(std::string line) {
+void reg_expr(std::string line) {
   std::smatch m;
   if ( !std::regex_match(line, m, pReg) 
         && !std::regex_match(line, m, pRegConst) )
@@ -64,7 +51,7 @@ void reg_taint_gen(std::string line) {
 }
 
 
-void wire_taint_gen(std::string line) {
+void wire_expr(std::string line) {
   std::smatch m;
   if ( !std::regex_match(line, m, pWire) )
     return;
@@ -86,7 +73,7 @@ void wire_taint_gen(std::string line) {
 }
 
 
-void mem_taint_gen(std::string line) {
+void mem_expr(std::string line) {
   std::smatch m;
   if ( !std::regex_match(line, m, pMem )) 
     return;
@@ -113,6 +100,7 @@ void mem_taint_gen(std::string line) {
 }
 
 
+// TODO: put output into moduleWires?
 void output_expr(std::string line) {
   std::smatch m;
   if ( !std::regex_match(line, m, pOutput) )
@@ -140,6 +128,20 @@ void output_expr(std::string line) {
 }
 
 
+void single_line_expr(std::string line) {
+  std::smatch m;
+  if( !std::regex_match(line, m, pSingleLine) ) {
+    toCout("Error in matching single line expression: "+line);
+    return;
+  }
+  std::string destAndSlice = m.str(2);
+  put_into_reg2Slice(destAndSlice);
+  auto ret = g_ssaTable.emplace(destAndSlice, line);
+  if(!ret.second)
+    toCout("Error in inserting ssaTable for key: "+m.str(2));
+}
+
+
 void both_concat_expr(std::string line) {
   std::smatch m;
   if( !std::regex_match(line, m, pSrcDestBothConcat) )
@@ -160,6 +162,7 @@ void both_concat_expr(std::string line) {
   uint32_t destTotalWidthNum = 0;
   uint32_t yuzengIdx = g_new_var++;
   std::string yuzengIdxStr = toStr(yuzengIdx);
+  std::string dest, destSlice;
   for(std::string destAndSlice: destVec) {
     assert(!isMem(destAndSlice));  
     if(isNum(destAndSlice)) {
@@ -171,8 +174,8 @@ void both_concat_expr(std::string line) {
 
   uint32_t startIdx = destTotalWidthNum - 1;
   uint32_t endIdx;
-  std::string startIdxStr = toStr(startIdx);
-  varWidth.var_width_insert("yuzeng"+yuzengIdxStr, startIdxStr, toStr(0));
+  moduleWires.insert("yuzeng"+yuzengIdxStr);
+  varWidth.var_width_insert("yuzeng"+yuzengIdxStr, startIdx, 0);
   std::string newAssign = "  assign yuzeng"+yuzengIdxStr+" = "+srcList+" ;";
 
   auto ret = g_ssaTable.emplace("yuzeng"+yuzengIdxStr, line);
@@ -190,17 +193,18 @@ void both_concat_expr(std::string line) {
       std::string destHighIdx  = toStr(destIdxPair.first);
       std::string destLowIdx   = toStr(destIdxPair.second);
 
-      std::string destAssign = "  assign " + destAndSlice + " = yuzeng" + yuzengIdxStr + " [" + toStr(startIdx) + ":" + toStr(endIdx) + "] ;";
+      std::string destAssign = "  assign "+destAndSlice+" = yuzeng"+yuzengIdxStr+" [" + toStr(startIdx)+" : "+toStr(endIdx)+"] ;";
       auto ret = g_ssaTable.emplace(destAndSlice, destAssign);
+      put_into_reg2Slice(destAndSlice);
       if(!ret.second)
-        toCout("Error in inserting ssaTable for key: "destAndSlice+", original line:"+line);
+        toCout("Error in inserting ssaTable for key: "+destAndSlice+", original line:"+line);
     }
     startIdx = endIdx - 1;
   }
 }
 
 
-void nb_expr(line) {
+void nb_expr(std::string line) {
   std::smatch m;
   if( !std::regex_match(line, m, pSingleLine) ) {
     toCout("Error in matching single line expression: "+line);
@@ -215,19 +219,18 @@ void nb_expr(line) {
 
 void always_expr(std::string line, std::ifstream &input) {
   std::smatch m;
-  if( !std::regex_match(firstLine, m, pAlwaysClk) ) {
+  if( !std::regex_match(line, m, pAlwaysClk) ) {
     std::cout << "!! Error in parsing always with clk & rst !!" << std::endl;
     abort();
   }
   g_recentClk = m.str(2);
-  std::string line;
   // parse first assignment
   std::getline(input, line);
   if( std::regex_match(line, m, pNonblock) || std::regex_match(line, m, pNonblockConcat) ) {
     nb_expr(line);
   }
   else if( std::regex_match(line, m, pNonblockIf) ) {
-    nonblockif_expr(line, firstLine, input, output);
+    nonblockif_expr(line, input);
   }
   else {
     toCout("Error in parsing nonblocking: "+line);
@@ -248,7 +251,7 @@ void nonblockif_expr(std::string line, std::ifstream &input) {
   std::string destAndSlice;
   std::string srcAndSlice;
   std::string dest, destSlice;
-  std::string src, src1Slice;
+  std::string src, srcSlice;
   std::string cond, condSlice;
   std::vector<std::string> nonConstAssign;
 
@@ -263,6 +266,7 @@ void nonblockif_expr(std::string line, std::ifstream &input) {
 
   std::string yuzengIdx = toStr(g_new_var++);
   std::string destNext = "yuzeng"+yuzengIdx;
+  moduleWires.insert("yuzeng"+yuzengIdx);
   uint32_t localWidth = get_var_slice_width(destAndSlice);
   bool insertDone;
     insertDone = varWidth.var_width_insert(destNext, localWidth-1, 0);
@@ -316,6 +320,7 @@ void always_clkrst_expr(std::string line, std::ifstream &input) {
 
   std::string yuzengIdx = toStr(g_new_var++);
   std::string destNext = "yuzeng"+yuzengIdx;
+  moduleWires.insert("yuzeng"+yuzengIdx);
   std::string destNextLine = "  assign yuzeng"+yuzengIdx+" = "+condAndSlice+" ? "+src1AndSlice+" : "+src2AndSlice+" ;";
   auto ret = g_ssaTable.emplace("yuzeng"+yuzengIdx, destNextLine);
   if(!ret.second)
@@ -330,4 +335,19 @@ void always_clkrst_expr(std::string line, std::ifstream &input) {
 
 void case_expr(std::string line, std::ifstream &input) {
   // TODO:
+}
+
+
+void put_into_reg2Slice(std::string destAndSlice) {
+  std::string dest, destSlice;
+  split_slice(destAndSlice, dest, destSlice);
+  // if the destAndSlice has slice, put it into the reg2Slices map
+  if(!destSlice.empty()) {
+    if(reg2Slices.find(dest) == reg2Slices.end()) {
+      reg2Slices.emplace(dest, std::vector<std::string>{destAndSlice});
+    }
+    else {
+      reg2Slices[dest].push_back(destAndSlice);
+    }
+  }
 }

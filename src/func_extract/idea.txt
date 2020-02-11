@@ -1,0 +1,14 @@
+2/1/2020
+1. I think the task of function extraction can actually be done in the same manner as searching for architecture states. But only write taints need to be used. The idea is like this: all the inputs and registers emit taints. But inputs and aa emit red taints, while non-aa emits green taints. 
+
+2. The overall workflow　can be like this:
+First, call the set of all architectural states and inputs S.
+(1) parse the verilog program, get the SSA of each variable, stored in some data structure(hash table)
+(2) For each architectural state, start from its SSA, 
+(3) replace all wire in the SSA with its SSA, repeat this process until the final SSA does not contain wires.(only registers and inputs)
+(4) convert it to a SAT expression, check if it is staifiable
+(5) if true. Finished, otherwise, for all the registers in the SSA, replace it with its non-blocking assignment, and go to (3).
+
+3. How to convert SSA into SAT expressions.
+in a good SSA, there are only three types of variables: AS, non-AS, inputs. Also there are different versions of these variables, each version corresponds to a time stamp.
+According to the good SSA, we construct a new expression, a taint expression. Besically, taints have the same width as variables. Inputs and AS's taints are clear (all 0), non-AS's taints are dirty(all 1). If input signal is the condition variable for ite, then do not replace it with taints. assert the result is clean and solve this SAT problem.

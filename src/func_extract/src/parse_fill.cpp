@@ -1,26 +1,14 @@
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <regex>
-#include <vector>
-#include <unordered_map>
-#include "../../taint_method/taint_gen.h"
 #include "parse_fill.h"
-#include "../../taint_method/helper.h"
-#include "../../taint_method/varWidth.h"
+#include "expr.h"
 
 // global variables
-std::vector<std::string> moduleInputs;
-std::vector<std::string> moduleOutputs;
-std::vector<std::string> moduleRegs;
-std::set<std::string> moduleWires;
-std::unordered_map<std::string, uint32_t> moduleMems;
-std::unordered_map<std::string, std::pair<std::string, std::string>> memDims;
+std::set<std::string> moduleAs;
+std::unordered_map<std::string, std::vector<std::string>> reg2Slices;
+std::unordered_map<std::string, uint32_t> reg2timeIdx;
 std::unordered_map<std::string, std::string> g_ssaTable;
 // non-blocking assignment table
 std::unordered_map<std::string, std::string> g_nbTable;
 uint32_t g_new_var;
-VarWidth varWidth;
 
 std::regex pSingleLine (to_re("^(\\s*)assign (NAME) = (.*)$"));
 
@@ -34,6 +22,8 @@ void clear_global_vars() {
   memDims.clear();
   g_ssaTable.clear();
   varWidth.clear();
+  moduleAs.clear();
+  reg2Slices.clear();
   g_new_var = 0;
 }
 
@@ -41,13 +31,14 @@ void clear_global_vars() {
 void parse_verilog(std::string fileName) {
   std::ifstream input(fileName);
   std::string line;
-  while( std::getline(line, input) ) {
+  std::smatch match;
+  while( std::getline(input, line) ) {
     if ( std::regex_match(line, match, pAlwaysComb) ) {
-      case_expr(line, input);
+      //TODO:case_expr(line, input);
       continue;
     }
     else if ( std::regex_match(line, match, pModuleBegin) ) {
-      module_instantiation_expr(input, line, moduleInputsMap, moduleOutputsMap);
+      //TODO:module_instantiation_expr(input, line, moduleInputsMap, moduleOutputsMap);
       continue;
     }
     uint32_t choice = parse_verilog_line(line, true);
@@ -83,7 +74,7 @@ void parse_verilog(std::string fileName) {
       nb_expr(line);
       break;
     case NONBLOCKIF:
-      nonblockif_expr(line);
+      nonblockif_expr(line, input);
       break;
     case ALWAYS:
       always_expr(line, input);
@@ -92,7 +83,7 @@ void parse_verilog(std::string fileName) {
       always_clkrst_expr(line, input);
       break;
     case ALWAYS_FAKE:
-      always_fake_taint_gen(line, input, output);
+      //TODO: always_fake_taint_gen(line, input, output);
       break;
     case FUNCDEF:
       toCout("!! Error: function found in verilog file");
@@ -110,9 +101,26 @@ void parse_verilog(std::string fileName) {
 }
 
 
-// assume g_ssaTable and g_nbTable have been filled
-void check_architectural state() {
-  for(std::string reg: moduleRegs) {
-    
+void read_in_architectural_states(std::string fileName) {
+  std::ifstream input(fileName);
+  std::string line;
+  std::smatch m;
+  // assume each line has only one AS
+  while(std::getline(input, line)) {
+    if(!std::regex_match(line, m, pVarName)) {
+      toCout("Error in matching: "+line);
+      abort();
+    }
+    moduleAs.insert(m.str(0));
   }
+}
+
+
+bool isAs(std::string var) {
+  auto it = std::find( moduleAs.begin(), moduleAs.end(), var );
+  return it != moduleAs.end();
+}
+
+bool isClean(std::string var) {
+  return isAs(var) | isInput(var) | isMem(var);
 }

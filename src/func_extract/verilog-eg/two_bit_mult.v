@@ -16,7 +16,7 @@ module two_bit_mult(clk, rst, func, in1, in2, out);
   wire [1:0] partial_res1_next;
   wire [1:0] partial_res2_next;
 
-  assign cnt_next = func ? 1 : (cnt == 2) ? 0 : (cnt > 0) ? cnt + 1;
+  assign cnt_next = func ? 1 : (cnt == 2) ? 0 : (cnt > 0) ? cnt + 1 : cnt;
   assign partial_res1_next = cnt == 1 ? in1 & in2[0] : partial_res1;
   assign partial_res2_next = cnt == 2 ? in1 & in2[1] : partial_res1;
 
