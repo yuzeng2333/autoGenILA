@@ -141,6 +141,7 @@ bool g_recentRst_positive = true;
 std::set<std::string> g_rstGroup;
 bool isTop = false;
 int g_hasRst;
+bool g_verb;
 
 /* clean all the global data */
 void clean_global_data() {

@@ -59,7 +59,7 @@ void add_func_taints(std::ifstream &input, std::ofstream &output, std::string fu
 void add_case_taints(std::ifstream &input, std::ofstream &output, std::string firstLine, std::string taintBits);
 
 void add_func_taints_limited(std::ifstream &input, std::ofstream &output, std::string firstLine);
-
+  
 void add_func_taints_call_limited(std::string line, std::ofstream &output);
 
 void extend_module_instantiation(std::ifstream &input, std::ofstream &output, std::string moduleFirstLine, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap);

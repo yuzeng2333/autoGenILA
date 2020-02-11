@@ -86,6 +86,8 @@ int str2int(std::string str, std::string info);
 
 void toCout(std::string line);
 
+void toCoutVerb(std::string line);
+
 bool isSingleBit(std::string slice);
 
 std::string further_clean_line(std::string line);

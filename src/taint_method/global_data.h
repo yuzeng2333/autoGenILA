@@ -116,4 +116,6 @@ extern std::regex pVarNameGroup;
 extern std::regex pNum;
 extern std::regex pNumExist;
 
+extern bool g_verb;
+
 #endif

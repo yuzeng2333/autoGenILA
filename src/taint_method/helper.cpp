@@ -9,7 +9,7 @@
 #include <unordered_map>
 #include "helper.h"
 #include <algorithm>
-#include <math>
+#include <math.h>
 /* help functions */
 
 #define toStr(a) std::to_string(a)
@@ -821,6 +821,12 @@ int str2int(std::string str, std::string info) {
 
 void toCout(std::string line) {
   std::cout << line << std::endl;
+}
+
+
+void toCoutVerb(std::string line) {
+  if(g_verb)
+    std::cout << line << std::endl;
 }
 
 
