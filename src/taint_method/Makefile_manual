@@ -1,5 +1,5 @@
 all:
-	g++ main.cpp taint_gen.cpp helper.cpp op_taint_gen.cpp VarWidth.cpp
+	g++ taint_gen.cpp helper.cpp op_taint_gen.cpp VarWidth.cpp
 
 debug:
 	g++ -g taint_gen.cpp helper.cpp op_taint_gen.cpp VarWidth.cpp
@@ -43,5 +43,4 @@ gb1:
 csimple:
 	./a.out /workspace/research/ILA/autoGenILA/naiveEg/case_simple/case.v 0
 
-rbm:
-	./a.out /workspace/research/ILA/autoGenILA/RBM/SYN/rbm_yosys.v 0
+

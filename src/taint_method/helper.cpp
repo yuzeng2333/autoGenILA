@@ -1070,8 +1070,15 @@ void merge_vec(std::vector<std::string> &srcVec, std::vector<std::string> &destV
       prevVar = var;
       leftIdx = get_end(varSlice);
       rightIdx = get_begin(varSlice);
-      lastPushed = false;
-      continue;
+      if(leftIdx < rightIdx) { // push it and do not merge
+        destVec.push_back(varAndSlice);        
+        lastPushed = true;
+        continue;
+      }
+      else {
+        lastPushed = false;
+        continue;        
+      }
     }
     
     // if last is not pushed and current one contains slice, check if they can be merged
@@ -1084,7 +1091,7 @@ void merge_vec(std::vector<std::string> &srcVec, std::vector<std::string> &destV
       lastPushed = false;
       continue;
     }
-    else { 
+    else { // var names are the same
       highIdx = get_end(varSlice);
       lowIdx = get_begin(varSlice);
       if(leftIdx > rightIdx) {
@@ -1092,7 +1099,7 @@ void merge_vec(std::vector<std::string> &srcVec, std::vector<std::string> &destV
           rightIdx = lowIdx;
           lastPushed = false;
         }
-        else {
+        else { 
           destVec.push_back(prevVar+" ["+toStr(leftIdx)+":"+toStr(rightIdx)+"]");
           prevVar = var;
           leftIdx = get_end(varSlice);
@@ -1100,17 +1107,27 @@ void merge_vec(std::vector<std::string> &srcVec, std::vector<std::string> &destV
           lastPushed = false;
         }
       }
-      else {
-        if(highIdx <= lowIdx && rightIdx == highIdx - 1) {
-          rightIdx = lowIdx;
-          lastPushed = false;
+      else if (leftIdx < rightIdx) {
+        toCout("Error: leftIdx < rightIdx for "+var);
+        abort();
+      }
+      else { // leftIdx == rightIdx
+        if(highIdx < lowIdx) {//&& rightIdx == highIdx - 1) {
+          toCout("Error: leftIdx < rightIdx for "+var);
+          abort();
         }
-        else {
-          destVec.push_back(prevVar+" ["+toStr(leftIdx)+":"+toStr(rightIdx)+"]");
-          prevVar = var;
-          leftIdx = get_end(varSlice);
-          rightIdx = get_begin(varSlice);
-          lastPushed = false;
+        else { // highIdx > lowIdx or not continuous
+          if(rightIdx == highIdx + 1) {
+            rightIdx = lowIdx;
+            lastPushed = false;
+          }
+          else{
+            destVec.push_back(prevVar+" ["+toStr(leftIdx)+":"+toStr(rightIdx)+"]");
+            prevVar = var;
+            leftIdx = get_end(varSlice);
+            rightIdx = get_begin(varSlice);
+            lastPushed = false;
+          }
         }
       }
     }
