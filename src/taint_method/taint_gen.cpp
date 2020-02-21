@@ -140,8 +140,9 @@ std::string g_recentRst;
 bool g_recentRst_positive = true;
 std::set<std::string> g_rstGroup;
 bool isTop = false;
-int g_hasRst;
+bool g_hasRst;
 bool g_verb;
+bool g_has_read_taint;
 
 /* clean all the global data */
 void clean_global_data() {
@@ -174,6 +175,7 @@ void clean_global_data() {
   g_recentRst_positive = true;
   g_rstGroup.clear();
   g_hasRst = false;
+  g_has_read_taint = false;
 }
 
 
@@ -626,22 +628,42 @@ void merge_taints(std::string fileName) {
       output << "    for(i = 0; i < "+highIdx+"; i = i + 1) begin" << std::endl;
       output << "      "+it->first+"_r [i] = (";
       for (uint32_t i = 0; i < it->second - 1; i++) {
-        output << it->first + "_x" + std::to_string(i) + " [i] & ";
-        output << it->first + "_r" + std::to_string(i) + " [i] ) | ( ";
+        if(g_has_read_taint) {
+          output << it->first + "_x" + std::to_string(i) + " [i] & ";
+          output << it->first + "_r" + std::to_string(i) + " [i] ) | ( ";
+        }
+        else { // if do not want read taint
+          output << it->first + "_x" + std::to_string(i) + " [i] ) | ( ";
+        }
       }
-      output << it->first + "_x" + std::to_string(it->second - 1) + " [i] & ";
-      output << it->first + "_r" + std::to_string(it->second - 1) + " [i] );" << std::endl;
+      if(g_has_read_taint) {
+        output << it->first + "_x" + std::to_string(it->second - 1) + " [i] & ";
+        output << it->first + "_r" + std::to_string(it->second - 1) + " [i] );" << std::endl;
+      }
+      else {
+        output << it->first + "_x" + std::to_string(it->second - 1) + " [i] );" << std::endl;
+      }
       output << "    end" << std::endl;
       output << "  end" << std::endl;
     }
     else {
       output << "  assign " + it->first + "_r = ( ";
       for (uint32_t i = 0; i < it->second - 1; i++) {
-        output << it->first + "_x" + std::to_string(i) + " & ";
-        output << it->first + "_r" + std::to_string(i) + " ) | ( ";
+        if(g_has_read_taint) {
+          output << it->first + "_x" + std::to_string(i) + " & ";
+          output << it->first + "_r" + std::to_string(i) + " ) | ( ";
+        }
+        else {
+          output << it->first + "_x" + std::to_string(i) + " ) | ( ";
+        }
       }
-      output << it->first + "_x" + std::to_string(it->second - 1) + " & ";
-      output << it->first + "_r" + std::to_string(it->second - 1) + " );" << std::endl;
+      if(g_has_read_taint) {      
+        output << it->first + "_x" + std::to_string(it->second - 1) + " & ";
+        output << it->first + "_r" + std::to_string(it->second - 1) + " );" << std::endl;
+      }
+      else {
+        output << it->first + "_x" + std::to_string(it->second - 1) + " );" << std::endl;
+      }
     }
   }
 

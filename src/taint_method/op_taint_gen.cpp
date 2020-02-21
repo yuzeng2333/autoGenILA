@@ -26,6 +26,7 @@ void input_taint_gen(std::string line, std::ofstream &output) {
     if(var.compare("rst") == 0
         || var.compare("reset") == 0
         || var.compare("reset_n") == 0
+        || var.compare("i_rst") == 0
         || var.compare("reset") == 0)
       g_hasRst = true;
   }

@@ -29,10 +29,10 @@ exp:
 	./a.out ./experiment/experiment.v 0
 
 pid0:
-	./a.out /workspace/research/ILA/autoGenILA/PID/SYN/PID_simp.v 0
+	./a.out /workspace/research/ILA/autoGenILA/PID/SYN/PID_short.v 0
 
 pid1:
-	./a.out /workspace/research/ILA/autoGenILA/PID/SYN/PID_simp.v 1
+	./a.out /workspace/research/ILA/autoGenILA/PID/SYN/PID_short.v 1
 
 gb0:
 	./a.out /workspace/research/ILA/autoGenILA/GB/SYN/gb_yosys.v 0
