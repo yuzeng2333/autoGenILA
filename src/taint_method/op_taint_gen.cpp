@@ -86,7 +86,7 @@ void reg_taint_gen(std::string line, std::ofstream &output) {
     }
     else {
       output << blank << "wire " + slice + var + "_x" + toStr(inVerNum) + " ;" << std::endl;
-      output << blank << "assign " + var + "_x" + toStr(inVerNum) + " = " + max_num(get_width(slice)) + " ;" << std::endl;
+      output << blank << "assign " + var + "_x" + toStr(inVerNum) + " = " +  var + "_r" + toStr(inVerNum) + " ;" << std::endl;
     }
     extendOutputs.push_back(var+"_t");
     extendInputs.push_back(var+"_r"+toStr(inVerNum));
@@ -243,7 +243,7 @@ void output_insert_map(std::string line, std::ofstream &output, std::ifstream &i
     extendInputs.push_back(var+"_x"+toStr(inVerNum));
 
   if(isTop)
-    output << blank << "assign " + var + "_x" + toStr(inVerNum) + " = " + max_num(get_width(slice)) + " ;" << std::endl;
+    output << blank << "assign " + var + "_x" + toStr(inVerNum) + " = " + var + "_x" + toStr(inVerNum) + " ;" << std::endl;
   // TODO: how to deal with the taints of output?
   // It seems to me, the _r taints should only be high 
   // when the output is valid to be read
