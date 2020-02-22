@@ -683,19 +683,23 @@ void merge_taints(std::string fileName) {
   }
 
   // these wires are never used as inputs
-  output << " // ground taints for used wires" << std::endl;  
+  output << " // ground taints for used wires" << std::endl;
+  std::string outputStr = "";
   for (auto wire : moduleWires) {
     if ( isNum(wire) ) {
       std::cout << "find num in nextVersion: " + wire << std::endl;
       continue;
     }
     if ( nextVersion.find(wire) == nextVersion.end() ) {
-      output << "  assign " + wire + "_r = 0;" << std::endl;  
-      output << "  assign " + wire + "_c = 0;" << std::endl;
+      outputStr = outputStr + wire + "_r, ";
+      outputStr = outputStr + wire + "_c, ";
       if( g_wire2reg.find(wire) == g_wire2reg.end() )
-        output << "  assign " + wire + "_x = 0;" << std::endl;
+        outputStr = outputStr + wire + "_x, ";        
     }
   }
+  outputStr.pop_back();
+  outputStr.pop_back();
+  output << "  assign { " + outputStr + " } = 0;" << std::endl; 
 
   // wires giving value to regs should have taints grounded.
   output << " // ground taints for wires connected to regs" << std::endl;
