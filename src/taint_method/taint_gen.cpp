@@ -691,15 +691,17 @@ void merge_taints(std::string fileName) {
       continue;
     }
     if ( nextVersion.find(wire) == nextVersion.end() ) {
-      outputStr = outputStr + wire + "_r, ";
-      outputStr = outputStr + wire + "_c, ";
+      outputStr = outputStr + wire + "_r , ";
+      outputStr = outputStr + wire + "_c , ";
       if( g_wire2reg.find(wire) == g_wire2reg.end() )
-        outputStr = outputStr + wire + "_x, ";        
+        outputStr = outputStr + wire + "_x , ";        
     }
   }
-  outputStr.pop_back();
-  outputStr.pop_back();
-  output << "  assign { " + outputStr + " } = 0;" << std::endl; 
+  if(outputStr.length() > 2) {
+    outputStr.pop_back();
+    outputStr.pop_back();
+    output << "  assign { " + outputStr + " } = 0;" << std::endl; 
+  }
 
   // wires giving value to regs should have taints grounded.
   output << " // ground taints for wires connected to regs" << std::endl;

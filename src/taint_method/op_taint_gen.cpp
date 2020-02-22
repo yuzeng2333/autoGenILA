@@ -343,20 +343,18 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
       output << blank << "assign " + dest + "_t" + destSlice + " = (| " + op1 + "_t" + op1Slice + " ) | (|" + op2 + "_t" + op2Slice + " ) ;" << std::endl;
     if ( isOutput(dest) && isTop ) {
       output << blank << "assign " + op1 + "_c" + sndVer + op1Slice + " = 0 ;" << std::endl;
-      uint32_t exp = get_var_slice_width(op1AndSlice);
-      uint32_t pow2 = uint32_t(std::pow(2, exp));
-      output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + std::to_string(pow2 - 1) + " ;" << std::endl;
       output << blank << "assign " + op2 + "_c" + thdVer + op2Slice + " = 0 ;" << std::endl;
-      exp = get_var_slice_width(op2AndSlice);
-      pow2 = uint32_t(std::pow(2, exp)); 
-      output << blank << "assign " + op2 + "_x" + thdVer + op2Slice + " = " + std::to_string(pow2 - 1) + " ;" << std::endl;
       if(!isReduceOp) {
         output << blank << "assign " + op1 + "_r" + sndVer + op1Slice + " = " + dest + "_r" + destSlice + " ;" << std::endl;
-        output << blank << "assign " + op2 + "_r" + thdVer + op2Slice + " = " + dest + "_r" + destSlice + " ;" << std::endl;  
+        output << blank << "assign " + op2 + "_r" + thdVer + op2Slice + " = " + dest + "_r" + destSlice + " ;" << std::endl; 
+        output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + dest + "_r" + destSlice + " ;" << std::endl;
+        output << blank << "assign " + op2 + "_x" + thdVer + op2Slice + " = " + dest + "_r" + destSlice + " ;" << std::endl;  
       }
       else {
         output << blank << "assign " + op1 + "_r" + sndVer + op1Slice + " = " + extend(dest+"_r"+destSlice, op1LocalWidthNum) +  " ;" << std::endl;
-        output << blank << "assign " + op2 + "_r" + thdVer + op2Slice + " = " + extend(dest+"_c"+destSlice, op2LocalWidthNum) +  " ;" << std::endl;
+        output << blank << "assign " + op2 + "_r" + thdVer + op2Slice + " = " + extend(dest+"_r"+destSlice, op2LocalWidthNum) +  " ;" << std::endl;
+        output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + extend(dest+"_r"+destSlice, op1LocalWidthNum) +  " ;" << std::endl;
+        output << blank << "assign " + op2 + "_x" + thdVer + op2Slice + " = " + extend(dest+"_r"+destSlice, op2LocalWidthNum) +  " ;" << std::endl;
       }
     }
     else if (!isReduceOp){
@@ -410,14 +408,13 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
 
     if ( isOutput(dest) && isTop ) {
       output << blank << "assign " + op1 + "_c" + sndVer + op1Slice + " = 0 ;" << std::endl;
-      uint32_t exp = get_var_slice_width(op1AndSlice);
-      uint32_t pow2 = uint32_t(std::pow(2, exp));
-      output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + std::to_string(pow2 - 1) + " ;" << std::endl;
       if(!isReduceOp) {
         output << blank << "assign " + op1 + "_r" + sndVer + op1Slice + " = " + dest + "_r" + destSlice + " ;" << std::endl;
+        output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + dest + "_r" + destSlice + " ;" << std::endl;
       }
       else {
         output << blank << "assign " + op1 + "_r" + sndVer + op1Slice + " = " + extend(dest+"_r"+destSlice, op1LocalWidthNum) +  " ;" << std::endl;
+        output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + extend(dest+"_r"+destSlice, op1LocalWidthNum) +  " ;" << std::endl;
       }
     }
     else if(!isReduceOp){
@@ -455,14 +452,13 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
 
     if ( isOutput(dest) && isTop ) {
       output << blank << "assign " + op2 + "_c" + thdVer + op2Slice + " = 0 ;" << std::endl;
-      uint32_t exp = get_var_slice_width(op2AndSlice);
-      uint32_t pow2 = uint32_t(std::pow(2, exp));
-      output << blank << "assign " + op2 + "_x" + thdVer + op2Slice + " = " + std::to_string(pow2 - 1) + " ;" << std::endl;
       if(!isReduceOp) {
         output << blank << "assign " + op2 + "_r" + thdVer + op2Slice + " = " + dest + "_r" + destSlice + " ;" << std::endl;  
+        output << blank << "assign " + op2 + "_x" + thdVer + op2Slice + " = " + dest + "_r" + destSlice + " ;" << std::endl;  
       }
       else {
-        output << blank << "assign " + op2 + "_r" + thdVer + op2Slice + " = " + extend(dest+"_c"+destSlice, op2LocalWidthNum) +  " ;" << std::endl;
+        output << blank << "assign " + op2 + "_r" + thdVer + op2Slice + " = " + extend(dest+"_r"+destSlice, op2LocalWidthNum) +  " ;" << std::endl;
+        output << blank << "assign " + op2 + "_x" + thdVer + op2Slice + " = " + extend(dest+"_r"+destSlice, op2LocalWidthNum) +  " ;" << std::endl;
       }
     }
     else if(!isReduceOp) {
@@ -567,9 +563,7 @@ void one_op_taint_gen(std::string line, std::ofstream &output) {
   if ( isOutput(dest) && isTop ) {
       output << blank << "assign " + op1 + "_c" + sndVer + op1Slice + " = 0 ;" << std::endl;
       output << blank << "assign " + op1 + "_r" + sndVer + op1Slice + " = " + dest + "_r" + destSlice + " ;" << std::endl;
-      uint32_t exp = get_var_slice_width(op1AndSlice);
-      uint32_t pow2 = uint32_t(std::pow(2, exp));
-      output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + std::to_string(pow2 - 1) + " ;" << std::endl;
+      output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + dest + "_r" + destSlice + " ;" << std::endl;
       // FIXME: because output is floating, it is always changed??      
   }
   else {
@@ -677,32 +671,31 @@ void sel_op_taint_gen(std::string line, std::ofstream &output) {
       output << blank << "logic [" + op2HighIdx + ":" + op2LowIdx + "] " + op2 + "_x" + thdVer + " ;" << std::endl;
     }
 
-    output << blank + "assign " + dest + "_t" + destSlice + " = " + op1 + "_t" + slice + " | " + extend("|"+op2+"_t"+op2Slice, localWidth) + " ;" << std::endl;  
+    output << blank + "assign " + dest + "_t" + destSlice + " = " + op1 + "_t" + slice + " | " + extend("| "+op2+"_t"+op2Slice, localWidth) + " ;" << std::endl;  
 
     if ( isOutput(dest) && isTop ) {
       output << blank << "assign " + op1 + "_c" + sndVer + slice + " = 0 ;" << std::endl;
       output << blank << "assign " + op1 + "_r" + sndVer + slice + " = " + dest + "_r" + destSlice + " ;" << std::endl;
-      uint32_t exp = get_var_slice_width(op1AndSlice);
-      uint32_t pow2 = uint32_t(std::pow(2, exp));
-      output << blank << "assign " + op1 + "_x" + sndVer + slice + " = " + std::to_string(pow2 - 1) + " ;" << std::endl;
+      output << blank << "assign " + op1 + "_x" + sndVer + slice + " = " + dest + "_r" + destSlice + " ;" << std::endl;
 
       output << blank << "assign " + op2 + "_c" + thdVer + op2Slice + " = 0 ;" << std::endl;
-      output << blank << "assign " + op2 + "_r" + thdVer + op2Slice + " = " + extend("|"+dest+"_r"+destSlice, op2Width) + " ;" << std::endl;
-      exp = get_var_slice_width(op2AndSlice);
-      pow2 = uint32_t(std::pow(2, exp));
-      output << blank << "assign " + op2 + "_x" + thdVer + op2Slice + " = " + std::to_string(pow2 - 1) + " ;" << std::endl;
+      output << blank << "assign " + op2 + "_r" + thdVer + op2Slice + " = " + extend("| "+dest+"_r"+destSlice, op2Width) + " ;" << std::endl;
+      output << blank << "assign " + op2 + "_x" + thdVer + op2Slice + " = " + extend("| "+dest+"_r"+destSlice, op2Width) + " ;" << std::endl;
       return;
     }
 
     // assume memory slices can only be used in simple assignment statements11
     // also assume each memory slice is used only once
     output << blank + "always @(*) begin" << std::endl;
+    output << blank + "  " + op1 + "_c" + sndVer + " = 0 ;" << std::endl;
+    output << blank + "  " + op1 + "_r" + sndVer + " = 0 ;" << std::endl;
+    output << blank + "  " + op1 + "_x" + sndVer + " = 0 ;" << std::endl;
     output << blank + "  " + op1 + "_c" + sndVer + slice + " = " + dest + "_c" + destSlice + " ;" << std::endl;
     output << blank + "  " + op1 + "_r" + sndVer + slice + " = " + dest + "_r" + destSlice + " ;" << std::endl;
     output << blank + "  " + op1 + "_x" + sndVer + slice + " = " + dest + "_x" + destSlice + " ;" << std::endl;
-    output << blank + "  " + op2 + "_c" + thdVer + op2Slice + " = " + extend("|"+dest+"_c"+destSlice, op2Width) + " ;" << std::endl;
-    output << blank + "  " + op2 + "_r" + thdVer + op2Slice + " = " + extend("|"+dest+"_r"+destSlice, op2Width) + " ;" << std::endl;
-    output << blank + "  " + op2 + "_x" + thdVer + op2Slice + " = " + extend("|"+dest+"_x"+destSlice, op2Width) + " ;" << std::endl;
+    output << blank + "  " + op2 + "_c" + thdVer + op2Slice + " = " + extend("| "+dest+"_c"+destSlice, op2Width) + " ;" << std::endl;
+    output << blank + "  " + op2 + "_r" + thdVer + op2Slice + " = " + extend("| "+dest+"_r"+destSlice, op2Width) + " ;" << std::endl;
+    output << blank + "  " + op2 + "_x" + thdVer + op2Slice + " = " + extend("| "+dest+"_x"+destSlice, op2Width) + " ;" << std::endl;
     output << blank + "end" << std::endl;    
   }
   else { // isNum(op2)
@@ -710,12 +703,13 @@ void sel_op_taint_gen(std::string line, std::ofstream &output) {
     if ( isOutput(dest) && isTop ) {
       output << blank << "assign " + op1 + "_c" + sndVer + slice + " = 0 ;" << std::endl;
       output << blank << "assign " + op1 + "_r" + sndVer + slice + " = " + dest + "_r" + destSlice + " ;" << std::endl;
-      uint32_t exp = get_var_slice_width(op1AndSlice);
-      uint32_t pow2 = uint32_t(std::pow(2, exp));
-      output << blank << "assign " + op1 + "_x" + sndVer + slice + " = " + std::to_string(pow2 - 1) + " ;" << std::endl;
+      output << blank << "assign " + op1 + "_x" + sndVer + slice + " = " + dest + "_r" + destSlice + " ;" << std::endl;
       return;
     }
     output << blank + "always @(*) begin" << std::endl;
+    output << blank + "  " + op1 + "_c" + sndVer + " = 0 ;" << std::endl;
+    output << blank + "  " + op1 + "_r" + sndVer + " = 0 ;" << std::endl;
+    output << blank + "  " + op1 + "_x" + sndVer + " = 0 ;" << std::endl;
     output << blank + "  " + op1 + "_c" + sndVer + slice + " = " + dest + "_c" + destSlice + " ;" << std::endl;
     output << blank + "  " + op1 + "_r" + sndVer + slice + " = " + dest + "_r" + destSlice + " ;" << std::endl;
     output << blank + "  " + op1 + "_x" + sndVer + slice + " = " + dest + "_x" + destSlice + " ;" << std::endl;
@@ -769,9 +763,7 @@ void reduce_one_op_taint_gen(std::string line, std::ofstream &output) {
   if ( isOutput(dest) && isTop ) {
       output << blank << "assign " + op1 + "_c" + sndVer + op1Slice + " = 0 ;" << std::endl;
       output << blank << "assign " + op1 + "_r" + sndVer + op1Slice + " = " + extend(dest+"_r"+destSlice, op1WidthNum) + " ;" << std::endl;
-      uint32_t exp = get_var_slice_width(op1AndSlice);
-      uint32_t pow2 = uint32_t(std::pow(2, exp));
-      output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + std::to_string(pow2 - 1) + " ;" << std::endl;
+      output << blank << "assign " + op1 + "_x" + sndVer + op1Slice + " = " + extend(dest+"_r"+destSlice, op1WidthNum) + " ;" << std::endl;
       // FIXME: because output is floating, it is always changed??      
   }
   else {
