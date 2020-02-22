@@ -343,7 +343,8 @@ void remove_functions(std::string fileName) {
 }
 
 
-void add_line_taints(std::string line, std::ofstream &output, std::ifstream &input) {
+void add_line_taints(std::string line, std::ofstream &output, std::ifstream &input) 
+{
   line = further_clean_line(line);
   std::string printedLine = line;
   int choice = parse_verilog_line(line);
@@ -668,6 +669,7 @@ void merge_taints(std::string fileName) {
   }
 
   // ground taints for floating regs
+  output << " // ground taints for floating regs" << std::endl;
   for (auto reg : moduleRegs) {
     if ( isNum(reg) ) {
       std::cout << "find num in nextVersion: " + reg << std::endl;
@@ -681,6 +683,7 @@ void merge_taints(std::string fileName) {
   }
 
   // these wires are never used as inputs
+  output << " // ground taints for used wires" << std::endl;  
   for (auto wire : moduleWires) {
     if ( isNum(wire) ) {
       std::cout << "find num in nextVersion: " + wire << std::endl;
@@ -695,6 +698,7 @@ void merge_taints(std::string fileName) {
   }
 
   // wires giving value to regs should have taints grounded.
+  output << " // ground taints for wires connected to regs" << std::endl;
   for (auto it = g_wire2reg.begin(); it != g_wire2reg.end(); ++it) {
     if ( isNum(*it) || nextVersion.find(*it) != nextVersion.end() ) {
       continue;
@@ -717,6 +721,7 @@ void merge_taints(std::string fileName) {
 
   // some bits of taints are still floating
   //output << "// ground floating taints" << std::endl;
+  output << " // ground taints for unused wire slices" << std::endl;  
   for(auto it = nxtVerBits.begin(); it != nxtVerBits.end(); ++it) {
     uint32_t verNum = nextVersion[it->first];
     std::vector<std::string> freeBitsVec;

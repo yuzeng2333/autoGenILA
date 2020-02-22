@@ -377,6 +377,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
       output << blank << "assign " + op2 + "_r" + thdVer + op2Slice + " = " + extend(dest+"_c"+destSlice, op2LocalWidthNum) + " | ( " + extend(dest+"_c"+destSlice, op2LocalWidthNum) + " & " + op1 + "_t" + op1Slice + " );" << std::endl;
       output << blank << "assign " + op2 + "_x" + thdVer + op2Slice + " = " + extend(dest+"_c"+destSlice, op2LocalWidthNum) + " ;" << std::endl;
     }
+    // all ground_wires are removed because the unused wires are grounded in find_version_num()
     /* ground all the floating wires */
     //if(op1IsNew) {
     //ground_wires(op1+"_c"+sndVer, op1IdxPair, op1Slice, blank, output);
