@@ -26,7 +26,7 @@ std::regex pModule    (to_re("^(\\s*)module (NAME)\\(.+\\);$"));
 std::regex pInput     (to_re("^(\\s*)input (\\[\\d+\\:0\\] )?(NAME)(\\s*)?;$"));
 std::regex pOutput    (to_re("^(\\s*)output (\\[\\d+\\:0\\] )?(NAME)(\\s*)?;$"));
 std::regex pReg       (to_re("^(\\s*)reg (\\[\\d+\\:\\d+\\] )?(NAME)(\\s*)?;$"));
-std::regex pRegConst  (to_re("^(\\s*)reg (\\[\\d+\\:\\d+\\] )?(NAME) = (NUM)(\\s*)?;$"));
+std::regex pRegConst  (to_re("^(\\s*)reg (\\[\\d+\\:\\d+\\] )?(NAME)(\\s*)= (NUM)(\\s*)?;$"));
 std::regex pWire      (to_re("^(\\s*)wire (\\[\\d+\\:\\d+\\] )?(NAME)(\\s*)?;$"));
 std::regex pMem       (to_re("^(\\s*)reg (\\[\\d+\\:\\d+\\]) (NAME) (\\[\\d+\\:\\d+\\]);$"));
 /* 2 operators */
@@ -231,7 +231,11 @@ void clean_file(std::string fileName) {
         break;
       case REG:
         {
-          std::regex_match(line, m, pReg);
+          if(!std::regex_match(line, m, pReg)
+              && !std::regex_match(line, m, pRegConst) ) {
+            toCout("Error in matching pReg or pRegConst: "+line);
+            abort();
+          }
           std::string slice = m.str(2);
           std::string var = m.str(3);
           bool insertDone = false;

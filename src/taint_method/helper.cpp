@@ -68,10 +68,10 @@ bool isMem(std::string varAndSlice) {
 
 std::string to_re(std::string input) {
   std::regex pName("NAME");
-  std::string varName("[\aa-zA-Z0-9_\\.\\$\\\\'\\[\\]\\(]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?(?: \\))?");
+  std::string varName("[\a\ba-zA-Z0-9_\\.\\$\\\\'\\[\\]\\(]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?(?: \\))?");
   auto res = std::regex_replace(input, pName, varName);
   std::regex pNUM("NUM");
-  std::string regexNum("\\d+'h[\\dabcdef]+");
+  std::string regexNum("\\d+'(h|b)[\\dabcdef]+");
   res = std::regex_replace(res, pNUM, regexNum);
   std::regex pInt("INT");
   std::string regexInt("\\d+");

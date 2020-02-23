@@ -1,0 +1,17 @@
+  logic [7:0] \buff[0] = 8'b00000000;
+  logic [7:0]  \buff[0]_t ;
+  logic \buff[0]_t_flag ;
+  logic \buff[0]_r_flag ;
+  logic [7:0]  \buff[0]_r ;
+  logic [7:0]  \buff[0]_x ;
+  logic [7:0]  \buff[0]_c ;
+  logic \buff[0]_reset ;
+ // ground taints for floating regs
+  assign \buff[0]_r = 0;
+  assign \buff[0]_c = 0;
+  assign \buff[0]_x = 0;
+ // ground taints for used wires
+ // ground taints for wires connected to regs
+ // ground taints for unused wire slices
+  assert property(\buff[0]_r_flag == 0 );
+endmodule

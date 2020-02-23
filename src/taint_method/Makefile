@@ -2,7 +2,7 @@ all:
 	g++ main.cpp taint_gen.cpp helper.cpp op_taint_gen.cpp VarWidth.cpp
 
 debug:
-	g++ -g taint_gen.cpp helper.cpp op_taint_gen.cpp VarWidth.cpp
+	g++ -g main.cpp taint_gen.cpp helper.cpp op_taint_gen.cpp VarWidth.cpp
 
 adder:
 	./a.out /workspace/research/ILA/autoGenILA/naiveEg/word_adder/word_adder_yosys.v 0
@@ -45,3 +45,6 @@ csimple:
 
 rbm:
 	./a.out /workspace/research/ILA/autoGenILA/RBM/SYN/rbm_yosys.v 0
+
+8051:
+	./a.out /workspace/research/ILA/autoGenILA/8051/tags/rel0/rtl/SYN/oc8051_yosys.v 0
