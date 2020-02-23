@@ -33,6 +33,7 @@ std::regex pMem       (to_re("^(\\s*)reg (\\[\\d+\\:\\d+\\]) (NAME) (\\[\\d+\\:\
 std::regex pAdd       (to_re("^(\\s*)assign (NAME) = (NAME) \\+ (NAME)(\\s*)?;$"));
 std::regex pSub       (to_re("^(\\s*)assign (NAME) = (NAME) - (NAME)(\\s*)?;$"));
 std::regex pMult      (to_re("^(\\s*)assign (NAME) = (NAME) \\* (NAME)(\\s*)?;$"));
+std::regex pMod       (to_re("^(\\s*)assign (NAME) = (NAME) \\% (NAME)(\\s*)?;$"));
 std::regex pAnd       (to_re("^(\\s*)assign (NAME) = (NAME) && (NAME)(\\s*)?;$"));
 std::regex pOr        (to_re("^(\\s*)assign (NAME) = (NAME) \\|\\| (NAME)(\\s*)?;$"));
 std::regex pEq        (to_re("^(\\s*)assign (NAME) = (NAME) == (NAME)(\\s*)?;$"));
@@ -469,6 +470,7 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   else if (std::regex_match(line, m, pAdd)
             || std::regex_match(line, m, pSub)
             || std::regex_match(line, m, pMult)
+            || std::regex_match(line, m, pMod)
             || std::regex_match(line, m, pAnd)
             || std::regex_match(line, m, pEq)
             || std::regex_match(line, m, pEq3)

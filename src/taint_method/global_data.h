@@ -51,6 +51,7 @@ extern std::regex pMem;
 extern std::regex pAdd;
 extern std::regex pSub;      
 extern std::regex pMult;      
+extern std::regex pMod;      
 extern std::regex pEq;     
 extern std::regex pEq3;
 extern std::regex pNeq;     

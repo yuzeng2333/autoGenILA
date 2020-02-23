@@ -257,6 +257,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
   if (std::regex_match(line, m, pAdd)
             || std::regex_match(line, m, pSub)
             || std::regex_match(line, m, pMult)
+            || std::regex_match(line, m, pMod)
             || std::regex_match(line, m, pAnd)
             || std::regex_match(line, m, pOr)
             || std::regex_match(line, m, pBitOr)
