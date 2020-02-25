@@ -38,6 +38,12 @@ extern bool g_recentRst_positive;
 extern std::set<std::string> g_rstGroup;
 extern bool isTop;
 extern bool g_hasRst;
+extern bool g_verb;
+extern bool g_has_read_taint;
+extern std::string _t;
+extern std::string _r;
+extern std::string _x;
+extern std::string _c;
 
 /* declarations */
 extern std::regex pModule;
