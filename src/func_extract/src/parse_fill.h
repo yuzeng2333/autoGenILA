@@ -20,6 +20,7 @@ extern std::unordered_map<std::string, std::string> g_nbTable;
 extern uint32_t g_new_var;
 extern VarWidth varWidth;
 extern std::regex pSingleLine;
+extern std::regex pNbLine;
 
 void clear_global_vars();
 

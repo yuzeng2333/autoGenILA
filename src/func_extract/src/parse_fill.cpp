@@ -10,7 +10,8 @@ std::unordered_map<std::string, std::string> g_ssaTable;
 std::unordered_map<std::string, std::string> g_nbTable;
 uint32_t g_new_var;
 
-std::regex pSingleLine (to_re("^(\\s*)assign (NAME) = (.*)$"));
+std::regex pSingleLine (to_re("^(\\s*)assign (NAME) = (.*);$"));
+std::regex pNbLine (to_re("^(\\s*)(NAME) <= (.*);$"));
 
 
 void clear_global_vars() {
@@ -28,6 +29,7 @@ void clear_global_vars() {
 }
 
 
+// parse the verilog lines, and store them into g_ssaTable & g_nbTable
 void parse_verilog(std::string fileName) {
   std::ifstream input(fileName);
   std::string line;
@@ -115,12 +117,3 @@ void read_in_architectural_states(std::string fileName) {
   }
 }
 
-
-bool isAs(std::string var) {
-  auto it = std::find( moduleAs.begin(), moduleAs.end(), var );
-  return it != moduleAs.end();
-}
-
-bool isClean(std::string var) {
-  return isAs(var) | isInput(var) | isMem(var);
-}

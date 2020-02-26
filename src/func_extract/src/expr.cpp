@@ -3,6 +3,12 @@
 
 #define toStr(a) std::to_string(a)
 
+////////////////////////////////////////////////////////////////
+//
+//  This file containts functions that process single verilog line
+//  and put it into the map tables
+//
+/////////////////////////////////////////////////////////////////
 
 void input_expr(std::string line) {
   std::smatch m;
@@ -44,7 +50,7 @@ void reg_expr(std::string line) {
   else
     insertDone = varWidth.var_width_insert(var, 0, 0);
   if (!insertDone) {
-    std::cout << "insert failed in input case:" + line << std::endl;
+    std::cout << "insert failed in reg case:" + line << std::endl;
     std::cout << "m.str(2):" + m.str(2) << std::endl;
     std::cout << "m.str(3):" + m.str(3) << std::endl;
   }
@@ -66,7 +72,7 @@ void wire_expr(std::string line) {
   else
     insertDone = varWidth.var_width_insert(var, 0, 0);
   if (!insertDone) {
-    std::cout << "insert failed in input case:" + line << std::endl;
+    std::cout << "insert failed in wire case:" + line << std::endl;
     std::cout << "m.str(2):" + m.str(2) << std::endl;
     std::cout << "m.str(3):" + m.str(3) << std::endl;
   }
@@ -93,7 +99,7 @@ void mem_expr(std::string line) {
   else
     insertDone = varWidth.var_width_insert(var, 0, 0);
   if (!insertDone) {
-    std::cout << "insert failed in input case:" + line << std::endl;
+    std::cout << "insert failed in mem case:" + line << std::endl;
     std::cout << "m.str(2):" + m.str(2) << std::endl;
     std::cout << "m.str(3):" + m.str(3) << std::endl;
   }
@@ -206,14 +212,13 @@ void both_concat_expr(std::string line) {
 
 void nb_expr(std::string line) {
   std::smatch m;
-  if( !std::regex_match(line, m, pSingleLine) ) {
+  if( !std::regex_match(line, m, pNbLine) ) {
     toCout("Error in matching single line expression: "+line);
     return;
   }
   auto ret = g_nbTable.emplace(m.str(2), line);
   if(!ret.second)
     toCout("Error in inserting ssaTable for key: "+m.str(2));
-
 }
 
 
