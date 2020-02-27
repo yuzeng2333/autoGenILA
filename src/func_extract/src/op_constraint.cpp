@@ -1,6 +1,6 @@
 #include "parse_fill.h"
 #include "op_constraint.h"
-#include "verilog_to_z3.h"
+#include "check_regs.h"
 #include "helper.h"
 #include "ast.h"
 

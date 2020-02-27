@@ -56,6 +56,23 @@ bool check_two_op(std::string line, std::string &op, bool &isReduceOp) {
 }
 
 
+bool check_one_op(std::string line, std::string &op) {
+  isReduceOp = false;
+  std::smatch m;
+  if ( std::regex_match(line, m, pNone)) {
+    op = "";
+    return true;
+  }
+  if ( std::regex_match(line, m, pInvert)) {
+    op = "~";
+    return true;
+  }
+  toCout("Unsupported expressions: "+line);
+  abort();
+  return false;
+}
+
+
 bool isAs(std::string var) {
   auto it = std::find( moduleAs.begin(), moduleAs.end(), var );
   return it != moduleAs.end();
@@ -65,3 +82,16 @@ bool isAs(std::string var) {
 bool isClean(std::string var) {
   return isAs(var) | isInput(var) | isMem(var);
 }
+
+
+bool isReg(std::string var) {
+  auto it = std::find( moduleRegs.begin(), moduleRegs.end(), var );
+  return it != moduleRegs.end();
+}
+
+
+bool isInput(std::string var) {
+  auto it = std::find( moduleInputs.begin(), moduleInputs.end(), var );
+  return it != moduleInputs.end();
+}
+

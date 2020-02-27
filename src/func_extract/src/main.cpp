@@ -1,6 +1,6 @@
 #include "parse_fill.h"
 #include "expr.h"
-#include "verilog_to_z3.h"
+#include "check_regs.h"
 #include "op_constraint.h"
 #include <string>
 
@@ -16,6 +16,7 @@ int main(int argc, char *argv[]) {
   clear_global_vars();
   parse_verilog(vlgFile);
   read_in_architectural_states(asFile);
-  check_all_regs();
+  build_ast_tree();
+  check_all_regs(); 
   return 0;
 }

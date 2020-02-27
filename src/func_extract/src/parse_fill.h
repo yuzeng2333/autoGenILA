@@ -21,6 +21,7 @@ extern uint32_t g_new_var;
 extern VarWidth varWidth;
 extern std::regex pSingleLine;
 extern std::regex pNbLine;
+extern std::unordered_map<std::string, astNode*> g_asSliceRoot;
 
 void clear_global_vars();
 

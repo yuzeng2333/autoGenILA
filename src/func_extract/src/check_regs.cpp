@@ -1,5 +1,5 @@
 #include "parse_fill.h"
-#include "verilog_to_z3.h"
+#include "check_regs.h"
 #include "op_constraint.h"
 
 using namespace z3;
@@ -34,13 +34,36 @@ void check_single_reg_and_slice(std::string regAndSlice) {
   uint32_t regWidth = get_var_slice_width(regAndSlice);
   context c;
   solver s(c);
-  astNode* root = new astNode;
-  add_nb_constraint(regAndSlice, 0, c, s, root);
+  astNode *root = g_asSliceRoot[regAndSlice]; 
+  if(root)
+    add_nb_constraint(root, 0, c, s);
+  else {
+    toCout(regAndSlice+" does not have its root!");
+    abort();
+  }
 }
 
 
-bool add_nb_constraint(std::string regAndSlice, uint32_t timeIdx, context &c, solver &s, astNode* const node) {
-  toCoutVerb("Add nb constraint for :" + regAndSlice);
+bool add_nb_constraint(astNode* node, uint32_t timeIdx, context &c, solver &s) {
+  toCoutVerb("Add nb constraint for :" + node->dest);
+  std::string dest = node->dest;
+  std::string destNext = node->srcVec.front();
+  uint32_t destWidth = get_var_slice_width(dest);  
+  uint32_t destNextWidth = get_var_slice_width(destNext);
+  std::string destTimed = dest + toStr(timeIdx);
+  std::string destNextTimed = destNext + toStr(timeIdx+1);
+  expr destExpr = c.bv_const(destTimed.c_str(), destWidth);
+  expr destNextExpr = c.bv_const(destNextTimed.c_str(), destNextWidth);
+  s.add(destExpr == destNextExpr);  
+  return add_ssa_constraint(node->srcVec.front(), timeIdx+1, c, s);
+
+
+
+
+
+
+
+
   std::string destAssign = g_nbTable[regAndSlice];
   std::smatch m;
   if(std::regex_match(destAssign, m, pNonblock)) {

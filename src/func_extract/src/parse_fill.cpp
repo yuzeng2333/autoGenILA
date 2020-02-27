@@ -1,5 +1,7 @@
 #include "parse_fill.h"
 #include "expr.h"
+#include "ast.h"
+
 
 // global variables
 std::set<std::string> moduleAs;
@@ -9,6 +11,8 @@ std::unordered_map<std::string, std::string> g_ssaTable;
 // non-blocking assignment table
 std::unordered_map<std::string, std::string> g_nbTable;
 uint32_t g_new_var;
+std::unordered_map<std::string, astNode*> g_asSliceRoot;
+
 
 std::regex pSingleLine (to_re("^(\\s*)assign (NAME) = (.*);$"));
 std::regex pNbLine (to_re("^(\\s*)(NAME) <= (.*);$"));
