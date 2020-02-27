@@ -34,7 +34,7 @@ void check_single_reg_and_slice(std::string regAndSlice) {
   uint32_t regWidth = get_var_slice_width(regAndSlice);
   context c;
   solver s(c);
-  astNode *root = g_asSliceRoot[regAndSlice]; 
+  astNode *root = g_varNode[regAndSlice]; 
   if(root)
     add_nb_constraint(root, 0, c, s);
   else {
@@ -44,7 +44,24 @@ void check_single_reg_and_slice(std::string regAndSlice) {
 }
 
 
-bool add_nb_constraint(astNode* node, uint32_t timeIdx, context &c, solver &s) {
+void add_constraint(astNode* const node, uint32_t timeIdx, astNode* const node ) {
+  std::string var = node->dest;
+  if ( isInput(var) ) {
+    add_input_node(var, timeIdx, node);
+  }
+  else if ( isAs(var) ) {
+    add_as_node(var, timeIdx, node);    
+  }
+  else if( isReg(var) ) {
+    add_nb_constraint(var, timeIdx, node);
+  }
+  else { // it is wire
+    add_ssa_constraint(var, timeIdx, node);
+  }
+}
+
+
+bool add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s) {
   toCoutVerb("Add nb constraint for :" + node->dest);
   std::string dest = node->dest;
   std::string destNext = node->srcVec.front();
@@ -55,70 +72,32 @@ bool add_nb_constraint(astNode* node, uint32_t timeIdx, context &c, solver &s) {
   expr destExpr = c.bv_const(destTimed.c_str(), destWidth);
   expr destNextExpr = c.bv_const(destNextTimed.c_str(), destNextWidth);
   s.add(destExpr == destNextExpr);  
-  return add_ssa_constraint(node->srcVec.front(), timeIdx+1, c, s);
-
-
-
-
-
-
-
-
-  std::string destAssign = g_nbTable[regAndSlice];
-  std::smatch m;
-  if(std::regex_match(destAssign, m, pNonblock)) {
-    std::string destNext = m.str(3);
-    uint32_t destNextWidth = get_var_slice_width(destNext);
-    uint32_t destWidth = get_var_slice_width(regAndSlice);
-    std::string regAndSliceTimed = regAndSlice+"#"+toStr(timeIdx);
-    std::string destNextTimed = destNext+"#"+toStr(timeIdx+1);
-    expr destExpr = c.bv_const(regAndSliceTimed.c_str(), destWidth);
-    expr destNextExpr = c.bv_const(destNextTimed.c_str(), destNextWidth);
-    s.add(destExpr == destNextExpr);
-
-    ast* nextNode = new astNode;
-    node->type = NONBLOCK;
-    node->dest = regAndSliceTimed;
-    node->op = "<=";
-    node->srcVec.push_back(destNextTimed);
-    node->childVec.push_back(nextNode);
-    node->destTime = timeIdx;
-    node->done = false;
-    return add_ssa_constraint(destNext, timeIdx+1, c, s, nextNode);
-  }
-  else if(std::regex_match(destAssign, m, pNonblockConcat)) {
-  }
-  else if(std::regex_match(destAssign, m, pNonblockIf)) {
-  }
-  else {
-    toCout("Error in add_nb_constraint: "+destAssign);
-  }
+  return add_constraint(node->childVec.front(), timeIdx+1, c, s);
 }
 
 
-bool add_ssa_constraint(std::string var, uint32_t timeIdx, context &c, solver &s, astNode* const node) {
-  toCoutVerb("Add ssa constraint for :" + var);  
-  std::string varAssign = g_ssaTable[var];
-  std::smatch m;
-  uint32_t choice = parse_verilog_line(varAssign);
-  switch( choice ) {
+bool add_ssa_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s) {
+  toCoutVerb("Add ssa constraint for :" + node->dest);
+  std::string var = node->dest;
+
+  switch( node->type ) {
     case TWO_OP:
-      two_op_constraint(varAssign, timeIdx, c, s, node);
+      two_op_constraint(node, timeIdx, c, s);
       break;
     case ONE_OP:
-      one_op_constraint(varAssign, timeIdx, c, s, doExpand);
+      one_op_constraint(node, timeIdx, c, s);
       break;
     case REDUCE1:
-      reduce_op_constraint(varAssign, timeIdx, c, s, doExpand);
+      reduce_op_constraint(node, timeIdx, c, s);
       break;
     case SEL:
-      sel_op_constraint(varAssign, timeIdx, c, s, doExpand);
+      sel_op_constraint(node, timeIdx, c, s);
       break;
     case SRC_CONCAT:
-      src_concat_op_constraint(varAssign, timeIdx, c, s, doExpand);
+      src_concat_op_constraint(node, timeIdx, c, s);
       break;
     case ITE:
-      ite_op_constraint(varAssign, timeIdx, c, s, doExpand);
+      ite_op_constraint(node, timeIdx, c, s);
       break;
     default:
       toCout("Error in add_ssa_constraint for: "+var);

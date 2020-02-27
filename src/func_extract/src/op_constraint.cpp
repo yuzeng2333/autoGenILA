@@ -49,16 +49,13 @@ expr var_constraint(std::string varAndSlice, uint32_t timeIdx, context &c, solve
 }
 
 
-void two_op_constraint(std::string line, uint32_t timeIdx, context &c, solver &s, astNode* const node) {
-  toCoutVerb("Two op for :"+line);
+void two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s) {
   std::smatch m;  
   bool isReduceOp;
-  std::string op;
-  if (!check_two_op(line, op, isReduceOp))
-    return;
 
-  assert(!m.str(3).empty());
-  assert(!m.str(4).empty());
+  std::string destAndSlice = node->dest;
+  std::string op1AndSlice = m.str(3);
+  std::string op2AndSlice = m.str(4);
   bool op1IsWire = isWire(m.str(3));
   bool op2IsWire = isWire(m.str(4));
   bool op1IsAs, op2IsAs;
@@ -68,9 +65,6 @@ void two_op_constraint(std::string line, uint32_t timeIdx, context &c, solver &s
   std::string dest, destSlice;
   std::string op1, op1Slice;
   std::string op2, op2Slice;
-  std::string destAndSlice = m.str(2);
-  std::string op1AndSlice = m.str(3);
-  std::string op2AndSlice = m.str(4);
   split_slice(destAndSlice, dest, destSlice);
   split_slice(op1AndSlice, op1, op1Slice);
   split_slice(op2AndSlice, op2, op2Slice);

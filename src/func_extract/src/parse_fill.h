@@ -22,6 +22,7 @@ extern VarWidth varWidth;
 extern std::regex pSingleLine;
 extern std::regex pNbLine;
 extern std::unordered_map<std::string, astNode*> g_asSliceRoot;
+extern std::unordered_map<std::string, astNode*> g_varNode;
 
 void clear_global_vars();
 

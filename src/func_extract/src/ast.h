@@ -8,6 +8,13 @@
 
 typedef uint32_t type;
 
+// Some note about the astNode data structure
+// 1. srcVec stores the operands on the RHS, they may contain slices
+// 2. one var can have multiple associated assignments. E.g., some slice
+// has different assignment than others
+// 3. Therefore, each slice should have its own node. And the childVec contains
+// nodes for all slices.
+
 struct astNode{
   uint32_t type;
   std::string dest;
