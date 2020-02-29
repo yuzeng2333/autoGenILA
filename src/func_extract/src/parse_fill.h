@@ -1,6 +1,7 @@
 #ifndef PARSE 
-#define PARSE 
+#define PARSE
 
+#include "ast.h"
 #include <string>
 #include <unordered_map>
 #include <string>
@@ -30,7 +31,4 @@ void parse_verilog(std::string fileName);
 
 void read_in_architectural_states(std::string fileName);
 
-bool isAs(std::string var);
-
-bool isClean(std::string var);
 #endif

@@ -1,4 +1,3 @@
-
 cmake_minimum_required(VERSION 2.8)
 
 project (func-extract)
@@ -9,6 +8,8 @@ link_directories(/workspace/research/ILA/autoGenILA/src/taint_method)
 link_directories(/usr/bin)
 
 set(VERILOG_EXE func_extract)
+set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g")
 
 add_executable(${VERILOG_EXE} ${SRC_DIR})
 target_link_libraries(${VERILOG_EXE} TaintGenLib)

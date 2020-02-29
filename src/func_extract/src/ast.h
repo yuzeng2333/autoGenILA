@@ -3,8 +3,12 @@
 
 #include <string>
 #include <vector>
+#include <cassert>
+#include "../../taint_method/taint_gen.h"
+#include "../../taint_method/helper.h"
 
-#define AS 101
+#define AS  101
+#define NUM 102
 
 typedef uint32_t type;
 
@@ -25,19 +29,31 @@ struct astNode{
   bool done;
 };
 
-void stmt2ast(std::string line, astNode* node);
+typedef struct astNode astNode;
 
 void build_ast_tree();
 
 void build_tree_for_single_as(std::string regAndSlice);
 
-bool add_nb_node(std::string regAndSlice, uint32_t timeIdx, astNode* const node);
+void add_node(std::string var, uint32_t timeIdx, astNode* const node, bool varIsDest);
 
-bool add_ssa_node(std::string var, uint32_t timeIdx, astNode* const node);
+void add_child_node(std::string varAndSlice, uint32_t timeIdx, astNode* const node);
+
+void add_nb_node(std::string regAndSlice, uint32_t timeIdx, astNode* const node);
+
+void add_ssa_node(std::string var, uint32_t timeIdx, astNode* const node);
+
+void add_input_node(std::string input, uint32_t timeIdx, astNode* const node);
+
+void add_num_node(std::string num, uint32_t timeIdx, astNode* const node);
+
+void add_as_node(std::string as, uint32_t timeIdx, astNode* const node);
 
 void add_two_op_node(std::string line, uint32_t timeIdx, astNode* const node);
 
 void add_one_op_node(std::string line, uint32_t timeIdx, astNode* const node);
+
+void add_ite_op_node(std::string line, uint32_t timeIdx, astNode* const node);
 
 void add_reduce_op_node(std::string line, uint32_t timeIdx, astNode* const node);
 

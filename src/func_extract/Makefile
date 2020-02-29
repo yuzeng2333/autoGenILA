@@ -134,6 +134,60 @@ func_extract/fast:
 	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/build
 .PHONY : func_extract/fast
 
+src/ast.o: src/ast.cpp.o
+
+.PHONY : src/ast.o
+
+# target to build an object file
+src/ast.cpp.o:
+	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/ast.cpp.o
+.PHONY : src/ast.cpp.o
+
+src/ast.i: src/ast.cpp.i
+
+.PHONY : src/ast.i
+
+# target to preprocess a source file
+src/ast.cpp.i:
+	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/ast.cpp.i
+.PHONY : src/ast.cpp.i
+
+src/ast.s: src/ast.cpp.s
+
+.PHONY : src/ast.s
+
+# target to generate assembly for a file
+src/ast.cpp.s:
+	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/ast.cpp.s
+.PHONY : src/ast.cpp.s
+
+src/check_regs.o: src/check_regs.cpp.o
+
+.PHONY : src/check_regs.o
+
+# target to build an object file
+src/check_regs.cpp.o:
+	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/check_regs.cpp.o
+.PHONY : src/check_regs.cpp.o
+
+src/check_regs.i: src/check_regs.cpp.i
+
+.PHONY : src/check_regs.i
+
+# target to preprocess a source file
+src/check_regs.cpp.i:
+	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/check_regs.cpp.i
+.PHONY : src/check_regs.cpp.i
+
+src/check_regs.s: src/check_regs.cpp.s
+
+.PHONY : src/check_regs.s
+
+# target to generate assembly for a file
+src/check_regs.cpp.s:
+	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/check_regs.cpp.s
+.PHONY : src/check_regs.cpp.s
+
 src/expr.o: src/expr.cpp.o
 
 .PHONY : src/expr.o
@@ -160,6 +214,33 @@ src/expr.s: src/expr.cpp.s
 src/expr.cpp.s:
 	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/expr.cpp.s
 .PHONY : src/expr.cpp.s
+
+src/helper.o: src/helper.cpp.o
+
+.PHONY : src/helper.o
+
+# target to build an object file
+src/helper.cpp.o:
+	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/helper.cpp.o
+.PHONY : src/helper.cpp.o
+
+src/helper.i: src/helper.cpp.i
+
+.PHONY : src/helper.i
+
+# target to preprocess a source file
+src/helper.cpp.i:
+	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/helper.cpp.i
+.PHONY : src/helper.cpp.i
+
+src/helper.s: src/helper.cpp.s
+
+.PHONY : src/helper.s
+
+# target to generate assembly for a file
+src/helper.cpp.s:
+	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/helper.cpp.s
+.PHONY : src/helper.cpp.s
 
 src/main.o: src/main.cpp.o
 
@@ -269,33 +350,6 @@ src/trial.cpp.s:
 	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/trial.cpp.s
 .PHONY : src/trial.cpp.s
 
-src/verilog_to_z3.o: src/verilog_to_z3.cpp.o
-
-.PHONY : src/verilog_to_z3.o
-
-# target to build an object file
-src/verilog_to_z3.cpp.o:
-	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/verilog_to_z3.cpp.o
-.PHONY : src/verilog_to_z3.cpp.o
-
-src/verilog_to_z3.i: src/verilog_to_z3.cpp.i
-
-.PHONY : src/verilog_to_z3.i
-
-# target to preprocess a source file
-src/verilog_to_z3.cpp.i:
-	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/verilog_to_z3.cpp.i
-.PHONY : src/verilog_to_z3.cpp.i
-
-src/verilog_to_z3.s: src/verilog_to_z3.cpp.s
-
-.PHONY : src/verilog_to_z3.s
-
-# target to generate assembly for a file
-src/verilog_to_z3.cpp.s:
-	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/verilog_to_z3.cpp.s
-.PHONY : src/verilog_to_z3.cpp.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -306,9 +360,18 @@ help:
 	@echo "... edit_cache"
 	@echo "... func_extract"
 	@echo "... test"
+	@echo "... src/ast.o"
+	@echo "... src/ast.i"
+	@echo "... src/ast.s"
+	@echo "... src/check_regs.o"
+	@echo "... src/check_regs.i"
+	@echo "... src/check_regs.s"
 	@echo "... src/expr.o"
 	@echo "... src/expr.i"
 	@echo "... src/expr.s"
+	@echo "... src/helper.o"
+	@echo "... src/helper.i"
+	@echo "... src/helper.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
@@ -321,9 +384,6 @@ help:
 	@echo "... src/trial.o"
 	@echo "... src/trial.i"
 	@echo "... src/trial.s"
-	@echo "... src/verilog_to_z3.o"
-	@echo "... src/verilog_to_z3.i"
-	@echo "... src/verilog_to_z3.s"
 .PHONY : help
 
 

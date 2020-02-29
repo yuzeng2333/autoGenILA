@@ -8,15 +8,25 @@
 #include "z3++.h"
 #include "ast.h"
 #include <string>
+#include <cmath>
 
 using namespace z3;
 
+extern uint32_t bound_limit;
+
 void check_all_regs();
 
-void check_single_reg_and_slice(std::string reg);
+void check_single_reg_and_slice(std::string regAndSlice);
 
-bool add_nb_constraint(std::string regAndSlice, uint32_t timeIdx, context &c, solver &s, const astNode* node);
+void add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, uint32_t bound);
 
-bool add_ssa_constraint(std::string var, uint32_t timeIdx, context &c, solver &s, const astNode* node);
+void add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, uint32_t bound);
 
+void add_ssa_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, uint32_t bound);
+
+void add_child_constraint(astNode* const parentNode, uint32_t timeIdx, context &c, solver &s, uint32_t bound);
+
+void add_clean_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, uint32_t bound);
+
+void add_dirty_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, uint32_t bound);
 #endif
