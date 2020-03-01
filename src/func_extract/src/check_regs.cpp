@@ -8,9 +8,11 @@ using namespace z3;
 #define toStr(a) std::to_string(a)
 
 uint32_t bound_limit;
+std::regex pTimed("^(\\S+)#(\d+)$");
 
 // assume g_ssaTable and g_nbTable have been filled
 void check_all_regs() {
+  toCoutVerb("###### Begin checking SAT! ");
   for(std::string reg: moduleRegs) {
     if(reg2Slices.find(reg) == reg2Slices.end()) {
       check_single_reg_and_slice(reg);
@@ -33,14 +35,15 @@ void check_all_regs() {
 // constructed only one. But the SMT equation may need to be constructed
 // multiple times, until a solution is obtained or a bound is reached.
 void check_single_reg_and_slice(std::string regAndSlice) {
-  toCoutVerb("Begin check: "+regAndSlice);
+  toCoutVerb("Begin check SAT for: "+regAndSlice);
   uint32_t regWidth = get_var_slice_width(regAndSlice);
-  uint32_t bound = 1;
+  uint32_t bound = 2;
   bound_limit = 10;
   bool z3Res = false;
   context c;  
   solver s(c);    
   while(!z3Res && bound < bound_limit) {
+    toCoutVerb("### Begin bound: "+ toStr(bound));
     s.reset();
     astNode *root = g_varNode[regAndSlice];
     if(root)
@@ -73,6 +76,9 @@ void add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s
   else if( isReg(var) ) {
     add_nb_constraint(node, timeIdx, c, s, bound);
   }
+  else if( isNum(var) ) {
+    add_clean_constraint(node, timeIdx, c, s, bound);    
+  }
   else { // it is wire
     add_ssa_constraint(node, timeIdx, c, s, bound);
   }
@@ -80,14 +86,14 @@ void add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s
 
 
 void add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, uint32_t bound) {
-  std::string dest = node->dest;  
+  std::string dest = node->dest;
   if(timeIdx < bound) {
-    toCoutVerb("Add nb constraint for :" + node->dest);
+    toCoutVerb("Add nb constraint for: " + dest);
     std::string destNext = node->srcVec.front();
     uint32_t destWidth = get_var_slice_width(dest);  
     uint32_t destNextWidth = get_var_slice_width(destNext);
-    std::string destTimed = dest + toStr(timeIdx);
-    std::string destNextTimed = destNext + toStr(timeIdx+1);
+    std::string destTimed = dest + "#" + toStr(timeIdx);
+    std::string destNextTimed = destNext + "#" + toStr(timeIdx+1);
     expr destExpr = c.bv_const(destTimed.c_str(), destWidth);
     expr destNextExpr = c.bv_const(destNextTimed.c_str(), destNextWidth);
     s.add(destExpr == destNextExpr);
@@ -102,7 +108,7 @@ void add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
 
 
 void add_ssa_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, uint32_t bound) {
-  toCoutVerb("Add ssa constraint for :" + node->dest);
+  toCoutVerb("Add ssa constraint for: " + node->dest);
   std::string var = node->dest;
 
   switch( node->type ) {
@@ -139,18 +145,19 @@ void add_child_constraint(astNode* const parentNode, uint32_t timeIdx, context &
 
 
 void add_clean_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, uint32_t bound) {
+  toCoutVerb("Add clean constraint for: " + node->dest);
   std::string dest = node->dest;
-  uint32_t destWidth = get_var_slice_width(dest);
-  std::string destTimed = dest + toStr(timeIdx);
-  expr destExpr = c.bv_const(destTimed.c_str(), destWidth);
-  s.add( destExpr == 0 );
+  expr destExpr_t = var_expr(dest, timeIdx, true);
+  s.add( destExpr_t == 0 );
 };
 
 
 void add_dirty_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, uint32_t bound) {
+  toCoutVerb("Add dirty constraint for: " + node->dest);  
   std::string dest = node->dest;
-  uint32_t destWidth = get_var_slice_width(dest);  
-  std::string destTimed = dest + toStr(timeIdx);  
-  expr destExpr = c.bv_const(destTimed.c_str(), destWidth);
-  s.add( destExpr == uint32_t(std::pow(2, destWidth)-1) );
+  expr destExpr_t = var_expr(dest, timeIdx, true);  
+  expr destExpr = var_expr(dest, timeIdx, false);  
+  s.add( destExpr_t == uint32_t(std::pow(2, destWidth)-1) );
+  // TODO: maybe deal with it in a better way?
+  s.add( destExpr == 0 );
 };

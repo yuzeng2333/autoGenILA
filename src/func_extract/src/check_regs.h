@@ -9,6 +9,7 @@
 #include "ast.h"
 #include <string>
 #include <cmath>
+#include <regex>
 
 using namespace z3;
 

@@ -10,6 +10,8 @@
 
 
 using namespace z3;
+std::string _t = "_t";
+
 //std::regex pTwoOp (to_re("^(\\s*)assign (NAME) = (NAME) (\\S+) (NAME)(\\s*);$"));
 
 /* this function is used for expanding vars used as ITE conditions */
@@ -28,13 +30,17 @@ using namespace z3;
 //}
 
 
-expr var_constraint(std::string varAndSlice, uint32_t timeIdx, context &c, solver &s) {
-  std::string varAndSliceTimed = varAndSlice + "#" + toStr(timeIdx);
+expr var_expr(std::string varAndSlice, uint32_t timeIdx, bool isTaint) {
+  if(isTaint)
+    std::string varAndSliceTimed = varAndSlice + "#" + toStr(timeIdx) + _t;
+  else
+    std::string varAndSliceTimed = varAndSlice + "#" + toStr(timeIdx);
   return c.bv_const(varAndSliceTimed.c_str(), get_var_slice_width(varAndSlice));
 }
 
 
 void two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, uint32_t bound) {
+  toCoutVerb("Two op constraint for :"+node->dest);   
   std::smatch m;  
   bool isReduceOp;
 
@@ -57,26 +63,39 @@ void two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   uint32_t op1AndSliceWidth = get_var_slice_width(op1AndSlice);
   uint32_t op2AndSliceWidth = get_var_slice_width(op2AndSlice);
 
-  expr destExpr = c.bv_const(destAndSlice.c_str(), destAndSliceWidth);
-
   assert(!isMem(op1));
   assert(!isMem(op2));
 
-  expr op1Expr = var_constraint(op1AndSlice, timeIdx, c, s);
-  expr op2Expr = var_constraint(op2AndSlice, timeIdx, c, s);
+  expr destExpr_t = var_expr(destAndSlice, timeIdx, true);
+  expr op1Expr_t = var_expr(op1AndSlice, timeIdx, true);
+  expr op2Expr_t = var_expr(op2AndSlice, timeIdx, true);
+
   if(!isReduceOp) {
-    s.add(destExpr == op1Expr | op2Expr);
+    s.add(destExpr_t == op1Expr_t | op2Expr_t);
   }
   else {
     // TODO: how to do bitwise or for all bits of a vector
     s.add(destExpr == op1Expr | op2Expr);
   }
+
+  expr destExpr = var_expr(destAndSlice, timeIdx, false);
+  expr op1Expr = var_expr(op1AndSlice, timeIdx, false);
+  expr op2Expr = var_expr(op2AndSlice, timeIdx, false);
+
+  if(!isReduceOp) {
+    make_z3_expr(s, op, destExpr, op1Expr, op2Expr);
+  }
+  else {
+    // TODO: how to do bitwise or for all bits of a vector
+    toCout("Not supported yet in two_op");
+  }
+
   add_child_constraint(node, timeIdx, c, s, bound);
 }
 
 
 void one_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, uint32_t bound) {
-  toCoutVerb("One op for :"+node->dest); 
+  toCoutVerb("One op constraint for :"+node->dest); 
  
   assert(node->srcVec.size() == 1);
   std::string dest, destSlice;
@@ -86,32 +105,35 @@ void one_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   split_slice(destAndSlice, dest, destSlice);
   split_slice(op1AndSlice, op1, op1Slice);
 
-  std::string destAndSliceTimed = destAndSlice + "#" + toStr(timeIdx);
-  expr op1Expr = var_constraint(op1AndSlice, timeIdx, c, s);
-  expr destExpr = c.bv_const(destAndSliceTimed.c_str(), get_var_slice_width(destAndSlice));
-  s.add( destExpr == op1Expr );
+  expr destExpr_t = var_expr(destAndSlice, timeIdx, true);
+  expr op1Expr_t = var_expr(op1AndSlice, timeIdx, true);
+  s.add( destExpr_t == op1Expr_t );
+
+  expr destExpr = var_expr(destAndSlice, timeIdx, false);
+  expr op1Expr = var_expr(op1AndSlice, timeIdx, false);
+  make_z3_expr(s, op, destExpr, op1Expr);
 
   add_child_constraint(node, timeIdx, c, s, bound);
 }
 
 
 void reduce_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, uint32_t bound) {
-  toCoutVerb("Reduce op for :"+node->dest);  
+  toCoutVerb("Reduce op constraint for :"+node->dest);  
 }
 
 
 void sel_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, uint32_t bound  ) {
-  toCoutVerb("Sel op for :"+node->dest);  
+  toCoutVerb("Sel op constraint for :"+node->dest);  
 }
 
 
 void src_concat_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, uint32_t bound ) {
-  toCoutVerb("Src concat op for :"+node->dest);  
+  toCoutVerb("Src concat op constraint for :"+node->dest);  
 }
 
 
 void ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, uint32_t bound ) {
-  toCoutVerb("Ite op for :"+node->dest);
+  toCoutVerb("Ite op constraint for :"+node->dest);
   assert(node->type == ITE);
   assert(node->srcVec.size() == 3);
 
@@ -138,16 +160,43 @@ void ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
 
   localWidth = std::to_string(localWidthNum);
 
-  expr op1Expr = var_constraint(op1AndSlice, timeIdx, c, s);
-  expr op2Expr = var_constraint(op2AndSlice, timeIdx, c, s);
-  expr destExpr = c.bv_const(destAndSlice.c_str(), varWidth.get_from_var_width(destAndSlice));
+  expr op1Expr = var_expr(op1AndSlice, timeIdx, false);
+  expr op2Expr = var_expr(op2AndSlice, timeIdx, false);
+  expr destExpr = var_expr(destAndSlice, timeIdx, false);
+  expr condExpr = var_expr(condAndSlice, timeIdx, false);
+
+  expr op1Expr_t = var_expr(op1AndSlice, timeIdx, true);
+  expr op2Expr_t = var_expr(op2AndSlice, timeIdx, true);
+  expr destExpr_t = var_expr(destAndSlice, timeIdx, true);
+  expr condExpr_t = var_expr(condAndSlice, timeIdx, true);
 
   // if condVar is wire, put condVar in ite, and also expand it
 
-  expr condValExpr = c.bv_const(condAndSlice.c_str(), get_var_slice_width(condAndSlice));
-  expr condExpr = var_constraint(condAndSlice, timeIdx, c, s);
-
   // TODO: not sure if following statement is correct
-  s.add( destExpr == ite(condValExpr, op1Expr | condExpr, op2Expr | condExpr) );
+  s.add( destExpr_t == ite(condExpr, op1Expr_t | condExpr_t, op2Expr_t | condExpr_t) );
+  s.add( destExpr == ite(condExpr, op1Expr, op2Expr) );
   add_child_constraint(node, timeIdx, c, s, bound);
 }
+
+
+void make_z3_expr(solver &s, std::string op, expr destExpr, expr op1Expr, expr op2Expr) {
+  if(op == "&&") {
+    s.add( destExpr = op1Expr && op2Expr );
+  }
+  else {
+    toCout("Not supported 2-op in make_z3_expr!!");
+    abort();
+  }
+}
+
+
+void make_z3_expr(solver &s, std::string op, expr destExpr, expr op1Expr, expr op2Expr) {
+  if(op.empty()) {
+    s.add( destExpr = op1Expr );
+  }
+  else {
+    toCout("Not supported 1-op in make_z3_expr!!");
+    abort();
+  }
+}
+

@@ -25,7 +25,7 @@ struct astNode{
   std::string op;
   std::vector<std::string> srcVec;
   std::vector<astNode*> childVec;
-  uint32_t destTime;
+  uint32_t deearch tTime;
   bool done;
 };
 

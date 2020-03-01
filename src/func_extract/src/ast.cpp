@@ -22,7 +22,7 @@ void build_ast_tree() {
 
 
 void build_tree_for_single_as(std::string regAndSlice) {
-  toCoutVerb("Begin check: "+regAndSlice);
+  toCoutVerb("### Begin build: "+regAndSlice);
   uint32_t regWidth = get_var_slice_width(regAndSlice);
   astNode* root = new astNode;
   g_varNode.emplace(regAndSlice, root);
@@ -49,19 +49,21 @@ void add_node(std::string var, uint32_t timeIdx, astNode* const node, bool varIs
 }
 
 
+// varAndSlice is the child variable. node is the parent node
 void add_child_node(std::string varAndSlice, uint32_t timeIdx, astNode* const node) {
-  if( g_ssaTable.find(varAndSlice) != g_ssaTable.end() ) { // if assign exists
+  toCoutVerb("!! Add child "+varAndSlice+" to "+node->dest);
+  std::string var, varSlice;
+  split_slice(varAndSlice, var, varSlice);  
+  if( reg2Slices.find(var) == reg2Slices.end() ) {
     astNode* nextNode = new astNode;      
-    node->childVec.push_back(nextNode);    
-    add_node(varAndSlice, timeIdx, nextNode, false);
+    node->childVec.push_back(nextNode);
+    add_node(var, timeIdx, nextNode, false);
   }
   else {
-    std::string var, varSlice;
-    split_slice(varAndSlice, var, varSlice);
-    for(std::string varSlice: reg2Slices[var]) {
+    for(std::string slice: reg2Slices[var]) {
       astNode* nextNode = new astNode;      
       node->childVec.push_back(nextNode);
-      add_node(varSlice, timeIdx, nextNode, false);
+      add_node(slice, timeIdx, nextNode, false);
     }
   }
 }
@@ -80,9 +82,9 @@ void add_nb_node(std::string regAndSlice, uint32_t timeIdx, astNode* const node)
     std::string destNextTimed = destNext+"#"+toStr(timeIdx+1);
 
     node->type = NONBLOCK;
-    node->dest = regAndSliceTimed;
+    node->dest = regAndSlice;
     node->op = "<=";
-    node->srcVec.push_back(destNextTimed);
+    node->srcVec.push_back(destNext);
     node->destTime = timeIdx;
     node->done = false;
 
@@ -141,7 +143,7 @@ void add_ssa_node(std::string varAndSlice, uint32_t timeIdx, astNode* const node
 void add_input_node(std::string input, uint32_t timeIdx, astNode* const node) {
   toCoutVerb("Process input node: "+input);
   node->type = INPUT;
-  node->dest = input+"#"+toStr(timeIdx);
+  node->dest = input;
   node->op = "";
   node->destTime = timeIdx;
   node->done = true;
@@ -161,7 +163,7 @@ void add_num_node(std::string num, uint32_t timeIdx, astNode* const node) {
 void add_as_node(std::string as, uint32_t timeIdx, astNode* const node) {
   toCoutVerb("Process AS node: "+as);  
   node->type = AS;
-  node->dest = as+"#"+toStr(timeIdx);
+  node->dest = as;
   node->op = "";
   node->destTime = timeIdx;
   node->done = true;
@@ -170,26 +172,18 @@ void add_as_node(std::string as, uint32_t timeIdx, astNode* const node) {
 
 void add_two_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   toCoutVerb("Process Two op for :"+line);
-  std::smatch m;  
   bool isReduceOp;
   std::string op;
-  if (!check_two_op(line, op, isReduceOp))
+  std::string destAndSlice;
+  std::string op1AndSlice;
+  std::string op2AndSlice;
+  if (!check_two_op(line, op, destAndSlice, op1AndSlice, op2AndSlice, isReduceOp))
     return;
 
-  assert(!m.str(3).empty());
-  assert(!m.str(4).empty());
-  bool op1IsWire = isWire(m.str(3));
-  bool op2IsWire = isWire(m.str(4));
-  bool op1IsAs, op2IsAs;
-  //bool op1IsNum = isNum(m.str(3));
-  //bool op2IsNum = isNum(m.str(4));
-  std::string blank = m.str(1);
   std::string dest, destSlice;
   std::string op1, op1Slice;
   std::string op2, op2Slice;
-  std::string destAndSlice = m.str(2);
-  std::string op1AndSlice = m.str(3);
-  std::string op2AndSlice = m.str(4);
+
   split_slice(destAndSlice, dest, destSlice);
   split_slice(op1AndSlice, op1, op1Slice);
   split_slice(op2AndSlice, op2, op2Slice);
@@ -198,14 +192,14 @@ void add_two_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   uint32_t op2AndSliceWidth = get_var_slice_width(op2AndSlice);
 
   node->type = TWO_OP;
-  node->dest = destAndSlice+"#"+toStr(timeIdx);
+  node->dest = destAndSlice;
   node->op = op;
-  node->srcVec = SV{op1AndSlice+"#"+toStr(timeIdx), op2AndSlice+"#"+toStr(timeIdx)};
+  node->srcVec = SV{op1AndSlice, op2AndSlice};
   node->destTime = timeIdx;
   node->done = false;
 
-  add_node(op1AndSlice, timeIdx, node, false);
-  add_node(op2AndSlice, timeIdx, node, false);
+  add_child_node(op1AndSlice, timeIdx, node);
+  add_child_node(op2AndSlice, timeIdx, node);
 
   if(isReduceOp)
     assert(destAndSliceWidth == 1);
@@ -217,31 +211,28 @@ void add_two_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
 
 void add_one_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   toCoutVerb("Process One op for :"+line); 
-  std::smatch m;
   std::string op;
-  if (!check_one_op(line, op))
+  std::string destAndSlice;
+  std::string op1AndSlice;
+  if (!check_one_op(line, op, destAndSlice, op1AndSlice))
     return;
-  assert(!m.str(2).empty());
-  assert(!m.str(3).empty());
- 
-  std::string blank = m.str(1);
+
   std::string dest, destSlice;
   std::string op1, op1Slice;
-  std::string destAndSlice = m.str(2);
-  std::string op1AndSlice = m.str(3);
+
   split_slice(destAndSlice, dest, destSlice);
   split_slice(op1AndSlice, op1, op1Slice);
 
   std::string destAndSliceTimed = destAndSlice + "#" + toStr(timeIdx);
 
   node->type = ONE_OP;
-  node->dest = destAndSlice+"#"+toStr(timeIdx);
+  node->dest = destAndSlice;
   node->op = op;
-  node->srcVec = SV{op1AndSlice+"#"+toStr(timeIdx)};
+  node->srcVec = SV{op1AndSlice};
   node->destTime = timeIdx;
   node->done = false;
 
-  add_node(op1AndSlice, timeIdx, node, false);  
+  add_child_node(op1AndSlice, timeIdx, node);  
 }
 
 
@@ -278,15 +269,15 @@ void add_ite_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   localWidth = std::to_string(localWidthNum);
 
   node->type = ITE;
-  node->dest = destAndSlice+"#"+toStr(timeIdx);
+  node->dest = destAndSlice;
   node->op = "ite";
-  node->srcVec = SV{condAndSlice+"#"+toStr(timeIdx), op1AndSlice+"#"+toStr(timeIdx), op2AndSlice+"#"+toStr(timeIdx)};
+  node->srcVec = SV{condAndSlice, op1AndSlice, op2AndSlice};
   node->destTime = timeIdx;
   node->done = false;
 
-  add_node(condAndSlice, timeIdx, node, false);  
-  add_node(op1AndSlice,  timeIdx, node, false);  
-  add_node(op2AndSlice,  timeIdx, node, false);  
+  add_child_node(condAndSlice, timeIdx, node);  
+  add_child_node(op1AndSlice,  timeIdx, node);  
+  add_child_node(op2AndSlice,  timeIdx, node);  
 }
 
 
