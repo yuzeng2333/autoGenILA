@@ -1,0 +1,1143 @@
+../func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/two_reg/two_reg_yosys.v.clean /workspace/research/ILA/autoGenILA/src/func_extract/test/two_reg/two_reg_as.txt
+Begin main!
+insert failed in reg case:  reg sign;
+m.str(2):
+m.str(3):sign
+### Begin build: enable
+Add nb node for :enable
+!! Add child _00_ to enable
+Add ssa node for :_00_
+process Ite line for:   assign _00_ = rst ? 1'h0 : enable_next;
+!! Add child rst to _00_
+Process input node: rst
+!! Add child 1'h0 to _00_
+Process num node: 1'h0
+!! Add child enable_next to _00_
+Add ssa node for :enable_next
+process Ite line for:   assign enable_next = _03_ ? 1'h1 : enable;
+!! Add child _03_ to enable_next
+Add ssa node for :_03_
+Process Two op for :  assign _03_ = func == 2'h1;
+!! Add child func to _03_
+Process input node: func
+!! Add child 2'h1 to _03_
+Process num node: 2'h1
+!! Add child 1'h1 to enable_next
+Process num node: 1'h1
+!! Add child enable to enable_next
+Process AS node: enable
+### Begin build: out
+Add nb node for :out
+!! Add child _01_ to out
+Add ssa node for :_01_
+process Ite line for:   assign _01_ = rst ? 1'h0 : out_next;
+!! Add child rst to _01_
+Process input node: rst
+!! Add child 1'h0 to _01_
+Process num node: 1'h0
+!! Add child out_next to _01_
+Add ssa node for :out_next
+process Ite line for:   assign out_next = _05_ ? 1'h1 : out;
+!! Add child _05_ to out_next
+Add ssa node for :_05_
+Process Two op for :  assign _05_ = _04_ && enable;
+!! Add child _04_ to _05_
+Add ssa node for :_04_
+Process Two op for :  assign _04_ = func == 2'h2;
+!! Add child func to _04_
+Process input node: func
+!! Add child 2'h2 to _04_
+Process num node: 2'h2
+!! Add child enable to _05_
+Process AS node: enable
+!! Add child 1'h1 to out_next
+Process num node: 1'h1
+!! Add child out to out_next
+Process AS node: out
+### Begin build: sign
+Add nb node for :sign
+!! Add child _02_ to sign
+Add ssa node for :_02_
+process Ite line for:   assign _02_ = rst ? 1'h0 : sign_next;
+!! Add child rst to _02_
+Process input node: rst
+!! Add child 1'h0 to _02_
+Process num node: 1'h0
+!! Add child sign_next to _02_
+Add ssa node for :sign_next
+process Ite line for:   assign sign_next = _04_ ? 1'h1 : sign;
+!! Add child _04_ to sign_next
+Add ssa node for :_04_
+Process Two op for :  assign _04_ = func == 2'h2;
+!! Add child func to _04_
+Process input node: func
+!! Add child 2'h2 to _04_
+Process num node: 2'h2
+!! Add child 1'h1 to sign_next
+Process num node: 1'h1
+!! Add child sign to sign_next
+Process AS node: sign
+###### Begin checking SAT! 
+========== Begin check SAT for: enable ==========
+### Begin bound: 0
+Add nb constraint for: enable ------  time: 0
+Add ssa constraint for: _00_ ------  time: 1
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 1
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 1
+Two op constraint for :_03_
+Add dirty constraint for: enable ------  time: 1
++++++++ Solution found for enable, bound: 0 +++++++++
+enable___#0_T = #b0
+_00____#1_T = #b0
+_03____#1_T = false
+rst___#1 = true
+1'h1___#1_T = #b0
+_03____#1_T = #b0
+_00____#1 = #b0
+enable___#0 = #b0
+enable___#1_T = #b1
+func___#1_T = #b00
+1'h0___#1 = #b0
+rst___#1_T = #b0
+enable_next___#1 = #b0
+func___#1 = #b00
+_03____#1 = false
+enable___#1 = #b0
+2'h1___#1_T = #b00
+1'h0___#1_T = #b0
+enable_next___#1_T = #b1
+1'h1___#1 = #b1
+2'h1___#1 = #b01
+Add dirty constraint for: enable ------  time: 1
+------- No more solution found within the bound: 0 ----------
+### Begin bound: 1
+Add nb constraint for: enable ------  time: 1
+Add ssa constraint for: _00_ ------  time: 2
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 2
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 2
+Two op constraint for :_03_
+Add dirty constraint for: enable ------  time: 1
+Add dirty constraint for: enable ------  time: 2
+------- No more solution found within the bound: 1 ----------
+### Begin bound: 2
+Add nb constraint for: enable ------  time: 2
+Add ssa constraint for: _00_ ------  time: 3
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 3
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 3
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 2
+Add ssa constraint for: _00_ ------  time: 3
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 3
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 3
+Two op constraint for :_03_
+Add dirty constraint for: enable ------  time: 1
+Add dirty constraint for: enable ------  time: 2
+Add dirty constraint for: enable ------  time: 3
+Add dirty constraint for: enable ------  time: 3
+------- No more solution found within the bound: 2 ----------
+### Begin bound: 3
+Add nb constraint for: enable ------  time: 3
+Add ssa constraint for: _00_ ------  time: 4
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 4
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 4
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 3
+Add ssa constraint for: _00_ ------  time: 4
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 4
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 4
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 3
+Add ssa constraint for: _00_ ------  time: 4
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 4
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 4
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 3
+Add ssa constraint for: _00_ ------  time: 4
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 4
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 4
+Two op constraint for :_03_
+Add dirty constraint for: enable ------  time: 1
+Add dirty constraint for: enable ------  time: 2
+Add dirty constraint for: enable ------  time: 3
+Add dirty constraint for: enable ------  time: 3
+Add dirty constraint for: enable ------  time: 4
+Add dirty constraint for: enable ------  time: 4
+Add dirty constraint for: enable ------  time: 4
+Add dirty constraint for: enable ------  time: 4
+------- No more solution found within the bound: 3 ----------
+### Begin bound: 4
+Add nb constraint for: enable ------  time: 4
+Add ssa constraint for: _00_ ------  time: 5
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 5
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 5
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 4
+Add ssa constraint for: _00_ ------  time: 5
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 5
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 5
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 4
+Add ssa constraint for: _00_ ------  time: 5
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 5
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 5
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 4
+Add ssa constraint for: _00_ ------  time: 5
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 5
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 5
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 4
+Add ssa constraint for: _00_ ------  time: 5
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 5
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 5
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 4
+Add ssa constraint for: _00_ ------  time: 5
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 5
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 5
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 4
+Add ssa constraint for: _00_ ------  time: 5
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 5
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 5
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 4
+Add ssa constraint for: _00_ ------  time: 5
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 5
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 5
+Two op constraint for :_03_
+Add dirty constraint for: enable ------  time: 1
+Add dirty constraint for: enable ------  time: 2
+Add dirty constraint for: enable ------  time: 3
+Add dirty constraint for: enable ------  time: 3
+Add dirty constraint for: enable ------  time: 4
+Add dirty constraint for: enable ------  time: 4
+Add dirty constraint for: enable ------  time: 4
+Add dirty constraint for: enable ------  time: 4
+Add dirty constraint for: enable ------  time: 5
+Add dirty constraint for: enable ------  time: 5
+Add dirty constraint for: enable ------  time: 5
+Add dirty constraint for: enable ------  time: 5
+Add dirty constraint for: enable ------  time: 5
+Add dirty constraint for: enable ------  time: 5
+Add dirty constraint for: enable ------  time: 5
+Add dirty constraint for: enable ------  time: 5
+------- No more solution found within the bound: 4 ----------
+### Begin bound: 5
+Add nb constraint for: enable ------  time: 5
+Add ssa constraint for: _00_ ------  time: 6
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 6
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 6
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 5
+Add ssa constraint for: _00_ ------  time: 6
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 6
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 6
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 5
+Add ssa constraint for: _00_ ------  time: 6
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 6
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 6
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 5
+Add ssa constraint for: _00_ ------  time: 6
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 6
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 6
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 5
+Add ssa constraint for: _00_ ------  time: 6
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 6
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 6
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 5
+Add ssa constraint for: _00_ ------  time: 6
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 6
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 6
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 5
+Add ssa constraint for: _00_ ------  time: 6
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 6
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 6
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 5
+Add ssa constraint for: _00_ ------  time: 6
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 6
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 6
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 5
+Add ssa constraint for: _00_ ------  time: 6
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 6
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 6
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 5
+Add ssa constraint for: _00_ ------  time: 6
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 6
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 6
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 5
+Add ssa constraint for: _00_ ------  time: 6
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 6
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 6
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 5
+Add ssa constraint for: _00_ ------  time: 6
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 6
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 6
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 5
+Add ssa constraint for: _00_ ------  time: 6
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 6
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 6
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 5
+Add ssa constraint for: _00_ ------  time: 6
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 6
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 6
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 5
+Add ssa constraint for: _00_ ------  time: 6
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 6
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 6
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 5
+Add ssa constraint for: _00_ ------  time: 6
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 6
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 6
+Two op constraint for :_03_
+Add dirty constraint for: enable ------  time: 1
+Add dirty constraint for: enable ------  time: 2
+Add dirty constraint for: enable ------  time: 3
+Add dirty constraint for: enable ------  time: 3
+Add dirty constraint for: enable ------  time: 4
+Add dirty constraint for: enable ------  time: 4
+Add dirty constraint for: enable ------  time: 4
+Add dirty constraint for: enable ------  time: 4
+Add dirty constraint for: enable ------  time: 5
+Add dirty constraint for: enable ------  time: 5
+Add dirty constraint for: enable ------  time: 5
+Add dirty constraint for: enable ------  time: 5
+Add dirty constraint for: enable ------  time: 5
+Add dirty constraint for: enable ------  time: 5
+Add dirty constraint for: enable ------  time: 5
+Add dirty constraint for: enable ------  time: 5
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 6
+------- No more solution found within the bound: 5 ----------
+### Begin bound: 6
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 6
+Add ssa constraint for: _00_ ------  time: 7
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 7
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 7
+Two op constraint for :_03_
+Add dirty constraint for: enable ------  time: 1
+Add dirty constraint for: enable ------  time: 2
+Add dirty constraint for: enable ------  time: 3
+Add dirty constraint for: enable ------  time: 3
+Add dirty constraint for: enable ------  time: 4
+Add dirty constraint for: enable ------  time: 4
+Add dirty constraint for: enable ------  time: 4
+Add dirty constraint for: enable ------  time: 4
+Add dirty constraint for: enable ------  time: 5
+Add dirty constraint for: enable ------  time: 5
+Add dirty constraint for: enable ------  time: 5
+Add dirty constraint for: enable ------  time: 5
+Add dirty constraint for: enable ------  time: 5
+Add dirty constraint for: enable ------  time: 5
+Add dirty constraint for: enable ------  time: 5
+Add dirty constraint for: enable ------  time: 5
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 6
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+Add dirty constraint for: enable ------  time: 7
+------- No more solution found within the bound: 6 ----------
+### Begin bound: 7
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Add nb constraint for: enable ------  time: 7
+Add ssa constraint for: _00_ ------  time: 8
+Ite op constraint for :_00_
+Add ssa constraint for: enable_next ------  time: 8
+Ite op constraint for :enable_next
+Add ssa constraint for: _03_ ------  time: 8
+Two op constraint for :_03_
+Makefile:2: recipe for target 'two_reg' failed

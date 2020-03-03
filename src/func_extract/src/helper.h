@@ -14,4 +14,5 @@ bool isAs(std::string var);
 
 bool isClean(std::string var);
 
+uint32_t hdb2int(std::string num);
 #endif

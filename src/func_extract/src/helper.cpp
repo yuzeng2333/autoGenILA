@@ -116,3 +116,25 @@ bool isClean(std::string var) {
   return isAs(var) | isInput(var) | isMem(var);
 }
 
+
+// convert a string number, in hex|decimal|binary form, into uint32_t
+uint32_t hdb2int(std::string num) {
+  std::regex pHex("^(\\d+)'h([\\dabcdefx\\?]+)$");
+  std::regex pDec("^(\\d+)'d([\\dx\\?]+)$");
+  std::regex pBin("^(\\d+)'h([01x\\?]+)$");
+  std::smatch m;
+  if(std::regex_match(num, m, pDec)) {
+    std::string pureNum = m.str(2);
+    return str2int(pureNum, "input num in hdb is: "+num);
+  }
+  else if(std::regex_match(num, m, pHex)) {
+    std::string pureNum = m.str(2); 
+    return str2int(pureNum, "input num in hdb is: "+num);    
+  }
+  else {
+    std::regex_match(num, m, pBin);
+    std::string pureNum = m.str(2); 
+    toCout("Binary number not supported yet!");
+    abort();
+  }
+}

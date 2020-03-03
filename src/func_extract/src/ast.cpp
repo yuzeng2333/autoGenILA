@@ -78,8 +78,6 @@ void add_nb_node(std::string regAndSlice, uint32_t timeIdx, astNode* const node)
     std::string destNext = m.str(3);
     uint32_t destNextWidth = get_var_slice_width(destNext);
     uint32_t destWidth = get_var_slice_width(regAndSlice);
-    std::string regAndSliceTimed = regAndSlice+"#"+toStr(timeIdx);
-    std::string destNextTimed = destNext+"#"+toStr(timeIdx+1);
 
     node->type = NONBLOCK;
     node->dest = regAndSlice;
@@ -196,6 +194,7 @@ void add_two_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   node->op = op;
   node->srcVec = SV{op1AndSlice, op2AndSlice};
   node->destTime = timeIdx;
+  node->isReduceOp = isReduceOp;
   node->done = false;
 
   add_child_node(op1AndSlice, timeIdx, node);

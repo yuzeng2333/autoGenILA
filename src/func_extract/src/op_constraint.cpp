@@ -10,7 +10,6 @@
 
 
 using namespace z3;
-std::string _t = "_t";
 
 //std::regex pTwoOp (to_re("^(\\s*)assign (NAME) = (NAME) (\\S+) (NAME)(\\s*);$"));
 
@@ -28,68 +27,68 @@ std::string _t = "_t";
 //    toCout("Unsuppoted var in var_expand: "+varAndSlice);
 //  }
 //}
+expr var_width_expr(std::string var, uint32_t width, context &c) {
+  return c.bv_const(var.c_str(), width);
+}
 
 
-expr var_expr(std::string varAndSlice, uint32_t timeIdx, bool isTaint) {
+expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTaint) {
+  std::string varAndSliceTimed;
   if(isTaint)
-    std::string varAndSliceTimed = varAndSlice + "#" + toStr(timeIdx) + _t;
+    varAndSliceTimed = varAndSlice + "___#" + toStr(timeIdx) + _t;
   else
-    std::string varAndSliceTimed = varAndSlice + "#" + toStr(timeIdx);
+    varAndSliceTimed = varAndSlice + "___#" + toStr(timeIdx);
   return c.bv_const(varAndSliceTimed.c_str(), get_var_slice_width(varAndSlice));
+}
+
+
+expr bool_expr(std::string var, uint32_t timeIdx, context &c, bool isTaint) {
+  assert(get_var_slice_width(var) == 1);
+  std::string varTimed;
+  if(isTaint)
+    varTimed = var + "___#" + toStr(timeIdx) + _t;
+  else
+    varTimed = var + "___#" + toStr(timeIdx);
+  return c.bool_const(varTimed.c_str());
 }
 
 
 void two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, uint32_t bound) {
   toCoutVerb("Two op constraint for :"+node->dest);   
   std::smatch m;  
-  bool isReduceOp;
-
+  bool isReduceOp = node->isReduceOp;
   assert(node->srcVec.size() == 2);
   std::string destAndSlice = node->dest;
   std::string op1AndSlice = node->srcVec[0];
   std::string op2AndSlice = node->srcVec[1];
-  bool op1IsWire = isWire(op1AndSlice);
-  bool op2IsWire = isWire(op2AndSlice);
-  bool op1IsAs, op2IsAs;
-  //bool op1IsNum = isNum(m.str(3));
-  //bool op2IsNum = isNum(m.str(4));
   std::string dest, destSlice;
   std::string op1, op1Slice;
   std::string op2, op2Slice;
   split_slice(destAndSlice, dest, destSlice);
   split_slice(op1AndSlice, op1, op1Slice);
   split_slice(op2AndSlice, op2, op2Slice);
-  uint32_t destAndSliceWidth = get_var_slice_width(destAndSlice);
-  uint32_t op1AndSliceWidth = get_var_slice_width(op1AndSlice);
-  uint32_t op2AndSliceWidth = get_var_slice_width(op2AndSlice);
 
   assert(!isMem(op1));
   assert(!isMem(op2));
 
-  expr destExpr_t = var_expr(destAndSlice, timeIdx, true);
-  expr op1Expr_t = var_expr(op1AndSlice, timeIdx, true);
-  expr op2Expr_t = var_expr(op2AndSlice, timeIdx, true);
+  expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true);
+  expr op2Expr_t = var_expr(op2AndSlice, timeIdx, c, true);
+  expr op1Expr = var_expr(op1AndSlice, timeIdx, c, false);
+  expr op2Expr = var_expr(op2AndSlice, timeIdx, c, false);
 
+  // taint expression
   if(!isReduceOp) {
-    s.add(destExpr_t == op1Expr_t | op2Expr_t);
+    expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
+    s.add(destExpr_t == (op1Expr_t | op2Expr_t));
+    expr destExpr = var_expr(destAndSlice, timeIdx, c, false);
+    make_z3_expr(s, c, node->op, destExpr, op1Expr, op2Expr);
   }
   else {
-    // TODO: how to do bitwise or for all bits of a vector
-    s.add(destExpr == op1Expr | op2Expr);
+    expr destExpr_t = bool_expr(destAndSlice, timeIdx, c, true);
+    s.add(destExpr_t == ( (op1Expr_t | op2Expr_t) !=0 ));
+    expr destExpr = bool_expr(destAndSlice, timeIdx, c, false);
+    make_z3_expr(s, c, node->op, destExpr, op1Expr, op2Expr);
   }
-
-  expr destExpr = var_expr(destAndSlice, timeIdx, false);
-  expr op1Expr = var_expr(op1AndSlice, timeIdx, false);
-  expr op2Expr = var_expr(op2AndSlice, timeIdx, false);
-
-  if(!isReduceOp) {
-    make_z3_expr(s, op, destExpr, op1Expr, op2Expr);
-  }
-  else {
-    // TODO: how to do bitwise or for all bits of a vector
-    toCout("Not supported yet in two_op");
-  }
-
   add_child_constraint(node, timeIdx, c, s, bound);
 }
 
@@ -105,13 +104,13 @@ void one_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   split_slice(destAndSlice, dest, destSlice);
   split_slice(op1AndSlice, op1, op1Slice);
 
-  expr destExpr_t = var_expr(destAndSlice, timeIdx, true);
-  expr op1Expr_t = var_expr(op1AndSlice, timeIdx, true);
+  expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
+  expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true);
   s.add( destExpr_t == op1Expr_t );
 
-  expr destExpr = var_expr(destAndSlice, timeIdx, false);
-  expr op1Expr = var_expr(op1AndSlice, timeIdx, false);
-  make_z3_expr(s, op, destExpr, op1Expr);
+  expr destExpr = var_expr(destAndSlice, timeIdx, c, false);
+  expr op1Expr = var_expr(op1AndSlice, timeIdx, c, false);
+  make_z3_expr(s, c, node->op, destExpr, op1Expr);
 
   add_child_constraint(node, timeIdx, c, s, bound);
 }
@@ -160,15 +159,15 @@ void ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
 
   localWidth = std::to_string(localWidthNum);
 
-  expr op1Expr = var_expr(op1AndSlice, timeIdx, false);
-  expr op2Expr = var_expr(op2AndSlice, timeIdx, false);
-  expr destExpr = var_expr(destAndSlice, timeIdx, false);
-  expr condExpr = var_expr(condAndSlice, timeIdx, false);
+  expr op1Expr = var_expr(op1AndSlice, timeIdx, c, false);
+  expr op2Expr = var_expr(op2AndSlice, timeIdx, c, false);
+  expr destExpr = var_expr(destAndSlice, timeIdx, c, false);
+  expr condExpr = bool_expr(condAndSlice, timeIdx, c, false);
 
-  expr op1Expr_t = var_expr(op1AndSlice, timeIdx, true);
-  expr op2Expr_t = var_expr(op2AndSlice, timeIdx, true);
-  expr destExpr_t = var_expr(destAndSlice, timeIdx, true);
-  expr condExpr_t = var_expr(condAndSlice, timeIdx, true);
+  expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true);
+  expr op2Expr_t = var_expr(op2AndSlice, timeIdx, c, true);
+  expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
+  expr condExpr_t = var_expr(condAndSlice, timeIdx, c, true);
 
   // if condVar is wire, put condVar in ite, and also expand it
 
@@ -179,9 +178,13 @@ void ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
 }
 
 
-void make_z3_expr(solver &s, std::string op, expr destExpr, expr op1Expr, expr op2Expr) {
+void make_z3_expr(solver &s, context &c, std::string op, expr destExpr, expr op1Expr, expr op2Expr) {
   if(op == "&&") {
-    s.add( destExpr = op1Expr && op2Expr );
+    s.add( destExpr == (op1Expr & op2Expr) );
+  }
+  else if (op == "==") {
+    // TODO: use = or == in the following line?
+    s.add( destExpr == ite(op1Expr == op2Expr, c.bool_val(true), c.bool_val(false)) );
   }
   else {
     toCout("Not supported 2-op in make_z3_expr!!");
@@ -190,9 +193,9 @@ void make_z3_expr(solver &s, std::string op, expr destExpr, expr op1Expr, expr o
 }
 
 
-void make_z3_expr(solver &s, std::string op, expr destExpr, expr op1Expr, expr op2Expr) {
+void make_z3_expr(solver &s, context &c, std::string op, expr destExpr, expr op1Expr) {
   if(op.empty()) {
-    s.add( destExpr = op1Expr );
+    s.add( destExpr == op1Expr );
   }
   else {
     toCout("Not supported 1-op in make_z3_expr!!");
