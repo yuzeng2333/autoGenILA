@@ -52,8 +52,8 @@ std::regex pSel1      (to_re("^(\\s*)assign (NAME) = (NAME)(\\[\\$signed\\((NAME
 std::regex pSel2      (to_re("^(\\s*)assign (NAME) = (NAME)(\\[(NAME) \\+\\: (INT)\\])(\\s*)?;$"));
 std::regex pSel3      (to_re("^(\\s*)assign (NAME) = (NAME)(\\[\\$signed\\((NAME)\\) \\-\\: (INT)\\])(\\s*)?;$"));
 std::regex pSel4      (to_re("^(\\s*)assign (NAME) = (NAME)(\\[(NAME) \\-\\: (INT)\\])(\\s*)?;$"));
-
 std::regex pBitOrRed2 (to_re("^(\\s*)assign (NAME) = \\| \\{ (NAME), (NAME) \\}(\\s*)?;$"));
+std::regex pLeftShift (to_re("^(\\s*)assign (NAME) = (NAME) << (NAME)(\\s*)?;$"));
 /* 1 operator */
 std::regex pNone      (to_re("^(\\s*)assign (NAME) = (NAME)(\\s*)?;$"));
 std::regex pInvert    (to_re("^(\\s*)assign (NAME) = \\~ (NAME)(\\s*)?;$"));
@@ -139,15 +139,14 @@ bool did_clean_file = false;
 std::string g_recentClk;
 std::string g_recentRst;
 bool g_recentRst_positive = true;
-std::set<std::string> g_rstGroup;
 bool isTop = false;
 bool g_hasRst;
 bool g_verb;
 bool g_has_read_taint;
-std::string _t="_t";
-std::string _r="_r";
-std::string _x="_x";
-std::string _c="_c";
+std::string _t="_T";
+std::string _r="_R";
+std::string _x="_X";
+std::string _c="_C";
 
 /* clean all the global data */
 void clean_global_data() {
@@ -178,7 +177,6 @@ void clean_global_data() {
   g_recentClk.clear();
   g_recentRst.clear();
   g_recentRst_positive = true;
-  g_rstGroup.clear();
   g_hasRst = false;
   g_has_read_taint = false;
 }
@@ -487,6 +485,7 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
             || std::regex_match(line, m, pBitOr)
             || std::regex_match(line, m, pBitExOr)
             || std::regex_match(line, m, pBitAnd)
+            || std::regex_match(line, m, pLeftShift)
             || std::regex_match(line, m, pBitOrRed2) ) {
     return TWO_OP;
   } // end of 2-operator
@@ -569,17 +568,23 @@ void read_in_clkrst(std::string fileName) {
   resetName = "rst";
   g_recentClk = clockName;
   g_recentRst = resetName;
-  g_rstGroup.insert(g_recentRst);  
   std::ifstream in(fileName);
   std::string line;
   std::smatch match;
   std::regex pClk("clock\\:([a-zA-Z0-9_:'\\[\\]]+)");
   std::regex pRst("reset\\:([a-zA-Z0-9_:'\\[\\]]+)");
   while( std::getline(in, line) ) {
-    if ( std::regex_match(line, match, pClk) )
+    if ( std::regex_match(line, match, pClk) ) {
        clockName = match.str(1);
-    if ( std::regex_match(line, match, pRst) )
+       g_recentClk = clockName;
+       toCout("+++ Get clock: "+clockName);
+    }
+    if ( std::regex_match(line, match, pRst) ) {
       resetName = match.str(1);
+      g_hasRst = true;
+      g_recentRst = resetName;
+      toCout("+++ Get reset: "+resetName);      
+    }
   }
   in.close();
 }
@@ -619,7 +624,7 @@ void add_file_taints(std::string fileName, std::map<std::string, std::vector<std
 void merge_taints(std::string fileName) {
   std::ofstream output(fileName, std::fstream::app);
   // assign _c, _x
-  std::vector<std::string> appendix{"_c", "_x"};
+  std::vector<std::string> appendix{_c, _x};
   for (std::string app : appendix) {  
     for ( auto it = nextVersion.begin(); it != nextVersion.end(); ++it ) {
       if ( isNum(it->first) ) continue;
@@ -637,43 +642,43 @@ void merge_taints(std::string fileName) {
       std::string highIdx = toStr(get_end(sliceTop));
       output << "  always @(*) begin" << std::endl;
       output << "    for(i = 0; i < "+highIdx+"; i = i + 1) begin" << std::endl;
-      output << "      "+it->first+"_r [i] = (";
+      output << "      "+it->first+_r+" [i] = (";
       for (uint32_t i = 0; i < it->second - 1; i++) {
         if(g_has_read_taint) {
-          output << it->first + "_x" + std::to_string(i) + " [i] & ";
-          output << it->first + "_r" + std::to_string(i) + " [i] ) | ( ";
+          output << it->first + _x + std::to_string(i) + " [i] & ";
+          output << it->first + _r + std::to_string(i) + " [i] ) | ( ";
         }
         else { // if do not want read taint
-          output << it->first + "_x" + std::to_string(i) + " [i] ) | ( ";
+          output << it->first + _x + std::to_string(i) + " [i] ) | ( ";
         }
       }
       if(g_has_read_taint) {
-        output << it->first + "_x" + std::to_string(it->second - 1) + " [i] & ";
-        output << it->first + "_r" + std::to_string(it->second - 1) + " [i] );" << std::endl;
+        output << it->first + _x + std::to_string(it->second - 1) + " [i] & ";
+        output << it->first + _r + std::to_string(it->second - 1) + " [i] );" << std::endl;
       }
       else {
-        output << it->first + "_x" + std::to_string(it->second - 1) + " [i] );" << std::endl;
+        output << it->first + _x + std::to_string(it->second - 1) + " [i] );" << std::endl;
       }
       output << "    end" << std::endl;
       output << "  end" << std::endl;
     }
     else {
-      output << "  assign " + it->first + "_r = ( ";
+      output << "  assign " + it->first + _r+" = ( ";
       for (uint32_t i = 0; i < it->second - 1; i++) {
         if(g_has_read_taint) {
-          output << it->first + "_x" + std::to_string(i) + " & ";
-          output << it->first + "_r" + std::to_string(i) + " ) | ( ";
+          output << it->first + _x + std::to_string(i) + " & ";
+          output << it->first + _r + std::to_string(i) + " ) | ( ";
         }
         else {
-          output << it->first + "_x" + std::to_string(i) + " ) | ( ";
+          output << it->first + _x + std::to_string(i) + " ) | ( ";
         }
       }
       if(g_has_read_taint) {      
-        output << it->first + "_x" + std::to_string(it->second - 1) + " & ";
-        output << it->first + "_r" + std::to_string(it->second - 1) + " );" << std::endl;
+        output << it->first + _x + std::to_string(it->second - 1) + " & ";
+        output << it->first + _r + std::to_string(it->second - 1) + " );" << std::endl;
       }
       else {
-        output << it->first + "_x" + std::to_string(it->second - 1) + " );" << std::endl;
+        output << it->first + _x + std::to_string(it->second - 1) + " );" << std::endl;
       }
     }
   }
@@ -686,9 +691,9 @@ void merge_taints(std::string fileName) {
       continue;
     }
     if ( nextVersion.find(reg) == nextVersion.end() ) {
-      output << "  assign " + reg + "_r = 0;" << std::endl;  
-      output << "  assign " + reg + "_c = 0;" << std::endl;  
-      output << "  assign " + reg + "_x = 0;" << std::endl;  
+      output << "  assign " + reg + _r+" = 0;" << std::endl;  
+      output << "  assign " + reg + _c+" = 0;" << std::endl;  
+      output << "  assign " + reg + _x+" = 0;" << std::endl;  
     }
   }
 
@@ -701,10 +706,10 @@ void merge_taints(std::string fileName) {
       continue;
     }
     if ( nextVersion.find(wire) == nextVersion.end() ) {
-      outputStr = outputStr + wire + "_r , ";
-      outputStr = outputStr + wire + "_c , ";
+      outputStr = outputStr + wire + _r+" , ";
+      outputStr = outputStr + wire + _c+" , ";
       if( g_wire2reg.find(wire) == g_wire2reg.end() )
-        outputStr = outputStr + wire + "_x , ";        
+        outputStr = outputStr + wire + _x+" , ";        
     }
   }
   if(outputStr.length() > 2) {
@@ -721,8 +726,8 @@ void merge_taints(std::string fileName) {
     }
     std::string reg, regSlice;
     split_slice(*it, reg, regSlice);
-    output << "  assign " + reg + "_r" + regSlice + " = 0;" << std::endl;
-    output << "  assign " + reg + "_c" + regSlice + " = 0;" << std::endl;
+    output << "  assign " + reg + _r + regSlice + " = 0;" << std::endl;
+    output << "  assign " + reg + _c + regSlice + " = 0;" << std::endl;
   }
 
   // declare _r taints for wire-type outputs
@@ -731,7 +736,7 @@ void merge_taints(std::string fileName) {
   //  if( !isReg(out) && !isRFlag(out) ) {
   //    auto idxPair = varWidth.get_idx_pair(out);
   //    output << "  input [" + toStr(idxPair.first) + ":" + toStr(idxPair.second) + "] " + out + "_r ;" << std::endl;
-  //    moduleInputs.push_back(out+"_r");
+  //    moduleInputs.push_back(out+_r);
   //  }
   //}
 
@@ -743,9 +748,9 @@ void merge_taints(std::string fileName) {
     std::vector<std::string> freeBitsVec;
     free_bits(it->first, freeBitsVec);
     if(freeBitsVec.size() > 0) {
-      output << "  assign "+add_taint(freeBitsVec, "_r"+toStr(verNum-1)) + " = 0;" << std::endl;
-      output << "  assign "+add_taint(freeBitsVec, "_x"+toStr(verNum-1)) + " = 0;" << std::endl;
-      output << "  assign "+add_taint(freeBitsVec, "_c"+toStr(verNum-1)) + " = 0;" << std::endl;
+      output << "  assign "+add_taint(freeBitsVec, _r+toStr(verNum-1)) + " = 0;" << std::endl;
+      output << "  assign "+add_taint(freeBitsVec, _x+toStr(verNum-1)) + " = 0;" << std::endl;
+      output << "  assign "+add_taint(freeBitsVec, _c+toStr(verNum-1)) + " = 0;" << std::endl;
     }
   }
 
@@ -761,6 +766,8 @@ void merge_taints(std::string fileName) {
   }
 
   gen_assert_property(output);
+  if(g_hasRst)
+    output << "  assign rst_zy = "+resetName+" ;" << std::endl;
   output << "endmodule" << std::endl;
   output.close();
 }
@@ -795,6 +802,8 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
   // if no reset, add a reset
   if(!g_hasRst) 
     out << "  input rst_zy;" << std::endl;
+  else
+    out << "  logic rst_zy;" << std::endl;
   out << "  integer i;" << std::endl;
   while( std::getline(in, line) ) {
     out << line << std::endl;
@@ -1177,7 +1186,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     output << blank + "  endcase" << std::endl;
     output << blank + "end" << std::endl;
     //auto destBoundPair = varWidth.get_idx_pair(dest, line);
-    //ground(dest+"_t", destBoundPair, destSlice, blank, output);
+    //ground(dest+_t, destBoundPair, destSlice, blank, output);
 
     // print _r function
     if(sIsNew) {
@@ -1243,9 +1252,9 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     // ground other wires of s
     auto sBoundPair = varWidth.get_idx_pair(s, alwaysFirstLine);
     //if(sIsNew) {
-    //ground_wires(s+"_r"+sVer, sBoundPair, sSlice, blank, output);
-    //ground_wires(s+"_x"+sVer, sBoundPair, sSlice, blank, output);
-    //ground_wires(s+"_c"+sVer, sBoundPair, sSlice, blank, output);
+    //ground_wires(s+_r+sVer, sBoundPair, sSlice, blank, output);
+    //ground_wires(s+_x+sVer, sBoundPair, sSlice, blank, output);
+    //ground_wires(s+_c+sVer, sBoundPair, sSlice, blank, output);
     //}
   } // end of !aIsNum && !bIsNum
   else if(!aIsNum && bIsNum) {
@@ -1271,7 +1280,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     output << blank + "  endcase" << std::endl;
     output << blank + "end" << std::endl;
     //auto destBoundPair = varWidth.get_idx_pair(dest, line);
-    //ground(dest+"_t", destBoundPair, destSlice, blank, output);
+    //ground(dest+_t, destBoundPair, destSlice, blank, output);
 
     // print _r function
     output << blank + "reg [" + sWidth + "-1:0] " + s + _r + sVer + " ;" << std::endl;
@@ -1308,9 +1317,9 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     // ground other wires of s
     auto sBoundPair = varWidth.get_idx_pair(s, alwaysFirstLine);
     //if(sIsNew) {
-    //ground_wires(s+"_r"+sVer, sBoundPair, sSlice, blank, output);
-    //ground_wires(s+"_x"+sVer, sBoundPair, sSlice, blank, output);
-    //ground_wires(s+"_c"+sVer, sBoundPair, sSlice, blank, output);
+    //ground_wires(s+_r+sVer, sBoundPair, sSlice, blank, output);
+    //ground_wires(s+_x+sVer, sBoundPair, sSlice, blank, output);
+    //ground_wires(s+_c+sVer, sBoundPair, sSlice, blank, output);
     //}
   } // end of !aIsNum && bIsNum
   else if(aIsNum && !bIsNum) {
@@ -1360,7 +1369,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     output << blank + "  endcase" << std::endl;
     output << blank + "end" << std::endl;
     //auto destBoundPair = varWidth.get_idx_pair(dest, line);
-    //ground(dest+"_t", destBoundPair, destSlice, blank, output);
+    //ground(dest+_t, destBoundPair, destSlice, blank, output);
 
     // print _r function
     output << blank + "reg [" + sWidth + "-1:0] " + s + _r + sVer + " ;" << std::endl;
@@ -1412,9 +1421,9 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     // ground other wires of s
     auto sBoundPair = varWidth.get_idx_pair(s, alwaysFirstLine);
     //if(sIsNew) {
-    //ground_wires(s+"_r"+sVer, sBoundPair, sSlice, blank, output);
-    //ground_wires(s+"_x"+sVer, sBoundPair, sSlice, blank, output);
-    //ground_wires(s+"_c"+sVer, sBoundPair, sSlice, blank, output);
+    //ground_wires(s+_r+sVer, sBoundPair, sSlice, blank, output);
+    //ground_wires(s+_x+sVer, sBoundPair, sSlice, blank, output);
+    //ground_wires(s+_c+sVer, sBoundPair, sSlice, blank, output);
     //}
   } // end of aIsNum && !bIsNum
   else {
@@ -1434,7 +1443,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     output << blank + "  endcase" << std::endl;
     output << blank + "end" << std::endl;
     //auto destBoundPair = varWidth.get_idx_pair(dest, line);
-    //ground(dest+"_t", destBoundPair, destSlice, blank, output);
+    //ground(dest+_t, destBoundPair, destSlice, blank, output);
 
     // print _r function
     output << blank + "reg [" + sWidth + "-1:0] " + s + _r + sVer + " ;" << std::endl;
@@ -1677,9 +1686,9 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
       split_slice(localSignalAndSlice, localSignal, localSignalSlice);
       auto boundPair = varWidth.get_idx_pair(localSignal, "extend_module_instantiation:2");
       //if(localIsNewVec[i]) {
-      //  ground_wires(localSignal+"_r"+toStr(localVerVec[i]), boundPair, localSignalSlice, "  ", output);
-      //  ground_wires(localSignal+"_x"+toStr(localVerVec[i]), boundPair, localSignalSlice, "  ", output);
-      //  ground_wires(localSignal+"_c"+toStr(localVerVec[i++]), boundPair, localSignalSlice, "  ", output);
+      //  ground_wires(localSignal+_r+toStr(localVerVec[i]), boundPair, localSignalSlice, "  ", output);
+      //  ground_wires(localSignal+_x+toStr(localVerVec[i]), boundPair, localSignalSlice, "  ", output);
+      //  ground_wires(localSignal+_c+toStr(localVerVec[i++]), boundPair, localSignalSlice, "  ", output);
       //}
     }
   }

@@ -204,9 +204,9 @@ uint32_t find_version_num(std::string opAndSlice, bool &isNew, std::ofstream &ou
       std::vector<std::string> freeBitsVec;
       free_bits(op, freeBitsVec);
       if(freeBitsVec.size() > 0) {
-        output << "  assign "+add_taint(freeBitsVec, "_r"+toStr(verNum-1)) + " = 0;" << std::endl;
-        output << "  assign "+add_taint(freeBitsVec, "_x"+toStr(verNum-1)) + " = 0;" << std::endl;
-        output << "  assign "+add_taint(freeBitsVec, "_c"+toStr(verNum-1)) + " = 0;" << std::endl;
+        output << "  assign "+add_taint(freeBitsVec, _r+toStr(verNum-1)) + " = 0;" << std::endl;
+        output << "  assign "+add_taint(freeBitsVec, _x+toStr(verNum-1)) + " = 0;" << std::endl;
+        output << "  assign "+add_taint(freeBitsVec, _c+toStr(verNum-1)) + " = 0;" << std::endl;
       }
       nextVersion[op]++;
       nxtVerBits[op].clear();

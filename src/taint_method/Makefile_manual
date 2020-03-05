@@ -1,8 +1,8 @@
 all:
-	g++ taint_gen.cpp helper.cpp op_taint_gen.cpp VarWidth.cpp
+	g++ main.cpp taint_gen.cpp helper.cpp op_taint_gen.cpp VarWidth.cpp
 
 debug:
-	g++ -g taint_gen.cpp helper.cpp op_taint_gen.cpp VarWidth.cpp
+	g++ -g main.cpp taint_gen.cpp helper.cpp op_taint_gen.cpp VarWidth.cpp
 
 adder:
 	./a.out /workspace/research/ILA/autoGenILA/naiveEg/word_adder/word_adder_yosys.v 0
@@ -29,10 +29,10 @@ exp:
 	./a.out ./experiment/experiment.v 0
 
 pid0:
-	./a.out /workspace/research/ILA/autoGenILA/PID/SYN/PID_simp.v 0
+	./a.out /workspace/research/ILA/autoGenILA/PID/SYN/PID_short.v 0
 
 pid1:
-	./a.out /workspace/research/ILA/autoGenILA/PID/SYN/PID_simp.v 1
+	./a.out /workspace/research/ILA/autoGenILA/PID/SYN/PID_short.v 1
 
 gb0:
 	./a.out /workspace/research/ILA/autoGenILA/GB/SYN/gb_yosys.v 0
@@ -43,4 +43,8 @@ gb1:
 csimple:
 	./a.out /workspace/research/ILA/autoGenILA/naiveEg/case_simple/case.v 0
 
+rbm:
+	./a.out /workspace/research/ILA/autoGenILA/RBM/SYN/rbm_yosys.v 0
 
+8051:
+	./a.out /workspace/research/ILA/autoGenILA/8051/trunk/rtl/SYN/oc8051_yosys.v 0

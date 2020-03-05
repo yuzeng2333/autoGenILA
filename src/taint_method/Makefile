@@ -47,4 +47,4 @@ rbm:
 	./a.out /workspace/research/ILA/autoGenILA/RBM/SYN/rbm_yosys.v 0
 
 8051:
-	./a.out /workspace/research/ILA/autoGenILA/8051/tags/rel0/rtl/SYN/oc8051_yosys.v 0
+	./a.out /workspace/research/ILA/autoGenILA/8051/trunk/rtl/SYN/oc8051_yosys.v 0

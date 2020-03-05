@@ -267,6 +267,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
             || std::regex_match(line, m, pSel2)
             || std::regex_match(line, m, pSel3)
             || std::regex_match(line, m, pSel4) 
+            || std::regex_match(line, m, pLeftShift) 
             || std::regex_match(line, m, pBitOrRed2) ) {} 
   else if ( std::regex_match(line, m, pEq)
               || std::regex_match(line, m, pEq3)
@@ -1382,7 +1383,6 @@ void always_clkrst_taint_gen(std::string firstLine, std::ifstream &input, std::o
   }
   g_recentClk = m.str(2);
   g_recentRst = m.str(3);
-  g_rstGroup.insert(g_recentRst);
 
   std::regex pNeg("negedge");
   // assume clock is always positive edge

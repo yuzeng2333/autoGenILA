@@ -35,7 +35,6 @@ extern bool did_clean_file;
 extern std::string g_recentClk;
 extern std::string g_recentRst;
 extern bool g_recentRst_positive;
-extern std::set<std::string> g_rstGroup;
 extern bool isTop;
 extern bool g_hasRst;
 extern bool g_verb;
@@ -76,6 +75,7 @@ extern std::regex pSel2;
 extern std::regex pSel3;     
 extern std::regex pSel4;
 extern std::regex pBitOrRed2;
+extern std::regex pLeftShift;
 /* 1 operator */
 extern std::regex pNot;     
 extern std::regex pNone;     
