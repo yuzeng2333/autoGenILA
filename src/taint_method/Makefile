@@ -48,3 +48,6 @@ rbm:
 
 8051:
 	./a.out /workspace/research/ILA/autoGenILA/8051/trunk/rtl/SYN/oc8051_yosys.v 0
+
+riscv:
+	./a.out /workspace/research/ILA/autoGenILA/picorv32/SYN/picorv32_yosys.v 0

@@ -22,59 +22,61 @@
  * */
 
 /* declarations */
-std::regex pModule    (to_re("^(\\s*)module (NAME)\\(.+\\);$"));
-std::regex pInput     (to_re("^(\\s*)input (\\[\\d+\\:0\\] )?(NAME)(\\s*)?;$"));
-std::regex pOutput    (to_re("^(\\s*)output (\\[\\d+\\:0\\] )?(NAME)(\\s*)?;$"));
-std::regex pReg       (to_re("^(\\s*)reg (\\[\\d+\\:\\d+\\] )?(NAME)(\\s*)?;$"));
-std::regex pRegConst  (to_re("^(\\s*)reg (\\[\\d+\\:\\d+\\] )?(NAME)(\\s*)= (NUM)(\\s*)?;$"));
-std::regex pWire      (to_re("^(\\s*)wire (\\[\\d+\\:\\d+\\] )?(NAME)(\\s*)?;$"));
-std::regex pMem       (to_re("^(\\s*)reg (\\[\\d+\\:\\d+\\]) (NAME) (\\[\\d+\\:\\d+\\]);$"));
+std::regex pModule      (to_re("^(\\s*)module (NAME)\\(.+\\);$"));
+std::regex pInput       (to_re("^(\\s*)input (\\[\\d+\\:0\\] )?(NAME)(\\s*)?;$"));
+std::regex pOutput      (to_re("^(\\s*)output (\\[\\d+\\:0\\] )?(NAME)(\\s*)?;$"));
+std::regex pReg         (to_re("^(\\s*)reg (\\[\\d+\\:\\d+\\] )?(NAME)(\\s*)?;$"));
+std::regex pRegConst    (to_re("^(\\s*)reg (\\[\\d+\\:\\d+\\] )?(NAME)(\\s*)= (NUM)(\\s*)?;$"));
+std::regex pWire        (to_re("^(\\s*)wire (\\[\\d+\\:\\d+\\] )?(NAME)(\\s*)?;$"));
+std::regex pMem         (to_re("^(\\s*)reg (\\[\\d+\\:\\d+\\]) (NAME) (\\[\\d+\\:\\d+\\]);$"));
 /* 2 operators */
-std::regex pAdd       (to_re("^(\\s*)assign (NAME) = (NAME) \\+ (NAME)(\\s*)?;$"));
-std::regex pSub       (to_re("^(\\s*)assign (NAME) = (NAME) - (NAME)(\\s*)?;$"));
-std::regex pMult      (to_re("^(\\s*)assign (NAME) = (NAME) \\* (NAME)(\\s*)?;$"));
-std::regex pMod       (to_re("^(\\s*)assign (NAME) = (NAME) \\% (NAME)(\\s*)?;$"));
-std::regex pAnd       (to_re("^(\\s*)assign (NAME) = (NAME) && (NAME)(\\s*)?;$"));
-std::regex pOr        (to_re("^(\\s*)assign (NAME) = (NAME) \\|\\| (NAME)(\\s*)?;$"));
-std::regex pEq        (to_re("^(\\s*)assign (NAME) = (NAME) == (NAME)(\\s*)?;$"));
-std::regex pEq3       (to_re("^(\\s*)assign (NAME) = (NAME) === (NAME)(\\s*)?;$"));
-std::regex pNeq       (to_re("^(\\s*)assign (NAME) = (NAME) != (NAME)(\\s*)?;$"));
-std::regex pLt        (to_re("^(\\s*)assign (NAME) = (NAME) > (NAME)(\\s*)?;$"));
-std::regex pLe        (to_re("^(\\s*)assign (NAME) = (NAME) >= (NAME)(\\s*)?;$"));
-std::regex pSt        (to_re("^(\\s*)assign (NAME) = (NAME) < (NAME)(\\s*)?;$"));
-std::regex pSe        (to_re("^(\\s*)assign (NAME) = (NAME) <= (NAME)(\\s*)?;$"));
-std::regex pBitOr     (to_re("^(\\s*)assign (NAME) = (NAME) \\| (NAME)(\\s*)?;$"));
-std::regex pBitExOr   (to_re("^(\\s*)assign (NAME) = (NAME) \\^ (NAME)(\\s*)?;$"));
-std::regex pBitAnd    (to_re("^(\\s*)assign (NAME) = (NAME) & (NAME)(\\s*)?;$"));
-//TODO: merge pConcat and pPureConcat
-std::regex pConcat    (to_re("^(\\s*)assign (NAME) = \\{ (NAME), (NAME) \\}(\\s*)?;$"));
-std::regex pSel1      (to_re("^(\\s*)assign (NAME) = (NAME)(\\[\\$signed\\((NAME)\\) \\+\\: (INT)\\])(\\s*)?;$"));
-std::regex pSel2      (to_re("^(\\s*)assign (NAME) = (NAME)(\\[(NAME) \\+\\: (INT)\\])(\\s*)?;$"));
-std::regex pSel3      (to_re("^(\\s*)assign (NAME) = (NAME)(\\[\\$signed\\((NAME)\\) \\-\\: (INT)\\])(\\s*)?;$"));
-std::regex pSel4      (to_re("^(\\s*)assign (NAME) = (NAME)(\\[(NAME) \\-\\: (INT)\\])(\\s*)?;$"));
-std::regex pBitOrRed2 (to_re("^(\\s*)assign (NAME) = \\| \\{ (NAME), (NAME) \\}(\\s*)?;$"));
-std::regex pLeftShift (to_re("^(\\s*)assign (NAME) = (NAME) << (NAME)(\\s*)?;$"));
+std::regex pAdd         (to_re("^(\\s*)assign (NAME) = (NAME) \\+ (NAME)(\\s*)?;$"));
+std::regex pSub         (to_re("^(\\s*)assign (NAME) = (NAME) - (NAME)(\\s*)?;$"));
+std::regex pMult        (to_re("^(\\s*)assign (NAME) = (NAME) \\* (NAME)(\\s*)?;$"));
+std::regex pMod         (to_re("^(\\s*)assign (NAME) = (NAME) \\% (NAME)(\\s*)?;$"));
+std::regex pAnd         (to_re("^(\\s*)assign (NAME) = (NAME) && (NAME)(\\s*)?;$"));
+std::regex pOr          (to_re("^(\\s*)assign (NAME) = (NAME) \\|\\| (NAME)(\\s*)?;$"));
+std::regex pEq          (to_re("^(\\s*)assign (NAME) = (NAME) == (NAME)(\\s*)?;$"));
+std::regex pEq3         (to_re("^(\\s*)assign (NAME) = (NAME) === (NAME)(\\s*)?;$"));
+std::regex pNeq         (to_re("^(\\s*)assign (NAME) = (NAME) != (NAME)(\\s*)?;$"));
+std::regex pLt          (to_re("^(\\s*)assign (NAME) = (NAME) > (NAME)(\\s*)?;$"));
+std::regex pLe          (to_re("^(\\s*)assign (NAME) = (NAME) >= (NAME)(\\s*)?;$"));
+std::regex pSt          (to_re("^(\\s*)assign (NAME) = (NAME) < (NAME)(\\s*)?;$"));
+std::regex pSe          (to_re("^(\\s*)assign (NAME) = (NAME) <= (NAME)(\\s*)?;$"));
+std::regex pBitOr       (to_re("^(\\s*)assign (NAME) = (NAME) \\| (NAME)(\\s*)?;$"));
+std::regex pBitExOr     (to_re("^(\\s*)assign (NAME) = (NAME) \\^ (NAME)(\\s*)?;$"));
+std::regex pBitAnd      (to_re("^(\\s*)assign (NAME) = (NAME) & (NAME)(\\s*)?;$"));
+//TODO: merge pConcat   and pPureConcat
+std::regex pConcat      (to_re("^(\\s*)assign (NAME) = \\{ (NAME), (NAME) \\}(\\s*)?;$"));
+std::regex pSel1        (to_re("^(\\s*)assign (NAME) = (NAME)(\\[\\$signed\\((NAME)\\) \\+\\: (INT)\\])(\\s*)?;$"));
+std::regex pSel2        (to_re("^(\\s*)assign (NAME) = (NAME)(\\[(NAME) \\+\\: (INT)\\])(\\s*)?;$"));
+std::regex pSel3        (to_re("^(\\s*)assign (NAME) = (NAME)(\\[\\$signed\\((NAME)\\) \\-\\: (INT)\\])(\\s*)?;$"));
+std::regex pSel4        (to_re("^(\\s*)assign (NAME) = (NAME)(\\[(NAME) \\-\\: (INT)\\])(\\s*)?;$"));
+std::regex pBitOrRed2   (to_re("^(\\s*)assign (NAME) = \\| \\{ (NAME), (NAME) \\}(\\s*)?;$"));
+std::regex pLeftShift   (to_re("^(\\s*)assign (NAME) = (NAME) << (NAME)(\\s*)?;$"));
+std::regex pRightShift  (to_re("^(\\s*)assign (NAME) = (NAME) >> (NAME)(\\s*)?;$"));
+std::regex pSignedRightShift  (to_re("^(\\s*)assign (NAME) = (NAME) >>> (NAME)(\\s*)?;$"));
 /* 1 operator */
-std::regex pNone      (to_re("^(\\s*)assign (NAME) = (NAME)(\\s*)?;$"));
-std::regex pInvert    (to_re("^(\\s*)assign (NAME) = \\~ (NAME)(\\s*)?;$"));
+std::regex pNone        (to_re("^(\\s*)assign (NAME) = (NAME)(\\s*)?;$"));
+std::regex pInvert      (to_re("^(\\s*)assign (NAME) = \\~ (NAME)(\\s*)?;$"));
 /* reduce 1 op */
-std::regex pNot       (to_re("^(\\s*)assign (NAME) = ! (NAME)(\\s*)?;$"));
-std::regex pRedOr     (to_re("^(\\s*)assign (NAME) = \\| (NAME)(\\s*)?;$"));
-std::regex pRedAnd    (to_re("^(\\s*)assign (NAME) = & (NAME)(\\s*)?;$"));
-std::regex pRedNand   (to_re("^(\\s*)assign (NAME) = \\~& (NAME)(\\s*)?;$"));
-std::regex pRedNor    (to_re("^(\\s*)assign (NAME) = \\~\\| (NAME)(\\s*)?;$"));
-std::regex pRedXor    (to_re("^(\\s*)assign (NAME) = \\^ (NAME)(\\s*)?;$"));
-std::regex pRedXnor   (to_re("^(\\s*)assign (NAME) = \\~\\^ (NAME)(\\s*)?;$"));
+std::regex pNot         (to_re("^(\\s*)assign (NAME) = ! (NAME)(\\s*)?;$"));
+std::regex pRedOr       (to_re("^(\\s*)assign (NAME) = \\| (NAME)(\\s*)?;$"));
+std::regex pRedAnd      (to_re("^(\\s*)assign (NAME) = & (NAME)(\\s*)?;$"));
+std::regex pRedNand     (to_re("^(\\s*)assign (NAME) = \\~& (NAME)(\\s*)?;$"));
+std::regex pRedNor      (to_re("^(\\s*)assign (NAME) = \\~\\| (NAME)(\\s*)?;$"));
+std::regex pRedXor      (to_re("^(\\s*)assign (NAME) = \\^ (NAME)(\\s*)?;$"));
+std::regex pRedXnor     (to_re("^(\\s*)assign (NAME) = \\~\\^ (NAME)(\\s*)?;$"));
 /* ite */
-std::regex pIte       (to_re("^(\\s*)assign (NAME) = (NAME) \\? (NAME) \\: (NAME)(\\s*)?;$"));
-/* do not add anything */
-// Assume: always comes with posedge or negedge
-std::regex pAlwaysClk (to_re("^(\\s*)always @\\(posedge (NAME)\\)(?: begin)?$"));
-std::regex pAlwaysClkRst  (to_re("^(\\s*)always @\\(posedge (NAME) or (?:posedge|negedge) (NAME)(\\s?)\\)$"));
-std::regex pAlwaysComb(to_re("^(\\s*)always @\\(NAME or NAME(?: or NAME)?\\) begin$"));
-std::regex pAlwaysFake(to_re("^(\\s*)always @\\(negedge 1'bx\\)(?: begin)?$"));
-std::regex pEnd       ("^(\\s*)end$");
-std::regex pEndmodule ("^(\\s*)endmodule$");
+std::regex pIte         (to_re("^(\\s*)assign (NAME) = (NAME) \\? (NAME) \\: (NAME)(\\s*)?;$"));
+/* do not add anything   */
+// Assume: always come  s with posedge or negedge
+std::regex pAlwaysClk   (to_re("^(\\s*)always @\\(posedge (NAME)\\)(?: begin)?$"));
+std::regex pAlwaysClkRst(to_re("^(\\s*)always @\\(posedge (NAME) or (?:posedge|negedge) (NAME)(\\s?)\\)$"));
+std::regex pAlwaysComb  (to_re("^(\\s*)always @\\(NAME or NAME(?: or NAME)?\\) begin$"));
+std::regex pAlwaysFake  (to_re("^(\\s*)always @\\(negedge 1'bx\\)(?: begin)?$"));
+std::regex pEnd         ("^(\\s*)end$");
+std::regex pEndmodule   ("^(\\s*)endmodule$");
 /* non-blocking assignment */
 std::regex pNonblock  (to_re("^(\\s*)(NAME) <= (NAME)(\\s*)?;$"));
 std::regex pNonblockConcat    (to_re("^(\\s*)(NAME) <= \\{(.+)\\}(\\s*)?;$"));
@@ -486,6 +488,8 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
             || std::regex_match(line, m, pBitExOr)
             || std::regex_match(line, m, pBitAnd)
             || std::regex_match(line, m, pLeftShift)
+            || std::regex_match(line, m, pRightShift)
+            || std::regex_match(line, m, pSignedRightShift)
             || std::regex_match(line, m, pBitOrRed2) ) {
     return TWO_OP;
   } // end of 2-operator
