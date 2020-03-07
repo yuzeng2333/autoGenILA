@@ -145,6 +145,8 @@ bool isTop = false;
 bool g_hasRst;
 bool g_verb;
 bool g_has_read_taint;
+bool g_rst_pos;
+bool g_clkrst_exist = false;
 std::string _t="_T";
 std::string _r="_R";
 std::string _x="_X";
@@ -180,7 +182,9 @@ void clean_global_data() {
   g_recentRst.clear();
   g_recentRst_positive = true;
   g_hasRst = false;
-  g_has_read_taint = false;
+  g_has_read_taint = true; // if true, read taint takes effect
+  g_rst_pos = true;
+  g_clkrst_exist = false;
 }
 
 

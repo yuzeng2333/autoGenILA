@@ -878,10 +878,24 @@ std::string further_clean_line(std::string line) {
 
 
 std::string get_recent_rst() {
-  if(g_recentRst_positive)
+  if(g_clkrst_exist && g_recentRst_positive) {
+    if(is_neg_rst(g_recentRst)) {
+      toCout("neg rst found for positive edge: "+g_recentRst);
+    }
     return g_recentRst;
-  else
+  }
+  else if(g_clkrst_exist && !g_recentRst_positive){
+    if(!is_neg_rst(g_recentRst)) {
+      toCout("pos rst found for negative edge: "+g_recentRst);      
+    }
     return "!"+g_recentRst;
+  }
+  else { // if !g_clkrst_exist
+    if(is_neg_rst(g_recentRst))
+      return "!"+g_recentRst;
+    else
+      return g_recentRst;
+  }
 }
 
 
@@ -1136,3 +1150,22 @@ void merge_vec(std::vector<std::string> &srcVec, std::vector<std::string> &destV
   if(!lastPushed)
     destVec.push_back(prevVar+" ["+toStr(leftIdx)+":"+toStr(rightIdx)+"]");
 }
+
+
+// assume the input must be a reset signal, 
+// otherwise abort
+bool is_neg_rst(std::string var) {
+  if ( var.compare("reset_n") == 0
+         || var.compare("resetn") == 0
+         || var.compare("rstn") == 0 ) {
+    return true;
+  }
+  else if(var.compare("rst") == 0
+         || var.compare("i_rst") == 0
+         || var.compare("reset") == 0) {
+    return false;
+  }
+  else
+    abort();
+}
+

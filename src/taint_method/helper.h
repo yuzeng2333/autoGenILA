@@ -117,4 +117,7 @@ std::string add_taint(std::vector<std::string> &freeBitsVec, std::string taint);
 void assert_info(bool val, std::string info);
 
 void merge_vec(std::vector<std::string> &srcVec, std::vector<std::string> &destVec);
+
+bool is_neg_rst(std::string rst);
+
 #endif

@@ -24,11 +24,17 @@ void input_taint_gen(std::string line, std::ofstream &output) {
   std::string var = m.str(3);
   if(!g_hasRst) {
     if(var.compare("rst") == 0
-        || var.compare("reset") == 0
-        || var.compare("reset_n") == 0
         || var.compare("i_rst") == 0
-        || var.compare("reset") == 0)
+        || var.compare("reset") == 0) {
       g_hasRst = true;
+      g_rst_pos = true;
+    }
+    else if ( var.compare("reset_n") == 0
+                || var.compare("resetn") == 0
+                || var.compare("rstn") == 0 ) {
+      g_hasRst = true;
+      g_rst_pos = false;
+    }
   }
   moduleInputs.push_back(var);
   extendInputs.push_back(var+_t);
@@ -350,7 +356,8 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
       output << blank << "assign " + op2 + _c + thdVer + op2Slice + " = 0 ;" << std::endl;
       if(!isReduceOp) {
         output << blank << "assign " + op1 + _r + sndVer + op1Slice + " = " + dest + _r + destSlice + " ;" << std::endl;
-        output << blank << "assign " + op2 + _r + thdVer + op2Slice + " = " + dest + _r + destSlice + " ;" << std::endl; 
+        output << blank << "assign " + op2 + _r + thdVer + op2Slice + " = " + dest + _r + destSlice + " ;" << std::endl;
+        // TODO: check if the RHS is correct 
         output << blank << "assign " + op1 + _x + sndVer + op1Slice + " = " + dest + _r + destSlice + " ;" << std::endl;
         output << blank << "assign " + op2 + _x + thdVer + op2Slice + " = " + dest + _r + destSlice + " ;" << std::endl;  
       }
@@ -364,20 +371,20 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
     else if (!isReduceOp){
       output << blank << "assign " + op1 + _c + sndVer + op1Slice + " = " + dest + _c + destSlice + " ;" << std::endl;
       output << blank << "assign " + op1 + _r + sndVer + op1Slice + " = " + dest + _r + destSlice + " | ( " + dest + _c + destSlice + " & " + op2 + _t + op2Slice + " );" << std::endl;
-      output << blank << "assign " + op1 + _x + sndVer + op1Slice + " = " + dest + _x + destSlice + " ;" << std::endl;
+      output << blank << "assign " + op1 + _x + sndVer + op1Slice + " = " + dest + _x + destSlice + " | ( " + dest + _c + destSlice + " & " + op2 + _t + op2Slice + " );" << std::endl; 
         
       output << blank << "assign " + op2 + _c + thdVer + op2Slice + " = " + dest + _c + destSlice + " ;" << std::endl;
       output << blank << "assign " + op2 + _r + thdVer + op2Slice + " = " + dest + _r + destSlice + " | ( " + dest + _c + destSlice + " & " + op1 + _t + op1Slice + " );" << std::endl;
-      output << blank << "assign " + op2 + _x + thdVer + op2Slice + " = " + dest + _x + destSlice + " ;" << std::endl;
+      output << blank << "assign " + op2 + _x + thdVer + op2Slice + " = " + dest + _x + destSlice + " | ( " + dest + _c + destSlice + " & " + op1 + _t + op1Slice + " );" << std::endl; 
     }
     else {
       output << blank << "assign " + op1 + _c + sndVer + op1Slice + " = " + extend(dest+_c+destSlice, op1LocalWidthNum) + " ;" << std::endl;
       output << blank << "assign " + op1 + _r + sndVer + op1Slice + " = " + extend(dest+_r+destSlice, op1LocalWidthNum) + " | ( " + extend(dest+_c+destSlice, op1LocalWidthNum) + " & " + op2 + _t + op2Slice + " );" << std::endl;
-      output << blank << "assign " + op1 + _x + sndVer + op1Slice + " = " + extend(dest+_x+destSlice, op1LocalWidthNum) + " ;" << std::endl;
+      output << blank << "assign " + op1 + _x + sndVer + op1Slice + " = " + extend(dest+_x+destSlice, op1LocalWidthNum) + " | ( " + extend(dest+_c+destSlice, op1LocalWidthNum) + " & " + op2 + _t + op2Slice + " );" << std::endl; 
         
       output << blank << "assign " + op2 + _c + thdVer + op2Slice + " = " + extend(dest+_c+destSlice, op2LocalWidthNum) + " ;" << std::endl;
-      output << blank << "assign " + op2 + _r + thdVer + op2Slice + " = " + extend(dest+_c+destSlice, op2LocalWidthNum) + " | ( " + extend(dest+_c+destSlice, op2LocalWidthNum) + " & " + op1 + _t + op1Slice + " );" << std::endl;
-      output << blank << "assign " + op2 + _x + thdVer + op2Slice + " = " + extend(dest+_c+destSlice, op2LocalWidthNum) + " ;" << std::endl;
+      output << blank << "assign " + op2 + _r + thdVer + op2Slice + " = " + extend(dest+_r+destSlice, op2LocalWidthNum) + " | ( " + extend(dest+_c+destSlice, op2LocalWidthNum) + " & " + op1 + _t + op1Slice + " );" << std::endl;
+      output << blank << "assign " + op2 + _x + thdVer + op2Slice + " = " + extend(dest+_x+destSlice, op2LocalWidthNum) + " | ( " + extend(dest+_c+destSlice, op2LocalWidthNum) + " & " + op1 + _t + op1Slice + " );" << std::endl;
     }
     // all ground_wires are removed because the unused wires are grounded in find_version_num()
     /* ground all the floating wires */
@@ -1241,19 +1248,19 @@ void nonblockconcat_taint_gen(std::string line, std::ofstream &output) {
 
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
   if (g_hasRst)  
-    output << blank + dest + _t+" \t\t<= " + g_recentRst + " ? 0 : | ({ " + updateTList +" } & { " + updateXListRight + " });" << std::endl;
+    output << blank + dest + _t+" \t\t<= " + get_recent_rst() + " ? 0 : | ({ " + updateTList +" } & { " + updateXListRight + " });" << std::endl;
   else
     output << blank + dest + _t+" \t\t<= rst_zy ? 0 : | ({ " + updateTList +" } & { " + updateXListRight + " });" << std::endl;
 
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
   if (g_hasRst)    
-    output << blank + dest + "_t_flag \t<= " + g_recentRst + " ? 0 : " + dest + "_t_flag ? 1 : | ({ " + updateTList + " } & { " + updateXListRight + " });" << std::endl;
+    output << blank + dest + "_t_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_t_flag ? 1 : | ({ " + updateTList + " } & { " + updateXListRight + " });" << std::endl;
   else
     output << blank + dest + "_t_flag \t<= rst_zy ? 0 : " + dest + "_t_flag ? 1 : | ({ " + updateTList + " } & { " + updateXListRight + " });" << std::endl;    
 
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
   if (g_hasRst)    
-    output << blank + dest + "_r_flag \t<= " + g_recentRst + " ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + _r+" ;" << std::endl;
+    output << blank + dest + "_r_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + _r+" ;" << std::endl;
   else
     output << blank + dest + "_r_flag \t<= rst_zy ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + _r+" ;" << std::endl;    
 }
@@ -1378,6 +1385,7 @@ void always_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream
 
 
 void always_clkrst_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream &output) {
+  g_clkrst_exist = true;  
   std::smatch m;
   if( !std::regex_match(firstLine, m, pAlwaysClkRst) ) {
     std::cout << "!! Error in parsing always with clk & rst !!" << std::endl;
