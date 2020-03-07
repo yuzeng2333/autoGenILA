@@ -371,20 +371,20 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
     else if (!isReduceOp){
       output << blank << "assign " + op1 + _c + sndVer + op1Slice + " = " + dest + _c + destSlice + " ;" << std::endl;
       output << blank << "assign " + op1 + _r + sndVer + op1Slice + " = " + dest + _r + destSlice + " | ( " + dest + _c + destSlice + " & " + op2 + _t + op2Slice + " );" << std::endl;
-      output << blank << "assign " + op1 + _x + sndVer + op1Slice + " = " + dest + _x + destSlice + " | ( " + dest + _c + destSlice + " & " + op2 + _t + op2Slice + " );" << std::endl; 
+      output << blank << "assign " + op1 + _x + sndVer + op1Slice + " = " + dest + _x + destSlice + " ;" << std::endl; 
         
       output << blank << "assign " + op2 + _c + thdVer + op2Slice + " = " + dest + _c + destSlice + " ;" << std::endl;
       output << blank << "assign " + op2 + _r + thdVer + op2Slice + " = " + dest + _r + destSlice + " | ( " + dest + _c + destSlice + " & " + op1 + _t + op1Slice + " );" << std::endl;
-      output << blank << "assign " + op2 + _x + thdVer + op2Slice + " = " + dest + _x + destSlice + " | ( " + dest + _c + destSlice + " & " + op1 + _t + op1Slice + " );" << std::endl; 
+      output << blank << "assign " + op2 + _x + thdVer + op2Slice + " = " + dest + _x + destSlice + " ;" << std::endl; 
     }
     else {
       output << blank << "assign " + op1 + _c + sndVer + op1Slice + " = " + extend(dest+_c+destSlice, op1LocalWidthNum) + " ;" << std::endl;
       output << blank << "assign " + op1 + _r + sndVer + op1Slice + " = " + extend(dest+_r+destSlice, op1LocalWidthNum) + " | ( " + extend(dest+_c+destSlice, op1LocalWidthNum) + " & " + op2 + _t + op2Slice + " );" << std::endl;
-      output << blank << "assign " + op1 + _x + sndVer + op1Slice + " = " + extend(dest+_x+destSlice, op1LocalWidthNum) + " | ( " + extend(dest+_c+destSlice, op1LocalWidthNum) + " & " + op2 + _t + op2Slice + " );" << std::endl; 
+      output << blank << "assign " + op1 + _x + sndVer + op1Slice + " = " + extend(dest+_x+destSlice, op1LocalWidthNum) + " ;" << std::endl; 
         
       output << blank << "assign " + op2 + _c + thdVer + op2Slice + " = " + extend(dest+_c+destSlice, op2LocalWidthNum) + " ;" << std::endl;
       output << blank << "assign " + op2 + _r + thdVer + op2Slice + " = " + extend(dest+_r+destSlice, op2LocalWidthNum) + " | ( " + extend(dest+_c+destSlice, op2LocalWidthNum) + " & " + op1 + _t + op1Slice + " );" << std::endl;
-      output << blank << "assign " + op2 + _x + thdVer + op2Slice + " = " + extend(dest+_x+destSlice, op2LocalWidthNum) + " | ( " + extend(dest+_c+destSlice, op2LocalWidthNum) + " & " + op1 + _t + op1Slice + " );" << std::endl;
+      output << blank << "assign " + op2 + _x + thdVer + op2Slice + " = " + extend(dest+_x+destSlice, op2LocalWidthNum) + " ;" << std::endl;
     }
     // all ground_wires are removed because the unused wires are grounded in find_version_num()
     /* ground all the floating wires */
