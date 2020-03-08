@@ -1211,7 +1211,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     output << blank + "logic [" + bWidth + "-1:0] " + b + _c + bVer + " ;" << std::endl;
 
     output << blank + "always @( "+dest+_r+destSlice+" or "+s+" ) begin" << std::endl;
-    output << blank + "  "+s+_r+sVer+" "+sSlice+" = " + extend("| "+dest+_r+destSlice, sWidthNum) + " ;" << std::endl;
+    //output << blank + "  "+s+_r+sVer+" "+sSlice+" = " + extend("| "+dest+_r+destSlice, sWidthNum) + " ;" << std::endl;
     output << blank + "  "+b+_r+bVer+" = 0 ;" << std::endl;
     output << blank + "  "+a+_r+aVer+" = 0 ;" << std::endl;
     output << blank + "  casez ("+sAndSlice+")" << std::endl;
@@ -1225,9 +1225,26 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     output << blank + "  endcase" << std::endl;
     output << blank + "end" << std::endl;  
 
+    // _r for conditions
+    output << blank + "always @( "+dest+_r+destSlice+" or "+s+" ) begin" << std::endl;
+    output << blank + "  "+s+_r+sVer+" "+sSlice+" = 0 ;" << std::endl;
+    output << blank + "  casez ("+sAndSlice+")" << std::endl;
+    uint32_t i = 0;
+    checkCond(sSlice.empty(), "Condition in case has slice: "+sAndSlice);
+    for(auto localPair: caseAssignPairs) {
+      split_slice(localPair.second, rhs, rhsSlice);
+      output << blank + "    " + localPair.first + " :" << std::endl;
+      output << blank + "      " + s+_r+sVer+" "+sSlice+"["+toStr(i++)+"]" + " = | " + dest + _r + destSlice + " ;" << std::endl;
+    }
+    //output << blank + "    default :" << std::endl;
+    //output << blank + "      " + a + _r + aVer + aSlice + " = " + dest + _r + destSlice + " ;" << std::endl;
+    output << blank + "  endcase" << std::endl;
+    output << blank + "end" << std::endl;  
+
+
     // print _x function
     output << blank + "always @( "+dest+_x+destSlice+" or "+s+" ) begin" << std::endl;  
-    output << blank + "  "+s+_x+sVer+sSlice+" = " + extend("| "+dest+_x+destSlice, sWidthNum) + " ;" << std::endl;
+    //output << blank + "  "+s+_x+sVer+sSlice+" = " + extend("| "+dest+_x+destSlice, sWidthNum) + " ;" << std::endl;
     output << blank + "  "+b+_x+bVer+" = 0 ;" << std::endl;
     output << blank + "  "+a+_x+aVer+" = 0 ;" << std::endl;
     output << blank + "  casez ("+sAndSlice+")" << std::endl;
@@ -1240,6 +1257,22 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     output << blank + "      " + a + _x + aVer + aSlice + " = " + dest + _x + destSlice + " ;" << std::endl;
     output << blank + "  endcase" << std::endl;
     output << blank + "end" << std::endl;
+
+    // _x for conditions
+    output << blank + "always @( "+dest+_x+destSlice+" or "+s+" ) begin" << std::endl;
+    output << blank + "  "+s+_x+sVer+" "+sSlice+" = 0 ;" << std::endl;
+    output << blank + "  casez ("+sAndSlice+")" << std::endl;
+    i = 0;
+    checkCond(sSlice.empty(), "Condition in case has slice: "+sAndSlice);
+    for(auto localPair: caseAssignPairs) {
+      split_slice(localPair.second, rhs, rhsSlice);
+      output << blank + "    " + localPair.first + " :" << std::endl;
+      output << blank + "      " + s+_x+sVer+" "+sSlice+"["+toStr(i++)+"]" + " = | " + dest + _x + destSlice + " ;" << std::endl;
+    }
+    //output << blank + "    default :" << std::endl;
+    //output << blank + "      " + a + _x + aVer + aSlice + " = " + dest + _x + destSlice + " ;" << std::endl;
+    output << blank + "  endcase" << std::endl;
+    output << blank + "end" << std::endl;  
 
     // print _c function
     output << blank + "always @( "+dest+_c+destSlice+" or "+s+" ) begin" << std::endl;  
