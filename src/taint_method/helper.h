@@ -120,4 +120,7 @@ void merge_vec(std::vector<std::string> &srcVec, std::vector<std::string> &destV
 
 bool is_neg_rst(std::string rst);
 
+void printAndAbort(std::string in);
+
+void checkCond(bool cond, std::string in);
 #endif

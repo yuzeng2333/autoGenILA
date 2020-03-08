@@ -1169,3 +1169,15 @@ bool is_neg_rst(std::string var) {
     abort();
 }
 
+
+void printAndAbort(std::string in) {
+  toCout(in);
+  abort();
+}
+
+
+void checkCond(bool cond, std::string in) {
+  if(!cond) {
+    printAndAbort(in);
+  }
+}

@@ -260,6 +260,13 @@ void output_insert_map(std::string line, std::ofstream &output, std::ifstream &i
 void two_op_taint_gen(std::string line, std::ofstream &output) {
   std::smatch m;  
   bool isReduceOp = false;
+  bool isOR = false;
+  bool isAnd = false;
+  if( std::regex_match(line, m, pOr) )
+    isOR = true;
+  if( std::regex_match(line, m, pAnd) )
+    isAnd = true;
+
   if (std::regex_match(line, m, pAdd)
             || std::regex_match(line, m, pSub)
             || std::regex_match(line, m, pMult)
@@ -288,6 +295,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
   }
   else
     return;
+
   assert(!m.str(3).empty());
   assert(!m.str(4).empty());
   bool op1IsNum = isNum(m.str(3));
@@ -351,6 +359,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
       output << blank << "assign " + dest + _t + destSlice + " = " + op1 + _t + op1Slice + " | " + op2 + _t + op2Slice + " ;" << std::endl;
     else
       output << blank << "assign " + dest + _t + destSlice + " = (| " + op1 + _t + op1Slice + " ) | (|" + op2 + _t + op2Slice + " ) ;" << std::endl;
+
     if ( isOutput(dest) && isTop ) {
       output << blank << "assign " + op1 + _c + sndVer + op1Slice + " = 0 ;" << std::endl;
       output << blank << "assign " + op2 + _c + thdVer + op2Slice + " = 0 ;" << std::endl;
@@ -370,14 +379,24 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
     }
     else if (!isReduceOp){
       output << blank << "assign " + op1 + _c + sndVer + op1Slice + " = " + dest + _c + destSlice + " ;" << std::endl;
-      output << blank << "assign " + op1 + _r + sndVer + op1Slice + " = " + dest + _r + destSlice + " | ( " + dest + _c + destSlice + " & " + op2 + _t + op2Slice + " );" << std::endl;
       output << blank << "assign " + op1 + _x + sndVer + op1Slice + " = " + dest + _x + destSlice + " ;" << std::endl; 
-        
       output << blank << "assign " + op2 + _c + thdVer + op2Slice + " = " + dest + _c + destSlice + " ;" << std::endl;
-      output << blank << "assign " + op2 + _r + thdVer + op2Slice + " = " + dest + _r + destSlice + " | ( " + dest + _c + destSlice + " & " + op1 + _t + op1Slice + " );" << std::endl;
       output << blank << "assign " + op2 + _x + thdVer + op2Slice + " = " + dest + _x + destSlice + " ;" << std::endl; 
+      
+      if(isOR) { // NOTE, operands of OR can be more than 1 bit
+        output << blank << "assign " + op1 + _r + sndVer + op1Slice + " = " + dest + _r + destSlice + " | ( " + dest + _c + destSlice + " & " + op2 + _t + op2Slice + " & " + op2AndSlice + " == 0 );" << std::endl;     
+        output << blank << "assign " + op2 + _r + thdVer + op2Slice + " = " + dest + _r + destSlice + " | ( " + dest + _c + destSlice + " & " + op1 + _t + op1Slice + " & " + op1AndSlice + " == 0 );" << std::endl;
+      }
+      else if(isAnd) { // NOTE, operands of AND can be more than 1 bit
+        output << blank << "assign " + op1 + _r + sndVer + op1Slice + " = " + dest + _r + destSlice + " | ( " + dest + _c + destSlice + " & " + op2 + _t + op2Slice + " & " + op2AndSlice + " != 0 );" << std::endl;     
+        output << blank << "assign " + op2 + _r + thdVer + op2Slice + " = " + dest + _r + destSlice + " | ( " + dest + _c + destSlice + " & " + op1 + _t + op1Slice + " & " + op1AndSlice + " != 0 );" << std::endl;
+      }
+      else {
+        output << blank << "assign " + op1 + _r + sndVer + op1Slice + " = " + dest + _r + destSlice + " | ( " + dest + _c + destSlice + " & " + op2 + _t + op2Slice + " );" << std::endl;     
+        output << blank << "assign " + op2 + _r + thdVer + op2Slice + " = " + dest + _r + destSlice + " | ( " + dest + _c + destSlice + " & " + op1 + _t + op1Slice + " );" << std::endl;
+      }
     }
-    else {
+    else { // if dest is not output and op is reduceOp
       output << blank << "assign " + op1 + _c + sndVer + op1Slice + " = " + extend(dest+_c+destSlice, op1LocalWidthNum) + " ;" << std::endl;
       output << blank << "assign " + op1 + _r + sndVer + op1Slice + " = " + extend(dest+_r+destSlice, op1LocalWidthNum) + " | ( " + extend(dest+_c+destSlice, op1LocalWidthNum) + " & " + op2 + _t + op2Slice + " );" << std::endl;
       output << blank << "assign " + op1 + _x + sndVer + op1Slice + " = " + extend(dest+_x+destSlice, op1LocalWidthNum) + " ;" << std::endl; 
