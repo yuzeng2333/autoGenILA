@@ -1079,9 +1079,9 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
     output << blank << "logic [" + op1HighIdx + ":" + op1LowIdx + "] " + op1 + _r + thdVer + " ;" << std::endl;
     output << blank << "logic [" + op1HighIdx + ":" + op1LowIdx + "] " + op1 + _x + thdVer + " ;" << std::endl;
     }
-    output << blank << "assign " + op1 + _c + thdVer + op1Slice + " = " + extend(condAndSlice, localWidthNum) + ";" << std::endl;
+    output << blank << "assign " + op1 + _c + thdVer + op1Slice + " = " + extend(condAndSlice, localWidthNum) + " ;" << std::endl;
     output << blank << "assign " + op1 + _r + thdVer + op1Slice + " = " + extend(condAndSlice, localWidthNum) + " & " + dest + _r + destSlice + " ;" << std::endl;
-    output << blank << "assign " + op1 + _x + thdVer + op1Slice + " = " + dest + _x + destSlice + " ;" << std::endl;        
+    output << blank << "assign " + op1 + _x + thdVer + op1Slice + " = " + extend(condAndSlice, localWidthNum) + " & " + dest + _x + destSlice + " ;" << std::endl;        
 
     if(op2IsNew) {
     output << blank << "logic [" + op2HighIdx + ":" + op2LowIdx + "] " + op2 + _c + fthVer + " ;" << std::endl;
@@ -1091,7 +1091,7 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
 
     output << blank << "assign " + op2 + _c + fthVer + op2Slice + " = " + extend("!"+condAndSlice, localWidthNum) + " ;" << std::endl;
     output << blank << "assign " + op2 + _r + fthVer + op2Slice + " = " + extend("!"+condAndSlice, localWidthNum) + " & " + dest + _r + destSlice + " ;" << std::endl; 
-    output << blank << "assign " + op2 + _x + fthVer + op2Slice + " = " + dest + _x + destSlice + " ;" << std::endl;
+    output << blank << "assign " + op2 + _x + fthVer + op2Slice + " = " + extend("!"+condAndSlice, localWidthNum) + " & " + dest + _x + destSlice + " ;" << std::endl;
 
     //if(op1IsNew) {
     //ground_wires(op1+"_c"+thdVer, op1BoundPair, op1Slice, blank, output);
@@ -1117,7 +1117,7 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
     }
     output << blank << "assign " + op1 + _c + thdVer + op1Slice + " = " + extend(condAndSlice, localWidthNum) + " ;" << std::endl;
     output << blank << "assign " + op1 + _r + thdVer + op1Slice + " = " + extend(condAndSlice, localWidthNum) + " & " + dest + _r + destSlice + " ;" << std::endl;
-    output << blank << "assign " + op1 + _x + thdVer + op1Slice + " = " + dest + _x + destSlice + " ;" << std::endl;
+    output << blank << "assign " + op1 + _x + thdVer + op1Slice + " = " + extend(condAndSlice, localWidthNum) + " & " + dest + _x + destSlice + " ;" << std::endl;
 
     output << blank << "assign " + dest + _t + destSlice + " = " + condAndSlice + " ? ( " + extend("| "+cond+_t+" "+condSlice, localWidthNum) + " | " + op1 + _t + op1Slice + " ) : " + extend("| "+cond+_t+" "+condSlice, localWidthNum) + ";" << std::endl;
     output << blank << "assign " + cond + _r + condVer + condSlice + " = " + extend("| ("+dest+_r+destSlice+" | ( "+extend(condAndSlice, localWidthNum)+" & "+op1+_t+op1Slice+" ))", condSliceWidth) + " ;" << std::endl;
@@ -1140,7 +1140,7 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
     }
     output << blank << "assign " + op2 + _c + fthVer + op2Slice + " = " + extend("!"+condAndSlice, localWidthNum) + ";" << std::endl;
     output << blank << "assign " + op2 + _r + fthVer + op2Slice + " = " + extend("!"+condAndSlice, localWidthNum) + " & " + dest + _r + destSlice + " ;" << std::endl; 
-    output << blank << "assign " + op2 + _x + fthVer + op2Slice + " = " + dest + _x + destSlice + " ;" << std::endl;
+    output << blank << "assign " + op2 + _x + fthVer + op2Slice + " = " + extend("!"+condAndSlice, localWidthNum) + " & " + dest + _x + destSlice + " ;" << std::endl;
 
     output << blank << "assign " + dest + _t + destSlice + " = " + condAndSlice + " ? " + extend("| "+cond+_t+" "+condSlice, localWidthNum) + " : ( " + extend("| "+cond+_t+" "+condSlice, localWidthNum) + " | " + op2 + _t + op2Slice + " );" << std::endl;  
     output << blank << "assign " + cond + _r + condVer + condSlice + " = " + extend("| ("+dest+_r+destSlice+" | ( "+extend("!"+condAndSlice, localWidthNum)+" & "+op2+_t+op2Slice+" ))", condSliceWidth) + " ;" << std::endl;
