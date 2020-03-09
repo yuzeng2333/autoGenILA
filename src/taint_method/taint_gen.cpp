@@ -12,6 +12,7 @@
 #include <map>
 #include <bitset>
 #include "taint_gen.h"
+#include <cmath>
 
 #define toStr(a) std::to_string(a)
 
@@ -144,13 +145,19 @@ bool g_recentRst_positive = true;
 bool isTop = false;
 bool g_hasRst;
 bool g_verb;
-bool g_has_read_taint;
+bool g_has_read_taint;  // if false, read taint is replaced with x taint
 bool g_rst_pos;
 bool g_clkrst_exist = false;
+bool g_use_reset_taint = false;
 std::string _t="_T";
 std::string _r="_R";
 std::string _x="_X";
 std::string _c="_C";
+std::string _sig="_S";
+uint32_t g_reg_count;
+uint32_t g_sig_width; // == log2(g_reg_count);
+std::unordered_map<std::string, uint32_t> reg2sig;
+uint32_t g_next_sig;
 
 /* clean all the global data */
 void clean_global_data() {
@@ -185,6 +192,10 @@ void clean_global_data() {
   g_has_read_taint = true; // if true, read taint takes effect
   g_rst_pos = true;
   g_clkrst_exist = false;
+  g_reg_count = 0;
+  g_next_sig = 1; // 0 is reserved for unused
+  reg2sig.clear();
+  g_use_reset_taint = false;
 }
 
 
@@ -265,6 +276,7 @@ void clean_file(std::string fileName) {
             std::cout << "m.str(2):" + m.str(2) << std::endl;
             std::cout << "m.str(3):" + m.str(3) << std::endl;
           }
+          g_reg_count++;
         }
         break;
       case WIRE:
@@ -604,6 +616,7 @@ void add_file_taints(std::string fileName, std::map<std::string, std::vector<std
   std::ofstream output(fileName + ".tainted");
   std::string line;
   std::smatch match;
+  g_sig_width = uint32_t(ceil(log(g_reg_count) / log(2)));
   // Reserve first line for module declaration
   while( std::getline(input, line) ) {
     lineNo++;

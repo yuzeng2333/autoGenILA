@@ -41,10 +41,16 @@ extern bool g_verb;
 extern bool g_has_read_taint;
 extern bool g_rst_pos;
 extern bool g_clkrst_exist;
+extern bool g_use_reset_taint;
 extern std::string _t;
 extern std::string _r;
 extern std::string _x;
 extern std::string _c;
+extern std::string _sig;
+extern uint32_t g_reg_count;
+extern uint32_t g_sig_width; // == log2(g_reg_count);
+extern std::unordered_map<std::string, uint32_t> reg2sig;
+extern uint32_t g_next_sig;
 
 /* declarations */
 extern std::regex pModule;
