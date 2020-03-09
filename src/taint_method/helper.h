@@ -123,4 +123,6 @@ bool is_neg_rst(std::string rst);
 void printAndAbort(std::string in);
 
 void checkCond(bool cond, std::string in);
+
+std::string expand_slice(std::string slice);
 #endif
