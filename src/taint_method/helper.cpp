@@ -1188,3 +1188,5 @@ std::string expand_slice(std::string slice) {
   uint32_t lowIdx = get_begin(slice);
   return " [" + toStr(highIdx * g_sig_width-1) + ":" + toStr(lowIdx*g_sig_width) + "]";
 }
+
+

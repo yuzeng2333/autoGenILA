@@ -26,6 +26,9 @@ extern std::unordered_map<std::string, std::vector<bool>> nxtVerBits;
 extern std::unordered_map<std::string, std::string> new_next;
 extern std::unordered_map<std::string, std::string> update_reg;
 extern std::unordered_map<std::string, std::pair<std::string, std::string>> memDims;
+extern std::unordered_map<std::string, uint32_t> reg2sig;
+extern std::unordered_map<std::string, uint32_t> fangyuanItemNum; 
+extern std::unordered_map<std::string, uint32_t> fangyuanCaseSliceWidth;
 extern VarWidth varWidth;
 extern VarWidth funcVarWidth;
 extern unsigned long int NEW_VAR;
@@ -49,7 +52,6 @@ extern std::string _c;
 extern std::string _sig;
 extern uint32_t g_reg_count;
 extern uint32_t g_sig_width; // == log2(g_reg_count);
-extern std::unordered_map<std::string, uint32_t> reg2sig;
 extern uint32_t g_next_sig;
 
 /* declarations */

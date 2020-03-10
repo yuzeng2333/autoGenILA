@@ -133,6 +133,9 @@ std::unordered_map<std::string, std::vector<bool>> nxtVerBits;
 std::unordered_map<std::string, std::string> new_next;
 std::unordered_map<std::string, std::string> update_reg;
 std::unordered_map<std::string, std::pair<std::string, std::string>> memDims;
+std::unordered_map<std::string, uint32_t> reg2sig;
+std::unordered_map<std::string, uint32_t> fangyuanItemNum; // used to check item number in case statementsrs
+std::unordered_map<std::string, uint32_t> fangyuanCaseSliceWidth; // width of each slice used in RHS of case
 VarWidth varWidth;
 VarWidth funcVarWidth;
 unsigned long int NEW_VAR = 0;
@@ -156,7 +159,6 @@ std::string _c="_C";
 std::string _sig="_S";
 uint32_t g_reg_count;
 uint32_t g_sig_width; // == log2(g_reg_count);
-std::unordered_map<std::string, uint32_t> reg2sig;
 uint32_t g_next_sig;
 
 /* clean all the global data */
@@ -196,6 +198,7 @@ void clean_global_data() {
   g_next_sig = 1; // 0 is reserved for unused
   reg2sig.clear();
   g_use_reset_taint = false;
+  fangyuanItemNum.clear();
 }
 
 
@@ -1052,11 +1055,13 @@ void remove_function_wrapper(std::string firstLine, std::ifstream &input, std::o
       split_slice(localPair.second, rhs, rhsSlice);
       output << blank + "    " + localPair.first + " :" << std::endl;
       output << blank + "      " + result + " = " + b + rhsSlice + " ;" << std::endl;
+      checkCond(b.find("fangyuan") != std::string::npos, "RHS in case is not fangyuan! "+ b);
     }
     output << blank + "    default:" << std::endl;
     output << blank + "      " + result + " = " + a + " ;" << std::endl;
     output << blank + "  endcase" << std::endl;
     output << blank + "end" << std::endl;
+    fangyuanCaseSliceWidth.emplace(b, get_width(rhsSlice));
   }
   else {
     output << blank + "always @("+a+" or "+s+") begin" << std::endl;
@@ -1206,8 +1211,22 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     output << blank + "      " + dest+_t+destSlice+" = " + a + _t + aSlice + " | " + extend("| "+s+_t+sSlice, destWidthNum) + ";" << std::endl;
     output << blank + "  endcase" << std::endl;
     output << blank + "end" << std::endl;
-    //auto destBoundPair = varWidth.get_idx_pair(dest, line);
-    //ground(dest+_t, destBoundPair, destSlice, blank, output);
+
+    // print _sig function
+    uint32_t caseNum = 0;
+    output << blank + "always @( "+a+_sig+" or "+b+_sig+" or "+s+" ) begin" << std::endl;
+    output << blank + "  casez ("+sAndSlice+")" << std::endl;
+    for(auto localPair: caseAssignPairs) {
+      caseNum++;
+      split_slice(localPair.second, rhs, rhsSlice);
+      output << blank + "    " + localPair.first + " :" << std::endl;
+      output << blank + "      " + dest+_sig+" = " + rhs + _sig + " [" + toStr(caseNum*g_sig_width-1) + ":" + toStr(g_sig_width*(caseNum-1)) + "] ;" << std::endl;
+    }
+    output << blank + "    default :" << std::endl;
+    output << blank + "      " + dest+_sig+" = " + a + _sig + ";" << std::endl;
+    output << blank + "  endcase" << std::endl;
+    output << blank + "end" << std::endl;
+    checkCond(caseNum == fangyuanItemNum[rhs], "case number does not equal fangyuan item number!, var: "+rhs+" , caseNum:"+toStr(caseNum)+" , itemNum:"+toStr(fangyuanItemNum[rhs]));
 
     // print _r function
     if(sIsNew) {
