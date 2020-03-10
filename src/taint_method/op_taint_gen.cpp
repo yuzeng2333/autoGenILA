@@ -1299,7 +1299,7 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
     output << blank.substr(0, blank.length()-4) + "assign " + op1 + _x + op1Ver + op1Slice + " = " + extend(destAndSlice+" != "+op1AndSlice, localWidthNum) + " | " + extend(dest+"_reset", localWidthNum) + " ;" << std::endl;
   else
     output << blank.substr(0, blank.length()-4) + "assign " + op1 + _x + op1Ver + op1Slice + " = " + extend(destAndSlice+" != "+op1AndSlice, localWidthNum) + " ;" << std::endl; // TODO: modify x taint with signature?
-  output << blank.substr(0, blank.length()-4) + "assign " + op1 + _r + op1Ver + op1Slice + " = 0 ;" << std::endl;
+  output << blank.substr(0, blank.length()-4) + "assign " + op1 + _r + op1Ver + op1Slice + " = " + extend(destAndSlice+" != "+op1AndSlice, localWidthNum) + " ;" << std::endl;
   output << blank.substr(0, blank.length()-4) + "assign " + op1 + _c + op1Ver + op1Slice + " = 0 ;" << std::endl;
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
 
@@ -1355,10 +1355,11 @@ void nonblockconcat_taint_gen(std::string line, std::ofstream &output) {
   std::string localWidth;
   localWidth = std::to_string(localWidthNum);  
 
+  std::string updateRListLeft   = get_lhs_taint_list(updateList, _r, output);
   std::string updateXListLeft   = get_lhs_taint_list(updateList, _x, output);
-  //std::string updateXListRight  = get_rhs_taint_list(updateList, _x);
   std::string updateTList = get_rhs_taint_list(updateList, _t);
 
+  output << blank.substr(0, blank.length()-4) + "assign { " + updateRListLeft + " } = " + extend(destAndSlice+" != { "+updateList+" }", localWidthNum) + " ;" << std::endl;
   output << blank.substr(0, blank.length()-4) + "assign { " + updateXListLeft + " } = " + extend(destAndSlice+" != { "+updateList+" }", localWidthNum) + " ;" << std::endl;
 
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
@@ -1456,7 +1457,7 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
       output << "  logic [" + toStr(srcIdxPair.first) + ":" + toStr(srcIdxPair.second) + "] " + src + _c + srcVer + " ;" << std::endl;
     }
     output << "  assign " + src + _x + srcVer + srcSlice + " = " + extend(destAndSlice+" != "+srcAndSlice, localWidthNum) + " ;" << std::endl; 
-    output << "  assign " + src + _r + srcVer + srcSlice + " = 0 ;" << std::endl;
+    output << "  assign " + src + _r + srcVer + srcSlice + " = " + extend(destAndSlice+" != "+srcAndSlice, localWidthNum) + " ;" << std::endl; 
     output << "  assign " + src + _c + srcVer + srcSlice + " = 0 ;" << std::endl;
   }
 }
