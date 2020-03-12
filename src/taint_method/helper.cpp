@@ -1190,3 +1190,11 @@ std::string expand_slice(std::string slice) {
 }
 
 
+//bool check_number_sig(std::vector<std::string> &updateVec) {
+//  std::string var, varSlice;
+//  for(std::string varAndSlice : updateVec) {
+//    split_slice(varAndSlice, var, varSlice);
+//    if()
+//  }
+//  return true;
+//}

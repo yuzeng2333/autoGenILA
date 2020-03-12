@@ -160,6 +160,7 @@ std::string _sig="_S";
 uint32_t g_reg_count;
 uint32_t g_sig_width; // == log2(g_reg_count);
 uint32_t g_next_sig;
+uint32_t CONSTANT_SIG = 1; // reserve sig=1 for constants
 
 /* clean all the global data */
 void clean_global_data() {
@@ -195,7 +196,7 @@ void clean_global_data() {
   g_rst_pos = true;
   g_clkrst_exist = false;
   g_reg_count = 0;
-  g_next_sig = 1; // 0 is reserved for unused
+  g_next_sig = 2; // 0 is reserved for unused
   reg2sig.clear();
   g_use_reset_taint = false;
   fangyuanItemNum.clear();
@@ -619,7 +620,8 @@ void add_file_taints(std::string fileName, std::map<std::string, std::vector<std
   std::ofstream output(fileName + ".tainted");
   std::string line;
   std::smatch match;
-  g_sig_width = uint32_t(ceil(log(g_reg_count) / log(2)));
+  // +2 because of reserving 0 and 1.
+  g_sig_width = uint32_t(ceil(log(g_reg_count+2) / log(2)));
   // Reserve first line for module declaration
   while( std::getline(input, line) ) {
     lineNo++;
@@ -1177,7 +1179,6 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
 
     // print _sig function
     uint32_t caseNum = 0;
-    toCout("Generate _sig for casez!!");
     output << blank + "always @( "+a+_sig+" or "+b+_sig+" or "+s+" ) begin" << std::endl;
     output << blank + "  casez ("+sAndSlice+")" << std::endl;
     for(auto localPair: caseAssignPairs) {
@@ -1325,10 +1326,10 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     // only the last one matters
     for(auto localPair: caseAssignPairs) {
       output << blank + "    " + localPair.first + " :" << std::endl;
-      output << blank + "      " + dest+_t+destSlice+" = 0 ;" << std::endl;
+      output << blank + "      " + dest+_sig+destSlice+" = "+toStr(CONSTANT_SIG)+" ;" << std::endl;
     }
     output << blank + "    default:" << std::endl;
-    output << blank + "      " +  dest+_t+destSlice+" = " + a + _sig+ " ;" << std::endl;
+    output << blank + "      " +  dest+_sig+destSlice+" = " + a + _sig+ " ;" << std::endl;
     output << blank + "  endcase" << std::endl;
     output << blank + "end" << std::endl;
 
@@ -1406,7 +1407,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
       output << blank + "      " + dest+_sig+" = " + rhs + _sig + " [" + toStr(caseNum*g_sig_width-1) + ":" + toStr(g_sig_width*(caseNum-1)) + "] ;" << std::endl;      
     }
     output << blank + "    default:" << std::endl;
-    output << blank + "      " + dest+_sig+" = " + a + _sig + ";" << std::endl;
+    output << blank + "      " + dest+_sig+" = "+toStr(CONSTANT_SIG)+" ;" << std::endl;
     output << blank + "  endcase" << std::endl;
     output << blank + "end" << std::endl;
 
@@ -1485,7 +1486,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     //ground(dest+_t, destBoundPair, destSlice, blank, output);
 
     // print _sig function
-    output << blank + "assign " + dest + _sig + " = 0 ;" << std::endl;
+    output << blank + "assign " + dest + _sig + " = "+toStr(CONSTANT_SIG)+" ;" << std::endl;
 
     // print _r function
     output << blank + "reg [" + sWidth + "-1:0] " + s + _r + sVer + " ;" << std::endl;
