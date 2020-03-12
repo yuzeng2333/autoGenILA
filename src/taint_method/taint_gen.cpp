@@ -1323,7 +1323,6 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     output << blank + "always @( "+a+_sig+" or "+s+" ) begin" << std::endl;
     output << blank + "  casez ("+sAndSlice+")" << std::endl;
     // only the last one matters
-    auto lastPair = caseAssignPairs.back();
     for(auto localPair: caseAssignPairs) {
       output << blank + "    " + localPair.first + " :" << std::endl;
       output << blank + "      " + dest+_t+destSlice+" = 0 ;" << std::endl;
