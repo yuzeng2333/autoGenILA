@@ -152,6 +152,7 @@ bool g_has_read_taint;  // if false, read taint is replaced with x taint
 bool g_rst_pos;
 bool g_clkrst_exist = false;
 bool g_use_reset_taint = false;
+bool g_use_zy_count = true;
 std::string _t="_T";
 std::string _r="_R";
 std::string _x="_X";
@@ -1207,7 +1208,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     output << blank + "logic [" + bWidth + "-1:0] " + b + _x + bVer + " ;" << std::endl;
     output << blank + "logic [" + bWidth + "-1:0] " + b + _c + bVer + " ;" << std::endl;
 
-    output << blank + "always @( "+dest+_r+destSlice+" or "+s+" ) begin" << std::endl;
+    output << blank + "always @( "+dest+_r+destSlice+" or "+s+_t+sSlice+" or "+s+" ) begin" << std::endl;
     //output << blank + "  "+s+_r+sVer+" "+sSlice+" = " + extend("| "+dest+_r+destSlice, sWidthNum) + " ;" << std::endl;
     output << blank + "  "+b+_r+bVer+" = 0 ;" << std::endl;
     output << blank + "  "+a+_r+aVer+" = 0 ;" << std::endl;
@@ -1842,6 +1843,10 @@ void gen_assert_property(std::ofstream &output) {
     if(std::regex_search(out, m, pRFlag))
       output << "  assert property(" + out + " == 0 );" << std::endl;
   }
+   // for(std::string out: flagOutputs) {
+   //   if(std::regex_search(out, m, pRFlag))
+   //     output << "  assert property( (zy_count >= 50 && " + out + " == 0)  ||  (zy_count < 30 && " + out + " == 1) || (zy_count < 60) );" << std::endl;
+   // }
 }
 
 

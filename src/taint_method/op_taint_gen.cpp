@@ -865,6 +865,7 @@ void reduce_one_op_taint_gen(std::string line, std::ofstream &output) {
 }
 
 
+// src_concat
 void mult_op_taint_gen(std::string line, std::ofstream &output) {
   std::smatch m;
   if( !std::regex_match(line, m, pSrcConcat) )
@@ -1362,10 +1363,16 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
 
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
 
-  if (g_hasRst)  
-    output << blank + dest + "_r_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + _r+" ;" << std::endl;
+  if(!g_use_zy_count)
+    if (g_hasRst)  
+      output << blank + dest + "_r_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + _r+" ;" << std::endl;
+    else
+      output << blank + dest + "_r_flag \t<= rst_zy ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + _r+" ;" << std::endl;
   else
-    output << blank + dest + "_r_flag \t<= rst_zy ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + _r+" ;" << std::endl;
+    if (g_hasRst)  
+      output << blank + dest + "_r_flag \t<= ( " + get_recent_rst() + " || zy_count < 50 ) ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + _r+" ;" << std::endl;
+    else
+      output << blank + dest + "_r_flag \t<= ( rst_zy || zy_count < 50 ) ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + _r+" ;" << std::endl;
 
   // _dest is clear either write taint arrives or the value for dest is changed.
   if(g_use_reset_taint) {
@@ -1421,10 +1428,17 @@ void nonblockconcat_taint_gen(std::string line, std::ofstream &output) {
     output << blank + dest + "_t_flag \t<= rst_zy ? 0 : " + dest + "_t_flag ? 1 : | ({ " + updateTList + " });" << std::endl;    
 
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
-  if (g_hasRst)    
-    output << blank + dest + "_r_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + _r+" ;" << std::endl;
+
+  if(!g_use_zy_count)
+    if (g_hasRst)    
+      output << blank + dest + "_r_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + _r+" ;" << std::endl;
+    else
+      output << blank + dest + "_r_flag \t<= rst_zy ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + _r+" ;" << std::endl;
   else
-    output << blank + dest + "_r_flag \t<= rst_zy ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + _r+" ;" << std::endl;    
+    if (g_hasRst)    
+      output << blank + dest + "_r_flag \t<= ( " + get_recent_rst() + " && zy_count < 50 ) ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + _r+" ;" << std::endl;
+    else
+      output << blank + dest + "_r_flag \t<= ( rst_zy || zy_count < 50 ) ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + _r+" ;" << std::endl;
 }
 
 
@@ -1433,6 +1447,8 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
   if ( !std::regex_match(line, m, pNonblockIf) )
     return;
 
+  if(g_use_zy_count)
+    checkCond(false, "ERROR: encounter nonblockif whiling use zy_count! "+line);
   //output << always_line << std::endl;
   bool hasRst = false;
   std::string rst;

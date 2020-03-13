@@ -45,6 +45,7 @@ extern bool g_has_read_taint;
 extern bool g_rst_pos;
 extern bool g_clkrst_exist;
 extern bool g_use_reset_taint;
+extern bool g_use_zy_count;
 extern std::string _t;
 extern std::string _r;
 extern std::string _x;
