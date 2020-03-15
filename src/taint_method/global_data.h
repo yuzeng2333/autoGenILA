@@ -46,6 +46,7 @@ extern bool g_rst_pos;
 extern bool g_clkrst_exist;
 extern bool g_use_reset_taint;
 extern bool g_use_zy_count;
+extern bool g_use_reset_sig;
 extern std::string _t;
 extern std::string _r;
 extern std::string _x;
@@ -55,6 +56,7 @@ extern uint32_t g_reg_count;
 extern uint32_t g_sig_width; // == log2(g_reg_count);
 extern uint32_t g_next_sig;
 extern uint32_t CONSTANT_SIG;
+extern std::string RESET_SIG;
 
 /* declarations */
 extern std::regex pModule;

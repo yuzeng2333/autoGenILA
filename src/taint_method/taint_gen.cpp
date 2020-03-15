@@ -152,7 +152,8 @@ bool g_has_read_taint;  // if false, read taint is replaced with x taint
 bool g_rst_pos;
 bool g_clkrst_exist = false;
 bool g_use_reset_taint = false;
-bool g_use_zy_count = true;
+bool g_use_zy_count = false;
+bool g_use_reset_sig = true;
 std::string _t="_T";
 std::string _r="_R";
 std::string _x="_X";
@@ -162,6 +163,7 @@ uint32_t g_reg_count;
 uint32_t g_sig_width; // == log2(g_reg_count);
 uint32_t g_next_sig;
 uint32_t CONSTANT_SIG = 1; // reserve sig=1 for constants
+std::string RESET_SIG = "2"; // Rreserve sig=2 for constants
 
 /* clean all the global data */
 void clean_global_data() {
@@ -622,7 +624,7 @@ void add_file_taints(std::string fileName, std::map<std::string, std::vector<std
   std::string line;
   std::smatch match;
   // +2 because of reserving 0 and 1.
-  g_sig_width = uint32_t(ceil(log(g_reg_count+2) / log(2)));
+  g_sig_width = uint32_t(ceil(log(g_reg_count+3) / log(2)));
   // Reserve first line for module declaration
   while( std::getline(input, line) ) {
     lineNo++;
