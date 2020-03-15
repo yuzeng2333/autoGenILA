@@ -199,7 +199,7 @@ void clean_global_data() {
   g_rst_pos = true;
   g_clkrst_exist = false;
   g_reg_count = 0;
-  g_next_sig = 2; // 0 is reserved for unused
+  g_next_sig = 3; // 0 is reserved for unused
   reg2sig.clear();
   g_use_reset_taint = false;
   fangyuanItemNum.clear();

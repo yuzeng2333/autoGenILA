@@ -899,6 +899,14 @@ std::string get_recent_rst() {
 }
 
 
+std::string get_rst() {
+  if(g_hasRst)
+    return get_recent_rst();
+  else
+    return "rst_zy";
+}
+
+
 bool isRFlag(std::string var) {
   std::regex pRFlag("_r_flag");
   std::smatch m;
