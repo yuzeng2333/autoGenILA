@@ -1388,9 +1388,9 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
 
   // _x
   if(g_use_reset_taint)
-    output << blank.substr(0, blank.length()-4) + "assign " + op1 + _x + op1Ver + op1Slice + " = " + extend(destAndSlice+" != "+op1AndSlice, localWidthNum) + " | " + extend(dest+"_reset", localWidthNum) + " ;" << std::endl;
+    output << blank.substr(0, blank.length()-4) + "assign " + op1 + _x + op1Ver + op1Slice + " = " + extend(dest+_sig+" != "+op1+_sig, localWidthNum) + " | " + extend(dest+"_reset", localWidthNum) + " ;" << std::endl;
   else
-    output << blank.substr(0, blank.length()-4) + "assign " + op1 + _x + op1Ver + op1Slice + " = " + extend(destAndSlice+" != "+op1AndSlice, localWidthNum) + " ;" << std::endl; // TODO: modify x taint with signature?
+    output << blank.substr(0, blank.length()-4) + "assign " + op1 + _x + op1Ver + op1Slice + " = " + extend(dest+_sig+" != "+op1+_sig, localWidthNum) + " ;" << std::endl; // TODO: modify x taint with signature?
 
   // _r
   output << blank.substr(0, blank.length()-4) + "assign " + op1 + _r + op1Ver + op1Slice + " = 0 ;" << std::endl;
