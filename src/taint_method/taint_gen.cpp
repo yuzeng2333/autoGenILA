@@ -1276,7 +1276,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
 
     // print _c function
     output << blank + "always @( "+dest+_c+destSlice+" or "+s+" ) begin" << std::endl;  
-    output << blank + "  "+s+_c+sVer+sSlice+" = " + extend("1'b1", sWidthNum) + " ;" << std::endl;
+    output << blank + "  "+s+_c+sVer+sSlice+" = " + extend("| "+dest+_c+destSlice, sWidthNum) + " ;" << std::endl;
     output << blank + "  "+b+_c+bVer+" = 0 ;" << std::endl;
     output << blank + "  "+a+_c+aVer+" = 0 ;" << std::endl;
     output << blank + "  casez ("+sAndSlice+")" << std::endl;
@@ -1361,8 +1361,8 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     output << blank + "end" << std::endl;
 
     // print _c function
-    output << blank + "always @( "+dest+_c+destSlice+" or "+s+" ) begin" << std::endl;  
-    output << blank + "  "+s+_c+sVer+sSlice+" = " + extend("1'b1", sWidthNum) + " ;" << std::endl;
+    output << blank + "always @( "+dest+_c+destSlice+" or "+s+" ) begin" << std::endl;
+    output << blank + "  "+s+_c+sVer+sSlice+" = " + extend("| "+dest+_c+destSlice, sWidthNum) + " ;" << std::endl;
     output << blank + "  "+a+_c+aVer+" = 0 ;" << std::endl;
     output << blank + "  if (" + sAndSlice + " == 0 )" << std::endl;
     output << blank + "    "+a+_c+aVer+" = "+dest+_c+destSlice+" ;" << std::endl;
@@ -1449,8 +1449,8 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     output << blank + "end" << std::endl;
 
     // print _c function
-    output << blank + "always @( "+dest+_c+destSlice+" or "+s+" ) begin" << std::endl;  
-    output << blank + "  "+s+_c+sVer+sSlice+" = " + extend("1'b1", sWidthNum) + " ;" << std::endl;
+    output << blank + "always @( "+dest+_c+destSlice+" or "+s+" ) begin" << std::endl;
+    output << blank + "  "+s+_c+sVer+sSlice+" = " + extend("| "+dest+_c+destSlice, sWidthNum) + " ;" << std::endl;
     output << blank + "  "+b+_c+bVer+" = 0 ;" << std::endl;
     output << blank + "  casez ("+sAndSlice+")" << std::endl;
     for(auto localPair: caseAssignPairs) {
@@ -1507,7 +1507,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
 
     // print _c function
     output << blank + "always @( "+dest+_c+destSlice+" or "+s+" ) begin" << std::endl;  
-    output << blank + "  "+s+_c+sVer+sSlice+" = " + extend("1'b1", sWidthNum) + " ;" << std::endl;
+    output << blank + "  "+s+_c+sVer+sSlice+" = " + extend("| "+dest+_c+destSlice, sWidthNum) + " ;" << std::endl;    
     output << blank + "end" << std::endl;
   }
 }

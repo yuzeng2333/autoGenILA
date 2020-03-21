@@ -1043,9 +1043,9 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
       output << blank + "logic [" + updateHighIdx + ":" + updateLowIdx + "] " + update + _x + localVer + " ;" << std::endl;
       output << blank + "logic [" + updateHighIdx + ":" + updateLowIdx + "] " + update + _c + localVer + " ;" << std::endl;
       }
-      output << blank + "assign " + update + _r + localVer + updateSlice + " = " + dest + _r+" [" + startIdx + ":" + endIdx + "] ;" << std::endl;
-      output << blank + "assign " + update + _x + localVer + updateSlice + " = " + dest + _x+" [" + startIdx + ":" + endIdx + "] ;" << std::endl;
-      output << blank + "assign " + update + _c + localVer + updateSlice + " = " + dest + _c+" [" + startIdx + ":" + endIdx + "] ;" << std::endl;
+      output << blank + "assign " + update + _r + localVer + updateSlice + " = " + dest + _r + " [" + startIdx + ":" + endIdx + "] ;" << std::endl;
+      output << blank + "assign " + update + _x + localVer + updateSlice + " = " + dest + _x + " [" + startIdx + ":" + endIdx + "] ;" << std::endl;
+      output << blank + "assign " + update + _c + localVer + updateSlice + " = " + dest + _c + " [" + startIdx + ":" + endIdx + "] ;" << std::endl;
       //if(updateIsNew) {
       //ground_wires(update+"_r"+localVer, updateIdxPair, updateSlice, blank, output);
       //ground_wires(update+"_x"+localVer, updateIdxPair, updateSlice, blank, output);
@@ -1226,7 +1226,7 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
   }
   
   uint32_t condSliceWidth = get_width(condSlice);
-  output << blank << "assign " + cond + _c + condVer + condSlice + " = " + extend("1'b1", condSliceWidth) + " ;" << std::endl;
+  output << blank << "assign " + cond + _c + condVer + condSlice + " = | " + dest + _c + destSlice + " ;" << std::endl;
   output << blank << "assign " + cond + _x + condVer + condSlice + " = " + extend("| "+dest+_x+destSlice, condSliceWidth) + " ;" << std::endl;
 
   //if(condIsNew) {
@@ -1255,7 +1255,7 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
     output << blank << "logic [" + op1HighIdx + ":" + op1LowIdx + "] " + op1 + _r + thdVer + " ;" << std::endl;
     output << blank << "logic [" + op1HighIdx + ":" + op1LowIdx + "] " + op1 + _x + thdVer + " ;" << std::endl;
     }
-    output << blank << "assign " + op1 + _c + thdVer + op1Slice + " = " + extend(condAndSlice, localWidthNum) + " ;" << std::endl;
+    output << blank << "assign " + op1 + _c + thdVer + op1Slice + " = " + extend(condAndSlice, localWidthNum) + " & " + dest + _c + destSlice + " ;" << std::endl;
     output << blank << "assign " + op1 + _r + thdVer + op1Slice + " = " + extend(condAndSlice, localWidthNum) + " & ( " + dest + _r + destSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " );" << std::endl;
     output << blank << "assign " + op1 + _x + thdVer + op1Slice + " = " + extend(condAndSlice, localWidthNum) + " & " + dest + _x + destSlice + " ;" << std::endl;        
 
@@ -1265,7 +1265,7 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
     output << blank << "logic [" + op2HighIdx + ":" + op2LowIdx + "] " + op2 + _x + fthVer + " ;" << std::endl;
     }
 
-    output << blank << "assign " + op2 + _c + fthVer + op2Slice + " = " + extend("!"+condAndSlice, localWidthNum) + " ;" << std::endl;
+    output << blank << "assign " + op2 + _c + fthVer + op2Slice + " = " + extend("!"+condAndSlice, localWidthNum) + " & " + dest + _c + destSlice + " ;" << std::endl;
     output << blank << "assign " + op2 + _r + fthVer + op2Slice + " = " + extend("!"+condAndSlice, localWidthNum) + " & ( " + dest + _r + destSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " );" << std::endl; 
     output << blank << "assign " + op2 + _x + fthVer + op2Slice + " = " + extend("!"+condAndSlice, localWidthNum) + " & " + dest + _x + destSlice + " ;" << std::endl;
 
@@ -1291,7 +1291,7 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
     output << blank << "logic [" + op1HighIdx + ":" + op1LowIdx + "] " + op1 + _r + thdVer + " ;" << std::endl;
     output << blank << "logic [" + op1HighIdx + ":" + op1LowIdx + "] " + op1 + _x + thdVer + " ;" << std::endl;
     }
-    output << blank << "assign " + op1 + _c + thdVer + op1Slice + " = " + extend(condAndSlice, localWidthNum) + " ;" << std::endl;
+    output << blank << "assign " + op1 + _c + thdVer + op1Slice + " = " + extend(condAndSlice, localWidthNum) + " & " + dest + _c + destSlice + " ;" << std::endl;
     output << blank << "assign " + op1 + _r + thdVer + op1Slice + " = " + extend(condAndSlice, localWidthNum) + " & ( " + dest + _r + destSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " );" << std::endl;    
     output << blank << "assign " + op1 + _x + thdVer + op1Slice + " = " + extend(condAndSlice, localWidthNum) + " & " + dest + _x + destSlice + " ;" << std::endl;
 
@@ -1320,7 +1320,7 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
     output << blank << "logic [" + op2HighIdx + ":" + op2LowIdx + "] " + op2 + _r + fthVer + " ;" << std::endl;
     output << blank << "logic [" + op2HighIdx + ":" + op2LowIdx + "] " + op2 + _x + fthVer + " ;" << std::endl;
     }
-    output << blank << "assign " + op2 + _c + fthVer + op2Slice + " = " + extend("!"+condAndSlice, localWidthNum) + ";" << std::endl;
+    output << blank << "assign " + op2 + _c + fthVer + op2Slice + " = " + extend("!"+condAndSlice, localWidthNum) + " & " + dest + _c + destSlice + ";" << std::endl;
     output << blank << "assign " + op2 + _r + fthVer + op2Slice + " = " + extend("!"+condAndSlice, localWidthNum) + " & ( " + dest + _r + destSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " );" << std::endl;     
     output << blank << "assign " + op2 + _x + fthVer + op2Slice + " = " + extend("!"+condAndSlice, localWidthNum) + " & " + dest + _x + destSlice + " ;" << std::endl;
 
@@ -1341,7 +1341,7 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
   }
   else {
     /* when both inputs are constants */
-    output << blank << "assign " + dest + _t+" = " + extend(cond+_t+" "+condSlice, localWidthNum) + " ;" << std::endl;
+    output << blank << "assign " + dest + _t + " = " + extend(cond+_t+" "+condSlice, localWidthNum) + " ;" << std::endl;
 
     if(g_hasRst)
       output << blank << "assign " + dest + _sig + destSlice + " = " + get_recent_rst() + " ? " + RESET_SIG + " : " + toStr(CONSTANT_SIG) + " ;" << std::endl;
