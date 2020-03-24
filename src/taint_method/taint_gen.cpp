@@ -1173,10 +1173,10 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     for(auto localPair: caseAssignPairs) {
       split_slice(localPair.second, rhs, rhsSlice);
       output << blank + "    " + localPair.first + " :" << std::endl;
-      output << blank + "      " + dest+_t+destSlice+" = " + rhs + _t + rhsSlice + " | " + extend("| "+s+_t+sSlice, destWidthNum) + ";" << std::endl;
+      output << blank + "      " + dest+_t+destSlice + " = " + rhs + _t + rhsSlice + " | " + extend("| "+s+_t+sSlice, destWidthNum) + ";" << std::endl;
     }
     output << blank + "    default :" << std::endl;
-    output << blank + "      " + dest+_t+destSlice+" = " + a + _t + aSlice + " | " + extend("| "+s+_t+sSlice, destWidthNum) + ";" << std::endl;
+    output << blank + "      " + dest+_t+destSlice + " = " + a + _t + aSlice + " | " + extend("| "+s+_t+sSlice, destWidthNum) + ";" << std::endl;
     output << blank + "  endcase" << std::endl;
     output << blank + "end" << std::endl;
 
@@ -1210,7 +1210,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     output << blank + "logic [" + bWidth + "-1:0] " + b + _x + bVer + " ;" << std::endl;
     output << blank + "logic [" + bWidth + "-1:0] " + b + _c + bVer + " ;" << std::endl;
 
-    output << blank + "always @( "+dest+_r+destSlice+" or "+s+_t+sSlice+" or "+s+" ) begin" << std::endl;
+    output << blank + "always @( "+dest+_r+destSlice+" or "+s+_t+sSlice+" or "+s+" or "+dest+_c+destSlice+" ) begin" << std::endl;
     //output << blank + "  "+s+_r+sVer+" "+sSlice+" = " + extend("| "+dest+_r+destSlice, sWidthNum) + " ;" << std::endl;
     output << blank + "  "+b+_r+bVer+" = 0 ;" << std::endl;
     output << blank + "  "+a+_r+aVer+" = 0 ;" << std::endl;
@@ -1218,10 +1218,10 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     for(auto localPair: caseAssignPairs) {
       split_slice(localPair.second, rhs, rhsSlice);
       output << blank + "    " + localPair.first + " :" << std::endl;
-      output << blank + "      " + rhs + _r + bVer + rhsSlice + " = " + dest + _r + destSlice + " | " + extend("| "+s+_t+sSlice, destWidthNum) + " ;" << std::endl;
+      output << blank + "      " + rhs + _r + bVer + rhsSlice + " = " + dest + _r + destSlice + " | " + extend("| "+s+_t+sSlice, destWidthNum) + " & " + dest + _c + destSlice + " ;" << std::endl;
     }
     output << blank + "    default :" << std::endl;
-    output << blank + "      " + a + _r + aVer + aSlice + " = " + dest + _r + destSlice + " | " + extend("| "+s+_t+sSlice, destWidthNum) + " ;" << std::endl;
+    output << blank + "      " + a + _r + aVer + aSlice + " = " + dest + _r + destSlice + " | " + extend("| "+s+_t+sSlice, destWidthNum) + " & " + dest + _c + destSlice + " ;" << std::endl;
     output << blank + "  endcase" << std::endl;
     output << blank + "end" << std::endl;  
 
@@ -1234,7 +1234,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     for(auto localPair: caseAssignPairs) {
       split_slice(localPair.second, rhs, rhsSlice);
       output << blank + "    " + localPair.first + " :" << std::endl;
-      output << blank + "      " + s+_r+sVer+" "+sSlice+"["+toStr(i++)+"]" + " = | " + dest + _r + destSlice + " ;" << std::endl;
+      output << blank + "      " + s+_r+sVer+" "+sSlice+"["+toStr(i++)+"]" + " = | ( " + dest + _r + destSlice + " | " + dest + _c + destSlice + " & " + rhs + _t + rhsSlice + " ) ;" << std::endl;
     }
     //output << blank + "    default :" << std::endl;
     //output << blank + "      " + a + _r + aVer + aSlice + " = " + dest + _r + destSlice + " ;" << std::endl;
