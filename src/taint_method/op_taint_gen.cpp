@@ -1397,7 +1397,7 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
   output << blank.substr(0, blank.length()-4) + "assign " + op1 + _r + op1Ver + op1Slice + " = 0 ;" << std::endl;
 
   // _c
-  output << blank.substr(0, blank.length()-4) + "assign " + op1 + _c + op1Ver + op1Slice + " = " + extend("1", localWidthNum) + " ;" << std::endl;
+  output << blank.substr(0, blank.length()-4) + "assign " + op1 + _c + op1Ver + op1Slice + " = " + extend("1'b1", localWidthNum) + " ;" << std::endl;
 
   // _sig
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
@@ -1480,7 +1480,7 @@ void nonblockconcat_taint_gen(std::string line, std::ofstream &output) {
   output << blank.substr(0, blank.length()-4) + "assign { " + updateRListLeft + " } = 0 ;" << std::endl;
   //output << blank.substr(0, blank.length()-4) + "assign { " + updateRListLeft + " } = " + extend(destAndSlice+" != { "+updateList+" }", localWidthNum) + " ;" << std::endl;
   output << blank.substr(0, blank.length()-4) + "assign { " + updateXListLeft + " } = " + extend(destAndSlice+" != { "+updateList+" }", localWidthNum) + " ;" << std::endl;
-  output << blank.substr(0, blank.length()-4) + "assign { " + updateCListLeft + " } = " + extend("1", localWidthNum) + " ;" << std::endl;
+  output << blank.substr(0, blank.length()-4) + "assign { " + updateCListLeft + " } = " + extend("1'b1", localWidthNum) + " ;" << std::endl;
 
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
   // TODO: assume in this case, it is impossible that all the RHS has the same sig as dest
@@ -1589,7 +1589,7 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
     output << "  assign " + src + _x + srcVer + srcSlice + " = " + extend(destAndSlice+" != "+srcAndSlice, localWidthNum) + " ;" << std::endl; 
     output << "  assign " + src + _r + srcVer + srcSlice + " = 0 ;" << std::endl; 
     //output << "  assign " + src + _r + srcVer + srcSlice + " = " + extend(destAndSlice+" != "+srcAndSlice, localWidthNum) + " ;" << std::endl; 
-    output << "  assign " + src + _c + srcVer + srcSlice + " = " + extend("1", localWidthNum) + " ;" << std::endl;
+    output << "  assign " + src + _c + srcVer + srcSlice + " = " + extend("1'b1", localWidthNum) + " ;" << std::endl;
   }
 }
 
