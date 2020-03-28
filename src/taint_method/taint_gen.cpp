@@ -162,8 +162,9 @@ std::string _sig="_S";
 uint32_t g_reg_count;
 uint32_t g_sig_width; // == log2(g_reg_count);
 uint32_t g_next_sig;
-uint32_t CONSTANT_SIG = 1; // reserve sig=1 for constants
-std::string RESET_SIG = "2"; // Rreserve sig=2 for constants
+uint32_t CONSTANT_SIG_NUM = 1;
+std::string CONSTANT_SIG; // reserve sig=1 for constants
+std::string RESET_SIG = "2"; // reserve sig=2 for reset
 
 /* clean all the global data */
 void clean_global_data() {
@@ -625,6 +626,8 @@ void add_file_taints(std::string fileName, std::map<std::string, std::vector<std
   std::smatch match;
   // +2 because of reserving 0 and 1.
   g_sig_width = uint32_t(ceil(log(g_reg_count+3) / log(2)));
+  checkCond(CONSTANT_SIG_NUM == 1, "unexpected CONSTANT_SIG_NUM!!");
+  CONSTANT_SIG = toStr(g_sig_width) + "'b1";
   // Reserve first line for module declaration
   while( std::getline(input, line) ) {
     lineNo++;
@@ -1329,7 +1332,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     // only the last one matters
     for(auto localPair: caseAssignPairs) {
       output << blank + "    " + localPair.first + " :" << std::endl;
-      output << blank + "      " + dest+_sig+destSlice+" = "+toStr(CONSTANT_SIG)+" ;" << std::endl;
+      output << blank + "      " + dest+_sig+destSlice+" = "+CONSTANT_SIG+" ;" << std::endl;
     }
     output << blank + "    default:" << std::endl;
     output << blank + "      " +  dest+_sig+destSlice+" = " + a + _sig+ " ;" << std::endl;
@@ -1410,7 +1413,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
       output << blank + "      " + dest+_sig+" = " + rhs + _sig + " [" + toStr(caseNum*g_sig_width-1) + ":" + toStr(g_sig_width*(caseNum-1)) + "] ;" << std::endl;      
     }
     output << blank + "    default:" << std::endl;
-    output << blank + "      " + dest+_sig+" = "+toStr(CONSTANT_SIG)+" ;" << std::endl;
+    output << blank + "      " + dest+_sig+" = "+CONSTANT_SIG+" ;" << std::endl;
     output << blank + "  endcase" << std::endl;
     output << blank + "end" << std::endl;
 
@@ -1489,7 +1492,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     //ground(dest+_t, destBoundPair, destSlice, blank, output);
 
     // print _sig function
-    output << blank + "assign " + dest + _sig + " = "+toStr(CONSTANT_SIG)+" ;" << std::endl;
+    output << blank + "assign " + dest + _sig + " = "+CONSTANT_SIG+" ;" << std::endl;
 
     // print _r function
     output << blank + "reg [" + sWidth + "-1:0] " + s + _r + sVer + " ;" << std::endl;

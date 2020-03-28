@@ -55,7 +55,8 @@ extern std::string _sig;
 extern uint32_t g_reg_count;
 extern uint32_t g_sig_width; // == log2(g_reg_count);
 extern uint32_t g_next_sig;
-extern uint32_t CONSTANT_SIG;
+extern uint32_t CONSTANT_SIG_NUM;
+extern std::string CONSTANT_SIG;
 extern std::string RESET_SIG;
 
 /* declarations */
