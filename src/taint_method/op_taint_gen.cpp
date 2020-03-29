@@ -1402,9 +1402,9 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
   // _sig
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
   if (g_hasRst)
-    output << blank + dest + _sig + " \t\t<= " + get_recent_rst() + " ? " + RESET_SIG + " : " + dest + _sig + " != " + RESET_SIG + " ? " + dest + _sig + "_const : " + op1+_sig + " == " + RESET_SIG + " ? " + RESET_SIG + " : " + dest + _sig + "_const ;" << std::endl;
+    output << blank + dest + _sig + " \t\t<= " + get_recent_rst() + " ? " + RESET_SIG + " : " + dest + _sig + " == " + dest + _sig + "_const ? " + dest + _sig + "_const : " + op1+_sig + " == " + RESET_SIG + " ? " + RESET_SIG + " : " + op1+_sig + " == " + CONSTANT_SIG + " ? " + CONSTANT_SIG + " : " + dest + _sig + "_const ;" << std::endl;
   else 
-    output << blank + dest + _sig + " \t\t<= rst_zy ? " + RESET_SIG + " : " + dest + _sig + " != " + RESET_SIG + " ? " + dest + _sig + "_const : " + op1 + _sig + " == " + RESET_SIG + " ? " + RESET_SIG + " : " + dest + _sig + "_const ;" << std::endl;
+    output << blank + dest + _sig + " \t\t<= rst_zy ? " + RESET_SIG + " : " + dest + _sig + " == " + dest + _sig + "_const ? " + dest + _sig + "_const : " + op1 + _sig + " == " + RESET_SIG + " ? " + RESET_SIG + " : " + op1+_sig + " == " + CONSTANT_SIG + " ? " + CONSTANT_SIG + " : " + dest + _sig + "_const ;" << std::endl;
 
   // _t
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
