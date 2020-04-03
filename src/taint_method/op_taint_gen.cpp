@@ -1298,9 +1298,9 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
     output << blank << "assign " + dest + _t + destSlice + " = " + condAndSlice + " ? ( " + extend("| "+cond+_t+" "+condSlice, localWidthNum) + " | " + op1 + _t + op1Slice + " ) : " + extend("| "+cond+_t+" "+condSlice, localWidthNum) + ";" << std::endl;
 
     if (g_hasRst)
-      output << blank + "assign " + dest + _sig + " = " + condAndSlice + " ? " + op1 + _sig + " : " + get_recent_rst() + " ? " + RESET_SIG + " : " + CONSTANT_SIG + " ;";
+      output << blank + "assign " + dest + _sig + " = " + condAndSlice + " ? " + op1 + _sig + " : " + get_recent_rst() + " ? " + RESET_SIG + " : " + cond + _sig + " ;" << std::endl; // + " == " + RESET_SIG + " ? " + RESET_SIG + " : " + CONSTANT_SIG + " ;";
     else 
-      output << blank + "assign " + dest + _sig + " = " + condAndSlice + " ? " + op1 + _sig + " : " + "rst_zy ? " + RESET_SIG + " : " + CONSTANT_SIG + " ;";
+      output << blank + "assign " + dest + _sig + " = " + condAndSlice + " ? " + op1 + _sig + " : " + "rst_zy ? " + RESET_SIG + " : " + cond + _sig + " ;" << std::endl;//" == " + RESET_SIG + " ? " + RESET_SIG + " : " + CONSTANT_SIG + " ;";
 
     output << blank << "assign " + cond + _r + condVer + condSlice + " = ( | ("+dest+_r+destSlice+" | ( "+extend(condAndSlice, localWidthNum)+" & "+op1+_t+op1Slice+" & "+dest+_c+destSlice+" ))) && " + op1AndSlice + " != " + op2AndSlice + " ;" << std::endl;
 
@@ -1328,9 +1328,9 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
     output << blank << "assign " + dest + _t + destSlice + " = " + condAndSlice + " ? " + extend("| "+cond+_t+" "+condSlice, localWidthNum) + " : ( " + extend("| "+cond+_t+" "+condSlice, localWidthNum) + " | " + op2 + _t + op2Slice + " );" << std::endl;  
    
     if(g_hasRst)
-      output << blank << "assign " + dest + _sig + destSlice + " = " + condAndSlice + " ? ( " + get_recent_rst() + " ? " + RESET_SIG + " : " + CONSTANT_SIG + " ) : " + op2 + _sig + op2Slice + " ;" << std::endl;
+      output << blank << "assign " + dest + _sig + destSlice + " = " + condAndSlice + " ? ( " + get_recent_rst() + " ? " + RESET_SIG + " : " + cond + _sig + " ) : " + op2 + _sig + op2Slice + " ;" << std::endl;
     else
-      output << blank << "assign " + dest + _sig + destSlice + " = " + condAndSlice + " ? ( rst_zy ? " + RESET_SIG + " : " + CONSTANT_SIG + " ) : " + op2 + _sig + op2Slice + " ;" << std::endl;
+      output << blank << "assign " + dest + _sig + destSlice + " = " + condAndSlice + " ? ( rst_zy ? " + RESET_SIG + " : " + cond + _sig + " ) : " + op2 + _sig + op2Slice + " ;" << std::endl;
 
     output << blank << "assign " + cond + _r + condVer + condSlice + " = ( | ("+dest+_r+destSlice+" | ( "+extend("!"+condAndSlice, localWidthNum)+" & "+op2+_t+op2Slice+" & "+dest+_c+destSlice+" ))) && " + op1AndSlice + " != " + op2AndSlice + " ;" << std::endl;
 
@@ -1345,9 +1345,9 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
     output << blank << "assign " + dest + _t + " = " + extend(cond+_t+" "+condSlice, localWidthNum) + " ;" << std::endl;
 
     if(g_hasRst)
-      output << blank << "assign " + dest + _sig + destSlice + " = " + get_recent_rst() + " ? " + RESET_SIG + " : " + CONSTANT_SIG + " ;" << std::endl;
+      output << blank << "assign " + dest + _sig + destSlice + " = " + get_recent_rst() + " ? " + RESET_SIG + " : " + cond + _sig + " ;" << std::endl;//" == " + RESET_SIG + " ? " + RESET_SIG + " : " + CONSTANT_SIG + " ;" << std::endl;
     else
-      output << blank << "assign " + dest + _sig + destSlice + " = rst_zy ? " + RESET_SIG + " : " + CONSTANT_SIG + " ;" << std::endl;
+      output << blank << "assign " + dest + _sig + destSlice + " = rst_zy ? " + RESET_SIG + " : " + cond + _sig + " ;" << std::endl;//" == " + RESET_SIG + " ? " + RESET_SIG + " : " + CONSTANT_SIG + " ;" << std::endl;
 
     output << blank << "assign " + cond + _r + condVer + condSlice + " = ( | " + dest+_r+destSlice + ") && " + op1AndSlice + " != " + op2AndSlice + " ;" << std::endl;
   }
@@ -1417,22 +1417,22 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
   if(!g_use_zy_count)
     if (g_hasRst)
-      output << blank + dest + "_t_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_t_flag ? 1 : | ( (" + op1 + _t+" & " + extend( dest+_sig+" != "+op1+_sig, localWidthNum ) + " ) | " +  op1+_sig + " == " + CONSTANT_SIG + " );" << std::endl;
+      output << blank + dest + "_t_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_t_flag ? 1 : | (" + op1 + _t+" & " + extend( dest+_sig+" != "+op1+_sig, localWidthNum ) + " );" << std::endl; // | " +  op1+_sig + " == " + CONSTANT_SIG + " );" << std::endl;
     else
-      output << blank + dest + "_t_flag \t<= rst_zy ? 0 : " + dest + "_t_flag ? 1 : | ( (" + op1 + _t+" & " + extend( dest+_sig+" != "+op1+_sig, localWidthNum ) + " ) | " +  op1+_sig + " == " + CONSTANT_SIG + " );" << std::endl;
+      output << blank + dest + "_t_flag \t<= rst_zy ? 0 : " + dest + "_t_flag ? 1 : | (" + op1 + _t+" & " + extend( dest+_sig+" != "+op1+_sig, localWidthNum ) + " );" << std::endl;//| " +  op1+_sig + " == " + CONSTANT_SIG + " );" << std::endl;
   else
     if (g_hasRst)
-      output << blank + dest + "_t_flag \t<= ( " + get_recent_rst() + " || zy_count < 50 ) ? 0 : " + dest + "_t_flag ? 1 : | ( (" + op1 + _t+" & " + extend( dest+_sig+" != "+op1+_sig, localWidthNum ) + " ) | " +  op1+_sig + " == " + CONSTANT_SIG + " );" << std::endl;
+      output << blank + dest + "_t_flag \t<= ( " + get_recent_rst() + " || zy_count < 50 ) ? 0 : " + dest + "_t_flag ? 1 : | ( " + op1 + _t+" & " + extend( dest+_sig+" != "+op1+_sig, localWidthNum ) + " );" << std::endl; //| " +  op1+_sig + " == " + CONSTANT_SIG + " );" << std::endl;
     else
-      output << blank + dest + "_t_flag \t<= ( rst_zy || zy_count < 50 ) ? 0 : " + dest + "_t_flag ? 1 : | ( (" + op1 + _t+" & " + extend( dest+_sig+" != "+op1+_sig, localWidthNum ) + " ) | " +  op1+_sig + " == " + CONSTANT_SIG + " );" << std::endl;
+      output << blank + dest + "_t_flag \t<= ( rst_zy || zy_count < 50 ) ? 0 : " + dest + "_t_flag ? 1 : | ( " + op1 + _t+" & " + extend( dest+_sig+" != "+op1+_sig, localWidthNum ) + " );" << std::endl;//| " +  op1+_sig + " == " + CONSTANT_SIG + " );" << std::endl;
 
   // _r_flag
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
   if(!g_use_zy_count)
     if (g_hasRst)  
-      output << blank + dest + "_r_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : ( | " + dest + _r + " && " + dest + _sig + " != " + RESET_SIG + " ) ;" << std::endl;
+      output << blank + dest + "_r_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : ( | " + dest + _r /*+ " && " + dest + _sig + " != " + RESET_SIG*/ + " ) ;" << std::endl;
     else
-      output << blank + dest + "_r_flag \t<= rst_zy ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : ( | " + dest + _r + " && " + dest + _sig + " != " + RESET_SIG + " ) ;" << std::endl;
+      output << blank + dest + "_r_flag \t<= rst_zy ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : ( | " + dest + _r /*+ " && " + dest + _sig + " != " + RESET_SIG*/ + " ) ;" << std::endl;
   else
     if (g_hasRst)  
       output << blank + dest + "_r_flag \t<= ( " + get_recent_rst() + " || zy_count < 50 ) ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + _r+" ;" << std::endl;
