@@ -1011,10 +1011,10 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
   else { // if fangyuan var is not used as RHS of case or the variable is not named fangyuanXX
     // in this scenario, if dest is used in some select expression, we need to be careful with setting sig to 0.
     // First, we assume the above scenario does not happen.
-    if(g_selAssign.find(dest) != g_selAssign.end()) {
-      toCout("!!! Warning: src_concat variable appear in sel op: "+ line);
-      abort();
-    }
+    //if(g_selAssign.find(dest) != g_selAssign.end()) {
+    //  toCout("!!! Warning: src_concat variable appear in sel op: "+ line);
+    //  abort();
+    //}
     output << blank + "logic [" + toStr(g_sig_width-1) + ":" + "0] " + dest + _sig + " ;" << std::endl;
     // when all the signatures of concatenation elements are 
     output << blank + "assign " + dest + _sig + " = ( ";

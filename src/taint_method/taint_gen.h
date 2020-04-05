@@ -7,7 +7,6 @@
 #include "op_taint_gen.h"
 #include "global_data.h"
 #include "VarWidth.h"
-#include "analyze_reg_path.h"
 
 #define INPUT           1 
 #define REG             2

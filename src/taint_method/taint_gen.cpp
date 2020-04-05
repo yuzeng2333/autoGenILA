@@ -136,7 +136,6 @@ std::unordered_map<std::string, std::pair<std::string, std::string>> memDims;
 std::unordered_map<std::string, uint32_t> reg2sig;
 std::unordered_map<std::string, uint32_t> fangyuanItemNum; // used to check item number in case statementsrs
 std::unordered_map<std::string, uint32_t> fangyuanCaseSliceWidth; // width of each slice used in RHS of case
-std::unordered_map<std::string, std::vector<std::string>> g_selAssign; // which var is in RHS of select op and their assigment
 //std::unordered_map<std::string, destObj> g_passRelation; // concat assignment for variables
 VarWidth varWidth;
 VarWidth funcVarWidth;
@@ -207,7 +206,6 @@ void clean_global_data() {
   g_use_reset_taint = false;
   fangyuanItemNum.clear();
   fangyuanCaseSliceWidth.clear();
-  g_selAssign.clear();
   //g_passRelation.clear();
 }
 
@@ -1981,10 +1979,10 @@ int taint_gen(std::string fileName, uint32_t stage, bool isTopIn, std::map<std::
     std::cout << "Remove functions!" << std::endl;
     remove_functions(fileName);
   }
-  if (stage <= 1) {
-    std::cout << "Analyze register's path!" << std::endl;
-    analyze_reg_path(fileName);
-  }
+  //if (stage <= 1) {
+  //  std::cout << "Analyze register's path!" << std::endl;
+  //  analyze_reg_path(fileName);
+  //}
   if (stage <= 1) {  
     std::cout << "Begin read in clkrst!" << std::endl; //1
     read_in_clkrst(fileName + ".clkrst");
