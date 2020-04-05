@@ -910,7 +910,11 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
   //assert(destSlice.empty());
   std::string updateList = m.str(3);
   // assume only fangyuan variable can be LHS of src concatenation statement
-  checkCond(dest.find("fangyuan") != std::string::npos, "Var not name fangyuan appeared in src_concat! "+line);
+  //checkCond(dest.find("fangyuan") != std::string::npos, "Var not name fangyuan appeared in src_concat! "+line);
+  bool isFangyuan = (dest.find("fangyuan") != std::string::npos);
+  if(!isFangyuan) { 
+    toCout("Var not name fangyuan appeared in src_concat! "+line+", check if it is used in case or if it is splitted later!!");
+  }
 
   std::vector<std::string> updateVec;
   parse_var_list(updateList, updateVec);
@@ -935,18 +939,21 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
   auto destBoundPair = varWidth.get_idx_pair(dest, line);
   //ground_wires(destT, destBoundPair, destSlice, blank, output);
 
-  // _sig
+
   uint32_t srcVecItemNum = 0;
   std::string srcSigList;
   std::string v, vSlice;
   uint32_t localWidth;
-  uint32_t caseSliceWidth = fangyuanCaseSliceWidth[dest];
+  uint32_t caseSliceWidth = 0;
+  if(isFangyuan)
+    caseSliceWidth = fangyuanCaseSliceWidth[dest];
   uint32_t remainBits = caseSliceWidth;
   std::string currentSig = "";
   bool addElement = false;
   uint32_t overFlowBit = 0;
   // if caseSliceWidth > 0, fangyuan variable is used in case statements
-  if(caseSliceWidth > 0) {
+  if(isFangyuan && caseSliceWidth > 0) {
+    //if(line.find())
     for(auto vAndSlice : updateVec) {
       addElement = false;
       overFlowBit = 0;
@@ -974,8 +981,12 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
           srcSigList = srcSigList + currentSig + " , ";
         }
         else {
-          checkCond(currentSig == v+_sig, "WARNING: two signature found for one case assign!! First: "+currentSig+", second: "+v+_sig);
-          srcSigList = srcSigList + currentSig + " , ";
+          if(currentSig != v+_sig) {
+            toCout("WARNING: two signature found for one case assign!! First: "+currentSig+", second: "+v+_sig);
+            srcSigList = srcSigList + toStr(g_sig_width) + "'b0 , ";
+          }
+          else
+            srcSigList = srcSigList + currentSig + " , ";
         }
         remainBits = caseSliceWidth - overFlowBit;
         currentSig.clear();
@@ -997,7 +1008,13 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
     output << blank + "logic [" + toStr(srcVecItemNum*g_sig_width-1) + ":" + "0] " + dest + _sig + " ;" << std::endl;
     output << blank + "assign " + dest + _sig + " = { " + srcSigList + " };" << std::endl;
   }
-  else { // if fangyuan var is not used as RHS of case
+  else { // if fangyuan var is not used as RHS of case or the variable is not named fangyuanXX
+    // in this scenario, if dest is used in some select expression, we need to be careful with setting sig to 0.
+    // First, we assume the above scenario does not happen.
+    if(g_selAssign.find(dest) != g_selAssign.end()) {
+      toCout("!!! Warning: src_concat variable appear in sel op: "+ line);
+      abort();
+    }
     output << blank + "logic [" + toStr(g_sig_width-1) + ":" + "0] " + dest + _sig + " ;" << std::endl;
     // when all the signatures of concatenation elements are 
     output << blank + "assign " + dest + _sig + " = ( ";
@@ -1058,7 +1075,6 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
 
 
 void both_concat_op_taint_gen(std::string line, std::ofstream &output) {
-  toCout("!!!!!!!!!!!!!!!!! both_concat found, not supported for signature yet !!!!!! "+line);
   checkCond(!g_use_reset_sig, "both_concat not supported when use_reset_sig!!");
   std::smatch m;
   if( !std::regex_match(line, m, pSrcDestBothConcat) )
