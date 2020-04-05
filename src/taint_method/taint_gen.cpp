@@ -136,6 +136,8 @@ std::unordered_map<std::string, std::pair<std::string, std::string>> memDims;
 std::unordered_map<std::string, uint32_t> reg2sig;
 std::unordered_map<std::string, uint32_t> fangyuanItemNum; // used to check item number in case statementsrs
 std::unordered_map<std::string, uint32_t> fangyuanCaseSliceWidth; // width of each slice used in RHS of case
+std::unordered_map<std::string, std::vector<std::string>> g_selAssign; // which var is in RHS of select op and their assigment
+//std::unordered_map<std::string, destObj> g_passRelation; // concat assignment for variables
 VarWidth varWidth;
 VarWidth funcVarWidth;
 unsigned long int NEW_VAR = 0;
@@ -153,7 +155,7 @@ bool g_rst_pos;
 bool g_clkrst_exist = false;
 bool g_use_reset_taint = false;
 bool g_use_zy_count = false;
-bool g_use_reset_sig = true;
+bool g_use_reset_sig = false;
 std::string _t="_T";
 std::string _r="_R";
 std::string _x="_X";
@@ -204,13 +206,17 @@ void clean_global_data() {
   reg2sig.clear();
   g_use_reset_taint = false;
   fangyuanItemNum.clear();
+  fangyuanCaseSliceWidth.clear();
+  g_selAssign.clear();
+  //g_passRelation.clear();
 }
 
 
 /*remove comments
   remove redundent blanks 
   extract concatenants 
-  remove functions wrapping cases */
+  remove functions wrapping cases 
+  collect information of select and concat*/
 void clean_file(std::string fileName) {
   std::ifstream input(fileName);
   std::ofstream output(fileName + ".nocomment");
@@ -345,6 +351,95 @@ void clean_file(std::string fileName) {
       case FUNCEND:
         {
           inFunc = false;
+        }
+        break;
+      //case SEL:
+      //  {
+      //    if (std::regex_match(line, m, pSel1)
+      //        || std::regex_match(line, m, pSel2)
+      //        || std::regex_match(line, m, pSel3)
+      //        || std::regex_match(line, m, pSel4)) {}
+      //    else
+      //      abort();
+      //    std::string destAndSlice = m.str(2);
+      //    std::string op1AndSlice = m.str(3);
+      //    std::string slice = m.str(4);
+      //    std::string op2AndSlice = m.str(5);
+      //    std::string op1, op1Slice;
+      //    split_slice(op1AndSlice, op1, op1Slice);
+      //    if(!isNum(op2AndSlice))
+      //      toCout("!! Warning: select range has variable: "+line);
+      //    if( g_varSelectRange.find(op1) != g_varSelectRange.end() ) {
+      //      g_varSelectRange[op1].push_back(line);
+      //    }
+      //    else {
+      //      g_varSelectRange.emplace(op1, std::vector<uint32_t>{line});
+      //    }
+      //  }
+      case SEL:
+      case ITE:
+      case SRC_CONCAT:
+        {
+          //fill_in_pass_relation(line);
+        }
+        break;
+      case BOTH_CONCAT:
+        {
+          // split both_concat into src_concat and maybe also both_concat.
+          if( !std::regex_match(line, m, pSrcDestBothConcat) )
+            abort(); //
+
+          std::string blank = m.str(1);
+          std::string destList = m.str(2);
+          std::string srcList = m.str(3);
+          // if the srcList can be cleanly divided into parts for each dest, then divide it
+          // Otherwise, leave it.
+          std::vector<std::string> destVec;
+          std::vector<std::string> srcVec;
+          parse_var_list(destList, destVec);
+          parse_var_list(srcList, srcVec);
+          uint32_t srcIdx = 0;
+          uint32_t srcBits;
+          uint32_t remainBits = 0;
+          uint32_t idx = 0;
+          std::string outputString;
+          std::vector<std::string> lhsVec;
+          for(std::string singleDest: destVec) {
+            outputString.clear();            
+            lhsVec.push_back(singleDest);
+            if(lhsVec.size() == 1) {
+              idx = srcIdx;
+            }
+            remainBits += get_var_slice_width(singleDest);            
+            while(remainBits > 0) {
+              srcBits = get_var_slice_width(srcVec[srcIdx++]);
+              remainBits -= srcBits;
+            }
+            if(remainBits == 0) {
+              if(lhsVec.size() == 1) {
+                outputString = "  assign "+singleDest+" = { "+srcVec[idx++];
+                while(idx < srcIdx) {
+                  outputString += ", " + srcVec[idx++];
+                }
+                outputString += " };";
+              }
+              else {
+                outputString = "  assign { " + lhsVec[0];
+                auto it = lhsVec.begin();
+                std::advance(it,1);
+                while(it != lhsVec.end());
+                  outputString += " , " + *it;
+                outputString += " } = { "+srcVec[idx++];
+                while(idx < srcIdx) {
+                  outputString += " , " + srcVec[idx++];
+                }
+                outputString += " };";
+              }
+              std::cout << outputString << std::endl;
+              //fill_in_pass_relation(outputString);
+              lhsVec.clear();
+            }
+          }
         }
         break;
       default:
@@ -1064,6 +1159,7 @@ void remove_function_wrapper(std::string firstLine, std::ifstream &input, std::o
       output << blank + "    " + localPair.first + " :" << std::endl;
       output << blank + "      " + result + " = " + b + rhsSlice + " ;" << std::endl;
       checkCond(b.find("fangyuan") != std::string::npos, "RHS in case is not fangyuan! "+ b);
+      //fill_in_pass_relation(b+rhsSlice, result, localPair.first);
     }
     output << blank + "    default:" << std::endl;
     output << blank + "      " + result + " = " + a + " ;" << std::endl;
@@ -1776,7 +1872,7 @@ bool extract_concat(std::string line, std::ofstream &output, std::string &return
       for(std::string var: varVec) {
         uint32_t localWidth = get_var_slice_width(var);
         if(localWidth == 0) {
-          toCout("0 width found!!");
+          toCout("!! 0 width found for: " + var + ", in line: "+line);
           abort();
         }
         totalWidth += localWidth;
@@ -1884,6 +1980,10 @@ int taint_gen(std::string fileName, uint32_t stage, bool isTopIn, std::map<std::
   if (stage <= 1) {
     std::cout << "Remove functions!" << std::endl;
     remove_functions(fileName);
+  }
+  if (stage <= 1) {
+    std::cout << "Analyze register's path!" << std::endl;
+    analyze_reg_path(fileName);
   }
   if (stage <= 1) {  
     std::cout << "Begin read in clkrst!" << std::endl; //1

@@ -29,6 +29,8 @@ extern std::unordered_map<std::string, std::pair<std::string, std::string>> memD
 extern std::unordered_map<std::string, uint32_t> reg2sig;
 extern std::unordered_map<std::string, uint32_t> fangyuanItemNum; 
 extern std::unordered_map<std::string, uint32_t> fangyuanCaseSliceWidth;
+extern std::unordered_map<std::string, std::vector<uint32_t>> g_selAssign; 
+extern std::unordered_map<std::string, std::string> g_passRelation;
 extern VarWidth varWidth;
 extern VarWidth funcVarWidth;
 extern unsigned long int NEW_VAR;

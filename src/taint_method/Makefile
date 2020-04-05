@@ -51,3 +51,6 @@ rbm:
 
 riscv:
 	./a.out /workspace/research/ILA/autoGenILA/picorv32/SYN/picorv32_yosys.v 0
+
+piccolo:
+	./a.out /workspace/research/ILA/autoGenILA/Piccolo-iu/verilog-cpu-old/SYN/piccolo_yosys.v 0

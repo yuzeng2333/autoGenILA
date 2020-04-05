@@ -447,7 +447,7 @@ void parse_var_list(std::string list, std::vector<std::string> &vec, bool noSlic
     std::smatch m;
     std::regex pLocal;
     if(!noSlice) {
-      pLocal.assign("^(?:\\s)*([\aa-zA-Z0-9_\\.:\\\\'\\[\\]]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?)(?:\\s)*$");
+      pLocal.assign("^(?:\\s)*([\aa-zA-Z0-9_\\.\\$:\\\\'\\[\\]]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?)(?:\\s)*$");
       std::regex_match(arg, m, pLocal);
       vec.push_back(m.str(1));
     }
