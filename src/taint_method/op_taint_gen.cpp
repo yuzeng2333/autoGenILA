@@ -1074,8 +1074,10 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
 }
 
 
+// THIS IS NOT A GOOD SOLUTION:
+// sig of all LHS are set to 0.
 void both_concat_op_taint_gen(std::string line, std::ofstream &output) {
-  checkCond(!g_use_reset_sig, "both_concat not supported when use_reset_sig!!");
+  //checkCond(!g_use_reset_sig, "both_concat not supported when use_reset_sig!!");
   std::smatch m;
   if( !std::regex_match(line, m, pSrcDestBothConcat) )
     abort(); //
@@ -1143,14 +1145,16 @@ void both_concat_op_taint_gen(std::string line, std::ofstream &output) {
     std::string srcRList = get_lhs_ver_taint_list(srcVec, _r, output, verVec);
     std::string srcXList = get_lhs_ver_taint_list(srcVec, _x, output, verVec);
     std::string srcCList = get_lhs_ver_taint_list(srcVec, _c, output, verVec);
+    std::string srcSList = get_lhs_ver_taint_list(srcVec, _sig, output, verVec);
 
     output << blank + "assign { " + srcRList + " } = yuzeng" + yuzengIdxStr + _r+" ;" << std::endl;
     output << blank + "assign { " + srcXList + " } = yuzeng" + yuzengIdxStr + _x+" ;" << std::endl;
     output << blank + "assign { " + srcCList + " } = yuzeng" + yuzengIdxStr + _c+" ;" << std::endl;
+    output << blank + "assign { " + srcSList + " } = 0 ;" << std::endl;
     return;
   }
 
-  // if there is number in the list
+  // if there is number in the src list
   for (std::string srcAndSlice: srcVec) {
     uint32_t srcLocalWidthNum = get_var_slice_width(srcAndSlice);
     endIdx = startIdx - srcLocalWidthNum + 1;
