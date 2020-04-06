@@ -19,7 +19,7 @@ void input_taint_gen(std::string line, std::ofstream &output) {
   std::smatch m;
   if (!std::regex_match(line, m, pInput))
     return;
-  std::string blank;
+  std::string blank = m.str(1);
   std::string slice = m.str(2);
   std::string var = m.str(3);
   if(!g_hasRst) {
@@ -28,12 +28,14 @@ void input_taint_gen(std::string line, std::ofstream &output) {
         || var.compare("reset") == 0) {
       g_hasRst = true;
       g_rst_pos = true;
+      g_recentRst = var;
     }
     else if ( var.compare("reset_n") == 0
                 || var.compare("resetn") == 0
                 || var.compare("rstn") == 0 ) {
       g_hasRst = true;
       g_rst_pos = false;
+      g_recentRst = var;      
     }
   }
   moduleInputs.push_back(var);
@@ -44,18 +46,18 @@ void input_taint_gen(std::string line, std::ofstream &output) {
   //if (var.compare( clockName) == 0)
   //  return;
   //debug_line(line);
-  output << blank + "input " + slice + var + _t+" ;" << std::endl;
+  output << blank + "input " + slice + var + _t + " ;" << std::endl;
   output << blank + "wire [" + toStr(g_sig_width-1) + ":0] " + var + _sig + " ;" << std::endl;  
-  output << blank + "output " + slice + var + _r+" ;" << std::endl;
-  output << blank + "output " + slice + var + _x+" ;" << std::endl;
-  output << blank + "output " + slice + var + _c+" ;" << std::endl;
+  output << blank + "output " + slice + var + _r + " ;" << std::endl;
+  output << blank + "output " + slice + var + _x + " ;" << std::endl;
+  output << blank + "output " + slice + var + _c + " ;" << std::endl;
 
   //output << blank + "assign " + var + _sig + " =  0;" << std::endl;
 
   if (g_hasRst)
-    output << blank + "assign " + var + _sig + " = " + get_recent_rst() + " ? " + RESET_SIG + " : 0 ;";
+    output << blank + "assign " + var + _sig + " = " + get_recent_rst() + " ? " + RESET_SIG + " : 0 ;" << std::endl;
   else 
-    output << blank + "assign " + var + _sig + " = rst_zy ? " + RESET_SIG + " : 0 ;";
+    output << blank + "assign " + var + _sig + " = rst_zy ? " + RESET_SIG + " : 0 ;" << std::endl;
 
   if (!did_clean_file) {
     bool insertDone;

@@ -155,10 +155,10 @@ bool g_clkrst_exist = false;
 bool g_use_reset_taint = false;
 bool g_use_zy_count = false;
 bool g_use_reset_sig = false;
-std::string _t="_T";
-std::string _r="_R";
-std::string _x="_X";
-std::string _c="_C";
+std::string _t="_t";
+std::string _r="_r";
+std::string _x="_x";
+std::string _c="_c";
 std::string _sig="_S";
 uint32_t g_reg_count;
 uint32_t g_sig_width; // == log2(g_reg_count);
@@ -892,7 +892,7 @@ void merge_taints(std::string fileName) {
 
   gen_assert_property(output);
   if(g_hasRst)
-    output << "  assign rst_zy = "+resetName+" ;" << std::endl;
+    output << "  assign rst_zy = "+get_recent_rst()+" ;" << std::endl;
   output << "endmodule" << std::endl;
   output.close();
 }
@@ -1288,7 +1288,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
       output << blank + "      " + dest + _sig + " = " + rhs + _sig + " [" + toStr(caseNum*g_sig_width-1) + ":" + toStr(g_sig_width*(caseNum-1)) + "] == " + CONSTANT_SIG + " ? " + s + _sig + " : " + rhs + _sig + " [" + toStr(caseNum*g_sig_width-1) + ":" + toStr(g_sig_width*(caseNum-1)) + "] ;" << std::endl;
     }
     output << blank + "    default :" << std::endl;
-    output << blank + "      " + dest + _sig + " = " + a + _sig + " == " + CONSTANT_SIG + " ? " + s + _sig + " : " + a + _sig + ";" << std::endl;
+    output << blank + "      " + dest + _sig + " = " + a + _sig + " == " + CONSTANT_SIG + " ? " + s + _sig + " : " + a + _sig + " ;" << std::endl;
     output << blank + "  endcase" << std::endl;
     output << blank + "end" << std::endl;
     checkCond(caseNum == fangyuanItemNum[rhs], "case number does not equal fangyuan item number!, var: "+rhs+" , caseNum:"+toStr(caseNum)+" , itemNum:"+toStr(fangyuanItemNum[rhs]));
