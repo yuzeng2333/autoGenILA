@@ -805,6 +805,50 @@ std::string get_lhs_taint_list(std::string destList, std::string taint, std::str
 }
 
 
+std::string get_lhs_taint_list_no_slice(std::vector<std::string> &destVec, std::string taint, std::ofstream &output) {
+  assert(taint.find(_sig) != std::string::npos);
+  std::vector<std::string> taintVec;
+  std::smatch m;
+  for(std::string singleDest : destVec) {
+    if(!isNum(singleDest)) {
+      //std::regex_match(singleDest, m, pVarNameGroup);
+      //singleDest = std::regex_replace(singleDest, pVarNameGroup, "$1"+taint+"$3");
+      std::string dest, destSlice;
+      split_slice(singleDest, dest, destSlice);
+      singleDest = dest+taint;
+    }
+    else { // if isNum
+      if( !std::regex_match(singleDest, m, pNum)) {
+        std::cout << "!! Error in matching number: " + singleDest << std::endl;
+        abort();
+      }
+      std::string numWidth = m.str(1);
+      int localIdx = USELESS_VAR++;
+      // declare a dummy wire, just for being assigned
+      output << "  wire [" + numWidth + "-1:0] nouse" + toStr(localIdx) + " ;" << std::endl;
+      singleDest = "nouse" + toStr(localIdx);
+    }
+    taintVec.push_back(singleDest);    
+  }
+  std::string returnList = " ";
+  for (auto it = taintVec.begin(); it < taintVec.end() - 1; ++it) {
+    returnList = returnList + *it + " , ";
+  }
+  returnList = returnList + taintVec.back() + " ";
+  return returnList;
+}
+
+
+std::string get_lhs_taint_list_no_slice(std::string destList, std::string taint, std::ofstream &output) {
+  std::vector<std::string> destVec;
+  parse_var_list(destList, destVec);
+  if (destList.front() == '{')
+    return "{ "+get_lhs_taint_list_no_slice(destVec, taint, output)+" }";
+  else
+    return get_lhs_taint_list_no_slice(destVec, taint, output);
+}
+
+
 int str2int(std::string str, std::string info) {
   int res;
   try{

@@ -895,7 +895,6 @@ void reduce_one_op_taint_gen(std::string line, std::ofstream &output) {
   //ground_wires(op1+"_x"+sndVer, op1IdxPair, op1Slice, blank, output);
   //}
   output << blank + "assign " + dest + _sig + " = " + op1 + _sig + " == " + RESET_SIG + " ? " + RESET_SIG + " : 0 ;" << std::endl;
-  
 }
 
 
@@ -949,28 +948,54 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
   uint32_t caseSliceWidth = 0;
   if(isFangyuan)
     caseSliceWidth = fangyuanCaseSliceWidth[dest];
-  uint32_t remainBits = caseSliceWidth;
+  uint32_t remainBits = caseSliceWidth; // remainBits are bits to be filled
   std::string currentSig = "";
   bool addElement = false;
-  uint32_t overFlowBit = 0;
+  uint32_t overFlowBits = 0;
   // if caseSliceWidth > 0, fangyuan variable is used in case statements
   if(isFangyuan && caseSliceWidth > 0) {
     //if(line.find())
-    for(auto vAndSlice : updateVec) {
+    for(auto vAndSlice: updateVec) {
+      if(get_var_slice_width(vAndSlice) == 80)
+        toCout("Bug found!!");
       addElement = false;
-      overFlowBit = 0;
       checkCond(vAndSlice.find("fangyuan") == std::string::npos, "fangyuan found in fangyuan! "+line);
       split_slice(vAndSlice, v, vSlice);
       localWidth = get_var_slice_width(vAndSlice);
-      if(localWidth > remainBits) {
-        checkCond(isNum(vAndSlice), "!!! WARNING: "+vAndSlice+" is to be splitted in case! line is :"+line);
-        addElement = true;
-        overFlowBit = localWidth - remainBits;
-      }
-      remainBits = remainBits - localWidth;
-      if (remainBits == 0)
-        addElement = true;
 
+
+      if(overFlowBits == 0) { // there are remaining bits to fill
+        if(remainBits == 0)
+          remainBits = caseSliceWidth;
+        if(localWidth < remainBits) {
+          addElement = false;          
+          remainBits = remainBits - localWidth;
+          overFlowBits = 0;
+        }
+        else if (localWidth >= remainBits) {
+          addElement = true;
+          overFlowBits = localWidth - remainBits; // can be 0
+          remainBits = 0;          
+        }
+      }
+      else if(overFlowBits > 0 && remainBits == 0) {
+        assert(overFlowBits < caseSliceWidth);
+        if(overFlowBits + localWidth < caseSliceWidth) {
+          addElement = false;          
+          remainBits = caseSliceWidth - localWidth - overFlowBits;
+          overFlowBits = 0;
+        }
+        else if (overFlowBits + localWidth >= caseSliceWidth) {
+          addElement = true;
+          remainBits = 0;
+          overFlowBits = localWidth  + overFlowBits - caseSliceWidth; // can be 0
+        }
+      }
+      else {
+        checkCond(false, "Error: unexpected condition in src_concat: "+line);
+      }
+
+      // begin adding srcSigList
       if(addElement) {  // time to add one element
         srcVecItemNum++;
         if(currentSig.empty() && !isNum(vAndSlice)) {
@@ -990,8 +1015,16 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
           else
             srcSigList = srcSigList + currentSig + " , ";
         }
-        remainBits = caseSliceWidth - overFlowBit;
         currentSig.clear();
+        // need to deal with too much overFlow
+        if(overFlowBits >= caseSliceWidth) {
+          assert(isNum(vAndSlice));
+          while(overFlowBits >= caseSliceWidth) {
+            overFlowBits -= caseSliceWidth;
+            srcSigList = srcSigList + toStr(g_sig_width) + "'b0 , ";
+            srcVecItemNum++;
+          }
+        }
       }
       else { // if remaining bits not 0, need to wait for next vector element
         if(currentSig.empty() && isNum(vAndSlice)) {}
@@ -1003,10 +1036,11 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
           checkCond(currentSig == v+_sig, "WARNING: two signature found for one case assign!! First: "+currentSig+", second: "+v+_sig);
         }
       }
-    }
+    } // end of for loop
     srcSigList.pop_back();
     srcSigList.pop_back();
     fangyuanItemNum.emplace(dest, srcVecItemNum);
+    // _sig
     output << blank + "logic [" + toStr(srcVecItemNum*g_sig_width-1) + ":" + "0] " + dest + _sig + " ;" << std::endl;
     output << blank + "assign " + dest + _sig + " = { " + srcSigList + " };" << std::endl;
   }
@@ -1100,9 +1134,9 @@ void both_concat_op_taint_gen(std::string line, std::ofstream &output) {
   std::string srcTList = get_rhs_taint_list(srcVec, _t);
   output << blank + "assign { " + destTList + " } = { " + srcTList + " };" << std::endl;
 
-  std::string destSigList = get_lhs_taint_list(destList, _sig, output);
+  std::string destSigList = get_lhs_taint_list_no_slice(destList, _sig, output);
   std::string srcSigList = get_rhs_taint_list(srcVec, _sig);
-  output << blank + "assign { " + destSigList + " } = { " + srcSigList + " };" << std::endl;
+  output << blank + "assign { " + destSigList + " } = 0;" << std::endl;
   
   // declare new taint wires for dests
   uint32_t destTotalWidthNum = 0;
@@ -1350,9 +1384,9 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
     output << blank << "assign " + dest + _t + destSlice + " = " + condAndSlice + " ? " + extend("| "+cond+_t+" "+condSlice, localWidthNum) + " : ( " + extend("| "+cond+_t+" "+condSlice, localWidthNum) + " | " + op2 + _t + op2Slice + " );" << std::endl;  
    
     if(g_hasRst)
-      output << blank << "assign " + dest + _sig + destSlice + " = " + condAndSlice + " ? ( " + get_recent_rst() + " ? " + RESET_SIG + " : " + cond + _sig + " ) : " + op2 + _sig + op2Slice + " ;" << std::endl;
+      output << blank << "assign " + dest + _sig + " = " + condAndSlice + " ? ( " + get_recent_rst() + " ? " + RESET_SIG + " : " + cond + _sig + " ) : " + op2 + _sig + " ;" << std::endl;
     else
-      output << blank << "assign " + dest + _sig + destSlice + " = " + condAndSlice + " ? ( rst_zy ? " + RESET_SIG + " : " + cond + _sig + " ) : " + op2 + _sig + op2Slice + " ;" << std::endl;
+      output << blank << "assign " + dest + _sig + " = " + condAndSlice + " ? ( rst_zy ? " + RESET_SIG + " : " + cond + _sig + " ) : " + op2 + _sig + " ;" << std::endl;
 
     output << blank << "assign " + cond + _r + condVer + condSlice + " = ( | ("+dest+_r+destSlice+" | ( "+extend("!"+condAndSlice, localWidthNum)+" & "+op2+_t+op2Slice+" & "+dest+_c+destSlice+" ))) && " + op1AndSlice + " != " + op2AndSlice + " ;" << std::endl;
 
@@ -1367,9 +1401,9 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
     output << blank << "assign " + dest + _t + " = " + extend(cond+_t+" "+condSlice, localWidthNum) + " ;" << std::endl;
 
     if(g_hasRst)
-      output << blank << "assign " + dest + _sig + destSlice + " = " + get_recent_rst() + " ? " + RESET_SIG + " : " + cond + _sig + " ;" << std::endl;//" == " + RESET_SIG + " ? " + RESET_SIG + " : " + CONSTANT_SIG + " ;" << std::endl;
+      output << blank << "assign " + dest + _sig + " = " + get_recent_rst() + " ? " + RESET_SIG + " : " + cond + _sig + " ;" << std::endl;//" == " + RESET_SIG + " ? " + RESET_SIG + " : " + CONSTANT_SIG + " ;" << std::endl;
     else
-      output << blank << "assign " + dest + _sig + destSlice + " = rst_zy ? " + RESET_SIG + " : " + cond + _sig + " ;" << std::endl;//" == " + RESET_SIG + " ? " + RESET_SIG + " : " + CONSTANT_SIG + " ;" << std::endl;
+      output << blank << "assign " + dest + _sig + " = rst_zy ? " + RESET_SIG + " : " + cond + _sig + " ;" << std::endl;//" == " + RESET_SIG + " ? " + RESET_SIG + " : " + CONSTANT_SIG + " ;" << std::endl;
 
     output << blank << "assign " + cond + _r + condVer + condSlice + " = ( | " + dest+_r+destSlice + ") && " + op1AndSlice + " != " + op2AndSlice + " ;" << std::endl;
   }

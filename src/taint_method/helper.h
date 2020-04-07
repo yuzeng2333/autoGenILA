@@ -76,6 +76,10 @@ std::string get_lhs_taint_list(std::vector<std::string> &destVec, std::string ta
 
 std::string get_lhs_taint_list(std::string destList, std::string taint, std::string &newLogic);
 
+std::string get_lhs_taint_list_no_slice(std::vector<std::string> &destVec, std::string taint, std::ofstream &output);
+
+std::string get_lhs_taint_list_no_slice(std::string destList, std::string taint, std::ofstream &output);
+
 void get_ver_vec(std::vector<std::string> varVec, std::vector<uint32_t> &verVec, std::ofstream &output);
 
 void get_ver_vec(std::string list, std::vector<uint32_t> &verVec, std::ofstream &output);

@@ -374,72 +374,72 @@ void clean_file(std::string fileName) {
       //      g_varSelectRange.emplace(op1, std::vector<uint32_t>{line});
       //    }
       //  }
-      case SEL:
-      case ITE:
-      case SRC_CONCAT:
-        {
-          //fill_in_pass_relation(line);
-        }
-        break;
-      case BOTH_CONCAT:
-        {
-          // split both_concat into src_concat and maybe also both_concat.
-          if( !std::regex_match(line, m, pSrcDestBothConcat) )
-            abort(); //
+      //case SEL:
+      //case ITE:
+      //case SRC_CONCAT:
+      //  {
+      //    //fill_in_pass_relation(line);
+      //  }
+      //  break;
+      //case BOTH_CONCAT:
+      //  {
+      //    // split both_concat into src_concat and maybe also both_concat.
+      //    if( !std::regex_match(line, m, pSrcDestBothConcat) )
+      //      abort(); //
 
-          std::string blank = m.str(1);
-          std::string destList = m.str(2);
-          std::string srcList = m.str(3);
-          // if the srcList can be cleanly divided into parts for each dest, then divide it
-          // Otherwise, leave it.
-          std::vector<std::string> destVec;
-          std::vector<std::string> srcVec;
-          parse_var_list(destList, destVec);
-          parse_var_list(srcList, srcVec);
-          uint32_t srcIdx = 0;
-          uint32_t srcBits;
-          uint32_t remainBits = 0;
-          uint32_t idx = 0;
-          std::string outputString;
-          std::vector<std::string> lhsVec;
-          for(std::string singleDest: destVec) {
-            outputString.clear();            
-            lhsVec.push_back(singleDest);
-            if(lhsVec.size() == 1) {
-              idx = srcIdx;
-            }
-            remainBits += get_var_slice_width(singleDest);            
-            while(remainBits > 0) {
-              srcBits = get_var_slice_width(srcVec[srcIdx++]);
-              remainBits -= srcBits;
-            }
-            if(remainBits == 0) {
-              if(lhsVec.size() == 1) {
-                outputString = "  assign "+singleDest+" = { "+srcVec[idx++];
-                while(idx < srcIdx) {
-                  outputString += ", " + srcVec[idx++];
-                }
-                outputString += " };";
-              }
-              else {
-                outputString = "  assign { " + lhsVec[0];
-                auto it = lhsVec.begin();
-                std::advance(it,1);
-                while(it != lhsVec.end());
-                  outputString += " , " + *it;
-                outputString += " } = { "+srcVec[idx++];
-                while(idx < srcIdx) {
-                  outputString += " , " + srcVec[idx++];
-                }
-                outputString += " };";
-              }
-              std::cout << outputString << std::endl;
-              //fill_in_pass_relation(outputString);
-              lhsVec.clear();
-            }
-          }
-        }
-        break;
+      //    std::string blank = m.str(1);
+      //    std::string destList = m.str(2);
+      //    std::string srcList = m.str(3);
+      //    // if the srcList can be cleanly divided into parts for each dest, then divide it
+      //    // Otherwise, leave it.
+      //    std::vector<std::string> destVec;
+      //    std::vector<std::string> srcVec;
+      //    parse_var_list(destList, destVec);
+      //    parse_var_list(srcList, srcVec);
+      //    uint32_t srcIdx = 0;
+      //    uint32_t srcBits;
+      //    uint32_t remainBits = 0;
+      //    uint32_t idx = 0;
+      //    std::string outputString;
+      //    std::vector<std::string> lhsVec;
+      //    for(std::string singleDest: destVec) {
+      //      outputString.clear();            
+      //      lhsVec.push_back(singleDest);
+      //      if(lhsVec.size() == 1) {
+      //        idx = srcIdx;
+      //      }
+      //      remainBits += get_var_slice_width(singleDest);            
+      //      while(remainBits > 0) {
+      //        srcBits = get_var_slice_width(srcVec[srcIdx++]);
+      //        remainBits -= srcBits;
+      //      }
+      //      if(remainBits == 0) {
+      //        if(lhsVec.size() == 1) {
+      //          outputString = "  assign "+singleDest+" = { "+srcVec[idx++];
+      //          while(idx < srcIdx) {
+      //            outputString += ", " + srcVec[idx++];
+      //          }
+      //          outputString += " };";
+      //        }
+      //        else {
+      //          outputString = "  assign { " + lhsVec[0];
+      //          auto it = lhsVec.begin();
+      //          std::advance(it,1);
+      //          while(it != lhsVec.end());
+      //            outputString += " , " + *it;
+      //          outputString += " } = { "+srcVec[idx++];
+      //          while(idx < srcIdx) {
+      //            outputString += " , " + srcVec[idx++];
+      //          }
+      //          outputString += " };";
+      //        }
+      //        std::cout << outputString << std::endl;
+      //        //fill_in_pass_relation(outputString);
+      //        lhsVec.clear();
+      //      }
+      //    }
+      //  }
+      //  break;
       default:
         break;
     } // end of switch
