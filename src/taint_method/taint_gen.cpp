@@ -12,6 +12,7 @@
 #include <map>
 #include <bitset>
 #include "taint_gen.h"
+//#include "pass_info.h"
 #include <cmath>
 
 #define toStr(a) std::to_string(a)
@@ -47,8 +48,6 @@ std::regex pSe          (to_re("^(\\s*)assign (NAME) = (NAME) <= (NAME)(\\s*)?;$
 std::regex pBitOr       (to_re("^(\\s*)assign (NAME) = (NAME) \\| (NAME)(\\s*)?;$"));
 std::regex pBitExOr     (to_re("^(\\s*)assign (NAME) = (NAME) \\^ (NAME)(\\s*)?;$"));
 std::regex pBitAnd      (to_re("^(\\s*)assign (NAME) = (NAME) & (NAME)(\\s*)?;$"));
-//TODO: merge pConcat   and pPureConcat
-std::regex pConcat      (to_re("^(\\s*)assign (NAME) = \\{ (NAME), (NAME) \\}(\\s*)?;$"));
 std::regex pSel1        (to_re("^(\\s*)assign (NAME) = (NAME)(\\[\\$signed\\((NAME)\\) \\+\\: (INT)\\])(\\s*)?;$"));
 std::regex pSel2        (to_re("^(\\s*)assign (NAME) = (NAME)(\\[(NAME) \\+\\: (INT)\\])(\\s*)?;$"));
 std::regex pSel3        (to_re("^(\\s*)assign (NAME) = (NAME)(\\[\\$signed\\((NAME)\\) \\-\\: (INT)\\])(\\s*)?;$"));
@@ -70,7 +69,7 @@ std::regex pRedXor      (to_re("^(\\s*)assign (NAME) = \\^ (NAME)(\\s*)?;$"));
 std::regex pRedXnor     (to_re("^(\\s*)assign (NAME) = \\~\\^ (NAME)(\\s*)?;$"));
 /* ite */
 std::regex pIte         (to_re("^(\\s*)assign (NAME) = (NAME) \\? (NAME) \\: (NAME)(\\s*)?;$"));
-/* do not add anything   */
+std::regex pDestAndSlice("^(\\s*)assign ([\aa-zA-Z0-9_\\.\\$\\\\'\\[\\]]+)(\\s*\\[\\d+(\\:\\d+)?\\]) = (.+)$");
 // Assume: always come  s with posedge or negedge
 std::regex pAlwaysClk   (to_re("^(\\s*)always @\\(posedge (NAME)\\)(?: begin)?$"));
 std::regex pAlwaysClkRst(to_re("^(\\s*)always @\\(posedge (NAME) or (?:posedge|negedge) (NAME)(\\s?)\\)$"));
@@ -79,7 +78,7 @@ std::regex pAlwaysFake  (to_re("^(\\s*)always @\\(negedge 1'bx\\)(?: begin)?$"))
 std::regex pEnd         ("^(\\s*)end$");
 std::regex pEndmodule   ("^(\\s*)endmodule$");
 /* non-blocking assignment */
-std::regex pNonblock  (to_re("^(\\s*)(NAME) <= (NAME)(\\s*)?;$"));
+std::regex pNonblock  (to_re("^(\\s*)(NAME) (?:\\s)?<= (NAME)(\\s*)?;$"));
 std::regex pNonblockConcat    (to_re("^(\\s*)(NAME) <= \\{(.+)\\}(\\s*)?;$"));
 std::regex pNonblockIf(to_re("^(\\s*)if \\((NAME)\\) (NAME) <= (NAME)(\\s*)?;$"));
 /* function */
@@ -101,11 +100,13 @@ std::regex pIf        (to_re("^(\\s*)if \\(.*\\)$"));
 std::regex pElse      (to_re("^(\\s*)else$"));
 /* multiple/un-certain # of ops */
 //std::regex pBitExOrConcat (to_re("^(\\s*)assign (NAME) = \\{\\} \\^ (NAME)(\\s*)?;$"));
-std::regex pSrcConcat(to_re("^(\\s*)assign (NAME) = \\{ ((?:NAME(?:\\s)?, )+NAME) \\}(\\s*)?;$"));
-std::regex pSrcDestBothConcat(to_re("^(\\s*)assign \\{ ((?:NAME(?:\\s)?, )+NAME) \\} = \\{ ((?:NAME(?:\\s)?, )+NAME) \\}(\\s*)?;$"));
+std::regex pSrcConcat (to_re("^(\\s*)assign (NAME) = \\{ ((?:NAME(?:\\s)?, )*NAME)\\s*\\}(\\s*)?;$"));
+// here actually src can be only one var
+std::regex pSrcDestBothConcat(to_re("^(\\s*)assign \\{ ((?:NAME(?:\\s)?, )+NAME)\\s*\\} = \\{ ((?:NAME(?:\\s)?, )*NAME) \\}(\\s*)?;$"));
 
 /* Milicious */
 /* pVarName also exists in to_re(), and parse_var_list() */
+std::regex pVarAndSlice("([\aa-zA-Z0-9_\\.\\$\\\\'\\[\\]]+)(\\s*\\[\\d+(\\:\\d+)?\\])");
 std::regex pVarName("([\aa-zA-Z0-9_\\.\\$\\\\'\\[\\]]+)(\\s*\\[\\d+(\\:\\d+)?\\])?");
 std::regex pVarNameGroup("([\aa-zA-Z0-9_\\.\\$\\\\'\\[\\]]+)(?:(\\s*)(\\[\\d+(\\:\\d+)?\\]))?");
 std::regex pNum("^(\\d+)'(h|d|b)[\\dabcdefx\\?]+$");
@@ -122,6 +123,7 @@ std::vector<std::string> extendInputs;
 std::vector<std::string> extendOutputs;
 std::vector<std::string> flagOutputs;
 std::vector<std::string> moduleRegs;
+std::vector<std::string> moduleTrueRegs;
 std::unordered_map<std::string, uint32_t> moduleMems;
 std::set<std::string> moduleWires;
 std::string clockName;
@@ -136,7 +138,6 @@ std::unordered_map<std::string, std::pair<std::string, std::string>> memDims;
 std::unordered_map<std::string, uint32_t> reg2sig;
 std::unordered_map<std::string, uint32_t> fangyuanItemNum; // used to check item number in case statementsrs
 std::unordered_map<std::string, uint32_t> fangyuanCaseSliceWidth; // width of each slice used in RHS of case
-//std::unordered_map<std::string, destObj> g_passRelation; // concat assignment for variables
 VarWidth varWidth;
 VarWidth funcVarWidth;
 unsigned long int NEW_VAR = 0;
@@ -168,7 +169,7 @@ std::string CONSTANT_SIG; // reserve sig=1 for constants
 std::string RESET_SIG = "2"; // reserve sig=2 for reset
 
 /* clean all the global data */
-void clean_global_data() {
+void clean_global_data(uint32_t totalRegCnt, uint32_t nextSig) {
   moduleName.clear();
   moduleInputs.clear();
   moduleOutputs.clear();
@@ -200,13 +201,24 @@ void clean_global_data() {
   g_has_read_taint = true; // if true, read taint takes effect
   g_rst_pos = true;
   g_clkrst_exist = false;
-  g_reg_count = 0;
-  g_next_sig = 3; // 0 is reserved for unused
+  g_reg_count = totalRegCnt;
+  if(nextSig == 0)
+    g_next_sig = 3; // 0 is reserved for unused
+  else
+    g_next_sig = nextSig;
   reg2sig.clear();
   g_use_reset_taint = false;
   fangyuanItemNum.clear();
   fangyuanCaseSliceWidth.clear();
-  //g_passRelation.clear();
+  moduleTrueRegs.clear();
+  g_backwardMap.clear();
+  g_forwardMap.clear();
+  g_passExprStore.clear();
+  g_caseBackwardMap.clear();
+  g_caseForwardMap.clear();
+  g_caseStore.clear();
+  g_passInfoMap.clear();
+  g_regCondMap.clear();  
 }
 
 
@@ -216,7 +228,7 @@ void clean_global_data() {
   remove functions wrapping cases 
   collect information of select and concat*/
 void clean_file(std::string fileName) {
-  std::ifstream input(fileName);
+  std::ifstream cleanFileInput(fileName);
   std::ofstream output(fileName + ".nocomment");
   std::string line;
   std::string cleanLine;
@@ -226,7 +238,7 @@ void clean_file(std::string fileName) {
   std::regex redundentBlank("(\\S)(\\s+)(\\S)");
   std::regex extraBlank("([a-zA-Z0-9_\\.'])(\\s)(\\[)");
   bool inFunc = false;
-  while( std::getline(input, line) ) {
+  while( std::getline(cleanFileInput, line) ) {
     if(std::regex_match(line, match, pureComment) || line.substr(0,2) == "/*" || line.empty())
       continue;
     line = std::regex_replace(line, partialComment, "");
@@ -288,7 +300,6 @@ void clean_file(std::string fileName) {
             std::cout << "m.str(2):" + m.str(2) << std::endl;
             std::cout << "m.str(3):" + m.str(3) << std::endl;
           }
-          g_reg_count++;
         }
         break;
       case WIRE:
@@ -374,72 +385,160 @@ void clean_file(std::string fileName) {
       //      g_varSelectRange.emplace(op1, std::vector<uint32_t>{line});
       //    }
       //  }
-      //case SEL:
-      //case ITE:
-      //case SRC_CONCAT:
-      //  {
-      //    //fill_in_pass_relation(line);
-      //  }
       //  break;
-      //case BOTH_CONCAT:
+      //case ALWAYS_CLKRST:
       //  {
-      //    // split both_concat into src_concat and maybe also both_concat.
-      //    if( !std::regex_match(line, m, pSrcDestBothConcat) )
-      //      abort(); //
-
-      //    std::string blank = m.str(1);
-      //    std::string destList = m.str(2);
-      //    std::string srcList = m.str(3);
-      //    // if the srcList can be cleanly divided into parts for each dest, then divide it
-      //    // Otherwise, leave it.
-      //    std::vector<std::string> destVec;
-      //    std::vector<std::string> srcVec;
-      //    parse_var_list(destList, destVec);
-      //    parse_var_list(srcList, srcVec);
-      //    uint32_t srcIdx = 0;
-      //    uint32_t srcBits;
-      //    uint32_t remainBits = 0;
-      //    uint32_t idx = 0;
-      //    std::string outputString;
-      //    std::vector<std::string> lhsVec;
-      //    for(std::string singleDest: destVec) {
-      //      outputString.clear();            
-      //      lhsVec.push_back(singleDest);
-      //      if(lhsVec.size() == 1) {
-      //        idx = srcIdx;
-      //      }
-      //      remainBits += get_var_slice_width(singleDest);            
-      //      while(remainBits > 0) {
-      //        srcBits = get_var_slice_width(srcVec[srcIdx++]);
-      //        remainBits -= srcBits;
-      //      }
-      //      if(remainBits == 0) {
-      //        if(lhsVec.size() == 1) {
-      //          outputString = "  assign "+singleDest+" = { "+srcVec[idx++];
-      //          while(idx < srcIdx) {
-      //            outputString += ", " + srcVec[idx++];
-      //          }
-      //          outputString += " };";
-      //        }
-      //        else {
-      //          outputString = "  assign { " + lhsVec[0];
-      //          auto it = lhsVec.begin();
-      //          std::advance(it,1);
-      //          while(it != lhsVec.end());
-      //            outputString += " , " + *it;
-      //          outputString += " } = { "+srcVec[idx++];
-      //          while(idx < srcIdx) {
-      //            outputString += " , " + srcVec[idx++];
-      //          }
-      //          outputString += " };";
-      //        }
-      //        std::cout << outputString << std::endl;
-      //        //fill_in_pass_relation(outputString);
-      //        lhsVec.clear();
-      //      }
+      //    std::getline(cleanFileInput, line); // if line
+      //    std::getline(cleanFileInput, line); // if statement
+      //    std::getline(cleanFileInput, line); // else line
+      //    std::smatch m;          
+      //    if(!std::regex_match(line, m, pElse)) {
+      //      toCout("Error in matching else: "+line);
+      //      abort();
       //    }
+      //    std::getline(cleanFileInput, line); // else statement      
+      //    if(!std::regex_match(line, m, pNonblock)) {
+      //      toCout("match nonblock wrongly: "+line);
+      //      abort();
+      //    }
+      //    std::string dest = m.str(2);
+      //    std::string src = m.str(3);
+      //    moduleTrueRegs.push_back(dest);
+      //    fill_in_pass_relation(dest, src, line);
       //  }
       //  break;
+      case ONE_OP:
+        {
+          toCout("Matched in one_op");
+          if(std::regex_match(line, m, pNone)) {
+            std::string destAndSlice = m.str(2);
+            std::string op1AndSlice = m.str(3);
+            fill_in_pass_relation(destAndSlice, op1AndSlice, line);
+          }
+        }
+        break;
+      case SEL:
+        {
+          toCout("Matched in sel");
+          fill_in_sel_relation(line);
+        }
+        break;
+      case ITE:
+        {
+          toCout("Matched in ite");
+          fill_in_ite_relation(line);
+        }
+        break;
+      case SRC_CONCAT:
+        {
+          toCout("Matched in src_concat");          
+          fill_in_src_concat_relation(line);
+        }
+        break;
+      case BOTH_CONCAT:
+        {
+          toCout("Matched in both_concat");          
+          // split both_concat into src_concat and maybe also both_concat.
+          if( !std::regex_match(line, m, pSrcDestBothConcat) ) {
+            toCout("Error: both_concat not matched");
+            abort(); //
+          }
+
+          std::string blank = m.str(1);
+          std::string destList = m.str(2);
+          std::string srcList = m.str(3);
+          // if the srcList can be cleanly divided into parts for each dest, then divide it
+          // Otherwise, leave it.
+          std::vector<std::string> destVec;
+          std::vector<std::string> srcVec;
+          parse_var_list(destList, destVec);
+          parse_var_list(srcList, srcVec);
+          uint32_t srcIdx = 0;
+          uint32_t srcBits;
+          int remainBits = 0;
+          uint32_t idx = 0;
+          std::string outputString;
+          std::vector<std::string> lhsVec;
+          for(std::string singleDest: destVec) {
+            outputString.clear();            
+            lhsVec.push_back(singleDest);
+            if(lhsVec.size() == 1) {
+              idx = srcIdx;
+            }
+            remainBits += get_var_slice_width(singleDest);            
+            while(remainBits > 0) {
+              srcBits = get_var_slice_width(srcVec[srcIdx++]);
+              remainBits -= srcBits;
+            }
+            if(remainBits == 0) {
+              if(lhsVec.size() == 1) {
+                outputString = "  assign "+singleDest+" = { "+srcVec[idx++];
+                while(idx < srcIdx) {
+                  outputString += ", " + srcVec[idx++];
+                }
+                outputString += " };";
+                if( std::regex_match(outputString, m, pSrcConcat) )
+                  fill_in_src_concat_relation(outputString);
+                else
+                  checkCond(false, "Error: Unexpected operation found when splitting both_concat(1): "+outputString);
+              }
+              else {
+                outputString = "  assign { " + lhsVec[0];
+                auto it = lhsVec.begin();
+                std::advance(it,1);
+                while(it != lhsVec.end())
+                  outputString += " , " + *(it++);
+                outputString += " } = { "+srcVec[idx++];
+                while(idx < srcIdx) {
+                  outputString += " , " + srcVec[idx++];
+                }
+                outputString += " };";
+                // outputString could be simple pass or sel operation
+                if(std::regex_match(outputString, m, pSrcDestBothConcat))
+                  fill_in_both_concat_relation(outputString);
+                //else if(std::regex_match(outputString, m, pSel1)
+                //        || std::regex_match(outputString, m, pSel2)
+                //        || std::regex_match(outputString, m, pSel3)
+                //        || std::regex_match(outputString, m, pSel4) )
+                //  fill_in_sel_relation(outputString);
+                //else if(std::regex_match(outputString, m, pNone)) {
+                //  std::string destAndSlice = m.str(2);
+                //  std::string srcAndSlice = m.str(3);
+                //  fill_in_pass_relation(destAndSlice, srcAndSlice, outputString);
+                //}
+                else
+                  checkCond(false, "Error: Unexpected operation found when splitting both_concat(2): "+outputString);
+              }
+              output << outputString << std::endl;
+              lhsVec.clear();
+            }
+          }
+        }
+        break;
+      case NONBLOCK: 
+        {
+          toCout("Matched in nonblock");          
+          std::smatch m;
+          if(!std::regex_match(line, m, pNonblock)) {
+            toCout("match nonblock wrongly: "+line);
+            abort();
+          }
+          std::string destAndSlice = m.str(2);
+          std::string dest, destSlice;
+          split_slice(destAndSlice, dest, destSlice);
+          assert(destSlice.empty());
+          std::string src = m.str(3);
+          if(isNum(src))
+            break;
+          if(dest.back() == ' ') {
+            toCout("Warning: the last char is empty: "+dest);
+            dest.pop_back();
+          }
+          moduleTrueRegs.push_back(dest);
+
+          fill_in_pass_relation(dest, src, line);
+        }
+        break;
       default:
         break;
     } // end of switch
@@ -450,6 +549,7 @@ void clean_file(std::string fileName) {
       output << cleanLine << std::endl;
   }
   output.close();
+  cleanFileInput.close();
   did_clean_file = true;
 }
 
@@ -844,16 +944,15 @@ void merge_taints(std::string fileName) {
   }
 
   // wires giving value to regs should have taints grounded.
-  output << " // ground taints for wires connected to regs" << std::endl;
-  for (auto it = g_wire2reg.begin(); it != g_wire2reg.end(); ++it) {
-    if ( isNum(*it) || nextVersion.find(*it) != nextVersion.end() ) {
-      continue;
-    }
-    std::string reg, regSlice;
-    split_slice(*it, reg, regSlice);
-    output << "  assign " + reg + _r + regSlice + " = 0;" << std::endl;
-    output << "  assign " + reg + _c + regSlice + " = 0;" << std::endl;
-  }
+  //output << " // ground taints for wires connected to regs" << std::endl;
+  //for (auto it = g_wire2reg.begin(); it != g_wire2reg.end(); ++it) {
+  //  if ( isNum(*it) || nextVersion.find(*it) != nextVersion.end() ) {
+  //    continue;
+  //  }
+  //  std::string reg, regSlice;
+  //  split_slice(*it, reg, regSlice);
+  //  output << "  assign " + reg + _r + regSlice + " = 0;" << std::endl;
+  //}
 
   // declare _r taints for wire-type outputs
   // Assume: the original outputs do not end with "_r_flag"
@@ -949,6 +1048,7 @@ void fill_update(std::string fileName) {
   std::ifstream in(fileName);
   std::string line;
   std::smatch m;
+  std::string reg;
   // push all the vars on RHS of nonblocking to new_reg
   while( std::getline(in, line) ) {
     if ( std::regex_match(line, m, pNonblock) )
@@ -1146,6 +1246,8 @@ void remove_function_wrapper(std::string firstLine, std::ifstream &input, std::o
  
   bool bIsNum = isNum(b);
   bool aIsNum = isNum(a);
+
+  //fill_in_case_relation(result, b, a, s, caseAssignPairs);
 
   if(!bIsNum) {
     // begin to print the new case
@@ -1700,8 +1802,8 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
     abort();
   }
   std::string moduleName = m.str(2);
-  if(moduleName.compare("adder_32bit") == 0)
-    toCout("find adder_32bit!");
+  //if(moduleName.compare("adder_32bit") == 0)
+  //  toCout("find adder_32bit!");
 
   std::string instanceName = m.str(3);
   if( moduleInputsMap.find(moduleName) == moduleInputsMap.end() ) {
@@ -1782,20 +1884,41 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
       continue;
     }
     std::vector<uint32_t> localVerVec = input2SignalVerMap[inPort];
-    output << "    ." + inPort + _t+" ( " + get_rhs_taint_list(port2SignalMap[inPort], _t) + " )," << std::endl;
-    output << "    ." + inPort + _r+" ( " + get_lhs_ver_taint_list(port2SignalMap[inPort], _r, newLogic, localVerVec) + " )," << std::endl;
+    output << "    ." + inPort + _t + " ( " + get_rhs_taint_list(port2SignalMap[inPort], _t) + " )," << std::endl;
+    output << "    ." + inPort + _r + " ( " + get_lhs_ver_taint_list(port2SignalMap[inPort], _r, newLogic, localVerVec) + " )," << std::endl;
+    newLogicVec.push_back(newLogic) ; 
+    output << "    ." + inPort + _x + " ( " + get_lhs_ver_taint_list(port2SignalMap[inPort], _x, newLogic, localVerVec) + " )," << std::endl;
+    newLogicVec.push_back(newLogic) ;    
+    output << "    ." + inPort + _c + " ( " + get_lhs_ver_taint_list(port2SignalMap[inPort], _c, newLogic, localVerVec) + " )," << std::endl;
     newLogicVec.push_back(newLogic);
-    output << "    ." + inPort + _x+" ( " + get_lhs_ver_taint_list(port2SignalMap[inPort], _x, newLogic, localVerVec) + " )," << std::endl;
-    newLogicVec.push_back(newLogic);   
-    output << "    ." + inPort + _c+" ( " + get_lhs_ver_taint_list(port2SignalMap[inPort], _c, newLogic, localVerVec) + " )," << std::endl;
-    newLogicVec.push_back(newLogic);    
+    // _sig
+    std::string varAndSlice = port2SignalMap[inPort];
+    std::string varConnect;
+    if(!isNum(varAndSlice)) {
+      std::string var, varSlice;
+      split_slice(varAndSlice, var, varSlice);
+      varConnect = var + _sig;
+    }
+    else {
+      if( !std::regex_match(varAndSlice, m, pNum)) {
+        std::cout << "!! Error in matching number !!" << std::endl;
+      }
+      std::string numWidth = m.str(1);
+      varConnect = numWidth + "'h0";
+    }
+    output << "    ." + inPort + _sig + " ( " + varConnect + " )," << std::endl;    
   }
   for(std::string outPort: moduleOutputsMap[moduleName]) {
-    output << "    ." + outPort + _t+" ( " + get_lhs_taint_list(port2SignalMap[outPort], _t, newLogic) + " )," << std::endl;
-    newLogicVec.push_back(newLogic);    
-    output << "    ." + outPort + _r+"0 ( " + get_rhs_taint_list(port2SignalMap[outPort], _r) + " )," << std::endl; 
-    output << "    ." + outPort + _x+"0 ( " + get_rhs_taint_list(port2SignalMap[outPort], _x) + " )," << std::endl; 
-    output << "    ." + outPort + _c+"0 ( " + get_rhs_taint_list(port2SignalMap[outPort], _c) + " )," << std::endl; 
+    output << "    ." + outPort + _t + " ( " + get_lhs_taint_list(port2SignalMap[outPort], _t, newLogic) + " )," << std::endl;
+    newLogicVec.push_back(newLogic);      
+    output << "    ." + outPort + _r + "0 ( " + get_rhs_taint_list(port2SignalMap[outPort], _r) + " )," << std::endl; 
+    output << "    ." + outPort + _x + "0 ( " + get_rhs_taint_list(port2SignalMap[outPort], _x) + " )," << std::endl; 
+    output << "    ." + outPort + _c + "0 ( " + get_rhs_taint_list(port2SignalMap[outPort], _c) + " )," << std::endl;
+    // _sig
+    std::string varAndSlice = port2SignalMap[outPort];
+    std::string var, varSlice;
+    split_slice(varAndSlice, var, varSlice);
+    output << "    ." + outPort + _sig + " ( " + var + _sig + " )," << std::endl; 
   }
   // TODO: we cannot leave these _r_flags in the sub-modules,
   //for(std::string reg_r_flag: flagOutputs) {
@@ -1967,11 +2090,11 @@ void gen_wire_output(std::string fileName) {
 }
 
 
-int taint_gen(std::string fileName, uint32_t stage, bool isTopIn, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap, std::map<std::string, std::vector<std::string>> &moduleRFlagsMap) {
+int taint_gen(std::string fileName, uint32_t stage, bool isTopIn, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap, std::map<std::string, std::vector<std::string>> &moduleRFlagsMap, uint32_t totalRegCnt, uint32_t &nextSig) {
   toCout("*** Begin add taint for module: "+fileName);  
   if (stage <= 0) {
     toCout("Clear Global data!");
-    clean_global_data();
+    clean_global_data(totalRegCnt, nextSig);
     std::cout << "Begin cleaning!" << std::endl; //0
     clean_file(fileName);
   }
@@ -1991,6 +2114,10 @@ int taint_gen(std::string fileName, uint32_t stage, bool isTopIn, std::map<std::
     std::cout << "Begin fill update!" << std::endl; //2
     fill_update(fileName + ".clean");
   }
+  if (stage <= 2) {  
+    std::cout << "Process pass info!" << std::endl; //2
+    process_pass_info(fileName + ".clean");
+  }
   if (stage <= 3) {
     isTop = isTopIn;
     std::cout << "Begin add file taints!" << std::endl; //3
@@ -2009,6 +2136,7 @@ int taint_gen(std::string fileName, uint32_t stage, bool isTopIn, std::map<std::
     gen_reg_output(fileName + ".reg_output");
     gen_wire_output(fileName + ".wire_output");
   }
+  nextSig = g_next_sig;
   toCout("*** Finish add taint for module: "+fileName);  
   return 0;
 }

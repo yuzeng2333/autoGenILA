@@ -1,6 +1,7 @@
 #ifndef GLOBAL
 #define GLOBAL
 #include "VarWidth.h"
+#include "pass_info.h"
 #include <vector>
 #include <string>
 #include <unordered_map>
@@ -15,6 +16,7 @@ extern std::vector<std::string> extendInputs;
 extern std::vector<std::string> extendOutputs;
 extern std::vector<std::string> flagOutputs;
 extern std::vector<std::string> moduleRegs;
+extern std::vector<std::string> moduleTrueRegs;
 extern std::unordered_map<std::string, uint32_t> moduleMems;
 extern std::set<std::string> moduleWires;
 extern std::string clockName;
@@ -29,7 +31,17 @@ extern std::unordered_map<std::string, std::pair<std::string, std::string>> memD
 extern std::unordered_map<std::string, uint32_t> reg2sig;
 extern std::unordered_map<std::string, uint32_t> fangyuanItemNum; 
 extern std::unordered_map<std::string, uint32_t> fangyuanCaseSliceWidth;
-extern std::unordered_map<std::string, std::string> g_passRelation;
+extern std::map<std::string, std::string> g_finalRegCondMap;
+// pass_info
+extern std::unordered_map<std::string, std::vector<uint32_t>> g_backwardMap;
+extern std::unordered_map<std::string, std::vector<uint32_t>> g_forwardMap;
+extern std::vector<std::string> g_passExprStore;
+extern std::unordered_map<std::string, uint32_t> g_caseBackwardMap;
+extern std::unordered_map<std::string, uint32_t> g_caseForwardMap;
+extern std::vector<struct caseStruct> g_caseStore;
+extern std::unordered_map<std::string, std::vector<struct passInfo>> g_passInfoMap;
+extern std::map<std::string, std::string> g_regCondMap;
+
 extern VarWidth varWidth;
 extern VarWidth funcVarWidth;
 extern unsigned long int NEW_VAR;
@@ -85,7 +97,6 @@ extern std::regex pOr;
 extern std::regex pBitOr;     
 extern std::regex pBitExOr;     
 extern std::regex pBitAnd;     
-extern std::regex pConcat;    
 extern std::regex pSel1;   
 extern std::regex pSel2;     
 extern std::regex pSel3;     
@@ -106,7 +117,8 @@ extern std::regex pRedNor;
 extern std::regex pRedXor; 
 extern std::regex pRedXnor; 
 /* ite */
-extern std::regex pIte;     
+extern std::regex pIte;
+extern std::regex pDestAndSlice;
 /* do not add anything */
 extern std::regex pAlwaysClk;
 extern std::regex pAlwaysClkRst;
@@ -136,6 +148,7 @@ extern std::regex pElse;
 extern std::regex pSrcConcat;
 extern std::regex pSrcDestBothConcat;
 
+extern std::regex pVarAndSlice;
 extern std::regex pVarName;
 extern std::regex pVarNameGroup;
 extern std::regex pNum;

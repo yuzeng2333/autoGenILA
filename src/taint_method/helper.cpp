@@ -47,8 +47,8 @@ bool isInput(std::string var) {
 
 
 bool isReg(std::string var) {
-  auto it = std::find( moduleRegs.begin(), moduleRegs.end(), var );
-  return it != moduleRegs.end();
+  auto it = std::find( moduleTrueRegs.begin(), moduleTrueRegs.end(), var );
+  return it != moduleTrueRegs.end();
 }
 
 
@@ -67,9 +67,14 @@ bool isMem(std::string varAndSlice) {
 
 
 std::string to_re(std::string input) {
+  std::regex pNameBraces("\\(NAME\\)");
+  std::string varNameBraces("([\a\ba-zA-Z0-9_\\.\\$\\\\'\\[\\]\\(]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?(?: \\))?)(?:\\s)?");
+  auto res = std::regex_replace(input, pNameBraces, varNameBraces);
+
   std::regex pName("NAME");
-  std::string varName("[\a\ba-zA-Z0-9_\\.\\$\\\\'\\[\\]\\(]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?(?: \\))?");
-  auto res = std::regex_replace(input, pName, varName);
+  std::string varName("[\a\ba-zA-Z0-9_\\.\\$\\\\'\\[\\]\\(]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?(?: \\))?(?:\\s)?");
+  res = std::regex_replace(res, pName, varName);
+
   std::regex pNUM("NUM");
   std::string regexNum("\\d+'(h|b)[\\dabcdef]+");
   res = std::regex_replace(res, pNUM, regexNum);
