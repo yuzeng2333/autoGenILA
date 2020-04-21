@@ -47,8 +47,17 @@ bool isInput(std::string var) {
 
 
 bool isReg(std::string var) {
+  if(var.back() == ' ')
+    var.pop_back();
   auto it = std::find( moduleTrueRegs.begin(), moduleTrueRegs.end(), var );
   return it != moduleTrueRegs.end();
+}
+
+
+// belongs to over-approximated reg set
+bool isOAReg(std::string var) {
+  auto it = std::find( moduleRegs.begin(), moduleRegs.end(), var );
+  return it != moduleRegs.end();
 }
 
 

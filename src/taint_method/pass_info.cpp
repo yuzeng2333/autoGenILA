@@ -377,8 +377,12 @@ void merge_both_direction( const std::vector<std::pair<std::string, std::string>
   auto frontIt = mergedFrontCondMap.begin();
   auto backIt = mergedBackCondMap.begin();
   while( frontIt != mergedFrontCondMap.end() ) {
-    while( backIt->first.compare(frontIt->first) < 0 && backIt != mergedBackCondMap.end() )
+    while( backIt != mergedBackCondMap.end() && backIt->first.compare(frontIt->first) < 0 )
       backIt++;
+    if( backIt == mergedBackCondMap.end() ) {
+      frontIt++;      
+      continue;
+    }
     if(backIt->first.compare(frontIt->first) == 0) {
       std::string regAndSlice = backIt->first;
       if(g_regCondMap.find(regAndSlice) == g_regCondMap.end()) {
@@ -433,6 +437,7 @@ void merge_reg_cond_pair_vec(const std::vector<std::pair<std::string, std::strin
       std::string reg2, reg2Slice;
       split_slice(pairVec[j].first, reg2, reg2Slice);
       if(reg2.compare(reg) == 0) {
+        isAdded[j] = true; // 3
         uint32_t highIdx2 = get_end(reg2Slice);
         uint32_t lowIdx2 = get_begin(reg2Slice); 
         idxPairs.insert(std::make_pair(lowIdx2, highIdx2));
@@ -472,7 +477,7 @@ void merge_reg_cond_pair_vec(const std::vector<std::pair<std::string, std::strin
 
 
 void go_forward(std::string startVarAndSlice, std::vector<std::pair<std::string, std::string>> &frontCondPairVec) {
-  toCout("GO_FORWARD from: "+startVarAndSlice);
+  //toCout("GO_FORWARD from: "+startVarAndSlice);
   assert(frontCondPairVec.empty());
   std::string startVar, startVarSlice;
   split_slice(startVarAndSlice, startVar, startVarSlice);
@@ -594,6 +599,21 @@ void go_forward(std::string startVarAndSlice, std::vector<std::pair<std::string,
             go_forward(newStartVarAndSlice, localFrontCondPairVec);
             frontCondPairVec.insert(frontCondPairVec.end(), localFrontCondPairVec.begin(), localFrontCondPairVec.end());
           }
+        }
+      }
+      else if(std::regex_match(line, m, pNone)) {
+        std::string destAndSlice = m.str(2);      
+        std::string op1AndSlice = m.str(3);
+        std::string newStartVarAndSlice = get_target_and_slice(startVarAndSlice, op1AndSlice, op1AndSlice, destAndSlice);
+        if(newStartVarAndSlice.empty())
+          return;
+        else if(isTrueReg(newStartVarAndSlice)) { // if dest for this expression is reg
+          frontCondPairVec.push_back(std::make_pair(newStartVarAndSlice, ""));
+          return;
+        }
+        else {
+          go_forward(newStartVarAndSlice, localFrontCondPairVec);
+          frontCondPairVec.insert(frontCondPairVec.end(), localFrontCondPairVec.begin(), localFrontCondPairVec.end());
         }
       }
       else if(std::regex_match(line, m, pSel1)
@@ -719,7 +739,7 @@ void make_new_pair_vec( std::vector<std::pair<std::string, std::string>> &oldFro
 
 
 void go_backward(std::string startVarAndSlice, std::vector<std::pair<std::string, std::string>> &backCondPairVec) {
-  toCout("GO_BACKWARD for: "+startVarAndSlice);
+  //toCout("GO_BACKWARD for: "+startVarAndSlice);
   std::string startVar, startVarSlice;
   split_slice(startVarAndSlice, startVar, startVarSlice);
   if(g_backwardMap.find(startVar) == g_backwardMap.end()

@@ -407,35 +407,7 @@ void clean_file(std::string fileName) {
       //    fill_in_pass_relation(dest, src, line);
       //  }
       //  break;
-      case ONE_OP:
-        {
-          toCout("Matched in one_op");
-          if(std::regex_match(line, m, pNone)) {
-            std::string destAndSlice = m.str(2);
-            std::string op1AndSlice = m.str(3);
-            fill_in_pass_relation(destAndSlice, op1AndSlice, line);
-          }
-        }
-        break;
-      case SEL:
-        {
-          toCout("Matched in sel");
-          fill_in_sel_relation(line);
-        }
-        break;
-      case ITE:
-        {
-          toCout("Matched in ite");
-          fill_in_ite_relation(line);
-        }
-        break;
-      case SRC_CONCAT:
-        {
-          toCout("Matched in src_concat");          
-          fill_in_src_concat_relation(line);
-        }
-        break;
-      case BOTH_CONCAT:
+       case BOTH_CONCAT:
         {
           toCout("Matched in both_concat");          
           // split both_concat into src_concat and maybe also both_concat.
@@ -477,10 +449,6 @@ void clean_file(std::string fileName) {
                   outputString += ", " + srcVec[idx++];
                 }
                 outputString += " };";
-                if( std::regex_match(outputString, m, pSrcConcat) )
-                  fill_in_src_concat_relation(outputString);
-                else
-                  checkCond(false, "Error: Unexpected operation found when splitting both_concat(1): "+outputString);
               }
               else {
                 outputString = "  assign { " + lhsVec[0];
@@ -494,20 +462,6 @@ void clean_file(std::string fileName) {
                 }
                 outputString += " };";
                 // outputString could be simple pass or sel operation
-                if(std::regex_match(outputString, m, pSrcDestBothConcat))
-                  fill_in_both_concat_relation(outputString);
-                //else if(std::regex_match(outputString, m, pSel1)
-                //        || std::regex_match(outputString, m, pSel2)
-                //        || std::regex_match(outputString, m, pSel3)
-                //        || std::regex_match(outputString, m, pSel4) )
-                //  fill_in_sel_relation(outputString);
-                //else if(std::regex_match(outputString, m, pNone)) {
-                //  std::string destAndSlice = m.str(2);
-                //  std::string srcAndSlice = m.str(3);
-                //  fill_in_pass_relation(destAndSlice, srcAndSlice, outputString);
-                //}
-                else
-                  checkCond(false, "Error: Unexpected operation found when splitting both_concat(2): "+outputString);
               }
               output << outputString << std::endl;
               lhsVec.clear();
@@ -515,11 +469,11 @@ void clean_file(std::string fileName) {
           }
         }
         break;
-      case NONBLOCK: 
+      case NONBLOCKCONCAT: // will be splitted into nonblock and src_concat
         {
-          toCout("Matched in nonblock");          
+          toCout("Matched in nonblockconcat");          
           std::smatch m;
-          if(!std::regex_match(line, m, pNonblock)) {
+          if(!std::regex_match(line, m, pNonblockConcat)) {
             toCout("match nonblock wrongly: "+line);
             abort();
           }
@@ -527,18 +481,12 @@ void clean_file(std::string fileName) {
           std::string dest, destSlice;
           split_slice(destAndSlice, dest, destSlice);
           assert(destSlice.empty());
-          std::string src = m.str(3);
-          if(isNum(src))
-            break;
           if(dest.back() == ' ') {
             toCout("Warning: the last char is empty: "+dest);
             dest.pop_back();
           }
           moduleTrueRegs.push_back(dest);
-
-          fill_in_pass_relation(dest, src, line);
         }
-        break;
       default:
         break;
     } // end of switch
@@ -565,6 +513,102 @@ void remove_functions(std::string fileName) {
     }
     else
       output << line << std::endl;
+  }
+}
+
+
+void analyze_reg_path( std::string fileName ) {
+  std::ifstream input(fileName+".clean");
+  std::string line;
+  std::smatch m;
+  while( std::getline(input, line) ) {
+    uint32_t choice = parse_verilog_line(line, true);
+    switch(choice) {
+      case ONE_OP:
+        {
+          toCout("Matched in one_op");
+          if(std::regex_match(line, m, pNone)) {
+            std::string destAndSlice = m.str(2);
+            std::string op1AndSlice = m.str(3);
+            fill_in_pass_relation(destAndSlice, op1AndSlice, line);
+          }
+        }
+        break;
+      case SEL:
+        {
+          toCout("Matched in sel");
+          fill_in_sel_relation(line);
+        }
+        break;
+      case ITE:
+        {
+          toCout("Matched in ite");
+          fill_in_ite_relation(line);
+        }
+        break;
+      case SRC_CONCAT:
+        {
+          toCout("Matched in src_concat");          
+          fill_in_src_concat_relation(line);
+        }
+        break;
+      case BOTH_CONCAT:
+        {
+          toCout("Matched in both_concat");          
+          fill_in_both_concat_relation(line);
+        }
+        break;
+      case NONBLOCK: 
+        {
+          toCout("Matched in nonblock");          
+          std::smatch m;
+          if(!std::regex_match(line, m, pNonblock)) {
+            toCout("match nonblock wrongly: "+line);
+            abort();
+          }
+          std::string destAndSlice = m.str(2);
+          std::string dest, destSlice;
+          split_slice(destAndSlice, dest, destSlice);
+          assert(destSlice.empty());
+          std::string src = m.str(3);
+          if(isNum(src))
+            break;
+          if(dest.back() == ' ') {
+            toCout("Warning: the last char is empty: "+dest);
+            dest.pop_back();
+          }
+          moduleTrueRegs.push_back(dest);
+
+          fill_in_pass_relation(dest, src, line);
+        }
+        break;
+      case NONBLOCKIF:
+        {
+          toCout("Matched in nonblock");          
+          std::smatch m;
+          if(!std::regex_match(line, m, pNonblock)) {
+            toCout("match nonblock wrongly: "+line);
+            abort();
+          }
+          std::string destAndSlice = m.str(2);
+          std::string dest, destSlice;
+          split_slice(destAndSlice, dest, destSlice);
+          assert(destSlice.empty());
+          std::string src = m.str(3);
+          if(isNum(src))
+            break;
+          if(dest.back() == ' ') {
+            toCout("Warning: the last char is empty: "+dest);
+            dest.pop_back();
+          }
+          moduleTrueRegs.push_back(dest);
+
+          fill_in_pass_relation(dest, src, line); 
+        }
+        break;
+      default:
+        break;
+    }
   }
 }
 
@@ -1977,10 +2021,15 @@ bool extract_concat(std::string line, std::ofstream &output, std::string &return
   std::string newLine;
   std::vector<std::string> allVarList;
   std::queue<std::string> newVarQueue;
-  if (std::regex_search(line, m, pAssign)
-      && !std::regex_match(line, m, pSrcConcat)
-      && !std::regex_match(line, m, pSrcDestBothConcat)
-      && std::regex_search(line, m, pBraces)) {
+  // if isNonblockConcat, the declaration of fangyuan is after the nonblock stmt
+  bool isNonblockConcat = std::regex_match(line, m, pNonblockConcat);
+  std::string fangyuanDeclaration;
+  std::string fangyuanAssign;
+  if ( (std::regex_search(line, m, pAssign)
+       && !std::regex_match(line, m, pSrcConcat)
+       && !std::regex_match(line, m, pSrcDestBothConcat)
+       && std::regex_search(line, m, pBraces))
+       || std::regex_match(line, m, pNonblockConcat) ) { // also extract from nonblockconcat
     // iterate over all matches
     while( it != rend ) {
       varList = *it++;
@@ -2009,8 +2058,14 @@ bool extract_concat(std::string line, std::ofstream &output, std::string &return
         std::cout << "m.str(2):" + m.str(2) << std::endl;
         std::cout << "m.str(3):" + m.str(3) << std::endl;
       }
-      output << std::string(blankNo, ' ') + "wire [" + toStr(totalWidth-1) + ":0] fangyuan" + localIdx + ";" << std::endl;
-      output << std::string(blankNo, ' ') + "assign fangyuan" + localIdx + " = { " + varList + " };" << std::endl;
+      if(!isNonblockConcat) {
+        output << std::string(blankNo, ' ') + "wire [" + toStr(totalWidth-1) + ":0] fangyuan" + localIdx + ";" << std::endl;
+        output << std::string(blankNo, ' ') + "assign fangyuan" + localIdx + " = { " + varList + " };" << std::endl;
+      }
+      else {
+        fangyuanDeclaration = "  wire [" + toStr(totalWidth-1) + ":0] fangyuan" + localIdx + ";"; 
+        fangyuanAssign      = "  assign fangyuan" + localIdx + " = { " + varList + " };";
+      }
       newVarQueue.push("fangyuan"+localIdx);
     }
     char openBrace = '{';
@@ -2052,6 +2107,10 @@ bool extract_concat(std::string line, std::ofstream &output, std::string &return
       }
     }
     output << std::endl;
+    if(isNonblockConcat) {
+      output << fangyuanDeclaration << std::endl;
+      output << fangyuanAssign      << std::endl;
+    }
     return false;
   } // end of if
   return true; // true means no concatenation
@@ -2102,10 +2161,10 @@ int taint_gen(std::string fileName, uint32_t stage, bool isTopIn, std::map<std::
     std::cout << "Remove functions!" << std::endl;
     remove_functions(fileName);
   }
-  //if (stage <= 1) {
-  //  std::cout << "Analyze register's path!" << std::endl;
-  //  analyze_reg_path(fileName);
-  //}
+  if (stage <= 1) {
+    std::cout << "Analyze register's path!" << std::endl;
+    analyze_reg_path(fileName);
+  }
   if (stage <= 1) {  
     std::cout << "Begin read in clkrst!" << std::endl; //1
     read_in_clkrst(fileName + ".clkrst");

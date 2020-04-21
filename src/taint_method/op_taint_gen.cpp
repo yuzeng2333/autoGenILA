@@ -22,6 +22,7 @@ void input_taint_gen(std::string line, std::ofstream &output) {
   std::string blank = m.str(1);
   std::string slice = m.str(2);
   std::string var = m.str(3);
+  bool isClk = false, isRst = false;
   if(!g_hasRst) {
     if(var.compare("rst") == 0
         || var.compare("i_rst") == 0
@@ -29,13 +30,15 @@ void input_taint_gen(std::string line, std::ofstream &output) {
       g_hasRst = true;
       g_rst_pos = true;
       g_recentRst = var;
+      isClk = true;
     }
     else if ( var.compare("reset_n") == 0
                 || var.compare("resetn") == 0
                 || var.compare("rstn") == 0 ) {
       g_hasRst = true;
       g_rst_pos = false;
-      g_recentRst = var;      
+      g_recentRst = var;
+      isRst = true;
     }
   }
   moduleInputs.push_back(var);
@@ -59,10 +62,11 @@ void input_taint_gen(std::string line, std::ofstream &output) {
 
   //output << blank + "assign " + var + _sig + " =  0;" << std::endl;
 
-  if (g_hasRst)
-    output << blank + "assign " + var + _sig + " = " + get_recent_rst() + " ? " + RESET_SIG + " : 0 ;" << std::endl;
-  else 
-    output << blank + "assign " + var + _sig + " = rst_zy ? " + RESET_SIG + " : 0 ;" << std::endl;
+  if(isTop)
+    if (g_hasRst)
+      output << blank + "assign " + var + _sig + " = " + get_recent_rst() + " ? " + RESET_SIG + " : 0 ;" << std::endl;
+    else 
+      output << blank + "assign " + var + _sig + " = rst_zy ? " + RESET_SIG + " : 0 ;" << std::endl;
 
   if (!did_clean_file) {
     bool insertDone;
@@ -90,38 +94,18 @@ void reg_taint_gen(std::string line, std::ofstream &output) {
   std::string num = m.str(4);
 
   moduleRegs.push_back(var);
-  if(!isOutput(var)) {
-    output << blank << "logic " + slice + " " + var + _t+" ;" << std::endl;
-  }
-  else {
-    bool inTaintIsNew;    
-    uint32_t inVerNum = find_version_num(var, inTaintIsNew, output);
-    assert(inVerNum == 0);
-    assert(inTaintIsNew);    
-    output << blank << "output logic " + slice + " " + var + _t+" ;" << std::endl;
-    output << blank << "input " + slice + " " + var + _r + toStr(inVerNum) + " ;" << std::endl;
-    output << blank << "input " + slice + " " + var + _c + toStr(inVerNum) + " ;" << std::endl;
-    if(!isTop) {
-      output << blank << "input " + slice + var + _x + toStr(inVerNum) + " ;" << std::endl;
-      extendInputs.push_back(var+_x+toStr(inVerNum));      
-    }
-    else {
-      output << blank << "wire " + slice + var + _x + toStr(inVerNum) + " ;" << std::endl;
-      output << blank << "assign " + var + _x + toStr(inVerNum) + " = " +  var + _r + toStr(inVerNum) + " ;" << std::endl;
-    }
-    extendOutputs.push_back(var+_t);
-    extendOutputs.push_back(var+_sig);
-    extendInputs.push_back(var+_r+toStr(inVerNum));
-    extendInputs.push_back(var+_c+toStr(inVerNum));
+  output << blank << "logic " + slice + " " + var + _t + " ;" << std::endl; 
+  if(!isOutput(var)) { // maybe later declared as output
+    output << blank << "logic " + slice + " " + var + _r + " ;" << std::endl;
+    output << blank << "logic " + slice + " " + var + _x + " ;" << std::endl;
+    output << blank << "logic " + slice + " " + var + _c + " ;" << std::endl;
+    output << blank << "logic [" + toStr(g_sig_width-1) + ":0] " + var + _sig + " ;" << std::endl;    
   }
 
   output << blank << "logic " + var + "_t_flag ;" << std::endl;
   output << blank << "logic " + var + "_r_flag ;" << std::endl;
-  output << blank << "logic " + slice + " " + var + _r+" ;" << std::endl;
-  output << blank << "logic " + slice + " " + var + _x+" ;" << std::endl;
-  output << blank << "logic " + slice + " " + var + _c+" ;" << std::endl;
+
   if(isTrueReg(var)) {
-    output << blank << "logic [" + toStr(g_sig_width-1) + ":0] " + var + _sig + " ;" << std::endl;
     output << blank << "logic [" + toStr(g_sig_width-1) + ":0] " + var + _sig + "_const ;" << std::endl;
     output << blank << "assign " + var + _sig + "_const = " + toStr(g_next_sig++) + " ;" << std::endl;
   }
@@ -223,7 +207,6 @@ void output_insert_map(std::string line, std::ofstream &output, std::ifstream &i
   std::string slice = m.str(2);  
   std::string var = m.str(3);
   std::string blank = m.str(1);
-  output << blank + "logic " + slice + var + " ;" << std::endl;
     
   if(isOutput(var)) {
     std::cout << "!! Duplicate output find: " + line << std::endl;
@@ -250,10 +233,16 @@ void output_insert_map(std::string line, std::ofstream &output, std::ifstream &i
   }
 
   // return only if the next line is the reg declaration of this output
-  if( std::regex_match(nextLine, m, pReg) && var.compare(m.str(3)) ==0 )
-    return;
+  //if( std::regex_match(nextLine, m, pReg) && var.compare(m.str(3)) ==0 )
+  //  return;
 
-  output << blank << "output logic " + slice + var + _t+" ;" << std::endl;
+  output << blank << "output " + slice + var + _t + " ;" << std::endl;  
+  if(!isOAReg(var)) {
+    output << blank << "logic " + slice + var + _r + " ;" << std::endl;
+    output << blank << "logic " + slice + var + _c + " ;" << std::endl;
+    output << blank << "logic " + slice + var + _x + " ;" << std::endl;
+    output << blank << "logic [" + toStr(g_sig_width-1) + ":0] " + var + _sig + " ;" << std::endl;  }
+
   bool inTaintIsNew;
   uint32_t inVerNum = find_version_num(var, inTaintIsNew, output);
   assert(inVerNum == 0);
@@ -265,12 +254,7 @@ void output_insert_map(std::string line, std::ofstream &output, std::ifstream &i
   else 
     output << blank << "wire " + slice + var + _x + toStr(inVerNum) + " ;" << std::endl;
 
-  output << blank << "logic " + slice + var + _r+" ;" << std::endl;
-  output << blank << "logic " + slice + var + _c+" ;" << std::endl;
-  output << blank << "logic " + slice + var + _x+" ;" << std::endl;
-  if(isTop)
-    output << blank << "logic [" + toStr(g_sig_width-1) + ":0] " + var + _sig + " ;" << std::endl;
-  else
+  if(!isTop)
     output << blank << "output [" + toStr(g_sig_width-1) + ":0] " + var + _sig + " ;" << std::endl;
 
   extendOutputs.push_back(var+_t);
@@ -370,7 +354,12 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
   if (!op1IsNum && !op2IsNum) { // 2-op
 
     // _sig
-    output << blank + "assign " + dest + _sig + " = ( " + op1 + _sig + " == " + RESET_SIG + " && " +  op2 + _sig + " == " + RESET_SIG + " ) ? " + RESET_SIG + " : 0 ;" << std::endl;
+    if(op1 != dest && op2 != dest) {
+      output << blank + "assign " + dest + _sig + " = ( " + op1 + _sig + " == " + RESET_SIG + " && " +  op2 + _sig + " == " + RESET_SIG + " ) ? " + RESET_SIG + " : 0 ;" << std::endl;
+    }
+    else {
+      output << blank + "assign " + dest + _sig + " = 0 ;" << std::endl;
+    }
 
     /* Assgin new versions */
     uint32_t sndVerNum, thdVerNum;
@@ -471,8 +460,10 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
   else if (!op1IsNum && op2IsNum) { // 2-op
 
     // _sig
-    output << blank + "assign " + dest + _sig + " = " + op1 + _sig + " == " + RESET_SIG + " ? " + RESET_SIG + " : 0 ;" << std::endl;
-
+    if(op1 != dest)
+      output << blank + "assign " + dest + _sig + " = " + op1 + _sig + " == " + RESET_SIG + " ? " + RESET_SIG + " : 0 ;" << std::endl;
+    else
+      output << blank + "assign " + dest + _sig + " = 0 ;" << std::endl;
 
     bool op1IsNew;
     uint32_t sndVerNum = find_version_num(op1AndSlice, op1IsNew, output);
@@ -519,7 +510,10 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
   }
   else if (op1IsNum && !op2IsNum) { // 2-op
     // _sig
-    output << blank + "assign " + dest + _sig + " = " +  op2 + _sig + " == " + RESET_SIG + " ? " + RESET_SIG + " : 0 ;" << std::endl;
+    if(op1 != dest)    
+      output << blank + "assign " + dest + _sig + " = " +  op2 + _sig + " == " + RESET_SIG + " ? " + RESET_SIG + " : 0 ;" << std::endl;
+    else
+      output << blank + "assign " + dest + _sig + " = 0 ;" << std::endl;
 
     bool op2IsNew;    
     uint32_t thdVerNum = find_version_num(op2AndSlice, op2IsNew, output);
@@ -676,8 +670,10 @@ void one_op_taint_gen(std::string line, std::ofstream &output) {
   //}
   if(std::regex_match(line, m, pNone))
     output << blank + "assign " + dest + _sig + " = " + op1 + _sig + " ;" << std::endl;
-  else
+  else if(op1 != dest)
     output << blank + "assign " + dest + _sig + " = ( " + op1 + _sig + " == " + RESET_SIG + " ) ? " + RESET_SIG + " : 0 ;" << std::endl;
+  else
+    output << blank + "assign " + dest + _sig + " = 0 ;" << std::endl;
 }
 
 
@@ -1588,15 +1584,15 @@ void nonblockconcat_taint_gen(std::string line, std::ofstream &output) {
 
   output << blank.substr(0, blank.length()-4) + "assign { " + updateRListLeft + " } = 0 ;" << std::endl;
   //output << blank.substr(0, blank.length()-4) + "assign { " + updateRListLeft + " } = " + extend(destAndSlice+" != { "+updateList+" }", localWidthNum) + " ;" << std::endl;
-  output << blank.substr(0, blank.length()-4) + "assign { " + updateXListLeft + " } = " + extend(destAndSlice+" != { "+updateList+" }", localWidthNum) + " ;" << std::endl;
+  output << blank.substr(0, blank.length()-4) + "assign { " + updateXListLeft + " } = " + extend(dest+_sig+" != { "+updateList+" }", localWidthNum) + " ;" << std::endl;
   output << blank.substr(0, blank.length()-4) + "assign { " + updateCListLeft + " } = " + extend("1'b1", localWidthNum) + " ;" << std::endl;
 
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
   // TODO: assume in this case, it is impossible that all the RHS has the same sig as dest
   if (g_hasRst)  
-    output << blank + dest + _t+" \t\t<= " + get_recent_rst() + " ? 0 : ({ " + updateTList +" });" << std::endl;
+    output << blank + dest + _t + " \t\t<= " + get_recent_rst() + " ? 0 : ({ " + updateTList +" });" << std::endl;
   else
-    output << blank + dest + _t+" \t\t<= rst_zy ? 0 : ({ " + updateTList +" });" << std::endl;
+    output << blank + dest + _t + " \t\t<= rst_zy ? 0 : ({ " + updateTList +" });" << std::endl;
 
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
   if (g_hasRst)    

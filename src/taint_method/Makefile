@@ -20,10 +20,10 @@ case:
 	./a.out /workspace/research/ILA/autoGenILA/naiveEg/case/case.v 0
 
 aes0:
-	./a.out /workspace/research/ILA/autoGenILA/AES/Verilog/aes_top_simp.v 0
+	./a.out /workspace/research/ILA/autoGenILA/AES/Verilog/aes_128_yosys.v 0
 
 aes1:
-	./a.out /workspace/research/ILA/autoGenILA/AES/Verilog/aes_top_simp.v 1
+	./a.out /workspace/research/ILA/autoGenILA/AES/Verilog/aes_128_yosys.v 1
 
 exp:
 	./a.out ./experiment/experiment.v 0

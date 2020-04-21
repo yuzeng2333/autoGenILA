@@ -76,6 +76,8 @@ void gen_wire_output(std::string fileName);
 
 void remove_function_wrapper(std::string firstLine, std::ifstream &input, std::ofstream &output);
 
+void analyze_reg_path( std::string fileName );
+
 void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::string caseFirstLine);
 
 int taint_gen(std::string fileName, uint32_t stage, bool isTopIn, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap, std::map<std::string, std::vector<std::string>> &moduleRFlagsMap, uint32_t totalRegCnt, uint32_t &nextSig);
