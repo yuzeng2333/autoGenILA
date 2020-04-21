@@ -409,7 +409,7 @@ void clean_file(std::string fileName) {
       //  break;
        case BOTH_CONCAT:
         {
-          toCout("Matched in both_concat");          
+          //toCout("Matched in both_concat");          
           // split both_concat into src_concat and maybe also both_concat.
           if( !std::regex_match(line, m, pSrcDestBothConcat) ) {
             toCout("Error: both_concat not matched");
@@ -471,7 +471,7 @@ void clean_file(std::string fileName) {
         break;
       case NONBLOCKCONCAT: // will be splitted into nonblock and src_concat
         {
-          toCout("Matched in nonblockconcat");          
+          //toCout("Matched in nonblockconcat");          
           std::smatch m;
           if(!std::regex_match(line, m, pNonblockConcat)) {
             toCout("match nonblock wrongly: "+line);
@@ -526,7 +526,7 @@ void analyze_reg_path( std::string fileName ) {
     switch(choice) {
       case ONE_OP:
         {
-          toCout("Matched in one_op");
+          //toCout("Matched in one_op");
           if(std::regex_match(line, m, pNone)) {
             std::string destAndSlice = m.str(2);
             std::string op1AndSlice = m.str(3);
@@ -536,31 +536,31 @@ void analyze_reg_path( std::string fileName ) {
         break;
       case SEL:
         {
-          toCout("Matched in sel");
+          //toCout("Matched in sel");
           fill_in_sel_relation(line);
         }
         break;
       case ITE:
         {
-          toCout("Matched in ite");
+          //toCout("Matched in ite");
           fill_in_ite_relation(line);
         }
         break;
       case SRC_CONCAT:
         {
-          toCout("Matched in src_concat");          
+          //toCout("Matched in src_concat");          
           fill_in_src_concat_relation(line);
         }
         break;
       case BOTH_CONCAT:
         {
-          toCout("Matched in both_concat");          
+          //toCout("Matched in both_concat");          
           fill_in_both_concat_relation(line);
         }
         break;
       case NONBLOCK: 
         {
-          toCout("Matched in nonblock");          
+          //toCout("Matched in nonblock");          
           std::smatch m;
           if(!std::regex_match(line, m, pNonblock)) {
             toCout("match nonblock wrongly: "+line);
@@ -570,7 +570,7 @@ void analyze_reg_path( std::string fileName ) {
           std::string dest, destSlice;
           split_slice(destAndSlice, dest, destSlice);
           if(!destSlice.empty()) {
-            toCout("Warning: empty destSlice found!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            toCout("Warning: non-empty destSlice found!!!! "+line);
           }
           std::string src = m.str(3);
           if(isNum(src))
@@ -581,12 +581,12 @@ void analyze_reg_path( std::string fileName ) {
           }
           moduleTrueRegs.push_back(dest);
 
-          fill_in_pass_relation(dest, src, line);
+          fill_in_pass_relation(destAndSlice, src, line);
         }
         break;
       case NONBLOCKIF:
         {
-          toCout("Matched in nonblock");          
+          //toCout("Matched in nonblock");          
           std::smatch m;
           if(!std::regex_match(line, m, pNonblock)) {
             toCout("match nonblock wrongly: "+line);

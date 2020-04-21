@@ -19,11 +19,12 @@ std::vector<struct caseStruct> g_caseStore;
 std::unordered_map<std::string, std::vector<struct passInfo>> g_passInfoMap;
 std::map<std::string, std::string> g_regCondMap; // store register(AndSlice) and conditions that make it repeat itself
 
-void fill_in_pass_relation(std::string dest, std::string src, std::string line) {
+
+void fill_in_pass_relation(std::string destAndSlice, std::string src, std::string line) {
   uint32_t storeIdx = g_passExprStore.size();
   g_passExprStore.push_back(line);
 
-  add_into_backwardMap(dest, line, storeIdx);
+  add_into_backwardMap(destAndSlice, line, storeIdx);
   add_into_forwardMap(src, line, storeIdx);
 }
 
@@ -355,17 +356,18 @@ void merge_both_direction( const std::vector<std::pair<std::string, std::string>
   //  });
 
   if(frontCondPairVec.empty() && backCondPairVec.empty()) {
-    toCout("Nothing to merge!");
+    //toCout("Nothing to merge!");
     return;
   }
   else if(frontCondPairVec.empty()) {
-    toCout("frontCondPairVec is empty!!");
+    //toCout("frontCondPairVec is empty!!");
     return;
   }
   else if(backCondPairVec.empty()) {
-    toCout("backCondPairVec is empty!!");
+    //toCout("backCondPairVec is empty!!");
     return;
   }
+  uint32_t oldSize = g_regCondMap.size();
   toCout("Begin merge_both_direction");
   std::map<std::string, std::string> mergedFrontCondMap;
   std::map<std::string, std::string> mergedBackCondMap;
@@ -376,6 +378,7 @@ void merge_both_direction( const std::vector<std::pair<std::string, std::string>
 
   auto frontIt = mergedFrontCondMap.begin();
   auto backIt = mergedBackCondMap.begin();
+  // now the var in both maps should not have slice
   while( frontIt != mergedFrontCondMap.end() ) {
     while( backIt != mergedBackCondMap.end() && backIt->first.compare(frontIt->first) < 0 )
       backIt++;
@@ -385,6 +388,7 @@ void merge_both_direction( const std::vector<std::pair<std::string, std::string>
     }
     if(backIt->first.compare(frontIt->first) == 0) {
       std::string regAndSlice = backIt->first;
+      toCout("Merge succeeded for: "+regAndSlice);
       if(g_regCondMap.find(regAndSlice) == g_regCondMap.end()) {
         if(!frontIt->second.empty() && !backIt->second.empty())
           g_regCondMap.emplace(regAndSlice, frontIt->second + " && " + backIt->second);
@@ -392,6 +396,8 @@ void merge_both_direction( const std::vector<std::pair<std::string, std::string>
           g_regCondMap.emplace(regAndSlice, frontIt->second);
         else if(!backIt->second.empty())
           g_regCondMap.emplace(regAndSlice, backIt->second);
+        else
+          g_regCondMap.emplace(regAndSlice, "";
       }
       else {
         std::string existingCond = g_regCondMap[regAndSlice];
@@ -403,7 +409,8 @@ void merge_both_direction( const std::vector<std::pair<std::string, std::string>
           else if(!frontIt->second.empty())
             g_regCondMap[regAndSlice] = frontIt->second;
           else if(!backIt->second.empty())
-            g_regCondMap[regAndSlice] = backIt->second;            
+            g_regCondMap[regAndSlice] = backIt->second;
+          // else, the new cond is still empty, like existingCond
         }
       }
     }

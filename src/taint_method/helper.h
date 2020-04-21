@@ -12,7 +12,7 @@ bool isInput(std::string var);
 
 bool isReg(std::string var);
 
-bool isOAReg(std::string var); // belongs to over-approximated reg set
+bool isOAReg(std::string var);
 
 bool isWire(std::string var);
 

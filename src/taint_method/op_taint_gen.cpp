@@ -922,9 +922,9 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
   // assume only fangyuan variable can be LHS of src concatenation statement
   //checkCond(dest.find("fangyuan") != std::string::npos, "Var not name fangyuan appeared in src_concat! "+line);
   bool isFangyuan = (dest.find("fangyuan") != std::string::npos);
-  if(!isFangyuan) { 
-    toCout("Var not name fangyuan appeared in src_concat! "+line+", check if it is used in case or if it is splitted later!!");
-  }
+  //if(!isFangyuan) { 
+  //  toCout("Var not name fangyuan appeared in src_concat! "+line+", check if it is used in case or if it is splitted later!!");
+  //}
 
   std::vector<std::string> updateVec;
   parse_var_list(updateList, updateVec);
@@ -1432,7 +1432,9 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
   std::string op1, op1Slice;
   split_slice(op1AndSlice, op1, op1Slice);
   split_slice(destAndSlice, dest, destSlice);
-  checkCond(destSlice.empty(), "dest in nonblock has slice: "+line);
+  // some designs have separate assignment to different bits of a reg
+  if(!destSlice.empty())
+    toCout("dest in nonblock has slice: "+line);
   assert(!isMem(dest));    
   assert(!isMem(op1));    
 

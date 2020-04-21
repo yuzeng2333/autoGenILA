@@ -617,8 +617,8 @@ std::string get_lhs_ver_taint_list(std::vector<std::string> &updateVec, std::str
       std::string numWidth = m.str(1);
       int localIdx = USELESS_VAR++;
       // declare a dummy wire, just for being assigned
-      output << "  logic [" + numWidth + "-1:0] nouse" + toStr(localIdx) + " ;" << std::endl;
-      updateTaintSlice = "nouse" + toStr(localIdx);
+      output << "  logic [" + numWidth + "-1:0] nouse_zy" + toStr(localIdx) + " ;" << std::endl;
+      updateTaintSlice = "nouse_zy" + toStr(localIdx);
     }
     taintVec.push_back(updateTaintSlice);    
   }
@@ -641,7 +641,7 @@ std::string get_lhs_ver_taint_list(std::string list, std::string taint, std::ofs
 }
 
 
-// this function variant is created because sometines we do not want to create new nouse logic in the middle
+// this function variant is created because sometines we do not want to create new nouse_zy logic in the middle
 std::string get_lhs_ver_taint_list(std::vector<std::string> &updateVec, std::string taint, std::string &newLogic, std::vector<uint32_t> verVec) {
   assert(updateVec.size() == verVec.size());
   newLogic.clear();
@@ -670,8 +670,8 @@ std::string get_lhs_ver_taint_list(std::vector<std::string> &updateVec, std::str
       std::string numWidth = m.str(1);
       int localIdx = USELESS_VAR++;
       // declare a dummy wire, just for being assigned
-      newLogic = "  logic [" + numWidth + "-1:0] nouse" + toStr(localIdx) + " ;";
-      updateTaintSlice = "nouse" + toStr(localIdx);
+      newLogic = "  logic [" + numWidth + "-1:0] nouse_zy" + toStr(localIdx) + " ;";
+      updateTaintSlice = "nouse_zy" + toStr(localIdx);
     }
     taintVec.push_back(updateTaintSlice);
     i++;
@@ -750,8 +750,8 @@ std::string get_lhs_taint_list(std::vector<std::string> &destVec, std::string ta
       std::string numWidth = m.str(1);
       int localIdx = USELESS_VAR++;
       // declare a dummy wire, just for being assigned
-      output << "  wire [" + numWidth + "-1:0] nouse" + toStr(localIdx) + " ;" << std::endl;
-      singleDest = "nouse" + toStr(localIdx);
+      output << "  wire [" + numWidth + "-1:0] nouse_zy" + toStr(localIdx) + " ;" << std::endl;
+      singleDest = "nouse_zy" + toStr(localIdx);
     }
     taintVec.push_back(singleDest);    
   }
@@ -794,8 +794,8 @@ std::string get_lhs_taint_list(std::vector<std::string> &destVec, std::string ta
       std::string numWidth = m.str(1);
       int localIdx = USELESS_VAR++;
       // declare a dummy wire, just for being assigned
-      newLogic = "  logic [" + numWidth + "-1:0] nouse" + toStr(localIdx) + " ;";
-      singleDest = "nouse" + toStr(localIdx);
+      newLogic = "  logic [" + numWidth + "-1:0] nouse_zy" + toStr(localIdx) + " ;";
+      singleDest = "nouse_zy" + toStr(localIdx);
     }
     taintVec.push_back(singleDest);    
   }
@@ -839,8 +839,8 @@ std::string get_lhs_taint_list_no_slice(std::vector<std::string> &destVec, std::
       std::string numWidth = m.str(1);
       int localIdx = USELESS_VAR++;
       // declare a dummy wire, just for being assigned
-      output << "  wire [" + numWidth + "-1:0] nouse" + toStr(localIdx) + " ;" << std::endl;
-      singleDest = "nouse" + toStr(localIdx);
+      output << "  wire [" + numWidth + "-1:0] nouse_zy" + toStr(localIdx) + " ;" << std::endl;
+      singleDest = "nouse_zy" + toStr(localIdx);
     }
     taintVec.push_back(singleDest);    
   }

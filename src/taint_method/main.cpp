@@ -82,7 +82,7 @@ std::string separate_modules(std::string fileName, std::vector<std::string> &mod
       assert(!output.is_open());
       output.open(path+"/"+moduleName+"_NEW.v");
     }
-    else if(line.find("module") != std::string::npos) {
+    else if(line.find("module") != std::string::npos && line.find("module") == std::string::npos) {
       toCout("Error: module name not matched: "+line);
       abort();
     }
@@ -90,7 +90,7 @@ std::string separate_modules(std::string fileName, std::vector<std::string> &mod
     if(std::regex_match(line, m, pEndmodule)) {
       output << line << std::endl;
       if(!inModule) {
-        toCout("Error: found endmodule when not in module definition");
+        toCout("Error: found endmodule when not in module definition, last module name: "+moduleName);
         abort();
       }
       inModule = false;
