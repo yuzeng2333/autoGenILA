@@ -569,7 +569,9 @@ void analyze_reg_path( std::string fileName ) {
           std::string destAndSlice = m.str(2);
           std::string dest, destSlice;
           split_slice(destAndSlice, dest, destSlice);
-          assert(destSlice.empty());
+          if(!destSlice.empty()) {
+            toCout("Warning: empty destSlice found!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+          }
           std::string src = m.str(3);
           if(isNum(src))
             break;
