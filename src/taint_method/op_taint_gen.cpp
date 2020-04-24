@@ -63,10 +63,7 @@ void input_taint_gen(std::string line, std::ofstream &output) {
   //output << blank + "assign " + var + _sig + " =  0;" << std::endl;
 
   if(isTop)
-    if (g_hasRst)
-      output << blank + "assign " + var + _sig + " = " + get_recent_rst() + " ? " + RESET_SIG + " : 0 ;" << std::endl;
-    else 
-      output << blank + "assign " + var + _sig + " = rst_zy ? " + RESET_SIG + " : 0 ;" << std::endl;
+    output << blank + "assign " + var + _sig + " = 0 ;" << std::endl;
 
   if (!did_clean_file) {
     bool insertDone;
@@ -106,8 +103,7 @@ void reg_taint_gen(std::string line, std::ofstream &output) {
   output << blank << "logic " + var + "_r_flag ;" << std::endl;
 
   if(isTrueReg(var)) {
-    output << blank << "logic [" + toStr(g_sig_width-1) + ":0] " + var + _sig + "_const ;" << std::endl;
-    output << blank << "assign " + var + _sig + "_const = " + toStr(g_next_sig++) + " ;" << std::endl;
+    output << blank << "assign " + var + _sig + " = " + toStr(g_next_sig++) + " ;" << std::endl;
   }
   if(g_use_reset_taint)
     output << blank << "logic " + var + "_reset ;" << std::endl;
@@ -354,12 +350,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
   if (!op1IsNum && !op2IsNum) { // 2-op
 
     // _sig
-    if(op1 != dest && op2 != dest) {
-      output << blank + "assign " + dest + _sig + " = ( " + op1 + _sig + " == " + RESET_SIG + " && " +  op2 + _sig + " == " + RESET_SIG + " ) ? " + RESET_SIG + " : 0 ;" << std::endl;
-    }
-    else {
-      output << blank + "assign " + dest + _sig + " = 0 ;" << std::endl;
-    }
+    output << blank + "assign " + dest + _sig + " = 0 ;" << std::endl;
 
     /* Assgin new versions */
     uint32_t sndVerNum, thdVerNum;
@@ -460,10 +451,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
   else if (!op1IsNum && op2IsNum) { // 2-op
 
     // _sig
-    if(op1 != dest)
-      output << blank + "assign " + dest + _sig + " = " + op1 + _sig + " == " + RESET_SIG + " ? " + RESET_SIG + " : 0 ;" << std::endl;
-    else
-      output << blank + "assign " + dest + _sig + " = 0 ;" << std::endl;
+    output << blank + "assign " + dest + _sig + " = 0 ;" << std::endl;
 
     bool op1IsNew;
     uint32_t sndVerNum = find_version_num(op1AndSlice, op1IsNew, output);
@@ -510,10 +498,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
   }
   else if (op1IsNum && !op2IsNum) { // 2-op
     // _sig
-    if(op1 != dest)    
-      output << blank + "assign " + dest + _sig + " = " +  op2 + _sig + " == " + RESET_SIG + " ? " + RESET_SIG + " : 0 ;" << std::endl;
-    else
-      output << blank + "assign " + dest + _sig + " = 0 ;" << std::endl;
+    output << blank + "assign " + dest + _sig + " = 0 ;" << std::endl;
 
     bool op2IsNew;    
     uint32_t thdVerNum = find_version_num(op2AndSlice, op2IsNew, output);
@@ -628,10 +613,7 @@ void one_op_taint_gen(std::string line, std::ofstream &output) {
     isNone = true;
   if( isNum(op1) ) {
     output << blank + "assign " + dest + _t + destSlice + " = 0 ;" << std::endl;   
-    if (g_hasRst)
-      output << blank + "assign " + dest + _sig + " = " + get_recent_rst() + " ? " + RESET_SIG + " : " + CONSTANT_SIG + " ;";
-    else 
-      output << blank + "assign " + dest + _sig + " = rst_zy ? " + RESET_SIG + " : " + CONSTANT_SIG + " ;";
+    output << blank + "assign " + dest + _sig + " = " + CONSTANT_SIG + " ;" << std::endl;
     return;
   }
 
@@ -670,8 +652,6 @@ void one_op_taint_gen(std::string line, std::ofstream &output) {
   //}
   if(std::regex_match(line, m, pNone))
     output << blank + "assign " + dest + _sig + " = " + op1 + _sig + " ;" << std::endl;
-  else if(op1 != dest)
-    output << blank + "assign " + dest + _sig + " = ( " + op1 + _sig + " == " + RESET_SIG + " ) ? " + RESET_SIG + " : 0 ;" << std::endl;
   else
     output << blank + "assign " + dest + _sig + " = 0 ;" << std::endl;
 }
@@ -759,7 +739,7 @@ void sel_op_taint_gen(std::string line, std::ofstream &output) {
   if(!isNum(op2)) {
 
     // _sig
-    output << blank + "assign " + dest + _sig + " = ( " + op1 + _sig + " == " + RESET_SIG + " && " +  op2 + _sig + " == " + RESET_SIG + " ) ? " + RESET_SIG + " : 0 ;" << std::endl;
+    output << blank + "assign " + dest + _sig + " = 0 ;" << std::endl;
 
     auto op2IdxPair = varWidth.get_idx_pair(op2, line);
     std::string op2HighIdx  = toStr(op2IdxPair.first);
@@ -807,7 +787,7 @@ void sel_op_taint_gen(std::string line, std::ofstream &output) {
   else { // isNum(op2)
 
     // _sig
-    output << blank + "assign " + dest + _sig + " = ( " + op1 + _sig + " == " + RESET_SIG + " ) ? " + RESET_SIG + " : 0 ;" << std::endl;
+    output << blank + "assign " + dest + _sig + " = 0 ;" << std::endl;
 
     // taints
     output << blank + "assign " + dest + _t + destSlice + " = " + op1 + _t + slice + " ;" << std::endl;  
@@ -903,7 +883,7 @@ void reduce_one_op_taint_gen(std::string line, std::ofstream &output) {
   //ground_wires(op1+"_r"+sndVer, op1IdxPair, op1Slice, blank, output);
   //ground_wires(op1+"_x"+sndVer, op1IdxPair, op1Slice, blank, output);
   //}
-  output << blank + "assign " + dest + _sig + " = " + op1 + _sig + " == " + RESET_SIG + " ? " + RESET_SIG + " : 0 ;" << std::endl;
+  output << blank + "assign " + dest + _sig + " = 0 ;" << std::endl;
 }
 
 
@@ -1042,7 +1022,11 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
         }
         else if (!currentSig.empty() && isNum(vAndSlice)) {}
         else {  // !currentSig.empty() && !isNum(vAndSlice)
-          checkCond(currentSig == v+_sig, "WARNING: two signature found for one case assign!! First: "+currentSig+", second: "+v+_sig);
+          if(currentSig == v+_sig) {
+            toCout("WARNING: two signature found for one case assign!! First: "+currentSig+", second: "+v+_sig);
+            // if two sig found, set overall sig to 0.
+            currentSig = toStr(g_sig_width) + "'b0";
+          }
         }
       }
     } // end of for loop
@@ -1062,14 +1046,7 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
     //}
     output << blank + "logic [" + toStr(g_sig_width-1) + ":" + "0] " + dest + _sig + " ;" << std::endl;
     // when all the signatures of concatenation elements are 
-    output << blank + "assign " + dest + _sig + " = ( ";
-    for(auto vAndSlice : updateVec) {
-      if(isNum(vAndSlice))
-        continue;
-      split_slice(vAndSlice, v, vSlice);
-      output << v + _sig + " == " + RESET_SIG + " && ";
-    }
-    output << " 1 ) ? " + RESET_SIG + " : 0 ;" << std::endl;
+    output << blank + "assign " + dest + _sig + " = 0 ;" << std::endl;
   }
 
   // other taints
@@ -1361,10 +1338,7 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
 
     output << blank << "assign " + dest + _t + destSlice + " = " + condAndSlice + " ? ( " + extend("| "+cond+_t+" "+condSlice, localWidthNum) + " | " + op1 + _t + op1Slice + " ) : " + extend("| "+cond+_t+" "+condSlice, localWidthNum) + ";" << std::endl;
 
-    if (g_hasRst)
-      output << blank + "assign " + dest + _sig + " = " + condAndSlice + " ? " + op1 + _sig + " : " + get_recent_rst() + " ? " + RESET_SIG + " : " + cond + _sig + " ;" << std::endl; // + " == " + RESET_SIG + " ? " + RESET_SIG + " : " + CONSTANT_SIG + " ;";
-    else 
-      output << blank + "assign " + dest + _sig + " = " + condAndSlice + " ? " + op1 + _sig + " : " + "rst_zy ? " + RESET_SIG + " : " + cond + _sig + " ;" << std::endl;//" == " + RESET_SIG + " ? " + RESET_SIG + " : " + CONSTANT_SIG + " ;";
+    output << blank + "assign " + dest + _sig + " = " + condAndSlice + " ? " + op1 + _sig + " : " + cond + _sig + " ;" << std::endl;
 
     output << blank << "assign " + cond + _r + condVer + condSlice + " = ( | ("+dest+_r+destSlice+" | ( "+extend(condAndSlice, localWidthNum)+" & "+op1+_t+op1Slice+" & "+dest+_c+destSlice+" ))) && " + op1AndSlice + " != " + op2AndSlice + " ;" << std::endl;
 
@@ -1391,10 +1365,7 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
 
     output << blank << "assign " + dest + _t + destSlice + " = " + condAndSlice + " ? " + extend("| "+cond+_t+" "+condSlice, localWidthNum) + " : ( " + extend("| "+cond+_t+" "+condSlice, localWidthNum) + " | " + op2 + _t + op2Slice + " );" << std::endl;  
    
-    if(g_hasRst)
-      output << blank << "assign " + dest + _sig + " = " + condAndSlice + " ? ( " + get_recent_rst() + " ? " + RESET_SIG + " : " + cond + _sig + " ) : " + op2 + _sig + " ;" << std::endl;
-    else
-      output << blank << "assign " + dest + _sig + " = " + condAndSlice + " ? ( rst_zy ? " + RESET_SIG + " : " + cond + _sig + " ) : " + op2 + _sig + " ;" << std::endl;
+    output << blank << "assign " + dest + _sig + " = " + condAndSlice + " ? " + cond + _sig + " : " + op2 + _sig + " ;" << std::endl;
 
     output << blank << "assign " + cond + _r + condVer + condSlice + " = ( | ("+dest+_r+destSlice+" | ( "+extend("!"+condAndSlice, localWidthNum)+" & "+op2+_t+op2Slice+" & "+dest+_c+destSlice+" ))) && " + op1AndSlice + " != " + op2AndSlice + " ;" << std::endl;
 
@@ -1407,12 +1378,7 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
   else {
     /* when both inputs are constants */
     output << blank << "assign " + dest + _t + " = " + extend(cond+_t+" "+condSlice, localWidthNum) + " ;" << std::endl;
-
-    if(g_hasRst)
-      output << blank << "assign " + dest + _sig + " = " + get_recent_rst() + " ? " + RESET_SIG + " : " + cond + _sig + " ;" << std::endl;//" == " + RESET_SIG + " ? " + RESET_SIG + " : " + CONSTANT_SIG + " ;" << std::endl;
-    else
-      output << blank << "assign " + dest + _sig + " = rst_zy ? " + RESET_SIG + " : " + cond + _sig + " ;" << std::endl;//" == " + RESET_SIG + " ? " + RESET_SIG + " : " + CONSTANT_SIG + " ;" << std::endl;
-
+    output << blank << "assign " + dest + _sig + " = " + cond + _sig + " ;" << std::endl;
     output << blank << "assign " + cond + _r + condVer + condSlice + " = ( | " + dest+_r+destSlice + ") && " + op1AndSlice + " != " + op2AndSlice + " ;" << std::endl;
   }
 }
@@ -1480,14 +1446,6 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
   // _c
   output << blank.substr(0, blank.length()-4) + "assign " + op1 + _c + op1Ver + op1Slice + " = " + extend("1'b1", localWidthNum) + " ;" << std::endl;
 
-  // _sig
-  output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
-  if (g_hasRst)
-    output << blank + dest + _sig + " \t\t<= " + get_recent_rst() + " ? " + RESET_SIG + " : " + dest + _sig + " == " + dest + _sig + "_const ? " + dest + _sig + "_const : " + op1+_sig + " == " + RESET_SIG + " ? " + RESET_SIG + " : " + op1+_sig + " == " + CONSTANT_SIG + " ? " + CONSTANT_SIG + " : " + dest + _sig + "_const ;" << std::endl;
-  else 
-    output << blank + dest + _sig + " \t\t<= rst_zy ? " + RESET_SIG + " : " + dest + _sig + " == " + dest + _sig + "_const ? " + dest + _sig + "_const : " + op1 + _sig + " == " + RESET_SIG + " ? " + RESET_SIG + " : " + op1+_sig + " == " + CONSTANT_SIG + " ? " + CONSTANT_SIG + " : " + dest + _sig + "_const ;" << std::endl;
-
-
   // _t
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
   if(!replaceSig) {
@@ -1537,9 +1495,9 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
   if(!g_use_zy_count)
     if (g_hasRst)  
-      output << blank + dest + "_r_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : ( | " + dest + _r /*+ " && " + dest + _sig + " != " + RESET_SIG*/ + " ) ;" << std::endl;
+      output << blank + dest + "_r_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : ( | " + dest + _r + " ) ;" << std::endl;
     else
-      output << blank + dest + "_r_flag \t<= rst_zy ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : ( | " + dest + _r /*+ " && " + dest + _sig + " != " + RESET_SIG*/ + " ) ;" << std::endl;
+      output << blank + dest + "_r_flag \t<= rst_zy ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : ( | " + dest + _r + " ) ;" << std::endl;
   else
     if (g_hasRst)  
       output << blank + dest + "_r_flag \t<= ( " + get_recent_rst() + " || zy_count < 50 ) ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + _r+" ;" << std::endl;
@@ -1652,6 +1610,7 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
     split_slice(srcAndSlice, src, srcSlice);
     split_slice(condAndSlice, cond, condSlice);
     assert_info(isMem(dest), "dest is: "+dest);
+
     uint32_t localWidthNum = get_var_slice_width(destAndSlice);
 
     // assume: if src is num, the cond must be rst.

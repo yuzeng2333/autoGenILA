@@ -30,7 +30,7 @@ struct passInfo {
 };
 
 // functions
-void fill_in_pass_relation(std::string dest, std::string src, std::string line);
+void fill_in_pass_relation(std::string dest, std::string srcAndSlice, std::string line);
 
 void fill_in_case_relation(std::string dest, std::string longSrc, std::string shortSrc, std::string cond, std::vector<std::pair<std::string, std::string>> &caseAssignPairs);
 

@@ -20,10 +20,10 @@ std::unordered_map<std::string, std::vector<struct passInfo>> g_passInfoMap;
 std::map<std::string, std::string> g_regCondMap; // store register(AndSlice) and conditions that make it repeat itself
 
 
-void fill_in_pass_relation(std::string destAndSlice, std::string src, std::string line) {
+void fill_in_pass_relation(std::string destAndSlice, std::string srcAndSlice, std::string line) {
   uint32_t storeIdx = g_passExprStore.size();
   g_passExprStore.push_back(line);
-
+  std::string src, srcSlice;
   add_into_backwardMap(destAndSlice, line, storeIdx);
   add_into_forwardMap(src, line, storeIdx);
 }
@@ -131,7 +131,6 @@ void fill_in_sel_relation(std::string line) {
   add_into_backwardMap(destAndSlice, line, storeIdx);
   if(!isNum(op1))
     add_into_forwardMap(op1+slice, line, storeIdx);
-
 }
 
 
@@ -388,7 +387,7 @@ void merge_both_direction( const std::vector<std::pair<std::string, std::string>
     }
     if(backIt->first.compare(frontIt->first) == 0) {
       std::string regAndSlice = backIt->first;
-      toCout("Merge succeeded for: "+regAndSlice);
+      toCout("~~~~~~~~~~~~ *^* ~~~~~~~~~~~~~~~~~ <(* v *)> ~~~~~~  ~~~~~~~~~ Merge succeeded for: "+regAndSlice);
       if(g_regCondMap.find(regAndSlice) == g_regCondMap.end()) {
         if(!frontIt->second.empty() && !backIt->second.empty())
           g_regCondMap.emplace(regAndSlice, frontIt->second + " && " + backIt->second);
@@ -606,6 +605,24 @@ void go_forward(std::string startVarAndSlice, std::vector<std::pair<std::string,
             go_forward(newStartVarAndSlice, localFrontCondPairVec);
             frontCondPairVec.insert(frontCondPairVec.end(), localFrontCondPairVec.begin(), localFrontCondPairVec.end());
           }
+        }
+      }
+      else if(std::regex_match(line, m, pNonblockIf)) {
+        std::string ifCond = m.str(2);
+        std::string destAndSlice = m.str(3);
+        std::string op1AndSlice = m.str(4);
+        
+
+        std::string newStartVarAndSlice = get_target_and_slice(startVarAndSlice, op1AndSlice, op1AndSlice, destAndSlice);
+        if(newStartVarAndSlice.empty())
+          return;
+        else if(isTrueReg(newStartVarAndSlice)) { // if dest for this expression is reg
+          frontCondPairVec.push_back(std::make_pair(newStartVarAndSlice, ifCond));
+          return;
+        }
+        else {
+          toCout("Error: dest of nonblockif is not reg!!!");
+          abort();
         }
       }
       else if(std::regex_match(line, m, pNone)) {

@@ -586,26 +586,25 @@ void analyze_reg_path( std::string fileName ) {
         break;
       case NONBLOCKIF:
         {
-          //toCout("Matched in nonblock");          
-          std::smatch m;
-          if(!std::regex_match(line, m, pNonblock)) {
-            toCout("match nonblock wrongly: "+line);
-            abort();
-          }
-          std::string destAndSlice = m.str(2);
-          std::string dest, destSlice;
-          split_slice(destAndSlice, dest, destSlice);
-          assert(destSlice.empty());
-          std::string src = m.str(3);
-          if(isNum(src))
-            break;
-          if(dest.back() == ' ') {
-            toCout("Warning: the last char is empty: "+dest);
-            dest.pop_back();
-          }
-          moduleTrueRegs.push_back(dest);
+          toCout("Found nonblockif, which is not analyzed for reg path!");    
+          //std::smatch m;
+          //if(!std::regex_match(line, m, pNonblockIf)) {
+          //  toCout("match nonblockif wrongly: "+line);
+          //  abort();
+          //}
+          //std::string destAndSlice = m.str(3);
+          //std::string dest, destSlice;
+          //split_slice(destAndSlice, dest, destSlice);
+          //std::string srcAndSlice = m.str(4);
+          //if(isNum(srcAndSlice))
+          //  break;
+          //if(dest.back() == ' ') {
+          //  toCout("Warning: the last char is empty: "+dest);
+          //  dest.pop_back();
+          //}
+          //moduleTrueRegs.push_back(dest);
 
-          fill_in_pass_relation(dest, src, line); 
+          //fill_in_pass_relation(destAndSlice, srcAndSlice, line); 
         }
         break;
       default:

@@ -15,8 +15,12 @@
 #define toStr(a) std::to_string(a)
 
 bool isNum(std::string name) {
-  size_t bracePos = name.find('{');
   std::smatch m;
+  std::regex p("^(\\s*)(\\S+)(\\s*)$");
+  if(!std::regex_match(name, m, p))
+    abort();
+  name = m.str(2);
+  size_t bracePos = name.find('{');
   if (bracePos == name.npos)
     return std::regex_match(name, m, pNum);
   else {
@@ -520,6 +524,10 @@ uint32_t get_var_slice_width(std::string varAndSlice) {
   std::regex pName("(\\s*)(\\S+)(\\s*)");
   std::regex_match(var, m, pName);
   var = m.str(2);
+  if(isMem(var)) {
+    auto dim = memDims[var];
+    return get_width(dim.first);
+  }
   uint32_t totalWidth = 0;
   if(!varSlice.empty()) {
     if(isSingleBit(varSlice))
