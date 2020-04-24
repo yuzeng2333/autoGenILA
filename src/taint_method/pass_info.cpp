@@ -397,7 +397,7 @@ void merge_both_direction( const std::vector<std::pair<std::string, std::string>
         else if(!backIt->second.empty())
           g_regCondMap.emplace(regAndSlice, backIt->second);
         else
-          g_regCondMap.emplace(regAndSlice, "";
+          g_regCondMap.emplace(regAndSlice, "");
       }
       else {
         std::string existingCond = g_regCondMap[regAndSlice];
