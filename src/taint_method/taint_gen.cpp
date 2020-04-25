@@ -868,6 +868,7 @@ void add_file_taints(std::string fileName, std::map<std::string, std::vector<std
   CONSTANT_SIG = toStr(g_sig_width) + "'b1";
   // Reserve first line for module declaration
   while( std::getline(input, line) ) {
+    //toCout(line);
     lineNo++;
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       add_case_taints_limited(input, output, line);

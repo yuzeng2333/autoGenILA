@@ -7,7 +7,7 @@
 
 ///// Data structures used in this file
 
-/* in g_backwardMap, value is index to g_passExprStore, to find a line whose dest is exactly the key, or a line which is conctenation of multiple destAndSlice. Then we can use the multiple destAndSlice to query g_backwardMap again. So keys might be dest or destAndSlice */
+/* in g_forwardMap, key is dest, not destAndSlice. But the lines you get might have srcAndSlice instead of src */
 std::unordered_map<std::string, std::vector<uint32_t>> g_backwardMap;
 /* in g_forwardMap, key is src, not srcAndSlice. But the lines you get might have srcAndSlice instead of src */
 std::unordered_map<std::string, std::vector<uint32_t>> g_forwardMap;
@@ -207,6 +207,7 @@ void process_pass_info(std::string fileName) {
   std::string line;
   std::smatch m;
   while(std::getline(input, line)) {
+    toCout(line);
     uint32_t choice = parse_verilog_line(line, true);
     switch (choice) {
       case SRC_CONCAT:
@@ -253,7 +254,7 @@ void process_pass_info(std::string fileName) {
               || std::regex_match(line, m, pSel3)
               || std::regex_match(line, m, pSel4)) {}
         else 
-          return;
+          break;
         std::string destAndSlice = m.str(2);
         std::string op1 = m.str(3);
         std::string slice = m.str(4);
@@ -644,7 +645,27 @@ void go_forward(std::string startVarAndSlice, std::vector<std::pair<std::string,
               || std::regex_match(line, m, pSel2)
               || std::regex_match(line, m, pSel3)
               || std::regex_match(line, m, pSel4) ) {
-        checkCond(false, "Error: sel operation not supported yet for pass info analysis!");
+        std::string blank = m.str(1);
+        std::string destAndSlice = m.str(2);
+        std::string op1 = m.str(3);
+        std::string slice = m.str(4);
+        std::string op2AndSlice = m.str(5);
+        std::string range = m.str(6);
+        std::string dest, destSlice;
+        std::string op2, op2Slice;
+        split_slice(destAndSlice, dest, destSlice);
+        split_slice(op2AndSlice, op2, op2Slice);
+        checkCond( op1.compare(startVar) == 0, "Error: startVar("+startVar+") does not match op1("+op1+")" );
+        uint32_t highIdx = get_end(startVarSlice);
+        uint32_t  lowIdx = get_begin(startVarSlice);
+        if(highIdx - lowIdx + 1 != std::stoi(range)) {
+          toCout("Warning: range does not match in sel:"+ line);
+          return;
+        }
+        else {
+          go_forward(destAndSlice, localFrontCondPairVec);
+          make_new_pair_vec(localFrontCondPairVec, frontCondPairVec, op1+" == "+toStr(lowIdx));
+        }
       }
       else if( std::regex_match(line, m, pNonblockConcat) ) {
         checkCond(false, "Error: NONBLOCKCONCAT not supported in process_pass_info yet!");
@@ -889,7 +910,24 @@ void go_backward(std::string startVarAndSlice, std::vector<std::pair<std::string
             || std::regex_match(line, m, pSel2)
             || std::regex_match(line, m, pSel3)
             || std::regex_match(line, m, pSel4) ) {
-      checkCond(false, "Error: sel operation not supported yet for pass info analysis!");
+      toCout("Warning: found sel during go_backward!!");
+      //std::string blank = m.str(1);
+      //std::string destAndSlice = m.str(2);
+      //std::string op1 = m.str(3);
+      //std::string slice = m.str(4);
+      //std::string op2AndSlice = m.str(5);
+      //std::string lowIdx = m.str(6);
+      //std::string dest, destSlice;
+      //std::string op2, op2Slice;
+      //split_slice(destAndSlice, dest, destSlice);
+      //split_slice(op2AndSlice, op2, op2Slice);
+      //if(g_backwardMap.find(op1) == g_backwardMap.end()
+      //    && g_caseBackwardMap.find(op1) == g_caseBackwardMap.end())
+      //  return;
+      //if(isTrueReg(op1)) {
+      //  backCondPairVec.push_back(std::make_pair(op1, ""));
+      //  return;
+      //}
     }
     else {
       checkCond(false, "Error: this operation not supported yet for pass info analysis: "+line);

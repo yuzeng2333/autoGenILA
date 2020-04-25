@@ -16,9 +16,12 @@
 
 bool isNum(std::string name) {
   std::smatch m;
-  std::regex p("^(\\s*)(\\S+)(\\s*)$");
-  if(!std::regex_match(name, m, p))
-    abort();
+  while(name.back() == ' ')
+    name.pop_back();
+  std::regex p("^(\\s*)(.*)$");
+  if(!std::regex_match(name, m, p)) {
+    toCout("Error: var not matched in isNum: "+name);
+  }
   name = m.str(2);
   size_t bracePos = name.find('{');
   if (bracePos == name.npos)

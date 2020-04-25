@@ -1,0 +1,3 @@
+4/25: no reset_sig, (dest_sig != op1_sig | dest != op1) is used in assignment of reg_t and reg_t_flag:
+sha:
+instr2: 160s

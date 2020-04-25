@@ -1467,26 +1467,26 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
   if(!replaceSig) {
     if(!g_use_zy_count)
       if (g_hasRst)
-        output << blank + dest + "_t_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_t_flag ? 1 : | (" + op1 + _t + " & " + extend( dest+_sig+" != "+op1+_sig+" | "+destAndSlice+" != "+op1AndSlice, localWidthNum ) + " );" << std::endl; // | " +  op1+_sig + " == " + CONSTANT_SIG + " );" << std::endl;
+        output << blank + dest + "_t_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_t_flag ? 1 : | " + op1 + _t + " & ( " + dest+_sig+" != "+op1+_sig+" | "+destAndSlice+" != "+op1AndSlice + " );" << std::endl; // | " +  op1+_sig + " == " + CONSTANT_SIG + " );" << std::endl;
       else
-        output << blank + dest + "_t_flag \t<= rst_zy ? 0 : " + dest + "_t_flag ? 1 : | (" + op1 + _t + " & " + extend( dest+_sig+" != "+op1+_sig+" | "+destAndSlice+" != "+op1AndSlice, localWidthNum ) + " );" << std::endl;//| " +  op1+_sig + " == " + CONSTANT_SIG + " );" << std::endl;
+        output << blank + dest + "_t_flag \t<= rst_zy ? 0 : " + dest + "_t_flag ? 1 : | " + op1 + _t + " & ( " + dest+_sig+" != "+op1+_sig+" | "+destAndSlice+" != "+op1AndSlice + " );" << std::endl;//| " +  op1+_sig + " == " + CONSTANT_SIG + " );" << std::endl;
     else
       if (g_hasRst)
-        output << blank + dest + "_t_flag \t<= ( " + get_recent_rst() + " || zy_count < 50 ) ? 0 : " + dest + "_t_flag ? 1 : | ( " + op1 + _t+" & " + extend( dest+_sig+" != "+op1+_sig+" | "+destAndSlice+" != "+op1AndSlice, localWidthNum ) + " );" << std::endl; //| " +  op1+_sig + " == " + CONSTANT_SIG + " );" << std::endl;
+        output << blank + dest + "_t_flag \t<= ( " + get_recent_rst() + " || zy_count < 50 ) ? 0 : " + dest + "_t_flag ? 1 : | " + op1 + _t + " & ( " + dest+_sig+" != "+op1+_sig+" | "+destAndSlice+" != "+op1AndSlice + " );" << std::endl; 
       else
-        output << blank + dest + "_t_flag \t<= ( rst_zy || zy_count < 50 ) ? 0 : " + dest + "_t_flag ? 1 : | ( " + op1 + _t+" & " + extend( dest+_sig+" != "+op1+_sig+" | "+destAndSlice+" != "+op1AndSlice, localWidthNum ) + " );" << std::endl;//| " +  op1+_sig + " == " + CONSTANT_SIG + " );" << std::endl;
+        output << blank + dest + "_t_flag \t<= ( rst_zy || zy_count < 50 ) ? 0 : " + dest + "_t_flag ? 1 : | " + op1 + _t + " & ( " + dest+_sig+" != "+op1+_sig+" | "+destAndSlice+" != "+op1AndSlice + " );" << std::endl;//| " +  op1+_sig + " == " + CONSTANT_SIG + " );" << std::endl;
   }
   else {
     if(!g_use_zy_count)
       if (g_hasRst)
-        output << blank + dest + "_t_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_t_flag ? 1 : | (" + op1 + _t + " & " + extend( "!("+repeatCond+")", localWidthNum ) + " );" << std::endl; // | " +  op1+_sig + " == " + CONSTANT_SIG + " );" << std::endl;
+        output << blank + dest + "_t_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_t_flag ? 1 : | " + op1 + _t + " & !( "+repeatCond+" );" << std::endl; // | " +  op1+_sig + " == " + CONSTANT_SIG + " );" << std::endl;
       else
-        output << blank + dest + "_t_flag \t<= rst_zy ? 0 : " + dest + "_t_flag ? 1 : | (" + op1 + _t + " & " + extend( "!("+repeatCond+")", localWidthNum ) + " );" << std::endl;//| " +  op1+_sig + " == " + CONSTANT_SIG + " );" << std::endl;
+        output << blank + dest + "_t_flag \t<= rst_zy ? 0 : " + dest + "_t_flag ? 1 : | " + op1 + _t + " & !( "+repeatCond+" );" << std::endl;//| " +  op1+_sig + " == " + CONSTANT_SIG + " );" << std::endl;
     else
       if (g_hasRst)
-        output << blank + dest + "_t_flag \t<= ( " + get_recent_rst() + " || zy_count < 50 ) ? 0 : " + dest + "_t_flag ? 1 : | ( " + op1 + _t + " & " + extend( repeatCond, localWidthNum ) + " );" << std::endl; //| " +  op1+_sig + " == " + CONSTANT_SIG + " );" << std::endl;
+        output << blank + dest + "_t_flag \t<= ( " + get_recent_rst() + " || zy_count < 50 ) ? 0 : " + dest + "_t_flag ? 1 : | " + op1 + _t + " & ( " + repeatCond + " );" << std::endl; //| " +  op1+_sig + " == " + CONSTANT_SIG + " );" << std::endl;
       else
-        output << blank + dest + "_t_flag \t<= ( rst_zy || zy_count < 50 ) ? 0 : " + dest + "_t_flag ? 1 : | ( " + op1 + _t+" & " + extend( "!("+repeatCond+")", localWidthNum ) + " );" << std::endl;//| " +  op1+_sig + " == " + CONSTANT_SIG + " );" << std::endl;
+        output << blank + dest + "_t_flag \t<= ( rst_zy || zy_count < 50 ) ? 0 : " + dest + "_t_flag ? 1 : | " + op1 + _t + " & !( "+repeatCond+" );" << std::endl;//| " +  op1+_sig + " == " + CONSTANT_SIG + " );" << std::endl;
   }
 
 
@@ -1556,9 +1556,9 @@ void nonblockconcat_taint_gen(std::string line, std::ofstream &output) {
 
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
   if (g_hasRst)    
-    output << blank + dest + "_t_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_t_flag ? 1 : | ({ " + updateTList + " } & " + extend(dest+_sig+" != { "+updateList+" } | "+destAndSlice+" != "+updateList, localWidthNum) + ");" << std::endl;
+    output << blank + dest + "_t_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_t_flag ? 1 : | { " + updateTList + " } & ( " + dest+_sig+" != { "+updateList+" } | "+destAndSlice+" != "+updateList + ");" << std::endl;
   else
-    output << blank + dest + "_t_flag \t<= rst_zy ? 0 : " + dest + "_t_flag ? 1 : | ({ " + updateTList + " } & " + extend(dest+_sig+" != { "+updateList+" } | "+destAndSlice+" != "+updateList, localWidthNum) + ");" << std::endl;    
+    output << blank + dest + "_t_flag \t<= rst_zy ? 0 : " + dest + "_t_flag ? 1 : | { " + updateTList + " } & ( " + dest+_sig+" != { "+updateList+" } | "+destAndSlice+" != "+updateList + ");" << std::endl;    
 
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
 
