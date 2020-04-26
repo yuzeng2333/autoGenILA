@@ -6,8 +6,6 @@ proc
 opt
 opt_expr -mux_undef
 opt
-opt
-flatten;
 memory -nordff
 proc
 opt;;

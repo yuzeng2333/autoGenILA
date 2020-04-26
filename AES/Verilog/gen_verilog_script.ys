@@ -1,4 +1,3 @@
-read_verilog aes_top.v
 read_verilog aes_128.v
 read_verilog expand_key_128.v
 read_verilog final_round.v
@@ -15,16 +14,14 @@ read_verilog xS.v
 read_verilog S4.v
 
 
-prep -top aes_top
+prep -top aes_128
 
 hierarchy -check
 proc
 opt
 opt_expr -mux_undef
 opt
-opt
-flatten;
 memory -nordff
 proc
 opt;;
-write_verilog aes_top_simp.v
+write_verilog -nohex aes_128_yosys.v

@@ -21,7 +21,7 @@ module word_adder(clk, rst, func, inWord, result);
 
   wire running = counter > 0;
 
-  wire [8:0] word_next      = (func == 1) && inWord || !(func == 1) && word;
+  wire [8:0] word_next      = (func == 1) ? inWord : word;
 
   wire [4:0] counter_next   = func == 2 ? 8           :
                               running   ? counter - 1 : 0 ;

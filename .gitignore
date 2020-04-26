@@ -1,3 +1,15 @@
-*.swp
+8051/
+AES/
+GB/
+naiveEg/
+Piccolo-iu/
+picorv32/
+PID/
+RBM/
+SHA/
+*.out
 *.swo
-*.swq
+*.swp
+*.swn
+*.swm
+*.a

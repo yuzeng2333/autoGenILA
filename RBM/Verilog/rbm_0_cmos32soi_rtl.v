@@ -652,7 +652,7 @@ hidden_unit_A3);
         state_rbm_0_cmos32soi_rbm_load <= state_rbm_0_cmos32soi_rbm_load_next;
       end
     end
-  always @(*) begin : rbm_0_cmos32soi_rbm_load_combinational
+    
       reg [16:0] add_ln566_z;
       reg eq_ln569_z;
       reg ctrlOr_ln598_z;
@@ -672,6 +672,7 @@ hidden_unit_A3);
       reg ctrlAnd_0_ln575_z;
       reg ctrlAnd_1_ln604_z;
       reg ctrlAnd_0_ln604_z;
+
       reg ctrlAnd_1_ln607_z;
       reg ctrlAnd_0_ln607_z;
       reg ctrlAnd_1_ln614_z;
@@ -795,6 +796,7 @@ hidden_unit_A3);
       reg [31:0] mux_mux_dma_index_ln637_Z_27_mux_0_v;
       reg [9:0] mux_add_ln669_Z_v;
       reg [9:0] mux_add_ln669_Z_0_mux_0_v;
+  always @(*) begin : rbm_0_cmos32soi_rbm_load_combinational
 
       state_rbm_0_cmos32soi_rbm_load_next = 16'h0;
       add_ln566_z = {1'b0, num_movies} + num_movies[15:2];
@@ -1438,7 +1440,7 @@ hidden_unit_A3);
                                              visibleEnergies_D0), .mem_WE(
                                              visibleEnergies_WE0));
   // synopsys sync_set_reset_local rbm_0_cmos32soi_rbm_predict_rbm_seq_block rst
-  always @(posedge clk) // rbm_0_cmos32soi_rbm_predict_rbm_sequential
+  always @(posedge clk) // rbm_0_cmos32soi_rbm_predict_rbm_sequential //**predict**//
     begin : rbm_0_cmos32soi_rbm_predict_rbm_seq_block
       if (!rst) // Initialize state and outputs
       begin
@@ -3163,7 +3165,6 @@ hidden_unit_A3);
         state_rbm_0_cmos32soi_rbm_store <= state_rbm_0_cmos32soi_rbm_store_next;
       end
     end
-  always @(*) begin : rbm_0_cmos32soi_rbm_store_combinational
       reg ctrlOr_ln272_z;
       reg unary_nor_ln95_z;
       reg ctrlAnd_1_ln941_z;
@@ -3211,6 +3212,7 @@ hidden_unit_A3);
       reg ctrlOr_ln963_z;
       reg ctrlOr_ln958_z;
 
+  always @(*) begin : rbm_0_cmos32soi_rbm_store_combinational
       state_rbm_0_cmos32soi_rbm_store_next = 7'h0;
       ctrlOr_ln272_z = state_rbm_0_cmos32soi_rbm_store[6] | 
       state_rbm_0_cmos32soi_rbm_store[5];
@@ -3526,7 +3528,7 @@ hidden_unit_A3);
                                               data_Q1), .CLK(clk), .mem_CE(
                                               data_CE1), .mem_A(data_A1), .rtl_Q(
                                               data_bridge1_rtl_Q));
-  // synopsys sync_set_reset_local rbm_0_cmos32soi_rbm_train_rbm_seq_block rst
+  // synopsys sync_set_reset_local rbm_0_cmos32soi_rbm_train_rbm_seq_block rst //**train**//
   always @(posedge clk) // rbm_0_cmos32soi_rbm_train_rbm_sequential
     begin : rbm_0_cmos32soi_rbm_train_rbm_seq_block
       if (!rst) // Initialize state and outputs
@@ -3678,7 +3680,7 @@ hidden_unit_A3);
     end
   rbm_0_cmos32soi_sigmoid rbm_0_cmos32soi_sigmoid(.sum_in(mux_sum_ln191_z), .sigmoid_out(
                           rbm_0_cmos32soi_sigmoid_ln205_z));
-  always @(*) begin : rbm_0_cmos32soi_rbm_train_rbm_combinational
+  
       reg ACTIVATE_HIDDEN_TRAIN_V_for_exit_1_or_0;
       reg ACTIVATE_VISIBLE_TRAIN_ENERGY_UPDATE_for_begin_or_0;
       reg RAND_LOOP1_for_begin_0_or_0;
@@ -3775,6 +3777,7 @@ hidden_unit_A3);
       reg xor_ln165_3_z;
       reg [1:0] xor_ln73_z;
       reg [1:0] xor_ln73_0_z;
+
       reg ctrlAnd_1_ln111_0_z;
       reg ctrlAnd_1_ln86_0_z;
       reg ctrlOr_ln111_z;
@@ -4150,12 +4153,16 @@ hidden_unit_A3);
       reg memwrite_rbm_visible_unit_ln369_sel;
       reg mux_user_ln745_mux_0_sel;
       reg ctrlOr_ln745_z;
+
       reg ctrlAnd_1_ln745_z;
       reg ctrlAnd_0_ln745_z;
       reg ctrlOr_ln733_z;
       reg ctrlOr_ln750_z;
       reg mux_current_loop_ln733_mux_0_sel;
       reg read_rbm_num_visible_ln687_sel;
+                               
+                          
+  always @(*) begin : rbm_0_cmos32soi_rbm_train_rbm_combinational
 
       state_rbm_0_cmos32soi_rbm_train_rbm_next = 95'h0;
       ACTIVATE_HIDDEN_TRAIN_V_for_exit_1_or_0 = 
@@ -7252,19 +7259,19 @@ hidden_unit_A3);
               default: state_rbm_0_cmos32soi_rbm_train_rbm_next = 95'hX;
             endcase
           end
-        state_rbm_0_cmos32soi_rbm_train_rbm[65]: // expand_ln191
+        state_rbm_0_cmos32soi_rbm_train_rbm[65]: // expand_ln191 // activate hidden: for (v = 0; v < NUM_VISIBLE_MAX + 1; v++) 
           begin
             case (1'b1)// synopsys parallel_case
               ctrlAnd_0_ln62_z: state_rbm_0_cmos32soi_rbm_train_rbm_next[66] = 
-                1'b1;
-              ctrlOr_ln59_z: state_rbm_0_cmos32soi_rbm_train_rbm_next[87] = 1'b1;
+                1'b1;                                                             // goto rand_gen()
+              ctrlOr_ln59_z: state_rbm_0_cmos32soi_rbm_train_rbm_next[87] = 1'b1; //
               ctrlOr_ln62_z: state_rbm_0_cmos32soi_rbm_train_rbm_next[70] = 1'b1;
               ctrlAnd_1_ln193_z: state_rbm_0_cmos32soi_rbm_train_rbm_next[90] = 
                 1'b1;
               default: state_rbm_0_cmos32soi_rbm_train_rbm_next = 95'hX;
             endcase
           end
-        state_rbm_0_cmos32soi_rbm_train_rbm[66]: // Wait_ln65
+        state_rbm_0_cmos32soi_rbm_train_rbm[66]: // Wait_ln65  // START of ** rand_gen()
           state_rbm_0_cmos32soi_rbm_train_rbm_next[67] = 1'b1;
         state_rbm_0_cmos32soi_rbm_train_rbm[67]: // Wait_ln71
           state_rbm_0_cmos32soi_rbm_train_rbm_next[68] = 1'b1;
@@ -7329,19 +7336,19 @@ hidden_unit_A3);
           state_rbm_0_cmos32soi_rbm_train_rbm_next[87] = 1'b1;
         state_rbm_0_cmos32soi_rbm_train_rbm[87]: // expand_ln152
           state_rbm_0_cmos32soi_rbm_train_rbm_next[88] = 1'b1;
-        state_rbm_0_cmos32soi_rbm_train_rbm[88]: // Wait_ln152
+        state_rbm_0_cmos32soi_rbm_train_rbm[88]: // Wait_ln152         **END of rand_gen() **
           state_rbm_0_cmos32soi_rbm_train_rbm_next[89] = 1'b1;
         state_rbm_0_cmos32soi_rbm_train_rbm[89]: // Wait_ln216
           begin
             case (1'b1)// synopsys parallel_case
               ctrlAnd_0_ln186_z: state_rbm_0_cmos32soi_rbm_train_rbm_next[9] = 
-                1'b1;
-              ctrlAnd_1_ln186_z: state_rbm_0_cmos32soi_rbm_train_rbm_next[65] = 
-                1'b1;
+                1'b1;                                                   // ??
+              ctrlAnd_1_ln186_z: state_rbm_0_cmos32soi_rbm_train_rbm_next[65] =  
+                1'b1;                                                   // Line 65: inner:V for (v = 0; v < NUM_VISIBLE_MAX + 1; v++) 
               default: state_rbm_0_cmos32soi_rbm_train_rbm_next = 95'hX;
             endcase
           end
-        state_rbm_0_cmos32soi_rbm_train_rbm[90]: // Wait_ln197
+        state_rbm_0_cmos32soi_rbm_train_rbm[90]: // Wait_ln197      
           state_rbm_0_cmos32soi_rbm_train_rbm_next[91] = 1'b1;
         state_rbm_0_cmos32soi_rbm_train_rbm[91]: // expand_ln198
           begin
