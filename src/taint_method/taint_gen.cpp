@@ -1528,20 +1528,15 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     for(auto localPair: caseAssignPairs) {
       split_slice(localPair.second, rhs, rhsSlice);
       output << blank + "    " + localPair.first + " :" << std::endl;
-      output << blank + "      " + rhs + _c + bVer + rhsSlice + " = " + dest + _c + destSlice + " ;" << std::endl;
+      output << blank + "      " + rhs + _c + bVer + rhsSlice + " = " + extend("1'b1", destWidthNum) + " ;" << std::endl;
     }
     output << blank + "    default :" << std::endl;
-    output << blank + "      " + a + _c + aVer + aSlice + " = " + dest + _c + destSlice + " ;" << std::endl;
+    output << blank + "      " + a + _c + aVer + aSlice + " = " + extend("1'b1", destWidthNum) + " ;" << std::endl;
     output << blank + "  endcase" << std::endl;
     output << blank + "end" << std::endl;
 
     // ground other wires of s
     auto sBoundPair = varWidth.get_idx_pair(s, alwaysFirstLine);
-    //if(sIsNew) {
-    //ground_wires(s+_r+sVer, sBoundPair, sSlice, blank, output);
-    //ground_wires(s+_x+sVer, sBoundPair, sSlice, blank, output);
-    //ground_wires(s+_c+sVer, sBoundPair, sSlice, blank, output);
-    //}
   } // end of !aIsNum && !bIsNum
   else if(!aIsNum && bIsNum) {
     aWidthNum = get_var_slice_width(a);
@@ -1610,16 +1605,12 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     output << blank + "  "+s+_c+sVer+sSlice+" = " + extend("| "+dest+_c+destSlice, sWidthNum) + " ;" << std::endl;
     output << blank + "  "+a+_c+aVer+" = 0 ;" << std::endl;
     output << blank + "  if (" + sAndSlice + " == 0 )" << std::endl;
-    output << blank + "    "+a+_c+aVer+" = "+dest+_c+destSlice+" ;" << std::endl;
+    output << blank + "    "+a+_c+aVer+" = "+extend("1'b1", destWidthNum)+" ;" << std::endl;
     output << blank + "end" << std::endl;
 
     // ground other wires of s
     auto sBoundPair = varWidth.get_idx_pair(s, alwaysFirstLine);
-    //if(sIsNew) {
-    //ground_wires(s+_r+sVer, sBoundPair, sSlice, blank, output);
-    //ground_wires(s+_x+sVer, sBoundPair, sSlice, blank, output);
-    //ground_wires(s+_c+sVer, sBoundPair, sSlice, blank, output);
-    //}
+
   } // end of !aIsNum && bIsNum
   else if(aIsNum && !bIsNum) {
     bWidthNum = get_var_slice_width(b);
@@ -1701,18 +1692,14 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     for(auto localPair: caseAssignPairs) {
       split_slice(localPair.second, rhs, rhsSlice);
       output << blank + "    " + localPair.first + " :" << std::endl;
-      output << blank + "      " + rhs + _c + bVer + rhsSlice + " = "+dest+_c+destSlice+" ;" << std::endl;
+      output << blank + "      " + rhs + _c + bVer + rhsSlice + " = " + extend("1'b1", destWidthNum) + " ;" << std::endl;
     }
     output << blank + "  endcase" << std::endl;
     output << blank + "end" << std::endl;
 
     // ground other wires of s
     auto sBoundPair = varWidth.get_idx_pair(s, alwaysFirstLine);
-    //if(sIsNew) {
-    //ground_wires(s+_r+sVer, sBoundPair, sSlice, blank, output);
-    //ground_wires(s+_x+sVer, sBoundPair, sSlice, blank, output);
-    //ground_wires(s+_c+sVer, sBoundPair, sSlice, blank, output);
-    //}
+
   } // end of aIsNum && !bIsNum
   else {
     // print _t function
