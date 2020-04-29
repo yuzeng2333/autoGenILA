@@ -645,27 +645,28 @@ void go_forward(std::string startVarAndSlice, std::vector<std::pair<std::string,
               || std::regex_match(line, m, pSel2)
               || std::regex_match(line, m, pSel3)
               || std::regex_match(line, m, pSel4) ) {
-        std::string blank = m.str(1);
-        std::string destAndSlice = m.str(2);
-        std::string op1 = m.str(3);
-        std::string slice = m.str(4);
-        std::string op2AndSlice = m.str(5);
-        std::string range = m.str(6);
-        std::string dest, destSlice;
-        std::string op2, op2Slice;
-        split_slice(destAndSlice, dest, destSlice);
-        split_slice(op2AndSlice, op2, op2Slice);
-        checkCond( op1.compare(startVar) == 0, "Error: startVar("+startVar+") does not match op1("+op1+")" );
-        uint32_t highIdx = get_end(startVarSlice);
-        uint32_t  lowIdx = get_begin(startVarSlice);
-        if(highIdx - lowIdx + 1 != std::stoi(range)) {
-          toCout("Warning: range does not match in sel:"+ line);
-          return;
-        }
-        else {
-          go_forward(destAndSlice, localFrontCondPairVec);
-          make_new_pair_vec(localFrontCondPairVec, frontCondPairVec, op1+" == "+toStr(lowIdx));
-        }
+        checkCond(false, "Error: encounter sel_op during go_forward!");
+        //std::string blank = m.str(1);
+        //std::string destAndSlice = m.str(2);
+        //std::string op1 = m.str(3);
+        //std::string slice = m.str(4);
+        //std::string op2AndSlice = m.str(5);
+        //std::string range = m.str(6);
+        //std::string dest, destSlice;
+        //std::string op2, op2Slice;
+        //split_slice(destAndSlice, dest, destSlice);
+        //split_slice(op2AndSlice, op2, op2Slice);
+        //checkCond( op1.compare(startVar) == 0, "Error: startVar("+startVar+") does not match op1("+op1+")" );
+        //uint32_t highIdx = get_end(startVarSlice);
+        //uint32_t  lowIdx = get_begin(startVarSlice);
+        //if(highIdx - lowIdx + 1 != std::stoi(range)) {
+        //  toCout("Warning: range does not match in sel:"+ line);
+        //  return;
+        //}
+        //else {
+        //  go_forward(destAndSlice, localFrontCondPairVec);
+        //  make_new_pair_vec(localFrontCondPairVec, frontCondPairVec, op1+" == "+toStr(lowIdx));
+        //}
       }
       else if( std::regex_match(line, m, pNonblockConcat) ) {
         checkCond(false, "Error: NONBLOCKCONCAT not supported in process_pass_info yet!");
@@ -910,24 +911,36 @@ void go_backward(std::string startVarAndSlice, std::vector<std::pair<std::string
             || std::regex_match(line, m, pSel2)
             || std::regex_match(line, m, pSel3)
             || std::regex_match(line, m, pSel4) ) {
-      toCout("Warning: found sel during go_backward!!");
-      //std::string blank = m.str(1);
-      //std::string destAndSlice = m.str(2);
-      //std::string op1 = m.str(3);
-      //std::string slice = m.str(4);
-      //std::string op2AndSlice = m.str(5);
-      //std::string lowIdx = m.str(6);
-      //std::string dest, destSlice;
-      //std::string op2, op2Slice;
-      //split_slice(destAndSlice, dest, destSlice);
-      //split_slice(op2AndSlice, op2, op2Slice);
-      //if(g_backwardMap.find(op1) == g_backwardMap.end()
-      //    && g_caseBackwardMap.find(op1) == g_caseBackwardMap.end())
-      //  return;
-      //if(isTrueReg(op1)) {
-      //  backCondPairVec.push_back(std::make_pair(op1, ""));
-      //  return;
-      //}
+      toCout("Warning: found sel during go_backward!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+      std::string blank = m.str(1);
+      std::string destAndSlice = m.str(2);
+      std::string op1 = m. str(3);
+      std::string slice = m.str(4);
+      std::string op2AndSlice = m.str(5);
+      std::string lowIdxStr = m.str(6);
+      std::string dest, destSlice;
+      std::string op2, op2Slice;
+      split_slice(destAndSlice, dest, destSlice);
+      split_slice(op2AndSlice, op2, op2Slice);
+      uint32_t lowIdx = std::stoi(lowIdxStr);
+      uint32_t op1Width = get_var_slice_width(op1);
+      if( lowIdx == 1 ) {
+        toCout("Warning: sel op with lowIdx == 1 encountered during go_backward: "+line);
+        abort();
+      }
+      // if lowIdx > 1
+      auto op1IdxVec = g_backwardMap[op1];
+      checkCond(op1IdxVec.size() == 1, "Error: multiple assignment to op1 in sel found, op1: "+op1);
+      std::string op1Line = g_passExprStore[op1IdxVec.front()];
+      checkCond( std::regex_match(op1Line, m, pSrcConcat), "Error: assignment to op1 in sel is not src_concat, op1: "+op1+", line: "+op1Line );
+      uint32_t beishu = op1Width / lowIdx;
+      uint32_t i = 0;
+      while(++i <= beishu) {
+        std::vector<std::pair<std::string, std::string>> localBackCondPairVec;
+        std::string newStartVarAndSlice = get_target_and_slice(startVarAndSlice, destAndSlice, destAndSlice, op1+" ["+toStr(lowIdx*i-1)+":"+toStr(lowIdx*(i-1))+"]");
+        go_backward(newStartVarAndSlice, localBackCondPairVec);
+        make_new_pair_vec(localBackCondPairVec, backCondPairVec, op2AndSlice+" == "+toStr(lowIdx*(i-1)));
+      }
     }
     else {
       checkCond(false, "Error: this operation not supported yet for pass info analysis: "+line);

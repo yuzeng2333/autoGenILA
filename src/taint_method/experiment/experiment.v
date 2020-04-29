@@ -10,5 +10,6 @@ module exp(clk, rst, in, out);
   assign in1 = in == 2'b1;
   assign in2 = in == 2'b10;
 
+
 endmodule
 
