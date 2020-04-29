@@ -57,3 +57,6 @@ piccolo:
 
 sha:
 	./a.out /workspace/research/ILA/autoGenILA/SHA/SYN/sha_simp.v 0
+
+vpipe:
+	./a.out /workspace/research/ILA/autoGenILA/vpipe/SYN/vpipe_yosys.v 0

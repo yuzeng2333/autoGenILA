@@ -587,22 +587,22 @@ void analyze_reg_path( std::string fileName ) {
       case NONBLOCKIF:
         {
           toCout("Found nonblockif, which is not analyzed for reg path!");    
-          //std::smatch m;
-          //if(!std::regex_match(line, m, pNonblockIf)) {
-          //  toCout("match nonblockif wrongly: "+line);
-          //  abort();
-          //}
-          //std::string destAndSlice = m.str(3);
-          //std::string dest, destSlice;
-          //split_slice(destAndSlice, dest, destSlice);
-          //std::string srcAndSlice = m.str(4);
+          std::smatch m;
+          if(!std::regex_match(line, m, pNonblockIf)) {
+            toCout("match nonblockif wrongly: "+line);
+            abort();
+          }
+          std::string destAndSlice = m.str(3);
+          std::string dest, destSlice;
+          split_slice(destAndSlice, dest, destSlice);
+          std::string srcAndSlice = m.str(4);
           //if(isNum(srcAndSlice))
           //  break;
           //if(dest.back() == ' ') {
           //  toCout("Warning: the last char is empty: "+dest);
           //  dest.pop_back();
           //}
-          //moduleTrueRegs.push_back(dest);
+          moduleTrueRegs.push_back(dest);
 
           //fill_in_pass_relation(destAndSlice, srcAndSlice, line); 
         }

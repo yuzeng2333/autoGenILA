@@ -126,7 +126,7 @@ void reg_taint_gen(std::string line, std::ofstream &output) {
 
 // TODO: add sig for mem
 void mem_taint_gen(std::string line, std::ofstream &output) {
-  checkCond(!g_use_reset_sig, "mem not supported for use_reset_sig!!");  
+  toCout("Warning: mem not supported for use_reset_sig!!!");  
   std::smatch m;
   if ( !std::regex_match(line, m, pMem )) 
     return;
@@ -139,13 +139,18 @@ void mem_taint_gen(std::string line, std::ofstream &output) {
   uint32_t varLen = get_end(sliceTop) + 1;
   moduleMems.emplace(var, varLen);
   assert(!isOutput(var));
-  output << blank << "logic " + slice + " " + var + _t+" " + sliceTop + " ;" << std::endl;
+  output << blank << "logic " + slice + " " + var + _t + " " + sliceTop + " ;" << std::endl;
   output << blank << "logic " + sliceTop + " " + var + "_t_flag ;" << std::endl;
   output << blank << "logic " + sliceTop + " " + var + "_r_flag ;" << std::endl;
-  output << blank << "logic " + slice + " " + var + _c+" " + sliceTop + " ;" << std::endl;
-  output << blank << "logic " + slice + " " + var + _r+" " + sliceTop + " ;" << std::endl;
-  output << blank << "logic " + slice + " " + var + _x+" " + sliceTop + " ;" << std::endl;
+  output << blank << "logic " + slice + " " + var + _c + " " + sliceTop + " ;" << std::endl;
+  output << blank << "logic " + slice + " " + var + _r + " " + sliceTop + " ;" << std::endl;
+  output << blank << "logic " + slice + " " + var + _x + " " + sliceTop + " ;" << std::endl;
   output << blank << "logic " + var + "_r_flag_top ;" << std::endl;
+  // _sig
+  output << blank << "logic [" + toStr(g_sig_width-1) + ":0] " + var + _sig + " ;" << std::endl;
+    if(isTrueReg(var)) {
+    output << blank << "assign " + var + _sig + " = " + toStr(g_next_sig++) + " ;" << std::endl;
+  }
   //output << blank << "logic " + var + "_reset ;" << std::endl;
   flagOutputs.push_back(var+"_r_flag_top");
 
