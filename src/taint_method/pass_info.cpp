@@ -126,7 +126,7 @@ void fill_in_sel_relation(std::string line) {
   std::string op1 = m.str(3);
   std::string slice = m.str(4);  
   std::string op2AndSlice = m.str(5);
-  checkCond(isNum(op2AndSlice), "Error: op2 in sel is not number: "+line);
+  //checkCond(isNum(op2AndSlice), "Error: op2 in sel is not number: "+line);
 
   add_into_backwardMap(destAndSlice, line, storeIdx);
   if(!isNum(op1))
@@ -929,17 +929,23 @@ void go_backward(std::string startVarAndSlice, std::vector<std::pair<std::string
         abort();
       }
       // if lowIdx > 1
-      auto op1IdxVec = g_backwardMap[op1];
-      checkCond(op1IdxVec.size() == 1, "Error: multiple assignment to op1 in sel found, op1: "+op1);
-      std::string op1Line = g_passExprStore[op1IdxVec.front()];
-      checkCond( std::regex_match(op1Line, m, pSrcConcat), "Error: assignment to op1 in sel is not src_concat, op1: "+op1+", line: "+op1Line );
+      auto op2IdxVec = g_backwardMap[op2AndSlice];
+      checkCond(op2IdxVec.size() == 1, "Error: multiple assignment to op2 in sel found, op2: "+op2AndSlice);
+      std::string op2Line = g_passExprStore[op2IdxVec.front()];
+      checkCond( std::regex_match(op2Line, m, pSrcConcat), "Error: assignment to op2 in sel is not src_concat, op2: "+op2+", line: "+op2Line );
+
       uint32_t beishu = op1Width / lowIdx;
       uint32_t i = 0;
       while(++i <= beishu) {
         std::vector<std::pair<std::string, std::string>> localBackCondPairVec;
         std::string newStartVarAndSlice = get_target_and_slice(startVarAndSlice, destAndSlice, destAndSlice, op1+" ["+toStr(lowIdx*i-1)+":"+toStr(lowIdx*(i-1))+"]");
-        go_backward(newStartVarAndSlice, localBackCondPairVec);
-        make_new_pair_vec(localBackCondPairVec, backCondPairVec, op2AndSlice+" == "+toStr(lowIdx*(i-1)));
+        if(isTrueReg(newStartVarAndSlice)) {
+          backCondPairVec.push_back( std::make_pair(newStartVarAndSlice, op2AndSlice+" == "+toStr(lowIdx*(i-1))) );
+        }
+        else {
+          go_backward(newStartVarAndSlice, localBackCondPairVec);
+          make_new_pair_vec(localBackCondPairVec, backCondPairVec, op2AndSlice+" == "+toStr(lowIdx*(i-1)));
+        }
       }
     }
     else {
