@@ -1076,13 +1076,13 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
     out << "  logic rst_zy;" << std::endl;
   out << "  integer i;" << std::endl;
   out << "  logic INSTR_IN_ZY;" << std::endl;
-  out << "  assign INSTR_IN_ZY = " + extendInputs.front() + " > 0";
-  for (auto it = extendInputs.begin()+1; it != extendInputs.end(); ++it) {
+  out << "  assign INSTR_IN_ZY = ";
+  for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) {
     if((*it).compare(g_recentClk) == 0 || (*it).compare(g_recentRst) == 0)
       continue;
-    out << " && " + *it + " > 0";
+    out << *it + _t + " > 0 || ";
   }
-  out << ";" << std::endl;
+  out << "0 ;" << std::endl;
   while( std::getline(in, line) ) {
     out << line << std::endl;
   }
