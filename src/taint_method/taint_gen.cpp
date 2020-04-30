@@ -1075,6 +1075,14 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
   else
     out << "  logic rst_zy;" << std::endl;
   out << "  integer i;" << std::endl;
+  out << "  logic INSTR_IN_ZY;" << std::endl;
+  out << "  assign INSTR_IN_ZY = " + extendInputs.front() + " > 0";
+  for (auto it = extendInputs.begin()+1; it != extendInputs.end(); ++it) {
+    if((*it).compare(g_recentClk) == 0 || (*it).compare(g_recentRst) == 0)
+      continue;
+    out << " && " + *it + " > 0";
+  }
+  out << ";" << std::endl;
   while( std::getline(in, line) ) {
     out << line << std::endl;
   }
@@ -2112,6 +2120,12 @@ void gen_assert_property(std::ofstream &output) {
   for(std::string out: flagOutputs) {
     if(std::regex_search(out, m, pRFlag))
       output << "  assert property(" + out + " == 0 );" << std::endl;
+  }
+
+  for(std::string trueReg: moduleTrueRegs) {
+    if(isMem(trueReg))
+      continue;
+    output << "  assert property( " + trueReg + "_PREV_VAL1 == " + trueReg + "_PREV_VAL2 );" << std::endl;
   }
    // for(std::string out: flagOutputs) {
    //   if(std::regex_search(out, m, pRFlag))

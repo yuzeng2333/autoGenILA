@@ -104,6 +104,20 @@ void reg_taint_gen(std::string line, std::ofstream &output) {
 
   if(isTrueReg(var)) {
     output << blank << "assign " + var + _sig + " = " + toStr(g_next_sig++) + " ;" << std::endl;
+    output << blank << "logic " + slice + " " + var + "_PREV_VAL2 ;" << std::endl;
+    output << blank << "logic " + slice + " " + var + "_PREV_VAL1 ;" << std::endl;
+    output << blank << "always @( posedge " + g_recentClk + " ) begin" << std::endl;
+    if(g_hasRst) {
+    output << blank << "  if( " + get_recent_rst() + " ) " + var + "_PREV_VAL1 <= 0 ;"<< std::endl;
+    output << blank << "  if( " + get_recent_rst() + " ) " + var + "_PREV_VAL2 <= 0 ;" << std::endl;
+    }
+    else {
+    output << blank << "  if( rst_zy ) " + var + "_PREV_VAL1 <= 0 ;"<< std::endl;
+    output << blank << "  if( rst_zy ) " + var + "_PREV_VAL2 <= 0 ;" << std::endl;
+    }
+    output << blank << "  if( INSTR_IN_ZY ) " + var + "_PREV_VAL1 <= " + var + " ;"<< std::endl;
+    output << blank << "  if( INSTR_IN_ZY ) " + var + "_PREV_VAL2 <= " + var + "_PREV_VAL1 ;" << std::endl;
+    output << blank << "end" << std::endl;
   }
   if(g_use_reset_taint)
     output << blank << "logic " + var + "_reset ;" << std::endl;
@@ -608,6 +622,7 @@ void one_op_taint_gen(std::string line, std::ofstream &output) {
     output << blank + "end" << std::endl;
 
     output << blank + "assign " + dest + _t + destSlice + " = " + op1 + _t + op1Slice + " ;" << std::endl;
+    output << blank + "assign " + dest + _sig + " = " + op1 + _sig + " ;" << std::endl;
     output << blank + "always @(*) begin" << std::endl;
     output << blank + "  " + op1 + _c + sndVer + op1Slice + " = " + dest + _c + destSlice + " ;" << std::endl;
     output << blank + "  " + op1 + _r + sndVer + op1Slice + " = " + dest + _r + destSlice + " ;" << std::endl;
@@ -1607,7 +1622,8 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
     else {
       nonConstAssign.push_back(line);
       uint32_t localWidthNum = get_var_slice_width(srcAndSlice);
-      output << blank + "if (" + condAndSlice + ") " + dest + _t+" " + destSlice + " <= ( " + src + _t+" " + srcSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + extend( dest+_sig+" != "+src+_sig, localWidthNum ) + " );" << std::endl;
+      output << blank + "if (" + get_recent_rst() + ") " + dest + _t + " " + destSlice + " <= 0 ;" << std::endl;
+      output << blank + "if (" + condAndSlice + ") " + dest + _t + " " + destSlice + " <= ( " + src + _t+" " + srcSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + extend( dest+_sig+" != "+src+_sig, localWidthNum ) + " );" << std::endl;
 
       output << blank + "if (" + condAndSlice + ") " + dest + "_t_flag " + destSlice + " <= " + dest + "_t_flag " + destSlice + " ? 1 : (" + src + _t+" " + srcSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + extend( dest+_sig+" != "+src+_sig, localWidthNum ) + " );" << std::endl;
 
