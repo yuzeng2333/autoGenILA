@@ -844,7 +844,7 @@ void go_backward(std::string startVarAndSlice, std::vector<std::pair<std::string
       std::string updateList = m.str(3);
       std::string newStartVarAndSlice = get_target_and_slice(startVarAndSlice, destAndSlice, destAndSlice, updateList);
       if(newStartVarAndSlice.empty())
-        return;
+        continue;
       else if(isTrueReg(newStartVarAndSlice)) { 
         backCondPairVec.push_back(std::make_pair(newStartVarAndSlice, ""));
       }
@@ -859,7 +859,7 @@ void go_backward(std::string startVarAndSlice, std::vector<std::pair<std::string
       std::string op1AndSlice = m.str(3);
       std::string newStartVarAndSlice = get_target_and_slice(startVarAndSlice, destAndSlice, destAndSlice, op1AndSlice);
       if(newStartVarAndSlice.empty())
-        return;
+        continue;
       else if(isTrueReg(newStartVarAndSlice)) { 
         backCondPairVec.push_back(std::make_pair(newStartVarAndSlice, ""));
       }
@@ -883,7 +883,7 @@ void go_backward(std::string startVarAndSlice, std::vector<std::pair<std::string
           continue;
         std::string newStartVarAndSlice = get_target_and_slice(startVarAndSlice, destAndSlice, destList, srcList);
         if(newStartVarAndSlice.empty())
-          return;
+          continue;
         else if(isTrueReg(newStartVarAndSlice)) { 
           backCondPairVec.push_back(std::make_pair(newStartVarAndSlice, ""));
         }
@@ -898,7 +898,7 @@ void go_backward(std::string startVarAndSlice, std::vector<std::pair<std::string
       std::string op1AndSlice = m.str(3);
       std::string newStartVarAndSlice = get_target_and_slice(startVarAndSlice, destAndSlice, destAndSlice, op1AndSlice);
       if(newStartVarAndSlice.empty())
-        return;
+        continue;
       else if(isTrueReg(newStartVarAndSlice)) { 
         backCondPairVec.push_back(std::make_pair(newStartVarAndSlice, ""));
       }
@@ -926,7 +926,7 @@ void go_backward(std::string startVarAndSlice, std::vector<std::pair<std::string
       uint32_t op1Width = get_var_slice_width(op1);
       if( lowIdx == 1 ) {
         toCout("Warning: sel op with lowIdx == 1 encountered during go_backward: "+line);
-        abort();
+        continue;
       }
       // if lowIdx > 1
       auto op2IdxVec = g_backwardMap[op2AndSlice];

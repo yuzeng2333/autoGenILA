@@ -24,6 +24,8 @@ int main(int argc, char *argv[]) {
   std::map<std::string, std::vector<std::string>> moduleOutputsMap;
   std::map<std::string, std::vector<std::string>> moduleRFlagsMap;
   uint32_t nextSig = 0;
+  std::cout << "Begin read in clkrst!" << std::endl; //1
+  read_in_clkrst(fileName, "clkrst.txt");
 
   for(auto moduleName: modules) { 
     moduleReady.emplace(moduleName, false);
@@ -154,12 +156,3 @@ void add_taint_bottom_up(std::string path, std::string module, std::map<std::str
 }
 
 
-// assume the pure fileName is after the last "/"
-std::string extract_path(std::string fullFileName) {
-  std::size_t pos = fullFileName.find_last_of("/");
-  if(pos == std::string::npos) {
-    toCout("Error: the fileName does not contain path!");
-    abort();
-  }
-  return fullFileName.substr(0, pos);
-}

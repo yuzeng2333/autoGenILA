@@ -26,7 +26,7 @@ void input_taint_gen(std::string line, std::ofstream &output) {
   if(!g_hasRst) {
     if(var.compare("rst") == 0
         || var.compare("i_rst") == 0
-        || var.compare("reset") == 0) {
+        || var.compare("reset") == 0 ) {
       g_hasRst = true;
       g_rst_pos = true;
       g_recentRst = var;
@@ -35,6 +35,38 @@ void input_taint_gen(std::string line, std::ofstream &output) {
     else if ( var.compare("reset_n") == 0
                 || var.compare("resetn") == 0
                 || var.compare("rstn") == 0 ) {
+      g_hasRst = true;
+      g_rst_pos = false;
+      g_recentRst = var;
+      isRst = true;
+    }
+    else if ( var.compare(g_possibleRST) ) {
+      g_hasRst = true;
+      g_rst_pos = g_possibleSign;
+      g_recentRst = var;
+      isRst = true;
+    }
+    else if ( var.compare(g_possibleCLK) ) {
+      g_recentClk = var;
+    }
+    else if(var.find("clk") != std::string::npos
+            || var.find("clock") != std::string::npos ) {
+      toCout("================================================  Find potential unexpected clk signal: "+var+" in module: "+moduleName);
+      g_recentClk = var;
+    }
+    else if(var.find("rst") != std::string::npos
+            || var.find("reset") != std::string::npos ) {
+      toCout("================================================  Find potential unexpected rst signal: "+var+" in module: "+moduleName);
+      g_hasRst = true;
+      g_rst_pos = true;
+      g_recentRst = var;
+      isRst = true;
+    }
+    else if( var.find("rstn") != std::string::npos
+            || var.find("rst_n") != std::string::npos
+            || var.find("resetn") != std::string::npos
+            || var.find("reset_n") != std::string::npos ) {
+      toCout("================================================  Find potential unexpected rst signal: "+var+" in module: "+moduleName);
       g_hasRst = true;
       g_rst_pos = false;
       g_recentRst = var;
@@ -82,6 +114,9 @@ void input_taint_gen(std::string line, std::ofstream &output) {
 
 void reg_taint_gen(std::string line, std::ofstream &output) {
   std::smatch m;
+  if( std::regex_match(line, m, pRegConst) ) {
+    toCout("Found reg const");
+  }
   if ( !std::regex_match(line, m, pReg) 
         && !std::regex_match(line, m, pRegConst) )
     return;
@@ -104,20 +139,6 @@ void reg_taint_gen(std::string line, std::ofstream &output) {
 
   if(isTrueReg(var)) {
     output << blank << "assign " + var + _sig + " = " + toStr(g_next_sig++) + " ;" << std::endl;
-    output << blank << "logic " + slice + " " + var + "_PREV_VAL2 ;" << std::endl;
-    output << blank << "logic " + slice + " " + var + "_PREV_VAL1 ;" << std::endl;
-    output << blank << "always @( posedge " + g_recentClk + " ) begin" << std::endl;
-    if(g_hasRst) {
-    output << blank << "  if( " + get_recent_rst() + " ) " + var + "_PREV_VAL1 <= 0 ;"<< std::endl;
-    output << blank << "  if( " + get_recent_rst() + " ) " + var + "_PREV_VAL2 <= 0 ;" << std::endl;
-    }
-    else {
-    output << blank << "  if( rst_zy ) " + var + "_PREV_VAL1 <= 0 ;"<< std::endl;
-    output << blank << "  if( rst_zy ) " + var + "_PREV_VAL2 <= 0 ;" << std::endl;
-    }
-    output << blank << "  if( INSTR_IN_ZY ) " + var + "_PREV_VAL1 <= " + var + " ;"<< std::endl;
-    output << blank << "  if( INSTR_IN_ZY ) " + var + "_PREV_VAL2 <= " + var + "_PREV_VAL1 ;" << std::endl;
-    output << blank << "end" << std::endl;
   }
   if(g_use_reset_taint)
     output << blank << "logic " + var + "_reset ;" << std::endl;

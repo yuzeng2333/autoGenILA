@@ -37,7 +37,7 @@ void clean_file(std::string fileName);
 
 void add_line_taints(std::string line, std::ofstream &output, std::ifstream &input);
 
-void read_in_clkrst(std::string fileName);
+void read_in_clkrst(std::string pathFile, std::string fileName);
 
 void add_file_taints(std::string fileName, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap, std::map<std::string, std::vector<std::string>> &moduleRFlagsMap);
 

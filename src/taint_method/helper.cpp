@@ -947,6 +947,10 @@ std::string further_clean_line(std::string line) {
 
 
 std::string get_recent_rst() {
+  if(g_recentRst.compare(g_recentClk) == 0) {
+    toCout("Error: rst is same as clk:"+g_recentRst+", "+g_recentClk);
+    abort();
+  }
   if(g_clkrst_exist && g_recentRst_positive) {
     if(is_neg_rst(g_recentRst)) {
       toCout("neg rst found for positive edge: "+g_recentRst);
@@ -1242,8 +1246,8 @@ bool is_neg_rst(std::string var) {
          || var.compare("reset") == 0) {
     return false;
   }
-  else
-    abort();
+  else 
+    return g_rst_pos;
 }
 
 
@@ -1267,11 +1271,12 @@ std::string expand_slice(std::string slice) {
 }
 
 
-//bool check_number_sig(std::vector<std::string> &updateVec) {
-//  std::string var, varSlice;
-//  for(std::string varAndSlice : updateVec) {
-//    split_slice(varAndSlice, var, varSlice);
-//    if()
-//  }
-//  return true;
-//}
+// assume the pure fileName is after the last "/"
+std::string extract_path(std::string fullFileName) {
+  std::size_t pos = fullFileName.find_last_of("/");
+  if(pos == std::string::npos) {
+    toCout("Error: the fileName does not contain path!");
+    abort();
+  }
+  return fullFileName.substr(0, pos);
+}

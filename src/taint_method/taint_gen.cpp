@@ -147,6 +147,9 @@ bool did_clean_file = false;
 std::string g_recentClk;
 std::string g_recentRst;
 bool g_recentRst_positive = true;
+std::string g_possibleCLK;
+std::string g_possibleRST;
+bool g_possibleSign;
 bool isTop = false;
 bool g_hasRst;
 bool g_verb;
@@ -828,28 +831,39 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
 }
 
 
-void read_in_clkrst(std::string fileName) {
+void read_in_clkrst(std::string pathFile, std::string fileName) {
   // set default name for these two variables
+  std::string path = extract_path(pathFile);
   clockName = "clk";
   resetName = "rst";
-  g_recentClk = clockName;
-  g_recentRst = resetName;
-  std::ifstream in(fileName);
+  std::string signName;
+  std::ifstream in(path+"/"+fileName);
   std::string line;
   std::smatch match;
   std::regex pClk("clock\\:([a-zA-Z0-9_:'\\[\\]]+)");
   std::regex pRst("reset\\:([a-zA-Z0-9_:'\\[\\]]+)");
+  std::regex pSign("sign\\:([a-zA-Z0-9_:'\\[\\]]+)");
+  std::regex pModuleLocal("module\\:([a-zA-Z0-9_:'\\[\\]]+)");
   while( std::getline(in, line) ) {
     if ( std::regex_match(line, match, pClk) ) {
-       clockName = match.str(1);
-       g_recentClk = clockName;
-       toCout("+++ Get clock: "+clockName);
+      clockName = match.str(1);
+      g_possibleCLK = clockName;
+      toCout("+++ Get clock: "+clockName);
     }
     if ( std::regex_match(line, match, pRst) ) {
       resetName = match.str(1);
-      g_hasRst = true;
-      g_recentRst = resetName;
+      g_possibleRST = resetName;
       toCout("+++ Get reset: "+resetName);      
+    }
+    if( std::regex_match(line, match, pSign) ) {
+      signName = match.str(1);
+      if(signName.compare("pos") == 0)
+        g_possibleSign = true;
+      else if(signName.compare("neg") == 0)
+        g_possibleSign = false;
+      else
+        checkCond(false, "Error: false sign name is given: "+signName);
+      break;
     }
   }
   in.close();
@@ -989,26 +1003,24 @@ void merge_taints(std::string fileName) {
     output << "  assign { " + outputStr + " } = 0;" << std::endl; 
   }
 
-  // wires giving value to regs should have taints grounded.
-  //output << " // ground taints for wires connected to regs" << std::endl;
-  //for (auto it = g_wire2reg.begin(); it != g_wire2reg.end(); ++it) {
-  //  if ( isNum(*it) || nextVersion.find(*it) != nextVersion.end() ) {
-  //    continue;
-  //  }
-  //  std::string reg, regSlice;
-  //  split_slice(*it, reg, regSlice);
-  //  output << "  assign " + reg + _r + regSlice + " = 0;" << std::endl;
-  //}
 
-  // declare _r taints for wire-type outputs
-  // Assume: the original outputs do not end with "_r_flag"
-  //for(std::string out: moduleOutputs) {
-  //  if( !isReg(out) && !isRFlag(out) ) {
-  //    auto idxPair = varWidth.get_idx_pair(out);
-  //    output << "  input [" + toStr(idxPair.first) + ":" + toStr(idxPair.second) + "] " + out + "_r ;" << std::endl;
-  //    moduleInputs.push_back(out+_r);
-  //  }
-  //}
+  for(std::string var: moduleTrueRegs) {
+    uint32_t width = get_var_slice_width(var);
+    output << "  logic [" + toStr(width-1) + ": 0] " + var + "_PREV_VAL2 ;" << std::endl;
+    output << "  logic [" + toStr(width-1) + ": 0] " + var + "_PREV_VAL1 ;" << std::endl;
+    output << "  always @( posedge " + g_recentClk + " ) begin" << std::endl;
+    if(g_hasRst) {
+    output << "    if( " + get_recent_rst() + " ) " + var + "_PREV_VAL1 <= 0 ;"<< std::endl;
+    output << "    if( " + get_recent_rst() + " ) " + var + "_PREV_VAL2 <= 0 ;" << std::endl;
+    }
+    else {
+    output << "    if( rst_zy ) " + var + "_PREV_VAL1 <= 0 ;"<< std::endl;
+    output << "    if( rst_zy ) " + var + "_PREV_VAL2 <= 0 ;" << std::endl;
+    }
+    output << "    if( INSTR_IN_ZY ) " + var + "_PREV_VAL1 <= " + var + " ;"<< std::endl;
+    output << "    if( INSTR_IN_ZY ) " + var + "_PREV_VAL2 <= " + var + "_PREV_VAL1 ;" << std::endl;
+    output << "  end" << std::endl;
+  }
 
   // some bits of taints are still floating
   //output << "// ground floating taints" << std::endl;
@@ -1052,7 +1064,7 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
     moduleInputs.push_back("rst_zy");
     toCout("No reset signal found in "+moduleName+", check it!!");
   }
-  out << "module " + moduleName + "( ";
+  out << "module " + moduleName + " ( ";
   for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) {
     out << *it + " , ";
   }
@@ -1078,7 +1090,7 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
   out << "  logic INSTR_IN_ZY;" << std::endl;
   out << "  assign INSTR_IN_ZY = ";
   for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) {
-    if((*it).compare(g_recentClk) == 0 || (*it).compare(g_recentRst) == 0)
+    if((*it).compare(g_recentClk) == 0 || (*it).compare(g_recentRst) == 0 || (*it).compare("rst_zy") == 0)
       continue;
     out << *it + _t + " > 0 || ";
   }
@@ -2167,10 +2179,6 @@ int taint_gen(std::string fileName, uint32_t stage, bool isTopIn, std::map<std::
   if (stage <= 1) {
     std::cout << "Analyze register's path!" << std::endl;
     analyze_reg_path(fileName);
-  }
-  if (stage <= 1) {  
-    std::cout << "Begin read in clkrst!" << std::endl; //1
-    read_in_clkrst(fileName + ".clkrst");
   }
   if (stage <= 2) {  
     std::cout << "Begin fill update!" << std::endl; //2

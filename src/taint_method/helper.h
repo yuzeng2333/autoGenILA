@@ -133,4 +133,6 @@ void printAndAbort(std::string in);
 void checkCond(bool cond, std::string in);
 
 std::string expand_slice(std::string slice);
+
+std::string extract_path(std::string fullFileName);
 #endif
