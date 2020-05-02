@@ -40,22 +40,26 @@ void input_taint_gen(std::string line, std::ofstream &output) {
       g_recentRst = var;
       isRst = true;
     }
-    else if ( var.compare(g_possibleRST) ) {
+    else if ( g_clkrst_exist && var.compare(g_possibleRST) ) {
       g_hasRst = true;
       g_rst_pos = g_possibleSign;
       g_recentRst = var;
       isRst = true;
     }
-    else if ( var.compare(g_possibleCLK) ) {
+    else if ( g_clkrst_exist && var.compare(g_possibleCLK) ) {
       g_recentClk = var;
     }
     else if(var.find("clk") != std::string::npos
-            || var.find("clock") != std::string::npos ) {
+            || var.find("clock") != std::string::npos 
+            || var.find("CLOCK") != std::string::npos 
+            || var.find("CLK") != std::string::npos ) {
       toCout("================================================  Find potential unexpected clk signal: "+var+" in module: "+moduleName);
       g_recentClk = var;
     }
     else if(var.find("rst") != std::string::npos
-            || var.find("reset") != std::string::npos ) {
+            || var.find("reset") != std::string::npos 
+            || var.find("RST") != std::string::npos 
+            || var.find("RESET") != std::string::npos ) {
       toCout("================================================  Find potential unexpected rst signal: "+var+" in module: "+moduleName);
       g_hasRst = true;
       g_rst_pos = true;
@@ -65,6 +69,10 @@ void input_taint_gen(std::string line, std::ofstream &output) {
     else if( var.find("rstn") != std::string::npos
             || var.find("rst_n") != std::string::npos
             || var.find("resetn") != std::string::npos
+            || var.find("RSTN") != std::string::npos
+            || var.find("RST_N") != std::string::npos
+            || var.find("RESETN") != std::string::npos
+            || var.find("RESET_N") != std::string::npos
             || var.find("reset_n") != std::string::npos ) {
       toCout("================================================  Find potential unexpected rst signal: "+var+" in module: "+moduleName);
       g_hasRst = true;

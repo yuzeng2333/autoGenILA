@@ -833,6 +833,7 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
 
 void read_in_clkrst(std::string pathFile, std::string fileName) {
   // set default name for these two variables
+  g_clkrst_exist = true;
   std::string path = extract_path(pathFile);
   clockName = "clk";
   resetName = "rst";
@@ -882,7 +883,7 @@ void add_file_taints(std::string fileName, std::map<std::string, std::vector<std
   CONSTANT_SIG = toStr(g_sig_width) + "'b1";
   // Reserve first line for module declaration
   while( std::getline(input, line) ) {
-    //toCout(line);
+    //toCout(line+g_recentRst+": "+(g_hasRst?"true":"false")+", ");
     lineNo++;
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       add_case_taints_limited(input, output, line);
@@ -2127,18 +2128,22 @@ bool extract_concat(std::string line, std::ofstream &output, std::string &return
 
 
 void gen_assert_property(std::ofstream &output) {
-  std::regex pRFlag("r_flag");
+  std::regex pRFlag("(\\S*)_r_flag");
   std::smatch m;
+  std::smatch match;
   for(std::string out: flagOutputs) {
-    if(std::regex_search(out, m, pRFlag))
-      output << "  assert property(" + out + " == 0 );" << std::endl;
+    if(std::regex_search(out, m, pRFlag)) {
+      //std::string var = m.str(1);
+      //checkCond(std::regex_match(var, match, pRFlag), "Error: pRFlag is not matched: "+m.str(1));
+      output << "  assert property(" + out + " == 0 || " + m.str(1) + "_PREV_VAL1 == " + m.str(1) + "_PREV_VAL2 );" << std::endl;
+    }
   }
 
-  for(std::string trueReg: moduleTrueRegs) {
-    if(isMem(trueReg))
-      continue;
-    output << "  assert property( " + trueReg + "_PREV_VAL1 == " + trueReg + "_PREV_VAL2 );" << std::endl;
-  }
+  //for(std::string trueReg: moduleTrueRegs) {
+  //  if(isMem(trueReg))
+  //    continue;
+  //  output << "  assert property( " + trueReg + "_PREV_VAL1 == " + trueReg + "_PREV_VAL2 );" << std::endl;
+  //}
    // for(std::string out: flagOutputs) {
    //   if(std::regex_search(out, m, pRFlag))
    //     output << "  assert property( (zy_count >= 50 && " + out + " == 0)  ||  (zy_count < 30 && " + out + " == 1) || (zy_count < 60) );" << std::endl;

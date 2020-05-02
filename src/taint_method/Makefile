@@ -19,11 +19,11 @@ bound:
 case:
 	./a.out /workspace/research/ILA/autoGenILA/naiveEg/case/case.v 0
 
-aes0:
+128:
 	./a.out /workspace/research/ILA/autoGenILA/AES/Verilog/aes_128_yosys.v 0
 
-aes1:
-	./a.out /workspace/research/ILA/autoGenILA/AES/Verilog/aes_128_yosys.v 1
+aes:
+	./a.out /workspace/research/ILA/autoGenILA/AES/Verilog/aes_top_yosys.v 0
 
 exp:
 	./a.out ./experiment/experiment.v 0
