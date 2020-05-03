@@ -1247,7 +1247,7 @@ bool is_neg_rst(std::string var) {
     return false;
   }
   else 
-    return g_rst_pos;
+    return !g_rst_pos;
 }
 
 

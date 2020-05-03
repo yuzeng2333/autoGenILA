@@ -40,13 +40,13 @@ void input_taint_gen(std::string line, std::ofstream &output) {
       g_recentRst = var;
       isRst = true;
     }
-    else if ( g_clkrst_exist && var.compare(g_possibleRST) ) {
+    else if ( g_clkrst_exist && var.compare(g_possibleRST) == 0 ) {
       g_hasRst = true;
       g_rst_pos = g_possibleSign;
       g_recentRst = var;
       isRst = true;
     }
-    else if ( g_clkrst_exist && var.compare(g_possibleCLK) ) {
+    else if ( g_clkrst_exist && var.compare(g_possibleCLK) == 0 ) {
       g_recentClk = var;
     }
     else if(var.find("clk") != std::string::npos
@@ -55,16 +55,6 @@ void input_taint_gen(std::string line, std::ofstream &output) {
             || var.find("CLK") != std::string::npos ) {
       toCout("================================================  Find potential unexpected clk signal: "+var+" in module: "+moduleName);
       g_recentClk = var;
-    }
-    else if(var.find("rst") != std::string::npos
-            || var.find("reset") != std::string::npos 
-            || var.find("RST") != std::string::npos 
-            || var.find("RESET") != std::string::npos ) {
-      toCout("================================================  Find potential unexpected rst signal: "+var+" in module: "+moduleName);
-      g_hasRst = true;
-      g_rst_pos = true;
-      g_recentRst = var;
-      isRst = true;
     }
     else if( var.find("rstn") != std::string::npos
             || var.find("rst_n") != std::string::npos
@@ -77,6 +67,16 @@ void input_taint_gen(std::string line, std::ofstream &output) {
       toCout("================================================  Find potential unexpected rst signal: "+var+" in module: "+moduleName);
       g_hasRst = true;
       g_rst_pos = false;
+      g_recentRst = var;
+      isRst = true;
+    }
+    else if(var.find("rst") != std::string::npos
+            || var.find("reset") != std::string::npos 
+            || var.find("RST") != std::string::npos 
+            || var.find("RESET") != std::string::npos ) {
+      toCout("================================================  Find potential unexpected rst signal: "+var+" in module: "+moduleName);
+      g_hasRst = true;
+      g_rst_pos = true;
       g_recentRst = var;
       isRst = true;
     }
