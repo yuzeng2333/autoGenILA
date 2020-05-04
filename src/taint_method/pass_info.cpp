@@ -695,7 +695,6 @@ void go_forward(std::string startVarAndSlice, std::vector<std::pair<std::string,
 std::string get_target_and_slice(std::string startVarAndSlice, std::string op1AndSlice, std::string srcList, std::string destList) {
   std::string dest, destSlice;
   std::string op1, op1Slice;
-  std::string op2, op2Slice;
   std::string startVar, startVarSlice;
   split_slice(op1AndSlice , op1, op1Slice);
   split_slice(startVarAndSlice, startVar, startVarSlice);
@@ -752,6 +751,7 @@ std::string get_target_and_slice(std::string startVarAndSlice, std::string op1An
         if(shiftBits < 0) {
           shiftBits += get_var_slice_width(singleDest);
           destAndSlice = singleDest;
+          break;
         }
       }
     }
@@ -785,9 +785,12 @@ void make_new_pair_vec( std::vector<std::pair<std::string, std::string>> &oldFro
 
 
 void go_backward(std::string startVarAndSlice, std::vector<std::pair<std::string, std::string>> &backCondPairVec) {
-  //toCout("GO_BACKWARD for: "+startVarAndSlice);
+  toCout("GO_BACKWARD for: "+startVarAndSlice);
   std::string startVar, startVarSlice;
   split_slice(startVarAndSlice, startVar, startVarSlice);
+  if( startVar.compare("fangyuan626") == 0 || startVar.find("fangyuan626") != std::string::npos ) {
+    toCout("fangyuan626 found!");
+  }
   if(g_backwardMap.find(startVar) == g_backwardMap.end()
       && g_caseBackwardMap.find(startVar) == g_caseBackwardMap.end())
     return;
@@ -800,6 +803,7 @@ void go_backward(std::string startVarAndSlice, std::vector<std::pair<std::string
   std::vector<uint32_t> storeIdxVec = g_backwardMap[startVar];
   for(uint32_t storeIdx: storeIdxVec) {
     std::string line = g_passExprStore[storeIdx];
+    toCout("go back line is: "+line);
 
     std::vector<std::pair<std::string, std::string>> localBackCondPairVec;
     // if the line is not a list of destAndSlice;
@@ -922,7 +926,7 @@ void go_backward(std::string startVarAndSlice, std::vector<std::pair<std::string
       std::string op2, op2Slice;
       split_slice(destAndSlice, dest, destSlice);
       split_slice(op2AndSlice, op2, op2Slice);
-      uint32_t lowIdx = std::stoi(lowIdxStr);
+      uint32_t lowIdx = str2int(lowIdxStr, "In go_backward, str is: "+lowIdxStr);
       uint32_t op1Width = get_var_slice_width(op1);
       if( lowIdx == 1 ) {
         toCout("Warning: sel op with lowIdx == 1 encountered during go_backward: "+line);
@@ -935,6 +939,7 @@ void go_backward(std::string startVarAndSlice, std::vector<std::pair<std::string
       checkCond( std::regex_match(op2Line, m, pSrcConcat), "Error: assignment to op2 in sel is not src_concat, op2: "+op2+", line: "+op2Line );
 
       uint32_t beishu = op1Width / lowIdx;
+      toCout("beishu is: "+toStr(beishu)+", startVar is: "+startVarAndSlice);
       uint32_t i = 0;
       while(++i <= beishu) {
         std::vector<std::pair<std::string, std::string>> localBackCondPairVec;

@@ -875,6 +875,9 @@ std::string get_lhs_taint_list_no_slice(std::string destList, std::string taint,
 
 
 int str2int(std::string str, std::string info) {
+  if(str.length() > 8) {
+    toCout("Error: too large int found: "+str);
+  }
   int res;
   try{
     res = std::stoi(str);
@@ -1081,7 +1084,7 @@ std::string max_num(uint32_t width) {
 
 
 std::string max_num(std::string widthStr) {
-  uint32_t width = std::stoi(widthStr);
+  uint32_t width = str2int(widthStr, "In max_mum function with input: "+widthStr);
   return max_num(width);
 }
 
