@@ -966,11 +966,14 @@ std::string get_recent_rst() {
     }
     return "!"+g_recentRst;
   }
-  else { // if !g_clkrst_exist
+  else if(!g_recentRst.empty()) { // if !g_clkrst_exist
     if(is_neg_rst(g_recentRst))
       return "!"+g_recentRst;
     else
       return g_recentRst;
+  }
+  else {
+    return "rst_zy";
   }
 }
 
