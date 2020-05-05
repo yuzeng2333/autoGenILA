@@ -766,6 +766,8 @@ std::string get_target_and_slice(std::string startVarAndSlice, std::string op1An
     }
 
     destHighIdx = destHighIdx - shiftBits;
+    if(ovlpHighIdx - ovlpLowIdx > destHighIdx)
+      return "";
     destLowIdx = destHighIdx - (ovlpHighIdx - ovlpLowIdx);
     return dest+" ["+toStr(destHighIdx)+":"+toStr(destLowIdx)+"]";
   }
@@ -788,8 +790,8 @@ void go_backward(std::string startVarAndSlice, std::vector<std::pair<std::string
   toCout("GO_BACKWARD for: "+startVarAndSlice);
   std::string startVar, startVarSlice;
   split_slice(startVarAndSlice, startVar, startVarSlice);
-  if( startVar.compare("fangyuan626") == 0 || startVar.find("fangyuan626") != std::string::npos ) {
-    toCout("fangyuan626 found!");
+  if( startVar.compare("fangyuan299") == 0 || startVar.find("fangyuan299") != std::string::npos ) {
+    toCout("fangyuan299 found!");
   }
   if(g_backwardMap.find(startVar) == g_backwardMap.end()
       && g_caseBackwardMap.find(startVar) == g_caseBackwardMap.end())
