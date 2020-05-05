@@ -2168,7 +2168,7 @@ void gen_wire_output(std::string fileName) {
 }
 
 
-int taint_gen(std::string fileName, uint32_t stage, bool isTopIn, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap, std::map<std::string, std::vector<std::string>> &moduleRFlagsMap, uint32_t totalRegCnt, uint32_t &nextSig) {
+int taint_gen(std::string fileName, uint32_t stage, bool isTopIn, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap, std::map<std::string, std::vector<std::string>> &moduleRFlagsMap, uint32_t totalRegCnt, uint32_t &nextSig, bool doProcessPathInfo) {
   toCout("*** Begin add taint for module: "+fileName);  
   if (stage <= 0) {
     toCout("Clear Global data!");
@@ -2188,7 +2188,7 @@ int taint_gen(std::string fileName, uint32_t stage, bool isTopIn, std::map<std::
     std::cout << "Begin fill update!" << std::endl; //2
     fill_update(fileName + ".clean");
   }
-  if (stage <= 2) {  
+  if (stage <= 2 && doProcessPathInfo) {  
     std::cout << "Process pass info!" << std::endl; //2
     process_pass_info(fileName + ".clean");
   }

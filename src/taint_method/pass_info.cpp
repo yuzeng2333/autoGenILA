@@ -355,6 +355,7 @@ void merge_both_direction( const std::vector<std::pair<std::string, std::string>
   //    return pair1.first.compare(pair2.first) < 0;          
   //  });
 
+  std::ofstream mergeOut("./successful_merge.txt");
   if(frontCondPairVec.empty() && backCondPairVec.empty()) {
     //toCout("Nothing to merge!");
     return;
@@ -388,7 +389,7 @@ void merge_both_direction( const std::vector<std::pair<std::string, std::string>
     }
     if(backIt->first.compare(frontIt->first) == 0) {
       std::string regAndSlice = backIt->first;
-      toCout("~~~~~~~~~~~~ *^* ~~~~~~~~~~~~~~~~~ <(* v *)> ~~~~~~  ~~~~~~~~~ Merge succeeded for: "+regAndSlice);
+      mergeOut << "~~~~~~~~~~~~ *^* ~~~~~~~~~~~~~~~~~ <(* v *)> ~~~~~~  ~~~~~~~~~ Merge succeeded for: "+regAndSlice << std::endl;
       if(g_regCondMap.find(regAndSlice) == g_regCondMap.end()) {
         if(!frontIt->second.empty() && !backIt->second.empty())
           g_regCondMap.emplace(regAndSlice, frontIt->second + " && " + backIt->second);
@@ -416,6 +417,7 @@ void merge_both_direction( const std::vector<std::pair<std::string, std::string>
     }
     frontIt++;
   }
+  mergeOut.close();
 }
 
 

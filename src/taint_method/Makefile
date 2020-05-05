@@ -5,58 +5,52 @@ debug:
 	g++ -g main.cpp taint_gen.cpp helper.cpp op_taint_gen.cpp VarWidth.cpp pass_info.cpp
 
 adder:
-	./a.out /workspace/research/ILA/autoGenILA/naiveEg/word_adder/word_adder_yosys.v 0
+	./a.out /workspace/research/ILA/autoGenILA/naiveEg/word_adder/word_adder_yosys.v 
 
 naive:
-	./a.out /workspace/research/ILA/autoGenILA/naiveEg/naive/naive_yosys.v 0
+	./a.out /workspace/research/ILA/autoGenILA/naiveEg/naive/naive_yosys.v 
 
 two:
-	./a.out /workspace/research/ILA/autoGenILA/naiveEg/two_reg/two_reg_yosys.v 0
+	./a.out /workspace/research/ILA/autoGenILA/naiveEg/two_reg/two_reg_yosys.v 
 
 bound:
-	./a.out /workspace/research/ILA/autoGenILA/naiveEg/bound_test/bound_test_yosys.v 0
+	./a.out /workspace/research/ILA/autoGenILA/naiveEg/bound_test/bound_test_yosys.v 
 
 case:
-	./a.out /workspace/research/ILA/autoGenILA/naiveEg/case/case.v 0
+	./a.out /workspace/research/ILA/autoGenILA/naiveEg/case/case.v 
 
 128:
-	./a.out /workspace/research/ILA/autoGenILA/AES/Verilog/aes_128_yosys.v 0
+	./a.out /workspace/research/ILA/autoGenILA/AES/Verilog/aes_128_yosys.v 
 
 aes:
-	./a.out /workspace/research/ILA/autoGenILA/AES/Verilog/aes_top_yosys.v 0
+	./a.out /workspace/research/ILA/autoGenILA/AES/Verilog/aes_top_yosys.v 
 
 exp:
-	./a.out ./experiment/experiment.v 0
+	./a.out ./experiment/experiment.v 
 
-pid0:
-	./a.out /workspace/research/ILA/autoGenILA/PID/SYN/PID_short.v 0
+pid:
+	./a.out /workspace/research/ILA/autoGenILA/PID/SYN/PID_short.v 
 
-pid1:
-	./a.out /workspace/research/ILA/autoGenILA/PID/SYN/PID_short.v 1
-
-gb0:
-	./a.out /workspace/research/ILA/autoGenILA/GB/SYN/gb_yosys.v 0
-
-gb1:
-	./a.out /workspace/research/ILA/autoGenILA/GB/SYN/gb_yosys.v 1
+gb:
+	./a.out /workspace/research/ILA/autoGenILA/GB/SYN/gb_yosys.v 
 
 csimple:
-	./a.out /workspace/research/ILA/autoGenILA/naiveEg/case_simple/case.v 0
+	./a.out /workspace/research/ILA/autoGenILA/naiveEg/case_simple/case.v 
 
 rbm:
-	./a.out /workspace/research/ILA/autoGenILA/RBM/SYN/rbm_yosys.v 0
+	./a.out /workspace/research/ILA/autoGenILA/RBM/SYN/rbm_yosys.v 
 
 8051:
-	./a.out /workspace/research/ILA/autoGenILA/8051/trunk/rtl/SYN/oc8051_yosys.v 0
+	./a.out /workspace/research/ILA/autoGenILA/8051/trunk/rtl/SYN/oc8051_yosys.v 
 
 riscv:
-	./a.out /workspace/research/ILA/autoGenILA/picorv32/SYN/picorv32_yosys.v 0
+	./a.out /workspace/research/ILA/autoGenILA/picorv32/SYN/picorv32_yosys.v 
 
 piccolo:
-	./a.out /workspace/research/ILA/autoGenILA/Piccolo-iu/verilog-cpu-old/SYN/piccolo_yosys.v 0
+	./a.out /workspace/research/ILA/autoGenILA/Piccolo-iu/verilog-cpu-old/SYN/piccolo_yosys.v 
 
 sha:
-	./a.out /workspace/research/ILA/autoGenILA/SHA/SYN/sha_simp.v 0
+	./a.out /workspace/research/ILA/autoGenILA/SHA/SYN/sha_simp.v
 
 vpipe:
-	./a.out /workspace/research/ILA/autoGenILA/vpipe/SYN/vpipe_yosys.v 0
+	./a.out /workspace/research/ILA/autoGenILA/vpipe/SYN/vpipe_yosys.v 

@@ -11,8 +11,12 @@
 #include "helper.h"
 #include "main.h"
 
+// 1st argument is file name
+// 2rd is whether to do process_path_info
 int main(int argc, char *argv[]) {
   std::string fileName = argv[1];
+  std::string arg2 = argv[2];
+  bool doProcessPathInfo = arg2.empty();
   std::string path = extract_path(fileName);
   // data structures
   std::vector<std::string> modules;
@@ -32,7 +36,7 @@ int main(int argc, char *argv[]) {
   }
   for(std::string module: modules) {
     bool isTop = (topModule.compare(module) == 0);
-    add_taint_bottom_up(path, module, moduleReady, childModules, topModule, moduleInputsMap, moduleOutputsMap, moduleRFlagsMap, totalRegCnt, nextSig);
+    add_taint_bottom_up(path, module, moduleReady, childModules, topModule, moduleInputsMap, moduleOutputsMap, moduleRFlagsMap, totalRegCnt, nextSig, doProcessPathInfo);
   }
 
   // in the file for top module, append "include" at the end
@@ -136,22 +140,22 @@ std::string separate_modules(std::string fileName, std::vector<std::string> &mod
 }
 
 
-void add_taint_bottom_up(std::string path, std::string module, std::map<std::string, bool> &moduleReady, std::map<std::string, std::vector<std::string>> &childModules, std::string topModule, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap, std::map<std::string, std::vector<std::string>> &moduleRFlagsMap, uint32_t totalRegCnt, uint32_t &nextSig) {
+void add_taint_bottom_up(std::string path, std::string module, std::map<std::string, bool> &moduleReady, std::map<std::string, std::vector<std::string>> &childModules, std::string topModule, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap, std::map<std::string, std::vector<std::string>> &moduleRFlagsMap, uint32_t totalRegCnt, uint32_t &nextSig, bool doProcessPathInfo) {
   if( moduleReady[module] == true )
     return;
   if( childModules.find(module) == childModules.end() ) {
     moduleReady[module] = true;
-    taint_gen(path+"/"+module+"_NEW.v", 0, module.compare(topModule)==0, moduleInputsMap, moduleOutputsMap, moduleRFlagsMap, totalRegCnt, nextSig);
+    taint_gen(path+"/"+module+"_NEW.v", 0, module.compare(topModule)==0, moduleInputsMap, moduleOutputsMap, moduleRFlagsMap, totalRegCnt, nextSig, doProcessPathInfo);
   }
   else {
     for(auto oneChildModule: childModules[module]) {
       if(moduleReady[oneChildModule] == true)
         continue;
-      add_taint_bottom_up(path, oneChildModule, moduleReady, childModules, topModule, moduleInputsMap, moduleOutputsMap, moduleRFlagsMap, totalRegCnt, nextSig);
+      add_taint_bottom_up(path, oneChildModule, moduleReady, childModules, topModule, moduleInputsMap, moduleOutputsMap, moduleRFlagsMap, totalRegCnt, nextSig, doProcessPathInfo);
     }
     // all child modules should be ready now
     moduleReady[module] = true;
-    taint_gen(path+"/"+module+"_NEW.v", 0, module.compare(topModule)==0, moduleInputsMap, moduleOutputsMap, moduleRFlagsMap, totalRegCnt, nextSig);
+    taint_gen(path+"/"+module+"_NEW.v", 0, module.compare(topModule)==0, moduleInputsMap, moduleOutputsMap, moduleRFlagsMap, totalRegCnt, nextSig, doProcessPathInfo);
   }
 }
 
