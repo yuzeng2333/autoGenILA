@@ -15,8 +15,11 @@
 // 2rd is whether to do process_path_info
 int main(int argc, char *argv[]) {
   std::string fileName = argv[1];
-  std::string arg2 = argv[2];
-  bool doProcessPathInfo = arg2.empty();
+  bool doProcessPathInfo;
+  if(argc > 2)
+    doProcessPathInfo = false;
+  else
+    doProcessPathInfo = true;
   std::string path = extract_path(fileName);
   // data structures
   std::vector<std::string> modules;

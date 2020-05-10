@@ -1007,6 +1007,8 @@ void merge_taints(std::string fileName) {
 
   for(std::string var: moduleTrueRegs) {
     uint32_t width = get_var_slice_width(var);
+    if(isMem(var))
+      continue;
     output << "  logic [" + toStr(width-1) + ": 0] " + var + "_PREV_VAL2 ;" << std::endl;
     output << "  logic [" + toStr(width-1) + ": 0] " + var + "_PREV_VAL1 ;" << std::endl;
     output << "  always @( posedge " + g_recentClk + " ) begin" << std::endl;
@@ -2134,7 +2136,10 @@ void gen_assert_property(std::ofstream &output) {
     if(std::regex_search(out, m, pRFlag)) {
       //std::string var = m.str(1);
       //checkCond(std::regex_match(var, match, pRFlag), "Error: pRFlag is not matched: "+m.str(1));
-      output << "  assert property(" + out + " == 0 || " + m.str(1) + "_PREV_VAL1 == " + m.str(1) + "_PREV_VAL2 );" << std::endl;
+      if(!isMem(m.str(1)))
+        output << "  assert property( " + out + " == 0 || " + m.str(1) + "_PREV_VAL1 == " + m.str(1) + "_PREV_VAL2 );" << std::endl;
+      else
+        output << "  assert property( " + out + " == 0 );" << std::endl;
     }
   }
 
