@@ -1459,9 +1459,9 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
   // _x
   if(!replaceSig) {
     if(g_use_reset_taint)
-      output << blank.substr(0, blank.length()-4) + "assign " + op1 + _x + op1Ver + op1Slice + " = " + extend(dest+_sig+" != "+op1+_sig+" || "+op1+_sig+" == "+CONSTANT_SIG+" && "+destAndSlice+" != "+op1AndSlice, localWidthNum) + " | " + extend(dest+"_reset", localWidthNum) + " ;" << std::endl;
+      output << blank.substr(0, blank.length()-4) + "assign " + op1 + _x + op1Ver + op1Slice + " = " + extend(dest+_sig+" != "+op1+_sig, localWidthNum) + " | " + extend(dest+"_reset", localWidthNum) + " ;" << std::endl;
     else // the most widely used one
-      output << blank.substr(0, blank.length()-4) + "assign " + op1 + _x + op1Ver + op1Slice + " = " + extend(dest+_sig+" != "+op1+_sig+" || "+op1+_sig+" == "+CONSTANT_SIG+" && "+destAndSlice+" != "+op1AndSlice, localWidthNum) + " ;" << std::endl;
+      output << blank.substr(0, blank.length()-4) + "assign " + op1 + _x + op1Ver + op1Slice + " = " + extend(dest+_sig+" != "+op1+_sig, localWidthNum) + " ;" << std::endl;
   }
   else {
     assert(!g_use_reset_taint);
