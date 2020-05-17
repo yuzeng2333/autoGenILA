@@ -1033,9 +1033,9 @@ void merge_taints(std::string fileName) {
     std::vector<std::string> freeBitsVec;
     free_bits(it->first, freeBitsVec);
     if(freeBitsVec.size() > 0) {
-      output << "  assign "+add_taint(freeBitsVec, _r+toStr(verNum-1)) + " = 0;" << std::endl;
-      output << "  assign "+add_taint(freeBitsVec, _x+toStr(verNum-1)) + " = 0;" << std::endl;
-      output << "  assign "+add_taint(freeBitsVec, _c+toStr(verNum-1)) + " = 0;" << std::endl;
+      output << "  assign " + add_taint(freeBitsVec, _r+toStr(verNum-1)) + " = 0;" << std::endl;
+      output << "  assign " + add_taint(freeBitsVec, _x+toStr(verNum-1)) + " = 0;" << std::endl;
+      output << "  assign " + add_taint(freeBitsVec, _c+toStr(verNum-1)) + " = 0;" << std::endl;
     }
   }
 
@@ -1053,6 +1053,14 @@ void merge_taints(std::string fileName) {
   gen_assert_property(output);
   if(g_hasRst)
     output << "  assign rst_zy = "+get_recent_rst()+" ;" << std::endl;
+  output << "  logic write_taint_exist = " + moduleTrueRegs.front() + _t;
+  for( auto it = moduleTrueRegs.begin()+1; it != moduleTrueRegs.end(); it++ ) {
+    output << " || " + *it + _t;
+  }
+  for( auto it = moduleMems.begin(); it != moduleMems.end(); it++ ) {
+    output << " || " + it->first + _t;
+  }
+  output << " ;" << std::endl;
   output << "endmodule" << std::endl;
   output.close();
 }
