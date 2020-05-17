@@ -1288,3 +1288,17 @@ std::string extract_path(std::string fullFileName) {
   }
   return fullFileName.substr(0, pos);
 }
+
+
+uint32_t get_dest_ver(std::string destAndSlice) {
+  std::string dest, destSlice;
+  split_slice(destAndSlice, dest, destSlice);
+  if(g_destVersion.find(dest) == g_destVersion.end()) {
+    g_destVersion.emplace(dest, 0);
+    return 0;
+  }
+  else {
+    g_destVersion[dest]++;
+    return g_destVersion[dest];
+  }
+}

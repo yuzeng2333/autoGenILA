@@ -138,6 +138,7 @@ std::unordered_map<std::string, std::pair<std::string, std::string>> memDims;
 std::unordered_map<std::string, uint32_t> reg2sig;
 std::unordered_map<std::string, uint32_t> fangyuanItemNum; // used to check item number in case statementsrs
 std::unordered_map<std::string, uint32_t> fangyuanCaseSliceWidth; // width of each slice used in RHS of case
+std::unordered_map<std::string, uint32_t> g_destVersion;
 VarWidth varWidth;
 VarWidth funcVarWidth;
 unsigned long int NEW_VAR = 0;
@@ -213,6 +214,7 @@ void clean_global_data(uint32_t totalRegCnt, uint32_t nextSig) {
   g_use_reset_taint = false;
   fangyuanItemNum.clear();
   fangyuanCaseSliceWidth.clear();
+  g_destVersion.clear();
   moduleTrueRegs.clear();
   g_backwardMap.clear();
   g_forwardMap.clear();
@@ -921,6 +923,7 @@ void merge_taints(std::string fileName) {
     }
   }
 
+  // _r
   for ( auto it = nextVersion.begin(); it != nextVersion.end(); ++it ) {
     if(isMem(it->first)) {
       auto slicePair = memDims[it->first];
@@ -969,6 +972,14 @@ void merge_taints(std::string fileName) {
     }
   }
 
+  // _flip
+  for ( auto it = g_destVersion.begin(); it != g_destVersion.end(); ++it ) {
+    output << "  assign " + it->first + "_flip = ( ";
+    for (uint32_t i = 0; i < it->second - 1; i++)
+      output << it->first + "_flip" + std::to_string(i) + " ) | ( ";
+    output << it->first + "_flip" + std::to_string(it->second - 1) + " );" << std::endl;
+  }
+
   // ground taints for floating regs
   output << " // ground taints for floating regs" << std::endl;
   for (auto reg : moduleRegs) {
@@ -1009,8 +1020,6 @@ void merge_taints(std::string fileName) {
     uint32_t width = get_var_slice_width(var);
     if(isMem(var))
       continue;
-    output << "  logic [" + toStr(width-1) + ": 0] " + var + "_PREV_VAL2 ;" << std::endl;
-    output << "  logic [" + toStr(width-1) + ": 0] " + var + "_PREV_VAL1 ;" << std::endl;
     output << "  always @( posedge " + g_recentClk + " ) begin" << std::endl;
     if(g_hasRst) {
     output << "    if( " + get_recent_rst() + " ) " + var + "_PREV_VAL1 <= 0 ;"<< std::endl;
@@ -1070,6 +1079,8 @@ void merge_taints(std::string fileName) {
   output << "  logic reg_flipping = 0";
   if(isTop) {
     for( auto it = moduleTrueRegs.begin(); it != moduleTrueRegs.end(); it++ ) {
+      if(isOutput(*it))
+        continue;
       output << " || " + *it + "_flip";
     }
     for( auto it = moduleMems.begin(); it != moduleMems.end(); it++ ) {

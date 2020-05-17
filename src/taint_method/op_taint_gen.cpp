@@ -134,8 +134,12 @@ void reg_taint_gen(std::string line, std::ofstream &output) {
   std::string num = m.str(4);
 
   moduleRegs.push_back(var);
-  output << blank << "logic " + slice + " " + var + _t + " ;" << std::endl; 
-  output << blank << "logic " + slice + " " + var + "_flip ;" << std::endl; 
+  output << blank << "logic " + slice + " " + var + _t + " ;" << std::endl;
+  output << blank << "logic " + slice + " " + var + "_flip ;" << std::endl;
+
+  output << blank << "logic " + slice + " " + var + "_PREV_VAL1 ;" << std::endl; 
+  output << blank << "logic " + slice + " " + var + "_PREV_VAL2 ;" << std::endl; 
+
   if(!isOutput(var)) { // maybe later declared as output
     output << blank << "logic " + slice + " " + var + _r + " ;" << std::endl;
     output << blank << "logic " + slice + " " + var + _x + " ;" << std::endl;
@@ -185,6 +189,8 @@ void mem_taint_gen(std::string line, std::ofstream &output) {
   assert(!isOutput(var));
   output << blank << "logic " + sliceTop + " " + var + "_flip ;" << std::endl;
   output << blank << "logic " + slice + " " + var + _t + " " + sliceTop + " ;" << std::endl;
+  output << blank << "logic " + slice + " " + var + "_PREV_VAL1 " + sliceTop + " ;" << std::endl;
+  output << blank << "logic " + slice + " " + var + "_PREV_VAL2 " + sliceTop + " ;" << std::endl;
   output << blank << "logic " + sliceTop + " " + var + "_t_flag ;" << std::endl;
   output << blank << "logic " + sliceTop + " " + var + "_r_flag ;" << std::endl;
   output << blank << "logic " + slice + " " + var + _c + " " + sliceTop + " ;" << std::endl;
@@ -1484,7 +1490,8 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
   }
 
   // _flip
-  output << "  assign " + dest + "_flip = " + op1AndSlice + " != " + destAndSlice + " ; " << std::endl;
+  output << "  logic " + dest + "_flip" + toStr(get_dest_ver(dest)) + " ;" << std::endl;
+  output << "  assign " + dest + "_flip" + toStr(get_dest_ver(dest)) + " = " + dest + _x + destSlice + " > 0 || " + destAndSlice + " != " + dest + "_PREV_VAL1" + destSlice + " ;" << std::endl;
 
   // _r
   output << blank.substr(0, blank.length()-4) + "assign " + op1 + _r + op1Ver + op1Slice + " = 0 ;" << std::endl;
