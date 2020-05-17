@@ -1440,9 +1440,9 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
   split_slice(caseAssignPairs[0].second, b, bSlice);
   split_slice(caseAssignPairs.back().second, a, aSlice);
   split_slice(sAndSlice, s, sSlice);
-  assert(!isOutput(s));
-  assert(!isOutput(a));
-  assert(!isOutput(b));
+  assert_info(!isTop || !isOutput(s), "add_case_taints_limited:s is output, firstLine: "+alwaysFirstLine);
+  assert_info(!isTop || !isOutput(a), "add_case_taints_limited:s is output, firstLine: "+alwaysFirstLine);
+  assert_info(!isTop || !isOutput(b), "add_case_taints_limited:s is output, firstLine: "+alwaysFirstLine);
   // declare necessaey variables
   uint32_t destWidthNum, sWidthNum, aWidthNum, bWidthNum;
   std::string sWidth, aWidth, bWidth;
