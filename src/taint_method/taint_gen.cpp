@@ -1055,22 +1055,26 @@ void merge_taints(std::string fileName) {
     output << "  assign rst_zy = "+get_recent_rst()+" ;" << std::endl;
 
   // write_taint_exist
-  output << "  logic write_taint_exist = " + moduleTrueRegs.front() + _t;
-  for( auto it = moduleTrueRegs.begin()+1; it != moduleTrueRegs.end(); it++ ) {
-    output << " || " + *it + _t;
-  }
-  for( auto it = moduleMems.begin(); it != moduleMems.end(); it++ ) {
-    output << " || " + it->first + _t;
+  output << "  logic write_taint_exist = 0";
+  if(isTop) {
+    for( auto it = moduleTrueRegs.begin(); it != moduleTrueRegs.end(); it++ ) {
+      output << " || " + *it + _t;
+    }
+    for( auto it = moduleMems.begin(); it != moduleMems.end(); it++ ) {
+      output << " || " + it->first + _t;
+    }
   }
   output << " ;" << std::endl;
 
   // _flip signal
-  output << "  logic reg_flipping = " + moduleTrueRegs.front() + "_flip";
-  for( auto it = moduleTrueRegs.begin()+1; it != moduleTrueRegs.end(); it++ ) {
-    output << " || " + *it + "_flip";
-  }
-  for( auto it = moduleMems.begin(); it != moduleMems.end(); it++ ) {
-    output << " || " + it->first + "_flip";
+  output << "  logic reg_flipping = 0";
+  if(isTop) {
+    for( auto it = moduleTrueRegs.begin(); it != moduleTrueRegs.end(); it++ ) {
+      output << " || " + *it + "_flip";
+    }
+    for( auto it = moduleMems.begin(); it != moduleMems.end(); it++ ) {
+      output << " || " + it->first + "_flip";
+    }
   }
   output << " ;" << std::endl;
 
@@ -1425,6 +1429,9 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
   split_slice(caseAssignPairs[0].second, b, bSlice);
   split_slice(caseAssignPairs.back().second, a, aSlice);
   split_slice(sAndSlice, s, sSlice);
+  assert(!isOutput(s));
+  assert(!isOutput(a));
+  assert(!isOutput(b));
   // declare necessaey variables
   uint32_t destWidthNum, sWidthNum, aWidthNum, bWidthNum;
   std::string sWidth, aWidth, bWidth;

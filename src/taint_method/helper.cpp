@@ -41,7 +41,9 @@ bool isNum(std::string name) {
 }
 
 
-bool isOutput(std::string var) {
+bool isOutput(std::string varAndSlice) {
+  std::string var, varSlice;
+  split_slice(varAndSlice, var, varSlice);
   auto it = std::find( moduleOutputs.begin(), moduleOutputs.end(), var );
   return it != moduleOutputs.end();
 }
