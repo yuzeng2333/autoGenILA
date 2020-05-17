@@ -1053,6 +1053,8 @@ void merge_taints(std::string fileName) {
   gen_assert_property(output);
   if(g_hasRst)
     output << "  assign rst_zy = "+get_recent_rst()+" ;" << std::endl;
+
+  // write_taint_exist
   output << "  logic write_taint_exist = " + moduleTrueRegs.front() + _t;
   for( auto it = moduleTrueRegs.begin()+1; it != moduleTrueRegs.end(); it++ ) {
     output << " || " + *it + _t;
@@ -1061,6 +1063,17 @@ void merge_taints(std::string fileName) {
     output << " || " + it->first + _t;
   }
   output << " ;" << std::endl;
+
+  // _flip signal
+  output << "  logic reg_flipping = " + moduleTrueRegs.front() + "_flip";
+  for( auto it = moduleTrueRegs.begin()+1; it != moduleTrueRegs.end(); it++ ) {
+    output << " || " + *it + "_flip";
+  }
+  for( auto it = moduleMems.begin(); it != moduleMems.end(); it++ ) {
+    output << " || " + it->first + "_flip";
+  }
+  output << " ;" << std::endl;
+
   output << "endmodule" << std::endl;
   output.close();
 }

@@ -135,6 +135,7 @@ void reg_taint_gen(std::string line, std::ofstream &output) {
 
   moduleRegs.push_back(var);
   output << blank << "logic " + slice + " " + var + _t + " ;" << std::endl; 
+  output << blank << "logic " + slice + " " + var + "_flip ;" << std::endl; 
   if(!isOutput(var)) { // maybe later declared as output
     output << blank << "logic " + slice + " " + var + _r + " ;" << std::endl;
     output << blank << "logic " + slice + " " + var + _x + " ;" << std::endl;
@@ -1467,6 +1468,9 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
     assert(!g_use_reset_taint);
     output << blank.substr(0, blank.length()-4) + "assign " + op1 + _x + op1Ver + op1Slice + " = " + extend("!("+repeatCond+")", localWidthNum) + " ;" << std::endl; 
   }
+
+  // _flip
+  output << "  assign " + dest + "_flip = " + op1AndSlice + " != " + destAndSlice + " ; " << std::endl;
 
   // _r
   output << blank.substr(0, blank.length()-4) + "assign " + op1 + _r + op1Ver + op1Slice + " = 0 ;" << std::endl;
