@@ -56,6 +56,7 @@ std::regex pBitOrRed2   (to_re("^(\\s*)assign (NAME) = \\| \\{ (NAME), (NAME) \\
 std::regex pLeftShift   (to_re("^(\\s*)assign (NAME) = (NAME) << (NAME)(\\s*)?;$"));
 std::regex pRightShift  (to_re("^(\\s*)assign (NAME) = (NAME) >> (NAME)(\\s*)?;$"));
 std::regex pSignedRightShift  (to_re("^(\\s*)assign (NAME) = (NAME) >>> (NAME)(\\s*)?;$"));
+std::regex pSignedLeftShift   (to_re("^(\\s*)assign (NAME) = (NAME) <<< (NAME)(\\s*)?;$"));
 /* 1 operator */
 std::regex pNone        (to_re("^(\\s*)assign (NAME) = (NAME)(\\s*)?;$"));
 std::regex pInvert      (to_re("^(\\s*)assign (NAME) = \\~ (NAME)(\\s*)?;$"));
@@ -757,6 +758,7 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
             || std::regex_match(line, m, pLeftShift)
             || std::regex_match(line, m, pRightShift)
             || std::regex_match(line, m, pSignedRightShift)
+            || std::regex_match(line, m, pSignedLeftShift)
             || std::regex_match(line, m, pBitOrRed2) ) {
     return TWO_OP;
   } // end of 2-operator

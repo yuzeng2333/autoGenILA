@@ -109,6 +109,7 @@ extern std::regex pBitOrRed2;
 extern std::regex pLeftShift;
 extern std::regex pRightShift;
 extern std::regex pSignedRightShift;
+extern std::regex pSignedLeftShift;
 /* 1 operator */
 extern std::regex pNot;     
 extern std::regex pNone;     

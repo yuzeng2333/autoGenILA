@@ -3,6 +3,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/a.out.dir/helper.cpp.o"
   "CMakeFiles/a.out.dir/main.cpp.o"
   "CMakeFiles/a.out.dir/op_taint_gen.cpp.o"
+  "CMakeFiles/a.out.dir/pass_info.cpp.o"
   "CMakeFiles/a.out.dir/taint_gen.cpp.o"
   "a.out.pdb"
   "a.out"

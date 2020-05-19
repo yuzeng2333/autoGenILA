@@ -356,6 +356,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
             || std::regex_match(line, m, pLeftShift) 
             || std::regex_match(line, m, pRightShift) 
             || std::regex_match(line, m, pSignedRightShift) 
+            || std::regex_match(line, m, pSignedLeftShift) 
             || std::regex_match(line, m, pBitOrRed2) ) {} 
   else if ( std::regex_match(line, m, pEq)
               || std::regex_match(line, m, pEq3)

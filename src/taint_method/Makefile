@@ -54,3 +54,6 @@ sha:
 
 vpipe:
 	./a.out /workspace/research/ILA/autoGenILA/vpipe/SYN/vpipe_yosys.v
+
+dla:
+	./a.out /workspace/research/ILA/autoGenILA/NVDLA/SYN/nvdla_yosys.v
