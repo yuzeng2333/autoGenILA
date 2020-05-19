@@ -1733,6 +1733,74 @@ void always_fake_taint_gen(std::string firstLine, std::ifstream &input, std::ofs
 }
 
 
+// this expression is usually for mem with gated clock. The gated clock is the signal in if()
+// Therefore, we do not consider cond_t here. Because cond is gated clock signal, those variables
+// that composing it should not be treated as "read"(FIXME)
+void always_star_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream &output) {
+  std::string ifLine;
+  std::getline(input, ifLine);
+  std::getline(input, assignLine);
+  std::smatch m;
+  // process ifLine
+  if(!std::match(ifLine, m, pIf)) {
+    toCout("Error: the if line does not match pIf: "+ifLine);
+    abort();
+  }
+  std::string condAndSlice = m.str(2);
+  std::string cond, condSlice;
+  split_slice(condAndSlice, cond, condSlice);
+  // cond_r
+  bool condIsNew;
+  uint32_t condVerNum = find_version_num(condAndSlice, condIsNew, output);
+  std::string condVer = toStr(condVerNum);
+  auto condIdxPair = varWidth.get_idx_pair(cond, assignLine);
+  std::string condHighIdx  = toStr(condIdxPair.first);
+  std::string condLowIdx   = toStr(condIdxPair.second);
+
+
+  // process assignLine
+  if(!std::match(assignLine, m, pNonblock)) {
+    toCout("Error: the assign line does not match pNone: "+assignLine);
+    abort();
+  }
+  std::string destAndSlice = m.str(2);
+  std::string op1AndSlice = m.str(3);
+  std::string dest, destSlice;
+  std::string op1, op1Slice;
+  split_slice(destAndSlice, dest, destSlice);
+  split_slice(op1AndSlice, op1, op1Slice);
+  uint32_t destWidth = get_var_slice_width(destAndSlice);
+
+  //_r
+  bool op1IsNew;
+  uint32_t op1VerNum = find_version_num(op1AndSlice, op1IsNew, output);
+  std::string op1Ver = toStr(op1VerNum);
+  auto op1IdxPair = varWidth.get_idx_pair(op1, assignLine);
+  std::string op1HighIdx  = toStr(op1IdxPair.first);
+  std::string op1LowIdx   = toStr(op1IdxPair.second);
+
+  if(op1IsNew) {
+    output << "  logic [" + op1HighIdx + ":" + op1LowIdx + "] " + op1 + _r + op1Ver + " ;" << std::endl;
+    output << "  logic [" + op1HighIdx + ":" + op1LowIdx + "] " + op1 + _x + op1Ver + " ;" << std::endl;
+    output << "  logic [" + op1HighIdx + ":" + op1LowIdx + "] " + op1 + _c + op1Ver + " ;" << std::endl;
+  }
+
+  output << "  always @* begin" << std::endl;
+  output << "    " + dest + _t + destSlice + " = 0 ;" << std::endl;  
+  output << "    " + op1 + r + op1Ver + " = 0 ;" << std::endl;
+  output << "    " + op1 + x + op1Ver + " = 0 ;" << std::endl;
+  output << "    " + op1 + c + op1Ver + " = 0 ;" << std::endl;
+  output << ifLine + " begin" << std::endl;
+  output << assignLine << std::endl;
+  output << "      " + dest + _t + destSlice + " = " + op1 + _t + op1Slice + " ;" << std::endl;
+  output << "      " + op1 + _r + op1Ver + " = " + dest + _r + destSlice + " ;" << std::endl;
+  output << "      " + op1 + _x + op1Ver + " = " + dest + _x + destSlice + " ;" << std::endl;
+  //FIXME output << "      " + op1 + _c + op1Ver + " = " + extend("1'b1", destWidth) " ;" << std::endl;
+  output << "    end" << std::endl;
+  output << "  end" << std::endl;
+  //TODO: taint for cond!!
+} 
+
 void always_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream &output) {
   std::smatch m;
   if( !std::regex_match(firstLine, m, pAlwaysClk) ) {

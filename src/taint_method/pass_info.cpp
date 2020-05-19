@@ -789,7 +789,7 @@ void make_new_pair_vec( std::vector<std::pair<std::string, std::string>> &oldFro
 
 
 void go_backward(std::string startVarAndSlice, std::vector<std::pair<std::string, std::string>> &backCondPairVec) {
-  toCout("GO_BACKWARD for: "+startVarAndSlice);
+  //toCout("GO_BACKWARD for: "+startVarAndSlice);
   std::string startVar, startVarSlice;
   split_slice(startVarAndSlice, startVar, startVarSlice);
   if( startVar.compare("fangyuan299") == 0 || startVar.find("fangyuan299") != std::string::npos ) {

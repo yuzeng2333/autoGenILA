@@ -76,6 +76,7 @@ std::regex pAlwaysClk   (to_re("^(\\s*)always @\\(posedge (NAME)\\)(?: begin)?$"
 std::regex pAlwaysClkRst(to_re("^(\\s*)always @\\(posedge (NAME) or (?:posedge|negedge) (NAME)(\\s?)\\)$"));
 std::regex pAlwaysComb  (to_re("^(\\s*)always @\\(NAME or NAME(?: or NAME)?\\) begin$"));
 std::regex pAlwaysFake  (to_re("^(\\s*)always @\\(negedge 1'bx\\)(?: begin)?$"));
+std::regex pAlwaysStar  (to_re("^(\\s*)always @*$"));
 std::regex pEnd         ("^(\\s*)end$");
 std::regex pEndmodule   ("^(\\s*)endmodule$");
 /* non-blocking assignment */
@@ -693,6 +694,9 @@ void add_line_taints(std::string line, std::ofstream &output, std::ifstream &inp
     case ALWAYS_FAKE:
       always_fake_taint_gen(line, input, output);
       break;
+    case ALWAYS_STAR:
+      always_star_taint_gen(line, input, output);
+      break;
     case FUNCDEF:
       break;
     case NONE:
@@ -803,6 +807,9 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   }
   else if( std::regex_match(line, m, pAlwaysFake) ) {
     return ALWAYS_FAKE;
+  }
+  else if( std::regex_match(line, m, pAlwaysStar) ) {
+    return ALWAYS_STAR;
   }
   else if( std::regex_match(line, m, pNonblockIf) ) {
     return NONBLOCKIF;
