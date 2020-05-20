@@ -1760,8 +1760,8 @@ void always_star_taint_gen(std::string firstLine, std::ifstream &input, std::ofs
 
 
   // process assignLine
-  if(!std::regex_match(assignLine, m, pNonblock)) {
-    toCout("Error: the assign line does not match pNone: "+assignLine);
+  if(!std::regex_match(assignLine, m, pNoneNoAssign)) {
+    toCout("Error: the assign line does not match pNoneNoAssign: "+assignLine);
     abort();
   }
   std::string destAndSlice = m.str(2);

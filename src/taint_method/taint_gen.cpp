@@ -59,6 +59,7 @@ std::regex pSignedRightShift  (to_re("^(\\s*)assign (NAME) = (NAME) >>> (NAME)(\
 std::regex pSignedLeftShift   (to_re("^(\\s*)assign (NAME) = (NAME) <<< (NAME)(\\s*)?;$"));
 /* 1 operator */
 std::regex pNone        (to_re("^(\\s*)assign (NAME) = (NAME)(\\s*)?;$"));
+std::regex pNoneNoAssign(to_re("^(\\s*)(NAME) = (NAME)(\\s*)?;$"));
 std::regex pInvert      (to_re("^(\\s*)assign (NAME) = \\~ (NAME)(\\s*)?;$"));
 /* reduce 1 op */
 std::regex pNot         (to_re("^(\\s*)assign (NAME) = ! (NAME)(\\s*)?;$"));
@@ -102,7 +103,7 @@ std::regex pIf        (to_re("^(\\s*)if \\((.*)\\)$"));
 std::regex pElse      (to_re("^(\\s*)else$"));
 /* multiple/un-certain # of ops */
 //std::regex pBitExOrConcat (to_re("^(\\s*)assign (NAME) = \\{\\} \\^ (NAME)(\\s*)?;$"));
-std::regex pSrcConcat (to_re("^(\\s*)assign (NAME) = \\{ ((?:NAME(?:\\s)?, )*NAME)\\s*\\}(\\s*)?;$"));
+std::regex pSrcConcat (to_re("^(\\s*)assign (NAME) = \\{ ((?:NAME, )*NAME) \\}\\s?;$"));
 // here actually src can be only one var
 std::regex pSrcDestBothConcat(to_re("^(\\s*)assign \\{ ((?:NAME(?:\\s)?, )+NAME)\\s*\\} = \\{ ((?:NAME(?:\\s)?, )*NAME) \\}(\\s*)?;$"));
 
@@ -246,14 +247,26 @@ void clean_file(std::string fileName) {
   std::regex extraBlank("([a-zA-Z0-9_\\.'])(\\s)(\\[)");
   bool inFunc = false;
   while( std::getline(cleanFileInput, line) ) {
+    toCout(line);
+    if(line.find("/vmod/nvdla/sdp/NV_NVDLA_SDP_CORE_x.v:223") != std::string::npos) {
+      toCout("Found: "+line);
+    }
     if(std::regex_match(line, match, pureComment) || line.substr(0,2) == "/*" || line.empty())
       continue;
     line = std::regex_replace(line, partialComment, "");
     cleanLine = std::regex_replace(line, redundentBlank, "$1 $3");
+    bool noConcat=true;
+    std::string retStr;
+    noConcat = extract_concat(cleanLine, output, retStr, true);
+    if (noConcat)
+      output << cleanLine << std::endl;
+    else {
+      output << retStr << std::endl;
+      cleanLine = retStr;
+    }
     // store the width of wires and regs in varWidth
     uint32_t choice = parse_verilog_line(cleanLine, true);
     std::smatch m;
-    bool passExtractConcat = false;
     switch (choice) {
       case INPUT:
         {
@@ -497,11 +510,6 @@ void clean_file(std::string fileName) {
       default:
         break;
     } // end of switch
-    bool noConcat=true;
-    std::string nullStr;
-    noConcat = extract_concat(cleanLine, output, nullStr);
-    if (noConcat)
-      output << cleanLine << std::endl;
   }
   output.close();
   cleanFileInput.close();
@@ -2069,6 +2077,7 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
 /* if a basic operator contains concatenated input, 
  * declare a new variable representing the concatenated input*/
 bool extract_concat(std::string line, std::ofstream &output, std::string &returnedStmt, bool isFuncCall) {
+  std::string retStr = "";
   std::smatch m;
   int blankNo = line.find('a', 0);  
   std::regex pAssign("assign ");
@@ -2086,7 +2095,7 @@ bool extract_concat(std::string line, std::ofstream &output, std::string &return
   bool isNonblockConcat = std::regex_match(line, m, pNonblockConcat);
   std::string fangyuanDeclaration;
   std::string fangyuanAssign;
-  if ( (std::regex_search(line, m, pAssign)
+  if ( (line.find("assign") != std::string::npos
        && !std::regex_match(line, m, pSrcConcat)
        && !std::regex_match(line, m, pSrcDestBothConcat)
        && std::regex_search(line, m, pBraces))

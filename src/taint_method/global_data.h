@@ -113,6 +113,7 @@ extern std::regex pSignedLeftShift;
 /* 1 operator */
 extern std::regex pNot;     
 extern std::regex pNone;     
+extern std::regex pNoneNoAssign;  
 extern std::regex pInvert;
 /* reduce 1 op */
 extern std::regex pRedOr; 
