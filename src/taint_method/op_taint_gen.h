@@ -37,6 +37,8 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
 
 void always_fake_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream &output);
 
+void always_star_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream &output);
+
 void always_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream &output);
 
 void always_clkrst_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream &output);

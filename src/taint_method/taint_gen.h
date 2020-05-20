@@ -30,7 +30,7 @@
 #define ALWAYS_FAKE     20
 #define SEL             21
 #define NONBLOCKIF      22
-#define ALWAYS_FAKE     23
+#define ALWAYS_STAR     23
 #define UNSUPPORT       99
 #define NONE            100
 

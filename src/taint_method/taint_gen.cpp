@@ -76,7 +76,7 @@ std::regex pAlwaysClk   (to_re("^(\\s*)always @\\(posedge (NAME)\\)(?: begin)?$"
 std::regex pAlwaysClkRst(to_re("^(\\s*)always @\\(posedge (NAME) or (?:posedge|negedge) (NAME)(\\s?)\\)$"));
 std::regex pAlwaysComb  (to_re("^(\\s*)always @\\(NAME or NAME(?: or NAME)?\\) begin$"));
 std::regex pAlwaysFake  (to_re("^(\\s*)always @\\(negedge 1'bx\\)(?: begin)?$"));
-std::regex pAlwaysStar  (to_re("^(\\s*)always @*$"));
+std::regex pAlwaysStar  (to_re("^(\\s*)always @\\*$"));
 std::regex pEnd         ("^(\\s*)end$");
 std::regex pEndmodule   ("^(\\s*)endmodule$");
 /* non-blocking assignment */
@@ -98,7 +98,7 @@ std::regex pEndcase   (to_re("^(\\s*)endcase$"));
 std::regex pDefault   (to_re("^(\\s*)default\\:$"));
 std::regex pBlock     (to_re("^(\\s*)(NAME) = (NAME)(\\s*)?;$"));
 // if else
-std::regex pIf        (to_re("^(\\s*)if \\(.*\\)$"));
+std::regex pIf        (to_re("^(\\s*)if \\((.*)\\)$"));
 std::regex pElse      (to_re("^(\\s*)else$"));
 /* multiple/un-certain # of ops */
 //std::regex pBitExOrConcat (to_re("^(\\s*)assign (NAME) = \\{\\} \\^ (NAME)(\\s*)?;$"));
@@ -529,6 +529,7 @@ void analyze_reg_path( std::string fileName ) {
   std::string line;
   std::smatch m;
   while( std::getline(input, line) ) {
+    toCout(line);
     uint32_t choice = parse_verilog_line(line, true);
     switch(choice) {
       case ONE_OP:
@@ -613,6 +614,7 @@ void analyze_reg_path( std::string fileName ) {
 
           //fill_in_pass_relation(destAndSlice, srcAndSlice, line); 
         }
+        // TODO: add support for pAlwaysClkRst 
         break;
       default:
         break;
@@ -808,7 +810,7 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   else if( std::regex_match(line, m, pAlwaysFake) ) {
     return ALWAYS_FAKE;
   }
-  else if( std::regex_match(line, m, pAlwaysStar) ) {
+  else if( line.find("always @*") != std::string::npos || std::regex_match(line, m, pAlwaysStar) ) {
     return ALWAYS_STAR;
   }
   else if( std::regex_match(line, m, pNonblockIf) ) {
@@ -894,7 +896,7 @@ void add_file_taints(std::string fileName, std::map<std::string, std::vector<std
   CONSTANT_SIG = toStr(g_sig_width) + "'b1";
   // Reserve first line for module declaration
   while( std::getline(input, line) ) {
-    //toCout(line);
+    toCout(line);
     lineNo++;
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       add_case_taints_limited(input, output, line);

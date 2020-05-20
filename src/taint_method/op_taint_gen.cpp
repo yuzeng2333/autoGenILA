@@ -1287,8 +1287,6 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
   std::string cond, condSlice;
   std::string op1, op1Slice;
   std::string op2, op2Slice;
-  assert(!isMem(op1));    
-  assert(!isMem(op2));    
 
   uint32_t localWidthNum;
   std::string localWidth;
@@ -1312,6 +1310,8 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
   assert_info(!isTop || !isOutput(cond), "ite_taint_gen:"+cond+" is output, line: "+line);  
   assert_info(!isTop || !isOutput(op1), "ite_taint_gen:"+op1+" is output, line: "+line);  
   assert_info(!isTop || !isOutput(op2), "ite_taint_gen:"+op2+" is output, line: "+line);  
+  assert(!isMem(op1));    
+  assert(!isMem(op2));
 
   auto destIdxPair = varWidth.get_idx_pair(dest, line);
   auto condIdxPair = varWidth.get_idx_pair(cond, line);
@@ -1738,11 +1738,12 @@ void always_fake_taint_gen(std::string firstLine, std::ifstream &input, std::ofs
 // that composing it should not be treated as "read"(FIXME)
 void always_star_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream &output) {
   std::string ifLine;
+  std::string assignLine;
   std::getline(input, ifLine);
   std::getline(input, assignLine);
   std::smatch m;
   // process ifLine
-  if(!std::match(ifLine, m, pIf)) {
+  if(!std::regex_match(ifLine, m, pIf)) {
     toCout("Error: the if line does not match pIf: "+ifLine);
     abort();
   }
@@ -1759,7 +1760,7 @@ void always_star_taint_gen(std::string firstLine, std::ifstream &input, std::ofs
 
 
   // process assignLine
-  if(!std::match(assignLine, m, pNonblock)) {
+  if(!std::regex_match(assignLine, m, pNonblock)) {
     toCout("Error: the assign line does not match pNone: "+assignLine);
     abort();
   }
@@ -1787,9 +1788,9 @@ void always_star_taint_gen(std::string firstLine, std::ifstream &input, std::ofs
 
   output << "  always @* begin" << std::endl;
   output << "    " + dest + _t + destSlice + " = 0 ;" << std::endl;  
-  output << "    " + op1 + r + op1Ver + " = 0 ;" << std::endl;
-  output << "    " + op1 + x + op1Ver + " = 0 ;" << std::endl;
-  output << "    " + op1 + c + op1Ver + " = 0 ;" << std::endl;
+  output << "    " + op1 + _r + op1Ver + " = 0 ;" << std::endl;
+  output << "    " + op1 + _x + op1Ver + " = 0 ;" << std::endl;
+  output << "    " + op1 + _c + op1Ver + " = 0 ;" << std::endl;
   output << ifLine + " begin" << std::endl;
   output << assignLine << std::endl;
   output << "      " + dest + _t + destSlice + " = " + op1 + _t + op1Slice + " ;" << std::endl;

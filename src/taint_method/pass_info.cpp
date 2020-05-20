@@ -24,6 +24,7 @@ void fill_in_pass_relation(std::string destAndSlice, std::string srcAndSlice, st
   uint32_t storeIdx = g_passExprStore.size();
   g_passExprStore.push_back(line);
   std::string src, srcSlice;
+  split_slice(srcAndSlice, src, srcSlice);
   add_into_backwardMap(destAndSlice, line, storeIdx);
   add_into_forwardMap(src, line, storeIdx);
 }
