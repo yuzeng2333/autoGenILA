@@ -78,6 +78,7 @@ std::regex pAlwaysClkRst(to_re("^(\\s*)always @\\(posedge (NAME) or (?:posedge|n
 std::regex pAlwaysComb  (to_re("^(\\s*)always @\\(NAME or NAME(?: or NAME)?\\) begin$"));
 std::regex pAlwaysFake  (to_re("^(\\s*)always @\\(negedge 1'bx\\)(?: begin)?$"));
 std::regex pAlwaysStar  (to_re("^(\\s*)always @\\*$"));
+std::regex pAlwaysNeg   (to_re("^(\\s*)always @\\(negedge (NAME)\\)$"));
 std::regex pEnd         ("^(\\s*)end$");
 std::regex pEndmodule   ("^(\\s*)endmodule$");
 /* non-blocking assignment */
@@ -117,7 +118,6 @@ std::regex pNumExist("(\\d+)'(h|d|b)[\\dabcdef\\?]+");
 std::regex pBin("(\\d+)'b([01]+)");
 std::regex pHex("(\\d+)'h([01]+)");
 
-
 /* Global data */
 std::string moduleName;
 std::vector<std::string> moduleInputs;
@@ -129,10 +129,11 @@ std::vector<std::string> moduleRegs;
 std::vector<std::string> moduleTrueRegs;
 std::unordered_map<std::string, uint32_t> moduleMems;
 std::set<std::string> moduleWires;
+std::set<std::string> g_wire2reg;
+std::set<std::string> g_operators{"+", "-", "*", "%", "&&", "||", "==", "===", "!=", ">", ">=", "<", "<=", "|", "^", "&", "+:", "-:", "<<", ">>", "<<<", ">>>", "~", "!", "&", "~&", "~|", "~^", "^", "?", "<=", "always", "function"};
 std::string clockName;
 std::string resetName;
 std::vector<std::string> rTaints;
-std::set<std::string> g_wire2reg;
 std::unordered_map<std::string, uint32_t> nextVersion;
 std::unordered_map<std::string, std::vector<bool>> nxtVerBits;
 std::unordered_map<std::string, std::string> new_next;
@@ -168,6 +169,10 @@ std::string _r="_R";
 std::string _x="_X";
 std::string _c="_C";
 std::string _sig="_S";
+std::string srcConcatFeature = " = {";
+std::string bothConcatFeature = "} = {";
+std::string g_gatedClkFileName = "gated_clk.txt";
+std::string g_path;
 uint32_t g_reg_count;
 uint32_t g_sig_width; // == log2(g_reg_count);
 uint32_t g_next_sig;
@@ -707,6 +712,8 @@ void add_line_taints(std::string line, std::ofstream &output, std::ifstream &inp
     case ALWAYS_STAR:
       always_star_taint_gen(line, input, output);
       break;
+    case ALWAYS_NEG:
+      always_neg_taint_gen(line, input, output);      
     case FUNCDEF:
       break;
     case NONE:
@@ -796,7 +803,8 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
             || std::regex_match(line, m, pSel4)) {
     return SEL;
   }
-  else if (std::regex_match(line, m, pSrcConcat)) {
+  //else if (std::regex_match(line, m, pSrcConcat)) {
+  else if (is_srcConcat(line)) {
     return SRC_CONCAT;
   }
   else if (std::regex_match(line, m, pSrcDestBothConcat)) {
@@ -820,6 +828,9 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   }
   else if( line.find("always @*") != std::string::npos || std::regex_match(line, m, pAlwaysStar) ) {
     return ALWAYS_STAR;
+  }
+  else if( std::regex_match(line, m, pAlwaysNeg) ) {
+    return ALWAYS_NEG;
   }
   else if( std::regex_match(line, m, pNonblockIf) ) {
     return NONBLOCKIF;
@@ -1007,14 +1018,14 @@ void merge_taints(std::string fileName) {
       continue;
     }
     if ( nextVersion.find(reg) == nextVersion.end() ) {
-      output << "  assign " + reg + _r+" = 0;" << std::endl;  
-      output << "  assign " + reg + _c+" = 0;" << std::endl;  
-      output << "  assign " + reg + _x+" = 0;" << std::endl;  
+      output << "  assign " + reg + _r+ " = 0;" << std::endl;  
+      output << "  assign " + reg + _c+ " = 0;" << std::endl;  
+      output << "  assign " + reg + _x+ " = 0;" << std::endl;  
     }
   }
 
   // these wires are never used as inputs
-  output << " // ground taints for used wires" << std::endl;
+  output << " // ground taints for unused wires" << std::endl;
   std::string outputStr = "";
   for (auto wire : moduleWires) {
     if ( isNum(wire) ) {
@@ -1022,10 +1033,10 @@ void merge_taints(std::string fileName) {
       continue;
     }
     if ( nextVersion.find(wire) == nextVersion.end() ) {
-      outputStr = outputStr + wire + _r+" , ";
-      outputStr = outputStr + wire + _c+" , ";
-      if( g_wire2reg.find(wire) == g_wire2reg.end() )
-        outputStr = outputStr + wire + _x+" , ";        
+      outputStr = outputStr + wire + _r+ " , ";
+      outputStr = outputStr + wire + _c+ " , ";
+      //if( g_wire2reg.find(wire) == g_wire2reg.end() )
+      outputStr = outputStr + wire + _x+ " , ";        
     }
   }
   if(outputStr.length() > 2) {
@@ -2096,7 +2107,8 @@ bool extract_concat(std::string line, std::ofstream &output, std::string &return
   std::string fangyuanDeclaration;
   std::string fangyuanAssign;
   if ( (line.find("assign") != std::string::npos
-       && !std::regex_match(line, m, pSrcConcat)
+       //&& !std::regex_match(line, m, pSrcConcat)
+       && !is_srcConcat(line)
        && !std::regex_match(line, m, pSrcDestBothConcat)
        && std::regex_search(line, m, pBraces))
        || std::regex_match(line, m, pNonblockConcat) ) { // also extract from nonblockconcat
@@ -2248,10 +2260,10 @@ int taint_gen(std::string fileName, uint32_t stage, bool isTopIn, std::map<std::
     std::cout << "Analyze register's path!" << std::endl;
     analyze_reg_path(fileName);
   }
-  if (stage <= 2) {  
-    std::cout << "Begin fill update!" << std::endl; //2
-    fill_update(fileName + ".clean");
-  }
+  //if (stage <= 2) {  
+  //  std::cout << "Begin fill update!" << std::endl; //2
+  //  fill_update(fileName + ".clean");
+  //}
   if (stage <= 2 && doProcessPathInfo) {  
     std::cout << "Process pass info!" << std::endl; //2
     process_pass_info(fileName + ".clean");

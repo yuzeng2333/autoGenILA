@@ -1310,3 +1310,20 @@ uint32_t get_dest_ver(std::string destAndSlice) {
     return g_destVersion[dest];
   }
 }
+
+
+bool is_srcConcat(std::string line) {
+  if(line.find(srcConcatFeature) == std::string::npos)
+    return false;
+  if(line.find(bothConcatFeature) != std::string::npos)
+    return false;
+
+  bool noOperator = true;
+  for(auto it = g_operators.begin(); it != g_operators.end(); it++) {
+    if(line.find(*it) != std::string::npos) {
+      noOperator = false;
+      break;
+    }
+  }
+  return noOperator;
+}

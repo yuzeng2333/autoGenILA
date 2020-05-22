@@ -20,7 +20,12 @@ int main(int argc, char *argv[]) {
     doProcessPathInfo = false;
   else
     doProcessPathInfo = true;
-  std::string path = extract_path(fileName);
+  g_path = extract_path(fileName);
+  // make gated_clk.txt file
+  std::ofstream pathOutput(g_path+"/"+g_gatedClkFileName);
+  pathOutput << "These are found potential gated clk, check it:" << std::endl;
+  pathOutput.close();
+
   // data structures
   std::vector<std::string> modules;
   std::map<std::string, std::vector<std::string>> childModules;
@@ -39,11 +44,11 @@ int main(int argc, char *argv[]) {
   }
   for(std::string module: modules) {
     bool isTop = (topModule.compare(module) == 0);
-    add_taint_bottom_up(path, module, moduleReady, childModules, topModule, moduleInputsMap, moduleOutputsMap, moduleRFlagsMap, totalRegCnt, nextSig, doProcessPathInfo);
+    add_taint_bottom_up(g_path, module, moduleReady, childModules, topModule, moduleInputsMap, moduleOutputsMap, moduleRFlagsMap, totalRegCnt, nextSig, doProcessPathInfo);
   }
 
   // in the file for top module, append "include" at the end
-  std::ofstream output(path+"/"+"include.final");
+  std::ofstream output(g_path+"/"+"include.final");
   for(std::string subModule: modules) {
     if(subModule.compare(topModule) == 0)
       continue;

@@ -2,6 +2,12 @@ module exp(clk, rst, in, out);
   reg out;
   input clk;
   input rst;
-  input in;
+  input [1:0] in;
   output out;
+  reg a;
+  wire in1;
+  wire [63:0] fangyuan0;
+  assign fangyuan0 = { a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a };
+
+  assign in1 = fangyuan0 <<< s;
 endmodule

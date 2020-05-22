@@ -137,4 +137,6 @@ std::string expand_slice(std::string slice);
 std::string extract_path(std::string fullFileName);
 
 uint32_t get_dest_ver(std::string destAndSlice);
+
+bool is_srcConcat(std::string line);
 #endif

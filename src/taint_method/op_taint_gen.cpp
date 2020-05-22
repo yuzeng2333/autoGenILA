@@ -1572,6 +1572,23 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
 }
 
 
+void nonblock_gate_taint_gen(std::string line, std::ofstream &output) {
+  std::smatch m;
+  if ( !std::regex_match(line, m, pNonblock) )
+    return;
+  // assume the LHS is always gate signal
+  std::string gate = m.str(2);
+  std::string gateUpdate = m.str(3);
+  // because the gate is only used to be anded with clk, its write taint does not matter.
+  output << "  assign " + gate + _t + " = 0;" << std::endl;
+  // also gateUpdate_c0 == 0, _r0 == 0, _x0 == 0, all are disregarded
+  // the gate should never be ASV. That is because I assume there is no instruction to directly set the gate.
+  //Or in another word, all gate are set and read in the same instruction.
+  output << "  assign " + gate + "_r_flag = 0;" << std::endl;
+  output << "  assign " + gate + "_t_flag = 0;" << std::endl;
+}
+
+
 void nonblockconcat_taint_gen(std::string line, std::ofstream &output) {
   checkCond(!g_use_reset_sig, "nonblockconcat not supported for use_reset_sig!!");
   std::smatch m;
@@ -1802,6 +1819,7 @@ void always_star_taint_gen(std::string firstLine, std::ifstream &input, std::ofs
   //TODO: taint for cond!!
 } 
 
+
 void always_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream &output) {
   std::smatch m;
   if( !std::regex_match(firstLine, m, pAlwaysClk) ) {
@@ -1824,6 +1842,33 @@ void always_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream
   }
   else if( std::regex_match(line, m, pEnd) ) {
     output << line << std::endl;
+  }
+  else {
+    toCout("Error in parsing nonblocking: "+line);
+    abort();
+  }
+}
+
+
+void always_neg_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream &output) {
+  std::smatch m;
+  if( !std::regex_match(firstLine, m, pAlwaysNeg) ) {
+    std::cout << "!! Error in parsing always_neg !!" << std::endl;
+    abort();
+  }
+  // here I do not update g_recentClk with the gated clk because it will not be directly used in always statement
+  //g_recentClk = m.str(2);
+  std::string gatedClk = m.str(2);
+  std::ofstream pathOutput(g_path+"/"+g_gatedClkFileName);
+  pathOutput << moduleName + " : " + gatedClk << std::endl;
+  pathOutput.close();
+
+  std::string line;
+  // parse first assignment
+  std::getline(input, line);
+  output << line << std::endl;
+  if( std::regex_match(line, m, pNonblock) ) {
+    nonblock_gate_taint_gen(line, output);  
   }
   else {
     toCout("Error in parsing nonblocking: "+line);
