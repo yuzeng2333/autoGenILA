@@ -1002,14 +1002,6 @@ void merge_taints(std::string fileName) {
     }
   }
 
-  // _flip
-  for ( auto it = g_destVersion.begin(); it != g_destVersion.end(); ++it ) {
-    output << "  assign " + it->first + "_flip = ( ";
-    for (uint32_t i = 0; i < it->second - 1; i++)
-      output << it->first + "_flip" + std::to_string(i) + " ) | ( ";
-    output << it->first + "_flip" + std::to_string(it->second - 1) + " );" << std::endl;
-  }
-
   // ground taints for floating regs
   output << " // ground taints for floating regs" << std::endl;
   for (auto reg : moduleRegs) {
@@ -1101,20 +1093,6 @@ void merge_taints(std::string fileName) {
     }
     for( auto it = moduleMems.begin(); it != moduleMems.end(); it++ ) {
       output << " || " + it->first + _t;
-    }
-  }
-  output << " ;" << std::endl;
-
-  // _flip signal
-  output << "  logic reg_flipping = 0";
-  if(isTop) {
-    for( auto it = moduleTrueRegs.begin(); it != moduleTrueRegs.end(); it++ ) {
-      if(isOutput(*it))
-        continue;
-      output << " || " + *it + "_flip";
-    }
-    for( auto it = moduleMems.begin(); it != moduleMems.end(); it++ ) {
-      output << " || " + it->first + "_flip";
     }
   }
   output << " ;" << std::endl;

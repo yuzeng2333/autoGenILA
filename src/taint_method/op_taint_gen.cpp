@@ -135,7 +135,6 @@ void reg_taint_gen(std::string line, std::ofstream &output) {
 
   moduleRegs.push_back(var);
   output << blank << "logic " + slice + " " + var + _t + " ;" << std::endl;
-  output << blank << "logic " + slice + " " + var + "_flip ;" << std::endl;
 
   output << blank << "logic " + slice + " " + var + "_PREV_VAL1 ;" << std::endl; 
   output << blank << "logic " + slice + " " + var + "_PREV_VAL2 ;" << std::endl; 
@@ -187,7 +186,6 @@ void mem_taint_gen(std::string line, std::ofstream &output) {
   uint32_t varLen = get_end(sliceTop) + 1;
   moduleMems.emplace(var, varLen);
   assert_info(!isTop || !isOutput(var), "mem_taint_gen:var is output, line: "+line);  
-  output << blank << "logic " + sliceTop + " " + var + "_flip ;" << std::endl;
   output << blank << "logic " + slice + " " + var + _t + " " + sliceTop + " ;" << std::endl;
   output << blank << "logic " + slice + " " + var + "_PREV_VAL1 " + sliceTop + " ;" << std::endl;
   output << blank << "logic " + slice + " " + var + "_PREV_VAL2 " + sliceTop + " ;" << std::endl;
@@ -1493,10 +1491,6 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
     output << blank.substr(0, blank.length()-4) + "assign " + op1 + _x + op1Ver + op1Slice + " = " + extend("!("+repeatCond+")", localWidthNum) + " ;" << std::endl; 
   }
 
-  // _flip
-  output << "  logic " + dest + "_flip" + toStr(get_dest_ver(dest)) + " ;" << std::endl;
-  output << "  assign " + dest + "_flip" + toStr(get_dest_ver(dest)) + " = " + dest + _x + destSlice + " > 0 || " + destAndSlice + " != " + dest + "_PREV_VAL1" + destSlice + " ;" << std::endl;
-
   // _r
   output << blank.substr(0, blank.length()-4) + "assign " + op1 + _r + op1Ver + op1Slice + " = 0 ;" << std::endl;
 
@@ -1734,9 +1728,6 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
     output << "  assign " + src + _r + srcVer + srcSlice + " = 0 ;" << std::endl; 
     //output << "  assign " + src + _r + srcVer + srcSlice + " = " + extend(destAndSlice+" != "+srcAndSlice, localWidthNum) + " ;" << std::endl; 
     output << "  assign " + src + _c + srcVer + srcSlice + " = " + extend("1'b1", localWidthNum) + " ;" << std::endl;
-    // _flip
-    checkCond(false, "Error: mem not supported yet for reg_flip");
-    output << "  assign " + dest + "_flip " + destSlice + " = " + srcAndSlice + " != " + destAndSlice + " ;" << std::endl;
   }
 }
 
