@@ -49,8 +49,11 @@ riscv:
 piccolo:
 	./a.out /workspace/research/ILA/autoGenILA/Piccolo-iu/verilog-cpu-old/SYN/piccolo_yosys.v
 
-sha:
+sha_core:
 	./a.out /workspace/research/ILA/autoGenILA/SHA/SYN/sha_simp.v
+
+sha:
+	./a.out /workspace/research/ILA/autoGenILA/SHA/SYN/sha_yosys.v
 
 vpipe:
 	./a.out /workspace/research/ILA/autoGenILA/vpipe/SYN/vpipe_yosys.v

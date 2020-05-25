@@ -185,7 +185,7 @@ void mem_taint_gen(std::string line, std::ofstream &output) {
   
   uint32_t varLen = get_end(sliceTop) + 1;
   moduleMems.emplace(var, varLen);
-  assert_info(!isTop || !isOutput(var), "mem_taint_gen:var is output, line: "+line);  
+  //assert_info(!isTop || !isOutput(var), "mem_taint_gen:var is output, line: "+line);  
   output << blank << "logic " + slice + " " + var + _t + " " + sliceTop + " ;" << std::endl;
   output << blank << "logic " + slice + " " + var + "_PREV_VAL1 " + sliceTop + " ;" << std::endl;
   output << blank << "logic " + slice + " " + var + "_PREV_VAL2 " + sliceTop + " ;" << std::endl;
@@ -379,8 +379,8 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
   std::string destAndSlice = m.str(2);
   std::string op1AndSlice = m.str(3);
   std::string op2AndSlice = m.str(4);
-  assert_info(!isTop || !isOutput(op1AndSlice), "two_op:op1 is output, line: "+line);
-  assert_info(!isTop || !isOutput(op2AndSlice), "two_op:op2 is output, line: "+line);  
+  //assert_info(!isTop || !isOutput(op1AndSlice), "two_op:op1 is output, line: "+line);
+  //assert_info(!isTop || !isOutput(op2AndSlice), "two_op:op2 is output, line: "+line);  
 
   split_slice(destAndSlice, dest, destSlice);
   if(isReduceOp)
@@ -625,7 +625,7 @@ void one_op_taint_gen(std::string line, std::ofstream &output) {
   std::string dest, destSlice;
   std::string op1, op1Slice;
   std::string op1AndSlice = m.str(3);
-  assert_info(!isTop || !isOutput(op1AndSlice), "one_op_taint_gen:op1 is output, line: "+line);  
+  //assert_info(!isTop || !isOutput(op1AndSlice), "one_op_taint_gen:op1 is output, line: "+line);  
   
   split_slice(m.str(2), dest, destSlice);
   split_slice(op1AndSlice, op1, op1Slice);
@@ -748,8 +748,8 @@ void sel_op_taint_gen(std::string line, std::ofstream &output) {
   split_slice(op1AndSlice, op1, op1Slice);
   split_slice(op2AndSlice, op2, op2Slice);
   assert(op1Slice.empty());
-  assert_info(!isTop || !isOutput(op1AndSlice), "sel_op_taint_gen:op1 is output, line: "+line);  
-  assert_info(!isTop || !isOutput(op2AndSlice), "sel_op_taint_gen:op2 is output, line: "+line);  
+  //assert_info(!isTop || !isOutput(op1AndSlice), "sel_op_taint_gen:op1 is output, line: "+line);  
+  //assert_info(!isTop || !isOutput(op2AndSlice), "sel_op_taint_gen:op2 is output, line: "+line);  
 
   assert_info(!isNum(op1), "Error: the var to be selected are numbers!");
   uint32_t localWidth = get_var_slice_width(destAndSlice);
@@ -905,7 +905,7 @@ void reduce_one_op_taint_gen(std::string line, std::ofstream &output) {
   split_slice(op1AndSlice, op1, op1Slice);
   assert(get_var_slice_width(destAndSlice) == 1);
   assert(!isMem(op1));
-  assert_info(!isTop || !isOutput(op1), "reduce_one_op_taint_gen:op1 is output, line: "+line);  
+  //assert_info(!isTop || !isOutput(op1), "reduce_one_op_taint_gen:op1 is output, line: "+line);  
 
   //uint32_t op1WidthNum = varWidth.get_from_var_width(op1, line);
   uint32_t op1WidthNum = get_var_slice_width(op1AndSlice);
@@ -977,7 +977,7 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
   uint32_t destWidthNum = 0;
   for(auto v : updateVec) {
     assert(!isMem(v));
-    assert_info(!isTop || !isOutput(v), "mult_op_taint_gen:"+v+" is output, line: "+line);      
+    //assert_info(!isTop || !isOutput(v), "mult_op_taint_gen:"+v+" is output, line: "+line);      
     destWidthNum += get_var_slice_width(v);
   }
   if (destWidthNum != get_var_slice_width(destAndSlice)) {
@@ -1181,7 +1181,7 @@ void both_concat_op_taint_gen(std::string line, std::ofstream &output) {
   parse_var_list(srcList, srcVec);
   for(std::string src: srcVec) { 
     assert(!isMem(src));
-    assert_info(!isTop || !isOutput(src), "both_concat_taint_gen:"+src+" is output, line: "+line);  
+    //assert_info(!isTop || !isOutput(src), "both_concat_taint_gen:"+src+" is output, line: "+line);  
   }
 
   //std::string destTList = std::regex_replace(destList, pVarNameGroup, "$1_t$3 ");
@@ -1305,9 +1305,9 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
   split_slice(condAndSlice, cond, condSlice);
   split_slice(op1AndSlice , op1, op1Slice);
   split_slice(op2AndSlice , op2, op2Slice);
-  assert_info(!isTop || !isOutput(cond), "ite_taint_gen:"+cond+" is output, line: "+line);  
-  assert_info(!isTop || !isOutput(op1), "ite_taint_gen:"+op1+" is output, line: "+line);  
-  assert_info(!isTop || !isOutput(op2), "ite_taint_gen:"+op2+" is output, line: "+line);  
+  //assert_info(!isTop || !isOutput(cond), "ite_taint_gen:"+cond+" is output, line: "+line);  
+  //assert_info(!isTop || !isOutput(op1), "ite_taint_gen:"+op1+" is output, line: "+line);  
+  //assert_info(!isTop || !isOutput(op2), "ite_taint_gen:"+op2+" is output, line: "+line);  
   assert(!isMem(op1));    
   assert(!isMem(op2));
 
@@ -1440,7 +1440,7 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
   std::string blank = m.str(1);
   std::string op1AndSlice = m.str(3);
   std::string destAndSlice = m.str(2);
-  assert_info(!isTop || !isOutput(op1AndSlice), "nonblock_taint_gen:"+op1AndSlice+" is output, line: "+line);  
+  //assert_info(!isTop || !isOutput(op1AndSlice), "nonblock_taint_gen:"+op1AndSlice+" is output, line: "+line);  
   
   if(isNum(op1AndSlice))
     checkCond(false, "Error: constant number found in RHS of nonblocking!!");
@@ -1600,7 +1600,7 @@ void nonblockconcat_taint_gen(std::string line, std::ofstream &output) {
   parse_var_list(updateList, updateVec);
   for(auto update: updateVec) {
     assert(!isMem(update));
-    assert_info(!isTop || !isOutput(update), "nonblockconcat_taint_gen:"+update+" is output, line: "+line);    
+    //assert_info(!isTop || !isOutput(update), "nonblockconcat_taint_gen:"+update+" is output, line: "+line);    
   }
 
   uint32_t localWidthNum = get_var_slice_width(destAndSlice);
@@ -1675,7 +1675,7 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
     condAndSlice = m.str(2);
     destAndSlice = m.str(3);
     srcAndSlice = m.str(4);
-    assert_info(!isTop || !isOutput(srcAndSlice), "nonblockif_taint_gen:"+srcAndSlice+" is output, line: "+line);    
+    //assert_info(!isTop || !isOutput(srcAndSlice), "nonblockif_taint_gen:"+srcAndSlice+" is output, line: "+line);    
 
     split_slice(destAndSlice, dest, destSlice);
     split_slice(srcAndSlice, src, srcSlice);

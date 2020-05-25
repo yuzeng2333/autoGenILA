@@ -1086,16 +1086,16 @@ void merge_taints(std::string fileName) {
     output << "  assign rst_zy = "+get_recent_rst()+" ;" << std::endl;
 
   // write_taint_exist
-  output << "  logic write_taint_exist = 0";
-  if(isTop) {
-    for( auto it = moduleTrueRegs.begin(); it != moduleTrueRegs.end(); it++ ) {
-      output << " || " + *it + _t;
-    }
-    for( auto it = moduleMems.begin(); it != moduleMems.end(); it++ ) {
-      output << " || " + it->first + _t;
-    }
-  }
-  output << " ;" << std::endl;
+  //output << "  logic write_taint_exist = 0";
+  //if(isTop) {
+  //  for( auto it = moduleTrueRegs.begin(); it != moduleTrueRegs.end(); it++ ) {
+  //    output << " || " + *it + _t + " > 0 ";
+  //  }
+  //  for( auto it = moduleMems.begin(); it != moduleMems.end(); it++ ) {
+  //    output << " || " + it->first + _t + " > 0 ";
+  //  }
+  //}
+  //output << " ;" << std::endl;
 
   output << "endmodule" << std::endl;
   output.close();
@@ -1448,9 +1448,9 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
   split_slice(caseAssignPairs[0].second, b, bSlice);
   split_slice(caseAssignPairs.back().second, a, aSlice);
   split_slice(sAndSlice, s, sSlice);
-  assert_info(!isTop || !isOutput(s), "add_case_taints_limited:s is output, firstLine: "+alwaysFirstLine);
-  assert_info(!isTop || !isOutput(a), "add_case_taints_limited:s is output, firstLine: "+alwaysFirstLine);
-  assert_info(!isTop || !isOutput(b), "add_case_taints_limited:s is output, firstLine: "+alwaysFirstLine);
+  //assert_info(!isTop || !isOutput(s), "add_case_taints_limited:s is output, firstLine: "+alwaysFirstLine);
+  //assert_info(!isTop || !isOutput(a), "add_case_taints_limited:s is output, firstLine: "+alwaysFirstLine);
+  //assert_info(!isTop || !isOutput(b), "add_case_taints_limited:s is output, firstLine: "+alwaysFirstLine);
   // declare necessaey variables
   uint32_t destWidthNum, sWidthNum, aWidthNum, bWidthNum;
   std::string sWidth, aWidth, bWidth;
