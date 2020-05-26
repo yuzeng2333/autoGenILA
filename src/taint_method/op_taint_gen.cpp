@@ -1501,7 +1501,7 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
   if(!replaceSig) {
     if (g_hasRst)
-      output << blank + dest + _t + " \t\t<= " + get_recent_rst() + " ? 0 : ( " + op1+_t+op1Slice + " & " + op1 + _x + op1Ver + op1Slice + " );" << std::endl;
+      output << blank + dest + _t + " \t\t<= " + get_recent_rst() + " ? 0 : ( " + op1 + _t + op1Slice + " & " + op1 + _x + op1Ver + op1Slice + " );" << std::endl;
     else 
       output << blank + dest + _t + " \t\t<= rst_zy ? 0 : ( " + op1 + _t + " & " +  op1 + _x + op1Ver + op1Slice + " );" << std::endl;
   }

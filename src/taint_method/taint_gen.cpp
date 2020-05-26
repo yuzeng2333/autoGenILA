@@ -252,7 +252,7 @@ void clean_file(std::string fileName) {
   std::regex extraBlank("([a-zA-Z0-9_\\.'])(\\s)(\\[)");
   bool inFunc = false;
   while( std::getline(cleanFileInput, line) ) {
-    toCout(line);
+    //toCout(line);
     if(line.find("/vmod/nvdla/sdp/NV_NVDLA_SDP_CORE_x.v:223") != std::string::npos) {
       toCout("Found: "+line);
     }
@@ -542,7 +542,7 @@ void analyze_reg_path( std::string fileName ) {
   std::string line;
   std::smatch m;
   while( std::getline(input, line) ) {
-    toCout(line);
+    //toCout(line);
     uint32_t choice = parse_verilog_line(line, true);
     switch(choice) {
       case ONE_OP:
@@ -915,7 +915,7 @@ void add_file_taints(std::string fileName, std::map<std::string, std::vector<std
   CONSTANT_SIG = toStr(g_sig_width) + "'b1";
   // Reserve first line for module declaration
   while( std::getline(input, line) ) {
-    toCout(line);
+    //toCout(line);
     lineNo++;
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       add_case_taints_limited(input, output, line);
@@ -1107,6 +1107,9 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
   std::ofstream out(fileName + ".final");
   std::string line;
   std::smatch match;
+  if(!isTop) {
+    moduleInputs.push_back("INSTR_IN_ZY");    
+  }
   if(!g_hasRst) {
     moduleInputs.push_back("rst_zy");
     toCout("No reset signal found in "+moduleName+", check it!!");
@@ -1134,14 +1137,16 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
   else
     out << "  logic rst_zy;" << std::endl;
   out << "  integer i;" << std::endl;
-  out << "  logic INSTR_IN_ZY;" << std::endl;
-  out << "  assign INSTR_IN_ZY = ";
-  for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) {
-    if((*it).compare(g_recentClk) == 0 || (*it).compare(g_recentRst) == 0 || (*it).compare("rst_zy") == 0)
-      continue;
-    out << *it + _t + " > 0 || ";
+  if(isTop) {
+    out << "  logic INSTR_IN_ZY;" << std::endl;
+    out << "  assign INSTR_IN_ZY = ";
+    for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) {
+      if((*it).compare(g_recentClk) == 0 || (*it).compare(g_recentRst) == 0 || (*it).compare("rst_zy") == 0)
+        continue;
+      out << *it + _t + " > 0 || ";
+    }
+    out << "0 ;" << std::endl;
   }
-  out << "0 ;" << std::endl;
   while( std::getline(in, line) ) {
     out << line << std::endl;
   }
@@ -1983,6 +1988,10 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
       continue;
     if(inPort.compare("rst_zy") == 0) {
       output << "    .rst_zy(rst_zy)," << std::endl;
+      continue;
+    }
+    if(inPort.compare("INSTR_IN_ZY") == 0) {
+      output << "    .INSTR_IN_ZY(INSTR_IN_ZY)," << std::endl;
       continue;
     }
     std::vector<uint32_t> localVerVec = input2SignalVerMap[inPort];
