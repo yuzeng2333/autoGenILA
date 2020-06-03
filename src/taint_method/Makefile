@@ -1,5 +1,5 @@
 all:
-	g++ -O2 main.cpp taint_gen.cpp helper.cpp op_taint_gen.cpp VarWidth.cpp pass_info.cpp
+	g++ main.cpp taint_gen.cpp helper.cpp op_taint_gen.cpp VarWidth.cpp pass_info.cpp
 
 debug:
 	g++ -g main.cpp taint_gen.cpp helper.cpp op_taint_gen.cpp VarWidth.cpp pass_info.cpp
@@ -60,3 +60,6 @@ vpipe:
 
 dla:
 	./a.out /workspace/research/ILA/autoGenILA/NVDLA/SYN/nvdla_yosys.v
+
+fsm:
+	./a.out /workspace/research/ILA/autoGenILA/naiveEg/fsm/fsm_yosys.v

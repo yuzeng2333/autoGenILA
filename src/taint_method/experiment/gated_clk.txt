@@ -1,1 +1,1 @@
-CKLNQD12PO4 : CP
+These are found potential gated clk, check it:

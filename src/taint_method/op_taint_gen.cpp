@@ -64,7 +64,7 @@ void input_taint_gen(std::string line, std::ofstream &output) {
             || var.find("RESETN") != std::string::npos
             || var.find("RESET_N") != std::string::npos
             || var.find("reset_n") != std::string::npos ) {
-      toCout("================================================  Find potential unexpected rst signal: "+var+" in module: "+moduleName);
+      toCout("================================================  Find potential unexpected rstn signal: "+var+" in module: "+moduleName);
       g_hasRst = true;
       g_rst_pos = false;
       g_recentRst = var;
@@ -1012,8 +1012,6 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
   if(isFangyuan && caseSliceWidth > 0) {
     //if(line.find())
     for(auto vAndSlice: updateVec) {
-      if(get_var_slice_width(vAndSlice) == 80)
-        toCout("Bug found!!");
       addElement = false;
       checkCond(vAndSlice.find("fangyuan") == std::string::npos, "fangyuan found in fangyuan! "+line);
       split_slice(vAndSlice, v, vSlice);

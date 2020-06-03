@@ -1,0 +1,31 @@
+  input a;
+  input a_T ;
+  input [5:0] a_S ;
+  output a_R ;
+  output a_X ;
+  output a_C ;
+  input s;
+  input s_T ;
+  input [5:0] s_S ;
+  output s_R ;
+  output s_X ;
+  output s_C ;
+  output z;
+  logic z ;
+  output z_T ;
+  logic z_T ;
+  logic z_R ;
+  logic z_C ;
+  logic z_X ;
+  logic [5:0] z_S ;
+  input z_R0 ;
+  input z_C0 ;
+  input z_X0 ;
+  output [5:0] z_S ;
+  assign z_C = ( z_C0 );
+  assign z_X = ( z_X0 );
+  assign z_R = ( z_X0 & z_R0 );
+ // ground taints for floating regs
+ // ground taints for unused wires
+ // ground taints for unused wire slices
+endmodule

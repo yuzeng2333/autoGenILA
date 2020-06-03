@@ -253,9 +253,6 @@ void clean_file(std::string fileName) {
   bool inFunc = false;
   while( std::getline(cleanFileInput, line) ) {
     //toCout(line);
-    if(line.find("/vmod/nvdla/sdp/NV_NVDLA_SDP_CORE_x.v:223") != std::string::npos) {
-      toCout("Found: "+line);
-    }
     if(std::regex_match(line, match, pureComment) || line.substr(0,2) == "/*" || line.empty())
       continue;
     line = std::regex_replace(line, partialComment, "");
@@ -915,7 +912,8 @@ void add_file_taints(std::string fileName, std::map<std::string, std::vector<std
   CONSTANT_SIG = toStr(g_sig_width) + "'b1";
   // Reserve first line for module declaration
   while( std::getline(input, line) ) {
-    //toCout(line);
+    if(moduleName.compare("HLS_cdp_icvt_core") == 0 && line.find("IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl") != std::string::npos)
+      toCout(line);
     lineNo++;
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       add_case_taints_limited(input, output, line);
@@ -1137,7 +1135,9 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
   else
     out << "  logic rst_zy;" << std::endl;
   out << "  integer i;" << std::endl;
-  if(isTop) {
+  if(!isTop)
+    out << "  input INSTR_IN_ZY;" << std::endl;
+  else {
     out << "  logic INSTR_IN_ZY;" << std::endl;
     out << "  assign INSTR_IN_ZY = ";
     for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) {
@@ -1937,7 +1937,7 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
   std::unordered_map<std::string, std::vector<bool>> inputSignalIsNewMap;
   
   for(std::string input: moduleInputsMap[moduleName]) {
-    if(input.compare(g_recentClk) == 0 || input.compare("rst_zy") == 0 )
+    if(input.compare(g_recentClk) == 0 || input.compare("rst_zy") == 0 || input.compare("INSTR_IN_ZY") == 0 )
       continue;
     std::string signalAndSliceList = port2SignalMap[input];
     if(signalAndSliceList.empty()) {
@@ -2006,9 +2006,7 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
     std::string varAndSlice = port2SignalMap[inPort];
     std::string varConnect;
     if(!isNum(varAndSlice)) {
-      std::string var, varSlice;
-      split_slice(varAndSlice, var, varSlice);
-      varConnect = var + _sig;
+      varConnect = get_rhs_taint_list(varAndSlice, _sig);
     }
     else {
       if( !std::regex_match(varAndSlice, m, pNum)) {

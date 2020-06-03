@@ -76,6 +76,7 @@ std::string separate_modules(std::string fileName, std::vector<std::string> &mod
   bool inModule = false;
 
   while(std::getline(input, line)) {
+    toCout(line);
     if(std::regex_match(line, m, pNonblock)
         || std::regex_match(line, m, pNonblockConcat)
         || std::regex_match(line, m, pNonblockIf) ) {

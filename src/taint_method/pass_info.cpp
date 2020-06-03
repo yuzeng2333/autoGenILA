@@ -488,7 +488,7 @@ void merge_reg_cond_pair_vec(const std::vector<std::pair<std::string, std::strin
 
 void go_forward(std::string startVarAndSlice, std::vector<std::pair<std::string, std::string>> &frontCondPairVec) {
   //toCout("GO_FORWARD from: "+startVarAndSlice);
-  assert(frontCondPairVec.empty());
+  //assert(frontCondPairVec.empty());
   std::string startVar, startVarSlice;
   split_slice(startVarAndSlice, startVar, startVarSlice);
   if(g_forwardMap.find(startVar) == g_forwardMap.end()
