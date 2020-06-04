@@ -10697,6 +10697,50 @@ module HLS_cdp_icvt_core ( cfg_alu_in_rsc_z , cfg_mul_in_rsc_z , cfg_precision_r
   assign fangyuan27_X0 = IntSubExt_8U_8U_9U_1_o_acc_nl_X ;
   assign fangyuan26_R0 = IntSubExt_8U_8U_9U_1_o_acc_nl_R | ( IntSubExt_8U_8U_9U_1_o_acc_nl_C & fangyuan27_T );
   assign fangyuan27_R0 = IntSubExt_8U_8U_9U_1_o_acc_nl_R | ( IntSubExt_8U_8U_9U_1_o_acc_nl_C & fangyuan26_T );
+  assign { IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R0 [0], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R0 [1], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R0 [2], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R0 [3], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R0 [4], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R0 [5], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R0 [6] } = 0;
+  assign { IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X0 [0], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X0 [1], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X0 [2], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X0 [3], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X0 [4], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X0 [5], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X0 [6] } = 0;
+  assign { IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C0 [0], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C0 [1], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C0 [2], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C0 [3], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C0 [4], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C0 [5], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C0 [6] } = 0;
+  logic [7:0] IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R0 ;
+  logic [7:0] IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X0 ;
+  logic [7:0] IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C0 ;
+  logic [7:0] IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R1 ;
+  logic [7:0] IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X1 ;
+  logic [7:0] IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C1 ;
+  logic [23:0] reg_IntMulExt_17U_16U_33U_o_mul_1_itm_R9 ;
+  logic [23:0] reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X9 ;
+  logic [23:0] reg_IntMulExt_17U_16U_33U_o_mul_1_itm_C9 ;
+  logic [0:0] reg_cfg_truncate_1_itm_R1 ;
+  logic [0:0] reg_cfg_truncate_1_itm_X1 ;
+  logic [0:0] reg_cfg_truncate_1_itm_C1 ;
+  logic [3:0] reg_cfg_truncate_1_2_itm_R2 ;
+  logic [3:0] reg_cfg_truncate_1_2_itm_X2 ;
+  logic [3:0] reg_cfg_truncate_1_2_itm_C2 ;
+// module: hhh
+  hhh h0 (
+    .a_T ( {  IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_T [7] , IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_T , reg_IntMulExt_17U_16U_33U_o_mul_1_itm_T , 31'h0  } ),
+    .a_R ( {  IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R0 [7] , IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R1 , reg_IntMulExt_17U_16U_33U_o_mul_1_itm_R9 , nouse_zy0  } ),
+    .a_X ( {  IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X0 [7] , IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X1 , reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X9 , nouse_zy1  } ),
+    .a_C ( {  IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C0 [7] , IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C1 , reg_IntMulExt_17U_16U_33U_o_mul_1_itm_C9 , nouse_zy2  } ),
+    .a_S ( {  IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_S [7] , IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_S , reg_IntMulExt_17U_16U_33U_o_mul_1_itm_S , 31'h0  } ),
+    .s_T ( {  reg_cfg_truncate_1_itm_T , reg_cfg_truncate_1_2_itm_T  } ),
+    .s_R ( {  reg_cfg_truncate_1_itm_R1 , reg_cfg_truncate_1_2_itm_R2  } ),
+    .s_X ( {  reg_cfg_truncate_1_itm_X1 , reg_cfg_truncate_1_2_itm_X2  } ),
+    .s_C ( {  reg_cfg_truncate_1_itm_C1 , reg_cfg_truncate_1_2_itm_C2  } ),
+    .s_S ( {  reg_cfg_truncate_1_itm_S , reg_cfg_truncate_1_2_itm_S  } ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .z_T (  z_out_2_T  ),
+    .z_R0 (  z_out_2_R  ),
+    .z_X0 (  z_out_2_X  ),
+    .z_C0 (  z_out_2_C  ),
+    .z_S ( z_out_2_S ),
+    .z ( z_out_2 ),
+    .a ( { IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl[7], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl, reg_IntMulExt_17U_16U_33U_o_mul_1_itm, 31'b0000000000000000000000000000000 } ),
+    .s ( { reg_cfg_truncate_1_itm, reg_cfg_truncate_1_2_itm } )
+  );
+  logic [31-1:0] nouse_zy0 ;
+  logic [31-1:0] nouse_zy1 ;
+  logic [31-1:0] nouse_zy2 ;
   assign _000_[2:1] = { and_76_nl, mux_44_nl };
   assign _000__T [2:1] = {  and_76_nl_T , mux_44_nl_T  };
   logic [5:0] _000__S ;
@@ -10899,43 +10943,43 @@ module HLS_cdp_icvt_core ( cfg_alu_in_rsc_z , cfg_mul_in_rsc_z , cfg_precision_r
   assign nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_a_T = {  IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_T [7] , IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_T , reg_IntMulExt_17U_16U_33U_o_mul_1_itm_T , 31'h0  };
   logic [5:0] nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_a_S ;
   assign nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_a_S = 0 ;
-  logic [7:0] IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R0 ;
-  logic [7:0] IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X0 ;
-  logic [7:0] IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C0 ;
-  assign IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R0 [7:7] = nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_a_R [63:63] ;
-  assign IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X0 [7:7] = nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_a_X [63:63] ;
-  assign IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C0 [7:7] = nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_a_C [63:63] ;
-  assign { IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R0 [0], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R0 [1], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R0 [2], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R0 [3], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R0 [4], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R0 [5], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R0 [6] } = 0;
-  assign { IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X0 [0], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X0 [1], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X0 [2], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X0 [3], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X0 [4], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X0 [5], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X0 [6] } = 0;
-  assign { IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C0 [0], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C0 [1], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C0 [2], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C0 [3], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C0 [4], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C0 [5], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C0 [6] } = 0;
-  logic [7:0] IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R1 ;
-  logic [7:0] IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X1 ;
-  logic [7:0] IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C1 ;
-  assign IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R1 = nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_a_R [62:55] ;
-  assign IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X1 = nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_a_X [62:55] ;
-  assign IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C1 = nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_a_C [62:55] ;
-  logic [23:0] reg_IntMulExt_17U_16U_33U_o_mul_1_itm_R9 ;
-  logic [23:0] reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X9 ;
-  logic [23:0] reg_IntMulExt_17U_16U_33U_o_mul_1_itm_C9 ;
-  assign reg_IntMulExt_17U_16U_33U_o_mul_1_itm_R9 = nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_a_R [54:31] ;
-  assign reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X9 = nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_a_X [54:31] ;
-  assign reg_IntMulExt_17U_16U_33U_o_mul_1_itm_C9 = nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_a_C [54:31] ;
+  logic [7:0] IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R2 ;
+  logic [7:0] IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X2 ;
+  logic [7:0] IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C2 ;
+  assign IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R2 [7:7] = nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_a_R [63:63] ;
+  assign IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X2 [7:7] = nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_a_X [63:63] ;
+  assign IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C2 [7:7] = nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_a_C [63:63] ;
+  assign { IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R2 [0], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R2 [1], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R2 [2], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R2 [3], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R2 [4], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R2 [5], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R2 [6] } = 0;
+  assign { IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X2 [0], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X2 [1], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X2 [2], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X2 [3], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X2 [4], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X2 [5], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X2 [6] } = 0;
+  assign { IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C2 [0], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C2 [1], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C2 [2], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C2 [3], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C2 [4], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C2 [5], IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C2 [6] } = 0;
+  logic [7:0] IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R3 ;
+  logic [7:0] IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X3 ;
+  logic [7:0] IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C3 ;
+  assign IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R3 = nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_a_R [62:55] ;
+  assign IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X3 = nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_a_X [62:55] ;
+  assign IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C3 = nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_a_C [62:55] ;
+  logic [23:0] reg_IntMulExt_17U_16U_33U_o_mul_1_itm_R10 ;
+  logic [23:0] reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X10 ;
+  logic [23:0] reg_IntMulExt_17U_16U_33U_o_mul_1_itm_C10 ;
+  assign reg_IntMulExt_17U_16U_33U_o_mul_1_itm_R10 = nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_a_R [54:31] ;
+  assign reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X10 = nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_a_X [54:31] ;
+  assign reg_IntMulExt_17U_16U_33U_o_mul_1_itm_C10 = nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_a_C [54:31] ;
   assign nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_s = { reg_cfg_truncate_1_itm, reg_cfg_truncate_1_2_itm };
   assign nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_s_T = {  reg_cfg_truncate_1_itm_T , reg_cfg_truncate_1_2_itm_T  };
   logic [5:0] nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_s_S ;
   assign nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_s_S = 0 ;
-  logic [0:0] reg_cfg_truncate_1_itm_R1 ;
-  logic [0:0] reg_cfg_truncate_1_itm_X1 ;
-  logic [0:0] reg_cfg_truncate_1_itm_C1 ;
-  assign reg_cfg_truncate_1_itm_R1 = nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_s_R [4:4] ;
-  assign reg_cfg_truncate_1_itm_X1 = nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_s_X [4:4] ;
-  assign reg_cfg_truncate_1_itm_C1 = nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_s_C [4:4] ;
-  logic [3:0] reg_cfg_truncate_1_2_itm_R2 ;
-  logic [3:0] reg_cfg_truncate_1_2_itm_X2 ;
-  logic [3:0] reg_cfg_truncate_1_2_itm_C2 ;
-  assign reg_cfg_truncate_1_2_itm_R2 = nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_s_R [3:0] ;
-  assign reg_cfg_truncate_1_2_itm_X2 = nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_s_X [3:0] ;
-  assign reg_cfg_truncate_1_2_itm_C2 = nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_s_C [3:0] ;
+  logic [0:0] reg_cfg_truncate_1_itm_R2 ;
+  logic [0:0] reg_cfg_truncate_1_itm_X2 ;
+  logic [0:0] reg_cfg_truncate_1_itm_C2 ;
+  assign reg_cfg_truncate_1_itm_R2 = nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_s_R [4:4] ;
+  assign reg_cfg_truncate_1_itm_X2 = nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_s_X [4:4] ;
+  assign reg_cfg_truncate_1_itm_C2 = nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_s_C [4:4] ;
+  logic [3:0] reg_cfg_truncate_1_2_itm_R3 ;
+  logic [3:0] reg_cfg_truncate_1_2_itm_X3 ;
+  logic [3:0] reg_cfg_truncate_1_2_itm_C3 ;
+  assign reg_cfg_truncate_1_2_itm_R3 = nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_s_R [3:0] ;
+  assign reg_cfg_truncate_1_2_itm_X3 = nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_s_X [3:0] ;
+  assign reg_cfg_truncate_1_2_itm_C3 = nl_IntShiftRight_25U_5U_9U_1_mbits_fixed_rshift_rg_s_C [3:0] ;
   assign nl_IntShiftRight_25U_5U_9U_1_obits_fixed_acc_sat_sva[25:0] = IntShiftRight_25U_5U_9U_1_obits_fixed_acc_sat_sva;
   logic [25:0] IntShiftRight_25U_5U_9U_1_obits_fixed_acc_sat_sva_C3 ;
   logic [25:0] IntShiftRight_25U_5U_9U_1_obits_fixed_acc_sat_sva_R3 ;
@@ -10968,18 +11012,18 @@ module HLS_cdp_icvt_core ( cfg_alu_in_rsc_z , cfg_mul_in_rsc_z , cfg_precision_r
   assign nl_IntShiftRight_25U_5U_9U_mbits_fixed_rshift_rg_s_T = {  reg_cfg_truncate_1_itm_T , reg_cfg_truncate_1_2_itm_T  };
   logic [5:0] nl_IntShiftRight_25U_5U_9U_mbits_fixed_rshift_rg_s_S ;
   assign nl_IntShiftRight_25U_5U_9U_mbits_fixed_rshift_rg_s_S = 0 ;
-  logic [0:0] reg_cfg_truncate_1_itm_R2 ;
-  logic [0:0] reg_cfg_truncate_1_itm_X2 ;
-  logic [0:0] reg_cfg_truncate_1_itm_C2 ;
-  assign reg_cfg_truncate_1_itm_R2 = nl_IntShiftRight_25U_5U_9U_mbits_fixed_rshift_rg_s_R [4:4] ;
-  assign reg_cfg_truncate_1_itm_X2 = nl_IntShiftRight_25U_5U_9U_mbits_fixed_rshift_rg_s_X [4:4] ;
-  assign reg_cfg_truncate_1_itm_C2 = nl_IntShiftRight_25U_5U_9U_mbits_fixed_rshift_rg_s_C [4:4] ;
-  logic [3:0] reg_cfg_truncate_1_2_itm_R3 ;
-  logic [3:0] reg_cfg_truncate_1_2_itm_X3 ;
-  logic [3:0] reg_cfg_truncate_1_2_itm_C3 ;
-  assign reg_cfg_truncate_1_2_itm_R3 = nl_IntShiftRight_25U_5U_9U_mbits_fixed_rshift_rg_s_R [3:0] ;
-  assign reg_cfg_truncate_1_2_itm_X3 = nl_IntShiftRight_25U_5U_9U_mbits_fixed_rshift_rg_s_X [3:0] ;
-  assign reg_cfg_truncate_1_2_itm_C3 = nl_IntShiftRight_25U_5U_9U_mbits_fixed_rshift_rg_s_C [3:0] ;
+  logic [0:0] reg_cfg_truncate_1_itm_R3 ;
+  logic [0:0] reg_cfg_truncate_1_itm_X3 ;
+  logic [0:0] reg_cfg_truncate_1_itm_C3 ;
+  assign reg_cfg_truncate_1_itm_R3 = nl_IntShiftRight_25U_5U_9U_mbits_fixed_rshift_rg_s_R [4:4] ;
+  assign reg_cfg_truncate_1_itm_X3 = nl_IntShiftRight_25U_5U_9U_mbits_fixed_rshift_rg_s_X [4:4] ;
+  assign reg_cfg_truncate_1_itm_C3 = nl_IntShiftRight_25U_5U_9U_mbits_fixed_rshift_rg_s_C [4:4] ;
+  logic [3:0] reg_cfg_truncate_1_2_itm_R4 ;
+  logic [3:0] reg_cfg_truncate_1_2_itm_X4 ;
+  logic [3:0] reg_cfg_truncate_1_2_itm_C4 ;
+  assign reg_cfg_truncate_1_2_itm_R4 = nl_IntShiftRight_25U_5U_9U_mbits_fixed_rshift_rg_s_R [3:0] ;
+  assign reg_cfg_truncate_1_2_itm_X4 = nl_IntShiftRight_25U_5U_9U_mbits_fixed_rshift_rg_s_X [3:0] ;
+  assign reg_cfg_truncate_1_2_itm_C4 = nl_IntShiftRight_25U_5U_9U_mbits_fixed_rshift_rg_s_C [3:0] ;
   assign nl_IntShiftRight_25U_5U_9U_obits_fixed_acc_sat_sva[25:0] = IntShiftRight_25U_5U_9U_obits_fixed_acc_sat_sva;
   logic [25:0] IntShiftRight_25U_5U_9U_obits_fixed_acc_sat_sva_C3 ;
   logic [25:0] IntShiftRight_25U_5U_9U_obits_fixed_acc_sat_sva_R3 ;
@@ -11055,7 +11099,7 @@ module HLS_cdp_icvt_core ( cfg_alu_in_rsc_z , cfg_mul_in_rsc_z , cfg_precision_r
   assign acc_nl_R3 [17:1] = z_out_1_R ;
   assign acc_nl_X3 [17:1] = z_out_1_X ;
   assign z_out_1_S = acc_nl_S ;
-  assign IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C = ( IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C0 ) | ( IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C1 );
+  assign IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C = ( IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C0 ) | ( IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C1 ) | ( IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C2 ) | ( IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_C3 );
   assign fangyuan27_C = ( fangyuan27_C0 );
   assign fangyuan26_C = ( fangyuan26_C0 );
   assign chn_data_in_rsci_iswt0_C = ( chn_data_in_rsci_iswt0_C0 );
@@ -11072,7 +11116,7 @@ module HLS_cdp_icvt_core ( cfg_alu_in_rsc_z , cfg_mul_in_rsc_z , cfg_precision_r
   assign chn_data_out_and_cse_C = ( chn_data_out_and_cse_C0 ) | ( chn_data_out_and_cse_C1 ) | ( chn_data_out_and_cse_C2 ) | ( chn_data_out_and_cse_C3 ) | ( chn_data_out_and_cse_C4 ) | ( chn_data_out_and_cse_C5 ) | ( chn_data_out_and_cse_C6 ) | ( chn_data_out_and_cse_C7 ) | ( chn_data_out_and_cse_C8 );
   assign _057__C = ( _057__C0 );
   assign _058__C = ( _058__C0 );
-  assign reg_cfg_truncate_1_itm_C = ( reg_cfg_truncate_1_itm_C0 ) | ( reg_cfg_truncate_1_itm_C1 ) | ( reg_cfg_truncate_1_itm_C2 );
+  assign reg_cfg_truncate_1_itm_C = ( reg_cfg_truncate_1_itm_C0 ) | ( reg_cfg_truncate_1_itm_C1 ) | ( reg_cfg_truncate_1_itm_C2 ) | ( reg_cfg_truncate_1_itm_C3 );
   assign _063__C = ( _063__C0 );
   assign IntMulExt_9U_16U_25U_o_mul_itm_2_C = ( IntMulExt_9U_16U_25U_o_mul_itm_2_C0 ) | ( IntMulExt_9U_16U_25U_o_mul_itm_2_C1 ) | ( IntMulExt_9U_16U_25U_o_mul_itm_2_C2 );
   assign IntMulExt_17U_16U_33U_o_mux1h_1_itm_C = ( IntMulExt_17U_16U_33U_o_mux1h_1_itm_C0 );
@@ -11089,7 +11133,7 @@ module HLS_cdp_icvt_core ( cfg_alu_in_rsc_z , cfg_mul_in_rsc_z , cfg_precision_r
   assign _077__C = ( _077__C0 );
   assign fangyuan25_C = ( fangyuan25_C0 );
   assign IntShiftRight_33U_5U_17U_mbits_fixed_and_nl_C = ( IntShiftRight_33U_5U_17U_mbits_fixed_and_nl_C0 );
-  assign reg_IntMulExt_17U_16U_33U_o_mul_1_itm_C = ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_C0 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_C1 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_C2 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_C3 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_C4 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_C5 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_C6 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_C7 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_C8 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_C9 );
+  assign reg_IntMulExt_17U_16U_33U_o_mul_1_itm_C = ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_C0 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_C1 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_C2 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_C3 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_C4 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_C5 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_C6 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_C7 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_C8 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_C9 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_C10 );
   assign nor_15_nl_C = ( nor_15_nl_C0 );
   assign _260__C = ( _260__C0 );
   assign IsDenorm_5U_10U_land_lpi_1_dfm_C = ( IsDenorm_5U_10U_land_lpi_1_dfm_C0 ) | ( IsDenorm_5U_10U_land_lpi_1_dfm_C1 ) | ( IsDenorm_5U_10U_land_lpi_1_dfm_C2 ) | ( IsDenorm_5U_10U_land_lpi_1_dfm_C3 ) | ( IsDenorm_5U_10U_land_lpi_1_dfm_C4 ) | ( IsDenorm_5U_10U_land_lpi_1_dfm_C5 );
@@ -11257,7 +11301,7 @@ module HLS_cdp_icvt_core ( cfg_alu_in_rsc_z , cfg_mul_in_rsc_z , cfg_precision_r
   assign _121__C = ( _121__C0 );
   assign _161__C = ( _161__C0 );
   assign _238__C = ( _238__C0 );
-  assign reg_cfg_truncate_1_2_itm_C = ( reg_cfg_truncate_1_2_itm_C0 ) | ( reg_cfg_truncate_1_2_itm_C1 ) | ( reg_cfg_truncate_1_2_itm_C2 ) | ( reg_cfg_truncate_1_2_itm_C3 );
+  assign reg_cfg_truncate_1_2_itm_C = ( reg_cfg_truncate_1_2_itm_C0 ) | ( reg_cfg_truncate_1_2_itm_C1 ) | ( reg_cfg_truncate_1_2_itm_C2 ) | ( reg_cfg_truncate_1_2_itm_C3 ) | ( reg_cfg_truncate_1_2_itm_C4 );
   assign _069__C = ( _069__C0 ) | ( _069__C1 ) | ( _069__C2 );
   assign nor_tmp_11_C = ( nor_tmp_11_C0 ) | ( nor_tmp_11_C1 ) | ( nor_tmp_11_C2 ) | ( nor_tmp_11_C3 ) | ( nor_tmp_11_C4 ) | ( nor_tmp_11_C5 ) | ( nor_tmp_11_C6 ) | ( nor_tmp_11_C7 ) | ( nor_tmp_11_C8 ) | ( nor_tmp_11_C9 ) | ( nor_tmp_11_C10 ) | ( nor_tmp_11_C11 ) | ( nor_tmp_11_C12 ) | ( nor_tmp_11_C13 ) | ( nor_tmp_11_C14 ) | ( nor_tmp_11_C15 ) | ( nor_tmp_11_C16 ) | ( nor_tmp_11_C17 ) | ( nor_tmp_11_C18 ) | ( nor_tmp_11_C19 );
   assign chn_data_out_rsc_lz_C = ( chn_data_out_rsc_lz_C0 );
@@ -11529,7 +11573,7 @@ module HLS_cdp_icvt_core ( cfg_alu_in_rsc_z , cfg_mul_in_rsc_z , cfg_precision_r
   assign and_dcpl_19_C = ( and_dcpl_19_C0 ) | ( and_dcpl_19_C1 );
   assign z_out_C = ( z_out_C0 ) | ( z_out_C1 ) | ( z_out_C2 );
   assign or_70_nl_C = ( or_70_nl_C0 );
-  assign IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X = ( IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X0 ) | ( IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X1 );
+  assign IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X = ( IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X0 ) | ( IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X1 ) | ( IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X2 ) | ( IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X3 );
   assign fangyuan27_X = ( fangyuan27_X0 );
   assign fangyuan26_X = ( fangyuan26_X0 );
   assign chn_data_in_rsci_iswt0_X = ( chn_data_in_rsci_iswt0_X0 );
@@ -11546,7 +11590,7 @@ module HLS_cdp_icvt_core ( cfg_alu_in_rsc_z , cfg_mul_in_rsc_z , cfg_precision_r
   assign chn_data_out_and_cse_X = ( chn_data_out_and_cse_X0 ) | ( chn_data_out_and_cse_X1 ) | ( chn_data_out_and_cse_X2 ) | ( chn_data_out_and_cse_X3 ) | ( chn_data_out_and_cse_X4 ) | ( chn_data_out_and_cse_X5 ) | ( chn_data_out_and_cse_X6 ) | ( chn_data_out_and_cse_X7 ) | ( chn_data_out_and_cse_X8 );
   assign _057__X = ( _057__X0 );
   assign _058__X = ( _058__X0 );
-  assign reg_cfg_truncate_1_itm_X = ( reg_cfg_truncate_1_itm_X0 ) | ( reg_cfg_truncate_1_itm_X1 ) | ( reg_cfg_truncate_1_itm_X2 );
+  assign reg_cfg_truncate_1_itm_X = ( reg_cfg_truncate_1_itm_X0 ) | ( reg_cfg_truncate_1_itm_X1 ) | ( reg_cfg_truncate_1_itm_X2 ) | ( reg_cfg_truncate_1_itm_X3 );
   assign _063__X = ( _063__X0 );
   assign IntMulExt_9U_16U_25U_o_mul_itm_2_X = ( IntMulExt_9U_16U_25U_o_mul_itm_2_X0 ) | ( IntMulExt_9U_16U_25U_o_mul_itm_2_X1 ) | ( IntMulExt_9U_16U_25U_o_mul_itm_2_X2 );
   assign IntMulExt_17U_16U_33U_o_mux1h_1_itm_X = ( IntMulExt_17U_16U_33U_o_mux1h_1_itm_X0 );
@@ -11563,7 +11607,7 @@ module HLS_cdp_icvt_core ( cfg_alu_in_rsc_z , cfg_mul_in_rsc_z , cfg_precision_r
   assign _077__X = ( _077__X0 );
   assign fangyuan25_X = ( fangyuan25_X0 );
   assign IntShiftRight_33U_5U_17U_mbits_fixed_and_nl_X = ( IntShiftRight_33U_5U_17U_mbits_fixed_and_nl_X0 );
-  assign reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X = ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X0 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X1 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X2 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X3 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X4 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X5 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X6 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X7 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X8 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X9 );
+  assign reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X = ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X0 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X1 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X2 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X3 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X4 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X5 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X6 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X7 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X8 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X9 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X10 );
   assign nor_15_nl_X = ( nor_15_nl_X0 );
   assign _260__X = ( _260__X0 );
   assign IsDenorm_5U_10U_land_lpi_1_dfm_X = ( IsDenorm_5U_10U_land_lpi_1_dfm_X0 ) | ( IsDenorm_5U_10U_land_lpi_1_dfm_X1 ) | ( IsDenorm_5U_10U_land_lpi_1_dfm_X2 ) | ( IsDenorm_5U_10U_land_lpi_1_dfm_X3 ) | ( IsDenorm_5U_10U_land_lpi_1_dfm_X4 ) | ( IsDenorm_5U_10U_land_lpi_1_dfm_X5 );
@@ -11731,7 +11775,7 @@ module HLS_cdp_icvt_core ( cfg_alu_in_rsc_z , cfg_mul_in_rsc_z , cfg_precision_r
   assign _121__X = ( _121__X0 );
   assign _161__X = ( _161__X0 );
   assign _238__X = ( _238__X0 );
-  assign reg_cfg_truncate_1_2_itm_X = ( reg_cfg_truncate_1_2_itm_X0 ) | ( reg_cfg_truncate_1_2_itm_X1 ) | ( reg_cfg_truncate_1_2_itm_X2 ) | ( reg_cfg_truncate_1_2_itm_X3 );
+  assign reg_cfg_truncate_1_2_itm_X = ( reg_cfg_truncate_1_2_itm_X0 ) | ( reg_cfg_truncate_1_2_itm_X1 ) | ( reg_cfg_truncate_1_2_itm_X2 ) | ( reg_cfg_truncate_1_2_itm_X3 ) | ( reg_cfg_truncate_1_2_itm_X4 );
   assign _069__X = ( _069__X0 ) | ( _069__X1 ) | ( _069__X2 );
   assign nor_tmp_11_X = ( nor_tmp_11_X0 ) | ( nor_tmp_11_X1 ) | ( nor_tmp_11_X2 ) | ( nor_tmp_11_X3 ) | ( nor_tmp_11_X4 ) | ( nor_tmp_11_X5 ) | ( nor_tmp_11_X6 ) | ( nor_tmp_11_X7 ) | ( nor_tmp_11_X8 ) | ( nor_tmp_11_X9 ) | ( nor_tmp_11_X10 ) | ( nor_tmp_11_X11 ) | ( nor_tmp_11_X12 ) | ( nor_tmp_11_X13 ) | ( nor_tmp_11_X14 ) | ( nor_tmp_11_X15 ) | ( nor_tmp_11_X16 ) | ( nor_tmp_11_X17 ) | ( nor_tmp_11_X18 ) | ( nor_tmp_11_X19 );
   assign chn_data_out_rsc_lz_X = ( chn_data_out_rsc_lz_X0 );
@@ -12003,7 +12047,7 @@ module HLS_cdp_icvt_core ( cfg_alu_in_rsc_z , cfg_mul_in_rsc_z , cfg_precision_r
   assign and_dcpl_19_X = ( and_dcpl_19_X0 ) | ( and_dcpl_19_X1 );
   assign z_out_X = ( z_out_X0 ) | ( z_out_X1 ) | ( z_out_X2 );
   assign or_70_nl_X = ( or_70_nl_X0 );
-  assign IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R = ( IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X0 & IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R0 ) | ( IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X1 & IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R1 );
+  assign IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R = ( IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X0 & IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R0 ) | ( IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X1 & IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R1 ) | ( IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X2 & IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R2 ) | ( IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_X3 & IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl_R3 );
   assign fangyuan27_R = ( fangyuan27_X0 & fangyuan27_R0 );
   assign fangyuan26_R = ( fangyuan26_X0 & fangyuan26_R0 );
   assign chn_data_in_rsci_iswt0_R = ( chn_data_in_rsci_iswt0_X0 & chn_data_in_rsci_iswt0_R0 );
@@ -12020,7 +12064,7 @@ module HLS_cdp_icvt_core ( cfg_alu_in_rsc_z , cfg_mul_in_rsc_z , cfg_precision_r
   assign chn_data_out_and_cse_R = ( chn_data_out_and_cse_X0 & chn_data_out_and_cse_R0 ) | ( chn_data_out_and_cse_X1 & chn_data_out_and_cse_R1 ) | ( chn_data_out_and_cse_X2 & chn_data_out_and_cse_R2 ) | ( chn_data_out_and_cse_X3 & chn_data_out_and_cse_R3 ) | ( chn_data_out_and_cse_X4 & chn_data_out_and_cse_R4 ) | ( chn_data_out_and_cse_X5 & chn_data_out_and_cse_R5 ) | ( chn_data_out_and_cse_X6 & chn_data_out_and_cse_R6 ) | ( chn_data_out_and_cse_X7 & chn_data_out_and_cse_R7 ) | ( chn_data_out_and_cse_X8 & chn_data_out_and_cse_R8 );
   assign _057__R = ( _057__X0 & _057__R0 );
   assign _058__R = ( _058__X0 & _058__R0 );
-  assign reg_cfg_truncate_1_itm_R = ( reg_cfg_truncate_1_itm_X0 & reg_cfg_truncate_1_itm_R0 ) | ( reg_cfg_truncate_1_itm_X1 & reg_cfg_truncate_1_itm_R1 ) | ( reg_cfg_truncate_1_itm_X2 & reg_cfg_truncate_1_itm_R2 );
+  assign reg_cfg_truncate_1_itm_R = ( reg_cfg_truncate_1_itm_X0 & reg_cfg_truncate_1_itm_R0 ) | ( reg_cfg_truncate_1_itm_X1 & reg_cfg_truncate_1_itm_R1 ) | ( reg_cfg_truncate_1_itm_X2 & reg_cfg_truncate_1_itm_R2 ) | ( reg_cfg_truncate_1_itm_X3 & reg_cfg_truncate_1_itm_R3 );
   assign _063__R = ( _063__X0 & _063__R0 );
   assign IntMulExt_9U_16U_25U_o_mul_itm_2_R = ( IntMulExt_9U_16U_25U_o_mul_itm_2_X0 & IntMulExt_9U_16U_25U_o_mul_itm_2_R0 ) | ( IntMulExt_9U_16U_25U_o_mul_itm_2_X1 & IntMulExt_9U_16U_25U_o_mul_itm_2_R1 ) | ( IntMulExt_9U_16U_25U_o_mul_itm_2_X2 & IntMulExt_9U_16U_25U_o_mul_itm_2_R2 );
   assign IntMulExt_17U_16U_33U_o_mux1h_1_itm_R = ( IntMulExt_17U_16U_33U_o_mux1h_1_itm_X0 & IntMulExt_17U_16U_33U_o_mux1h_1_itm_R0 );
@@ -12037,7 +12081,7 @@ module HLS_cdp_icvt_core ( cfg_alu_in_rsc_z , cfg_mul_in_rsc_z , cfg_precision_r
   assign _077__R = ( _077__X0 & _077__R0 );
   assign fangyuan25_R = ( fangyuan25_X0 & fangyuan25_R0 );
   assign IntShiftRight_33U_5U_17U_mbits_fixed_and_nl_R = ( IntShiftRight_33U_5U_17U_mbits_fixed_and_nl_X0 & IntShiftRight_33U_5U_17U_mbits_fixed_and_nl_R0 );
-  assign reg_IntMulExt_17U_16U_33U_o_mul_1_itm_R = ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X0 & reg_IntMulExt_17U_16U_33U_o_mul_1_itm_R0 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X1 & reg_IntMulExt_17U_16U_33U_o_mul_1_itm_R1 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X2 & reg_IntMulExt_17U_16U_33U_o_mul_1_itm_R2 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X3 & reg_IntMulExt_17U_16U_33U_o_mul_1_itm_R3 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X4 & reg_IntMulExt_17U_16U_33U_o_mul_1_itm_R4 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X5 & reg_IntMulExt_17U_16U_33U_o_mul_1_itm_R5 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X6 & reg_IntMulExt_17U_16U_33U_o_mul_1_itm_R6 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X7 & reg_IntMulExt_17U_16U_33U_o_mul_1_itm_R7 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X8 & reg_IntMulExt_17U_16U_33U_o_mul_1_itm_R8 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X9 & reg_IntMulExt_17U_16U_33U_o_mul_1_itm_R9 );
+  assign reg_IntMulExt_17U_16U_33U_o_mul_1_itm_R = ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X0 & reg_IntMulExt_17U_16U_33U_o_mul_1_itm_R0 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X1 & reg_IntMulExt_17U_16U_33U_o_mul_1_itm_R1 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X2 & reg_IntMulExt_17U_16U_33U_o_mul_1_itm_R2 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X3 & reg_IntMulExt_17U_16U_33U_o_mul_1_itm_R3 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X4 & reg_IntMulExt_17U_16U_33U_o_mul_1_itm_R4 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X5 & reg_IntMulExt_17U_16U_33U_o_mul_1_itm_R5 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X6 & reg_IntMulExt_17U_16U_33U_o_mul_1_itm_R6 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X7 & reg_IntMulExt_17U_16U_33U_o_mul_1_itm_R7 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X8 & reg_IntMulExt_17U_16U_33U_o_mul_1_itm_R8 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X9 & reg_IntMulExt_17U_16U_33U_o_mul_1_itm_R9 ) | ( reg_IntMulExt_17U_16U_33U_o_mul_1_itm_X10 & reg_IntMulExt_17U_16U_33U_o_mul_1_itm_R10 );
   assign nor_15_nl_R = ( nor_15_nl_X0 & nor_15_nl_R0 );
   assign _260__R = ( _260__X0 & _260__R0 );
   assign IsDenorm_5U_10U_land_lpi_1_dfm_R = ( IsDenorm_5U_10U_land_lpi_1_dfm_X0 & IsDenorm_5U_10U_land_lpi_1_dfm_R0 ) | ( IsDenorm_5U_10U_land_lpi_1_dfm_X1 & IsDenorm_5U_10U_land_lpi_1_dfm_R1 ) | ( IsDenorm_5U_10U_land_lpi_1_dfm_X2 & IsDenorm_5U_10U_land_lpi_1_dfm_R2 ) | ( IsDenorm_5U_10U_land_lpi_1_dfm_X3 & IsDenorm_5U_10U_land_lpi_1_dfm_R3 ) | ( IsDenorm_5U_10U_land_lpi_1_dfm_X4 & IsDenorm_5U_10U_land_lpi_1_dfm_R4 ) | ( IsDenorm_5U_10U_land_lpi_1_dfm_X5 & IsDenorm_5U_10U_land_lpi_1_dfm_R5 );
@@ -12205,7 +12249,7 @@ module HLS_cdp_icvt_core ( cfg_alu_in_rsc_z , cfg_mul_in_rsc_z , cfg_precision_r
   assign _121__R = ( _121__X0 & _121__R0 );
   assign _161__R = ( _161__X0 & _161__R0 );
   assign _238__R = ( _238__X0 & _238__R0 );
-  assign reg_cfg_truncate_1_2_itm_R = ( reg_cfg_truncate_1_2_itm_X0 & reg_cfg_truncate_1_2_itm_R0 ) | ( reg_cfg_truncate_1_2_itm_X1 & reg_cfg_truncate_1_2_itm_R1 ) | ( reg_cfg_truncate_1_2_itm_X2 & reg_cfg_truncate_1_2_itm_R2 ) | ( reg_cfg_truncate_1_2_itm_X3 & reg_cfg_truncate_1_2_itm_R3 );
+  assign reg_cfg_truncate_1_2_itm_R = ( reg_cfg_truncate_1_2_itm_X0 & reg_cfg_truncate_1_2_itm_R0 ) | ( reg_cfg_truncate_1_2_itm_X1 & reg_cfg_truncate_1_2_itm_R1 ) | ( reg_cfg_truncate_1_2_itm_X2 & reg_cfg_truncate_1_2_itm_R2 ) | ( reg_cfg_truncate_1_2_itm_X3 & reg_cfg_truncate_1_2_itm_R3 ) | ( reg_cfg_truncate_1_2_itm_X4 & reg_cfg_truncate_1_2_itm_R4 );
   assign _069__R = ( _069__X0 & _069__R0 ) | ( _069__X1 & _069__R1 ) | ( _069__X2 & _069__R2 );
   assign nor_tmp_11_R = ( nor_tmp_11_X0 & nor_tmp_11_R0 ) | ( nor_tmp_11_X1 & nor_tmp_11_R1 ) | ( nor_tmp_11_X2 & nor_tmp_11_R2 ) | ( nor_tmp_11_X3 & nor_tmp_11_R3 ) | ( nor_tmp_11_X4 & nor_tmp_11_R4 ) | ( nor_tmp_11_X5 & nor_tmp_11_R5 ) | ( nor_tmp_11_X6 & nor_tmp_11_R6 ) | ( nor_tmp_11_X7 & nor_tmp_11_R7 ) | ( nor_tmp_11_X8 & nor_tmp_11_R8 ) | ( nor_tmp_11_X9 & nor_tmp_11_R9 ) | ( nor_tmp_11_X10 & nor_tmp_11_R10 ) | ( nor_tmp_11_X11 & nor_tmp_11_R11 ) | ( nor_tmp_11_X12 & nor_tmp_11_R12 ) | ( nor_tmp_11_X13 & nor_tmp_11_R13 ) | ( nor_tmp_11_X14 & nor_tmp_11_R14 ) | ( nor_tmp_11_X15 & nor_tmp_11_R15 ) | ( nor_tmp_11_X16 & nor_tmp_11_R16 ) | ( nor_tmp_11_X17 & nor_tmp_11_R17 ) | ( nor_tmp_11_X18 & nor_tmp_11_R18 ) | ( nor_tmp_11_X19 & nor_tmp_11_R19 );
   assign chn_data_out_rsc_lz_R = ( chn_data_out_rsc_lz_X0 & chn_data_out_rsc_lz_R0 );

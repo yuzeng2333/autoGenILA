@@ -144,7 +144,7 @@ void fill_in_both_concat_relation(std::string line) {
   uint32_t storeIdx = g_passExprStore.size();
   g_passExprStore.push_back(line);
   std::string destList = m.str(2);
-  std::string srcList = m.str(4);
+  std::string srcList = m.str(3);
 
   std::vector<std::string> destVec;
   parse_var_list(destList, destVec);
@@ -155,6 +155,8 @@ void fill_in_both_concat_relation(std::string line) {
   std::vector<std::string> srcVec;
   parse_var_list(srcList, srcVec);
   for(std::string srcAndSlice: srcVec) {
+    if(isNum(srcAndSlice))
+      continue;
     add_into_forwardMap(srcAndSlice, line, storeIdx);
   } 
 }
