@@ -1,5 +1,5 @@
 all:
-	g++ -O2 main.cpp taint_gen.cpp helper.cpp op_taint_gen.cpp VarWidth.cpp pass_info.cpp
+	g++ main.cpp taint_gen.cpp helper.cpp op_taint_gen.cpp VarWidth.cpp pass_info.cpp
 
 debug:
 	g++ -g main.cpp taint_gen.cpp helper.cpp op_taint_gen.cpp VarWidth.cpp pass_info.cpp
@@ -49,11 +49,17 @@ riscv:
 piccolo:
 	./a.out /workspace/research/ILA/autoGenILA/Piccolo-iu/verilog-cpu-old/SYN/piccolo_yosys.v
 
-sha:
+sha_core:
 	./a.out /workspace/research/ILA/autoGenILA/SHA/SYN/sha_simp.v
+
+sha:
+	./a.out /workspace/research/ILA/autoGenILA/SHA/SYN/sha_yosys.v
 
 vpipe:
 	./a.out /workspace/research/ILA/autoGenILA/vpipe/SYN/vpipe_yosys.v
 
 dla:
 	./a.out /workspace/research/ILA/autoGenILA/NVDLA/SYN/nvdla_yosys.v
+
+fsm:
+	./a.out /workspace/research/ILA/autoGenILA/naiveEg/fsm/fsm_yosys.v

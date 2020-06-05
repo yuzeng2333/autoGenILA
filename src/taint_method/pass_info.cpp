@@ -210,7 +210,7 @@ void process_pass_info(std::string fileName) {
   std::string line;
   std::smatch m;
   while(std::getline(input, line)) {
-    //toCout(line);
+    toCout(line);
     uint32_t choice = parse_verilog_line(line, true);
     switch (choice) {
       case SRC_CONCAT:
@@ -439,10 +439,18 @@ void merge_reg_cond_pair_vec(const std::vector<std::pair<std::string, std::strin
     overallCond = pairVec[i].second; // 1
     idxPairs.clear(); // 2
     std::string reg, regSlice;
-    split_slice(pairVec[i].first, reg, regSlice);   
-    uint32_t highIdx = get_end(regSlice);
-    uint32_t lowIdx = get_begin(regSlice);
-    idxPairs.insert(std::make_pair(lowIdx, highIdx));
+    split_slice(pairVec[i].first, reg, regSlice);
+    uint32_t highIdx;
+    uint32_t lowIdx;   
+    if(!regSlice.empty()) {
+      highIdx = get_end(regSlice);
+      lowIdx = get_begin(regSlice);
+      idxPairs.insert(std::make_pair(lowIdx, highIdx));      
+    }
+    else {
+      mergedMap.emplace(reg, overallCond);
+      continue;
+    }
     for( uint32_t j = 0; j < pairVec.size(); j++ ) {
       if( i == j || isAdded[j] )
         continue;
@@ -810,7 +818,7 @@ void go_backward(std::string startVarAndSlice, std::vector<std::pair<std::string
   std::vector<uint32_t> storeIdxVec = g_backwardMap[startVar];
   for(uint32_t storeIdx: storeIdxVec) {
     std::string line = g_passExprStore[storeIdx];
-    toCout("go back line is: "+line);
+    //toCout("go back line is: "+line);
 
     std::vector<std::pair<std::string, std::string>> localBackCondPairVec;
     // if the line is not a list of destAndSlice;
