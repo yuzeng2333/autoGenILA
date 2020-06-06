@@ -150,8 +150,10 @@ void single_line_expr(std::string line) {
 
 void both_concat_expr(std::string line) {
   std::smatch m;
-  if( !std::regex_match(line, m, pSrcDestBothConcat) )
+  if( !std::regex_match(line, m, pSrcDestBothConcat) ) {
+    toCout("Error: Not both_concat!!");
     abort(); //
+  }
 
   std::string blank = m.str(1);
   std::string destList = m.str(2);
@@ -217,6 +219,7 @@ void nb_expr(std::string line) {
     return;
   }
   auto ret = g_nbTable.emplace(m.str(2), line);
+  moduleTrueRegs.push_back(m.str(2));
   if(!ret.second)
     toCout("Error in inserting ssaTable for key: "+m.str(2));
 }
@@ -268,6 +271,7 @@ void nonblockif_expr(std::string line, std::ifstream &input) {
   split_slice(destAndSlice, dest, destSlice);
   split_slice(srcAndSlice, src, srcSlice);
   split_slice(condAndSlice, cond, condSlice);
+  moduleTrueRegs.push_back(dest);
 
   std::string yuzengIdx = toStr(g_new_var++);
   std::string destNext = "yuzeng"+yuzengIdx;

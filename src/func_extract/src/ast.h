@@ -17,7 +17,7 @@ typedef uint32_t type;
 // 2. one var can have multiple associated assignments. E.g., some slice
 // has different assignment than others
 // 3. Therefore, each slice should have its own node. And the childVec contains
-// nodes for all slices.
+// nodes for all slices of RHS variables.
 
 struct astNode{
   uint32_t type;

@@ -38,7 +38,8 @@ expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTain
     varAndSliceTimed = varAndSlice + "___#" + toStr(timeIdx) + _t;
   else
     varAndSliceTimed = varAndSlice + "___#" + toStr(timeIdx);
-  return c.bv_const(varAndSliceTimed.c_str(), get_var_slice_width(varAndSlice));
+  uint32_t localWidth = get_var_slice_width(varAndSlice);
+  return c.bv_const(varAndSliceTimed.c_str(), localWidth);
 }
 
 
@@ -70,26 +71,78 @@ void two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
 
   assert(!isMem(op1));
   assert(!isMem(op2));
+  
+  bool op1IsNum = isNum(op1);
+  bool op2IsNum = isNum(op2);
 
-  expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true);
-  expr op2Expr_t = var_expr(op2AndSlice, timeIdx, c, true);
-  expr op1Expr = var_expr(op1AndSlice, timeIdx, c, false);
-  expr op2Expr = var_expr(op2AndSlice, timeIdx, c, false);
+  if(!op1IsNum && !op2IsNum) {
+    expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true);
+    expr op2Expr_t = var_expr(op2AndSlice, timeIdx, c, true);
+    expr op1Expr = var_expr(op1AndSlice, timeIdx, c, false);
+    expr op2Expr = var_expr(op2AndSlice, timeIdx, c, false);
 
-  // taint expression
-  if(!isReduceOp) {
-    expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
-    s.add(destExpr_t == (op1Expr_t | op2Expr_t));
-    expr destExpr = var_expr(destAndSlice, timeIdx, c, false);
-    make_z3_expr(s, c, node->op, destExpr, op1Expr, op2Expr);
+    // taint expression
+    if(!isReduceOp) {
+      expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
+      s.add(destExpr_t == (op1Expr_t | op2Expr_t));
+      expr destExpr = var_expr(destAndSlice, timeIdx, c, false);
+      make_z3_expr<expr, expr>(s, c, node->op, destExpr, op1Expr, op2Expr);
+    }
+    else {
+      expr destExpr_t = bool_expr(destAndSlice, timeIdx, c, true);
+      s.add(destExpr_t == ( (op1Expr_t | op2Expr_t) != 0 ));
+      expr destExpr = bool_expr(destAndSlice, timeIdx, c, false);
+      make_z3_expr<expr, expr>(s, c, node->op, destExpr, op1Expr, op2Expr);
+    }
+    add_child_constraint(node, timeIdx, c, s, bound);
   }
-  else {
-    expr destExpr_t = bool_expr(destAndSlice, timeIdx, c, true);
-    s.add(destExpr_t == ( (op1Expr_t | op2Expr_t) !=0 ));
-    expr destExpr = bool_expr(destAndSlice, timeIdx, c, false);
-    make_z3_expr(s, c, node->op, destExpr, op1Expr, op2Expr);
+  else if(!op1IsNum && op2IsNum) {
+    expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true);
+    //op2Expr_t = 0;
+    expr op1Expr = var_expr(op1AndSlice, timeIdx, c, false);
+    uint32_t op2Int = hdb2int(op2AndSlice);
+
+    // taint expression
+    if(!isReduceOp) {
+      expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
+      s.add(destExpr_t == op1Expr_t );
+      expr destExpr = var_expr(destAndSlice, timeIdx, c, false);
+      make_z3_expr<expr, uint32_t>(s, c, node->op, destExpr, op1Expr, op2Int);
+    }
+    else {
+      expr destExpr_t = bool_expr(destAndSlice, timeIdx, c, true);
+      s.add(destExpr_t == ( op1Expr_t != 0 ));
+      expr destExpr = bool_expr(destAndSlice, timeIdx, c, false);
+      make_z3_expr<expr, uint32_t>(s, c, node->op, destExpr, op1Expr, op2Int);
+    }
+    add_child_constraint(node, timeIdx, c, s, bound);
   }
-  add_child_constraint(node, timeIdx, c, s, bound);
+  else if(op1IsNum && !op2IsNum) {
+
+    //op1Expr_t = 0;
+    expr op2Expr_t = var_expr(op2AndSlice, timeIdx, c, true);
+    uint32_t op1Int = hdb2int(op1AndSlice);
+    expr op2Expr = var_expr(op2AndSlice, timeIdx, c, false);
+
+    // taint expression
+    if(!isReduceOp) {
+      expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
+      s.add(destExpr_t == op2Expr_t);
+      expr destExpr = var_expr(destAndSlice, timeIdx, c, false);
+      make_z3_expr<uint32_t, expr>(s, c, node->op, destExpr, op1Int, op2Expr);
+    }
+    else {
+      expr destExpr_t = bool_expr(destAndSlice, timeIdx, c, true);
+      s.add(destExpr_t == ( op2Expr_t != 0 ));
+      expr destExpr = bool_expr(destAndSlice, timeIdx, c, false);
+      make_z3_expr<uint32_t, expr>(s, c, node->op, destExpr, op1Int, op2Expr);
+    }
+    add_child_constraint(node, timeIdx, c, s, bound);
+  }
+  else { // both are num
+    toCout("Error: both operands are num!");
+    abort();
+  }
 }
 
 
@@ -178,7 +231,8 @@ void ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
 }
 
 
-void make_z3_expr(solver &s, context &c, std::string op, expr destExpr, expr op1Expr, expr op2Expr) {
+template <class EXPR1, class EXPR2>
+void make_z3_expr(solver &s, context &c, std::string op, expr destExpr, EXPR1 op1Expr, EXPR2 op2Expr) {
   if(op == "&&") {
     s.add( destExpr == (op1Expr & op2Expr) );
   }

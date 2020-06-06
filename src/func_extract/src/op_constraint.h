@@ -26,7 +26,8 @@ void src_concat_op_constraint(astNode* const node, uint32_t timeIdx, context &c,
 
 void ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, uint32_t bound);
 
-void make_z3_expr(solver &s, context &c, std::string op, expr destExpr, expr op1Expr, expr op2Expr);
+template <class EXPR1, class EXPR2>
+void make_z3_expr(solver &s, context &c, std::string op, expr destExpr, EXPR1 op1Expr, EXPR2 op2Expr);
 
 void make_z3_expr(solver &s, context &c, std::string op, expr destExpr, expr op1Expr);
 #endif
