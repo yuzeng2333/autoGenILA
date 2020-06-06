@@ -44,4 +44,11 @@ void add_all_dirty_constraints(context &c, solver &s, uint32_t bound);
 
 void save_dirty_nodes_for_expand(std::vector<std::string> &varToExpand);
 
+bool is_in_clean_queue(std::string var);
+
+bool is_in_dirty_queue(std::string var);
+
+std::string pure(std::string var);
+
+bool is_taint(std::string var);
 #endif

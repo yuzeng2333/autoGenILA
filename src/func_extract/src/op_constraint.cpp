@@ -212,22 +212,52 @@ void ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
 
   localWidth = std::to_string(localWidthNum);
 
-  expr op1Expr = var_expr(op1AndSlice, timeIdx, c, false);
-  expr op2Expr = var_expr(op2AndSlice, timeIdx, c, false);
+  bool op1IsNum = isNum(op1);
+  bool op2IsNum = isNum(op2);
+ 
   expr destExpr = var_expr(destAndSlice, timeIdx, c, false);
   expr condExpr = bool_expr(condAndSlice, timeIdx, c, false);
-
-  expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true);
-  expr op2Expr_t = var_expr(op2AndSlice, timeIdx, c, true);
   expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
   expr condExpr_t = var_expr(condAndSlice, timeIdx, c, true);
+  if(!op1IsNum && !op2IsNum) {
+    expr op1Expr = var_expr(op1AndSlice, timeIdx, c, false);
+    expr op2Expr = var_expr(op2AndSlice, timeIdx, c, false);
 
-  // if condVar is wire, put condVar in ite, and also expand it
+    expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true);
+    expr op2Expr_t = var_expr(op2AndSlice, timeIdx, c, true);
 
-  // TODO: not sure if following statement is correct
-  s.add( destExpr_t == ite(condExpr, op1Expr_t | condExpr_t, op2Expr_t | condExpr_t) );
-  s.add( destExpr == ite(condExpr, op1Expr, op2Expr) );
-  add_child_constraint(node, timeIdx, c, s, bound);
+    // if condVar is wire, put condVar in ite, and also expand it
+    // TODO: not sure if following statement is correct
+    s.add( destExpr_t == ite(condExpr, op1Expr_t | condExpr_t, op2Expr_t | condExpr_t) );
+    s.add( destExpr == ite(condExpr, op1Expr, op2Expr) );
+  }
+  else if(!op1IsNum && op2IsNum) {
+    expr op1Expr = var_expr(op1AndSlice, timeIdx, c, false);
+    expr op2Int = c.bv_val(hdb2int(op2AndSlice), get_var_slice_width(op2AndSlice));
+
+    expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true);
+    //op2Expr_t = 0
+
+    s.add( destExpr_t == ite(condExpr, op1Expr_t | condExpr_t, condExpr_t) );
+    s.add( destExpr == ite(condExpr, op1Expr, op2Int) );
+  }
+  else if(op1IsNum && !op2IsNum) {
+    expr op1Int = c.bv_val(hdb2int(op1AndSlice), get_var_slice_width(op1AndSlice));
+    expr op2Expr = var_expr(op2AndSlice, timeIdx, c, false);
+
+    //op1Expr_t = 0
+    expr op2Expr_t = var_expr(op2AndSlice, timeIdx, c, true);
+
+    s.add( destExpr_t == ite(condExpr, condExpr_t, op2Expr_t | condExpr_t) );
+    s.add( destExpr == ite(condExpr, op1Int, op2Expr) );
+  }
+  else {
+    expr op1Int = c.bv_val(hdb2int(op1AndSlice), get_var_slice_width(op1AndSlice));
+    expr op2Int = c.bv_val(hdb2int(op2AndSlice), get_var_slice_width(op2AndSlice));
+    s.add( destExpr_t == condExpr_t );
+    s.add( destExpr == ite(condExpr, op1Int, op2Int) );
+  }
+  add_child_constraint(node, timeIdx, c, s, bound);  
 }
 
 

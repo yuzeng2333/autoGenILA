@@ -1,11 +1,3 @@
-////// TODO /////
-// 1. it is a hard problem. After finding one solution, how to 
-// block it to get another meaningful solution? You cannot naively block
-// it, because actually only a few of them are important. Others can have
-// many different values, and makes the results more many. I think this should
-// be a typical problem when using Z3.
-
-
 #include "parse_fill.h"
 #include "check_regs.h"
 #include "op_constraint.h"
@@ -18,7 +10,10 @@ using namespace z3;
 uint32_t bound_limit;
 std::regex pTimed("^(\\S+)___#(\d+)$");
 std::string CURRENT_VAR;
+// CLEAN_QUEUE includes: input, not-current AS and num
 std::vector<std::pair<astNode*, uint32_t>> CLEAN_QUEUE;
+std::set<std::string> CLEAN_SET;
+// DIRTY_QUEUE is mainly not-current AS
 std::vector<std::pair<astNode*, uint32_t>> DIRTY_QUEUE;
 
 // assume g_ssaTable and g_nbTable have been filled
@@ -46,11 +41,14 @@ void check_all_regs() {
 // constructed only one. But the SMT equation may need to be constructed
 // multiple times, until a solution is obtained or a bound is reached.
 void check_single_reg_and_slice(std::string regAndSlice) {
-  toCoutVerb("========== Begin check SAT for: "+regAndSlice+" ==========");
+  CLEAN_QUEUE.clear();
+  CLEAN_SET.clear();
+  DIRTY_QUEUE.clear();
+  toCout("========== Begin check SAT for: "+regAndSlice+" ==========");
   uint32_t regWidth = get_var_slice_width(regAndSlice);
   CURRENT_VAR = regAndSlice;
   uint32_t bound = 0;
-  bound_limit = 10;
+  bound_limit = 5;
   bool z3Res = false;
   context c;
   solver s(c);
@@ -80,14 +78,36 @@ void check_single_reg_and_slice(std::string regAndSlice) {
     while(z3Res) { 
       model m = s.get_model();
       s.pop();
+      uint32_t j = 0;
+      // only block values for varriables in CLEAN_QUEUE
       toCout("+++++++ Solution found for "+regAndSlice+", bound: "+toStr(bound)+" +++++++++");
-      for (unsigned i = 0; i < m.size(); i++) {
+      for (uint32_t i = 0; i < m.size(); i++) {
         func_decl v = m[i];
         assert(v.arity() == 0);
-        std::cout << v.name() << " = " << m.get_const_interp(v) << "\n";
-        // block this value 
-        s.add( v() != m.get_const_interp(v) );
+        std::string var = v.name().str();
+        if(!is_taint(var) && ( isInput(pure(var)) || isAs(pure(var)) ))
+          std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ " << v.name() << " = " << m.get_const_interp(v) << "\n";
+        else 
+          std::cout << v.name() << " = " << m.get_const_interp(v) << "\n";
       }
+      while( j < m.size() ) {
+        bool res = is_in_clean_queue(m[j++].name().str());
+        if(res) break;
+      }
+      if( j == m.size()) {
+        toCout("Error: does not find clean var in the model");
+        abort();
+      }
+      j--;
+      func_decl v = m[j];
+      expr block = (v() != m.get_const_interp(v));
+      for (uint32_t i = j+1; i < m.size(); i++) {
+        func_decl v = m[i];
+        // block this value 
+        if( is_in_clean_queue(v.name().str()) )
+          block = block || (v() != m.get_const_interp(v));        
+      }
+      s.add(block);
       s.push();
       // Make sure the clean and dirty constraints are at the top
       add_all_clean_constraints(c, s, bound);
@@ -208,6 +228,7 @@ void add_clean_constraint(astNode* const node, uint32_t timeIdx, context &c, sol
 
 void push_clean_queue(astNode* node, uint32_t timeIdx) {
   CLEAN_QUEUE.emplace_back(node, timeIdx);
+  CLEAN_SET.insert(node->dest);
 }
 
 
@@ -247,4 +268,65 @@ void save_dirty_nodes_for_expand(std::vector<std::string> &varToExpand) {
   for(auto pair: DIRTY_QUEUE) {
     varToExpand.push_back(pair.first->dest);
   }
+}
+
+
+//bool is_in_clean_queue(std::string var) {
+//  if(var.back() == 'T')
+//    return false;
+//  std::string cleanVar;
+//  uint32_t len;
+//  for(auto pair : CLEAN_QUEUE) {
+//    len = var.length();
+//    cleanVar = var.substr(0, len - 7);
+//    if((pair.first->dest).compare(cleanVar) == 0)
+//      return true;
+//  }
+//  return false;
+//}
+
+
+bool is_in_clean_queue(std::string var) {
+  if(var.back() == 'T')
+    return false;
+  std::string cleanVar;
+  uint32_t len;
+  len = var.length();
+  cleanVar = var.substr(0, len - 5);
+  for(auto it = CLEAN_SET.begin(); it != CLEAN_SET.end(); it++) {
+    if((*it).compare(cleanVar) == 0)
+      return true;
+  }
+  return false;
+}
+
+
+bool is_in_dirty_queue(std::string var) {
+  if(var.back() == 'T')
+    return false;
+  std::string cleanVar;
+  uint32_t len;
+  for(auto pair : DIRTY_QUEUE) {
+    len = var.length();
+    cleanVar = var.substr(0, len - 5);
+    if((pair.first->dest).compare(cleanVar) == 0)
+      return true;
+  }
+  return false;
+}
+
+
+std::string pure(std::string var) {
+  if(var.find("_#") == std::string::npos)
+    return var;
+  uint32_t len = var.length();
+  if(var.back() == 'T')
+    return var.substr(0, len-7);
+  else
+    return var.substr(0, len-5);
+}
+
+
+bool is_taint(std::string var) {
+  return var.back() == 'T';
 }
