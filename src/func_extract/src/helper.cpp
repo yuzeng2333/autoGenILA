@@ -1,6 +1,8 @@
 #include "helper.h"
 #include "parse_fill.h"
+#include "global_data_struct.h"
 
+#define toStr(a) std::to_string(a)
 
 bool check_two_op(std::string line, std::string &op, std::string &dest, std::string &op1, std::string &op2, bool &isReduceOp) {
   isReduceOp = false;
@@ -137,4 +139,13 @@ uint32_t hdb2int(std::string num) {
     toCout("Binary number not supported yet!");
     abort();
   }
+}
+
+std::string timed_name(std::string name, uint32_t timeIdx) {
+  return name + "___#" + toStr(timeIdx);
+}
+
+void record_expr(expr varExpr) {
+  expr *tmpPnt = new expr(varExpr);
+  TIMED_VAR2EXPR.emplace(varExpr.decl().name().str(), tmpPnt);
 }
