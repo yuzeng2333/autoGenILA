@@ -32,19 +32,34 @@ expr var_width_expr(std::string var, uint32_t width, context &c) {
 }
 
 
+// returned _t is 0 for number, returned var is its value for int
 expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTaint, uint32_t width) {
   std::string varAndSliceTimed;
-  if(isTaint)
-    varAndSliceTimed = varAndSlice + "___#" + toStr(timeIdx) + _t;
-  else
-    varAndSliceTimed = varAndSlice + "___#" + toStr(timeIdx);
-
   uint32_t localWidth;
   if(width == 0)
     localWidth = get_var_slice_width(varAndSlice);
   else
     localWidth = width;
-  return c.bv_const(varAndSliceTimed.c_str(), localWidth);
+
+  if(isNum(varAndSlice)) {
+    if(isTaint) {
+      varAndSliceTimed = varAndSlice + "___#" + toStr(timeIdx) + "_"+toStr(localWidth)+"b" + _t;
+      return c.bv_val(0, localWidth);
+    }
+    else {
+      varAndSliceTimed = varAndSlice + "___#" + toStr(timeIdx) + "_"+toStr(localWidth)+"b";
+      return c.bv_val(hdb2int(varAndSlice), localWidth);
+    }
+  }
+  else { // if is not num
+    if(isTaint) {
+      varAndSliceTimed = varAndSlice + "___#" + toStr(timeIdx) + _t;
+    }
+    else {
+      varAndSliceTimed = varAndSlice + "___#" + toStr(timeIdx);
+    }
+    return c.bv_const(varAndSliceTimed.c_str(), localWidth);    
+  }
 }
 
 
@@ -89,15 +104,20 @@ void two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   expr destExpr(c);
   if(!isReduceOp)
     destExpr = var_expr(destAndSlice, timeIdx, c, false);
-  else
+  else {
     destExpr = bool_expr(destAndSlice, timeIdx, c, false);
+  }
 
   expr destExpr_g = *TIMED_VAR2EXPR[timed_name(destAndSlice, timeIdx)];
 
   uint32_t localWidthNum = std::max(get_var_slice_width(op1AndSlice), get_var_slice_width(op2AndSlice));
   expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true, localWidthNum);
   expr op2Expr_t = var_expr(op2AndSlice, timeIdx, c, true, localWidthNum);
-  expr op1Expr = var_expr(op1AndSlice, timeIdx, c, false, localWidthNum);
+  //expr op1Expr(c);
+  //if(!op1IsNum)
+  expr  op1Expr = var_expr(op1AndSlice, timeIdx, c, false, localWidthNum);
+  //else
+  //  op1Expr = INT_EXPR_SET
   expr op2Expr = var_expr(op2AndSlice, timeIdx, c, false, localWidthNum);
   record_expr(op1Expr);
   record_expr(op2Expr);
@@ -223,6 +243,14 @@ void ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
 
   add_child_constraint(node, timeIdx, c, s, g, bound, isSolve);
 }
+
+
+//template <class EXPR1, class EXPR2>
+//void make_z3_expr_taint(solver &s, goal &g, context &c, std::string op, expr& destExpr, EXPR1& op1Expr, EXPR2& op2Expr, bool isSolve) {
+//  if
+//  s.add(destExpr_t == (op1Expr_t | op2Expr_t));
+//  make_z3_expr<expr, expr>(s, g, c, node->op, destExpr, op1Expr, op2Expr, isSolve);
+//}
 
 
 template <class EXPR1, class EXPR2>

@@ -9,4 +9,5 @@ extern std::set<std::string> CLEAN_SET;
 extern std::vector<std::pair<astNode*, uint32_t>> DIRTY_QUEUE;
 extern std::unordered_map<std::string, expr*> INPUT_EXPR_VAL;
 extern std::unordered_map<std::string, expr*> TIMED_VAR2EXPR;
+extern std::set<std::string> INT_EXPR_SET;
 #endif

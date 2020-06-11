@@ -17,6 +17,8 @@ std::set<std::string> CLEAN_SET;
 std::vector<std::pair<astNode*, uint32_t>> DIRTY_QUEUE;
 std::unordered_map<std::string, expr*> INPUT_EXPR_VAL;
 std::unordered_map<std::string, expr*> TIMED_VAR2EXPR;
+//std::unordered_map<std::string, expr*> INT_EXPR_VAL;
+std::set<std::string> INT_EXPR_SET;
 
 // assume g_ssaTable and g_nbTable have been filled
 void check_all_regs() {
@@ -87,6 +89,7 @@ void check_single_reg_and_slice(std::string regAndSlice) {
     while(z3Res) {
       INPUT_EXPR_VAL.clear();
       TIMED_VAR2EXPR.clear();
+      INT_EXPR_SET.clear();
       model m = s.get_model();
       s.pop();
       uint32_t j = 0;
@@ -258,14 +261,20 @@ void add_clean_constraint(astNode* const node, uint32_t timeIdx, context &c, sol
   expr destExpr_t = var_expr(dest, timeIdx, c, true);
   s.add( destExpr_t == 0 );
   expr destExpr = var_expr(dest, timeIdx, c, false);
-  expr destExpr_g = *TIMED_VAR2EXPR[timed_name(dest, timeIdx)];
+  expr destExpr_g(c);
+  if(!isSolve) expr destExpr_g = *TIMED_VAR2EXPR[timed_name(dest, timeIdx)];
   // add val expr
-  if( isNum(dest) ) {
-    std::smatch m;
-    std::regex_match(dest, m, pNum);
-    if(isSolve) s.add( destExpr == hdb2int(node->dest) );
-    else        g.add( destExpr_g = bv_val(dest, c) );
-  }
+  //if( isNum(dest) ) {
+  //  std::smatch m;
+  //  std::regex_match(dest, m, pNum);
+  //  std::string timedInt = timed_name(dest, timeIdx);
+  //  //if(INT_EXPR_SET.find(timedInt) != INT_EXPR_SET.end() )
+  //  //  return;
+  //  //else
+  //  //  INT_EXPR_SET.insert(timedInt);
+  //  if(isSolve) s.add( destExpr == hdb2int(node->dest) );
+  //  else        g.add( destExpr_g = bv_val(dest, c) );
+  //}
 }
 
 
