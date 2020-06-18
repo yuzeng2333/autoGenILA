@@ -57,7 +57,7 @@ void check_single_reg_and_slice(std::string regAndSlice) {
   uint32_t regWidth = get_var_slice_width(regAndSlice);
   CURRENT_VAR = regAndSlice;
   uint32_t bound = 0;
-  bound_limit = 5;
+  bound_limit = 2;
   bool z3Res = false;
   context c;
   solver s(c);
@@ -66,13 +66,12 @@ void check_single_reg_and_slice(std::string regAndSlice) {
   while(bound < bound_limit) {
     toCoutVerb("### Begin bound: "+ toStr(bound));
     s.pop();
-    context cg; // context for goal
-    goal g(cg);
+    goal g(c);
     for(std::string rootReg: varToExpand) {
       astNode *root = g_varNode[rootReg];
       if(root)
         // TODO: remove one bound
-        add_nb_constraint(root, bound, c, s, g, bound, true);
+        add_nb_constraint(root, bound, c, s, g, bound, true, true);
       else {
         toCout(regAndSlice+" does not have its root!");
         abort();
@@ -111,15 +110,15 @@ void check_single_reg_and_slice(std::string regAndSlice) {
       }
 
       // after getting one solution, build a goal and simplify it with input values
-      //add_nb_constraint(g_varNode[regAndSlice], bound, cg, s, g, bound, false);
-      //add_all_clean_constraints(cg, s, g, bound, false);
-      //tactic t(cg, "simplify");
-      //apply_result r = t(g);
-      //toCout("*************************  Update function for "+regAndSlice);
-      //std::cout << r << std::endl;
-      //for(uint32_t i = 0; i < r.size(); i++) {
-      //  std::cout << r[i] << std::endl;
-      //}
+      add_nb_constraint(g_varNode[regAndSlice], bound, c, s, g, bound, /*isSolve=*/false, /*isBool=*/false, /*isRoot=*/true);
+      add_all_clean_constraints(c, s, g, bound, /*isSolve=*/false);
+      tactic t(c, "simplify");
+      apply_result r = t(g);
+      toCout("*************************  Update function for "+regAndSlice);
+      std::cout << r << std::endl;
+      for(uint32_t i = 0; i < r.size(); i++) {
+        std::cout << r[i] << std::endl;
+      }
 
       // begin block this solution for a new solution
       while( j < m.size() ) {
@@ -153,38 +152,40 @@ void check_single_reg_and_slice(std::string regAndSlice) {
 }
 
 
-void add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
+expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve, bool isBool) {
   std::string var = node->dest;
   if ( isInput(var) ) {
-    push_clean_queue(node, timeIdx);
+    return input_constraint(node, timeIdx, c, s, g, isSolve, isBool);
   }
   else if ( isAs(var) ) {
     if(var == CURRENT_VAR)
       push_dirty_queue(node, timeIdx);
     else
       push_clean_queue(node, timeIdx);
+    return var_expr(var, timeIdx, c, false);
   }
   else if( isReg(var) ) {
-    add_nb_constraint(node, timeIdx, c, s, g, bound, isSolve);
+    return add_nb_constraint(node, timeIdx, c, s, g, bound, isSolve, isBool);
   }
   else if( isNum(var) ) {
-    push_clean_queue(node, timeIdx);
+    return num_constraint(node, timeIdx, c, s, g, isSolve);
   }
   else { // it is wire
-    add_ssa_constraint(node, timeIdx, c, s, g, bound, isSolve);
+    return add_ssa_constraint(node, timeIdx, c, s, g, bound, isSolve, isBool);
   }
 }
 
 
-void add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve, bool isRoot) {
+expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve, bool isBool, bool isRoot) {
   std::string dest = node->dest;
+  expr destExpr(c);
   if(timeIdx <= bound) {
     toCoutVerb("Add nb constraint for: " + dest+" ------  time: "+toStr(timeIdx));
     std::string destNext = node->srcVec.front();
 
     expr destExpr = var_expr(dest, timeIdx, c, false);
-    expr destNextExpr = var_expr(destNext, timeIdx+1, c, false);
-    TIMED_VAR2EXPR.emplace( timed_name(destNext, timeIdx+1), &destNextExpr );
+    expr destNextExpr = add_constraint(node->childVec.front(), timeIdx+1, c, s, g, bound, isSolve);
+    record_expr(destNextExpr);
     if(isSolve) {
       s.add(destExpr == destNextExpr);
 
@@ -199,54 +200,58 @@ void add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
         g.add( destExpr == destNextExpr );
       }
       else {
-        g.add( destExpr = destNextExpr );
-        if(isInput(destNext)) {
-          expr localVal = *INPUT_EXPR_VAL[timed_name(destNext, timeIdx+1)];
-          g.add( destNextExpr = localVal );
-        }
+        destExpr = destNextExpr;
+        //if(isInput(destNext)) {
+        //  expr localVal = *INPUT_EXPR_VAL[timed_name(destNext, timeIdx+1)];
+        //  g.add( destNextExpr = localVal );
+        //}
       }
     }
-    add_constraint(node->childVec.front(), timeIdx+1, c, s, g, bound, isSolve);
+   
   }
   else if ( isAs(dest) ){ // the bound has been reached, do not expand its assignment
     push_clean_queue(node, timeIdx);
   }
   else
     push_dirty_queue(node, timeIdx);
+
+  return destExpr;  
 }
 
 
-void add_ssa_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
+expr add_ssa_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve, bool isBool) {
   toCoutVerb("Add ssa constraint for: " + node->dest+" ------  time: "+toStr(timeIdx));
   std::string var = node->dest;
 
   switch( node->type ) {
     case TWO_OP:
-      two_op_constraint(node, timeIdx, c, s, g, bound, isSolve);
+      return two_op_constraint(node, timeIdx, c, s, g, bound, isSolve);
       break;
-    case ONE_OP:
-      one_op_constraint(node, timeIdx, c, s, g, bound, isSolve);
-      break;
-    case REDUCE1:
-      reduce_op_constraint(node, timeIdx, c, s, g, bound, isSolve);
-      break;
-    case SEL:
-      sel_op_constraint(node, timeIdx, c, s, g, bound, isSolve);
-      break;
-    case SRC_CONCAT:
-      src_concat_op_constraint(node, timeIdx, c, s, g, bound, isSolve);
-      break;
+    //case ONE_OP:
+    //  return one_op_constraint(node, timeIdx, c, s, g, bound, isSolve);
+    //  break;
+    //case REDUCE1:
+    //  return reduce_op_constraint(node, timeIdx, c, s, g, bound, isSolve);
+    //  break;
+    //case SEL:
+    //  return sel_op_constraint(node, timeIdx, c, s, g, bound, isSolve);
+    //  break;
+    //case SRC_CONCAT:
+    //  return src_concat_op_constraint(node, timeIdx, c, s, g, bound, isSolve);
+    //  break;
     case ITE:
-      ite_op_constraint(node, timeIdx, c, s, g, bound, isSolve);
+      return ite_op_constraint(node, timeIdx, c, s, g, bound, isSolve);
       break;
     default:
       toCout("Error in add_ssa_constraint for: "+var);
+      abort();
       break;
   }
 }
 
 
 void add_child_constraint(astNode* const parentNode, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
+  abort();
   for( astNode* node: parentNode->childVec ) {
     add_constraint(node, timeIdx, c, s, g, bound, isSolve);
   }
@@ -258,11 +263,20 @@ void add_clean_constraint(astNode* const node, uint32_t timeIdx, context &c, sol
   //toCoutVerb("Add clean constraint for: " + node->dest);
   std::string dest = node->dest;
   // add clean taint
-  expr destExpr_t = var_expr(dest, timeIdx, c, true);
-  s.add( destExpr_t == 0 );
+  expr destExpr_t(c);
+  if(isSolve) {
+    destExpr_t = var_expr(dest, timeIdx, c, true);
+    s.add( destExpr_t == 0 );
+  }
   expr destExpr = var_expr(dest, timeIdx, c, false);
   expr destExpr_g(c);
-  if(!isSolve) expr destExpr_g = *TIMED_VAR2EXPR[timed_name(dest, timeIdx)];
+  if(!isSolve) {
+    expr destExpr_g = *TIMED_VAR2EXPR[timed_name(dest, timeIdx)];
+    if( isInput(dest) ) {
+      expr localVal = *INPUT_EXPR_VAL[timed_name(dest, timeIdx)];
+      g.add( destExpr_g = localVal ); 
+    }
+  }
   // add val expr
   //if( isNum(dest) ) {
   //  std::smatch m;

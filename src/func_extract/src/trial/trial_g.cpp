@@ -6,11 +6,12 @@ using namespace z3;
 
 //expr or_expr(std::)
 
-void make_y(goal& g, context& c) {
+expr make_y(goal& g, context& c) {
   expr y = c.bool_const("y");
   expr a1 = c.bv_val(2, 32);
   expr a2 = c.bv_val(2, 32);  
-  g.add( y =  (a2 == a1) );
+  return a2 == a1;
+  //return y;
 }
 
 
@@ -18,7 +19,7 @@ void make_x(goal& g, context& c) {
   expr in = c.bv_const("in", 32);
   expr z1 = c.bv_val(1, 32);
   expr z2 = c.bv_const("z2", 32);
-  expr y = c.bool_const("y");  
+  expr y = make_y(g, c);  
   expr x = c.bv_const("x", 32);
   g.add(x == in + ite(y, z1, z2));  
 }

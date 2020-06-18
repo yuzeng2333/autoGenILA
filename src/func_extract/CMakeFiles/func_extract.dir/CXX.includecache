@@ -18,6 +18,16 @@ cassert
 ../../taint_method/helper.h
 /workspace/research/ILA/autoGenILA/src/taint_method/helper.h
 
+/workspace/research/ILA/autoGenILA/src/func_extract/src/check_regs.cpp
+parse_fill.h
+/workspace/research/ILA/autoGenILA/src/func_extract/src/parse_fill.h
+check_regs.h
+/workspace/research/ILA/autoGenILA/src/func_extract/src/check_regs.h
+op_constraint.h
+/workspace/research/ILA/autoGenILA/src/func_extract/src/op_constraint.h
+helper.h
+/workspace/research/ILA/autoGenILA/src/func_extract/src/helper.h
+
 /workspace/research/ILA/autoGenILA/src/func_extract/src/check_regs.h
 ../../taint_method/VarWidth.h
 /workspace/research/ILA/autoGenILA/src/taint_method/VarWidth.h
@@ -55,18 +65,6 @@ regex
 /workspace/research/ILA/autoGenILA/src/taint_method/helper.h
 z3++.h
 /workspace/research/ILA/autoGenILA/src/func_extract/src/z3++.h
-
-/workspace/research/ILA/autoGenILA/src/func_extract/src/op_constraint.cpp
-parse_fill.h
-/workspace/research/ILA/autoGenILA/src/func_extract/src/parse_fill.h
-op_constraint.h
-/workspace/research/ILA/autoGenILA/src/func_extract/src/op_constraint.h
-check_regs.h
-/workspace/research/ILA/autoGenILA/src/func_extract/src/check_regs.h
-helper.h
-/workspace/research/ILA/autoGenILA/src/func_extract/src/helper.h
-ast.h
-/workspace/research/ILA/autoGenILA/src/func_extract/src/ast.h
 
 /workspace/research/ILA/autoGenILA/src/func_extract/src/op_constraint.h
 string

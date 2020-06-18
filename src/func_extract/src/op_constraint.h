@@ -17,9 +17,13 @@ expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTain
 
 expr bv_val(std::string var, context &c);
 
-expr bool_expr(std::string var, uint32_t timeIdx, context &c);
+expr bool_expr(std::string var, uint32_t timeIdx, context &c, bool isTaint=false);
 
-void two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve);
+expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, bool isSolve, bool isBool);
+
+expr num_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, bool isSolve);
+
+expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve);
 
 void one_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve);
 
@@ -29,7 +33,7 @@ void sel_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
 
 void src_concat_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve);
 
-void ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve);
+expr ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve);
 
 template <class EXPR1, class EXPR2>
 void make_z3_expr(solver &s, goal &g, context &c, std::string op, expr& destExpr, EXPR1& op1Expr, EXPR2& op2Expr, bool isSolve);
