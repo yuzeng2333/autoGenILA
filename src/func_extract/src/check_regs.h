@@ -51,4 +51,6 @@ bool is_in_dirty_queue(std::string var);
 std::string pure(std::string var);
 
 bool is_taint(std::string var);
+
+bool is_clean(std::string var, std::string root);
 #endif

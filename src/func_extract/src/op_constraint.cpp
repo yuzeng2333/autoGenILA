@@ -170,9 +170,7 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
     }
   }
   // add expression to s or g
-  make_z3_expr<expr, expr>(s, g, c, node->op, destExpr, op1Expr, op2Expr, isSolve);        
-  
-  return destExpr;
+  return make_z3_expr<expr, expr>(s, g, c, node->op, destExpr, op1Expr, op2Expr, isSolve);        
 }
 
 
@@ -276,20 +274,21 @@ expr ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
 
 
 template <class EXPR1, class EXPR2>
-void make_z3_expr(solver &s, goal &g, context &c, std::string op, expr& destExpr, EXPR1& op1Expr, EXPR2& op2Expr, bool isSolve) {
+expr make_z3_expr(solver &s, goal &g, context &c, std::string op, const expr& destExpr, EXPR1& op1Expr, EXPR2& op2Expr, bool isSolve) {
   if(op == "&&") {
     if(isSolve)  s.add( destExpr == (op1Expr & op2Expr) );
-    else         destExpr = (op1Expr & op2Expr);
+    else         return (op1Expr & op2Expr);
   }
   else if (op == "==") {
     // TODO: use = or == in the following line?
     if(isSolve)  s.add( destExpr == ite(op1Expr == op2Expr, c.bool_val(true), c.bool_val(false)) );
-    else         destExpr = ite(op1Expr == op2Expr, c.bool_val(true), c.bool_val(false));
+    else         return ite(op1Expr == op2Expr, c.bool_val(true), c.bool_val(false));
   }
   else {
     toCout("Not supported 2-op in make_z3_expr!!");
     abort();
   }
+  return destExpr;
 }
 
 

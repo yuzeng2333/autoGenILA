@@ -111,7 +111,7 @@ void check_single_reg_and_slice(std::string regAndSlice) {
 
       // after getting one solution, build a goal and simplify it with input values
       add_nb_constraint(g_varNode[regAndSlice], bound, c, s, g, bound, /*isSolve=*/false, /*isBool=*/false, /*isRoot=*/true);
-      add_all_clean_constraints(c, s, g, bound, /*isSolve=*/false);
+      //add_all_clean_constraints(c, s, g, bound, /*isSolve=*/false);
       tactic t(c, "simplify");
       apply_result r = t(g);
       toCout("*************************  Update function for "+regAndSlice);
@@ -122,7 +122,7 @@ void check_single_reg_and_slice(std::string regAndSlice) {
 
       // begin block this solution for a new solution
       while( j < m.size() ) {
-        bool res = is_in_clean_queue(m[j++].name().str());
+        bool res = is_clean(m[j++].name().str(), regAndSlice);
         if(res) break;
       }
       if( j == m.size()) {
@@ -135,7 +135,7 @@ void check_single_reg_and_slice(std::string regAndSlice) {
       for (uint32_t i = j+1; i < m.size(); i++) {
         func_decl v = m[i];
         // block this value 
-        if( is_in_clean_queue(v.name().str()) )
+        if( is_clean(v.name().str(), regAndSlice) )
           block = block || (v() != m.get_const_interp(v));        
       }
       s.add(block);
@@ -179,12 +179,16 @@ expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s
 expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve, bool isBool, bool isRoot) {
   std::string dest = node->dest;
   expr destExpr(c);
+  expr destExpr_g(c);
+  expr destNextExpr(c);
+
   if(timeIdx <= bound) {
     toCoutVerb("Add nb constraint for: " + dest+" ------  time: "+toStr(timeIdx));
     std::string destNext = node->srcVec.front();
 
-    expr destExpr = var_expr(dest, timeIdx, c, false);
-    expr destNextExpr = add_constraint(node->childVec.front(), timeIdx+1, c, s, g, bound, isSolve);
+    destExpr = var_expr(dest, timeIdx, c, false);
+    destExpr_g = var_expr(dest, timeIdx+100, c, false);
+    destNextExpr = add_constraint(node->childVec.front(), timeIdx+1, c, s, g, bound, isSolve);
     record_expr(destNextExpr);
     if(isSolve) {
       s.add(destExpr == destNextExpr);
@@ -197,10 +201,10 @@ expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
     }
     else {
       if(isRoot) {
-        g.add( destExpr == destNextExpr );
+        g.add( destExpr_g == destNextExpr );
       }
       else {
-        destExpr = destNextExpr;
+        return destNextExpr;
         //if(isInput(destNext)) {
         //  expr localVal = *INPUT_EXPR_VAL[timed_name(destNext, timeIdx+1)];
         //  g.add( destNextExpr = localVal );
@@ -268,15 +272,6 @@ void add_clean_constraint(astNode* const node, uint32_t timeIdx, context &c, sol
     destExpr_t = var_expr(dest, timeIdx, c, true);
     s.add( destExpr_t == 0 );
   }
-  expr destExpr = var_expr(dest, timeIdx, c, false);
-  expr destExpr_g(c);
-  if(!isSolve) {
-    expr destExpr_g = *TIMED_VAR2EXPR[timed_name(dest, timeIdx)];
-    if( isInput(dest) ) {
-      expr localVal = *INPUT_EXPR_VAL[timed_name(dest, timeIdx)];
-      g.add( destExpr_g = localVal ); 
-    }
-  }
   // add val expr
   //if( isNum(dest) ) {
   //  std::smatch m;
@@ -337,21 +332,6 @@ void save_dirty_nodes_for_expand(std::vector<std::string> &varToExpand) {
 }
 
 
-//bool is_in_clean_queue(std::string var) {
-//  if(var.back() == 'T')
-//    return false;
-//  std::string cleanVar;
-//  uint32_t len;
-//  for(auto pair : CLEAN_QUEUE) {
-//    len = var.length();
-//    cleanVar = var.substr(0, len - 7);
-//    if((pair.first->dest).compare(cleanVar) == 0)
-//      return true;
-//  }
-//  return false;
-//}
-
-
 bool is_in_clean_queue(std::string var) {
   if(var.back() == 'T')
     return false;
@@ -395,4 +375,9 @@ std::string pure(std::string var) {
 
 bool is_taint(std::string var) {
   return var.back() == 'T';
+}
+
+
+bool is_clean(std::string var, std::string root) {
+  return !is_taint(var) && ( isInput(pure(var)) || (isAs(pure(var)) && root.compare(pure(var)) != 0 ) );
 }
