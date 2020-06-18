@@ -47,7 +47,7 @@ expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTain
       return c.bv_val(0, localWidth);
     }
     else {
-      varAndSliceTimed = varAndSlice + "___#" + toStr(timeIdx) + "_"+toStr(localWidth)+"b";
+      varAndSliceTimed = varAndSlice + "___#" + toStr(timeIdx) + "_"+toStr(localWidth)+"b";      
       return c.bv_val(hdb2int(varAndSlice), localWidth);
     }
   }
@@ -136,7 +136,7 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   bool op2IsNum = isNum(op2);
 
   expr destExpr(c);
-  if(!isReduceOp)
+  if(!isReduceOp && !is_bool_op(node->op))
     destExpr = var_expr(destAndSlice, timeIdx, c, false);
   else
     destExpr = bool_expr(destAndSlice, timeIdx, c, false);
@@ -276,8 +276,14 @@ expr ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
 template <class EXPR1, class EXPR2>
 expr make_z3_expr(solver &s, goal &g, context &c, std::string op, const expr& destExpr, EXPR1& op1Expr, EXPR2& op2Expr, bool isSolve) {
   if(op == "&&") {
-    if(isSolve)  s.add( destExpr == (op1Expr & op2Expr) );
-    else         return (op1Expr & op2Expr);
+    expr op1Bool = op1Expr;
+    expr op2Bool = op2Expr;
+    if(op1Expr.is_bv())
+      op1Bool = ite(op1Expr > 0, c.bool_val(true), c.bool_val(false));
+    if(op2Expr.is_bv())
+      op2Bool = ite(op2Expr > 0, c.bool_val(true), c.bool_val(false));
+    if(isSolve)  s.add( destExpr == (op1Bool && op2Bool) );
+    else         return (op1Bool && op2Bool);
   }
   else if (op == "==") {
     // TODO: use = or == in the following line?
@@ -302,3 +308,10 @@ void make_z3_expr(solver &s, goal &g, context &c, std::string op, expr& destExpr
   }
 }
 
+
+bool is_bool_op(std::string op) {
+  if(op == "&&")
+    return true;
+  else
+    return false;
+}

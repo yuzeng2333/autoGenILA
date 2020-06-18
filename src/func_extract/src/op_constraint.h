@@ -39,4 +39,6 @@ template <class EXPR1, class EXPR2>
 expr make_z3_expr(solver &s, goal &g, context &c, std::string op, const expr& destExpr, EXPR1& op1Expr, EXPR2& op2Expr, bool isSolve);
 
 void make_z3_expr(solver &s, goal &g, context &c, std::string op, expr& destExpr, expr& op1Expr);
+
+bool is_bool_op(std::string op);
 #endif

@@ -10,7 +10,7 @@
 
 int main(int argc, char *argv[]) {
   toCout("Begin main!");
-  g_verb = false;
+  g_verb = true;
   std::string vlgFile = argv[1];
   std::string asFile = argv[2];
   clear_global_vars();
