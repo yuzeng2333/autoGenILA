@@ -25,8 +25,8 @@ std::set<std::string> INT_EXPR_SET;
 void check_all_regs() {
   toCoutVerb("###### Begin checking SAT! ");
   for(std::string reg: moduleAs) {
-    if(reg.compare("enable") == 0 || reg.compare("sign") == 0)
-      continue;
+    //if(reg.compare("enable") == 0 || reg.compare("sign") == 0)
+    //  continue;
     if(reg2Slices.find(reg) == reg2Slices.end()) {
       check_single_reg_and_slice(reg);
     }
@@ -134,15 +134,15 @@ void check_single_reg_and_slice(std::string regAndSlice) {
       }
 
       // after getting one solution, build a goal and simplify it with input values
-      add_nb_constraint(g_varNode[regAndSlice], bound, c, s, g, bound, /*isSolve=*/false, /*isBool=*/false, /*isRoot=*/true);
-      //add_all_clean_constraints(c, s, g, bound, /*isSolve=*/false);
-      tactic t(c, "simplify");
-      apply_result r = t(g);
-      toCout("*************************  Update function for "+regAndSlice);
-      std::cout << r << std::endl;
-      for(uint32_t i = 0; i < r.size(); i++) {
-        std::cout << r[i] << std::endl;
-      }
+     // add_nb_constraint(g_varNode[regAndSlice], bound, c, s, g, bound, /*isSolve=*/false, /*isBool=*/false, /*isRoot=*/true);
+     // //add_all_clean_constraints(c, s, g, bound, /*isSolve=*/false);
+     // tactic t(c, "simplify");
+     // apply_result r = t(g);
+     // toCout("*************************  Update function for "+regAndSlice);
+     // std::cout << r << std::endl;
+     // for(uint32_t i = 0; i < r.size(); i++) {
+     //   std::cout << r[i] << std::endl;
+     // }
 
       // begin block this solution for a new solution
       while( j < m.size() ) {
@@ -338,6 +338,7 @@ void push_clean_queue(astNode* node, uint32_t timeIdx) {
 
 
 void add_all_clean_constraints(context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
+  toCout("-------- Begin Add all clean ----------");
   for(auto pair: CLEAN_QUEUE) {
     add_clean_constraint(pair.first, pair.second, c, s, g, bound, isSolve);
   }
@@ -368,6 +369,7 @@ void push_dirty_queue(astNode* node, uint32_t timeIdx) {
 
 
 void add_all_dirty_constraints(context &c, solver &s, uint32_t bound) {
+  toCout("-------- Begin Add all dirty ----------");  
   for(auto pair: DIRTY_QUEUE) {
     add_dirty_constraint(pair.first, pair.second, c, s, bound);
   }

@@ -42,25 +42,14 @@ expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTain
     localWidth = width;
 
   if(isNum(varAndSlice)) {
-    if(localWidth > 1)
-      if(isTaint) {
-        varAndSliceTimed = varAndSlice + "___#" + toStr(timeIdx) + "_"+toStr(localWidth)+"b" + _t;
-        return c.bv_val(0, localWidth);
-      }
-      else {
-        varAndSliceTimed = varAndSlice + "___#" + toStr(timeIdx) + "_"+toStr(localWidth)+"b";      
-        return c.bv_val(hdb2int(varAndSlice), localWidth);
-      }
-    else
-      if(isTaint) {
-        return c.bool_val(false);
-      }
-      else {
-        if(hdb2int(varAndSlice) == 0)
-          return c.bool_val(false);
-        else
-          return c.bool_val(true);
-      }
+    if(isTaint) {
+      varAndSliceTimed = varAndSlice + "___#" + toStr(timeIdx) + "_"+toStr(localWidth)+"b" + _t;
+      return c.bv_val(0, localWidth);
+    }
+    else {
+      varAndSliceTimed = varAndSlice + "___#" + toStr(timeIdx) + "_"+toStr(localWidth)+"b";      
+      return c.bv_val(hdb2int(varAndSlice), localWidth);
+    }
   }
   else { // if is not num
     if(isTaint) {
@@ -70,12 +59,7 @@ expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTain
       varAndSliceTimed = varAndSlice + "___#" + toStr(timeIdx);
     }
 
-    if(localWidth > 1) {   
-      return c.bv_const(varAndSliceTimed.c_str(), localWidth);
-    }
-    else {
-      return c.bool_const(varAndSliceTimed.c_str());
-    }
+    return c.bv_const(varAndSliceTimed.c_str(), localWidth);
   }
 }
 
@@ -101,10 +85,10 @@ expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver 
   std::string dest = node->dest;
   expr destExpr_t(c);
   expr destExpr(c);
-  if(isBool)
-    destExpr = bool_expr(dest, timeIdx, c);
-  else
-    destExpr = var_expr(dest, timeIdx, c, false);
+  //if(isBool)
+  //  destExpr = bool_expr(dest, timeIdx, c);
+  //else
+  destExpr = var_expr(dest, timeIdx, c, false);
   if(isSolve) {
     destExpr_t = var_expr(dest, timeIdx, c, true);
     set_zero(s, destExpr_t);
@@ -153,10 +137,10 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   bool op2IsNum = isNum(op2);
 
   expr destExpr(c);
-  if(!isReduceOp && !is_bool_op(node->op))
+  //if(!isReduceOp && !is_bool_op(node->op))
     destExpr = var_expr(destAndSlice, timeIdx, c, false);
-  else
-    destExpr = bool_expr(destAndSlice, timeIdx, c, false);
+  //else
+  //  destExpr = bool_expr(destAndSlice, timeIdx, c, false);
 
   uint32_t localWidthNum = std::max(get_var_slice_width(op1AndSlice), get_var_slice_width(op2AndSlice));
   expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true, localWidthNum);
@@ -192,15 +176,8 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   }
   else {
     if(isSolve) {
-      expr destExpr_t = bool_expr(destAndSlice, timeIdx, c, true);
-      if(op1Expr_t.is_bool()) {
-        assert(op2Expr_t.is_bool());
-        assert(destExpr_t.is_bool());
-        s.add(destExpr_t == (op1Expr_t || op2Expr_t) != 0 );
-      }
-      else {
-        s.add(destExpr_t == ( (op1Expr_t | op2Expr_t) != 0 ));
-      }
+      expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
+      s.add(destExpr_t == ite( (op1Expr_t | op2Expr_t) != 0, c.bv_val(1, 1), c.bv_val(0, 1) ) );
       if(g_print_solver) {
         toCout("Add-Solver: "+get_name(destExpr_t)+" == "+get_name(op1Expr_t) + " | "+ get_name(op2Expr_t) + " != 0");
       }
@@ -274,6 +251,7 @@ expr ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   uint32_t localWidthNum;
   std::string localWidth;
   localWidthNum = get_var_slice_width(destAndSlice);
+  uint32_t condWidth = get_var_slice_width(condAndSlice);
 
   localWidth = std::to_string(localWidthNum);
 
@@ -291,20 +269,22 @@ expr ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   if(isSolve) {
     expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true, localWidthNum);
     expr op2Expr_t = var_expr(op2AndSlice, timeIdx, c, true, localWidthNum);
-    s.add( destExpr_t == ite(condExpr, op1Expr_t || condExpr_t, op2Expr_t || condExpr_t) );
+    //expr condBoolExpr = c.bool_const((condExpr.decl().name()+"_bool".c_str()));
+    //s.add( condBoolExpr == (condExpr > 0) );
+    s.add( destExpr_t == ite( condExpr == c.bv_val(1, 1), op1Expr_t | condExpr_t, op2Expr_t | condExpr_t) );
     if(g_print_solver) {
-      toCout("Add-Solver: "+get_name(destExpr_t)+" == ite("+get_name(condExpr)+", "+get_name(op1Expr_t)+" | "+get_name(condExpr_t)+", "+get_name(op2Expr_t)+" | "+get_name(condExpr_t)+" )" );
+      toCout("Add-Solver: "+get_name(destExpr_t)+" == ite("+get_name(condExpr)+" == 1'b1, "+get_name(op1Expr_t)+" | "+get_name(condExpr_t)+", "+get_name(op2Expr_t)+" | "+get_name(condExpr_t)+" )" );
     }
     // if condVar is wire, put condVar in ite, and also expand it
     // TODO: not sure if following statement is correct
-    s.add( destExpr == ite(condExpr, op1Expr, op2Expr) );
+    s.add( destExpr == ite( condExpr == c.bv_val(1, 1), op1Expr, op2Expr) );
     if(g_print_solver) {
-      toCout("Add-Solver: "+get_name(destExpr)+" == ite("+get_name(condExpr)+", "+get_name(op1Expr)+", "+get_name(op2Expr)+" )" );
+      toCout("Add-Solver: "+get_name(destExpr)+" == ite("+get_name(condExpr)+" == 1'b1, "+get_name(op1Expr)+", "+get_name(op2Expr)+" )" );
     }
     return destExpr;
   }
   else
-    return ite(condExpr, op1Expr, op2Expr);
+    return ite( c.bool_val(condExpr > 0), op1Expr, op2Expr);
 }
 
 
@@ -318,37 +298,39 @@ expr ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
 template <class EXPR1, class EXPR2>
 expr make_z3_expr(solver &s, goal &g, context &c, std::string op, const expr& destExpr, EXPR1& op1Expr, EXPR2& op2Expr, bool isSolve) {
   if(op == "&&") {
-    expr op1Bool = op1Expr;
-    expr op2Bool = op2Expr;
-    if(op1Expr.is_bv()) {
-      op1Bool = c.bool_const((op1Expr.decl().name().str()+"_bool").c_str());
-      s.add( op1Bool == ite(op1Expr > 0, c.bool_val(true), c.bool_val(false)) );
-      if(g_print_solver) {
-        toCout("Add-Solver: "+get_name(op1Bool)+" == ite("+get_name(op1Expr)+" > 0, true, false )" );
-      }
-    }
-    if(op2Expr.is_bv()) {
-      op2Bool = c.bool_const((op2Expr.decl().name().str()+"_bool").c_str());
-      s.add( op2Bool == ite(op2Expr > 0, c.bool_val(true), c.bool_val(false)) );
-      if(g_print_solver) {
-        toCout("Add-Solver: "+get_name(op2Bool)+" == ite("+get_name(op2Expr)+" > 0, true, false )" );
-      }
-    }
+    //expr op1Bool = op1Expr;
+    //expr op2Bool = op2Expr;
+    //if(op1Expr.is_bv()) {
+    //  op1Bool = c.bool_const((op1Expr.decl().name().str()+"_bool").c_str());
+    //  s.add( op1Bool == ite(op1Expr > 0, c.bool_val(true), c.bool_val(false)) );
+    //  if(g_print_solver) {
+    //    toCout("Add-Solver: "+get_name(op1Bool)+" == ite("+get_name(op1Expr)+" > 0, true, false )" );
+    //  }
+    //}
+    //if(op2Expr.is_bv()) {
+    //  op2Bool = c.bool_const((op2Expr.decl().name().str()+"_bool").c_str());
+    //  s.add( op2Bool == ite(op2Expr > 0, c.bool_val(true), c.bool_val(false)) );
+    //  if(g_print_solver) {
+    //    toCout("Add-Solver: "+get_name(op2Bool)+" == ite("+get_name(op2Expr)+" > 0, true, false )" );
+    //  }
+    //}
     if(isSolve)  {
-      s.add( destExpr == (op1Bool && op2Bool) );
+      //s.add( destExpr == (op1Bool & op2Bool) );
+      s.add( destExpr == (op1Expr & op2Expr) );
       if(g_print_solver) {      
-        toCout("Add-Solver: "+get_name(destExpr)+" == ( "+get_name(op1Bool)+" && "+get_name(op2Bool)+" )" );
+        toCout("Add-Solver: "+get_name(destExpr)+" == ( "+get_name(op1Expr)+" && "+get_name(op2Expr)+" )" );
       }
     }
     else        
-      return (op1Bool && op2Bool);
+      return (op1Expr && op2Expr);
+      //return (op1Bool && op2Bool);
   }
   else if (op == "==") {
     // TODO: use = or == in the following line?
     if(isSolve) {
-      s.add( destExpr == ite(op1Expr == op2Expr, c.bool_val(true), c.bool_val(false)) );
+      s.add( destExpr == ite(op1Expr == op2Expr, c.bv_val(1, 1), c.bv_val(0, 1)) );
       if(g_print_solver) {      
-        toCout("Add-Solver: "+get_name(destExpr)+" == ite( "+get_name(op1Expr)+" == "+get_name(op2Expr)+", true, false )" );
+        toCout("Add-Solver: "+get_name(destExpr)+" == ite( "+get_name(op1Expr)+" == "+get_name(op2Expr)+", 1'b1, 1'b0 )" );
       }
     }
     else         
