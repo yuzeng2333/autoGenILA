@@ -7,10 +7,12 @@
 #include "../../taint_method/global_data.h"
 #include "../../taint_method/helper.h"
 
+bool g_print_solver;
 
 int main(int argc, char *argv[]) {
   toCout("Begin main!");
-  g_verb = true;
+  g_verb = false;
+  g_print_solver = true;
   std::string vlgFile = argv[1];
   std::string asFile = argv[2];
   clear_global_vars();

@@ -53,4 +53,6 @@ std::string pure(std::string var);
 bool is_taint(std::string var);
 
 bool is_clean(std::string var, std::string root);
+
+std::string get_name(expr expression);
 #endif

@@ -2,6 +2,7 @@
 #include "check_regs.h"
 #include "op_constraint.h"
 #include "helper.h"
+#include "global_data_struct.h"
 
 using namespace z3;
 #define SV std::vector<std::string>
@@ -24,6 +25,8 @@ std::set<std::string> INT_EXPR_SET;
 void check_all_regs() {
   toCoutVerb("###### Begin checking SAT! ");
   for(std::string reg: moduleAs) {
+    if(reg.compare("enable") == 0 || reg.compare("sign") == 0)
+      continue;
     if(reg2Slices.find(reg) == reg2Slices.end()) {
       check_single_reg_and_slice(reg);
     }
@@ -61,6 +64,13 @@ void check_single_reg_and_slice(std::string regAndSlice) {
   bool z3Res = false;
   context c;
   solver s(c);
+  params p(c);
+  p.set("unsat_core", true);
+  s.set(p);
+  // block solution with positive rst
+  //expr rst = c.bool_const("rst___#1");
+  //s.add( rst == c.bool_val(false) );
+
   std::vector<std::string> varToExpand{regAndSlice};
   s.push();
   while(bound < bound_limit) {
@@ -68,10 +78,14 @@ void check_single_reg_and_slice(std::string regAndSlice) {
     s.pop();
     goal g(c);
     for(std::string rootReg: varToExpand) {
+      if(g_varNode.find(rootReg) == g_varNode.end()) {
+        toCout("Error: root does not have its node: " + rootReg);
+        abort();
+      }
       astNode *root = g_varNode[rootReg];
       if(root)
         // TODO: remove one bound
-        add_nb_constraint(root, bound, c, s, g, bound, true, true);
+        add_nb_constraint(root, bound, c, s, g, bound, /*isSolve=*/true, /*isBool=*/false, /*isRoot=*/true);
       else {
         toCout(regAndSlice+" does not have its root!");
         abort();
@@ -83,7 +97,17 @@ void check_single_reg_and_slice(std::string regAndSlice) {
     add_all_dirty_constraints(c, s, bound);
     // save dirty regs for next round
     save_dirty_nodes_for_expand(varToExpand);
+    //expr rst = c.bool_const("enable___#1");
+    //s.add( rst == c.bool_val(true) );
     z3Res = (s.check() == sat);
+    if(!z3Res) {
+      expr_vector core = s.unsat_core();
+      std::cout << core << "\n";
+      std::cout << "size: " << core.size() << "\n";
+      for (unsigned i = 0; i < core.size(); i++) {
+          std::cout << core[i] << "\n";
+      }
+    }
     // exhaust all the solutions for a bound
     while(z3Res) {
       INPUT_EXPR_VAL.clear();
@@ -154,6 +178,9 @@ void check_single_reg_and_slice(std::string regAndSlice) {
 
 expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve, bool isBool) {
   std::string var = node->dest;
+  if(var.compare("enable") == 0) {
+    toCout("enable found!");
+  }
   if ( isInput(var) ) {
     return input_constraint(node, timeIdx, c, s, g, isSolve, isBool);
   }
@@ -192,12 +219,26 @@ expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
     record_expr(destNextExpr);
     if(isSolve) {
       s.add(destExpr == destNextExpr);
+      if(g_print_solver) {
+        toCout("Add-Solver: "+get_name(destExpr)+" == "+get_name(destNextExpr));
+      }
 
       expr destExpr_t = var_expr(dest, timeIdx, c, true);
       expr destNextExpr_t = var_expr(destNext, timeIdx+1, c, true);  
       s.add(destExpr_t == destNextExpr_t);
-      if(isRoot)
-        s.add( destExpr_t == 0 );
+      if(g_print_solver) {
+        toCout("Add-Solver: "+get_name(destExpr_t)+" == "+get_name(destNextExpr_t));
+      }
+      if(isRoot) {
+        if(destExpr_t.is_bool()) {
+          s.add( !destExpr_t, "clean_taint" );          
+        }
+        else
+          s.add( destExpr_t == 0, "clean_taint" );
+        if(g_print_solver) {
+          toCout("Add-Solver: "+get_name(destExpr_t)+" == 0");
+        }
+      }
     }
     else {
       if(isRoot) {
@@ -271,6 +312,9 @@ void add_clean_constraint(astNode* const node, uint32_t timeIdx, context &c, sol
   if(isSolve) {
     destExpr_t = var_expr(dest, timeIdx, c, true);
     s.add( destExpr_t == 0 );
+    if(g_print_solver) {
+      toCout("Add-Solver: "+get_name(destExpr_t)+" == 0");
+    }
   }
   // add val expr
   //if( isNum(dest) ) {
@@ -307,8 +351,14 @@ void add_dirty_constraint(astNode* const node, uint32_t timeIdx, context &c, sol
   expr destExpr_t = var_expr(dest, timeIdx, c, true);  
   expr destExpr = var_expr(dest, timeIdx, c, false);  
   s.add( destExpr_t == uint32_t(std::pow(2, destWidth)-1) );
+  if(g_print_solver) {
+    toCout("Add-Solver: "+get_name(destExpr_t)+" == "+toStr(uint32_t(std::pow(2, destWidth)-1)));
+  }
   // TODO: maybe deal with it in a better way?
   s.add( destExpr == 0 );
+  if(g_print_solver) {
+    toCout("Add-Solver: "+get_name(destExpr)+" == 0");
+  }
 };
 
 
@@ -380,4 +430,9 @@ bool is_taint(std::string var) {
 
 bool is_clean(std::string var, std::string root) {
   return !is_taint(var) && ( isInput(pure(var)) || (isAs(pure(var)) && root.compare(pure(var)) != 0 ) );
+}
+
+
+std::string get_name(expr expression) {
+  return expression.decl().name().str();
 }

@@ -9,3 +9,6 @@ s:
 
 g:
 	g++ -g trial_g.cpp -L/usr/bin -lz3
+
+unsat:
+	g++ -g unsat.cpp -L/usr/bin -lz3
