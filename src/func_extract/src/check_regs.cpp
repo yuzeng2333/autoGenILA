@@ -68,12 +68,12 @@ void check_single_reg_and_slice(std::string regAndSlice) {
   p.set("unsat_core", true);
   s.set(p);
   // block solution with positive rst
-  expr rst = c.bv_const("rst___#1", 1);
-  s.add( rst == c.bv_val(0, 1) );
 
   std::vector<std::string> varToExpand{regAndSlice};
   s.push();
   while(bound < bound_limit) {
+    expr rst = c.bv_const(("rst___#"+toStr(bound)).c_str(), 1);
+    s.add( rst == c.bv_val(0, 1) );
     toCoutVerb("### Begin bound: "+ toStr(bound));
     s.pop();
     goal g(c);

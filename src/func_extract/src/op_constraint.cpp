@@ -57,8 +57,8 @@ expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTain
     }
     else {
       varAndSliceTimed = varAndSlice + "___#" + toStr(timeIdx);
-      if(!isSolve && INPUT_EXPR_VAL.find(timed_name(varAndSlice, timeIdx)) != INPUT_EXPR_VAL.end() )
-        return *INPUT_EXPR_VAL[varAndSliceTimed];
+      //if(!isSolve && INPUT_EXPR_VAL.find(timed_name(varAndSlice, timeIdx)) != INPUT_EXPR_VAL.end() )
+      //  return *INPUT_EXPR_VAL[varAndSliceTimed];
     }
 
     return c.bv_const(varAndSliceTimed.c_str(), localWidth);
