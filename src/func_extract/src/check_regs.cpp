@@ -68,8 +68,8 @@ void check_single_reg_and_slice(std::string regAndSlice) {
   p.set("unsat_core", true);
   s.set(p);
   // block solution with positive rst
-  //expr rst = c.bool_const("rst___#1");
-  //s.add( rst == c.bool_val(false) );
+  expr rst = c.bv_const("rst___#1", 1);
+  s.add( rst == c.bv_val(0, 1) );
 
   std::vector<std::string> varToExpand{regAndSlice};
   s.push();
@@ -124,7 +124,7 @@ void check_single_reg_and_slice(std::string regAndSlice) {
         std::string var = v.name().str();
         if(!is_taint(var) && ( isInput(pure(var)) || isAs(pure(var)) )) {
           std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ " << v.name() << " = " << m.get_const_interp(v) << "\n";
-          if(isInput(pure(var))) {
+          if(isInput(pure(var)) || isAs(pure(var)) ) {
             expr *tmpPnt = new expr(m.get_const_interp(v));
             INPUT_EXPR_VAL.emplace(var, tmpPnt);
           }
@@ -134,15 +134,15 @@ void check_single_reg_and_slice(std::string regAndSlice) {
       }
 
       // after getting one solution, build a goal and simplify it with input values
-     // add_nb_constraint(g_varNode[regAndSlice], bound, c, s, g, bound, /*isSolve=*/false, /*isBool=*/false, /*isRoot=*/true);
-     // //add_all_clean_constraints(c, s, g, bound, /*isSolve=*/false);
-     // tactic t(c, "simplify");
-     // apply_result r = t(g);
-     // toCout("*************************  Update function for "+regAndSlice);
-     // std::cout << r << std::endl;
-     // for(uint32_t i = 0; i < r.size(); i++) {
-     //   std::cout << r[i] << std::endl;
-     // }
+      add_nb_constraint(g_varNode[regAndSlice], bound, c, s, g, bound, /*isSolve=*/false, /*isBool=*/false, /*isRoot=*/true);
+      //add_all_clean_constraints(c, s, g, bound, /*isSolve=*/false);
+      tactic t(c, "simplify");
+      apply_result r = t(g);
+      toCout("*************************  Update function for "+regAndSlice);
+      std::cout << r << std::endl;
+      for(uint32_t i = 0; i < r.size(); i++) {
+        std::cout << r[i] << std::endl;
+      }
 
       // begin block this solution for a new solution
       while( j < m.size() ) {
@@ -189,7 +189,7 @@ expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s
       push_dirty_queue(node, timeIdx);
     else
       push_clean_queue(node, timeIdx);
-    return var_expr(var, timeIdx, c, false);
+    return var_expr(var, timeIdx, c, false, isSolve);
   }
   else if( isReg(var) ) {
     return add_nb_constraint(node, timeIdx, c, s, g, bound, isSolve, isBool);
@@ -213,8 +213,8 @@ expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
     toCoutVerb("Add nb constraint for: " + dest+" ------  time: "+toStr(timeIdx));
     std::string destNext = node->srcVec.front();
 
-    destExpr = var_expr(dest, timeIdx, c, false);
-    destExpr_g = var_expr(dest, timeIdx+100, c, false);
+    destExpr = var_expr(dest, timeIdx, c, false, isSolve);
+    destExpr_g = var_expr(dest, timeIdx+100, c, false, isSolve);
     destNextExpr = add_constraint(node->childVec.front(), timeIdx+1, c, s, g, bound, isSolve);
     record_expr(destNextExpr);
     if(isSolve) {
@@ -223,8 +223,8 @@ expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
         toCout("Add-Solver: "+get_name(destExpr)+" == "+get_name(destNextExpr));
       }
 
-      expr destExpr_t = var_expr(dest, timeIdx, c, true);
-      expr destNextExpr_t = var_expr(destNext, timeIdx+1, c, true);  
+      expr destExpr_t = var_expr(dest, timeIdx, c, true, isSolve);
+      expr destNextExpr_t = var_expr(destNext, timeIdx+1, c, true, isSolve);  
       s.add(destExpr_t == destNextExpr_t);
       if(g_print_solver) {
         toCout("Add-Solver: "+get_name(destExpr_t)+" == "+get_name(destNextExpr_t));
@@ -310,7 +310,7 @@ void add_clean_constraint(astNode* const node, uint32_t timeIdx, context &c, sol
   // add clean taint
   expr destExpr_t(c);
   if(isSolve) {
-    destExpr_t = var_expr(dest, timeIdx, c, true);
+    destExpr_t = var_expr(dest, timeIdx, c, true, isSolve);
     s.add( destExpr_t == 0 );
     if(g_print_solver) {
       toCout("Add-Solver: "+get_name(destExpr_t)+" == 0");
@@ -349,8 +349,8 @@ void add_dirty_constraint(astNode* const node, uint32_t timeIdx, context &c, sol
   toCoutVerb("Add dirty constraint for: " + node->dest+" ------  time: "+toStr(timeIdx));  
   std::string dest = node->dest;
   uint32_t destWidth = get_var_slice_width(node->dest);
-  expr destExpr_t = var_expr(dest, timeIdx, c, true);  
-  expr destExpr = var_expr(dest, timeIdx, c, false);  
+  expr destExpr_t = var_expr(dest, timeIdx, c, true, true);  
+  expr destExpr = var_expr(dest, timeIdx, c, false, true);  
   s.add( destExpr_t == uint32_t(std::pow(2, destWidth)-1) );
   if(g_print_solver) {
     toCout("Add-Solver: "+get_name(destExpr_t)+" == "+toStr(uint32_t(std::pow(2, destWidth)-1)));

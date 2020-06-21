@@ -13,10 +13,14 @@ int main(int argc, char *argv[]) {
   std::string equal = "equal";
   std::string dest = "dest";
   std::string pos = "pos";
+  std::string rst = "rst";
+  std::string result = "result";
+  expr rstExpr = c.bv_const(rst.c_str(), 1);
   expr inputExpr = c.bv_const(input.c_str(), 2);
   expr equalExpr = c.bv_const(equal.c_str(), 1);
   expr equalBoolExpr = c.bool_const(equal.c_str());
   expr destExpr = c.bv_const(dest.c_str(), 1);
+  expr resultExpr = c.bv_const(result.c_str(), 1);
 
   expr twoBitOneExpr = c.bv_val(2, 2);
   expr oneExpr = c.bv_val(1, 1);
@@ -33,6 +37,8 @@ int main(int argc, char *argv[]) {
   //s.add( destExpr == ite(equalBoolExpr, oneExpr, zeroExpr) );
   //s.add( destExpr == ite( posExpr, oneExpr, zeroExpr) );
   s.add( destExpr == 1 );
+  s.add( resultExpr == ite( rstExpr == c.bv_val(1, 1), oneExpr, zeroExpr  ) );
+  s.add( resultExpr == 1 );
   if(s.check() == sat)
     std::cout << "yes!" << std::endl;
 

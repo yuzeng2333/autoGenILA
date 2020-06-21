@@ -13,7 +13,7 @@ using namespace z3;
 //extern std::regex pTwoOp;
 
 
-expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTaint, uint32_t width=0);
+expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTaint, bool isSolve, uint32_t width=0);
 
 expr bv_val(std::string var, context &c);
 
