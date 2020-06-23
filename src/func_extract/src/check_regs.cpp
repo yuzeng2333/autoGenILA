@@ -278,9 +278,9 @@ expr add_ssa_constraint(astNode* const node, uint32_t timeIdx, context &c, solve
     //case REDUCE1:
     //  return reduce_op_constraint(node, timeIdx, c, s, g, bound, isSolve);
     //  break;
-    //case SEL:
-    //  return sel_op_constraint(node, timeIdx, c, s, g, bound, isSolve);
-    //  break;
+    case SEL:
+      return sel_op_constraint(node, timeIdx, c, s, g, bound, isSolve);
+      break;
     //case SRC_CONCAT:
     //  return src_concat_op_constraint(node, timeIdx, c, s, g, bound, isSolve);
     //  break;

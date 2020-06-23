@@ -218,8 +218,62 @@ void reduce_op_constraint(astNode* const node, uint32_t timeIdx, context &c, sol
 }
 
 
-void sel_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve  ) {
-  toCoutVerb("Sel op constraint for :"+node->dest);  
+expr sel_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve  ) {
+  toCoutVerb("Sel op constraint for :"+node->dest);
+
+  std::smatch m;  
+  assert(node->srcVec.size() == 3);
+  std::string destAndSlice = node->dest;
+  std::string op1AndSlice = node->srcVec[0];
+  std::string op2AndSlice = node->srcVec[1];
+  std::string integer = node->srcVec[2];
+  std::string dest, destSlice;
+  std::string op1, op1Slice;
+  std::string op2, op2Slice;
+  split_slice(destAndSlice, dest, destSlice);
+  split_slice(op1AndSlice, op1, op1Slice);
+  split_slice(op2AndSlice, op2, op2Slice);
+
+  assert(!isMem(op1));
+  assert(!isMem(op2));
+  
+  bool op1IsNum = isNum(op1);
+  assert(!op1IsNum);
+  bool op2IsNum = isNum(op2);
+
+  expr destExpr(c);
+  destExpr = var_expr(destAndSlice, timeIdx, c, false, isSolve);
+
+  uint32_t localWidthNum = get_var_slice_width(op1AndSlice);  
+  expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true, isSolve);
+  expr op2Expr_t = var_expr(op2AndSlice, timeIdx, c, true, isSolve);
+  expr op1Expr(c);
+  expr op2Expr(c);
+  if(!op1IsNum)
+    op1Expr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve); 
+
+  if(!op2IsNum)
+    op2Expr = add_constraint(node->childVec[1], timeIdx, c, s, g, bound, isSolve);
+  else
+    op2Expr = var_expr(op2AndSlice, timeIdx, c, false, isSolve, localWidthNum);
+  
+  expr intExpr = var_expr(integer, timeIdx, c, false, isSolve);
+
+  // taint expression
+  if(isSolve) {
+    expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true, isSolve);
+    if(node->op == "sel1" || node->op == "sel2") {
+      s.add(destExpr_t == op1Expr_t.extract(op2Expr, intExpr));
+      s.add(destExpr == op1Expr.extract(op2Expr, intExpr));
+    }
+    else if(node->op == "sel3" || node->op == "sel4")
+      toCout("Error: sel3 and sel4 not supported yet!");
+    if(g_print_solver) {
+      toCout("Add-Solver: "+get_name(destExpr_t)+" == "+get_name(op1Expr_t) + " [ "+ get_name(op2Expr) + "+:" + get_name(intExpr) + "]");
+    }
+  }
+  // add expression to s or g
+  return op1Expr.extract(op2Expr, intExpr);
 }
 
 
@@ -299,15 +353,35 @@ expr ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
 
 template <class EXPR1, class EXPR2>
 expr make_z3_expr(solver &s, goal &g, context &c, std::string op, const expr& destExpr, EXPR1& op1Expr, EXPR2& op2Expr, bool isSolve) {
-  if(op == "&&") {
+  if(op == "&&" || op == "&") {
     if(isSolve)  {
       s.add( destExpr == (op1Expr & op2Expr) );
       if(g_print_solver) {      
-        toCout("Add-Solver: "+get_name(destExpr)+" == ( "+get_name(op1Expr)+" && "+get_name(op2Expr)+" )" );
+        toCout("Add-Solver: "+get_name(destExpr)+" == ( "+get_name(op1Expr)+" & "+get_name(op2Expr)+" )" );
       }
     }
     else        
       return (op1Expr & op2Expr);
+  }
+  else if(op == "||" || op == "|") {
+    if(isSolve)  {
+      s.add( destExpr == (op1Expr | op2Expr) );
+      if(g_print_solver) {      
+        toCout("Add-Solver: "+get_name(destExpr)+" == ( "+get_name(op1Expr)+" | "+get_name(op2Expr)+" )" );
+      }
+    }
+    else        
+      return (op1Expr | op2Expr);
+  }
+  else if(op == "^") {
+    if(isSolve)  {
+      s.add( destExpr == (op1Expr ^ op2Expr) );
+      if(g_print_solver) {      
+        toCout("Add-Solver: "+get_name(destExpr)+" == ( "+get_name(op1Expr)+" ^ "+get_name(op2Expr)+" )" );
+      }
+    }
+    else        
+      return (op1Expr ^ op2Expr);
   }
   else if (op == "==") {
     // TODO: use = or == in the following line?
@@ -319,6 +393,81 @@ expr make_z3_expr(solver &s, goal &g, context &c, std::string op, const expr& de
     }
     else         
       return ite(op1Expr == op2Expr, c.bv_val(1, 1), c.bv_val(0, 1));
+  }
+  else if (op == "!=") {
+    // TODO: use = or == in the following line?
+    if(isSolve) {
+      s.add( destExpr == ite(op1Expr != op2Expr, c.bv_val(1, 1), c.bv_val(0, 1)) );
+      if(g_print_solver) {      
+        toCout("Add-Solver: "+get_name(destExpr)+" == ite( "+get_name(op1Expr)+" != "+get_name(op2Expr)+", 1'b1, 1'b0 )" );
+      }
+    }
+    else         
+      return ite(op1Expr != op2Expr, c.bv_val(1, 1), c.bv_val(0, 1));
+  }
+  else if (op == ">") {
+    // TODO: use = or == in the following line?
+    if(isSolve) {
+      s.add( destExpr == ite(op1Expr > op2Expr, c.bv_val(1, 1), c.bv_val(0, 1)) );
+      if(g_print_solver) {      
+        toCout("Add-Solver: "+get_name(destExpr)+" == ite( "+get_name(op1Expr)+" > "+get_name(op2Expr)+", 1'b1, 1'b0 )" );
+      }
+    }
+    else         
+      return ite(op1Expr > op2Expr, c.bv_val(1, 1), c.bv_val(0, 1));
+  }
+  else if (op == ">=") {
+    // TODO: use = or == in the following line?
+    if(isSolve) {
+      s.add( destExpr == ite(op1Expr >= op2Expr, c.bv_val(1, 1), c.bv_val(0, 1)) );
+      if(g_print_solver) {      
+        toCout("Add-Solver: "+get_name(destExpr)+" == ite( "+get_name(op1Expr)+" >= "+get_name(op2Expr)+", 1'b1, 1'b0 )" );
+      }
+    }
+    else         
+      return ite(op1Expr >= op2Expr, c.bv_val(1, 1), c.bv_val(0, 1));
+  }
+  else if (op == "<") {
+    // TODO: use = or == in the following line?
+    if(isSolve) {
+      s.add( destExpr == ite(op1Expr < op2Expr, c.bv_val(1, 1), c.bv_val(0, 1)) );
+      if(g_print_solver) {      
+        toCout("Add-Solver: "+get_name(destExpr)+" == ite( "+get_name(op1Expr)+" < "+get_name(op2Expr)+", 1'b1, 1'b0 )" );
+      }
+    }
+    else         
+      return ite(op1Expr < op2Expr, c.bv_val(1, 1), c.bv_val(0, 1));
+  }
+  else if (op == "<=") {
+    // TODO: use = or == in the following line?
+    if(isSolve) {
+      s.add( destExpr == ite(op1Expr <= op2Expr, c.bv_val(1, 1), c.bv_val(0, 1)) );
+      if(g_print_solver) {      
+        toCout("Add-Solver: "+get_name(destExpr)+" == ite( "+get_name(op1Expr)+" <= "+get_name(op2Expr)+", 1'b1, 1'b0 )" );
+      }
+    }
+    else         
+      return ite(op1Expr <= op2Expr, c.bv_val(1, 1), c.bv_val(0, 1));
+  }
+  else if(op == "+") {
+    if(isSolve)  {
+      s.add( destExpr == (op1Expr + op2Expr) );
+      if(g_print_solver) {      
+        toCout("Add-Solver: "+get_name(destExpr)+" == ( "+get_name(op1Expr)+" + "+get_name(op2Expr)+" )" );
+      }
+    }
+    else        
+      return (op1Expr + op2Expr);
+  }
+  else if(op == "-") {
+    if(isSolve)  {
+      s.add( destExpr == (op1Expr + op2Expr) );
+      if(g_print_solver) {      
+        toCout("Add-Solver: "+get_name(destExpr)+" == ( "+get_name(op1Expr)+" - "+get_name(op2Expr)+" )" );
+      }
+    }
+    else        
+      return (op1Expr - op2Expr);
   }
   else {
     toCout("Not supported 2-op in make_z3_expr!!");

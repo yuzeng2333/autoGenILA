@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <cassert>
+#include <regex>
 #include "../../taint_method/taint_gen.h"
 #include "../../taint_method/helper.h"
 
@@ -63,6 +64,13 @@ void add_sel_op_node(std::string line, uint32_t timeIdx, astNode* const node);
 void add_src_concat_op_node(std::string line, uint32_t timeIdx, astNode* const node);
 
 void add_ite_op_node(std::string line, uint32_t timeIdx, astNode* const node);
+
+
+bool check_two_op(std::string line, std::string &op, std::string &dest, std::string &op1, std::string &op2, bool &isReduceOp);
+
+bool check_one_op(std::string line, std::string &op, std::string &dest, std::string &op1);
+
+bool check_sel_op(std::string line, std::string &op, std::string &dest, std::string &op1, std::string &op2, std::string &integer);
 
 #endif
 
