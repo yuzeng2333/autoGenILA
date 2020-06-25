@@ -13,7 +13,7 @@ uint32_t g_new_var;
 std::unordered_map<std::string, astNode*> g_varNode;
 // each element is a map from input signal to its value
 // x means the value can be arbitrary
-std::vector<std::unordered_map<std::string, std::string>> g_instr;;
+std::vector<struct instrInfo> g_instrInfo;
 
 
 std::regex pSingleLine (to_re("^(\\s*)assign (NAME) = (.*);$"));
@@ -125,26 +125,49 @@ void read_in_architectural_states(std::string fileName) {
 
 
 void read_in_instructions(std::string fileName) {
-  g_instr.clear();
+  g_instrInfo.clear();
   std::ifstream input(fileName);
   std::string line;
   std::smatch m;
-  uint32_t idx = 0;
-  bool firstElement;
+  enum State {FirstInstr, OtherInstr, WriteASV, ReadASV};
+  enum State state;
   while(std::getline(input, line)) {
     if(line.front() == '#') { // a new instr begins
-      firstElement = true;
+      state = FirstInstr;
     }
+    else if(line.front() == 'W') {
+      state = WriteASV;
+    }
+    else if(line.front() == 'R') {
+      state = WriteASV;
+    } 
     else { // still the old instruction
-      auto pos = line.find("=");
-      std::string instrName = line.sub(0, pos-1);
-      std::string encoding = line.sub(pos+1);
-      if(firstElement) {
-        std::unordered_map<std::string, std::string> mp = {{instrName, encoding}};
-        g_instr.push_back(mp);
-      }
-      else {
-        g_instr.back().emplace(instrName, encoding);
+      switch(state) {
+        case FirstInstr:
+          {
+            auto pos = line.find("=");
+            std::string instrName = line.substr(0, pos-1);
+            std::string encoding = line.substr(pos+1);
+            struct instrInfo info = { {{instrName, encoding}}, std::vector<std::string>{}, std::vector<std::string>{} };
+            //info.instrEncoding.emplace(instrName, encoding);
+            g_instrInfo.push_back(info);
+            state = OtherInstr;
+          }
+          break;
+        case OtherInstr:
+          {
+            auto pos = line.find("=");
+            std::string instrName = line.substr(0, pos-1);
+            std::string encoding = line.substr(pos+1);
+            g_instrInfo.back().instrEncoding.emplace(instrName, encoding);
+          }
+          break;
+        case WriteASV:
+          g_instrInfo.back().writeASV.push_back(line);
+          break;
+        case ReadASV:
+          g_instrInfo.back().readASV.push_back(line);          
+          break;
       }
     }
   }

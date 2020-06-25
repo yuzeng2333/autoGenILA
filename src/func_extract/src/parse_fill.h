@@ -32,4 +32,10 @@ void parse_verilog(std::string fileName);
 void read_in_architectural_states(std::string fileName);
 
 void read_in_instructions(std::string fileName);
+
+struct instrInfo {
+  std::unordered_map<std::string, std::string> instrEncoding;
+  std::vector<std::string> readASV;
+  std::vector<std::string> writeASV;
+};
 #endif

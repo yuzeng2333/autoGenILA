@@ -12,4 +12,5 @@ extern std::unordered_map<std::string, expr*> TIMED_VAR2EXPR;
 extern std::set<std::string> INT_EXPR_SET;
 
 extern bool g_print_solver;
+
 #endif
