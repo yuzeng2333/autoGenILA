@@ -15,9 +15,11 @@ int main(int argc, char *argv[]) {
   g_print_solver = false;
   std::string vlgFile = argv[1];
   std::string asFile = argv[2];
+  std::string instrFile = argv[3];
   clear_global_vars();
   parse_verilog(vlgFile);
   read_in_architectural_states(asFile);
+  read_in_instructions(instrFile);
   build_ast_tree();
   check_all_regs(); 
   return 0;

@@ -11,6 +11,9 @@ std::unordered_map<std::string, std::string> g_nbTable;
 uint32_t g_new_var;
 //std::unordered_map<std::string, astNode*> g_asSliceRoot;
 std::unordered_map<std::string, astNode*> g_varNode;
+// each element is a map from input signal to its value
+// x means the value can be arbitrary
+std::vector<std::unordered_map<std::string, std::string>> g_instr;;
 
 
 std::regex pSingleLine (to_re("^(\\s*)assign (NAME) = (.*);$"));
@@ -117,6 +120,33 @@ void read_in_architectural_states(std::string fileName) {
       abort();
     }
     moduleAs.insert(m.str(0));
+  }
+}
+
+
+void read_in_instructions(std::string fileName) {
+  g_instr.clear();
+  std::ifstream input(fileName);
+  std::string line;
+  std::smatch m;
+  uint32_t idx = 0;
+  bool firstElement;
+  while(std::getline(input, line)) {
+    if(line.front() == '#') { // a new instr begins
+      firstElement = true;
+    }
+    else { // still the old instruction
+      auto pos = line.find("=");
+      std::string instrName = line.sub(0, pos-1);
+      std::string encoding = line.sub(pos+1);
+      if(firstElement) {
+        std::unordered_map<std::string, std::string> mp = {{instrName, encoding}};
+        g_instr.push_back(mp);
+      }
+      else {
+        g_instr.back().emplace(instrName, encoding);
+      }
+    }
   }
 }
 
