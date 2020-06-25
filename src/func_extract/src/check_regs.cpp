@@ -55,6 +55,7 @@ void clean_data() {
 // constructed only one. But the SMT equation may need to be constructed
 // multiple times, until a solution is obtained or a bound is reached.
 void check_single_reg_and_slice(std::string regAndSlice) {
+  std::string rootNode = regAndSlice;
   clean_data();
   toCout("========== Begin check SAT for: "+regAndSlice+" ==========");
   uint32_t regWidth = get_var_slice_width(regAndSlice);
@@ -67,15 +68,17 @@ void check_single_reg_and_slice(std::string regAndSlice) {
   params p(c);
   p.set("unsat_core", true);
   s.set(p);
+  std::unordered_map<std::string, expr*> last_input_expr_val;
+  std::set<std::string> changedVal;
   // block solution with positive rst
 
   std::vector<std::string> varToExpand{regAndSlice};
   s.push();
   while(bound < bound_limit) {
+    s.pop();    
     expr rst = c.bv_const(("rst___#"+toStr(bound)).c_str(), 1);
     s.add( rst == c.bv_val(0, 1) );
     toCoutVerb("### Begin bound: "+ toStr(bound));
-    s.pop();
     goal g(c);
     for(std::string rootReg: varToExpand) {
       if(g_varNode.find(rootReg) == g_varNode.end()) {
@@ -140,9 +143,39 @@ void check_single_reg_and_slice(std::string regAndSlice) {
       apply_result r = t(g);
       toCout("*************************  Update function for "+regAndSlice);
       std::cout << r << std::endl;
-      for(uint32_t i = 0; i < r.size(); i++) {
-        std::cout << r[i] << std::endl;
+      // if two goals are the same, then check the two solutions. If any
+      // varriable is different in the two solutions, fix it.
+      changedVal.clear();
+      if(!last_input_expr_val.empty()) {
+        for(auto it = INPUT_EXPR_VAL.begin(); it != INPUT_EXPR_VAL.end(); it++) {
+          if(rootNode.compare(pure(it->first)) == 0)
+            continue;
+          if(last_input_expr_val.find(it->first) == last_input_expr_val.end()) {
+            toCout("Error: not found in last_input_expr_val: "+it->first);
+            abort();
+          }
+          if(*(it->second) != *last_input_expr_val[it->first]) {
+            changedVal.insert(it->first);
+          }
+        }
       }
+      
+      // fix values for variables in changedVal
+      for(auto timedVar: changedVal) {
+        std::string pureVar = pure(timedVar);
+        uint32_t localWidth = get_var_slice_width(pureVar);
+        expr localExpr = c.bv_const(timedVar.c_str(), localWidth);
+        s.add( localExpr == *INPUT_EXPR_VAL[timedVar] );
+        toCout("######## Fix "+timedVar );
+      }
+
+      // update last_input_expr_val
+      last_input_expr_val.clear();
+      last_input_expr_val.insert( INPUT_EXPR_VAL.begin(), INPUT_EXPR_VAL.end() );
+
+      //for(uint32_t i = 0; i < r.size(); i++) {
+      //  std::cout << r[i] << std::endl;
+      //}
 
       // begin block this solution for a new solution
       while( j < m.size() ) {

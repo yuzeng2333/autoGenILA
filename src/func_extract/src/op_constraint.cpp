@@ -327,7 +327,7 @@ expr ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
     expr op2Expr_t = var_expr(op2AndSlice, timeIdx, c, true, isSolve, localWidthNum);
     //expr condBoolExpr = c.bool_const((condExpr.decl().name()+"_bool".c_str()));
     //s.add( condBoolExpr == (condExpr > 0) );
-    s.add( destExpr_t == ite( condExpr == c.bv_val(1, 1), op1Expr_t | condExpr_t, op2Expr_t | condExpr_t) );
+    s.add( destExpr_t == ite( condExpr == c.bv_val(1, 1), op1Expr_t | sext(condExpr_t, localWidthNum-1), op2Expr_t | sext(condExpr_t, localWidthNum-1) ) );
     if(g_print_solver) {
       toCout("Add-Solver: "+get_name(destExpr_t)+" == ite("+get_name(condExpr)+" == 1'b1, "+get_name(op1Expr_t)+" | "+get_name(condExpr_t)+", "+get_name(op2Expr_t)+" | "+get_name(condExpr_t)+" )" );
     }

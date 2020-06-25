@@ -6,48 +6,27 @@ using namespace z3;
 
 //expr or_expr(std::)
 
+expr sext(expr const& e, uint32_t added_len) {
+  return to_expr(e.ctx(), Z3_mk_sign_ext(e.ctx(), added_len, e));
+}
+
 int main(int argc, char *argv[]) {
   context c;
   solver s(c);
-  std::string input = "input";
-  std::string equal = "equal";
-  std::string dest = "dest";
-  std::string pos = "pos";
-  std::string rst = "rst";
-  std::string result = "result";
-  expr rstExpr = c.bv_const(rst.c_str(), 1);
-  expr inputExpr = c.bv_const(input.c_str(), 2);
-  expr equalExpr = c.bv_const(equal.c_str(), 1);
-  expr equalBoolExpr = c.bool_const(equal.c_str());
-  expr destExpr = c.bv_const(dest.c_str(), 1);
-  expr resultExpr = c.bv_const(result.c_str(), 1);
-
-  expr twoBitOneExpr = c.bv_val(2, 2);
-  expr oneExpr = c.bv_val(1, 1);
-  expr zeroExpr = c.bv_val(0, 1);
-  expr trueExpr = c.bool_val(true);
-  expr falseExpr = c.bool_val(false);
-  s.add( equalExpr == ite(inputExpr == twoBitOneExpr, oneExpr, zeroExpr) );
-  s.add( equalBoolExpr == ite(inputExpr == twoBitOneExpr, trueExpr, falseExpr) );
-
-  //expr posExpr = c.bool_const(pos.c_str());
-  //s.add( posExpr  c.bool_val(equalExpr == c.bv_val(1,1)) ) ;
-  //s.add( posExpr == equalBoolExpr ) ;
-  s.add( destExpr == ite( equalExpr == c.bv_val(1, 1) , oneExpr, zeroExpr) );
-  //s.add( destExpr == ite(equalBoolExpr, oneExpr, zeroExpr) );
-  //s.add( destExpr == ite( posExpr, oneExpr, zeroExpr) );
-  s.add( destExpr == 1 );
-  s.add( resultExpr == ite( rstExpr == c.bv_val(1, 1), oneExpr, zeroExpr  ) );
-  s.add( resultExpr == 1 );
-  if(s.check() == sat)
-    std::cout << "yes!" << std::endl;
-
-  model m = s.get_model();  
-  for (uint32_t i = 0; i < m.size(); i++) {
-    func_decl v = m[i];
-    std::cout << v.name() << " = " << m.get_const_interp(v) << "\n";
-  }        
+  expr a = c.bv_const("a", 1);
+  expr b = c.bv_const("b", 2);
+  expr d = c.bv_const("c", 2);
+  expr w = c.bv_val("width", 2);
+  expr e = ule(b, d);
+  //expr f = to_expr(c, Z3_mk_sign_ext(c, 1, a));
+  //expr f = sext(a, 2);
+  expr f = sext(a, 1);
+  s.add( d == (f | b) );
+  if(s.check() == sat) {
+    model m = s.get_model();
+    for (uint32_t i = 0; i < m.size(); i++) {
+      func_decl v = m[i];
+      std::cout << v.name() << " = " << m.get_const_interp(v) << "\n";
+    }
+  }
 }
-
-
-

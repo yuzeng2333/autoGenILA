@@ -4,6 +4,8 @@
 
 #define toStr(a) std::to_string(a)
 
+using namespace z3;
+
 bool isAs(std::string var) {
   auto it = std::find( moduleAs.begin(), moduleAs.end(), var );
   return it != moduleAs.end();
@@ -37,11 +39,18 @@ uint32_t hdb2int(std::string num) {
   }
 }
 
+
 std::string timed_name(std::string name, uint32_t timeIdx) {
   return name + "___#" + toStr(timeIdx);
 }
 
+
 void record_expr(expr varExpr) {
   expr *tmpPnt = new expr(varExpr);
   TIMED_VAR2EXPR.emplace(varExpr.decl().name().str(), tmpPnt);
+}
+
+
+expr sext(expr const& e, uint32_t added_len) {
+  return to_expr(e.ctx(), Z3_mk_sign_ext(e.ctx(), added_len, e));
 }
