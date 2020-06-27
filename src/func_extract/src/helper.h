@@ -20,4 +20,8 @@ std::string timed_name(std::string name, uint32_t timeIdx);
 void record_expr(expr varExpr);
 
 expr sext(expr const& e, uint32_t added_len);
+
+bool is_root(std::string var);
+
+bool has_explicit_value(std::string input);
 #endif

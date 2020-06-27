@@ -54,3 +54,18 @@ void record_expr(expr varExpr) {
 expr sext(expr const& e, uint32_t added_len) {
   return to_expr(e.ctx(), Z3_mk_sign_ext(e.ctx(), added_len, e));
 }
+
+
+bool is_root(std::string var) {
+  return var.compare(g_rootNode) == 0;
+}
+
+
+bool has_explicit_value(std::string input) {
+  if(g_currInstrInfo.instrEncoding.find(input) == g_currInstrInfo.instrEncoding.end())
+    return false;
+  if(g_currInstrInfo.instrEncoding[input] == "x" )
+    return false;
+  else
+    return true;
+}

@@ -125,6 +125,7 @@ void read_in_architectural_states(std::string fileName) {
 
 
 void read_in_instructions(std::string fileName) {
+  moduleAs.clear();
   g_instrInfo.clear();
   std::ifstream input(fileName);
   std::string line;
@@ -139,7 +140,7 @@ void read_in_instructions(std::string fileName) {
       state = WriteASV;
     }
     else if(line.front() == 'R') {
-      state = WriteASV;
+      state = ReadASV;
     } 
     else { // still the old instruction
       switch(state) {
@@ -147,8 +148,9 @@ void read_in_instructions(std::string fileName) {
           {
             auto pos = line.find("=");
             std::string instrName = line.substr(0, pos-1);
-            std::string encoding = line.substr(pos+1);
-            struct instrInfo info = { {{instrName, encoding}}, std::vector<std::string>{}, std::vector<std::string>{} };
+            std::string encoding = line.substr(pos+2);
+            assert(encoding == "x" || isNum(encoding));
+            struct instrInfo info = { {{instrName, encoding}}, std::set<std::string>{}, std::set<std::string>{} };
             //info.instrEncoding.emplace(instrName, encoding);
             g_instrInfo.push_back(info);
             state = OtherInstr;
@@ -158,15 +160,18 @@ void read_in_instructions(std::string fileName) {
           {
             auto pos = line.find("=");
             std::string instrName = line.substr(0, pos-1);
-            std::string encoding = line.substr(pos+1);
+            std::string encoding = line.substr(pos+2);
+            assert(encoding == "x" || isNum(encoding));            
             g_instrInfo.back().instrEncoding.emplace(instrName, encoding);
           }
           break;
         case WriteASV:
-          g_instrInfo.back().writeASV.push_back(line);
+          g_instrInfo.back().writeASV.insert(line);
+          moduleAs.insert(line);
           break;
         case ReadASV:
-          g_instrInfo.back().readASV.push_back(line);          
+          g_instrInfo.back().readASV.insert(line);
+          moduleAs.insert(line);
           break;
       }
     }

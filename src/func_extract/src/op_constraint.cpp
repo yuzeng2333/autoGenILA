@@ -33,7 +33,7 @@ expr var_width_expr(std::string var, uint32_t width, context &c) {
 
 
 // returned _t is 0 for number, returned var is its value for int
-expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTaint, bool isSolve, uint32_t width) {
+expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTaint, uint32_t width) {
   std::string varAndSliceTimed;
   uint32_t localWidth;
   if(width == 0)
@@ -90,13 +90,15 @@ expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver 
   //if(isBool)
   //  destExpr = bool_expr(dest, timeIdx, c);
   //else
-  destExpr = var_expr(dest, timeIdx, c, false, isSolve);
+  destExpr = var_expr(dest, timeIdx, c, false);
   if(isSolve) {
-    destExpr_t = var_expr(dest, timeIdx, c, true, isSolve);
+    destExpr_t = var_expr(dest, timeIdx, c, true);
     set_zero(s, destExpr_t);
   }
   else {
-    return *INPUT_EXPR_VAL[timed_name(dest, timeIdx)];
+    if( INPUT_EXPR_VAL.find(timed_name(dest, timeIdx)) != INPUT_EXPR_VAL.end() 
+        && has_explicit_value(dest) )
+      return *INPUT_EXPR_VAL[timed_name(dest, timeIdx)];
     //expr localVal = *INPUT_EXPR_VAL[timed_name(dest, timeIdx)];
     //g.add( destExpr = localVal ); 
   }
@@ -108,9 +110,9 @@ expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver 
 expr num_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, bool isSolve) {
   std::string dest = node->dest;
   expr destExpr_t(c);
-  expr destExpr = var_expr(dest, timeIdx, c, false, isSolve);
+  expr destExpr = var_expr(dest, timeIdx, c, false);
   if(isSolve) {
-    destExpr_t = var_expr(dest, timeIdx, c, true, isSolve);
+    destExpr_t = var_expr(dest, timeIdx, c, true);
     set_zero(s, destExpr_t);
   }
   return destExpr;
@@ -140,49 +142,67 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
 
   expr destExpr(c);
   //if(!isReduceOp && !is_bool_op(node->op))
-    destExpr = var_expr(destAndSlice, timeIdx, c, false, isSolve);
+    destExpr = var_expr(destAndSlice, timeIdx, c, false);
   //else
   //  destExpr = bool_expr(destAndSlice, timeIdx, c, false);
 
   uint32_t localWidthNum = std::max(get_var_slice_width(op1AndSlice), get_var_slice_width(op2AndSlice));
-  expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true, isSolve, localWidthNum);
-  expr op2Expr_t = var_expr(op2AndSlice, timeIdx, c, true, isSolve, localWidthNum);
+  expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true, localWidthNum);
+  expr op2Expr_t = var_expr(op2AndSlice, timeIdx, c, true, localWidthNum);
+  assert(!op1Expr_t.is_bool());
+  assert(!op2Expr_t.is_bool());
   expr op1Expr(c);
   expr op2Expr(c);
   if(!op1IsNum)
     op1Expr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve); 
   else
-    op1Expr = var_expr(op1AndSlice, timeIdx, c, false, isSolve, localWidthNum);
+    op1Expr = var_expr(op1AndSlice, timeIdx, c, false, localWidthNum);
 
   if(!op2IsNum)
     op2Expr = add_constraint(node->childVec[1], timeIdx, c, s, g, bound, isSolve);
   else
-    op2Expr = var_expr(op2AndSlice, timeIdx, c, false, isSolve, localWidthNum);
+    op2Expr = var_expr(op2AndSlice, timeIdx, c, false, localWidthNum);
+
+  expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
+  
+  bool op1IsCleanRoot = is_root(op1AndSlice) && is_clean(op1AndSlice);
+  bool op2IsCleanRoot = is_root(op2AndSlice) && is_clean(op2AndSlice);
 
   // taint expression
-  if(!isReduceOp) {
-    if(isSolve) {
-      expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true, isSolve);
-      if(op1Expr_t.is_bool()) {
-        assert(op2Expr_t.is_bool());
-        assert(destExpr_t.is_bool());
-        s.add(destExpr_t == (op1Expr_t || op2Expr_t) );
+  if(isSolve) {
+    if(!op1IsCleanRoot && !op2IsCleanRoot) {
+      if(!isReduceOp) {
+        s.add(destExpr_t == (op1Expr_t | op2Expr_t));
+        if(g_print_solver) toCout("Add-Solver: "+get_name(destExpr_t)+" == "+get_name(op1Expr_t) + " | "+ get_name(op2Expr_t));
       }
       else {
-        s.add(destExpr_t == (op1Expr_t | op2Expr_t));
-      }
-      if(g_print_solver) {
-        toCout("Add-Solver: "+get_name(destExpr_t)+" == "+get_name(op1Expr_t) + " | "+ get_name(op2Expr_t));
+        s.add(destExpr_t == ite( (op1Expr_t | op2Expr_t) != 0, c.bv_val(1, 1), c.bv_val(0, 1) ) );
+        if(g_print_solver) toCout("Add-Solver: "+get_name(destExpr_t)+" == "+get_name(op1Expr_t) + " | "+ get_name(op2Expr_t) + " != 0");
       }
     }
-  }
-  else {
-    if(isSolve) {
-      expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true, isSolve);
-      s.add(destExpr_t == ite( (op1Expr_t | op2Expr_t) != 0, c.bv_val(1, 1), c.bv_val(0, 1) ) );
-      if(g_print_solver) {
-        toCout("Add-Solver: "+get_name(destExpr_t)+" == "+get_name(op1Expr_t) + " | "+ get_name(op2Expr_t) + " != 0");
+    else if(!op1IsCleanRoot && op2IsCleanRoot) {
+      if(!isReduceOp) {
+        s.add(destExpr_t == op1Expr_t );
+        if(g_print_solver) toCout("Add-Solver: "+get_name(destExpr_t)+" == "+get_name(op1Expr_t) );
       }
+      else {
+        s.add(destExpr_t == ite( op1Expr_t != 0, c.bv_val(1, 1), c.bv_val(0, 1) ) );
+        if(g_print_solver) toCout("Add-Solver: "+get_name(destExpr_t)+" == "+get_name(op1Expr_t) + " != 0");
+      }
+    }
+    else if(op1IsCleanRoot && !op2IsCleanRoot) {
+      if(!isReduceOp) {
+        s.add(destExpr_t == op2Expr_t );
+        if(g_print_solver) toCout("Add-Solver: "+get_name(destExpr_t)+" == "+get_name(op2Expr_t) );
+      }
+      else {
+        s.add(destExpr_t == ite( op2Expr_t != 0, c.bv_val(1, 1), c.bv_val(0, 1) ) );
+        if(g_print_solver) toCout("Add-Solver: "+get_name(destExpr_t)+" == "+get_name(op2Expr_t) + " != 0");
+      }
+    }
+    else { // both op are roots
+      s.add( destExpr_t == 0 );
+      if(g_print_solver) toCout("Add-Solver: "+get_name(destExpr_t)+" == 0" );      
     }
   }
   // add expression to s or g
@@ -201,12 +221,12 @@ void one_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   split_slice(destAndSlice, dest, destSlice);
   split_slice(op1AndSlice, op1, op1Slice);
 
-  expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true, isSolve);
-  expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true, isSolve);
+  expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
+  expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true);
   s.add( destExpr_t == op1Expr_t );
 
-  expr destExpr = var_expr(destAndSlice, timeIdx, c, false, isSolve);
-  expr op1Expr = var_expr(op1AndSlice, timeIdx, c, false, isSolve);
+  expr destExpr = var_expr(destAndSlice, timeIdx, c, false);
+  expr op1Expr = var_expr(op1AndSlice, timeIdx, c, false);
   make_z3_expr(s, g, c, node->op, destExpr, op1Expr);
 
   add_child_constraint(node, timeIdx, c, s, g, bound, isSolve);
@@ -224,9 +244,9 @@ expr sel_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   std::smatch m;  
   assert(node->srcVec.size() == 3);
   std::string destAndSlice = node->dest;
-  std::string op1AndSlice = node->srcVec[0];
-  std::string op2AndSlice = node->srcVec[1];
-  std::string integer = node->srcVec[2];
+  std::string op1AndSlice = node->srcVec[0]; // op1 is var to be selected
+  std::string op2AndSlice = node->srcVec[1]; // op2 is start index
+  std::string integer = node->srcVec[2];     // integer is the length of range
   std::string dest, destSlice;
   std::string op1, op1Slice;
   std::string op2, op2Slice;
@@ -242,11 +262,11 @@ expr sel_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   bool op2IsNum = isNum(op2);
 
   expr destExpr(c);
-  destExpr = var_expr(destAndSlice, timeIdx, c, false, isSolve);
+  destExpr = var_expr(destAndSlice, timeIdx, c, false);
 
   uint32_t localWidthNum = get_var_slice_width(op1AndSlice);  
-  expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true, isSolve);
-  expr op2Expr_t = var_expr(op2AndSlice, timeIdx, c, true, isSolve);
+  expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true);
+  expr op2Expr_t = var_expr(op2AndSlice, timeIdx, c, true);
   expr op1Expr(c);
   expr op2Expr(c);
   if(!op1IsNum)
@@ -255,13 +275,13 @@ expr sel_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   if(!op2IsNum)
     op2Expr = add_constraint(node->childVec[1], timeIdx, c, s, g, bound, isSolve);
   else
-    op2Expr = var_expr(op2AndSlice, timeIdx, c, false, isSolve, localWidthNum);
+    op2Expr = var_expr(op2AndSlice, timeIdx, c, false, localWidthNum);
   
-  expr intExpr = var_expr(integer, timeIdx, c, false, isSolve);
+  expr intExpr = var_expr(integer, timeIdx, c, false);
 
   // taint expression
   if(isSolve) {
-    expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true, isSolve);
+    expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
     if(node->op == "sel1" || node->op == "sel2") {
       s.add(destExpr_t == op1Expr_t.extract(op2Expr, intExpr));
       s.add(destExpr == op1Expr.extract(op2Expr, intExpr));
@@ -314,17 +334,17 @@ expr ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   bool op1IsNum = isNum(op1);
   bool op2IsNum = isNum(op2);
  
-  expr destExpr = var_expr(destAndSlice, timeIdx, c, false, isSolve);
+  expr destExpr = var_expr(destAndSlice, timeIdx, c, false);
   expr condExpr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve, true);
-  expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true, isSolve);
-  expr condExpr_t = var_expr(condAndSlice, timeIdx, c, true, isSolve);
+  expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
+  expr condExpr_t = var_expr(condAndSlice, timeIdx, c, true);
 
   expr op1Expr = add_constraint(node->childVec[1], timeIdx, c, s, g, bound, isSolve);
   expr op2Expr = add_constraint(node->childVec[2], timeIdx, c, s, g, bound, isSolve);
 
   if(isSolve) {
-    expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true, isSolve, localWidthNum);
-    expr op2Expr_t = var_expr(op2AndSlice, timeIdx, c, true, isSolve, localWidthNum);
+    expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true, localWidthNum);
+    expr op2Expr_t = var_expr(op2AndSlice, timeIdx, c, true, localWidthNum);
     //expr condBoolExpr = c.bool_const((condExpr.decl().name()+"_bool".c_str()));
     //s.add( condBoolExpr == (condExpr > 0) );
     s.add( destExpr_t == ite( condExpr == c.bv_val(1, 1), op1Expr_t | sext(condExpr_t, localWidthNum-1), op2Expr_t | sext(condExpr_t, localWidthNum-1) ) );
@@ -366,7 +386,7 @@ expr make_z3_expr(solver &s, goal &g, context &c, std::string op, const expr& de
   else if(op == "||" || op == "|") {
     if(isSolve)  {
       s.add( destExpr == (op1Expr | op2Expr) );
-      if(g_print_solver) {      
+      if(g_print_solver) {
         toCout("Add-Solver: "+get_name(destExpr)+" == ( "+get_name(op1Expr)+" | "+get_name(op2Expr)+" )" );
       }
     }

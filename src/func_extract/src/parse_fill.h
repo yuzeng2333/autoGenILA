@@ -35,7 +35,7 @@ void read_in_instructions(std::string fileName);
 
 struct instrInfo {
   std::unordered_map<std::string, std::string> instrEncoding;
-  std::vector<std::string> readASV;
-  std::vector<std::string> writeASV;
+  std::set<std::string> readASV;
+  std::set<std::string> writeASV;
 };
 #endif

@@ -42,7 +42,9 @@ void push_dirty_queue(astNode* node, uint32_t timeIdx);
 
 void add_all_dirty_constraints(context &c, solver &s, uint32_t bound);
 
-void save_dirty_nodes_for_expand(std::vector<std::string> &varToExpand);
+void add_input_values(context &c, solver &s, uint32_t bound);
+
+void save_regs_for_expand(std::vector<std::string> &varToExpand);
 
 bool is_in_clean_queue(std::string var);
 
@@ -52,7 +54,9 @@ std::string pure(std::string var);
 
 bool is_taint(std::string var);
 
-bool is_clean(std::string var, std::string root);
+bool is_clean(std::string var);
 
 std::string get_name(expr expression);
+
+bool is_read_asv(std::string var);
 #endif

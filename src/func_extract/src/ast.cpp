@@ -24,7 +24,7 @@ void build_ast_tree() {
 
 
 void build_tree_for_single_as(std::string regAndSlice) {
-  g_visitedNode.clear();
+  //g_visitedNode.clear();
   toCoutVerb("### Begin build: "+regAndSlice);
   uint32_t regWidth = get_var_slice_width(regAndSlice);
   astNode* root = new astNode;

@@ -11,6 +11,9 @@ extern std::unordered_map<std::string, expr*> INPUT_EXPR_VAL;
 extern std::unordered_map<std::string, expr*> TIMED_VAR2EXPR;
 extern std::set<std::string> INT_EXPR_SET;
 
+extern std::vector<struct instrInfo> g_instrInfo;
 extern bool g_print_solver;
-
+extern std::set<std::string> g_readASV;
+extern std::string g_rootNode;
+extern struct instrInfo g_currInstrInfo;
 #endif
