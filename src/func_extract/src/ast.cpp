@@ -28,7 +28,6 @@ void build_tree_for_single_as(std::string regAndSlice) {
   toCoutVerb("### Begin build: "+regAndSlice);
   uint32_t regWidth = get_var_slice_width(regAndSlice);
   astNode* root = new astNode;
-  g_varNode.emplace(regAndSlice, root);
   add_node(regAndSlice, 0, root, true);
 }
 
@@ -36,6 +35,7 @@ void build_tree_for_single_as(std::string regAndSlice) {
 void add_node(std::string var, uint32_t timeIdx, astNode* const node, bool varIsDest) {
   if(g_visitedNode.find(var) != g_visitedNode.end())
     return;
+  g_varNode.emplace(var, node);  
   if ( isInput(var) ) {
     add_input_node(var, timeIdx, node);
   }

@@ -134,6 +134,21 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   split_slice(op1AndSlice, op1, op1Slice);
   split_slice(op2AndSlice, op2, op2Slice);
 
+  uint32_t op1Hi;
+  uint32_t op1Lo;
+  uint32_t op2Hi;
+  uint32_t op2Lo;
+
+  if(!op1Slice.empty()) {
+    op1Hi = get_end(op1Slice);
+    op1Lo = get_begin(op1Slice);
+  }
+
+  if(!op2Slice.empty()) {
+    op2Hi = get_end(op2Slice);
+    op2Lo = get_begin(op2Slice);
+  }
+
   assert(!isMem(op1));
   assert(!isMem(op2));
   
@@ -159,12 +174,14 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   expr op1Expr(c);
   expr op2Expr(c);
   if(!op1IsNum)
-    op1Expr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve); 
+    if(!op1Slice.empty())  op1Expr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve).extract(op1Hi, op1Lo); 
+    else                   op1Expr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve); 
   else
     op1Expr = var_expr(op1AndSlice, timeIdx, c, false, op1WidthNum);
 
   if(!op2IsNum)
-    op2Expr = add_constraint(node->childVec[1], timeIdx, c, s, g, bound, isSolve);
+    if(!op2Slice.empty()) op2Expr = add_constraint(node->childVec[1], timeIdx, c, s, g, bound, isSolve).extract(op2Hi, op2Lo);
+    else                  op2Expr = add_constraint(node->childVec[1], timeIdx, c, s, g, bound, isSolve);
   else
     op2Expr = var_expr(op2AndSlice, timeIdx, c, false, op2WidthNum);
 
@@ -266,6 +283,21 @@ expr sel_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   split_slice(op1AndSlice, op1, op1Slice);
   split_slice(op2AndSlice, op2, op2Slice);
 
+  uint32_t op1Hi;
+  uint32_t op1Lo;
+  uint32_t op2Hi;
+  uint32_t op2Lo;
+
+  if(!op1Slice.empty()) {
+    op1Hi = get_end(op1Slice);
+    op1Lo = get_begin(op1Slice);
+  }
+
+  if(!op2Slice.empty()) {
+    op2Hi = get_end(op2Slice);
+    op2Lo = get_begin(op2Slice);
+  }
+
   assert(!isMem(op1));
   assert(!isMem(op2));
   
@@ -283,10 +315,12 @@ expr sel_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   expr op1Expr(c);
   expr op2Expr(c);
   if(!op1IsNum)
-    op1Expr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve); 
+    if(!op1Slice.empty()) op1Expr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve).extract(op1Hi, op1Lo);
+    else                  op1Expr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve);
 
   if(!op2IsNum)
-    op2Expr = add_constraint(node->childVec[1], timeIdx, c, s, g, bound, isSolve);
+    if(!op2Slice.empty()) op2Expr = add_constraint(node->childVec[1], timeIdx, c, s, g, bound, isSolve).extract(op2Hi, op2Lo);
+    else                  op2Expr = add_constraint(node->childVec[1], timeIdx, c, s, g, bound, isSolve);
   else
     op2Expr = var_expr(op2AndSlice, timeIdx, c, false, op1WidthNum);
   
@@ -358,46 +392,82 @@ expr ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   split_slice(op1AndSlice , op1, op1Slice);
   split_slice(op2AndSlice , op2, op2Slice);
 
+  uint32_t condHi;
+  uint32_t condLo;
+  uint32_t op1Hi; 
+  uint32_t op1Lo; 
+  uint32_t op2Hi; 
+  uint32_t op2Lo; 
+
+  if(!condSlice.empty()) {
+    condHi = get_end(condSlice);
+    condLo = get_begin(condSlice);
+  }
+
+  if(!op1Slice.empty()) {
+    op1Hi = get_end(op1Slice);
+    op1Lo = get_begin(op1Slice);
+  }
+
+  if(!op2Slice.empty()) {
+    op2Hi = get_end(op2Slice);
+    op2Lo = get_begin(op2Slice);
+  }
+
   assert(!isMem(op1));    
   assert(!isMem(op2));    
 
-  uint32_t localWidthNum;
-  std::string localWidth;
-  localWidthNum = get_var_slice_width(destAndSlice);
+  uint32_t destWidthNum;
+  uint32_t op1WidthNum;
+  uint32_t op2WidthNum;
+  std::string destWidth;
+  destWidthNum = get_var_slice_width(destAndSlice);
+  op1WidthNum = get_var_slice_width(op1AndSlice);
+  op2WidthNum = get_var_slice_width(op2AndSlice);
   uint32_t condWidth = get_var_slice_width(condAndSlice);
 
-  localWidth = std::to_string(localWidthNum);
+  destWidth = std::to_string(destWidthNum);
 
   bool op1IsNum = isNum(op1);
   bool op2IsNum = isNum(op2);
  
   expr destExpr = var_expr(destAndSlice, timeIdx, c, false);
-  expr condExpr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve, true);
+  expr condExpr(c);
+  
+  if(!condSlice.empty()) condExpr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve, true).extract(condHi, condLo);
+  else                   condExpr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve, true);
+
   expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
   expr condExpr_t = var_expr(condAndSlice, timeIdx, c, true);
 
-  expr op1Expr = add_constraint(node->childVec[1], timeIdx, c, s, g, bound, isSolve);
-  expr op2Expr = add_constraint(node->childVec[2], timeIdx, c, s, g, bound, isSolve);
+  expr op1Expr(c);
+  expr op2Expr(c);
+
+  if(!op1Slice.empty()) 
+    op1Expr = add_constraint(node->childVec[1], timeIdx, c, s, g, bound, isSolve).extract(op1Hi, op1Lo);
+  else                  op1Expr = add_constraint(node->childVec[1], timeIdx, c, s, g, bound, isSolve);
+  if(!op2Slice.empty()) op2Expr = add_constraint(node->childVec[2], timeIdx, c, s, g, bound, isSolve).extract(op2Hi, op2Lo);
+  else                  op2Expr = add_constraint(node->childVec[2], timeIdx, c, s, g, bound, isSolve);
 
   if(isSolve) {
-    expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true, localWidthNum);
-    expr op2Expr_t = var_expr(op2AndSlice, timeIdx, c, true, localWidthNum);
+    expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true, op1WidthNum);
+    expr op2Expr_t = var_expr(op2AndSlice, timeIdx, c, true, op2WidthNum);
     //expr condBoolExpr = c.bool_const((condExpr.decl().name()+"_bool".c_str()));
     //s.add( condBoolExpr == (condExpr > 0) );
-    s.add( destExpr_t == ite( condExpr == c.bv_val(1, 1), op1Expr_t | sext(condExpr_t, localWidthNum-1), op2Expr_t | sext(condExpr_t, localWidthNum-1) ) );
+    s.add( destExpr_t == ite( condExpr == c.bv_val(1, 1), zext(op1Expr_t, destWidthNum-op1WidthNum) | zext(condExpr_t, destWidthNum-1), zext(op2Expr_t, destWidthNum-op2WidthNum) | zext(condExpr_t, destWidthNum-1) ) );
     if(g_print_solver) {
       toCout("Add-Solver: "+get_name(destExpr_t)+" == ite("+get_name(condExpr)+" == 1'b1, "+get_name(op1Expr_t)+" | "+get_name(condExpr_t)+", "+get_name(op2Expr_t)+" | "+get_name(condExpr_t)+" )" );
     }
     // if condVar is wire, put condVar in ite, and also expand it
     // TODO: not sure if following statement is correct
-    s.add( destExpr == ite( condExpr == c.bv_val(1, 1), op1Expr, op2Expr) );
+    s.add( destExpr == ite( condExpr == c.bv_val(1, 1), zext(op1Expr, destWidthNum-op1WidthNum), zext(op2Expr, destWidthNum-op2WidthNum) ) );
     if(g_print_solver) {
       toCout("Add-Solver: "+get_name(destExpr)+" == ite("+get_name(condExpr)+" == 1'b1, "+get_name(op1Expr)+", "+get_name(op2Expr)+" )" );
     }
     return destExpr;
   }
   else
-    return ite( condExpr == c.bv_val(1, 1), op1Expr, op2Expr);
+    return ite( condExpr == c.bv_val(1, 1), zext(op1Expr, destWidthNum-op1WidthNum), zext(op2Expr, destWidthNum-op2WidthNum));
 }
 
 
