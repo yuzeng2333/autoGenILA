@@ -51,13 +51,64 @@ void record_expr(expr varExpr) {
 }
 
 
-expr sext(expr const& e, uint32_t added_len) {
-  return to_expr(e.ctx(), Z3_mk_sign_ext(e.ctx(), added_len, e));
+// extend e to added_len + len(e)
+//expr sext(expr const& e, uint32_t added_len) {
+//  return to_expr(e.ctx(), Z3_mk_sign_ext(e.ctx(), added_len, e));
+//}
+
+
+// extend e to len
+expr sext_full(expr const& e, uint32_t len) {
+  uint32_t eLen = get_var_slice_width(pure(get_name(e)));
+  if(eLen == len)
+    return e; 
+  else
+    return to_expr(e.ctx(), Z3_mk_sign_ext(e.ctx(), len - eLen, e));
+}
+
+
+// extend e to len
+expr zext_full(expr const& e, uint32_t destWidth, uint32_t opWidth) {
+  if(destWidth == opWidth)
+    return e; 
+  else
+    return zext(e, destWidth - opWidth);
 }
 
 
 bool is_root(std::string var) {
   return var.compare(g_rootNode) == 0;
+}
+
+
+std::string pure(std::string var) {
+  if(var.find("_#") == std::string::npos)
+    return var;
+  uint32_t len = var.length();
+  if(var.back() == 'T')
+    return var.substr(0, len-7);
+  else
+    return var.substr(0, len-5);
+}
+
+
+bool is_taint(std::string var) {
+  return var.back() == 'T';
+}
+
+
+bool is_clean(std::string var) {
+  return !is_taint(var) && !is_root(var) && ( isInput(pure(var)) || is_read_asv(pure(var)) );
+}
+
+
+std::string get_name(expr expression) {
+  return expression.decl().name().str();
+}
+
+
+bool is_read_asv(std::string var) {
+  return g_readASV.find(var) != g_readASV.end();
 }
 
 
@@ -68,4 +119,9 @@ bool has_explicit_value(std::string input) {
     return false;
   else
     return true;
+}
+
+
+uint32_t expr_len(expr &e) {
+  return get_var_slice_width(pure(get_name(e)));
 }

@@ -50,13 +50,4 @@ bool is_in_clean_queue(std::string var);
 
 bool is_in_dirty_queue(std::string var);
 
-std::string pure(std::string var);
-
-bool is_taint(std::string var);
-
-bool is_clean(std::string var);
-
-std::string get_name(expr expression);
-
-bool is_read_asv(std::string var);
 #endif

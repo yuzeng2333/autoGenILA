@@ -470,33 +470,3 @@ bool is_in_dirty_queue(std::string var) {
   return false;
 }
 
-
-std::string pure(std::string var) {
-  if(var.find("_#") == std::string::npos)
-    return var;
-  uint32_t len = var.length();
-  if(var.back() == 'T')
-    return var.substr(0, len-7);
-  else
-    return var.substr(0, len-5);
-}
-
-
-bool is_taint(std::string var) {
-  return var.back() == 'T';
-}
-
-
-bool is_clean(std::string var) {
-  return !is_taint(var) && !is_root(var) && ( isInput(pure(var)) || is_read_asv(pure(var)) );
-}
-
-
-std::string get_name(expr expression) {
-  return expression.decl().name().str();
-}
-
-
-bool is_read_asv(std::string var) {
-  return g_readASV.find(var) != g_readASV.end();
-}
