@@ -65,7 +65,7 @@ void check_single_reg_and_slice(std::string regAndSlice) {
   uint32_t regWidth = get_var_slice_width(regAndSlice);
   CURRENT_VAR = regAndSlice;
   uint32_t bound = 0;
-  bound_limit = 2;
+  bound_limit = 10;
   bool z3Res = false;
   context c;
   solver s(c);
@@ -73,8 +73,9 @@ void check_single_reg_and_slice(std::string regAndSlice) {
   p.set("unsat_core", true);
   s.set(p);
 
-  std::vector<std::string> varToExpand{regAndSlice};
+  std::set<std::string> varToExpand{regAndSlice};
   s.push();
+  bool hasSolution = false;
   while(bound < bound_limit) {
     s.pop();    
     expr rst = c.bv_const(("rst___#"+toStr(bound)).c_str(), 1);
@@ -116,6 +117,7 @@ void check_single_reg_and_slice(std::string regAndSlice) {
     //}
     // exhaust all the solutions for a bound
     while(z3Res) {
+      hasSolution = true;
       INPUT_EXPR_VAL.clear();
       TIMED_VAR2EXPR.clear();
       INT_EXPR_SET.clear();
@@ -209,6 +211,7 @@ void check_single_reg_and_slice(std::string regAndSlice) {
     }
     assert(bound <= bound_limit);
     toCout("------- No more solution found within the bound: "+toStr(bound)+" ----------");
+    if(hasSolution) return;
     bound++;      
   }
 }
@@ -430,13 +433,13 @@ void add_input_values(context &c, solver &s, uint32_t bound) {
 }
 
 
-void save_regs_for_expand(std::vector<std::string> &varToExpand) {
+void save_regs_for_expand(std::set<std::string> &varToExpand) {
   varToExpand.clear();
   for(auto pair: DIRTY_QUEUE) {
-    varToExpand.push_back(pair.first->dest);
+    varToExpand.insert(pair.first->dest);
   }
   for(auto pair: CLEAN_QUEUE) {
-    varToExpand.push_back(pair.first->dest);
+    varToExpand.insert(pair.first->dest);
   }
 }
 

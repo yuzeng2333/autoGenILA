@@ -44,7 +44,7 @@ void add_all_dirty_constraints(context &c, solver &s, uint32_t bound);
 
 void add_input_values(context &c, solver &s, uint32_t bound);
 
-void save_regs_for_expand(std::vector<std::string> &varToExpand);
+void save_regs_for_expand(std::set<std::string> &varToExpand);
 
 bool is_in_clean_queue(std::string var);
 
