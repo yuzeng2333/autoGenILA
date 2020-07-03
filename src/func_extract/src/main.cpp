@@ -11,8 +11,8 @@ bool g_print_solver;
 
 int main(int argc, char *argv[]) {
   toCout("Begin main!");
-  g_verb = false;
-  g_print_solver = false;
+  g_verb = true;
+  g_print_solver = true;
   std::string vlgFile = argv[1];
   std::string instrFile = argv[2];
   //clear_global_vars();

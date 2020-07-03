@@ -65,7 +65,7 @@ void check_single_reg_and_slice(std::string regAndSlice) {
   uint32_t regWidth = get_var_slice_width(regAndSlice);
   CURRENT_VAR = regAndSlice;
   uint32_t bound = 0;
-  bound_limit = 10;
+  bound_limit = 3;
   bool z3Res = false;
   context c;
   solver s(c);
@@ -73,14 +73,21 @@ void check_single_reg_and_slice(std::string regAndSlice) {
   p.set("unsat_core", true);
   s.set(p);
 
+  std::string rst1 = "rst___#1";
+  expr rst = c.bv_const(rst1.c_str(), 1);
+  // FIXME: valid reset value should come from file
+  s.add( rst == c.bv_val(0, 1) );
+  if(g_print_solver)
+    toCout("Add-Solver: rst___#1 == 0");
+
   std::set<std::string> varToExpand{regAndSlice};
   s.push();
   bool hasSolution = false;
   while(bound < bound_limit) {
-    s.pop();    
-    expr rst = c.bv_const(("rst___#"+toStr(bound)).c_str(), 1);
-    // FIXME: valid reset value should come from file
-    s.add( rst == c.bv_val(0, 1) );
+    s.pop();
+    CLEAN_QUEUE.clear();
+    DIRTY_QUEUE.clear();
+
     toCoutVerb("### Begin bound: "+ toStr(bound));
     goal g(c);
     for(std::string rootReg: varToExpand) {
@@ -126,10 +133,18 @@ void check_single_reg_and_slice(std::string regAndSlice) {
       uint32_t j = 0;
       // only block values for varriables in CLEAN_QUEUE
       toCout("+++++++ Solution found for "+regAndSlice+", bound: "+toStr(bound)+" +++++++++");
-      for (uint32_t i = 0; i < m.size(); i++) {
-        func_decl v = m[i];
+
+      std::vector<std::pair<std::string, uint32_t>> varIdxPairVec;
+      for (uint32_t i = 0; i < m.size(); i++)
+        varIdxPairVec.push_back(std::make_pair(m[i].name().str(), i));
+
+      std::sort(varIdxPairVec.begin(), varIdxPairVec.end(), comparePair);
+
+      for (auto pair : varIdxPairVec) {
+        func_decl v = m[pair.second];
         assert(v.arity() == 0);
         std::string var = v.name().str();
+        assert(var == pair.first);
         if(!is_taint(var) && ( isInput(pure(var)) || isAs(pure(var)) )) {
           std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ " << v.name() << " = " << m.get_const_interp(v) << "\n";
           if(isInput(pure(var)) || isAs(pure(var)) ) {
@@ -398,10 +413,7 @@ void add_dirty_constraint(astNode* const node, uint32_t timeIdx, context &c, sol
     toCout("Add-Solver: "+get_name(destExpr_t)+" == "+toStr(uint32_t(std::pow(2, destWidth)-1)));
   }
   // TODO: maybe deal with it in a better way?
-  s.add( destExpr == 0 );
-  if(g_print_solver) {
-    toCout("Add-Solver: "+get_name(destExpr)+" == 0");
-  }
+  //s.add( destExpr == 0 );
 };
 
 

@@ -40,4 +40,6 @@ bool is_read_asv(std::string var);
 bool has_explicit_value(std::string input);
 
 uint32_t expr_len(expr &e);
+
+bool comparePair(const std::pair<std::string, uint32_t> &p1, const std::pair<std::string, uint32_t> &p2 );
 #endif
