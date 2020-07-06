@@ -187,8 +187,10 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
 
   expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
   
-  bool op1IsReadRoot = is_root(op1AndSlice) && is_read_asv(op1AndSlice);
-  bool op2IsReadRoot = is_root(op2AndSlice) && is_read_asv(op2AndSlice);
+  //bool op1IsReadRoot = is_root(op1AndSlice) && is_read_asv(op1AndSlice) && timeIdx == bound + 1;
+  //bool op2IsReadRoot = is_root(op2AndSlice) && is_read_asv(op2AndSlice) && timeIdx == bound + 1;
+  bool op1IsReadRoot = false;
+  bool op2IsReadRoot = false;
 
   expr zero = c.bv_val(0, destWidthNum);
   bool sameWidth = op1WidthNum == destWidthNum && op1WidthNum == op2WidthNum;
@@ -466,7 +468,7 @@ expr ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
     expr op2Expr_t = var_expr(op2AndSlice, timeIdx, c, true, op2WidthNum);
 
     //if(!op1IsReadRoot && !op2IsReadRoot) {
-    s.add( destExpr_t == ite( condExpr == c.bv_val(1, 1), zext(op1Expr_t, destWidthNum-op1WidthNum) | zext(condExpr_t, destWidthNum-1), zext(op2Expr_t, destWidthNum-op2WidthNum) | zext(condExpr_t, destWidthNum-1) ) );
+    s.add( destExpr_t == ite( condExpr == c.bv_val(1, 1), zext(op1Expr_t, destWidthNum-op1WidthNum) | sext(condExpr_t, destWidthNum-1), zext(op2Expr_t, destWidthNum-op2WidthNum) | sext(condExpr_t, destWidthNum-1) ) );
     if(g_print_solver)
       toCout("Add-Solver: "+get_name(destExpr_t)+" == ite("+get_name(condExpr)+" == 1'b1, "+get_name(op1Expr_t)+" | "+get_name(condExpr_t)+", "+get_name(op2Expr_t)+" | "+get_name(condExpr_t)+" )" );
     //}

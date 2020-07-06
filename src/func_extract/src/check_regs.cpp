@@ -12,10 +12,10 @@ uint32_t bound_limit;
 std::regex pTimed("^(\\S+)___#(\\d+)$");
 std::string CURRENT_VAR;
 // CLEAN_QUEUE includes: input, not-current AS and num
-std::vector<std::pair<astNode*, uint32_t>> CLEAN_QUEUE;
-std::set<std::string> CLEAN_SET;
+std::unordered_map<astNode*, uint32_t> CLEAN_QUEUE;
+std::unordered_map<astNode*, uint32_t> DIRTY_QUEUE;
 // DIRTY_QUEUE is mainly not-current AS
-std::vector<std::pair<astNode*, uint32_t>> DIRTY_QUEUE;
+
 std::unordered_map<std::string, expr*> INPUT_EXPR_VAL;
 std::unordered_map<std::string, expr*> TIMED_VAR2EXPR;
 //std::unordered_map<std::string, expr*> INT_EXPR_VAL;
@@ -44,7 +44,6 @@ void check_all_regs() {
 
 void clean_data() {
   CLEAN_QUEUE.clear();
-  CLEAN_SET.clear();
   DIRTY_QUEUE.clear();
 }
 
@@ -58,8 +57,7 @@ void clean_data() {
 // constructed only one. But the SMT equation may need to be constructed
 // multiple times, until a solution is obtained or a bound is reached.
 void check_single_reg_and_slice(std::string regAndSlice) {
-  std::string rootNode = regAndSlice;
-  std::string g_rootNode = regAndSlice;
+  g_rootNode = regAndSlice;
   clean_data();
   toCout("========== Begin check SAT for: "+regAndSlice+" ==========");
   uint32_t regWidth = get_var_slice_width(regAndSlice);
@@ -109,6 +107,7 @@ void check_single_reg_and_slice(std::string regAndSlice) {
     add_all_clean_constraints(c, s, g, bound, true);
     add_all_dirty_constraints(c, s, bound);
     add_input_values(c, s, bound);
+    add_nop(c, s, bound);
     // save dirty regs for next round
     save_regs_for_expand(varToExpand);
     //expr rst = c.bool_const("enable___#1");
@@ -157,7 +156,7 @@ void check_single_reg_and_slice(std::string regAndSlice) {
       }
 
       // after getting one solution, build a goal and simplify it with input values
-      add_nb_constraint(g_varNode[regAndSlice], bound, c, s, g, bound, /*isSolve=*/false, /*isBool=*/false, /*isRoot=*/true);
+      add_nb_constraint(g_varNode[regAndSlice], 0, c, s, g, bound, /*isSolve=*/false, /*isBool=*/false, /*isRoot=*/true);
       //add_all_clean_constraints(c, s, g, bound, /*isSolve=*/false);
       tactic t(c, "simplify");
       apply_result r = t(g);
@@ -211,16 +210,21 @@ void check_single_reg_and_slice(std::string regAndSlice) {
       expr block = (v() != m.get_const_interp(v));
       for (uint32_t i = j+1; i < m.size(); i++) {
         func_decl v = m[i];
+        std::string vName = v.name().str();
         // block this value 
-        if( is_clean(v.name().str()) )
-          block = block || (v() != m.get_const_interp(v));        
+        if( is_clean(vName) && !is_read_asv(vName) )
+          block = block || (v() != m.get_const_interp(v));
+        else if(is_read_asv(vName) && get_time(vName) == bound + 1)
+          // we do not want to iterate read-ASV values
+          s.add( v() == m.get_const_interp(v) );
       }
       s.add(block);
       s.push();
       // Make sure the clean and dirty constraints are at the top
       add_all_clean_constraints(c, s, g, bound);
       add_all_dirty_constraints(c, s, bound);
-      add_input_values(c, s, bound);      
+      add_input_values(c, s, bound);
+      add_nop(c, s, bound);      
       save_regs_for_expand(varToExpand);      
       z3Res = (s.check() == sat);      
     }
@@ -308,9 +312,8 @@ expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
         //}
       }
     }
-   
   }
-  else if ( is_clean(dest) && !is_root(dest) ){ // the bound has been reached, do not expand its assignment
+  else if ( is_clean(dest) ){ // the bound has been reached, do not expand its assignment
     push_clean_queue(node, timeIdx);
   }
   else
@@ -389,15 +392,16 @@ void add_clean_constraint(astNode* const node, uint32_t timeIdx, context &c, sol
 
 
 void push_clean_queue(astNode* node, uint32_t timeIdx) {
-  CLEAN_QUEUE.emplace_back(node, timeIdx);
-  CLEAN_SET.insert(node->dest);
+  if(CLEAN_QUEUE.find(node) != CLEAN_QUEUE.end())
+    return;
+  CLEAN_QUEUE.emplace(node, timeIdx);
 }
 
 
 void add_all_clean_constraints(context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
   toCout("-------- Begin Add all clean ----------");
-  for(auto pair: CLEAN_QUEUE) {
-    add_clean_constraint(pair.first, pair.second, c, s, g, bound, isSolve);
+  for(auto it = CLEAN_QUEUE.begin(); it != CLEAN_QUEUE.end(); it++) {
+    add_clean_constraint(it->first, it->second, c, s, g, bound, isSolve);
   }
 }
 
@@ -418,7 +422,9 @@ void add_dirty_constraint(astNode* const node, uint32_t timeIdx, context &c, sol
 
 
 void push_dirty_queue(astNode* node, uint32_t timeIdx) {
-  DIRTY_QUEUE.emplace_back(node, timeIdx);
+  if(DIRTY_QUEUE.find(node) != DIRTY_QUEUE.end())
+    return;
+  DIRTY_QUEUE.emplace(node, timeIdx);
 }
 
 
@@ -430,18 +436,35 @@ void add_all_dirty_constraints(context &c, solver &s, uint32_t bound) {
 }
 
 
+// value at bound+1 should be from instrInfo
+// values in other cycles should all be NOP instructions
 void add_input_values(context &c, solver &s, uint32_t bound) {
   toCout("-------- Begin add input vals ----------");
   for(auto pair: g_currInstrInfo.instrEncoding) {
     expr singleInput = var_expr(pair.first, bound+1, c, false);
     uint32_t width = get_var_slice_width(pair.first);
     expr localVal(c);
-    if(pair.second != "x") 
-      localVal = var_expr(pair.second, bound+1, c, false, width);
-    else
+    if(pair.second == "x")
       localVal = var_expr("1'd0", bound+1, c, false, width);
+    else
+      localVal = var_expr(pair.second, bound+1, c, false, width);
     s.add( singleInput == localVal );
+    // input in later cycles should be filled with NOP
   }
+}
+
+
+void add_nop(context &c, solver &s, uint32_t bound) {
+  std::vector<uint32_t> bVec{0};
+  for(uint32_t b = 1; b <= bound; b++)
+  //for(uint32_t b: bVec)
+    for(auto it = g_nopInstr.begin(); it != g_nopInstr.end(); it++) {
+      expr singleInput = var_expr(it->first, b, c, false);     
+      uint32_t width = get_var_slice_width(it->first);   
+      assert(isNum(it->second));
+      expr localVal = var_expr(it->second, b, c, false, width);
+      s.add( singleInput == localVal );
+    }
 }
 
 
@@ -463,8 +486,8 @@ bool is_in_clean_queue(std::string var) {
   uint32_t len;
   len = var.length();
   cleanVar = var.substr(0, len - 5);
-  for(auto it = CLEAN_SET.begin(); it != CLEAN_SET.end(); it++) {
-    if((*it).compare(cleanVar) == 0)
+  for(auto it = CLEAN_QUEUE.begin(); it != CLEAN_QUEUE.end(); it++) {
+    if((it->first->dest).compare(cleanVar) == 0)
       return true;
   }
   return false;

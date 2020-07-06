@@ -11,8 +11,6 @@ using namespace z3;
 
 bool isAs(std::string var);
 
-bool isClean(std::string var);
-
 uint32_t hdb2int(std::string num);
 
 std::string timed_name(std::string name, uint32_t timeIdx);
@@ -42,4 +40,6 @@ bool has_explicit_value(std::string input);
 uint32_t expr_len(expr &e);
 
 bool comparePair(const std::pair<std::string, uint32_t> &p1, const std::pair<std::string, uint32_t> &p2 );
+
+uint32_t get_time(std::string var);
 #endif

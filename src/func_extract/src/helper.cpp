@@ -12,11 +12,6 @@ bool isAs(std::string var) {
 }
 
 
-bool isClean(std::string var) {
-  return isAs(var) | isInput(var) | isMem(var);
-}
-
-
 // convert a string number, in hex|decimal|binary form, into uint32_t
 uint32_t hdb2int(std::string num) {
   std::regex pHex("^(\\d+)'h([\\dabcdefx\\?]+)$");
@@ -98,7 +93,7 @@ bool is_taint(std::string var) {
 
 
 bool is_clean(std::string var) {
-  return !is_taint(var) && !is_root(var) && ( isInput(pure(var)) || is_read_asv(pure(var)) );
+  return !is_taint(var) && ( isInput(pure(var)) || is_read_asv(pure(var)) );
 }
 
 
@@ -108,7 +103,7 @@ std::string get_name(expr expression) {
 
 
 bool is_read_asv(std::string var) {
-  return g_readASV.find(var) != g_readASV.end();
+  return g_readASV.find(pure(var)) != g_readASV.end();
 }
 
 
@@ -128,5 +123,19 @@ uint32_t expr_len(expr &e) {
 
 
 bool comparePair(const std::pair<std::string, uint32_t> &p1, const std::pair<std::string, uint32_t> &p2 ) {
-  return p1.first > p2.first;
+  return p1.first < p2.first;
+}
+
+
+uint32_t get_time(std::string var) {
+  if(var.find("___#") == std::string::npos) {
+    toCout("Error: the var's Name has no time!");
+    abort();
+  }
+  uint32_t pos = var.find("___#");
+  uint32_t len = var.length();
+  if(var.back() == 'T')
+    return std::stoi(var.substr(pos+4, len-2));
+  else
+    return std::stoi(var.substr(pos+4));
 }

@@ -1,5 +1,7 @@
 This document is a framework for algorithms used in check_all_regs:
+
 1. Each time we analyze a pair of <instruction, writeASV>. We also know the readASV.
+
 2. writeASV is writte by the instruction, but we do not know when/in which cycle it is written. So we need to unroll its ast tree N times and check it. There are two questions here:
 (1) How to assign input values: for bound of length N, if input A has explicit value a, A__#N = a; if A can be any value, do not assign A. (or asign A a random value?). 
 (2) which variables has positive taints: 
@@ -11,3 +13,5 @@ This document is a framework for algorithms used in check_all_regs:
 -- non-ASV registers has positive taints.
 
 3. Each time we do one more unroll, the unroll may end up with any register. These register will be unrolled again in the next iteration. So they are pushed to clean queue and dirty queue, depending on whether they have positive taints.
+
+4. 

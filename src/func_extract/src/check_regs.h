@@ -50,4 +50,6 @@ bool is_in_clean_queue(std::string var);
 
 bool is_in_dirty_queue(std::string var);
 
+void add_nop(context &c, solver &s, uint32_t bound);
+
 #endif
