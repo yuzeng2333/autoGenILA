@@ -327,7 +327,7 @@ expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
       }
     }
   }
-  else if(!isSolve && g_resetedReg.find(timed_name(dest, timeIdx)) != g_resetedReg.end()) {
+  else if(!isSolve && !is_read_asv(dest) && g_resetedReg.find(timed_name(dest, timeIdx)) != g_resetedReg.end()) {
     assert(INPUT_EXPR_VAL.find(timed_name(dest, timeIdx)) != INPUT_EXPR_VAL.end());
     return *INPUT_EXPR_VAL[timed_name(dest, timeIdx)];        
   }
