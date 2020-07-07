@@ -15,6 +15,7 @@ std::unordered_map<std::string, astNode*> g_varNode;
 // x means the value can be arbitrary
 std::vector<struct instrInfo> g_instrInfo;
 std::unordered_map<std::string, std::string> g_nopInstr;
+std::unordered_map<std::string, std::string> g_rstVal;
 
 
 std::regex pSingleLine (to_re("^(\\s*)assign (NAME) = (.*);$"));
@@ -131,7 +132,7 @@ void read_in_instructions(std::string fileName) {
   std::ifstream input(fileName);
   std::string line;
   std::smatch m;
-  enum State {FirstInstr, OtherInstr, WriteASV, ReadASV, ReadNOP};
+  enum State {FirstInstr, OtherInstr, WriteASV, ReadASV, ReadNOP, ResetVal};
   enum State state;
   while(std::getline(input, line)) {
     if(line.front() == '#') { // a new instr begins
@@ -145,6 +146,9 @@ void read_in_instructions(std::string fileName) {
     }
     else if(line.front() == '$') {
       state = ReadNOP;
+    }
+    else if(line.front() == '*') {
+      state = ResetVal;
     }
     else { // still the old instruction
       switch(state) {
@@ -186,6 +190,14 @@ void read_in_instructions(std::string fileName) {
             g_nopInstr.emplace(instrName, encoding);
           }
           break;
+        case ResetVal:
+          {
+            auto pos = line.find("=");
+            std::string instrName = line.substr(0, pos-1);
+            std::string encoding = line.substr(pos+2);
+            assert(encoding == "x" || isNum(encoding));            
+            g_rstVal.emplace(instrName, encoding);         
+          }
       }
     }
   }

@@ -16,4 +16,5 @@ extern std::set<std::string> g_readASV;
 extern std::string g_rootNode;
 extern struct instrInfo g_currInstrInfo;
 extern std::unordered_map<std::string, std::string> g_nopInstr;
+extern std::unordered_map<std::string, std::string> g_rstVal;
 #endif

@@ -18,6 +18,7 @@ std::unordered_map<astNode*, uint32_t> DIRTY_QUEUE;
 
 std::unordered_map<std::string, expr*> INPUT_EXPR_VAL;
 std::unordered_map<std::string, expr*> TIMED_VAR2EXPR;
+std::set<std::string> g_resetedReg;
 //std::unordered_map<std::string, expr*> INT_EXPR_VAL;
 std::set<std::string> INT_EXPR_SET;
 std::set<std::string> g_readASV;
@@ -45,6 +46,7 @@ void check_all_regs() {
 void clean_data() {
   CLEAN_QUEUE.clear();
   DIRTY_QUEUE.clear();
+  g_resetedReg.clear();
 }
 
 
@@ -80,8 +82,10 @@ void check_single_reg_and_slice(std::string regAndSlice) {
 
   std::set<std::string> varToExpand{regAndSlice};
   s.push();
-  bool hasSolution = false;
+  bool lastHasSolution = false;
+  bool curHasSolution = false;
   while(bound < bound_limit) {
+    curHasSolution = false;
     s.pop();
     CLEAN_QUEUE.clear();
     DIRTY_QUEUE.clear();
@@ -123,10 +127,11 @@ void check_single_reg_and_slice(std::string regAndSlice) {
     //}
     // exhaust all the solutions for a bound
     while(z3Res) {
-      hasSolution = true;
+      curHasSolution = true;
       INPUT_EXPR_VAL.clear();
       TIMED_VAR2EXPR.clear();
       INT_EXPR_SET.clear();
+      g_resetedReg.clear();
       model m = s.get_model();
       s.pop();
       uint32_t j = 0;
@@ -138,12 +143,20 @@ void check_single_reg_and_slice(std::string regAndSlice) {
         varIdxPairVec.push_back(std::make_pair(m[i].name().str(), i));
 
       std::sort(varIdxPairVec.begin(), varIdxPairVec.end(), comparePair);
-
       for (auto pair : varIdxPairVec) {
         func_decl v = m[pair.second];
         assert(v.arity() == 0);
         std::string var = v.name().str();
         assert(var == pair.first);
+        // check if current is reg and has reset value
+        expr tmp = m.get_const_interp(v);
+        if( g_rstVal.find(pure(var)) != g_rstVal.end() && !is_taint(var))
+          if(tmp == c.bv_val(hdb2int(g_rstVal[pure(var)]), get_var_slice_width(pure(var)))) {
+            g_resetedReg.insert(var);
+            expr *tmpPnt = new expr(m.get_const_interp(v));
+            INPUT_EXPR_VAL.emplace(var, tmpPnt);
+          }
+
         if(!is_taint(var) && ( isInput(pure(var)) || isAs(pure(var)) )) {
           std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ " << v.name() << " = " << m.get_const_interp(v) << "\n";
           if(isInput(pure(var)) || isAs(pure(var)) ) {
@@ -230,8 +243,9 @@ void check_single_reg_and_slice(std::string regAndSlice) {
     }
     assert(bound <= bound_limit);
     toCout("------- No more solution found within the bound: "+toStr(bound)+" ----------");
-    if(hasSolution) return;
-    bound++;      
+    if(lastHasSolution && !curHasSolution) return; // terminate if has solution in lower bound but no solution in current bound
+    bound++;
+    lastHasSolution = curHasSolution;
   }
 }
 
@@ -312,6 +326,10 @@ expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
         //}
       }
     }
+  }
+  else if(!isSolve && g_resetedReg.find(timed_name(dest, timeIdx)) != g_resetedReg.end()) {
+    assert(INPUT_EXPR_VAL.find(timed_name(dest, timeIdx)) != INPUT_EXPR_VAL.end());
+    return *INPUT_EXPR_VAL[timed_name(dest, timeIdx)];        
   }
   else if ( is_clean(dest) ){ // the bound has been reached, do not expand its assignment
     push_clean_queue(node, timeIdx);
@@ -408,11 +426,17 @@ void add_all_clean_constraints(context &c, solver &s, goal &g, uint32_t bound, b
 
 void add_dirty_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, uint32_t bound) {
   toCoutVerb("Add dirty constraint for: " + node->dest+" ------  time: "+toStr(timeIdx));  
-  std::string dest = node->dest;
-  uint32_t destWidth = get_var_slice_width(node->dest);
-  expr destExpr_t = var_expr(dest, timeIdx, c, true);  
-  expr destExpr = var_expr(dest, timeIdx, c, false);  
-  s.add( destExpr_t == uint32_t(std::pow(2, destWidth)-1) );
+  std::string destAndSlice = node->dest;
+  std::string dest, destSlice;
+  split_slice(destAndSlice, dest, destSlice);
+  uint32_t destWidth = get_var_slice_width(destAndSlice);
+  expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);  
+  expr destExpr = var_expr(destAndSlice, timeIdx, c, false);
+  assert(g_rstVal.find(dest) != g_rstVal.end());
+  std::string rstVal = g_rstVal[dest];
+  expr rstValExpr = var_expr(rstVal, timeIdx, c, false, destWidth);
+  uint32_t allOne = std::pow(2, destWidth)-1;
+  s.add( destExpr_t == ite( destExpr == rstValExpr, c.bv_val(0, destWidth), c.bv_val(uint32_t(allOne), destWidth) ) );
   if(g_print_solver) {
     toCout("Add-Solver: "+get_name(destExpr_t)+" == "+toStr(uint32_t(std::pow(2, destWidth)-1)));
   }
