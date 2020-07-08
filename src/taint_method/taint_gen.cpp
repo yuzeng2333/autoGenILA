@@ -107,6 +107,7 @@ std::regex pElse      (to_re("^(\\s*)else$"));
 std::regex pSrcConcat (to_re("^(\\s*)assign (NAME) = \\{ ((?:NAME, )*NAME) \\}\\s?;$"));
 // here actually src can be only one var
 std::regex pSrcDestBothConcat(to_re("^(\\s*)assign \\{ ((?:NAME(?:\\s)?, )+NAME)\\s*\\} = \\{ ((?:NAME(?:\\s)?, )*NAME) \\}(\\s*)?;$"));
+std::regex pDestConcat(to_re("^(\\s*)assign \\{ ((?:NAME(?:\\s)?, )+NAME)\\s*\\} = (NAME)(\\s*)?;$"));
 
 /* Milicious */
 /* pVarName also exists in to_re(), and parse_var_list() */
@@ -687,6 +688,9 @@ void add_line_taints(std::string line, std::ofstream &output, std::ifstream &inp
       break;
     case BOTH_CONCAT:
       both_concat_op_taint_gen(line, output);
+      break;
+    case DEST_CONCAT:
+      dest_concat_op_taint_gen(line, output);
       break;
     case ITE:
       ite_taint_gen(line, output);      
@@ -1948,6 +1952,7 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
       continue;
     std::vector<std::string> signalAndSliceVec;
     parse_var_list(signalAndSliceList, signalAndSliceVec);
+
     std::vector<uint32_t> signalVerVec;
     std::vector<bool> isNewVec;
     get_ver_vec(signalAndSliceVec, signalVerVec, isNewVec, output);
@@ -2037,9 +2042,18 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
       output << "    ." + outPort + _c + "0 ( " + get_rhs_taint_list(port2SignalMap[outPort], _c) + " )," << std::endl;
       // _sig
       std::string varAndSlice = port2SignalMap[outPort];
-      std::string var, varSlice;
-      split_slice(varAndSlice, var, varSlice);
-      output << "    ." + outPort + _sig + " ( " + var + _sig + " )," << std::endl;
+      std::string varConnect;
+      if(!isNum(varAndSlice)) {
+        varConnect = get_rhs_taint_list(varAndSlice, _sig);
+      }
+      else {
+        if( !std::regex_match(varAndSlice, m, pNum )) {
+          std::cout << "!! Error in matching number !!" << std::endl;
+        }
+        std::string numWidth = m.str(1);
+        varConnect = numWidth + "'h0";
+      }
+      output << "    ." + outPort + _sig + " ( " + varConnect + " )," << std::endl;
     }
     else {
       output << "    ." + outPort + _t + " ()," << std::endl; 
@@ -2100,6 +2114,12 @@ bool extract_concat(std::string line, std::ofstream &output, std::string &return
   std::regex pBraces(to_re("\\{ ((?:NAME(?:\\s)?, )+NAME) \\}"));
   std::regex pSlice("\\[(\\d+)(:)?(\\d+)?\\]");
 
+  // check if dest is {}
+  uint32_t openBracePos = line.find("{");
+  uint32_t equalPos = line.find("=");
+  bool destIsBrace = openBracePos < equalPos;
+  uint32_t braceIdx = 0;
+
   std::regex_token_iterator<std::string::iterator> rend;
   std::regex_token_iterator<std::string::iterator> it(line.begin(), line.end(), pBraces, 1);
 
@@ -2146,14 +2166,18 @@ bool extract_concat(std::string line, std::ofstream &output, std::string &return
         std::cout << "m.str(3):" + m.str(3) << std::endl;
       }
       if(!isNonblockConcat) {
-        output << std::string(blankNo, ' ') + "wire [" + toStr(totalWidth-1) + ":0] fangyuan" + localIdx + ";" << std::endl;
-        output << std::string(blankNo, ' ') + "assign fangyuan" + localIdx + " = { " + varList + " };" << std::endl;
+        output << std::string(blankNo, ' ') + "wire [" + toStr(totalWidth-1) + ":0] fangyuan" + localIdx + ";" << std::endl;        
+        if(braceIdx == 0 && destIsBrace) // deal with "dest is brace" situation
+          output << std::string(blankNo, ' ') + "assign { " + varList + " } = fangyuan" + localIdx + ";" << std::endl;
+        else
+          output << std::string(blankNo, ' ') + "assign fangyuan" + localIdx + " = { " + varList + " };" << std::endl;
       }
       else {
         fangyuanDeclaration = "  wire [" + toStr(totalWidth-1) + ":0] fangyuan" + localIdx + ";"; 
         fangyuanAssign      = "  assign fangyuan" + localIdx + " = { " + varList + " };";
       }
       newVarQueue.push("fangyuan"+localIdx);
+      braceIdx++;
     }
     char openBrace = '{';
     char closeBrace = '}';

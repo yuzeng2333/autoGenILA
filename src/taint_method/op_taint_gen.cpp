@@ -1269,6 +1269,38 @@ void both_concat_op_taint_gen(std::string line, std::ofstream &output) {
 }
 
 
+void dest_concat_op_taint_gen(std::string line, std::ofstream &output) {
+  //checkCond(!g_use_reset_sig, "both_concat not supported when use_reset_sig!!");
+  std::smatch m;
+  if( !std::regex_match(line, m, pDestConcat) )
+    abort(); //
+
+  std::string blank = m.str(1);
+  std::string destList = m.str(2);
+  std::string srcAndSlice = m.str(3);
+
+  std::vector<std::string> destVec;
+  parse_var_list(destList, destVec);
+  std::string src, srcSlice;
+  split_slice(srcAndSlice, src, srcSlice);
+  assert(!isMem(src));
+
+  //std::string destTList = std::regex_replace(destList, pVarNameGroup, "$1_t$3 ");
+  std::string destTList = get_lhs_taint_list(destList, _t, output);
+  output << blank + "assign { " + destTList + " } = " + src + _t + srcSlice + " ;" << std::endl;
+
+  std::string destSigList = get_lhs_taint_list_no_slice(destList, _sig, output);
+  output << blank + "assign { " + destSigList + " } = 0;" << std::endl;
+  
+  std::string destRList = get_rhs_taint_list(destList, _r);
+  std::string destXList = get_rhs_taint_list(destList, _x);
+  std::string destCList = get_rhs_taint_list(destList, _c);
+  output << blank + "assign " + src + _r + srcSlice + " = { " + destRList + " };" << std::endl;
+  output << blank + "assign " + src + _x + srcSlice + " = { " + destXList + " };" << std::endl;
+  output << blank + "assign " + src + _c + srcSlice + " = { " + destCList + " };" << std::endl;
+}
+
+
 void ite_taint_gen(std::string line, std::ofstream &output) {
   std::smatch m;
   if ( !std::regex_match(line, m, pIte) )

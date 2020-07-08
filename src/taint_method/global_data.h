@@ -161,6 +161,7 @@ extern std::regex pElse;
 
 extern std::regex pSrcConcat;
 extern std::regex pSrcDestBothConcat;
+extern std::regex pDestConcat;
 
 extern std::regex pVarAndSlice;
 extern std::regex pVarName;

@@ -27,6 +27,8 @@ void mult_op_taint_gen(std::string line, std::ofstream &output);
 
 void both_concat_op_taint_gen(std::string line, std::ofstream &output);
 
+void dest_concat_op_taint_gen(std::string line, std::ofstream &output);
+
 void ite_taint_gen(std::string line, std::ofstream &output);
 
 void nonblock_taint_gen(std::string line, std::ofstream &output);

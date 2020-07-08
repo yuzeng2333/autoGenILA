@@ -32,10 +32,13 @@
 #define NONBLOCKIF      22
 #define ALWAYS_STAR     23
 #define ALWAYS_NEG      24
+#define DEST_CONCAT     25
 #define UNSUPPORT       99
 #define NONE            100
 
 void clean_file(std::string fileName);
+
+void remove_functions(std::string fileName);
 
 void add_line_taints(std::string line, std::ofstream &output, std::ifstream &input);
 

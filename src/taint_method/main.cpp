@@ -11,6 +11,8 @@
 #include "helper.h"
 #include "main.h"
 
+std::string orderFileName = "order.txt";
+
 // 1st argument is file name
 // 2rd is whether to do process_path_info
 int main(int argc, char *argv[]) {
@@ -76,7 +78,7 @@ std::string separate_modules(std::string fileName, std::vector<std::string> &mod
   bool inModule = false;
 
   while(std::getline(input, line)) {
-    toCout(line);
+    //toCout(line);
     if(std::regex_match(line, m, pNonblock)
         || std::regex_match(line, m, pNonblockConcat)
         || std::regex_match(line, m, pNonblockIf) ) {
@@ -154,6 +156,7 @@ void add_taint_bottom_up(std::string path, std::string module, std::map<std::str
     return;
   if( childModules.find(module) == childModules.end() ) {
     moduleReady[module] = true;
+    write_order_file(module+"_NEW.v.clean");
     taint_gen(path+"/"+module+"_NEW.v", 0, module.compare(topModule)==0, moduleInputsMap, moduleOutputsMap, moduleRFlagsMap, totalRegCnt, nextSig, doProcessPathInfo);
   }
   else {
@@ -164,8 +167,13 @@ void add_taint_bottom_up(std::string path, std::string module, std::map<std::str
     }
     // all child modules should be ready now
     moduleReady[module] = true;
+    write_order_file(module+"_NEW.v.clean");
     taint_gen(path+"/"+module+"_NEW.v", 0, module.compare(topModule)==0, moduleInputsMap, moduleOutputsMap, moduleRFlagsMap, totalRegCnt, nextSig, doProcessPathInfo);
   }
 }
 
 
+void write_order_file(std::string fileName) {
+  std::ofstream output(g_path+"/"+orderFileName, std::ios_base::app);
+  output << fileName << std::endl;
+}

@@ -210,7 +210,7 @@ void process_pass_info(std::string fileName) {
   std::string line;
   std::smatch m;
   while(std::getline(input, line)) {
-    toCout(line);
+    //toCout(line);
     uint32_t choice = parse_verilog_line(line, true);
     switch (choice) {
       case SRC_CONCAT:

@@ -151,7 +151,7 @@ bool split_slice(std::string slicedName, std::string &name, std::string &slice) 
     name = slicedName;
     if(name.empty()) {
       toCout("Error: name is empty in split_slice, input is: "+slicedName);
-      abort();
+      //abort();
     }
     std::regex_match(name, m, pLocal);
     name = m.str(2);
@@ -164,7 +164,7 @@ bool split_slice(std::string slicedName, std::string &name, std::string &slice) 
     name = m.str(2);
     if(name.empty()) {
       toCout("Error: name is empty in split_slice, input is: "+slicedName);
-      abort();
+      //abort();
     }
     slice = slicedName.substr(pos);
     slice = " " + slice;
