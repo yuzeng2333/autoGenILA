@@ -8,6 +8,7 @@ std::unordered_map<std::string, uint32_t> reg2timeIdx;
 std::unordered_map<std::string, std::string> g_ssaTable;
 // non-blocking assignment table
 std::unordered_map<std::string, std::string> g_nbTable;
+std::unordered_map<std::string, std::vector<std::pair<std::string, std::string>>> g_caseTable;
 uint32_t g_new_var;
 //std::unordered_map<std::string, astNode*> g_asSliceRoot;
 std::unordered_map<std::string, astNode*> g_varNode;
@@ -30,6 +31,8 @@ void clear_global_vars() {
   moduleMems.clear();
   memDims.clear();
   g_ssaTable.clear();
+  g_nbTable.clear();
+  g_caseTable.clear();
   varWidth.clear();
   moduleAs.clear();
   reg2Slices.clear();
@@ -44,11 +47,13 @@ void parse_verilog(std::string fileName) {
   std::smatch match;
   while( std::getline(input, line) ) {
     if ( std::regex_match(line, match, pAlwaysComb) ) {
-      //TODO:case_expr(line, input);
+      case_expr(line, input);
       continue;
     }
     else if ( std::regex_match(line, match, pModuleBegin) ) {
       //TODO:module_instantiation_expr(input, line, moduleInputsMap, moduleOutputsMap);
+      toCout("pModuleBegin is not supported yet: "+line);
+      abort();
       continue;
     }
     uint32_t choice = parse_verilog_line(line, true);

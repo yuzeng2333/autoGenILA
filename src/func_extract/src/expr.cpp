@@ -1,6 +1,5 @@
 #include "expr.h"
 #include "parse_fill.h"
-
 #define toStr(a) std::to_string(a)
 
 ////////////////////////////////////////////////////////////////
@@ -343,7 +342,17 @@ void always_clkrst_expr(std::string line, std::ifstream &input) {
 
 
 void case_expr(std::string line, std::ifstream &input) {
-  // TODO:
+  std::smatch m;
+  std::string caseFirstLine;
+  std::getline(input, caseFirstLine);
+  if ( !std::regex_match(caseFirstLine, m, pCase) )
+    return;
+  std::string blank = m.str(1);
+  std::string sAndSlice = m.str(3);
+  std::vector<std::pair<std::string, std::string>> caseAssignPairs;
+  std::vector<std::string> inputSlice;
+  std::string destAndSlice = parse_case_statements(caseAssignPairs, input, false);
+  g_caseTable.emplace(destAndSlice, caseAssignPairs);
 }
 
 
