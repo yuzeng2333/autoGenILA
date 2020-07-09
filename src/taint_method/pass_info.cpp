@@ -93,6 +93,28 @@ void fill_in_src_concat_relation(std::string line) {
 }
 
 
+void fill_in_dest_concat_relation(std::string line) {
+  std::smatch m;
+  if(!std::regex_match(line, m, pDestConcat)) {
+    toCout("Error: not matched for dest_concat: "+line);
+    abort();
+  }
+  uint32_t storeIdx = g_passExprStore.size();
+  g_passExprStore.push_back(line);
+  std::string destList = m.str(2);
+  std::string srcAndSlice = m.str(3);
+
+  add_into_forwardMap(srcAndSlice, line, storeIdx);
+
+  // fill in g_forwardMap
+  std::vector<std::string> destVec;
+  parse_var_list(destList, destVec);
+  for(std::string destAndSlice: destVec) {
+    add_into_backwardMap(destAndSlice, line, storeIdx);
+  }
+}
+
+
 void fill_in_ite_relation(std::string line) {
   std::smatch m;
   if(!std::regex_match(line, m, pIte)) {
@@ -258,6 +280,29 @@ void process_pass_info(std::string fileName) {
             continue;
           frontCondPairVec.clear();
           go_forward(forwardStart, frontCondPairVec);
+          // output of merge_both_direction is stored in g_regCondMap
+          merge_both_direction(frontCondPairVec, backCondPairVec);
+        }
+      }
+      break;
+      case DEST_CONCAT:
+      {
+        if(!std::regex_match(line, m, pDestConcat))
+          abort();
+        std::string destList = m.str(2);
+        std::string srcAndSlice = m.str(3);
+        std::vector<std::pair<std::string, std::string>> frontCondPairVec;
+        std::vector<std::pair<std::string, std::string>> backCondPairVec;
+        std::vector<std::string> destVec;
+        parse_var_list(destList, destVec);
+        for(std::string destAndSlice: destVec) {
+          frontCondPairVec.clear();
+          go_forward(destAndSlice, frontCondPairVec);
+          if(frontCondPairVec.empty())
+            continue;
+          std::string backwardStart = get_target_and_slice(destAndSlice, destAndSlice, destList, srcAndSlice);
+          backCondPairVec.clear();
+          go_backward(backwardStart, backCondPairVec);
           // output of merge_both_direction is stored in g_regCondMap
           merge_both_direction(frontCondPairVec, backCondPairVec);
         }

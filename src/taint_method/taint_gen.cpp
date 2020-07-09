@@ -577,6 +577,12 @@ void analyze_reg_path( std::string fileName ) {
           fill_in_both_concat_relation(line);
         }
         break;
+      case DEST_CONCAT:
+        {
+          //toCout("Matched in both_concat");          
+          fill_in_dest_concat_relation(line);
+        }
+        break;
       case NONBLOCK: 
         {
           //toCout("Matched in nonblock");          

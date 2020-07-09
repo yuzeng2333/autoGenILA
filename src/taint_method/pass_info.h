@@ -38,6 +38,8 @@ void make_case_val_explicit(std::vector<std::pair<std::string, std::string>> &ca
 
 void fill_in_src_concat_relation(std::string line);
 
+void fill_in_dest_concat_relation(std::string line);
+
 void fill_in_ite_relation(std::string line);
 
 void fill_in_sel_relation(std::string line);
