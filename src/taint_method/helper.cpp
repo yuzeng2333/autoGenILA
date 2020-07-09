@@ -151,7 +151,7 @@ bool split_slice(std::string slicedName, std::string &name, std::string &slice) 
     name = slicedName;
     if(name.empty()) {
       toCout("Error: name is empty in split_slice, input is: "+slicedName);
-      //abort();
+      abort();
     }
     std::regex_match(name, m, pLocal);
     name = m.str(2);
@@ -164,7 +164,7 @@ bool split_slice(std::string slicedName, std::string &name, std::string &slice) 
     name = m.str(2);
     if(name.empty()) {
       toCout("Error: name is empty in split_slice, input is: "+slicedName);
-      //abort();
+      abort();
     }
     slice = slicedName.substr(pos);
     slice = " " + slice;
@@ -181,7 +181,7 @@ uint32_t get_width(std::string slice) {
   if (slice.empty())
     return 1;
   if( !std::regex_match(slice, m, pSlice) && !std::regex_match(slice, m, pSingleBit) )
-    std::cout << "Wrong input:|" + slice << "|" << std::endl;
+    std::cout << "Wrong input to get_width:|" + slice << "|" << std::endl;
   if( std::regex_match(slice, m, pSingleBit) )
     return 1;
   else {
@@ -201,7 +201,7 @@ uint32_t get_begin(std::string slice) {
   std::regex pSlice("^(?:\\s?)\\[(?:(\\d+)\\:)?(\\d+)\\](\\s)?$");
   std::smatch m;
   if( !std::regex_match(slice, m, pSlice) )
-    std::cout << "Wrong input:|" + slice << "|" << std::endl;
+    std::cout << "Wrong input to get_begin:|" + slice << "|" << std::endl;
   return str2int(m.str(2), "get_begin("+slice+")");
 }
 
@@ -210,8 +210,10 @@ uint32_t get_begin(std::string slice) {
 uint32_t get_end(std::string slice) {
   std::regex pSlice("^(?:\\s?)\\[(\\d+)(?:\\:(\\d+))?\\](\\s)?$");
   std::smatch m;
-  if( !std::regex_match(slice, m, pSlice) )
-    std::cout << "Wrong input:|" + slice << "|" << std::endl;
+  if( !std::regex_match(slice, m, pSlice) ) {
+    std::cout << "Wrong input to get_end:|" + slice << "|" << std::endl;
+    return 0;
+  }
   return str2int(m.str(1), "get_end("+slice+")");
 }
 
