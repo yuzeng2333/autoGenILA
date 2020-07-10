@@ -817,6 +817,9 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   else if (std::regex_match(line, m, pSrcDestBothConcat)) {
     return BOTH_CONCAT;
   }
+  else if (std::regex_match(line, m, pDestConcat)) {
+    return DEST_CONCAT;
+  }
   else if (std::regex_match(line, m, pIte)) { // if cond is rst, then does not add any taint
     return ITE;
   } // end of ite
