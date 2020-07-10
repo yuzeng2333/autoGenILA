@@ -261,12 +261,13 @@ void clean_file(std::string fileName) {
     bool noConcat=true;
     std::string retStr;
     noConcat = extract_concat(cleanLine, output, retStr, true);
-    if (noConcat)
-      output << cleanLine << std::endl;
-    else {
-      output << retStr << std::endl;
-      cleanLine = retStr;
-    }
+    if( !std::regex_match(line, match, pSrcDestBothConcat) )
+      if (noConcat)
+        output << cleanLine << std::endl;
+      else {
+        output << retStr << std::endl;
+        cleanLine = retStr;
+      }
     // store the width of wires and regs in varWidth
     uint32_t choice = parse_verilog_line(cleanLine, true);
     std::smatch m;
@@ -2143,6 +2144,7 @@ bool extract_concat(std::string line, std::ofstream &output, std::string &return
   if ( (line.find("assign") != std::string::npos
        //&& !std::regex_match(line, m, pSrcConcat)
        && !is_srcConcat(line)
+       && !std::regex_match(line, m, pDestConcat)
        && !std::regex_match(line, m, pSrcDestBothConcat)
        && std::regex_search(line, m, pBraces))
        || std::regex_match(line, m, pNonblockConcat) ) { // also extract from nonblockconcat
