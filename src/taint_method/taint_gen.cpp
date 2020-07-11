@@ -659,7 +659,8 @@ void add_line_taints(std::string line, std::ofstream &output, std::ifstream &inp
   // because they are treated separately
   if ( !std::regex_match(line, m, pModule) 
       && !std::regex_match(line, m, pEndmodule)
-      && !std::regex_match(line, m, pModuleBegin))
+      && !std::regex_match(line, m, pModuleBegin)
+      && !std::regex_match(line, m, pAlwaysClkRst))
     output << printedLine << std::endl;
 
   switch( choice ) {

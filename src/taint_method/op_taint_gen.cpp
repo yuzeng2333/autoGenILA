@@ -1898,6 +1898,7 @@ void always_neg_taint_gen(std::string firstLine, std::ifstream &input, std::ofst
 }
 
 
+// print the modified firstLine in this function
 void always_clkrst_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream &output) {
   g_clkrst_exist = true;  
   std::smatch m;
@@ -1907,6 +1908,7 @@ void always_clkrst_taint_gen(std::string firstLine, std::ifstream &input, std::o
   }
   g_recentClk = m.str(2);
   g_recentRst = m.str(3);
+  output << "  always @(posedge "+g_recentClk+")" << std::endl;
 
   std::regex pNeg("negedge");
   // assume clock is always positive edge
