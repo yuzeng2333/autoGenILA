@@ -17,4 +17,6 @@ extern std::string g_rootNode;
 extern struct instrInfo g_currInstrInfo;
 extern std::unordered_map<std::string, std::string> g_nopInstr;
 extern std::unordered_map<std::string, std::string> g_rstVal;
+extern std::unordered_map<std::string, std::string> g_nameVarMap;
+extern std::unordered_map<std::string, std::string> g_varRstValMap;
 #endif

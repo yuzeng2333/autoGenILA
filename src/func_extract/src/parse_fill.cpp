@@ -18,7 +18,6 @@ std::vector<struct instrInfo> g_instrInfo;
 std::unordered_map<std::string, std::string> g_nopInstr;
 std::unordered_map<std::string, std::string> g_rstVal;
 
-
 std::regex pSingleLine (to_re("^(\\s*)assign (NAME) = (.*);$"));
 std::regex pNbLine (to_re("^(\\s*)(NAME) <= (.*);$"));
 
@@ -80,6 +79,9 @@ void parse_verilog(std::string fileName) {
     case SRC_CONCAT:
     case ITE:
       single_line_expr(line);
+      break;
+    case DEST_CONCAT:
+      dest_concat_expr(line);
       break;
     case BOTH_CONCAT:
       both_concat_expr(line);

@@ -143,7 +143,7 @@ void single_line_expr(std::string line) {
   put_into_reg2Slice(destAndSlice);
   auto ret = g_ssaTable.emplace(destAndSlice, line);
   if(!ret.second)
-    toCout("Error in inserting ssaTable for key: "+m.str(2));
+    toCout("Error in inserting ssaTable in single_line for key: "+m.str(2));
 }
 
 
@@ -187,7 +187,7 @@ void both_concat_expr(std::string line) {
 
   auto ret = g_ssaTable.emplace("yuzeng"+yuzengIdxStr, line);
   if(!ret.second)
-    toCout("Error in inserting ssaTable for key: yuzeng"+yuzengIdxStr+", original line:"+line);
+    toCout("Error in inserting ssaTable in both_concat1 for key: yuzeng"+yuzengIdxStr+", original line:"+line);
   
   // if there is number in the list
   for (std::string destAndSlice: destVec) {
@@ -204,7 +204,58 @@ void both_concat_expr(std::string line) {
       auto ret = g_ssaTable.emplace(destAndSlice, destAssign);
       put_into_reg2Slice(destAndSlice);
       if(!ret.second)
-        toCout("Error in inserting ssaTable for key: "+destAndSlice+", original line:"+line);
+        toCout("Error in inserting ssaTable in both_concat2 for key: "+destAndSlice+", original line:"+line);
+    }
+    startIdx = endIdx - 1;
+  }
+}
+
+
+void dest_concat_expr(std::string line) {
+  std::smatch m;
+  if( !std::regex_match(line, m, pDestConcat) ) {
+    toCout("Error: Not both_concat!!");
+    abort(); //
+  }
+
+  std::string blank = m.str(1);
+  std::string destList = m.str(2);
+  std::string srcAndSlice = m.str(3);
+
+  std::vector<std::string> destVec;
+  parse_var_list(destList, destVec);
+  std::string src, srcSlice;
+  split_slice(srcAndSlice, src, srcSlice);
+  assert(srcSlice.empty());
+  assert(!isMem(src));    
+
+  // declare new taint wires for dests
+  uint32_t destTotalWidthNum = 0;
+  std::string dest, destSlice;
+  for(std::string destAndSlice: destVec) {
+    assert(!isMem(destAndSlice));  
+    if(isNum(destAndSlice)) {
+      toCout("Unexpected ");
+      abort();
+    }
+    destTotalWidthNum += get_var_slice_width(destAndSlice);
+  }
+
+  uint32_t startIdx = destTotalWidthNum - 1;
+  uint32_t endIdx;
+  
+  // if there is number in the list
+  for (std::string destAndSlice: destVec) {
+    uint32_t destLocalWidthNum = get_var_slice_width(destAndSlice);
+    endIdx = startIdx - destLocalWidthNum + 1;
+    if(!isNum(destAndSlice)) {
+      split_slice(destAndSlice, dest, destSlice);
+
+      std::string destAssign = "  assign "+destAndSlice+" = "+src+" [" + toStr(startIdx)+" : "+toStr(endIdx)+"] ;";
+      auto ret = g_ssaTable.emplace(destAndSlice, destAssign);
+      put_into_reg2Slice(destAndSlice);
+      if(!ret.second)
+        toCout("Error in inserting ssaTable in both_concat2 for key: "+destAndSlice+", original line:"+line);
     }
     startIdx = endIdx - 1;
   }
@@ -220,7 +271,7 @@ void nb_expr(std::string line) {
   auto ret = g_nbTable.emplace(m.str(2), line);
   moduleTrueRegs.push_back(m.str(2));
   if(!ret.second)
-    toCout("Error in inserting ssaTable for key: "+m.str(2));
+    toCout("Error in inserting ssaTable in nb for key: "+m.str(2));
 }
 
 

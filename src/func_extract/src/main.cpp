@@ -12,20 +12,19 @@ bool g_print_solver;
 int main(int argc, char *argv[]) {
   toCout("Begin main!");
   g_verb = false;
-  g_print_solver  = false;
-  std::string vlgFile = argv[1];
-  std::string instrFile = argv[2];
+  g_print_solver = false;
+  std::string path = argv[1];
   // if argv[3] is 1, clean the file
-  std::string doClean = argv[3];
+  std::string doClean = argv[2];
   if(doClean.compare("1") == 0) {
-    clean_file(vlgFile);
-    remove_functions(vlgFile);
-    parse_verilog(vlgFile+".clean");    
+    clean_file(path+"/design.v");
+    remove_functions(path+"/design.v");
+    parse_verilog(path+"/design.v.clean");    
   }
   else
-    parse_verilog(vlgFile);
+    parse_verilog(path+"/design.v");
   //read_in_architectural_states(asFile);
-  read_in_instructions(instrFile);
+  read_in_instructions(path+"/instr.txt");
   build_ast_tree();
   check_all_regs(); 
   return 0;

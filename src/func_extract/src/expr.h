@@ -27,6 +27,8 @@ void single_line_expr(std::string line);
 
 void both_concat_expr(std::string line);
 
+void dest_concat_expr(std::string line);
+
 void nb_expr(std::string line);
 
 void always_expr(std::string line, std::ifstream &input);
