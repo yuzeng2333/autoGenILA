@@ -96,6 +96,7 @@ void fill_in_src_concat_relation(std::string line) {
 void fill_in_dest_concat_relation(std::string line) {
   std::smatch m;
   if(!std::regex_match(line, m, pDestConcat)) {
+  //if(!is_destConcat(line)) {
     toCout("Error: not matched for dest_concat: "+line);
     abort();
   }
@@ -232,7 +233,10 @@ void process_pass_info(std::string fileName) {
   std::string line;
   std::smatch m;
   while(std::getline(input, line)) {
-    //toCout(line);
+    toCout(line);
+    if(line.find("27'b000000000000000000000000000, of, 32'b00000000000000000000000000000000") != std::string::npos) {
+      toCout("FIND IT!");
+    }
     uint32_t choice = parse_verilog_line(line, true);
     switch (choice) {
       case SRC_CONCAT:
@@ -245,7 +249,8 @@ void process_pass_info(std::string fileName) {
         std::vector<std::pair<std::string, std::string>> backCondPairVec;
         std::vector<std::string> srcVec;
         parse_var_list(srcList, srcVec);
-        for(std::string srcAndSlice: srcVec) {
+        std::unordered_set<std::string> srcSet(srcVec.begin(), srcVec.end());
+        for(std::string srcAndSlice: srcSet) {
           backCondPairVec.clear();
           go_backward(srcAndSlice, backCondPairVec);
           if(backCondPairVec.empty())
@@ -261,6 +266,7 @@ void process_pass_info(std::string fileName) {
       case BOTH_CONCAT:
       {
         if(!std::regex_match(line, m, pSrcDestBothConcat))
+        //if(!is_srcDestConcat(line))
           abort();
         std::string destList = m.str(2);
         std::string srcList = m.str(3);
@@ -268,9 +274,10 @@ void process_pass_info(std::string fileName) {
         parse_var_list(destList, destVec);
         std::vector<std::string> srcVec;
         parse_var_list(srcList, srcVec);
+        std::unordered_set<std::string> srcSet(srcVec.begin(), srcVec.end());        
         std::vector<std::pair<std::string, std::string>> frontCondPairVec;
         std::vector<std::pair<std::string, std::string>> backCondPairVec;
-        for(std::string srcAndSlice: srcVec) {
+        for(std::string srcAndSlice: srcSet) {
           backCondPairVec.clear();
           go_backward(srcAndSlice, backCondPairVec);
           if(backCondPairVec.empty())
@@ -287,7 +294,8 @@ void process_pass_info(std::string fileName) {
       break;
       case DEST_CONCAT:
       {
-        if(!std::regex_match(line, m, pDestConcat))
+        //if(!std::regex_match(line, m, pDestConcat))
+        if(!is_destConcat(line))
           abort();
         std::string destList = m.str(2);
         std::string srcAndSlice = m.str(3);
@@ -655,15 +663,21 @@ void go_forward(std::string startVarAndSlice, std::vector<std::pair<std::string,
           frontCondPairVec.insert(frontCondPairVec.end(), localFrontCondPairVec.begin(), localFrontCondPairVec.end());
         }
       }
-      else if(std::regex_match(line, m, pSrcDestBothConcat)) {
+      //else if(std::regex_match(line, m, pSrcDestBothConcat)) {
+      else if(is_srcDestConcat(line)) {
+        if(!std::regex_match(line, m, pSrcDestBothConcat)) {
+          toCout("Error: srcDestBothConcat not matched!");
+          abort();
+        }
         std::string destList = m.str(2);
         std::string srcList = m.str(3);
         std::vector<std::string> destVec;
         parse_var_list(destList, destVec);
         std::vector<std::string> srcVec;
         parse_var_list(srcList, srcVec);
+        std::unordered_set<std::string> srcSet(srcVec.begin(), srcVec.end());        
         std::string src, srcSlice;
-        for(std::string srcAndSlice: srcVec) {
+        for(std::string srcAndSlice: srcSet) {
           split_slice(srcAndSlice, src, srcSlice);
           if(src.compare(startVar) != 0)
             continue;
@@ -965,7 +979,12 @@ void go_backward(std::string startVarAndSlice, std::vector<std::pair<std::string
         backCondPairVec.insert(backCondPairVec.end(), localBackCondPairVec.begin(), localBackCondPairVec.end());
       }
     }
-    else if(std::regex_match(line, m, pSrcDestBothConcat)) {
+    //else if(std::regex_match(line, m, pSrcDestBothConcat)) {
+    else if(is_srcDestConcat(line)) {
+      if(!std::regex_match(line, m, pSrcDestBothConcat)) {
+        toCout("Error: srcDestBothConcat not matched!");
+        abort();
+      }
       std::string destList = m.str(2);
       std::string srcList = m.str(3);
       std::vector<std::string> destVec;

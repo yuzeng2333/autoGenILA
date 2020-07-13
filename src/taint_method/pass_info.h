@@ -1,6 +1,7 @@
 #ifndef PASS_INFO
 #define PASS_INFO
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 #include <regex>
 #include <iostream>

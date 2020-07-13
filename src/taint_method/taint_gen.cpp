@@ -254,6 +254,9 @@ void clean_file(std::string fileName) {
   bool inFunc = false;
   while( std::getline(cleanFileInput, line) ) {
     //toCout(line);
+    if(line.find("27'b000000000000000000000000000, of, 32'b00000000000000000000000000000000") != std::string::npos) {
+      toCout("FIND IT!");
+    }
     if(std::regex_match(line, match, pureComment) || line.substr(0,2) == "/*" || line.empty())
       continue;
     line = std::regex_replace(line, partialComment, "");
@@ -261,7 +264,8 @@ void clean_file(std::string fileName) {
     bool noConcat=true;
     std::string retStr;
     noConcat = extract_concat(cleanLine, output, retStr, true);
-    if( !std::regex_match(line, match, pSrcDestBothConcat) )
+    //if( !std::regex_match(line, match, pSrcDestBothConcat) )
+    if( !is_srcDestConcat(line) )
       if (noConcat)
         output << cleanLine << std::endl;
       else {
@@ -436,6 +440,7 @@ void clean_file(std::string fileName) {
           //toCout("Matched in both_concat");          
           // split both_concat into src_concat and maybe also both_concat.
           if( !std::regex_match(line, m, pSrcDestBothConcat) ) {
+          //if( !is_srcDestConcat(line) ) {
             toCout("Error: both_concat not matched");
             abort(); //
           }
@@ -542,6 +547,9 @@ void analyze_reg_path( std::string fileName ) {
   std::smatch m;
   while( std::getline(input, line) ) {
     //toCout(line);
+    if(line.find("27'b000000000000000000000000000, of, 32'b00000000000000000000000000000000") != std::string::npos) {
+      toCout("FIND IT!");
+    }
     uint32_t choice = parse_verilog_line(line, true);
     switch(choice) {
       case ONE_OP:
@@ -816,10 +824,11 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   else if (is_srcConcat(line)) {
     return SRC_CONCAT;
   }
-  else if (std::regex_match(line, m, pSrcDestBothConcat)) {
+  //else if (std::regex_match(line, m, pSrcDestBothConcat)) {
+  else if (is_srcDestConcat(line)) {
     return BOTH_CONCAT;
   }
-  else if (std::regex_match(line, m, pDestConcat)) {
+  else if (is_destConcat(line)) {
     return DEST_CONCAT;
   }
   else if (std::regex_match(line, m, pIte)) { // if cond is rst, then does not add any taint
@@ -928,7 +937,7 @@ void add_file_taints(std::string fileName, std::map<std::string, std::vector<std
   // Reserve first line for module declaration
   while( std::getline(input, line) ) {
     if(moduleName.compare("HLS_cdp_icvt_core") == 0 && line.find("IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl") != std::string::npos)
-      toCout(line);
+      //toCout(line);
     lineNo++;
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       add_case_taints_limited(input, output, line);
@@ -2145,8 +2154,8 @@ bool extract_concat(std::string line, std::ofstream &output, std::string &return
   if ( (line.find("assign") != std::string::npos
        //&& !std::regex_match(line, m, pSrcConcat)
        && !is_srcConcat(line)
-       && !std::regex_match(line, m, pDestConcat)
-       && !std::regex_match(line, m, pSrcDestBothConcat)
+       && !is_destConcat(line)
+       && !is_srcDestConcat(line)
        && std::regex_search(line, m, pBraces))
        || std::regex_match(line, m, pNonblockConcat) ) { // also extract from nonblockconcat
     // iterate over all matches

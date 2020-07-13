@@ -1,0 +1,20 @@
+module exp( clk, rst, in1, in2, in3, r);
+  input clk;
+  input rst;
+  input [1:0] in1;
+  input [1:0] in2;
+  input [1:0] in3;
+  output [5:0] r;
+  wire [351:0] fangyuan6;
+  wire [15:0] ki;
+  wire [15:0] kd;
+  wire [15:0] sp;
+  wire [15:0] pv;
+  wire [15:0] kpd;
+  wire [15:0] \err[0] ;
+  wire [15:0] \err[1] ;
+  wire [31:0] un;
+  wire [31:0] sigma;
+  wire [4:0] of;
+  assign fangyuan6 = { ki[15], ki[15], ki[15], ki[15], ki[15], ki[15], ki[15], ki[15], ki[15], ki[15], ki[15], ki[15], ki[15], ki[15], ki[15], ki[15], ki, kd[15], kd[15], kd[15], kd[15], kd[15], kd[15], kd[15], kd[15], kd[15], kd[15], kd[15], kd[15], kd[15], kd[15], kd[15], kd[15], kd, sp[15], sp[15], sp[15], sp[15], sp[15], sp[15], sp[15], sp[15], sp[15], sp[15], sp[15], sp[15], sp[15], sp[15], sp[15], sp[15], sp, pv[15], pv[15], pv[15], pv[15], pv[15], pv[15], pv[15], pv[15], pv[15], pv[15], pv[15], pv[15], pv[15], pv[15], pv[15], pv[15], pv, kpd[15], kpd[15], kpd[15], kpd[15], kpd[15], kpd[15], kpd[15], kpd[15], kpd[15], kpd[15], kpd[15], kpd[15], kpd[15], kpd[15], kpd[15], kpd[15], kpd, \err[0] [15], \err[0] [15], \err[0] [15], \err[0] [15], \err[0] [15], \err[0] [15], \err[0] [15], \err[0] [15], \err[0] [15], \err[0] [15], \err[0] [15], \err[0] [15], \err[0] [15], \err[0] [15], \err[0] [15], \err[0] [15], \err[0] , \err[1] [15], \err[1] [15], \err[1] [15], \err[1] [15], \err[1] [15], \err[1] [15], \err[1] [15], \err[1] [15], \err[1] [15], \err[1] [15], \err[1] [15], \err[1] [15], \err[1] [15], \err[1] [15], \err[1] [15], \err[1] [15], \err[1] , un, sigma, 27'b000000000000000000000000000, of, 32'b00000000000000000000000000000000 };
+endmodule

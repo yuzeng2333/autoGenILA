@@ -139,4 +139,8 @@ std::string extract_path(std::string fullFileName);
 uint32_t get_dest_ver(std::string destAndSlice);
 
 bool is_srcConcat(std::string line);
+
+bool is_destConcat(std::string line);
+
+bool is_srcDestConcat(std::string line);
 #endif

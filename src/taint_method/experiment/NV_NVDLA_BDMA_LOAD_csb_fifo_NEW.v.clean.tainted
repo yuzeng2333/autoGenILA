@@ -1,4 +1,0 @@
- // ground taints for floating regs
- // ground taints for unused wires
- // ground taints for unused wire slices
-endmodule

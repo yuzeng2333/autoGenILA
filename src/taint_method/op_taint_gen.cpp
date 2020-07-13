@@ -1167,6 +1167,7 @@ void both_concat_op_taint_gen(std::string line, std::ofstream &output) {
   //checkCond(!g_use_reset_sig, "both_concat not supported when use_reset_sig!!");
   std::smatch m;
   if( !std::regex_match(line, m, pSrcDestBothConcat) )
+  //if(!is_srcDestConcat(line))
     abort(); //
 
   std::string blank = m.str(1);
@@ -1272,7 +1273,8 @@ void both_concat_op_taint_gen(std::string line, std::ofstream &output) {
 void dest_concat_op_taint_gen(std::string line, std::ofstream &output) {
   //checkCond(!g_use_reset_sig, "both_concat not supported when use_reset_sig!!");
   std::smatch m;
-  if( !std::regex_match(line, m, pDestConcat) )
+  //if( !std::regex_match(line, m, pDestConcat) )
+  if( !is_destConcat(line) )
     abort(); //
 
   std::string blank = m.str(1);
