@@ -566,6 +566,9 @@ void merge_reg_cond_pair_vec(const std::vector<std::pair<std::string, std::strin
 void go_forward(std::string startVarAndSlice, std::vector<std::pair<std::string, std::string>> &frontCondPairVec) {
   //toCout("GO_FORWARD from: "+startVarAndSlice);
   //assert(frontCondPairVec.empty());
+  if(startVarAndSlice.compare("fangyuan88") == 0) {
+    toCout("Find it!");
+  }
   std::string startVar, startVarSlice;
   split_slice(startVarAndSlice, startVar, startVarSlice);
   if(g_forwardMap.find(startVar) == g_forwardMap.end()
@@ -692,6 +695,29 @@ void go_forward(std::string startVarAndSlice, std::vector<std::pair<std::string,
             go_forward(newStartVarAndSlice, localFrontCondPairVec);
             frontCondPairVec.insert(frontCondPairVec.end(), localFrontCondPairVec.begin(), localFrontCondPairVec.end());
           }
+        }
+      }
+      else if(is_destConcat(line)) {
+        if(!std::regex_match(line, m, pDestConcat)) {
+          toCout("Error: srcDestBothConcat not matched!");
+          abort();
+        }
+        std::string destList = m.str(2);
+        std::string srcAndSlice = m.str(3);
+        std::string src, srcSlice;
+        split_slice(srcAndSlice, src, srcSlice);
+        if(src.compare(startVar) != 0)
+          continue;
+        std::string newStartVarAndSlice = get_target_and_slice(startVarAndSlice, srcAndSlice, srcAndSlice, destList);
+        if(newStartVarAndSlice.empty())
+          return;
+        else if(isTrueReg(newStartVarAndSlice)) { // if dest for this expression is reg
+          frontCondPairVec.push_back(std::make_pair(newStartVarAndSlice, ""));
+          return;
+        }
+        else {
+          go_forward(newStartVarAndSlice, localFrontCondPairVec);
+          frontCondPairVec.insert(frontCondPairVec.end(), localFrontCondPairVec.begin(), localFrontCondPairVec.end());
         }
       }
       else if(std::regex_match(line, m, pNonblockIf)) {
@@ -998,6 +1024,32 @@ void go_backward(std::string startVarAndSlice, std::vector<std::pair<std::string
         if(dest.compare(startVar) != 0)
           continue;
         std::string newStartVarAndSlice = get_target_and_slice(startVarAndSlice, destAndSlice, destList, srcList);
+        if(newStartVarAndSlice.empty())
+          continue;
+        else if(isTrueReg(newStartVarAndSlice)) { 
+          backCondPairVec.push_back(std::make_pair(newStartVarAndSlice, ""));
+        }
+        else {
+          go_backward(newStartVarAndSlice, localBackCondPairVec);
+          backCondPairVec.insert(backCondPairVec.end(), localBackCondPairVec.begin(), localBackCondPairVec.end());
+        }
+      }
+    }
+    else if(is_destConcat(line)) {
+      if(!std::regex_match(line, m, pDestConcat)) {
+        toCout("Error: srcDestBothConcat not matched!");
+        abort();
+      }
+      std::string destList = m.str(2);
+      std::string srcAndSlice = m.str(3);
+      std::vector<std::string> destVec;
+      parse_var_list(destList, destVec);
+      std::string dest, destSlice;
+      for(std::string destAndSlice: destVec) {
+        split_slice(destAndSlice, dest, destSlice);
+        if(dest.compare(startVar) != 0)
+          continue;
+        std::string newStartVarAndSlice = get_target_and_slice(startVarAndSlice, destAndSlice, destList, srcAndSlice);
         if(newStartVarAndSlice.empty())
           continue;
         else if(isTrueReg(newStartVarAndSlice)) { 
