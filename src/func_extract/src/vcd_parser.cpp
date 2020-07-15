@@ -1,8 +1,8 @@
 #include "vcd_parser.h"
 #include "helper.h"
+#include "global_data_struct.h"
 
 std::unordered_map<std::string, std::string> g_nameVarMap;
-std::unordered_map<std::string, std::string> g_varRstValMap;
 
 void vcd_parser(std::string fileName) {
   std::regex pName("^\\$var wire (\\d+) (n\\d+) (\\S+) \\$end$");
@@ -19,9 +19,9 @@ void vcd_parser(std::string fileName) {
     }
     else if(line.front() == '#') {
       state = readValue;
-      if(line.substr(1, 1) = '0')
+      if(line.substr(1, 1) == "0")
         passLine = true;
-      else if(line.substr(1, 1) != '0')
+      else if(line.substr(1, 1) != "0")
         passLine = false;
       continue;
     }
@@ -34,21 +34,22 @@ void vcd_parser(std::string fileName) {
       }
       std::string name = m.str(2);
       std::string var = m.str(3);
-      g_varNameMap.emplace(name, var);
+      if(isTrueReg(var))
+        g_nameVarMap.emplace(name, var);
+      else if(isTrueReg("\\"+var))
+        g_nameVarMap.emplace(name, "\\"+var);
     }
     else if(state == readValue) {
       uint32_t blankPos = line.find(" "); 
       std::string rstVal = line.substr(1, blankPos-1);
       std::string name = line.substr(blankPos+1);
-      if(g_varNameMap.find(name) == g_varNameMap.end()) {
-        toCout("Error: cannot find the name: "+name+" in the g_varNameMap!");
-        abort();
-      }
-      std::string var = g_varNameMap[name];
-      if(g_varRstValMap.find(var) == g_varRstValMap.end())
-        g_varRstValMap.emplace(var, rstVal);
+      if(g_nameVarMap.find(name) == g_nameVarMap.end())
+        continue;
+      std::string var = g_nameVarMap[name];
+      if(g_rstVal.find(var) == g_rstVal.end())
+        g_rstVal.emplace(var, rstVal);
       else
-        g_varRstValMap[var] = rstVal;
+        g_rstVal[var] = rstVal;
     }
   }
 }

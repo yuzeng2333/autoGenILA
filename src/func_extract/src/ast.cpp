@@ -35,6 +35,9 @@ void build_tree_for_single_as(std::string regAndSlice) {
 void add_node(std::string var, uint32_t timeIdx, astNode* const node, bool varIsDest) {
   if(g_visitedNode.find(var) != g_visitedNode.end())
     return;
+  if(var.compare("kp") == 0) {
+    toCout("FIND IT!");
+  }
   g_varNode.emplace(var, node);  
   if ( isInput(var) ) {
     add_input_node(var, timeIdx, node);

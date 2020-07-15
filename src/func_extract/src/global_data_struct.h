@@ -1,6 +1,7 @@
 #ifndef GLOBAL_DATA_STRUCT
 #define GLOBAL_DATA_STRUCT
 #include "z3++.h"
+#include "ast.h"
 
 using namespace z3;
 

@@ -269,7 +269,9 @@ void nb_expr(std::string line) {
     return;
   }
   auto ret = g_nbTable.emplace(m.str(2), line);
-  moduleTrueRegs.push_back(m.str(2));
+  std::string dest, destSlice;
+  split_slice(m.str(2), dest, destSlice);
+  moduleTrueRegs.push_back(dest);
   if(!ret.second)
     toCout("Error in inserting ssaTable in nb for key: "+m.str(2));
 }
@@ -339,7 +341,7 @@ void nonblockif_expr(std::string line, std::ifstream &input) {
     toCout("Error in inserting ssaTable for the line: "+line+", "+destNextLine );
 
   std::string destNbLine = "  "+destAndSlice+" <= yuzeng"+yuzengIdx;
-  ret = g_nbTable.emplace("yuzeng"+yuzengIdx, destNbLine);
+  ret = g_nbTable.emplace(destAndSlice, destNbLine);
   if(!ret.second)
     toCout("Error in inserting ssaTable for the line: "+line+", "+destNbLine );
 }
@@ -363,6 +365,11 @@ void always_clkrst_expr(std::string line, std::ifstream &input) {
   }
   std::string destAndSlice = m.str(2);
   std::string src1AndSlice = m.str(3);
+  uint32_t src1Width = get_var_slice_width(src1AndSlice);
+
+  std::string dest, destSlice;
+  split_slice(destAndSlice, dest, destSlice);
+  moduleTrueRegs.push_back(dest);
 
   std::getline(input, line);
   if ( !std::regex_match(line, m, pElse) ) {
@@ -376,17 +383,24 @@ void always_clkrst_expr(std::string line, std::ifstream &input) {
     abort();
   }
   std::string src2AndSlice = m.str(3);
+  uint32_t src2Width = get_var_slice_width(src2AndSlice);
+  uint32_t localWidth = std::max(src1Width, src2Width);
 
   std::string yuzengIdx = toStr(g_new_var++);
   std::string destNext = "yuzeng"+yuzengIdx;
   moduleWires.insert("yuzeng"+yuzengIdx);
+  bool insertDone;
+    insertDone = varWidth.var_width_insert(destNext, localWidth-1, 0);
+  if (!insertDone) {
+    std::cout << "insert failed: " + line << std::endl;
+  }
   std::string destNextLine = "  assign yuzeng"+yuzengIdx+" = "+condAndSlice+" ? "+src1AndSlice+" : "+src2AndSlice+" ;";
   auto ret = g_ssaTable.emplace("yuzeng"+yuzengIdx, destNextLine);
   if(!ret.second)
     toCout("Error in inserting ssaTable for the line: "+line+", "+destNextLine);
 
   std::string destNbLine = "  "+destAndSlice+" <= yuzeng"+yuzengIdx+" ;";
-  ret = g_nbTable.emplace("yuzeng"+yuzengIdx, destNbLine);
+  ret = g_nbTable.emplace(destAndSlice, destNbLine);
   if(!ret.second)
     toCout("Error in inserting ssaTable for the line: "+line+", "+destNbLine );
 }

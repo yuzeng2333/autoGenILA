@@ -86,13 +86,6 @@ void parse_verilog(std::string fileName) {
     case BOTH_CONCAT:
       both_concat_expr(line);
       break;
-    case NONBLOCK:
-    case NONBLOCKCONCAT:
-      nb_expr(line);
-      break;
-    case NONBLOCKIF:
-      nonblockif_expr(line, input);
-      break;
     case ALWAYS:
       always_expr(line, input);
       break;
@@ -101,6 +94,13 @@ void parse_verilog(std::string fileName) {
       break;
     case ALWAYS_FAKE:
       //TODO: always_fake_taint_gen(line, input, output);
+      break;
+    case NONBLOCK:
+    case NONBLOCKCONCAT:
+      nb_expr(line);
+      break;
+    case NONBLOCKIF:
+      nonblockif_expr(line, input);
       break;
     case FUNCDEF:
       toCout("!! Error: function found in verilog file");
@@ -142,6 +142,8 @@ void read_in_instructions(std::string fileName) {
   enum State {FirstInstr, OtherInstr, WriteASV, ReadASV, ReadNOP, ResetVal};
   enum State state;
   while(std::getline(input, line)) {
+    if(line.back() == ' ')
+      line.pop_back();
     if(line.front() == '#') { // a new instr begins
       state = FirstInstr;
     }
@@ -164,7 +166,10 @@ void read_in_instructions(std::string fileName) {
             auto pos = line.find("=");
             std::string instrName = line.substr(0, pos-1);
             std::string encoding = line.substr(pos+2);
-            assert(encoding == "x" || isNum(encoding));
+            if(encoding != "x" && !isNum(encoding)) {
+              toCout("Encoding is not x or number[1], line is: "+line);
+              abort();
+            }
             struct instrInfo info = { {{instrName, encoding}}, std::set<std::string>{}, std::set<std::string>{} };
             //info.instrEncoding.emplace(instrName, encoding);
             g_instrInfo.push_back(info);
@@ -176,7 +181,10 @@ void read_in_instructions(std::string fileName) {
             auto pos = line.find("=");
             std::string instrName = line.substr(0, pos-1);
             std::string encoding = line.substr(pos+2);
-            assert(encoding == "x" || isNum(encoding));            
+            if(encoding != "x" && !isNum(encoding)) {
+              toCout("Encoding is not x or number[2], line is: "+line);
+              abort();
+            }
             g_instrInfo.back().instrEncoding.emplace(instrName, encoding);
           }
           break;
@@ -193,7 +201,10 @@ void read_in_instructions(std::string fileName) {
             auto pos = line.find("=");
             std::string instrName = line.substr(0, pos-1);
             std::string encoding = line.substr(pos+2);
-            assert(encoding == "x" || isNum(encoding));            
+            if(encoding != "x" && !isNum(encoding)) {
+              toCout("Encoding is not x or number[3], line is: "+line);
+              abort();
+            }
             g_nopInstr.emplace(instrName, encoding);
           }
           break;
@@ -202,7 +213,10 @@ void read_in_instructions(std::string fileName) {
             auto pos = line.find("=");
             std::string instrName = line.substr(0, pos-1);
             std::string encoding = line.substr(pos+2);
-            assert(encoding == "x" || isNum(encoding));            
+            if(encoding != "x" && !isNum(encoding)) {
+              toCout("Encoding is not x or number[4], line is: "+line);
+              abort();
+            }
             g_rstVal.emplace(instrName, encoding);         
           }
       }
