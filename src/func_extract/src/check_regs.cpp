@@ -271,6 +271,9 @@ expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s
   else if( isNum(var) ) { // num_t is always 0
     return num_constraint(node, timeIdx, c, s, g, isSolve);
   }
+  else if( is_case_dest(var) ) {
+    return case_constraint(node, timeIdx, c, s, g, bound, isSolve);
+  }
   else { // it is wire
     return add_ssa_constraint(node, timeIdx, c, s, g, bound, isSolve, isBool);
   }

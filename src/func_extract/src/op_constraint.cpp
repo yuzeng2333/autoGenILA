@@ -34,34 +34,39 @@ expr var_width_expr(std::string var, uint32_t width, context &c) {
 
 // returned _t is 0 for number, returned var is its value for int
 expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTaint, uint32_t width) {
-  std::string varAndSliceTimed;
+  std::string var, varSlice;
+  split_slice(varAndSlice, var, varSlice);
+  std::string varTimed;
   uint32_t localWidth;
   if(width == 0)
     localWidth = get_var_slice_width(varAndSlice);
   else
     localWidth = width;
+  uint32_t varWidthNum = get_var_slice_width(var);
 
-  if(isNum(varAndSlice)) {
+  if(isNum(var)) {
     if(isTaint) {
-      varAndSliceTimed = varAndSlice + "___#" + toStr(timeIdx) + "_"+toStr(localWidth)+"b" + _t;
+      varTimed = var + "___#" + toStr(timeIdx) + "_"+toStr(localWidth)+"b" + _t;
       return c.bv_val(0, localWidth);
     }
     else {
-      varAndSliceTimed = varAndSlice + "___#" + toStr(timeIdx) + "_"+toStr(localWidth)+"b";      
-      return c.bv_val(hdb2int(varAndSlice), localWidth);
+      varTimed = var + "___#" + toStr(timeIdx) + "_"+toStr(localWidth)+"b";      
+      return c.bv_val(hdb2int(var), localWidth);
     }
   }
   else { // if is not num
+    uint32_t hi = get_hi(varAndSlice);
+    uint32_t lo = get_lo(varAndSlice);
     if(isTaint) {
-      varAndSliceTimed = varAndSlice + "___#" + toStr(timeIdx) + _t;
+      varTimed = var + "___#" + toStr(timeIdx) + _t;
     }
     else {
-      varAndSliceTimed = varAndSlice + "___#" + toStr(timeIdx);
+      varTimed = var + "___#" + toStr(timeIdx);
       //if(!isSolve && INPUT_EXPR_VAL.find(timed_name(varAndSlice, timeIdx)) != INPUT_EXPR_VAL.end() )
-      //  return *INPUT_EXPR_VAL[varAndSliceTimed];
+      //  return *INPUT_EXPR_VAL[varTimed];
     }
 
-    return c.bv_const(varAndSliceTimed.c_str(), localWidth);
+    return c.bv_const(varTimed.c_str(), varWidthNum).extract(hi, lo);
   }
 }
 
@@ -490,12 +495,56 @@ expr ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
 }
 
 
-//template <class EXPR1, class EXPR2>
-//void make_z3_expr_taint(solver &s, goal &g, context &c, std::string op, expr& destExpr, EXPR1& op1Expr, EXPR2& op2Expr, bool isSolve) {
-//  if
-//  s.add(destExpr_t == (op1Expr_t | op2Expr_t));
-//  make_z3_expr<expr, expr>(s, g, c, node->op, destExpr, op1Expr, op2Expr, isSolve);
-//}
+expr case_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
+  assert(node->type == CASE);
+  std::string destAndSlice = node->dest;
+  std::string caseVar = node->srcVec[0];
+  uint32_t caseHi = get_hi(caseVar);
+  uint32_t caseLo = get_lo(caseVar);
+  expr caseExpr = add_constraint( node->childVec[0], timeIdx, c, s, g, bound, isSolve, false).extract(caseHi, caseLo);
+  // size of srcVec must be odd number
+  assert(node->srcVec[0].size() % 2 == 1);
+  std::vector<std::pair<std::string, std::string>> caseAssignPair;
+  std::string assignVarAndSlice;
+  std::string caseValue;
+  uint32_t localWdith = get_var_slice_width(node->srcVec[2]);
+  std::string defaultVal;
+  expr assignVarExpr = add_constraint(node->childVec[1], timeIdx, c, s, g, bound, isSolve);
+  uint32_t localWidth;
+
+  for(uint32_t i = node->srcVec.size()-1; i > 0 ; i--) {
+    if(i % 2 == 0) { // this is assign var
+      assignVarAndSlice = node->srcVec[i];
+      localWidth = get_var_slice_width(assignVarAndSlice);
+    }
+    else { // this is case value
+      caseValue = node->srcVec[i];
+      std::string assignVar, assignVarSlice;      
+      split_slice(assignVarAndSlice, assignVar, assignVarSlice);      
+      uint32_t Hi, Lo;
+      Hi = get_hi(assignVarAndSlice);
+      Lo = get_lo(assignVarAndSlice);
+      if(caseValue.compare("default") == 0) {
+        expr destExpr = var_expr(destAndSlice+"_CASE_"+toStr((i-1)/2), timeIdx, c, false, localWidth);
+        expr defaultVarExpr = add_constraint(node->childVec[2], timeIdx, c, s, g, bound, isSolve).extract(Hi, Lo);
+        s.add( destExpr == defaultVarExpr );
+      }
+      else {
+        uint32_t posOfOne = get_pos_of_one(caseValue);
+        expr destExpr = var_expr(destAndSlice+"_CASE_"+toStr((i-1)/2), timeIdx, c, false, localWidth);
+        expr lastAssignExpr = var_expr(destAndSlice+"_CASE_"+toStr((i+1)/2), timeIdx, c, false, localWidth);
+        s.add( destExpr == ite( caseExpr.extract(posOfOne, posOfOne) == c.bv_val(1, 1), assignVarExpr.extract(Hi, Lo),  lastAssignExpr) );
+      }
+    }
+  }
+}
+
+
+expr add_one_case_branch_expr(uint32_t idx, std::vector<std::string> &srcVec) {
+
+
+}
+
 
 template <class EXPR1, class EXPR2>
 expr make_z3_expr(solver &s, goal &g, context &c, std::string op, const expr& destExpr, EXPR1& op1Expr, EXPR2& op2Expr, bool isSolve, uint32_t destWidth, uint32_t op1Width, uint32_t op2Width) {

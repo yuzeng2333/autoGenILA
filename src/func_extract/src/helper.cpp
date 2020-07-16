@@ -139,3 +139,48 @@ uint32_t get_time(std::string var) {
   else
     return std::stoi(var.substr(pos+4));
 }
+
+
+bool is_case_dest(std::string var) {
+  return g_caseTable.find(var) != g_caseTable.end();
+}
+
+
+uint32_t get_pos_of_one(std::string value) {
+  if(value.compare("default") == 0) {
+    toCout("Error: try to find 1 in default: "+value);
+    abort();
+  }
+  if(value.find("?") == std::string::npos 
+      || value.find("b") == std::string::npos) {
+    toCout("Error: case value is not in the correct form: "+value);
+    abort();    
+  }
+  uint32_t pos = value.find("1");
+  uint32_t pos2 = value.find("1", pos+1);
+  if(pos2 != std::string::npos) {
+    toCout("Error: found 2 1 in the case value");
+    abort();
+  }
+  return pos;
+}
+
+
+uint32_t get_hi(std::string varAndSlice) {
+  std::string var, varSlice;
+  split_slice(varAndSlice, var, varSlice);
+  if(!varSlice.empty())
+    return get_end(varSlice);
+  auto idxPairs = varWidth.get_idx_pair(var, "find_version_num for: "+var);
+  return idxPairs.first;
+}
+
+
+uint32_t get_lo(std::string varAndSlice) {
+  std::string var, varSlice;
+  split_slice(varAndSlice, var, varSlice);
+  if(!varSlice.empty())
+    return get_begin(varSlice);
+  auto idxPairs = varWidth.get_idx_pair(var, "find_version_num for: "+var);
+  return idxPairs.second;
+}

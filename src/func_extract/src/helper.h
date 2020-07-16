@@ -42,4 +42,13 @@ uint32_t expr_len(expr &e);
 bool comparePair(const std::pair<std::string, uint32_t> &p1, const std::pair<std::string, uint32_t> &p2 );
 
 uint32_t get_time(std::string var);
+
+bool is_case_dest(std::string var);
+
+uint32_t get_pos_of_one(std::string value);
+
+uint32_t get_hi(std::string varAndSlice);
+
+uint32_t get_lo(std::string varAndSlice);
+
 #endif

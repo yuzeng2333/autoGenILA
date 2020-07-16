@@ -51,6 +51,9 @@ void add_node(std::string var, uint32_t timeIdx, astNode* const node, bool varIs
   else if( isNum(var) ) {
     add_num_node(var, timeIdx, node);
   }
+  else if( is_case_dest(var) ) {
+    add_case_node(var, timeIdx, node);
+  }
   else { // it is wire
     add_ssa_node(var, timeIdx, node);
   }
@@ -355,6 +358,39 @@ void add_sel_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
 void add_src_concat_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   return;
 }
+
+
+void add_case_node(std::string var, uint32_t timeIdx, astNode* const node) {
+  if(g_caseTable.find(var) == g_caseTable.end()) {
+    toCout("Error: not found in g_caseTable: "+var);
+    abort();
+  }
+  auto localPair = g_caseTable[var];
+  std::string caseVar = localPair.first;
+  auto caseAssignPairs = localPair.second;
+
+  node->type = CASE;
+  node->dest = var;
+  node->op = "";
+  //node->srcVec = SV{op1AndSlice, op2AndSlice, integer};
+  // srcVec must follow this format:
+  // 1st is the sAndSlice(case variable)
+  // then followed are N pairs of (caseValue, assignVariable).
+  // So the total number is 2N+1
+  node->srcVec.push_back(caseVar);
+  add_child_node(caseVar, timeIdx, node);
+  add_child_node(caseAssignPairs.front().second, timeIdx, node);
+  add_child_node(caseAssignPairs.back().second, timeIdx, node);
+  for(std::pair<std::string, std::string> caseAssign : caseAssignPairs) {
+    node->srcVec.push_back(caseAssign.first);
+    node->srcVec.push_back(caseAssign.second);
+  }
+  node->destTime = timeIdx;
+  node->isReduceOp = false;
+  node->done = false;
+  return;
+}
+
 
 
 bool check_two_op(std::string line, std::string &op, std::string &dest, std::string &op1, std::string &op2, bool &isReduceOp) {

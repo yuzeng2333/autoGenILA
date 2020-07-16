@@ -8,7 +8,7 @@ std::unordered_map<std::string, uint32_t> reg2timeIdx;
 std::unordered_map<std::string, std::string> g_ssaTable;
 // non-blocking assignment table
 std::unordered_map<std::string, std::string> g_nbTable;
-std::unordered_map<std::string, std::vector<std::pair<std::string, std::string>>> g_caseTable;
+std::unordered_map<std::string, std::pair<std::string, std::vector<std::pair<std::string, std::string>>>> g_caseTable;
 uint32_t g_new_var;
 //std::unordered_map<std::string, astNode*> g_asSliceRoot;
 std::unordered_map<std::string, astNode*> g_varNode;

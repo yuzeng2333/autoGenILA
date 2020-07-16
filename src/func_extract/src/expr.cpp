@@ -417,7 +417,7 @@ void case_expr(std::string line, std::ifstream &input) {
   std::vector<std::pair<std::string, std::string>> caseAssignPairs;
   std::vector<std::string> inputSlice;
   std::string destAndSlice = parse_case_statements(caseAssignPairs, input, false);
-  g_caseTable.emplace(destAndSlice, caseAssignPairs);
+  g_caseTable.emplace(destAndSlice, std::make_pair(sAndSlice, caseAssignPairs));
 }
 
 
