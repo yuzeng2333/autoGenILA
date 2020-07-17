@@ -491,59 +491,91 @@ expr ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
     return destExpr;
   }
   else
-    return ite( condExpr == c.bv_val(1, 1), zext(op1Expr, destWidthNum-op1WidthNum), zext(op2Expr, destWidthNum-op2WidthNum));
+    return ite( condExpr == c.bv_val(1, 1), zext(op1Expr, destWidthNum-op1WidthNum), zext(op2Expr, destWidthNum-op2WidthNum) );
 }
 
 
 expr case_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
   assert(node->type == CASE);
-  std::string destAndSlice = node->dest;
-  std::string caseVar = node->srcVec[0];
-  uint32_t caseHi = get_hi(caseVar);
-  uint32_t caseLo = get_lo(caseVar);
-  expr caseExpr = add_constraint( node->childVec[0], timeIdx, c, s, g, bound, isSolve, false).extract(caseHi, caseLo);
-  // size of srcVec must be odd number
   assert(node->srcVec[0].size() % 2 == 1);
-  std::vector<std::pair<std::string, std::string>> caseAssignPair;
+
+  std::string destAndSlice = node->dest;
+  std::string caseVarAndSlice = node->srcVec[0];
+  uint32_t caseHi = get_hi(caseVarAndSlice);
+  uint32_t caseLo = get_lo(caseVarAndSlice);
+  expr caseExpr = add_constraint( node->childVec[0], timeIdx, c, s, g, bound, isSolve, false).extract(caseHi, caseLo);
+  expr caseExpr_t = var_expr(caseVarAndSlice, timeIdx, c, true);
+  expr assignVarExpr = add_constraint(node->childVec[1], timeIdx, c, s, g, bound, isSolve);
+  expr assignVarExpr_t = var_expr(node->childVec[1]->dest, timeIdx, c, true);
+
   std::string assignVarAndSlice;
   std::string caseValue;
-  uint32_t localWdith = get_var_slice_width(node->srcVec[2]);
   std::string defaultVal;
-  expr assignVarExpr = add_constraint(node->childVec[1], timeIdx, c, s, g, bound, isSolve);
   uint32_t localWidth;
 
-  for(uint32_t i = node->srcVec.size()-1; i > 0 ; i--) {
-    if(i % 2 == 0) { // this is assign var
-      assignVarAndSlice = node->srcVec[i];
-      localWidth = get_var_slice_width(assignVarAndSlice);
-    }
-    else { // this is case value
-      caseValue = node->srcVec[i];
-      std::string assignVar, assignVarSlice;      
-      split_slice(assignVarAndSlice, assignVar, assignVarSlice);      
-      uint32_t Hi, Lo;
-      Hi = get_hi(assignVarAndSlice);
-      Lo = get_lo(assignVarAndSlice);
-      if(caseValue.compare("default") == 0) {
-        expr destExpr = var_expr(destAndSlice+"_CASE_"+toStr((i-1)/2), timeIdx, c, false, localWidth);
-        expr defaultVarExpr = add_constraint(node->childVec[2], timeIdx, c, s, g, bound, isSolve).extract(Hi, Lo);
-        s.add( destExpr == defaultVarExpr );
+  if(isSolve) {
+    for(uint32_t i = node->srcVec.size()-1; i > 0 ; i--) {
+      if(i % 2 == 0) { // this is assign var
+        assignVarAndSlice = node->srcVec[i];
+        localWidth = get_var_slice_width(assignVarAndSlice);
       }
-      else {
-        uint32_t posOfOne = get_pos_of_one(caseValue);
-        expr destExpr = var_expr(destAndSlice+"_CASE_"+toStr((i-1)/2), timeIdx, c, false, localWidth);
-        expr lastAssignExpr = var_expr(destAndSlice+"_CASE_"+toStr((i+1)/2), timeIdx, c, false, localWidth);
-        s.add( destExpr == ite( caseExpr.extract(posOfOne, posOfOne) == c.bv_val(1, 1), assignVarExpr.extract(Hi, Lo),  lastAssignExpr) );
+      else { // this is case value
+        caseValue = node->srcVec[i];
+        std::string assignVar, assignVarSlice;      
+        split_slice(assignVarAndSlice, assignVar, assignVarSlice); 
+        uint32_t Hi, Lo;
+        Hi = get_hi(assignVarAndSlice);
+        Lo = get_lo(assignVarAndSlice);
+        if(caseValue.compare("default") == 0) {
+          expr destExpr = var_expr(destAndSlice+"_CASE_"+toStr((i-1)/2), timeIdx, c, false, localWidth);
+          expr defaultVarExpr = add_constraint(node->childVec[2], timeIdx, c, s, g, bound, isSolve).extract(Hi, Lo);
+          s.add( destExpr == defaultVarExpr );
+
+          // _t
+          expr destExpr_t = var_expr(destAndSlice+"_CASE_"+toStr((i-1)/2), timeIdx, c, true, localWidth);
+          expr defaultVarExpr_t = var_expr(assignVarAndSlice, timeIdx, c, true);
+          s.add( destExpr_t == defaultVarExpr_t );
+        }
+        else {
+          uint32_t posOfOne = get_pos_of_one(caseValue);
+          expr destExpr(c);
+          if(i > 1)
+            destExpr = var_expr(destAndSlice+"_CASE_"+toStr((i-1)/2), timeIdx, c, false, localWidth);
+          else
+            destExpr = var_expr(destAndSlice, timeIdx, c, false, localWidth);
+          expr lastAssignExpr = var_expr(destAndSlice+"_CASE_"+toStr((i+1)/2), timeIdx, c, false, localWidth);
+          s.add( destExpr == ite( caseExpr.extract(posOfOne, posOfOne) == c.bv_val(1, 1), assignVarExpr.extract(Hi, Lo), lastAssignExpr) );
+
+          // _t
+          expr destExpr_t = var_expr(destAndSlice+"_CASE_"+toStr((i-1)/2), timeIdx, c, true, localWidth);
+          expr lastAssignExpr_t = var_expr(destAndSlice+"_CASE_"+toStr((i+1)/2), timeIdx, c, true, localWidth);
+          expr defaultVarExpr_t = var_expr(assignVarAndSlice, timeIdx, c, true);
+          s.add( destExpr_t == ite( caseExpr.extract(posOfOne, posOfOne) == c.bv_val(1, 1), assignVarExpr_t, lastAssignExpr_t) );
+        }
       }
     }
   }
+  else
+    return add_one_case_branch_expr(node, caseExpr, 1, timeIdx, c, s, g, bound);
 }
 
 
-expr add_one_case_branch_expr(uint32_t idx, std::vector<std::string> &srcVec) {
-
-
-}
+expr add_one_case_branch_expr(astNode* const node, expr &caseExpr, uint32_t idx, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound) {
+  astNode *assignNode;
+  std::string assignVarAndSlice = node->srcVec[idx+1];
+  uint32_t hi = get_hi(assignVarAndSlice);
+  uint32_t lo = get_lo(assignVarAndSlice);
+  if(idx < node->srcVec.size()-2) {
+    assignNode = node->childVec[1];
+    std::string caseValue = node->srcVec[idx];
+    uint32_t posOfOne = get_pos_of_one(caseValue);  
+    return ite(caseExpr.extract(posOfOne, posOfOne) == c.bv_val(1, 1), add_constraint(assignNode, timeIdx, c, s, g, bound, false, false).extract(hi, lo), add_one_case_branch_expr(node, caseExpr, idx+2, timeIdx, c, s, g, bound));
+  }
+  else {
+    assignNode = node->childVec[2];
+    return add_constraint(assignNode, timeIdx, c, s, g, bound, false, false).extract(hi, lo);
+  }
+} 
 
 
 template <class EXPR1, class EXPR2>
