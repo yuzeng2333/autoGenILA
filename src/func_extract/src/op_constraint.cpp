@@ -246,8 +246,8 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
 }
 
 
-void one_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
-  toCoutVerb("One op constraint for :"+node->dest); 
+expr one_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
+  toCoutVerb("One op constraint for :"+node->dest);
  
   assert(node->srcVec.size() == 1);
   std::string dest, destSlice;
@@ -257,20 +257,46 @@ void one_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   split_slice(destAndSlice, dest, destSlice);
   split_slice(op1AndSlice, op1, op1Slice);
 
-  expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
-  expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true);
-  s.add( destExpr_t == op1Expr_t );
+  expr destExpr(c);
+  expr op1Expr(c);
+  if(isSolve) {
+    expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
+    expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true);
+    s.add( destExpr_t == op1Expr_t );
 
-  expr destExpr = var_expr(destAndSlice, timeIdx, c, false);
-  expr op1Expr = var_expr(op1AndSlice, timeIdx, c, false);
-  make_z3_expr(s, g, c, node->op, destExpr, op1Expr);
+    destExpr = var_expr(destAndSlice, timeIdx, c, false);
+    op1Expr = var_expr(op1AndSlice, timeIdx, c, false);
 
-  add_child_constraint(node, timeIdx, c, s, g, bound, isSolve);
+    add_child_constraint(node, timeIdx, c, s, g, bound, isSolve);
+  }
+  return make_z3_expr(s, g, c, node->op, destExpr, op1Expr, isSolve);
 }
 
 
-void reduce_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
-  toCoutVerb("Reduce op constraint for :"+node->dest);  
+expr reduce_one_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
+  toCoutVerb("Reduce one op constraint for: "+node->dest);
+ 
+  assert(node->srcVec.size() == 1);
+  std::string dest, destSlice;
+  std::string op1, op1Slice;
+  std::string destAndSlice = node->dest;
+  std::string op1AndSlice = node->srcVec.front();
+  split_slice(destAndSlice, dest, destSlice);
+  split_slice(op1AndSlice, op1, op1Slice);
+
+  expr destExpr(c);
+  expr op1Expr(c);
+  if(isSolve) {
+    expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
+    expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true);
+    s.add( destExpr_t == ite(op1Expr_t > 0, c.bv_val(1, 1), c.bv_val(0, 1)) );
+
+    destExpr = var_expr(destAndSlice, timeIdx, c, false);
+    op1Expr = var_expr(op1AndSlice, timeIdx, c, false);
+
+    add_child_constraint(node, timeIdx, c, s, g, bound, isSolve);
+  }
+  return make_z3_expr(s, g, c, node->op, destExpr, op1Expr, isSolve);  
 }
 
 
@@ -382,7 +408,8 @@ expr sel_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
 
 
 void src_concat_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve ) {
-  toCoutVerb("Src concat op constraint for :"+node->dest);  
+  toCoutVerb("Src concat op constraint for :"+node->dest);
+  
 }
 
 
@@ -496,6 +523,7 @@ expr ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
 
 
 expr case_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
+  toCoutVerb("Case op constraint for :"+node->dest);  
   assert(node->type == CASE);
   assert(node->srcVec[0].size() % 2 == 1);
 
@@ -555,8 +583,7 @@ expr case_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
       }
     }
   }
-  else
-    return add_one_case_branch_expr(node, caseExpr, 1, timeIdx, c, s, g, bound);
+  return add_one_case_branch_expr(node, caseExpr, 1, timeIdx, c, s, g, bound);
 }
 
 
@@ -578,6 +605,7 @@ expr add_one_case_branch_expr(astNode* const node, expr &caseExpr, uint32_t idx,
 } 
 
 
+// for two operators
 template <class EXPR1, class EXPR2>
 expr make_z3_expr(solver &s, goal &g, context &c, std::string op, const expr& destExpr, EXPR1& op1Expr, EXPR2& op2Expr, bool isSolve, uint32_t destWidth, uint32_t op1Width, uint32_t op2Width) {
   uint32_t opWidth = std::max(op1Width, op2Width);
@@ -705,9 +733,19 @@ expr make_z3_expr(solver &s, goal &g, context &c, std::string op, const expr& de
 }
 
 
-void make_z3_expr(solver &s, goal &g, context &c, std::string op, expr& destExpr, expr& op1Expr) {
+// for one operator
+expr make_z3_expr(solver &s, goal &g, context &c, std::string op, expr& destExpr, expr& op1Expr, bool isSolve) {
   if(op.empty()) {
-    s.add( destExpr == op1Expr );
+    if(isSolve) 
+      s.add( destExpr == op1Expr );
+    else
+      return op1Expr;
+  }
+  else if(op == "~") {
+    if(isSolve) 
+      s.add( destExpr == ~op1Expr );
+    else
+      return ~op1Expr;
   }
   else {
     toCout("Not supported 1-op in make_z3_expr!!");
