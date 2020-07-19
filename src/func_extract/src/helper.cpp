@@ -29,9 +29,17 @@ uint32_t hdb2int(std::string num) {
   else {
     std::regex_match(num, m, pBin);
     std::string pureNum = m.str(2); 
-    toCout("Binary number not supported yet: "+num);
-    abort();
+    return bin2int(pureNum);    
   }
+}
+
+
+uint32_t bin2int(std::string num) {
+  uint32_t res = 0;
+  for(auto it = num.begin(); it != num.end(); it++) {
+    res = res << 1 + *it - '0';
+  }
+  return res;
 }
 
 

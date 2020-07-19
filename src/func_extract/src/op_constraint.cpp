@@ -407,9 +407,40 @@ expr sel_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
 }
 
 
-void src_concat_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve ) {
-  toCoutVerb("Src concat op constraint for :"+node->dest);
-  
+expr src_concat_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve ) {
+  toCoutVerb("Src concat op constraint for: "+node->dest);
+
+  std::string destAndSlice = node->dest;
+  std::string dest, destSlice;
+  split_slice(destAndSlice, dest, destSlice);
+  uint32_t destHi = get_hi(destAndSlice);
+  uint32_t destLo = get_lo(destAndSlice);
+  expr destExpr = var_expr(destAndSlice, timeIdx, c, false);//add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve).extract(destHi, destLo);
+  expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
+
+  if(isSolve) {
+    std::string firstSrcAndSlice = node->srcVec[0];
+    expr firstSrcExpr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve);
+    expr firstSrcExpr_t = var_expr(node->srcVec[0], timeIdx, c, true);
+    s.add( destExpr == concat(firstSrcExpr, add_one_concat_expr(node, 1, timeIdx, c, s, g, bound, isSolve, false)) );
+    s.add( destExpr_t == concat(firstSrcExpr_t, add_one_concat_expr(node, 1, timeIdx, c, s, g, bound, isSolve, true)) );
+  }
+
+  return add_one_concat_expr(node, 0, timeIdx, c, s, g, bound, isSolve, false);
+}
+
+
+expr add_one_concat_expr(astNode* const node, uint32_t nxtIdx, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve, bool isTaint ) {
+  expr firstSrcExpr(c);
+  if(!isTaint)
+    firstSrcExpr = add_constraint(node->childVec[nxtIdx], timeIdx, c, s, g, bound, isSolve);
+  else
+    firstSrcExpr = var_expr(node->srcVec[nxtIdx], timeIdx, c, true);
+
+  if(nxtIdx == node->childVec.size() - 1)
+    return firstSrcExpr;
+  else 
+    return concat(firstSrcExpr, add_one_concat_expr(node, nxtIdx+1, timeIdx, c, s, g, bound, isSolve, isTaint) );
 }
 
 

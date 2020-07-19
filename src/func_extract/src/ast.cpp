@@ -500,16 +500,17 @@ bool check_one_op(std::string line, std::string &op, std::string &dest, std::str
   std::smatch m;
   if ( std::regex_match(line, m, pNone)) {
     op = "";
-    dest = m.str(2);
-    op1 = m.str(3);
-    return true;
   }
   if ( std::regex_match(line, m, pInvert)) {
     op = "~";
-    return true;
   }
-  toCout("Unsupported expressions: "+line);
-  abort();
-  return false;
+  else {
+    toCout("Unsupported expressions: "+line);
+    abort();
+    return false;
+  }
+  dest = m.str(2);
+  op1 = m.str(3);
+  return true;
 }
 
