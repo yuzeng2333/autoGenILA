@@ -256,6 +256,8 @@ expr one_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   std::string op1AndSlice = node->srcVec.front();
   split_slice(destAndSlice, dest, destSlice);
   split_slice(op1AndSlice, op1, op1Slice);
+  uint32_t op1Hi = get_hi(op1AndSlice);
+  uint32_t op1Lo = get_lo(op1AndSlice);
 
   expr destExpr(c);
   expr op1Expr(c);
@@ -265,9 +267,7 @@ expr one_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
     s.add( destExpr_t == op1Expr_t );
 
     destExpr = var_expr(destAndSlice, timeIdx, c, false);
-    op1Expr = var_expr(op1AndSlice, timeIdx, c, false);
-
-    add_child_constraint(node, timeIdx, c, s, g, bound, isSolve);
+    op1Expr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve).extract(op1Hi, op1Lo);
   }
   return make_z3_expr(s, g, c, node->op, destExpr, op1Expr, isSolve);
 }
@@ -283,6 +283,8 @@ expr reduce_one_op_constraint(astNode* const node, uint32_t timeIdx, context &c,
   std::string op1AndSlice = node->srcVec.front();
   split_slice(destAndSlice, dest, destSlice);
   split_slice(op1AndSlice, op1, op1Slice);
+  uint32_t op1Hi = get_hi(op1AndSlice);
+  uint32_t op1Lo = get_lo(op1AndSlice);
 
   expr destExpr(c);
   expr op1Expr(c);
@@ -292,9 +294,7 @@ expr reduce_one_op_constraint(astNode* const node, uint32_t timeIdx, context &c,
     s.add( destExpr_t == ite(op1Expr_t > 0, c.bv_val(1, 1), c.bv_val(0, 1)) );
 
     destExpr = var_expr(destAndSlice, timeIdx, c, false);
-    op1Expr = var_expr(op1AndSlice, timeIdx, c, false);
-
-    add_child_constraint(node, timeIdx, c, s, g, bound, isSolve);
+    op1Expr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve).extract(op1Hi, op1Lo);
   }
   return make_z3_expr(s, g, c, node->op, destExpr, op1Expr, isSolve);  
 }
