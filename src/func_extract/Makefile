@@ -350,6 +350,33 @@ src/trial.cpp.s:
 	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/trial.cpp.s
 .PHONY : src/trial.cpp.s
 
+src/vcd_parser.o: src/vcd_parser.cpp.o
+
+.PHONY : src/vcd_parser.o
+
+# target to build an object file
+src/vcd_parser.cpp.o:
+	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/vcd_parser.cpp.o
+.PHONY : src/vcd_parser.cpp.o
+
+src/vcd_parser.i: src/vcd_parser.cpp.i
+
+.PHONY : src/vcd_parser.i
+
+# target to preprocess a source file
+src/vcd_parser.cpp.i:
+	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/vcd_parser.cpp.i
+.PHONY : src/vcd_parser.cpp.i
+
+src/vcd_parser.s: src/vcd_parser.cpp.s
+
+.PHONY : src/vcd_parser.s
+
+# target to generate assembly for a file
+src/vcd_parser.cpp.s:
+	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/vcd_parser.cpp.s
+.PHONY : src/vcd_parser.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -384,6 +411,9 @@ help:
 	@echo "... src/trial.o"
 	@echo "... src/trial.i"
 	@echo "... src/trial.s"
+	@echo "... src/vcd_parser.o"
+	@echo "... src/vcd_parser.i"
+	@echo "... src/vcd_parser.s"
 .PHONY : help
 
 

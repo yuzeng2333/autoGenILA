@@ -74,5 +74,6 @@ bool check_one_op(std::string line, std::string &op, std::string &dest, std::str
 
 bool check_sel_op(std::string line, std::string &op, std::string &dest, std::string &op1, std::string &op2, std::string &integer);
 
+bool check_reduce_one_op(std::string line, std::string &op, std::string &dest, std::string &op1);
 #endif
 

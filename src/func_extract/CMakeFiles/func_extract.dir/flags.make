@@ -6,5 +6,5 @@ CXX_FLAGS =  -O0 -Wall -g
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = 
+CXX_INCLUDES = -I/workspace/tools/z3-4.8.8/z3/src/api/c++ -I/workspace/tools/z3-4.8.8/z3/src/api 
 

@@ -16,6 +16,7 @@ module two_reg(clk, rst, func, out_wire, sign);
   output sign;
   reg sign;
   wire sign_next;
+  wire rst_1b;
   assign _03_ = func == 1'h1;
   assign _04_ = func == 2'h2;
   assign _05_ = _04_ && enable;

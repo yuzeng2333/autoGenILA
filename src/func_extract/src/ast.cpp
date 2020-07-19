@@ -204,6 +204,9 @@ void add_two_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   if (!check_two_op(line, op, destAndSlice, op1AndSlice, op2AndSlice, isReduceOp))
     return;
 
+  if(destAndSlice.compare("adr_check") == 0) {
+    toCout("Found adr_check");
+  }
   std::string dest, destSlice;
   std::string op1, op1Slice;
   std::string op2, op2Slice;
@@ -307,6 +310,28 @@ void add_ite_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
 
 
 void add_reduce_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
+  toCoutVerb("Process Reduce One op for :"+line); 
+  std::string op;
+  std::string destAndSlice;
+  std::string op1AndSlice;
+  if (!check_reduce_one_op(line, op, destAndSlice, op1AndSlice))
+    return;
+
+  std::string dest, destSlice;
+  std::string op1, op1Slice;
+
+  split_slice(destAndSlice, dest, destSlice);
+  split_slice(op1AndSlice, op1, op1Slice);
+
+  node->type = REDUCE1;
+  node->dest = destAndSlice;
+  node->op = op;
+  node->srcVec = SV{op1AndSlice};
+  node->destTime = timeIdx;
+  node->done = false;
+
+  add_child_node(op1AndSlice, timeIdx, node);  
+
   return;
 }
 
@@ -356,6 +381,30 @@ void add_sel_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
 
 
 void add_src_concat_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
+  toCoutVerb("Process Reduce One op for :"+line); 
+  std::smatch m;
+  if (!std::regex_match(line, m, pSrcConcat))
+    return;
+  std::string op;
+  std::string destAndSlice = m.str(2);
+  std::string srcList = m.str(3);
+
+  std::string dest, destSlice;
+  std::vector<std::string> srcVec;
+
+  split_slice(destAndSlice, dest, destSlice);
+  parse_var_list(srcList, srcVec);
+
+  node->type = SRC_CONCAT;
+  node->dest = destAndSlice;
+  node->op = "";
+  node->srcVec = srcVec;
+  node->destTime = timeIdx;
+  node->done = false;
+
+  for(auto src: srcVec)
+    add_child_node(src, timeIdx, node);  
+
   return;
 }
 
@@ -514,3 +563,36 @@ bool check_one_op(std::string line, std::string &op, std::string &dest, std::str
   return true;
 }
 
+
+bool check_reduce_one_op(std::string line, std::string &op, std::string &dest, std::string &op1) {
+  std::smatch m;
+  if ( std::regex_match(line, m, pNot)) {
+    op = "!";
+  }
+  if ( std::regex_match(line, m, pRedOr)) {
+    op = "|";
+  }
+  if ( std::regex_match(line, m, pRedAnd)) {
+    op = "&";
+  }
+  if ( std::regex_match(line, m, pRedNand)) {
+    op = "~&";
+  }
+  if ( std::regex_match(line, m, pRedNor)) {
+    op = "~|";
+  }
+  if ( std::regex_match(line, m, pRedXor)) {
+    op = "^";
+  }
+  if ( std::regex_match(line, m, pRedXnor)) {
+    op = "~^";
+  }
+  else {
+    toCout("Unsupported expressions for reduce op: "+line);
+    abort();
+    return false;
+  }
+  dest = m.str(2);
+  op1 = m.str(3);
+  return true;
+}
