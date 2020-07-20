@@ -42,7 +42,9 @@ expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTain
     localWidth = get_var_slice_width(varAndSlice);
   else
     localWidth = width;
-  uint32_t varWidthNum = get_var_slice_width(var);
+
+  uint32_t varWidthNum;
+  if(width == 0) varWidthNum = get_var_slice_width(var);
 
   if(isNum(var)) {
     if(isTaint) {
@@ -54,7 +56,7 @@ expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTain
       return c.bv_val(hdb2int(var), localWidth);
     }
   }
-  else { // if is not num
+  else if(width == 0){ // if is not num
     uint32_t hi = get_hi(varAndSlice);
     uint32_t lo = get_lo(varAndSlice);
     if(isTaint) {
@@ -67,6 +69,13 @@ expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTain
     }
 
     return c.bv_const(varTimed.c_str(), varWidthNum).extract(hi, lo);
+  }
+  else {
+    if(isTaint)
+      varTimed = var + "___#" + toStr(timeIdx) + _t;
+    else
+      varTimed = var + "___#" + toStr(timeIdx);
+    return c.bv_const(varTimed.c_str(), localWidth);
   }
 }
 
@@ -139,9 +148,9 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   split_slice(op1AndSlice, op1, op1Slice);
   split_slice(op2AndSlice, op2, op2Slice);
   
-  if(destAndSlice.compare("adr_check") == 0) {
-    toCout("Found it!");
-  }
+  //if(destAndSlice.compare("_0036_") == 0) {
+  //  toCout("Found it!");
+  //}
 
   uint32_t op1Hi;
   uint32_t op1Lo;
@@ -210,7 +219,8 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
     if(!op1IsReadRoot && !op2IsReadRoot) {
       if(!isReduceOp) {
         if(sameWidth) s.add(destExpr_t == (op1Expr_t | op2Expr_t));
-        else          s.add(destExpr_t.extract(opWidthNum-1, 0) == (zext(op1Expr_t, opWidthNum - op1WidthNum) | zext(op2Expr_t, opWidthNum - op2WidthNum)));          
+        else          s.add(destExpr_t.extract(opWidthNum-1, 0) == ( zext(op1Expr_t, opWidthNum - op1WidthNum) | zext(op2Expr_t, opWidthNum - op2WidthNum) ));          
+        //else          s.add(destExpr_t == ( zext(op1Expr_t, destWidthNum - op1WidthNum) | zext(op2Expr_t, destWidthNum - op2WidthNum) ));          
         if(g_print_solver) toCout("Add-Solver: "+get_name(destExpr_t)+" == "+get_name(op1Expr_t) + " | "+ get_name(op2Expr_t));
       }
       else {
@@ -651,8 +661,7 @@ expr make_z3_expr(solver &s, goal &g, context &c, std::string op, const expr& de
         toCout("Add-Solver: "+get_name(destExpr)+" == ( "+get_name(op1Expr)+" & "+get_name(op2Expr)+" )" );
       }
     }
-    else        
-      return ( zext(op1Expr, destWidth-op1Width) & zext(op2Expr, destWidth-op2Width) );
+    return ( zext(op1Expr, destWidth-op1Width) & zext(op2Expr, destWidth-op2Width) );
   }
   else if(op == "||" || op == "|") {
     if(isSolve)  {
@@ -661,8 +670,7 @@ expr make_z3_expr(solver &s, goal &g, context &c, std::string op, const expr& de
         toCout("Add-Solver: "+get_name(destExpr)+" == ( "+get_name(op1Expr)+" | "+get_name(op2Expr)+" )" );
       }
     }
-    else        
-      return ( zext(op1Expr, destWidth-op1Width) | zext(op2Expr, destWidth-op2Width) );
+    return ( zext(op1Expr, destWidth-op1Width) | zext(op2Expr, destWidth-op2Width) );
   }
   else if(op == "^") {
     if(isSolve)  {
@@ -671,8 +679,7 @@ expr make_z3_expr(solver &s, goal &g, context &c, std::string op, const expr& de
         toCout("Add-Solver: "+get_name(destExpr)+" == ( "+get_name(op1Expr)+" ^ "+get_name(op2Expr)+" )" );
       }
     }
-    else        
-      return ( zext(op1Expr, destWidth-op1Width) ^ zext(op2Expr, destWidth-op2Width) );
+    return ( zext(op1Expr, destWidth-op1Width) ^ zext(op2Expr, destWidth-op2Width) );
   }
   else if (op == "==") {
     // TODO: use = or == in the following line?
@@ -682,8 +689,7 @@ expr make_z3_expr(solver &s, goal &g, context &c, std::string op, const expr& de
         toCout("Add-Solver: "+get_name(destExpr)+" == ite( "+get_name(op1Expr)+" == "+get_name(op2Expr)+", 1'b1, 1'b0 )" );
       }
     }
-    else         
-      return ite(zext(op1Expr, opWidth-op1Width) == zext(op2Expr, opWidth-op2Width), c.bv_val(1, 1), c.bv_val(0, 1));
+    return ite(zext(op1Expr, opWidth-op1Width) == zext(op2Expr, opWidth-op2Width), c.bv_val(1, 1), c.bv_val(0, 1));
   }
   else if (op == "!=") {
     // TODO: use = or == in the following line?
@@ -693,8 +699,7 @@ expr make_z3_expr(solver &s, goal &g, context &c, std::string op, const expr& de
         toCout("Add-Solver: "+get_name(destExpr)+" == ite( "+get_name(op1Expr)+" != "+get_name(op2Expr)+", 1'b1, 1'b0 )" );
       }
     }
-    else
-      return ite(zext(op1Expr, opWidth-op1Width) != zext(op2Expr, opWidth-op2Width), c.bv_val(1, 1), c.bv_val(0, 1));      
+    return ite(zext(op1Expr, opWidth-op1Width) != zext(op2Expr, opWidth-op2Width), c.bv_val(1, 1), c.bv_val(0, 1));      
   }
   else if (op == ">") {
     // TODO: use = or == in the following line?
@@ -704,8 +709,7 @@ expr make_z3_expr(solver &s, goal &g, context &c, std::string op, const expr& de
         toCout("Add-Solver: "+get_name(destExpr)+" == ite( "+get_name(op1Expr)+" > "+get_name(op2Expr)+", 1'b1, 1'b0 )" );
       }
     }
-    else          
-      return ite(zext(op1Expr, opWidth-op1Width) > zext(op2Expr, opWidth-op2Width), c.bv_val(1, 1), c.bv_val(0, 1));      
+    return ite(zext(op1Expr, opWidth-op1Width) > zext(op2Expr, opWidth-op2Width), c.bv_val(1, 1), c.bv_val(0, 1));      
   }
   else if (op == ">=") {
     // TODO: use = or == in the following line?
@@ -715,8 +719,7 @@ expr make_z3_expr(solver &s, goal &g, context &c, std::string op, const expr& de
         toCout("Add-Solver: "+get_name(destExpr)+" == ite( "+get_name(op1Expr)+" >= "+get_name(op2Expr)+", 1'b1, 1'b0 )" );
       }
     }
-    else         
-      return ite(zext(op1Expr, opWidth-op1Width) >= zext(op2Expr, opWidth-op2Width), c.bv_val(1, 1), c.bv_val(0, 1));      
+    return ite(zext(op1Expr, opWidth-op1Width) >= zext(op2Expr, opWidth-op2Width), c.bv_val(1, 1), c.bv_val(0, 1));      
   }
   else if (op == "<") {
     // TODO: use = or == in the following line?
@@ -726,8 +729,7 @@ expr make_z3_expr(solver &s, goal &g, context &c, std::string op, const expr& de
         toCout("Add-Solver: "+get_name(destExpr)+" == ite( "+get_name(op1Expr)+" < "+get_name(op2Expr)+", 1'b1, 1'b0 )" );
       }
     }
-    else         
-      return ite(zext(op1Expr, opWidth-op1Width) < zext(op2Expr, opWidth-op2Width), c.bv_val(1, 1), c.bv_val(0, 1));      
+    return ite(zext(op1Expr, opWidth-op1Width) < zext(op2Expr, opWidth-op2Width), c.bv_val(1, 1), c.bv_val(0, 1));      
   }
   else if (op == "<=") {
     // TODO: use = or == in the following line?
@@ -737,8 +739,7 @@ expr make_z3_expr(solver &s, goal &g, context &c, std::string op, const expr& de
         toCout("Add-Solver: "+get_name(destExpr)+" == ite( "+get_name(op1Expr)+" <= "+get_name(op2Expr)+", 1'b1, 1'b0 )" );
       }
     }
-    else         
-      return ite(zext(op1Expr, opWidth-op1Width) <= zext(op2Expr, opWidth-op2Width), c.bv_val(1, 1), c.bv_val(0, 1));      
+    return ite(zext(op1Expr, opWidth-op1Width) <= zext(op2Expr, opWidth-op2Width), c.bv_val(1, 1), c.bv_val(0, 1));      
   }
   else if(op == "+") {
     if(isSolve)  {
@@ -747,8 +748,7 @@ expr make_z3_expr(solver &s, goal &g, context &c, std::string op, const expr& de
         toCout("Add-Solver: "+get_name(destExpr)+" == ( "+get_name(op1Expr)+" + "+get_name(op2Expr)+" )" );
       }
     }
-    else       
-      return ( zext(op1Expr, destWidth-op1Width) + zext(op2Expr, destWidth-op2Width) );
+    return ( zext(op1Expr, destWidth-op1Width) + zext(op2Expr, destWidth-op2Width) );
   }
   else if(op == "-") {
     if(isSolve)  {
@@ -757,8 +757,7 @@ expr make_z3_expr(solver &s, goal &g, context &c, std::string op, const expr& de
         toCout("Add-Solver: "+get_name(destExpr)+" == ( "+get_name(op1Expr)+" - "+get_name(op2Expr)+" )" );
       }
     }
-    else        
-      return ( zext(op1Expr, destWidth-op1Width) - zext(op2Expr, destWidth-op2Width) );
+    return ( zext(op1Expr, destWidth-op1Width) - zext(op2Expr, destWidth-op2Width) );
   }
   else {
     toCout("Not supported 2-op in make_z3_expr!!");
@@ -773,20 +772,17 @@ expr make_z3_expr(solver &s, goal &g, context &c, std::string op, expr& destExpr
   if(op.empty()) {
     if(isSolve) 
       s.add( destExpr == op1Expr );
-    else
-      return op1Expr;
+    return op1Expr;
   }
   else if(op == "~") {
     if(isSolve) 
       s.add( destExpr == ~op1Expr );
-    else
-      return ~op1Expr;
+    return ~op1Expr;
   }
   else if(op == "!") {
     if(isSolve) 
       s.add( destExpr == ite(op1Expr != 0, c.bv_val(1, 1), c.bv_val(0, 1) ));
-    else
-      return ite(op1Expr != 0, c.bv_val(1, 1), c.bv_val(0, 1));
+    return ite(op1Expr != 0, c.bv_val(1, 1), c.bv_val(0, 1));
   }
   else {
     toCout("Not supported 1-op in make_z3_expr, op is: "+op);
