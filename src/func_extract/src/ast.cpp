@@ -470,7 +470,11 @@ bool check_two_op(std::string line, std::string &op, std::string &dest, std::str
     op = "&";
   }
   else if ( std::regex_match(line, m, pBitOrRed2) ) {
-
+    abort(); // needs to add support in two_op_constraint
+    //since this op is same as pBitOr. 
+    //needs to separate them with the isReduceOp
+    op = "|";
+    isReduceOp = true;
   } 
   else if ( std::regex_match(line, m, pEq) ) {
     op = "==";
@@ -550,7 +554,7 @@ bool check_one_op(std::string line, std::string &op, std::string &dest, std::str
   if ( std::regex_match(line, m, pNone)) {
     op = "";
   }
-  if ( std::regex_match(line, m, pInvert)) {
+  else if ( std::regex_match(line, m, pInvert)) {
     op = "~";
   }
   else {
@@ -569,22 +573,22 @@ bool check_reduce_one_op(std::string line, std::string &op, std::string &dest, s
   if ( std::regex_match(line, m, pNot)) {
     op = "!";
   }
-  if ( std::regex_match(line, m, pRedOr)) {
+  else if ( std::regex_match(line, m, pRedOr)) {
     op = "|";
   }
-  if ( std::regex_match(line, m, pRedAnd)) {
+  else if ( std::regex_match(line, m, pRedAnd)) {
     op = "&";
   }
-  if ( std::regex_match(line, m, pRedNand)) {
+  else if ( std::regex_match(line, m, pRedNand)) {
     op = "~&";
   }
-  if ( std::regex_match(line, m, pRedNor)) {
+  else if ( std::regex_match(line, m, pRedNor)) {
     op = "~|";
   }
-  if ( std::regex_match(line, m, pRedXor)) {
+  else if ( std::regex_match(line, m, pRedXor)) {
     op = "^";
   }
-  if ( std::regex_match(line, m, pRedXnor)) {
+  else if ( std::regex_match(line, m, pRedXnor)) {
     op = "~^";
   }
   else {
