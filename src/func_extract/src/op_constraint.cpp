@@ -148,9 +148,9 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   split_slice(op1AndSlice, op1, op1Slice);
   split_slice(op2AndSlice, op2, op2Slice);
   
-  //if(destAndSlice.compare("_0036_") == 0) {
-  //  toCout("Found it!");
-  //}
+  if(destAndSlice.compare("_0036_") == 0) {
+    toCout("Found it!");
+  }
 
   uint32_t op1Hi;
   uint32_t op1Lo;
@@ -570,7 +570,7 @@ expr ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
 expr case_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
   toCoutVerb("Case op constraint for :"+node->dest);  
   assert(node->type == CASE);
-  assert(node->srcVec[0].size() % 2 == 1);
+  assert(node->srcVec.size() % 2 == 1);
 
   std::string destAndSlice = node->dest;
   std::string caseVarAndSlice = node->srcVec[0];
@@ -617,13 +617,13 @@ expr case_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
           else
             destExpr = var_expr(destAndSlice, timeIdx, c, false, localWidth);
           expr lastAssignExpr = var_expr(destAndSlice+"_CASE_"+toStr((i+1)/2), timeIdx, c, false, localWidth);
-          s.add( destExpr == ite( caseExpr.extract(posOfOne, posOfOne) == c.bv_val(1, 1), assignVarExpr.extract(Hi, Lo), lastAssignExpr) );
+          s.add( destExpr == ite( caseExpr.extract(posOfOne, posOfOne) == c.bv_val(1, 1), assignVarExpr.extract(Hi, Lo), lastAssignExpr ) );
 
           // _t
           expr destExpr_t = var_expr(destAndSlice+"_CASE_"+toStr((i-1)/2), timeIdx, c, true, localWidth);
           expr lastAssignExpr_t = var_expr(destAndSlice+"_CASE_"+toStr((i+1)/2), timeIdx, c, true, localWidth);
           expr defaultVarExpr_t = var_expr(assignVarAndSlice, timeIdx, c, true);
-          s.add( destExpr_t == ite( caseExpr.extract(posOfOne, posOfOne) == c.bv_val(1, 1), assignVarExpr_t, lastAssignExpr_t) );
+          s.add( destExpr_t == (ite(caseExpr_t > 0, c.bv_val(max_num_dec(localWidth), localWidth), c.bv_val(0, localWidth)) | ite( caseExpr.extract(posOfOne, posOfOne) == c.bv_val(1, 1), assignVarExpr_t.extract(Hi, Lo), lastAssignExpr_t)) ) ;
         }
       }
     }

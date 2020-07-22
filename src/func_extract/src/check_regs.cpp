@@ -435,14 +435,24 @@ void add_dirty_constraint(astNode* const node, uint32_t timeIdx, context &c, sol
   uint32_t destWidth = get_var_slice_width(destAndSlice);
   expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);  
   expr destExpr = var_expr(destAndSlice, timeIdx, c, false);
-  assert(g_rstVal.find(dest) != g_rstVal.end());
-  std::string rstVal = g_rstVal[dest];
-  expr rstValExpr = var_expr(rstVal, timeIdx, c, false, destWidth);
-  uint32_t allOne = std::pow(2, destWidth)-1;
-  s.add( destExpr_t == ite( destExpr == rstValExpr, c.bv_val(0, destWidth), c.bv_val(uint32_t(allOne), destWidth) ) );
-  if(g_print_solver) {
-    toCout("Add-Solver: "+get_name(destExpr_t)+" == "+toStr(uint32_t(std::pow(2, destWidth)-1)));
+  //assert(g_rstVal.find(dest) != g_rstVal.end());
+  if( g_rstVal.find(dest) != g_rstVal.end() ) {
+    std::string rstVal = g_rstVal[dest];
+    expr rstValExpr = var_expr(rstVal, timeIdx, c, false, destWidth);
+    uint32_t allOne = std::pow(2, destWidth)-1;
+    s.add( destExpr_t == ite( destExpr == rstValExpr, c.bv_val(0, destWidth), c.bv_val(uint32_t(allOne), destWidth) ) );
+    if(g_print_solver) {
+      toCout("Add-Solver: "+get_name(destExpr_t)+" == "+toStr(uint32_t(std::pow(2, destWidth)-1)));
+    }
   }
+  else {
+    uint32_t allOne = std::pow(2, destWidth)-1;
+    s.add( destExpr_t == c.bv_val(uint32_t(allOne), destWidth) );
+    if(g_print_solver) {
+      toCout("Add-Solver: "+get_name(destExpr_t)+" == "+toStr(uint32_t(std::pow(2, destWidth)-1)));
+    }
+  }
+
   // TODO: maybe deal with it in a better way?
   //s.add( destExpr == 0 );
 };

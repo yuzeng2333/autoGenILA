@@ -164,13 +164,13 @@ uint32_t get_pos_of_one(std::string value) {
     toCout("Error: case value is not in the correct form: "+value);
     abort();    
   }
-  uint32_t pos = value.find("1");
-  uint32_t pos2 = value.find("1", pos+1);
+  size_t pos = value.find("1");
+  size_t pos2 = value.find("1", pos+1);
   if(pos2 != std::string::npos) {
-    toCout("Error: found 2 1 in the case value");
+    toCout("Error: found 2 1 in the case value: "+value);
     abort();
   }
-  return pos;
+  return value.length() - pos - 1;
 }
 
 
