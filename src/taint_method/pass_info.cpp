@@ -294,8 +294,8 @@ void process_pass_info(std::string fileName) {
       break;
       case DEST_CONCAT:
       {
-        //if(!std::regex_match(line, m, pDestConcat))
-        if(!is_destConcat(line))
+        if(!std::regex_match(line, m, pDestConcat))
+        //if(!is_destConcat(line))
           abort();
         std::string destList = m.str(2);
         std::string srcAndSlice = m.str(3);

@@ -35,6 +35,7 @@ std::regex pMem         (to_re("^(\\s*)reg (\\[\\d+\\:\\d+\\]) (NAME) (\\[\\d+\\
 std::regex pAdd         (to_re("^(\\s*)assign (NAME) = (NAME) \\+ (NAME)(\\s*)?;$"));
 std::regex pSub         (to_re("^(\\s*)assign (NAME) = (NAME) - (NAME)(\\s*)?;$"));
 std::regex pMult        (to_re("^(\\s*)assign (NAME) = (NAME) \\* (NAME)(\\s*)?;$"));
+std::regex pDvd         (to_re("^(\\s*)assign (NAME) = (NAME) \\/ (NAME)(\\s*)?;$"));
 std::regex pMod         (to_re("^(\\s*)assign (NAME) = (NAME) \\% (NAME)(\\s*)?;$"));
 std::regex pAnd         (to_re("^(\\s*)assign (NAME) = (NAME) && (NAME)(\\s*)?;$"));
 std::regex pOr          (to_re("^(\\s*)assign (NAME) = (NAME) \\|\\| (NAME)(\\s*)?;$"));
@@ -131,7 +132,7 @@ std::vector<std::string> moduleTrueRegs;
 std::unordered_map<std::string, uint32_t> moduleMems;
 std::set<std::string> moduleWires;
 std::set<std::string> g_wire2reg;
-std::set<std::string> g_operators{"+", "-", "*", "%", "&&", "||", "==", "===", "!=", ">", ">=", "<", "<=", "|", "^", "&", "+:", "-:", "<<", ">>", "<<<", ">>>", "~", "!", "&", "~&", "~|", "~^", "^", "?", "<=", "always", "function"};
+std::set<std::string> g_operators{"+", "-", "*", "/","%", "&&", "||", "==", "===", "!=", ">", ">=", "<", "<=", "|", "^", "&", "+:", "-:", "<<", ">>", "<<<", ">>>", "~", "!", "&", "~&", "~|", "~^", "^", "?", "<=", "always", "function"};
 std::string clockName;
 std::string resetName;
 std::vector<std::string> rTaints;
@@ -165,6 +166,7 @@ bool g_clkrst_exist = false;
 bool g_use_reset_taint = false;
 bool g_use_zy_count = false;
 bool g_use_reset_sig = false;
+bool g_remove_adff = false;
 std::string _t="_T";
 std::string _r="_R";
 std::string _x="_X";
@@ -265,13 +267,14 @@ void clean_file(std::string fileName) {
     std::string retStr;
     noConcat = extract_concat(cleanLine, output, retStr, true);
     //if( !std::regex_match(line, match, pSrcDestBothConcat) )
-    if( !is_srcDestConcat(line) )
+    if( !is_srcDestConcat(line) && (!std::regex_match(line, match, pAlwaysClkRst) || !g_remove_adff) ) {
       if (noConcat)
         output << cleanLine << std::endl;
       else {
         output << retStr << std::endl;
         cleanLine = retStr;
       }
+    }
     // store the width of wires and regs in varWidth
     uint32_t choice = parse_verilog_line(cleanLine, true);
     std::smatch m;
@@ -441,7 +444,7 @@ void clean_file(std::string fileName) {
           // split both_concat into src_concat and maybe also both_concat.
           if( !std::regex_match(line, m, pSrcDestBothConcat) ) {
           //if( !is_srcDestConcat(line) ) {
-            toCout("Error: both_concat not matched");
+            toCout("Error: both_concat not matched: "+line);
             abort(); //
           }
 
@@ -516,6 +519,21 @@ void clean_file(std::string fileName) {
           }
           moduleTrueRegs.push_back(dest);
         }
+        break;
+      case ALWAYS_CLKRST:
+        {
+          if(!g_remove_adff)
+            break;
+          std::smatch m;
+          if( !std::regex_match(line, m, pAlwaysClkRst) ) {
+            std::cout << "!! Error in parsing always with clk & rst !!" << std::endl;
+            abort();
+          }  
+          g_recentClk = m.str(2);
+          g_recentRst = m.str(3);
+          output << "  always @(posedge "+g_recentClk+")" << std::endl;          
+        }
+        break;
       default:
         break;
     } // end of switch
@@ -667,8 +685,7 @@ void add_line_taints(std::string line, std::ofstream &output, std::ifstream &inp
   // because they are treated separately
   if ( !std::regex_match(line, m, pModule) 
       && !std::regex_match(line, m, pEndmodule)
-      && !std::regex_match(line, m, pModuleBegin)
-      && !std::regex_match(line, m, pAlwaysClkRst))
+      && !std::regex_match(line, m, pModuleBegin))
     output << printedLine << std::endl;
 
   switch( choice ) {
@@ -781,6 +798,7 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
             || std::regex_match(line, m, pSub)
             || std::regex_match(line, m, pMult)
             || std::regex_match(line, m, pMod)
+            || std::regex_match(line, m, pDvd)
             || std::regex_match(line, m, pAnd)
             || std::regex_match(line, m, pEq)
             || std::regex_match(line, m, pEq3)
@@ -936,6 +954,7 @@ void add_file_taints(std::string fileName, std::map<std::string, std::vector<std
   CONSTANT_SIG = toStr(g_sig_width) + "'b1";
   // Reserve first line for module declaration
   while( std::getline(input, line) ) {
+    toCout(line);
     if(moduleName.compare("HLS_cdp_icvt_core") == 0 && line.find("IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl") != std::string::npos)
       //toCout(line);
     lineNo++;

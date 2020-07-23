@@ -346,6 +346,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
             || std::regex_match(line, m, pSub)
             || std::regex_match(line, m, pMult)
             || std::regex_match(line, m, pMod)
+            || std::regex_match(line, m, pDvd)
             || std::regex_match(line, m, pAnd)
             || std::regex_match(line, m, pOr)
             || std::regex_match(line, m, pBitOr)
@@ -353,7 +354,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
             || std::regex_match(line, m, pBitAnd)
             || std::regex_match(line, m, pLeftShift) 
             || std::regex_match(line, m, pRightShift) 
-            || std::regex_match(line, m, pSignedRightShift) 
+            || std::regex_match(line, m, pSignedRightShift)
             || std::regex_match(line, m, pSignedLeftShift) 
             || std::regex_match(line, m, pBitOrRed2) ) {} 
   else if ( std::regex_match(line, m, pEq)
@@ -1273,8 +1274,8 @@ void both_concat_op_taint_gen(std::string line, std::ofstream &output) {
 void dest_concat_op_taint_gen(std::string line, std::ofstream &output) {
   //checkCond(!g_use_reset_sig, "both_concat not supported when use_reset_sig!!");
   std::smatch m;
-  //if( !std::regex_match(line, m, pDestConcat) )
-  if( !is_destConcat(line) )
+  if( !std::regex_match(line, m, pDestConcat) )
+  //if( !is_destConcat(line) )
     abort(); //
 
   std::string blank = m.str(1);
@@ -1910,7 +1911,6 @@ void always_clkrst_taint_gen(std::string firstLine, std::ifstream &input, std::o
   }
   g_recentClk = m.str(2);
   g_recentRst = m.str(3);
-  output << "  always @(posedge "+g_recentClk+")" << std::endl;
 
   std::regex pNeg("negedge");
   // assume clock is always positive edge
