@@ -430,13 +430,16 @@ void add_all_clean_constraints(context &c, solver &s, goal &g, uint32_t bound, b
 void add_dirty_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, uint32_t bound) {
   toCoutVerb("Add dirty constraint for: " + node->dest+" ------  time: "+toStr(timeIdx));  
   std::string destAndSlice = node->dest;
+  if(destAndSlice.compare("state_0") == 0) {
+    toCoutVerb("Found it!");
+  }
   std::string dest, destSlice;
   split_slice(destAndSlice, dest, destSlice);
   uint32_t destWidth = get_var_slice_width(destAndSlice);
   expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);  
   expr destExpr = var_expr(destAndSlice, timeIdx, c, false);
   //assert(g_rstVal.find(dest) != g_rstVal.end());
-  if( g_rstVal.find(dest) != g_rstVal.end() ) {
+  if( g_rstVal.find(dest) != g_rstVal.end() && !is_root(dest) ) {
     std::string rstVal = g_rstVal[dest];
     expr rstValExpr = var_expr(rstVal, timeIdx, c, false, destWidth);
     uint32_t allOne = std::pow(2, destWidth)-1;
@@ -462,6 +465,7 @@ void push_dirty_queue(astNode* node, uint32_t timeIdx) {
   if(DIRTY_QUEUE.find(node) != DIRTY_QUEUE.end())
     return;
   DIRTY_QUEUE.emplace(node, timeIdx);
+  toCoutVerb("push into dirty queue: "+node->dest);
 }
 
 
@@ -486,6 +490,7 @@ void add_input_values(context &c, solver &s, uint32_t bound) {
     else
       localVal = var_expr(pair.second, bound+1, c, false, width);
     s.add( singleInput == localVal );
+    toCoutVerb("Assign "+pair.second+" to "+timed_name(pair.first, bound+1));
     // input in later cycles should be filled with NOP
   }
 }
@@ -498,7 +503,7 @@ void add_nop(context &c, solver &s, uint32_t bound) {
     for(auto it = g_nopInstr.begin(); it != g_nopInstr.end(); it++) {
       expr singleInput = var_expr(it->first, b, c, false);     
       uint32_t width = get_var_slice_width(it->first);   
-      assert(isNum(it->second));
+      if(!isNum(it->second)) continue;
       expr localVal = var_expr(it->second, b, c, false, width);
       s.add( singleInput == localVal );
     }

@@ -11,8 +11,6 @@
 
 using namespace z3;
 
-//std::regex pTwoOp (to_re("^(\\s*)assign (NAME) = (NAME) (\\S+) (NAME)(\\s*);$"));
-
 /* this function is used for expanding vars used as ITE conditions */
 //void var_expand(std::string varAndSlice, uint32_t timeIdx, context &c, solver &s) {
 //  std::string var, varSlice;
@@ -33,6 +31,7 @@ expr var_width_expr(std::string var, uint32_t width, context &c) {
 
 
 // returned _t is 0 for number, returned var is its value for int
+// if 
 expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTaint, uint32_t width) {
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
@@ -111,8 +110,11 @@ expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver 
   }
   else {
     if( INPUT_EXPR_VAL.find(timed_name(dest, timeIdx)) != INPUT_EXPR_VAL.end() 
-        && has_explicit_value(dest) )
-      return *INPUT_EXPR_VAL[timed_name(dest, timeIdx)];
+        && has_explicit_value(dest) ) {
+      expr retExpr = *INPUT_EXPR_VAL[timed_name(dest, timeIdx)];
+      toCoutVerb("input value for "+dest+": "+retExpr.decl().name().str());
+      return retExpr;
+    }
     //expr localVal = *INPUT_EXPR_VAL[timed_name(dest, timeIdx)];
     //g.add( destExpr = localVal ); 
   }
@@ -273,15 +275,12 @@ expr one_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   uint32_t op1Hi = get_hi(op1AndSlice);
   uint32_t op1Lo = get_lo(op1AndSlice);
 
-  expr destExpr(c);
-  expr op1Expr(c);
+  expr destExpr = var_expr(destAndSlice, timeIdx, c, false);
+  expr op1Expr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve).extract(op1Hi, op1Lo);
   if(isSolve) {
     expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
     expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true);
     s.add( destExpr_t == op1Expr_t );
-
-    destExpr = var_expr(destAndSlice, timeIdx, c, false);
-    op1Expr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve).extract(op1Hi, op1Lo);
   }
   return make_z3_expr(s, g, c, node->op, destExpr, op1Expr, isSolve);
 }
@@ -289,7 +288,7 @@ expr one_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
 
 expr reduce_one_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
   toCoutVerb("Reduce one op constraint for: "+node->dest);
- 
+
   assert(node->srcVec.size() == 1);
   std::string dest, destSlice;
   std::string op1, op1Slice;
@@ -300,15 +299,17 @@ expr reduce_one_op_constraint(astNode* const node, uint32_t timeIdx, context &c,
   uint32_t op1Hi = get_hi(op1AndSlice);
   uint32_t op1Lo = get_lo(op1AndSlice);
 
-  expr destExpr(c);
-  expr op1Expr(c);
+  if(destAndSlice.compare("_0062_") == 0) {
+    toCout("Found it!");
+  }
+
+  expr destExpr = var_expr(destAndSlice, timeIdx, c, false);
+  expr op1Expr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve).extract(op1Hi, op1Lo);
+
   if(isSolve) {
     expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
     expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true);
     s.add( destExpr_t == ite(op1Expr_t > 0, c.bv_val(1, 1), c.bv_val(0, 1)) );
-
-    destExpr = var_expr(destAndSlice, timeIdx, c, false);
-    op1Expr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve).extract(op1Hi, op1Lo);
   }
   return make_z3_expr(s, g, c, node->op, destExpr, op1Expr, isSolve);  
 }
@@ -587,7 +588,7 @@ expr case_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
   uint32_t localWidth;
 
   if(isSolve) {
-    for(uint32_t i = node->srcVec.size()-1; i > 0 ; i--) {
+    for(uint32_t i = node->srcVec.size()-1; i > 0; i--) {
       if(i % 2 == 0) { // this is assign var
         assignVarAndSlice = node->srcVec[i];
         localWidth = get_var_slice_width(assignVarAndSlice);
@@ -783,6 +784,11 @@ expr make_z3_expr(solver &s, goal &g, context &c, std::string op, expr& destExpr
     if(isSolve) 
       s.add( destExpr == ite(op1Expr != 0, c.bv_val(1, 1), c.bv_val(0, 1) ));
     return ite(op1Expr != 0, c.bv_val(1, 1), c.bv_val(0, 1));
+  }
+  else if(op == "|") {
+    if(isSolve) 
+      s.add( destExpr == ite(op1Expr > 0, c.bv_val(1, 1), c.bv_val(0, 1) ));
+    return ite(op1Expr > 0, c.bv_val(1, 1), c.bv_val(0, 1));
   }
   else {
     toCout("Not supported 1-op in make_z3_expr, op is: "+op);

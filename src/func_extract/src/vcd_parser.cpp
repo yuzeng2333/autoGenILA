@@ -20,7 +20,7 @@ void vcd_parser(std::string fileName) {
     else if(line.front() == '#') {
       state = readValue;
       if(line.substr(1, 1) == "0")
-        passLine = true;
+        passLine = true; // do not parse value for time 0
       else if(line.substr(1, 1) != "0")
         passLine = false;
       continue;
@@ -29,8 +29,7 @@ void vcd_parser(std::string fileName) {
       continue;
     else if(state == readName){
       if(!std::regex_match(line, m, pName)) {
-        std::cout << "Error happened while parsing names in vcd_parser" << std::endl;
-        abort();
+        continue;
       }
       std::string name = m.str(2);
       std::string var = m.str(3);
@@ -46,6 +45,9 @@ void vcd_parser(std::string fileName) {
       if(g_nameVarMap.find(name) == g_nameVarMap.end())
         continue;
       std::string var = g_nameVarMap[name];
+      if(var.compare("state_0") == 0) {
+        toCoutVerb("Found it!");
+      }
       if(g_rstVal.find(var) == g_rstVal.end())
         g_rstVal.emplace(var, rstVal);
       else

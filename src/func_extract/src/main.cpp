@@ -14,6 +14,7 @@ int main(int argc, char *argv[]) {
   toCout("Begin main!");
   g_verb = true;
   g_print_solver = false;
+  g_remove_adff = false;
   std::string path = argv[1];
   // if argv[3] is 1, clean the file
   std::string doClean = argv[2];
