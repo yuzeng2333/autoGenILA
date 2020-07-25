@@ -789,8 +789,8 @@ expr make_z3_expr(solver &s, goal &g, context &c, std::string op, expr& destExpr
   }
   else if(op == "!") {
     if(isSolve) 
-      s.add( destExpr == ite(op1Expr != 0, c.bv_val(1, 1), c.bv_val(0, 1) ));
-    return ite(op1Expr != 0, c.bv_val(1, 1), c.bv_val(0, 1));
+      s.add( destExpr == ite(op1Expr == 0, c.bv_val(1, 1), c.bv_val(0, 1) ));
+    return ite(op1Expr == 0, c.bv_val(1, 1), c.bv_val(0, 1));
   }
   else if(op == "|") {
     if(isSolve) 

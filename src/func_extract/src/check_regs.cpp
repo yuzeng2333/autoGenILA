@@ -75,6 +75,11 @@ void check_single_reg_and_slice(std::string regAndSlice) {
   p.set("unsat_core", true);
   s.set(p);
 
+  // *********************
+  expr wack_time2 = var_expr("wack", 2, c, false);
+  s.add( wack_time2 == 0 );
+  // *********************
+
   std::string rst1 = "rst___#1";
   expr rst = c.bv_const(rst1.c_str(), 1);
   // FIXME: valid reset value should come from file
@@ -289,7 +294,7 @@ expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s
 expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve, bool isBool, bool isRoot) {
   std::string dest = node->dest;
   if(dest.compare("wack") == 0) {
-    toCout("wack found!");
+    toCout("wack found! time: "+toStr(timeIdx));
   }
   expr destExpr = var_expr(dest, timeIdx, c, false);
   expr destExpr_g(c);
