@@ -37,7 +37,7 @@ uint32_t hdb2int(std::string num) {
 uint32_t bin2int(std::string num) {
   uint32_t res = 0;
   for(auto it = num.begin(); it != num.end(); it++) {
-    res = res << 1 + *it - '0';
+    res = res << 1 + (*it - '0');
   }
   return res;
 }
@@ -137,7 +137,7 @@ bool comparePair(const std::pair<std::string, uint32_t> &p1, const std::pair<std
 
 uint32_t get_time(std::string var) {
   if(var.find("___#") == std::string::npos) {
-    toCout("Error: the var's Name has no time!");
+    toCout("Error: the var's Name has no time: "+var);
     abort();
   }
   uint32_t pos = var.find("___#");

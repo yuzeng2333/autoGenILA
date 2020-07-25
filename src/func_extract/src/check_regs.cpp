@@ -76,8 +76,8 @@ void check_single_reg_and_slice(std::string regAndSlice) {
   s.set(p);
 
   // *********************
-  expr wack_time2 = var_expr("wack", 2, c, false);
-  s.add( wack_time2 == 0 );
+  //expr wack_time2 = var_expr("wack", 2, c, false);
+  //s.add( wack_time2 == 0 );
   // *********************
 
   std::string rst1 = "rst___#1";
@@ -91,6 +91,9 @@ void check_single_reg_and_slice(std::string regAndSlice) {
   s.push();
   bool lastHasSolution = false;
   bool curHasSolution = false;
+  // relation between bound and timeIdx:
+  // expr wih timeIdx = bound exist in solutions.
+  // But those expr are only inputs.
   while(bound < bound_limit) {
     curHasSolution = false;
     s.pop();
@@ -215,6 +218,23 @@ void check_single_reg_and_slice(std::string regAndSlice) {
       //  std::cout << r[i] << std::endl;
       //}
 
+
+      // if value is x, fix it to x
+      for(uint32_t i = 0; i < m.size(); i++) {
+        func_decl v = m[i];
+        std::string vName = v.name().str();
+        std::string pureVName = pure(vName);
+        uint32_t localTimeIdx = get_time(vName);
+        if(localTimeIdx == bound) {
+          if(g_currInstrInfo.instrEncoding.find(pureVName) == g_currInstrInfo.instrEncoding.end())
+            continue;
+          if(g_currInstrInfo.instrEncoding[pureVName] == "x") {
+            toCoutVerb("Fix value for "+vName);
+            s.add( v() == m.get_const_interp(v) );
+          }
+        }
+      }
+
       // begin block this solution for a new solution
       while( j < m.size() ) {
         bool res = is_clean(m[j++].name().str());
@@ -320,16 +340,16 @@ expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
       if(g_print_solver) {
         toCout("Add-Solver: "+get_name(destExpr_t)+" == "+get_name(destNextExpr_t));
       }
-      if(isRoot && timeIdx == 0) {
-        if(destExpr_t.is_bool()) {
-          s.add( !destExpr_t, "clean_taint" );          
-        }
-        else
-          s.add( destExpr_t == 0, "clean_taint" );
-        if(g_print_solver) {
-          toCout("Add-Solver: "+get_name(destExpr_t)+" == 0");
-        }
-      }
+      //if(isRoot && timeIdx == 0) {
+      //  if(destExpr_t.is_bool()) {
+      //    s.add( !destExpr_t, "clean_taint" );          
+      //  }
+      //  else
+      //    s.add( destExpr_t == 0, "clean_taint" );
+      //  if(g_print_solver) {
+      //    toCout("Add-Solver: "+get_name(destExpr_t)+" == 0");
+      //  }
+      //}
     }
     else {
       if(isRoot && timeIdx == 0) {
