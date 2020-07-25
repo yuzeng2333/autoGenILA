@@ -340,16 +340,16 @@ expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
       if(g_print_solver) {
         toCout("Add-Solver: "+get_name(destExpr_t)+" == "+get_name(destNextExpr_t));
       }
-      //if(isRoot && timeIdx == 0) {
-      //  if(destExpr_t.is_bool()) {
-      //    s.add( !destExpr_t, "clean_taint" );          
-      //  }
-      //  else
-      //    s.add( destExpr_t == 0, "clean_taint" );
-      //  if(g_print_solver) {
-      //    toCout("Add-Solver: "+get_name(destExpr_t)+" == 0");
-      //  }
-      //}
+      if(isRoot && timeIdx == 0) {
+        if(destExpr_t.is_bool()) {
+          s.add( !destExpr_t );          
+        }
+        else
+          s.add( destExpr_t == 0 );
+        if(g_print_solver) {
+          toCout("Add-Solver: "+get_name(destExpr_t)+" == 0");
+        }
+      }
     }
     else {
       if(isRoot && timeIdx == 0) {
