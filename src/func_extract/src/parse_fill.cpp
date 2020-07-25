@@ -1,5 +1,6 @@
 #include "parse_fill.h"
 #include "expr.h"
+#include "helper.h"
 
 // global variables
 std::set<std::string> moduleAs;
@@ -166,7 +167,7 @@ void read_in_instructions(std::string fileName) {
             auto pos = line.find("=");
             std::string instrName = line.substr(0, pos-1);
             std::string encoding = line.substr(pos+2);
-            if(encoding != "x" && !isNum(encoding)) {
+            if(encoding != "x" && !is_number(encoding)) {
               toCout("Encoding is not x or number[1], line is: "+line);
               abort();
             }
@@ -181,7 +182,7 @@ void read_in_instructions(std::string fileName) {
             auto pos = line.find("=");
             std::string instrName = line.substr(0, pos-1);
             std::string encoding = line.substr(pos+2);
-            if(encoding != "x" && !isNum(encoding)) {
+            if(encoding != "x" && !is_number(encoding)) {
               toCout("Encoding is not x or number[2], line is: "+line);
               abort();
             }
@@ -201,7 +202,7 @@ void read_in_instructions(std::string fileName) {
             auto pos = line.find("=");
             std::string instrName = line.substr(0, pos-1);
             std::string encoding = line.substr(pos+2);
-            if(encoding != "x" && !isNum(encoding)) {
+            if(encoding != "x" && !is_number(encoding)) {
               toCout("Encoding is not x or number[3], line is: "+line);
               abort();
             }
@@ -213,7 +214,7 @@ void read_in_instructions(std::string fileName) {
             auto pos = line.find("=");
             std::string instrName = line.substr(0, pos-1);
             std::string encoding = line.substr(pos+2);
-            if(encoding != "x" && !isNum(encoding)) {
+            if(encoding != "x" && !is_number(encoding)) {
               toCout("Encoding is not x or number[4], line is: "+line);
               abort();
             }

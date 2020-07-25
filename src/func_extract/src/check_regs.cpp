@@ -268,7 +268,7 @@ expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s
   else if( isReg(var) ) { // AS case is moved to add_nb_constraint
     return add_nb_constraint(node, timeIdx, c, s, g, bound, isSolve, isBool);
   }
-  else if( isNum(var) ) { // num_t is always 0
+  else if( is_number(var) ) { // num_t is always 0
     return num_constraint(node, timeIdx, c, s, g, isSolve);
   }
   else if( is_case_dest(var) ) {
@@ -286,7 +286,7 @@ expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   expr destExpr_g(c);
   expr destNextExpr(c);
   // assuming RHS of nonblocking is not number
-  assert(!isNum(node->childVec.front()->dest));
+  assert(!is_number(node->childVec.front()->dest));
 
   if(timeIdx <= bound) {
     toCoutVerb("Add nb constraint for: " + dest+" ------  time: "+toStr(timeIdx));
@@ -398,7 +398,7 @@ void add_clean_constraint(astNode* const node, uint32_t timeIdx, context &c, sol
     }
   }
   // add val expr
-  //if( isNum(dest) ) {
+  //if( is_number(dest) ) {
   //  std::smatch m;
   //  std::regex_match(dest, m, pNum);
   //  std::string timedInt = timed_name(dest, timeIdx);
@@ -430,7 +430,7 @@ void add_all_clean_constraints(context &c, solver &s, goal &g, uint32_t bound, b
 void add_dirty_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, uint32_t bound) {
   toCoutVerb("Add dirty constraint for: " + node->dest+" ------  time: "+toStr(timeIdx));  
   std::string destAndSlice = node->dest;
-  if(destAndSlice.compare("state_0") == 0) {
+  if(destAndSlice.compare("wla") == 0) {
     toCoutVerb("Found it!");
   }
   std::string dest, destSlice;
@@ -503,7 +503,7 @@ void add_nop(context &c, solver &s, uint32_t bound) {
     for(auto it = g_nopInstr.begin(); it != g_nopInstr.end(); it++) {
       expr singleInput = var_expr(it->first, b, c, false);     
       uint32_t width = get_var_slice_width(it->first);   
-      if(!isNum(it->second)) continue;
+      if(!is_number(it->second)) continue;
       expr localVal = var_expr(it->second, b, c, false, width);
       s.add( singleInput == localVal );
     }

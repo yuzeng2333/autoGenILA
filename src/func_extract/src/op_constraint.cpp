@@ -45,7 +45,7 @@ expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTain
   uint32_t varWidthNum;
   if(width == 0) varWidthNum = get_var_slice_width(var);
 
-  if(isNum(var)) {
+  if(is_number(var)) {
     if(isTaint) {
       varTimed = var + "___#" + toStr(timeIdx) + "_"+toStr(localWidth)+"b" + _t;
       return c.bv_val(0, localWidth);
@@ -80,7 +80,7 @@ expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTain
 
 
 expr bv_val(std::string var, context &c) {
-  assert(isNum(var));
+  assert(is_number(var));
   return c.bv_val(hdb2int(var), get_var_slice_width(var));
 }
 
@@ -172,8 +172,8 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   assert(!isMem(op1));
   assert(!isMem(op2));
   
-  bool op1IsNum = isNum(op1);
-  bool op2IsNum = isNum(op2);
+  bool op1IsNum = is_number(op1);
+  bool op2IsNum = is_number(op2);
 
   expr destExpr(c);
   //if(!isReduceOp && !is_bool_op(node->op))
@@ -349,9 +349,9 @@ expr sel_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   assert(!isMem(op1));
   assert(!isMem(op2));
   
-  bool op1IsNum = isNum(op1);
+  bool op1IsNum = is_number(op1);
   assert(!op1IsNum);
-  bool op2IsNum = isNum(op2);
+  bool op2IsNum = is_number(op2);
 
   expr destExpr(c);
   destExpr = var_expr(destAndSlice, timeIdx, c, false);
@@ -516,8 +516,8 @@ expr ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   bool op1IsReadRoot = is_root(op1AndSlice) && is_read_asv(op1AndSlice);
   bool op2IsReadRoot = is_root(op2AndSlice) && is_read_asv(op2AndSlice);
 
-  bool op1IsNum = isNum(op1);
-  bool op2IsNum = isNum(op2);
+  bool op1IsNum = is_number(op1);
+  bool op2IsNum = is_number(op2);
  
   expr destExpr = var_expr(destAndSlice, timeIdx, c, false);
   expr condExpr(c);
@@ -627,7 +627,14 @@ expr case_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
           s.add( destExpr_t == (ite(caseExpr_t > 0, c.bv_val(max_num_dec(localWidth), localWidth), c.bv_val(0, localWidth)) | ite( caseExpr.extract(posOfOne, posOfOne) == c.bv_val(1, 1), assignVarExpr_t.extract(Hi, Lo), lastAssignExpr_t)) ) ;
         }
       }
-    }
+    } // end of for
+    expr destFinalExpr = var_expr(destAndSlice, timeIdx, c, false);
+    expr caseOverallExpr = var_expr(destAndSlice+"_CASE_0", timeIdx, c, false, localWidth);
+    s.add( destFinalExpr == caseOverallExpr );
+
+    expr destFinalExpr_t = var_expr(destAndSlice, timeIdx, c, true);
+    expr caseOverallExpr_t = var_expr(destAndSlice+"_CASE_0", timeIdx, c, true, localWidth);
+    s.add( destFinalExpr_t == caseOverallExpr_t );
   }
   return add_one_case_branch_expr(node, caseExpr, 1, timeIdx, c, s, g, bound);
 }

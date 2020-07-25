@@ -192,3 +192,11 @@ uint32_t get_lo(std::string varAndSlice) {
   auto idxPairs = varWidth.get_idx_pair(var, "find_version_num for: "+var);
   return idxPairs.second;
 }
+
+
+bool is_number(const std::string& s) {
+  if(isNum(s)) return true; 
+  std::string::const_iterator it = s.begin();
+  while (it != s.end() && std::isdigit(*it)) ++it;
+  return !s.empty() && it == s.end();
+}

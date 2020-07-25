@@ -1,5 +1,6 @@
 #include "expr.h"
 #include "parse_fill.h"
+#include "helper.h"
 #define toStr(a) std::to_string(a)
 
 ////////////////////////////////////////////////////////////////
@@ -172,7 +173,7 @@ void both_concat_expr(std::string line) {
   std::string dest, destSlice;
   for(std::string destAndSlice: destVec) {
     assert(!isMem(destAndSlice));  
-    if(isNum(destAndSlice)) {
+    if(is_number(destAndSlice)) {
       toCout("Unexpected ");
       abort();
     }
@@ -193,7 +194,7 @@ void both_concat_expr(std::string line) {
   for (std::string destAndSlice: destVec) {
     uint32_t destLocalWidthNum = get_var_slice_width(destAndSlice);
     endIdx = startIdx - destLocalWidthNum + 1;
-    if(!isNum(destAndSlice)) {
+    if(!is_number(destAndSlice)) {
       split_slice(destAndSlice, dest, destSlice);
 
       auto destIdxPair = varWidth.get_idx_pair(dest, line);
@@ -234,7 +235,7 @@ void dest_concat_expr(std::string line) {
   std::string dest, destSlice;
   for(std::string destAndSlice: destVec) {
     assert(!isMem(destAndSlice));  
-    if(isNum(destAndSlice)) {
+    if(is_number(destAndSlice)) {
       toCout("Unexpected ");
       abort();
     }
@@ -248,7 +249,7 @@ void dest_concat_expr(std::string line) {
   for (std::string destAndSlice: destVec) {
     uint32_t destLocalWidthNum = get_var_slice_width(destAndSlice);
     endIdx = startIdx - destLocalWidthNum + 1;
-    if(!isNum(destAndSlice)) {
+    if(!is_number(destAndSlice)) {
       split_slice(destAndSlice, dest, destSlice);
 
       std::string destAssign = "  assign "+destAndSlice+" = "+src+" [" + toStr(startIdx)+" : "+toStr(endIdx)+"] ;";

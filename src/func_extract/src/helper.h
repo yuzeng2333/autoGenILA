@@ -6,6 +6,7 @@
 #include "../../taint_method/global_data.h"
 #include "../../taint_method/helper.h"
 #include "z3++.h"
+#include <cctype>
 
 using namespace z3;
 
@@ -53,4 +54,5 @@ uint32_t get_hi(std::string varAndSlice);
 
 uint32_t get_lo(std::string varAndSlice);
 
+bool is_number(const std::string& s);
 #endif

@@ -12,7 +12,7 @@ bool g_print_solver;
 
 int main(int argc, char *argv[]) {
   toCout("Begin main!");
-  g_verb = true;
+  g_verb = false;
   g_print_solver = false;
   g_remove_adff = false;
   std::string path = argv[1];
