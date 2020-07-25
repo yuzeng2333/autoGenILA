@@ -22,6 +22,7 @@ std::set<std::string> g_resetedReg;
 //std::unordered_map<std::string, expr*> INT_EXPR_VAL;
 std::set<std::string> INT_EXPR_SET;
 std::set<std::string> g_readASV;
+std::set<std::string> g_existedExpr;
 std::string g_rootNode;
 struct instrInfo g_currInstrInfo;
 
@@ -47,6 +48,7 @@ void clean_data() {
   CLEAN_QUEUE.clear();
   DIRTY_QUEUE.clear();
   g_resetedReg.clear();
+  g_existedExpr.clear();
 }
 
 
@@ -129,7 +131,6 @@ void check_single_reg_and_slice(std::string regAndSlice) {
     while(z3Res) {
       curHasSolution = true;
       INPUT_EXPR_VAL.clear();
-      TIMED_VAR2EXPR.clear();
       INT_EXPR_SET.clear();
       g_resetedReg.clear();
       model m = s.get_model();
@@ -252,9 +253,14 @@ void check_single_reg_and_slice(std::string regAndSlice) {
 
 expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve, bool isBool) {
   std::string var = node->dest;
-  if(var.compare("enable") == 0) {
-    toCout("enable found!");
+  if(isSolve) {
+    if(g_existedExpr.find(timed_name(var, timeIdx)) != g_existedExpr.end() )
+      return var_expr(var, timeIdx, c, false);
+    g_existedExpr.insert(timed_name(var, timeIdx));
   }
+  //if(var.compare("wack") == 0) {
+  //  toCout("wack found!");
+  //}
   if ( isInput(var) ) { // input_t is always 0
     return input_constraint(node, timeIdx, c, s, g, isSolve, isBool);
   }
@@ -282,6 +288,9 @@ expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s
 
 expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve, bool isBool, bool isRoot) {
   std::string dest = node->dest;
+  if(dest.compare("wack") == 0) {
+    toCout("wack found!");
+  }
   expr destExpr = var_expr(dest, timeIdx, c, false);
   expr destExpr_g(c);
   expr destNextExpr(c);
@@ -430,7 +439,7 @@ void add_all_clean_constraints(context &c, solver &s, goal &g, uint32_t bound, b
 void add_dirty_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, uint32_t bound) {
   toCoutVerb("Add dirty constraint for: " + node->dest+" ------  time: "+toStr(timeIdx));  
   std::string destAndSlice = node->dest;
-  if(destAndSlice.compare("wla") == 0) {
+  if(destAndSlice.compare("wack") == 0) {
     toCoutVerb("Found it!");
   }
   std::string dest, destSlice;

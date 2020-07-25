@@ -48,7 +48,7 @@ void add_node(std::string var, uint32_t timeIdx, astNode* const node, bool varIs
   else if( isReg(var) ) {
     add_nb_node(var, timeIdx, node);
   }
-  else if( isNum(var) ) {
+  else if( is_number(var) ) {
     add_num_node(var, timeIdx, node);
   }
   else if( is_case_dest(var) ) {
