@@ -5,6 +5,7 @@
 std::unordered_map<std::string, std::string> g_nameVarMap;
 
 void vcd_parser(std::string fileName) {
+  toCout("### Begin vcd_parser");
   std::regex pName("^\\$var wire (\\d+) (n\\d+) (\\S+) \\$end$");
   std::string line;
   std::ifstream input(fileName);
@@ -45,9 +46,9 @@ void vcd_parser(std::string fileName) {
       if(g_nameVarMap.find(name) == g_nameVarMap.end())
         continue;
       std::string var = g_nameVarMap[name];
-      if(var.compare("state_0") == 0) {
-        toCoutVerb("Found it!");
-      }
+      //if(var.compare("state_0") == 0) {
+      //  toCoutVerb("Found it!");
+      //}
       if(g_rstVal.find(var) == g_rstVal.end())
         g_rstVal.emplace(var, rstVal);
       else

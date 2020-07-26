@@ -28,18 +28,22 @@ struct instrInfo g_currInstrInfo;
 
 // assume g_ssaTable and g_nbTable have been filled
 void check_all_regs() {
+  toCout("### Begin check_all_regs");  
   toCoutVerb("###### Begin checking SAT! ");
   uint32_t i = 1;
   for(auto instrInfo : g_instrInfo) {
     toCout("---  BEGIN INSTRUCTION #"+toStr(i++)+" ---");
     g_readASV = instrInfo.readASV;
     g_currInstrInfo = instrInfo;
-    for(auto oneWriteAsv: instrInfo.writeASV) 
+    for(auto pair: instrInfo.writeASV) {
+      uint32_t cycleCnt = pair.first;
+      std::string oneWriteAsv = pair.second;
       if(reg2Slices.find(oneWriteAsv) == reg2Slices.end())
-        check_single_reg_and_slice(oneWriteAsv);
+        check_single_reg_and_slice(oneWriteAsv, cycleCnt);
       else
         for(std::string regAndSlice: reg2Slices[oneWriteAsv])
-          check_single_reg_and_slice(regAndSlice);
+          check_single_reg_and_slice(regAndSlice, cycleCnt);
+    }
   }
 }
 
@@ -60,14 +64,14 @@ void clean_data() {
 // However, constructions for the two are quite different. AST tree is
 // constructed only one. But the SMT equation may need to be constructed
 // multiple times, until a solution is obtained or a bound is reached.
-void check_single_reg_and_slice(std::string regAndSlice) {
+void check_single_reg_and_slice(std::string regAndSlice, uint32_t cycleCnt) {
   g_rootNode = regAndSlice;
   clean_data();
   toCout("========== Begin check SAT for: "+regAndSlice+" ==========");
   uint32_t regWidth = get_var_slice_width(regAndSlice);
   CURRENT_VAR = regAndSlice;
-  uint32_t bound = 0;
-  bound_limit = 3;
+  uint32_t bound = cycleCnt > 0 ? cycleCnt-1 : 0;
+  bound_limit = cycleCnt+2;
   bool z3Res = false;
   context c;
   solver s(c);
@@ -94,6 +98,7 @@ void check_single_reg_and_slice(std::string regAndSlice) {
   // relation between bound and timeIdx:
   // expr wih timeIdx = bound exist in solutions.
   // But those expr are only inputs.
+  uint32_t topTimeIdx = 0;
   while(bound < bound_limit) {
     curHasSolution = false;
     s.pop();
@@ -110,7 +115,7 @@ void check_single_reg_and_slice(std::string regAndSlice) {
       astNode *root = g_varNode[pure(rootReg)];
       if(root)
         // TODO: remove one bound
-        add_nb_constraint(root, bound, c, s, g, bound, /*isSolve=*/true, /*isBool=*/false, /*isRoot=*/true);
+        add_nb_constraint(root, topTimeIdx, c, s, g, bound, /*isSolve=*/true, /*isBool=*/false, /*isRoot=*/true);
       else {
         toCout(regAndSlice+" does not have its root!");
         abort();
@@ -271,6 +276,7 @@ void check_single_reg_and_slice(std::string regAndSlice) {
     toCout("------- No more solution found within the bound: "+toStr(bound)+" ----------");
     if(lastHasSolution && !curHasSolution) return; // terminate if has solution in lower bound but no solution in current bound
     bound++;
+    topTimeIdx = bound;
     lastHasSolution = curHasSolution;
   }
 }
@@ -465,7 +471,7 @@ void add_dirty_constraint(astNode* const node, uint32_t timeIdx, context &c, sol
   toCoutVerb("Add dirty constraint for: " + node->dest+" ------  time: "+toStr(timeIdx));  
   std::string destAndSlice = node->dest;
   if(destAndSlice.compare("wack") == 0) {
-    toCoutVerb("Found it!");
+    //toCoutVerb("Found it!");
   }
   std::string dest, destSlice;
   split_slice(destAndSlice, dest, destSlice);
@@ -584,3 +590,10 @@ bool is_in_dirty_queue(std::string var) {
   return false;
 }
 
+
+void print_time() {
+  time_t my_time = time(NULL); 
+  
+  // ctime() used to give the present time 
+  printf("%s", ctime(&my_time)); 
+}

@@ -151,7 +151,7 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   split_slice(op2AndSlice, op2, op2Slice);
   
   if(destAndSlice.compare("_0036_") == 0) {
-    toCout("Found it!");
+    //toCout("Found it!");
   }
 
   uint32_t op1Hi;
@@ -300,7 +300,7 @@ expr reduce_one_op_constraint(astNode* const node, uint32_t timeIdx, context &c,
   uint32_t op1Lo = get_lo(op1AndSlice);
 
   if(destAndSlice.compare("_0062_") == 0) {
-    toCout("Found it!");
+    //toCoutVerb("Found it!");
   }
 
   expr destExpr = var_expr(destAndSlice, timeIdx, c, false);
@@ -315,8 +315,33 @@ expr reduce_one_op_constraint(astNode* const node, uint32_t timeIdx, context &c,
 }
 
 
+expr sel5_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve  ) {
+  std::smatch m;  
+  assert(node->srcVec.size() == 3);
+  std::string destAndSlice = node->dest;
+  std::string op = node->srcVec[0]; // op1 is var to be selected
+  uint32_t int1 = std::stoi(node->srcVec[1]); // op1 is var to be selected
+  uint32_t int2 = std::stoi(node->srcVec[2]); // op2 is start index
+  expr destExpr = var_expr(destAndSlice, timeIdx, c, false);
+  expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
+
+  expr opExpr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve);
+  expr opExpr_t = var_expr(op, timeIdx, c, true);
+
+  if(isSolve) {
+    s.add( destExpr == opExpr.extract(int1, int2) );
+    s.add( destExpr_t == opExpr_t.extract(int1, int2) );
+    if(g_print_solver)
+      toCout("Add-Solver: "+get_name(destExpr)+" == "+get_name(opExpr) + " [ "+ toStr(int1)+ ":" + toStr(int2) + "]"); 
+  }
+  return opExpr.extract(int1, int2);
+}
+
+
 expr sel_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve  ) {
   toCoutVerb("Sel op constraint for :"+node->dest);
+  if(node->op == "sel5")
+    return sel5_op_constraint(node, timeIdx, c, s, g, bound, isSolve);
 
   std::smatch m;  
   assert(node->srcVec.size() == 3);

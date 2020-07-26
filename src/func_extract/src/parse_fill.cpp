@@ -42,6 +42,7 @@ void clear_global_vars() {
 
 // parse the verilog lines, and store them into g_ssaTable & g_nbTable
 void parse_verilog(std::string fileName) {
+  toCout("### Begin parse_verilog");
   std::ifstream input(fileName);
   std::string line;
   std::smatch match;
@@ -171,7 +172,7 @@ void read_in_instructions(std::string fileName) {
               toCout("Encoding is not x or number[1], line is: "+line);
               abort();
             }
-            struct instrInfo info = { {{instrName, encoding}}, std::set<std::string>{}, std::set<std::string>{} };
+            struct instrInfo info = { {{instrName, encoding}}, std::set<std::string>{}, std::set<std::pair<uint32_t, std::string>>{} };
             //info.instrEncoding.emplace(instrName, encoding);
             g_instrInfo.push_back(info);
             state = OtherInstr;
@@ -190,8 +191,28 @@ void read_in_instructions(std::string fileName) {
           }
           break;
         case WriteASV:
-          g_instrInfo.back().writeASV.insert(line);
-          moduleAs.insert(line);
+          {
+            if(line.find(" ") == std::string::npos) {
+              g_instrInfo.back().writeASV.insert(std::make_pair(0, line));
+              moduleAs.insert(line);
+            }
+            else {
+              size_t pos = line.find(" ");
+              if(pos == line.length() - 1) {
+                line.pop_back();
+                g_instrInfo.back().writeASV.insert(std::make_pair(0, line));
+                moduleAs.insert(line);
+              }
+              std::string cycleCnt = line.substr(pos+1);
+              if(!is_number(cycleCnt)) {
+                toCout("Error: cycle count is not number: "+line);
+                abort();
+              }
+              std::string asName = line.substr(0, pos);
+              g_instrInfo.back().writeASV.insert(std::make_pair(uint32_t(std::stoi(cycleCnt)), asName));
+              moduleAs.insert(asName);
+            }
+          }
           break;
         case ReadASV:
           g_instrInfo.back().readASV.insert(line);

@@ -12,12 +12,13 @@ bool g_print_solver;
 
 int main(int argc, char *argv[]) {
   toCout("Begin main!");
-  g_verb = false;
+  g_verb = true;
   g_print_solver = false;
   g_remove_adff = false;
   std::string path = argv[1];
   // if argv[3] is 1, clean the file
   std::string doClean = argv[2];
+  print_time();  
   if(doClean.compare("1") == 0) {
     clean_file(path+"/design.v");
     remove_functions(path+"/design.v");
@@ -29,6 +30,7 @@ int main(int argc, char *argv[]) {
   read_in_instructions(path+"/instr.txt");
   vcd_parser(path+"/rst.vcd");
   build_ast_tree();
-  check_all_regs(); 
+  check_all_regs();
+  print_time();
   return 0;
 }

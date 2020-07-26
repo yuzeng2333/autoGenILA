@@ -11,6 +11,7 @@
 #include <cmath>
 #include <regex>
 #include <utility>
+#include <time.h>
 
 using namespace z3;
 
@@ -20,7 +21,7 @@ void check_all_regs();
 
 void clean_data();
 
-void check_single_reg_and_slice(std::string regAndSlice);
+void check_single_reg_and_slice(std::string regAndSlice, uint32_t cycleCnt);
 
 expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve, bool isBool=false);
 
@@ -52,4 +53,5 @@ bool is_in_dirty_queue(std::string var);
 
 void add_nop(context &c, solver &s, uint32_t bound);
 
+void print_time(); 
 #endif

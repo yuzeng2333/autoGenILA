@@ -248,11 +248,14 @@ void dest_concat_expr(std::string line) {
   // if there is number in the list
   for (std::string destAndSlice: destVec) {
     uint32_t destLocalWidthNum = get_var_slice_width(destAndSlice);
+    //uint32_t hi = get_hi(destAndSlice);
+    //uint32_t lo = get_lo(destAndSlice);
+    //assert(hi >= lo);
     endIdx = startIdx - destLocalWidthNum + 1;
     if(!is_number(destAndSlice)) {
       split_slice(destAndSlice, dest, destSlice);
 
-      std::string destAssign = "  assign "+destAndSlice+" = "+src+" [" + toStr(startIdx)+" : "+toStr(endIdx)+"] ;";
+      std::string destAssign = "  assign "+destAndSlice+" = "+src+" [" + toStr(startIdx)+" : "+toStr(endIdx)+"];";
       auto ret = g_ssaTable.emplace(destAndSlice, destAssign);
       put_into_reg2Slice(destAndSlice);
       if(!ret.second)
@@ -395,7 +398,11 @@ void always_clkrst_expr(std::string line, std::ifstream &input) {
   if (!insertDone) {
     std::cout << "insert failed: " + line << std::endl;
   }
-  std::string destNextLine = "  assign yuzeng"+yuzengIdx+" = "+condAndSlice+" ? "+src1AndSlice+" : "+src2AndSlice+" ;";
+  std::string destNextLine;
+  if(condAndSlice.front() != '!')
+    destNextLine = "  assign yuzeng"+yuzengIdx+" = "+condAndSlice+" ? "+src1AndSlice+" : "+src2AndSlice+";";
+  else
+    destNextLine = "  assign yuzeng"+yuzengIdx+" = "+condAndSlice.substr(1)+" ? "+src2AndSlice+" : "+src1AndSlice+";";
   auto ret = g_ssaTable.emplace("yuzeng"+yuzengIdx, destNextLine);
   if(!ret.second)
     toCout("Error in inserting ssaTable for the line: "+line+", "+destNextLine);

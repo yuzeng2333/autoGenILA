@@ -8,6 +8,7 @@
 #include <iostream>
 #include <fstream>
 #include <regex>
+#include <utility>
 #include <vector>
 #include "../../taint_method/taint_gen.h"
 #include "../../taint_method/helper.h"
@@ -37,6 +38,6 @@ void read_in_instructions(std::string fileName);
 struct instrInfo {
   std::unordered_map<std::string, std::string> instrEncoding;
   std::set<std::string> readASV;
-  std::set<std::string> writeASV;
+  std::set<std::pair<uint32_t, std::string>> writeASV;
 };
 #endif
