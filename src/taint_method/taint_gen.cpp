@@ -53,6 +53,7 @@ std::regex pSel1        (to_re("^(\\s*)assign (NAME) = (NAME)(\\[\\$signed\\((NA
 std::regex pSel2        (to_re("^(\\s*)assign (NAME) = (NAME)(\\[(NAME) \\+\\: (INT)\\])(\\s*)?;$"));
 std::regex pSel3        (to_re("^(\\s*)assign (NAME) = (NAME)(\\[\\$signed\\((NAME)\\) \\-\\: (INT)\\])(\\s*)?;$"));
 std::regex pSel4        (to_re("^(\\s*)assign (NAME) = (NAME)(\\[(NAME) \\-\\: (INT)\\])(\\s*)?;$"));
+std::regex pSel5        (to_re("^(\\s*)assign (NAME) = (NAME)(\\[(INT) \\: (INT)\\])(\\s*)?;$"));
 std::regex pBitOrRed2   (to_re("^(\\s*)assign (NAME) = \\| \\{ (NAME), (NAME) \\}(\\s*)?;$"));
 std::regex pLeftShift   (to_re("^(\\s*)assign (NAME) = (NAME) << (NAME)(\\s*)?;$"));
 std::regex pRightShift  (to_re("^(\\s*)assign (NAME) = (NAME) >> (NAME)(\\s*)?;$"));
@@ -835,7 +836,8 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   else if (std::regex_match(line, m, pSel1)
             || std::regex_match(line, m, pSel2)
             || std::regex_match(line, m, pSel3)
-            || std::regex_match(line, m, pSel4)) {
+            || std::regex_match(line, m, pSel4)
+            || std::regex_match(line, m, pSel5)) {
     return SEL;
   }
   //else if (std::regex_match(line, m, pSrcConcat)) {

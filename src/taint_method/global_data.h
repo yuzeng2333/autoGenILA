@@ -112,6 +112,7 @@ extern std::regex pSel1;
 extern std::regex pSel2;     
 extern std::regex pSel3;     
 extern std::regex pSel4;
+extern std::regex pSel5;
 extern std::regex pBitOrRed2;
 extern std::regex pLeftShift;
 extern std::regex pRightShift;
