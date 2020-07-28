@@ -150,7 +150,7 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   split_slice(op1AndSlice, op1, op1Slice);
   split_slice(op2AndSlice, op2, op2Slice);
   
-  if(destAndSlice.compare("_0041_") == 0) {
+  if(destAndSlice.find("adder_32bit_0.operator_B_stage_4_15.Po") != std::string::npos) {
     toCout("Found it!");
   }
 
@@ -457,13 +457,19 @@ expr src_concat_op_constraint(astNode* const node, uint32_t timeIdx, context &c,
   uint32_t destLo = get_lo(destAndSlice);
   expr destExpr = var_expr(destAndSlice, timeIdx, c, false);//add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve).extract(destHi, destLo);
   expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
-
+  if(node->dest == "fangyuan23" ) {
+    toCoutVerb("Found it!");
+  }
+  expr restConcatExpr_t(c);
   if(isSolve) {
     std::string firstSrcAndSlice = node->srcVec[0];
     expr firstSrcExpr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve);
     expr firstSrcExpr_t = var_expr(node->srcVec[0], timeIdx, c, true);
-    s.add( destExpr == concat(firstSrcExpr, add_one_concat_expr(node, 1, timeIdx, c, s, g, bound, isSolve, false)) );
-    s.add( destExpr_t == concat(firstSrcExpr_t, add_one_concat_expr(node, 1, timeIdx, c, s, g, bound, isSolve, true)) );
+    expr restConcatExpr = add_one_concat_expr(node, 1, timeIdx, c, s, g, bound, isSolve, false);
+    restConcatExpr_t = add_one_concat_expr(node, 0, timeIdx, c, s, g, bound, isSolve, true);
+    s.add( destExpr == concat(firstSrcExpr, restConcatExpr) );
+    s.add( destExpr_t == restConcatExpr_t );
+    //s.add( destExpr_t == concat(firstSrcExpr_t, restConcatExpr_t) );
   }
 
   return add_one_concat_expr(node, 0, timeIdx, c, s, g, bound, isSolve, false);
@@ -471,16 +477,34 @@ expr src_concat_op_constraint(astNode* const node, uint32_t timeIdx, context &c,
 
 
 expr add_one_concat_expr(astNode* const node, uint32_t nxtIdx, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve, bool isTaint ) {
+  if(node->dest == "fangyuan23" && nxtIdx == 0) {
+    toCoutVerb("Found it!");
+  }
   expr firstSrcExpr(c);
+  expr retExpr(c);
+  std::string childVarAndSlice = node->childVec[nxtIdx]->dest;
+  std::string childVar, childVarSlice;
+  split_slice(childVarAndSlice, childVar, childVarSlice);
+  auto it = std::find(node->srcVec.begin(), node->srcVec.end(), childVar);
+  assert(it != node->srcVec.end());
   if(!isTaint)
     firstSrcExpr = add_constraint(node->childVec[nxtIdx], timeIdx, c, s, g, bound, isSolve);
   else
-    firstSrcExpr = var_expr(node->srcVec[nxtIdx], timeIdx, c, true);
+    firstSrcExpr = var_expr(childVarAndSlice, timeIdx, c, true);
 
   if(nxtIdx == node->childVec.size() - 1)
-    return firstSrcExpr;
-  else 
-    return concat(firstSrcExpr, add_one_concat_expr(node, nxtIdx+1, timeIdx, c, s, g, bound, isSolve, isTaint) );
+    retExpr = firstSrcExpr;
+  else {
+    expr restConcatExpr = add_one_concat_expr(node, nxtIdx+1, timeIdx, c, s, g, bound, isSolve, isTaint);
+    retExpr = concat(firstSrcExpr, restConcatExpr);
+  }
+  toCoutVerb("Finished idx: "+toStr(nxtIdx)+" for: "+node->dest);
+  if(node->dest == "fangyuan23" && nxtIdx == 1) {
+    toCoutVerb("Found it!");
+  }
+  toCoutVerb("blank1");
+  toCoutVerb("blank2");
+  return retExpr;
 }
 
 

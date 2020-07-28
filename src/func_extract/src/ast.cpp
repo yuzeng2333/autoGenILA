@@ -386,6 +386,9 @@ void add_src_concat_op_node(std::string line, uint32_t timeIdx, astNode* const n
     return;
   std::string op;
   std::string destAndSlice = m.str(2);
+  if(destAndSlice.compare("fangyuan23") == 0) {
+    toCout("Find it!");
+  }
   std::string srcList = m.str(3);
 
   std::string dest, destSlice;
@@ -401,8 +404,12 @@ void add_src_concat_op_node(std::string line, uint32_t timeIdx, astNode* const n
   node->destTime = timeIdx;
   node->done = false;
 
-  for(auto src: srcVec)
+  for(auto src: srcVec) {
+    if(destAndSlice.compare("fangyuan23") == 0) {
+      toCout("Find it!");
+    }
     add_child_node(src, timeIdx, node);  
+  }
 
   return;
 }
