@@ -150,8 +150,8 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   split_slice(op1AndSlice, op1, op1Slice);
   split_slice(op2AndSlice, op2, op2Slice);
   
-  if(destAndSlice.compare("_0036_") == 0) {
-    //toCout("Found it!");
+  if(destAndSlice.compare("_0041_") == 0) {
+    toCout("Found it!");
   }
 
   uint32_t op1Hi;
@@ -661,11 +661,11 @@ expr case_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
     expr caseOverallExpr_t = var_expr(destAndSlice+"_CASE_0", timeIdx, c, true, localWidth);
     s.add( destFinalExpr_t == caseOverallExpr_t );
   }
-  return add_one_case_branch_expr(node, caseExpr, 1, timeIdx, c, s, g, bound);
+  return add_one_case_branch_expr(node, caseExpr, 1, timeIdx, c, s, g, bound, isSolve);
 }
 
 
-expr add_one_case_branch_expr(astNode* const node, expr &caseExpr, uint32_t idx, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound) {
+expr add_one_case_branch_expr(astNode* const node, expr &caseExpr, uint32_t idx, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
   astNode *assignNode;
   std::string assignVarAndSlice = node->srcVec[idx+1];
   uint32_t hi = get_hi(assignVarAndSlice);
@@ -673,12 +673,14 @@ expr add_one_case_branch_expr(astNode* const node, expr &caseExpr, uint32_t idx,
   if(idx < node->srcVec.size()-2) {
     assignNode = node->childVec[1];
     std::string caseValue = node->srcVec[idx];
-    uint32_t posOfOne = get_pos_of_one(caseValue);  
-    return ite(caseExpr.extract(posOfOne, posOfOne) == c.bv_val(1, 1), add_constraint(assignNode, timeIdx, c, s, g, bound, false, false).extract(hi, lo), add_one_case_branch_expr(node, caseExpr, idx+2, timeIdx, c, s, g, bound));
+    uint32_t posOfOne = get_pos_of_one(caseValue);
+    expr localAssignExpr = add_constraint(assignNode, timeIdx, c, s, g, bound, isSolve, false).extract(hi, lo);
+    expr localBranchExpr = add_one_case_branch_expr(node, caseExpr, idx+2, timeIdx, c, s, g, bound, isSolve);
+    return ite(caseExpr.extract(posOfOne, posOfOne) == c.bv_val(1, 1), localAssignExpr, localBranchExpr);
   }
   else {
     assignNode = node->childVec[2];
-    return add_constraint(assignNode, timeIdx, c, s, g, bound, false, false).extract(hi, lo);
+    return add_constraint(assignNode, timeIdx, c, s, g, bound, isSolve, false).extract(hi, lo);
   }
 } 
 

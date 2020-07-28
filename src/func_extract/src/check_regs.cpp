@@ -22,7 +22,7 @@ std::set<std::string> g_resetedReg;
 //std::unordered_map<std::string, expr*> INT_EXPR_VAL;
 std::set<std::string> INT_EXPR_SET;
 std::set<std::string> g_readASV;
-std::set<std::string> g_existedExpr;
+std::unordered_map<std::string, expr*> g_existedExpr;
 std::string g_rootNode;
 struct instrInfo g_currInstrInfo;
 
@@ -183,6 +183,7 @@ void check_single_reg_and_slice(std::string regAndSlice, uint32_t cycleCnt) {
       }
 
       // after getting one solution, build a goal and simplify it with input values
+      g_existedExpr.clear();
       add_nb_constraint(g_varNode[regAndSlice], 0, c, s, g, bound, /*isSolve=*/false, /*isBool=*/false, /*isRoot=*/true);
       //add_all_clean_constraints(c, s, g, bound, /*isSolve=*/false);
       tactic t(c, "simplify");
@@ -284,16 +285,18 @@ void check_single_reg_and_slice(std::string regAndSlice, uint32_t cycleCnt) {
 
 expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve, bool isBool) {
   std::string var = node->dest;
-  if(isSolve) {
-    if(g_existedExpr.find(timed_name(var, timeIdx)) != g_existedExpr.end() )
+  if(g_existedExpr.find(timed_name(var, timeIdx)) != g_existedExpr.end() ) {
+    if(isSolve)
       return var_expr(var, timeIdx, c, false);
-    g_existedExpr.insert(timed_name(var, timeIdx));
+    else
+      return *g_existedExpr[timed_name(var, timeIdx)];
   }
-  //if(var.compare("wack") == 0) {
-  //  toCout("wack found!");
+  expr retExpr(c);
+  //if(var.compare("fangyuan35") == 0) {
+  //  toCout("fangyuan35 found!");
   //}
   if ( isInput(var) ) { // input_t is always 0
-    return input_constraint(node, timeIdx, c, s, g, isSolve, isBool);
+    retExpr = input_constraint(node, timeIdx, c, s, g, isSolve, isBool);
   }
   //else if ( isAs(var) ) {
   //  if(var == CURRENT_VAR)
@@ -303,17 +306,26 @@ expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s
   //  return var_expr(var, timeIdx, c, false, isSolve);
   //}
   else if( isReg(var) ) { // AS case is moved to add_nb_constraint
-    return add_nb_constraint(node, timeIdx, c, s, g, bound, isSolve, isBool);
+    retExpr = add_nb_constraint(node, timeIdx, c, s, g, bound, isSolve, isBool);
   }
   else if( is_number(var) ) { // num_t is always 0
-    return num_constraint(node, timeIdx, c, s, g, isSolve);
+    retExpr = num_constraint(node, timeIdx, c, s, g, isSolve);
   }
   else if( is_case_dest(var) ) {
-    return case_constraint(node, timeIdx, c, s, g, bound, isSolve);
+    retExpr = case_constraint(node, timeIdx, c, s, g, bound, isSolve);
   }
   else { // it is wire
-    return add_ssa_constraint(node, timeIdx, c, s, g, bound, isSolve, isBool);
+    retExpr = add_ssa_constraint(node, timeIdx, c, s, g, bound, isSolve, isBool);
   }
+  if(isSolve) {
+    expr* newExprPnt = NULL;    
+    g_existedExpr.emplace(timed_name(var, timeIdx), newExprPnt);
+  }
+  else {
+    expr* newExprPnt = new expr(retExpr);
+    g_existedExpr.emplace(timed_name(var, timeIdx), newExprPnt);
+  }
+  return retExpr;
 }
 
 
