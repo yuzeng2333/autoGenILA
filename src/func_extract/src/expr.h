@@ -2,11 +2,11 @@
 #define EXPR 
 
 #include <string>
-#include <string>
 #include <iostream>
 #include <fstream>
 #include <regex>
 #include <vector>
+#include <algorithm>
 #include <unordered_map>
 #include "../../taint_method/global_data.h"
 #include "../../taint_method/helper.h"

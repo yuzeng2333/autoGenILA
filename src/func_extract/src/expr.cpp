@@ -429,6 +429,17 @@ void case_expr(std::string line, std::ifstream &input) {
 }
 
 
+bool compareSlice(std::string destAndSlice1, std::string destAndSlice2) {
+  std::string dest1, destSlice1;
+  std::string dest2, destSlice2;
+  split_slice(destAndSlice1, dest1, destSlice1);
+  split_slice(destAndSlice2, dest2, destSlice2);
+  uint32_t hi1 = get_end(destSlice1);
+  uint32_t hi2 = get_end(destSlice2);
+  return hi1 > hi2;
+}
+
+
 void put_into_reg2Slice(std::string destAndSlice) {
   std::string dest, destSlice;
   split_slice(destAndSlice, dest, destSlice);
@@ -439,6 +450,7 @@ void put_into_reg2Slice(std::string destAndSlice) {
     }
     else {
       reg2Slices[dest].push_back(destAndSlice);
+      std::sort(reg2Slices[dest].begin(), reg2Slices[dest].end(), compareSlice);
     }
   }
 }
