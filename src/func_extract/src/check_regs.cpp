@@ -291,6 +291,10 @@ expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s
     else
       return *g_existedExpr[timed_name(var, timeIdx)];
   }
+  //if(node->srcVec.size() != node->childVec.size() && node->type != ITE) {
+  //  toCout("Error: srcVec and childVec has different length: "+node->dest);
+  //  abort();
+  //}
   expr retExpr(c);
   //if(var.compare("fangyuan35") == 0) {
   //  toCout("fangyuan35 found!");

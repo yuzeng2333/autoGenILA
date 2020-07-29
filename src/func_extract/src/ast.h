@@ -41,6 +41,8 @@ void add_node(std::string var, uint32_t timeIdx, astNode* const node, bool varIs
 
 void add_child_node(std::string varAndSlice, uint32_t timeIdx, astNode* const node);
 
+void add_sliced_node(std::string varAndSlice, uint32_t timeIdx, astNode* const node);
+
 void add_nb_node(std::string regAndSlice, uint32_t timeIdx, astNode* const node);
 
 void add_ssa_node(std::string var, uint32_t timeIdx, astNode* const node);

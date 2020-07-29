@@ -55,4 +55,6 @@ uint32_t get_hi(std::string varAndSlice);
 uint32_t get_lo(std::string varAndSlice);
 
 bool is_number(const std::string& s);
+
+bool is_sliced(std::string varAndSlice);
 #endif

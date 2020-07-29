@@ -149,8 +149,11 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   split_slice(destAndSlice, dest, destSlice);
   split_slice(op1AndSlice, op1, op1Slice);
   split_slice(op2AndSlice, op2, op2Slice);
-  
-  if(destAndSlice.find("adder_32bit_0.operator_B_stage_4_15.Po") != std::string::npos) {
+ 
+  bool op1Extract = !op1Slice.empty() && !is_sliced(op1);
+  bool op2Extract = !op2Slice.empty() && !is_sliced(op2);
+
+  if(destAndSlice.find("_0100_") != std::string::npos) {
     toCout("Found it!");
   }
 
@@ -194,16 +197,16 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   expr op1Expr(c);
   expr op2Expr(c);
   if(!op1IsNum)
-    if(!op1Slice.empty())  op1Expr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve).extract(op1Hi, op1Lo); 
+    if(!op1Extract)  op1Expr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve).extract(op1Hi, op1Lo); 
     else                   op1Expr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve); 
   else
-    op1Expr = var_expr(op1AndSlice, timeIdx, c, false, op1WidthNum);
+    op1Expr = var_expr(op1AndSlice, timeIdx, c, false, opWidthNum);
 
   if(!op2IsNum)
-    if(!op2Slice.empty())  op2Expr = add_constraint(node->childVec[1], timeIdx, c, s, g, bound, isSolve).extract(op2Hi, op2Lo);
+    if(!op2Extract)  op2Expr = add_constraint(node->childVec[1], timeIdx, c, s, g, bound, isSolve).extract(op2Hi, op2Lo);
     else                   op2Expr = add_constraint(node->childVec[1], timeIdx, c, s, g, bound, isSolve);
   else
-    op2Expr = var_expr(op2AndSlice, timeIdx, c, false, op2WidthNum);
+    op2Expr = var_expr(op2AndSlice, timeIdx, c, false, opWidthNum);
 
   expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
   
@@ -213,7 +216,7 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   bool op2IsReadRoot = false;
 
   expr zero = c.bv_val(0, destWidthNum);
-  bool sameWidth = op1WidthNum == destWidthNum && op1WidthNum == op2WidthNum;
+  bool sameWidth = (op1WidthNum == destWidthNum) && (op1WidthNum == op2WidthNum);
   assert(isReduceOp || destWidthNum >= opWidthNum);
 
   // taint expression
@@ -457,17 +460,17 @@ expr src_concat_op_constraint(astNode* const node, uint32_t timeIdx, context &c,
   uint32_t destLo = get_lo(destAndSlice);
   expr destExpr = var_expr(destAndSlice, timeIdx, c, false);//add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve).extract(destHi, destLo);
   expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
-  if(node->dest == "fangyuan23" ) {
+  if(node->dest == "fangyuan35" ) {
     toCoutVerb("Found it!");
   }
   expr restConcatExpr_t(c);
   if(isSolve) {
     std::string firstSrcAndSlice = node->srcVec[0];
-    expr firstSrcExpr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve);
-    expr firstSrcExpr_t = var_expr(node->srcVec[0], timeIdx, c, true);
-    expr restConcatExpr = add_one_concat_expr(node, 1, timeIdx, c, s, g, bound, isSolve, false);
+    //expr firstSrcExpr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve);
+    //expr firstSrcExpr_t = var_expr(node->srcVec[0], timeIdx, c, true);
+    expr restConcatExpr = add_one_concat_expr(node, 0, timeIdx, c, s, g, bound, isSolve, false);
     restConcatExpr_t = add_one_concat_expr(node, 0, timeIdx, c, s, g, bound, isSolve, true);
-    s.add( destExpr == concat(firstSrcExpr, restConcatExpr) );
+    s.add( destExpr == restConcatExpr );
     s.add( destExpr_t == restConcatExpr_t );
     //s.add( destExpr_t == concat(firstSrcExpr_t, restConcatExpr_t) );
   }
@@ -477,7 +480,7 @@ expr src_concat_op_constraint(astNode* const node, uint32_t timeIdx, context &c,
 
 
 expr add_one_concat_expr(astNode* const node, uint32_t nxtIdx, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve, bool isTaint ) {
-  if(node->dest == "fangyuan23" && nxtIdx == 0) {
+  if(node->dest == "fangyuan27" && nxtIdx == 0) {
     toCoutVerb("Found it!");
   }
   expr firstSrcExpr(c);
@@ -485,12 +488,18 @@ expr add_one_concat_expr(astNode* const node, uint32_t nxtIdx, uint32_t timeIdx,
   std::string childVarAndSlice = node->childVec[nxtIdx]->dest;
   std::string childVar, childVarSlice;
   split_slice(childVarAndSlice, childVar, childVarSlice);
-  auto it = std::find(node->srcVec.begin(), node->srcVec.end(), childVar);
-  assert(it != node->srcVec.end());
+  uint32_t hi = get_hi(childVarAndSlice);
+  uint32_t lo = get_lo(childVarAndSlice);
+  //auto it = std::find(node->srcVec.begin(), node->srcVec.end(), childVar);
+  //assert(it != node->srcVec.end());
+  if(node->childVec.size() != node->srcVec.size()) {
+    toCout("Error: srcVec and childVec have different sizes for: "+node->dest);
+    abort();
+  }
   if(!isTaint)
-    firstSrcExpr = add_constraint(node->childVec[nxtIdx], timeIdx, c, s, g, bound, isSolve);
+    firstSrcExpr = add_constraint(node->childVec[nxtIdx], timeIdx, c, s, g, bound, isSolve).extract(hi, lo);
   else
-    firstSrcExpr = var_expr(childVarAndSlice, timeIdx, c, true);
+    firstSrcExpr = var_expr(node->srcVec[nxtIdx], timeIdx, c, true);
 
   if(nxtIdx == node->childVec.size() - 1)
     retExpr = firstSrcExpr;
@@ -499,7 +508,7 @@ expr add_one_concat_expr(astNode* const node, uint32_t nxtIdx, uint32_t timeIdx,
     retExpr = concat(firstSrcExpr, restConcatExpr);
   }
   toCoutVerb("Finished idx: "+toStr(nxtIdx)+" for: "+node->dest);
-  if(node->dest == "fangyuan23" && nxtIdx == 1) {
+  if(node->dest == "fangyuan27" && nxtIdx == 1) {
     toCoutVerb("Found it!");
   }
   toCoutVerb("blank1");

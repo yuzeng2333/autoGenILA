@@ -175,8 +175,19 @@ uint32_t get_pos_of_one(std::string value) {
 
 
 uint32_t get_hi(std::string varAndSlice) {
+  std::smatch m;
+  if(is_number(varAndSlice)) {
+    if(!std::regex_match(varAndSlice, m, pBin)) {
+      toCout("Error: input number for get_hi is not binary: "+varAndSlice);
+    }
+    std::string bitNum = m.str(1);
+    return std::stoi(bitNum)-1;
+  }
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
+  if(is_sliced(var)) {
+    return get_end(varSlice) - get_begin(varSlice);
+  }
   if(!varSlice.empty())
     return get_end(varSlice);
   auto idxPairs = varWidth.get_idx_pair(var, "find_version_num for: "+var);
@@ -185,8 +196,13 @@ uint32_t get_hi(std::string varAndSlice) {
 
 
 uint32_t get_lo(std::string varAndSlice) {
+  if(is_number(varAndSlice))
+    return 0;
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
+  if(is_sliced(var)) {
+    return 0;
+  }
   if(!varSlice.empty())
     return get_begin(varSlice);
   auto idxPairs = varWidth.get_idx_pair(var, "find_version_num for: "+var);
@@ -199,4 +215,11 @@ bool is_number(const std::string& s) {
   std::string::const_iterator it = s.begin();
   while (it != s.end() && std::isdigit(*it)) ++it;
   return !s.empty() && it == s.end();
+}
+
+
+bool is_sliced(std::string varAndSlice) {
+  std::string var, varSlice;
+  split_slice(varAndSlice, var, varSlice);
+  return reg2Slices.find(var) != reg2Slices.end();
 }

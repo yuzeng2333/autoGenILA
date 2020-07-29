@@ -36,11 +36,15 @@ void build_tree_for_single_as(std::string regAndSlice) {
 void add_node(std::string var, uint32_t timeIdx, astNode* const node, bool varIsDest) {
   if(g_visitedNode.find(var) != g_visitedNode.end())
     return;
+  g_visitedNode.emplace(var, node);
   if(var.compare("kp") == 0) {
-    toCout("FIND IT!");
+    //toCoutVerb("FIND IT!");
   }
-  g_varNode.emplace(var, node);  
-  if ( isInput(var) ) {
+  g_varNode.emplace(var, node);
+  if( reg2Slices.find(var) != reg2Slices.end() ) {
+    add_sliced_node(var, timeIdx, node);
+  }
+  else if ( isInput(var) ) {
     add_input_node(var, timeIdx, node);
   }
   else if ( isAs(var) && !varIsDest ) {
@@ -65,9 +69,19 @@ void add_node(std::string var, uint32_t timeIdx, astNode* const node, bool varIs
 void add_child_node(std::string varAndSlice, uint32_t timeIdx, astNode* const node) {
   toCoutVerb("!! Add child "+varAndSlice+" to "+node->dest);
   std::string var, varSlice;
-  split_slice(varAndSlice, var, varSlice);  
-  if( reg2Slices.find(var) == reg2Slices.end() ) {
-    // TODO: JUN/23 if reg has already been visited, link to that node, instead of making a new node
+  split_slice(varAndSlice, var, varSlice);
+  if(is_sliced(var)) {
+    if(g_visitedNode.find(varAndSlice) == g_visitedNode.end()) {
+      astNode* nextNode = new astNode;      
+      node->childVec.push_back(nextNode);
+      add_node(varAndSlice, timeIdx, nextNode, false);
+    }
+    else {
+      astNode* existedNode = g_visitedNode[varAndSlice];
+      node->childVec.push_back(existedNode);
+    }
+  }
+  else {
     if(g_visitedNode.find(var) == g_visitedNode.end()) {
       astNode* nextNode = new astNode;      
       node->childVec.push_back(nextNode);
@@ -78,18 +92,23 @@ void add_child_node(std::string varAndSlice, uint32_t timeIdx, astNode* const no
       node->childVec.push_back(existedNode);
     }
   }
-  else {
-    for(std::string slice: reg2Slices[var]) {
-      if(g_visitedNode.find(slice) == g_visitedNode.end()) {      
-        astNode* nextNode = new astNode;      
-        node->childVec.push_back(nextNode);
-        add_node(slice, timeIdx, nextNode, false);
-      }
-      else {
-        astNode* existedNode = g_visitedNode[slice];
-        node->childVec.push_back(existedNode);
-      }
-    }
+}
+
+
+void add_sliced_node(std::string varAndSlice, uint32_t timeIdx, astNode* const node) {
+  std::string var, varSlice;
+  split_slice(varAndSlice, var, varSlice);
+  assert(varSlice.empty());
+
+  node->type = SRC_CONCAT;
+  node->dest = var;
+  node->op = "";
+  node->srcVec = reg2Slices[var];
+  node->destTime = timeIdx;
+  node->done = false;
+
+  for(auto src: reg2Slices[var]) {
+    add_child_node(src, timeIdx, node);  
   }
 }
 
@@ -133,8 +152,12 @@ void add_ssa_node(std::string varAndSlice, uint32_t timeIdx, astNode* const node
   g_visitedNode.emplace(varAndSlice, node);
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
-  assert( g_ssaTable.find(varAndSlice) != g_ssaTable.end() );
-  std::string varAssign = g_ssaTable[varAndSlice];
+  std::string varAssign;
+  if(g_ssaTable.find(varAndSlice) != g_ssaTable.end() )
+    varAssign = g_ssaTable[varAndSlice];
+  else if(g_ssaTable.find(var) != g_ssaTable.end())
+    varAssign = g_ssaTable[var];
+
   uint32_t choice = parse_verilog_line(varAssign);
   switch( choice ) {
     case INPUT:
