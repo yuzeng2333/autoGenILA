@@ -157,20 +157,10 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
     toCout("Found it!");
   }
 
-  uint32_t op1Hi;
-  uint32_t op1Lo;
-  uint32_t op2Hi;
-  uint32_t op2Lo;
-
-  if(!op1Slice.empty()) {
-    op1Hi = get_end(op1Slice);
-    op1Lo = get_begin(op1Slice);
-  }
-
-  if(!op2Slice.empty()) {
-    op2Hi = get_end(op2Slice);
-    op2Lo = get_begin(op2Slice);
-  }
+  uint32_t op1Hi = get_hi(op1AndSlice);
+  uint32_t op1Lo = get_lo(op1AndSlice);
+  uint32_t op2Hi = get_hi(op2AndSlice);
+  uint32_t op2Lo = get_lo(op2AndSlice);
 
   assert(!isMem(op1));
   assert(!isMem(op2));
@@ -197,16 +187,14 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   expr op1Expr(c);
   expr op2Expr(c);
   if(!op1IsNum)
-    if(!op1Extract)  op1Expr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve).extract(op1Hi, op1Lo); 
-    else                   op1Expr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve); 
+    op1Expr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve).extract(op1Hi, op1Lo); 
   else
-    op1Expr = var_expr(op1AndSlice, timeIdx, c, false, opWidthNum);
+    op1Expr = var_expr(op1AndSlice, timeIdx, c, false, op1WidthNum);
 
   if(!op2IsNum)
-    if(!op2Extract)  op2Expr = add_constraint(node->childVec[1], timeIdx, c, s, g, bound, isSolve).extract(op2Hi, op2Lo);
-    else                   op2Expr = add_constraint(node->childVec[1], timeIdx, c, s, g, bound, isSolve);
+    op2Expr = add_constraint(node->childVec[1], timeIdx, c, s, g, bound, isSolve).extract(op2Hi, op2Lo);
   else
-    op2Expr = var_expr(op2AndSlice, timeIdx, c, false, opWidthNum);
+    op2Expr = var_expr(op2AndSlice, timeIdx, c, false, op2WidthNum);
 
   expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
   
