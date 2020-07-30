@@ -4,6 +4,7 @@
 #include "check_regs.h"
 #include "op_constraint.h"
 #include <string>
+#include <fstream>
 
 #include "../../taint_method/global_data.h"
 #include "../../taint_method/helper.h"
@@ -11,6 +12,10 @@
 bool g_print_solver;
 
 int main(int argc, char *argv[]) {
+  std::ofstream outFile;
+  outFile.open("./result.txt", std::ios_base::app);
+  outFile << "Begin main!" << std::endl;
+  outFile.close();
   toCout("Begin main!");
   g_verb = true;
   g_print_solver = false;

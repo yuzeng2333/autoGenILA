@@ -11,6 +11,7 @@
 #include <cmath>
 #include <regex>
 #include <utility>
+#include <fstream>
 #include <time.h>
 
 using namespace z3;

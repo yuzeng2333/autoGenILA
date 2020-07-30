@@ -65,6 +65,8 @@ void clean_data() {
 // constructed only one. But the SMT equation may need to be constructed
 // multiple times, until a solution is obtained or a bound is reached.
 void check_single_reg_and_slice(std::string regAndSlice, uint32_t cycleCnt) {
+  std::ofstream outFile;
+  outFile.open("./result.txt", std::ios_base::app);
   g_rootNode = regAndSlice;
   clean_data();
   toCout("========== Begin check SAT for: "+regAndSlice+" ==========");
@@ -151,6 +153,7 @@ void check_single_reg_and_slice(std::string regAndSlice, uint32_t cycleCnt) {
       uint32_t j = 0;
       // only block values for varriables in CLEAN_QUEUE
       toCout("+++++++ Solution found for "+regAndSlice+", bound: "+toStr(bound)+" +++++++++");
+      outFile << "+++++++ Solution found for "+regAndSlice+", bound: "+toStr(bound)+" +++++++++" << std::endl;
 
       std::vector<std::pair<std::string, uint32_t>> varIdxPairVec;
       for (uint32_t i = 0; i < m.size(); i++)
@@ -173,13 +176,16 @@ void check_single_reg_and_slice(std::string regAndSlice, uint32_t cycleCnt) {
 
         if(!is_taint(var) && ( isInput(pure(var)) || isAs(pure(var)) )) {
           std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ " << v.name() << " = " << m.get_const_interp(v) << "\n";
+          outFile << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ " << v.name() << " = " << m.get_const_interp(v) << "\n";
           if(isInput(pure(var)) || isAs(pure(var)) ) {
             expr *tmpPnt = new expr(m.get_const_interp(v));
             INPUT_EXPR_VAL.emplace(var, tmpPnt);
           }
         }
-        else 
+        else  {
           std::cout << v.name() << " = " << m.get_const_interp(v) << "\n";
+          outFile << v.name() << " = " << m.get_const_interp(v) << "\n";
+        }
       }
 
       // after getting one solution, build a goal and simplify it with input values
@@ -190,6 +196,7 @@ void check_single_reg_and_slice(std::string regAndSlice, uint32_t cycleCnt) {
       apply_result r = t(g);
       toCout("*************************  Update function for "+regAndSlice);
       std::cout << r << std::endl;
+      outFile << r << std::endl;
       // if two goals are the same, then check the two solutions. If any
       // varriable is different in the two solutions, fix it.
       //changedVal.clear();
@@ -275,11 +282,13 @@ void check_single_reg_and_slice(std::string regAndSlice, uint32_t cycleCnt) {
     }
     assert(bound <= bound_limit);
     toCout("------- No more solution found within the bound: "+toStr(bound)+" ----------");
+    outFile << "------- No more solution found within the bound: "+toStr(bound)+" ----------" << std::endl;
     if(lastHasSolution && !curHasSolution) return; // terminate if has solution in lower bound but no solution in current bound
     bound++;
     topTimeIdx = bound;
     lastHasSolution = curHasSolution;
   }
+  outFile.close();
 }
 
 
