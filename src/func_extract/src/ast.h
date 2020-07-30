@@ -5,6 +5,7 @@
 #include <vector>
 #include <cassert>
 #include <regex>
+#include <algorithm>
 #include "../../taint_method/taint_gen.h"
 #include "../../taint_method/helper.h"
 

@@ -70,7 +70,13 @@ void add_child_node(std::string varAndSlice, uint32_t timeIdx, astNode* const no
   toCoutVerb("!! Add child "+varAndSlice+" to "+node->dest);
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
+  // if varAndSlice is dest of one line, treat it separately
+  bool isSlicedDest = false;
   if(is_sliced(var)) {
+    auto it = std::find(reg2Slices[var].begin(), reg2Slices[var].end(), varAndSlice);
+    isSlicedDest = it != reg2Slices[var].end();
+  }
+  if(isSlicedDest) {
     if(g_visitedNode.find(varAndSlice) == g_visitedNode.end()) {
       astNode* nextNode = new astNode;      
       node->childVec.push_back(nextNode);

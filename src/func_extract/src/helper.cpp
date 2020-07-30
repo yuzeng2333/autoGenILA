@@ -185,11 +185,14 @@ uint32_t get_hi(std::string varAndSlice) {
   }
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
-  if(is_sliced(var)) {
-    return get_end(varSlice) - get_begin(varSlice);
-  }
-  if(!varSlice.empty())
+  if(!varSlice.empty()) {
+    if(is_sliced(var)) {
+      auto it = std::find(reg2Slices[var].begin(), reg2Slices[var].end(), varAndSlice);
+      if(it != reg2Slices[var].end())
+        return get_end(varSlice) - get_begin(varSlice);
+    }
     return get_end(varSlice);
+  }
   auto idxPairs = varWidth.get_idx_pair(var, "find_version_num for: "+var);
   return idxPairs.first;
 }
@@ -200,11 +203,15 @@ uint32_t get_lo(std::string varAndSlice) {
     return 0;
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
-  if(is_sliced(var)) {
-    return 0;
-  }
-  if(!varSlice.empty())
+
+  if(!varSlice.empty()) {
+    if(is_sliced(var)) {
+      auto it = std::find(reg2Slices[var].begin(), reg2Slices[var].end(), varAndSlice);
+      if(it != reg2Slices[var].end())
+        return 0;
+    }
     return get_begin(varSlice);
+  }
   auto idxPairs = varWidth.get_idx_pair(var, "find_version_num for: "+var);
   return idxPairs.second;
 }

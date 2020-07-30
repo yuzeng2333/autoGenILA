@@ -263,6 +263,9 @@ expr one_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   std::string op1AndSlice = node->srcVec.front();
   split_slice(destAndSlice, dest, destSlice);
   split_slice(op1AndSlice, op1, op1Slice);
+  if(destAndSlice.compare("_0075_") == 0) {
+    toCoutVerb("Found it!");
+  }
   uint32_t op1Hi = get_hi(op1AndSlice);
   uint32_t op1Lo = get_lo(op1AndSlice);
 
@@ -473,11 +476,11 @@ expr add_one_concat_expr(astNode* const node, uint32_t nxtIdx, uint32_t timeIdx,
   }
   expr firstSrcExpr(c);
   expr retExpr(c);
-  std::string childVarAndSlice = node->childVec[nxtIdx]->dest;
-  std::string childVar, childVarSlice;
-  split_slice(childVarAndSlice, childVar, childVarSlice);
-  uint32_t hi = get_hi(childVarAndSlice);
-  uint32_t lo = get_lo(childVarAndSlice);
+  std::string varAndSlice = node->srcVec[nxtIdx];
+  std::string var, varSlice;
+  split_slice(varAndSlice, var, varSlice);
+  uint32_t hi = get_hi(varAndSlice);
+  uint32_t lo = get_lo(varAndSlice);
   //auto it = std::find(node->srcVec.begin(), node->srcVec.end(), childVar);
   //assert(it != node->srcVec.end());
   if(node->childVec.size() != node->srcVec.size()) {
@@ -518,6 +521,10 @@ expr ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   std::string cond, condSlice;
   std::string op1, op1Slice;
   std::string op2, op2Slice;
+
+  if(destAndSlice.compare("_0123_") == 0) {
+    toCoutVerb("Found it!");
+  }
 
   split_slice(destAndSlice, dest, destSlice);
   split_slice(condAndSlice, cond, condSlice);
