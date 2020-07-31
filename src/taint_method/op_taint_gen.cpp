@@ -1298,9 +1298,21 @@ void dest_concat_op_taint_gen(std::string line, std::ofstream &output) {
   std::string destRList = get_rhs_taint_list(destList, _r);
   std::string destXList = get_rhs_taint_list(destList, _x);
   std::string destCList = get_rhs_taint_list(destList, _c);
-  output << blank + "assign " + src + _r + srcSlice + " = { " + destRList + " };" << std::endl;
-  output << blank + "assign " + src + _x + srcSlice + " = { " + destXList + " };" << std::endl;
-  output << blank + "assign " + src + _c + srcSlice + " = { " + destCList + " };" << std::endl;
+
+  auto srcIdxPair = varWidth.get_idx_pair(src, line);
+  std::string srcHighIdx = toStr(srcIdxPair.first);
+  std::string srcLowIdx  = toStr(srcIdxPair.second);
+  bool isNew;
+  uint32_t localVerNum = find_version_num(srcAndSlice, isNew, output);
+  std::string localVer = std::to_string(localVerNum);
+  if(isNew) {
+    output << blank + "logic [" + srcHighIdx + ":" + srcLowIdx + "] " + src + _r + localVer + " ;" << std::endl;
+    output << blank + "logic [" + srcHighIdx + ":" + srcLowIdx + "] " + src + _x + localVer + " ;" << std::endl;
+    output << blank + "logic [" + srcHighIdx + ":" + srcLowIdx + "] " + src + _c + localVer + " ;" << std::endl;
+  }
+  output << blank + "assign " + src + _r + localVer + srcSlice + " = { " + destRList + " };" << std::endl;
+  output << blank + "assign " + src + _x + localVer + srcSlice + " = { " + destXList + " };" << std::endl;
+  output << blank + "assign " + src + _c + localVer + srcSlice + " = { " + destCList + " };" << std::endl;
 }
 
 
