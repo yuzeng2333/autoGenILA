@@ -171,7 +171,8 @@ extern std::regex pVarName;
 extern std::regex pVarNameGroup;
 extern std::regex pNum;
 extern std::regex pNumExist;
-
+extern std::regex pBin;
+extern std::regex pHex;
 extern bool g_verb;
 
 #endif
