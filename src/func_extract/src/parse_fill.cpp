@@ -138,6 +138,7 @@ void read_in_architectural_states(std::string fileName) {
 void read_in_instructions(std::string fileName) {
   moduleAs.clear();
   g_instrInfo.clear();
+  g_rstVal.clear();
   std::ifstream input(fileName);
   std::string line;
   std::smatch m;

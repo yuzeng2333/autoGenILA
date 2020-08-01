@@ -313,6 +313,9 @@ expr sel5_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solve
   std::smatch m;  
   assert(node->srcVec.size() == 3);
   std::string destAndSlice = node->dest;
+  if(destAndSlice.compare("_12_[3:2]") == 0) {
+    toCoutVerb("Found it!");
+  }
   std::string op = node->srcVec[0]; // op1 is var to be selected
   uint32_t int1 = std::stoi(node->srcVec[1]); // op1 is var to be selected
   uint32_t int2 = std::stoi(node->srcVec[2]); // op2 is start index
@@ -349,6 +352,10 @@ expr sel_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   split_slice(destAndSlice, dest, destSlice);
   split_slice(op1AndSlice, op1, op1Slice);
   split_slice(op2AndSlice, op2, op2Slice);
+
+  if(destAndSlice.compare("_12_[3:2]") == 0) {
+    toCoutVerb("Found it!");
+  }
 
   uint32_t op1Hi;
   uint32_t op1Lo;
@@ -454,19 +461,32 @@ expr src_concat_op_constraint(astNode* const node, uint32_t timeIdx, context &c,
   if(node->dest == "fangyuan35" ) {
     toCoutVerb("Found it!");
   }
+  // analyze index of srcVec
+  uint32_t srcHi = get_hi(node->srcVec[0]);
+  uint32_t srcLo = get_lo(node->srcVec.back());
+  expr restConcatExpr(c);
   expr restConcatExpr_t(c);
   if(isSolve) {
     std::string firstSrcAndSlice = node->srcVec[0];
-    //expr firstSrcExpr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve);
-    //expr firstSrcExpr_t = var_expr(node->srcVec[0], timeIdx, c, true);
-    expr restConcatExpr = add_one_concat_expr(node, 0, timeIdx, c, s, g, bound, isSolve, false);
+    restConcatExpr = add_one_concat_expr(node, 0, timeIdx, c, s, g, bound, isSolve, false);
     restConcatExpr_t = add_one_concat_expr(node, 0, timeIdx, c, s, g, bound, isSolve, true);
-    s.add( destExpr == restConcatExpr );
-    s.add( destExpr_t == restConcatExpr_t );
+    s.add( destExpr.extract(srcHi, srcLo) == restConcatExpr );
+    s.add( destExpr_t.extract(srcHi, srcLo) == restConcatExpr_t );
     //s.add( destExpr_t == concat(firstSrcExpr_t, restConcatExpr_t) );
   }
 
-  return add_one_concat_expr(node, 0, timeIdx, c, s, g, bound, isSolve, false);
+  if(destHi == srcHi && destLo == srcLo)
+    return restConcatExpr;
+  else if(destHi > srcHi && destLo == srcLo)
+    return concat(c.bv_val(0, destHi - srcHi), restConcatExpr);
+  else if(destHi == srcHi && destLo < srcLo)
+    return concat(restConcatExpr, c.bv_val(0, srcLo - destLo));
+  else if(destHi > srcHi && destLo < srcLo)
+    return concat(c.bv_val(0, destHi - srcHi), concat(restConcatExpr, c.bv_val(0, srcLo - destLo)));
+  else {
+    toCout("Error: src index range is out of dest index range!");
+    abort();
+  }
 }
 
 

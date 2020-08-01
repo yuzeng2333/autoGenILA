@@ -5,6 +5,10 @@
 std::unordered_map<std::string, std::string> g_nameVarMap;
 
 void vcd_parser(std::string fileName) {
+  if(!g_rstVal.empty()) {
+    toCout("Reset value is manually specified!");
+    return;
+  }
   toCout("### Begin vcd_parser");
   std::regex pName("^\\$var wire (\\d+) (n\\d+) (\\S+) \\$end$");
   std::string line;

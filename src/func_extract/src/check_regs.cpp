@@ -344,7 +344,7 @@ expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s
 
 expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve, bool isBool, bool isRoot) {
   std::string dest = node->dest;
-  if(dest.compare("wack") == 0) {
+  if(dest.compare("word_sum") == 0) {
     toCout("wack found! time: "+toStr(timeIdx));
   }
   expr destExpr = var_expr(dest, timeIdx, c, false);

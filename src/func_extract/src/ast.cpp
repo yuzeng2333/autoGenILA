@@ -101,6 +101,7 @@ void add_child_node(std::string varAndSlice, uint32_t timeIdx, astNode* const no
 }
 
 
+// attention: the slices in reg2Slices may not be complete
 void add_sliced_node(std::string varAndSlice, uint32_t timeIdx, astNode* const node) {
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
@@ -397,9 +398,6 @@ void add_sel_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
 
   add_child_node(op1AndSlice, timeIdx, node);
   add_child_node(op2AndSlice, timeIdx, node);
-
-  if(isReduceOp)
-    assert(destAndSliceWidth == 1);
 
   assert(!isMem(op1));
   assert(!isMem(op2));

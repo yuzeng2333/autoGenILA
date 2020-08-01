@@ -176,9 +176,13 @@ uint32_t get_pos_of_one(std::string value) {
 
 uint32_t get_hi(std::string varAndSlice) {
   std::smatch m;
+  std::regex pHex("^(\\d+)'h([\\dabcdefx\\?]+)$");
+  std::regex pDec("^(\\d+)'d([\\dx\\?]+)$");
+  std::regex pBin("^(\\d+)'h([01x\\?]+)$");
   if(is_number(varAndSlice)) {
-    if(!std::regex_match(varAndSlice, m, pBin)) {
-      toCout("Error: input number for get_hi is not binary: "+varAndSlice);
+    if(!std::regex_match(varAndSlice, m, pBin)
+        && !std::regex_match(varAndSlice, m, pHex)) {
+      toCout("Error: input number for get_hi is not binary or hex: "+varAndSlice);
     }
     std::string bitNum = m.str(1);
     return std::stoi(bitNum)-1;

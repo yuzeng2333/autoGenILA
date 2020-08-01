@@ -12,3 +12,6 @@ pidc:
 
 tmp:
 	../func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/tmp/tmp.v /workspace/research/ILA/autoGenILA/src/func_extract/test/tmp/as.txt 1
+
+ad:
+	../func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/advanced 0
