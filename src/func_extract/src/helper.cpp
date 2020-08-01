@@ -24,7 +24,7 @@ uint32_t hdb2int(std::string num) {
   }
   else if(std::regex_match(num, m, pHex)) {
     std::string pureNum = m.str(2); 
-    return str2int(pureNum, "input num in hdb is: "+num);    
+    return hex2int(pureNum);    
   }
   else {
     std::regex_match(num, m, pBin);
@@ -33,6 +33,27 @@ uint32_t hdb2int(std::string num) {
   }
 }
 
+uint32_t hex2int(std::string num) {
+  uint32_t res = 0;
+  for(auto it = num.begin(); it != num.end(); it++) {
+    res = res * 16;
+    if(*it == 'f')
+      res += 15;
+    else if(*it == 'e')
+      res += 14;
+    else if(*it == 'd')
+      res += 13;
+    else if(*it == 'c')
+      res += 12;
+    else if(*it == 'b')
+      res += 11;
+    else if(*it == 'a')
+      res += 10;
+    else
+      res += (*it - '0');
+  }
+  return res;
+}
 
 uint32_t bin2int(std::string num) {
   uint32_t res = 0;

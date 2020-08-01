@@ -153,7 +153,7 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   bool op1Extract = !op1Slice.empty() && !is_sliced(op1);
   bool op2Extract = !op2Slice.empty() && !is_sliced(op2);
 
-  if(destAndSlice.find("_0100_") != std::string::npos) {
+  if(destAndSlice.find("u0.stg1_nxt") != std::string::npos) {
     toCout("Found it!");
   }
 

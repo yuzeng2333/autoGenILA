@@ -1,1903 +1,616 @@
-Finished idx: 1 for: fangyuan43
-blank1
-blank2
-Finished idx: 0 for: fangyuan43
-blank1
-blank2
-Finished idx: 1 for: fangyuan43
-blank1
-blank2
-Finished idx: 0 for: fangyuan43
-blank1
-blank2
-Finished idx: 1 for: fangyuan43
-blank1
-blank2
-Finished idx: 0 for: fangyuan43
-blank1
-blank2
-Add ssa constraint for: fangyuan42 ------  time: 7
-Src concat op constraint for: fangyuan42
-Add ssa constraint for: _0047_ ------  time: 7
-Two op constraint for :_0047_
-Add ssa constraint for: we ------  time: 7
-Two op constraint for :we
-Add ssa constraint for: _0026_ ------  time: 7
-Two op constraint for :_0026_
-Add ssa constraint for: _0062_ ------  time: 7
-Reduce one op constraint for: _0062_
-Add ssa constraint for: _0141_ ------  time: 7
-Ite op constraint for :_0141_
-Finished idx: 1 for: fangyuan42
-blank1
-blank2
-Finished idx: 0 for: fangyuan42
-blank1
-blank2
-Finished idx: 1 for: fangyuan42
-blank1
-blank2
-Finished idx: 0 for: fangyuan42
-blank1
-blank2
-Finished idx: 1 for: fangyuan42
-blank1
-blank2
-Finished idx: 0 for: fangyuan42
-blank1
-blank2
-Add ssa constraint for: _0145_ ------  time: 6
-Ite op constraint for :_0145_
-Add ssa constraint for: _0144_ ------  time: 6
-Ite op constraint for :_0144_
-Add ssa constraint for: _0140_ ------  time: 6
-Sel op constraint for :_0140_
-Add ssa constraint for: fangyuan44 ------  time: 6
-Src concat op constraint for: fangyuan44
-Add nb constraint for: wla ------  time: 6
-Add ssa constraint for: yuzeng1 ------  time: 7
-Ite op constraint for :yuzeng1
-Case op constraint for :_0024_
-Add ssa constraint for: fangyuan40 ------  time: 7
-Src concat op constraint for: fangyuan40
-Finished idx: 1 for: fangyuan40
-blank1
-blank2
-Finished idx: 0 for: fangyuan40
-blank1
-blank2
-Finished idx: 1 for: fangyuan40
-blank1
-blank2
-Finished idx: 0 for: fangyuan40
-blank1
-blank2
-Finished idx: 1 for: fangyuan40
-blank1
-blank2
-Finished idx: 0 for: fangyuan40
-blank1
-blank2
-Add ssa constraint for: fangyuan39 ------  time: 7
-Src concat op constraint for: fangyuan39
-Add ssa constraint for: _0138_ ------  time: 7
-Ite op constraint for :_0138_
-Add ssa constraint for: _0137_ ------  time: 7
-Ite op constraint for :_0137_
-Finished idx: 1 for: fangyuan39
-blank1
-blank2
-Finished idx: 0 for: fangyuan39
-blank1
-blank2
-Finished idx: 1 for: fangyuan39
-blank1
-blank2
-Finished idx: 0 for: fangyuan39
-blank1
-blank2
-Finished idx: 1 for: fangyuan39
-blank1
-blank2
-Finished idx: 0 for: fangyuan39
-blank1
-blank2
-Add nb constraint for: wlb ------  time: 6
-Add ssa constraint for: yuzeng2 ------  time: 7
-Ite op constraint for :yuzeng2
-Case op constraint for :_0025_
-Add ssa constraint for: fangyuan38 ------  time: 7
-Src concat op constraint for: fangyuan38
-Finished idx: 1 for: fangyuan38
-blank1
-blank2
-Finished idx: 0 for: fangyuan38
-blank1
-blank2
-Finished idx: 1 for: fangyuan38
-blank1
-blank2
-Finished idx: 0 for: fangyuan38
-blank1
-blank2
-Finished idx: 1 for: fangyuan38
-blank1
-blank2
-Finished idx: 0 for: fangyuan38
-blank1
-blank2
-Add ssa constraint for: fangyuan37 ------  time: 7
-Src concat op constraint for: fangyuan37
-Add ssa constraint for: _0136_ ------  time: 7
-Ite op constraint for :_0136_
-Add ssa constraint for: _0135_ ------  time: 7
-Ite op constraint for :_0135_
-Finished idx: 1 for: fangyuan37
-blank1
-blank2
-Finished idx: 0 for: fangyuan37
-blank1
-blank2
-Finished idx: 1 for: fangyuan37
-blank1
-blank2
-Finished idx: 0 for: fangyuan37
-blank1
-blank2
-Finished idx: 1 for: fangyuan37
-blank1
-blank2
-Finished idx: 0 for: fangyuan37
-blank1
-blank2
-Finished idx: 5 for: fangyuan44
-blank1
-blank2
-Finished idx: 4 for: fangyuan44
-blank1
-blank2
-Finished idx: 3 for: fangyuan44
-blank1
-blank2
-Finished idx: 2 for: fangyuan44
-blank1
-blank2
-Finished idx: 1 for: fangyuan44
-blank1
-blank2
-Finished idx: 0 for: fangyuan44
-blank1
-blank2
-Finished idx: 5 for: fangyuan44
-blank1
-blank2
-Finished idx: 4 for: fangyuan44
-blank1
-blank2
-Finished idx: 3 for: fangyuan44
-blank1
-blank2
-Finished idx: 2 for: fangyuan44
-blank1
-blank2
-Finished idx: 1 for: fangyuan44
-blank1
-blank2
-Finished idx: 0 for: fangyuan44
-blank1
-blank2
-Finished idx: 5 for: fangyuan44
-blank1
-blank2
-Finished idx: 4 for: fangyuan44
-blank1
-blank2
-Finished idx: 3 for: fangyuan44
-blank1
-blank2
-Finished idx: 2 for: fangyuan44
-blank1
-blank2
-Finished idx: 1 for: fangyuan44
-blank1
-blank2
-Finished idx: 0 for: fangyuan44
-blank1
-blank2
-Add ssa constraint for: _0036_ ------  time: 6
-Two op constraint for :_0036_
-Add ssa constraint for: _0143_ ------  time: 6
-Ite op constraint for :_0143_
-Add ssa constraint for: _0046_ ------  time: 6
-Two op constraint for :_0046_
-Add ssa constraint for: _0061_ ------  time: 6
-Reduce one op constraint for: _0061_
-Add ssa constraint for: _0071_ ------  time: 5
-One op constraint for :_0071_
-Add ssa constraint for: _0072_ ------  time: 5
-One op constraint for :_0072_
-Add ssa constraint for: adr_check ------  time: 5
-Two op constraint for :adr_check
-Add ssa constraint for: _0038_ ------  time: 5
-One op constraint for :_0038_
-Add ssa constraint for: adr_check_1 ------  time: 5
-Reduce one op constraint for: adr_check_1
-Add ssa constraint for: _0133_ ------  time: 5
-Ite op constraint for :_0133_
-Add ssa constraint for: update_esu ------  time: 5
-Two op constraint for :update_esu
-Add ssa constraint for: _0052_ ------  time: 5
-Two op constraint for :_0052_
-Add ssa constraint for: _0041_ ------  time: 5
-Two op constraint for :_0041_
-Finished idx: 1 for: fangyuan35
-blank1
-blank2
-Finished idx: 0 for: fangyuan35
-blank1
-blank2
-Finished idx: 1 for: fangyuan35
-blank1
-blank2
-Finished idx: 0 for: fangyuan35
-blank1
-blank2
-Finished idx: 1 for: fangyuan35
-blank1
-blank2
-Finished idx: 0 for: fangyuan35
-blank1
-blank2
-Add ssa constraint for: _0129_ ------  time: 4
-Two op constraint for :_0129_
-Add ssa constraint for: _0122_ ------  time: 4
-Two op constraint for :_0122_
-Add ssa constraint for: _0106_ ------  time: 4
-Two op constraint for :_0106_
-Add ssa constraint for: _0117_ ------  time: 4
-Two op constraint for :_0117_
-Add ssa constraint for: _0121_ ------  time: 4
-Two op constraint for :_0121_
-Add ssa constraint for: _0096_ ------  time: 4
-Two op constraint for :_0096_
-Add ssa constraint for: _0102_ ------  time: 4
-Two op constraint for :_0102_
-Add ssa constraint for: _0035_ ------  time: 4
-Reduce one op constraint for: _0035_
-Add ssa constraint for: fangyuan4 ------  time: 4
-Src concat op constraint for: fangyuan4
-Add ssa constraint for: _0101_ ------  time: 4
-Two op constraint for :_0101_
-Add ssa constraint for: _0113_ ------  time: 4
-Two op constraint for :_0113_
-Finished idx: 1 for: fangyuan4
-blank1
-blank2
-Finished idx: 0 for: fangyuan4
-blank1
-blank2
-Finished idx: 1 for: fangyuan4
-blank1
-blank2
-Finished idx: 0 for: fangyuan4
-blank1
-blank2
-Finished idx: 1 for: fangyuan4
-blank1
-blank2
-Finished idx: 0 for: fangyuan4
-blank1
-blank2
-Finished idx: 8 for: fangyuan36
-blank1
-blank2
-Finished idx: 7 for: fangyuan36
-blank1
-blank2
-Finished idx: 6 for: fangyuan36
-blank1
-blank2
-Finished idx: 5 for: fangyuan36
-blank1
-blank2
-Finished idx: 4 for: fangyuan36
-blank1
-blank2
-Finished idx: 3 for: fangyuan36
-blank1
-blank2
-Finished idx: 2 for: fangyuan36
-blank1
-blank2
-Finished idx: 1 for: fangyuan36
-blank1
-blank2
-Finished idx: 0 for: fangyuan36
-blank1
-blank2
-Finished idx: 8 for: fangyuan36
-blank1
-blank2
-Finished idx: 7 for: fangyuan36
-blank1
-blank2
-Finished idx: 6 for: fangyuan36
-blank1
-blank2
-Finished idx: 5 for: fangyuan36
-blank1
-blank2
-Finished idx: 4 for: fangyuan36
-blank1
-blank2
-Finished idx: 3 for: fangyuan36
-blank1
-blank2
-Finished idx: 2 for: fangyuan36
-blank1
-blank2
-Finished idx: 1 for: fangyuan36
-blank1
-blank2
-Finished idx: 0 for: fangyuan36
-blank1
-blank2
-Finished idx: 8 for: fangyuan36
-blank1
-blank2
-Finished idx: 7 for: fangyuan36
-blank1
-blank2
-Finished idx: 6 for: fangyuan36
-blank1
-blank2
-Finished idx: 5 for: fangyuan36
-blank1
-blank2
-Finished idx: 4 for: fangyuan36
-blank1
-blank2
-Finished idx: 3 for: fangyuan36
-blank1
-blank2
-Finished idx: 2 for: fangyuan36
-blank1
-blank2
-Finished idx: 1 for: fangyuan36
-blank1
-blank2
-Finished idx: 0 for: fangyuan36
-blank1
-blank2
-Add ssa constraint for: fangyuan35 ------  time: 4
-Src concat op constraint for: fangyuan35
+Begin main!
+Sat Aug  1 15:33:57 2020
+### Begin parse_verilog
+Reset value is manually specified!
+### Begin build_ast_tree
+### Begin build: word
+Add nb node for :word
+!! Add child _00_ to word
+Add ssa node for :_00_
+process Ite line for:   assign _00_ = rst ? 9'h000 : word_next;
+!! Add child rst to _00_
+Process input node: rst
+!! Add child 9'h000 to _00_
+Process num node: 9'h000
+!! Add child word_next to _00_
+Add ssa node for :word_next
+process Ite line for:   assign word_next = _02_ ? inWord : word;
+!! Add child _02_ to word_next
+Add ssa node for :_02_
+Process Two op for :  assign _02_ = func == 1'h1;
+!! Add child func to _02_
+Process input node: func
+!! Add child 1'h1 to _02_
+Process num node: 1'h1
+!! Add child inWord to word_next
+Process input node: inWord
+!! Add child word to word_next
+### Begin build: word_sum
+Add nb node for :word_sum
+!! Add child _01_ to word_sum
+Add ssa node for :_01_
+process Ite line for:   assign _01_ = rst ? 9'h000 : \u0.out ;
+!! Add child rst to _01_
+!! Add child 9'h000 to _01_
+!! Add child \u0.out to _01_
+Add nb node for :\u0.out
+!! Add child fangyuan2 to \u0.out
+Add ssa node for :fangyuan2
+Process Reduce One op for :  assign fangyuan2 = { _11_[8:6], \u0.stg2_nxt };
+!! Add child _11_[8:6] to fangyuan2
+Add ssa node for :_11_[8:6]
+Process Sel op for :  assign _11_[8:6] = fangyuan0 [8 : 6];
+!! Add child fangyuan0 to _11_[8:6]
+Add ssa node for :fangyuan0
+Process Two op for :  assign fangyuan0 = fangyuan1 & 9'h19d;
+!! Add child fangyuan1 to fangyuan0
+Add ssa node for :fangyuan1
+Process Reduce One op for :  assign fangyuan1 = { \u0.stg1 , \u0.stg1 };
+!! Add child \u0.stg1 to fangyuan1
+Add nb node for :\u0.stg1
+!! Add child \u0.stg1_nxt to \u0.stg1
+Add ssa node for :\u0.stg1_nxt
+Process Two op for :  assign \u0.stg1_nxt = _07_ + \u0.word [8];
+!! Add child _07_ to \u0.stg1_nxt
+Add ssa node for :_07_
+Process Two op for :  assign _07_ = _06_ + \u0.word [7];
+!! Add child _06_ to _07_
+Add ssa node for :_06_
+Process Two op for :  assign _06_ = _05_ + \u0.word [6];
+!! Add child _05_ to _06_
+Add ssa node for :_05_
+Process Two op for :  assign _05_ = _04_ + \u0.word [5];
+!! Add child _04_ to _05_
+Add ssa node for :_04_
+Process Two op for :  assign _04_ = _10_ + \u0.word [4];
+!! Add child _10_ to _04_
+Add ssa node for :_10_
+Process Two op for :  assign _10_ = _09_ + \u0.word [3];
+!! Add child _09_ to _10_
+Add ssa node for :_09_
+Process Two op for :  assign _09_ = _08_ + \u0.word [2];
+!! Add child _08_ to _09_
+Add ssa node for :_08_
+Process Two op for :  assign _08_ = \u0.word [0] + \u0.word [1];
+!! Add child \u0.word [0] to _08_
+Add ssa node for :\u0.word
+process Ite line for:   assign \u0.word = _03_ ? word : 9'h000;
+!! Add child _03_ to \u0.word
+Add ssa node for :_03_
+Process Two op for :  assign _03_ = func == 2'h2;
+!! Add child func to _03_
+!! Add child 2'h2 to _03_
+Process num node: 2'h2
+!! Add child word to \u0.word
+!! Add child 9'h000 to \u0.word
+!! Add child \u0.word [1] to _08_
+!! Add child \u0.word [2] to _09_
+!! Add child \u0.word [3] to _10_
+!! Add child \u0.word [4] to _04_
+!! Add child \u0.word [5] to _05_
+!! Add child \u0.word [6] to _06_
+!! Add child \u0.word [7] to _07_
+!! Add child \u0.word [8] to \u0.stg1_nxt
+!! Add child \u0.stg1 to fangyuan1
+!! Add child 9'h19d to fangyuan0
+Process num node: 9'h19d
+!! Add child 8 to _11_[8:6]
+Process num node: 8
+!! Add child \u0.stg2_nxt to fangyuan2
+Add ssa node for :\u0.stg2_nxt
+Process Sel op for :  assign \u0.stg2_nxt = fangyuan0 [5 : 0];
+!! Add child fangyuan0 to \u0.stg2_nxt
+!! Add child 5 to \u0.stg2_nxt
+Process num node: 5
+### Begin check_all_regs
+###### Begin checking SAT! 
+---  BEGIN INSTRUCTION #1 ---
+========== Begin check SAT for: word ==========
+### Begin bound: 0
+Add nb constraint for: word ------  time: 0
+Add ssa constraint for: _00_ ------  time: 1
+Ite op constraint for :_00_
+Add ssa constraint for: word_next ------  time: 1
+Ite op constraint for :word_next
+Add ssa constraint for: _02_ ------  time: 1
+Two op constraint for :_02_
+push into dirty queue: word
+-------- Begin Add all clean ----------
+-------- Begin Add all dirty ----------
+Add dirty constraint for: word ------  time: 1
+-------- Begin add input vals ----------
+Assign 1'd0 to rst___#1
+Assign x to inWord___#1
+Assign 2'd1 to func___#1
++++++++ Solution found for word, bound: 0 +++++++++
+_00____#1 = #b000000000
+_00____#1_T = #b000000000
+_02____#1 = #b1
+_02____#1_T = #b0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ func___#1 = #b01
+func___#1_T = #b00
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ inWord___#1 = #b000000000
+inWord___#1_T = #b000000000
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rst___#1 = #b0
+rst___#1_T = #b0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ word___#0 = #b000000000
+word___#0_T = #b000000000
+word___#1_T = #b111111111
+word_next___#1 = #b000000000
+word_next___#1_T = #b000000000
+Add nb constraint for: word ------  time: 0
+Add ssa constraint for: _00_ ------  time: 1
+Ite op constraint for :_00_
+input value for rst: bv
+Add ssa constraint for: word_next ------  time: 1
+Ite op constraint for :word_next
+Add ssa constraint for: _02_ ------  time: 1
+Two op constraint for :_02_
+input value for func: bv
+*************************  Update function for word
+(goals
+(goal
+  (= |word___#100| |inWord___#1|))
+)
+-------- Begin Add all clean ----------
+-------- Begin Add all dirty ----------
+Add dirty constraint for: word ------  time: 1
+-------- Begin add input vals ----------
+Assign 1'd0 to rst___#1
+Assign x to inWord___#1
+Assign 2'd1 to func___#1
+------- No more solution found within the bound: 0 ----------
+### Begin bound: 1
+Add nb constraint for: word ------  time: 1
+Add ssa constraint for: _00_ ------  time: 2
+Ite op constraint for :_00_
+Add ssa constraint for: word_next ------  time: 2
+Ite op constraint for :word_next
+Add ssa constraint for: _02_ ------  time: 2
+Two op constraint for :_02_
+push into dirty queue: word
+-------- Begin Add all clean ----------
+-------- Begin Add all dirty ----------
+Add dirty constraint for: word ------  time: 2
+-------- Begin add input vals ----------
+Assign 1'd0 to rst___#2
+Assign x to inWord___#2
+Assign 2'd1 to func___#2
++++++++ Solution found for word, bound: 1 +++++++++
+_00____#1 = #b000000000
+_00____#1_T = #b000000000
+_00____#2 = #b000000000
+_00____#2_T = #b000000000
+_02____#1 = #b0
+_02____#1_T = #b0
+_02____#2 = #b1
+_02____#2_T = #b0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ func___#1 = #b00
+func___#1_T = #b00
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ func___#2 = #b01
+func___#2_T = #b00
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ inWord___#1 = #b000000000
+inWord___#1_T = #b000000000
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ inWord___#2 = #b000000000
+inWord___#2_T = #b000000000
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rst___#1 = #b0
+rst___#1_T = #b0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rst___#2 = #b0
+rst___#2_T = #b0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ word___#0 = #b000000000
+word___#0_T = #b000000000
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ word___#1 = #b000000000
+word___#1_T = #b000000000
+word___#2_T = #b111111111
+word_next___#1 = #b000000000
+word_next___#1_T = #b000000000
+word_next___#2 = #b000000000
+word_next___#2_T = #b000000000
+Add nb constraint for: word ------  time: 0
+Add ssa constraint for: _00_ ------  time: 1
+Ite op constraint for :_00_
+input value for rst: bv
+Add ssa constraint for: word_next ------  time: 1
+Ite op constraint for :word_next
+Add ssa constraint for: _02_ ------  time: 1
+Two op constraint for :_02_
+input value for func: bv
+Add nb constraint for: word ------  time: 1
+Add ssa constraint for: _00_ ------  time: 2
+Ite op constraint for :_00_
+input value for rst: bv
+Add ssa constraint for: word_next ------  time: 2
+Ite op constraint for :word_next
+Add ssa constraint for: _02_ ------  time: 2
+Two op constraint for :_02_
+input value for func: bv
+*************************  Update function for word
+(goals
+(goal
+  (= |word___#100| |inWord___#2|))
+)
+Fix value for inWord___#1_T
+Fix value for inWord___#1
+-------- Begin Add all clean ----------
+-------- Begin Add all dirty ----------
+Add dirty constraint for: word ------  time: 2
+-------- Begin add input vals ----------
+Assign 1'd0 to rst___#2
+Assign x to inWord___#2
+Assign 2'd1 to func___#2
+------- No more solution found within the bound: 1 ----------
+---  BEGIN INSTRUCTION #2 ---
+========== Begin check SAT for: word_sum ==========
+### Begin bound: 1
+wack found! time: 0
+Add nb constraint for: word_sum ------  time: 0
+Add ssa constraint for: _01_ ------  time: 1
+Ite op constraint for :_01_
+Add nb constraint for: \u0.out ------  time: 1
+Add ssa constraint for: fangyuan2 ------  time: 2
+Src concat op constraint for: fangyuan2
+Add ssa constraint for: _11_[8:6] ------  time: 2
+Sel op constraint for :_11_[8:6]
+Add ssa constraint for: fangyuan0 ------  time: 2
+Two op constraint for :fangyuan0
+Add ssa constraint for: fangyuan1 ------  time: 2
+Src concat op constraint for: fangyuan1
 Found it!
-Add ssa constraint for: _0134_ ------  time: 4
-Ite op constraint for :_0134_
-Add ssa constraint for: update_kpd ------  time: 4
-Two op constraint for :update_kpd
-Add ssa constraint for: _0051_ ------  time: 4
-Two op constraint for :_0051_
-Add ssa constraint for: _0050_ ------  time: 4
-Two op constraint for :_0050_
-wack found! time: 4
-Add nb constraint for: wack ------  time: 4
-Add ssa constraint for: yuzeng22 ------  time: 5
-Ite op constraint for :yuzeng22
-Add ssa constraint for: _0023_ ------  time: 5
-Ite op constraint for :_0023_
-Add nb constraint for: state_0 ------  time: 5
-Add ssa constraint for: yuzeng23 ------  time: 6
-Ite op constraint for :yuzeng23
-Case op constraint for :_0020_
-Add ssa constraint for: fangyuan43 ------  time: 6
-Src concat op constraint for: fangyuan43
-Add ssa constraint for: _0142_ ------  time: 6
-One op constraint for :_0142_
-Finished idx: 1 for: fangyuan43
+push into dirty queue: \u0.stg1
+Finished idx: 1 for: fangyuan1
 blank1
 blank2
-Finished idx: 0 for: fangyuan43
+Finished idx: 0 for: fangyuan1
 blank1
 blank2
-Finished idx: 1 for: fangyuan43
-blank1
-blank2
-Finished idx: 0 for: fangyuan43
-blank1
-blank2
-Finished idx: 1 for: fangyuan43
-blank1
-blank2
-Finished idx: 0 for: fangyuan43
-blank1
-blank2
-Add ssa constraint for: fangyuan42 ------  time: 6
-Src concat op constraint for: fangyuan42
-Add ssa constraint for: _0047_ ------  time: 6
-Two op constraint for :_0047_
-Add ssa constraint for: we ------  time: 6
-Two op constraint for :we
-Add ssa constraint for: _0026_ ------  time: 6
-Two op constraint for :_0026_
-Add ssa constraint for: _0062_ ------  time: 6
-Reduce one op constraint for: _0062_
-Add ssa constraint for: _0141_ ------  time: 6
-Ite op constraint for :_0141_
-Finished idx: 1 for: fangyuan42
-blank1
-blank2
-Finished idx: 0 for: fangyuan42
-blank1
-blank2
-Finished idx: 1 for: fangyuan42
-blank1
-blank2
-Finished idx: 0 for: fangyuan42
-blank1
-blank2
-Finished idx: 1 for: fangyuan42
-blank1
-blank2
-Finished idx: 0 for: fangyuan42
-blank1
-blank2
-Add ssa constraint for: _0145_ ------  time: 5
-Ite op constraint for :_0145_
-Add ssa constraint for: _0144_ ------  time: 5
-Ite op constraint for :_0144_
-Add ssa constraint for: _0140_ ------  time: 5
-Sel op constraint for :_0140_
-Add ssa constraint for: fangyuan44 ------  time: 5
-Src concat op constraint for: fangyuan44
-Add nb constraint for: wla ------  time: 5
-Add ssa constraint for: yuzeng1 ------  time: 6
-Ite op constraint for :yuzeng1
-Case op constraint for :_0024_
-Add ssa constraint for: fangyuan40 ------  time: 6
-Src concat op constraint for: fangyuan40
-Finished idx: 1 for: fangyuan40
-blank1
-blank2
-Finished idx: 0 for: fangyuan40
-blank1
-blank2
-Finished idx: 1 for: fangyuan40
-blank1
-blank2
-Finished idx: 0 for: fangyuan40
-blank1
-blank2
-Finished idx: 1 for: fangyuan40
-blank1
-blank2
-Finished idx: 0 for: fangyuan40
-blank1
-blank2
-Add ssa constraint for: fangyuan39 ------  time: 6
-Src concat op constraint for: fangyuan39
-Add ssa constraint for: _0138_ ------  time: 6
-Ite op constraint for :_0138_
-Add ssa constraint for: _0137_ ------  time: 6
-Ite op constraint for :_0137_
-Finished idx: 1 for: fangyuan39
-blank1
-blank2
-Finished idx: 0 for: fangyuan39
-blank1
-blank2
-Finished idx: 1 for: fangyuan39
-blank1
-blank2
-Finished idx: 0 for: fangyuan39
-blank1
-blank2
-Finished idx: 1 for: fangyuan39
-blank1
-blank2
-Finished idx: 0 for: fangyuan39
-blank1
-blank2
-Add nb constraint for: wlb ------  time: 5
-Add ssa constraint for: yuzeng2 ------  time: 6
-Ite op constraint for :yuzeng2
-Case op constraint for :_0025_
-Add ssa constraint for: fangyuan38 ------  time: 6
-Src concat op constraint for: fangyuan38
-Finished idx: 1 for: fangyuan38
-blank1
-blank2
-Finished idx: 0 for: fangyuan38
-blank1
-blank2
-Finished idx: 1 for: fangyuan38
-blank1
-blank2
-Finished idx: 0 for: fangyuan38
-blank1
-blank2
-Finished idx: 1 for: fangyuan38
-blank1
-blank2
-Finished idx: 0 for: fangyuan38
-blank1
-blank2
-Add ssa constraint for: fangyuan37 ------  time: 6
-Src concat op constraint for: fangyuan37
-Add ssa constraint for: _0136_ ------  time: 6
-Ite op constraint for :_0136_
-Add ssa constraint for: _0135_ ------  time: 6
-Ite op constraint for :_0135_
-Finished idx: 1 for: fangyuan37
-blank1
-blank2
-Finished idx: 0 for: fangyuan37
-blank1
-blank2
-Finished idx: 1 for: fangyuan37
-blank1
-blank2
-Finished idx: 0 for: fangyuan37
-blank1
-blank2
-Finished idx: 1 for: fangyuan37
-blank1
-blank2
-Finished idx: 0 for: fangyuan37
-blank1
-blank2
-Finished idx: 5 for: fangyuan44
-blank1
-blank2
-Finished idx: 4 for: fangyuan44
-blank1
-blank2
-Finished idx: 3 for: fangyuan44
-blank1
-blank2
-Finished idx: 2 for: fangyuan44
-blank1
-blank2
-Finished idx: 1 for: fangyuan44
-blank1
-blank2
-Finished idx: 0 for: fangyuan44
-blank1
-blank2
-Finished idx: 5 for: fangyuan44
-blank1
-blank2
-Finished idx: 4 for: fangyuan44
-blank1
-blank2
-Finished idx: 3 for: fangyuan44
-blank1
-blank2
-Finished idx: 2 for: fangyuan44
-blank1
-blank2
-Finished idx: 1 for: fangyuan44
-blank1
-blank2
-Finished idx: 0 for: fangyuan44
-blank1
-blank2
-Finished idx: 5 for: fangyuan44
-blank1
-blank2
-Finished idx: 4 for: fangyuan44
-blank1
-blank2
-Finished idx: 3 for: fangyuan44
-blank1
-blank2
-Finished idx: 2 for: fangyuan44
-blank1
-blank2
-Finished idx: 1 for: fangyuan44
-blank1
-blank2
-Finished idx: 0 for: fangyuan44
-blank1
-blank2
-Add ssa constraint for: _0036_ ------  time: 5
-Two op constraint for :_0036_
-Add ssa constraint for: _0143_ ------  time: 5
-Ite op constraint for :_0143_
-Add ssa constraint for: _0046_ ------  time: 5
-Two op constraint for :_0046_
-Add ssa constraint for: _0061_ ------  time: 5
-Reduce one op constraint for: _0061_
-Add ssa constraint for: _0071_ ------  time: 4
-One op constraint for :_0071_
-Add ssa constraint for: _0072_ ------  time: 4
-One op constraint for :_0072_
-Add ssa constraint for: adr_check ------  time: 4
-Two op constraint for :adr_check
-Add ssa constraint for: _0038_ ------  time: 4
-One op constraint for :_0038_
-Add ssa constraint for: adr_check_1 ------  time: 4
-Reduce one op constraint for: adr_check_1
-Add ssa constraint for: _0133_ ------  time: 4
-Ite op constraint for :_0133_
-Add ssa constraint for: update_esu ------  time: 4
-Two op constraint for :update_esu
-Add ssa constraint for: _0052_ ------  time: 4
-Two op constraint for :_0052_
-Add ssa constraint for: _0041_ ------  time: 4
-Two op constraint for :_0041_
-Finished idx: 1 for: fangyuan35
-blank1
-blank2
-Finished idx: 0 for: fangyuan35
-blank1
-blank2
-Finished idx: 1 for: fangyuan35
-blank1
-blank2
-Finished idx: 0 for: fangyuan35
-blank1
-blank2
-Finished idx: 1 for: fangyuan35
-blank1
-blank2
-Finished idx: 0 for: fangyuan35
-blank1
-blank2
-Add ssa constraint for: _0129_ ------  time: 3
-Two op constraint for :_0129_
-Add ssa constraint for: _0122_ ------  time: 3
-Two op constraint for :_0122_
-Add ssa constraint for: _0106_ ------  time: 3
-Two op constraint for :_0106_
-Add ssa constraint for: _0117_ ------  time: 3
-Two op constraint for :_0117_
-Add ssa constraint for: _0121_ ------  time: 3
-Two op constraint for :_0121_
-Add ssa constraint for: _0096_ ------  time: 3
-Two op constraint for :_0096_
-Add ssa constraint for: _0102_ ------  time: 3
-Two op constraint for :_0102_
-Add ssa constraint for: _0035_ ------  time: 3
-Reduce one op constraint for: _0035_
-Add ssa constraint for: fangyuan4 ------  time: 3
-Src concat op constraint for: fangyuan4
-Add ssa constraint for: _0101_ ------  time: 3
-Two op constraint for :_0101_
-Add ssa constraint for: _0113_ ------  time: 3
-Two op constraint for :_0113_
-Finished idx: 1 for: fangyuan4
-blank1
-blank2
-Finished idx: 0 for: fangyuan4
-blank1
-blank2
-Finished idx: 1 for: fangyuan4
-blank1
-blank2
-Finished idx: 0 for: fangyuan4
-blank1
-blank2
-Finished idx: 1 for: fangyuan4
-blank1
-blank2
-Finished idx: 0 for: fangyuan4
-blank1
-blank2
-Finished idx: 8 for: fangyuan36
-blank1
-blank2
-Finished idx: 7 for: fangyuan36
-blank1
-blank2
-Finished idx: 6 for: fangyuan36
-blank1
-blank2
-Finished idx: 5 for: fangyuan36
-blank1
-blank2
-Finished idx: 4 for: fangyuan36
-blank1
-blank2
-Finished idx: 3 for: fangyuan36
-blank1
-blank2
-Finished idx: 2 for: fangyuan36
-blank1
-blank2
-Finished idx: 1 for: fangyuan36
-blank1
-blank2
-Finished idx: 0 for: fangyuan36
-blank1
-blank2
-Finished idx: 8 for: fangyuan36
-blank1
-blank2
-Finished idx: 7 for: fangyuan36
-blank1
-blank2
-Finished idx: 6 for: fangyuan36
-blank1
-blank2
-Finished idx: 5 for: fangyuan36
-blank1
-blank2
-Finished idx: 4 for: fangyuan36
-blank1
-blank2
-Finished idx: 3 for: fangyuan36
-blank1
-blank2
-Finished idx: 2 for: fangyuan36
-blank1
-blank2
-Finished idx: 1 for: fangyuan36
-blank1
-blank2
-Finished idx: 0 for: fangyuan36
-blank1
-blank2
-Finished idx: 8 for: fangyuan36
-blank1
-blank2
-Finished idx: 7 for: fangyuan36
-blank1
-blank2
-Finished idx: 6 for: fangyuan36
-blank1
-blank2
-Finished idx: 5 for: fangyuan36
-blank1
-blank2
-Finished idx: 4 for: fangyuan36
-blank1
-blank2
-Finished idx: 3 for: fangyuan36
-blank1
-blank2
-Finished idx: 2 for: fangyuan36
-blank1
-blank2
-Finished idx: 1 for: fangyuan36
-blank1
-blank2
-Finished idx: 0 for: fangyuan36
-blank1
-blank2
-Add ssa constraint for: fangyuan35 ------  time: 3
-Src concat op constraint for: fangyuan35
 Found it!
-Add ssa constraint for: _0134_ ------  time: 3
-Ite op constraint for :_0134_
-Add ssa constraint for: update_kpd ------  time: 3
-Two op constraint for :update_kpd
-Add ssa constraint for: _0051_ ------  time: 3
-Two op constraint for :_0051_
-Add ssa constraint for: _0050_ ------  time: 3
-Two op constraint for :_0050_
-wack found! time: 3
-Add nb constraint for: wack ------  time: 3
-Add ssa constraint for: yuzeng22 ------  time: 4
-Ite op constraint for :yuzeng22
-Add ssa constraint for: _0023_ ------  time: 4
-Ite op constraint for :_0023_
-Add nb constraint for: state_0 ------  time: 4
-Add ssa constraint for: yuzeng23 ------  time: 5
-Ite op constraint for :yuzeng23
-Case op constraint for :_0020_
-Add ssa constraint for: fangyuan43 ------  time: 5
-Src concat op constraint for: fangyuan43
-Add ssa constraint for: _0142_ ------  time: 5
-One op constraint for :_0142_
-Finished idx: 1 for: fangyuan43
-blank1
-blank2
-Finished idx: 0 for: fangyuan43
-blank1
-blank2
-Finished idx: 1 for: fangyuan43
-blank1
-blank2
-Finished idx: 0 for: fangyuan43
-blank1
-blank2
-Finished idx: 1 for: fangyuan43
-blank1
-blank2
-Finished idx: 0 for: fangyuan43
-blank1
-blank2
-Add ssa constraint for: fangyuan42 ------  time: 5
-Src concat op constraint for: fangyuan42
-Add ssa constraint for: _0047_ ------  time: 5
-Two op constraint for :_0047_
-Add ssa constraint for: we ------  time: 5
-Two op constraint for :we
-Add ssa constraint for: _0026_ ------  time: 5
-Two op constraint for :_0026_
-Add ssa constraint for: _0062_ ------  time: 5
-Reduce one op constraint for: _0062_
-Add ssa constraint for: _0141_ ------  time: 5
-Ite op constraint for :_0141_
-Finished idx: 1 for: fangyuan42
-blank1
-blank2
-Finished idx: 0 for: fangyuan42
-blank1
-blank2
-Finished idx: 1 for: fangyuan42
-blank1
-blank2
-Finished idx: 0 for: fangyuan42
-blank1
-blank2
-Finished idx: 1 for: fangyuan42
-blank1
-blank2
-Finished idx: 0 for: fangyuan42
-blank1
-blank2
-Add ssa constraint for: _0145_ ------  time: 4
-Ite op constraint for :_0145_
-Add ssa constraint for: _0144_ ------  time: 4
-Ite op constraint for :_0144_
-Add ssa constraint for: _0140_ ------  time: 4
-Sel op constraint for :_0140_
-Add ssa constraint for: fangyuan44 ------  time: 4
-Src concat op constraint for: fangyuan44
-Add nb constraint for: wla ------  time: 4
-Add ssa constraint for: yuzeng1 ------  time: 5
-Ite op constraint for :yuzeng1
-Case op constraint for :_0024_
-Add ssa constraint for: fangyuan40 ------  time: 5
-Src concat op constraint for: fangyuan40
-Finished idx: 1 for: fangyuan40
-blank1
-blank2
-Finished idx: 0 for: fangyuan40
-blank1
-blank2
-Finished idx: 1 for: fangyuan40
-blank1
-blank2
-Finished idx: 0 for: fangyuan40
-blank1
-blank2
-Finished idx: 1 for: fangyuan40
-blank1
-blank2
-Finished idx: 0 for: fangyuan40
-blank1
-blank2
-Add ssa constraint for: fangyuan39 ------  time: 5
-Src concat op constraint for: fangyuan39
-Add ssa constraint for: _0138_ ------  time: 5
-Ite op constraint for :_0138_
-Add ssa constraint for: _0137_ ------  time: 5
-Ite op constraint for :_0137_
-Finished idx: 1 for: fangyuan39
-blank1
-blank2
-Finished idx: 0 for: fangyuan39
-blank1
-blank2
-Finished idx: 1 for: fangyuan39
-blank1
-blank2
-Finished idx: 0 for: fangyuan39
-blank1
-blank2
-Finished idx: 1 for: fangyuan39
-blank1
-blank2
-Finished idx: 0 for: fangyuan39
-blank1
-blank2
-Add nb constraint for: wlb ------  time: 4
-Add ssa constraint for: yuzeng2 ------  time: 5
-Ite op constraint for :yuzeng2
-Case op constraint for :_0025_
-Add ssa constraint for: fangyuan38 ------  time: 5
-Src concat op constraint for: fangyuan38
-Finished idx: 1 for: fangyuan38
-blank1
-blank2
-Finished idx: 0 for: fangyuan38
-blank1
-blank2
-Finished idx: 1 for: fangyuan38
-blank1
-blank2
-Finished idx: 0 for: fangyuan38
-blank1
-blank2
-Finished idx: 1 for: fangyuan38
-blank1
-blank2
-Finished idx: 0 for: fangyuan38
-blank1
-blank2
-Add ssa constraint for: fangyuan37 ------  time: 5
-Src concat op constraint for: fangyuan37
-Add ssa constraint for: _0136_ ------  time: 5
-Ite op constraint for :_0136_
-Add ssa constraint for: _0135_ ------  time: 5
-Ite op constraint for :_0135_
-Finished idx: 1 for: fangyuan37
-blank1
-blank2
-Finished idx: 0 for: fangyuan37
-blank1
-blank2
-Finished idx: 1 for: fangyuan37
-blank1
-blank2
-Finished idx: 0 for: fangyuan37
-blank1
-blank2
-Finished idx: 1 for: fangyuan37
-blank1
-blank2
-Finished idx: 0 for: fangyuan37
-blank1
-blank2
-Finished idx: 5 for: fangyuan44
-blank1
-blank2
-Finished idx: 4 for: fangyuan44
-blank1
-blank2
-Finished idx: 3 for: fangyuan44
-blank1
-blank2
-Finished idx: 2 for: fangyuan44
-blank1
-blank2
-Finished idx: 1 for: fangyuan44
-blank1
-blank2
-Finished idx: 0 for: fangyuan44
-blank1
-blank2
-Finished idx: 5 for: fangyuan44
-blank1
-blank2
-Finished idx: 4 for: fangyuan44
-blank1
-blank2
-Finished idx: 3 for: fangyuan44
-blank1
-blank2
-Finished idx: 2 for: fangyuan44
-blank1
-blank2
-Finished idx: 1 for: fangyuan44
-blank1
-blank2
-Finished idx: 0 for: fangyuan44
-blank1
-blank2
-Finished idx: 5 for: fangyuan44
-blank1
-blank2
-Finished idx: 4 for: fangyuan44
-blank1
-blank2
-Finished idx: 3 for: fangyuan44
-blank1
-blank2
-Finished idx: 2 for: fangyuan44
-blank1
-blank2
-Finished idx: 1 for: fangyuan44
-blank1
-blank2
-Finished idx: 0 for: fangyuan44
-blank1
-blank2
-Add ssa constraint for: _0036_ ------  time: 4
-Two op constraint for :_0036_
-Add ssa constraint for: _0143_ ------  time: 4
-Ite op constraint for :_0143_
-Add ssa constraint for: _0046_ ------  time: 4
-Two op constraint for :_0046_
-Add ssa constraint for: _0061_ ------  time: 4
-Reduce one op constraint for: _0061_
-Add ssa constraint for: _0071_ ------  time: 3
-One op constraint for :_0071_
-Add ssa constraint for: _0072_ ------  time: 3
-One op constraint for :_0072_
-Add ssa constraint for: adr_check ------  time: 3
-Two op constraint for :adr_check
-Add ssa constraint for: _0038_ ------  time: 3
-One op constraint for :_0038_
-Add ssa constraint for: adr_check_1 ------  time: 3
-Reduce one op constraint for: adr_check_1
-Add ssa constraint for: _0133_ ------  time: 3
-Ite op constraint for :_0133_
-Add ssa constraint for: update_esu ------  time: 3
-Two op constraint for :update_esu
-Add ssa constraint for: _0052_ ------  time: 3
-Two op constraint for :_0052_
-Add ssa constraint for: _0041_ ------  time: 3
-Two op constraint for :_0041_
-Finished idx: 1 for: fangyuan35
-blank1
-blank2
-Finished idx: 0 for: fangyuan35
-blank1
-blank2
-Finished idx: 1 for: fangyuan35
-blank1
-blank2
-Finished idx: 0 for: fangyuan35
-blank1
-blank2
-Finished idx: 1 for: fangyuan35
-blank1
-blank2
-Finished idx: 0 for: fangyuan35
-blank1
-blank2
-Add ssa constraint for: _0129_ ------  time: 2
-Two op constraint for :_0129_
-Add ssa constraint for: _0122_ ------  time: 2
-Two op constraint for :_0122_
-Add ssa constraint for: _0106_ ------  time: 2
-Two op constraint for :_0106_
-Add ssa constraint for: _0117_ ------  time: 2
-Two op constraint for :_0117_
-Add ssa constraint for: _0121_ ------  time: 2
-Two op constraint for :_0121_
-Add ssa constraint for: _0096_ ------  time: 2
-Two op constraint for :_0096_
-Add ssa constraint for: _0102_ ------  time: 2
-Two op constraint for :_0102_
-Add ssa constraint for: _0035_ ------  time: 2
-Reduce one op constraint for: _0035_
-Add ssa constraint for: fangyuan4 ------  time: 2
-Src concat op constraint for: fangyuan4
-Add ssa constraint for: _0101_ ------  time: 2
-Two op constraint for :_0101_
-Add ssa constraint for: _0113_ ------  time: 2
-Two op constraint for :_0113_
-Finished idx: 1 for: fangyuan4
-blank1
-blank2
-Finished idx: 0 for: fangyuan4
-blank1
-blank2
-Finished idx: 1 for: fangyuan4
-blank1
-blank2
-Finished idx: 0 for: fangyuan4
-blank1
-blank2
-Finished idx: 1 for: fangyuan4
-blank1
-blank2
-Finished idx: 0 for: fangyuan4
-blank1
-blank2
-Finished idx: 8 for: fangyuan36
-blank1
-blank2
-Finished idx: 7 for: fangyuan36
-blank1
-blank2
-Finished idx: 6 for: fangyuan36
-blank1
-blank2
-Finished idx: 5 for: fangyuan36
-blank1
-blank2
-Finished idx: 4 for: fangyuan36
-blank1
-blank2
-Finished idx: 3 for: fangyuan36
-blank1
-blank2
-Finished idx: 2 for: fangyuan36
-blank1
-blank2
-Finished idx: 1 for: fangyuan36
-blank1
-blank2
-Finished idx: 0 for: fangyuan36
-blank1
-blank2
-Finished idx: 8 for: fangyuan36
-blank1
-blank2
-Finished idx: 7 for: fangyuan36
-blank1
-blank2
-Finished idx: 6 for: fangyuan36
-blank1
-blank2
-Finished idx: 5 for: fangyuan36
-blank1
-blank2
-Finished idx: 4 for: fangyuan36
-blank1
-blank2
-Finished idx: 3 for: fangyuan36
-blank1
-blank2
-Finished idx: 2 for: fangyuan36
-blank1
-blank2
-Finished idx: 1 for: fangyuan36
-blank1
-blank2
-Finished idx: 0 for: fangyuan36
-blank1
-blank2
-Finished idx: 8 for: fangyuan36
-blank1
-blank2
-Finished idx: 7 for: fangyuan36
-blank1
-blank2
-Finished idx: 6 for: fangyuan36
-blank1
-blank2
-Finished idx: 5 for: fangyuan36
-blank1
-blank2
-Finished idx: 4 for: fangyuan36
-blank1
-blank2
-Finished idx: 3 for: fangyuan36
-blank1
-blank2
-Finished idx: 2 for: fangyuan36
-blank1
-blank2
-Finished idx: 1 for: fangyuan36
-blank1
-blank2
-Finished idx: 0 for: fangyuan36
-blank1
-blank2
-Add ssa constraint for: fangyuan35 ------  time: 2
-Src concat op constraint for: fangyuan35
+Finished idx: 1 for: fangyuan1
+blank1
+blank2
+Finished idx: 0 for: fangyuan1
+blank1
+blank2
+Add ssa constraint for: \u0.stg2_nxt ------  time: 2
+Sel op constraint for :\u0.stg2_nxt
+Finished idx: 1 for: fangyuan2
+blank1
+blank2
+Finished idx: 0 for: fangyuan2
+blank1
+blank2
+Finished idx: 1 for: fangyuan2
+blank1
+blank2
+Finished idx: 0 for: fangyuan2
+blank1
+blank2
+-------- Begin Add all clean ----------
+-------- Begin Add all dirty ----------
+Add dirty constraint for: \u0.stg1 ------  time: 2
+-------- Begin add input vals ----------
+Assign 1'd0 to rst___#2
+Assign x to inWord___#2
+Assign 2'd2 to func___#2
+------- No more solution found within the bound: 1 ----------
+### Begin bound: 2
+Add nb constraint for: \u0.stg1 ------  time: 2
+Add ssa constraint for: \u0.stg1_nxt ------  time: 3
+Two op constraint for :\u0.stg1_nxt
+Add ssa constraint for: _07_ ------  time: 3
+Two op constraint for :_07_
+Add ssa constraint for: _06_ ------  time: 3
+Two op constraint for :_06_
+Add ssa constraint for: _05_ ------  time: 3
+Two op constraint for :_05_
+Add ssa constraint for: _04_ ------  time: 3
+Two op constraint for :_04_
+Add ssa constraint for: _10_ ------  time: 3
+Two op constraint for :_10_
+Add ssa constraint for: _09_ ------  time: 3
+Two op constraint for :_09_
+Add ssa constraint for: _08_ ------  time: 3
+Two op constraint for :_08_
+Add ssa constraint for: \u0.word ------  time: 3
+Ite op constraint for :\u0.word
+Add ssa constraint for: _03_ ------  time: 3
+Two op constraint for :_03_
+-------- Begin Add all clean ----------
+-------- Begin Add all dirty ----------
+-------- Begin add input vals ----------
+Assign 1'd0 to rst___#3
+Assign x to inWord___#3
+Assign 2'd2 to func___#3
++++++++ Solution found for word_sum, bound: 2 +++++++++
+\u0.out___#1 = #b000000000
+\u0.out___#1_T = #b000000000
+\u0.stg1___#2 = #x0
+\u0.stg1___#2_T = #x0
+\u0.stg1_nxt___#3 = #x0
+\u0.stg1_nxt___#3_T = #x0
+\u0.stg2_nxt___#2 = #b000000
+\u0.stg2_nxt___#2_T = #b000000
+\u0.word___#3 = #b000000000
+\u0.word___#3_T = #b000000000
+\u0.word___#3_T = #b0
+_01____#1 = #b000000000
+_01____#1_T = #b000000000
+_03____#3 = #b1
+_03____#3_T = #b0
+_04____#3 = #x0
+_04____#3_T = #x0
+_05____#3 = #x0
+_05____#3_T = #x0
+_06____#3 = #x0
+_06____#3_T = #x0
+_07____#3 = #x0
+_07____#3_T = #x0
+_08____#3 = #b00
+_08____#3_T = #b00
+_09____#3 = #b000
+_09____#3_T = #b000
+_10____#3 = #x0
+_10____#3_T = #x0
+_11____#2 = #b000000000
+_11____#2_T = #b000000000
+fangyuan0___#2 = #b000000000
+fangyuan0___#2_T = #b000000000
+fangyuan1___#2 = #x00
+fangyuan1___#2_T = #x00
+fangyuan2___#2 = #b000000000
+fangyuan2___#2_T = #b000000000
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ func___#1 = #b00
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ func___#2 = #b00
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ func___#3 = #b10
+func___#3_T = #b00
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ inWord___#1 = #b000000000
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ inWord___#2 = #b000000000
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ inWord___#3 = #b000000000
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rst___#1 = #b0
+rst___#1_T = #b0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rst___#2 = #b0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rst___#3 = #b0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ word___#3 = #b000000000
+word___#3_T = #b000000000
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ word_sum___#0 = #b000000000
+word_sum___#0_T = #b000000000
+wack found! time: 0
+Add nb constraint for: word_sum ------  time: 0
+Add ssa constraint for: _01_ ------  time: 1
+Ite op constraint for :_01_
+input value for rst: bv
+Add nb constraint for: \u0.out ------  time: 1
+Add ssa constraint for: fangyuan2 ------  time: 2
+Src concat op constraint for: fangyuan2
+Add ssa constraint for: _11_[8:6] ------  time: 2
+Sel op constraint for :_11_[8:6]
+Add ssa constraint for: fangyuan0 ------  time: 2
+Two op constraint for :fangyuan0
+Add ssa constraint for: fangyuan1 ------  time: 2
+Src concat op constraint for: fangyuan1
 Found it!
-Add ssa constraint for: _0134_ ------  time: 2
-Ite op constraint for :_0134_
-Add ssa constraint for: update_kpd ------  time: 2
-Two op constraint for :update_kpd
-Add ssa constraint for: _0051_ ------  time: 2
-Two op constraint for :_0051_
-Add ssa constraint for: _0050_ ------  time: 2
-Two op constraint for :_0050_
-wack found! time: 2
-Add nb constraint for: wack ------  time: 2
-Add ssa constraint for: yuzeng22 ------  time: 3
-Ite op constraint for :yuzeng22
-Add ssa constraint for: _0023_ ------  time: 3
-Ite op constraint for :_0023_
-Add nb constraint for: state_0 ------  time: 3
-Add ssa constraint for: yuzeng23 ------  time: 4
-Ite op constraint for :yuzeng23
-Case op constraint for :_0020_
-Add ssa constraint for: fangyuan43 ------  time: 4
-Src concat op constraint for: fangyuan43
-Add ssa constraint for: _0142_ ------  time: 4
-One op constraint for :_0142_
-Finished idx: 1 for: fangyuan43
-blank1
-blank2
-Finished idx: 0 for: fangyuan43
-blank1
-blank2
-Finished idx: 1 for: fangyuan43
-blank1
-blank2
-Finished idx: 0 for: fangyuan43
-blank1
-blank2
-Finished idx: 1 for: fangyuan43
-blank1
-blank2
-Finished idx: 0 for: fangyuan43
-blank1
-blank2
-Add ssa constraint for: fangyuan42 ------  time: 4
-Src concat op constraint for: fangyuan42
-Add ssa constraint for: _0047_ ------  time: 4
-Two op constraint for :_0047_
-Add ssa constraint for: we ------  time: 4
-Two op constraint for :we
-Add ssa constraint for: _0026_ ------  time: 4
-Two op constraint for :_0026_
-Add ssa constraint for: _0062_ ------  time: 4
-Reduce one op constraint for: _0062_
-Add ssa constraint for: _0141_ ------  time: 4
-Ite op constraint for :_0141_
-Finished idx: 1 for: fangyuan42
-blank1
-blank2
-Finished idx: 0 for: fangyuan42
-blank1
-blank2
-Finished idx: 1 for: fangyuan42
-blank1
-blank2
-Finished idx: 0 for: fangyuan42
-blank1
-blank2
-Finished idx: 1 for: fangyuan42
-blank1
-blank2
-Finished idx: 0 for: fangyuan42
-blank1
-blank2
-Add ssa constraint for: _0145_ ------  time: 3
-Ite op constraint for :_0145_
-Add ssa constraint for: _0144_ ------  time: 3
-Ite op constraint for :_0144_
-Add ssa constraint for: _0140_ ------  time: 3
-Sel op constraint for :_0140_
-Add ssa constraint for: fangyuan44 ------  time: 3
-Src concat op constraint for: fangyuan44
-Add nb constraint for: wla ------  time: 3
-Add ssa constraint for: yuzeng1 ------  time: 4
-Ite op constraint for :yuzeng1
-Case op constraint for :_0024_
-Add ssa constraint for: fangyuan40 ------  time: 4
-Src concat op constraint for: fangyuan40
-Finished idx: 1 for: fangyuan40
-blank1
-blank2
-Finished idx: 0 for: fangyuan40
-blank1
-blank2
-Finished idx: 1 for: fangyuan40
-blank1
-blank2
-Finished idx: 0 for: fangyuan40
-blank1
-blank2
-Finished idx: 1 for: fangyuan40
-blank1
-blank2
-Finished idx: 0 for: fangyuan40
-blank1
-blank2
-Add ssa constraint for: fangyuan39 ------  time: 4
-Src concat op constraint for: fangyuan39
-Add ssa constraint for: _0138_ ------  time: 4
-Ite op constraint for :_0138_
-Add ssa constraint for: _0137_ ------  time: 4
-Ite op constraint for :_0137_
-Finished idx: 1 for: fangyuan39
-blank1
-blank2
-Finished idx: 0 for: fangyuan39
-blank1
-blank2
-Finished idx: 1 for: fangyuan39
-blank1
-blank2
-Finished idx: 0 for: fangyuan39
-blank1
-blank2
-Finished idx: 1 for: fangyuan39
-blank1
-blank2
-Finished idx: 0 for: fangyuan39
-blank1
-blank2
-Add nb constraint for: wlb ------  time: 3
-Add ssa constraint for: yuzeng2 ------  time: 4
-Ite op constraint for :yuzeng2
-Case op constraint for :_0025_
-Add ssa constraint for: fangyuan38 ------  time: 4
-Src concat op constraint for: fangyuan38
-Finished idx: 1 for: fangyuan38
-blank1
-blank2
-Finished idx: 0 for: fangyuan38
-blank1
-blank2
-Finished idx: 1 for: fangyuan38
-blank1
-blank2
-Finished idx: 0 for: fangyuan38
-blank1
-blank2
-Finished idx: 1 for: fangyuan38
-blank1
-blank2
-Finished idx: 0 for: fangyuan38
-blank1
-blank2
-Add ssa constraint for: fangyuan37 ------  time: 4
-Src concat op constraint for: fangyuan37
-Add ssa constraint for: _0136_ ------  time: 4
-Ite op constraint for :_0136_
-Add ssa constraint for: _0135_ ------  time: 4
-Ite op constraint for :_0135_
-Finished idx: 1 for: fangyuan37
-blank1
-blank2
-Finished idx: 0 for: fangyuan37
-blank1
-blank2
-Finished idx: 1 for: fangyuan37
-blank1
-blank2
-Finished idx: 0 for: fangyuan37
-blank1
-blank2
-Finished idx: 1 for: fangyuan37
-blank1
-blank2
-Finished idx: 0 for: fangyuan37
-blank1
-blank2
-Finished idx: 5 for: fangyuan44
-blank1
-blank2
-Finished idx: 4 for: fangyuan44
-blank1
-blank2
-Finished idx: 3 for: fangyuan44
-blank1
-blank2
-Finished idx: 2 for: fangyuan44
-blank1
-blank2
-Finished idx: 1 for: fangyuan44
-blank1
-blank2
-Finished idx: 0 for: fangyuan44
-blank1
-blank2
-Finished idx: 5 for: fangyuan44
-blank1
-blank2
-Finished idx: 4 for: fangyuan44
-blank1
-blank2
-Finished idx: 3 for: fangyuan44
-blank1
-blank2
-Finished idx: 2 for: fangyuan44
-blank1
-blank2
-Finished idx: 1 for: fangyuan44
-blank1
-blank2
-Finished idx: 0 for: fangyuan44
-blank1
-blank2
-Finished idx: 5 for: fangyuan44
-blank1
-blank2
-Finished idx: 4 for: fangyuan44
-blank1
-blank2
-Finished idx: 3 for: fangyuan44
-blank1
-blank2
-Finished idx: 2 for: fangyuan44
-blank1
-blank2
-Finished idx: 1 for: fangyuan44
-blank1
-blank2
-Finished idx: 0 for: fangyuan44
-blank1
-blank2
-Add ssa constraint for: _0036_ ------  time: 3
-Two op constraint for :_0036_
-Add ssa constraint for: _0143_ ------  time: 3
-Ite op constraint for :_0143_
-Add ssa constraint for: _0046_ ------  time: 3
-Two op constraint for :_0046_
-Add ssa constraint for: _0061_ ------  time: 3
-Reduce one op constraint for: _0061_
-Add ssa constraint for: _0071_ ------  time: 2
-One op constraint for :_0071_
-Add ssa constraint for: _0072_ ------  time: 2
-One op constraint for :_0072_
-Add ssa constraint for: adr_check ------  time: 2
-Two op constraint for :adr_check
-Add ssa constraint for: _0038_ ------  time: 2
-One op constraint for :_0038_
-Add ssa constraint for: adr_check_1 ------  time: 2
-Reduce one op constraint for: adr_check_1
-Add ssa constraint for: _0133_ ------  time: 2
-Ite op constraint for :_0133_
-Add ssa constraint for: update_esu ------  time: 2
-Two op constraint for :update_esu
-Add ssa constraint for: _0052_ ------  time: 2
-Two op constraint for :_0052_
-Add ssa constraint for: _0041_ ------  time: 2
-Two op constraint for :_0041_
-Finished idx: 1 for: fangyuan35
-blank1
-blank2
-Finished idx: 0 for: fangyuan35
-blank1
-blank2
-Finished idx: 1 for: fangyuan35
-blank1
-blank2
-Finished idx: 0 for: fangyuan35
-blank1
-blank2
-Finished idx: 1 for: fangyuan35
-blank1
-blank2
-Finished idx: 0 for: fangyuan35
-blank1
-blank2
-Add ssa constraint for: _0101_ ------  time: 1
-Two op constraint for :_0101_
-Finished idx: 1 for: fangyuan24
-blank1
-blank2
-Finished idx: 0 for: fangyuan24
-blank1
-blank2
-Finished idx: 1 for: fangyuan24
-blank1
-blank2
-Finished idx: 0 for: fangyuan24
-blank1
-blank2
-Finished idx: 1 for: fangyuan24
-blank1
-blank2
-Finished idx: 0 for: fangyuan24
-blank1
-blank2
-Add ssa constraint for: fangyuan23 ------  time: 1
-Src concat op constraint for: fangyuan23
-Add ssa constraint for: _0125_ ------  time: 1
-Ite op constraint for :_0125_
-Add ssa constraint for: update_kpd ------  time: 1
-Two op constraint for :update_kpd
-Add ssa constraint for: _0051_ ------  time: 1
-Two op constraint for :_0051_
-Add ssa constraint for: _0050_ ------  time: 1
-Two op constraint for :_0050_
-wack found! time: 1
-Add nb constraint for: wack ------  time: 1
-Add ssa constraint for: yuzeng22 ------  time: 2
-Ite op constraint for :yuzeng22
-Add ssa constraint for: _0023_ ------  time: 2
-Ite op constraint for :_0023_
-Add nb constraint for: state_0 ------  time: 2
-Add ssa constraint for: yuzeng23 ------  time: 3
-Ite op constraint for :yuzeng23
-Case op constraint for :_0020_
-Add ssa constraint for: fangyuan43 ------  time: 3
-Src concat op constraint for: fangyuan43
-Add ssa constraint for: _0142_ ------  time: 3
-One op constraint for :_0142_
-Finished idx: 1 for: fangyuan43
-blank1
-blank2
-Finished idx: 0 for: fangyuan43
-blank1
-blank2
-Finished idx: 1 for: fangyuan43
-blank1
-blank2
-Finished idx: 0 for: fangyuan43
-blank1
-blank2
-Finished idx: 1 for: fangyuan43
-blank1
-blank2
-Finished idx: 0 for: fangyuan43
-blank1
-blank2
-Add ssa constraint for: fangyuan42 ------  time: 3
-Src concat op constraint for: fangyuan42
-Add ssa constraint for: _0047_ ------  time: 3
-Two op constraint for :_0047_
-Add ssa constraint for: we ------  time: 3
-Two op constraint for :we
-Add ssa constraint for: _0026_ ------  time: 3
-Two op constraint for :_0026_
-Add ssa constraint for: _0062_ ------  time: 3
-Reduce one op constraint for: _0062_
-Add ssa constraint for: _0141_ ------  time: 3
-Ite op constraint for :_0141_
-Finished idx: 1 for: fangyuan42
-blank1
-blank2
-Finished idx: 0 for: fangyuan42
-blank1
-blank2
-Finished idx: 1 for: fangyuan42
-blank1
-blank2
-Finished idx: 0 for: fangyuan42
-blank1
-blank2
-Finished idx: 1 for: fangyuan42
-blank1
-blank2
-Finished idx: 0 for: fangyuan42
-blank1
-blank2
-Add ssa constraint for: _0145_ ------  time: 2
-Ite op constraint for :_0145_
-Add ssa constraint for: _0144_ ------  time: 2
-Ite op constraint for :_0144_
-Add ssa constraint for: _0140_ ------  time: 2
-Sel op constraint for :_0140_
-Add ssa constraint for: fangyuan44 ------  time: 2
-Src concat op constraint for: fangyuan44
-Add nb constraint for: wla ------  time: 2
-Add ssa constraint for: yuzeng1 ------  time: 3
-Ite op constraint for :yuzeng1
-Case op constraint for :_0024_
-Add ssa constraint for: fangyuan40 ------  time: 3
-Src concat op constraint for: fangyuan40
-Finished idx: 1 for: fangyuan40
-blank1
-blank2
-Finished idx: 0 for: fangyuan40
-blank1
-blank2
-Finished idx: 1 for: fangyuan40
-blank1
-blank2
-Finished idx: 0 for: fangyuan40
-blank1
-blank2
-Finished idx: 1 for: fangyuan40
-blank1
-blank2
-Finished idx: 0 for: fangyuan40
-blank1
-blank2
-Add ssa constraint for: fangyuan39 ------  time: 3
-Src concat op constraint for: fangyuan39
-Add ssa constraint for: _0138_ ------  time: 3
-Ite op constraint for :_0138_
-Add ssa constraint for: _0137_ ------  time: 3
-Ite op constraint for :_0137_
-Finished idx: 1 for: fangyuan39
-blank1
-blank2
-Finished idx: 0 for: fangyuan39
-blank1
-blank2
-Finished idx: 1 for: fangyuan39
-blank1
-blank2
-Finished idx: 0 for: fangyuan39
-blank1
-blank2
-Finished idx: 1 for: fangyuan39
-blank1
-blank2
-Finished idx: 0 for: fangyuan39
-blank1
-blank2
-Add nb constraint for: wlb ------  time: 2
-Add ssa constraint for: yuzeng2 ------  time: 3
-Ite op constraint for :yuzeng2
-Case op constraint for :_0025_
-Add ssa constraint for: fangyuan38 ------  time: 3
-Src concat op constraint for: fangyuan38
-Finished idx: 1 for: fangyuan38
-blank1
-blank2
-Finished idx: 0 for: fangyuan38
-blank1
-blank2
-Finished idx: 1 for: fangyuan38
-blank1
-blank2
-Finished idx: 0 for: fangyuan38
-blank1
-blank2
-Finished idx: 1 for: fangyuan38
-blank1
-blank2
-Finished idx: 0 for: fangyuan38
-blank1
-blank2
-Add ssa constraint for: fangyuan37 ------  time: 3
-Src concat op constraint for: fangyuan37
-Add ssa constraint for: _0136_ ------  time: 3
-Ite op constraint for :_0136_
-Add ssa constraint for: _0135_ ------  time: 3
-Ite op constraint for :_0135_
-Finished idx: 1 for: fangyuan37
-blank1
-blank2
-Finished idx: 0 for: fangyuan37
-blank1
-blank2
-Finished idx: 1 for: fangyuan37
-blank1
-blank2
-Finished idx: 0 for: fangyuan37
-blank1
-blank2
-Finished idx: 1 for: fangyuan37
-blank1
-blank2
-Finished idx: 0 for: fangyuan37
-blank1
-blank2
-Finished idx: 5 for: fangyuan44
-blank1
-blank2
-Finished idx: 4 for: fangyuan44
-blank1
-blank2
-Finished idx: 3 for: fangyuan44
-blank1
-blank2
-Finished idx: 2 for: fangyuan44
-blank1
-blank2
-Finished idx: 1 for: fangyuan44
-blank1
-blank2
-Finished idx: 0 for: fangyuan44
-blank1
-blank2
-Finished idx: 5 for: fangyuan44
-blank1
-blank2
-Finished idx: 4 for: fangyuan44
-blank1
-blank2
-Finished idx: 3 for: fangyuan44
-blank1
-blank2
-Finished idx: 2 for: fangyuan44
-blank1
-blank2
-Finished idx: 1 for: fangyuan44
-blank1
-blank2
-Finished idx: 0 for: fangyuan44
-blank1
-blank2
-Finished idx: 5 for: fangyuan44
-blank1
-blank2
-Finished idx: 4 for: fangyuan44
-blank1
-blank2
-Finished idx: 3 for: fangyuan44
-blank1
-blank2
-Finished idx: 2 for: fangyuan44
-blank1
-blank2
-Finished idx: 1 for: fangyuan44
-blank1
-blank2
-Finished idx: 0 for: fangyuan44
-blank1
-blank2
-Add ssa constraint for: _0036_ ------  time: 2
-Two op constraint for :_0036_
-Add ssa constraint for: _0143_ ------  time: 2
-Ite op constraint for :_0143_
-Add ssa constraint for: _0046_ ------  time: 2
-Two op constraint for :_0046_
-Add ssa constraint for: _0061_ ------  time: 2
-Reduce one op constraint for: _0061_
-Add ssa constraint for: _0071_ ------  time: 1
-One op constraint for :_0071_
-Add ssa constraint for: _0072_ ------  time: 1
-One op constraint for :_0072_
-Add ssa constraint for: adr_check ------  time: 1
-Two op constraint for :adr_check
-Add ssa constraint for: _0038_ ------  time: 1
-One op constraint for :_0038_
-Add ssa constraint for: adr_check_1 ------  time: 1
-Reduce one op constraint for: adr_check_1
-Add nb constraint for: un ------  time: 1
-Add ssa constraint for: yuzeng11 ------  time: 2
-Ite op constraint for :yuzeng11
-Case op constraint for :_0022_
-Add ssa constraint for: fangyuan24 ------  time: 2
-Src concat op constraint for: fangyuan24
-Finished idx: 1 for: fangyuan24
-blank1
-blank2
-Finished idx: 0 for: fangyuan24
-blank1
-blank2
-Finished idx: 1 for: fangyuan24
-blank1
-blank2
-Finished idx: 0 for: fangyuan24
-blank1
-blank2
-Finished idx: 1 for: fangyuan24
-blank1
-blank2
-Finished idx: 0 for: fangyuan24
-blank1
-blank2
-Add ssa constraint for: fangyuan23 ------  time: 2
-Src concat op constraint for: fangyuan23
-Add ssa constraint for: _0125_ ------  time: 2
-Ite op constraint for :_0125_
-Add nb constraint for: un ------  time: 2
-Add ssa constraint for: yuzeng11 ------  time: 3
-Ite op constraint for :yuzeng11
-Case op constraint for :_0022_
-Add ssa constraint for: fangyuan24 ------  time: 3
-Src concat op constraint for: fangyuan24
-Finished idx: 1 for: fangyuan24
-blank1
-blank2
-Finished idx: 0 for: fangyuan24
-blank1
-blank2
-Finished idx: 1 for: fangyuan24
-blank1
-blank2
-Finished idx: 0 for: fangyuan24
-blank1
-blank2
-Finished idx: 1 for: fangyuan24
-blank1
-blank2
-Finished idx: 0 for: fangyuan24
-blank1
-blank2
-Add ssa constraint for: fangyuan23 ------  time: 3
-Src concat op constraint for: fangyuan23
-Add ssa constraint for: _0125_ ------  time: 3
-Ite op constraint for :_0125_
-Add nb constraint for: un ------  time: 3
-Add ssa constraint for: yuzeng11 ------  time: 4
-Ite op constraint for :yuzeng11
-Case op constraint for :_0022_
-Add ssa constraint for: fangyuan24 ------  time: 4
-Src concat op constraint for: fangyuan24
-Finished idx: 1 for: fangyuan24
-blank1
-blank2
-Finished idx: 0 for: fangyuan24
-blank1
-blank2
-Finished idx: 1 for: fangyuan24
-blank1
-blank2
-Finished idx: 0 for: fangyuan24
-blank1
-blank2
-Finished idx: 1 for: fangyuan24
-blank1
-blank2
-Finished idx: 0 for: fangyuan24
-blank1
-blank2
-Add ssa constraint for: fangyuan23 ------  time: 4
-Src concat op constraint for: fangyuan23
-Add ssa constraint for: _0125_ ------  time: 4
-Ite op constraint for :_0125_
-Add nb constraint for: un ------  time: 4
-Add ssa constraint for: yuzeng11 ------  time: 5
-Ite op constraint for :yuzeng11
-Case op constraint for :_0022_
-Add ssa constraint for: fangyuan24 ------  time: 5
-Src concat op constraint for: fangyuan24
-Finished idx: 1 for: fangyuan24
-blank1
-blank2
-Finished idx: 0 for: fangyuan24
-blank1
-blank2
-Finished idx: 1 for: fangyuan24
-blank1
-blank2
-Finished idx: 0 for: fangyuan24
-blank1
-blank2
-Finished idx: 1 for: fangyuan24
-blank1
-blank2
-Finished idx: 0 for: fangyuan24
-blank1
-blank2
-Add ssa constraint for: fangyuan23 ------  time: 5
-Src concat op constraint for: fangyuan23
-Add ssa constraint for: _0125_ ------  time: 5
-Ite op constraint for :_0125_
-Add nb constraint for: un ------  time: 5
-Add ssa constraint for: yuzeng11 ------  time: 6
-Ite op constraint for :yuzeng11
-Case op constraint for :_0022_
-Add ssa constraint for: fangyuan24 ------  time: 6
-Src concat op constraint for: fangyuan24
-Finished idx: 1 for: fangyuan24
-blank1
-blank2
-Finished idx: 0 for: fangyuan24
-blank1
-blank2
-Finished idx: 1 for: fangyuan24
-blank1
-blank2
-Finished idx: 0 for: fangyuan24
-blank1
-blank2
-Finished idx: 1 for: fangyuan24
-blank1
-blank2
-Finished idx: 0 for: fangyuan24
-blank1
-blank2
-Add ssa constraint for: fangyuan23 ------  time: 6
-Src concat op constraint for: fangyuan23
-Add ssa constraint for: _0125_ ------  time: 6
-Ite op constraint for :_0125_
-Add nb constraint for: un ------  time: 6
-Add ssa constraint for: yuzeng11 ------  time: 7
-Ite op constraint for :yuzeng11
-Case op constraint for :_0022_
-Add ssa constraint for: fangyuan24 ------  time: 7
-Src concat op constraint for: fangyuan24
-Finished idx: 1 for: fangyuan24
-blank1
-blank2
-Finished idx: 0 for: fangyuan24
-blank1
-blank2
-Finished idx: 1 for: fangyuan24
-blank1
-blank2
-Finished idx: 0 for: fangyuan24
-blank1
-blank2
-Finished idx: 1 for: fangyuan24
-blank1
-blank2
-Finished idx: 0 for: fangyuan24
-blank1
-blank2
-Add ssa constraint for: fangyuan23 ------  time: 7
-Src concat op constraint for: fangyuan23
-Add ssa constraint for: _0125_ ------  time: 7
-Ite op constraint for :_0125_
-Add nb constraint for: un ------  time: 7
-Add ssa constraint for: yuzeng11 ------  time: 8
-Ite op constraint for :yuzeng11
-Case op constraint for :_0022_
-Add ssa constraint for: fangyuan24 ------  time: 8
-Src concat op constraint for: fangyuan24
-Finished idx: 1 for: fangyuan24
-blank1
-blank2
-Finished idx: 0 for: fangyuan24
-blank1
-blank2
-Finished idx: 1 for: fangyuan24
-blank1
-blank2
-Finished idx: 0 for: fangyuan24
-blank1
-blank2
-Finished idx: 1 for: fangyuan24
-blank1
-blank2
-Finished idx: 0 for: fangyuan24
-blank1
-blank2
-Add ssa constraint for: fangyuan23 ------  time: 8
-Src concat op constraint for: fangyuan23
-Add ssa constraint for: _0125_ ------  time: 8
-Ite op constraint for :_0125_
+Add nb constraint for: \u0.stg1 ------  time: 2
+Add ssa constraint for: \u0.stg1_nxt ------  time: 3
+Two op constraint for :\u0.stg1_nxt
+Add ssa constraint for: _07_ ------  time: 3
+Two op constraint for :_07_
+Add ssa constraint for: _06_ ------  time: 3
+Two op constraint for :_06_
+Add ssa constraint for: _05_ ------  time: 3
+Two op constraint for :_05_
+Add ssa constraint for: _04_ ------  time: 3
+Two op constraint for :_04_
+Add ssa constraint for: _10_ ------  time: 3
+Two op constraint for :_10_
+Add ssa constraint for: _09_ ------  time: 3
+Two op constraint for :_09_
+Add ssa constraint for: _08_ ------  time: 3
+Two op constraint for :_08_
+Add ssa constraint for: \u0.word ------  time: 3
+Ite op constraint for :\u0.word
+Add ssa constraint for: _03_ ------  time: 3
+Two op constraint for :_03_
+input value for func: bv
+Finished idx: 1 for: fangyuan1
+blank1
+blank2
+Finished idx: 0 for: fangyuan1
+blank1
+blank2
+Add ssa constraint for: \u0.stg2_nxt ------  time: 2
+Sel op constraint for :\u0.stg2_nxt
+Finished idx: 1 for: fangyuan2
+blank1
+blank2
+Finished idx: 0 for: fangyuan2
+blank1
+blank2
+Found it!
+*************************  Update function for word_sum
+(goals
+(goal
+  (let ((a!1 (concat #x0
+                     (bvadd ((_ extract 0 0) |word___#3|)
+                            ((_ extract 1 1) |word___#3|)
+                            ((_ extract 2 2) |word___#3|)
+                            ((_ extract 3 3) |word___#3|)
+                            ((_ extract 4 4) |word___#3|)
+                            ((_ extract 5 5) |word___#3|)
+                            ((_ extract 6 6) |word___#3|)
+                            ((_ extract 7 7) |word___#3|)
+                            ((_ extract 8 8) |word___#3|))
+                     #b00
+                     (bvadd (concat #b0 ((_ extract 0 0) |word___#3|))
+                            (concat #b0 ((_ extract 1 1) |word___#3|))
+                            (concat #b0 ((_ extract 2 2) |word___#3|))
+                            (concat #b0 ((_ extract 3 3) |word___#3|))
+                            (concat #b0 ((_ extract 4 4) |word___#3|))
+                            (concat #b0 ((_ extract 5 5) |word___#3|))
+                            (concat #b0 ((_ extract 6 6) |word___#3|))
+                            (concat #b0 ((_ extract 7 7) |word___#3|))
+                            (concat #b0 ((_ extract 8 8) |word___#3|))))))
+    (= |word_sum___#100| a!1)))
+)
+Fix value for inWord___#2
+-------- Begin Add all clean ----------
+-------- Begin Add all dirty ----------
+-------- Begin add input vals ----------
+Assign 1'd0 to rst___#3
+Assign x to inWord___#3
+Assign 2'd2 to func___#3
+------- No more solution found within the bound: 2 ----------
+### Begin bound: 3
+Add nb constraint for: word ------  time: 3
+Add ssa constraint for: _00_ ------  time: 4
+Ite op constraint for :_00_
+Add ssa constraint for: word_next ------  time: 4
+Ite op constraint for :word_next
+Add ssa constraint for: _02_ ------  time: 4
+Two op constraint for :_02_
+-------- Begin Add all clean ----------
+-------- Begin Add all dirty ----------
+-------- Begin add input vals ----------
+Assign 1'd0 to rst___#4
+Assign x to inWord___#4
+Assign 2'd2 to func___#4
++++++++ Solution found for word_sum, bound: 3 +++++++++
+\u0.out___#1 = #b000000000
+\u0.out___#1_T = #b000000000
+\u0.stg1___#2 = #x0
+\u0.stg1___#2_T = #x0
+\u0.stg1_nxt___#3 = #x0
+\u0.stg1_nxt___#3_T = #x0
+\u0.stg2_nxt___#2 = #b000000
+\u0.stg2_nxt___#2_T = #b000000
+\u0.word___#3 = #b000000000
+\u0.word___#3_T = #b000000000
+\u0.word___#3_T = #b0
+_00____#4 = #b000000000
+_00____#4_T = #b000000000
+_01____#1 = #b000000000
+_01____#1_T = #b000000000
+_02____#4 = #b0
+_02____#4_T = #b0
+_03____#3 = #b0
+_03____#3_T = #b0
+_04____#3 = #x0
+_04____#3_T = #x0
+_05____#3 = #x0
+_05____#3_T = #x0
+_06____#3 = #x0
+_06____#3_T = #x0
+_07____#3 = #x0
+_07____#3_T = #x0
+_08____#3 = #b00
+_08____#3_T = #b00
+_09____#3 = #b000
+_09____#3_T = #b000
+_10____#3 = #x0
+_10____#3_T = #x0
+_11____#2 = #b000000000
+_11____#2_T = #b000000000
+fangyuan0___#2 = #b000000000
+fangyuan0___#2_T = #b000000000
+fangyuan1___#2 = #x00
+fangyuan1___#2_T = #x00
+fangyuan2___#2 = #b000000000
+fangyuan2___#2_T = #b000000000
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ func___#1 = #b00
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ func___#2 = #b00
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ func___#3 = #b00
+func___#3_T = #b00
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ func___#4 = #b10
+func___#4_T = #b00
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ inWord___#1 = #b000000000
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ inWord___#2 = #b000000000
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ inWord___#3 = #b000000000
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ inWord___#4 = #b000000000
+inWord___#4_T = #b000000000
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rst___#1 = #b0
+rst___#1_T = #b0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rst___#2 = #b0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rst___#3 = #b0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rst___#4 = #b0
+rst___#4_T = #b0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ word___#3 = #b000000000
+word___#3_T = #b000000000
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ word___#4 = #b000000000
+word___#4_T = #b000000000
+word_next___#4 = #b000000000
+word_next___#4_T = #b000000000
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ word_sum___#0 = #b000000000
+word_sum___#0_T = #b000000000
+wack found! time: 0
+Add nb constraint for: word_sum ------  time: 0
+Add ssa constraint for: _01_ ------  time: 1
+Ite op constraint for :_01_
+input value for rst: bv
+Add nb constraint for: \u0.out ------  time: 1
+Add ssa constraint for: fangyuan2 ------  time: 2
+Src concat op constraint for: fangyuan2
+Add ssa constraint for: _11_[8:6] ------  time: 2
+Sel op constraint for :_11_[8:6]
+Add ssa constraint for: fangyuan0 ------  time: 2
+Two op constraint for :fangyuan0
+Add ssa constraint for: fangyuan1 ------  time: 2
+Src concat op constraint for: fangyuan1
+Found it!
+Add nb constraint for: \u0.stg1 ------  time: 2
+Add ssa constraint for: \u0.stg1_nxt ------  time: 3
+Two op constraint for :\u0.stg1_nxt
+Add ssa constraint for: _07_ ------  time: 3
+Two op constraint for :_07_
+Add ssa constraint for: _06_ ------  time: 3
+Two op constraint for :_06_
+Add ssa constraint for: _05_ ------  time: 3
+Two op constraint for :_05_
+Add ssa constraint for: _04_ ------  time: 3
+Two op constraint for :_04_
+Add ssa constraint for: _10_ ------  time: 3
+Two op constraint for :_10_
+Add ssa constraint for: _09_ ------  time: 3
+Two op constraint for :_09_
+Add ssa constraint for: _08_ ------  time: 3
+Two op constraint for :_08_
+Add ssa constraint for: \u0.word ------  time: 3
+Ite op constraint for :\u0.word
+Add ssa constraint for: _03_ ------  time: 3
+Two op constraint for :_03_
+input value for func: bv
+Add nb constraint for: word ------  time: 3
+Add ssa constraint for: _00_ ------  time: 4
+Ite op constraint for :_00_
+input value for rst: bv
+Add ssa constraint for: word_next ------  time: 4
+Ite op constraint for :word_next
+Add ssa constraint for: _02_ ------  time: 4
+Two op constraint for :_02_
+input value for func: bv
+Finished idx: 1 for: fangyuan1
+blank1
+blank2
+Finished idx: 0 for: fangyuan1
+blank1
+blank2
+Add ssa constraint for: \u0.stg2_nxt ------  time: 2
+Sel op constraint for :\u0.stg2_nxt
+Finished idx: 1 for: fangyuan2
+blank1
+blank2
+Finished idx: 0 for: fangyuan2
+blank1
+blank2
+Found it!
+*************************  Update function for word_sum
+(goals
+(goal
+  (= |word_sum___#100| #b000000000))
+)
+Fix value for inWord___#3
+-------- Begin Add all clean ----------
+-------- Begin Add all dirty ----------
+-------- Begin add input vals ----------
+Assign 1'd0 to rst___#4
+Assign x to inWord___#4
+Assign 2'd2 to func___#4
+------- No more solution found within the bound: 3 ----------
 

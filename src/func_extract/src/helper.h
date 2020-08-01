@@ -14,6 +14,8 @@ bool isAs(std::string var);
 
 uint32_t hdb2int(std::string num);
 
+uint32_t hex2int(std::string num);
+
 uint32_t bin2int(std::string num);
 
 std::string timed_name(std::string name, uint32_t timeIdx);
