@@ -458,17 +458,15 @@ expr src_concat_op_constraint(astNode* const node, uint32_t timeIdx, context &c,
   uint32_t destLo = get_lo(destAndSlice);
   expr destExpr = var_expr(destAndSlice, timeIdx, c, false);//add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve).extract(destHi, destLo);
   expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
-  if(node->dest == "fangyuan1" ) {
+  if(node->dest == "fangyuan0" ) {
     toCoutVerb("Found it!");
   }
   // analyze index of srcVec
   uint32_t srcHi = get_hi(node->srcVec[0]);
   uint32_t srcLo = get_lo(node->srcVec.back());
-  expr restConcatExpr(c);
+  expr restConcatExpr = add_one_concat_expr(node, 0, timeIdx, c, s, g, bound, isSolve, false);  
   expr restConcatExpr_t(c);
   if(isSolve) {
-    std::string firstSrcAndSlice = node->srcVec[0];
-    restConcatExpr = add_one_concat_expr(node, 0, timeIdx, c, s, g, bound, isSolve, false);
     restConcatExpr_t = add_one_concat_expr(node, 0, timeIdx, c, s, g, bound, isSolve, true);
     s.add( destExpr == restConcatExpr );
     s.add( destExpr_t == restConcatExpr_t );
@@ -637,8 +635,15 @@ expr ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
     //}
     return destExpr;
   }
-  else
-    return ite( condExpr == c.bv_val(1, 1), zext(op1Expr, destWidthNum-op1WidthNum), zext(op2Expr, destWidthNum-op2WidthNum) );
+  else {
+    if(node->dest == "_01_") {
+      toCoutVerb("Found it!");
+    }
+    expr iteCond = condExpr == c.bv_val(1, 1);
+    expr iteOp1 = zext(op1Expr, destWidthNum-op1WidthNum);
+    expr iteOp2 = zext(op2Expr, destWidthNum-op2WidthNum);
+    return ite( iteCond, iteOp1, iteOp2 );
+  }
 }
 
 
