@@ -110,11 +110,24 @@ void add_sliced_node(std::string varAndSlice, uint32_t timeIdx, astNode* const n
   node->type = SRC_CONCAT;
   node->dest = var;
   node->op = "";
-  node->srcVec = reg2Slices[var];
+  //node->srcVec = reg2Slices[var];
   node->destTime = timeIdx;
   node->done = false;
 
-  for(auto src: reg2Slices[var]) {
+  auto srcVec = reg2Slices[var];
+  uint32_t srcHi = get_hi(srcVec.front());
+  uint32_t srcLo = get_lo(srcVec.back());
+  auto idxPairs = varWidth.get_idx_pair(var, "add_sliced_node for:"+var);
+  uint32_t destHi = idxPairs.first;
+  uint32_t destLo = idxPairs.second;
+
+  if(destHi > srcHi)
+    srcVec.insert(srcVec.begin(), toStr(destHi-srcHi)+"'h0");
+  if(destLo < srcLo)
+    srcVec.push_back(toStr(srcLo-destLo)+"'h0");
+  node->srcVec = srcVec; 
+    
+  for(auto src: srcVec) {
     add_child_node(src, timeIdx, node);  
   }
 }

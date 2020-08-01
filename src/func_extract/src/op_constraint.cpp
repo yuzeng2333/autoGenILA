@@ -458,7 +458,7 @@ expr src_concat_op_constraint(astNode* const node, uint32_t timeIdx, context &c,
   uint32_t destLo = get_lo(destAndSlice);
   expr destExpr = var_expr(destAndSlice, timeIdx, c, false);//add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve).extract(destHi, destLo);
   expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
-  if(node->dest == "fangyuan35" ) {
+  if(node->dest == "fangyuan1" ) {
     toCoutVerb("Found it!");
   }
   // analyze index of srcVec
@@ -470,28 +470,29 @@ expr src_concat_op_constraint(astNode* const node, uint32_t timeIdx, context &c,
     std::string firstSrcAndSlice = node->srcVec[0];
     restConcatExpr = add_one_concat_expr(node, 0, timeIdx, c, s, g, bound, isSolve, false);
     restConcatExpr_t = add_one_concat_expr(node, 0, timeIdx, c, s, g, bound, isSolve, true);
-    s.add( destExpr.extract(srcHi, srcLo) == restConcatExpr );
-    s.add( destExpr_t.extract(srcHi, srcLo) == restConcatExpr_t );
+    s.add( destExpr == restConcatExpr );
+    s.add( destExpr_t == restConcatExpr_t );
     //s.add( destExpr_t == concat(firstSrcExpr_t, restConcatExpr_t) );
   }
 
-  if(destHi == srcHi && destLo == srcLo)
-    return restConcatExpr;
-  else if(destHi > srcHi && destLo == srcLo)
-    return concat(c.bv_val(0, destHi - srcHi), restConcatExpr);
-  else if(destHi == srcHi && destLo < srcLo)
-    return concat(restConcatExpr, c.bv_val(0, srcLo - destLo));
-  else if(destHi > srcHi && destLo < srcLo)
-    return concat(c.bv_val(0, destHi - srcHi), concat(restConcatExpr, c.bv_val(0, srcLo - destLo)));
-  else {
-    toCout("Error: src index range is out of dest index range!");
-    abort();
-  }
+  //if(destHi == srcHi && destLo == srcLo)
+  //  return restConcatExpr;
+  //else if(destHi > srcHi && destLo == srcLo)
+  //  return concat(c.bv_val(0, destHi - srcHi), restConcatExpr);
+  //else if(destHi == srcHi && destLo < srcLo)
+  //  return concat(restConcatExpr, c.bv_val(0, srcLo - destLo));
+  //else if(destHi > srcHi && destLo < srcLo)
+  //  return concat(c.bv_val(0, destHi - srcHi), concat(restConcatExpr, c.bv_val(0, srcLo - destLo)));
+  //else {
+  //  toCout("Error: src index range is out of dest index range!");
+  //  abort();
+  //}
+  return restConcatExpr;  
 }
 
 
 expr add_one_concat_expr(astNode* const node, uint32_t nxtIdx, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve, bool isTaint ) {
-  if(node->dest == "fangyuan27" && nxtIdx == 0) {
+  if(node->dest == "fangyuan1" && nxtIdx == 0) {
     toCoutVerb("Found it!");
   }
   expr firstSrcExpr(c);
