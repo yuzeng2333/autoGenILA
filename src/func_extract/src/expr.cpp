@@ -248,8 +248,8 @@ void dest_concat_expr(std::string line) {
   // if there is number in the list
   for (std::string destAndSlice: destVec) {
     uint32_t destLocalWidthNum = get_var_slice_width(destAndSlice);
-    //uint32_t hi = get_hi(destAndSlice);
-    //uint32_t lo = get_lo(destAndSlice);
+    //uint32_t hi = get_lgc_hi(destAndSlice);
+    //uint32_t lo = get_lgc_lo(destAndSlice);
     //assert(hi >= lo);
     endIdx = startIdx - destLocalWidthNum + 1;
     if(!is_number(destAndSlice)) {

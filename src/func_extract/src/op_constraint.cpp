@@ -56,8 +56,8 @@ expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTain
     }
   }
   else if(width == 0){ // if is not num
-    uint32_t hi = get_hi(varAndSlice);
-    uint32_t lo = get_lo(varAndSlice);
+    uint32_t hi = get_lgc_hi(varAndSlice);
+    uint32_t lo = get_lgc_lo(varAndSlice);
     if(isTaint) {
       varTimed = var + "___#" + toStr(timeIdx) + _t;
     }
@@ -157,10 +157,10 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
     toCout("Found it!");
   }
 
-  uint32_t op1Hi = get_hi(op1AndSlice);
-  uint32_t op1Lo = get_lo(op1AndSlice);
-  uint32_t op2Hi = get_hi(op2AndSlice);
-  uint32_t op2Lo = get_lo(op2AndSlice);
+  uint32_t op1Hi = get_lgc_hi(op1AndSlice);
+  uint32_t op1Lo = get_lgc_lo(op1AndSlice);
+  uint32_t op2Hi = get_lgc_hi(op2AndSlice);
+  uint32_t op2Lo = get_lgc_lo(op2AndSlice);
 
   assert(!isMem(op1));
   assert(!isMem(op2));
@@ -266,8 +266,8 @@ expr one_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   if(destAndSlice.compare("_0075_") == 0) {
     toCoutVerb("Found it!");
   }
-  uint32_t op1Hi = get_hi(op1AndSlice);
-  uint32_t op1Lo = get_lo(op1AndSlice);
+  uint32_t op1Hi = get_lgc_hi(op1AndSlice);
+  uint32_t op1Lo = get_lgc_lo(op1AndSlice);
 
   expr destExpr = var_expr(destAndSlice, timeIdx, c, false);
   expr op1Expr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve).extract(op1Hi, op1Lo);
@@ -290,8 +290,8 @@ expr reduce_one_op_constraint(astNode* const node, uint32_t timeIdx, context &c,
   std::string op1AndSlice = node->srcVec.front();
   split_slice(destAndSlice, dest, destSlice);
   split_slice(op1AndSlice, op1, op1Slice);
-  uint32_t op1Hi = get_hi(op1AndSlice);
-  uint32_t op1Lo = get_lo(op1AndSlice);
+  uint32_t op1Hi = get_lgc_hi(op1AndSlice);
+  uint32_t op1Lo = get_lgc_lo(op1AndSlice);
 
   if(destAndSlice.compare("_0062_") == 0) {
     //toCoutVerb("Found it!");
@@ -454,16 +454,16 @@ expr src_concat_op_constraint(astNode* const node, uint32_t timeIdx, context &c,
   std::string destAndSlice = node->dest;
   std::string dest, destSlice;
   split_slice(destAndSlice, dest, destSlice);
-  uint32_t destHi = get_hi(destAndSlice);
-  uint32_t destLo = get_lo(destAndSlice);
+  uint32_t destHi = get_lgc_hi(destAndSlice);
+  uint32_t destLo = get_lgc_lo(destAndSlice);
   expr destExpr = var_expr(destAndSlice, timeIdx, c, false);//add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve).extract(destHi, destLo);
   expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
   if(node->dest == "fangyuan0" ) {
     toCoutVerb("Found it!");
   }
   // analyze index of srcVec
-  uint32_t srcHi = get_hi(node->srcVec[0]);
-  uint32_t srcLo = get_lo(node->srcVec.back());
+  uint32_t srcHi = get_lgc_hi(node->srcVec[0]);
+  uint32_t srcLo = get_lgc_lo(node->srcVec.back());
   expr restConcatExpr = add_one_concat_expr(node, 0, timeIdx, c, s, g, bound, isSolve, false);  
   expr restConcatExpr_t(c);
   if(isSolve) {
@@ -490,7 +490,8 @@ expr src_concat_op_constraint(astNode* const node, uint32_t timeIdx, context &c,
 
 
 expr add_one_concat_expr(astNode* const node, uint32_t nxtIdx, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve, bool isTaint ) {
-  if(node->dest == "fangyuan1" && nxtIdx == 0) {
+  //if(node->dest == "fangyuan1" && nxtIdx == 0) {
+  if(node->dest.find("u0.word") != std::string::npos ) {
     toCoutVerb("Found it!");
   }
   expr firstSrcExpr(c);
@@ -498,8 +499,8 @@ expr add_one_concat_expr(astNode* const node, uint32_t nxtIdx, uint32_t timeIdx,
   std::string varAndSlice = node->srcVec[nxtIdx];
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
-  uint32_t hi = get_hi(varAndSlice);
-  uint32_t lo = get_lo(varAndSlice);
+  uint32_t hi = get_lgc_hi(varAndSlice);
+  uint32_t lo = get_lgc_lo(varAndSlice);
   //auto it = std::find(node->srcVec.begin(), node->srcVec.end(), childVar);
   //assert(it != node->srcVec.end());
   if(node->childVec.size() != node->srcVec.size()) {
@@ -654,8 +655,8 @@ expr case_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
 
   std::string destAndSlice = node->dest;
   std::string caseVarAndSlice = node->srcVec[0];
-  uint32_t caseHi = get_hi(caseVarAndSlice);
-  uint32_t caseLo = get_lo(caseVarAndSlice);
+  uint32_t caseHi = get_lgc_hi(caseVarAndSlice);
+  uint32_t caseLo = get_lgc_lo(caseVarAndSlice);
   expr caseExpr = add_constraint( node->childVec[0], timeIdx, c, s, g, bound, isSolve, false).extract(caseHi, caseLo);
   expr caseExpr_t = var_expr(caseVarAndSlice, timeIdx, c, true);
   expr assignVarExpr = add_constraint(node->childVec[1], timeIdx, c, s, g, bound, isSolve);
@@ -677,8 +678,8 @@ expr case_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
         std::string assignVar, assignVarSlice;      
         split_slice(assignVarAndSlice, assignVar, assignVarSlice); 
         uint32_t Hi, Lo;
-        Hi = get_hi(assignVarAndSlice);
-        Lo = get_lo(assignVarAndSlice);
+        Hi = get_lgc_hi(assignVarAndSlice);
+        Lo = get_lgc_lo(assignVarAndSlice);
         if(caseValue.compare("default") == 0) {
           expr destExpr = var_expr(destAndSlice+"_CASE_"+toStr((i-1)/2), timeIdx, c, false, localWidth);
           expr defaultVarExpr = add_constraint(node->childVec[2], timeIdx, c, s, g, bound, isSolve).extract(Hi, Lo);
@@ -722,8 +723,8 @@ expr case_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
 expr add_one_case_branch_expr(astNode* const node, expr &caseExpr, uint32_t idx, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
   astNode *assignNode;
   std::string assignVarAndSlice = node->srcVec[idx+1];
-  uint32_t hi = get_hi(assignVarAndSlice);
-  uint32_t lo = get_lo(assignVarAndSlice);
+  uint32_t hi = get_lgc_hi(assignVarAndSlice);
+  uint32_t lo = get_lgc_lo(assignVarAndSlice);
   if(idx < node->srcVec.size()-2) {
     assignNode = node->childVec[1];
     std::string caseValue = node->srcVec[idx];

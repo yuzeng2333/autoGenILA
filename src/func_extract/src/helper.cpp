@@ -195,7 +195,10 @@ uint32_t get_pos_of_one(std::string value) {
 }
 
 
-uint32_t get_hi(std::string varAndSlice) {
+// Attention:
+// This function is a little counter-intuitive
+// get logical hi
+uint32_t get_lgc_hi(std::string varAndSlice) {
   std::smatch m;
   std::regex pHex("^(\\d+)'h([\\dabcdefx\\?]+)$");
   std::regex pDec("^(\\d+)'d([\\dx\\?]+)$");
@@ -203,7 +206,7 @@ uint32_t get_hi(std::string varAndSlice) {
   if(is_number(varAndSlice)) {
     if(!std::regex_match(varAndSlice, m, pBin)
         && !std::regex_match(varAndSlice, m, pHex)) {
-      toCout("Error: input number for get_hi is not binary or hex: "+varAndSlice);
+      toCout("Error: input number for get_lgc_hi is not binary or hex: "+varAndSlice);
     }
     std::string bitNum = m.str(1);
     return std::stoi(bitNum)-1;
@@ -223,7 +226,30 @@ uint32_t get_hi(std::string varAndSlice) {
 }
 
 
-uint32_t get_lo(std::string varAndSlice) {
+// get literal hi
+uint32_t get_ltr_hi(std::string varAndSlice) {
+  std::smatch m;
+  std::regex pHex("^(\\d+)'h([\\dabcdefx\\?]+)$");
+  std::regex pDec("^(\\d+)'d([\\dx\\?]+)$");
+  std::regex pBin("^(\\d+)'h([01x\\?]+)$");
+  if(is_number(varAndSlice)) {
+    if(!std::regex_match(varAndSlice, m, pBin)
+        && !std::regex_match(varAndSlice, m, pHex)) {
+      toCout("Error: input number for get_lgc_hi is not binary or hex: "+varAndSlice);
+    }
+    std::string bitNum = m.str(1);
+    return std::stoi(bitNum)-1;
+  }
+  std::string var, varSlice;
+  split_slice(varAndSlice, var, varSlice);
+  if(!varSlice.empty())
+    return get_end(varSlice);
+  auto idxPairs = varWidth.get_idx_pair(var, "find_version_num for: "+var);
+  return idxPairs.first;
+}
+
+
+uint32_t get_lgc_lo(std::string varAndSlice) {
   if(is_number(varAndSlice))
     return 0;
   std::string var, varSlice;
@@ -237,6 +263,19 @@ uint32_t get_lo(std::string varAndSlice) {
     }
     return get_begin(varSlice);
   }
+  auto idxPairs = varWidth.get_idx_pair(var, "find_version_num for: "+var);
+  return idxPairs.second;
+}
+
+
+uint32_t get_ltr_lo(std::string varAndSlice) {
+  if(is_number(varAndSlice))
+    return 0;
+  std::string var, varSlice;
+  split_slice(varAndSlice, var, varSlice);
+
+  if(!varSlice.empty())
+    return get_begin(varSlice);
   auto idxPairs = varWidth.get_idx_pair(var, "find_version_num for: "+var);
   return idxPairs.second;
 }

@@ -15,3 +15,6 @@ tmp:
 
 ad:
 	../func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/advanced 0
+
+ad1:
+	../func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/advanced 1

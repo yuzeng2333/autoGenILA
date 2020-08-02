@@ -52,9 +52,13 @@ bool is_case_dest(std::string var);
 
 uint32_t get_pos_of_one(std::string value);
 
-uint32_t get_hi(std::string varAndSlice);
+uint32_t get_lgc_hi(std::string varAndSlice);
 
-uint32_t get_lo(std::string varAndSlice);
+uint32_t get_ltr_hi(std::string varAndSlice);
+
+uint32_t get_lgc_lo(std::string varAndSlice);
+
+uint32_t get_ltr_lo(std::string varAndSlice);
 
 bool is_number(const std::string& s);
 

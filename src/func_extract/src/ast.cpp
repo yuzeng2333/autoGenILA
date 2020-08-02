@@ -106,6 +106,9 @@ void add_sliced_node(std::string varAndSlice, uint32_t timeIdx, astNode* const n
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
   assert(varSlice.empty());
+  if(var.find("u0.word") != std::string::npos) {
+    toCoutVerb("Found it!");
+  }
 
   node->type = SRC_CONCAT;
   node->dest = var;
@@ -115,8 +118,8 @@ void add_sliced_node(std::string varAndSlice, uint32_t timeIdx, astNode* const n
   node->done = false;
 
   auto srcVec = reg2Slices[var];
-  uint32_t srcHi = get_hi(srcVec.front());
-  uint32_t srcLo = get_lo(srcVec.back());
+  uint32_t srcHi = get_ltr_hi(srcVec.front());
+  uint32_t srcLo = get_ltr_lo(srcVec.back());
   auto idxPairs = varWidth.get_idx_pair(var, "add_sliced_node for:"+var);
   uint32_t destHi = idxPairs.first;
   uint32_t destLo = idxPairs.second;
