@@ -1,616 +1,415 @@
-Begin main!
-Sat Aug  1 15:33:57 2020
-### Begin parse_verilog
-Reset value is manually specified!
-### Begin build_ast_tree
-### Begin build: word
-Add nb node for :word
-!! Add child _00_ to word
-Add ssa node for :_00_
-process Ite line for:   assign _00_ = rst ? 9'h000 : word_next;
-!! Add child rst to _00_
-Process input node: rst
-!! Add child 9'h000 to _00_
-Process num node: 9'h000
-!! Add child word_next to _00_
-Add ssa node for :word_next
-process Ite line for:   assign word_next = _02_ ? inWord : word;
-!! Add child _02_ to word_next
-Add ssa node for :_02_
-Process Two op for :  assign _02_ = func == 1'h1;
-!! Add child func to _02_
-Process input node: func
-!! Add child 1'h1 to _02_
-Process num node: 1'h1
-!! Add child inWord to word_next
-Process input node: inWord
-!! Add child word to word_next
-### Begin build: word_sum
-Add nb node for :word_sum
-!! Add child _01_ to word_sum
-Add ssa node for :_01_
-process Ite line for:   assign _01_ = rst ? 9'h000 : \u0.out ;
-!! Add child rst to _01_
-!! Add child 9'h000 to _01_
-!! Add child \u0.out to _01_
-Add nb node for :\u0.out
-!! Add child fangyuan2 to \u0.out
-Add ssa node for :fangyuan2
-Process Reduce One op for :  assign fangyuan2 = { _11_[8:6], \u0.stg2_nxt };
-!! Add child _11_[8:6] to fangyuan2
-Add ssa node for :_11_[8:6]
-Process Sel op for :  assign _11_[8:6] = fangyuan0 [8 : 6];
-!! Add child fangyuan0 to _11_[8:6]
-Add ssa node for :fangyuan0
-Process Two op for :  assign fangyuan0 = fangyuan1 & 9'h19d;
-!! Add child fangyuan1 to fangyuan0
-Add ssa node for :fangyuan1
-Process Reduce One op for :  assign fangyuan1 = { \u0.stg1 , \u0.stg1 };
-!! Add child \u0.stg1 to fangyuan1
-Add nb node for :\u0.stg1
-!! Add child \u0.stg1_nxt to \u0.stg1
-Add ssa node for :\u0.stg1_nxt
-Process Two op for :  assign \u0.stg1_nxt = _07_ + \u0.word [8];
-!! Add child _07_ to \u0.stg1_nxt
-Add ssa node for :_07_
-Process Two op for :  assign _07_ = _06_ + \u0.word [7];
-!! Add child _06_ to _07_
-Add ssa node for :_06_
-Process Two op for :  assign _06_ = _05_ + \u0.word [6];
-!! Add child _05_ to _06_
-Add ssa node for :_05_
-Process Two op for :  assign _05_ = _04_ + \u0.word [5];
-!! Add child _04_ to _05_
-Add ssa node for :_04_
-Process Two op for :  assign _04_ = _10_ + \u0.word [4];
-!! Add child _10_ to _04_
-Add ssa node for :_10_
-Process Two op for :  assign _10_ = _09_ + \u0.word [3];
-!! Add child _09_ to _10_
-Add ssa node for :_09_
-Process Two op for :  assign _09_ = _08_ + \u0.word [2];
-!! Add child _08_ to _09_
-Add ssa node for :_08_
-Process Two op for :  assign _08_ = \u0.word [0] + \u0.word [1];
-!! Add child \u0.word [0] to _08_
-Add ssa node for :\u0.word
-process Ite line for:   assign \u0.word = _03_ ? word : 9'h000;
-!! Add child _03_ to \u0.word
-Add ssa node for :_03_
-Process Two op for :  assign _03_ = func == 2'h2;
-!! Add child func to _03_
-!! Add child 2'h2 to _03_
-Process num node: 2'h2
-!! Add child word to \u0.word
-!! Add child 9'h000 to \u0.word
-!! Add child \u0.word [1] to _08_
-!! Add child \u0.word [2] to _09_
-!! Add child \u0.word [3] to _10_
-!! Add child \u0.word [4] to _04_
-!! Add child \u0.word [5] to _05_
-!! Add child \u0.word [6] to _06_
-!! Add child \u0.word [7] to _07_
-!! Add child \u0.word [8] to \u0.stg1_nxt
-!! Add child \u0.stg1 to fangyuan1
-!! Add child 9'h19d to fangyuan0
-Process num node: 9'h19d
-!! Add child 8 to _11_[8:6]
-Process num node: 8
-!! Add child \u0.stg2_nxt to fangyuan2
-Add ssa node for :\u0.stg2_nxt
-Process Sel op for :  assign \u0.stg2_nxt = fangyuan0 [5 : 0];
-!! Add child fangyuan0 to \u0.stg2_nxt
-!! Add child 5 to \u0.stg2_nxt
-Process num node: 5
-### Begin check_all_regs
-###### Begin checking SAT! 
----  BEGIN INSTRUCTION #1 ---
-========== Begin check SAT for: word ==========
-### Begin bound: 0
-Add nb constraint for: word ------  time: 0
-Add ssa constraint for: _00_ ------  time: 1
-Ite op constraint for :_00_
-Add ssa constraint for: word_next ------  time: 1
-Ite op constraint for :word_next
-Add ssa constraint for: _02_ ------  time: 1
-Two op constraint for :_02_
-push into dirty queue: word
--------- Begin Add all clean ----------
--------- Begin Add all dirty ----------
-Add dirty constraint for: word ------  time: 1
--------- Begin add input vals ----------
-Assign 1'd0 to rst___#1
-Assign x to inWord___#1
-Assign 2'd1 to func___#1
-+++++++ Solution found for word, bound: 0 +++++++++
-_00____#1 = #b000000000
-_00____#1_T = #b000000000
-_02____#1 = #b1
-_02____#1_T = #b0
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ func___#1 = #b01
-func___#1_T = #b00
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ inWord___#1 = #b000000000
-inWord___#1_T = #b000000000
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rst___#1 = #b0
-rst___#1_T = #b0
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ word___#0 = #b000000000
-word___#0_T = #b000000000
-word___#1_T = #b111111111
-word_next___#1 = #b000000000
-word_next___#1_T = #b000000000
-Add nb constraint for: word ------  time: 0
-Add ssa constraint for: _00_ ------  time: 1
-Ite op constraint for :_00_
-input value for rst: bv
-Add ssa constraint for: word_next ------  time: 1
-Ite op constraint for :word_next
-Add ssa constraint for: _02_ ------  time: 1
-Two op constraint for :_02_
-input value for func: bv
-*************************  Update function for word
-(goals
-(goal
-  (= |word___#100| |inWord___#1|))
-)
--------- Begin Add all clean ----------
--------- Begin Add all dirty ----------
-Add dirty constraint for: word ------  time: 1
--------- Begin add input vals ----------
-Assign 1'd0 to rst___#1
-Assign x to inWord___#1
-Assign 2'd1 to func___#1
-------- No more solution found within the bound: 0 ----------
-### Begin bound: 1
-Add nb constraint for: word ------  time: 1
-Add ssa constraint for: _00_ ------  time: 2
-Ite op constraint for :_00_
-Add ssa constraint for: word_next ------  time: 2
-Ite op constraint for :word_next
-Add ssa constraint for: _02_ ------  time: 2
-Two op constraint for :_02_
-push into dirty queue: word
--------- Begin Add all clean ----------
--------- Begin Add all dirty ----------
-Add dirty constraint for: word ------  time: 2
--------- Begin add input vals ----------
-Assign 1'd0 to rst___#2
-Assign x to inWord___#2
-Assign 2'd1 to func___#2
-+++++++ Solution found for word, bound: 1 +++++++++
-_00____#1 = #b000000000
-_00____#1_T = #b000000000
-_00____#2 = #b000000000
-_00____#2_T = #b000000000
-_02____#1 = #b0
-_02____#1_T = #b0
-_02____#2 = #b1
-_02____#2_T = #b0
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ func___#1 = #b00
-func___#1_T = #b00
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ func___#2 = #b01
-func___#2_T = #b00
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ inWord___#1 = #b000000000
-inWord___#1_T = #b000000000
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ inWord___#2 = #b000000000
-inWord___#2_T = #b000000000
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rst___#1 = #b0
-rst___#1_T = #b0
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rst___#2 = #b0
-rst___#2_T = #b0
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ word___#0 = #b000000000
-word___#0_T = #b000000000
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ word___#1 = #b000000000
-word___#1_T = #b000000000
-word___#2_T = #b111111111
-word_next___#1 = #b000000000
-word_next___#1_T = #b000000000
-word_next___#2 = #b000000000
-word_next___#2_T = #b000000000
-Add nb constraint for: word ------  time: 0
-Add ssa constraint for: _00_ ------  time: 1
-Ite op constraint for :_00_
-input value for rst: bv
-Add ssa constraint for: word_next ------  time: 1
-Ite op constraint for :word_next
-Add ssa constraint for: _02_ ------  time: 1
-Two op constraint for :_02_
-input value for func: bv
-Add nb constraint for: word ------  time: 1
-Add ssa constraint for: _00_ ------  time: 2
-Ite op constraint for :_00_
-input value for rst: bv
-Add ssa constraint for: word_next ------  time: 2
-Ite op constraint for :word_next
-Add ssa constraint for: _02_ ------  time: 2
-Two op constraint for :_02_
-input value for func: bv
-*************************  Update function for word
-(goals
-(goal
-  (= |word___#100| |inWord___#2|))
-)
-Fix value for inWord___#1_T
-Fix value for inWord___#1
--------- Begin Add all clean ----------
--------- Begin Add all dirty ----------
-Add dirty constraint for: word ------  time: 2
--------- Begin add input vals ----------
-Assign 1'd0 to rst___#2
-Assign x to inWord___#2
-Assign 2'd1 to func___#2
-------- No more solution found within the bound: 1 ----------
----  BEGIN INSTRUCTION #2 ---
-========== Begin check SAT for: word_sum ==========
-### Begin bound: 1
-wack found! time: 0
-Add nb constraint for: word_sum ------  time: 0
-Add ssa constraint for: _01_ ------  time: 1
-Ite op constraint for :_01_
-Add nb constraint for: \u0.out ------  time: 1
-Add ssa constraint for: fangyuan2 ------  time: 2
-Src concat op constraint for: fangyuan2
-Add ssa constraint for: _11_[8:6] ------  time: 2
-Sel op constraint for :_11_[8:6]
-Add ssa constraint for: fangyuan0 ------  time: 2
-Two op constraint for :fangyuan0
-Add ssa constraint for: fangyuan1 ------  time: 2
-Src concat op constraint for: fangyuan1
-Found it!
-push into dirty queue: \u0.stg1
-Finished idx: 1 for: fangyuan1
-blank1
-blank2
-Finished idx: 0 for: fangyuan1
-blank1
-blank2
-Found it!
-Finished idx: 1 for: fangyuan1
-blank1
-blank2
-Finished idx: 0 for: fangyuan1
-blank1
-blank2
-Add ssa constraint for: \u0.stg2_nxt ------  time: 2
-Sel op constraint for :\u0.stg2_nxt
-Finished idx: 1 for: fangyuan2
-blank1
-blank2
-Finished idx: 0 for: fangyuan2
-blank1
-blank2
-Finished idx: 1 for: fangyuan2
-blank1
-blank2
-Finished idx: 0 for: fangyuan2
-blank1
-blank2
--------- Begin Add all clean ----------
--------- Begin Add all dirty ----------
-Add dirty constraint for: \u0.stg1 ------  time: 2
--------- Begin add input vals ----------
-Assign 1'd0 to rst___#2
-Assign x to inWord___#2
-Assign 2'd2 to func___#2
-------- No more solution found within the bound: 1 ----------
-### Begin bound: 2
-Add nb constraint for: \u0.stg1 ------  time: 2
-Add ssa constraint for: \u0.stg1_nxt ------  time: 3
-Two op constraint for :\u0.stg1_nxt
-Add ssa constraint for: _07_ ------  time: 3
-Two op constraint for :_07_
-Add ssa constraint for: _06_ ------  time: 3
-Two op constraint for :_06_
-Add ssa constraint for: _05_ ------  time: 3
-Two op constraint for :_05_
-Add ssa constraint for: _04_ ------  time: 3
-Two op constraint for :_04_
-Add ssa constraint for: _10_ ------  time: 3
-Two op constraint for :_10_
-Add ssa constraint for: _09_ ------  time: 3
-Two op constraint for :_09_
-Add ssa constraint for: _08_ ------  time: 3
-Two op constraint for :_08_
-Add ssa constraint for: \u0.word ------  time: 3
-Ite op constraint for :\u0.word
-Add ssa constraint for: _03_ ------  time: 3
-Two op constraint for :_03_
--------- Begin Add all clean ----------
--------- Begin Add all dirty ----------
--------- Begin add input vals ----------
-Assign 1'd0 to rst___#3
-Assign x to inWord___#3
-Assign 2'd2 to func___#3
-+++++++ Solution found for word_sum, bound: 2 +++++++++
-\u0.out___#1 = #b000000000
-\u0.out___#1_T = #b000000000
-\u0.stg1___#2 = #x0
-\u0.stg1___#2_T = #x0
-\u0.stg1_nxt___#3 = #x0
-\u0.stg1_nxt___#3_T = #x0
-\u0.stg2_nxt___#2 = #b000000
-\u0.stg2_nxt___#2_T = #b000000
-\u0.word___#3 = #b000000000
-\u0.word___#3_T = #b000000000
-\u0.word___#3_T = #b0
-_01____#1 = #b000000000
-_01____#1_T = #b000000000
-_03____#3 = #b1
-_03____#3_T = #b0
-_04____#3 = #x0
-_04____#3_T = #x0
-_05____#3 = #x0
-_05____#3_T = #x0
-_06____#3 = #x0
-_06____#3_T = #x0
-_07____#3 = #x0
-_07____#3_T = #x0
-_08____#3 = #b00
-_08____#3_T = #b00
-_09____#3 = #b000
-_09____#3_T = #b000
-_10____#3 = #x0
-_10____#3_T = #x0
-_11____#2 = #b000000000
-_11____#2_T = #b000000000
-fangyuan0___#2 = #b000000000
-fangyuan0___#2_T = #b000000000
-fangyuan1___#2 = #x00
-fangyuan1___#2_T = #x00
-fangyuan2___#2 = #b000000000
-fangyuan2___#2_T = #b000000000
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ func___#1 = #b00
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ func___#2 = #b00
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ func___#3 = #b10
-func___#3_T = #b00
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ inWord___#1 = #b000000000
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ inWord___#2 = #b000000000
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ inWord___#3 = #b000000000
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rst___#1 = #b0
-rst___#1_T = #b0
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rst___#2 = #b0
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rst___#3 = #b0
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ word___#3 = #b000000000
-word___#3_T = #b000000000
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ word_sum___#0 = #b000000000
-word_sum___#0_T = #b000000000
-wack found! time: 0
-Add nb constraint for: word_sum ------  time: 0
-Add ssa constraint for: _01_ ------  time: 1
-Ite op constraint for :_01_
-input value for rst: bv
-Add nb constraint for: \u0.out ------  time: 1
-Add ssa constraint for: fangyuan2 ------  time: 2
-Src concat op constraint for: fangyuan2
-Add ssa constraint for: _11_[8:6] ------  time: 2
-Sel op constraint for :_11_[8:6]
-Add ssa constraint for: fangyuan0 ------  time: 2
-Two op constraint for :fangyuan0
-Add ssa constraint for: fangyuan1 ------  time: 2
-Src concat op constraint for: fangyuan1
-Found it!
-Add nb constraint for: \u0.stg1 ------  time: 2
-Add ssa constraint for: \u0.stg1_nxt ------  time: 3
-Two op constraint for :\u0.stg1_nxt
-Add ssa constraint for: _07_ ------  time: 3
-Two op constraint for :_07_
-Add ssa constraint for: _06_ ------  time: 3
-Two op constraint for :_06_
-Add ssa constraint for: _05_ ------  time: 3
-Two op constraint for :_05_
-Add ssa constraint for: _04_ ------  time: 3
-Two op constraint for :_04_
-Add ssa constraint for: _10_ ------  time: 3
-Two op constraint for :_10_
-Add ssa constraint for: _09_ ------  time: 3
-Two op constraint for :_09_
-Add ssa constraint for: _08_ ------  time: 3
-Two op constraint for :_08_
-Add ssa constraint for: \u0.word ------  time: 3
-Ite op constraint for :\u0.word
-Add ssa constraint for: _03_ ------  time: 3
-Two op constraint for :_03_
-input value for func: bv
-Finished idx: 1 for: fangyuan1
-blank1
-blank2
-Finished idx: 0 for: fangyuan1
-blank1
-blank2
-Add ssa constraint for: \u0.stg2_nxt ------  time: 2
-Sel op constraint for :\u0.stg2_nxt
-Finished idx: 1 for: fangyuan2
-blank1
-blank2
-Finished idx: 0 for: fangyuan2
-blank1
-blank2
-Found it!
-*************************  Update function for word_sum
-(goals
-(goal
-  (let ((a!1 (concat #x0
-                     (bvadd ((_ extract 0 0) |word___#3|)
-                            ((_ extract 1 1) |word___#3|)
-                            ((_ extract 2 2) |word___#3|)
-                            ((_ extract 3 3) |word___#3|)
-                            ((_ extract 4 4) |word___#3|)
-                            ((_ extract 5 5) |word___#3|)
-                            ((_ extract 6 6) |word___#3|)
-                            ((_ extract 7 7) |word___#3|)
-                            ((_ extract 8 8) |word___#3|))
-                     #b00
-                     (bvadd (concat #b0 ((_ extract 0 0) |word___#3|))
-                            (concat #b0 ((_ extract 1 1) |word___#3|))
-                            (concat #b0 ((_ extract 2 2) |word___#3|))
-                            (concat #b0 ((_ extract 3 3) |word___#3|))
-                            (concat #b0 ((_ extract 4 4) |word___#3|))
-                            (concat #b0 ((_ extract 5 5) |word___#3|))
-                            (concat #b0 ((_ extract 6 6) |word___#3|))
-                            (concat #b0 ((_ extract 7 7) |word___#3|))
-                            (concat #b0 ((_ extract 8 8) |word___#3|))))))
-    (= |word_sum___#100| a!1)))
-)
-Fix value for inWord___#2
--------- Begin Add all clean ----------
--------- Begin Add all dirty ----------
--------- Begin add input vals ----------
-Assign 1'd0 to rst___#3
-Assign x to inWord___#3
-Assign 2'd2 to func___#3
-------- No more solution found within the bound: 2 ----------
-### Begin bound: 3
-Add nb constraint for: word ------  time: 3
-Add ssa constraint for: _00_ ------  time: 4
-Ite op constraint for :_00_
-Add ssa constraint for: word_next ------  time: 4
-Ite op constraint for :word_next
-Add ssa constraint for: _02_ ------  time: 4
-Two op constraint for :_02_
--------- Begin Add all clean ----------
--------- Begin Add all dirty ----------
--------- Begin add input vals ----------
-Assign 1'd0 to rst___#4
-Assign x to inWord___#4
-Assign 2'd2 to func___#4
-+++++++ Solution found for word_sum, bound: 3 +++++++++
-\u0.out___#1 = #b000000000
-\u0.out___#1_T = #b000000000
-\u0.stg1___#2 = #x0
-\u0.stg1___#2_T = #x0
-\u0.stg1_nxt___#3 = #x0
-\u0.stg1_nxt___#3_T = #x0
-\u0.stg2_nxt___#2 = #b000000
-\u0.stg2_nxt___#2_T = #b000000
-\u0.word___#3 = #b000000000
-\u0.word___#3_T = #b000000000
-\u0.word___#3_T = #b0
-_00____#4 = #b000000000
-_00____#4_T = #b000000000
-_01____#1 = #b000000000
-_01____#1_T = #b000000000
-_02____#4 = #b0
-_02____#4_T = #b0
-_03____#3 = #b0
-_03____#3_T = #b0
-_04____#3 = #x0
-_04____#3_T = #x0
-_05____#3 = #x0
-_05____#3_T = #x0
-_06____#3 = #x0
-_06____#3_T = #x0
-_07____#3 = #x0
-_07____#3_T = #x0
-_08____#3 = #b00
-_08____#3_T = #b00
-_09____#3 = #b000
-_09____#3_T = #b000
-_10____#3 = #x0
-_10____#3_T = #x0
-_11____#2 = #b000000000
-_11____#2_T = #b000000000
-fangyuan0___#2 = #b000000000
-fangyuan0___#2_T = #b000000000
-fangyuan1___#2 = #x00
-fangyuan1___#2_T = #x00
-fangyuan2___#2 = #b000000000
-fangyuan2___#2_T = #b000000000
++++++++ Solution found for word_sum, bound: 6 +++++++++
+\u0.cnt___#2 = #b00
+\u0.cnt___#2_T = #b10
+\u0.cnt___#3 = #b00
+\u0.cnt___#3_T = #b00
+\u0.cnt___#4 = #b01
+\u0.cnt___#4_T = #b00
+\u0.cnt___#5 = #b01
+\u0.cnt___#5_T = #b11
+\u0.cnt___#6 = #b00
+\u0.cnt___#6_T = #b11
+\u0.cnt___#7 = #b00
+\u0.cnt___#7_T = #b11
+\u0.cnt_nxt___#3 = #b00
+\u0.cnt_nxt___#3_T = #b10
+\u0.cnt_nxt___#4 = #b00
+\u0.cnt_nxt___#4_T = #b00
+\u0.cnt_nxt___#5 = #b01
+\u0.cnt_nxt___#5_T = #b00
+\u0.cnt_nxt___#6 = #b01
+\u0.cnt_nxt___#6_T = #b11
+\u0.cnt_nxt___#7 = #b00
+\u0.cnt_nxt___#7_T = #b11
+\u0.stg1___#3 = #x0
+\u0.stg1___#3_T = #x0
+\u0.stg1___#4 = #x0
+\u0.stg1___#4_T = #x0
+\u0.stg1___#5 = #x0
+\u0.stg1___#5_T = #x0
+\u0.stg1___#6 = #x6
+\u0.stg1___#6_T = #x0
+\u0.stg1___#7 = #x6
+\u0.stg1___#7_T = #xf
+\u0.stg1_nxt___#4 = #b000
+\u0.stg1_nxt___#4_T = #b000
+\u0.stg1_nxt___#5 = #b000
+\u0.stg1_nxt___#5_T = #b000
+\u0.stg1_nxt___#6 = #b000
+\u0.stg1_nxt___#6_T = #b000
+\u0.stg1_nxt___#7 = #b110
+\u0.stg1_nxt___#7_T = #b000
+\u0.stg1_vld___#3 = #b0
+\u0.stg1_vld___#3_T = #b0
+\u0.stg1_vld___#4 = #b0
+\u0.stg1_vld___#4_T = #b0
+\u0.stg1_vld___#5 = #b0
+\u0.stg1_vld___#5_T = #b0
+\u0.stg1_vld___#6 = #b1
+\u0.stg1_vld___#6_T = #b0
+\u0.stg1_vld___#7 = #b1
+\u0.stg1_vld___#7_T = #b1
+\u0.stg2___#2 = #xa
+\u0.stg2___#2_T = #x0
+\u0.stg2___#3 = #xa
+\u0.stg2___#3_T = #x0
+\u0.stg2___#4 = #xa
+\u0.stg2___#4_T = #x0
+\u0.stg2___#5 = #x0
+\u0.stg2___#5_T = #x0
+\u0.stg2___#6 = #x0
+\u0.stg2___#6_T = #xf
+\u0.stg2___#7_T = #xf
+\u0.stg2_nxt___#3 = #xa
+\u0.stg2_nxt___#3_T = #x0
+\u0.stg2_nxt___#4 = #xa
+\u0.stg2_nxt___#4_T = #x0
+\u0.stg2_nxt___#5 = #xa
+\u0.stg2_nxt___#5_T = #x0
+\u0.stg2_nxt___#6 = #x0
+\u0.stg2_nxt___#6_T = #x0
+\u0.stg2_nxt___#7 = #x0
+\u0.stg2_nxt___#7_T = #xf
+\u0.stg2_vld___#2 = #b0
+\u0.stg2_vld___#2_T = #b0
+\u0.stg2_vld___#3 = #b0
+\u0.stg2_vld___#3_T = #b0
+\u0.stg2_vld___#4 = #b0
+\u0.stg2_vld___#4_T = #b0
+\u0.stg2_vld___#5 = #b1
+\u0.stg2_vld___#5_T = #b0
+\u0.stg2_vld___#6 = #b1
+\u0.stg2_vld___#6_T = #b1
+\u0.stg2_vld___#7 = #b0
+\u0.stg2_vld___#7_T = #b1
+\u0.stg3___#1 = #x1
+\u0.stg3___#1_T = #x0
+\u0.stg3___#2 = #x1
+\u0.stg3___#2_T = #x0
+\u0.stg3___#3 = #x1
+\u0.stg3___#3_T = #x0
+\u0.stg3___#4 = #x0
+\u0.stg3___#4_T = #x0
+\u0.stg3___#5 = #x0
+\u0.stg3___#5_T = #xf
+\u0.stg3___#6 = #x1
+\u0.stg3___#6_T = #xf
+\u0.stg3___#7 = #x1
+\u0.stg3___#7_T = #xf
+\u0.stg3_nxt___#2 = #x1
+\u0.stg3_nxt___#2_T = #x0
+\u0.stg3_nxt___#3 = #x1
+\u0.stg3_nxt___#3_T = #x0
+\u0.stg3_nxt___#4 = #x1
+\u0.stg3_nxt___#4_T = #x0
+\u0.stg3_nxt___#5 = #x0
+\u0.stg3_nxt___#5_T = #x0
+\u0.stg3_nxt___#6 = #x0
+\u0.stg3_nxt___#6_T = #xf
+\u0.stg3_nxt___#7 = #x1
+\u0.stg3_nxt___#7_T = #xf
+\u0.valid___#4 = #b0
+\u0.valid___#4_T = #b0
+\u0.valid___#5 = #b0
+\u0.valid___#5_T = #b0
+\u0.valid___#6 = #b0
+\u0.valid___#6_T = #b0
+\u0.valid___#7 = #b1
+\u0.valid___#7_T = #b0
+\u0.word___#4 = #b000000000
+\u0.word___#4_T = #b000000000
+\u0.word___#5 = #b000000000
+\u0.word___#5_T = #b000000000
+\u0.word___#6 = #b000000000
+\u0.word___#6_T = #b000000000
+\u0.word___#7 = #b001001001
+\u0.word___#7_T = #b000000000
+_00____#5 = #b001001001
+_00____#5_T = #b000000000
+_00____#6 = #b001001001
+_00____#6_T = #b000000000
+_00____#7 = #b001001001
+_00____#7_T = #b000000000
+_01____#1 = #x1
+_01____#1_T = #x0
+_02____#5 = #b0
+_02____#5_T = #b0
+_02____#6 = #b0
+_02____#6_T = #b0
+_02____#7 = #b0
+_02____#7_T = #b0
+_03____#3 = #b01
+_03____#3_T = #b00
+_03____#4 = #b10
+_03____#4_T = #b00
+_03____#5 = #b10
+_03____#5_T = #b11
+_03____#6 = #b01
+_03____#6_T = #b11
+_03____#7 = #b01
+_03____#7_T = #b11
+_04____#3 = #x00000000
+_04____#3_T = #b01
+_04____#3_T = #x00000000
+_04____#4 = #x00000000
+_04____#4_T = #x00000000
+_04____#4_T = #b10
+_04____#5 = #x00000000
+_04____#5_T = #b00
+_04____#5_T = #x00000003
+_04____#6 = #x00000000
+_04____#6_T = #x00000003
+_04____#6_T = #b00
+_04____#7 = #x00000000
+_04____#7_T = #b00
+_04____#7_T = #x00000003
+_05____#3 = #x00000000
+_05____#3_T = #x00000001
+_05____#3_T = #b10
+_05____#4 = #x00000000
+_05____#4_T = #b00
+_05____#4_T = #x00000002
+_05____#5 = #x00000000
+_05____#5_T = #x00000003
+_05____#6 = #x00000000
+_05____#6_T = #x00000003
+_05____#7 = #x00000000
+_05____#7_T = #x00000003
+_05____#7_T = #b00
+_06____#2 = #b1
+_06____#2_T = #b0
+_06____#3 = #b1
+_06____#3_T = #b0
+_06____#4 = #b0
+_06____#4_T = #b0
+_06____#5 = #b0
+_06____#5_T = #b0
+_06____#6 = #b1
+_06____#6_T = #b0
+_06____#7 = #b1
+_06____#7_T = #b0
+_07____#3 = #b1
+_07____#3_T = #b0
+_07____#4 = #b1
+_07____#4_T = #b0
+_07____#5 = #b1
+_07____#5_T = #b1
+_07____#6 = #b1
+_07____#6_T = #b1
+_07____#7 = #b1
+_07____#7_T = #b1
+_08____#3 = #b0
+_08____#3_T = #b0
+_08____#4 = #b1
+_08____#4_T = #b0
+_08____#5 = #b1
+_08____#5_T = #b1
+_08____#6 = #b0
+_08____#6_T = #b1
+_08____#7 = #b0
+_08____#7_T = #b1
+_09____#3 = #b0
+_09____#3_T = #b0
+_09____#4 = #b0
+_09____#4_T = #b0
+_09____#5 = #b0
+_09____#5_T = #b1
+_09____#6 = #b0
+_09____#6_T = #b1
+_09____#7 = #b0
+_09____#7_T = #b1
+_10____#3 = #b0
+_10____#3_T = #b0
+_10____#4 = #b0
+_10____#4_T = #b0
+_10____#5 = #b0
+_10____#5_T = #b1
+_10____#6 = #b0
+_10____#6_T = #b1
+_10____#7 = #b0
+_10____#7_T = #b1
+_11____#2 = #b0
+_11____#2_T = #b0
+_11____#3 = #b0
+_11____#3_T = #b0
+_11____#4 = #b1
+_11____#4_T = #b0
+_11____#5 = #b1
+_11____#5_T = #b0
+_11____#6 = #b0
+_11____#6_T = #b0
+_11____#7 = #b0
+_11____#7_T = #b0
+_12____#2 = #b0
+_12____#2_T = #b0
+_12____#3 = #b0
+_12____#3_T = #b0
+_12____#4 = #b0
+_12____#4_T = #b0
+_12____#5 = #b0
+_12____#5_T = #b0
+_12____#6 = #b0
+_12____#6_T = #b0
+_12____#7 = #b0
+_12____#7_T = #b0
+_13__ADJUSTED___#2 = #xf
+_13__ADJUSTED___#3 = #xf
+_13__ADJUSTED___#4 = #x0
+_13__ADJUSTED___#5 = #x0
+_13__ADJUSTED___#6 = #xf
+_13__ADJUSTED___#7 = #xf
+_13____#2 = #xffffffff
+_13____#2_T = #x80000006
+_13____#3 = #xffffffff
+_13____#3_T = #x82000000
+_13____#4 = #x00000000
+_13____#4_T = #x80040000
+_13____#5 = #x00000000
+_13____#5_T = #x80000003
+_13____#6 = #xffffffff
+_13____#6_T = #x80000003
+_13____#7 = #xffffffff
+_13____#7_T = #x80000003
+_14__ADJUSTED___#2 = #xe
+_14__ADJUSTED___#3 = #xe
+_14__ADJUSTED___#4 = #xf
+_14__ADJUSTED___#5 = #xf
+_14__ADJUSTED___#6 = #xe
+_14__ADJUSTED___#7 = #xe
+_14____#2 = #xfffffffe
+_14____#2_T = #x80000006
+_14____#3 = #xfffffffe
+_14____#3_T = #x80000800
+_14____#4 = #xffffffff
+_14____#4_T = #x80000004
+_14____#5 = #xffffffff
+_14____#5_T = #x80000003
+_14____#6 = #xfffffffe
+_14____#6_T = #x80000003
+_14____#7 = #xfffffffe
+_14____#7_T = #x80000003
+_15____#2 = #x1
+_15____#2_T = #x0
+_15____#3 = #x1
+_15____#3_T = #x0
+_15____#4 = #x1
+_15____#4_T = #x0
+_15____#5 = #x1
+_15____#5_T = #xf
+_15____#6 = #x1
+_15____#6_T = #xf
+_15____#7 = #x1
+_15____#7_T = #xf
+_16____#2 = #x1
+_16____#2_T = #x0
+_16____#3 = #x1
+_16____#3_T = #x0
+_16____#4 = #x1
+_16____#4_T = #x0
+_16____#5 = #x1
+_16____#5_T = #xf
+_16____#6 = #x1
+_16____#6_T = #xf
+_16____#7 = #x1
+_16____#7_T = #xf
+_17____#2 = #x1
+_17____#2_T = #x0
+_17____#3 = #x1
+_17____#3_T = #x0
+_17____#4 = #x1
+_17____#4_T = #x0
+_17____#5 = #x1
+_17____#5_T = #xf
+_17____#6 = #x1
+_17____#6_T = #xf
+_17____#7 = #x1
+_17____#7_T = #xf
+fangyuan0___#4 = #x0
+fangyuan0___#4_T = #x0
+fangyuan0___#5 = #x0
+fangyuan0___#5_T = #x0
+fangyuan0___#6 = #x0
+fangyuan0___#6_T = #x0
+fangyuan0___#7 = #x6
+fangyuan0___#7_T = #x0
+fangyuan1___#4 = #b000
+fangyuan1___#4_T = #b000
+fangyuan1___#5 = #b000
+fangyuan1___#5_T = #b000
+fangyuan1___#6 = #b000
+fangyuan1___#6_T = #b000
+fangyuan1___#7 = #b100
+fangyuan1___#7_T = #b000
+fangyuan2___#4 = #b000
+fangyuan2___#4_T = #b000
+fangyuan2___#5 = #b000
+fangyuan2___#5_T = #b000
+fangyuan2___#6 = #b000
+fangyuan2___#6_T = #b000
+fangyuan2___#7 = #b010
+fangyuan2___#7_T = #b000
+fangyuan3___#4 = #b000000000
+fangyuan3___#4_T = #b000000000
+fangyuan3___#5 = #b000000000
+fangyuan3___#5_T = #b000000000
+fangyuan3___#6 = #b000000000
+fangyuan3___#6_T = #b000000000
+fangyuan3___#7 = #b001001001
+fangyuan3___#7_T = #b000000000
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ func___#1 = #b00
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ func___#2 = #b00
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ func___#3 = #b00
-func___#3_T = #b00
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ func___#4 = #b10
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ func___#4 = #b00
 func___#4_T = #b00
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ func___#5 = #b00
+func___#5_T = #b00
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ func___#6 = #b00
+func___#6_T = #b00
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ func___#7 = #b10
+func___#7_T = #b00
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ inWord___#1 = #b000000000
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ inWord___#2 = #b000000000
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ inWord___#3 = #b000000000
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ inWord___#4 = #b000000000
-inWord___#4_T = #b000000000
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ inWord___#5 = #b000000000
+inWord___#5_T = #b000000000
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ inWord___#6 = #b000000000
+inWord___#6_T = #b000000000
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ inWord___#7 = #b000000000
+inWord___#7_T = #b000000000
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rst___#1 = #b0
 rst___#1_T = #b0
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rst___#2 = #b0
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rst___#3 = #b0
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rst___#4 = #b0
-rst___#4_T = #b0
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ word___#3 = #b000000000
-word___#3_T = #b000000000
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ word___#4 = #b000000000
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rst___#5 = #b0
+rst___#5_T = #b0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rst___#6 = #b0
+rst___#6_T = #b0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rst___#7 = #b0
+rst___#7_T = #b0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ word___#4 = #b001001001
 word___#4_T = #b000000000
-word_next___#4 = #b000000000
-word_next___#4_T = #b000000000
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ word_sum___#0 = #b000000000
-word_sum___#0_T = #b000000000
-wack found! time: 0
-Add nb constraint for: word_sum ------  time: 0
-Add ssa constraint for: _01_ ------  time: 1
-Ite op constraint for :_01_
-input value for rst: bv
-Add nb constraint for: \u0.out ------  time: 1
-Add ssa constraint for: fangyuan2 ------  time: 2
-Src concat op constraint for: fangyuan2
-Add ssa constraint for: _11_[8:6] ------  time: 2
-Sel op constraint for :_11_[8:6]
-Add ssa constraint for: fangyuan0 ------  time: 2
-Two op constraint for :fangyuan0
-Add ssa constraint for: fangyuan1 ------  time: 2
-Src concat op constraint for: fangyuan1
-Found it!
-Add nb constraint for: \u0.stg1 ------  time: 2
-Add ssa constraint for: \u0.stg1_nxt ------  time: 3
-Two op constraint for :\u0.stg1_nxt
-Add ssa constraint for: _07_ ------  time: 3
-Two op constraint for :_07_
-Add ssa constraint for: _06_ ------  time: 3
-Two op constraint for :_06_
-Add ssa constraint for: _05_ ------  time: 3
-Two op constraint for :_05_
-Add ssa constraint for: _04_ ------  time: 3
-Two op constraint for :_04_
-Add ssa constraint for: _10_ ------  time: 3
-Two op constraint for :_10_
-Add ssa constraint for: _09_ ------  time: 3
-Two op constraint for :_09_
-Add ssa constraint for: _08_ ------  time: 3
-Two op constraint for :_08_
-Add ssa constraint for: \u0.word ------  time: 3
-Ite op constraint for :\u0.word
-Add ssa constraint for: _03_ ------  time: 3
-Two op constraint for :_03_
-input value for func: bv
-Add nb constraint for: word ------  time: 3
-Add ssa constraint for: _00_ ------  time: 4
-Ite op constraint for :_00_
-input value for rst: bv
-Add ssa constraint for: word_next ------  time: 4
-Ite op constraint for :word_next
-Add ssa constraint for: _02_ ------  time: 4
-Two op constraint for :_02_
-input value for func: bv
-Finished idx: 1 for: fangyuan1
-blank1
-blank2
-Finished idx: 0 for: fangyuan1
-blank1
-blank2
-Add ssa constraint for: \u0.stg2_nxt ------  time: 2
-Sel op constraint for :\u0.stg2_nxt
-Finished idx: 1 for: fangyuan2
-blank1
-blank2
-Finished idx: 0 for: fangyuan2
-blank1
-blank2
-Found it!
-*************************  Update function for word_sum
-(goals
-(goal
-  (= |word_sum___#100| #b000000000))
-)
-Fix value for inWord___#3
--------- Begin Add all clean ----------
--------- Begin Add all dirty ----------
--------- Begin add input vals ----------
-Assign 1'd0 to rst___#4
-Assign x to inWord___#4
-Assign 2'd2 to func___#4
-------- No more solution found within the bound: 3 ----------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ word___#5 = #b001001001
+word___#5_T = #b000000000
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ word___#6 = #b001001001
+word___#6_T = #b000000000
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ word___#7 = #b001001001
+word___#7_T = #b000000000
+word_in___#4 = #b000000000
+word_in___#4_T = #b000000000
+word_in___#5 = #b000000000
+word_in___#5_T = #b000000000
+word_in___#6 = #b000000000
+word_in___#6_T = #b000000000
+word_in___#7 = #b000000001
+word_in___#7_T = #b000000000
+word_next___#5 = #b001001001
+word_next___#5_T = #b000000000
+word_next___#6 = #b001001001
+word_next___#6_T = #b000000000
+word_next___#7 = #b001001001
+word_next___#7_T = #b000000000
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ word_sum___#0 = #x1
+word_sum___#0_T = #x0
 

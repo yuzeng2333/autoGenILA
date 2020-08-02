@@ -140,6 +140,10 @@ void add_sliced_node(std::string varAndSlice, uint32_t timeIdx, astNode* const n
 void add_nb_node(std::string regAndSlice, uint32_t timeIdx, astNode* const node) {
   toCoutVerb("Add nb node for :" + regAndSlice);
   g_visitedNode.emplace(regAndSlice, node);
+  if(g_nbTable.find(regAndSlice) == g_nbTable.end()) {
+    toCout("Error: not in g_nbTable: "+regAndSlice);
+    abort();
+  }
   std::string destAssign = g_nbTable[regAndSlice];
   std::smatch m;
   if(std::regex_match(destAssign, m, pNonblock)) {
@@ -180,6 +184,10 @@ void add_ssa_node(std::string varAndSlice, uint32_t timeIdx, astNode* const node
     varAssign = g_ssaTable[varAndSlice];
   else if(g_ssaTable.find(var) != g_ssaTable.end())
     varAssign = g_ssaTable[var];
+  else {
+    toCout("Error: not in g_ssaTable:"+varAndSlice);
+    abort();
+  }
 
   uint32_t choice = parse_verilog_line(varAssign);
   switch( choice ) {
