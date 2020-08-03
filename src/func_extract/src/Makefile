@@ -18,3 +18,9 @@ ad:
 
 ad1:
 	../func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/advanced 1
+
+ex:
+	../func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/expand_key 0
+
+ex1:
+	../func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/expand_key 1

@@ -64,14 +64,14 @@ void clean_data() {
 // However, constructions for the two are quite different. AST tree is
 // constructed only one. But the SMT equation may need to be constructed
 // multiple times, until a solution is obtained or a bound is reached.
-void check_single_reg_and_slice(std::string regAndSlice, uint32_t cycleCnt) {
+void check_single_reg_and_slice(std::string destAndSlice, uint32_t cycleCnt) {
   std::ofstream outFile;
   outFile.open("./result.txt", std::ios_base::app);
-  g_rootNode = regAndSlice;
+  g_rootNode = destAndSlice;
   clean_data();
-  toCout("========== Begin check SAT for: "+regAndSlice+" ==========");
-  uint32_t regWidth = get_var_slice_width(regAndSlice);
-  CURRENT_VAR = regAndSlice;
+  toCout("========== Begin check SAT for: "+destAndSlice+" ==========");
+  uint32_t regWidth = get_var_slice_width(destAndSlice);
+  CURRENT_VAR = destAndSlice;
   uint32_t bound = cycleCnt > 0 ? cycleCnt-1 : 0;
   bound_limit = cycleCnt+2;
   bool z3Res = false;
@@ -93,7 +93,7 @@ void check_single_reg_and_slice(std::string regAndSlice, uint32_t cycleCnt) {
   if(g_print_solver)
     toCout("Add-Solver: rst___#1 == 0");
 
-  std::set<std::string> varToExpand{regAndSlice};
+  std::set<std::string> varToExpand{destAndSlice};
   s.push();
   bool lastHasSolution = false;
   bool curHasSolution = false;
@@ -115,11 +115,13 @@ void check_single_reg_and_slice(std::string regAndSlice, uint32_t cycleCnt) {
         abort();
       }
       astNode *root = g_varNode[pure(rootReg)];
-      if(root)
-        // TODO: remove one bound
-        add_nb_constraint(root, topTimeIdx, c, s, g, bound, /*isSolve=*/true, /*isBool=*/false, /*isRoot=*/true);
+      if(root) {
+        expr destExpr_t = var_expr(pure(rootReg), topTimeIdx, c, true);      
+        s.add( destExpr_t == 0 );
+        add_constraint(root, topTimeIdx, c, s, g, bound, true);
+      }
       else {
-        toCout(regAndSlice+" does not have its root!");
+        toCout(destAndSlice+" does not have its root!");
         abort();
       }
     }
@@ -152,8 +154,8 @@ void check_single_reg_and_slice(std::string regAndSlice, uint32_t cycleCnt) {
       s.pop();
       uint32_t j = 0;
       // only block values for varriables in CLEAN_QUEUE
-      toCout("+++++++ Solution found for "+regAndSlice+", bound: "+toStr(bound)+" +++++++++");
-      outFile << "+++++++ Solution found for "+regAndSlice+", bound: "+toStr(bound)+" +++++++++" << std::endl;
+      toCout("+++++++ Solution found for "+destAndSlice+", bound: "+toStr(bound)+" +++++++++");
+      outFile << "+++++++ Solution found for "+destAndSlice+", bound: "+toStr(bound)+" +++++++++" << std::endl;
 
       std::vector<std::pair<std::string, uint32_t>> varIdxPairVec;
       for (uint32_t i = 0; i < m.size(); i++)
@@ -190,11 +192,13 @@ void check_single_reg_and_slice(std::string regAndSlice, uint32_t cycleCnt) {
 
       // after getting one solution, build a goal and simplify it with input values
       g_existedExpr.clear();
-      add_nb_constraint(g_varNode[regAndSlice], 0, c, s, g, bound, /*isSolve=*/false, /*isBool=*/false, /*isRoot=*/true);
+      expr destNextExpr = add_constraint(g_varNode[destAndSlice], 0, c, s, g, bound, /*isSolve=*/false);
+      expr destExpr_g = var_expr(destAndSlice, 100, c, false);
+      g.add( destExpr_g == destNextExpr ); 
       //add_all_clean_constraints(c, s, g, bound, /*isSolve=*/false);
       tactic t(c, "simplify");
       apply_result r = t(g);
-      toCout("*************************  Update function for "+regAndSlice);
+      toCout("*************************  Update function for "+destAndSlice);
       std::cout << r << std::endl;
       outFile << r << std::endl;
       // if two goals are the same, then check the two solutions. If any
@@ -292,7 +296,7 @@ void check_single_reg_and_slice(std::string regAndSlice, uint32_t cycleCnt) {
 }
 
 
-expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve, bool isBool) {
+expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
   std::string var = node->dest;
   if(g_existedExpr.find(timed_name(var, timeIdx)) != g_existedExpr.end() ) {
     if(isSolve)
@@ -300,26 +304,17 @@ expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s
     else
       return *g_existedExpr[timed_name(var, timeIdx)];
   }
-  //if(node->srcVec.size() != node->childVec.size() && node->type != ITE) {
-  //  toCout("Error: srcVec and childVec has different length: "+node->dest);
-  //  abort();
-  //}
+
   expr retExpr(c);
-  //if(var.compare("fangyuan35") == 0) {
-  //  toCout("fangyuan35 found!");
-  //}
-  if ( isInput(var) ) { // input_t is always 0
-    retExpr = input_constraint(node, timeIdx, c, s, g, isSolve, isBool);
+  if(var.compare("out_2") == 0) {
+    toCout("Found it!");
   }
-  //else if ( isAs(var) ) {
-  //  if(var == CURRENT_VAR)
-  //    push_dirty_queue(node, timeIdx);
-  //  else
-  //    push_clean_queue(node, timeIdx);
-  //  return var_expr(var, timeIdx, c, false, isSolve);
-  //}
+  if ( isInput(var) ) { // input_t is always 0
+    retExpr = input_constraint(node, timeIdx, c, s, g, isSolve);
+  }
+
   else if( isReg(var) ) { // AS case is moved to add_nb_constraint
-    retExpr = add_nb_constraint(node, timeIdx, c, s, g, bound, isSolve, isBool);
+    retExpr = add_nb_constraint(node, timeIdx, c, s, g, bound, isSolve);
   }
   else if( is_number(var) ) { // num_t is always 0
     retExpr = num_constraint(node, timeIdx, c, s, g, isSolve);
@@ -328,7 +323,7 @@ expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s
     retExpr = case_constraint(node, timeIdx, c, s, g, bound, isSolve);
   }
   else { // it is wire
-    retExpr = add_ssa_constraint(node, timeIdx, c, s, g, bound, isSolve, isBool);
+    retExpr = add_ssa_constraint(node, timeIdx, c, s, g, bound, isSolve);
   }
   if(isSolve) {
     expr* newExprPnt = NULL;    
@@ -342,9 +337,9 @@ expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s
 }
 
 
-expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve, bool isBool, bool isRoot) {
+expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
   std::string dest = node->dest;
-  if(dest.compare("word_sum") == 0) {
+  if(dest.compare("out_2") == 0) {
     toCout("wack found! time: "+toStr(timeIdx));
   }
   expr destExpr = var_expr(dest, timeIdx, c, false);
@@ -371,29 +366,9 @@ expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
       if(g_print_solver) {
         toCout("Add-Solver: "+get_name(destExpr_t)+" == "+get_name(destNextExpr_t));
       }
-      if(isRoot && timeIdx == 0) {
-        if(destExpr_t.is_bool()) {
-          s.add( !destExpr_t );          
-        }
-        else
-          s.add( destExpr_t == 0 );
-        if(g_print_solver) {
-          toCout("Add-Solver: "+get_name(destExpr_t)+" == 0");
-        }
-      }
     }
-    else {
-      if(isRoot && timeIdx == 0) {
-        g.add( destExpr_g == destNextExpr );
-      }
-      else {
-        return destNextExpr;
-        //if(isInput(destNext)) {
-        //  expr localVal = *INPUT_EXPR_VAL[timed_name(destNext, timeIdx+1)];
-        //  g.add( destNextExpr = localVal );
-        //}
-      }
-    }
+    else
+      return destNextExpr;
   }
   else if(!isSolve && !is_read_asv(dest) && g_resetedReg.find(timed_name(dest, timeIdx)) != g_resetedReg.end()) {
     assert(INPUT_EXPR_VAL.find(timed_name(dest, timeIdx)) != INPUT_EXPR_VAL.end());
@@ -410,7 +385,7 @@ expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
 }
 
 
-expr add_ssa_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve, bool isBool) {
+expr add_ssa_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
   toCoutVerb("Add ssa constraint for: " + node->dest+" ------  time: "+toStr(timeIdx));
   std::string var = node->dest;
 

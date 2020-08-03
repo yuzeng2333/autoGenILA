@@ -96,13 +96,11 @@ expr bool_expr(std::string var, uint32_t timeIdx, context &c, bool isTaint) {
 }
 
 
-expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, bool isSolve, bool isBool) {
+expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, bool isSolve) {
   std::string dest = node->dest;
   expr destExpr_t(c);
   expr destExpr(c);
-  //if(isBool)
-  //  destExpr = bool_expr(dest, timeIdx, c);
-  //else
+
   destExpr = var_expr(dest, timeIdx, c, false);
   if(isSolve) {
     destExpr_t = var_expr(dest, timeIdx, c, true);
@@ -597,8 +595,8 @@ expr ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   expr destExpr = var_expr(destAndSlice, timeIdx, c, false);
   expr condExpr(c);
   
-  if(!condSlice.empty()) condExpr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve, true).extract(condHi, condLo);
-  else                   condExpr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve, true);
+  if(!condSlice.empty()) condExpr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve).extract(condHi, condLo);
+  else                   condExpr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve);
 
   expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
   expr condExpr_t = var_expr(condAndSlice, timeIdx, c, true);
@@ -659,7 +657,7 @@ expr case_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
   std::string caseVarAndSlice = node->srcVec[0];
   uint32_t caseHi = get_lgc_hi(caseVarAndSlice);
   uint32_t caseLo = get_lgc_lo(caseVarAndSlice);
-  expr caseExpr = add_constraint( node->childVec[0], timeIdx, c, s, g, bound, isSolve, false).extract(caseHi, caseLo);
+  expr caseExpr = add_constraint( node->childVec[0], timeIdx, c, s, g, bound, isSolve).extract(caseHi, caseLo);
   expr caseExpr_t = var_expr(caseVarAndSlice, timeIdx, c, true);
   expr assignVarExpr = add_constraint(node->childVec[1], timeIdx, c, s, g, bound, isSolve);
   expr assignVarExpr_t = var_expr(node->childVec[1]->dest, timeIdx, c, true);
@@ -731,13 +729,13 @@ expr add_one_case_branch_expr(astNode* const node, expr &caseExpr, uint32_t idx,
     assignNode = node->childVec[1];
     std::string caseValue = node->srcVec[idx];
     uint32_t posOfOne = get_pos_of_one(caseValue);
-    expr localAssignExpr = add_constraint(assignNode, timeIdx, c, s, g, bound, isSolve, false).extract(hi, lo);
+    expr localAssignExpr = add_constraint(assignNode, timeIdx, c, s, g, bound, isSolve).extract(hi, lo);
     expr localBranchExpr = add_one_case_branch_expr(node, caseExpr, idx+2, timeIdx, c, s, g, bound, isSolve);
     return ite(caseExpr.extract(posOfOne, posOfOne) == c.bv_val(1, 1), localAssignExpr, localBranchExpr);
   }
   else {
     assignNode = node->childVec[2];
-    return add_constraint(assignNode, timeIdx, c, s, g, bound, isSolve, false).extract(hi, lo);
+    return add_constraint(assignNode, timeIdx, c, s, g, bound, isSolve).extract(hi, lo);
   }
 } 
 
