@@ -37,8 +37,13 @@ expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTain
   split_slice(varAndSlice, var, varSlice);
   std::string varTimed;
   uint32_t localWidth;
-  if(width == 0)
-    localWidth = get_var_slice_width(varAndSlice);
+  if(width == 0) {
+    if(is_number(varAndSlice)) {
+      localWidth = get_num_len(varAndSlice);
+    }
+    else
+      localWidth = get_var_slice_width(varAndSlice);
+  }
   else
     localWidth = width;
 
@@ -660,7 +665,8 @@ expr case_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
   expr caseExpr = add_constraint( node->childVec[0], timeIdx, c, s, g, bound, isSolve).extract(caseHi, caseLo);
   expr caseExpr_t = var_expr(caseVarAndSlice, timeIdx, c, true);
   expr assignVarExpr = add_constraint(node->childVec[1], timeIdx, c, s, g, bound, isSolve);
-  expr assignVarExpr_t = var_expr(node->childVec[1]->dest, timeIdx, c, true);
+  expr assignVarExpr_t(c);
+  assignVarExpr_t = var_expr(node->childVec[1]->dest, timeIdx, c, true);
 
   std::string assignVarAndSlice;
   std::string caseValue;
@@ -682,7 +688,12 @@ expr case_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
         Lo = get_lgc_lo(assignVarAndSlice);
         if(caseValue.compare("default") == 0) {
           expr destExpr = var_expr(destAndSlice+"_CASE_"+toStr((i-1)/2), timeIdx, c, false, localWidth);
-          expr defaultVarExpr = add_constraint(node->childVec[2], timeIdx, c, s, g, bound, isSolve).extract(Hi, Lo);
+          expr defaultVarExpr(c);
+          if(isNum(assignVarAndSlice)) {
+            defaultVarExpr = var_expr(assignVarAndSlice, timeIdx, c, false);
+          }
+          else
+            defaultVarExpr = add_constraint(node->childVec[2], timeIdx, c, s, g, bound, isSolve).extract(Hi, Lo);
           s.add( destExpr == defaultVarExpr );
 
           // _t
@@ -698,8 +709,14 @@ expr case_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
           else
             destExpr = var_expr(destAndSlice, timeIdx, c, false, localWidth);
           expr lastAssignExpr = var_expr(destAndSlice+"_CASE_"+toStr((i+1)/2), timeIdx, c, false, localWidth);
-          s.add( destExpr == ite( caseExpr.extract(posOfOne, posOfOne) == c.bv_val(1, 1), assignVarExpr.extract(Hi, Lo), lastAssignExpr ) );
+          expr firstAssignExpr(c);
+          if(isNum(assignVarAndSlice)) {
+            firstAssignExpr = var_expr(assignVarAndSlice, timeIdx, c, false);
+          }
+          else
+            firstAssignExpr = assignVarExpr.extract(Hi, Lo);
 
+          s.add( destExpr == ite( caseExpr.extract(posOfOne, posOfOne) == c.bv_val(1, 1), firstAssignExpr, lastAssignExpr ) );
           // _t
           expr destExpr_t = var_expr(destAndSlice+"_CASE_"+toStr((i-1)/2), timeIdx, c, true, localWidth);
           expr lastAssignExpr_t = var_expr(destAndSlice+"_CASE_"+toStr((i+1)/2), timeIdx, c, true, localWidth);
@@ -729,13 +746,20 @@ expr add_one_case_branch_expr(astNode* const node, expr &caseExpr, uint32_t idx,
     assignNode = node->childVec[1];
     std::string caseValue = node->srcVec[idx];
     uint32_t posOfOne = get_pos_of_one(caseValue);
-    expr localAssignExpr = add_constraint(assignNode, timeIdx, c, s, g, bound, isSolve).extract(hi, lo);
+    expr localAssignExpr(c);
+    if(isNum(assignVarAndSlice))
+      localAssignExpr = var_expr(assignVarAndSlice, timeIdx, c, false);
+    else
+      localAssignExpr = add_constraint(assignNode, timeIdx, c, s, g, bound, isSolve).extract(hi, lo);
     expr localBranchExpr = add_one_case_branch_expr(node, caseExpr, idx+2, timeIdx, c, s, g, bound, isSolve);
     return ite(caseExpr.extract(posOfOne, posOfOne) == c.bv_val(1, 1), localAssignExpr, localBranchExpr);
   }
   else {
     assignNode = node->childVec[2];
-    return add_constraint(assignNode, timeIdx, c, s, g, bound, isSolve).extract(hi, lo);
+    if(isNum(assignVarAndSlice))
+      return var_expr(assignVarAndSlice, timeIdx, c, false);
+    else
+      return add_constraint(assignNode, timeIdx, c, s, g, bound, isSolve).extract(hi, lo);
   }
 } 
 

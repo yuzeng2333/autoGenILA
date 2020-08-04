@@ -24419,3 +24419,68 @@ rst___#1 = #b0
 )
 ------- No more solution found within the bound: 0 ----------
 ------- No more solution found within the bound: 1 ----------
+Begin main!
+Begin main!
+Begin main!
+Begin main!
+Begin main!
+Begin main!
+Begin main!
+Begin main!
+Begin main!
+Begin main!
+Begin main!
++++++++ Solution found for out, bound: 0 +++++++++
+_00__CASE_0___#1 = #x63
+_00__CASE_0___#1_T = #x00
+_00__CASE_1___#1 = #x63
+_00__CASE_1___#1_T = #x00
+_00__CASE_2___#1 = #x63
+_00__CASE_2___#1_T = #x00
+_00__CASE_3___#1 = #x63
+_00__CASE_3___#1_T = #x00
+_00__CASE_4___#1 = #x63
+_00__CASE_4___#1_T = #x00
+_00__CASE_5___#1 = #x63
+_00__CASE_5___#1_T = #x00
+_00__CASE_6___#1 = #x00
+_00__CASE_6___#1_T = #xff
+_00____#1 = #x63
+_00____#1_T = #x00
+_01____#1 = #b0
+_01____#1_T = #b0
+_02____#1 = #b0
+_02____#1_T = #b0
+_03____#1 = #b0
+_03____#1_T = #b0
+_04____#1 = #b0
+_04____#1_T = #b0
+_05____#1 = #b0
+_05____#1_T = #b0
+_06____#1 = #b1
+_06____#1_T = #b0
+fangyuan0___#1 = #b100000
+fangyuan0___#1_T = #b000000
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ in___#1 = #x00
+in___#1_T = #x00
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ out___#0 = #x63
+out___#0_T = #x00
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ out___#1 = #x00
+out___#1_T = #xff
+rst___#1 = #b0
+(goals
+(goal
+  (let ((a!1 (ite (= |in___#1| #x02)
+                  #x77
+                  (ite (= |in___#1| #x01)
+                       #x7c
+                       (ite (= |in___#1| #x00) #x63 |out___#1|)))))
+  (let ((a!2 (ite (= |in___#1| #x05)
+                  #xaa
+                  (ite (= |in___#1| #x04)
+                       #xf2
+                       (ite (= |in___#1| #x03) #x7b a!1)))))
+    (= |out___#100| a!2))))
+)
+------- No more solution found within the bound: 0 ----------
+------- No more solution found within the bound: 1 ----------

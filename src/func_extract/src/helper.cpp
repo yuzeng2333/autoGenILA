@@ -294,3 +294,19 @@ bool is_sliced(std::string varAndSlice) {
   split_slice(varAndSlice, var, varSlice);
   return reg2Slices.find(var) != reg2Slices.end();
 }
+
+
+uint32_t get_num_len(std::string num) {
+  std::regex pHex("^(\\d+)'h([\\dabcdefx\\?]+)$");
+  std::regex pDec("^(\\d+)'d([\\dx\\?]+)$");
+  std::regex pBin("^(\\d+)'b([01x\\?]+)$"); 
+  std::smatch m;
+  if(std::regex_match(num, m, pHex)
+      || std::regex_match(num, m, pDec)
+      || std::regex_match(num, m, pBin))
+    return std::stoi(m.str(1));
+  else {
+    toCout("Error: input to get_num_len is not num:"+ num);
+    abort();
+  }
+}
