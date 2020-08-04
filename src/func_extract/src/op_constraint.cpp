@@ -261,7 +261,7 @@ expr one_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   std::string op1AndSlice = node->srcVec.front();
   split_slice(destAndSlice, dest, destSlice);
   split_slice(op1AndSlice, op1, op1Slice);
-  if(destAndSlice.compare("_0075_") == 0) {
+  if(destAndSlice.compare("fangyuan1") == 0) {
     toCoutVerb("Found it!");
   }
   uint32_t op1Hi = get_lgc_hi(op1AndSlice);

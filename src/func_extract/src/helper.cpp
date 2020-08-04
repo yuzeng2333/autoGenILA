@@ -16,7 +16,7 @@ bool isAs(std::string var) {
 uint32_t hdb2int(std::string num) {
   std::regex pHex("^(\\d+)'h([\\dabcdefx\\?]+)$");
   std::regex pDec("^(\\d+)'d([\\dx\\?]+)$");
-  std::regex pBin("^(\\d+)'h([01x\\?]+)$");
+  std::regex pBin("^(\\d+)'b([01x\\?]+)$");
   std::smatch m;
   if(std::regex_match(num, m, pDec)) {
     std::string pureNum = m.str(2);
@@ -57,8 +57,8 @@ uint32_t hex2int(std::string num) {
 
 uint32_t bin2int(std::string num) {
   uint32_t res = 0;
-  for(auto it = num.begin(); it != num.end(); it++) {
-    res = res << 1 + (*it - '0');
+  for(char &c: num) {
+    res = res << 1 + (c - '0');
   }
   return res;
 }
@@ -200,9 +200,9 @@ uint32_t get_pos_of_one(std::string value) {
 // get logical hi
 uint32_t get_lgc_hi(std::string varAndSlice) {
   std::smatch m;
-  std::regex pHex("^(\\d+)'h([\\dabcdefx\\?]+)$");
-  std::regex pDec("^(\\d+)'d([\\dx\\?]+)$");
-  std::regex pBin("^(\\d+)'h([01x\\?]+)$");
+  std::regex pHex("^(\\d+)'h([\\dabcdefx\\?]+)\\s*$");
+  std::regex pDec("^(\\d+)'d([\\dx\\?]+)\\s*$");
+  std::regex pBin("^(\\d+)'b([01x\\?]+)\\s*$");
   if(is_number(varAndSlice)) {
     if(!std::regex_match(varAndSlice, m, pBin)
         && !std::regex_match(varAndSlice, m, pHex)) {
@@ -231,11 +231,11 @@ uint32_t get_ltr_hi(std::string varAndSlice) {
   std::smatch m;
   std::regex pHex("^(\\d+)'h([\\dabcdefx\\?]+)$");
   std::regex pDec("^(\\d+)'d([\\dx\\?]+)$");
-  std::regex pBin("^(\\d+)'h([01x\\?]+)$");
+  std::regex pBin("^(\\d+)'b([01x\\?]+)$");
   if(is_number(varAndSlice)) {
     if(!std::regex_match(varAndSlice, m, pBin)
         && !std::regex_match(varAndSlice, m, pHex)) {
-      toCout("Error: input number for get_lgc_hi is not binary or hex: "+varAndSlice);
+      toCout("Error: input number for get_ltr_hi is not binary or hex: "+varAndSlice);
     }
     std::string bitNum = m.str(1);
     return std::stoi(bitNum)-1;

@@ -119,7 +119,7 @@ std::regex pVarNameGroup("([\aa-zA-Z0-9_\\.\\$\\\\'\\[\\]]+)(?:(\\s*)(\\[\\d+(\\
 std::regex pNum("^(\\d+)'(h|d|b)[\\dabcdefx\\?]+$");
 std::regex pNumExist("(\\d+)'(h|d|b)[\\dabcdef\\?]+");
 std::regex pBin("(\\d+)'b([01]+)");
-std::regex pHex("(\\d+)'h([01]+)");
+std::regex pHex("(\\d+)'h([\\dabcdefx\\?]+)");
 
 /* Global data */
 std::string moduleName;
@@ -1431,6 +1431,23 @@ void remove_function_wrapper(std::string firstLine, std::ifstream &input, std::o
     fangyuanCaseSliceWidth.emplace(b, get_width(rhsSlice));
   }
   else {
+    std::string localIdx = std::to_string(NEW_FANGYUAN++);
+    if(!std::regex_search(b, m, pBin)
+        && !std::regex_search(b, m, pHex)) {
+      toCout("Error: the number for case input is not binary or hex!");
+      toCout("First line: "+firstLine);
+      toCout("b is: "+b);
+      abort();
+    }
+    uint32_t fangyuanWidth = std::stoi(m.str(1));
+    bool insertDone = varWidth.var_width_insert("fangyuan"+localIdx, fangyuanWidth-1, 0);
+    if (!insertDone) {
+      std::cout << "insert failed for this line:" + line << std::endl;
+      std::cout << "m.str(2):" + m.str(2) << std::endl;
+      std::cout << "m.str(3):" + m.str(3) << std::endl;
+    }
+    //output << blank + "wire ["+toStr(fangyuanWidth-1)+":0] fangyuan"+localIdx+";" << std::endl;
+    //output << blank + "assign fangyuan"+localIdx+" = "+b+";" << std::endl;
     output << blank + "always @("+a+" or "+s+") begin" << std::endl;
     output << blank + "  casez ("+s+")" << std::endl;
     std::string rhs, rhsSlice;
@@ -1439,20 +1456,16 @@ void remove_function_wrapper(std::string firstLine, std::ifstream &input, std::o
       output << blank + "    " + localPair.first + " :" << std::endl;
       // extract the bits from number
       std::smatch m;
-      if(!std::regex_search(b, m, pBin)) {
-        toCout("Error: the number for case input is not binary!");
-        abort();
-      }
       uint32_t lowIdx = get_begin(rhsSlice);
       uint32_t highIdx = get_end(rhsSlice);
       //wholeNum = wholeNum >> lowIdx;
       //uint32_t selectedBits = wholeNum & ((1<<(highIdx-lowIdx+1))-1);
       //std::string binNum = dec2bin(selectedBits);
-      std::string binNum = get_bits(m.str(2), highIdx, lowIdx);
-      std::string binWidth = toStr(binNum.length());
+      //std::string binWidth = toStr(binNum.length());
       //std::string rhsNum = (selectedBits == 0) ? "0" : (binWidth + "'b" + binNum);
-      std::string rhsNum = binWidth + "'b" + binNum;
-      output << blank + "      " + result + " = " + rhsNum + " ;" << std::endl;
+      std::string rhsBin = extract_bin(b, highIdx, lowIdx);
+      //std::string rhsNum = "fangyuan"+localIdx+"["+toStr(highIdx)+":"+toStr(lowIdx)+"]";
+      output << blank + "      " + result + " = " + toStr(rhsBin.length()) + "'b" + rhsBin + " ;" << std::endl;
     }
     output << blank + "    default:" << std::endl;
     output << blank + "      " + result + " = " + a + " ;" << std::endl;

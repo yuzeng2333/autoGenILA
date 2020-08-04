@@ -24,3 +24,15 @@ ex:
 
 ex1:
 	../func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/expand_key 1
+
+s:
+	../func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/aes_s 0
+
+s1:
+	../func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/aes_s 1
+
+ss:
+	../func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/aes_short_s 0
+
+ss1:
+	../func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/aes_short_s 1

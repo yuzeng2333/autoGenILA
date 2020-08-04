@@ -143,4 +143,8 @@ bool is_srcConcat(std::string line);
 bool is_destConcat(std::string line);
 
 bool is_srcDestConcat(std::string line);
+
+std::string extract_bin(std::string num, uint32_t highIdx, uint32_t lowIdx);
+
+std::string hex2bin(std::string hexNum);
 #endif

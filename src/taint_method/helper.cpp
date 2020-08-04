@@ -2,8 +2,10 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <regex>
 #include <vector>
+#include <bitset>
 #include <utility>
 #include <assert.h>
 #include <unordered_map>
@@ -1363,4 +1365,78 @@ bool is_srcDestConcat(std::string line) {
     }
   }
   return noOperator;
+}
+
+
+std::string extract_bin(std::string num, uint32_t highIdx, uint32_t lowIdx) {
+  std::smatch m;
+  if(std::regex_match(num, m, pBin)) {
+    uint32_t width = std::stoi(m.str(1));
+    std::string bits = m.str(2);
+    if(highIdx >= width) {
+      toCout("Error: highIdx is out of bound! highIdx: "+toStr(highIdx)+", num:"+num);
+      abort();
+    }
+    return num.substr(width-highIdx-1, highIdx-lowIdx+1);
+  }
+  else if(std::regex_match(num, m, pHex)) {
+    uint32_t width = std::stoi(m.str(1));
+    std::string bits = m.str(2);
+
+    uint32_t highRes = (width-1-highIdx) % 4;
+    uint32_t highDvd = (width-1-highIdx) / 4;
+    uint32_t lowDvd = (width-1-lowIdx) / 4;
+
+    std::string subBits = bits.substr(highDvd, lowDvd-highDvd+1);
+    std::string binSubBits = hex2bin(subBits);
+    return binSubBits.substr(highRes, highIdx-lowIdx+1);
+  }
+  else {
+    toCout("Error: input num for extract_bin is not binary or hex: "+num);
+    abort();
+  }
+}
+
+
+std::string hex2bin(std::string hexNum) {
+  std::string res = "";
+  for(char &c: hexNum) {
+    if(c == 'f')
+      res += "1111";
+    else if(c == 'e')
+      res += "1110";
+    else if(c == 'd')
+      res += "1101";
+    else if(c == 'c')
+      res += "1100";
+    else if(c == 'b')
+      res += "1011";
+    else if(c == 'a')
+      res += "1010";
+    else if(c == '9')
+      res += "1001";
+    else if(c == '8')
+      res += "1000";
+    else if(c == '7')
+      res += "0111";
+    else if(c == '6')
+      res += "0110";
+    else if(c == '5')
+      res += "0101";
+    else if(c == '4')
+      res += "0100";
+    else if(c == '3')
+      res += "0011";
+    else if(c == '2')
+      res += "0010";
+    else if(c == '1')
+      res += "0001";
+    else if(c == '0')
+      res += "0000";
+    else {
+      toCout("Error: unexpected char in hex:"+hexNum);
+      abort();
+    }
+  }
+  return res;
 }
