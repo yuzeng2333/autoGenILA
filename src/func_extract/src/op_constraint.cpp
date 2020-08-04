@@ -8,7 +8,6 @@
 #define SV std::vector<std::string>
 #define PV std::vector<astNode*>
 
-
 using namespace z3;
 
 /* this function is used for expanding vars used as ITE conditions */
