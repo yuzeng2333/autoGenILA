@@ -58,7 +58,7 @@ uint32_t hex2int(std::string num) {
 uint32_t bin2int(std::string num) {
   uint32_t res = 0;
   for(char &c: num) {
-    res = res << 1 + (c - '0');
+    res = (res << 1) + (c - '0');
   }
   return res;
 }
