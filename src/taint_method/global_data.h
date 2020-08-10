@@ -32,7 +32,9 @@ extern std::unordered_map<std::string, std::pair<std::string, std::string>> memD
 extern std::unordered_map<std::string, uint32_t> reg2sig;
 extern std::unordered_map<std::string, uint32_t> fangyuanItemNum; 
 extern std::unordered_map<std::string, uint32_t> fangyuanCaseSliceWidth;
-extern std::unordered_map<std::string, uint32_t> g_destVersion;
+extern std::unordered_map<std::string, uint32_t> g_destVersion; 
+extern std::unordered_map<std::string, std::string> g_instance2moduleMap;
+extern std::map<std::string, std::unordered_map<std::string, std::string>> g_rstValMap;
 extern std::map<std::string, std::string> g_finalRegCondMap;
 // pass_info
 extern std::unordered_map<std::string, std::vector<uint32_t>> g_backwardMap;
@@ -75,6 +77,8 @@ extern std::string srcConcatFeature;
 extern std::string bothConcatFeature;
 extern std::string g_gatedClkFileName;
 extern std::string g_path;
+extern std::string g_topModule;
+extern std::string idxedModuleName;
 extern uint32_t g_reg_count;
 extern uint32_t g_sig_width; // == log2(g_reg_count);
 extern uint32_t g_next_sig;

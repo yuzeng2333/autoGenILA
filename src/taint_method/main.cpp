@@ -1,17 +1,11 @@
 #include "taint_gen.h"
-#include <string>
-#include <vector>
-#include <iostream>
-#include <fstream>
-#include <regex>
-#include <assert.h>
-#include <map>
-#include <unordered_set>
 #include "global_data.h"
 #include "helper.h"
 #include "main.h"
+#include "vcd_parser.h"
 
 std::string orderFileName = "order.txt";
+std::string g_topModule;
 
 // 1st argument is file name
 // 2rd is whether to do process_path_info
@@ -32,7 +26,7 @@ int main(int argc, char *argv[]) {
   std::vector<std::string> modules;
   std::map<std::string, std::vector<std::string>> childModules;
   uint32_t totalRegCnt;
-  std::string topModule = separate_modules(fileName, modules, childModules, totalRegCnt);
+  g_topModule = separate_modules(fileName, modules, childModules, totalRegCnt, g_instance2moduleMap);
   std::map<std::string, bool> moduleReady;
   std::map<std::string, std::vector<std::string>> moduleInputsMap;
   std::map<std::string, std::vector<std::string>> moduleOutputsMap;
@@ -40,19 +34,19 @@ int main(int argc, char *argv[]) {
   uint32_t nextSig = 0;
   std::cout << "Begin read in clkrst!" << std::endl; //1
   read_in_clkrst(fileName, "clkrst.txt");
-
+  hierarchical_vcd_parser(g_path+"/rst.vcd");
   for(auto moduleName: modules) { 
     moduleReady.emplace(moduleName, false);
   }
   for(std::string module: modules) {
-    bool isTop = (topModule.compare(module) == 0);
-    add_taint_bottom_up(g_path, module, moduleReady, childModules, topModule, moduleInputsMap, moduleOutputsMap, moduleRFlagsMap, totalRegCnt, nextSig, doProcessPathInfo);
+    bool isTop = (g_topModule.compare(module) == 0);
+    add_taint_bottom_up(g_path, module, moduleReady, childModules, g_topModule, moduleInputsMap, moduleOutputsMap, moduleRFlagsMap, totalRegCnt, nextSig, doProcessPathInfo);
   }
 
   // in the file for top module, append "include" at the end
   std::ofstream output(g_path+"/"+"include.final");
   for(std::string subModule: modules) {
-    if(subModule.compare(topModule) == 0)
+    if(subModule.compare(g_topModule) == 0)
       continue;
     output << "`include \"../RTL/" + subModule + "_NEW.v.clean.tainted.final\"" << std::endl;
   }
@@ -64,14 +58,14 @@ int main(int argc, char *argv[]) {
 // 1. separate the original file into multiple files, each containing one module
 // 2. analyze for each module, which sub-modules it uses
 // Return name of top module
-std::string separate_modules(std::string fileName, std::vector<std::string> &modules, std::map<std::string, std::vector<std::string>> &childModules, uint32_t &totalRegCnt) {
+std::string separate_modules(std::string fileName, std::vector<std::string> &modules, std::map<std::string, std::vector<std::string>> &childModules, uint32_t &totalRegCnt, std::unordered_map<std::string, std::string>& g_instance2moduleMap) {
   toCout("... Begin separating modules!");
   totalRegCnt = 0;
   std::ifstream input(fileName);
   std::string line;
   std::smatch m;
   std::ofstream output;
-  std::string topModule;
+  std::string g_topModule;
   std::string moduleName;
   std::string path = extract_path(fileName);
   std::set<std::string> regSet;
@@ -116,6 +110,17 @@ std::string separate_modules(std::string fileName, std::vector<std::string> &mod
 
     // analyze module dependency
     if(inModule && std::regex_match(line, m, pModuleBegin)) {
+      std::string localModuleName = m.str(2);
+      std::string instanceName = m.str(3);
+      if(g_instance2moduleMap.find(instanceName) != g_instance2moduleMap.end()) {
+        if(g_instance2moduleMap[instanceName] != localModuleName) {
+          toCout("Error: instance: "+instanceName+" matches multiple modules:"+localModuleName+", "+g_instance2moduleMap[instanceName]);
+          abort();
+        }
+      }
+      else
+        g_instance2moduleMap.emplace(instanceName, localModuleName);
+
       if(childModules.find(moduleName) == childModules.end())
         childModules.emplace(moduleName, std::vector<std::string>{m.str(2)});
       else
@@ -136,39 +141,39 @@ std::string separate_modules(std::string fileName, std::vector<std::string> &mod
   }
   for(std::string singleModule: modules) {
     if(childSet.find(singleModule) == childSet.end()) {
-      if(!topModule.empty()) {
-        toCout("Two top modules found: "+topModule+" & "+singleModule);
+      if(!g_topModule.empty()) {
+        toCout("Two top modules found: "+g_topModule+" & "+singleModule);
         abort();
       }
       else {
-        topModule = singleModule;
+        g_topModule = singleModule;
       }
     }
   }
 
   toCout("... Finished separating modules!");  
-  return topModule;
+  return g_topModule;
 }
 
 
-void add_taint_bottom_up(std::string path, std::string module, std::map<std::string, bool> &moduleReady, std::map<std::string, std::vector<std::string>> &childModules, std::string topModule, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap, std::map<std::string, std::vector<std::string>> &moduleRFlagsMap, uint32_t totalRegCnt, uint32_t &nextSig, bool doProcessPathInfo) {
+void add_taint_bottom_up(std::string path, std::string module, std::map<std::string, bool> &moduleReady, std::map<std::string, std::vector<std::string>> &childModules, std::string g_topModule, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap, std::map<std::string, std::vector<std::string>> &moduleRFlagsMap, uint32_t totalRegCnt, uint32_t &nextSig, bool doProcessPathInfo) {
   if( moduleReady[module] == true )
     return;
   if( childModules.find(module) == childModules.end() ) {
     moduleReady[module] = true;
     write_order_file(module+"_NEW.v.clean");
-    taint_gen(path+"/"+module+"_NEW.v", 0, module.compare(topModule)==0, moduleInputsMap, moduleOutputsMap, moduleRFlagsMap, totalRegCnt, nextSig, doProcessPathInfo);
+    taint_gen(path+"/"+module+"_NEW.v", 0, module.compare(g_topModule)==0, moduleInputsMap, moduleOutputsMap, moduleRFlagsMap, totalRegCnt, nextSig, doProcessPathInfo);
   }
   else {
     for(auto oneChildModule: childModules[module]) {
       if(moduleReady[oneChildModule] == true)
         continue;
-      add_taint_bottom_up(path, oneChildModule, moduleReady, childModules, topModule, moduleInputsMap, moduleOutputsMap, moduleRFlagsMap, totalRegCnt, nextSig, doProcessPathInfo);
+      add_taint_bottom_up(path, oneChildModule, moduleReady, childModules, g_topModule, moduleInputsMap, moduleOutputsMap, moduleRFlagsMap, totalRegCnt, nextSig, doProcessPathInfo);
     }
     // all child modules should be ready now
     moduleReady[module] = true;
     write_order_file(module+"_NEW.v.clean");
-    taint_gen(path+"/"+module+"_NEW.v", 0, module.compare(topModule)==0, moduleInputsMap, moduleOutputsMap, moduleRFlagsMap, totalRegCnt, nextSig, doProcessPathInfo);
+    taint_gen(path+"/"+module+"_NEW.v", 0, module.compare(g_topModule)==0, moduleInputsMap, moduleOutputsMap, moduleRFlagsMap, totalRegCnt, nextSig, doProcessPathInfo);
   }
 }
 
