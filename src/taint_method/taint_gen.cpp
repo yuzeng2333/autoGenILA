@@ -1093,17 +1093,24 @@ void merge_taints(std::string fileName) {
     uint32_t width = get_var_slice_width(var);
     if(isMem(var))
       continue;
-    std::string rstVal = g_rstValMap[moduleName][var];
+    std::string rstVal;
+    if(g_use_vcd_parser)
+      rstVal = g_rstValMap[moduleName][var];
     if(rstVal.empty()) rstVal = "0";
     output << "  always @( posedge " + g_recentClk + " ) begin" << std::endl;
     if(g_hasRst) {
-    output << "    if( " + get_recent_rst() + " ) " + var + "_PREV_VAL1 <= " + rstVal + " ;" << std::endl;
+      output << "    if( " + get_recent_rst() + " ) " + var + "_PREV_VAL1 <= " + rstVal + " ;" << std::endl;
+      if(!g_use_vcd_parser)
+        output << "    if( " + get_recent_rst() + " ) " + var + "_PREV_VAL2 <= " + rstVal + " ;" << std::endl;
     }
     else {
-    output << "    if( rst_zy ) " + var + "_PREV_VAL1 <= " + rstVal + " ;" << std::endl;
+      output << "    if( rst_zy ) " + var + "_PREV_VAL1 <= " + rstVal + " ;" << std::endl;
+      if(!g_use_vcd_parser)  
+        output << "    if( rst_zy ) " + var + "_PREV_VAL2 <= " + rstVal + " ;" << std::endl;
     }
     output << "    if( INSTR_IN_ZY ) " + var + "_PREV_VAL1 <= " + var + " ;"<< std::endl;
-    //output << "    if( INSTR_IN_ZY ) " + var + "_PREV_VAL2 <= " + var + "_PREV_VAL1 ;" << std::endl;
+    if(!g_use_vcd_parser)
+      output << "    if( INSTR_IN_ZY ) " + var + "_PREV_VAL2 <= " + var + "_PREV_VAL1 ;" << std::endl;
     output << "  end" << std::endl;
   }
 
@@ -2299,10 +2306,16 @@ void gen_assert_property(std::ofstream &output) {
     if(std::regex_search(out, m, pRFlag)) {
       //std::string var = m.str(1);
       //checkCond(std::regex_match(var, match, pRFlag), "Error: pRFlag is not matched: "+m.str(1));
-      std::string rstVal = g_rstValMap[moduleName][m.str(1)];
+      std::string rstVal; 
+      if(g_use_vcd_parser)
+        rstVal = g_rstValMap[moduleName][m.str(1)];
       if(rstVal.empty()) rstVal = "0";
-      if(!isMem(m.str(1)))
-        output << "  assert property( " + out + " == 0 || " + m.str(1) + "_PREV_VAL1 == " + rstVal + " );" << std::endl;
+      if(!isMem(m.str(1))) {
+        if(g_use_vcd_parser)
+          output << "  assert property( " + out + " == 0 || " + m.str(1) + "_PREV_VAL1 == " + rstVal + " );" << std::endl;
+        else
+          output << "  assert property( " + out + " == 0 || " + m.str(1) + "_PREV_VAL1 == " + m.str(1) + "_PREV_VAL2 );" << std::endl;
+      }
       else
         output << "  assert property( " + out + " == 0 );" << std::endl;
     }

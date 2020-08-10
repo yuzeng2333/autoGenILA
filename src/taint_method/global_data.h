@@ -68,6 +68,7 @@ extern bool g_use_reset_taint;
 extern bool g_use_zy_count;
 extern bool g_use_reset_sig;
 extern bool g_remove_adff;
+extern bool g_use_vcd_parser;
 extern std::string _t;
 extern std::string _r;
 extern std::string _x;

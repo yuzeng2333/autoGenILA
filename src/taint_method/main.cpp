@@ -6,6 +6,7 @@
 
 std::string orderFileName = "order.txt";
 std::string g_topModule;
+bool g_use_vcd_parser = true;
 
 // 1st argument is file name
 // 2rd is whether to do process_path_info
@@ -34,7 +35,8 @@ int main(int argc, char *argv[]) {
   uint32_t nextSig = 0;
   std::cout << "Begin read in clkrst!" << std::endl; //1
   read_in_clkrst(fileName, "clkrst.txt");
-  hierarchical_vcd_parser(g_path+"/rst.vcd");
+  if(g_use_vcd_parser)
+    hierarchical_vcd_parser(g_path+"/rst.vcd");
   for(auto moduleName: modules) { 
     moduleReady.emplace(moduleName, false);
   }

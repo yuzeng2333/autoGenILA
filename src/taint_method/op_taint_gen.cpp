@@ -137,6 +137,8 @@ void reg_taint_gen(std::string line, std::ofstream &output) {
   output << blank << "logic " + slice + " " + var + _t + " ;" << std::endl;
 
   output << blank << "logic " + slice + " " + var + "_PREV_VAL1 ;" << std::endl; 
+  if(!g_use_vcd_parser)
+    output << blank << "logic " + slice + " " + var + "_PREV_VAL2 ;" << std::endl; 
 
   if(!isOutput(var)) { // maybe later declared as output
     output << blank << "logic " + slice + " " + var + _r + " ;" << std::endl;
@@ -187,6 +189,8 @@ void mem_taint_gen(std::string line, std::ofstream &output) {
   //assert_info(!isTop || !isOutput(var), "mem_taint_gen:var is output, line: "+line);  
   output << blank << "logic " + slice + " " + var + _t + " " + sliceTop + " ;" << std::endl;
   output << blank << "logic " + slice + " " + var + "_PREV_VAL1 " + sliceTop + " ;" << std::endl;
+  if(!g_use_vcd_parser)
+    output << blank << "logic " + slice + " " + var + "_PREV_VAL2 " + sliceTop + " ;" << std::endl;
   output << blank << "logic " + sliceTop + " " + var + "_t_flag ;" << std::endl;
   output << blank << "logic " + sliceTop + " " + var + "_r_flag ;" << std::endl;
   output << blank << "logic " + slice + " " + var + _c + " " + sliceTop + " ;" << std::endl;
