@@ -3,6 +3,7 @@
 #include "vcd_parser.h"
 #include "check_regs.h"
 #include "op_constraint.h"
+#include "clean_goal.h"
 #include <string>
 #include <fstream>
 
@@ -36,7 +37,7 @@ int main(int argc, char *argv[]) {
   vcd_parser(g_path+"/rst.vcd");
   build_ast_tree();
   check_all_regs();
-  //clean_goal();
+  clean_goal();
   print_time();
   return 0;
 }

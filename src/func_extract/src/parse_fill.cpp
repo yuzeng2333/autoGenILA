@@ -135,6 +135,7 @@ void read_in_architectural_states(std::string fileName) {
 }
 
 
+// parsed result is in g_instrInfo
 void read_in_instructions(std::string fileName) {
   moduleAs.clear();
   g_instrInfo.clear();
