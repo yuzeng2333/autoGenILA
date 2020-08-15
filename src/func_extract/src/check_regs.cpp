@@ -39,10 +39,10 @@ void check_all_regs() {
       uint32_t cycleCnt = pair.first;
       std::string oneWriteAsv = pair.second;
       if(reg2Slices.find(oneWriteAsv) == reg2Slices.end())
-        check_single_reg_and_slice(oneWriteAsv, cycleCnt);
+        check_single_reg_and_slice(oneWriteAsv, cycleCnt, i-1);
       else
         for(std::string regAndSlice: reg2Slices[oneWriteAsv])
-          check_single_reg_and_slice(regAndSlice, cycleCnt);
+          check_single_reg_and_slice(regAndSlice, cycleCnt, i-1);
     }
   }
 }
@@ -64,9 +64,11 @@ void clean_data() {
 // However, constructions for the two are quite different. AST tree is
 // constructed only one. But the SMT equation may need to be constructed
 // multiple times, until a solution is obtained or a bound is reached.
-void check_single_reg_and_slice(std::string destAndSlice, uint32_t cycleCnt) {
+void check_single_reg_and_slice(std::string destAndSlice, uint32_t cycleCnt, uint32_t instrIdx) {
   std::ofstream outFile;
-  outFile.open("./result.txt", std::ios_base::app);
+  outFile.open(g_path+"/result.txt");
+  std::ofstream goalFile;
+  goalFile.open(g_path+"/goal.txt");
   g_rootNode = destAndSlice;
   clean_data();
   toCout("========== Begin check SAT for: "+destAndSlice+" ==========");
@@ -201,6 +203,8 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t cycleCnt) {
       toCout("*************************  Update function for "+destAndSlice);
       std::cout << r << std::endl;
       outFile << r << std::endl;
+      goalFile << "#"+toStr(instrIdx)+"#"+destAndSlice+"#"+toStr(bound) << std::endl;
+      goalFile << r << std::endl;
       // if two goals are the same, then check the two solutions. If any
       // varriable is different in the two solutions, fix it.
       //changedVal.clear();
@@ -293,6 +297,7 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t cycleCnt) {
     lastHasSolution = curHasSolution;
   }
   outFile.close();
+  goalFile.close();
 }
 
 
@@ -339,7 +344,7 @@ expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s
 
 expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
   std::string dest = node->dest;
-  if(dest.compare("out_2") == 0) {
+  if(dest.compare("word_sum") == 0 && timeIdx > bound) {
     toCout("wack found! time: "+toStr(timeIdx));
   }
   expr destExpr = var_expr(dest, timeIdx, c, false);

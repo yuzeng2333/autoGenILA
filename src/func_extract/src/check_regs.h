@@ -22,7 +22,7 @@ void check_all_regs();
 
 void clean_data();
 
-void check_single_reg_and_slice(std::string regAndSlice, uint32_t cycleCnt);
+void check_single_reg_and_slice(std::string regAndSlice, uint32_t cycleCnt, uint32_t instrIdx);
 
 expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve);
 

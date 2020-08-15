@@ -21,4 +21,5 @@ extern std::unordered_map<std::string, std::string> g_nopInstr;
 extern std::unordered_map<std::string, std::string> g_rstVal;
 extern std::unordered_map<std::string, std::string> g_nameVarMap;
 extern std::unordered_map<std::string, std::string> g_varRstValMap;
+//extern std::string g_path;
 #endif
