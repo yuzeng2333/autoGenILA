@@ -1,10 +1,12 @@
 #include "global_data_struct.h"
 #include "clean_goal.h"
 #include "parse_fill.h"
+#include "helper.h"
 
 #define toStr(a) std::to_string(a)
 
 void clean_goal() {
+  toCout("### Begin clean_goal");
   std::ifstream input(g_path+"/goal.txt");
   std::ofstream output(g_path+"/clean_goal.txt");
   std::string line;
@@ -13,6 +15,7 @@ void clean_goal() {
   uint32_t bound;
   uint32_t assumIdx = 0;
   while(std::getline(input, line)) {
+    toCout(line);
     if(line.front() == '#') {
       size_t pos2 = line.find("#", 1);
       size_t pos3 = line.find(  "#", pos2+1);
@@ -37,6 +40,8 @@ void clean_goal() {
     }
     if(line.front() == ')') {
       std::string instrEncodings = get_encodings(g_instrInfo[instrIdx-1].instrEncoding);
+      if(instrEncodings.empty())
+        continue;
       std::string rstEncodings = get_encodings(g_rstVal);
       uint32_t writeDelay = get_write_delay(g_instrInfo[instrIdx-1].writeASV, writeASV);
       output << "assume -name zy_assume"+toStr(assumIdx++)+" {__START__ == 1 |-> ("+instrEncodings+" ##1 ( "+rstEncodings+" )[*"+toStr(writeDelay+1)+"] ) }" << std::endl;
@@ -58,9 +63,11 @@ std::string get_encodings( const std::unordered_map<std::string, std::string> &i
       continue;
     ret += it->first + " == " + it->second + " && ";
   }
-  ret.pop_back();
-  ret.pop_back();
-  ret.pop_back();
+  if(ret.length() > 3) {
+    ret.pop_back();
+    ret.pop_back();
+    ret.pop_back();
+  }
   return ret;
 }
 
