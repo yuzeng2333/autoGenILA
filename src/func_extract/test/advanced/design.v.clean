@@ -1,0 +1,96 @@
+module advanced(clk, rst, func, inWord, result);
+  wire [8:0] _00_;
+  wire [3:0] _01_;
+  wire _02_;
+  wire [2:0] _03_;
+  wire [31:0] _04_;
+  wire [31:0] _05_;
+  wire [31:0] _06_;
+  wire _07_;
+  wire _08_;
+  wire _09_;
+  wire _10_;
+  wire _11_;
+  wire _12_;
+  wire [3:0] _13_;
+  wire [3:0] _14_;
+  input clk;
+  input [1:0] func;
+  input [8:0] inWord;
+  output [8:0] result;
+  input rst;
+  wire \u0.clk ;
+  reg [2:0] \u0.cnt ;
+  wire [2:0] \u0.cnt_nxt ;
+  wire [3:0] \u0.out ;
+  reg [3:0] \u0.stg1 ;
+  wire [2:0] \u0.stg1_nxt ;
+  reg \u0.stg1_vld ;
+  reg [3:0] \u0.stg2 ;
+  wire [3:0] \u0.stg2_nxt ;
+  reg \u0.stg2_vld ;
+  reg [3:0] \u0.stg3 ;
+  wire [3:0] \u0.stg3_nxt ;
+  wire \u0.valid ;
+  wire [8:0] \u0.word ;
+  reg [8:0] word;
+  wire [8:0] word_in;
+  wire [8:0] word_next;
+  reg [3:0] word_sum;
+  wire [3:0] word_sum_next;
+  assign _02_ = func == 1'h1;
+  assign \u0.valid = func == 2'h2;
+  always @(posedge clk)
+      word <= _00_;
+  always @(posedge clk)
+      word_sum <= _01_;
+  assign _01_ = rst ? 4'h0 : \u0.stg3 ;
+  assign _00_ = rst ? 9'h000 : word_next;
+  assign \u0.stg2_nxt = \u0.stg1 + 4'ha;
+  assign _03_ = \u0.cnt + 1'h1;
+  assign _07_ = ! \u0.cnt ;
+  assign _08_ = \u0.cnt >= 3'h4;
+  assign _09_ = \u0.cnt > 1'h0;
+  assign _10_ = _09_ && _11_;
+  assign _11_ = \u0.cnt < 3'h4;
+  always @(posedge clk)
+
+  wire [3:0] fangyuan0;
+  assign fangyuan0 = { 1'h0, \u0.stg1_nxt };
+      \u0.stg1 <= fangyuan0;
+  always @(posedge clk)
+      \u0.stg1_vld <= \u0.valid ;
+  always @(posedge clk)
+      \u0.stg2 <= \u0.stg2_nxt ;
+  always @(posedge clk)
+      \u0.stg2_vld <= \u0.stg1_vld ;
+  always @(posedge clk)
+      \u0.stg3 <= \u0.stg3_nxt ;
+  always @(posedge clk)
+      \u0.cnt <= \u0.cnt_nxt ;
+  assign _12_ = 4'hf[$signed(_04_) +: 1];
+  assign _04_ = \u0.cnt - 1'h1;
+  assign _05_[2:0] = _08_ ? 3'h0 : \u0.cnt ;
+  assign _06_[2:0] = _10_ ? _03_ : _05_[2:0];
+  assign \u0.cnt_nxt = \u0.stg2_vld ? 3'h1 : _06_[2:0];
+  assign _13_ = _07_ ? \u0.stg3 : _14_;
+  assign \u0.stg3_nxt = \u0.stg2_vld ? \u0.stg2 : _13_;
+  wire [2:0] fangyuan1;
+  assign fangyuan1 = { \u0.word [0], \u0.word [2], \u0.word [4] };
+  wire [2:0] fangyuan2;
+  assign fangyuan2 = { \u0.word [1], \u0.word [3], \u0.word [5] };
+
+  assign \u0.stg1_nxt = fangyuan1 ^ fangyuan2;
+  assign _14_ = \u0.stg3 ^ _12_;
+  assign word_next = _02_ ? inWord : word;
+  wire [8:0] fangyuan3;
+  assign { word_in[8:6], \u0.word [5:0] } = fangyuan3;
+
+  assign fangyuan3 = \u0.valid ? word : 9'h000;
+  assign result = { 5'h00, word_sum };
+  assign \u0.clk = clk;
+  assign \u0.out = \u0.stg3 ;
+  assign \u0.word [8:6] = word_in[8:6];
+  assign word_in[5:0] = \u0.word [5:0];
+  assign word_sum_next = \u0.stg3 ;
+endmodule

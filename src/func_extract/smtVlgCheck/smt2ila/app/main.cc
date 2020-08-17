@@ -11,7 +11,7 @@ using namespace ilang;
 
 int main() {
 
-  aes_s_gen();
+  expand_key_gen();
   return 0;
 }
 
@@ -73,4 +73,31 @@ void aes_s_gen() {
   vg.GenerateTargets();
 }
 
+void expand_key_gen() {
+  auto m = Ila("bar");
 
+  auto in = m.NewBvState("in", 128);
+  auto rcon = m.NewBvState("rcon", 8);
+  auto out_1 = m.NewBvState("out_1", 128);
+
+  auto i1 = m.NewInstr("i1");
+  {
+    i1.SetUpdate(out_1, LoadSmtExprFromFile("../smtlib2in/expand_key.smtlib", m) );
+
+    std::ofstream fout("../expand_key_ila.v");
+    i1.ExportToVerilog(fout);
+  }
+
+  
+  VerilogVerificationTargetGenerator vg(
+      {},                                                   // no include
+      {"../verilog/expand_key_test.v"},     // vlog files
+      "expand_key_128",              // top_module_name
+      "../rfmap/expand_key_vmap.json", // variable mapping
+      "../rfmap/expand_key_cond.json",
+      "../output/", // output path
+      m.get(),
+      VerilogVerificationTargetGenerator::backend_selector::JASPERGOLD);
+
+  vg.GenerateTargets();
+}

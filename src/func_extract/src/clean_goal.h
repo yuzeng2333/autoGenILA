@@ -17,4 +17,5 @@ std::string get_encodings( const std::unordered_map<std::string, std::string> &i
 
 uint32_t get_write_delay(const std::set<std::pair<uint32_t, std::string>> &writeASV, std::string asv);
 
+std::string get_zero(uint32_t width);
 #endif

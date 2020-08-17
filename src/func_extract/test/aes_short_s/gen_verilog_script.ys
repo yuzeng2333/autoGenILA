@@ -1,0 +1,14 @@
+read_verilog -sv S.v
+prep -top S
+
+hierarchy -check
+proc
+opt
+opt_expr -mux_undef
+opt
+opt
+flatten;
+memory -nordff
+proc
+opt;;
+write_verilog design.v

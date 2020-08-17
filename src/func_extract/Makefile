@@ -188,6 +188,33 @@ src/check_regs.cpp.s:
 	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/check_regs.cpp.s
 .PHONY : src/check_regs.cpp.s
 
+src/clean_goal.o: src/clean_goal.cpp.o
+
+.PHONY : src/clean_goal.o
+
+# target to build an object file
+src/clean_goal.cpp.o:
+	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/clean_goal.cpp.o
+.PHONY : src/clean_goal.cpp.o
+
+src/clean_goal.i: src/clean_goal.cpp.i
+
+.PHONY : src/clean_goal.i
+
+# target to preprocess a source file
+src/clean_goal.cpp.i:
+	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/clean_goal.cpp.i
+.PHONY : src/clean_goal.cpp.i
+
+src/clean_goal.s: src/clean_goal.cpp.s
+
+.PHONY : src/clean_goal.s
+
+# target to generate assembly for a file
+src/clean_goal.cpp.s:
+	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/clean_goal.cpp.s
+.PHONY : src/clean_goal.cpp.s
+
 src/expr.o: src/expr.cpp.o
 
 .PHONY : src/expr.o
@@ -393,6 +420,9 @@ help:
 	@echo "... src/check_regs.o"
 	@echo "... src/check_regs.i"
 	@echo "... src/check_regs.s"
+	@echo "... src/clean_goal.o"
+	@echo "... src/clean_goal.i"
+	@echo "... src/clean_goal.s"
 	@echo "... src/expr.o"
 	@echo "... src/expr.i"
 	@echo "... src/expr.s"

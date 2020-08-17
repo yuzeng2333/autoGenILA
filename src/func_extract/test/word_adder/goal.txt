@@ -1,0 +1,23 @@
+#2#word_sum#2
+(goals
+(goal
+  (= |word_sum___#100|
+     (bvadd (concat #x00 ((_ extract 2 2) |word___#3|))
+            (concat #x00 ((_ extract 1 1) |word___#3|)))))
+)
+#2#word_sum#3
+(goals
+(goal
+  (= |word_sum___#100|
+     (bvadd (concat #x00 ((_ extract 2 2) |word___#4|))
+            (concat #x00 ((_ extract 1 1) |word___#4|))
+            (concat #x00 ((_ extract 0 0) |word___#4|)))))
+)
+#2#word_sum#4
+(goals
+(goal
+  (= |word_sum___#100|
+     (bvadd (concat #x00 ((_ extract 2 2) |word___#5|))
+            (concat #x00 ((_ extract 1 1) |word___#5|))
+            (concat #x00 ((_ extract 0 0) |word___#5|)))))
+)

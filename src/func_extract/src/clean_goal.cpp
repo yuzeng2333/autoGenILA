@@ -18,7 +18,7 @@ void clean_goal() {
     toCout(line);
     if(line.front() == '#') {
       size_t pos2 = line.find("#", 1);
-      size_t pos3 = line.find(  "#", pos2+1);
+      size_t pos3 = line.find("#", pos2+1);
       size_t pos4 = line.find("#", pos3+1);
       if(pos4 != std::string::npos) {
         toCout("Error: more than 3 # found: "+line);
@@ -27,7 +27,6 @@ void clean_goal() {
       instrIdx = std::stoi(line.substr(1, pos2-1));
       writeASV = line.substr(pos2+1, pos3-pos2-1);
       bound = std::stoi(line.substr(pos3+1));
-      output << line << std::endl;
     }
     else {
       while(line.find("___#") != std::string::npos) {
@@ -36,8 +35,14 @@ void clean_goal() {
         while(i != std::string::npos && std::isdigit(line[i++]));
         line = line.substr(0, pos) + line.substr(i-1);
       }
-      output << line << std::endl;
     }
+    if(line.find("MIXIEGEN") != std::string::npos) {
+      uint32_t localWidth = get_var_slice_width(g_rootNode);
+      size_t pos = line.find("MIXIEGEN");
+      line = line.substr(0, pos) + get_zero(localWidth) + line.substr(pos+7);
+    }
+    output << line << std::endl;
+
     if(line.front() == ')') {
       std::string instrEncodings = get_encodings(g_instrInfo[instrIdx-1].instrEncoding);
       if(instrEncodings.empty())
@@ -46,6 +51,7 @@ void clean_goal() {
       uint32_t writeDelay = get_write_delay(g_instrInfo[instrIdx-1].writeASV, writeASV);
       output << "assume -name zy_assume"+toStr(assumIdx++)+" {__START__ == 1 |-> ("+instrEncodings+" ##1 ( "+rstEncodings+" )[*"+toStr(writeDelay+1)+"] ) }" << std::endl;
     }
+
   }
   input.close();
   output.close();
@@ -83,4 +89,20 @@ uint32_t get_write_delay(const std::set<std::pair<uint32_t, std::string>> &write
   }
   toCout("Error:"+asv+" is not in the writeASV set!");
   abort();
+}
+
+
+std::string get_zero(uint32_t width) {
+  std::string ret = "#";
+  if(width % 4 == 0) {
+    width = width / 4;
+    ret += "x";
+  }
+  else {
+    ret += "b";
+  }
+  while(width-- > 0) {
+    ret += "0";
+  }
+  return ret;
 }

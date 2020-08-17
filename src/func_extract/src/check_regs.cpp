@@ -25,6 +25,7 @@ std::set<std::string> g_readASV;
 std::unordered_map<std::string, expr*> g_existedExpr;
 std::string g_rootNode;
 struct instrInfo g_currInstrInfo;
+uint32_t g_destWidth;
 
 // assume g_ssaTable and g_nbTable have been filled
 void check_all_regs() {
@@ -75,7 +76,7 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t cycleCnt, uin
   uint32_t regWidth = get_var_slice_width(destAndSlice);
   CURRENT_VAR = destAndSlice;
   uint32_t bound = cycleCnt > 0 ? cycleCnt-1 : 0;
-  bound_limit = cycleCnt+2;
+  bound_limit = cycleCnt+1;
   bool z3Res = false;
   context c;
   solver s(c);
@@ -303,6 +304,9 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t cycleCnt, uin
 
 expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
   std::string var = node->dest;
+  //if(var.find("4_0.S_0.out") != std::string::npos) {
+  //  toCout("%%%%%%%%%%%%% Found S4_0.S_0.out!");
+  //}
   if(g_existedExpr.find(timed_name(var, timeIdx)) != g_existedExpr.end() ) {
     if(isSolve)
       return var_expr(var, timeIdx, c, false);
@@ -311,9 +315,6 @@ expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s
   }
 
   expr retExpr(c);
-  if(var.compare("out_2") == 0) {
-    toCout("Found it!");
-  }
   if ( isInput(var) ) { // input_t is always 0
     retExpr = input_constraint(node, timeIdx, c, s, g, isSolve);
   }
@@ -382,8 +383,14 @@ expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   else if ( is_clean(dest) ){ // the bound has been reached, do not expand its assignment
     push_clean_queue(node, timeIdx);
   }
-  else
+  else {
     push_dirty_queue(node, timeIdx);
+    if(!isSolve) {
+      uint32_t localWidth = get_var_slice_width(dest);
+      toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Replaced with 0: "+timed_name(dest, timeIdx));
+      return var_expr("MIXIEGEN", timeIdx, c, false, localWidth); 
+    }
+  }
   // end of if
 
   return destExpr;  

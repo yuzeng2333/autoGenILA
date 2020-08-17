@@ -1,6 +1,7 @@
 file(REMOVE_RECURSE
   "CMakeFiles/func_extract.dir/src/ast.cpp.o"
   "CMakeFiles/func_extract.dir/src/check_regs.cpp.o"
+  "CMakeFiles/func_extract.dir/src/clean_goal.cpp.o"
   "CMakeFiles/func_extract.dir/src/expr.cpp.o"
   "CMakeFiles/func_extract.dir/src/helper.cpp.o"
   "CMakeFiles/func_extract.dir/src/main.cpp.o"

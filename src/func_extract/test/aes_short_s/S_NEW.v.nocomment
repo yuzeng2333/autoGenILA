@@ -1,0 +1,46 @@
+module S(clk, in, out);
+  wire [7:0] _00_;
+  wire _01_;
+  wire _02_;
+  wire _03_;
+  wire _04_;
+  wire _05_;
+  wire _06_;
+  input clk;
+  input [7:0] in;
+  output [7:0] out;
+  reg [7:0] out;
+  always @(posedge clk)
+      out <= _00_;
+  function [7:0] _08_;
+    input [7:0] a;
+    input [47:0] b;
+    input [5:0] s;
+    casez (s)
+      6'b?????1:
+        _08_ = b[7:0];
+      6'b????1?:
+        _08_ = b[15:8];
+      6'b???1??:
+        _08_ = b[23:16];
+      6'b??1???:
+        _08_ = b[31:24];
+      6'b?1????:
+        _08_ = b[39:32];
+      6'b1?????:
+        _08_ = b[47:40];
+      default:
+        _08_ = a;
+    endcase
+  endfunction
+  wire [5:0] fangyuan0;
+  assign fangyuan0 = { _06_, _05_, _04_, _03_, _02_, _01_ };
+
+  assign _00_ = _08_(out, 48'h637c777bf2aa, fangyuan0);
+  assign _01_ = in == 3'h5;
+  assign _02_ = in == 3'h4;
+  assign _03_ = in == 2'h3;
+  assign _04_ = in == 2'h2;
+  assign _05_ = in == 1'h1;
+  assign _06_ = ! in;
+endmodule

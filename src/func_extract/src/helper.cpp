@@ -26,11 +26,12 @@ uint32_t hdb2int(std::string num) {
     std::string pureNum = m.str(2); 
     return hex2int(pureNum);    
   }
-  else {
-    std::regex_match(num, m, pBin);
+  else if(std::regex_match(num, m, pBin)){
     std::string pureNum = m.str(2); 
     return bin2int(pureNum);    
   }
+  else 
+    return std::stoi(num);
 }
 
 uint32_t hex2int(std::string num) {

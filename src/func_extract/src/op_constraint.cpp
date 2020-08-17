@@ -754,11 +754,24 @@ expr add_one_case_branch_expr(astNode* const node, expr &caseExpr, uint32_t idx,
     return ite(caseExpr.extract(posOfOne, posOfOne) == c.bv_val(1, 1), localAssignExpr, localBranchExpr);
   }
   else {
+    // if the case has all the values for caseVar, the default option is redundant
+    //std::string caseVarAndSlice = node->srcVec[0];
+    //uint32_t caseHi = get_lgc_hi(caseVarAndSlice);
+    //uint32_t caseLo = get_lgc_lo(caseVarAndSlice);
+    //if(std::exp2(caseHi-caseLo+1) == ((node->srcVec.size()-3)/2)) {
+    //  return var_expr(0, timeIdx, c, false, get_var_slice_width(assignVarAndSlice));
+    //}
     assignNode = node->childVec[2];
     if(isNum(assignVarAndSlice))
       return var_expr(assignVarAndSlice, timeIdx, c, false);
-    else
-      return add_constraint(assignNode, timeIdx, c, s, g, bound, isSolve).extract(hi, lo);
+    else {
+      //if(isSolve)
+        return add_constraint(assignNode, timeIdx, c, s, g, bound, isSolve).extract(hi, lo);
+      //else {
+      //  uint32_t localWidth = get_var_slice_width(assignVarAndSlice);
+      //  return var_expr("0", timeIdx, c, false, localWidth);
+      //}
+    }
   }
 } 
 

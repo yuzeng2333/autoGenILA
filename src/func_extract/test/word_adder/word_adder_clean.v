@@ -26,7 +26,8 @@ module word_adder(clk, rst, func, inWord, result);
   wire [4:0] counter_next   = func == 2 ? 8           :
                               running   ? counter - 1 : 0 ;
 
-  wire [8:0] word_sum_next  = running   ? word_sum + word[counter-1] : word_sum;
+  wire [8:0] word_sum_next  = func == 2 ? 0                          :
+                              running   ? word_sum + word[counter-1] : word_sum;
 
   assign result = word_sum;
 
