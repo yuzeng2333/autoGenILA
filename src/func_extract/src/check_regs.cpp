@@ -388,7 +388,7 @@ expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
     if(!isSolve) {
       uint32_t localWidth = get_var_slice_width(dest);
       toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Replaced with 0: "+timed_name(dest, timeIdx));
-      return var_expr("MIXIEGEN", timeIdx, c, false, localWidth); 
+      return var_expr("0", timeIdx, c, false, localWidth); 
     }
   }
   // end of if

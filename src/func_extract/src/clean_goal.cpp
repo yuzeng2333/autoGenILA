@@ -36,11 +36,15 @@ void clean_goal() {
         line = line.substr(0, pos) + line.substr(i-1);
       }
     }
-    if(line.find("MIXIEGEN") != std::string::npos) {
-      uint32_t localWidth = get_var_slice_width(g_rootNode);
-      size_t pos = line.find("MIXIEGEN");
-      line = line.substr(0, pos) + get_zero(localWidth) + line.substr(pos+7);
-    }
+    //if(line.find("MIXIEGEN") != std::string::npos) {
+    //  size_t pos = line.find("MIXIEGEN");
+    //  std::string width;
+    //  uint32_t i = pos + 8;
+    //  while(std::isdigit(line[i])) 
+    //    width += line[i++];
+    //  uint32_t localWidth = std::stoi(width);
+    //  line = line.substr(0, pos) + get_zero(localWidth) + line.substr(i);
+    //}
     output << line << std::endl;
 
     if(line.front() == ')') {

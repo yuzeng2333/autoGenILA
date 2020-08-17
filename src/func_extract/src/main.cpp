@@ -26,12 +26,17 @@ int main(int argc, char *argv[]) {
   g_remove_adff = false;
   print_time();  
   if(doClean.compare("1") == 0) {
+    toCout("### Begin clean_file");
     clean_file(g_path+"/design.v");
+    toCout("### Begin remove_functions");
     remove_functions(g_path+"/design.v");
+    toCout("### Begin parse_verilog");
     parse_verilog(g_path+"/design.v.clean");    
   }
-  else
+  else {
+    toCout("### Begin parse_verilog");
     parse_verilog(g_path+"/design.v.clean");
+  }
   //read_in_architectural_states(asFile);
   read_in_instructions(g_path+"/instr.txt");
   vcd_parser(g_path+"/rst.vcd");
