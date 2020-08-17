@@ -135,6 +135,19 @@ CMakeFiles/TaintGenLib.dir/taint_gen.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/TaintGenLib.dir/taint_gen.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /workspace/research/ILA/autoGenILA/src/taint_method/taint_gen.cpp -o CMakeFiles/TaintGenLib.dir/taint_gen.cpp.s
 
+CMakeFiles/TaintGenLib.dir/vcd_parser.cpp.o: CMakeFiles/TaintGenLib.dir/flags.make
+CMakeFiles/TaintGenLib.dir/vcd_parser.cpp.o: vcd_parser.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/taint_method/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/TaintGenLib.dir/vcd_parser.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/TaintGenLib.dir/vcd_parser.cpp.o -c /workspace/research/ILA/autoGenILA/src/taint_method/vcd_parser.cpp
+
+CMakeFiles/TaintGenLib.dir/vcd_parser.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/TaintGenLib.dir/vcd_parser.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /workspace/research/ILA/autoGenILA/src/taint_method/vcd_parser.cpp > CMakeFiles/TaintGenLib.dir/vcd_parser.cpp.i
+
+CMakeFiles/TaintGenLib.dir/vcd_parser.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/TaintGenLib.dir/vcd_parser.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /workspace/research/ILA/autoGenILA/src/taint_method/vcd_parser.cpp -o CMakeFiles/TaintGenLib.dir/vcd_parser.cpp.s
+
 # Object files for target TaintGenLib
 TaintGenLib_OBJECTS = \
 "CMakeFiles/TaintGenLib.dir/VarWidth.cpp.o" \
@@ -142,7 +155,8 @@ TaintGenLib_OBJECTS = \
 "CMakeFiles/TaintGenLib.dir/main.cpp.o" \
 "CMakeFiles/TaintGenLib.dir/op_taint_gen.cpp.o" \
 "CMakeFiles/TaintGenLib.dir/pass_info.cpp.o" \
-"CMakeFiles/TaintGenLib.dir/taint_gen.cpp.o"
+"CMakeFiles/TaintGenLib.dir/taint_gen.cpp.o" \
+"CMakeFiles/TaintGenLib.dir/vcd_parser.cpp.o"
 
 # External object files for target TaintGenLib
 TaintGenLib_EXTERNAL_OBJECTS =
@@ -153,9 +167,10 @@ libTaintGenLib.a: CMakeFiles/TaintGenLib.dir/main.cpp.o
 libTaintGenLib.a: CMakeFiles/TaintGenLib.dir/op_taint_gen.cpp.o
 libTaintGenLib.a: CMakeFiles/TaintGenLib.dir/pass_info.cpp.o
 libTaintGenLib.a: CMakeFiles/TaintGenLib.dir/taint_gen.cpp.o
+libTaintGenLib.a: CMakeFiles/TaintGenLib.dir/vcd_parser.cpp.o
 libTaintGenLib.a: CMakeFiles/TaintGenLib.dir/build.make
 libTaintGenLib.a: CMakeFiles/TaintGenLib.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/workspace/research/ILA/autoGenILA/src/taint_method/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX static library libTaintGenLib.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/workspace/research/ILA/autoGenILA/src/taint_method/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Linking CXX static library libTaintGenLib.a"
 	$(CMAKE_COMMAND) -P CMakeFiles/TaintGenLib.dir/cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/TaintGenLib.dir/link.txt --verbose=$(VERBOSE)
 

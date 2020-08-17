@@ -21,6 +21,7 @@ CMakeFiles/a.out.dir/main.cpp.o: main.h
 CMakeFiles/a.out.dir/main.cpp.o: op_taint_gen.h
 CMakeFiles/a.out.dir/main.cpp.o: pass_info.h
 CMakeFiles/a.out.dir/main.cpp.o: taint_gen.h
+CMakeFiles/a.out.dir/main.cpp.o: vcd_parser.h
 
 CMakeFiles/a.out.dir/op_taint_gen.cpp.o: VarWidth.h
 CMakeFiles/a.out.dir/op_taint_gen.cpp.o: global_data.h
@@ -44,4 +45,11 @@ CMakeFiles/a.out.dir/taint_gen.cpp.o: op_taint_gen.h
 CMakeFiles/a.out.dir/taint_gen.cpp.o: pass_info.h
 CMakeFiles/a.out.dir/taint_gen.cpp.o: taint_gen.cpp
 CMakeFiles/a.out.dir/taint_gen.cpp.o: taint_gen.h
+
+CMakeFiles/a.out.dir/vcd_parser.cpp.o: VarWidth.h
+CMakeFiles/a.out.dir/vcd_parser.cpp.o: global_data.h
+CMakeFiles/a.out.dir/vcd_parser.cpp.o: helper.h
+CMakeFiles/a.out.dir/vcd_parser.cpp.o: pass_info.h
+CMakeFiles/a.out.dir/vcd_parser.cpp.o: vcd_parser.cpp
+CMakeFiles/a.out.dir/vcd_parser.cpp.o: vcd_parser.h
 

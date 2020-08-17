@@ -256,28 +256,44 @@ void clean_file(std::string fileName) {
   std::regex redundentBlank("(\\S)(\\s+)(\\S)");
   std::regex extraBlank("([a-zA-Z0-9_\\.'])(\\s)(\\[)");
   bool inFunc = false;
+  std::string rsvdLine; // reserved line, not printed in last iteration
   while( std::getline(cleanFileInput, line) ) {
     //toCout(line);
-    if(line.find("27'b000000000000000000000000000, of, 32'b00000000000000000000000000000000") != std::string::npos) {
-      toCout("FIND IT!");
-    }
+    //if(line.find("27'b000000000000000000000000000, of, 32'b00000000000000000000000000000000") != std::string::npos) {
+    //  toCout("FIND IT!");
+    //}
+
+    /// skipe comment line
     if(std::regex_match(line, match, pureComment) || line.substr(0,2) == "/*" || line.empty())
       continue;
+
+    /// remove in-line comments
     line = std::regex_replace(line, partialComment, "");
     cleanLine = std::regex_replace(line, redundentBlank, "$1 $3");
+
+    /// extract aways concatenations into new Fangyuan variables
     bool noConcat=true;
-    std::string retStr;
+    /// if is always line, look ahead for non-blocking concatenation assignments
+    std::string retStr;    
     noConcat = extract_concat(cleanLine, output, retStr, true);
-    //if( !std::regex_match(line, match, pSrcDestBothConcat) )
-    if( !is_srcDestConcat(line) && (!std::regex_match(line, match, pAlwaysClkRst) || !g_remove_adff) ) {
-      if (noConcat)
+    if( !is_srcDestConcat(line) && (!std::regex_match(line, match, pAlwaysClkRst) || !g_remove_adff) ) { // pAlwaysClkRst is printed below
+      if(std::regex_match(cleanLine, match, pAlwaysClk)) {
+        rsvdLine = cleanLine;
+      }
+      else if (noConcat) {
+        if(!rsvdLine.empty()) output << rsvdLine << std::endl;
         output << cleanLine << std::endl;
+        rsvdLine.clear();
+      }
       else {
+        if(!rsvdLine.empty()) output << rsvdLine << std::endl;        
         output << retStr << std::endl;
         cleanLine = retStr;
+        rsvdLine.clear();        
       }
     }
-    // store the width of wires and regs in varWidth
+
+    /// store the width of wires and regs in varWidth
     uint32_t choice = parse_verilog_line(cleanLine, true);
     std::smatch m;
     switch (choice) {

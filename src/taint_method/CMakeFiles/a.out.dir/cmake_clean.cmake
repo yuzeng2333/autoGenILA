@@ -5,6 +5,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/a.out.dir/op_taint_gen.cpp.o"
   "CMakeFiles/a.out.dir/pass_info.cpp.o"
   "CMakeFiles/a.out.dir/taint_gen.cpp.o"
+  "CMakeFiles/a.out.dir/vcd_parser.cpp.o"
   "a.out.pdb"
   "a.out"
 )
