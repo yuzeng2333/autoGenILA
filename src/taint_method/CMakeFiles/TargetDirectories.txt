@@ -1,4 +1,3 @@
 /workspace/research/ILA/autoGenILA/src/taint_method/CMakeFiles/rebuild_cache.dir
-/workspace/research/ILA/autoGenILA/src/taint_method/CMakeFiles/edit_cache.dir
-/workspace/research/ILA/autoGenILA/src/taint_method/CMakeFiles/a.out.dir
 /workspace/research/ILA/autoGenILA/src/taint_method/CMakeFiles/TaintGenLib.dir
+/workspace/research/ILA/autoGenILA/src/taint_method/CMakeFiles/edit_cache.dir

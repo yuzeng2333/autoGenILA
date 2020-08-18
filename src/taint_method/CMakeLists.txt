@@ -9,5 +9,5 @@ aux_source_directory(. SRC_DIR)
 
 set(VERILOG_EXE a.out)
 
-add_executable(${VERILOG_EXE} ${SRC_DIR})
+#add_executable(${VERILOG_EXE} ${SRC_DIR})
 add_library(TaintGenLib ${SRC_DIR})

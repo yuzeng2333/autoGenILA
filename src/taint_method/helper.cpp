@@ -1377,7 +1377,7 @@ std::string extract_bin(std::string num, uint32_t highIdx, uint32_t lowIdx) {
       toCout("Error: highIdx is out of bound! highIdx: "+toStr(highIdx)+", num:"+num);
       abort();
     }
-    return num.substr(width-highIdx-1, highIdx-lowIdx+1);
+    return bits.substr(width-highIdx-1, highIdx-lowIdx+1);
   }
   else if(std::regex_match(num, m, pHex)) {
     uint32_t width = std::stoi(m.str(1));

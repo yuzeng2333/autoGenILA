@@ -111,19 +111,6 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named a.out
-
-# Build rule for target.
-a.out: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 a.out
-.PHONY : a.out
-
-# fast build rule for target.
-a.out/fast:
-	$(MAKE) -f CMakeFiles/a.out.dir/build.make CMakeFiles/a.out.dir/build
-.PHONY : a.out/fast
-
-#=============================================================================
 # Target rules for targets named TaintGenLib
 
 # Build rule for target.
@@ -142,7 +129,6 @@ VarWidth.o: VarWidth.cpp.o
 
 # target to build an object file
 VarWidth.cpp.o:
-	$(MAKE) -f CMakeFiles/a.out.dir/build.make CMakeFiles/a.out.dir/VarWidth.cpp.o
 	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/VarWidth.cpp.o
 .PHONY : VarWidth.cpp.o
 
@@ -152,7 +138,6 @@ VarWidth.i: VarWidth.cpp.i
 
 # target to preprocess a source file
 VarWidth.cpp.i:
-	$(MAKE) -f CMakeFiles/a.out.dir/build.make CMakeFiles/a.out.dir/VarWidth.cpp.i
 	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/VarWidth.cpp.i
 .PHONY : VarWidth.cpp.i
 
@@ -162,7 +147,6 @@ VarWidth.s: VarWidth.cpp.s
 
 # target to generate assembly for a file
 VarWidth.cpp.s:
-	$(MAKE) -f CMakeFiles/a.out.dir/build.make CMakeFiles/a.out.dir/VarWidth.cpp.s
 	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/VarWidth.cpp.s
 .PHONY : VarWidth.cpp.s
 
@@ -172,7 +156,6 @@ helper.o: helper.cpp.o
 
 # target to build an object file
 helper.cpp.o:
-	$(MAKE) -f CMakeFiles/a.out.dir/build.make CMakeFiles/a.out.dir/helper.cpp.o
 	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/helper.cpp.o
 .PHONY : helper.cpp.o
 
@@ -182,7 +165,6 @@ helper.i: helper.cpp.i
 
 # target to preprocess a source file
 helper.cpp.i:
-	$(MAKE) -f CMakeFiles/a.out.dir/build.make CMakeFiles/a.out.dir/helper.cpp.i
 	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/helper.cpp.i
 .PHONY : helper.cpp.i
 
@@ -192,7 +174,6 @@ helper.s: helper.cpp.s
 
 # target to generate assembly for a file
 helper.cpp.s:
-	$(MAKE) -f CMakeFiles/a.out.dir/build.make CMakeFiles/a.out.dir/helper.cpp.s
 	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/helper.cpp.s
 .PHONY : helper.cpp.s
 
@@ -202,7 +183,6 @@ main.o: main.cpp.o
 
 # target to build an object file
 main.cpp.o:
-	$(MAKE) -f CMakeFiles/a.out.dir/build.make CMakeFiles/a.out.dir/main.cpp.o
 	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/main.cpp.o
 .PHONY : main.cpp.o
 
@@ -212,7 +192,6 @@ main.i: main.cpp.i
 
 # target to preprocess a source file
 main.cpp.i:
-	$(MAKE) -f CMakeFiles/a.out.dir/build.make CMakeFiles/a.out.dir/main.cpp.i
 	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/main.cpp.i
 .PHONY : main.cpp.i
 
@@ -222,7 +201,6 @@ main.s: main.cpp.s
 
 # target to generate assembly for a file
 main.cpp.s:
-	$(MAKE) -f CMakeFiles/a.out.dir/build.make CMakeFiles/a.out.dir/main.cpp.s
 	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/main.cpp.s
 .PHONY : main.cpp.s
 
@@ -232,7 +210,6 @@ op_taint_gen.o: op_taint_gen.cpp.o
 
 # target to build an object file
 op_taint_gen.cpp.o:
-	$(MAKE) -f CMakeFiles/a.out.dir/build.make CMakeFiles/a.out.dir/op_taint_gen.cpp.o
 	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/op_taint_gen.cpp.o
 .PHONY : op_taint_gen.cpp.o
 
@@ -242,7 +219,6 @@ op_taint_gen.i: op_taint_gen.cpp.i
 
 # target to preprocess a source file
 op_taint_gen.cpp.i:
-	$(MAKE) -f CMakeFiles/a.out.dir/build.make CMakeFiles/a.out.dir/op_taint_gen.cpp.i
 	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/op_taint_gen.cpp.i
 .PHONY : op_taint_gen.cpp.i
 
@@ -252,7 +228,6 @@ op_taint_gen.s: op_taint_gen.cpp.s
 
 # target to generate assembly for a file
 op_taint_gen.cpp.s:
-	$(MAKE) -f CMakeFiles/a.out.dir/build.make CMakeFiles/a.out.dir/op_taint_gen.cpp.s
 	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/op_taint_gen.cpp.s
 .PHONY : op_taint_gen.cpp.s
 
@@ -262,7 +237,6 @@ pass_info.o: pass_info.cpp.o
 
 # target to build an object file
 pass_info.cpp.o:
-	$(MAKE) -f CMakeFiles/a.out.dir/build.make CMakeFiles/a.out.dir/pass_info.cpp.o
 	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/pass_info.cpp.o
 .PHONY : pass_info.cpp.o
 
@@ -272,7 +246,6 @@ pass_info.i: pass_info.cpp.i
 
 # target to preprocess a source file
 pass_info.cpp.i:
-	$(MAKE) -f CMakeFiles/a.out.dir/build.make CMakeFiles/a.out.dir/pass_info.cpp.i
 	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/pass_info.cpp.i
 .PHONY : pass_info.cpp.i
 
@@ -282,7 +255,6 @@ pass_info.s: pass_info.cpp.s
 
 # target to generate assembly for a file
 pass_info.cpp.s:
-	$(MAKE) -f CMakeFiles/a.out.dir/build.make CMakeFiles/a.out.dir/pass_info.cpp.s
 	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/pass_info.cpp.s
 .PHONY : pass_info.cpp.s
 
@@ -292,7 +264,6 @@ taint_gen.o: taint_gen.cpp.o
 
 # target to build an object file
 taint_gen.cpp.o:
-	$(MAKE) -f CMakeFiles/a.out.dir/build.make CMakeFiles/a.out.dir/taint_gen.cpp.o
 	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/taint_gen.cpp.o
 .PHONY : taint_gen.cpp.o
 
@@ -302,7 +273,6 @@ taint_gen.i: taint_gen.cpp.i
 
 # target to preprocess a source file
 taint_gen.cpp.i:
-	$(MAKE) -f CMakeFiles/a.out.dir/build.make CMakeFiles/a.out.dir/taint_gen.cpp.i
 	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/taint_gen.cpp.i
 .PHONY : taint_gen.cpp.i
 
@@ -312,7 +282,6 @@ taint_gen.s: taint_gen.cpp.s
 
 # target to generate assembly for a file
 taint_gen.cpp.s:
-	$(MAKE) -f CMakeFiles/a.out.dir/build.make CMakeFiles/a.out.dir/taint_gen.cpp.s
 	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/taint_gen.cpp.s
 .PHONY : taint_gen.cpp.s
 
@@ -322,7 +291,6 @@ vcd_parser.o: vcd_parser.cpp.o
 
 # target to build an object file
 vcd_parser.cpp.o:
-	$(MAKE) -f CMakeFiles/a.out.dir/build.make CMakeFiles/a.out.dir/vcd_parser.cpp.o
 	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/vcd_parser.cpp.o
 .PHONY : vcd_parser.cpp.o
 
@@ -332,7 +300,6 @@ vcd_parser.i: vcd_parser.cpp.i
 
 # target to preprocess a source file
 vcd_parser.cpp.i:
-	$(MAKE) -f CMakeFiles/a.out.dir/build.make CMakeFiles/a.out.dir/vcd_parser.cpp.i
 	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/vcd_parser.cpp.i
 .PHONY : vcd_parser.cpp.i
 
@@ -342,7 +309,6 @@ vcd_parser.s: vcd_parser.cpp.s
 
 # target to generate assembly for a file
 vcd_parser.cpp.s:
-	$(MAKE) -f CMakeFiles/a.out.dir/build.make CMakeFiles/a.out.dir/vcd_parser.cpp.s
 	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/vcd_parser.cpp.s
 .PHONY : vcd_parser.cpp.s
 
@@ -353,9 +319,8 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... rebuild_cache"
-	@echo "... edit_cache"
-	@echo "... a.out"
 	@echo "... TaintGenLib"
+	@echo "... edit_cache"
 	@echo "... VarWidth.o"
 	@echo "... VarWidth.i"
 	@echo "... VarWidth.s"

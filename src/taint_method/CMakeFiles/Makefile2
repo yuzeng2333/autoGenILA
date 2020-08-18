@@ -65,43 +65,6 @@ CMAKE_SOURCE_DIR = /workspace/research/ILA/autoGenILA/src/taint_method
 CMAKE_BINARY_DIR = /workspace/research/ILA/autoGenILA/src/taint_method
 
 #=============================================================================
-# Target rules for target CMakeFiles/a.out.dir
-
-# All Build rule for target.
-CMakeFiles/a.out.dir/all:
-	$(MAKE) -f CMakeFiles/a.out.dir/build.make CMakeFiles/a.out.dir/depend
-	$(MAKE) -f CMakeFiles/a.out.dir/build.make CMakeFiles/a.out.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/workspace/research/ILA/autoGenILA/src/taint_method/CMakeFiles --progress-num=9,10,11,12,13,14,15,16 "Built target a.out"
-.PHONY : CMakeFiles/a.out.dir/all
-
-# Include target in all.
-all: CMakeFiles/a.out.dir/all
-
-.PHONY : all
-
-# Build rule for subdir invocation for target.
-CMakeFiles/a.out.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /workspace/research/ILA/autoGenILA/src/taint_method/CMakeFiles 8
-	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/a.out.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /workspace/research/ILA/autoGenILA/src/taint_method/CMakeFiles 0
-.PHONY : CMakeFiles/a.out.dir/rule
-
-# Convenience name for target.
-a.out: CMakeFiles/a.out.dir/rule
-
-.PHONY : a.out
-
-# clean rule for target.
-CMakeFiles/a.out.dir/clean:
-	$(MAKE) -f CMakeFiles/a.out.dir/build.make CMakeFiles/a.out.dir/clean
-.PHONY : CMakeFiles/a.out.dir/clean
-
-# clean rule for target.
-clean: CMakeFiles/a.out.dir/clean
-
-.PHONY : clean
-
-#=============================================================================
 # Target rules for target CMakeFiles/TaintGenLib.dir
 
 # All Build rule for target.

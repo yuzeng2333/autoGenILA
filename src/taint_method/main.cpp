@@ -10,7 +10,7 @@ bool g_use_vcd_parser = true;
 
 // 1st argument is file name
 // 2rd is whether to do process_path_info
-int main(int argc, char *argv[]) {
+int main_entry(int argc, char *argv[]) {
   std::string fileName = argv[1];
   bool doProcessPathInfo;
   if(argc > 2)
