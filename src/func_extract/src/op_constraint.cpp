@@ -106,7 +106,12 @@ expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver 
   expr destExpr(c);
 
   destExpr = var_expr(dest, timeIdx, c, false);
+  expr destFirstExpr = var_expr(dest, 1, c, false);
   if(isSolve) {
+    // if input signal's value is X, fix it for all timeIdx
+    if(g_currInstrInfo.instrEncoding[dest] == "x") {
+      s.add( destExpr == destFirstExpr );
+    }
     destExpr_t = var_expr(dest, timeIdx, c, true);
     set_zero(s, destExpr_t);
   }

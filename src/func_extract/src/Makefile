@@ -36,3 +36,9 @@ ss:
 
 ss1:
 	../func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/aes_short_s 1
+
+aes1:
+	../func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/aes 1
+
+aes:
+	../func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/aes 0
