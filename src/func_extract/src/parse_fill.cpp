@@ -229,6 +229,7 @@ void read_in_instructions(std::string fileName) {
               toCout("Encoding is not x or number[3], line is: "+line);
               abort();
             }
+            if(encoding == "x") toCout("Warning: find value X in NOP: "+instrName);
             g_nopInstr.emplace(instrName, encoding);
           }
           break;
