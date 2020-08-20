@@ -26,6 +26,7 @@ std::unordered_map<std::string, expr*> g_existedExpr;
 std::string g_rootNode;
 struct instrInfo g_currInstrInfo;
 uint32_t g_destWidth;
+bool g_skipCheck;
 
 // assume g_ssaTable and g_nbTable have been filled
 void check_all_regs() {
@@ -39,11 +40,14 @@ void check_all_regs() {
     for(auto pair: instrInfo.writeASV) {
       uint32_t cycleCnt = pair.first;
       std::string oneWriteAsv = pair.second;
-      if(reg2Slices.find(oneWriteAsv) == reg2Slices.end())
-        check_single_reg_and_slice(oneWriteAsv, cycleCnt, i-1);
-      else
-        for(std::string regAndSlice: reg2Slices[oneWriteAsv])
-          check_single_reg_and_slice(regAndSlice, cycleCnt, i-1);
+      if(instrInfo.skipWriteASV.find(oneWriteAsv) == instrInfo.skipWriteASV.end())
+        if(reg2Slices.find(oneWriteAsv) == reg2Slices.end())
+          check_single_reg_and_slice(oneWriteAsv, cycleCnt, i-1);
+        else
+          for(std::string regAndSlice: reg2Slices[oneWriteAsv])
+            check_single_reg_and_slice(regAndSlice, cycleCnt, i-1);
+      else // if the writeASV is to be skipped
+        simplify_goal(oneWriteAsv, cycleCnt, i-1);
     }
   }
 }
@@ -57,6 +61,30 @@ void clean_data() {
 }
 
 
+void simplify_goal(std::string destAndSlice, uint32_t bound, uint32_t instrIdx) {
+  g_skipCheck = true;
+  clean_data();
+  std::ofstream outFile;
+  outFile.open(g_path+"/result.txt");
+  std::ofstream goalFile;
+  goalFile.open(g_path+"/goal.txt");
+  context c;
+  solver s(c);
+  goal g(c); 
+  expr destNextExpr = add_constraint(g_varNode[destAndSlice], 0, c, s, g, bound, /*isSolve=*/false);
+  expr destExpr_g = var_expr(destAndSlice, 100, c, false);
+  g.add( destExpr_g == destNextExpr ); 
+  //add_all_clean_constraints(c, s, g, bound, /*isSolve=*/false);
+  tactic t(c, "simplify");
+  apply_result r = t(g);
+  toCout("*************************  Update function for "+destAndSlice);
+  std::cout << r << std::endl;
+  outFile << r << std::endl;
+  goalFile << "#"+toStr(instrIdx)+"#"+destAndSlice+"#"+toStr(bound) << std::endl;
+  goalFile << r << std::endl;
+}
+
+
 // should construct two things while checking
 // 1. a SMT equation to be solved for correct input and AS
 // 2. an AST tree for the reg related expression. The solution 
@@ -66,6 +94,7 @@ void clean_data() {
 // constructed only one. But the SMT equation may need to be constructed
 // multiple times, until a solution is obtained or a bound is reached.
 void check_single_reg_and_slice(std::string destAndSlice, uint32_t cycleCnt, uint32_t instrIdx) {
+  g_skipCheck = false;  
   std::ofstream outFile;
   outFile.open(g_path+"/result.txt");
   std::ofstream goalFile;
@@ -304,9 +333,9 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t cycleCnt, uin
 
 expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
   std::string var = node->dest;
-  //if(var.find("4_0.S_0.out") != std::string::npos) {
-  //  toCout("%%%%%%%%%%%%% Found S4_0.S_0.out!");
-  //}
+  if(var.find("_07_") != std::string::npos) {
+    toCout("%%%%%%%%%%%%% Found _07_");
+  }
   if(g_existedExpr.find(timed_name(var, timeIdx)) != g_existedExpr.end() ) {
     if(isSolve)
       return var_expr(var, timeIdx, c, false);
@@ -316,7 +345,7 @@ expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s
 
   expr retExpr(c);
   if ( isInput(var) ) { // input_t is always 0
-    retExpr = input_constraint(node, timeIdx, c, s, g, isSolve);
+    retExpr = input_constraint(node, timeIdx, c, s, g, bound, isSolve);
   }
 
   else if( isReg(var) ) { // AS case is moved to add_nb_constraint

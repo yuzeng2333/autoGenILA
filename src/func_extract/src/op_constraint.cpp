@@ -100,7 +100,7 @@ expr bool_expr(std::string var, uint32_t timeIdx, context &c, bool isTaint) {
 }
 
 
-expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, bool isSolve) {
+expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
   std::string dest = node->dest;
   expr destExpr_t(c);
   expr destExpr(c);
@@ -116,14 +116,40 @@ expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver 
     set_zero(s, destExpr_t);
   }
   else {
-    if( INPUT_EXPR_VAL.find(timed_name(dest, timeIdx)) != INPUT_EXPR_VAL.end() 
+    if( !g_skipCheck ) {
+      if( INPUT_EXPR_VAL.find(timed_name(dest, timeIdx)) != INPUT_EXPR_VAL.end() 
         && has_explicit_value(dest) ) {
-      expr retExpr = *INPUT_EXPR_VAL[timed_name(dest, timeIdx)];
-      toCoutVerb("input value for "+dest+": "+retExpr.decl().name().str());
-      return retExpr;
+        expr retExpr = *INPUT_EXPR_VAL[timed_name(dest, timeIdx)];
+        toCoutVerb("input value for "+dest+": "+retExpr.decl().name().str());
+        return retExpr;
+      } // else, retuen destExpr instead
     }
-    //expr localVal = *INPUT_EXPR_VAL[timed_name(dest, timeIdx)];
-    //g.add( destExpr = localVal ); 
+    else if(timeIdx == bound+1){
+      if(g_currInstrInfo.instrEncoding.find(dest) == g_currInstrInfo.instrEncoding.end()) {
+        toCout("Error: input signal not found for current instruction: "+dest);
+        abort();
+      }
+      std::string localVal = g_currInstrInfo.instrEncoding[dest];
+      uint32_t localWidth = get_var_slice_width(dest);
+      if(localVal != "x") {
+        assert(is_number(localVal));
+        toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give "+localVal+" to "+timed_name(dest, timeIdx));
+        return c.bv_val(hdb2int(localVal), localWidth);
+      }
+    }
+    else if(!g_nopInstr.empty()){ // else, give the reset value
+      if(g_nopInstr.find(dest) == g_nopInstr.end()) {
+        toCout("Error: var not found for nop instruction: "+dest);
+        abort();
+      }
+      std::string localVal = g_nopInstr[dest];
+      uint32_t localWidth = get_var_slice_width(dest);
+      if(localVal != "x") {
+        assert(is_number(localVal));
+        toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give "+localVal+" to "+timed_name(dest, timeIdx));
+        return c.bv_val(hdb2int(localVal), localWidth);
+      }
+    }
   }
   return destExpr;
 }
@@ -157,6 +183,10 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   split_slice(op1AndSlice, op1, op1Slice);
   split_slice(op2AndSlice, op2, op2Slice);
  
+  if(destAndSlice == "_07_") {
+    toCoutVerb("Found _07_!");
+  }
+
   bool op1Extract = !op1Slice.empty() && !is_sliced(op1);
   bool op2Extract = !op2Slice.empty() && !is_sliced(op2);
 
@@ -193,8 +223,10 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   assert(!op2Expr_t.is_bool());
   expr op1Expr(c);
   expr op2Expr(c);
-  if(!op1IsNum)
-    op1Expr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve).extract(op1Hi, op1Lo); 
+  if(!op1IsNum) {
+    expr tmpExpr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve); 
+    op1Expr = tmpExpr.extract(op1Hi, op1Lo);
+  }
   else
     op1Expr = var_expr(op1AndSlice, timeIdx, c, false, op1WidthNum);
 

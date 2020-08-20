@@ -37,9 +37,10 @@ void add_node(std::string var, uint32_t timeIdx, astNode* const node, bool varIs
   if(g_visitedNode.find(var) != g_visitedNode.end())
     return;
   g_visitedNode.emplace(var, node);
-  if(var.compare("kp") == 0) {
+  //toCout("Add node for");
+  //if(var.compare("kp") == 0) {
     //toCoutVerb("FIND IT!");
-  }
+  //}
   g_varNode.emplace(var, node);
   if( reg2Slices.find(var) != reg2Slices.end() ) {
     add_sliced_node(var, timeIdx, node);

@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
   outFile << "Begin main!" << std::endl;
   outFile.close();
   toCout("Begin main!");
-  g_verb = false;
+  g_verb = true;
   g_print_solver = false;
   g_remove_adff = false;
   print_time();  

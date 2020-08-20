@@ -13,6 +13,7 @@ extern std::set<std::string> INT_EXPR_SET;
 
 extern std::vector<struct instrInfo> g_instrInfo;
 extern bool g_print_solver;
+extern bool g_skipCheck;
 extern std::set<std::string> g_readASV;
 extern std::unordered_map<std::string, expr*> g_existedExpr;
 extern std::string g_rootNode;

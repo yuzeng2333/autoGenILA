@@ -1,6 +1,8 @@
 #include "parse_fill.h"
 #include "expr.h"
 #include "helper.h"
+#include "../../taint_method/main.h"
+#include "../../taint_method/global_data.h"
 
 // global variables
 std::set<std::string> moduleAs;
@@ -38,6 +40,31 @@ void clear_global_vars() {
   reg2Slices.clear();
   g_new_var = 0;
 }
+
+
+//void hierarchical_parse(std::string fileName) {
+//  g_path = extract_path(fileName);  
+//  std::vector<std::string> modules;
+//  std::map<std::string, std::vector<std::string>> childModules;
+//  uint32_t totalRegCnt;
+//  g_topModule = separate_modules(fileName, modules, childModules, totalRegCnt, g_instance2moduleMap);
+//  std::map<std::string, bool> moduleReady;
+//  std::map<std::string, std::vector<std::string>> moduleInputsMap;
+//  std::map<std::string, std::vector<std::string>> moduleOutputsMap;
+//  std::map<std::string, std::vector<std::string>> moduleRFlagsMap;
+//  for(auto moduleName: modules) { 
+//    moduleReady.emplace(moduleName, false);
+//  }
+//  for(std::string module: modules) {
+//    bool isTop = (g_topModule.compare(module) == 0);
+//    parse_verilog_bottom_up(g_path, module, moduleReady, childModules, g_topModule, moduleInputsMap, moduleOutputsMap, moduleRFlagsMap, totalRegCnt, nextSig, doProcessPathInfo);
+//  }
+//}
+
+
+//void parse_verilog_bottom_up(std::string path, ) {
+//
+//}
 
 
 // parse the verilog lines, and store them into g_ssaTable & g_nbTable
@@ -120,21 +147,7 @@ void parse_verilog(std::string fileName) {
 }
 
 
-void read_in_architectural_states(std::string fileName) {
-  std::ifstream input(fileName);
-  std::string line;
-  std::smatch m;
-  // assume each line has only one AS
-  while(std::getline(input, line)) {
-    if(!std::regex_match(line, m, pVarName)) {
-      toCout("Error in matching: "+line);
-      abort();
-    }
-    moduleAs.insert(m.str(0));
-  }
-}
-
-
+// parse instr.txt file
 // parsed result is in g_instrInfo
 void read_in_instructions(std::string fileName) {
   moduleAs.clear();
@@ -174,7 +187,7 @@ void read_in_instructions(std::string fileName) {
               toCout("Encoding is not x or number[1], line is: "+line);
               abort();
             }
-            struct instrInfo info = { {{instrName, encoding}}, std::set<std::string>{}, std::set<std::pair<uint32_t, std::string>>{} };
+            struct instrInfo info = { {{instrName, encoding}}, std::set<std::string>{}, std::set<std::pair<uint32_t, std::string>>{}, std::set<std::string>{} };
             //info.instrEncoding.emplace(instrName, encoding);
             g_instrInfo.push_back(info);
             state = OtherInstr;
@@ -211,6 +224,11 @@ void read_in_instructions(std::string fileName) {
                 abort();
               }
               std::string asName = line.substr(0, pos);
+              std::string subLine = line.substr(0, pos);
+              if(subLine.find("(skip)") != std::string::npos) {
+                asName = line.substr(0, pos-6);
+                g_instrInfo.back().skipWriteASV.insert(asName);                
+              }
               g_instrInfo.back().writeASV.insert(std::make_pair(uint32_t(std::stoi(cycleCnt)), asName));
               moduleAs.insert(asName);
             }
