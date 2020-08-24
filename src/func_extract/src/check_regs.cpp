@@ -27,7 +27,6 @@ std::string g_rootNode;
 struct instrInfo g_currInstrInfo;
 uint32_t g_destWidth;
 bool g_skipCheck;
-std::ofstream g_outFile;
 
 // assume g_ssaTable and g_nbTable have been filled
 void check_all_regs() {
@@ -70,7 +69,6 @@ void clean_data() {
 void simplify_goal(std::string destAndSlice, uint32_t bound, uint32_t instrIdx) {
   g_skipCheck = true;
   clean_data();
-  g_outFile.open(g_path+"/result.txt");
   std::ofstream goalFile;
   goalFile.open(g_path+"/goal.txt");
   context c;
@@ -88,7 +86,6 @@ void simplify_goal(std::string destAndSlice, uint32_t bound, uint32_t instrIdx) 
   goalFile << "#"+toStr(instrIdx)+"#"+destAndSlice+"#"+toStr(bound) << std::endl;
   goalFile << r << std::endl;
   goalFile.close();
-  g_outFile.close();
 }
 
 
@@ -102,7 +99,6 @@ void simplify_goal(std::string destAndSlice, uint32_t bound, uint32_t instrIdx) 
 // multiple times, until a solution is obtained or a bound is reached.
 void check_single_reg_and_slice(std::string destAndSlice, uint32_t cycleCnt, uint32_t instrIdx) {
   g_skipCheck = false;  
-  g_outFile.open(g_path+"/result.txt");
   std::ofstream goalFile;
   goalFile.open(g_path+"/goal.txt");
   g_rootNode = destAndSlice;
@@ -332,7 +328,6 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t cycleCnt, uin
     topTimeIdx = bound;
     lastHasSolution = curHasSolution;
   }
-  g_outFile.close();
   goalFile.close();
 }
 

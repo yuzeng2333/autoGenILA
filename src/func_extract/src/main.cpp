@@ -6,20 +6,24 @@
 #include "clean_goal.h"
 #include <string>
 #include <fstream>
+#include <time.h>
 
 #include "../../taint_method/global_data.h"
 #include "../../taint_method/helper.h"
 
 bool g_print_solver;
+std::ofstream g_outFile;
+
 
 int main(int argc, char *argv[]) {
   g_path = argv[1];
   // if argv[3] is 1, clean the file
   std::string doClean = argv[2];
-  std::ofstream outFile;
-  outFile.open(g_path+"/result.txt");
-  outFile << "Begin main!" << std::endl;
-  outFile.close();
+  time_t my_time = time(NULL);
+  g_outFile.open(g_path+"/result.txt");
+  g_outFile << "Begin main!" << std::endl;
+  std::string time(ctime(&my_time));
+  g_outFile << "Start time: "+time << std::endl;
   toCout("Begin main!");
   g_verb = true;
   g_print_solver = false;
@@ -44,5 +48,8 @@ int main(int argc, char *argv[]) {
   check_all_regs();
   clean_goal();
   print_time();
+  std::string time2(ctime(&my_time));
+  g_outFile << "End time: "+time2 << std::endl;
+  g_outFile.close();
   return 0;
 }
