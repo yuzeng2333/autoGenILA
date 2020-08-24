@@ -27,6 +27,7 @@ std::string g_rootNode;
 struct instrInfo g_currInstrInfo;
 uint32_t g_destWidth;
 bool g_skipCheck;
+std::ofstream g_outFile;
 
 // assume g_ssaTable and g_nbTable have been filled
 void check_all_regs() {
@@ -42,12 +43,14 @@ void check_all_regs() {
       std::string oneWriteAsv = pair.second;
       if(instrInfo.skipWriteASV.find(oneWriteAsv) == instrInfo.skipWriteASV.end())
         if(reg2Slices.find(oneWriteAsv) == reg2Slices.end())
+          // FIXME: replace cycleCnt with cycleCnt-1? 
+          // It should be, but cycleCnt works well
           check_single_reg_and_slice(oneWriteAsv, cycleCnt, i-1);
         else
           for(std::string regAndSlice: reg2Slices[oneWriteAsv])
             check_single_reg_and_slice(regAndSlice, cycleCnt, i-1);
       else // if the writeASV is to be skipped
-        simplify_goal(oneWriteAsv, cycleCnt, i-1);
+        simplify_goal(oneWriteAsv, cycleCnt-1, i-1);
     }
   }
 }
@@ -61,11 +64,13 @@ void clean_data() {
 }
 
 
+// Attention: bound is the number of unroll non-blocking
+// By default, there already exists one non-blocking for every reg
+// so last timeIdx = bound + 1, or in2out delay = bound + 1
 void simplify_goal(std::string destAndSlice, uint32_t bound, uint32_t instrIdx) {
   g_skipCheck = true;
   clean_data();
-  std::ofstream outFile;
-  outFile.open(g_path+"/result.txt");
+  g_outFile.open(g_path+"/result.txt");
   std::ofstream goalFile;
   goalFile.open(g_path+"/goal.txt");
   context c;
@@ -79,9 +84,11 @@ void simplify_goal(std::string destAndSlice, uint32_t bound, uint32_t instrIdx) 
   apply_result r = t(g);
   toCout("*************************  Update function for "+destAndSlice);
   std::cout << r << std::endl;
-  outFile << r << std::endl;
+  g_outFile << r << std::endl;
   goalFile << "#"+toStr(instrIdx)+"#"+destAndSlice+"#"+toStr(bound) << std::endl;
   goalFile << r << std::endl;
+  goalFile.close();
+  g_outFile.close();
 }
 
 
@@ -95,8 +102,7 @@ void simplify_goal(std::string destAndSlice, uint32_t bound, uint32_t instrIdx) 
 // multiple times, until a solution is obtained or a bound is reached.
 void check_single_reg_and_slice(std::string destAndSlice, uint32_t cycleCnt, uint32_t instrIdx) {
   g_skipCheck = false;  
-  std::ofstream outFile;
-  outFile.open(g_path+"/result.txt");
+  g_outFile.open(g_path+"/result.txt");
   std::ofstream goalFile;
   goalFile.open(g_path+"/goal.txt");
   g_rootNode = destAndSlice;
@@ -187,7 +193,7 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t cycleCnt, uin
       uint32_t j = 0;
       // only block values for varriables in CLEAN_QUEUE
       toCout("+++++++ Solution found for "+destAndSlice+", bound: "+toStr(bound)+" +++++++++");
-      outFile << "+++++++ Solution found for "+destAndSlice+", bound: "+toStr(bound)+" +++++++++" << std::endl;
+      g_outFile << "+++++++ Solution found for "+destAndSlice+", bound: "+toStr(bound)+" +++++++++" << std::endl;
 
       std::vector<std::pair<std::string, uint32_t>> varIdxPairVec;
       for (uint32_t i = 0; i < m.size(); i++)
@@ -210,7 +216,7 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t cycleCnt, uin
 
         if(!is_taint(var) && ( isInput(pure(var)) || isAs(pure(var)) )) {
           std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ " << v.name() << " = " << m.get_const_interp(v) << "\n";
-          outFile << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ " << v.name() << " = " << m.get_const_interp(v) << "\n";
+          g_outFile << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ " << v.name() << " = " << m.get_const_interp(v) << "\n";
           if(isInput(pure(var)) || isAs(pure(var)) ) {
             expr *tmpPnt = new expr(m.get_const_interp(v));
             INPUT_EXPR_VAL.emplace(var, tmpPnt);
@@ -218,7 +224,7 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t cycleCnt, uin
         }
         else  {
           std::cout << v.name() << " = " << m.get_const_interp(v) << "\n";
-          outFile << v.name() << " = " << m.get_const_interp(v) << "\n";
+          g_outFile << v.name() << " = " << m.get_const_interp(v) << "\n";
         }
       }
 
@@ -232,7 +238,7 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t cycleCnt, uin
       apply_result r = t(g);
       toCout("*************************  Update function for "+destAndSlice);
       std::cout << r << std::endl;
-      outFile << r << std::endl;
+      g_outFile << r << std::endl;
       goalFile << "#"+toStr(instrIdx)+"#"+destAndSlice+"#"+toStr(bound) << std::endl;
       goalFile << r << std::endl;
       // if two goals are the same, then check the two solutions. If any
@@ -320,13 +326,13 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t cycleCnt, uin
     }
     assert(bound <= bound_limit);
     toCout("------- No more solution found within the bound: "+toStr(bound)+" ----------");
-    outFile << "------- No more solution found within the bound: "+toStr(bound)+" ----------" << std::endl;
+    g_outFile << "------- No more solution found within the bound: "+toStr(bound)+" ----------" << std::endl;
     if(lastHasSolution && !curHasSolution) return; // terminate if has solution in lower bound but no solution in current bound
     bound++;
     topTimeIdx = bound;
     lastHasSolution = curHasSolution;
   }
-  outFile.close();
+  g_outFile.close();
   goalFile.close();
 }
 

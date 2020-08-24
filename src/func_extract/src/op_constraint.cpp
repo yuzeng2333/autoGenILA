@@ -109,7 +109,6 @@ expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver 
   expr destFirstExpr = var_expr(dest, 1, c, false);
   if(isSolve) {
     // if input signal's value is X, fix it for all timeIdx
-    //if(g_currInstrInfo.instrEncoding[dest] == "x") {
     //  s.add( destExpr == destFirstExpr );
     //}
     destExpr_t = var_expr(dest, timeIdx, c, true);
@@ -121,6 +120,7 @@ expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver 
         && has_explicit_value(dest) ) {
         expr retExpr = *INPUT_EXPR_VAL[timed_name(dest, timeIdx)];
         toCoutVerb("input value for "+dest+": "+retExpr.decl().name().str());
+        g_outFile << "input value for "+dest+": "+retExpr.decl().name().str() << std::endl;
         return retExpr;
       } // else, retuen destExpr instead
     }
@@ -133,11 +133,12 @@ expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver 
       uint32_t localWidth = get_var_slice_width(dest);
       if(localVal != "x") {
         assert(is_number(localVal));
-        toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give "+localVal+" to "+timed_name(dest, timeIdx));
+        toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%B Give "+localVal+" to "+timed_name(dest, timeIdx));
+        g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
         return c.bv_val(hdb2int(localVal), localWidth);
       }
     }
-    else if(!g_nopInstr.empty()){ // else, give the reset value
+    else if(!g_nopInstr.empty()){ // give the value in nop instruction
       if(g_nopInstr.find(dest) == g_nopInstr.end()) {
         toCout("Error: var not found for nop instruction: "+dest);
         abort();
@@ -147,6 +148,7 @@ expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver 
       if(localVal != "x") {
         assert(is_number(localVal));
         toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give "+localVal+" to "+timed_name(dest, timeIdx));
+        g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
         return c.bv_val(hdb2int(localVal), localWidth);
       }
     }
