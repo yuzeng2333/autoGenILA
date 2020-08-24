@@ -104,6 +104,7 @@ expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver 
   std::string dest = node->dest;
   expr destExpr_t(c);
   expr destExpr(c);
+  toCoutVerb("See input:"+timed_name(dest, timeIdx));
 
   destExpr = var_expr(dest, timeIdx, c, false);
   expr destFirstExpr = var_expr(dest, 1, c, false);
@@ -119,8 +120,8 @@ expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver 
       if( INPUT_EXPR_VAL.find(timed_name(dest, timeIdx)) != INPUT_EXPR_VAL.end() 
         && has_explicit_value(dest) ) {
         expr retExpr = *INPUT_EXPR_VAL[timed_name(dest, timeIdx)];
-        toCoutVerb("input value for "+dest+": "+retExpr.decl().name().str());
-        g_outFile << "input value for "+dest+": "+retExpr.decl().name().str() << std::endl;
+        toCoutVerb("input value for "+timed_name(dest, timeIdx)+": "+retExpr.decl().name().str());
+        g_outFile << "input value for "+timed_name(dest, timeIdx)+": "+retExpr.decl().name().str() << std::endl;
         return retExpr;
       } // else, retuen destExpr instead
     }

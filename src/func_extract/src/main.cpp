@@ -48,8 +48,9 @@ int main(int argc, char *argv[]) {
   check_all_regs();
   clean_goal();
   print_time();
-  std::string time2(ctime(&my_time));
-  g_outFile << "End time: "+time2 << std::endl;
+  //time_t my_time2 = time(NULL);
+  //std::string time2(ctime(&my_time2));
+  //g_outFile << "End time: "+time2 << std::endl;
   g_outFile.close();
   return 0;
 }

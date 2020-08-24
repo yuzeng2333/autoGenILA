@@ -30,7 +30,7 @@ bool g_skipCheck;
 
 // assume g_ssaTable and g_nbTable have been filled
 void check_all_regs() {
-  toCout("### Begin check_all_regs");  
+  toCout("### Begin check_all_regs");
   toCoutVerb("###### Begin checking SAT! ");
   uint32_t i = 1;
   for(auto instrInfo : g_instrInfo) {
@@ -42,12 +42,10 @@ void check_all_regs() {
       std::string oneWriteAsv = pair.second;
       if(instrInfo.skipWriteASV.find(oneWriteAsv) == instrInfo.skipWriteASV.end())
         if(reg2Slices.find(oneWriteAsv) == reg2Slices.end())
-          // FIXME: replace cycleCnt with cycleCnt-1? 
-          // It should be, but cycleCnt works well
-          check_single_reg_and_slice(oneWriteAsv, cycleCnt, i-1);
+          check_single_reg_and_slice(oneWriteAsv, cycleCnt-1, i-1);
         else
           for(std::string regAndSlice: reg2Slices[oneWriteAsv])
-            check_single_reg_and_slice(regAndSlice, cycleCnt, i-1);
+            check_single_reg_and_slice(regAndSlice, cycleCnt-1, i-1);
       else // if the writeASV is to be skipped
         simplify_goal(oneWriteAsv, cycleCnt-1, i-1);
     }
@@ -106,7 +104,7 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t cycleCnt, uin
   toCout("========== Begin check SAT for: "+destAndSlice+" ==========");
   uint32_t regWidth = get_var_slice_width(destAndSlice);
   CURRENT_VAR = destAndSlice;
-  uint32_t bound = cycleCnt > 0 ? cycleCnt-1 : 0;
+  uint32_t bound = cycleCnt > 0 ? cycleCnt : 0;
   bound_limit = cycleCnt+1;
   bool z3Res = false;
   context c;
