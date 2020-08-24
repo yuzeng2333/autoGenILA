@@ -109,11 +109,9 @@ bool is_root(std::string var) {
 std::string pure(std::string var) {
   if(var.find("_#") == std::string::npos)
     return var;
+  size_t pos = var.find_last_of("#");
   uint32_t len = var.length();
-  if(var.back() == 'T')
-    return var.substr(0, len-7);
-  else
-    return var.substr(0, len-5);
+  return var.substr(0, pos-3);
 }
 
 
