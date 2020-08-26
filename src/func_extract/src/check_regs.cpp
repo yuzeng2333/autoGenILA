@@ -126,6 +126,8 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t cycleCnt, uin
     toCout("Add-Solver: rst___#1 == 0");
 
   std::set<std::string> varToExpand{destAndSlice};
+  expr destExpr_t = var_expr(destAndSlice, 0, c, true);      
+  s.add( destExpr_t == 0 );
   s.push();
   bool lastHasSolution = false;
   bool curHasSolution = false;
@@ -148,8 +150,6 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t cycleCnt, uin
       }
       astNode *root = g_varNode[pure(rootReg)];
       if(root) {
-        expr destExpr_t = var_expr(pure(rootReg), topTimeIdx, c, true);      
-        s.add( destExpr_t == 0 );
         add_constraint(root, topTimeIdx, c, s, g, bound, true);
       }
       else {
@@ -163,19 +163,9 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t cycleCnt, uin
     add_all_dirty_constraints(c, s, bound);
     add_input_values(c, s, bound);
     add_nop(c, s, bound);
-    // save dirty regs for next round
+    // save dirty and clean regs for next round
     save_regs_for_expand(varToExpand);
-    //expr rst = c.bool_const("enable___#1");
-    //s.add( rst == c.bool_val(true) );
     z3Res = (s.check() == sat);
-    //if(!z3Res) {
-    //  expr_vector core = s.unsat_core();
-    //  std::cout << core << "\n";
-    //  std::cout << "size: " << core.size() << "\n";
-    //  for (unsigned i = 0; i < core.size(); i++) {
-    //      std::cout << core[i] << "\n";
-    //  }
-    //}
     // exhaust all the solutions for a bound
     while(z3Res) {
       curHasSolution = true;
@@ -323,7 +313,7 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t cycleCnt, uin
     g_outFile << "------- No more solution found within the bound: "+toStr(bound)+" ----------" << std::endl;
     if(lastHasSolution && !curHasSolution) return; // terminate if has solution in lower bound but no solution in current bound
     bound++;
-    topTimeIdx = bound;
+    topTimeIdx = bound+1;
     lastHasSolution = curHasSolution;
   }
   goalFile.close();
@@ -332,6 +322,8 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t cycleCnt, uin
 
 expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
   std::string var = node->dest;
+  expr destExpr = var_expr(var, timeIdx, c, false);  
+  expr destExpr_t = var_expr(var, timeIdx, c, true);  
   if(var.find("_07_") != std::string::npos) {
     toCout("%%%%%%%%%%%%% Found _07_");
   }
@@ -373,8 +365,8 @@ expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s
 
 expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
   std::string dest = node->dest;
-  if(dest.compare("word_sum") == 0 && timeIdx > bound) {
-    toCout("wack found! time: "+toStr(timeIdx));
+  if(dest.compare("kp") == 0 && timeIdx == bound) {
+    toCout("target reg found! time: "+toStr(timeIdx));
   }
   expr destExpr = var_expr(dest, timeIdx, c, false);
   expr destExpr_g(c);
@@ -583,7 +575,10 @@ void add_nop(context &c, solver &s, uint32_t bound) {
     for(auto it = g_nopInstr.begin(); it != g_nopInstr.end(); it++) {
       expr singleInput = var_expr(it->first, b, c, false);     
       uint32_t width = get_var_slice_width(it->first);   
-      if(!is_number(it->second)) continue;
+      if(!is_number(it->second)){
+        toCout("Error: non-number value found for NOP instruction!");
+        abort();
+      }
       expr localVal = var_expr(it->second, b, c, false, width);
       s.add( singleInput == localVal );
     }
