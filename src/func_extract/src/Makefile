@@ -42,3 +42,9 @@ aes1:
 
 aes:
 	../func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/aes 0
+
+case1:
+	../func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/case_test 1
+
+case:
+	../func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/case_test 0

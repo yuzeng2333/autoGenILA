@@ -345,7 +345,7 @@ expr reduce_one_op_constraint(astNode* const node, uint32_t timeIdx, context &c,
   if(isSolve) {
     expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
     expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true);
-    s.add( destExpr_t == ite(op1Expr_t > 0, c.bv_val(1, 1), c.bv_val(0, 1)) );
+    s.add( destExpr_t == ite(ugt(op1Expr_t, 0), c.bv_val(1, 1), c.bv_val(0, 1)) );
   }
   return make_z3_expr(s, g, c, node->op, destExpr, op1Expr, isSolve);  
 }
@@ -462,11 +462,11 @@ expr sel_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
     expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
     if(node->op == "sel1" || node->op == "sel2") {
       if(op1WidthNum == op2WidthNum ) {
-        s.add( destExpr_t == ( lshr(op1Expr_t, op2Expr).extract(upBound, 0) | ite(op2Expr_t > c.bv_val(0, op2WidthNum), c.bv_val(uint32_t(std::pow(2, upBound+1)-1), upBound+1), c.bv_val(0, upBound+1)) ) );
+        s.add( destExpr_t == ( lshr(op1Expr_t, op2Expr).extract(upBound, 0) | ite( ugt(op2Expr_t, c.bv_val(0, op2WidthNum)), c.bv_val(uint32_t(std::pow(2, upBound+1)-1), upBound+1), c.bv_val(0, upBound+1)) ) );
         s.add( destExpr == lshr(op1Expr, op2Expr).extract(upBound, 0) );
       }
       else {
-        s.add( destExpr_t == ( lshr(op1Expr_t, op2AdjustedExpr).extract(upBound, 0) | ite(op2Expr_t > c.bv_val(0, op2WidthNum), c.bv_val(uint32_t(std::pow(2, upBound+1)-1), upBound+1), c.bv_val(0, upBound+1)) ) );
+        s.add( destExpr_t == ( lshr(op1Expr_t, op2AdjustedExpr).extract(upBound, 0) | ite( ugt(op2Expr_t, c.bv_val(0, op2WidthNum)), c.bv_val(uint32_t(std::pow(2, upBound+1)-1), upBound+1), c.bv_val(0, upBound+1)) ) );
         //s.add( destExpr_t == (lshr(op1Expr_t, op2AdjustedExpr).extract(upBound, 0) | c.bv_val(uint32_t(std::pow(2, upBound+1)-1), upBound+1)) );
         s.add( destExpr == lshr(op1Expr, op2AdjustedExpr).extract(upBound, 0) );
       }
@@ -725,7 +725,7 @@ expr case_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
         uint32_t Hi, Lo;
         Hi = get_lgc_hi(assignVarAndSlice);
         Lo = get_lgc_lo(assignVarAndSlice);
-        if(caseValue.compare("default") == 0) {
+        if(caseValue.compare("default") == 0) { // the last default assignment
           expr destExpr = var_expr(destAndSlice+"_CASE_"+toStr((i-1)/2), timeIdx, c, false, localWidth);
           expr defaultVarExpr(c);
           if(isNum(assignVarAndSlice)) {
@@ -760,7 +760,7 @@ expr case_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
           expr destExpr_t = var_expr(destAndSlice+"_CASE_"+toStr((i-1)/2), timeIdx, c, true, localWidth);
           expr lastAssignExpr_t = var_expr(destAndSlice+"_CASE_"+toStr((i+1)/2), timeIdx, c, true, localWidth);
           expr defaultVarExpr_t = var_expr(assignVarAndSlice, timeIdx, c, true);
-          s.add( destExpr_t == (ite(caseExpr_t > 0, c.bv_val(max_num_dec(localWidth), localWidth), c.bv_val(0, localWidth)) | ite( caseExpr.extract(posOfOne, posOfOne) == c.bv_val(1, 1), assignVarExpr_t.extract(Hi, Lo), lastAssignExpr_t)) ) ;
+          s.add( destExpr_t == (ite( ugt(caseExpr_t, 0), c.bv_val(max_num_dec(localWidth), localWidth), c.bv_val(0, localWidth)) | ite( caseExpr.extract(posOfOne, posOfOne) == c.bv_val(1, 1), assignVarExpr_t.extract(Hi, Lo), lastAssignExpr_t)) ) ;
         }
       }
     } // end of for
@@ -961,7 +961,7 @@ expr make_z3_expr(solver &s, goal &g, context &c, std::string op, expr& destExpr
     return retExpr;
   }
   else if(op == "|") {
-    expr retExpr = ite(op1Expr > 0, c.bv_val(1, 1), c.bv_val(0, 1));
+    expr retExpr = ite(op1Expr != 0, c.bv_val(1, 1), c.bv_val(0, 1));
     if(isSolve) 
       s.add( destExpr == retExpr );
     return retExpr;

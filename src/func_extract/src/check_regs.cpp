@@ -105,7 +105,7 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t cycleCnt, uin
   uint32_t regWidth = get_var_slice_width(destAndSlice);
   CURRENT_VAR = destAndSlice;
   uint32_t bound = cycleCnt > 0 ? cycleCnt : 0;
-  bound_limit = cycleCnt+1;
+  bound_limit = cycleCnt+2;
   bool z3Res = false;
   context c;
   solver s(c);
