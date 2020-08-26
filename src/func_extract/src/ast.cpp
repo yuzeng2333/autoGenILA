@@ -257,8 +257,10 @@ void add_two_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   std::string destAndSlice;
   std::string op1AndSlice;
   std::string op2AndSlice;
-  if (!check_two_op(line, op, destAndSlice, op1AndSlice, op2AndSlice, isReduceOp))
-    return;
+  if (!check_two_op(line, op, destAndSlice, op1AndSlice, op2AndSlice, isReduceOp)) {
+    toCout("Error: check_two_op failed!");
+    abort();
+  }
 
   //if(destAndSlice.compare("adr_check") == 0) {
   //  toCout("Found adr_check");
@@ -298,8 +300,10 @@ void add_one_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   std::string op;
   std::string destAndSlice;
   std::string op1AndSlice;
-  if (!check_one_op(line, op, destAndSlice, op1AndSlice))
-    return;
+  if (!check_one_op(line, op, destAndSlice, op1AndSlice)) {
+    toCout("Error: check_one_op failed!");
+    abort();
+  }
 
   std::string dest, destSlice;
   std::string op1, op1Slice;
@@ -323,8 +327,11 @@ void add_one_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
 void add_ite_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   toCoutVerb("process Ite line for: "+line);
   std::smatch m;
-  if ( !std::regex_match(line, m, pIte) )
-    return;
+  if ( !std::regex_match(line, m, pIte) ) {
+    toCout("Error: does not match ite");
+    abort();
+  }
+
   assert(!m.str(3).empty());
   assert(!m.str(4).empty());
   assert(!m.str(5).empty());
@@ -370,8 +377,10 @@ void add_reduce_op_node(std::string line, uint32_t timeIdx, astNode* const node)
   std::string op;
   std::string destAndSlice;
   std::string op1AndSlice;
-  if (!check_reduce_one_op(line, op, destAndSlice, op1AndSlice))
-    return;
+  if (!check_reduce_one_op(line, op, destAndSlice, op1AndSlice)) {
+    toCout("Error: check_reduce_one_op failed");
+    abort();
+  }
 
   std::string dest, destSlice;
   std::string op1, op1Slice;
@@ -401,7 +410,8 @@ void add_sel_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   std::string op2AndSlice;
   std::string integer;
   if (!check_sel_op(line, op, destAndSlice, op1AndSlice, op2AndSlice, integer)) {
-    return;
+    toCout("Error: check_sel_op failed");
+    abort();
   }
 
   std::string dest, destSlice;
@@ -434,8 +444,11 @@ void add_sel_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
 void add_src_concat_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   toCoutVerb("Process Reduce One op for :"+line); 
   std::smatch m;
-  if (!std::regex_match(line, m, pSrcConcat))
-    return;
+  if (!std::regex_match(line, m, pSrcConcat)) {
+    toCout("Error: does not match srcConcat");
+    abort();
+  }
+
   std::string op;
   std::string destAndSlice = m.str(2);
   if(destAndSlice.compare("fangyuan23") == 0) {
