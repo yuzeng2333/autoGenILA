@@ -140,6 +140,8 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint
     s.pop();
     CLEAN_QUEUE.clear();
     DIRTY_QUEUE.clear();
+    // g_existedExpr must be cleared because reg_#bound needs to be expanded
+    g_existedExpr.clear();
 
     toCoutVerb("### Begin bound: "+ toStr(bound));
     goal g(c);
