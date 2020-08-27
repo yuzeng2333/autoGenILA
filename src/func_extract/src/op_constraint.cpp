@@ -36,6 +36,10 @@ expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTain
   split_slice(varAndSlice, var, varSlice);
   std::string varTimed;
   uint32_t localWidth;
+  if(varAndSlice.find("_CASE_") == std::string::npos && !is_number(varAndSlice) && isTaint && width > 0 && width != get_var_slice_width(varAndSlice)) {
+    toCout("Error: input taint width does not equal var's width: "+toStr(get_var_slice_width(varAndSlice))+", "+toStr(width));
+    abort();
+  }
   if(width == 0) {
     if(is_number(varAndSlice)) {
       localWidth = get_num_len(varAndSlice);
@@ -193,7 +197,7 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   bool op1Extract = !op1Slice.empty() && !is_sliced(op1);
   bool op2Extract = !op2Slice.empty() && !is_sliced(op2);
 
-  if(destAndSlice.find("_10_") != std::string::npos) {
+  if(destAndSlice.find("_14_") != std::string::npos || destAndSlice.find("_16_") != std::string::npos) {
     toCout("Found it!");
   }
 
@@ -220,8 +224,8 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   uint32_t opWidthNum = std::max(op1WidthNum, op2WidthNum);
   uint32_t localWidthNum = std::max( opWidthNum, destWidthNum );
   // assume the destWidth is not smaller than opWidth
-  expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true, op1WidthNum);
-  expr op2Expr_t = var_expr(op2AndSlice, timeIdx, c, true, op2WidthNum);
+  expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true);
+  expr op2Expr_t = var_expr(op2AndSlice, timeIdx, c, true);
   assert(!op1Expr_t.is_bool());
   assert(!op2Expr_t.is_bool());
   expr op1Expr(c);
