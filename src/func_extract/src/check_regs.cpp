@@ -95,7 +95,7 @@ void simplify_goal(std::string destAndSlice, uint32_t bound, uint32_t instrIdx) 
 // However, constructions for the two are quite different. AST tree is
 // constructed only one. But the SMT equation may need to be constructed
 // multiple times, until a solution is obtained or a bound is reached.
-void check_single_reg_and_slice(std::string destAndSlice, uint32_t cycleCnt, uint32_t instrIdx) {
+void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint32_t instrIdx) {
   g_skipCheck = false;  
   std::ofstream goalFile;
   goalFile.open(g_path+"/goal.txt");
@@ -104,8 +104,8 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t cycleCnt, uin
   toCout("========== Begin check SAT for: "+destAndSlice+" ==========");
   uint32_t regWidth = get_var_slice_width(destAndSlice);
   CURRENT_VAR = destAndSlice;
-  uint32_t bound = cycleCnt > 0 ? cycleCnt : 0;
-  bound_limit = cycleCnt+2;
+  uint32_t bound = boundIn > 0 ? boundIn : 0;
+  bound_limit = boundIn+2;
   bool z3Res = false;
   context c;
   solver s(c);
@@ -118,12 +118,12 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t cycleCnt, uin
   //s.add( wack_time2 == 0 );
   // *********************
 
-  std::string rst1 = "rst___#1";
-  expr rst = c.bv_const(rst1.c_str(), 1);
+  //std::string rst1 = "rst___#1";
+  //expr rst = c.bv_const(rst1.c_str(), 1);
   // FIXME: valid reset value should come from file
-  s.add( rst == c.bv_val(0, 1) );
-  if(g_print_solver)
-    toCout("Add-Solver: rst___#1 == 0");
+  //s.add( rst == c.bv_val(0, 1) );
+  //if(g_print_solver)
+  //  toCout("Add-Solver: rst___#1 == 0");
 
   std::set<std::string> varToExpand{destAndSlice};
   expr destExpr_t = var_expr(destAndSlice, 0, c, true);      
@@ -173,7 +173,6 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t cycleCnt, uin
       INT_EXPR_SET.clear();
       g_resetedReg.clear();
       model m = s.get_model();
-      s.pop();
       uint32_t j = 0;
       // only block values for varriables in CLEAN_QUEUE
       toCout("+++++++ Solution found for "+destAndSlice+", bound: "+toStr(bound)+" +++++++++");
@@ -260,16 +259,21 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t cycleCnt, uin
       //}
 
 
-      // if value is x, fix it to x
+      // if input's value is x, fix it to x
+      // fix value for readASV
       for(uint32_t i = 0; i < m.size(); i++) {
         func_decl v = m[i];
         std::string vName = v.name().str();
         std::string pureVName = pure(vName);
         uint32_t localTimeIdx = get_time(vName);
-        if(localTimeIdx == bound) {
-          if(g_currInstrInfo.instrEncoding.find(pureVName) == g_currInstrInfo.instrEncoding.end())
-            continue;
-          if(g_currInstrInfo.instrEncoding[pureVName] == "x") {
+        if(localTimeIdx == bound + 1) {
+          if( g_currInstrInfo.instrEncoding.find(pureVName) != g_currInstrInfo.instrEncoding.end() ) {
+            if(g_currInstrInfo.instrEncoding[pureVName] == "x") {
+              toCoutVerb("Fix value for "+vName);
+              s.add( v() == m.get_const_interp(v) );
+            }
+          }
+          else if( is_read_asv(pureVName) ) {
             toCoutVerb("Fix value for "+vName);
             s.add( v() == m.get_const_interp(v) );
           }
@@ -299,14 +303,13 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t cycleCnt, uin
           s.add( v() == m.get_const_interp(v) );
       }
       s.add(block);
-      s.push();
       // Make sure the clean and dirty constraints are at the top
-      add_all_clean_constraints(c, s, g, bound);
-      add_all_dirty_constraints(c, s, bound);
-      add_input_values(c, s, bound);
-      add_nop(c, s, bound);      
+      //add_all_clean_constraints(c, s, g, bound);
+      //add_all_dirty_constraints(c, s, bound);
+      //add_input_values(c, s, bound);
+      //add_nop(c, s, bound);      
       save_regs_for_expand(varToExpand);      
-      z3Res = (s.check() == sat);      
+      z3Res = (s.check() == sat);
     }
     assert(bound <= bound_limit);
     toCout("------- No more solution found within the bound: "+toStr(bound)+" ----------");
