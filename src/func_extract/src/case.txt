@@ -1191,7 +1191,12 @@ counter_next___#4 = #b10100
 counter_next___#4_T = #b00000
 fangyuan1___#2 = #b00000
 fangyuan1___#2_T = #b00000
-fangyuan1___#3 = #b00000
+fangyuan1___#3 = #b00000#1:
+rst = 1'd0
+func = 2'd1
+inWord = x
+W:
+word 1
 fangyuan1___#3_T = #b00000
 fangyuan1___#4 = #b00000
 fangyuan1___#4_T = #b00000

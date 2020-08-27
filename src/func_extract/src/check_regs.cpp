@@ -316,7 +316,7 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint
     g_outFile << "------- No more solution found within the bound: "+toStr(bound)+" ----------" << std::endl;
     if(lastHasSolution && !curHasSolution) return; // terminate if has solution in lower bound but no solution in current bound
     bound++;
-    topTimeIdx = bound+1;
+    topTimeIdx = bound; // Attention: bound has already added by 1
     lastHasSolution = curHasSolution;
   }
   goalFile.close();
