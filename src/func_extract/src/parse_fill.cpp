@@ -162,18 +162,22 @@ void read_in_instructions(std::string fileName) {
     if(line.back() == ' ')
       line.pop_back();
     if(line.front() == '#') { // a new instr begins
+      if(!is_number(line.substr(1))) {
+        toCout("Error: parse instr.txt failed! # is not followed by intruction ID: "+line);
+        abort();
+      }
       state = FirstInstr;
     }
-    else if(line.front() == 'W') {
+    else if(line == "W:") {
       state = WriteASV;
     }
-    else if(line.front() == 'R') {
+    else if(line == "R:") {
       state = ReadASV;
     }
-    else if(line.front() == '$') {
+    else if(line == "$NOP:") {
       state = ReadNOP;
     }
-    else if(line.front() == '*') {
+    else if(line == "*RESET:") {
       state = ResetVal;
     }
     else { // still the old instruction

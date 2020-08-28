@@ -37,6 +37,8 @@ void nonblockif_expr(std::string line, std::ifstream &input);
 
 void always_clkrst_expr(std::string line, std::ifstream &input);
 
+void always_if_else_expr(std::string line, std::ifstream &input);
+
 void case_expr(std::string line, std::ifstream &input);
 
 void put_into_reg2Slice(std::string destAndSlice);

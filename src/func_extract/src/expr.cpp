@@ -296,8 +296,11 @@ void always_expr(std::string line, std::ifstream &input) {
   else if( std::regex_match(line, m, pNonblockIf) ) {
     nonblockif_expr(line, input);
   }
+  else if( std::regex_match(line, m, pIf) ) {
+    always_if_else_expr(line, input);
+  }
   else {
-    toCout("Error in parsing nonblocking: "+line);
+    toCout("Error in parsing nonblocking(always_expr): "+line);
     abort();
   }
 }
@@ -358,6 +361,12 @@ void always_clkrst_expr(std::string line, std::ifstream &input) {
 
   // read lines of if...else...
   std::getline(input, line);
+  always_if_else_expr(line, input);
+}
+
+
+void always_if_else_expr(std::string line, std::ifstream &input) {
+  std::smatch m;  
   if ( !std::regex_match(line, m, pIf) )
     return;
   std::string condAndSlice = m.str(2);

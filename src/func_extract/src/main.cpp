@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
   toCout("Begin main!");
   g_verb = true;
   g_print_solver = false;
-  g_remove_adff = false;
+  g_remove_adff = true;
   print_time();  
   if(doClean.compare("1") == 0) {
     toCout("### Begin clean_file");
