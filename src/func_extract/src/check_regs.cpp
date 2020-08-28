@@ -127,7 +127,7 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint
 
   std::set<std::string> varToExpand{destAndSlice};
   expr destExpr_t = var_expr(destAndSlice, 0, c, true);      
-  s.add( destExpr_t == 0 );
+  //s.add( destExpr_t == 0 );
   s.push();
   bool lastHasSolution = false;
   bool curHasSolution = false;
@@ -412,8 +412,17 @@ expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
     push_dirty_queue(node, timeIdx);
     if(!isSolve) {
       uint32_t localWidth = get_var_slice_width(dest);
-      toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Replaced with 0: "+timed_name(dest, timeIdx));
-      return var_expr("0", timeIdx, c, false, localWidth); 
+      if(g_rstVal.find(dest) == g_rstVal.end()) {
+        toCout("Error: cannot find reset value for: "+dest);
+        abort();
+      }
+      std::string localRstVal = g_rstVal[dest];      
+      if(!is_number(localRstVal)) {
+        toCout("Error: reset value is not number! "+dest+", "+localRstVal);
+        abort();
+      }
+      toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Replaced with "+localRstVal+": "+timed_name(dest, timeIdx));
+      return var_expr(localRstVal, timeIdx, c, false, localWidth); 
     }
   }
   // end of if
@@ -579,6 +588,7 @@ void add_nop(context &c, solver &s, uint32_t bound) {
   //for(uint32_t b: bVec)
     for(auto it = g_nopInstr.begin(); it != g_nopInstr.end(); it++) {
       expr singleInput = var_expr(it->first, b, c, false);     
+      expr singleInput_t = var_expr(it->first, b, c, true);     
       uint32_t width = get_var_slice_width(it->first);   
       if(!is_number(it->second)){
         toCout("Error: non-number value found for NOP instruction!");
@@ -586,6 +596,9 @@ void add_nop(context &c, solver &s, uint32_t bound) {
       }
       expr localVal = var_expr(it->second, b, c, false, width);
       s.add( singleInput == localVal );
+      // FIXME: is this correct or necessary?
+      expr localZero = var_expr("1'd0", b, c, false, width);
+      s.add( singleInput_t == localZero );
     }
 }
 
