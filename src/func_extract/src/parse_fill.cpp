@@ -162,7 +162,7 @@ void read_in_instructions(std::string fileName) {
     if(line.back() == ' ')
       line.pop_back();
     if(line.front() == '#') { // a new instr begins
-      if(!is_number(line.substr(1))) {
+      if(!is_number(line.substr(1, line.length()-2))) {
         toCout("Error: parse instr.txt failed! # is not followed by intruction ID: "+line);
         abort();
       }
