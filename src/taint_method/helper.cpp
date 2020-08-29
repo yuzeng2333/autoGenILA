@@ -1440,3 +1440,69 @@ std::string hex2bin(std::string hexNum) {
   }
   return res;
 }
+
+
+// input string might contain variables besides bit-vectors
+std::string split_long_bit_vec(std::string varList) {
+  size_t lastPos = 0;
+  std::smatch m;
+  std::string ret;
+  if(varList.find(",") == std::string::npos)
+    return varList;
+
+  while(varList.find(", ", lastPos) != std::string::npos) {
+    size_t end = varList.find(", ", lastPos);
+    std::string var = varList.substr(lastPos, end-lastPos);
+    lastPos = end+2;
+    if(!isNum(var)) {
+      ret = ret + var + ", ";
+      continue;
+    }
+    if(!std::regex_match(var, m, pBin)) {
+      toCout("Error: non-binary number found in concat: "+var+", "+varList);
+      abort();
+    }
+    uint32_t width = std::stoi(m.str(1));
+    std::string num = m.str(2);
+    if(width < 31) {
+      ret = ret + var + ", ";
+      continue;
+    }
+    // split into multiple 16 bit number
+    size_t pos = 0;
+    while(pos < width) {
+      uint32_t subWidth = std::min(16, int(width-pos));
+      std::string subVar = toStr(subWidth)+"'b"+num.substr(pos, subWidth);
+      pos += 16;
+      ret = ret + subVar + ", ";
+    }
+  } // end of while
+
+  // process the last one
+  std::string var = varList.substr(lastPos);
+  if(!isNum(var)) {
+    ret = ret + var;
+    return ret;
+  }
+  if(!std::regex_match(var, m, pBin)) {
+    toCout("Error: non-binary number found in concat: "+var+", "+varList);
+    abort();
+  }
+  uint32_t width = std::stoi(m.str(1));  
+  std::string num = m.str(2);
+  if(width < 31) {
+    ret = ret + var;
+    return ret;
+  }
+  // split into multiple 16 bit number
+  size_t pos = 0;
+  while(pos < width) {
+    uint32_t subWidth = std::min(16, int(width-pos));
+    std::string subVar = toStr(subWidth)+"'b"+num.substr(pos, subWidth);
+    pos += 16;
+    ret = ret + subVar + ", ";
+  }
+  ret.pop_back();
+  ret.pop_back();
+  return ret;
+}

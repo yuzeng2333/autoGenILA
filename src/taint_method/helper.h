@@ -147,4 +147,6 @@ bool is_srcDestConcat(std::string line);
 std::string extract_bin(std::string num, uint32_t highIdx, uint32_t lowIdx);
 
 std::string hex2bin(std::string hexNum);
+
+std::string split_long_bit_vec(std::string varList);
 #endif

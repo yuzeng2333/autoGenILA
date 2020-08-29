@@ -168,6 +168,7 @@ bool g_use_reset_taint = false;
 bool g_use_zy_count = false;
 bool g_use_reset_sig = false;
 bool g_remove_adff = false;
+bool g_split_long_num = false;
 std::string _t="_T";
 std::string _r="_R";
 std::string _x="_X";
@@ -2191,6 +2192,7 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
 
 /* if a basic operator contains concatenated input, 
  * declare a new variable representing the concatenated input*/
+// if a long number(>32bit) is found, split it if g_split_long_num is true
 bool extract_concat(std::string line, std::ofstream &output, std::string &returnedStmt, bool isFuncCall) {
   std::string retStr = "";
   std::smatch m;
@@ -2226,6 +2228,9 @@ bool extract_concat(std::string line, std::ofstream &output, std::string &return
     // iterate over all matches
     while( it != rend ) {
       varList = *it++;
+      if(g_split_long_num)
+        varList = split_long_bit_vec(varList);
+
       allVarList.push_back(varList);
       int localIdxNum = NEW_FANGYUAN++;
       std::string localIdx = std::to_string(localIdxNum);
