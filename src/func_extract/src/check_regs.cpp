@@ -377,6 +377,10 @@ expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   expr destExpr_g(c);
   expr destNextExpr(c);
   // assuming RHS of nonblocking is not number
+  if( node->childVec.front()->dest.empty() ) {
+    toCout("Error: first child's dest is empty: "+node->dest);
+    abort();
+  }
   assert(!is_number(node->childVec.front()->dest));
 
   if(timeIdx <= bound) {
@@ -591,8 +595,7 @@ void add_nop(context &c, solver &s, uint32_t bound) {
       expr singleInput_t = var_expr(it->first, b, c, true);     
       uint32_t width = get_var_slice_width(it->first);   
       if(!is_number(it->second)){
-        toCout("Error: non-number value found for NOP instruction!");
-        abort();
+        toCout("!!!!!!!!!!!!!!!  Warning: non-number value found for NOP instruction!");
       }
       expr localVal = var_expr(it->second, b, c, false, width);
       s.add( singleInput == localVal );

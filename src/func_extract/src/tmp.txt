@@ -1,402 +1,507 @@
-../func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/case_test 0
+../func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/PID 0#make sure design.v is cleaned with taint_gen!
 Begin main!
-Thu Aug 27 21:10:54 2020
+Fri Aug 28 20:00:20 2020
 ### Begin parse_verilog
 ### Begin parse_verilog
-Reset value is manually specified!
+Warning: find value X in NOP: i_wb_data
+### Begin vcd_parser
 ### Begin build_ast_tree
-### Begin build: word
-Add nb node for :word
-!! Add child _01_ to word
-Add ssa node for :_01_
-process Ite line for:   assign _01_ = rst ? 9'h000 : word_next;
-!! Add child rst to _01_
-Process input node: rst
-!! Add child 9'h000 to _01_
-Process num node: 9'h000
-!! Add child word_next to _01_
-Add ssa node for :word_next
-process Ite line for:   assign word_next = _14_ ? inWord : word;
-!! Add child _14_ to word_next
-Add ssa node for :_14_
-Process Two op for :  assign _14_ = func[1] == 1'h1;
-!! Add child func[1] to _14_
-Process input node: func
-!! Add child 1'h1 to _14_
-Process num node: 1'h1
-!! Add child inWord to word_next
-Process input node: inWord
-!! Add child word to word_next
-### Begin build: word_sum
-Add nb node for :word_sum
-!! Add child _02_ to word_sum
-Add ssa node for :_02_
-process Ite line for:   assign _02_ = rst ? 9'h000 : word_sum_next;
-!! Add child rst to _02_
-!! Add child 9'h000 to _02_
-!! Add child word_sum_next to _02_
-Add ssa node for :word_sum_next
-process Ite line for:   assign word_sum_next = _21_ ? 9'h000 : _13_[8:0];
-!! Add child _21_ to word_sum_next
-Add ssa node for :_21_
-Process Two op for :  assign _21_ = _15_ && _16_;
-!! Add child _15_ to _21_
-Add ssa node for :_15_
-Process Two op for :  assign _15_ = counter == 3'h4;
-!! Add child counter to _15_
-Add nb node for :counter
-!! Add child _00_ to counter
-Add ssa node for :_00_
-process Ite line for:   assign _00_ = rst ? 5'h04 : counter_next;
-!! Add child rst to _00_
-!! Add child 5'h04 to _00_
-Process num node: 5'h04
-!! Add child counter_next to _00_
-!! Add child fangyuan1 to counter_next
-Add ssa node for :fangyuan1
-Process Reduce One op for :  assign fangyuan1 = { _20_, _19_, _18_, _17_, _21_ };
-!! Add child _20_ to fangyuan1
-Add ssa node for :_20_
-Process Reduce One op for :  assign _20_ = ! counter;
-!! Add child counter to _20_
-!! Add child _19_ to fangyuan1
-Add ssa node for :_19_
-Process Two op for :  assign _19_ = counter == 1'h1;
-!! Add child counter to _19_
-!! Add child 1'h1 to _19_
-!! Add child _18_ to fangyuan1
-Add ssa node for :_18_
-Process Two op for :  assign _18_ = counter == 2'h2;
-!! Add child counter to _18_
-!! Add child 2'h2 to _18_
-Process num node: 2'h2
-!! Add child _17_ to fangyuan1
-Add ssa node for :_17_
-Process Two op for :  assign _17_ = counter == 2'h3;
-!! Add child counter to _17_
-!! Add child 2'h3 to _17_
-Process num node: 2'h3
-!! Add child _21_ to fangyuan1
-!! Add child 5'h03 to counter_next
-Process num node: 5'h03
-!! Add child counter to counter_next
-!! Add child 3'h4 to _15_
-Process num node: 3'h4
-!! Add child _16_ to _21_
-Add ssa node for :_16_
-Process Two op for :  assign _16_ = func[1:0] == 2'h2;
-!! Add child func[1:0] to _16_
-!! Add child 2'h2 to _16_
-!! Add child 9'h000 to word_sum_next
-!! Add child _13_[8:0] to word_sum_next
-Add ssa node for :_13_[8:0]
-process Ite line for:   assign _13_[8:0] = _17_ ? _03_ : _12_[8:0];
-!! Add child _17_ to _13_[8:0]
-!! Add child _03_ to _13_[8:0]
-Add ssa node for :_03_
-Process Two op for :  assign _03_ = word_sum + word[3];
-!! Add child word_sum to _03_
-!! Add child word[3] to _03_
-!! Add child _12_[8:0] to _13_[8:0]
-Add ssa node for :_12_[8:0]
-process Ite line for:   assign _12_[8:0] = _18_ ? _04_ : _11_[8:0];
-!! Add child _18_ to _12_[8:0]
-!! Add child _04_ to _12_[8:0]
-Add ssa node for :_04_
-Process Two op for :  assign _04_ = word_sum + word[2];
-!! Add child word_sum to _04_
-!! Add child word[2] to _04_
-!! Add child _11_[8:0] to _12_[8:0]
-Add ssa node for :_11_[8:0]
-process Ite line for:   assign _11_[8:0] = _19_ ? _05_ : _10_[8:0];
-!! Add child _19_ to _11_[8:0]
-!! Add child _05_ to _11_[8:0]
-Add ssa node for :_05_
-Process Two op for :  assign _05_ = word_sum + word[1];
-!! Add child word_sum to _05_
-!! Add child word[1] to _05_
-!! Add child _10_[8:0] to _11_[8:0]
-Add ssa node for :_10_[8:0]
-process Ite line for:   assign _10_[8:0] = _20_ ? _06_ : word_sum;
-!! Add child _20_ to _10_[8:0]
-!! Add child _06_ to _10_[8:0]
-Add ssa node for :_06_
-Process Two op for :  assign _06_ = word_sum + word[0];
-!! Add child word_sum to _06_
-!! Add child word[0] to _06_
-!! Add child word_sum to _10_[8:0]
+### Begin build: RS
+Add nb node for :RS
+!! Add child yuzeng24 to RS
+Add ssa node for :yuzeng24
+process Ite line for:   assign yuzeng24 = i_rst ? 1'b0 : _0001_;
+!! Add child i_rst to yuzeng24
+Process input node: i_rst
+!! Add child 1'b0 to yuzeng24
+Process num node: 1'b0
+!! Add child _0001_ to yuzeng24
+Add ssa node for :_0001_
+process Ite line for:   assign _0001_ = state_0 ? _0139_ : 1'b0;
+!! Add child state_0 to _0001_
+Found state_0!
+Process AS node: state_0
+!! Add child _0139_ to _0001_
+Add ssa node for :_0139_
+process Ite line for:   assign _0139_ = adr_check ? 1'b0 : _0049_;
+!! Add child adr_check to _0139_
+Add ssa node for :adr_check
+Process Two op for :  assign adr_check = _0038_ && adr_check_1;
+!! Add child _0038_ to adr_check
+Add ssa node for :_0038_
+Process One op for :  assign _0038_ = ~ i_wb_adr[5];
+!! Add child i_wb_adr[5] to _0038_
+Process input node: i_wb_adr
+!! Add child adr_check_1 to adr_check
+Add ssa node for :adr_check_1
+Process Reduce One op for :  assign adr_check_1 = ! i_wb_adr[15:6];
+!! Add child i_wb_adr[15:6] to adr_check_1
+!! Add child 1'b0 to _0139_
+!! Add child _0049_ to _0139_
+Add ssa node for :_0049_
+Process Two op for :  assign _0049_ = _0048_ && _0040_;
+!! Add child _0048_ to _0049_
+Add ssa node for :_0048_
+Process Two op for :  assign _0048_ = _0039_ && _0063_;
+!! Add child _0039_ to _0048_
+Add ssa node for :_0039_
+Process Two op for :  assign _0039_ = i_wb_adr[5:2] == 4'b1011;
+!! Add child i_wb_adr[5:2] to _0039_
+!! Add child 4'b1011 to _0039_
+Process num node: 4'b1011
+!! Add child _0063_ to _0048_
+Add ssa node for :_0063_
+Process Reduce One op for :  assign _0063_ = ! wlRS;
+!! Add child wlRS to _0063_
+Add ssa node for :wlRS
+Process Two op for :  assign wlRS = wla | wlb;
+!! Add child wla to wlRS
+Add nb node for :wla
+!! Add child yuzeng1 to wla
+Add ssa node for :yuzeng1
+process Ite line for:   assign yuzeng1 = i_rst ? 1'b0 : _0024_;
+!! Add child i_rst to yuzeng1
+!! Add child 1'b0 to yuzeng1
+!! Add child _0024_ to yuzeng1
+!! Add child fangyuan40 to _0024_
+Add ssa node for :fangyuan40
+Process Reduce One op for :  assign fangyuan40 = { _0100_, _0035_ };
+!! Add child _0100_ to fangyuan40
+Add ssa node for :_0100_
+Process Two op for :  assign _0100_ = state_1 == 1'b1;
+!! Add child state_1 to _0100_
+Add nb node for :state_1
+!! Add child yuzeng3 to state_1
+Add ssa node for :yuzeng3
+process Ite line for:   assign yuzeng3 = i_rst ? 10'b0000000001 : _0021_;
+!! Add child i_rst to yuzeng3
+!! Add child 10'b0000000001 to yuzeng3
+Process num node: 10'b0000000001
+!! Add child _0021_ to yuzeng3
+!! Add child fangyuan36 to _0021_
+Add ssa node for :fangyuan36
+Process Reduce One op for :  assign fangyuan36 = { _0100_, _0129_, _0122_, _0106_, _0117_, _0121_, _0096_, _0102_, _0035_ };
+!! Add child _0100_ to fangyuan36
+!! Add child _0129_ to fangyuan36
+Add ssa node for :_0129_
+Process Two op for :  assign _0129_ = state_1 == 2'b10;
+!! Add child state_1 to _0129_
+!! Add child 2'b10 to _0129_
+Process num node: 2'b10
+!! Add child _0122_ to fangyuan36
+Add ssa node for :_0122_
+Process Two op for :  assign _0122_ = state_1 == 4'b1000;
+!! Add child state_1 to _0122_
+!! Add child 4'b1000 to _0122_
+Process num node: 4'b1000
+!! Add child _0106_ to fangyuan36
+Add ssa node for :_0106_
+Process Two op for :  assign _0106_ = state_1 == 5'b10000;
+!! Add child state_1 to _0106_
+!! Add child 5'b10000 to _0106_
+Process num node: 5'b10000
+!! Add child _0117_ to fangyuan36
+Add ssa node for :_0117_
+Process Two op for :  assign _0117_ = state_1 == 6'b100000;
+!! Add child state_1 to _0117_
+!! Add child 6'b100000 to _0117_
+Process num node: 6'b100000
+!! Add child _0121_ to fangyuan36
+Add ssa node for :_0121_
+Process Two op for :  assign _0121_ = state_1 == 7'b1000000;
+!! Add child state_1 to _0121_
+!! Add child 7'b1000000 to _0121_
+Process num node: 7'b1000000
+!! Add child _0096_ to fangyuan36
+Add ssa node for :_0096_
+Process Two op for :  assign _0096_ = state_1 == 8'b10000000;
+!! Add child state_1 to _0096_
+!! Add child 8'b10000000 to _0096_
+Process num node: 8'b10000000
+!! Add child _0102_ to fangyuan36
+Add ssa node for :_0102_
+Process Two op for :  assign _0102_ = state_1 == 9'b100000000;
+!! Add child state_1 to _0102_
+!! Add child 9'b100000000 to _0102_
+Process num node: 9'b100000000
+!! Add child _0035_ to fangyuan36
+Add ssa node for :_0035_
+Process Reduce One op for :  assign _0035_ = | fangyuan4;
+!! Add child fangyuan4 to _0035_
+Add ssa node for :fangyuan4
+Process Reduce One op for :  assign fangyuan4 = { _0101_, _0113_ };
+!! Add child _0101_ to fangyuan4
+Add ssa node for :_0101_
+Process Two op for :  assign _0101_ = state_1 == 10'b1000000000;
+!! Add child state_1 to _0101_
+!! Add child 10'b1000000000 to _0101_
+Process num node: 10'b1000000000
+!! Add child _0113_ to fangyuan4
+Add ssa node for :_0113_
+Process Two op for :  assign _0113_ = state_1 == 3'b100;
+!! Add child state_1 to _0113_
+!! Add child 3'b100 to _0113_
+Process num node: 3'b100
+!! Add child fangyuan35 [9:0] to _0021_
+Add ssa node for :fangyuan35
+Process Reduce One op for :  assign fangyuan35 = { _0134_, 80'b00000001000000010000000010000000010000000010000000010000000010000000000000000001 };
+!! Add child _0134_ to fangyuan35
+Add ssa node for :_0134_
+process Ite line for:   assign _0134_ = update_kpd ? 10'b0000000010 : _0133_;
+!! Add child update_kpd to _0134_
+Add ssa node for :update_kpd
+Process Two op for :  assign update_kpd = _0051_ && adr_check;
+!! Add child _0051_ to update_kpd
+Add ssa node for :_0051_
+Process Two op for :  assign _0051_ = _0050_ && _0072_;
+!! Add child _0050_ to _0051_
+Add ssa node for :_0050_
+Process Two op for :  assign _0050_ = wack && _0071_;
+!! Add child wack to _0050_
+Add nb node for :wack
+!! Add child yuzeng22 to wack
+Add ssa node for :yuzeng22
+process Ite line for:   assign yuzeng22 = i_rst ? 1'b0 : _0023_;
+!! Add child i_rst to yuzeng22
+!! Add child 1'b0 to yuzeng22
+!! Add child _0023_ to yuzeng22
+Add ssa node for :_0023_
+process Ite line for:   assign _0023_ = state_0 ? _0145_ : _0143_;
+!! Add child state_0 to _0023_
+!! Add child _0145_ to _0023_
+Add ssa node for :_0145_
+process Ite line for:   assign _0145_ = adr_check ? _0144_ : 1'b1;
+!! Add child adr_check to _0145_
+!! Add child _0144_ to _0145_
+Add ssa node for :_0144_
+process Ite line for:   assign _0144_ = _0140_ ? _0143_ : 1'b1;
+!! Add child _0140_ to _0144_
+Add ssa node for :_0140_
+Process Sel op for :  assign _0140_ = fangyuan44[$signed(_0036_) +: 1];
+!! Add child fangyuan44 to _0140_
+Add ssa node for :fangyuan44
+Process Reduce One op for :  assign fangyuan44 = { wla, wla, wla, wlb, wlb, 3'b000 };
+!! Add child wla to fangyuan44
+!! Add child wla to fangyuan44
+!! Add child wla to fangyuan44
+!! Add child wlb to fangyuan44
+Add nb node for :wlb
+!! Add child yuzeng2 to wlb
+Add ssa node for :yuzeng2
+process Ite line for:   assign yuzeng2 = i_rst ? 1'b0 : _0025_;
+!! Add child i_rst to yuzeng2
+!! Add child 1'b0 to yuzeng2
+!! Add child _0025_ to yuzeng2
+!! Add child fangyuan38 to _0025_
+Add ssa node for :fangyuan38
+Process Reduce One op for :  assign fangyuan38 = { _0100_, _0101_ };
+!! Add child _0100_ to fangyuan38
+!! Add child _0101_ to fangyuan38
+!! Add child fangyuan37 [0:0] to _0025_
+Add ssa node for :fangyuan37
+Process Reduce One op for :  assign fangyuan37 = { _0136_, 1'b0 };
+!! Add child _0136_ to fangyuan37
+Add ssa node for :_0136_
+process Ite line for:   assign _0136_ = update_kpd ? wlb : _0135_;
+!! Add child update_kpd to _0136_
+!! Add child wlb to _0136_
+!! Add child _0135_ to _0136_
+Add ssa node for :_0135_
+process Ite line for:   assign _0135_ = update_esu ? 1'b1 : wlb;
+!! Add child update_esu to _0135_
+Add ssa node for :update_esu
+Process Two op for :  assign update_esu = _0052_ && adr_check;
+!! Add child _0052_ to update_esu
+Add ssa node for :_0052_
+Process Two op for :  assign _0052_ = wack && _0041_;
+!! Add child wack to _0052_
+!! Add child _0041_ to _0052_
+Add ssa node for :_0041_
+Process Two op for :  assign _0041_ = i_wb_adr[4:2] == 3'b100;
+!! Add child i_wb_adr[4:2] to _0041_
+!! Add child 3'b100 to _0041_
+!! Add child adr_check to update_esu
+!! Add child 1'b1 to _0135_
+Process num node: 1'b1
+!! Add child wlb to _0135_
+!! Add child 1'b0 to fangyuan37
+!! Add child wlb to _0025_
+!! Add child wlb to fangyuan44
+!! Add child 3'b000 to fangyuan44
+Process num node: 3'b000
+!! Add child _0036_ to _0140_
+Add ssa node for :_0036_
+Process Two op for :  assign _0036_ = 3'b111 - i_wb_adr[4:2];
+!! Add child 3'b111 to _0036_
+Process num node: 3'b111
+!! Add child i_wb_adr[4:2] to _0036_
+!! Add child _0143_ to _0144_
+Add ssa node for :_0143_
+process Ite line for:   assign _0143_ = _0046_ ? 1'b0 : wack;
+!! Add child _0046_ to _0143_
+Add ssa node for :_0046_
+Process Two op for :  assign _0046_ = wack && _0061_;
+!! Add child wack to _0046_
+!! Add child _0061_ to _0046_
+Add ssa node for :_0061_
+Process Reduce One op for :  assign _0061_ = ! i_wb_stb;
+!! Add child i_wb_stb to _0061_
+Process input node: i_wb_stb
+!! Add child 1'b0 to _0143_
+!! Add child wack to _0143_
+!! Add child 1'b1 to _0144_
+!! Add child 1'b1 to _0145_
+!! Add child _0143_ to _0023_
+!! Add child _0071_ to _0050_
+Add ssa node for :_0071_
+Process One op for :  assign _0071_ = ~ i_wb_adr[4];
+!! Add child i_wb_adr[4] to _0071_
+!! Add child _0072_ to _0051_
+Add ssa node for :_0072_
+Process One op for :  assign _0072_ = ~ i_wb_adr[2];
+!! Add child i_wb_adr[2] to _0072_
+!! Add child adr_check to update_kpd
+!! Add child 10'b0000000010 to _0134_
+Process num node: 10'b0000000010
+!! Add child _0133_ to _0134_
+Add ssa node for :_0133_
+process Ite line for:   assign _0133_ = update_esu ? 10'b0000001000 : state_1;
+!! Add child update_esu to _0133_
+!! Add child 10'b0000001000 to _0133_
+Process num node: 10'b0000001000
+!! Add child state_1 to _0133_
+!! Add child 80'b00000001000000010000000010000000010000000010000000010000000010000000000000000001 to fangyuan35
+Process num node: 80'b00000001000000010000000010000000010000000010000000010000000010000000000000000001
+!! Add child state_1 to _0021_
+!! Add child 1'b1 to _0100_
+!! Add child _0035_ to fangyuan40
+!! Add child fangyuan39 [0:0] to _0024_
+Add ssa node for :fangyuan39
+Process Reduce One op for :  assign fangyuan39 = { _0138_, 1'b0 };
+!! Add child _0138_ to fangyuan39
+Add ssa node for :_0138_
+process Ite line for:   assign _0138_ = update_kpd ? 1'b1 : _0137_;
+!! Add child update_kpd to _0138_
+!! Add child 1'b1 to _0138_
+!! Add child _0137_ to _0138_
+Add ssa node for :_0137_
+process Ite line for:   assign _0137_ = update_esu ? 1'b1 : wla;
+!! Add child update_esu to _0137_
+!! Add child 1'b1 to _0137_
+!! Add child wla to _0137_
+!! Add child 1'b0 to fangyuan39
+!! Add child wla to _0024_
+!! Add child wlb to wlRS
+!! Add child _0040_ to _0049_
+Add ssa node for :_0040_
+Process Reduce One op for :  assign _0040_ = ! i_wb_data;
+!! Add child i_wb_data to _0040_
+Process input node: i_wb_data
+!! Add child 1'b0 to _0001_
+### Begin build: kd
+Add nb node for :kd
+!! Add child yuzeng19 to kd
+Add ssa node for :yuzeng19
+process Ite line for:   assign yuzeng19 = i_rst ? 16'b0000000000000000 : _0006_;
+!! Add child i_rst to yuzeng19
+!! Add child 16'b0000000000000000 to yuzeng19
+Process num node: 16'b0000000000000000
+!! Add child _0006_ to yuzeng19
+Add ssa node for :_0006_
+process Ite line for:   assign _0006_ = state_0 ? _0156_ : kd;
+!! Add child state_0 to _0006_
+!! Add child _0156_ to _0006_
+Add ssa node for :_0156_
+process Ite line for:   assign _0156_ = adr_check ? _0155_ : kd;
+!! Add child adr_check to _0156_
+!! Add child _0155_ to _0156_
+Add ssa node for :_0155_
+process Ite line for:   assign _0155_ = _0140_ ? kd : _0153_;
+!! Add child _0140_ to _0155_
+!! Add child kd to _0155_
+!! Add child _0153_ to _0155_
+Add ssa node for :_0153_
+process Ite line for:   assign _0153_ = _0154_ ? i_wb_data[15:0] : kd;
+!! Add child _0154_ to _0153_
+Add ssa node for :_0154_
+Process Two op for :  assign _0154_ = i_wb_adr[4:2] == 2'b10;
+!! Add child i_wb_adr[4:2] to _0154_
+!! Add child 2'b10 to _0154_
+!! Add child i_wb_data[15:0] to _0153_
+!! Add child kd to _0153_
+!! Add child kd to _0156_
+!! Add child kd to _0006_
+### Begin build: ki
+Add nb node for :ki
+!! Add child yuzeng18 to ki
+Add ssa node for :yuzeng18
+process Ite line for:   assign yuzeng18 = i_rst ? 16'b0000000000000000 : _0007_;
+!! Add child i_rst to yuzeng18
+!! Add child 16'b0000000000000000 to yuzeng18
+!! Add child _0007_ to yuzeng18
+Add ssa node for :_0007_
+process Ite line for:   assign _0007_ = state_0 ? _0160_ : ki;
+!! Add child state_0 to _0007_
+!! Add child _0160_ to _0007_
+Add ssa node for :_0160_
+process Ite line for:   assign _0160_ = adr_check ? _0159_ : ki;
+!! Add child adr_check to _0160_
+!! Add child _0159_ to _0160_
+Add ssa node for :_0159_
+process Ite line for:   assign _0159_ = _0140_ ? ki : _0157_;
+!! Add child _0140_ to _0159_
+!! Add child ki to _0159_
+!! Add child _0157_ to _0159_
+Add ssa node for :_0157_
+process Ite line for:   assign _0157_ = _0158_ ? i_wb_data[15:0] : ki;
+!! Add child _0158_ to _0157_
+Add ssa node for :_0158_
+Process Two op for :  assign _0158_ = i_wb_adr[4:2] == 1'b1;
+!! Add child i_wb_adr[4:2] to _0158_
+!! Add child 1'b1 to _0158_
+!! Add child i_wb_data[15:0] to _0157_
+!! Add child ki to _0157_
+!! Add child ki to _0160_
+!! Add child ki to _0007_
+### Begin build: kp
+Add nb node for :kp
+!! Add child yuzeng17 to kp
+Add ssa node for :yuzeng17
+process Ite line for:   assign yuzeng17 = i_rst ? 16'b0000000000000000 : _0008_;
+!! Add child i_rst to yuzeng17
+!! Add child 16'b0000000000000000 to yuzeng17
+!! Add child _0008_ to yuzeng17
+Add ssa node for :_0008_
+process Ite line for:   assign _0008_ = state_0 ? _0164_ : kp;
+!! Add child state_0 to _0008_
+!! Add child _0164_ to _0008_
+Add ssa node for :_0164_
+process Ite line for:   assign _0164_ = adr_check ? _0163_ : kp;
+!! Add child adr_check to _0164_
+!! Add child _0163_ to _0164_
+Add ssa node for :_0163_
+process Ite line for:   assign _0163_ = _0140_ ? kp : _0161_;
+!! Add child _0140_ to _0163_
+!! Add child kp to _0163_
+!! Add child _0161_ to _0163_
+Add ssa node for :_0161_
+process Ite line for:   assign _0161_ = _0162_ ? i_wb_data[15:0] : kp;
+!! Add child _0162_ to _0161_
+Add ssa node for :_0162_
+Process Reduce One op for :  assign _0162_ = ! i_wb_adr[4:2];
+!! Add child i_wb_adr[4:2] to _0162_
+!! Add child i_wb_data[15:0] to _0161_
+!! Add child kp to _0161_
+!! Add child kp to _0164_
+!! Add child kp to _0008_
+### Begin build: pv
+Add nb node for :pv
+!! Add child yuzeng21 to pv
+Add ssa node for :yuzeng21
+process Ite line for:   assign yuzeng21 = i_rst ? 16'b0000000000000000 : _0014_;
+!! Add child i_rst to yuzeng21
+!! Add child 16'b0000000000000000 to yuzeng21
+!! Add child _0014_ to yuzeng21
+Add ssa node for :_0014_
+process Ite line for:   assign _0014_ = state_0 ? _0148_ : pv;
+!! Add child state_0 to _0014_
+!! Add child _0148_ to _0014_
+Add ssa node for :_0148_
+process Ite line for:   assign _0148_ = adr_check ? _0147_ : pv;
+!! Add child adr_check to _0148_
+!! Add child _0147_ to _0148_
+Add ssa node for :_0147_
+process Ite line for:   assign _0147_ = _0140_ ? pv : _0146_;
+!! Add child _0140_ to _0147_
+!! Add child pv to _0147_
+!! Add child _0146_ to _0147_
+Add ssa node for :_0146_
+process Ite line for:   assign _0146_ = _0041_ ? i_wb_data[15:0] : pv;
+!! Add child _0041_ to _0146_
+!! Add child i_wb_data[15:0] to _0146_
+!! Add child pv to _0146_
+!! Add child pv to _0148_
+!! Add child pv to _0014_
+### Begin build: sp
+Add nb node for :sp
+!! Add child yuzeng20 to sp
+Add ssa node for :yuzeng20
+process Ite line for:   assign yuzeng20 = i_rst ? 16'b0000000000000000 : _0018_;
+!! Add child i_rst to yuzeng20
+!! Add child 16'b0000000000000000 to yuzeng20
+!! Add child _0018_ to yuzeng20
+Add ssa node for :_0018_
+process Ite line for:   assign _0018_ = state_0 ? _0152_ : sp;
+!! Add child state_0 to _0018_
+!! Add child _0152_ to _0018_
+Add ssa node for :_0152_
+process Ite line for:   assign _0152_ = adr_check ? _0151_ : sp;
+!! Add child adr_check to _0152_
+!! Add child _0151_ to _0152_
+Add ssa node for :_0151_
+process Ite line for:   assign _0151_ = _0140_ ? sp : _0149_;
+!! Add child _0140_ to _0151_
+!! Add child sp to _0151_
+!! Add child _0149_ to _0151_
+Add ssa node for :_0149_
+process Ite line for:   assign _0149_ = _0150_ ? i_wb_data[15:0] : sp;
+!! Add child _0150_ to _0149_
+Add ssa node for :_0150_
+Process Two op for :  assign _0150_ = i_wb_adr[4:2] == 2'b11;
+!! Add child i_wb_adr[4:2] to _0150_
+!! Add child 2'b11 to _0150_
+Process num node: 2'b11
+!! Add child i_wb_data[15:0] to _0149_
+!! Add child sp to _0149_
+!! Add child sp to _0152_
+!! Add child sp to _0018_
+### Begin build: state_0
+Found state_0!
+Add nb node for :state_0
+Found state_0!
+!! Add child yuzeng23 to state_0
+Add ssa node for :yuzeng23
+process Ite line for:   assign yuzeng23 = i_rst ? 1'b0 : _0020_;
+!! Add child i_rst to yuzeng23
+!! Add child 1'b0 to yuzeng23
+!! Add child _0020_ to yuzeng23
+!! Add child fangyuan43 to _0020_
+Add ssa node for :fangyuan43
+Process Reduce One op for :  assign fangyuan43 = { _0142_, state_0 };
+!! Add child _0142_ to fangyuan43
+Add ssa node for :_0142_
+Process One op for :  assign _0142_ = ~ state_0;
+!! Add child state_0 to _0142_
+!! Add child state_0 to fangyuan43
+!! Add child fangyuan42 [0:0] to _0020_
+Add ssa node for :fangyuan42
+Process Reduce One op for :  assign fangyuan42 = { _0047_, _0141_ };
+!! Add child _0047_ to fangyuan42
+Add ssa node for :_0047_
+Process Two op for :  assign _0047_ = we && _0062_;
+!! Add child we to _0047_
+Add ssa node for :we
+Process Two op for :  assign we = _0026_ & i_wb_stb;
+!! Add child _0026_ to we
+Add ssa node for :_0026_
+Process Two op for :  assign _0026_ = i_wb_cyc & i_wb_we;
+!! Add child i_wb_cyc to _0026_
+Process input node: i_wb_cyc
+!! Add child i_wb_we to _0026_
+Process input node: i_wb_we
+!! Add child i_wb_stb to we
+!! Add child _0062_ to _0047_
+Add ssa node for :_0062_
+Process Reduce One op for :  assign _0062_ = ! wack;
+!! Add child wack to _0062_
+!! Add child _0141_ to fangyuan42
+Add ssa node for :_0141_
+process Ite line for:   assign _0141_ = adr_check ? _0140_ : 1'b0;
+!! Add child adr_check to _0141_
+!! Add child _0140_ to _0141_
+!! Add child 1'b0 to _0141_
+!! Add child 1'b0 to _0020_
 ### Begin check_all_regs
 ###### Begin checking SAT! 
 ---  BEGIN INSTRUCTION #1 ---
-Add nb constraint for: word_sum ------  time: 0
-Add ssa constraint for: _02_ ------  time: 1
-Ite op constraint for :_02_
-See input:rst___#1
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give 1'd0 to rst___#1
-Add ssa constraint for: word_sum_next ------  time: 1
-Ite op constraint for :word_sum_next
-Add ssa constraint for: _21_ ------  time: 1
-Two op constraint for :_21_
-Add ssa constraint for: _15_ ------  time: 1
-Two op constraint for :_15_
-Add nb constraint for: counter ------  time: 1
-Add ssa constraint for: _00_ ------  time: 2
-Ite op constraint for :_00_
-See input:rst___#2
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give 1'd0 to rst___#2
-Case op constraint for :counter_next
-Add ssa constraint for: fangyuan1 ------  time: 2
-Src concat op constraint for: fangyuan1
-Add ssa constraint for: _20_ ------  time: 2
-Reduce one op constraint for: _20_
-Add nb constraint for: counter ------  time: 2
-Add ssa constraint for: _00_ ------  time: 3
-Ite op constraint for :_00_
-See input:rst___#3
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give 1'd0 to rst___#3
-Case op constraint for :counter_next
-Add ssa constraint for: fangyuan1 ------  time: 3
-Src concat op constraint for: fangyuan1
-Add ssa constraint for: _20_ ------  time: 3
-Reduce one op constraint for: _20_
-Add nb constraint for: counter ------  time: 3
-Add ssa constraint for: _00_ ------  time: 4
-Ite op constraint for :_00_
-See input:rst___#4
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%B Give 1'd0 to rst___#4
-Case op constraint for :counter_next
-Add ssa constraint for: fangyuan1 ------  time: 4
-Src concat op constraint for: fangyuan1
-Add ssa constraint for: _20_ ------  time: 4
-Reduce one op constraint for: _20_
-push into dirty queue: counter
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Replaced with 0: counter___#4
-Add ssa constraint for: _19_ ------  time: 4
-Two op constraint for :_19_
-Add ssa constraint for: _18_ ------  time: 4
-Two op constraint for :_18_
-Add ssa constraint for: _17_ ------  time: 4
-Two op constraint for :_17_
-Add ssa constraint for: _21_ ------  time: 4
-Two op constraint for :_21_
-Add ssa constraint for: _15_ ------  time: 4
-Two op constraint for :_15_
-Add ssa constraint for: _16_ ------  time: 4
-Two op constraint for :_16_
-Found it!
-See input:func___#4
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%B Give 2'd2 to func___#4
-Finished idx: 4 for: fangyuan1
-blank1
-blank2
-Finished idx: 3 for: fangyuan1
-blank1
-blank2
-Finished idx: 2 for: fangyuan1
-blank1
-blank2
-Finished idx: 1 for: fangyuan1
-blank1
-blank2
-Finished idx: 0 for: fangyuan1
-blank1
-blank2
-Add ssa constraint for: _19_ ------  time: 3
-Two op constraint for :_19_
-Add ssa constraint for: _18_ ------  time: 3
-Two op constraint for :_18_
-Add ssa constraint for: _17_ ------  time: 3
-Two op constraint for :_17_
-Add ssa constraint for: _21_ ------  time: 3
-Two op constraint for :_21_
-Add ssa constraint for: _15_ ------  time: 3
-Two op constraint for :_15_
-Add ssa constraint for: _16_ ------  time: 3
-Two op constraint for :_16_
-Found it!
-See input:func___#3
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give 2'd0 to func___#3
-Finished idx: 4 for: fangyuan1
-blank1
-blank2
-Finished idx: 3 for: fangyuan1
-blank1
-blank2
-Finished idx: 2 for: fangyuan1
-blank1
-blank2
-Finished idx: 1 for: fangyuan1
-blank1
-blank2
-Finished idx: 0 for: fangyuan1
-blank1
-blank2
-Add ssa constraint for: _19_ ------  time: 2
-Two op constraint for :_19_
-Add ssa constraint for: _18_ ------  time: 2
-Two op constraint for :_18_
-Add ssa constraint for: _17_ ------  time: 2
-Two op constraint for :_17_
-Add ssa constraint for: _21_ ------  time: 2
-Two op constraint for :_21_
-Add ssa constraint for: _15_ ------  time: 2
-Two op constraint for :_15_
-Add ssa constraint for: _16_ ------  time: 2
-Two op constraint for :_16_
-Found it!
-See input:func___#2
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give 2'd0 to func___#2
-Finished idx: 4 for: fangyuan1
-blank1
-blank2
-Finished idx: 3 for: fangyuan1
-blank1
-blank2
-Finished idx: 2 for: fangyuan1
-blank1
-blank2
-Finished idx: 1 for: fangyuan1
-blank1
-blank2
-Finished idx: 0 for: fangyuan1
-blank1
-blank2
-Add ssa constraint for: _16_ ------  time: 1
-Two op constraint for :_16_
-Found it!
-See input:func___#1
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give 2'd0 to func___#1
-Add ssa constraint for: _13_[8:0] ------  time: 1
-Ite op constraint for :_13_[8:0]
-Add ssa constraint for: _17_ ------  time: 1
-Two op constraint for :_17_
-Add ssa constraint for: _03_ ------  time: 1
-Two op constraint for :_03_
-Add nb constraint for: word_sum ------  time: 1
-Add ssa constraint for: _02_ ------  time: 2
-Ite op constraint for :_02_
-Add ssa constraint for: word_sum_next ------  time: 2
-Ite op constraint for :word_sum_next
-Add ssa constraint for: _13_[8:0] ------  time: 2
-Ite op constraint for :_13_[8:0]
-Add ssa constraint for: _03_ ------  time: 2
-Two op constraint for :_03_
-Add nb constraint for: word_sum ------  time: 2
-Add ssa constraint for: _02_ ------  time: 3
-Ite op constraint for :_02_
-Add ssa constraint for: word_sum_next ------  time: 3
-Ite op constraint for :word_sum_next
-Add ssa constraint for: _13_[8:0] ------  time: 3
-Ite op constraint for :_13_[8:0]
-Add ssa constraint for: _03_ ------  time: 3
-Two op constraint for :_03_
-Add nb constraint for: word_sum ------  time: 3
-Add ssa constraint for: _02_ ------  time: 4
-Ite op constraint for :_02_
-Add ssa constraint for: word_sum_next ------  time: 4
-Ite op constraint for :word_sum_next
-Add ssa constraint for: _13_[8:0] ------  time: 4
-Ite op constraint for :_13_[8:0]
-Add ssa constraint for: _03_ ------  time: 4
-Two op constraint for :_03_
-push into dirty queue: word_sum
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Replaced with 0: word_sum___#4
-Add ssa constraint for: _12_[8:0] ------  time: 4
-Ite op constraint for :_12_[8:0]
-Add ssa constraint for: _04_ ------  time: 4
-Two op constraint for :_04_
-Add ssa constraint for: _11_[8:0] ------  time: 4
-Ite op constraint for :_11_[8:0]
-Add ssa constraint for: _05_ ------  time: 4
-Two op constraint for :_05_
-Add ssa constraint for: _10_[8:0] ------  time: 4
-Ite op constraint for :_10_[8:0]
-Add ssa constraint for: _06_ ------  time: 4
-Two op constraint for :_06_
-Add nb constraint for: word ------  time: 3
-Add ssa constraint for: _01_ ------  time: 4
-Ite op constraint for :_01_
-Add ssa constraint for: word_next ------  time: 4
-Ite op constraint for :word_next
-Add ssa constraint for: _14_ ------  time: 4
-Two op constraint for :_14_
-Found it!
-See input:inWord___#4
-Found it!
-Add ssa constraint for: _12_[8:0] ------  time: 3
-Ite op constraint for :_12_[8:0]
-Add ssa constraint for: _04_ ------  time: 3
-Two op constraint for :_04_
-Add ssa constraint for: _11_[8:0] ------  time: 3
-Ite op constraint for :_11_[8:0]
-Add ssa constraint for: _05_ ------  time: 3
-Two op constraint for :_05_
-Add ssa constraint for: _10_[8:0] ------  time: 3
-Ite op constraint for :_10_[8:0]
-Add ssa constraint for: _06_ ------  time: 3
-Two op constraint for :_06_
-Add nb constraint for: word ------  time: 2
-Add ssa constraint for: _01_ ------  time: 3
-Ite op constraint for :_01_
-Add ssa constraint for: word_next ------  time: 3
-Ite op constraint for :word_next
-Add ssa constraint for: _14_ ------  time: 3
-Two op constraint for :_14_
-Found it!
-See input:inWord___#3
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give 9'd0 to inWord___#3
-Found it!
-Add ssa constraint for: _12_[8:0] ------  time: 2
-Ite op constraint for :_12_[8:0]
-Add ssa constraint for: _04_ ------  time: 2
-Two op constraint for :_04_
-Add ssa constraint for: _11_[8:0] ------  time: 2
-Ite op constraint for :_11_[8:0]
-Add ssa constraint for: _05_ ------  time: 2
-Two op constraint for :_05_
-Add ssa constraint for: _10_[8:0] ------  time: 2
-Ite op constraint for :_10_[8:0]
-Add ssa constraint for: _06_ ------  time: 2
-Two op constraint for :_06_
-Add nb constraint for: word ------  time: 1
-Add ssa constraint for: _01_ ------  time: 2
-Ite op constraint for :_01_
-Add ssa constraint for: word_next ------  time: 2
-Ite op constraint for :word_next
-Add ssa constraint for: _14_ ------  time: 2
-Two op constraint for :_14_
-Found it!
-See input:inWord___#2
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give 9'd0 to inWord___#2
-Found it!
-Add ssa constraint for: _12_[8:0] ------  time: 1
-Ite op constraint for :_12_[8:0]
-Add ssa constraint for: _18_ ------  time: 1
-Two op constraint for :_18_
-Add ssa constraint for: _04_ ------  time: 1
-Two op constraint for :_04_
-Add ssa constraint for: _11_[8:0] ------  time: 1
-Ite op constraint for :_11_[8:0]
-Add ssa constraint for: _19_ ------  time: 1
-Two op constraint for :_19_
-Add ssa constraint for: _05_ ------  time: 1
-Two op constraint for :_05_
-Add ssa constraint for: _10_[8:0] ------  time: 1
-Ite op constraint for :_10_[8:0]
-Add ssa constraint for: _20_ ------  time: 1
-Reduce one op constraint for: _20_
-Add ssa constraint for: _06_ ------  time: 1
-Two op constraint for :_06_
-*************************  Update function for word_sum
-(goals
-(goal
-  (= |word_sum___#100| (concat #x00 ((_ extract 0 0) |word___#4|))))
-)
-### Begin clean_goal
-#1#word_sum#3
-(goals
-(goal
-  (= |word_sum___#100| (concat #x00 ((_ extract 0 0) |word___#4|))))
-)
-Thu Aug 27 21:11:06 2020
-
+Makefile:11: recipe for target 'pidc' failed

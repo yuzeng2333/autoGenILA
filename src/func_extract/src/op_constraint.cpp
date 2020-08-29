@@ -145,8 +145,8 @@ expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver 
     }
     else if(!g_nopInstr.empty()){ // give the value in nop instruction
       if(g_nopInstr.find(dest) == g_nopInstr.end()) {
-        toCout("Error: var not found for nop instruction: "+dest);
-        abort();
+        toCout("!!!!!!!!!! WARNING: var not found for nop instruction: "+dest);
+        return destExpr;
       }
       std::string localVal = g_nopInstr[dest];
       uint32_t localWidth = get_var_slice_width(dest);
