@@ -4,6 +4,7 @@
 #include "check_regs.h"
 #include "op_constraint.h"
 #include "clean_goal.h"
+#include "inv_gen.h"
 #include <string>
 #include <fstream>
 #include <time.h>
@@ -28,6 +29,7 @@ int main(int argc, char *argv[]) {
   g_verb = true;
   g_print_solver = false;
   g_remove_adff = true;
+  g_split_long_num = true;
   print_time();  
   if(doClean.compare("1") == 0) {
     toCout("### Begin clean_file");
@@ -44,6 +46,7 @@ int main(int argc, char *argv[]) {
   //read_in_architectural_states(asFile);
   read_in_instructions(g_path+"/instr.txt");
   vcd_parser(g_path+"/rst.vcd");
+  inv_gen();
   build_ast_tree();
   check_all_regs();
   clean_goal();

@@ -1,0 +1,5 @@
+../func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/PID 0#make sure design.v is cleaned with taint_gen!
+Begin main!
+Sun Aug 30 01:06:51 2020
+### Begin parse_verilog
+### Begin parse_verilog

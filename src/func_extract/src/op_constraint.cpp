@@ -54,11 +54,19 @@ expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTain
   if(width == 0) varWidthNum = get_var_slice_width(var);
 
   if(is_number(var)) {
+    if(localWidth > 32) {
+      toCout("Warning: too long bit-vector is found : "+varAndSlice);
+    }
     if(isTaint) {
       varTimed = var + "___#" + toStr(timeIdx) + "_"+toStr(localWidth)+"b" + _t;
       return c.bv_val(0, localWidth);
     }
     else {
+      uint32_t localNum = hdb2int(var);
+      if(localNum > 4294967295) {
+        toCout("Error: too large number is found : "+var);
+        abort();
+      }
       varTimed = var + "___#" + toStr(timeIdx) + "_"+toStr(localWidth)+"b";      
       return c.bv_val(hdb2int(var), localWidth);
     }
@@ -539,7 +547,7 @@ expr src_concat_op_constraint(astNode* const node, uint32_t timeIdx, context &c,
 
 expr add_one_concat_expr(astNode* const node, uint32_t nxtIdx, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve, bool isTaint ) {
   //if(node->dest == "fangyuan1" && nxtIdx == 0) {
-  if(node->dest.find("u0.word") != std::string::npos ) {
+  if(node->dest.find("fangyuan35") != std::string::npos ) {
     toCoutVerb("Found it!");
   }
   expr firstSrcExpr(c);

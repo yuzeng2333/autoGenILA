@@ -65,4 +65,6 @@ bool is_number(const std::string& s);
 bool is_sliced(std::string varAndSlice);
 
 uint32_t get_num_len(std::string num);
+
+bool is_all_zero(std::string);
 #endif

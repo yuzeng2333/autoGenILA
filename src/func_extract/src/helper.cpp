@@ -309,3 +309,12 @@ uint32_t get_num_len(std::string num) {
     abort();
   }
 }
+
+
+bool is_all_zero(std::string str) {
+  for(auto &c: str) {
+    if(c != '0')
+      return false;
+  }
+  return true;
+}
