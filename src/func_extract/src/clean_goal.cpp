@@ -51,9 +51,9 @@ void clean_goal() {
       std::string instrEncodings = get_encodings(g_instrInfo[instrIdx-1].instrEncoding);
       if(instrEncodings.empty())
         continue;
-      std::string rstEncodings = get_encodings(g_rstVal);
+      std::string nopEncodings = get_encodings(g_nopInstr);
       uint32_t writeDelay = get_write_delay(g_instrInfo[instrIdx-1].writeASV, writeASV);
-      output << "assume -name zy_assume"+toStr(assumIdx++)+" {__START__ == 1 |-> ("+instrEncodings+" ##1 ( "+rstEncodings+" )[*"+toStr(writeDelay+1)+"] ) }" << std::endl;
+      output << "assume -name zy_assume"+toStr(assumIdx++)+" {__START__ == 1 |-> ("+instrEncodings+" ##1 ( "+nopEncodings+" )[*"+toStr(writeDelay+1)+"] ) }" << std::endl;
     }
 
   }
