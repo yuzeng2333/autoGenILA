@@ -1,8 +1,7 @@
 #include "parse_fill.h"
 #include "expr.h"
 #include "helper.h"
-#include "../../taint_method/main.h"
-#include "../../taint_method/global_data.h"
+#include "../../taint_method/src/global_data.h"
 
 // global variables
 std::set<std::string> moduleAs;

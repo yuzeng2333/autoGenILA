@@ -1,7 +1,7 @@
 #include "pseudo_vlg_gen.h"
 #include "helper.h"
 #include "global_data_struct.h"
-#include "../../taint_method/global_data.h"
+#include "../../taint_method/src/global_data.h"
 #define toStr(a) std::to_string(a)
 
 void pseudo_vlg_gen() {

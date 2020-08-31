@@ -5,9 +5,9 @@
 #include <regex>
 #include <algorithm>
 #include <math.h>
-#include "../../taint_method/helper.h"
+#include "../../taint_method/src/helper.h"
 #include "z3++.h"
-#include "../../taint_method/global_data.h"
+#include "../../taint_method/src/global_data.h"
 #include "global_data_struct.h"
 
 using namespace z3;

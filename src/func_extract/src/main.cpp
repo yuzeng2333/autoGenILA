@@ -11,8 +11,8 @@
 #include <fstream>
 #include <time.h>
 
-#include "../../taint_method/global_data.h"
-#include "../../taint_method/helper.h"
+#include "../../taint_method/src/global_data.h"
+#include "../../taint_method/src/helper.h"
 
 bool g_print_solver;
 std::ofstream g_outFile;

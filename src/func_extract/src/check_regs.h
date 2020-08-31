@@ -1,10 +1,10 @@
 #ifndef VLG2Z3 
 #define VLG2Z3
 
-#include "../../taint_method/VarWidth.h"
-#include "../../taint_method/taint_gen.h"
-#include "../../taint_method/global_data.h"
-#include "../../taint_method/helper.h"
+#include "../../taint_method/src/varWidth.h"
+#include "../../taint_method/src/taint_gen.h"
+#include "../../taint_method/src/global_data.h"
+#include "../../taint_method/src/helper.h"
 #include "z3++.h"
 #include "ast.h"
 #include <string>

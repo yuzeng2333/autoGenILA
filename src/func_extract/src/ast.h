@@ -6,8 +6,8 @@
 #include <cassert>
 #include <regex>
 #include <algorithm>
-#include "../../taint_method/taint_gen.h"
-#include "../../taint_method/helper.h"
+#include "../../taint_method/src/taint_gen.h"
+#include "../../taint_method/src/helper.h"
 
 #define AS  101
 #define NUM 102

@@ -10,9 +10,9 @@
 #include <regex>
 #include <utility>
 #include <vector>
-#include "../../taint_method/taint_gen.h"
-#include "../../taint_method/helper.h"
-#include "../../taint_method/VarWidth.h"
+#include "../../taint_method/src/taint_gen.h"
+#include "../../taint_method/src/helper.h"
+#include "../../taint_method/src/varWidth.h"
 
 extern std::unordered_map<std::string, std::string> g_ssaTable;
 extern std::set<std::string> moduleAs;

@@ -1,5 +1,5 @@
-#include "../../taint_method/taint_gen.h"
-#include "../../taint_method/helper.h"
+#include "../../taint_method/src/taint_gen.h"
+#include "../../taint_method/src/helper.h"
 #include "helper.h"
 
 #define toStr(a) std::to_string(a)
