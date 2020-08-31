@@ -6,6 +6,7 @@
 #include "clean_goal.h"
 #include "clean_verilog.h"
 #include "inv_gen.h"
+#include "pseudo_vlg_gen.h"
 #include <string>
 #include <fstream>
 #include <time.h>
@@ -46,6 +47,7 @@ int main(int argc, char *argv[]) {
   }
   //read_in_architectural_states(asFile);
   clean_verilog(g_path+"/design.v.clean");
+  pseudo_vlg_gen();
   read_in_instructions(g_path+"/instr.txt");
   vcd_parser(g_path+"/rst.vcd");
   inv_gen();

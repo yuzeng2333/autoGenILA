@@ -327,3 +327,13 @@ bool replace(std::string& str, const std::string& from, const std::string& to) {
     str.replace(start_pos, from.length(), to);
     return true;
 }
+
+
+void vec2str(std::vector<std::string> &vec, std::string &ret) {
+  ret.clear();
+  for(auto &var : vec) {
+    ret = ret + var + ", ";
+  }
+  ret.pop_back();
+  ret.pop_back();
+}
