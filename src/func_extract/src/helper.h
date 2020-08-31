@@ -67,4 +67,6 @@ bool is_sliced(std::string varAndSlice);
 uint32_t get_num_len(std::string num);
 
 bool is_all_zero(std::string);
+
+bool replace(std::string& str, const std::string& from, const std::string& to);
 #endif

@@ -4,6 +4,7 @@
 #include "check_regs.h"
 #include "op_constraint.h"
 #include "clean_goal.h"
+#include "clean_verilog.h"
 #include "inv_gen.h"
 #include <string>
 #include <fstream>
@@ -44,6 +45,7 @@ int main(int argc, char *argv[]) {
     parse_verilog(g_path+"/design.v.clean");
   }
   //read_in_architectural_states(asFile);
+  clean_verilog(g_path+"/design.v.clean");
   read_in_instructions(g_path+"/instr.txt");
   vcd_parser(g_path+"/rst.vcd");
   inv_gen();
