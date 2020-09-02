@@ -263,10 +263,10 @@ void clean_file(std::string fileName) {
   bool inFunc = false;
   std::string rsvdLine; // reserved line, not printed in last iteration
   while( std::getline(cleanFileInput, line) ) {
-    //toCout(line);
-    //if(line.find("27'b000000000000000000000000000, of, 32'b00000000000000000000000000000000") != std::string::npos) {
-    //  toCout("FIND IT!");
-    //}
+    toCoutVerb(line);
+    if(line.find("27'b000000000000000000000000000, of, 32'b00000000000000000000000000000000") != std::string::npos) {
+      toCout("FIND IT!");
+    }
 
     /// skipe comment line
     if(std::regex_match(line, match, pureComment) || line.substr(0,2) == "/*" || line.empty())
@@ -274,6 +274,8 @@ void clean_file(std::string fileName) {
 
     /// remove in-line comments
     line = std::regex_replace(line, partialComment, "");
+    if(line.find("//") != std::string::npos)
+      line = line.substr(0, line.find("//"));
     cleanLine = std::regex_replace(line, redundentBlank, "$1 $3");
 
     /// extract aways concatenations into new Fangyuan variables

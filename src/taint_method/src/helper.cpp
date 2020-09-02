@@ -1022,7 +1022,10 @@ void parse_func_statements(std::vector<std::pair<std::string, std::string>> &cas
     inputWidth.push_back(m.str(2));
   }
   std::getline(input, line);
-  assert( std::regex_search(line, m, pCase) );
+  if( !std::regex_search(line, m, pCase) ) {
+    toCout("Error: does not match pCase in parse_func_statements: "+line);
+    abort();
+  }
   parse_case_statements(caseAssignPairs, input);
   if( !goToEnd )
     input.seekg(funcBegin);
