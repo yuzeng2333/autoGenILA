@@ -1100,7 +1100,7 @@ void go_backward(std::string startVarAndSlice, std::vector<std::pair<std::string
       auto op1IdxVec = g_backwardMap[op1];
       checkCond(op1IdxVec.size() == 1, "Error: multiple assignment to op2 in sel found, op2: "+op2AndSlice);
       std::string op1Line = g_passExprStore[op1IdxVec.front()];
-      checkCond( std::regex_match(op1Line, m, pSrcConcat), "Error: assignment to op2 in sel is not src_concat, op2: "+op2+", line: "+op1Line );
+      checkCond( std::regex_match(op1Line, m, pSrcConcat), "Error: assignment to op1 in sel is not src_concat, op1: "+op1+", op1Line: "+op1Line+", original line"+line );
 
       uint32_t beishu = op1Width / lowIdx;
       toCout("beishu is: "+toStr(beishu)+", startVar is: "+startVarAndSlice);

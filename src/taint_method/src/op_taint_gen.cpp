@@ -1474,7 +1474,7 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
   }
   else {
     /* when both inputs are constants */
-    output << blank << "assign " + dest + _t + " = " + extend(cond+_t+" "+condSlice, localWidthNum) + " ;" << std::endl;
+    output << blank << "assign " + dest + _t + destSlice + " = " + extend(cond+_t+" "+condSlice, localWidthNum) + " ;" << std::endl;
     if(printSig) output << blank << "assign " + dest + _sig + " = " + cond + _sig + " ;" << std::endl;
     output << blank << "assign " + cond + _r + condVer + condSlice + " = ( | " + dest+_r+destSlice + ") && " + op1AndSlice + " != " + op2AndSlice + " ;" << std::endl;
   }

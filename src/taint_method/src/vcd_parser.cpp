@@ -90,11 +90,12 @@ void hierarchical_vcd_parser(std::string fileName) {
         rstValMap[modName][varName] = rstVal;
     }
   } // end of while
-  if(!check_rst_value(rstValMap)) {
-    toCout("Error: different instances of same module has different rst values");
-    abort();
-  }
-  // fill g_rstValMap
+  // FIXME: do not check temprally
+  //if(!check_rst_value(rstValMap)) {
+  //  toCout("Error: different instances of same module has different rst values");
+  //  abort();
+  //}
+  //// fill g_rstValMap
   for(auto it = rstValMap.begin(); it != rstValMap.end(); it++) {
     if((it->first).compare(g_topModule) == 0) {
       g_rstValMap.emplace(g_topModule, it->second);
