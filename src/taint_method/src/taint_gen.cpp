@@ -97,7 +97,7 @@ std::regex pModulePort    (to_re("^(\\s*)\\.(NAME)\\((.*)\\),?$"));
 std::regex pModuleEnd     (to_re("^(\\s*)\\);$"));
 /* control keywords */
 // case
-std::regex pCase      (to_re("^(\\s*)case(\\S)? \\((NAME)\\)$"));
+std::regex pCase      (to_re("^(\\s*)case(\\S)? \\((NAME)\\)"));
 std::regex pEndcase   (to_re("^(\\s*)endcase$"));
 std::regex pDefault   (to_re("^(\\s*)default\\:$"));
 std::regex pBlock     (to_re("^(\\s*)(NAME) = (NAME)(\\s*)?;$"));
@@ -171,6 +171,7 @@ bool g_remove_adff = false;
 bool g_split_long_num = false;
 bool g_use_vcd_parser = true;
 bool g_write_assert = true;
+bool g_double_assert = false;
 std::string _t="_T";
 std::string _r="_R";
 std::string _x="_X";
@@ -2337,7 +2338,7 @@ void gen_assert_property(std::ofstream &output) {
       if(g_use_vcd_parser)
         rstVal = g_rstValMap[moduleName][m.str(1)];
       if(rstVal.empty()) rstVal = "0";
-      if(!isMem(m.str(1))) {
+      if(!isMem(m.str(1)) && g_double_assert) {
         if(g_use_vcd_parser)
           output << "  assert property( " + out + " == 0 || " + m.str(1) + "_PREV_VAL1 == " + rstVal + " );" << std::endl;
         else
