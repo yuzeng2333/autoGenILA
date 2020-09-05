@@ -1,11 +1,3 @@
-#2#word_sum#2
-(goals
-(goal
-  (= |word_sum|
-     (bvadd (concat #x00 ((_ extract 2 2) |word|))
-            (concat #x00 ((_ extract 1 1) |word|)))))
-)
-assume -name zy_assume0 {__START__ == 1 |-> (rst == 1'd0 && func == 2'd2  ##1 ( word_sum == 9'd0 && counter == 5'd0 && word == 9'd0  )[*4] ) }
 #2#word_sum#3
 (goals
 (goal
@@ -14,13 +6,4 @@ assume -name zy_assume0 {__START__ == 1 |-> (rst == 1'd0 && func == 2'd2  ##1 ( 
             (concat #x00 ((_ extract 1 1) |word|))
             (concat #x00 ((_ extract 0 0) |word|)))))
 )
-assume -name zy_assume1 {__START__ == 1 |-> (rst == 1'd0 && func == 2'd2  ##1 ( word_sum == 9'd0 && counter == 5'd0 && word == 9'd0  )[*4] ) }
-#2#word_sum#4
-(goals
-(goal
-  (= |word_sum|
-     (bvadd (concat #x00 ((_ extract 2 2) |word|))
-            (concat #x00 ((_ extract 1 1) |word|))
-            (concat #x00 ((_ extract 0 0) |word|)))))
-)
-assume -name zy_assume2 {__START__ == 1 |-> (rst == 1'd0 && func == 2'd2  ##1 ( word_sum == 9'd0 && counter == 5'd0 && word == 9'd0  )[*4] ) }
+assume -name zy_assume0 {__START__ == 1 |-> (rst == 1'd0 && func == 2'd2  ##1 ( word_sum == 9'd0 && counter == 5'd0 && word == 9'd0  )[*5] ) }

@@ -3,13 +3,13 @@ rst = 1'd0
 func = 2'd1
 inWord = x
 W:
-word
+word 1
 #2:
 rst = 1'd0
 func = 2'd2
 inWord = x
 W:
-word_sum 3
+word_sum(skip) 4
 R:
 word
 word_sum

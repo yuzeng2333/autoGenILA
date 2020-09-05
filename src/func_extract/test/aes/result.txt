@@ -1,0 +1,9 @@
+Begin main!
+Start time: Mon Aug 24 00:12:59 2020
+
+(goals
+(goal
+  (= |out___#100| #x66e94bd4ef8a2c3b884cfa59ca342b2e))
+)
+End time: Mon Aug 24 08:51:42 2020
+

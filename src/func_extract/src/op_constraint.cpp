@@ -827,36 +827,20 @@ expr add_one_case_branch_expr(astNode* const node, expr &caseExpr, uint32_t idx,
   }
 } 
 
+
 expr func_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
   std::string destAndSlice = node->dest;
+  toCout("Func constraint for:"+destAndSlice);  
   uint32_t width = get_var_slice_width(destAndSlice);
   std::string moduleName = node->op;
+  ModuleInfo_t moduleInfo = g_allModuleInfo[moduleName];
+  std::unordered_map<std::string, uint32_t> inputDelayMap = moduleInfo.out2InDelayMp[destAndSlice];
   sort_vector sorts(c);
   for(std::string &var: node->srcVec) {
     sorts.push_back(c.bv_sort(get_var_slice_width(var)));
   }
   uint32_t inputNo = node->srcVec.size();
-  //func_decl subModule = function(moduleName, inputNo,c.bv_sort(width), c.bv_sort(width));  
   func_decl subModule = function(moduleName, sorts, c.bv_sort(width));  
-  //if(inputNo == 1) {
-  //  uint32_t width1 = get_var_slice_width(node->srcVec[0]);
-  //  subModule = function(moduleName, c.bv_sort(width1), c.bv_sort(width));
-  //}
-  //else if(inputNo == 2) {
-  //  uint32_t width1 = get_var_slice_width(node->srcVec[0]);
-  //  uint32_t width2 = get_var_slice_width(node->srcVec[1]);
-  //  subModule = function(moduleName, c.bv_sort(width1), c.bv_sort(width2), c.bv_sort(width));
-  //}
-  //else if(inputNo == 3) {
-  //  uint32_t width1 = get_var_slice_width(node->srcVec[0]);
-  //  uint32_t width2 = get_var_slice_width(node->srcVec[1]);
-  //  uint32_t width3 = get_var_slice_width(node->srcVec[2]);
-  //  subModule = function(moduleName, c.bv_sort(width1), c.bv_sort(width2), c.bv_sort(width3), c.bv_sort(width));
-  //}
-  //else {
-  //  toCout("Error: too many input numbers:"+toStr(inputNo));
-  //  abort();
-  //}
 
   if(isSolve) {
     toCout("Error: func_constraint not supported for solve yet!");
@@ -865,14 +849,14 @@ expr func_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
   expr_vector exprVec(c);
   uint32_t i = 0;
   for(std::string &var: node->srcVec) {
+    uint32_t delay =inputDelayMap[var]; 
     uint32_t op1Hi = get_lgc_hi(var);
     uint32_t op1Lo = get_lgc_lo(var);
-    expr localExpr = add_constraint(node->childVec[i++], timeIdx, c, s, g, bound, isSolve).extract(op1Hi, op1Lo);
+    expr localExpr = add_constraint(node->childVec[i++], timeIdx+delay, c, s, g, bound, isSolve).extract(op1Hi, op1Lo);
     exprVec.push_back(localExpr);
   }
   return subModule(exprVec);
 }
-
 
 
 // for two operators

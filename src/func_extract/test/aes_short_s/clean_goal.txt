@@ -1,0 +1,35 @@
+#1#out#2
+(goals
+(goal
+  (let ((a!1 (ite (= |in| #x02)
+                  #x77
+                  (ite (= |in| #x01)
+                       #x7c
+                       (ite (= |in| #x00) #x63 #x00)))))
+  (let ((a!2 (ite (= |in| #x05)
+                  #xaa
+                  (ite (= |in| #x04)
+                       #xf2
+                       (ite (= |in| #x03) #x7b a!1)))))
+  (let ((a!3 (ite (= |in| #x02)
+                  #x77
+                  (ite (= |in| #x01)
+                       #x7c
+                       (ite (= |in| #x00) #x63 a!2)))))
+  (let ((a!4 (ite (= |in| #x05)
+                  #xaa
+                  (ite (= |in| #x04)
+                       #xf2
+                       (ite (= |in| #x03) #x7b a!3)))))
+  (let ((a!5 (ite (= |in| #x02)
+                  #x77
+                  (ite (= |in| #x01)
+                       #x7c
+                       (ite (= |in| #x00) #x63 a!4)))))
+  (let ((a!6 (ite (= |in| #x05)
+                  #xaa
+                  (ite (= |in| #x04)
+                       #xf2
+                       (ite (= |in| #x03) #x7b a!5)))))
+    (= |out| a!6))))))))
+)

@@ -2,7 +2,7 @@
 in = x
 rcon = x
 W:
-out_1 2
+out_1(skip) 2
 $NOP:
 in = 128'd0
 rcon = 1'd0

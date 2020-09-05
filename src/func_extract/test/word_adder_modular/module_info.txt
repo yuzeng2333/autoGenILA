@@ -1,0 +1,5 @@
+adder:
+result {
+  enable: 4 
+  word: 4
+}

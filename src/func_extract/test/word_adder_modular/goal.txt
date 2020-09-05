@@ -1,0 +1,5 @@
+#1#result#3
+(goals
+(goal
+  (= |result___#100| (adder #b1 #b0 |word___#4|)))
+)

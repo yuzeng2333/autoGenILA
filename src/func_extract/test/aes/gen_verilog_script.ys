@@ -1,5 +1,7 @@
-read_verilog -sv word_adder_clean.v
-prep -top word_adder
+read_verilog -sv expand_key_128.v
+read_verilog -sv S.v
+read_verilog -sv S4.v
+prep -top expand_key_128
 
 hierarchy -check
 proc
@@ -11,4 +13,4 @@ flatten;
 memory -nordff
 proc
 opt;;
-write_verilog word_adder_yosys.v
+write_verilog design.v

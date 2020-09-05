@@ -59,7 +59,6 @@ void read_in_architectural_states(std::string fileName);
 
 void read_in_instructions(std::string fileName);
 
-
 void read_module_info();
 
 #endif

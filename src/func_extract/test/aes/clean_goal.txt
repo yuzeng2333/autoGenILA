@@ -1,0 +1,5 @@
+#1#out#19
+(goals
+(goal
+  (= |out| #x66e94bd4ef8a2c3b884cfa59ca342b2e))
+)

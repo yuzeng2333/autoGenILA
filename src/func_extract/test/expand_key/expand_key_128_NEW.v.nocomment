@@ -1065,15 +1065,15 @@ module expand_key_128(clk, in, out_1, out_2, rcon);
   wire [31:0] v1;
   wire [31:0] v2;
   wire [31:0] v3;
-  always @(posedge clk)
 
   wire [127:0] fangyuan0;
   assign fangyuan0 = { k0b, k1b, k2b, k3b };
-      out_1 <= fangyuan0;
   always @(posedge clk)
+      out_1 <= fangyuan0;
 
   wire [31:0] fangyuan1;
   assign fangyuan1 = { v0[31:24], in[119:96] };
+  always @(posedge clk)
       k0a <= fangyuan1;
   always @(posedge clk)
       k1a <= v1;

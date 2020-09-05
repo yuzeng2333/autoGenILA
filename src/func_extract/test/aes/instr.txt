@@ -1,23 +1,9 @@
 #1:
-rst = 1'd0
-func = 2'd1
-inWord = x
+state = x
+key = x
 W:
-word
-#2:
-rst = 1'd0
-func = 2'd2
-inWord = x
-W:
-word_sum
-R:
-word
-word_sum
+out(skip) 21
 $NOP:
-func = 2'd0
-rst = 1'd0
-inWord = 9'd0
+state = x
+key = x
 *RESET:
-counter = 5'd0
-word = 9'd0
-word_sum = 9'd0
