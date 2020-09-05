@@ -459,7 +459,7 @@ void module_expr(std::string firstLine, std::ifstream &input) {
       toCout("Error in matching module ports");
       abort();
     }
-    if(m.str(2) == g_recentClk || m.str(2) == g_recentRst)
+    if(m.str(3) == g_recentClk || m.str(3) == g_recentRst)
       continue;
     if(g_allModuleInfo[moduleName].out2InDelayMp.find(m.str(2)) == g_allModuleInfo[moduleName].out2InDelayMp.end() )
       inputVec.push_back(m.str(2)+"_#_"+m.str(3));
