@@ -427,14 +427,56 @@ void case_expr(std::string line, std::ifstream &input) {
   std::smatch m;
   std::string caseFirstLine;
   std::getline(input, caseFirstLine);
-  if ( !std::regex_match(caseFirstLine, m, pCase) )
-    return;
+  if ( !std::regex_match(caseFirstLine, m, pCase) ) {
+    toCout("Error: does not match pCase: "+caseFirstLine);
+    abort();
+  }
   std::string blank = m.str(1);
   std::string sAndSlice = m.str(3);
   std::vector<std::pair<std::string, std::string>> caseAssignPairs;
   std::vector<std::string> inputSlice;
   std::string destAndSlice = parse_case_statements(caseAssignPairs, input, false);
   g_caseTable.emplace(destAndSlice, std::make_pair(sAndSlice, caseAssignPairs));
+}
+
+// TODO: separate inputs and outputs
+void module_expr(std::string firstLine, std::ifstream &input) {
+  std::smatch m;
+  if ( !std::regex_match(firstLine, m, pModuleBegin) ) {
+    toCout("Error: does not match pModuleBegin: "+firstLine);
+    abort();
+  }
+  std::string moduleName = m.str(2);
+  std::string instanceName = m.str(3);
+  FuncInfo_t funcInfo;
+  // moduleName is important, instanceName does not matter
+  funcInfo.name = moduleName;
+  std::string line;
+  std::vector<std::string> inputVec;
+  std::vector<std::string> outputVec;
+  while(std::getline(input, line) && !std::regex_match(line, m, pModuleEnd)) {
+    if(!std::regex_match(line, m, pModulePort)) {
+      toCout("Error in matching module ports");
+      abort();
+    }
+    if(m.str(2) == g_recentClk || m.str(2) == g_recentRst)
+      continue;
+    if(g_allModuleInfo[moduleName].out2InDelayMp.find(m.str(2)) == g_allModuleInfo[moduleName].out2InDelayMp.end() )
+      inputVec.push_back(m.str(2)+"_#_"+m.str(3));
+    else
+      outputVec.push_back(m.str(2)+"_#_"+m.str(3));
+  }
+  std::sort(inputVec.begin(), inputVec.end());
+  for(std::string &in : inputVec) {
+    size_t pos = in.find("_#_");
+    std::string wire = in.substr(pos+3);
+    funcInfo.inputs.push_back(wire);
+  }
+  for(std::string &out: outputVec) {
+    size_t pos = out.find("_#_");
+    std::string wire = out.substr(pos+3);
+    g_funcTable.emplace(wire, funcInfo);
+  }
 }
 
 

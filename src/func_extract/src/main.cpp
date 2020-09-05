@@ -33,6 +33,7 @@ int main(int argc, char *argv[]) {
   g_remove_adff = true;
   g_split_long_num = true;
   print_time();  
+  read_module_info();  
   if(doClean.compare("1") == 0) {
     toCout("### Begin clean_file");
     clean_file(g_path+"/design.v");

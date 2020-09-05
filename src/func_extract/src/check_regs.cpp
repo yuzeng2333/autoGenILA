@@ -353,6 +353,9 @@ expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s
   else if( is_case_dest(var) ) {
     retExpr = case_constraint(node, timeIdx, c, s, g, bound, isSolve);
   }
+  else if( is_func_output(var) ) {
+    retExpr = func_constraint(node, timeIdx, c, s, g, bound, isSolve);
+  }
   else { // it is wire
     retExpr = add_ssa_constraint(node, timeIdx, c, s, g, bound, isSolve);
   }

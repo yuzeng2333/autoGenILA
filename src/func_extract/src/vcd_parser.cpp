@@ -18,6 +18,9 @@ void vcd_parser(std::string fileName) {
   bool passLine = false;
   std::smatch m;
   while(std::getline(input, line)) {
+    if(line.find("multiplier_16x16bit_pipelined.reg") != std::string::npos) {
+      toCout("Found it");
+    }
     if(line.substr(0, 6).compare("$scope") == 0) {
       state = readName;
       continue;

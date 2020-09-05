@@ -50,6 +50,8 @@ uint32_t get_time(std::string var);
 
 bool is_case_dest(std::string var);
 
+bool is_func_output(std::string var);
+
 uint32_t get_pos_of_one(std::string value);
 
 uint32_t get_lgc_hi(std::string varAndSlice);
@@ -72,4 +74,7 @@ bool replace(std::string& str, const std::string& from, const std::string& to);
 
 void vec2str(std::vector<std::string> &vec, std::string &ret);
 
+void remove_back_space(std::string &str);
+
+void remove_two_end_space(std::string &str);
 #endif

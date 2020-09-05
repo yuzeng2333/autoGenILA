@@ -173,6 +173,9 @@ bool is_case_dest(std::string var) {
   return g_caseTable.find(var) != g_caseTable.end();
 }
 
+bool is_func_output(std::string var) {
+  return g_funcTable.find(var) != g_funcTable.end();
+}
 
 uint32_t get_pos_of_one(std::string value) {
   if(value.compare("default") == 0) {
@@ -336,4 +339,21 @@ void vec2str(std::vector<std::string> &vec, std::string &ret) {
   }
   ret.pop_back();
   ret.pop_back();
+}
+
+
+void remove_back_space(std::string &str) {
+  while(str.back() == ' ')
+    str.pop_back();
+}
+
+
+void remove_front_space(std::string &str) {
+  size_t pos = str.find_first_not_of(" ");
+  str = str.substr(pos);
+}
+
+void remove_two_end_space(std::string &str) {
+  remove_front_space(str);
+  remove_back_space(str);
 }

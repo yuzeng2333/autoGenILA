@@ -11,6 +11,7 @@ std::unordered_map<std::string, std::string> g_ssaTable;
 // non-blocking assignment table
 std::unordered_map<std::string, std::string> g_nbTable;
 std::unordered_map<std::string, std::pair<std::string, std::vector<std::pair<std::string, std::string>>>> g_caseTable;
+std::unordered_map<std::string, FuncInfo_t> g_funcTable;
 uint32_t g_new_var;
 //std::unordered_map<std::string, astNode*> g_asSliceRoot;
 std::unordered_map<std::string, astNode*> g_varNode;
@@ -19,6 +20,7 @@ std::unordered_map<std::string, astNode*> g_varNode;
 std::vector<struct instrInfo> g_instrInfo;
 std::unordered_map<std::string, std::string> g_nopInstr;
 std::unordered_map<std::string, std::string> g_rstVal;
+std::unordered_map<std::string, ModuleInfo_t> g_allModuleInfo;
 
 std::regex pSingleLine (to_re("^(\\s*)assign (NAME) = (.*);$"));
 std::regex pNbLine (to_re("^(\\s*)(NAME) <= (.*);$"));
@@ -73,14 +75,9 @@ void parse_verilog(std::string fileName) {
   std::string line;
   std::smatch match;
   while( std::getline(input, line) ) {
+    //toCout(line);
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       case_expr(line, input);
-      continue;
-    }
-    else if ( std::regex_match(line, match, pModuleBegin) ) {
-      //TODO:module_instantiation_expr(input, line, moduleInputsMap, moduleOutputsMap);
-      toCout("pModuleBegin is not supported yet: "+line);
-      abort();
       continue;
     }
     uint32_t choice = parse_verilog_line(line, true);
@@ -130,6 +127,9 @@ void parse_verilog(std::string fileName) {
     case NONBLOCKIF:
       nonblockif_expr(line, input);
       break;
+    case MODULEBEGIN:
+      module_expr(line, input);
+      break;
     case FUNCDEF:
       toCout("!! Error: function found in verilog file");
       break;
@@ -149,15 +149,32 @@ void parse_verilog(std::string fileName) {
 // parse instr.txt file
 // parsed result is in g_instrInfo
 void read_in_instructions(std::string fileName) {
+  toCout("### Begin read in instr info");
   moduleAs.clear();
   g_instrInfo.clear();
   g_rstVal.clear();
   std::ifstream input(fileName);
+  if(!input.is_open()) {
+    toCout("Error: cannot open file: "+fileName);
+    abort();
+  }
   std::string line;
   std::smatch m;
   enum State {FirstInstr, OtherInstr, WriteASV, ReadASV, ReadNOP, ResetVal};
   enum State state;
   while(std::getline(input, line)) {
+    if(line.substr(0, 4) == "#CLK") {
+      std::string clk = line.substr(5);
+      remove_two_end_space(clk);
+      g_recentClk = clk;
+      continue;
+    }
+    if(line.substr(0, 4) == "#RST") {
+      std::string rst = line.substr(5);
+      remove_two_end_space(rst);
+      g_recentRst = rst;
+      continue;
+    }
     if(line.back() == ' ')
       line.pop_back();
     if(line.front() == '#') { // a new instr begins
@@ -270,3 +287,62 @@ void read_in_instructions(std::string fileName) {
   }
 }
 
+
+bool is_module_line(const std::string &line, std::string &moduleName) {
+  size_t pos = line.find(":");
+  if(pos == std::string::npos)
+    return false;
+  if(line.find_first_not_of(" ", pos+1) != std::string::npos )
+    return false;
+  else {
+    moduleName = line.substr(0, pos);
+    if(moduleName.back() == ' ')
+      moduleName.pop_back();
+    return true;
+  }
+}
+
+
+void read_module_info() {
+  std::string fileName = g_path + "/module_info.txt";
+  std::ifstream input(fileName);
+  std::string line;
+  std::string moduleName;
+  ModuleInfo_t moduleInfo;
+  bool seeOutput = false;
+  std::string outVar;  
+  std::unordered_map<std::string, uint32_t> inputDelayMap;
+  while(std::getline(input, line)) {
+    if(is_module_line(line, moduleName)) {
+      // store info of last module
+      if(!moduleInfo.name.empty()) {
+        g_allModuleInfo.emplace(moduleInfo.name, moduleInfo);
+      }
+      moduleInfo.name = moduleName;
+      moduleInfo.out2InDelayMp.clear();
+    }
+    else if(line.find(":") == std::string::npos && line.find("}") == std::string::npos) { // output name
+      if(line.find("{") != std::string::npos)
+        outVar = line.substr(0, line.find("{"));
+      else
+        outVar = line;
+      remove_back_space(outVar);
+      inputDelayMap.clear();
+      seeOutput = true;
+    }
+    else if(line.find("}") == std::string::npos) { // input and delay
+      assert(seeOutput);
+      size_t pos = line.find(":");
+      std::string input = line.substr(0, pos);
+      std::string delay = line.substr(pos+1);
+      remove_two_end_space(input);
+      remove_two_end_space(delay);
+      inputDelayMap.emplace(input, std::stoi(delay));
+    }
+    else {
+      seeOutput = false;
+      moduleInfo.out2InDelayMp.emplace(outVar, inputDelayMap);
+    }
+  }
+  g_allModuleInfo.emplace(moduleInfo.name, moduleInfo);
+} 
