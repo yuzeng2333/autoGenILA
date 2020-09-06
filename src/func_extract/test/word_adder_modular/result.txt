@@ -1,9 +1,24 @@
 Begin main!
-Start time: Sat Sep  5 11:46:46 2020
+Start time: Sun Sep  6 08:18:23 2020
 
 Give 2'd2 to func___#4
-Give 1'd0 to rst___#0
 (goals
 (goal
-  (= |result___#100| (adder #b1 #b0 |word___#4|)))
+  (= |result___#100| (adder #b1 |word___#4|)))
+)
+(goals
+(goal
+  (= |result___#100| |result___#0|))
+)
+Give 2'd2 to func___#4
+(goals
+(goal
+  (= |result___#100| |result___#0|)
+  (= |enable___#100| #b1))
+)
+(goals
+(goal
+  (= |result___#100| |result___#0|)
+  (= |enable___#100| #b1)
+  (= |word___#100| |word___#4|))
 )

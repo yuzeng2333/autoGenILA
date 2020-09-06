@@ -8,6 +8,7 @@
 #include "z3++.h"
 #include "ast.h"
 #include <string>
+#include <queue>
 #include <cmath>
 #include <regex>
 #include <utility>
@@ -17,12 +18,15 @@
 using namespace z3;
 
 extern uint32_t bound_limit;
+extern bool g_ignoreSubModules;
 
 void check_all_regs();
 
 void clean_data();
 
 void simplify_goal(std::string destAndSlice, uint32_t bound, uint32_t instrIdx);
+
+void simplify_goal_without_submodules(std::string destAndSlice, uint32_t bound, uint32_t instrIdx);
 
 void check_single_reg_and_slice(std::string regAndSlice, uint32_t cycleCnt, uint32_t instrIdx);
 

@@ -23,10 +23,13 @@ std::set<std::string> g_resetedReg;
 std::set<std::string> INT_EXPR_SET;
 std::set<std::string> g_readASV;
 std::unordered_map<std::string, expr*> g_existedExpr;
+// remaining variables to be built goal for
+std::queue<std::pair<std::string, uint32_t>> g_goalVars;
 std::string g_rootNode;
 struct instrInfo g_currInstrInfo;
 uint32_t g_destWidth;
 bool g_skipCheck;
+bool g_ignoreSubModules=false;
 
 // assume g_ssaTable and g_nbTable have been filled
 void check_all_regs() {
@@ -46,8 +49,10 @@ void check_all_regs() {
         else
           for(std::string regAndSlice: reg2Slices[oneWriteAsv])
             check_single_reg_and_slice(regAndSlice, cycleCnt-1, i-1);
-      else // if the writeASV is to be skipped
+      else {// if the writeASV is to be skipped
         simplify_goal(oneWriteAsv, cycleCnt-1, i-1);
+        simplify_goal_without_submodules(oneWriteAsv, cycleCnt-1, i-1);
+      }
     }
   }
 }
@@ -83,6 +88,38 @@ void simplify_goal(std::string destAndSlice, uint32_t bound, uint32_t instrIdx) 
   g_outFile << r << std::endl;
   goalFile << "#"+toStr(instrIdx)+"#"+destAndSlice+"#"+toStr(bound) << std::endl;
   goalFile << r << std::endl;
+  goalFile.close();
+}
+
+
+// submodules are treated as another module, communicated with ports
+void simplify_goal_without_submodules(std::string destAndSlice, uint32_t bound, uint32_t instrIdx) {
+  g_skipCheck = true;
+  g_ignoreSubModules = true;
+  clean_data();
+  std::ofstream goalFile;
+  goalFile.open(g_path+"/sub_goals.txt");
+  context c;
+  solver s(c);
+  goal g(c);
+  g_goalVars.push(std::make_pair(destAndSlice, 0));
+  while(g_goalVars.size() > 0) {
+    auto varPair = g_goalVars.front();
+    g_goalVars.pop();
+    std::string var = varPair.first;
+    uint32_t timeIdx = varPair.second;
+    expr destNextExpr = add_constraint(g_varNode[var], timeIdx, c, s, g, bound, /*isSolve=*/false);
+    expr destExpr_g = var_expr(var, 100, c, false);
+    g.add( destExpr_g == destNextExpr ); 
+    //add_all_clean_constraints(c, s, g, bound, /*isSolve=*/false);
+    tactic t(c, "simplify");
+    apply_result r = t(g);
+    toCout("*************************  Update function for "+var);
+    std::cout << r << std::endl;
+    g_outFile << r << std::endl;
+    goalFile << "#"+toStr(instrIdx)+"#"+var+"#"+toStr(bound) << std::endl;
+    goalFile << r << std::endl;
+  }
   goalFile.close();
 }
 

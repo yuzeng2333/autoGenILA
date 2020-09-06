@@ -2,6 +2,7 @@
 #define GLOBAL_DATA_STRUCT
 #include "z3++.h"
 #include "ast.h"
+#include <queue>
 
 using namespace z3;
 
@@ -22,6 +23,7 @@ extern std::unordered_map<std::string, std::string> g_nopInstr;
 extern std::unordered_map<std::string, std::string> g_rstVal;
 extern std::unordered_map<std::string, std::string> g_nameVarMap;
 extern std::unordered_map<std::string, std::string> g_varRstValMap;
+extern std::queue<std::pair<std::string, uint32_t>> g_goalVars;
 extern std::ofstream g_outFile;
 //extern std::string g_path;
 #endif

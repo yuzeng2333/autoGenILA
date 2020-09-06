@@ -82,7 +82,6 @@ expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTain
       //if(!isSolve && INPUT_EXPR_VAL.find(timed_name(varAndSlice, timeIdx)) != INPUT_EXPR_VAL.end() )
       //  return *INPUT_EXPR_VAL[varTimed];
     }
-
     return c.bv_const(varTimed.c_str(), varWidthNum).extract(hi, lo);
   }
   else {
@@ -835,27 +834,36 @@ expr func_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
   std::string moduleName = node->op;
   ModuleInfo_t moduleInfo = g_allModuleInfo[moduleName];
   std::unordered_map<std::string, uint32_t> inputDelayMap = moduleInfo.out2InDelayMp[destAndSlice];
-  sort_vector sorts(c);
-  for(std::string &var: node->srcVec) {
-    sorts.push_back(c.bv_sort(get_var_slice_width(var)));
-  }
-  uint32_t inputNo = node->srcVec.size();
-  func_decl subModule = function(moduleName, sorts, c.bv_sort(width));  
+  if(!g_ignoreSubModules) {
+    sort_vector sorts(c);
+    for(std::string &var: node->srcVec) {
+      sorts.push_back(c.bv_sort(get_var_slice_width(var)));
+    }
+    uint32_t inputNo = node->srcVec.size();
+    func_decl subModule = function(moduleName, sorts, c.bv_sort(width));  
 
-  if(isSolve) {
-    toCout("Error: func_constraint not supported for solve yet!");
-    abort();
+    if(isSolve) {
+      toCout("Error: func_constraint not supported for solve yet!");
+      abort();
+    }
+    expr_vector exprVec(c);
+    uint32_t i = 0;
+    for(std::string &var: node->srcVec) {
+      uint32_t delay =inputDelayMap[var]; 
+      uint32_t op1Hi = get_lgc_hi(var);
+      uint32_t op1Lo = get_lgc_lo(var);
+      expr localExpr = add_constraint(node->childVec[i++], timeIdx+delay, c, s, g, bound, isSolve).extract(op1Hi, op1Lo);
+      exprVec.push_back(localExpr);
+    }
+    return subModule(exprVec);
   }
-  expr_vector exprVec(c);
-  uint32_t i = 0;
-  for(std::string &var: node->srcVec) {
-    uint32_t delay =inputDelayMap[var]; 
-    uint32_t op1Hi = get_lgc_hi(var);
-    uint32_t op1Lo = get_lgc_lo(var);
-    expr localExpr = add_constraint(node->childVec[i++], timeIdx+delay, c, s, g, bound, isSolve).extract(op1Hi, op1Lo);
-    exprVec.push_back(localExpr);
+  else {
+    for(std::string &var: node->srcVec) {
+      uint32_t delay = inputDelayMap[var]; 
+      g_goalVars.push(std::make_pair(var, timeIdx+delay));
+    }
+    return var_expr(destAndSlice, timeIdx, c, false);
   }
-  return subModule(exprVec);
 }
 
 
