@@ -75,6 +75,11 @@ void parse_verilog(std::string fileName) {
   std::string line;
   std::smatch match;
   while( std::getline(input, line) ) {
+    if( line.find("module") != std::string::npos ) {
+      std::regex_match(line, match, pModule);
+      moduleName = match.str(1);
+      continue;
+    }
     //toCout(line);
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       case_expr(line, input);

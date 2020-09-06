@@ -30,6 +30,7 @@ struct instrInfo g_currInstrInfo;
 uint32_t g_destWidth;
 bool g_skipCheck;
 bool g_ignoreSubModules=false;
+uint32_t g_maxDelay = 0;
 
 // assume g_ssaTable and g_nbTable have been filled
 void check_all_regs() {
@@ -52,6 +53,7 @@ void check_all_regs() {
       else {// if the writeASV is to be skipped
         simplify_goal(oneWriteAsv, cycleCnt-1, i-1);
         simplify_goal_without_submodules(oneWriteAsv, cycleCnt-1, i-1);
+        g_maxDelay = cycleCnt;
       }
     }
   }

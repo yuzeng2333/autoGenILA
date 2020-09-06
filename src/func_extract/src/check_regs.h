@@ -19,6 +19,7 @@ using namespace z3;
 
 extern uint32_t bound_limit;
 extern bool g_ignoreSubModules;
+extern uint32_t g_maxDelay;
 
 void check_all_regs();
 

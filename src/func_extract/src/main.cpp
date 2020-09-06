@@ -7,6 +7,8 @@
 #include "clean_verilog.h"
 #include "inv_gen.h"
 #include "pseudo_vlg_gen.h"
+#include "check_regs.h"
+#include "auxiliary_files_gen.h"
 #include <string>
 #include <fstream>
 #include <time.h>
@@ -55,6 +57,7 @@ int main(int argc, char *argv[]) {
   build_ast_tree();
   check_all_regs();
   clean_goal();
+  auxiliary_files_gen(g_path+"/"+moduleName, g_maxDelay);
   print_time();
   //time_t my_time2 = time(NULL);
   //std::string time2(ctime(&my_time2));
