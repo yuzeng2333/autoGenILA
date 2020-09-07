@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
   build_ast_tree();
   check_all_regs();
   clean_goal();
-  auxiliary_files_gen(g_path+"/"+moduleName, g_maxDelay);
+  auxiliary_files_gen(g_path, g_maxDelay);
   print_time();
   //time_t my_time2 = time(NULL);
   //std::string time2(ctime(&my_time2));

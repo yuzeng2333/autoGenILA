@@ -6,12 +6,31 @@
 #define el std::endl
 #define toStr(a) std::to_string(a)
 
-void auxiliary_files_gen(const std::string &dirName, uint32_t delay) {
+void make_dirs(const std::string &path) {
+  std::ofstream out(path+"/mkdir.sh");
+  out << "mkdir -p "+path+"/"+moduleName << std::endl;
+  out << "cd "+path+"/"+moduleName << std::endl;
+  out << "mkdir app" << std::endl;
+  out << "mkdir verilog" << std::endl;
+  out << "mkdir rfmap" << std::endl;
+  out << "mkdir output" << std::endl;
+  out.close();
+  system(("rm -rf "+path+"/"+moduleName).c_str());
+  system(("chmod +777 "+path+"/mkdir.sh").c_str());
+  system((path+"/mkdir.sh").c_str());
+  //system(("rm "+path+"/mkdir.sh").c_str());
+}
+
+
+void auxiliary_files_gen(const std::string &path, uint32_t delay) {
+  toCout("### Begin generate auxiliary files");
+  make_dirs(path);
   //if(!mkdir(g_path+"/"+moduleName) == -1) {
   //  toCout("Error: cannot make dir: "+dirName);
   //  abort();
   //}
   // generate vmap refinement
+  std::string dirName = path + "/" + moduleName;
   std::ofstream vmapFile(dirName+"/rfmap/vmap.json");
   vmapFile << "{" << el;
   vmapFile << "  \"models\": { \"ILA\":\"m0\", \"VERILOG\": \"m1\" }," << el;  
@@ -54,6 +73,7 @@ void auxiliary_files_gen(const std::string &dirName, uint32_t delay) {
   appFile << "#include <ilang/vtarget-out/vtarget_gen.h>" << el;
   appFile << "#include <iostream>" << el;
   appFile << "#include <fstream>" << el;
+  appFile << el;
   appFile << "void ila_gen() {" << el;
   appFile << "  auto m = Ila(\"bar\");" << el;
 
@@ -74,14 +94,17 @@ void auxiliary_files_gen(const std::string &dirName, uint32_t delay) {
   
   appFile << "  VerilogVerificationTargetGenerator vg(" << el;
   appFile << "      {},                                 // no include" << el;
-  appFile << "      {\"../verilog/"+moduleName+".v\"},              // vlog files" << el;
+  appFile << "      {\"../target/verilog/pseudo_vlg.v\"},              // vlog files" << el;
   appFile << "      \""+moduleName+"\",                           // top_module_name" << el;
-  appFile << "      \"../rfmap/vmap.json\",             // variable mapping" << el;
-  appFile << "      \"../rfmap/cond.json\"," << el;
-  appFile << "      \"../output/\",                     // output path" << el;
+  appFile << "      \"../target/rfmap/vmap.json\",             // variable mapping" << el;
+  appFile << "      \"../target/rfmap/cond.json\"," << el;
+  appFile << "      \"../target/output/\",                     // output path" << el;
   appFile << "      m.get()," << el;
   appFile << "      VerilogVerificationTargetGenerator::backend_selector::JASPERGOLD);" << el;
 
   appFile << "  vg.GenerateTargets();" << el;
   appFile << "}" << el;
 }
+
+
+

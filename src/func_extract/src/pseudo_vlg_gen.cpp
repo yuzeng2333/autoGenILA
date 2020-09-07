@@ -6,7 +6,7 @@
 
 void pseudo_vlg_gen() {
   toCout("### Begin generate pseudo verilog file");
-  std::ofstream output(g_path+"/pseudo_vlg.v");
+  std::ofstream output(g_path+"/"+moduleName+"/verilog/pseudo_vlg.v");
   std::string inputList;
   vec2str(moduleInputs, inputList);
   std::string outputList;
