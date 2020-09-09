@@ -14,6 +14,7 @@ void make_dirs(const std::string &path) {
   out << "mkdir verilog" << std::endl;
   out << "mkdir rfmap" << std::endl;
   out << "mkdir output" << std::endl;
+  out << "mkdir smtlib2in" << std::endl;
   out.close();
   system(("rm -rf "+path+"/"+moduleName).c_str());
   system(("chmod +777 "+path+"/mkdir.sh").c_str());
@@ -85,7 +86,7 @@ void auxiliary_files_gen(const std::string &path, uint32_t delay) {
   appFile << "  auto i1 = m.NewInstr(\"i1\");" << el;
   appFile << "  {" << el;
   for(auto as = moduleAs.begin(); as != moduleAs.end(); as++)  
-  appFile << "    i1.SetUpdate("+*as+", LoadSmtExprFromFile(\"../smtlib2in/word_module_"+*as+".smtlib\", m) );" << el;
+  appFile << "    i1.SetUpdate("+*as+", LoadSmtExprFromFile(\"../target/smtlib2in/"+*as+".smtlib\", m) );" << el;
 
   appFile << "    std::ofstream fout(\"../ila2Vlg/out.v\");" << el;
   appFile << "    i1.ExportToVerilog(fout);" << el;

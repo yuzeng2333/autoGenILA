@@ -9,6 +9,7 @@
 #include "pseudo_vlg_gen.h"
 #include "check_regs.h"
 #include "auxiliary_files_gen.h"
+#include "make_define_fun.h"
 #include <string>
 #include <fstream>
 #include <time.h>
@@ -51,13 +52,14 @@ int main(int argc, char *argv[]) {
   }
   //read_in_architectural_states(asFile);
   clean_verilog(g_path+"/design.v.clean");
-  pseudo_vlg_gen();
   vcd_parser(g_path+"/rst.vcd");
   inv_gen();
   build_ast_tree();
   check_all_regs();
   clean_goal();
   auxiliary_files_gen(g_path, g_maxDelay);
+  pseudo_vlg_gen();  
+  define_fun_gen(g_path+"/sub_goals.txt");
   print_time();
   //time_t my_time2 = time(NULL);
   //std::string time2(ctime(&my_time2));

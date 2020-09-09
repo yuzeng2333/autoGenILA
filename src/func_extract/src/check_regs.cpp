@@ -103,9 +103,9 @@ void simplify_goal_without_submodules(std::string destAndSlice, uint32_t bound, 
   goalFile.open(g_path+"/sub_goals.txt");
   context c;
   solver s(c);
-  goal g(c);
   g_goalVars.push(std::make_pair(destAndSlice, 0));
   while(g_goalVars.size() > 0) {
+    goal g(c);
     auto varPair = g_goalVars.front();
     g_goalVars.pop();
     std::string var = varPair.first;
