@@ -26,6 +26,9 @@ void define_fun_gen(std::string fileName) {
     else if(line.length() == 6 && line.substr(0, 6) == "(goals") {
       continue;
     }
+    else if(line.substr(0, 6) == "assume") {
+      continue;
+    }
     else if(line.length() == 5 && line.substr(0, 5) == "(goal") {
       std::string args;
       make_args_list(dest2ArgsMap[destName], args);
@@ -33,13 +36,14 @@ void define_fun_gen(std::string fileName) {
       output << "(define-fun INV_"+destName+" ( "+args+" ) (_ BitVec "+toStr(destWidth)+")" << std::endl;
     }
     else if(line.front() == ')') {
+      output.close();      
       continue; // remove one close brace at the end
     }
     else if(line.find("=") != std::string::npos) {
       uint32_t equalPos = line.find("=");
       uint32_t verticalLinePos = line.find("|", equalPos+1);
       uint32_t verticalLinePos2 = line.find("|", verticalLinePos+1);
-      std::string firstPart = line.substr(equalPos);
+      std::string firstPart = line.substr(0, equalPos);
       std::string lastPart = line.substr(verticalLinePos2+1);
       uint32_t destWidth = get_var_slice_width(destName);
       std::string middlePart;
@@ -74,12 +78,16 @@ void collect_args(std::unordered_map<std::string, std::set<std::string>> &dest2A
     else if(line.find("|") != std::string::npos) {
       uint32_t pos ;
       uint32_t pos2 = 0;
+      bool firstMatch = true;
       do{
         pos = line.find("|", pos2+1);
         pos2 = line.find("|", pos+1);
+        if(firstMatch && line.find("=") != std::string::npos) {
+          firstMatch = false;          
+          continue;
+        }
         std::string arg = line.substr(pos+1, pos2-pos-1);
-        if(arg != destName)
-          dest2ArgsMap[destName].insert(arg);
+        dest2ArgsMap[destName].insert(arg);
       } while(line.find("|", pos2+1) != std::string::npos);
     }
   }

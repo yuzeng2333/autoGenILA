@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
   clean_goal();
   auxiliary_files_gen(g_path, g_maxDelay);
   pseudo_vlg_gen();  
-  define_fun_gen(g_path+"/sub_goals.txt");
+  define_fun_gen(g_path+"/clean_sub_goals.txt");
   print_time();
   //time_t my_time2 = time(NULL);
   //std::string time2(ctime(&my_time2));

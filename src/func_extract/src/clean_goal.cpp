@@ -6,9 +6,15 @@
 #define toStr(a) std::to_string(a)
 
 void clean_goal() {
-  toCout("### Begin clean_goal");
-  std::ifstream input(g_path+"/goal.txt");
-  std::ofstream output(g_path+"/clean_goal.txt");
+  toCout("### Begin clean_goal");  
+  clean_goal_file(g_path+"/goal.txt", g_path+"/clean_goal.txt");
+  clean_goal_file(g_path+"/sub_goals.txt", g_path+"/clean_sub_goals.txt");
+}
+
+
+void clean_goal_file(std::string fileName, std::string outFileName) {
+  std::ifstream input(fileName);
+  std::ofstream output(outFileName);
   std::string line;
   uint32_t instrIdx;
   std::string writeASV;
@@ -36,15 +42,6 @@ void clean_goal() {
         line = line.substr(0, pos) + line.substr(i-1);
       }
     }
-    //if(line.find("MIXIEGEN") != std::string::npos) {
-    //  size_t pos = line.find("MIXIEGEN");
-    //  std::string width;
-    //  uint32_t i = pos + 8;
-    //  while(std::isdigit(line[i])) 
-    //    width += line[i++];
-    //  uint32_t localWidth = std::stoi(width);
-    //  line = line.substr(0, pos) + get_zero(localWidth) + line.substr(i);
-    //}
     output << line << std::endl;
 
     if(line.front() == ')') {
@@ -52,10 +49,9 @@ void clean_goal() {
       if(instrEncodings.empty())
         continue;
       std::string nopEncodings = get_encodings(g_nopInstr);
-      uint32_t writeDelay = get_write_delay(g_instrInfo[instrIdx-1].writeASV, writeASV);
-      output << "assume -name zy_assume"+toStr(assumIdx++)+" {__START__ == 1 |-> ("+instrEncodings+" ##1 ( "+nopEncodings+" )[*"+toStr(writeDelay+1)+"] ) }" << std::endl;
+      //uint32_t writeDelay = get_write_delay(g_instrInfo[instrIdx-1].writeASV, writeASV);
+      //output << "assume -name zy_assume"+toStr(assumIdx++)+" {__START__ == 1 |-> ("+instrEncodings+" ##1 ( "+nopEncodings+" )[*"+toStr(writeDelay+1)+"] ) }" << std::endl;
     }
-
   }
   input.close();
   output.close();
