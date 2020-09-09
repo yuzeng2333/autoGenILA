@@ -469,13 +469,16 @@ void module_expr(std::string firstLine, std::ifstream &input) {
   std::sort(inputVec.begin(), inputVec.end());
   for(std::string &in : inputVec) {
     size_t pos = in.find("_#_");
+    std::string port = in.substr(0, pos);
     std::string wire = in.substr(pos+3);
     funcInfo.inputs.push_back(wire);
+    g_wire2ModulePort.emplace(wire, port);
   }
   for(std::string &out: outputVec) {
     size_t pos = out.find("_#_");
     std::string wire = out.substr(pos+3);
     g_funcTable.emplace(wire, funcInfo);
+    g_wire2ModulePort.emplace(wire, port);    
   }
 }
 

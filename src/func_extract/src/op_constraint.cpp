@@ -829,11 +829,17 @@ expr add_one_case_branch_expr(astNode* const node, expr &caseExpr, uint32_t idx,
 
 expr func_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
   std::string destAndSlice = node->dest;
+  g_moduleOutportTime.emplace(destAndSlice, timeIdx);
   toCout("Func constraint for:"+destAndSlice);  
   uint32_t width = get_var_slice_width(destAndSlice);
   std::string moduleName = node->op;
   ModuleInfo_t moduleInfo = g_allModuleInfo[moduleName];
-  std::unordered_map<std::string, uint32_t> inputDelayMap = moduleInfo.out2InDelayMp[destAndSlice];
+  if(g_wire2ModulePort.find(destAndSlice) == g_wire2ModulePort.end()) {
+    toCout("Error: this key does not exist in g_wire2ModulePort: "+destAndSlice);
+    abort();
+  }
+  std::string outPort = g_wire2ModulePort[destAndSlice];
+  std::unordered_map<std::string, uint32_t> inputDelayMap = moduleInfo.out2InDelayMp[port];
   if(!g_ignoreSubModules) {
     sort_vector sorts(c);
     for(std::string &var: node->srcVec) {
@@ -849,7 +855,9 @@ expr func_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
     expr_vector exprVec(c);
     uint32_t i = 0;
     for(std::string &var: node->srcVec) {
-      uint32_t delay =inputDelayMap[var]; 
+      std::string inPort = g_wire2ModulePort[var];
+      uint32_t delay = inputDelayMap[inPort]; 
+      g_moduleInportTime.emplace(var, timeIdx+delay);
       uint32_t op1Hi = get_lgc_hi(var);
       uint32_t op1Lo = get_lgc_lo(var);
       expr localExpr = add_constraint(node->childVec[i++], timeIdx+delay, c, s, g, bound, isSolve).extract(op1Hi, op1Lo);
@@ -859,7 +867,8 @@ expr func_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
   }
   else {
     for(std::string &var: node->srcVec) {
-      uint32_t delay = inputDelayMap[var]; 
+      std::string inPort = g_wire2ModulePort[var];      
+      uint32_t delay = inputDelayMap[inPort]; 
       g_goalVars.push(std::make_pair(var, timeIdx+delay));
     }
     return var_expr(destAndSlice, timeIdx, c, false);

@@ -21,6 +21,9 @@ std::vector<struct instrInfo> g_instrInfo;
 std::unordered_map<std::string, std::string> g_nopInstr;
 std::unordered_map<std::string, std::string> g_rstVal;
 std::unordered_map<std::string, ModuleInfo_t> g_allModuleInfo;
+std::unordered_map<std::string, std::string> g_wire2ModulePort;
+std::unordered_map<std::string, uint32_t> g_moduleOutportTime;
+std::unordered_map<std::string, uint32_t> g_moduleInportTime;
 
 std::regex pSingleLine (to_re("^(\\s*)assign (NAME) = (.*);$"));
 std::regex pNbLine (to_re("^(\\s*)(NAME) <= (.*);$"));
