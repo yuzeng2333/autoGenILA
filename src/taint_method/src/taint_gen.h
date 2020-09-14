@@ -87,5 +87,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
 
 void collect_ite_dest(const std::string &line);
 
+void collect_case_dest(const std::string &line);
+
 int taint_gen(std::string fileName, uint32_t stage, bool isTopIn, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap, std::map<std::string, std::vector<std::string>> &moduleRFlagsMap, uint32_t totalRegCnt, uint32_t &nextSig, bool doProcessPathInfo);
 #endif

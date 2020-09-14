@@ -698,6 +698,15 @@ void analyze_reg_path( std::string fileName ) {
         }
         // TODO: add support for pAlwaysClkRst 
         break;
+      case CASE:
+        {
+          auto currentPos = input.tellg();
+          std::string nextLine;
+          std::getline(input, nextLine);
+          std::getline(input, nextLine);
+          input.seekg(currentPos);
+          collect_case_dest(nextLine);
+        }
       default:
         break;
     }
@@ -2400,6 +2409,17 @@ void gen_wire_output(std::string fileName) {
 void collect_ite_dest(const std::string &line) {
   std::smatch m;
   if ( !std::regex_match(line, m, pIte) )
+    return;
+  std::string destAndSlice = m.str(2);
+  std::string dest, destSlice;
+  split_slice(destAndSlice, dest, destSlice);
+  g_iteDest.insert(dest);
+}
+
+
+void collect_case_dest(const std::string &line) {
+  std::smatch m;
+  if ( !std::regex_match(line, m, pBlock) )
     return;
   std::string destAndSlice = m.str(2);
   std::string dest, destSlice;

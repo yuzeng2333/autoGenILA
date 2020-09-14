@@ -1510,13 +1510,20 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
   std::string destAndSlice = m.str(2);
   //assert_info(!isTop || !isOutput(op1AndSlice), "nonblock_taint_gen:"+op1AndSlice+" is output, line: "+line);  
   
-  if(isNum(op1AndSlice))
-    checkCond(false, "Error: constant number found in RHS of nonblocking!!");
-
   std::string dest, destSlice;
   std::string op1, op1Slice;
   split_slice(op1AndSlice, op1, op1Slice);
   split_slice(destAndSlice, dest, destSlice);
+
+  if(isNum(op1AndSlice)) {
+    toCout("Warning: constant number found in RHS of nonblocking: "+line);
+    output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
+    output << blank + dest + _t + " \t\t<= 0 ;" << std::endl;
+    output << blank + dest + "_t_flag \t\t<= 0 ;" << std::endl;
+    output << blank + dest + "_r_flag \t\t<= 0 ;" << std::endl;
+    return;
+  }
+
   // some designs have separate assignment to different bits of a reg
   if(!destSlice.empty()) {
     toCout("Error: dest in nonblock has slice: "+line);
@@ -1563,7 +1570,7 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
 
   // _r
   if(g_iteDest.find(op1) != g_iteDest.end())
-    output << blank.substr(0, blank.length()-4) + "assign " + op1 + _r + op1Ver + op1Slice + " = " + dest + _t + " ;" << std::endl;
+    output << blank.substr(0, blank.length()-4) + "assign " + op1 + _r + op1Ver + op1Slice + " = " + op1 + _t + op1Slice + " ;" << std::endl;
   else
     output << blank.substr(0, blank.length()-4) + "assign " + op1 + _r + op1Ver + op1Slice + " = 0 ;" << std::endl;
 
@@ -1825,8 +1832,7 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
       output << "  logic [" + toStr(srcIdxPair.first) + ":" + toStr(srcIdxPair.second) + "] " + src + _c + srcVer + " ;" << std::endl;
     }
     output << "  assign " + src + _x + srcVer + srcSlice + " = " + extend(destAndSlice+" != "+srcAndSlice, localWidthNum) + " ;" << std::endl; 
-    output << "  assign " + src + _r + srcVer + srcSlice + " = " + extend(condAndSlice, localWidthNum) + " & " + dest + _t + destSlice + " ;" << std::endl; 
-    //output << "  assign " + src + _r + srcVer + srcSlice + " = " + extend(destAndSlice+" != "+srcAndSlice, localWidthNum) + " ;" << std::endl; 
+    output << "  assign " + src + _r + srcVer + srcSlice + " = " + extend(condAndSlice, localWidthNum) + " & " + src + _t + srcSlice + " ;" << std::endl; 
     output << "  assign " + src + _c + srcVer + srcSlice + " = " + extend("1'b1", localWidthNum) + " ;" << std::endl;
   }
 }
