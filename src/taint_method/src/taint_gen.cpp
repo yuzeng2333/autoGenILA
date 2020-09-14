@@ -54,6 +54,7 @@ std::regex pSel2        (to_re("^(\\s*)assign (NAME) = (NAME)(\\[(NAME) \\+\\: (
 std::regex pSel3        (to_re("^(\\s*)assign (NAME) = (NAME)(\\[\\$signed\\((NAME)\\) \\-\\: (INT)\\])(\\s*)?;$"));
 std::regex pSel4        (to_re("^(\\s*)assign (NAME) = (NAME)(\\[(NAME) \\-\\: (INT)\\])(\\s*)?;$"));
 std::regex pSel5        (to_re("^(\\s*)assign (NAME) = (NAME)(\\[(INT) \\: (INT)\\])(\\s*)?;$"));
+std::regex pDbSel       (to_re("^(\\s*)assign (NAME) = (NAME)(\\[(NAME)\\[(\\d+):(\\d+)\\]\\])$"));
 std::regex pBitOrRed2   (to_re("^(\\s*)assign (NAME) = \\| \\{ (NAME), (NAME) \\}(\\s*)?;$"));
 std::regex pLeftShift   (to_re("^(\\s*)assign (NAME) = (NAME) << (NAME)(\\s*)?;$"));
 std::regex pRightShift  (to_re("^(\\s*)assign (NAME) = (NAME) >> (NAME)(\\s*)?;$"));
@@ -168,10 +169,15 @@ bool g_use_reset_taint = false;
 bool g_use_zy_count = false;
 bool g_use_reset_sig = false;
 bool g_remove_adff = false;
+// TODO: set this configurations!
+// // for func_extract, split long bitVec into multiple short ones
 bool g_split_long_num = false;
-bool g_use_vcd_parser = true;
-bool g_write_assert = true;
-bool g_double_assert = false;
+// if true, add (reg_PREV_VAL == rst_val) into assertion
+bool g_use_vcd_parser = false;
+bool g_write_assert = false; // for find written ASV
+bool g_double_assert = false; // to enable having PREV_VAL in assert
+// set the read flag only if reg's value is not reset value
+bool g_set_rflag_if_not_rst_val = true; 
 std::string _t="_T";
 std::string _r="_R";
 std::string _x="_X";
@@ -278,6 +284,10 @@ void clean_file(std::string fileName) {
     if(line.find("//") != std::string::npos)
       line = line.substr(0, line.find("//"));
     cleanLine = std::regex_replace(line, redundentBlank, "$1 $3");
+    // TODO: deal with pDbSel;
+    //if(std::regex_match(cleanLine, match, pDbSel)) {
+    //  
+    //}
 
     /// extract aways concatenations into new Fangyuan variables
     bool noConcat=true;
@@ -2341,6 +2351,9 @@ void gen_assert_property(std::ofstream &output) {
       if(!isMem(m.str(1)) && g_double_assert) {
         if(g_use_vcd_parser)
           output << "  assert property( " + out + " == 0 || " + m.str(1) + "_PREV_VAL1 == " + rstVal + " );" << std::endl;
+        else if(g_set_rflag_if_not_rst_val)
+        //else if(true)
+          output << "  assert property( " + out + " == 0 );" << std::endl;
         else
           output << "  assert property( " + out + " == 0 || " + m.str(1) + "_PREV_VAL1 == " + m.str(1) + "_PREV_VAL2 );" << std::endl;
       }
@@ -2353,7 +2366,7 @@ void gen_assert_property(std::ofstream &output) {
   if(g_write_assert) {
     std::ifstream input(g_path+"/ILA/asv.txt");
     if(!input.is_open()) {
-      toCout("Error: asv.txt file is not opened: "+g_path+"/ILA/asv.txt");
+      toCout("Warning: asv.txt file is not opened: "+g_path+"/ILA/asv.txt");
       return;
     }
     std::string asv;

@@ -66,18 +66,22 @@ void hierarchical_vcd_parser(std::string fileName) {
       nameVarMap.emplace(name, std::make_pair(modNameStack.top(), var));
     }
     else if(state == readValue) {
-      uint32_t blankPos = line.find(" "); 
+      uint32_t blankPos = line.find(" ");       
+      std::string name = line.substr(blankPos+1);
+      if(nameVarMap.find(name) == nameVarMap.end()) {
+        toCout("Error: "+name+" is not found in map");
+        abort();
+      }
+      if(name == "n14") {
+        toCoutVerb("Found cpu_state");
+      }
+
       std::string rstVal = line.substr(1, blankPos-1);
       if(is_zero(rstVal)) {
         rstVal = "0";
       }
       else {
-        rstVal = rstVal.length()+"'b"+rstVal;
-      }
-      std::string name = line.substr(blankPos+1);
-      if(nameVarMap.find(name) == nameVarMap.end()) {
-        toCout("Error: "+name+" is not found in map");
-        abort();
+        rstVal = toStr(rstVal.length())+"'b"+rstVal;
       }
       auto moduleVarPair = nameVarMap[name];
       std::string modName = moduleVarPair.first;

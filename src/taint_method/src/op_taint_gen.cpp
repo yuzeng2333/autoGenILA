@@ -841,9 +841,11 @@ void sel_op_taint_gen(std::string line, std::ofstream &output) {
     // assume memory slices can only be used in simple assignment statements11
     // also assume each memory slice is used only once
     output << blank + "always @(*) begin" << std::endl;
+    if(!isMem(op1)) {
     output << blank + "  " + op1 + _c + sndVer + " = 0 ;" << std::endl;
     output << blank + "  " + op1 + _r + sndVer + " = 0 ;" << std::endl;
     output << blank + "  " + op1 + _x + sndVer + " = 0 ;" << std::endl;
+    }
     output << blank + "  " + op1 + _c + sndVer + slice + " = " + dest + _c + destSlice + " ;" << std::endl;
     output << blank + "  " + op1 + _r + sndVer + slice + " = " + dest + _r + destSlice + " | ( " + dest + _c + destSlice + " & " + extend("| "+op2+_t+op2Slice, localWidth) + " );" << std::endl;
     output << blank + "  " + op1 + _x + sndVer + slice + " = " + dest + _x + destSlice + " ;" << std::endl;
@@ -1447,7 +1449,12 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
 
     output << blank << "assign " + dest + _t + destSlice + " = " + condAndSlice + " ? ( " + extend("| "+cond+_t+" "+condSlice, localWidthNum) + " | " + op1 + _t + op1Slice + " ) : " + extend("| "+cond+_t+" "+condSlice, localWidthNum) + ";" << std::endl;
 
-    if(printSig) output << blank + "assign " + dest + _sig + " = " + condAndSlice + " ? " + op1 + _sig + " : " + cond + _sig + " ;" << std::endl;
+    if(std::stoi(op2) == 0) {
+      if(printSig) output << blank + "assign " + dest + _sig + " = " + condAndSlice + " ? " + op1 + _sig + " : " + cond + _sig + " ;" << std::endl;
+    }
+    else {
+      if(printSig) output << blank + "assign " + dest + _sig + " = " + condAndSlice + " ? " + op1 + _sig + " : 0 ;" << std::endl;
+    }
 
     output << blank << "assign " + cond + _r + condVer + condSlice + " = ( | ("+dest+_r+destSlice+" | ( "+extend(condAndSlice, localWidthNum)+" & "+op1+_t+op1Slice+" & "+dest+_c+destSlice+" ))) && " + op1AndSlice + " != " + op2AndSlice + " ;" << std::endl;
   }
@@ -1468,14 +1475,30 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
 
     output << blank << "assign " + dest + _t + destSlice + " = " + condAndSlice + " ? " + extend("| "+cond+_t+" "+condSlice, localWidthNum) + " : ( " + extend("| "+cond+_t+" "+condSlice, localWidthNum) + " | " + op2 + _t + op2Slice + " );" << std::endl;  
    
-    if(printSig) output << blank << "assign " + dest + _sig + " = " + condAndSlice + " ? " + cond + _sig + " : " + op2 + _sig + " ;" << std::endl;
+    if(std::stoi(op1) == 1) {    
+      if(printSig) output << blank << "assign " + dest + _sig + " = " + condAndSlice + " ? " + cond + _sig + " : " + op2 + _sig + " ;" << std::endl;
+    }
+    else {
+      if(printSig) output << blank << "assign " + dest + _sig + " = " + condAndSlice + " ? 0 : " + op2 + _sig + " ;" << std::endl;
+    }
 
     output << blank << "assign " + cond + _r + condVer + condSlice + " = ( | ("+dest+_r+destSlice+" | ( "+extend("!"+condAndSlice, localWidthNum)+" & "+op2+_t+op2Slice+" & "+dest+_c+destSlice+" ))) && " + op1AndSlice + " != " + op2AndSlice + " ;" << std::endl;
   }
   else {
     /* when both inputs are constants */
     output << blank << "assign " + dest + _t + destSlice + " = " + extend(cond+_t+" "+condSlice, localWidthNum) + " ;" << std::endl;
-    if(printSig) output << blank << "assign " + dest + _sig + " = " + cond + _sig + " ;" << std::endl;
+    if(printSig) {
+      uint32_t op1Num = std::stoi(op1);
+      uint32_t op2Num = std::stoi(op2);
+      if(op1Num == 1 && op2Num == 0)
+        output << blank << "assign " + dest + _sig + " = " + cond + _sig + " ;" << std::endl;
+      else if(op1Num == 1 && op2Num != 0)
+        output << blank << "assign " + dest + _sig + " = " + condAndSlice + " ? " + cond + _sig + " : 0 ;" << std::endl; 
+      else if(op1Num != 1 && op2Num == 0)
+        output << blank << "assign " + dest + _sig + " = " + condAndSlice + " ? 0 : " + cond + _sig + " ;" << std::endl;
+      else
+        output << blank << "assign " + dest + _sig + " = 0 ;" << std::endl;
+    }
     output << blank << "assign " + cond + _r + condVer + condSlice + " = ( | " + dest+_r+destSlice + ") && " + op1AndSlice + " != " + op2AndSlice + " ;" << std::endl;
   }
 }
@@ -1591,17 +1614,26 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
 
 
   // _r_flag
+  std::string neqRst = "";
+  if(g_set_rflag_if_not_rst_val) {
+    if(g_rstValMap[moduleName].find(dest) == g_rstValMap[moduleName].end()) {
+      toCout("Warning: cannot find in g_rstValMap for module: "+moduleName+", var: "+dest);
+      neqRst = " && ("+dest+" != 0)";
+    }
+    else
+      neqRst = " && ("+dest+" != "+g_rstValMap[moduleName][dest]+")";
+  }
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
   if(!g_use_zy_count)
     if (g_hasRst)  
-      output << blank + dest + "_r_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : ( | " + dest + _r + " ) ;" << std::endl;
+      output << blank + dest + "_r_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : ( (| " + dest + _r + " )" + neqRst + " ) ;" << std::endl;
     else
-      output << blank + dest + "_r_flag \t<= rst_zy ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : ( | " + dest + _r + " ) ;" << std::endl;
+      output << blank + dest + "_r_flag \t<= rst_zy ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : ( | " + dest + _r + neqRst + " ) ;" << std::endl;
   else
     if (g_hasRst)  
-      output << blank + dest + "_r_flag \t<= ( " + get_recent_rst() + " || zy_count < 50 ) ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + _r+" ;" << std::endl;
+      output << blank + dest + "_r_flag \t<= ( " + get_recent_rst() + " || zy_count < 50 ) ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : ( | " + dest + _r + neqRst + " ) ;" << std::endl;
     else
-      output << blank + dest + "_r_flag \t<= ( rst_zy || zy_count < 50 ) ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + _r+" ;" << std::endl;
+      output << blank + dest + "_r_flag \t<= ( rst_zy || zy_count < 50 ) ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : ( | " + dest + _r + neqRst + " ) ;" << std::endl;
 
   // _dest is clear either write taint arrives or the value for dest is changed.
   if(g_use_reset_taint) {
@@ -1680,16 +1712,26 @@ void nonblockconcat_taint_gen(std::string line, std::ofstream &output) {
 
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
 
+  // r_flag
+  std::string neqRst = "";
+  if(g_set_rflag_if_not_rst_val) {
+    if(g_rstValMap[moduleName].find(dest) == g_rstValMap[moduleName].end()) {
+      toCout("Warning: cannot find in g_rstValMap for module: "+moduleName+", var: "+dest);
+      neqRst = " && "+dest+" != 0";      
+    }
+    else
+      neqRst = " && "+dest+" != "+g_rstValMap[moduleName][dest];
+  }
   if(!g_use_zy_count)
     if (g_hasRst)    
-      output << blank + dest + "_r_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + _r+" ;" << std::endl;
+      output << blank + dest + "_r_flag \t<= " + get_recent_rst() + " ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : ( | " + dest + _r + neqRst + " ) ;" << std::endl;
     else
-      output << blank + dest + "_r_flag \t<= rst_zy ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + _r+" ;" << std::endl;
+      output << blank + dest + "_r_flag \t<= rst_zy ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : ( | " + dest + _r + neqRst + " ) ;" << std::endl;
   else
     if (g_hasRst)    
-      output << blank + dest + "_r_flag \t<= ( " + get_recent_rst() + " && zy_count < 50 ) ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + _r+" ;" << std::endl;
+      output << blank + dest + "_r_flag \t<= ( " + get_recent_rst() + " && zy_count < 50 ) ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : ( | " + dest + _r + neqRst + " ) ;" << std::endl;
     else
-      output << blank + dest + "_r_flag \t<= ( rst_zy || zy_count < 50 ) ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : | " + dest + _r+" ;" << std::endl;
+      output << blank + dest + "_r_flag \t<= ( rst_zy || zy_count < 50 ) ? 0 : " + dest + "_r_flag ? 1 : " + dest + "_t_flag ? 0 : ( | " + dest + _r + neqRst + " ) ;" << std::endl;
 }
 
 
@@ -1747,7 +1789,16 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
 
       output << blank + "if (" + condAndSlice + ") " + dest + "_t_flag " + destSlice + " <= " + dest + "_t_flag " + destSlice + " ? 1 : (" + src + _t + " " + srcSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + extend( dest+_sig+" != "+src+_sig, localWidthNum ) + " );" << std::endl;
 
-      output << blank + "if (" + condAndSlice + ") " + dest + "_r_flag " + destSlice + " <= " + dest + "_r_flag " + destSlice + " ? 1 : " + dest + "_t_flag " + destSlice + " ? 0 : |" + dest + _r+" " + destSlice + " ;" << std::endl;
+      std::string neqRst = "";
+      if(g_set_rflag_if_not_rst_val) {
+        if(g_rstValMap[moduleName].find(dest) == g_rstValMap[moduleName].end()) {
+          toCout("Error: cannot find in g_rstValMap for module: "+moduleName+", var: "+dest);
+          neqRst = " && "+dest+" "+destSlice+" != 0";          
+        }
+        else
+          neqRst = " && "+dest+" "+destSlice+" != "+g_rstValMap[moduleName][dest];
+      }
+      output << blank + "if (" + condAndSlice + ") " + dest + "_r_flag " + destSlice + " <= " + dest + "_r_flag " + destSlice + " ? 1 : " + dest + "_t_flag " + destSlice + " ? 0 : ( |" + dest + _r+" " + destSlice + neqRst + " ) ;" << std::endl;
     }
   } while( std::getline(input, line) && std::regex_match(line, m, pNonblockIf) );
   assert( std::regex_match(line, m, pEnd) );
