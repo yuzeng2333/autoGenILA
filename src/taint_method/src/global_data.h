@@ -19,6 +19,7 @@ extern std::vector<std::string> moduleRegs;
 extern std::vector<std::string> moduleTrueRegs;
 extern std::unordered_map<std::string, uint32_t> moduleMems;
 extern std::set<std::string> moduleWires;
+extern std::set<std::string> g_iteDest;
 extern std::set<std::string> g_wire2reg;
 extern std::set<std::string> g_operators;
 extern std::string clockName;

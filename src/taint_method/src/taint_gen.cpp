@@ -133,6 +133,7 @@ std::vector<std::string> moduleRegs;
 std::vector<std::string> moduleTrueRegs;
 std::unordered_map<std::string, uint32_t> moduleMems;
 std::set<std::string> moduleWires;
+std::set<std::string> g_iteDest;
 std::set<std::string> g_wire2reg;
 std::set<std::string> g_operators{"+", "-", "*", "/","%", "&&", "||", "==", "===", "!=", ">", ">=", "<", "<=", "|", "^", "&", "+:", "-:", "<<", ">>", "<<<", ">>>", "~", "!", "&", "~&", "~|", "~^", "^", "?", "<=", "always", "function"};
 std::string clockName;
@@ -626,6 +627,7 @@ void analyze_reg_path( std::string fileName ) {
         {
           //toCout("Matched in ite");
           fill_in_ite_relation(line);
+          collect_ite_dest(line);
         }
         break;
       case SRC_CONCAT:
@@ -1644,10 +1646,10 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     for(auto localPair: caseAssignPairs) {
       split_slice(localPair.second, rhs, rhsSlice);
       output << blank + "    " + localPair.first + " :" << std::endl;
-      output << blank + "      " + rhs + _r + bVer + rhsSlice + " = " + dest + _r + destSlice + " | " + extend("| "+s+_t+sSlice, destWidthNum) + " & " + dest + _c + destSlice + " ;" << std::endl;
+      output << blank + "      " + rhs + _r + bVer + rhsSlice + " = " + dest + _r + destSlice + " ;" << std::endl;
     }
     output << blank + "    default :" << std::endl;
-    output << blank + "      " + a + _r + aVer + aSlice + " = " + dest + _r + destSlice + " | " + extend("| "+s+_t+sSlice, destWidthNum) + " & " + dest + _c + destSlice + " ;" << std::endl;
+    output << blank + "      " + a + _r + aVer + aSlice + " = " + dest + _r + destSlice + " ;" << std::endl;
     output << blank + "  endcase" << std::endl;
     output << blank + "end" << std::endl;  
 
@@ -1660,7 +1662,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     for(auto localPair: caseAssignPairs) {
       split_slice(localPair.second, rhs, rhsSlice);
       output << blank + "    " + localPair.first + " :" << std::endl;
-      output << blank + "      " + s+_r+sVer+" "+sSlice+"["+toStr(i++)+"]" + " = | ( " + dest + _r + destSlice + " | " + dest + _c + destSlice + " & " + rhs + _t + rhsSlice + " ) ;" << std::endl;
+      output << blank + "      " + s+_r+sVer+" "+sSlice+"["+toStr(i++)+"]" + " = | " + dest + _r + destSlice + " ;" << std::endl;
     }
     //output << blank + "    default :" << std::endl;
     //output << blank + "      " + a + _r + aVer + aSlice + " = " + dest + _r + destSlice + " ;" << std::endl;
@@ -1770,7 +1772,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     output << blank + "  "+s+_r+sVer+sSlice+" = " + extend("| "+dest+_r+destSlice, sWidthNum) + " ;" << std::endl;
     output << blank + "  "+a+_r+aVer+" = 0 ;" << std::endl;
     output << blank + "  if (" + sAndSlice + " == 0 )" << std::endl;
-    output << blank + "    "+a+_r+aVer+" = "+dest+_r+destSlice+" | "+extend("| "+s+_t+sSlice, destWidthNum)+" ;" << std::endl;
+    output << blank + "    "+a+_r+aVer+" = "+dest+_r+destSlice+" ;" << std::endl;
     output << blank + "end" << std::endl;  
 
     // print _x function
@@ -1847,7 +1849,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     for(auto localPair: caseAssignPairs) {
       split_slice(localPair.second, rhs, rhsSlice);
       output << blank + "    " + localPair.first + " :" << std::endl;
-      output << blank + "      " + rhs + _r + bVer + rhsSlice + " = "+dest+_r+destSlice+" | "+extend("| "+s+_t+sSlice, destWidthNum)+" ;" << std::endl;
+      output << blank + "      " + rhs + _r + bVer + rhsSlice + " = " + dest + _r + destSlice + " ;" << std::endl;
     }
     output << blank + "  endcase" << std::endl;
     output << blank + "end" << std::endl;  
@@ -2392,6 +2394,17 @@ void gen_wire_output(std::string fileName) {
     if( !isReg(out) && !isRFlag(out) ) 
       output << out << std::endl;
   }
+}
+
+
+void collect_ite_dest(const std::string &line) {
+  std::smatch m;
+  if ( !std::regex_match(line, m, pIte) )
+    return;
+  std::string destAndSlice = m.str(2);
+  std::string dest, destSlice;
+  split_slice(destAndSlice, dest, destSlice);
+  g_iteDest.insert(dest);
 }
 
 
