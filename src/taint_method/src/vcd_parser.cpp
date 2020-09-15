@@ -6,18 +6,17 @@
 
 // the first key is module name, the second key is variable name
 std::map<std::string, std::unordered_map<std::string, std::string>> g_rstValMap;
-std::unordered_map<std::string, std::string> g_instance2moduleMap;
+// first key is module name: which module the instance is within
+// second key is instance name. Value is the corresponding module name
+std::unordered_map<std::string, std::unordered_map<std::string, std::string>> g_instance2moduleMap;
 
 // Assumption: different instances of same module would 
 // have same reset value for same register.
 void hierarchical_vcd_parser(std::string fileName) {
   // key is nXXX, pair is <moduleName, varName>
   std::unordered_map<std::string, std::pair<std::string, std::string>> nameVarMap;
-  // key is instance name
-  std::map<std::string, std::unordered_map<std::string, std::string>> rstValMap;
-  rstValMap.clear();
-  std::stack<std::string> modNameStack;
-  std::set<std::string> visitedModules;
+  std::stack<std::string> instanceNameStack;
+  std::stack<std::string> moduleNameStack;
 
   toCout("### Begin vcd_parser");
   std::regex pName("^\\$var wire (\\d+) (n\\d+) (\\S+) \\$end$");
@@ -28,20 +27,25 @@ void hierarchical_vcd_parser(std::string fileName) {
   enum State state;
   bool passLine = false;
   std::smatch m;
+  bool isFirstInstance = true;
   while(std::getline(input, line)) {
     toCout(line);
     if(line.substr(0, 6).compare("$scope") == 0) {
       if(!std::regex_match(line, m, pScope)) {
         continue;
       }
-      std::string pureCurModule = m.str(1);
-      std::string curModule = pureCurModule;
+      std::string curInstance = m.str(1);
       uint32_t idx = 0;
-      while(visitedModules.find(curModule) != visitedModules.end()) {
-        curModule = pureCurModule + "_YUZENG_" + toStr(++idx);
+      instanceNameStack.push(curInstance);
+      if(isFirstInstance) {
+        isFirstInstance = false;
+        moduleNameStack.push(curInstance);
       }
-      visitedModules.insert(curModule);
-      modNameStack.push(curModule);
+      else {
+        std::string moduleName = moduleNameStack.top();
+        std::string curModule = g_instance2moduleMap[moduleName][curInstance];
+        moduleNameStack.push(curModule);
+      }
       state = readName;
       continue;
     }
@@ -54,7 +58,8 @@ void hierarchical_vcd_parser(std::string fileName) {
       continue;
     }
     else if(line.substr(0, 8).compare("$upscope") == 0) {
-      modNameStack.pop();
+      instanceNameStack.pop();
+      moduleNameStack.pop();
     }
     else if(passLine)
       continue;
@@ -63,7 +68,7 @@ void hierarchical_vcd_parser(std::string fileName) {
         continue;
       std::string name = m.str(2);
       std::string var = m.str(3);
-      nameVarMap.emplace(name, std::make_pair(modNameStack.top(), var));
+      nameVarMap.emplace(name, std::make_pair(moduleNameStack.top(), var));
     }
     else if(state == readValue) {
       uint32_t blankPos = line.find(" ");       
@@ -86,12 +91,12 @@ void hierarchical_vcd_parser(std::string fileName) {
       auto moduleVarPair = nameVarMap[name];
       std::string modName = moduleVarPair.first;
       std::string varName = moduleVarPair.second;
-      if(rstValMap.find(modName) == rstValMap.end())
-        rstValMap.emplace(modName, std::unordered_map<std::string, std::string>{{varName, rstVal}});
-      else if(rstValMap[modName].find(varName) == rstValMap[modName].end())
-        rstValMap[modName].emplace(varName, rstVal);
+      if(g_rstValMap.find(modName) == g_rstValMap.end())
+        g_rstValMap.emplace(modName, std::unordered_map<std::string, std::string>{{varName, rstVal}});
+      else if(g_rstValMap[modName].find(varName) == g_rstValMap[modName].end())
+        g_rstValMap[modName].emplace(varName, rstVal);
       else
-        rstValMap[modName][varName] = rstVal;
+        g_rstValMap[modName][varName] = rstVal;
     }
   } // end of while
   // FIXME: do not check temprally
@@ -99,17 +104,6 @@ void hierarchical_vcd_parser(std::string fileName) {
   //  toCout("Error: different instances of same module has different rst values");
   //  abort();
   //}
-  //// fill g_rstValMap
-  for(auto it = rstValMap.begin(); it != rstValMap.end(); it++) {
-    if((it->first).compare(g_topModule) == 0) {
-      g_rstValMap.emplace(g_topModule, it->second);
-      continue;
-    }
-    std::string modName = g_instance2moduleMap[it->first];
-    if(g_rstValMap.find(modName) != g_rstValMap.end())
-      continue;
-    g_rstValMap.emplace(modName, it->second);
-  }
 }
 
 
@@ -160,9 +154,10 @@ bool same_module(const std::string& name1, const std::string& name2) {
       toCout("Error: name2 is not in g_instance2moduleMap: "+name2);
       abort();
     }
-    std::string mod1 = g_instance2moduleMap[name1];
-    std::string mod2 = g_instance2moduleMap[name2];
-    return (mod1.compare(mod2) == 0);
+    //std::string mod1 = g_instance2moduleMap[name1];
+    //std::string mod2 = g_instance2moduleMap[name2];
+    //return (mod1.compare(mod2) == 0);
+    return false;
   }
 }
 
@@ -192,3 +187,41 @@ bool is_zero(std::string s) {
   while (it != s.end() && (*it) == '0') ++it;
   return !s.empty() && it == s.end();
 }
+
+
+//InstanceTreeNode::InstanceTreeNode() {
+//  instanceName = "";
+//  moduleName = "";
+//  childInstance =  std::vector<InstanceTreeNode*>{};
+//};
+//
+//
+//InstanceTreeNode::InstanceTreeNode(std::string instanceNameIn, std::string moduleNameIn) {
+//  instanceName = instanceNameIn;
+//  moduleName = moduleNameIn;
+//  childInstance =  std::vector<InstanceTreeNode*>{};
+//};
+//
+//
+//void InstanceTreeNode::append_child(InstanceTreeNode *child) {
+//  if(childInstance.find(child) != childInstance.end())
+//    return;
+//  childInstance.push_back(child);
+//}
+//
+//
+//std::string InstanceTreeNode::get_module_name() {
+//  return moduleName;
+//}
+//
+//
+//void InstanceTreeNode::set_instance_name(std::string instanceNameIn) {
+//  instanceName = instanceNameIn;
+//  return;
+//}
+//
+//
+//void InstanceTreeNode::set_module_name(std::string moduleNameIn) {
+//  moduleName = moduleNameIn;
+//  return;
+//}

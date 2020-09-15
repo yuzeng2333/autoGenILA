@@ -4,6 +4,7 @@
 #include <regex>
 #include <utility>
 #include <stack>
+#include <vector>
 #include <unordered_map>
 //#include "global_data_struct.h"
 
@@ -18,3 +19,17 @@ bool equal_maps( std::unordered_map<std::string, std::string>& mp1, std::unorder
 bool check_rst_value(std::map<std::string, std::unordered_map<std::string, std::string>>& rstValMap);
 
 bool is_zero(std::string s);
+
+
+//class InstanceTreeNode {
+//private:
+//  std::string instanceName;
+//  std::string moduleName;
+//  std::vector<InstanceTreeNode*> childInstance;
+//
+//public:
+//  void append_child(InstanceTreeNode *child);
+//  void set_instance_name(std::string instanceName);
+//  void set_module_name(std::string moduleName);
+//  std::string get_module_name();
+//};

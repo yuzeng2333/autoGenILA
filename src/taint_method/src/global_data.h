@@ -34,7 +34,7 @@ extern std::unordered_map<std::string, uint32_t> reg2sig;
 extern std::unordered_map<std::string, uint32_t> fangyuanItemNum; 
 extern std::unordered_map<std::string, uint32_t> fangyuanCaseSliceWidth;
 extern std::unordered_map<std::string, uint32_t> g_destVersion; 
-extern std::unordered_map<std::string, std::string> g_instance2moduleMap;
+extern std::unordered_map<std::string, std::unordered_map<std::string, std::string>> g_instance2moduleMap;
 extern std::map<std::string, std::unordered_map<std::string, std::string>> g_rstValMap;
 extern std::map<std::string, std::string> g_finalRegCondMap;
 // pass_info
