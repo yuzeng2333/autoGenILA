@@ -56,9 +56,9 @@ std::string get_nth_var_in_list(std::string list, uint32_t idx);
 
 uint32_t get_var_slice_width(std::string varSlice);
 
-std::string get_rhs_taint_list(std::vector<std::string> &updateVec, std::string taint);
+std::string get_rhs_taint_list(std::vector<std::string> &updateVec, std::string taint, bool noSlice=false);
 
-std::string get_rhs_taint_list(std::string updateList, std::string taint);
+std::string get_rhs_taint_list(std::string updateList, std::string taint, bool noSlice=false);
 
 std::string insert_taint(std::string signalAndSlice, std::string taint, std::string ver="");
 

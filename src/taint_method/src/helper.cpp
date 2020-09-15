@@ -565,15 +565,17 @@ uint32_t get_var_slice_width(std::string varAndSlice) {
 }
 
 
-std::string get_rhs_taint_list(std::vector<std::string> &updateVec, std::string taint) {
+std::string get_rhs_taint_list(std::vector<std::string> &updateVec, std::string taint, bool noSlice) {
   std::vector<std::string> taintVec;
   std::smatch m;
   for(std::string singleUpdate : updateVec) {
     if(!isNum(singleUpdate)) {
       std::string update, updateSlice;
       split_slice(singleUpdate, update, updateSlice);
-      singleUpdate = update+taint+updateSlice;
-      //singleUpdate = std::regex_replace(singleUpdate, pVarNameGroup, "$1"+taint+"$3");
+      if(noSlice)
+        singleUpdate = update+taint;
+      else
+        singleUpdate = update+taint+updateSlice;
     }
     else { // if isNum
       if( !std::regex_match(singleUpdate, m, pNum)) {
@@ -593,13 +595,13 @@ std::string get_rhs_taint_list(std::vector<std::string> &updateVec, std::string 
 }
 
 
-std::string get_rhs_taint_list(std::string updateList, std::string taint) {
+std::string get_rhs_taint_list(std::string updateList, std::string taint, bool noSlice) {
   std::vector<std::string> updateVec;
   parse_var_list(updateList, updateVec);
   if (updateList.front() == '{')
-    return "{ "+get_rhs_taint_list(updateVec, taint)+" }";
+    return "{ "+get_rhs_taint_list(updateVec, taint, noSlice)+" }";
   else
-    return get_rhs_taint_list(updateVec, taint);
+    return get_rhs_taint_list(updateVec, taint, noSlice);
 }
 
 

@@ -2128,7 +2128,7 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
       std::string varAndSlice = port2SignalMap[inPort];
       std::string varConnect;
       if(!isNum(varAndSlice)) {
-        varConnect = get_rhs_taint_list(varAndSlice, _sig);
+        varConnect = get_rhs_taint_list(varAndSlice, _sig, true);
       }
       else {
         if( !std::regex_match(varAndSlice, m, pNum)) {
@@ -2158,7 +2158,7 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
       std::string varAndSlice = port2SignalMap[outPort];
       std::string varConnect;
       if(!isNum(varAndSlice)) {
-        varConnect = get_rhs_taint_list(varAndSlice, _sig);
+        varConnect = get_rhs_taint_list(varAndSlice, _sig, true);
       }
       else {
         if( !std::regex_match(varAndSlice, m, pNum )) {
