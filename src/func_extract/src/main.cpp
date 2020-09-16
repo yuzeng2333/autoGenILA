@@ -19,6 +19,7 @@
 
 bool g_print_solver;
 std::ofstream g_outFile;
+std::string g_pj_path = "/workspace/research/ILA/autoGenILA/src/";
 
 
 int main(int argc, char *argv[]) {
@@ -35,8 +36,12 @@ int main(int argc, char *argv[]) {
   g_print_solver = false;
   g_remove_adff = true;
   g_split_long_num = true;
-  print_time();  
-  read_module_info();  
+  print_time();
+  /// read module_info.txt, result in g_allModuleInfo
+  /// read input-output delay info for sub-modules
+  read_module_info();
+  // read instr.txt, result in g_instrInfo
+  // instruction encodings, write/read ASV, NOP
   read_in_instructions(g_path+"/instr.txt");  
   if(doClean.compare("1") == 0) {
     toCout("### Begin clean_file");
@@ -44,7 +49,7 @@ int main(int argc, char *argv[]) {
     toCout("### Begin remove_functions");
     remove_functions(g_path+"/design.v");
     toCout("### Begin parse_verilog");
-    parse_verilog(g_path+"/design.v.clean");    
+    parse_verilog(g_path+"/design.v.clean");
   }
   else {
     toCout("### Begin parse_verilog");
@@ -57,9 +62,10 @@ int main(int argc, char *argv[]) {
   build_ast_tree();
   check_all_regs();
   clean_goal();
-  auxiliary_files_gen(g_path, g_maxDelay);
+  make_dirs(g_path);
   pseudo_vlg_gen();  
   define_fun_gen(g_path+"/clean_sub_goals.txt");
+  auxiliary_files_gen(g_path, g_maxDelay);  
   print_time();
   //time_t my_time2 = time(NULL);
   //std::string time2(ctime(&my_time2));

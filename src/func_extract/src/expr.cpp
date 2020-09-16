@@ -1,6 +1,7 @@
 #include "expr.h"
 #include "parse_fill.h"
 #include "helper.h"
+#include "global_data_struct.h"
 #define toStr(a) std::to_string(a)
 
 ////////////////////////////////////////////////////////////////
@@ -476,6 +477,7 @@ void module_expr(std::string firstLine, std::ifstream &input) {
   }
   for(std::string &out: outputVec) {
     size_t pos = out.find("_#_");
+    std::string port = out.substr(0, pos);    
     std::string wire = out.substr(pos+3);
     g_funcTable.emplace(wire, funcInfo);
     g_wire2ModulePort.emplace(wire, port);    

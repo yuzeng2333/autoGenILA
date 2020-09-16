@@ -2,6 +2,7 @@
 #include "parse_fill.h"
 #include "global_data_struct.h"
 #include "../../taint_method/src/global_data.h"
+//#include "../../smt_vlg_check/smt2ila/app/smt_to_vlg.h"
 
 #define el std::endl
 #define toStr(a) std::to_string(a)
@@ -25,7 +26,6 @@ void make_dirs(const std::string &path) {
 
 void auxiliary_files_gen(const std::string &path, uint32_t delay) {
   toCout("### Begin generate auxiliary files");
-  make_dirs(path);
   //if(!mkdir(g_path+"/"+moduleName) == -1) {
   //  toCout("Error: cannot make dir: "+dirName);
   //  abort();
@@ -36,16 +36,20 @@ void auxiliary_files_gen(const std::string &path, uint32_t delay) {
   vmapFile << "{" << el;
   vmapFile << "  \"models\": { \"ILA\":\"m0\", \"VERILOG\": \"m1\" }," << el;  
   vmapFile << "  \"state mapping\": {" << el;
-  for(auto as = moduleAs.begin(); as != moduleAs.end(); as++)
-  vmapFile << "      \""+*as+"\": \""+*as+"\"," << el;
+  for(auto as = moduleAs.begin(); as != moduleAs.end(); as++) {
+    if(*as != *moduleAs.rbegin())
+      vmapFile << "      \""+*as+"\": \""+*as+"\"," << el;
+    else
+      vmapFile << "      \""+*as+"\": \""+*as+"\"" << el;
+  }
   vmapFile << "    }," << el << el;
 
   vmapFile << "  \"interface mapping\": {" << el;
   for(std::string &in:  moduleInputs) {
-  vmapFile << "      \""+in+"\":\"**KEEP**\"," << el;
+    vmapFile << "      \""+in+"\":\"**KEEP**\"," << el;
   }
   for(std::string &out:  moduleOutputs) {
-  vmapFile << "      \""+out+"\":\"**SO**\"," << el;
+    vmapFile << "      \""+out+"\":\"**SO**\"," << el;
   }
   vmapFile << "      \""+g_recentRst+"\":\"**RESET**\"," << el;
   vmapFile << "      \""+g_recentClk+"\":\"**CLOCK**\"" << el;
@@ -58,7 +62,7 @@ void auxiliary_files_gen(const std::string &path, uint32_t delay) {
   // generate cond refinement
   std::ofstream condFile(dirName+"/rfmap/cond.json");
   condFile << "{" << el;
-  condFile << "  \"global invaraints\": [ ]," << el;  
+  condFile << "  \"global invariants\": [ ]," << el;  
   condFile << "  \"instructions\": [" << el;
   condFile << "    {" << el;
   condFile << "      \"instruction\": \"i1\"," << el;
@@ -68,44 +72,20 @@ void auxiliary_files_gen(const std::string &path, uint32_t delay) {
   condFile << "}" << el;
   condFile.close();
 
-  std::ofstream appFile(dirName+"/app/app.cpp");
 
-  appFile << "#include <ilang/ilang++.h>" << el;
-  appFile << "#include <ilang/vtarget-out/vtarget_gen.h>" << el;
-  appFile << "#include <iostream>" << el;
-  appFile << "#include <fstream>" << el;
-  appFile << el;
-  appFile << "void ila_gen() {" << el;
-  appFile << "  auto m = Ila(\"bar\");" << el;
-
+  std::vector<std::pair<std::string, uint32_t>> states;
+  // print info in a file to be read by smt_vlg_check
+  std::ofstream infoFile("../smt_vlg_check/smt2ila/app/circuit_info.txt");
   for(auto as = moduleAs.begin(); as != moduleAs.end(); as++) {
-  uint32_t width = get_var_slice_width(*as);
-  appFile << "  auto "+*as+" = m.NewBvState(\""+*as+"\", "+toStr(width)+");" << el;
+    uint32_t width = get_var_slice_width(*as);
+    //states.push_back(std::make_pair(*as, width));
+    infoFile << *as+"__:__"+toStr(width) << std::endl;
   }
+  infoFile << "#moduleName:"+moduleName << std::endl;
+  infoFile << "#dirName:"+dirName << std::endl;
+  infoFile.close();
 
-  appFile << "  auto i1 = m.NewInstr(\"i1\");" << el;
-  appFile << "  {" << el;
-  for(auto as = moduleAs.begin(); as != moduleAs.end(); as++)  
-  appFile << "    i1.SetUpdate("+*as+", LoadSmtExprFromFile(\"../target/smtlib2in/"+*as+".smtlib\", m) );" << el;
-
-  appFile << "    std::ofstream fout(\"../ila2Vlg/out.v\");" << el;
-  appFile << "    i1.ExportToVerilog(fout);" << el;
-  appFile << "  }" << el;
-
-  
-  appFile << "  VerilogVerificationTargetGenerator vg(" << el;
-  appFile << "      {},                                 // no include" << el;
-  appFile << "      {\"../target/verilog/pseudo_vlg.v\"},              // vlog files" << el;
-  appFile << "      \""+moduleName+"\",                           // top_module_name" << el;
-  appFile << "      \"../target/rfmap/vmap.json\",             // variable mapping" << el;
-  appFile << "      \"../target/rfmap/cond.json\"," << el;
-  appFile << "      \"../target/output/\",                     // output path" << el;
-  appFile << "      m.get()," << el;
-  appFile << "      VerilogVerificationTargetGenerator::backend_selector::JASPERGOLD);" << el;
-
-  appFile << "  vg.GenerateTargets();" << el;
-  appFile << "}" << el;
+  toCout("### Begin generate ilaVlg, wrapper, etc.");
+  system(("../smt_vlg_check/smt2ila/build/starter "+g_pj_path+"/smt_vlg_check/smt2ila/app").c_str());
+  //smt_to_vlg(states, moduleName, dirName);
 }
-
-
-

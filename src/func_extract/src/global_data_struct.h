@@ -28,5 +28,6 @@ extern std::unordered_map<std::string, uint32_t> g_moduleInportTime;
 extern std::unordered_map<std::string, uint32_t> g_moduleOutportTime;
 extern std::queue<std::pair<std::string, uint32_t>> g_goalVars;
 extern std::ofstream g_outFile;
+extern std::string g_pj_path; 
 //extern std::string g_path;
 #endif

@@ -4,6 +4,7 @@
 
 #define toStr(a) std::to_string(a)
 
+/// generate invariance needed for checking equivalence of two RTL
 /// for each register that is not ASV, set it to rst value
 void inv_gen() {
   toCout("### Begin inv_gen");

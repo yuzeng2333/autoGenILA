@@ -839,7 +839,7 @@ expr func_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
     abort();
   }
   std::string outPort = g_wire2ModulePort[destAndSlice];
-  std::unordered_map<std::string, uint32_t> inputDelayMap = moduleInfo.out2InDelayMp[port];
+  std::unordered_map<std::string, uint32_t> inputDelayMap = moduleInfo.out2InDelayMp[outPort];
   if(!g_ignoreSubModules) {
     sort_vector sorts(c);
     for(std::string &var: node->srcVec) {

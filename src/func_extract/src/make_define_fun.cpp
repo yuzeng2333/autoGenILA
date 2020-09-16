@@ -22,6 +22,10 @@ void define_fun_gen(std::string fileName) {
       }
       destName = m.str(1);
       output.open(g_path+"/"+moduleName+"/smtlib2in/"+destName+".smtlib", std::ios::out );
+      if(!output.is_open()) {
+        toCout("Error: cannot open smtlib2 file for write:"+g_path+"/"+moduleName+"/smtlib2in/"+destName+".smtlib");
+        abort();
+      }
     }
     else if(line.length() == 6 && line.substr(0, 6) == "(goals") {
       continue;
