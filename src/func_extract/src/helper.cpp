@@ -357,3 +357,13 @@ void remove_two_end_space(std::string &str) {
   remove_front_space(str);
   remove_back_space(str);
 }
+
+bool is_written_ASV(std::string reg) {
+  // currently does not support multiple instructions
+  assert(g_instrInfo.size() == 1);
+  for(auto it = g_instrInfo.back().writeASV.begin(); it != g_instrInfo.back().writeASV.end(); it++) {
+    if(it->second == reg)
+      return true;
+  }
+  return false;
+}
