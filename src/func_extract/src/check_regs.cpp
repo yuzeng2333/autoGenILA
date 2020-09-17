@@ -19,6 +19,7 @@ std::unordered_map<astNode*, uint32_t> DIRTY_QUEUE;
 std::unordered_map<std::string, expr*> INPUT_EXPR_VAL;
 std::unordered_map<std::string, expr*> TIMED_VAR2EXPR;
 std::set<std::string> g_resetedReg;
+std::set<std::string> g_regWithFunc;
 //std::unordered_map<std::string, expr*> INT_EXPR_VAL;
 std::set<std::string> INT_EXPR_SET;
 std::set<std::string> g_readASV;
@@ -110,6 +111,7 @@ void simplify_goal_without_submodules(std::string destAndSlice, uint32_t bound, 
     g_goalVars.pop();
     std::string var = varPair.first;
     uint32_t timeIdx = varPair.second;
+    g_regWithFunc.insert(var);    
     expr destNextExpr = add_constraint(g_varNode[var], timeIdx, c, s, g, bound, /*isSolve=*/false);
     expr destExpr_g = var_expr(var, 100, c, false);
     g.add( destExpr_g == destNextExpr ); 

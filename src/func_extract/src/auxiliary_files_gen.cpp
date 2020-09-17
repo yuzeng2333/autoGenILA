@@ -33,20 +33,35 @@ void auxiliary_files_gen(const std::string &path, uint32_t delay) {
   // generate vmap refinement
   std::string dirName = path + "/" + moduleName;
   std::ofstream vmapFile(dirName+"/rfmap/vmap.json");
+  std::set<std::string> addedVar;
   vmapFile << "{" << el;
   vmapFile << "  \"models\": { \"ILA\":\"m0\", \"VERILOG\": \"m1\" }," << el;  
   vmapFile << "  \"state mapping\": {" << el;
-  for(auto as = moduleAs.begin(); as != moduleAs.end(); as++) {
-    if(*as != *moduleAs.rbegin())
-      vmapFile << "      \""+*as+"\": \""+*as+"\"," << el;
-    else
-      vmapFile << "      \""+*as+"\": \""+*as+"\"" << el;
+
+  for(auto it = g_funcTable.begin(); it != g_funcTable.end(); it++) {
+    auto &funcInfo = it->second;
+    for(auto in = funcInfo.inputs.begin(); in != funcInfo.inputs.end(); in++) {
+      if(addedVar.find(*in) == addedVar.end()) {
+        vmapFile << "      \""+*in+"\": \""+*in+"\"," << el;
+        addedVar.insert(*in);
+      }
+    }
   }
+
+  for(auto as = moduleAs.begin(); as != moduleAs.end(); as++) {
+    // make mapping for submodule's inputs. They should be checked
+    if(addedVar.find(*as) == addedVar.end()) {    
+      addedVar.insert(*as);
+      vmapFile << "      \""+*as+"\": \""+*as+"\"," << el;
+    }
+  }
+  vmapFile << "      \""+*moduleAs.rbegin()+"\": \""+*moduleAs.rbegin()+"\"" << el;
   vmapFile << "    }," << el << el;
 
   vmapFile << "  \"interface mapping\": {" << el;
   for(std::string &in:  moduleInputs) {
-    vmapFile << "      \""+in+"\":\"**KEEP**\"," << el;
+    if(in != g_recentRst && in != g_recentClk)
+      vmapFile << "      \""+in+"\":\"**KEEP**\"," << el;
   }
   for(std::string &out:  moduleOutputs) {
     vmapFile << "      \""+out+"\":\"**SO**\"," << el;
@@ -76,10 +91,18 @@ void auxiliary_files_gen(const std::string &path, uint32_t delay) {
   std::vector<std::pair<std::string, uint32_t>> states;
   // print info in a file to be read by smt_vlg_check
   std::ofstream infoFile("../smt_vlg_check/smt2ila/app/circuit_info.txt");
+
+  for(auto as = g_regWithFunc.begin(); as != g_regWithFunc.end(); as++) {
+    uint32_t width = get_var_slice_width(*as);
+    //states.push_back(std::make_pair(*as, width));
+    infoFile << *as+"__:__"+toStr(width)+", YES" << std::endl;
+  }
+
   for(auto as = moduleAs.begin(); as != moduleAs.end(); as++) {
     uint32_t width = get_var_slice_width(*as);
     //states.push_back(std::make_pair(*as, width));
-    infoFile << *as+"__:__"+toStr(width) << std::endl;
+    if(g_regWithFunc.find(*as) == g_regWithFunc.end())
+      infoFile << *as+"__:__"+toStr(width) << std::endl;
   }
   infoFile << "#moduleName:"+moduleName << std::endl;
   infoFile << "#dirName:"+dirName << std::endl;
@@ -89,3 +112,4 @@ void auxiliary_files_gen(const std::string &path, uint32_t delay) {
   system(("../smt_vlg_check/smt2ila/build/starter "+g_pj_path+"/smt_vlg_check/smt2ila/app").c_str());
   //smt_to_vlg(states, moduleName, dirName);
 }
+

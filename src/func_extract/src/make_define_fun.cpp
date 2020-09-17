@@ -37,7 +37,8 @@ void define_fun_gen(std::string fileName) {
       std::string args;
       make_args_list(dest2ArgsMap[destName], args);
       uint32_t destWidth = get_var_slice_width(destName);
-      output << "(define-fun INV_"+destName+" ( "+args+" ) (_ BitVec "+toStr(destWidth)+")" << std::endl;
+      //output << "(define-fun INV_"+destName+" ( "+args+" ) (_ BitVec "+toStr(destWidth)+")" << std::endl;
+      output << "(define-fun INV ( "+args+" ) (_ BitVec "+toStr(destWidth)+")" << std::endl;
     }
     else if(line.front() == ')') {
       output.close();      
