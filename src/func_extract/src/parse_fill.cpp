@@ -21,7 +21,9 @@ std::vector<struct instrInfo> g_instrInfo;
 std::unordered_map<std::string, std::string> g_nopInstr;
 std::unordered_map<std::string, std::string> g_rstVal;
 std::unordered_map<std::string, ModuleInfo_t> g_allModuleInfo;
-std::unordered_map<std::string, std::string> g_wire2ModulePort;
+// first key is instance name, second key is wire name
+std::unordered_map<std::string, std::unordered_map<std::string, std::string>> g_wire2ModulePort;
+std::unordered_map<std::string, std::string> g_ins2modMap;
 std::unordered_map<std::string, uint32_t> g_moduleOutportTime;
 std::unordered_map<std::string, uint32_t> g_moduleInportTime;
 
@@ -314,6 +316,10 @@ bool is_module_line(const std::string &line, std::string &moduleName) {
 void read_module_info() {
   std::string fileName = g_path + "/module_info.txt";
   std::ifstream input(fileName);
+  if(!input.is_open()) {
+    toCout("Error: cannot open "+g_path + "/module_info.txt");
+    abort();
+  }
   std::string line;
   std::string moduleName;
   ModuleInfo_t moduleInfo;

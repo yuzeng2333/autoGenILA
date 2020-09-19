@@ -39,8 +39,8 @@ void build_tree_for_single_as(std::string regAndSlice) {
 
 
 void add_node(std::string var, uint32_t timeIdx, astNode* const node, bool varIsDest) {
-  if(var == "state_0") {
-    toCout("Found state_0!");
+  if(var == "product") {
+    toCout("Found product!");
     s_node = node;
   }
   if(g_visitedNode.find(var) != g_visitedNode.end() && !varIsDest)
@@ -538,7 +538,7 @@ void add_func_node(std::string var, uint32_t timeIdx, astNode* const node) {
   auto funcInfo = g_funcTable[var];
   node->type = MODULEBEGIN;
   node->dest = var;
-  node->op = funcInfo.name;
+  node->op = funcInfo.instanceName;
   node->srcVec = funcInfo.inputs;
   for(std::string &input: funcInfo.inputs) {
     add_child_node(input, timeIdx, node);

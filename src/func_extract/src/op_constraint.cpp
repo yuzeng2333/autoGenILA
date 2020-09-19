@@ -832,13 +832,14 @@ expr func_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
   g_moduleOutportTime.emplace(destAndSlice, timeIdx);
   toCout("Func constraint for:"+destAndSlice);  
   uint32_t width = get_var_slice_width(destAndSlice);
-  std::string moduleName = node->op;
+  std::string instanceName = node->op;
+  std::string moduleName = g_ins2modMap[instanceName];
   ModuleInfo_t moduleInfo = g_allModuleInfo[moduleName];
-  if(g_wire2ModulePort.find(destAndSlice) == g_wire2ModulePort.end()) {
+  if(g_wire2ModulePort[instanceName].find(destAndSlice) == g_wire2ModulePort[instanceName].end()) {
     toCout("Error: this key does not exist in g_wire2ModulePort: "+destAndSlice);
     abort();
   }
-  std::string outPort = g_wire2ModulePort[destAndSlice];
+  std::string outPort = g_wire2ModulePort[instanceName][destAndSlice];
   std::unordered_map<std::string, uint32_t> inputDelayMap = moduleInfo.out2InDelayMp[outPort];
   if(!g_ignoreSubModules) {
     sort_vector sorts(c);
@@ -846,7 +847,8 @@ expr func_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
       sorts.push_back(c.bv_sort(get_var_slice_width(var)));
     }
     uint32_t inputNo = node->srcVec.size();
-    func_decl subModule = function(moduleName, sorts, c.bv_sort(width));  
+    func_decl subModule = function(moduleName+"__"+outPort+"__#"+toStr(timeIdx), sorts, c.bv_sort(width));
+    toCout("See module "+moduleName+" in cycle "+toStr(timeIdx)+", for var: "+destAndSlice);
 
     if(isSolve) {
       toCout("Error: func_constraint not supported for solve yet!");
@@ -855,7 +857,7 @@ expr func_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
     expr_vector exprVec(c);
     uint32_t i = 0;
     for(std::string &var: node->srcVec) {
-      std::string inPort = g_wire2ModulePort[var];
+      std::string inPort = g_wire2ModulePort[instanceName][var];
       uint32_t delay = inputDelayMap[inPort]; 
       g_moduleInportTime.emplace(var, timeIdx+delay);
       uint32_t op1Hi = get_lgc_hi(var);
@@ -867,9 +869,9 @@ expr func_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
   }
   else {
     for(std::string &var: node->srcVec) {
-      std::string inPort = g_wire2ModulePort[var];      
+      std::string inPort = g_wire2ModulePort[instanceName][var];      
       uint32_t delay = inputDelayMap[inPort]; 
-      g_goalVars.push(std::make_pair(var, timeIdx+delay));
+      g_goalVars.push(std::make_pair(inPort, timeIdx+delay));
     }
     return var_expr(destAndSlice, timeIdx, c, false);
   }

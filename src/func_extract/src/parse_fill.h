@@ -25,7 +25,8 @@ struct instrInfo {
 
 // one for each sub-module
 struct FuncInfo_t {
-  std::string name;
+  std::string moduleName;
+  std::string instanceName;
   std::vector<std::string> inputs;
 };
 

@@ -11,6 +11,8 @@
 //
 /////////////////////////////////////////////////////////////////
 
+
+
 void input_expr(std::string line) {
   std::smatch m;
   if (!std::regex_match(line, m, pInput))
@@ -449,9 +451,13 @@ void module_expr(std::string firstLine, std::ifstream &input) {
   }
   std::string moduleName = m.str(2);
   std::string instanceName = m.str(3);
+  g_ins2modMap.emplace(instanceName, moduleName);
+  if(g_wire2ModulePort.find(instanceName) == g_wire2ModulePort.end())
+    g_wire2ModulePort.emplace(instanceName, std::unordered_map<std::string, std::string>{});
   FuncInfo_t funcInfo;
   // moduleName is important, instanceName does not matter
-  funcInfo.name = moduleName;
+  funcInfo.moduleName = moduleName;
+  funcInfo.instanceName = instanceName;
   std::string line;
   std::vector<std::string> inputVec;
   std::vector<std::string> outputVec;
@@ -473,14 +479,14 @@ void module_expr(std::string firstLine, std::ifstream &input) {
     std::string port = in.substr(0, pos);
     std::string wire = in.substr(pos+3);
     funcInfo.inputs.push_back(wire);
-    g_wire2ModulePort.emplace(wire, port);
+    g_wire2ModulePort[instanceName].emplace(wire, port);
   }
   for(std::string &out: outputVec) {
     size_t pos = out.find("_#_");
     std::string port = out.substr(0, pos);    
     std::string wire = out.substr(pos+3);
     g_funcTable.emplace(wire, funcInfo);
-    g_wire2ModulePort.emplace(wire, port);    
+    g_wire2ModulePort[instanceName].emplace(wire, port);    
   }
 }
 

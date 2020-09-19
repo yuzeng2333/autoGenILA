@@ -53,7 +53,7 @@ void check_all_regs() {
             check_single_reg_and_slice(regAndSlice, cycleCnt-1, i-1);
       else {// if the writeASV is to be skipped
         simplify_goal(oneWriteAsv, cycleCnt-1, i-1);
-        simplify_goal_without_submodules(oneWriteAsv, cycleCnt-1, i-1);
+        //simplify_goal_without_submodules(oneWriteAsv, cycleCnt-1, i-1);
         g_maxDelay = cycleCnt;
       }
     }
@@ -81,7 +81,7 @@ void simplify_goal(std::string destAndSlice, uint32_t bound, uint32_t instrIdx) 
   solver s(c);
   goal g(c); 
   expr destNextExpr = add_constraint(g_varNode[destAndSlice], 0, c, s, g, bound, /*isSolve=*/false);
-  expr destExpr_g = var_expr(destAndSlice, 100, c, false);
+  expr destExpr_g = var_expr(destAndSlice, 1000, c, false);
   g.add( destExpr_g == destNextExpr ); 
   //add_all_clean_constraints(c, s, g, bound, /*isSolve=*/false);
   tactic t(c, "simplify");
@@ -113,7 +113,7 @@ void simplify_goal_without_submodules(std::string destAndSlice, uint32_t bound, 
     uint32_t timeIdx = varPair.second;
     g_regWithFunc.insert(var);    
     expr destNextExpr = add_constraint(g_varNode[var], timeIdx, c, s, g, bound, /*isSolve=*/false);
-    expr destExpr_g = var_expr(var, 100, c, false);
+    expr destExpr_g = var_expr(var, timeIdx+100, c, false);
     g.add( destExpr_g == destNextExpr ); 
     //add_all_clean_constraints(c, s, g, bound, /*isSolve=*/false);
     tactic t(c, "simplify");

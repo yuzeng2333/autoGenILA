@@ -22,6 +22,9 @@ std::ofstream g_outFile;
 std::string g_pj_path = "/workspace/research/ILA/autoGenILA/src/";
 
 
+// Needed input files:
+// 1. instr.txt
+// 2. module_info.txt
 int main(int argc, char *argv[]) {
   g_path = argv[1];
   // if argv[3] is 1, clean the file
