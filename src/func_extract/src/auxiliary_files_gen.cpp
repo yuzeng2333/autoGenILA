@@ -95,15 +95,18 @@ void auxiliary_files_gen(const std::string &path, uint32_t delay) {
   // print info in a file to be read by smt_vlg_check
   std::ofstream infoFile("../smt_vlg_check/smt2ila/app/circuit_info.txt");
 
+  for(auto as = moduleInputs.begin(); as != moduleInputs.end(); as++) {
+    uint32_t width = get_var_slice_width(*as);
+    infoFile << *as+"__:__"+toStr(width) << std::endl;
+  }
+
   for(auto as = g_regWithFunc.begin(); as != g_regWithFunc.end(); as++) {
     uint32_t width = get_var_slice_width(*as);
-    //states.push_back(std::make_pair(*as, width));
     infoFile << *as+"__:__"+toStr(width)+", YES" << std::endl;
   }
 
   for(auto as = moduleAs.begin(); as != moduleAs.end(); as++) {
     uint32_t width = get_var_slice_width(*as);
-    //states.push_back(std::make_pair(*as, width));
     if(g_regWithFunc.find(*as) == g_regWithFunc.end())
       infoFile << *as+"__:__"+toStr(width) << std::endl;
   }
