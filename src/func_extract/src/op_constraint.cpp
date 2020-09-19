@@ -858,6 +858,11 @@ expr func_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
     uint32_t i = 0;
     for(std::string &var: node->srcVec) {
       std::string inPort = g_wire2ModulePort[instanceName][var];
+      if(inputDelayMap.find(inPort) == inputDelayMap.end()) {
+        toCout("Error: cannot find in inputDelayMap: "+inPort);
+        toCout("Check module_info.txt!");
+        abort();
+      }
       uint32_t delay = inputDelayMap[inPort]; 
       g_moduleInportTime.emplace(var, timeIdx+delay);
       uint32_t op1Hi = get_lgc_hi(var);
@@ -869,6 +874,9 @@ expr func_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
   }
   else {
     for(std::string &var: node->srcVec) {
+      // do not add goal for constants
+      if(is_number(var))
+        continue;
       std::string inPort = g_wire2ModulePort[instanceName][var];      
       uint32_t delay = inputDelayMap[inPort]; 
       g_goalVars.push(std::make_pair(var, timeIdx+delay));

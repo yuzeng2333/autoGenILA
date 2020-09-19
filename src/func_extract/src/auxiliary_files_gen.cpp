@@ -43,7 +43,7 @@ void auxiliary_files_gen(const std::string &path, uint32_t delay) {
   for(auto it = g_funcTable.begin(); it != g_funcTable.end(); it++) {
     auto &funcInfo = it->second;
     for(auto in = funcInfo.inputs.begin(); in != funcInfo.inputs.end(); in++) {
-      if(addedVar.find(*in) == addedVar.end()) {
+      if(addedVar.find(*in) == addedVar.end() && !is_number(*in)) {
         vmapFile << "      \""+*in+"\": \""+*in+"\"," << el;
         addedVar.insert(*in);
       }
@@ -68,7 +68,8 @@ void auxiliary_files_gen(const std::string &path, uint32_t delay) {
   for(std::string &out:  moduleOutputs) {
     vmapFile << "      \""+out+"\":\"**SO**\"," << el;
   }
-  vmapFile << "      \""+g_recentRst+"\":\"**RESET**\"," << el;
+  if(!g_recentRst.empty())
+    vmapFile << "      \""+g_recentRst+"\":\"**RESET**\"," << el;
   vmapFile << "      \""+g_recentClk+"\":\"**CLOCK**\"" << el;
   vmapFile << "  }," << el;
   vmapFile << "  \"mapping control\": [" << el;
