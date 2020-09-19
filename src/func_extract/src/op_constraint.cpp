@@ -871,7 +871,7 @@ expr func_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
     for(std::string &var: node->srcVec) {
       std::string inPort = g_wire2ModulePort[instanceName][var];      
       uint32_t delay = inputDelayMap[inPort]; 
-      g_goalVars.push(std::make_pair(inPort, timeIdx+delay));
+      g_goalVars.push(std::make_pair(var, timeIdx+delay));
     }
     return var_expr(destAndSlice, timeIdx, c, false);
   }

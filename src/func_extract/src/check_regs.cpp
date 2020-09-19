@@ -53,7 +53,7 @@ void check_all_regs() {
             check_single_reg_and_slice(regAndSlice, cycleCnt-1, i-1);
       else {// if the writeASV is to be skipped
         simplify_goal(oneWriteAsv, cycleCnt-1, i-1);
-        //simplify_goal_without_submodules(oneWriteAsv, cycleCnt-1, i-1);
+        simplify_goal_without_submodules(oneWriteAsv, cycleCnt-1, i-1);
         g_maxDelay = cycleCnt;
       }
     }
