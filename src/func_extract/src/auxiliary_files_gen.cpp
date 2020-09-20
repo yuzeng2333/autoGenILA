@@ -193,7 +193,10 @@ void modify_wrapper_tcl(std::string wrapperFile, std::string tclFile) {
       tclOut << "  design.v \\" << std::endl;
     }
     else if(line.find("wrapper.v") != std::string::npos) {
-      tclOut << "  wrapper_v2.v \\" << std::endl;      
+      tclOut << "  wrapper_v2.v \\" << std::endl;
+      for(auto it: g_allModuleInfo) {
+        tclOut << "  -bbox_m "+it->first+" \\" << std::endl;
+      }
     }
     else if(line.find("variable_map_assume_") != std::string::npos) {
       uint32_t pos = line.find("(__m");
