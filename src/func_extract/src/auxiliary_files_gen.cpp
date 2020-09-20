@@ -41,6 +41,8 @@ void auxiliary_files_gen(const std::string &path, uint32_t delay) {
   vmapFile << "  \"state mapping\": {" << el;
 
   for(std::string &in: moduleInputs) {
+    if(in.compare(g_recentClk) == 0 || in.compare("clk") == 0)
+      continue;
     vmapFile << "      \""+in+"\": \""+in+"\"," << el;
   }
 
@@ -100,6 +102,8 @@ void auxiliary_files_gen(const std::string &path, uint32_t delay) {
   std::ofstream infoFile("../smt_vlg_check/smt2ila/app/circuit_info.txt");
 
   for(auto as = moduleInputs.begin(); as != moduleInputs.end(); as++) {
+    if((*as).compare(g_recentClk) == 0 || (*as).compare(g_recentRst) == 0)
+      continue;
     uint32_t width = get_var_slice_width(*as);
     infoFile << *as+"__:__"+toStr(width) << std::endl;
   }
@@ -121,6 +125,7 @@ void auxiliary_files_gen(const std::string &path, uint32_t delay) {
   toCout("### Begin generate ilaVlg, wrapper, etc.");
   system(("../smt_vlg_check/smt2ila/build/starter "+g_pj_path+"/smt_vlg_check/smt2ila/app").c_str());
   //smt_to_vlg(states, moduleName, dirName);
+  system(("mv "+path+"/design.v.clean "+path+"/"+moduleName+"/output/i1/design.v").c_str());
 
   modify_wrapper_tcl(dirName+"/output/i1/wrapper.v", dirName+"/output/i1/do.tcl");
 }
@@ -186,6 +191,9 @@ void modify_wrapper_tcl(std::string wrapperFile, std::string tclFile) {
     //toCout(line);
     if(line.find("pseudo_vlg.v") != std::string::npos) {
       tclOut << "  design.v \\" << std::endl;
+    }
+    else if(line.find("wrapper.v") != std::string::npos) {
+      tclOut << "  wrapper_v2.v \\" << std::endl;      
     }
     else if(line.find("variable_map_assume_") != std::string::npos) {
       uint32_t pos = line.find("(__m");
