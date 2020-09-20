@@ -40,6 +40,10 @@ void auxiliary_files_gen(const std::string &path, uint32_t delay) {
   vmapFile << "  \"models\": { \"ILA\":\"m0\", \"VERILOG\": \"m1\" }," << el;  
   vmapFile << "  \"state mapping\": {" << el;
 
+  for(std::string &in: moduleInputs) {
+    vmapFile << "      \""+in+"\": \""+in+"\"," << el;
+  }
+
   for(auto it = g_funcTable.begin(); it != g_funcTable.end(); it++) {
     auto &funcInfo = it->second;
     for(auto in = funcInfo.inputs.begin(); in != funcInfo.inputs.end(); in++) {
@@ -126,6 +130,10 @@ void modify_wrapper_tcl(std::string wrapperFile, std::string tclFile) {
   toCout("### Begin modify wrapper and do.tcl");
   std::string path = extract_path(wrapperFile);  
   std::ifstream wrapperIn(wrapperFile);
+  if(!wrapperIn.is_open()) {
+    toCout("Error: cannot open wrapper file: "+wrapperFile);
+    abort();
+  }
   std::ofstream wrapperOut(path+"/wrapper_v2.v");
   std::string line;
   std::regex pM("^\\s*assign __m(\\d+)__ = m1.(\\S+) == ");
@@ -135,6 +143,9 @@ void modify_wrapper_tcl(std::string wrapperFile, std::string tclFile) {
     if(line.find("assign __EDCOND__") != std::string::npos) {
       // declare more EDCOND for subModuleInputs(top-module outputs)
       for(auto it = g_moduleInportTime.begin(); it != g_moduleInportTime.end(); it++) {
+        //toCout(it->first);
+        if(is_number(it->first)) // if is constant, do not need assertion
+          continue;
         uint32_t idx = find_key(idx2varMap, it->first);
         uint32_t delay = it->second;
         wrapperOut << "assign __EDCOND"+toStr(idx)+"__ = (`false|| ( __CYCLE_CNT__ == "+toStr(delay)+")) && __STARTED__  ;" << std::endl;
@@ -142,6 +153,9 @@ void modify_wrapper_tcl(std::string wrapperFile, std::string tclFile) {
     }
     else if(line.find("assign __IEND__") != std::string::npos) {
       for(auto it = g_moduleInportTime.begin(); it != g_moduleInportTime.end(); it++) {
+        //toCout(it->first);
+        if(is_number(it->first)) // if is constant, do not need assertion
+          continue;
         uint32_t idx = find_key(idx2varMap, it->first);
         uint32_t delay = it->second;
         wrapperOut << "assign __IEND"+toStr(idx)+"__ = (`false|| ( __CYCLE_CNT__ == "+toStr(delay)+")) && __STARTED__ && __RESETED__ && (~ __ENDED__) ;" << std::endl;
@@ -169,6 +183,7 @@ void modify_wrapper_tcl(std::string wrapperFile, std::string tclFile) {
   uint32_t assumeNo = 1;
   uint32_t assertNo = 0;  
   while(std::getline(tclIn, line)) {
+    //toCout(line);
     if(line.find("pseudo_vlg.v") != std::string::npos) {
       tclOut << "  design.v \\" << std::endl;
     }
@@ -212,10 +227,13 @@ void modify_wrapper_tcl(std::string wrapperFile, std::string tclFile) {
     if(it->second != "x")
       encodings = encodings + it->first + " == " + it->second + " && ";
   }
-  encodings.pop_back();
-  encodings.pop_back();
-  encodings.pop_back();
-  tclOut << "assume -name instr_encoding { (~ __START__) || ( "+encodings+" ) }" << std::endl;
+  if(encodings.length() > 4) {
+    encodings.pop_back();
+    encodings.pop_back();
+    encodings.pop_back();
+  }
+  if(!encodings.empty())
+    tclOut << "assume -name instr_encoding { (~ __START__) || ( "+encodings+" ) }" << std::endl;
   tclIn.close();
   tclOut.close();
 
