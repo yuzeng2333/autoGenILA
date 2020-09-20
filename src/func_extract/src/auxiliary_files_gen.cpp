@@ -143,6 +143,13 @@ void modify_wrapper_tcl(std::string wrapperFile, std::string tclFile) {
   std::string line;
   std::regex pM("^\\s*assign __m(\\d+)__ = m1.(\\S+) == ");
   std::map<uint32_t, std::string> idx2varMap;
+
+  auto writeASV = g_currInstrInfo.writeASV;
+  if(writeASV.size() > 1) {
+    toCout("Error: writeASV's size > 1, not supported yet");
+    abort();
+  }
+  uint32_t totalDelay = writeASV.begin()->first;
   while(std::getline(wrapperIn, line)) {
     wrapperOut << line << std::endl;
     if(line.find("assign __EDCOND__") != std::string::npos) {
@@ -152,7 +159,7 @@ void modify_wrapper_tcl(std::string wrapperFile, std::string tclFile) {
         if(is_number(it->first)) // if is constant, do not need assertion
           continue;
         uint32_t idx = find_key(idx2varMap, it->first);
-        uint32_t delay = it->second;
+        uint32_t delay = totalDelay - it->second;
         wrapperOut << "assign __EDCOND"+toStr(idx)+"__ = (`false|| ( __CYCLE_CNT__ == "+toStr(delay)+")) && __STARTED__  ;" << std::endl;
       }
     }
@@ -162,7 +169,7 @@ void modify_wrapper_tcl(std::string wrapperFile, std::string tclFile) {
         if(is_number(it->first)) // if is constant, do not need assertion
           continue;
         uint32_t idx = find_key(idx2varMap, it->first);
-        uint32_t delay = it->second;
+        uint32_t delay = totalDelay - it->second;
         wrapperOut << "assign __IEND"+toStr(idx)+"__ = (`false|| ( __CYCLE_CNT__ == "+toStr(delay)+")) && __STARTED__ && __RESETED__ && (~ __ENDED__) ;" << std::endl;
       }
     }
@@ -194,7 +201,7 @@ void modify_wrapper_tcl(std::string wrapperFile, std::string tclFile) {
     }
     else if(line.find("wrapper.v") != std::string::npos) {
       tclOut << "  wrapper_v2.v \\" << std::endl;
-      for(auto it: g_allModuleInfo) {
+      for(auto it = g_allModuleInfo.begin(); it != g_allModuleInfo.end(); it++) {
         tclOut << "  -bbox_m "+it->first+" \\" << std::endl;
       }
     }
