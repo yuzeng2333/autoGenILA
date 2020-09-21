@@ -175,7 +175,7 @@ bool g_remove_adff = false;
 bool g_split_long_num = false;
 // if true, add (reg_PREV_VAL == rst_val) into assertion
 bool g_use_vcd_parser = false;
-bool g_write_assert = false; // for find written ASV
+bool g_write_assert = true; // for find written ASV
 bool g_double_assert = false; // to enable having PREV_VAL in assert
 // set the read flag only if reg's value is not reset value
 bool g_set_rflag_if_not_rst_val = true; 
@@ -2351,34 +2351,36 @@ void gen_assert_property(std::ofstream &output) {
   std::regex pRFlag("(\\S*)_r_flag");
   std::smatch m;
   std::smatch match;
-  for(std::string out: flagOutputs) {
-    if(std::regex_search(out, m, pRFlag)) {
-      //std::string var = m.str(1);
-      //checkCond(std::regex_match(var, match, pRFlag), "Error: pRFlag is not matched: "+m.str(1));
-      std::string rstVal; 
-      if(g_use_vcd_parser)
-        rstVal = g_rstValMap[moduleName][m.str(1)];
-      if(rstVal.empty()) rstVal = "0";
-      if(!isMem(m.str(1)) && g_double_assert) {
+  if(!g_write_assert) {
+    for(std::string out: flagOutputs) {
+      if(std::regex_search(out, m, pRFlag)) {
+        //std::string var = m.str(1);
+        //checkCond(std::regex_match(var, match, pRFlag), "Error: pRFlag is not matched: "+m.str(1));
+        std::string rstVal; 
         if(g_use_vcd_parser)
-          output << "  assert property( " + out + " == 0 || " + m.str(1) + "_PREV_VAL1 == " + rstVal + " );" << std::endl;
-        else if(g_set_rflag_if_not_rst_val)
-        //else if(true)
-          output << "  assert property( " + out + " == 0 );" << std::endl;
+          rstVal = g_rstValMap[moduleName][m.str(1)];
+        if(rstVal.empty()) rstVal = "0";
+        if(!isMem(m.str(1)) && g_double_assert) {
+          if(g_use_vcd_parser)
+            output << "  assert property( " + out + " == 0 || " + m.str(1) + "_PREV_VAL1 == " + rstVal + " );" << std::endl;
+          else if(g_set_rflag_if_not_rst_val)
+          //else if(true)
+            output << "  assert property( " + out + " == 0 );" << std::endl;
+          else
+            output << "  assert property( " + out + " == 0 || " + m.str(1) + "_PREV_VAL1 == " + m.str(1) + "_PREV_VAL2 );" << std::endl;
+        }
         else
-          output << "  assert property( " + out + " == 0 || " + m.str(1) + "_PREV_VAL1 == " + m.str(1) + "_PREV_VAL2 );" << std::endl;
+          output << "  assert property( " + out + " == 0 );" << std::endl;
       }
-      else
-        output << "  assert property( " + out + " == 0 );" << std::endl;
     }
   }
   
   // generate properties for checking written ASV by each instruction
-  if(g_write_assert) {
+  if(g_write_assert && isTop) {
     std::ifstream input(g_path+"/ILA/asv.txt");
     if(!input.is_open()) {
-      toCout("Warning: asv.txt file is not opened: "+g_path+"/ILA/asv.txt");
-      return;
+      toCout("Error: asv.txt file is not opened: "+g_path+"/ILA/asv.txt");
+      abort();
     }
     std::string asv;
     while(std::getline(input, asv)) {
