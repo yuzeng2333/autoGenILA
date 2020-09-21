@@ -44,7 +44,7 @@ void define_fun_gen(std::string fileName) {
       output.close();      
       continue; // remove one close brace at the end
     }
-    else if(line.find("=") != std::string::npos) {
+    else if(line.find(destName) != std::string::npos) {
       uint32_t equalPos = line.find("=");
       uint32_t verticalLinePos = line.find("|", equalPos+1);
       uint32_t verticalLinePos2 = line.find("|", verticalLinePos+1);
