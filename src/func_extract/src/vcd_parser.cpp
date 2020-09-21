@@ -15,9 +15,12 @@ void vcd_parser(std::string fileName) {
   std::ifstream input(fileName);
   enum State {readName, readValue};
   enum State state;
-  bool passLine = false;
   std::smatch m;
   while(std::getline(input, line)) {
+    toCout(line);
+    if(line.compare("b00000000 n3") == 0) {
+      toCout("Find it");
+    }
     if(line.find("multiplier_16x16bit_pipelined.reg") != std::string::npos) {
       toCout("Found it");
     }
@@ -27,20 +30,17 @@ void vcd_parser(std::string fileName) {
     }
     else if(line.front() == '#') {
       state = readValue;
-      if(line.substr(1, 1) == "0")
-        passLine = true; // do not parse value for time 0
-      else if(line.substr(1, 1) != "0")
-        passLine = false;
       continue;
     }
-    else if(passLine)
-      continue;
     else if(state == readName){
       if(!std::regex_match(line, m, pName)) {
         continue;
       }
       std::string name = m.str(2);
       std::string var = m.str(3);
+      if(var.find("S4_0.S_0.out") != std::string::npos) {
+        toCout("Find it");
+      }
       if(isTrueReg(var))
         g_nameVarMap.emplace(name, var);
       else if(isTrueReg("\\"+var))
@@ -50,6 +50,9 @@ void vcd_parser(std::string fileName) {
       uint32_t blankPos = line.find(" "); 
       std::string rstVal = line.substr(1, blankPos-1);
       std::string name = line.substr(blankPos+1);
+      if(name == "n3") {
+        toCout("Find it");
+      }
       if(g_nameVarMap.find(name) == g_nameVarMap.end())
         continue;
       std::string var = g_nameVarMap[name];
