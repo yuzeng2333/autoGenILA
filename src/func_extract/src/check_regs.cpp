@@ -466,8 +466,12 @@ expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
       }
       std::string localRstVal = g_rstVal[dest];      
       if(!is_number(localRstVal)) {
-        toCout("Error: reset value is not number! "+dest+", "+localRstVal);
-        abort();
+        if(is_all_x(localRstVal))
+          localRstVal = "0";
+        else {
+          toCout("Error: reset value is not number! "+dest+", "+localRstVal);
+          abort();
+        }
       }
       toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Replaced with "+localRstVal+": "+timed_name(dest, timeIdx));
       return var_expr(localRstVal, timeIdx, c, false, localWidth); 

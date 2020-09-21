@@ -367,3 +367,12 @@ bool is_written_ASV(std::string reg) {
   }
   return false;
 }
+
+
+bool is_all_x(std::string strIn) {
+  for(char &c: strIn) {
+    if(c != 'x')
+      return false;
+  }
+  return true;
+}

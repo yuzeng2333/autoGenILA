@@ -13,8 +13,8 @@ void inv_gen() {
     if(isAs(reg))
       continue;
     if(g_rstVal.find(reg) == g_rstVal.end()) {
-      toCout("Error: cannot find rst val for: "+reg);
-      abort();
+      toCout("Error: cannot find rst val for: "+reg+", does not make inv.txt file");
+      return;
     }
     std::string val = g_rstVal[reg];
     if(is_all_zero(val))

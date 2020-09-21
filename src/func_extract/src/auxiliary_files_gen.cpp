@@ -11,6 +11,8 @@
 
 void make_dirs(const std::string &path) {
   std::ofstream out(path+"/mkdir.sh");
+  //if(std::exists(path+"/"+moduleName))
+  //  return;
   out << "mkdir -p "+path+"/"+moduleName << std::endl;
   out << "cd "+path+"/"+moduleName << std::endl;
   out << "mkdir app" << std::endl;
@@ -125,7 +127,7 @@ void auxiliary_files_gen(const std::string &path, uint32_t delay) {
   toCout("### Begin generate ilaVlg, wrapper, etc.");
   system(("../smt_vlg_check/smt2ila/build/starter "+g_pj_path+"/smt_vlg_check/smt2ila/app").c_str());
   //smt_to_vlg(states, moduleName, dirName);
-  system(("mv "+path+"/design.v.clean "+path+"/"+moduleName+"/output/i1/design.v").c_str());
+  system(("cp "+path+"/design.v.clean "+path+"/"+moduleName+"/output/i1/design.v").c_str());
 
   modify_wrapper_tcl(dirName+"/output/i1/wrapper.v", dirName+"/output/i1/do.tcl");
 }

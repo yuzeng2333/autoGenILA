@@ -317,8 +317,7 @@ void read_module_info() {
   std::string fileName = g_path + "/module_info.txt";
   std::ifstream input(fileName);
   if(!input.is_open()) {
-    toCout("Error: cannot open "+g_path + "/module_info.txt");
-    abort();
+    toCout("Warning: cannot open "+g_path + "/module_info.txt");
   }
   std::string line;
   std::string moduleName;

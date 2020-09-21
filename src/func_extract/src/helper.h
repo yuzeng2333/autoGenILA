@@ -80,4 +80,5 @@ void remove_two_end_space(std::string &str);
 
 bool is_written_ASV(std::string reg);
 
+bool is_all_x(std::string);
 #endif
