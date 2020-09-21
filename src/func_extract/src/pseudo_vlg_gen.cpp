@@ -22,28 +22,28 @@ void pseudo_vlg_gen() {
     if(declaredVar.find(in) == declaredVar.end()) {
       declaredVar.insert(in);
       uint32_t inWidth = get_var_slice_width(in);
-      output << "  input ["+toStr(inWidth-1)+":0] "+in+";" << std::endl;
+      output << "  input ["+toStr(inWidth-1)+":0] "+in+" ;" << std::endl;
     }
   }
   for(auto &out: moduleOutputs) {
     if(declaredVar.find(out) == declaredVar.end()) {
       declaredVar.insert(out);
       uint32_t outWidth = get_var_slice_width(out);
-      output << "  output ["+toStr(outWidth-1)+":0] "+out+";" << std::endl;
+      output << "  output ["+toStr(outWidth-1)+":0] "+out+" ;" << std::endl;
     }
   }
   for(auto &var: moduleRegs) {
     if(declaredVar.find(var) == declaredVar.end()) {    
       declaredVar.insert(var);      
       uint32_t varWidth = get_var_slice_width(var);
-      output << "  reg ["+toStr(varWidth-1)+":0] "+var+";" << std::endl;
+      output << "  reg ["+toStr(varWidth-1)+":0] "+var+" ;" << std::endl;
     }
   }
   for(auto &var: g_regWithFunc) {
     if(declaredVar.find(var) == declaredVar.end()) {    
       declaredVar.insert(var);      
       uint32_t varWidth = get_var_slice_width(var);
-      output << "  reg ["+toStr(varWidth-1)+":0] "+var+";" << std::endl;
+      output << "  reg ["+toStr(varWidth-1)+":0] "+var+" ;" << std::endl;
     }
   }
   output << "endmodule" << std::endl;
