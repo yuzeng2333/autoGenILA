@@ -36,7 +36,7 @@
 #define UNSUPPORT       99
 #define NONE            100
 
-void clean_file(std::string fileName);
+void clean_file(std::string fileName, bool useLogic);
 
 void remove_functions(std::string fileName);
 

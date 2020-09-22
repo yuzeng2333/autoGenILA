@@ -258,7 +258,7 @@ void clean_global_data(uint32_t totalRegCnt, uint32_t nextSig) {
   extract concatenants 
   remove functions wrapping cases 
   collect information of select and concat*/
-void clean_file(std::string fileName) {
+void clean_file(std::string fileName, bool useLogic) {
   std::ifstream cleanFileInput(fileName);
   std::ofstream output(fileName + ".nocomment");
   std::string line;
@@ -286,10 +286,6 @@ void clean_file(std::string fileName) {
       line = line.substr(0, line.find("//"));
     cleanLine = std::regex_replace(line, redundentBlank, "$1 $3");
     // TODO: deal with pDbSel;
-    //if(std::regex_match(cleanLine, match, pDbSel)) {
-    //  
-    //}
-
     /// extract aways concatenations into new Fangyuan variables
     bool noConcat=true;
     /// if is always line, look ahead for non-blocking concatenation assignments
@@ -298,6 +294,18 @@ void clean_file(std::string fileName) {
     if( !is_srcDestConcat(line) && (!std::regex_match(line, match, pAlwaysClkRst) || !g_remove_adff) ) { // pAlwaysClkRst is printed below
       if(std::regex_match(cleanLine, match, pAlwaysClk)) {
         rsvdLine = cleanLine;
+      }
+      else if(useLogic && std::regex_match(line, match, pReg)) {
+        std::string printedLine = line;        
+        int pos = printedLine.find("reg", 0);
+        printedLine.replace(pos, 3, "logic");
+        output << printedLine << std::endl;
+      }
+      else if(useLogic && std::regex_match(line, match, pWire)) {
+        std::string printedLine = line;
+        int pos = printedLine.find("wire", 0);
+        printedLine.replace(pos, 4, "logic");
+        output << printedLine << std::endl;
       }
       else if (noConcat) {
         if(!rsvdLine.empty()) output << rsvdLine << std::endl;
@@ -2436,7 +2444,7 @@ int taint_gen(std::string fileName, uint32_t stage, bool isTopIn, std::map<std::
     toCout("Clear Global data!");
     clean_global_data(totalRegCnt, nextSig);
     std::cout << "Begin cleaning!" << std::endl; //0
-    clean_file(fileName);
+    clean_file(fileName, false);
   }
   if (stage <= 1) {
     std::cout << "Remove functions!" << std::endl;
