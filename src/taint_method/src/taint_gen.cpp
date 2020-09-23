@@ -170,6 +170,7 @@ bool g_use_reset_taint = false;
 bool g_use_zy_count = false;
 bool g_use_reset_sig = false;
 bool g_remove_adff = false;
+bool g_use_value_change = true;
 // TODO: set this configurations!
 // // for func_extract, split long bitVec into multiple short ones
 bool g_split_long_num = false;
