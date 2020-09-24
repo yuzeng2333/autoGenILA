@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
   bool doProcessPathInfo;
   doProcessPathInfo = false;
   g_path = extract_path(fileName);
-  g_write_assert = true;
+  g_write_assert = false;
   // make gated_clk.txt file
   std::ofstream pathOutput(g_path+"/"+g_gatedClkFileName);
   pathOutput << "These are found potential gated clk, check it:" << std::endl;

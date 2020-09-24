@@ -1083,7 +1083,8 @@ void merge_taints(std::string fileName) {
       output << "  assign " + it->first + _r+" = ( ";
       for (uint32_t i = 0; i < it->second - 1; i++) {
         if(g_has_read_taint) {
-          output << it->first + _c + std::to_string(i) + " & ";
+          output << it->first + _x + std::to_string(i) + " & ";
+          //output << it->first + _c + std::to_string(i) + " & ";
           output << it->first + _r + std::to_string(i) + " ) | ( ";
         }
         else {
@@ -1091,7 +1092,8 @@ void merge_taints(std::string fileName) {
         }
       }
       if(g_has_read_taint) {      
-        output << it->first + _c + std::to_string(it->second - 1) + " & ";
+        output << it->first + _x + std::to_string(it->second - 1) + " & ";
+        //output << it->first + _c + std::to_string(it->second - 1) + " & ";
         output << it->first + _r + std::to_string(it->second - 1) + " );" << std::endl;
       }
       else {
