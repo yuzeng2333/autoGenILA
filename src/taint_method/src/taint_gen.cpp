@@ -170,7 +170,7 @@ bool g_use_reset_taint = false;
 bool g_use_zy_count = false;
 bool g_use_reset_sig = false;
 bool g_remove_adff = false;
-bool g_use_value_change = true;
+bool g_use_value_change = false;
 // TODO: set this configurations!
 // // for func_extract, split long bitVec into multiple short ones
 bool g_split_long_num = false;
@@ -1079,7 +1079,7 @@ void merge_taints(std::string fileName) {
       output << "    end" << std::endl;
       output << "  end" << std::endl;
     }
-    else {
+    else if(isTrueReg(it->first)) {
       output << "  assign " + it->first + _r+" = ( ";
       for (uint32_t i = 0; i < it->second - 1; i++) {
         if(g_has_read_taint) {

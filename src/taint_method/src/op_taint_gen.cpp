@@ -234,9 +234,9 @@ void wire_taint_gen(std::string line, std::ofstream &output) {
   moduleWires.insert(var);  
   //debug_line(line);  
   output << blank + "logic " + slice + var + _t+" ;" << std::endl;
-  output << blank + "logic " + slice + var + _r+" ;" << std::endl;
-  output << blank + "logic " + slice + var + _c+" ;" << std::endl;
-  output << blank + "logic " + slice + var + _x+" ;" << std::endl;
+  //output << blank + "logic " + slice + var + _r+" ;" << std::endl;
+  //output << blank + "logic " + slice + var + _c+" ;" << std::endl;
+  //output << blank + "logic " + slice + var + _x+" ;" << std::endl;
   // for wires named fangyuan, delay declaring it until assignment
   if(var.find("fangyuan") == std::string::npos && !g_use_value_change)
     output << blank + "logic [" + toStr(g_sig_width-1) + ":0] " + var + _sig + " ;" << std::endl;
