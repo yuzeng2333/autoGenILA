@@ -176,7 +176,7 @@ bool g_use_value_change = true;
 bool g_split_long_num = false;
 // if true, add (reg_PREV_VAL == rst_val) into assertion
 bool g_use_vcd_parser = false;
-bool g_write_assert = true; // for find written ASV
+bool g_write_assert = false; // for find written ASV
 bool g_double_assert = false; // to enable having PREV_VAL in assert
 // set the read flag only if reg's value is not reset value
 bool g_set_rflag_if_not_rst_val = true; 
@@ -1627,20 +1627,22 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     output << blank + "end" << std::endl;
 
     // print _sig function
-    uint32_t caseNum = 0;
-    output << blank + "always @( "+a+_sig+" or "+b+_sig+" or "+s+" ) begin" << std::endl;
-    output << blank + "  casez ("+sAndSlice+")" << std::endl;
-    for(auto localPair: caseAssignPairs) {
-      caseNum++;
-      split_slice(localPair.second, rhs, rhsSlice);
-      output << blank + "    " + localPair.first + " :" << std::endl;
-      output << blank + "      " + dest + _sig + " = " + rhs + _sig + " [" + toStr(caseNum*g_sig_width-1) + ":" + toStr(g_sig_width*(caseNum-1)) + "] == " + CONSTANT_SIG + " ? " + s + _sig + " : " + rhs + _sig + " [" + toStr(caseNum*g_sig_width-1) + ":" + toStr(g_sig_width*(caseNum-1)) + "] ;" << std::endl;
+    if(!g_use_value_change) {
+      uint32_t caseNum = 0;
+      output << blank + "always @( "+a+_sig+" or "+b+_sig+" or "+s+" ) begin" << std::endl;
+      output << blank + "  casez ("+sAndSlice+")" << std::endl;
+      for(auto localPair: caseAssignPairs) {
+        caseNum++;
+        split_slice(localPair.second, rhs, rhsSlice);
+        output << blank + "    " + localPair.first + " :" << std::endl;
+        output << blank + "      " + dest + _sig + " = " + rhs + _sig + " [" + toStr(caseNum*g_sig_width-1) + ":" + toStr(g_sig_width*(caseNum-1)) + "] == " + CONSTANT_SIG + " ? " + s + _sig + " : " + rhs + _sig + " [" + toStr(caseNum*g_sig_width-1) + ":" + toStr(g_sig_width*(caseNum-1)) + "] ;" << std::endl;
+      }
+      output << blank + "    default :" << std::endl;
+      output << blank + "      " + dest + _sig + " = " + a + _sig + " == " + CONSTANT_SIG + " ? " + s + _sig + " : " + a + _sig + " ;" << std::endl;
+      output << blank + "  endcase" << std::endl;
+      output << blank + "end" << std::endl;
+      checkCond(caseNum == fangyuanItemNum[rhs], "case number does not equal fangyuan item number!, var: "+rhs+" , caseNum:"+toStr(caseNum)+" , itemNum:"+toStr(fangyuanItemNum[rhs]));
     }
-    output << blank + "    default :" << std::endl;
-    output << blank + "      " + dest + _sig + " = " + a + _sig + " == " + CONSTANT_SIG + " ? " + s + _sig + " : " + a + _sig + " ;" << std::endl;
-    output << blank + "  endcase" << std::endl;
-    output << blank + "end" << std::endl;
-    checkCond(caseNum == fangyuanItemNum[rhs], "case number does not equal fangyuan item number!, var: "+rhs+" , caseNum:"+toStr(caseNum)+" , itemNum:"+toStr(fangyuanItemNum[rhs]));
 
     // print _r function
     if(sIsNew) {
@@ -1765,17 +1767,19 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     //ground(dest+_t, destBoundPair, destSlice, blank, output);
 
     // _sig
-    output << blank + "always @( "+a+_sig+" or "+s+" ) begin" << std::endl;
-    output << blank + "  casez ("+sAndSlice+")" << std::endl;
-    // only the last one matters
-    for(auto localPair: caseAssignPairs) {
-      output << blank + "    " + localPair.first + " :" << std::endl;
-      output << blank + "      " + dest+_sig+destSlice+" = "+CONSTANT_SIG+" ;" << std::endl;
+    if(!g_use_value_change) {
+      output << blank + "always @( "+a+_sig+" or "+s+" ) begin" << std::endl;
+      output << blank + "  casez ("+sAndSlice+")" << std::endl;
+      // only the last one matters
+      for(auto localPair: caseAssignPairs) {
+        output << blank + "    " + localPair.first + " :" << std::endl;
+        output << blank + "      " + dest+_sig+destSlice+" = "+CONSTANT_SIG+" ;" << std::endl;
+      }
+      output << blank + "    default:" << std::endl;
+      output << blank + "      " +  dest+_sig+destSlice+" = " + a + _sig+ " ;" << std::endl;
+      output << blank + "  endcase" << std::endl;
+      output << blank + "end" << std::endl;
     }
-    output << blank + "    default:" << std::endl;
-    output << blank + "      " +  dest+_sig+destSlice+" = " + a + _sig+ " ;" << std::endl;
-    output << blank + "  endcase" << std::endl;
-    output << blank + "end" << std::endl;
 
     // print _r function
     output << blank + "reg [" + sWidth + "-1:0] " + s + _r + sVer + " ;" << std::endl;
@@ -1837,19 +1841,21 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
 
 
     // _sig
-    uint32_t caseNum = 0;
-    output << blank + "always @( "+b+_sig+" or "+s+" ) begin" << std::endl;
-    output << blank + "  casez ("+sAndSlice+")" << std::endl;
-    for(auto localPair: caseAssignPairs) {
-      caseNum++;
-      split_slice(localPair.second, rhs, rhsSlice);
-      output << blank + "    " + localPair.first + " :" << std::endl;
-      output << blank + "      " + dest+_sig+" = " + rhs + _sig + " [" + toStr(caseNum*g_sig_width-1) + ":" + toStr(g_sig_width*(caseNum-1)) + "] ;" << std::endl;      
+    if(!g_use_value_change) {
+      uint32_t caseNum = 0;
+      output << blank + "always @( "+b+_sig+" or "+s+" ) begin" << std::endl;
+      output << blank + "  casez ("+sAndSlice+")" << std::endl;
+      for(auto localPair: caseAssignPairs) {
+        caseNum++;
+        split_slice(localPair.second, rhs, rhsSlice);
+        output << blank + "    " + localPair.first + " :" << std::endl;
+        output << blank + "      " + dest+_sig+" = " + rhs + _sig + " [" + toStr(caseNum*g_sig_width-1) + ":" + toStr(g_sig_width*(caseNum-1)) + "] ;" << std::endl;      
+      }
+      output << blank + "    default:" << std::endl;
+      output << blank + "      " + dest+_sig+" = "+CONSTANT_SIG+" ;" << std::endl;
+      output << blank + "  endcase" << std::endl;
+      output << blank + "end" << std::endl;
     }
-    output << blank + "    default:" << std::endl;
-    output << blank + "      " + dest+_sig+" = "+CONSTANT_SIG+" ;" << std::endl;
-    output << blank + "  endcase" << std::endl;
-    output << blank + "end" << std::endl;
 
     // print _r function
     output << blank + "reg [" + sWidth + "-1:0] " + s + _r + sVer + " ;" << std::endl;
@@ -1922,7 +1928,8 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     //ground(dest+_t, destBoundPair, destSlice, blank, output);
 
     // print _sig function
-    output << blank + "assign " + dest + _sig + " = "+CONSTANT_SIG+" ;" << std::endl;
+    if(!g_use_value_change)
+      output << blank + "assign " + dest + _sig + " = "+CONSTANT_SIG+" ;" << std::endl;
 
     // print _r function
     output << blank + "reg [" + sWidth + "-1:0] " + s + _r + sVer + " ;" << std::endl;
@@ -2134,25 +2141,28 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
       output << "    ." + inPort + _c + " ( " + get_lhs_ver_taint_list(port2SignalMap[inPort], _c, newLogic, localVerVec) + " )," << std::endl;
       newLogicVec.push_back(newLogic);
       // _sig
-      std::string varAndSlice = port2SignalMap[inPort];
-      std::string varConnect;
-      if(!isNum(varAndSlice)) {
-        varConnect = get_rhs_taint_list(varAndSlice, _sig, true);
-      }
-      else {
-        if( !std::regex_match(varAndSlice, m, pNum)) {
-          std::cout << "!! Error in matching number !!" << std::endl;
+      if(!g_use_value_change) {
+        std::string varAndSlice = port2SignalMap[inPort];
+        std::string varConnect;
+        if(!isNum(varAndSlice)) {
+          varConnect = get_rhs_taint_list(varAndSlice, _sig, true);
         }
-        std::string numWidth = m.str(1);
-        varConnect = numWidth + "'h0";
+        else {
+          if( !std::regex_match(varAndSlice, m, pNum)) {
+            std::cout << "!! Error in matching number !!" << std::endl;
+          }
+          std::string numWidth = m.str(1);
+          varConnect = numWidth + "'h0";
+        }
+        output << "    ." + inPort + _sig + " ( " + varConnect + " )," << std::endl;    
       }
-      output << "    ." + inPort + _sig + " ( " + varConnect + " )," << std::endl;    
     }
     else {  // if the connected signal is empty
       output << "    ." + inPort + _t + " ()," << std::endl; 
       output << "    ." + inPort + _r + " ()," << std::endl; 
       output << "    ." + inPort + _x + " ()," << std::endl; 
       output << "    ." + inPort + _c + " ()," << std::endl;
+      if(!g_use_value_change)
       output << "    ." + inPort + _sig + " ()," << std::endl;
     }
   }
@@ -2164,25 +2174,28 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
       output << "    ." + outPort + _x + "0 ( " + get_rhs_taint_list(port2SignalMap[outPort], _x) + " )," << std::endl; 
       output << "    ." + outPort + _c + "0 ( " + get_rhs_taint_list(port2SignalMap[outPort], _c) + " )," << std::endl;
       // _sig
-      std::string varAndSlice = port2SignalMap[outPort];
-      std::string varConnect;
-      if(!isNum(varAndSlice)) {
-        varConnect = get_rhs_taint_list(varAndSlice, _sig, true);
-      }
-      else {
-        if( !std::regex_match(varAndSlice, m, pNum )) {
-          std::cout << "!! Error in matching number !!" << std::endl;
+      if(!g_use_value_change) {
+        std::string varAndSlice = port2SignalMap[outPort];
+        std::string varConnect;
+        if(!isNum(varAndSlice)) {
+          varConnect = get_rhs_taint_list(varAndSlice, _sig, true);
         }
-        std::string numWidth = m.str(1);
-        varConnect = numWidth + "'h0";
+        else {
+          if( !std::regex_match(varAndSlice, m, pNum )) {
+            std::cout << "!! Error in matching number !!" << std::endl;
+          }
+          std::string numWidth = m.str(1);
+          varConnect = numWidth + "'h0";
+        }
+        output << "    ." + outPort + _sig + " ( " + varConnect + " )," << std::endl;
       }
-      output << "    ." + outPort + _sig + " ( " + varConnect + " )," << std::endl;
     }
     else {
       output << "    ." + outPort + _t + " ()," << std::endl; 
       output << "    ." + outPort + _r + "0 ()," << std::endl; 
       output << "    ." + outPort + _x + "0 ()," << std::endl; 
       output << "    ." + outPort + _c + "0 ()," << std::endl;
+      if(!g_use_value_change)
       output << "    ." + outPort + _sig + " ()," << std::endl;
     }
   }
