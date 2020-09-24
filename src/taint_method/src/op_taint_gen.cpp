@@ -82,7 +82,8 @@ void input_taint_gen(std::string line, std::ofstream &output) {
     }
   }
   moduleInputs.push_back(var);
-  extendInputs.push_back(var+_t);
+  if(var != g_recentClk)
+    extendInputs.push_back(var+_t);
   if(!isTop && !g_use_value_change)
     extendInputs.push_back(var+_sig);
   extendOutputs.push_back(var+_r);
@@ -91,7 +92,8 @@ void input_taint_gen(std::string line, std::ofstream &output) {
   //if (var.compare( clockName) == 0)
   //  return;
   //debug_line(line);
-  output << blank + "input " + slice + var + _t + " ;" << std::endl;
+  if(var != g_recentClk)  
+    output << blank + "input " + slice + var + _t + " ;" << std::endl;
   if(!g_use_value_change && isTop)
     output << blank + "wire [" + toStr(g_sig_width-1) + ":0] " + var + _sig + " ;" << std::endl;
   else if(!g_use_value_change)
