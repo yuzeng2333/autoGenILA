@@ -568,6 +568,7 @@ uint32_t get_var_slice_width(std::string varAndSlice) {
 std::string get_rhs_taint_list(std::vector<std::string> &updateVec, std::string taint, bool noSlice) {
   std::vector<std::string> taintVec;
   std::smatch m;
+  bool allSliceEmpty = true;
   for(std::string singleUpdate : updateVec) {
     if(!isNum(singleUpdate)) {
       std::string update, updateSlice;

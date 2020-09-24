@@ -1079,7 +1079,7 @@ void merge_taints(std::string fileName) {
       output << "    end" << std::endl;
       output << "  end" << std::endl;
     }
-    else if(isTrueReg(it->first)) {
+    else {
       output << "  assign " + it->first + _r+" = ( ";
       for (uint32_t i = 0; i < it->second - 1; i++) {
         if(g_has_read_taint) {
@@ -2147,14 +2147,19 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
         std::string varAndSlice = port2SignalMap[inPort];
         std::string varConnect;
         if(!isNum(varAndSlice)) {
-          varConnect = get_rhs_taint_list(varAndSlice, _sig, true);
+          std::vector<std::string> varVec;
+          parse_var_list(varAndSlice, varVec);
+          if(varVec.size() > 1)
+            varConnect = "0";
+          else
+            varConnect = get_rhs_taint_list(varAndSlice, _sig, true);
         }
         else {
           if( !std::regex_match(varAndSlice, m, pNum)) {
             std::cout << "!! Error in matching number !!" << std::endl;
           }
-          std::string numWidth = m.str(1);
-          varConnect = numWidth + "'h0";
+          //std::string numWidth = m.str(1);
+          varConnect = "0";
         }
         output << "    ." + inPort + _sig + " ( " + varConnect + " )," << std::endl;    
       }
@@ -2180,14 +2185,19 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
         std::string varAndSlice = port2SignalMap[outPort];
         std::string varConnect;
         if(!isNum(varAndSlice)) {
-          varConnect = get_rhs_taint_list(varAndSlice, _sig, true);
+          std::vector<std::string> varVec;
+          parse_var_list(varAndSlice, varVec);
+          if(varVec.size() > 1)
+            varConnect = "";
+          else
+            varConnect = get_rhs_taint_list(varAndSlice, _sig, true);
         }
         else {
           if( !std::regex_match(varAndSlice, m, pNum )) {
             std::cout << "!! Error in matching number !!" << std::endl;
           }
           std::string numWidth = m.str(1);
-          varConnect = numWidth + "'h0";
+          varConnect = "0";
         }
         output << "    ." + outPort + _sig + " ( " + varConnect + " )," << std::endl;
       }
