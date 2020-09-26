@@ -2158,8 +2158,8 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
           if( !std::regex_match(varAndSlice, m, pNum)) {
             std::cout << "!! Error in matching number !!" << std::endl;
           }
-          //std::string numWidth = m.str(1);
-          varConnect = "0";
+          std::string numWidth = toStr(g_sig_width);
+          varConnect = numWidth + "'h0";
         }
         output << "    ." + inPort + _sig + " ( " + varConnect + " )," << std::endl;    
       }
@@ -2196,8 +2196,8 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
           if( !std::regex_match(varAndSlice, m, pNum )) {
             std::cout << "!! Error in matching number !!" << std::endl;
           }
-          std::string numWidth = m.str(1);
-          varConnect = "0";
+          std::string numWidth = toStr(g_sig_width);
+          varConnect = numWidth + "'h0";
         }
         output << "    ." + outPort + _sig + " ( " + varConnect + " )," << std::endl;
       }
