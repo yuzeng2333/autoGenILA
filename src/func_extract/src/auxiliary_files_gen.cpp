@@ -175,7 +175,16 @@ void modify_wrapper_tcl(std::string wrapperFile, std::string tclFile) {
         wrapperOut << "assign __IEND"+toStr(idx)+"__ = (`false|| ( __CYCLE_CNT__ == "+toStr(delay)+")) && __STARTED__ && __RESETED__ && (~ __ENDED__) ;" << std::endl;
       }
     }
-
+    else if(line.find("else if (__ISSUE__) __START__ <= 1;") != std::string::npos) {
+      std::string endLine;
+      std::getline(wrapperIn, endLine);
+      wrapperOut << endLine << std::endl;
+      uint32_t encodingSize = g_currInstrInfo.instrEncoding.begin()->second.size();
+      for(uint32_t i = 1; i < encodingSize; i++) {
+        wrapperOut << "wire __START"+toStr(i)+"__;" << std::endl;
+        wrapperOut << "assign __START"+toStr(i)+"__ = __CYCLE_CNT__ == "+toStr(i)+";" << std::endl;
+      }
+    }
     if(line.find("assign") != std::string::npos && line.find("m1") != std::string::npos) {
       std::smatch m;
       if(!std::regex_search(line, m, pM)) {
@@ -195,7 +204,8 @@ void modify_wrapper_tcl(std::string wrapperFile, std::string tclFile) {
   //std::set<uint32_t> assumedIdx;
   //std::set<uint32_t> assertedIdx;
   uint32_t assumeNo = 1;
-  uint32_t assertNo = 0;  
+  uint32_t assertNo = 0;
+  uint32_t encodingSize = g_currInstrInfo.instrEncoding.begin()->second.size();
   while(std::getline(tclIn, line)) {
     //toCout(line);
     if(line.find("pseudo_vlg.v") != std::string::npos) {
@@ -215,7 +225,13 @@ void modify_wrapper_tcl(std::string wrapperFile, std::string tclFile) {
       std::string var = idx2varMap[idxNum];
       if( isInput(var) ) {
         tclOut << "assume -name variable_map_assume_"+toStr(assumeNo++)+" {(~ __START__ )|| (__m"+idx+"__)}" << std::endl;
+        if(encodingSize > 1) {
+          for(uint32_t i = 1; i < encodingSize; i++) {
+            tclOut << "assume -name variable_map_assume_"+toStr(assumeNo++)+" {(~ __START"+toStr(i)+"__ )|| (__m"+idx+"__)}" << std::endl;            
+          }
+        }
       }
+      // for submodule output (top-module input) they should be the same all the time
       else if(g_moduleOutportTime.find(var) != g_moduleOutportTime.end()) {
         tclOut << "assume -name variable_map_assume_"+toStr(assumeNo++)+" {(__m"+idx+"__)}" << std::endl;
       }
@@ -243,17 +259,19 @@ void modify_wrapper_tcl(std::string wrapperFile, std::string tclFile) {
 
   // add assum for instruction encodings
   std::string encodings = "";
-  for(auto it = g_instrInfo.back().instrEncoding.begin(); it != g_instrInfo.back().instrEncoding.end(); it++) {
-    if(it->second != "x")
-      encodings = encodings + it->first + " == " + it->second + " && ";
+  for(uint32_t i = 0; i < encodingSize; i++) {
+    for(auto it = g_instrInfo.back().instrEncoding.begin(); it != g_instrInfo.back().instrEncoding.end(); it++) {
+      if(it->second[i] != "x")
+        encodings = encodings + it->first + " == " + it->second[i] + " && ";
+    }
+    if(encodings.length() > 4) {
+      encodings.pop_back();
+      encodings.pop_back();
+      encodings.pop_back();
+    }
+    if(!encodings.empty())
+      tclOut << "assume -name instr_encoding { (~ __START__) || ( "+encodings+" ) }" << std::endl;
   }
-  if(encodings.length() > 4) {
-    encodings.pop_back();
-    encodings.pop_back();
-    encodings.pop_back();
-  }
-  if(!encodings.empty())
-    tclOut << "assume -name instr_encoding { (~ __START__) || ( "+encodings+" ) }" << std::endl;
   tclIn.close();
   tclOut.close();
 

@@ -161,6 +161,33 @@ src/ast.cpp.s:
 	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/ast.cpp.s
 .PHONY : src/ast.cpp.s
 
+src/auxiliary_files_gen.o: src/auxiliary_files_gen.cpp.o
+
+.PHONY : src/auxiliary_files_gen.o
+
+# target to build an object file
+src/auxiliary_files_gen.cpp.o:
+	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/auxiliary_files_gen.cpp.o
+.PHONY : src/auxiliary_files_gen.cpp.o
+
+src/auxiliary_files_gen.i: src/auxiliary_files_gen.cpp.i
+
+.PHONY : src/auxiliary_files_gen.i
+
+# target to preprocess a source file
+src/auxiliary_files_gen.cpp.i:
+	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/auxiliary_files_gen.cpp.i
+.PHONY : src/auxiliary_files_gen.cpp.i
+
+src/auxiliary_files_gen.s: src/auxiliary_files_gen.cpp.s
+
+.PHONY : src/auxiliary_files_gen.s
+
+# target to generate assembly for a file
+src/auxiliary_files_gen.cpp.s:
+	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/auxiliary_files_gen.cpp.s
+.PHONY : src/auxiliary_files_gen.cpp.s
+
 src/check_regs.o: src/check_regs.cpp.o
 
 .PHONY : src/check_regs.o
@@ -350,6 +377,33 @@ src/main.cpp.s:
 	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
+src/make_define_fun.o: src/make_define_fun.cpp.o
+
+.PHONY : src/make_define_fun.o
+
+# target to build an object file
+src/make_define_fun.cpp.o:
+	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/make_define_fun.cpp.o
+.PHONY : src/make_define_fun.cpp.o
+
+src/make_define_fun.i: src/make_define_fun.cpp.i
+
+.PHONY : src/make_define_fun.i
+
+# target to preprocess a source file
+src/make_define_fun.cpp.i:
+	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/make_define_fun.cpp.i
+.PHONY : src/make_define_fun.cpp.i
+
+src/make_define_fun.s: src/make_define_fun.cpp.s
+
+.PHONY : src/make_define_fun.s
+
+# target to generate assembly for a file
+src/make_define_fun.cpp.s:
+	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/make_define_fun.cpp.s
+.PHONY : src/make_define_fun.cpp.s
+
 src/op_constraint.o: src/op_constraint.cpp.o
 
 .PHONY : src/op_constraint.o
@@ -498,6 +552,9 @@ help:
 	@echo "... src/ast.o"
 	@echo "... src/ast.i"
 	@echo "... src/ast.s"
+	@echo "... src/auxiliary_files_gen.o"
+	@echo "... src/auxiliary_files_gen.i"
+	@echo "... src/auxiliary_files_gen.s"
 	@echo "... src/check_regs.o"
 	@echo "... src/check_regs.i"
 	@echo "... src/check_regs.s"
@@ -519,6 +576,9 @@ help:
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/make_define_fun.o"
+	@echo "... src/make_define_fun.i"
+	@echo "... src/make_define_fun.s"
 	@echo "... src/op_constraint.o"
 	@echo "... src/op_constraint.i"
 	@echo "... src/op_constraint.s"

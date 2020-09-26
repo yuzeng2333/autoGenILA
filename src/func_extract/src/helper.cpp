@@ -110,7 +110,6 @@ std::string pure(std::string var) {
   if(var.find("_#") == std::string::npos)
     return var;
   size_t pos = var.find_last_of("#");
-  uint32_t len = var.length();
   return var.substr(0, pos-3);
 }
 
@@ -135,13 +134,16 @@ bool is_read_asv(std::string var) {
 }
 
 
+// FIXME: not sure if this is true for multi-cycle word
 bool has_explicit_value(std::string input) {
+  uint32_t encodingSize = g_currInstrInfo.instrEncoding.begin()->second.size();
   if(g_currInstrInfo.instrEncoding.find(input) == g_currInstrInfo.instrEncoding.end())
     return false;
-  if(g_currInstrInfo.instrEncoding[input] == "x" )
-    return false;
-  else
-    return true;
+  for(auto it = g_currInstrInfo.instrEncoding[input].begin(); it != g_currInstrInfo.instrEncoding[input].end(); it++) {
+    if(*it != "x")
+      return true;
+  }
+  return false;
 }
 
 

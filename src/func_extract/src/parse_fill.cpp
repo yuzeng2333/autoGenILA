@@ -77,9 +77,16 @@ void clear_global_vars() {
 void parse_verilog(std::string fileName) {
   toCout("### Begin parse_verilog");
   std::ifstream input(fileName);
+  if(!input.is_open()) {
+    toCout("Error: the file cannot be open: "+fileName);
+    abort();
+  }
   std::string line;
   std::smatch match;
   while( std::getline(input, line) ) {
+    if(line.find("state_out") != std::string::npos) {
+      toCout("Found it");
+    }
     if( line.find("module") != std::string::npos ) {
       std::regex_match(line, match, pModule);
       moduleName = match.str(1);
@@ -170,8 +177,10 @@ void read_in_instructions(std::string fileName) {
   }
   std::string line;
   std::smatch m;
-  enum State {FirstInstr, OtherInstr, WriteASV, ReadASV, ReadNOP, ResetVal};
+  enum State {FirstSignal, OtherSignal, WriteASV, ReadASV, ReadNOP, ResetVal};
   enum State state;
+  bool firstWord = true;
+  bool firstSignalSeen = false;
   while(std::getline(input, line)) {
     if(line.substr(0, 4) == "#CLK") {
       std::string clk = line.substr(5);
@@ -192,7 +201,14 @@ void read_in_instructions(std::string fileName) {
         toCout("Error: parse instr.txt failed! # is not followed by intruction ID: "+line);
         abort();
       }
-      state = FirstInstr;
+      state = FirstSignal;
+    }
+    else if(line.front() == '(') {
+      if(!is_number(line.substr(1, line.length()-2))) {
+        toCout("Error: parse instr.txt failed! # is not followed by intruction ID: "+line);
+        abort();
+      }
+      state = FirstSignal;
     }
     else if(line == "W:") {
       state = WriteASV;
@@ -208,31 +224,41 @@ void read_in_instructions(std::string fileName) {
     }
     else { // still the old instruction
       switch(state) {
-        case FirstInstr:
+        case FirstSignal:
           {
+            if(firstSignalSeen)
+              firstWord = false;
             auto pos = line.find("=");
-            std::string instrName = line.substr(0, pos-1);
+            std::string signalName = line.substr(0, pos-1);
             std::string encoding = line.substr(pos+2);
-            if(encoding != "x" && !is_number(encoding)) {
+            if(encoding != "x" && !is_number(encoding) && encoding != "DIRTY") {
               toCout("Encoding is not x or number[1], line is: "+line);
               abort();
             }
-            struct instrInfo info = { {{instrName, encoding}}, std::set<std::string>{}, std::set<std::pair<uint32_t, std::string>>{}, std::set<std::string>{} };
-            //info.instrEncoding.emplace(instrName, encoding);
-            g_instrInfo.push_back(info);
-            state = OtherInstr;
+            if(firstWord) {
+              struct instrInfo info = { {{signalName, std::vector<std::string>{encoding}}}, std::set<std::string>{}, std::set<std::pair<uint32_t, std::string>>{}, std::set<std::string>{} };
+              //info.instrEncoding.emplace(signalName, encoding);
+              g_instrInfo.push_back(info);
+            }
+            else
+              g_instrInfo.back().instrEncoding[signalName].push_back(encoding);
+            state = OtherSignal;
+            firstSignalSeen = true;
           }
           break;
-        case OtherInstr:
+        case OtherSignal:
           {
             auto pos = line.find("=");
-            std::string instrName = line.substr(0, pos-1);
+            std::string signalName = line.substr(0, pos-1);
             std::string encoding = line.substr(pos+2);
-            if(encoding != "x" && !is_number(encoding)) {
+            if(encoding != "x" && !is_number(encoding) && encoding != "DIRTY") {
               toCout("Encoding is not x or number[2], line is: "+line);
               abort();
             }
-            g_instrInfo.back().instrEncoding.emplace(instrName, encoding);
+            if(firstWord)
+              g_instrInfo.back().instrEncoding.emplace(signalName, std::vector<std::string>{encoding});
+            else
+              g_instrInfo.back().instrEncoding[signalName].push_back(encoding);
           }
           break;
         case WriteASV:
@@ -271,26 +297,26 @@ void read_in_instructions(std::string fileName) {
         case ReadNOP:
           {
             auto pos = line.find("=");
-            std::string instrName = line.substr(0, pos-1);
+            std::string signalName = line.substr(0, pos-1);
             std::string encoding = line.substr(pos+2);
             if(encoding != "x" && !is_number(encoding)) {
               toCout("Encoding is not x or number[3], line is: "+line);
               abort();
             }
-            if(encoding == "x") toCout("Warning: find value X in NOP: "+instrName);
-            g_nopInstr.emplace(instrName, encoding);
+            if(encoding == "x") toCout("Warning: find value X in NOP: "+signalName);
+            g_nopInstr.emplace(signalName, encoding);
           }
           break;
         case ResetVal:
           {
             auto pos = line.find("=");
-            std::string instrName = line.substr(0, pos-1);
+            std::string signalName = line.substr(0, pos-1);
             std::string encoding = line.substr(pos+2);
             if(encoding != "x" && !is_number(encoding)) {
               toCout("Encoding is not x or number[4], line is: "+line);
               abort();
             }
-            g_rstVal.emplace(instrName, encoding);         
+            g_rstVal.emplace(signalName, encoding);         
           }
       }
     }

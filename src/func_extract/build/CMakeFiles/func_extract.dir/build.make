@@ -70,9 +70,22 @@ CMakeFiles/func_extract.dir/src/ast.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/func_extract.dir/src/ast.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /workspace/research/ILA/autoGenILA/src/func_extract/src/ast.cpp -o CMakeFiles/func_extract.dir/src/ast.cpp.s
 
+CMakeFiles/func_extract.dir/src/auxiliary_files_gen.cpp.o: CMakeFiles/func_extract.dir/flags.make
+CMakeFiles/func_extract.dir/src/auxiliary_files_gen.cpp.o: ../src/auxiliary_files_gen.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/func_extract/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/func_extract.dir/src/auxiliary_files_gen.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/func_extract.dir/src/auxiliary_files_gen.cpp.o -c /workspace/research/ILA/autoGenILA/src/func_extract/src/auxiliary_files_gen.cpp
+
+CMakeFiles/func_extract.dir/src/auxiliary_files_gen.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/func_extract.dir/src/auxiliary_files_gen.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /workspace/research/ILA/autoGenILA/src/func_extract/src/auxiliary_files_gen.cpp > CMakeFiles/func_extract.dir/src/auxiliary_files_gen.cpp.i
+
+CMakeFiles/func_extract.dir/src/auxiliary_files_gen.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/func_extract.dir/src/auxiliary_files_gen.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /workspace/research/ILA/autoGenILA/src/func_extract/src/auxiliary_files_gen.cpp -o CMakeFiles/func_extract.dir/src/auxiliary_files_gen.cpp.s
+
 CMakeFiles/func_extract.dir/src/check_regs.cpp.o: CMakeFiles/func_extract.dir/flags.make
 CMakeFiles/func_extract.dir/src/check_regs.cpp.o: ../src/check_regs.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/func_extract/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/func_extract.dir/src/check_regs.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/func_extract/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/func_extract.dir/src/check_regs.cpp.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/func_extract.dir/src/check_regs.cpp.o -c /workspace/research/ILA/autoGenILA/src/func_extract/src/check_regs.cpp
 
 CMakeFiles/func_extract.dir/src/check_regs.cpp.i: cmake_force
@@ -85,7 +98,7 @@ CMakeFiles/func_extract.dir/src/check_regs.cpp.s: cmake_force
 
 CMakeFiles/func_extract.dir/src/clean_goal.cpp.o: CMakeFiles/func_extract.dir/flags.make
 CMakeFiles/func_extract.dir/src/clean_goal.cpp.o: ../src/clean_goal.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/func_extract/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/func_extract.dir/src/clean_goal.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/func_extract/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/func_extract.dir/src/clean_goal.cpp.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/func_extract.dir/src/clean_goal.cpp.o -c /workspace/research/ILA/autoGenILA/src/func_extract/src/clean_goal.cpp
 
 CMakeFiles/func_extract.dir/src/clean_goal.cpp.i: cmake_force
@@ -98,7 +111,7 @@ CMakeFiles/func_extract.dir/src/clean_goal.cpp.s: cmake_force
 
 CMakeFiles/func_extract.dir/src/clean_verilog.cpp.o: CMakeFiles/func_extract.dir/flags.make
 CMakeFiles/func_extract.dir/src/clean_verilog.cpp.o: ../src/clean_verilog.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/func_extract/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/func_extract.dir/src/clean_verilog.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/func_extract/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/func_extract.dir/src/clean_verilog.cpp.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/func_extract.dir/src/clean_verilog.cpp.o -c /workspace/research/ILA/autoGenILA/src/func_extract/src/clean_verilog.cpp
 
 CMakeFiles/func_extract.dir/src/clean_verilog.cpp.i: cmake_force
@@ -111,7 +124,7 @@ CMakeFiles/func_extract.dir/src/clean_verilog.cpp.s: cmake_force
 
 CMakeFiles/func_extract.dir/src/expr.cpp.o: CMakeFiles/func_extract.dir/flags.make
 CMakeFiles/func_extract.dir/src/expr.cpp.o: ../src/expr.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/func_extract/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/func_extract.dir/src/expr.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/func_extract/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/func_extract.dir/src/expr.cpp.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/func_extract.dir/src/expr.cpp.o -c /workspace/research/ILA/autoGenILA/src/func_extract/src/expr.cpp
 
 CMakeFiles/func_extract.dir/src/expr.cpp.i: cmake_force
@@ -124,7 +137,7 @@ CMakeFiles/func_extract.dir/src/expr.cpp.s: cmake_force
 
 CMakeFiles/func_extract.dir/src/helper.cpp.o: CMakeFiles/func_extract.dir/flags.make
 CMakeFiles/func_extract.dir/src/helper.cpp.o: ../src/helper.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/func_extract/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/func_extract.dir/src/helper.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/func_extract/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/func_extract.dir/src/helper.cpp.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/func_extract.dir/src/helper.cpp.o -c /workspace/research/ILA/autoGenILA/src/func_extract/src/helper.cpp
 
 CMakeFiles/func_extract.dir/src/helper.cpp.i: cmake_force
@@ -137,7 +150,7 @@ CMakeFiles/func_extract.dir/src/helper.cpp.s: cmake_force
 
 CMakeFiles/func_extract.dir/src/inv_gen.cpp.o: CMakeFiles/func_extract.dir/flags.make
 CMakeFiles/func_extract.dir/src/inv_gen.cpp.o: ../src/inv_gen.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/func_extract/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/func_extract.dir/src/inv_gen.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/func_extract/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/func_extract.dir/src/inv_gen.cpp.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/func_extract.dir/src/inv_gen.cpp.o -c /workspace/research/ILA/autoGenILA/src/func_extract/src/inv_gen.cpp
 
 CMakeFiles/func_extract.dir/src/inv_gen.cpp.i: cmake_force
@@ -150,7 +163,7 @@ CMakeFiles/func_extract.dir/src/inv_gen.cpp.s: cmake_force
 
 CMakeFiles/func_extract.dir/src/main.cpp.o: CMakeFiles/func_extract.dir/flags.make
 CMakeFiles/func_extract.dir/src/main.cpp.o: ../src/main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/func_extract/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/func_extract.dir/src/main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/func_extract/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/func_extract.dir/src/main.cpp.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/func_extract.dir/src/main.cpp.o -c /workspace/research/ILA/autoGenILA/src/func_extract/src/main.cpp
 
 CMakeFiles/func_extract.dir/src/main.cpp.i: cmake_force
@@ -161,9 +174,22 @@ CMakeFiles/func_extract.dir/src/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/func_extract.dir/src/main.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /workspace/research/ILA/autoGenILA/src/func_extract/src/main.cpp -o CMakeFiles/func_extract.dir/src/main.cpp.s
 
+CMakeFiles/func_extract.dir/src/make_define_fun.cpp.o: CMakeFiles/func_extract.dir/flags.make
+CMakeFiles/func_extract.dir/src/make_define_fun.cpp.o: ../src/make_define_fun.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/func_extract/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/func_extract.dir/src/make_define_fun.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/func_extract.dir/src/make_define_fun.cpp.o -c /workspace/research/ILA/autoGenILA/src/func_extract/src/make_define_fun.cpp
+
+CMakeFiles/func_extract.dir/src/make_define_fun.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/func_extract.dir/src/make_define_fun.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /workspace/research/ILA/autoGenILA/src/func_extract/src/make_define_fun.cpp > CMakeFiles/func_extract.dir/src/make_define_fun.cpp.i
+
+CMakeFiles/func_extract.dir/src/make_define_fun.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/func_extract.dir/src/make_define_fun.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /workspace/research/ILA/autoGenILA/src/func_extract/src/make_define_fun.cpp -o CMakeFiles/func_extract.dir/src/make_define_fun.cpp.s
+
 CMakeFiles/func_extract.dir/src/op_constraint.cpp.o: CMakeFiles/func_extract.dir/flags.make
 CMakeFiles/func_extract.dir/src/op_constraint.cpp.o: ../src/op_constraint.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/func_extract/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/func_extract.dir/src/op_constraint.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/func_extract/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/func_extract.dir/src/op_constraint.cpp.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/func_extract.dir/src/op_constraint.cpp.o -c /workspace/research/ILA/autoGenILA/src/func_extract/src/op_constraint.cpp
 
 CMakeFiles/func_extract.dir/src/op_constraint.cpp.i: cmake_force
@@ -176,7 +202,7 @@ CMakeFiles/func_extract.dir/src/op_constraint.cpp.s: cmake_force
 
 CMakeFiles/func_extract.dir/src/parse_fill.cpp.o: CMakeFiles/func_extract.dir/flags.make
 CMakeFiles/func_extract.dir/src/parse_fill.cpp.o: ../src/parse_fill.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/func_extract/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/func_extract.dir/src/parse_fill.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/func_extract/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/func_extract.dir/src/parse_fill.cpp.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/func_extract.dir/src/parse_fill.cpp.o -c /workspace/research/ILA/autoGenILA/src/func_extract/src/parse_fill.cpp
 
 CMakeFiles/func_extract.dir/src/parse_fill.cpp.i: cmake_force
@@ -189,7 +215,7 @@ CMakeFiles/func_extract.dir/src/parse_fill.cpp.s: cmake_force
 
 CMakeFiles/func_extract.dir/src/pseudo_vlg_gen.cpp.o: CMakeFiles/func_extract.dir/flags.make
 CMakeFiles/func_extract.dir/src/pseudo_vlg_gen.cpp.o: ../src/pseudo_vlg_gen.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/func_extract/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/func_extract.dir/src/pseudo_vlg_gen.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/func_extract/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/func_extract.dir/src/pseudo_vlg_gen.cpp.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/func_extract.dir/src/pseudo_vlg_gen.cpp.o -c /workspace/research/ILA/autoGenILA/src/func_extract/src/pseudo_vlg_gen.cpp
 
 CMakeFiles/func_extract.dir/src/pseudo_vlg_gen.cpp.i: cmake_force
@@ -202,7 +228,7 @@ CMakeFiles/func_extract.dir/src/pseudo_vlg_gen.cpp.s: cmake_force
 
 CMakeFiles/func_extract.dir/src/trial.cpp.o: CMakeFiles/func_extract.dir/flags.make
 CMakeFiles/func_extract.dir/src/trial.cpp.o: ../src/trial.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/func_extract/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/func_extract.dir/src/trial.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/func_extract/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/func_extract.dir/src/trial.cpp.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/func_extract.dir/src/trial.cpp.o -c /workspace/research/ILA/autoGenILA/src/func_extract/src/trial.cpp
 
 CMakeFiles/func_extract.dir/src/trial.cpp.i: cmake_force
@@ -215,7 +241,7 @@ CMakeFiles/func_extract.dir/src/trial.cpp.s: cmake_force
 
 CMakeFiles/func_extract.dir/src/vcd_parser.cpp.o: CMakeFiles/func_extract.dir/flags.make
 CMakeFiles/func_extract.dir/src/vcd_parser.cpp.o: ../src/vcd_parser.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/func_extract/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/func_extract.dir/src/vcd_parser.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/func_extract/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/func_extract.dir/src/vcd_parser.cpp.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/func_extract.dir/src/vcd_parser.cpp.o -c /workspace/research/ILA/autoGenILA/src/func_extract/src/vcd_parser.cpp
 
 CMakeFiles/func_extract.dir/src/vcd_parser.cpp.i: cmake_force
@@ -229,6 +255,7 @@ CMakeFiles/func_extract.dir/src/vcd_parser.cpp.s: cmake_force
 # Object files for target func_extract
 func_extract_OBJECTS = \
 "CMakeFiles/func_extract.dir/src/ast.cpp.o" \
+"CMakeFiles/func_extract.dir/src/auxiliary_files_gen.cpp.o" \
 "CMakeFiles/func_extract.dir/src/check_regs.cpp.o" \
 "CMakeFiles/func_extract.dir/src/clean_goal.cpp.o" \
 "CMakeFiles/func_extract.dir/src/clean_verilog.cpp.o" \
@@ -236,6 +263,7 @@ func_extract_OBJECTS = \
 "CMakeFiles/func_extract.dir/src/helper.cpp.o" \
 "CMakeFiles/func_extract.dir/src/inv_gen.cpp.o" \
 "CMakeFiles/func_extract.dir/src/main.cpp.o" \
+"CMakeFiles/func_extract.dir/src/make_define_fun.cpp.o" \
 "CMakeFiles/func_extract.dir/src/op_constraint.cpp.o" \
 "CMakeFiles/func_extract.dir/src/parse_fill.cpp.o" \
 "CMakeFiles/func_extract.dir/src/pseudo_vlg_gen.cpp.o" \
@@ -246,6 +274,7 @@ func_extract_OBJECTS = \
 func_extract_EXTERNAL_OBJECTS =
 
 func_extract: CMakeFiles/func_extract.dir/src/ast.cpp.o
+func_extract: CMakeFiles/func_extract.dir/src/auxiliary_files_gen.cpp.o
 func_extract: CMakeFiles/func_extract.dir/src/check_regs.cpp.o
 func_extract: CMakeFiles/func_extract.dir/src/clean_goal.cpp.o
 func_extract: CMakeFiles/func_extract.dir/src/clean_verilog.cpp.o
@@ -253,6 +282,7 @@ func_extract: CMakeFiles/func_extract.dir/src/expr.cpp.o
 func_extract: CMakeFiles/func_extract.dir/src/helper.cpp.o
 func_extract: CMakeFiles/func_extract.dir/src/inv_gen.cpp.o
 func_extract: CMakeFiles/func_extract.dir/src/main.cpp.o
+func_extract: CMakeFiles/func_extract.dir/src/make_define_fun.cpp.o
 func_extract: CMakeFiles/func_extract.dir/src/op_constraint.cpp.o
 func_extract: CMakeFiles/func_extract.dir/src/parse_fill.cpp.o
 func_extract: CMakeFiles/func_extract.dir/src/pseudo_vlg_gen.cpp.o
@@ -260,7 +290,7 @@ func_extract: CMakeFiles/func_extract.dir/src/trial.cpp.o
 func_extract: CMakeFiles/func_extract.dir/src/vcd_parser.cpp.o
 func_extract: CMakeFiles/func_extract.dir/build.make
 func_extract: CMakeFiles/func_extract.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/workspace/research/ILA/autoGenILA/src/func_extract/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Linking CXX executable func_extract"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/workspace/research/ILA/autoGenILA/src/func_extract/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Linking CXX executable func_extract"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/func_extract.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

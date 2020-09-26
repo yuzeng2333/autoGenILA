@@ -1,0 +1,5 @@
+read_verilog -sv design.v
+
+prep -top expand_key_128
+
+sim -clock clk -rstlen 20 -zinit -vcd rst.vcd

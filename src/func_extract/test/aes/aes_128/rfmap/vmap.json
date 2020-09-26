@@ -1,0 +1,48 @@
+{
+  "models": { "ILA":"m0", "VERILOG": "m1" },
+  "state mapping": {
+      "key": "key",
+      "state": "state",
+      "k9b": "k9b",
+      "s9": "s9",
+      "k8b": "k8b",
+      "s8": "s8",
+      "k7b": "k7b",
+      "s7": "s7",
+      "k6b": "k6b",
+      "s6": "s6",
+      "k2": "k2",
+      "k4": "k4",
+      "k3": "k3",
+      "k1": "k1",
+      "k0": "k0",
+      "k8": "k8",
+      "k9": "k9",
+      "k7": "k7",
+      "k3b": "k3b",
+      "s3": "s3",
+      "k6": "k6",
+      "k5b": "k5b",
+      "s5": "s5",
+      "k5": "k5",
+      "k4b": "k4b",
+      "s4": "s4",
+      "k1b": "k1b",
+      "s1": "s1",
+      "k0b": "k0b",
+      "s0": "s0",
+      "k2b": "k2b",
+      "s2": "s2",
+      "out": "out",
+      "out": "out"
+    },
+
+  "interface mapping": {
+      "key":"**KEEP**",
+      "state":"**KEEP**",
+      "out":"**SO**",
+      "clk":"**CLOCK**"
+  },
+  "mapping control": [
+   ]
+}

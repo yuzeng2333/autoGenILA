@@ -304,14 +304,16 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint
 
       // if input's value is x, fix it to x
       // fix value for readASV
+      uint32_t encodingSize = g_currInstrInfo.instrEncoding.begin()->second.size();
       for(uint32_t i = 0; i < m.size(); i++) {
         func_decl v = m[i];
         std::string vName = v.name().str();
         std::string pureVName = pure(vName);
         uint32_t localTimeIdx = get_time(vName);
-        if(localTimeIdx == bound + 1) {
+        if(localTimeIdx >= bound + 2 - encodingSize) {
+          uint32_t idx = bound+1-localTimeIdx;
           if( g_currInstrInfo.instrEncoding.find(pureVName) != g_currInstrInfo.instrEncoding.end() ) {
-            if(g_currInstrInfo.instrEncoding[pureVName] == "x") {
+            if(g_currInstrInfo.instrEncoding[pureVName][idx] == "x") {
               toCoutVerb("Fix value for "+vName);
               s.add( v() == m.get_const_interp(v) );
             }
@@ -619,17 +621,20 @@ void add_all_dirty_constraints(context &c, solver &s, uint32_t bound) {
 // values in other cycles should all be NOP instructions
 void add_input_values(context &c, solver &s, uint32_t bound) {
   toCout("-------- Begin add input vals ----------");
+  uint32_t encodingSize = g_currInstrInfo.instrEncoding.begin()->second.size();
   for(auto pair: g_currInstrInfo.instrEncoding) {
-    expr singleInput = var_expr(pair.first, bound+1, c, false);
-    uint32_t width = get_var_slice_width(pair.first);
-    expr localVal(c);
-    if(pair.second == "x")
-      localVal = var_expr("1'd0", bound+1, c, false, width);
-    else
-      localVal = var_expr(pair.second, bound+1, c, false, width);
-    s.add( singleInput == localVal );
-    toCoutVerb("Assign "+pair.second+" to "+timed_name(pair.first, bound+1));
-    // input in later cycles should be filled with NOP
+    for(uint32_t i = 0; i < encodingSize; i++) {
+      expr singleInput = var_expr(pair.first, bound+1-i, c, false);
+      uint32_t width = get_var_slice_width(pair.first);
+      expr localVal(c);
+      if(pair.second[i] == "x")
+        localVal = var_expr("1'd0", bound+1-i, c, false, width);
+      else
+        localVal = var_expr(pair.second[i], bound+1-i, c, false, width);
+      s.add( singleInput == localVal );
+      toCoutVerb("Assign "+pair.second[i]+" to "+timed_name(pair.first, bound+1-i));
+      // input in later cycles should be filled with NOP
+    }
   }
 }
 

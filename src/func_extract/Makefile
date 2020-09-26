@@ -54,3 +54,9 @@ wm:
 
 wm1:
 	./build/func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/word_adder_modular 1
+
+or:
+	./build/func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/one_round 0
+
+or1:
+	./build/func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/one_round 1

@@ -1,0 +1,2 @@
+(define-fun INV ( (|result| (_ BitVec 9))  ) (_ BitVec 9)
+  (bvadd #b000000000 |result|))

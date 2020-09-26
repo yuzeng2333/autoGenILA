@@ -136,18 +136,35 @@ expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver 
         return retExpr;
       } // else, retuen destExpr instead
     }
-    else if(timeIdx == bound+1){
+    else if(timeIdx >= bound+2-g_currInstrInfo.instrEncoding.begin()->second.size()) {
       if(g_currInstrInfo.instrEncoding.find(dest) == g_currInstrInfo.instrEncoding.end()) {
         toCout("Error: input signal not found for current instruction: "+dest);
         abort();
       }
-      std::string localVal = g_currInstrInfo.instrEncoding[dest];
+      uint32_t wordIdx = bound+1-timeIdx;
+      std::string localVal = g_currInstrInfo.instrEncoding[dest][wordIdx];
       uint32_t localWidth = get_var_slice_width(dest);
-      if(localVal != "x") {
+      if(localVal != "x" && localVal != "DIRTY") {
         assert(is_number(localVal));
         toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%B Give "+localVal+" to "+timed_name(dest, timeIdx));
         g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
         return c.bv_val(hdb2int(localVal), localWidth);
+      }
+      // FIXME: not sure if this is the best way
+      else if(localVal == "DIRTY") {
+        if(g_nopInstr.find(dest) == g_nopInstr.end()) {
+          toCout("!!!!!!!!!! Error: var not found for nop instruction: "+dest);
+          abort();
+          //return destExpr;
+        }
+        std::string localVal = g_nopInstr[dest];
+        uint32_t localWidth = get_var_slice_width(dest);
+        if(localVal != "x") {
+          assert(is_number(localVal));
+          toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give "+localVal+" to "+timed_name(dest, timeIdx));
+          g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
+          return c.bv_val(hdb2int(localVal), localWidth);
+        }
       }
     }
     else if(!g_nopInstr.empty()){ // give the value in nop instruction

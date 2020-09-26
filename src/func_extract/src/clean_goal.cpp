@@ -44,38 +44,38 @@ void clean_goal_file(std::string fileName, std::string outFileName) {
     }
     output << line << std::endl;
 
-    if(line.front() == ')') {
-      std::string instrEncodings = get_encodings(g_instrInfo[instrIdx-1].instrEncoding);
-      if(instrEncodings.empty())
-        continue;
-      std::string nopEncodings = get_encodings(g_nopInstr);
-      //uint32_t writeDelay = get_write_delay(g_instrInfo[instrIdx-1].writeASV, writeASV);
-      //output << "assume -name zy_assume"+toStr(assumIdx++)+" {__START__ == 1 |-> ("+instrEncodings+" ##1 ( "+nopEncodings+" )[*"+toStr(writeDelay+1)+"] ) }" << std::endl;
-    }
+    //if(line.front() == ')') {
+    //  auto instrEncodings = get_encodings(g_instrInfo[instrIdx-1].instrEncoding);
+    //  if(instrEncodings.empty())
+    //    continue;
+    //  std::string nopEncodings = get_encodings(g_nopInstr);
+    //  //uint32_t writeDelay = get_write_delay(g_instrInfo[instrIdx-1].writeASV, writeASV);
+    //  //output << "assume -name zy_assume"+toStr(assumIdx++)+" {__START__ == 1 |-> ("+instrEncodings+" ##1 ( "+nopEncodings+" )[*"+toStr(writeDelay+1)+"] ) }" << std::endl;
+    //}
   }
   input.close();
   output.close();
 }
 
 
-std::string get_encodings( const std::unordered_map<std::string, std::string> &instrEncoding ) {
-  if(instrEncoding.empty()) {
-    toCout("Error: instrEncoding is empty!");
-    abort();
-  }
-  std::string ret;
-  for(auto it = instrEncoding.begin(); it != instrEncoding.end(); it++) {
-    if(it->second == "x")
-      continue;
-    ret += it->first + " == " + it->second + " && ";
-  }
-  if(ret.length() > 3) {
-    ret.pop_back();
-    ret.pop_back();
-    ret.pop_back();
-  }
-  return ret;
-}
+//std::string get_encodings( const std::unordered_map<std::string, std::string> &instrEncoding ) {
+//  if(instrEncoding.empty()) {
+//    toCout("Error: instrEncoding is empty!");
+//    abort();
+//  }
+//  std::string ret;
+//  for(auto it = instrEncoding.begin(); it != instrEncoding.end(); it++) {
+//    if(it->second == "x")
+//      continue;
+//    ret += it->first + " == " + it->second + " && ";
+//  }
+//  if(ret.length() > 3) {
+//    ret.pop_back();
+//    ret.pop_back();
+//    ret.pop_back();
+//  }
+//  return ret;
+//}
 
 
 uint32_t get_write_delay(const std::set<std::pair<uint32_t, std::string>> &writeASV, std::string asv) {

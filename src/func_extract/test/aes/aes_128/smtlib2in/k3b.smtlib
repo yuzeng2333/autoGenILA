@@ -1,0 +1,2 @@
+(define-fun INV ( (|k3b| (_ BitVec 128))  ) (_ BitVec 128)
+  (bvadd #x00000000000000000000000000000000 |k3b|))

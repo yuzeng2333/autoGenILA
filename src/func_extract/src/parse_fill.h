@@ -16,7 +16,7 @@
 
 
 struct instrInfo {
-  std::unordered_map<std::string, std::string> instrEncoding;
+  std::unordered_map<std::string, std::vector<std::string>> instrEncoding;
   std::set<std::string> readASV;
   std::set<std::pair<uint32_t, std::string>> writeASV;
   std::set<std::string> skipWriteASV;

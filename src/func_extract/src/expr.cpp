@@ -36,6 +36,9 @@ void input_expr(std::string line) {
 
 
 void reg_expr(std::string line) {
+  if(line.find("state_out") != std::string::npos) {
+    toCout("Found it");
+  }
   std::smatch m;
   if ( !std::regex_match(line, m, pReg) 
         && !std::regex_match(line, m, pRegConst) )
@@ -111,6 +114,9 @@ void mem_expr(std::string line) {
 
 // TODO: put output into moduleWires?
 void output_expr(std::string line) {
+  if(line.find("state_out") != std::string::npos) {
+    toCout("Found it");
+  }
   std::smatch m;
   if ( !std::regex_match(line, m, pOutput) )
     return;
