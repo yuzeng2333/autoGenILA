@@ -94,17 +94,16 @@ void input_taint_gen(std::string line, std::ofstream &output) {
   //if (var.compare( clockName) == 0)
   //  return;
   //debug_line(line);
-  if(var != g_recentClk)  
+  if(var != g_recentClk) { 
     output << blank + "input " + slice + var + _t + " ;" << std::endl;
-  if(!g_use_value_change && isTop)
+    output << blank + "output " + slice + var + _r + " ;" << std::endl;
+    output << blank + "output " + slice + var + _x + " ;" << std::endl;
+    output << blank + "output " + slice + var + _c + " ;" << std::endl;
+  }
+  if(!g_use_value_change && isTop && var != g_recentClk)
     output << blank + "wire [" + toStr(g_sig_width-1) + ":0] " + var + _sig + " ;" << std::endl;
-  else if(!g_use_value_change)
+  else if(!g_use_value_change && var != g_recentClk)
     output << blank + "input [" + toStr(g_sig_width-1) + ":0] " + var + _sig + " ;" << std::endl;
-  output << blank + "output " + slice + var + _r + " ;" << std::endl;
-  output << blank + "output " + slice + var + _x + " ;" << std::endl;
-  output << blank + "output " + slice + var + _c + " ;" << std::endl;
-
-  //output << blank + "assign " + var + _sig + " =  0;" << std::endl;
 
   if(isTop && !g_use_value_change)
     output << blank + "assign " + var + _sig + " = 0 ;" << std::endl;
