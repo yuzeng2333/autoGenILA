@@ -136,6 +136,7 @@ std::set<std::string> moduleWires;
 std::set<std::string> g_iteDest;
 std::set<std::string> g_wire2reg;
 std::set<std::string> g_operators{"+", "-", "*", "/","%", "&&", "||", "==", "===", "!=", ">", ">=", "<", "<=", "|", "^", "&", "+:", "-:", "<<", ">>", "<<<", ">>>", "~", "!", "&", "~&", "~|", "~^", "^", "?", "<=", "always", "function"};
+std::set<std::string> g_clk_set;
 std::string clockName;
 std::string resetName;
 std::vector<std::string> rTaints;
@@ -577,6 +578,7 @@ void clean_file(std::string fileName, bool useLogic) {
           }  
           g_recentClk = m.str(2);
           g_recentRst = m.str(3);
+          g_clk_set.insert(g_recentClk);
           output << "  always @(posedge "+g_recentClk+")" << std::endl;          
         }
         break;
@@ -2123,7 +2125,7 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
   std::string newLogic;
   std::vector<std::string> newLogicVec;
   for(std::string inPort: moduleInputsMap[moduleName]) {
-    if(inPort.compare(g_recentClk) == 0)
+    if(inPort.compare(g_recentClk) == 0 || g_clk_set.find(inPort) != g_clk_set.end())
       continue;
     if(inPort.compare("rst_zy") == 0) {
       output << "    .rst_zy(rst_zy)," << std::endl;

@@ -22,6 +22,7 @@ extern std::set<std::string> moduleWires;
 extern std::set<std::string> g_iteDest;
 extern std::set<std::string> g_wire2reg;
 extern std::set<std::string> g_operators;
+extern std::set<std::string> g_clk_set;
 extern std::string clockName;
 extern std::string resetName;
 extern std::vector<std::string> rTaints;

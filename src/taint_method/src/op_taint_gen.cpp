@@ -81,14 +81,16 @@ void input_taint_gen(std::string line, std::ofstream &output) {
       isRst = true;
     }
   }
+  g_clk_set.insert(g_recentClk);
   moduleInputs.push_back(var);
-  if(var != g_recentClk)
+  if(var != g_recentClk) {
     extendInputs.push_back(var+_t);
+    extendOutputs.push_back(var+_r);
+    extendOutputs.push_back(var+_x);
+    extendOutputs.push_back(var+_c);
+  }
   if(!isTop && !g_use_value_change)
     extendInputs.push_back(var+_sig);
-  extendOutputs.push_back(var+_r);
-  extendOutputs.push_back(var+_x);
-  extendOutputs.push_back(var+_c);
   //if (var.compare( clockName) == 0)
   //  return;
   //debug_line(line);
@@ -1966,6 +1968,7 @@ void always_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream
     abort();
   }
   g_recentClk = m.str(2);
+  g_clk_set.insert(g_recentClk);
   std::string line;
   // parse first assignment
   std::getline(input, line);
@@ -2026,6 +2029,7 @@ void always_clkrst_taint_gen(std::string firstLine, std::ifstream &input, std::o
   }
   g_recentClk = m.str(2);
   g_recentRst = m.str(3);
+  g_clk_set.insert(g_recentClk);
 
   std::regex pNeg("negedge");
   // assume clock is always positive edge
