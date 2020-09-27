@@ -764,7 +764,10 @@ void sel_op_taint_gen(std::string line, std::ofstream &output) {
   split_slice(destAndSlice, dest, destSlice);
   split_slice(op1AndSlice, op1, op1Slice);
   split_slice(op2AndSlice, op2, op2Slice);
-  assert(op1Slice.empty());
+  if(!op1Slice.empty()){
+    toCout("Error: op1Slice is not empty in sel_op: op1AndSlice:"+op1AndSlice+", op1Slice:"+op1Slice);
+    abort();
+  }
   //assert_info(!isTop || !isOutput(op1AndSlice), "sel_op_taint_gen:op1 is output, line: "+line);  
   //assert_info(!isTop || !isOutput(op2AndSlice), "sel_op_taint_gen:op2 is output, line: "+line);  
 
