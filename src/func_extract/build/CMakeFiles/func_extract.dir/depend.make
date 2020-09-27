@@ -229,6 +229,7 @@ CMakeFiles/func_extract.dir/src/main.cpp.o: /workspace/tools/z3-4.8.8/z3/src/api
 
 CMakeFiles/func_extract.dir/src/make_define_fun.cpp.o: ../src/ast.h
 CMakeFiles/func_extract.dir/src/make_define_fun.cpp.o: ../src/global_data_struct.h
+CMakeFiles/func_extract.dir/src/make_define_fun.cpp.o: ../src/helper.h
 CMakeFiles/func_extract.dir/src/make_define_fun.cpp.o: ../src/make_define_fun.cpp
 CMakeFiles/func_extract.dir/src/make_define_fun.cpp.o: ../src/make_define_fun.h
 CMakeFiles/func_extract.dir/src/make_define_fun.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/global_data.h

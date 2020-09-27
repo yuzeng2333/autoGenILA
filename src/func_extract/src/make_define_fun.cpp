@@ -1,6 +1,7 @@
 #include "make_define_fun.h"
 #include "global_data_struct.h"
 #include "../../taint_method/src/helper.h"
+#include "helper.h"
 #define toStr(a) std::to_string(a)
 
 std::regex pDest (to_re("^#\\d+#(NAME)#\\d+$"));
@@ -83,15 +84,12 @@ void collect_args(std::unordered_map<std::string, std::set<std::string>> &dest2A
     else if(line.find("|") != std::string::npos) {
       uint32_t pos ;
       uint32_t pos2 = 0;
-      bool firstMatch = true;
       do{
         pos = line.find("|", pos2+1);
         pos2 = line.find("|", pos+1);
-        if(firstMatch && line.find("=") != std::string::npos) {
-          firstMatch = false;          
-          continue;
-        }
         std::string arg = line.substr(pos+1, pos2-pos-1);
+        if(is_written_ASV(arg))
+          continue;
         dest2ArgsMap[destName].insert(arg);
       } while(line.find("|", pos2+1) != std::string::npos);
     }
