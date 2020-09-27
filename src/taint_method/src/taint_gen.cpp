@@ -524,7 +524,7 @@ void clean_file(std::string fileName, bool useLogic) {
               if(lhsVec.size() == 1) {
                 outputString = "  assign "+singleDest+" = { "+srcVec[idx++];
                 while(idx < srcIdx) {
-                  outputString += ", " + srcVec[idx++];
+                  outputString += " , " + srcVec[idx++];
                 }
                 outputString += " };";
               }

@@ -1183,6 +1183,7 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
 }
 
 
+// FIXME
 // THIS IS NOT A GOOD SOLUTION:
 // sig of all LHS are set to 0.
 void both_concat_op_taint_gen(std::string line, std::ofstream &output) {
