@@ -1413,10 +1413,10 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
 
   // FIXME: the following may be wrong. The best way is to add this part to pass_info
   bool printSig = true;
-  if(!destSlice.empty() && !g_use_value_change) {
-    output << blank << "assign " + dest + _sig + " = 0;" << std::endl;
-    printSig = false;
-  }
+  //if(!destSlice.empty() && !g_use_value_change) {
+  //  output << blank << "assign " + dest + _sig + " = 0;" << std::endl;
+  //  printSig = false;
+  //}
 
   output << blank << "assign " + cond + _r + condVer + condSlice + " = ( | "+dest+_r+destSlice+" ) && " + op1AndSlice + " != " + op2AndSlice + " ;" << std::endl;
 
