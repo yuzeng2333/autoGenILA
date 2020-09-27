@@ -89,7 +89,7 @@ void input_taint_gen(std::string line, std::ofstream &output) {
     extendOutputs.push_back(var+_x);
     extendOutputs.push_back(var+_c);
   }
-  if(!isTop && !g_use_value_change)
+  if(!isTop && !g_use_value_change && var != g_recentClk)
     extendInputs.push_back(var+_sig);
   //if (var.compare( clockName) == 0)
   //  return;
