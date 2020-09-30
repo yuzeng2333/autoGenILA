@@ -85,9 +85,10 @@ std::regex pAlwaysNeg   (to_re("^(\\s*)always @\\(negedge (NAME)\\)$"));
 std::regex pEnd         ("^(\\s*)end$");
 std::regex pEndmodule   ("^(\\s*)endmodule$");
 /* non-blocking assignment */
-std::regex pNonblock  (to_re("^(\\s*)(NAME) (?:\\s)?<= (NAME)(\\s*)?;$"));
+std::regex pNonblock    (to_re("^(\\s*)(NAME) (?:\\s)?<= (NAME)(\\s*)?;$"));
 std::regex pNonblockConcat    (to_re("^(\\s*)(NAME) <= \\{(.+)\\}(\\s*)?;$"));
-std::regex pNonblockIf(to_re("^(\\s*)if \\((NAME)\\) (NAME) <= (NAME)(\\s*)?;$"));
+std::regex pNonblockIf  (to_re("^(\\s*)if \\((NAME)\\) (NAME) <= (NAME)(\\s*)?;$"));
+std::regex pNonblockIf2 (to_re("^(\\s*)if \\((NAME)\\) ([a-zA-Z0-9]+)(\\[([a-zA-Z0-9]+)\\[(\\d+)\\]\\]) <= (NAME)(\\s*)?;$"));
 /* function */
 std::regex pFunctionDef   (to_re("^(\\s*)function (\\[\\d+\\:0\\] )?(NAME)(\\s*)?;$"));
 std::regex pEndfunction   (to_re("^(\\s*)endfunction$"));
@@ -149,6 +150,8 @@ std::unordered_map<std::string, uint32_t> reg2sig;
 std::unordered_map<std::string, uint32_t> fangyuanItemNum; // used to check item number in case statementsrs
 std::unordered_map<std::string, uint32_t> fangyuanCaseSliceWidth; // width of each slice used in RHS of case
 std::unordered_map<std::string, uint32_t> g_destVersion;
+std::unordered_map<std::string, std::pair<std::string, bool>> g_moduleRst;
+std::unordered_map<std::string, std::string> g_moduleClk;
 VarWidth varWidth;
 VarWidth funcVarWidth;
 unsigned long int NEW_VAR = 0;
@@ -163,6 +166,7 @@ std::string g_possibleRST;
 bool g_possibleSign;
 bool isTop = false;
 bool g_hasRst;
+bool g_hasClk;
 bool g_verb;
 bool g_has_read_taint;  // if false, read taint is replaced with x taint
 bool g_rst_pos;
@@ -230,6 +234,7 @@ void clean_global_data(uint32_t totalRegCnt, uint32_t nextSig) {
   g_recentRst.clear();
   g_recentRst_positive = true;
   g_hasRst = false;
+  g_hasClk = false;
   g_has_read_taint = true; // if true, read taint takes effect
   g_rst_pos = true;
   g_clkrst_exist = false;
@@ -272,9 +277,19 @@ void clean_file(std::string fileName, bool useLogic) {
   std::regex extraBlank("([a-zA-Z0-9_\\.'])(\\s)(\\[)");
   bool inFunc = false;
   std::string rsvdLine; // reserved line, not printed in last iteration
+  if(g_moduleClk.find(moduleName) != g_moduleClk.end()) {
+    g_hasClk = true;
+    g_recentClk = g_moduleClk[moduleName];
+  }
+  if(g_moduleRst.find(moduleName) != g_moduleRst.end()) {
+    g_hasRst = true;
+    g_clkrst_exist = true;
+    g_recentRst = g_moduleRst[moduleName].first;
+    g_recentRst_positive = g_moduleRst[moduleName].second;
+  }
   while( std::getline(cleanFileInput, line) ) {
     toCoutVerb(line);
-    if(line.find("27'b000000000000000000000000000, of, 32'b00000000000000000000000000000000") != std::string::npos) {
+    if(line.find("tmp_div") != std::string::npos) {
       toCout("FIND IT!");
     }
 
@@ -292,7 +307,9 @@ void clean_file(std::string fileName, bool useLogic) {
     bool noConcat=true;
     /// if is always line, look ahead for non-blocking concatenation assignments
     std::string retStr;    
-    noConcat = extract_concat(cleanLine, output, retStr, true);
+    std::string fangyuanDeclaration;
+    std::string fangyuanAssign;
+    noConcat = extract_concat(cleanLine, output, retStr, fangyuanDeclaration, fangyuanAssign, true);
     if( !is_srcDestConcat(line) && (!std::regex_match(line, match, pAlwaysClkRst) || !g_remove_adff) ) { // pAlwaysClkRst is printed below
       if(std::regex_match(cleanLine, match, pAlwaysClk)) {
         rsvdLine = cleanLine;
@@ -321,7 +338,10 @@ void clean_file(std::string fileName, bool useLogic) {
         rsvdLine.clear();        
       }
     }
-
+    if(!fangyuanDeclaration.empty()) {
+      output << fangyuanDeclaration << std::endl;
+      output << fangyuanAssign << std::endl;
+    }
     /// store the width of wires and regs in varWidth
     uint32_t choice = parse_verilog_line(cleanLine, true);
     std::smatch m;
@@ -575,9 +595,11 @@ void clean_file(std::string fileName, bool useLogic) {
           if( !std::regex_match(line, m, pAlwaysClkRst) ) {
             std::cout << "!! Error in parsing always with clk & rst !!" << std::endl;
             abort();
-          }  
-          g_recentClk = m.str(2);
-          g_recentRst = m.str(3);
+          } 
+          if(!g_hasRst) {
+            g_recentClk = m.str(2);
+            g_recentRst = m.str(3);
+          }
           g_clk_set.insert(g_recentClk);
           output << "  always @(posedge "+g_recentClk+")" << std::endl;          
         }
@@ -961,32 +983,59 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
 }
 
 
-void read_in_clkrst(std::string pathFile, std::string fileName) {
+void read_in_clkrst(std::string filePath, std::string fileName) {
   // set default name for these two variables
   g_clkrst_exist = true;
-  std::string path = extract_path(pathFile);
   clockName = "clk";
   resetName = "rst";
   std::string signName;
+  std::string path = extract_path(filePath);
   std::ifstream in(path+"/"+fileName);
   std::string line;
+  std::string localModName;
   std::smatch match;
-  std::regex pClk("clock\\:([a-zA-Z0-9_:'\\[\\]]+)");
-  std::regex pRst("reset\\:([a-zA-Z0-9_:'\\[\\]]+)");
-  std::regex pSign("sign\\:([a-zA-Z0-9_:'\\[\\]]+)");
-  std::regex pModuleLocal("module\\:([a-zA-Z0-9_:'\\[\\]]+)");
+  std::regex pClk("^clk\\:\\s*([a-zA-Z0-9_:'\\[\\]]+)\\s*$");
+  std::regex pRst("^rst\\:\\s*([a-zA-Z0-9_:'\\[\\]!]+)\\s*$");
+  std::regex pSign("^sign\\:\\s*([a-zA-Z0-9_:'\\[\\]]+)\\s*$");
+  std::regex pModuleLocal("^module\\:\\s*([a-zA-Z0-9_:'\\[\\]\\$\\\\]+)\\s*$");
   while( std::getline(in, line) ) {
-    if ( std::regex_match(line, match, pClk) ) {
+    if ( line.substr(0, 7) == "module:" ) {
+      if( !std::regex_match(line, match, pModuleLocal) ) {
+        toCout("Error: module name does not match pattern: "+line);
+        abort();
+      }
+      localModName = match.str(1);
+    }
+    else if( line.substr(0, 4) == "clk:" ) {
+      if ( !std::regex_match(line, match, pClk) ) {
+        toCout("Error: clk name does not match pattern: "+line);
+        abort();
+      }
       clockName = match.str(1);
-      g_possibleCLK = clockName;
+      if(g_moduleClk.find(localModName) != g_moduleClk.end()) {
+        toCout("Error: repeated clk found for: "+localModName);
+        abort();
+      }
+      g_moduleClk.emplace(localModName, clockName);
       toCout("+++ Get clock: "+clockName);
     }
-    if ( std::regex_match(line, match, pRst) ) {
+    else if ( line.substr(0, 4) == "rst:" ) {
+      if ( !std::regex_match(line, match, pRst) ) {
+        toCout("Error: rst name does not match pattern: "+line);
+        abort();
+      }
       resetName = match.str(1);
-      g_possibleRST = resetName;
+      if(g_moduleRst.find(localModName) != g_moduleRst.end()) {
+        toCout("Error: repeated clk found for: "+localModName);
+        abort();
+      }
+      bool isPos = resetName.front() != '!';
+      if(!isPos)
+        resetName = resetName.substr(1);
+      g_moduleRst.emplace(localModName, std::make_pair(resetName, isPos));
       toCout("+++ Get reset: "+resetName);      
     }
-    if( std::regex_match(line, match, pSign) ) {
+    else if( std::regex_match(line, match, pSign) ) {
       signName = match.str(1);
       if(signName.compare("pos") == 0)
         g_possibleSign = true;
@@ -1002,6 +1051,18 @@ void read_in_clkrst(std::string pathFile, std::string fileName) {
 
 
 void add_file_taints(std::string fileName, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap, std::map<std::string, std::vector<std::string>> &moduleRFlagsMap) {
+  // read pre-defined clk and rst
+  if(g_moduleClk.find(moduleName) != g_moduleClk.end()) {
+    g_hasClk = true;
+    g_recentClk = g_moduleClk[moduleName];
+  }
+  if(g_moduleRst.find(moduleName) != g_moduleRst.end()) {
+    g_hasRst = true;
+    g_clkrst_exist = true;
+    g_recentRst = g_moduleRst[moduleName].first;
+    g_recentRst_positive = g_moduleRst[moduleName].second;
+  }
+
   long long int lineNo = 0;
   std::ifstream input(fileName);
   std::ofstream output(fileName + ".tainted");
@@ -2257,7 +2318,7 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
 /* if a basic operator contains concatenated input, 
  * declare a new variable representing the concatenated input*/
 // if a long number(>32bit) is found, split it if g_split_long_num is true
-bool extract_concat(std::string line, std::ofstream &output, std::string &returnedStmt, bool isFuncCall) {
+bool extract_concat(std::string line, std::ofstream &output, std::string &returnedStmt, std::string &fangyuanDeclaration, std::string &fangyuanAssign, bool isFuncCall) {
   std::string retStr = "";
   std::smatch m;
   int blankNo = line.find('a', 0);  
@@ -2280,8 +2341,6 @@ bool extract_concat(std::string line, std::ofstream &output, std::string &return
   std::queue<std::string> newVarQueue;
   // if isNonblockConcat, the declaration of fangyuan is after the nonblock stmt
   bool isNonblockConcat = std::regex_match(line, m, pNonblockConcat);
-  std::string fangyuanDeclaration;
-  std::string fangyuanAssign;
   if ( (line.find("assign") != std::string::npos
        //&& !std::regex_match(line, m, pSrcConcat)
        && !is_srcConcat(line)
@@ -2371,11 +2430,6 @@ bool extract_concat(std::string line, std::ofstream &output, std::string &return
           returnedStmt += newVar;
         newVarQueue.pop();
       }
-    }
-    output << std::endl;
-    if(isNonblockConcat) {
-      output << fangyuanDeclaration << std::endl;
-      output << fangyuanAssign      << std::endl;
     }
     return false;
   } // end of if
@@ -2472,6 +2526,7 @@ int taint_gen(std::string fileName, uint32_t stage, bool isTopIn, std::map<std::
     toCout("Clear Global data!");
     clean_global_data(totalRegCnt, nextSig);
     std::cout << "Begin cleaning!" << std::endl; //0
+    std::string path = extract_path(fileName);
     clean_file(fileName, false);
   }
   if (stage <= 1) {

@@ -71,7 +71,7 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
 
 void merge_taints(std::string fileName);
 
-bool extract_concat(std::string line, std::ofstream &output, std::string &returnedStmt, bool isFuncCall=false);
+bool extract_concat(std::string line, std::ofstream &output, std::string &returnedStmt, std::string &fangyuanDeclaration, std::string &fangyuanAssign, bool isFuncCall);
 
 void gen_assert_property(std::ofstream &output);
 
