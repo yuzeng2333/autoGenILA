@@ -127,9 +127,10 @@ void auxiliary_files_gen(const std::string &path, uint32_t delay) {
   toCout("### Begin generate ilaVlg, wrapper, etc.");
   system(("../smt_vlg_check/smt2ila/build/starter "+g_pj_path+"/smt_vlg_check/smt2ila/app").c_str());
   //smt_to_vlg(states, moduleName, dirName);
-  system(("cp "+path+"/design.v.clean "+path+"/"+moduleName+"/output/i1/design.v").c_str());
+  system(("cp "+path+"/design.v.no "+path+"/"+moduleName+"/output/i1/design.v").c_str());
 
   modify_wrapper_tcl(dirName+"/output/i1/wrapper.v", dirName+"/output/i1/do.tcl");
+  //submodule_vlg_gem(dirName+"/output/i1/ila.v");
 }
 
 
@@ -272,6 +273,21 @@ void modify_wrapper_tcl(std::string wrapperFile, std::string tclFile) {
     if(!encodings.empty())
       tclOut << "assume -name instr_encoding { (~ __START__) || ( "+encodings+" ) }" << std::endl;
   }
+
+  // add assum for nop instructions
+  encodings = ""; 
+  for(auto it = g_nopInstr.begin(); it != g_nopInstr.end(); it++) {
+    if(it->second != "x")
+      encodings = encodings + it->first + " == " + it->second + " && ";
+  }
+  if(encodings.length() > 4) {
+    encodings.pop_back();
+    encodings.pop_back();
+    encodings.pop_back();
+  }
+  if(!encodings.empty())
+    tclOut << "assume -name instr_encoding { ( __START__) || ( "+encodings+" ) }" << std::endl;
+
   tclIn.close();
   tclOut.close();
 
@@ -286,3 +302,33 @@ uint32_t find_key(const std::map<uint32_t, std::string> &idx2varMap, const std::
   toCout("Error:"+var+" is not in idx2varMap");
   abort();
 }
+
+
+// the automatically generated ila.v file cannot be used as an instance of submodule
+// This function generates a new one based on ila.v
+//void submodule_vlg_gem(std::string dirName) {
+//  std::ofstream output(dirName+"/output/i1/subModule.v");
+//  std::ifstream input(dirName+"/output/i1/ila.v");
+//
+//
+//  enum State {empty, readIO, readStmt};
+//  enum State state = empty;
+//  std::string line;
+//  while(std::getline(input, line)) {
+//    if(line.find("model") != std::string::npos) {
+//      state = readIO;
+//      output << "module "+moduleName+" (" << el;
+//    }
+//    else if(state == readIO) {
+//      if(line == "__START__,")
+//        continue;
+//      else if(line.substr(0, 20) == "__ILA_bar_decode_of_" )
+//        continue;
+//      else if(line == "")
+//    }
+//    else if(state == readStmt) {
+//
+//    }
+//  }
+//}
+
