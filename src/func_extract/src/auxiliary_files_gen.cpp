@@ -263,7 +263,7 @@ void modify_wrapper_tcl(std::string wrapperFile, std::string tclFile) {
   for(uint32_t i = 0; i < encodingSize; i++) {
     for(auto it = g_instrInfo.back().instrEncoding.begin(); it != g_instrInfo.back().instrEncoding.end(); it++) {
       if(it->second[i] != "x")
-        encodings = encodings + it->first + " == " + it->second[i] + " && ";
+        encodings = encodings + "m1." + it->first + " == " + it->second[i] + " && ";
     }
     if(encodings.length() > 4) {
       encodings.pop_back();
@@ -286,7 +286,7 @@ void modify_wrapper_tcl(std::string wrapperFile, std::string tclFile) {
     encodings.pop_back();
   }
   if(!encodings.empty())
-    tclOut << "assume -name instr_encoding { ( __START__) || ( "+encodings+" ) }" << std::endl;
+    tclOut << "assume -name nop_instr { ( __START__) || ( "+encodings+" ) }" << std::endl;
 
   tclIn.close();
   tclOut.close();
