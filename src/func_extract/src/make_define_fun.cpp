@@ -88,7 +88,7 @@ void collect_args(std::unordered_map<std::string, std::set<std::string>> &dest2A
         pos = line.find("|", pos2+1);
         pos2 = line.find("|", pos+1);
         std::string arg = line.substr(pos+1, pos2-pos-1);
-        if(is_written_ASV(arg))
+        if(is_written_ASV(arg) && arg != destName)
           continue;
         dest2ArgsMap[destName].insert(arg);
       } while(line.find("|", pos2+1) != std::string::npos);

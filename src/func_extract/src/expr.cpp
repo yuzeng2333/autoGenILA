@@ -152,8 +152,11 @@ void single_line_expr(std::string line) {
   std::string destAndSlice = m.str(2);
   put_into_reg2Slice(destAndSlice);
   auto ret = g_ssaTable.emplace(destAndSlice, line);
-  if(!ret.second)
+  if(!ret.second) {
     toCout("Error in inserting ssaTable in single_line for key: "+m.str(2));
+    toCout("Did you check the design.v/design.v.clean file can only have the top module??");
+    abort();
+  }
 }
 
 

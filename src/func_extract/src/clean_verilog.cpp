@@ -35,7 +35,7 @@ void clean_verilog(std::string fileName) {
         {
           std::smatch m;
           if(!std::regex_match(line, m, pSel1)) {
-            toCout("Error: does not match pSel1 in clean_verilog");
+            toCout("Error: does not match pSel1 in clean_verilog:"+line);
             abort();
           }
           std::string dest = m.str(2);
