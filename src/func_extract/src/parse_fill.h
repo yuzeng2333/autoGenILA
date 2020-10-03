@@ -62,4 +62,5 @@ void read_in_instructions(std::string fileName);
 
 void read_module_info();
 
+void read_top_module_info();
 #endif

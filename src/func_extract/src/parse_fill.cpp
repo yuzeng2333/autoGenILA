@@ -27,6 +27,10 @@ std::unordered_map<std::string, std::string> g_ins2modMap;
 std::unordered_map<std::string, uint32_t> g_moduleOutportTime;
 std::unordered_map<std::string, uint32_t> g_moduleInportTime;
 
+std::string g_mem2acclData;
+std::string g_accl2memAddr;
+std::string g_accl2memData;
+
 std::regex pSingleLine (to_re("^(\\s*)assign (NAME) = (.*);$"));
 std::regex pNbLine (to_re("^(\\s*)(NAME) <= (.*);$"));
 
@@ -385,3 +389,35 @@ void read_module_info() {
   }
   g_allModuleInfo.emplace(moduleInfo.name, moduleInfo);
 } 
+
+
+void read_top_module_info() {
+  std::string fileName = g_path + "/top_module_info.txt";
+  std::ifstream input(fileName);
+  if(!input.is_open()) {
+    toCout("Warning: cannot open "+g_path+"/top_module_info.txt");
+  }
+  std::string line;
+  while(std::getline(input, line)) {
+    if(line.substr(0, 13) == "mem2accl_data") {
+      std::string signalName = line.substr(14);
+      remove_two_end_space(signalName);
+      g_mem2acclData = signalName;
+    }
+    else if(line.substr(0, 13) == "accl2mem_addr") { // output name
+      std::string signalName = line.substr(14);
+      remove_two_end_space(signalName);
+      g_accl2memAddr = signalName;
+    }
+    else if(line.substr(0, 13) == "accl2mem_data") { // input and delay
+      std::string signalName = line.substr(14);
+      remove_two_end_space(signalName);
+      g_accl2memData = signalName;
+    }
+    else {
+      toCout("Error: unexpected content: "+line);
+      abort();
+    }
+  }
+} 
+

@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
   // instruction encodings, write/read ASV, NOP
   read_in_instructions(g_path+"/instr.txt");  
   if(doClean.compare("1") == 0) {
-    toCout("### Begin clean_file")n;
+    toCout("### Begin clean_file");
     clean_file(g_path+"/design.v", false);
     toCout("### Begin remove_functions");
     remove_functions(g_path+"/design.v");

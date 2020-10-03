@@ -136,6 +136,11 @@ expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver 
         return retExpr;
       } // else, retuen destExpr instead
     }
+    // if is memory io related signal
+    else if(g_mem2acclData == dest) {
+      return destExpr;
+    } 
+    // if input instruction should be given to the input ports
     else if(timeIdx >= bound+2-g_currInstrInfo.instrEncoding.begin()->second.size()) {
       if(g_currInstrInfo.instrEncoding.find(dest) == g_currInstrInfo.instrEncoding.end()) {
         toCout("Error: input signal not found for current instruction: "+dest);
