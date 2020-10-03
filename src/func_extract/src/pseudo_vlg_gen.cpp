@@ -20,7 +20,7 @@ void pseudo_vlg_gen() {
   output << "module "+moduleName+"("+portList+");" << std::endl;
   for(auto &in: moduleInputs) {
     if(in.find("\\") != std::string::npos) {
-      toCout("Warning: find \\ in input's name, skip: "+in);
+      toCout("Error: find \\ in input's name, skip: "+in);
       abort();
     }
     if(declaredVar.find(in) == declaredVar.end()) {
@@ -31,7 +31,7 @@ void pseudo_vlg_gen() {
   }
   for(auto &out: moduleOutputs) {
     if(out.find("\\") != std::string::npos) {
-      toCout("Warning: find \\ in output's name, skip: "+out);
+      toCout("Error: find \\ in output's name, skip: "+out);
       abort();
     }
     if(declaredVar.find(out) == declaredVar.end()) {
@@ -54,10 +54,10 @@ void pseudo_vlg_gen() {
   }
   output << "// regWithFunc" << std::endl;
   for(auto &var: g_regWithFunc) {
-    if(var.find("\\") != std::string::npos) {
-      toCout("Warning: find \\ in var's name, skip: "+var);
-      abort();
-    }
+    //if(var.find("\\") != std::string::npos) {
+    //  toCout("Error: find \\ in var's name, skip: "+var);
+    //  abort();
+    //}
     if(declaredVar.find(var) == declaredVar.end()) {    
       declaredVar.insert(var);      
       uint32_t varWidth = get_var_slice_width(var);

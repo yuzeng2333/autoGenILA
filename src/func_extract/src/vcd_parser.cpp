@@ -17,7 +17,7 @@ void vcd_parser(std::string fileName) {
   enum State state;
   std::smatch m;
   while(std::getline(input, line)) {
-    toCout(line);
+    //toCout(line);
     if(line.compare("b00000000 n3") == 0) {
       toCout("Find it");
     }

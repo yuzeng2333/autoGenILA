@@ -37,7 +37,11 @@ void define_fun_gen(std::string fileName) {
     else if(line.length() == 5 && line.substr(0, 5) == "(goal") {
       std::string args;
       make_args_list(dest2ArgsMap[destName], args);
-      uint32_t destWidth = get_var_slice_width(destName);
+      std::string pureDestName = destName;
+      if(destName.substr(0, 2) == "\\\\") {
+        pureDestName = destName.substr(1);
+      }
+      uint32_t destWidth = get_var_slice_width(pureDestName);
       //output << "(define-fun INV_"+destName+" ( "+args+" ) (_ BitVec "+toStr(destWidth)+")" << std::endl;
       output << "(define-fun INV ( "+args+" ) (_ BitVec "+toStr(destWidth)+")" << std::endl;
     }
@@ -51,7 +55,11 @@ void define_fun_gen(std::string fileName) {
       uint32_t verticalLinePos2 = line.find("|", verticalLinePos+1);
       std::string firstPart = line.substr(0, equalPos);
       std::string lastPart = line.substr(verticalLinePos2+1);
-      uint32_t destWidth = get_var_slice_width(destName);
+      std::string pureDestName = destName;
+      if(destName.substr(0, 2) == "\\\\") {      
+        pureDestName = destName.substr(1);
+      }
+      uint32_t destWidth = get_var_slice_width(pureDestName);
       std::string middlePart;
       if(destWidth % 4 == 0)
         middlePart = "bvadd #x"+make_zeros(destWidth/4);
@@ -90,6 +98,8 @@ void collect_args(std::unordered_map<std::string, std::set<std::string>> &dest2A
         std::string arg = line.substr(pos+1, pos2-pos-1);
         if(is_written_ASV(arg) && arg != destName)
           continue;
+        if(arg.substr(0, 1) == "\\")
+          arg = arg.substr(1);
         dest2ArgsMap[destName].insert(arg);
       } while(line.find("|", pos2+1) != std::string::npos);
     }

@@ -858,7 +858,7 @@ expr func_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
   std::string moduleName = g_ins2modMap[instanceName];
   ModuleInfo_t moduleInfo = g_allModuleInfo[moduleName];
   if(g_wire2ModulePort[instanceName].find(destAndSlice) == g_wire2ModulePort[instanceName].end()) {
-    toCout("Error: this key does not exist in g_wire2ModulePort: "+destAndSlice);
+    toCout("Error: this key does not exist in g_wire2ModulePort: |"+destAndSlice+"|");
     abort();
   }
   std::string outPort = g_wire2ModulePort[instanceName][destAndSlice];

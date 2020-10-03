@@ -80,6 +80,10 @@ void simplify_goal(std::string destAndSlice, uint32_t bound, uint32_t instrIdx) 
   context c;
   solver s(c);
   goal g(c); 
+  if(g_varNode.find(destAndSlice) == g_varNode.end() ) {
+    toCout("Error: the key does not exist in the map: |"+destAndSlice+"|");
+    abort();
+  } 
   expr destNextExpr = add_constraint(g_varNode[destAndSlice], 0, c, s, g, bound, /*isSolve=*/false);
   expr destExpr_g = var_expr(destAndSlice, 1000, c, false);
   g.add( destExpr_g == destNextExpr ); 
@@ -110,8 +114,13 @@ void simplify_goal_without_submodules(std::string destAndSlice, uint32_t bound, 
     auto varPair = g_goalVars.front();
     g_goalVars.pop();
     std::string var = varPair.first;
+    remove_two_end_space(var);
     uint32_t timeIdx = varPair.second;
-    g_regWithFunc.insert(var);    
+    g_regWithFunc.insert(var);
+    if(g_varNode.find(var) == g_varNode.end() && g_varNode.find("\\"+var) == g_varNode.end() ) {
+      toCout("Error: the key does not exist in the map: |"+var+"|");
+      abort();
+    } 
     expr destNextExpr = add_constraint(g_varNode[var], timeIdx, c, s, g, bound, /*isSolve=*/false);
     expr destExpr_g = var_expr(var, timeIdx+100, c, false);
     g.add( destExpr_g == destNextExpr ); 
@@ -191,6 +200,10 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint
         toCout("Error: root does not have its node: " + rootReg);
         abort();
       }
+      if(g_varNode.find(pure(rootReg)) == g_varNode.end() ) {
+        toCout("Error: the key does not exist in the map: |"+pure(rootReg)+"|");
+        abort();
+      } 
       astNode *root = g_varNode[pure(rootReg)];
       if(root) {
         add_constraint(root, topTimeIdx, c, s, g, bound, true);
@@ -256,6 +269,10 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint
 
       // after getting one solution, build a goal and simplify it with input values
       g_existedExpr.clear();
+      if(g_varNode.find(destAndSlice) == g_varNode.end() ) {
+        toCout("Error: the key does not exist in the map: |"+destAndSlice+"|");
+        abort();
+      } 
       expr destNextExpr = add_constraint(g_varNode[destAndSlice], 0, c, s, g, bound, /*isSolve=*/false);
       expr destExpr_g = var_expr(destAndSlice, 100, c, false);
       g.add( destExpr_g == destNextExpr ); 
