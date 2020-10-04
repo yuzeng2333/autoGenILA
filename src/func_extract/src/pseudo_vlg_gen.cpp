@@ -41,7 +41,7 @@ void pseudo_vlg_gen() {
     }
   }
   output << "// moduleRegs" << std::endl;  
-  for(auto &var: moduleRegs) {
+  for(auto var: moduleRegs) {
     if(var.find("\\") != std::string::npos) {
       toCout("Warning: find \\ in var's name, skip: "+var);
       continue;
@@ -49,11 +49,12 @@ void pseudo_vlg_gen() {
     if(declaredVar.find(var) == declaredVar.end()) {
       declaredVar.insert(var);      
       uint32_t varWidth = get_var_slice_width(var);
+      var = purify_var_name(var);
       output << "  reg ["+toStr(varWidth-1)+":0] "+var+" ;" << std::endl;
     }
   }
   output << "// regWithFunc" << std::endl;
-  for(auto &var: g_regWithFunc) {
+  for(auto var: g_regWithFunc) {
     //if(var.find("\\") != std::string::npos) {
     //  toCout("Error: find \\ in var's name, skip: "+var);
     //  abort();
@@ -61,6 +62,7 @@ void pseudo_vlg_gen() {
     if(declaredVar.find(var) == declaredVar.end()) {    
       declaredVar.insert(var);      
       uint32_t varWidth = get_var_slice_width(var);
+      var = purify_var_name(var);
       output << "  reg ["+toStr(varWidth-1)+":0] "+var+" ;" << std::endl;
     }
   }

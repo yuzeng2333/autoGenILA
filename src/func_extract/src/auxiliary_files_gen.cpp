@@ -45,6 +45,7 @@ void auxiliary_files_gen(const std::string &path, uint32_t delay) {
   for(std::string &in: moduleInputs) {
     if(in.compare(g_recentClk) == 0 || in.compare("clk") == 0)
       continue;
+    in = purify_var_name(in);
     vmapFile << "      \""+in+"\": \""+in+"\"," << el;
   }
 
@@ -52,7 +53,9 @@ void auxiliary_files_gen(const std::string &path, uint32_t delay) {
     auto &funcInfo = it->second;
     for(auto in = funcInfo.inputs.begin(); in != funcInfo.inputs.end(); in++) {
       if(addedVar.find(*in) == addedVar.end() && !is_number(*in)) {
-        vmapFile << "      \""+*in+"\": \""+*in+"\"," << el;
+        std::string inVar = *in;
+        inVar = purify_var_name(inVar);
+        vmapFile << "      \""+inVar+"\": \""+inVar+"\"," << el;
         addedVar.insert(*in);
       }
     }
@@ -62,10 +65,14 @@ void auxiliary_files_gen(const std::string &path, uint32_t delay) {
     // make mapping for submodule's inputs. They should be checked
     if(addedVar.find(*as) == addedVar.end()) {    
       addedVar.insert(*as);
-      vmapFile << "      \""+*as+"\": \""+*as+"\"," << el;
+      std::string asVar = *as;
+      asVar = purify_var_name(asVar);
+      vmapFile << "      \""+asVar+"\": \""+asVar+"\"," << el;
     }
   }
-  vmapFile << "      \""+*moduleAs.rbegin()+"\": \""+*moduleAs.rbegin()+"\"" << el;
+  std::string lastVar = *moduleAs.rbegin();
+  lastVar = purify_var_name(lastVar);
+  vmapFile << "      \""+lastVar+"\": \""+lastVar+"\"" << el;
   vmapFile << "    }," << el << el;
 
   vmapFile << "  \"interface mapping\": {" << el;
@@ -112,13 +119,16 @@ void auxiliary_files_gen(const std::string &path, uint32_t delay) {
 
   for(auto as = g_regWithFunc.begin(); as != g_regWithFunc.end(); as++) {
     uint32_t width = get_var_slice_width(*as);
-    infoFile << *as+"__:__"+toStr(width)+", YES" << std::endl;
+    std::string var = purify_var_name(*as);
+    infoFile << var+"__:__"+toStr(width)+", YES" << std::endl;
   }
 
   for(auto as = moduleAs.begin(); as != moduleAs.end(); as++) {
     uint32_t width = get_var_slice_width(*as);
-    if(g_regWithFunc.find(*as) == g_regWithFunc.end())
-      infoFile << *as+"__:__"+toStr(width) << std::endl;
+    if(g_regWithFunc.find(*as) == g_regWithFunc.end()) {
+      std::string var = purify_var_name(*as);
+      infoFile << var+"__:__"+toStr(width) << std::endl;
+    }
   }
   infoFile << "#moduleName:"+moduleName << std::endl;
   infoFile << "#dirName:"+dirName << std::endl;
@@ -127,7 +137,7 @@ void auxiliary_files_gen(const std::string &path, uint32_t delay) {
   toCout("### Begin generate ilaVlg, wrapper, etc.");
   system(("../smt_vlg_check/smt2ila/build/starter "+g_pj_path+"/smt_vlg_check/smt2ila/app").c_str());
   //smt_to_vlg(states, moduleName, dirName);
-  system(("cp "+path+"/design.v.no "+path+"/"+moduleName+"/output/i1/design.v").c_str());
+  system(("cp "+path+"/design_jasper.v "+path+"/"+moduleName+"/output/i1/design.v").c_str());
 
   modify_wrapper_tcl(dirName+"/output/i1/wrapper.v", dirName+"/output/i1/do.tcl");
   //submodule_vlg_gem(dirName+"/output/i1/ila.v");
@@ -295,11 +305,13 @@ void modify_wrapper_tcl(std::string wrapperFile, std::string tclFile) {
 
 
 uint32_t find_key(const std::map<uint32_t, std::string> &idx2varMap, const std::string &var) {
+  std::string pureVar = purify_var_name(var);
   for(auto it = idx2varMap.begin(); it != idx2varMap.end(); it++) {
-    if(it->second == var)
+    std::string pureVar = purify_var_name(var);
+    if(it->second == var || it->second == pureVar)
       return it->first;
   }
-  toCout("Error:"+var+" is not in idx2varMap");
+  toCout("Error:"+var+" and "+pureVar+" is not in idx2varMap");
   abort();
 }
 

@@ -12,3 +12,7 @@ void collect_args(std::unordered_map<std::string, std::set<std::string>> &dest2A
 void make_args_list(const std::set<std::string> &argSet, std::string &argList);
 
 std::string make_zeros(uint32_t width);
+
+void remove_extra_backslash(std::string &line);
+
+void remove_all_extra_backslash(std::string &line);

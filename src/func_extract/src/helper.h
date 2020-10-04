@@ -81,4 +81,12 @@ void remove_two_end_space(std::string &str);
 bool is_written_ASV(std::string reg);
 
 bool is_all_x(std::string);
+
+void add_front_backslash(std::string &line);
+
+std::string purify_var_name(std::string name);
+
+bool isLetter(const char &c);
+
+std::string purify_line(const std::string &line);
 #endif

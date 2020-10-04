@@ -55,6 +55,7 @@ void define_fun_gen(std::string fileName) {
       uint32_t verticalLinePos2 = line.find("|", verticalLinePos+1);
       std::string firstPart = line.substr(0, equalPos);
       std::string lastPart = line.substr(verticalLinePos2+1);
+      lastPart = purify_line(lastPart);
       std::string pureDestName = destName;
       if(destName.substr(0, 2) == "\\\\") {      
         pureDestName = destName.substr(1);
@@ -66,6 +67,10 @@ void define_fun_gen(std::string fileName) {
       else
         middlePart = "bvadd #b"+make_zeros(destWidth);
       output << firstPart+middlePart+lastPart << std::endl;
+    }
+    else if(line.find("\\\\") != std::string::npos){
+      line = purify_line(line);
+      output << line << std::endl;      
     }
     else {
       output << line << std::endl;
@@ -112,7 +117,9 @@ void make_args_list(const std::set<std::string> &argSet, std::string &argList) {
   argList.clear();
   for(auto it = argSet.begin(); it != argSet.end(); it++) {
     uint32_t width = get_var_slice_width(*it);
-    argList += "(|"+*it+"| (_ BitVec "+toStr(width)+")) ";
+    std::string var = *it;
+    var = purify_var_name(var);
+    argList += "(|"+var+"| (_ BitVec "+toStr(width)+")) ";
   }
 }
 
@@ -124,3 +131,19 @@ std::string make_zeros(uint32_t width) {
   }
   return ret;
 }
+
+
+void remove_extra_backslash(std::string &line) {
+  uint32_t pos = line.find("\\\\");
+  std::string firstPart = line.substr(0, pos);
+  std::string lastPart = line.substr(pos+2);
+  line = firstPart + "\\" + lastPart;
+}
+
+
+void remove_all_extra_backslash(std::string &line) {
+  while(line.find("\\\\") != std::string::npos)
+    remove_extra_backslash(line);
+}
+
+

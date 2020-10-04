@@ -1,6 +1,7 @@
 #include "helper.h"
 #include "parse_fill.h"
 #include "global_data_struct.h"
+#include <ctype.h>
 
 #define toStr(a) std::to_string(a)
 
@@ -377,4 +378,62 @@ bool is_all_x(std::string strIn) {
       return false;
   }
   return true;
+}
+
+void add_front_backslash(std::string &line) {
+  if(line.substr(0, 1) == "\\" && line.substr(0, 2) != "\\\\") {
+    line = "\\"+line;
+  }
+}
+
+
+std::string purify_var_name(std::string name) {
+  remove_two_end_space(name);
+  if(name.substr(0, 1) != "\\")
+    return name;
+  std::string ret = "";
+  bool isBegin = true;
+  for(uint32_t i = 0; i < name.length(); i++ ) {
+    char c = name[i];
+    //std::cout << c << std::endl;
+    if(c == '\\' && isBegin) {
+      continue;
+    }
+    else {
+      isBegin = false;
+      if(std::isdigit(c) || isLetter(c) || c == '_') {
+        ret += std::string(1, c);
+      }
+      else if(c == '$')
+        ret += "_DOLR_";
+      else if( c == '.')
+        ret += "_DOT_";
+      else if(c == '\\')
+        ret += "_BKSLSH_";
+      else {
+        toCout("Error: not matched char: "+std::string(1, c));
+        abort();
+      }
+    }
+  }
+  return ret;
+}
+
+
+bool isLetter(const char &c) {
+  return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+}
+
+
+std::string purify_line(const std::string &line) {
+  if(line.find("|") == std::string::npos)
+    return line;
+  uint32_t pos = line.find("|");
+  uint32_t pos2 = line.find("|", pos+1);
+  std::string firstPart = line.substr(0, pos);
+  std::string var = line.substr(pos+1, pos2-pos-1);
+  std::string lastPart = line.substr(pos2+1);
+  var = purify_var_name(var);
+  lastPart = purify_line(lastPart);
+  return firstPart + "|" + var + "|" + lastPart;
 }
