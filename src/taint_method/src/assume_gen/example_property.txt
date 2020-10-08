@@ -1,0 +1,262 @@
+ 
+  // read kpd
+  // _t of reset always be 0
+  property inputs1;
+    i_rst_t == 0;
+  endproperty
+
+  // timing constraints between instructions
+
+  // only interested instruction set the _t input taints to 1
+  // write kp
+  property inputs2;
+    i_wb_cyc == 0 && i_wb_adr == 32'h00000000 && i_wb_stb == 0 && i_wb_we == 1 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t;
+  endproperty
+
+  // write ki  
+  property inputs3;
+    i_wb_cyc == 0 && i_wb_adr == 32'h00000004 && i_wb_stb == 0 && i_wb_we == 1 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t;    
+  endproperty
+
+  // write kd  
+  property inputs4;
+    i_wb_cyc == 0 && i_wb_adr == 32'h00000008 && i_wb_stb == 0 && i_wb_we == 1 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t;    
+  endproperty
+
+  // write sp  
+  property inputs5;
+    i_wb_cyc == 0 && i_wb_adr == 32'h0000000c && i_wb_stb == 0 && i_wb_we == 1 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t;    
+  endproperty
+
+  // write pv  
+  property inputs6;
+    i_wb_cyc == 0 && i_wb_adr == 32'h00000010 && i_wb_stb == 0 && i_wb_we == 1 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t;    
+  endproperty
+
+  // read kpd
+  property inputs7;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000014 && i_wb_stb == 1 && i_wb_we == 0 |-> i_wb_cyc_t && i_wb_adr_t && i_wb_stb_t && i_wb_we_t && i_wb_data_t;
+  endproperty
+
+  // read kp
+  property inputs8;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000000 && i_wb_stb == 1 && i_wb_we == 0 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t;
+  endproperty
+
+  // read ki
+  property inputs9;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000004 && i_wb_stb == 1 && i_wb_we == 0 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t;
+  endproperty
+
+  // read kd
+  property inputs10;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000008 && i_wb_stb == 1 && i_wb_we == 0 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t;
+  endproperty
+
+  // read sp
+  property inputs11;
+    i_wb_cyc == 1 && i_wb_adr == 32'h0000000c && i_wb_stb == 1 && i_wb_we == 0 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t;
+  endproperty
+
+  // read pv
+  property inputs12;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000010 && i_wb_stb == 1 && i_wb_we == 0 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t;
+  endproperty
+
+  // read err0
+  property inputs13;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000018 && i_wb_stb == 1 && i_wb_we == 0 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t;
+  endproperty
+
+  // read err1
+  property inputs14;
+    i_wb_cyc == 1 && i_wb_adr == 32'h0000001c && i_wb_stb == 1 && i_wb_we == 0 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t;
+  endproperty
+
+  // read un
+  property inputs15;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000020 && i_wb_stb == 1 && i_wb_we == 0 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t;
+  endproperty
+
+  // read sigma
+  property inputs16;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000024 && i_wb_stb == 1 && i_wb_we == 0 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t;
+  endproperty
+
+  // read of
+  property inputs17;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000028 && i_wb_stb == 1 && i_wb_we == 0 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t;
+  endproperty
+
+  // write RS 
+  property inputs18;
+    i_wb_cyc == 0 && i_wb_adr == 32'h0000002c && i_wb_stb == 0 && i_wb_we == 1 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t;    
+  endproperty
+
+  // read RS
+  property inputs19;
+    i_wb_cyc == 1 && i_wb_adr == 32'h0000002c && i_wb_stb == 1 && i_wb_we == 0 |-> !i_wb_cyc_t && !i_wb_adr_t && !i_wb_stb_t && !i_wb_we_t && !i_wb_data_t;
+  endproperty
+
+
+
+  // write kp
+  property inputs2_2;
+    i_wb_cyc == 0 && i_wb_adr == 32'h00000000 && i_wb_stb == 0 && i_wb_we == 1 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;
+  endproperty
+
+  // write ki  
+  property inputs3_2;
+    i_wb_cyc == 0 && i_wb_adr == 32'h00000004 && i_wb_stb == 0 && i_wb_we == 1 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;    
+  endproperty
+
+  // write kd  
+  property inputs4_2;
+    i_wb_cyc == 0 && i_wb_adr == 32'h00000008 && i_wb_stb == 0 && i_wb_we == 1 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;    
+  endproperty
+
+  // write sp  
+  property inputs5_2;
+    i_wb_cyc == 0 && i_wb_adr == 32'h0000000c && i_wb_stb == 0 && i_wb_we == 1 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;    
+  endproperty
+
+  // write pv  
+  property inputs6_2;
+    i_wb_cyc == 0 && i_wb_adr == 32'h00000010 && i_wb_stb == 0 && i_wb_we == 1 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;    
+  endproperty
+
+  // read kpd
+  property inputs7_2;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000014 && i_wb_stb == 1 && i_wb_we == 0 |-> o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;
+  endproperty
+
+  // read kp
+  property inputs8_2;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000000 && i_wb_stb == 1 && i_wb_we == 0 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;
+  endproperty
+
+  // read ki
+  property inputs9_2;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000004 && i_wb_stb == 1 && i_wb_we == 0 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;
+  endproperty
+
+  // read kd
+  property inputs10_2;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000008 && i_wb_stb == 1 && i_wb_we == 0 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;
+  endproperty
+
+  // read sp
+  property inputs11_2;
+    i_wb_cyc == 1 && i_wb_adr == 32'h0000000c && i_wb_stb == 1 && i_wb_we == 0 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;
+  endproperty
+
+  // read pv
+  property inputs12_2;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000010 && i_wb_stb == 1 && i_wb_we == 0 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;
+  endproperty
+
+  // read err0
+  property inputs13_2;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000018 && i_wb_stb == 1 && i_wb_we == 0 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;
+  endproperty
+
+  // read err1
+  property inputs14_2;
+    i_wb_cyc == 1 && i_wb_adr == 32'h0000001c && i_wb_stb == 1 && i_wb_we == 0 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;
+  endproperty
+
+  // read un
+  property inputs15_2;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000020 && i_wb_stb == 1 && i_wb_we == 0 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;
+  endproperty
+
+  // read sigma
+  property inputs16_2;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000024 && i_wb_stb == 1 && i_wb_we == 0 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;
+  endproperty
+
+  // read of
+  property inputs17_2;
+    i_wb_cyc == 1 && i_wb_adr == 32'h00000028 && i_wb_stb == 1 && i_wb_we == 0 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;
+  endproperty
+
+  // write RS 
+  property inputs18_2;
+    i_wb_cyc == 0 && i_wb_adr == 32'h0000002c && i_wb_stb == 0 && i_wb_we == 1 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;   
+  endproperty
+
+  // read RS
+  property inputs19_2;
+    i_wb_cyc == 1 && i_wb_adr == 32'h0000002c && i_wb_stb == 1 && i_wb_we == 0 |-> !o_wb_data_r && !o_un_r && !o_valid_r && !o_wb_ack_r ;
+  endproperty
+
+
+
+
+  // the instruction must be within a given set
+  property inputs99;
+    i_wb_cyc == 0 && i_wb_adr == 32'h00000000 && i_wb_stb == 0 && i_wb_we == 1
+      || i_wb_cyc == 0 && i_wb_adr == 32'h00000004 && i_wb_stb == 0 && i_wb_we == 1
+      || i_wb_cyc == 0 && i_wb_adr == 32'h00000008 && i_wb_stb == 0 && i_wb_we == 1
+      || i_wb_cyc == 0 && i_wb_adr == 32'h0000000c && i_wb_stb == 0 && i_wb_we == 1
+      || i_wb_cyc == 0 && i_wb_adr == 32'h00000010 && i_wb_stb == 0 && i_wb_we == 1
+      || i_wb_cyc == 1 && i_wb_adr == 32'h00000000 && i_wb_stb == 1 && i_wb_we == 0
+      || i_wb_cyc == 1 && i_wb_adr == 32'h00000004 && i_wb_stb == 1 && i_wb_we == 0
+      || i_wb_cyc == 1 && i_wb_adr == 32'h00000008 && i_wb_stb == 1 && i_wb_we == 0
+      || i_wb_cyc == 1 && i_wb_adr == 32'h0000000c && i_wb_stb == 1 && i_wb_we == 0
+      || i_wb_cyc == 1 && i_wb_adr == 32'h00000010 && i_wb_stb == 1 && i_wb_we == 0
+      || i_wb_cyc == 1 && i_wb_adr == 32'h00000014 && i_wb_stb == 1 && i_wb_we == 0
+      || i_wb_cyc == 1 && i_wb_adr == 32'h00000018 && i_wb_stb == 1 && i_wb_we == 0
+      || i_wb_cyc == 1 && i_wb_adr == 32'h0000001c && i_wb_stb == 1 && i_wb_we == 0
+      || i_wb_cyc == 1 && i_wb_adr == 32'h00000020 && i_wb_stb == 1 && i_wb_we == 0      
+      || i_wb_cyc == 1 && i_wb_adr == 32'h00000024 && i_wb_stb == 1 && i_wb_we == 0
+      || i_wb_cyc == 1 && i_wb_adr == 32'h00000028 && i_wb_stb == 1 && i_wb_we == 0
+      || i_wb_cyc == 1 && i_wb_adr == 32'h0000002c && i_wb_stb == 1 && i_wb_we == 0
+      || i_wb_cyc == 0 && i_wb_adr == 32'h0000002c && i_wb_stb == 0 && i_wb_we == 1;
+  endproperty
+
+  assume property (inputs1);
+  assume property (inputs2);
+  assume property (inputs3);
+  assume property (inputs4);
+  assume property (inputs5);
+  assume property (inputs6);
+  assume property (inputs7);
+  assume property (inputs8);
+  assume property (inputs9);
+  assume property (inputs10);
+  assume property (inputs11);
+  assume property (inputs12);
+  assume property (inputs13);
+  assume property (inputs14);
+  assume property (inputs15);
+  assume property (inputs16);
+  assume property (inputs17);
+  assume property (inputs18);
+  assume property (inputs19);
+  assume property (inputs99);
+  
+  assume property (inputs2_2);
+  assume property (inputs3_2);
+  assume property (inputs4_2);
+  assume property (inputs5_2);
+  assume property (inputs6_2);
+  assume property (inputs7_2);
+  assume property (inputs8_2);
+  assume property (inputs9_2);
+  assume property (inputs10_2);
+  assume property (inputs11_2);
+  assume property (inputs12_2);
+  assume property (inputs13_2);
+  assume property (inputs14_2);
+  assume property (inputs15_2);
+  assume property (inputs16_2);
+  assume property (inputs17_2);
+  assume property (inputs18_2);
+  assume property (inputs19_2);
+
+
+`include "../properties/PID_simp.v.assert.property";
+
+endmodule
+

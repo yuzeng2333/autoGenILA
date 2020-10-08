@@ -75,6 +75,8 @@ extern bool g_remove_adff;
 extern bool g_use_vcd_parser;
 extern bool g_split_long_num;
 extern bool g_write_assert;
+extern bool g_double_assert;
+extern bool g_use_sig;
 extern bool g_use_value_change;
 extern bool g_set_rflag_if_not_rst_val;
 extern std::string _t;

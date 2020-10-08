@@ -1096,7 +1096,6 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
         currentSig.clear();
         // need to deal with too much overFlow
         if(overFlowBits >= caseSliceWidth) {
-          assert(isNum(vAndSlice));
           while(overFlowBits >= caseSliceWidth) {
             overFlowBits -= caseSliceWidth;
             srcSigList = srcSigList + toStr(g_sig_width) + "'b0 , ";
@@ -1589,7 +1588,7 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
   if(g_use_value_change) {
     output << blank.substr(0, blank.length()-4) + "assign " + op1 + _x + op1Ver + op1Slice + " = " + extend(destAndSlice+" != "+op1AndSlice, localWidthNum) + " ;" << std::endl;
   }
-  else {
+  else if(g_use_sig){
     if(!replaceSig) {
       if(g_use_reset_taint)
         output << blank.substr(0, blank.length()-4) + "assign " + op1 + _x + op1Ver + op1Slice + " = " + extend(dest+_sig+" != "+op1+_sig, localWidthNum) + " | " + extend(dest+"_reset", localWidthNum) + " ;" << std::endl;
@@ -1601,6 +1600,9 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
       output << blank.substr(0, blank.length()-4) + "assign " + op1 + _x + op1Ver + op1Slice + " = " + extend("!("+repeatCond+")", localWidthNum) + " ;" << std::endl; 
     }
   }
+  else
+    output << blank.substr(0, blank.length()-4) + "assign " + op1 + _x + op1Ver + op1Slice + " = " + extend("1'b1", localWidthNum) + " ;" << std::endl; 
+
 
   // _r
   if(g_iteDest.find(op1) != g_iteDest.end())
