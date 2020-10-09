@@ -770,7 +770,7 @@ void sel_op_taint_gen(std::string line, std::ofstream &output) {
   //assert_info(!isTop || !isOutput(op1AndSlice), "sel_op_taint_gen:op1 is output, line: "+line);  
   //assert_info(!isTop || !isOutput(op2AndSlice), "sel_op_taint_gen:op2 is output, line: "+line);  
 
-  assert_info(!isNum(op1), "Error: the var to be selected are numbers!");
+  //assert_info(!isNum(op1), "Error: the var to be selected are numbers!");
   uint32_t localWidth = get_var_slice_width(destAndSlice);
   uint32_t op2Width = get_var_slice_width(op2AndSlice);
   std::string sndVer;
@@ -778,7 +778,7 @@ void sel_op_taint_gen(std::string line, std::ofstream &output) {
   //output << blank + "assign " + dest + _sig + " = 0;" << std::endl;  
  
   ////// declare taints
-  if(!isMem(op1)) {
+  if(!isMem(op1) && !isNum(op1)) {
     auto op1IdxPair = varWidth.get_idx_pair(op1, line);
     std::string op1HighIdx  = toStr(op1IdxPair.first);
     std::string op1LowIdx   = toStr(op1IdxPair.second);
@@ -793,7 +793,7 @@ void sel_op_taint_gen(std::string line, std::ofstream &output) {
       output << blank << "logic [" + op1HighIdx + ":" + op1LowIdx + "] " + op1 + _x + sndVer + " ;" << std::endl;
     }
   }
-  else { //op1 is mem
+  else if(isMem(op1)) { //op1 is mem
     if( nextVersion.find(op1) == nextVersion.end() ) {
       sndVer = toStr(0);
       nextVersion.emplace(op1, 1);
@@ -820,7 +820,7 @@ void sel_op_taint_gen(std::string line, std::ofstream &output) {
   }
   ////// end of declare taints
   
-  if(!isNum(op2)) {
+  if(!isNum(op2) && !isNum(op1)) {
 
     // _sig
     if(!g_use_value_change)
@@ -871,7 +871,7 @@ void sel_op_taint_gen(std::string line, std::ofstream &output) {
     output << blank + "  " + op2 + _x + thdVer + op2Slice + " = " + extend("| "+dest+_x+destSlice, op2Width) + " ;" << std::endl;
     output << blank + "end" << std::endl;    
   }
-  else { // isNum(op2)
+  else if(!isNum(op1)){ // isNum(op2)
 
     // _sig
     if(!g_use_value_change)
@@ -893,6 +893,44 @@ void sel_op_taint_gen(std::string line, std::ofstream &output) {
     output << blank + "  " + op1 + _r + sndVer + slice + " = " + dest + _r + destSlice + " ;" << std::endl;
     output << blank + "  " + op1 + _x + sndVer + slice + " = " + dest + _x + destSlice + " ;" << std::endl;
     output << blank + "end" << std::endl;    
+  }
+  else if(!isNum(op2)) { // isNum(op1)
+    // _sig
+    if(!g_use_value_change)
+    output << blank + "assign " + dest + _sig + " = 0 ;" << std::endl;
+
+    auto op2IdxPair = varWidth.get_idx_pair(op2, line);
+    std::string op2HighIdx  = toStr(op2IdxPair.first);
+    std::string op2LowIdx   = toStr(op2IdxPair.second);
+
+    bool op2IsNew;
+    uint32_t thdVerNum = find_version_num(op2AndSlice, op2IsNew, output);
+    std::string thdVer = std::to_string(thdVerNum);
+
+    /* declare new wires */
+    if(op2IsNew) {
+      output << blank << "logic [" + op2HighIdx + ":" + op2LowIdx + "] " + op2 + _c + thdVer + " ;" << std::endl;
+      output << blank << "logic [" + op2HighIdx + ":" + op2LowIdx + "] " + op2 + _r + thdVer + " ;" << std::endl;
+      output << blank << "logic [" + op2HighIdx + ":" + op2LowIdx + "] " + op2 + _x + thdVer + " ;" << std::endl;
+    }
+
+    output << blank + "assign " + dest + _t + destSlice + " = " + extend("| "+op2+_t+op2Slice, localWidth) + " ;" << std::endl;  
+
+    if ( isOutput(dest) && isTop ) {
+      output << blank << "assign " + op2 + _c + thdVer + op2Slice + " = "+extend("1'b1", op2Width)+" ;" << std::endl;
+      output << blank << "assign " + op2 + _r + thdVer + op2Slice + " = " + extend("| "+dest+_r+destSlice, op2Width) + " ;" << std::endl;
+      output << blank << "assign " + op2 + _x + thdVer + op2Slice + " = " + extend("| "+dest+_r+destSlice, op2Width) + " ;" << std::endl;
+      return;
+    }
+
+    // both isMem and !isMem have the same assignments
+    // assume memory slices can only be used in simple assignment statements11
+    // also assume each memory slice is used only once
+    output << blank + "always @(*) begin" << std::endl;
+    output << blank + "  " + op2 + _c + thdVer + op2Slice + " = " + extend("| "+dest+_c+destSlice, op2Width) + " ;" << std::endl;
+    output << blank + "  " + op2 + _r + thdVer + op2Slice + " = " + extend("| "+dest+_r+destSlice, op2Width) + " ;" << std::endl;
+    output << blank + "  " + op2 + _x + thdVer + op2Slice + " = " + extend("| "+dest+_x+destSlice, op2Width) + " ;" << std::endl;
+    output << blank + "end" << std::endl; 
   }
 }
 
