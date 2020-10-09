@@ -448,7 +448,16 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
     /* make assignments */
     /* FIXME: the width of op1/op2 and dest are not necessarily the same */
     if(!isReduceOp)
-      output << blank << "assign " + dest + _t + destSlice + " = " + op1 + _t + op1Slice + " | " + op2 + _t + op2Slice + " ;" << std::endl;
+      if(isAnd)
+        output << blank << "assign " + dest + _t + destSlice + " = ( " + op1 + _t + op1Slice + " && " + op2AndSlice + " ) | ( " + op2 + _t + op2Slice + " && " + op1AndSlice + " ) ;" << std::endl;
+      else if(isOR)
+        output << blank << "assign " + dest + _t + destSlice + " = ( " + op1 + _t + op1Slice + " && " + op2AndSlice + " != 1 ) | ( " + op2 + _t + op2Slice + " && " + op1AndSlice + " != 1 ) ;" << std::endl;
+      else if(isBitAnd)
+        output << blank << "assign " + dest + _t + destSlice + " = ( " + op1 + _t + op1Slice + " & " + op2AndSlice + " ) | ( " + op2 + _t + op2Slice + " & " + op1AndSlice + " ) ;" << std::endl;
+      else if(isBitOr)
+        output << blank << "assign " + dest + _t + destSlice + " = ( " + op1 + _t + op1Slice + " & ~" + op2AndSlice + " ) | ( " + op2 + _t + op2Slice + " & ~" + op1AndSlice + " ) ;" << std::endl;
+      else
+        output << blank << "assign " + dest + _t + destSlice + " = " + op1 + _t + op1Slice + " | " + op2 + _t + op2Slice + " ;" << std::endl;
     else
       output << blank << "assign " + dest + _t + destSlice + " = (| " + op1 + _t + op1Slice + " ) | (|" + op2 + _t + op2Slice + " ) ;" << std::endl;
 
