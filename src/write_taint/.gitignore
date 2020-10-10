@@ -1,0 +1,7 @@
+*.out
+*.swo
+*.swp
+*.swn
+*.swm
+*.a
+libTaintGenLib.a

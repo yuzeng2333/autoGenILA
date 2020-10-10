@@ -1,0 +1,22 @@
+{
+  "models": { "ILA":"m0", "VERILOG": "m1" },
+  "state mapping": {
+      "data": "data",
+      "rst": "rst",
+      "start": "start",
+      "timer": "timer",
+      "timer": "timer"
+    },
+
+  "interface mapping": {
+      "data":"**KEEP**",
+      "rst":"**KEEP**",
+      "start":"**KEEP**",
+      "finish":"**SO**",
+      "sum":"**SO**",
+      "timer":"**SO**",
+      "clk":"**CLOCK**"
+  },
+  "mapping control": [
+   ]
+}

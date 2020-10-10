@@ -1,0 +1,27 @@
+{
+  "models": { "ILA":"m0" , "VERILOG": "m1" },
+  "state mapping": { 
+    "kp" :  "kp",
+    "ki" :  "ki",
+    "kd" :  "kd",
+    "sp" :  "sp",
+    "pv" :  "pv",
+    "RS" :  "RS",
+    "un" :  "un",
+    "i_wb_data" : "i_wb_data"
+   },
+
+  "interface mapping": {
+  	 "i_rst":"**RESET**", 
+  	 "i_clk":"**CLOCK**",
+  	 "i_wb_cyc":"**KEEP**",
+  	 "i_wb_stb":"**KEEP**",
+  	 "i_wb_we":"**KEEP**",
+  	 "i_wb_adr":"**KEEP**",
+  	 "i_wb_data":"**KEEP**"
+  },
+  // the following line has no use, it is just a case of finding wire
+  "mapping control" : [
+   ]  
+}
+

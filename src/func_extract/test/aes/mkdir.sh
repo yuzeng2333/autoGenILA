@@ -1,5 +1,5 @@
-mkdir -p /workspace/research/ILA/autoGenILA/src/func_extract/test/aes/aes_128
-cd /workspace/research/ILA/autoGenILA/src/func_extract/test/aes/aes_128
+mkdir -p /workspace/research/ILA/autoGenILA/src/func_extract/test/aes/aes_top
+cd /workspace/research/ILA/autoGenILA/src/func_extract/test/aes/aes_top
 mkdir app
 mkdir verilog
 mkdir rfmap

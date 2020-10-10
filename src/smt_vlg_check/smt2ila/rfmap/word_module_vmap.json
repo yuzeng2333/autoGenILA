@@ -1,0 +1,20 @@
+{
+  "models": { "ILA":"m0" , "VERILOG": "m1" },
+  "state mapping": { 
+    "word" :  "word",
+    "result" : "result",
+    "enable" : "enable"
+   },
+
+  "interface mapping": {
+  	 "rst":"**RESET**", 
+  	 "clk":"**CLOCK**",
+  	 "func":"**KEEP**",
+  	 "inWord":"**KEEP**",
+  	 "result":"**SO**"
+  },
+  // the following line has no use, it is just a case of finding wire
+  "mapping control" : [
+   ]  
+}
+

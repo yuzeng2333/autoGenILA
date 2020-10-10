@@ -1,0 +1,11 @@
+(define-fun INV_result ((|result| (_ BitVec 9))) (_ BitVec 9)
+  (|result|)
+)
+
+(define-fun INV_enable () (_ BitVec 1)
+  (#b1)
+)
+
+(define-fun INV_word ((|word| (_ BitVec 4))) (_ BitVec 4)
+  (|word|)
+)

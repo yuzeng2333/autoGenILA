@@ -1,5 +1,8 @@
-#1#out#19
+#1#aes_out#20
 (goals
 (goal
-  (= |out___#100| #x66e94bd4ef8a2c3b884cfa59ca342b2e))
+  (= |aes_out___#1000|
+     (|aes_128__out__#0|
+       |\\aes_reg_key0_i.reg_out___#21|
+       #x00000000000000000000000000000000)))
 )

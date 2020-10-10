@@ -1,0 +1,45 @@
+{
+  "models": { "ILA":"m0", "VERILOG": "m1" },
+  "state mapping": {
+      "addr": "addr",
+      "data_in": "data_in",
+      "rst": "rst",
+      "stb": "stb",
+      "wr": "wr",
+      "xram_ack": "xram_ack",
+      "xram_data_in": "xram_data_in",
+      "aes_reg_key0_i_DOT_reg_out": "aes_reg_key0_i_DOT_reg_out",
+      "uaes_ctr": "uaes_ctr",
+      "aes_reg_ctr_i_DOT_reg_out": "aes_reg_ctr_i_DOT_reg_out",
+      "aes_reg_key0_i_DOT_reg_out": "aes_reg_key0_i_DOT_reg_out",
+      "aes_reg_opaddr_i_DOT_reg_out": "aes_reg_opaddr_i_DOT_reg_out",
+      "aes_reg_oplen_i_DOT_reg_out": "aes_reg_oplen_i_DOT_reg_out",
+      "aes_out": "aes_out",
+      "aes_out": "aes_out"
+    },
+
+  "interface mapping": {
+      "addr":"**KEEP**",
+      "data_in":"**KEEP**",
+      "rst":"**KEEP**",
+      "stb":"**KEEP**",
+      "wr":"**KEEP**",
+      "xram_ack":"**KEEP**",
+      "xram_data_in":"**KEEP**",
+      "ack":"**SO**",
+      "aes_addr":"**SO**",
+      "aes_ctr":"**SO**",
+      "aes_key0":"**SO**",
+      "aes_len":"**SO**",
+      "aes_state":"**SO**",
+      "aes_step":"**SO**",
+      "data_out":"**SO**",
+      "xram_addr":"**SO**",
+      "xram_data_out":"**SO**",
+      "xram_stb":"**SO**",
+      "xram_wr":"**SO**",
+      "clk":"**CLOCK**"
+  },
+  "mapping control": [
+   ]
+}

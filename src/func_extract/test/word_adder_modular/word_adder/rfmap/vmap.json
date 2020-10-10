@@ -1,10 +1,12 @@
 {
   "models": { "ILA":"m0", "VERILOG": "m1" },
   "state mapping": {
+      "func": "func",
+      "inWord": "inWord",
+      "rst": "rst",
       "enable": "enable",
-      "word": "word",
       "result": "result",
-      "word": "word"
+      "word__n": "word_n"
     },
 
   "interface mapping": {

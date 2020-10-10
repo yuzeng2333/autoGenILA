@@ -1,0 +1,66 @@
+{
+  "global invariants": [ 
+    "a == 0",
+    "cout == 0",
+    "err_0 == 0",
+    "err_1 == 0",
+    "kpd == 0",
+    "md_index == 0",
+    "mr_index == 0",
+    "multiplier_16x16bit_pipelined.md == 0",
+    "multiplier_16x16bit_pipelined.mr == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w0 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w1 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w10 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w11 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w12 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w13 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w14 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w15 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w16 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w17 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w18 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w19 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w2 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w20 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w21 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w22 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w23 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w24 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w25 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w26 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w27 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w28 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w29 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w3 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w30 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w31 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w4 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w5 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w6 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w7 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w8 == 0",
+    "multiplier_16x16bit_pipelined.reg_layer_2_w9 == 0",
+    "multiplier_16x16bit_pipelined.stage_0_ready == 0",
+    "of == 0",
+    "p == 0",
+    "rla == 0",
+    "rlb == 0",
+    "sigma == 0",
+    "start == 0",
+    "state_0 == 0",
+    "state_1 == 10'b0000000001",
+    "wack == 0",
+    "wla == 0",
+    "wlb == 0"
+  ],
+
+  "instructions": [
+    {
+      "instruction": "i1",
+      "ready bound": 10
+    }
+  ]
+}
+
+

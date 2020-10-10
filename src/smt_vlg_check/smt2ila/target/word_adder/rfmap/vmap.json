@@ -1,0 +1,19 @@
+{
+  "models": { "ILA":"m0", "VERILOG": "m1" },
+  "state mapping": {
+      "result": "result",
+      "word": "word",
+    },
+
+  "interface mapping": {
+      "clk":"**KEEP**",
+      "func":"**KEEP**",
+      "inWord":"**KEEP**",
+      "rst":"**KEEP**",
+      "result":"**SO**",
+      "rst":"**RESET**",
+      "clk":"**CLOCK**"
+  },
+  "mapping control": [
+   ]
+}

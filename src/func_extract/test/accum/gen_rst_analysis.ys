@@ -1,0 +1,5 @@
+read_verilog -sv design.v
+
+prep -top accum
+
+sim -clock clk -rstlen 20 -zinit -vcd rst.vcd

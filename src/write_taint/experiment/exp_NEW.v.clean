@@ -1,0 +1,53 @@
+module exp(clk, valid, in, out);
+  wire [4:0] _00_;
+  wire [4:0] _01_;
+  wire [4:0] _02_;
+  wire [4:0] _03_;
+  wire [4:0] _04_;
+  wire [8:0] _05_;
+  wire [5:0] _06_;
+  wire [6:0] _07_;
+  wire [4:0] _08_;
+  wire [31:0] _09_;
+  wire [31:0] _10_;
+  input clk;
+  input [4:0] in;
+  output [4:0] out;
+  reg [4:0] reg1;
+  reg [4:0] reg2;
+  reg [4:0] reg3;
+  reg [4:0] reg4;
+  reg [4:0] reg5;
+  input valid;
+  wire [7:0] fangyuan0;
+  assign fangyuan0 = { _09_[7:5], _08_ };
+
+  assign _05_ = fangyuan0 + reg5;
+  assign _06_ = reg1 + reg2;
+  assign _07_ = _06_ + reg3;
+  wire [7:0] fangyuan1;
+  assign { _09_[7:5], _08_ } = fangyuan1;
+
+  assign fangyuan1 = _07_ + reg4;
+  wire [31:0] fangyuan2;
+  assign { _10_[31:5], out } = fangyuan2;
+  wire [31:0] fangyuan3;
+  assign fangyuan3 = { 23'b00000000000000000000000, _05_ };
+
+  assign fangyuan2 = fangyuan3 / 32'd5;
+  always @(posedge clk)
+      reg1 <= _00_;
+  always @(posedge clk)
+      reg2 <= _01_;
+  always @(posedge clk)
+      reg3 <= _02_;
+  always @(posedge clk)
+      reg4 <= _03_;
+  always @(posedge clk)
+      reg5 <= _04_;
+  assign _00_ = valid ? in : reg1;
+  assign _01_ = valid ? reg1 : reg2;
+  assign _02_ = valid ? reg2 : reg3;
+  assign _03_ = valid ? reg3 : reg4;
+  assign _04_ = valid ? reg4 : reg5;
+endmodule

@@ -6,13 +6,10 @@
 #1#enable#3
 (goals
 (goal
-  (= |result___#100| |result___#0|)
-  (= |enable___#100| #b1))
+  (= |enable___#104| #b1))
 )
 #1#word#3
 (goals
 (goal
-  (= |result___#100| |result___#0|)
-  (= |enable___#100| #b1)
-  (= |word___#100| |word___#4|))
+  (= |word___#104| |word___#4|))
 )

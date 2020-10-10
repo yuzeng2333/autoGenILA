@@ -1,21 +1,5 @@
-expand_key_128:
-out_1 {
-  in: 2
-  rcon: 2
-}
-out_2 {
-  in: 1
-  rcon: 1
-}
-
-final_round:
-state_out {
-  state_in: 2
-  key_in: 1
-}
-
-one_round:
-state_out {
-  state_in: 2
-  key: 1
+aes_128:
+out {
+  key: 21
+  state: 21
 }

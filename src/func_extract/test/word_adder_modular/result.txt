@@ -1,10 +1,10 @@
 Begin main!
-Start time: Sun Sep  6 08:18:23 2020
+Start time: Sat Oct  3 19:52:33 2020
 
 Give 2'd2 to func___#4
 (goals
 (goal
-  (= |result___#100| (adder #b1 |word___#4|)))
+  (= |result___#1000| (|adder__result__#0| #b1 |word___#4|)))
 )
 (goals
 (goal
@@ -13,12 +13,9 @@ Give 2'd2 to func___#4
 Give 2'd2 to func___#4
 (goals
 (goal
-  (= |result___#100| |result___#0|)
-  (= |enable___#100| #b1))
+  (= |enable___#104| #b1))
 )
 (goals
 (goal
-  (= |result___#100| |result___#0|)
-  (= |enable___#100| #b1)
-  (= |word___#100| |word___#4|))
+  (= |word___#104| |word___#4|))
 )

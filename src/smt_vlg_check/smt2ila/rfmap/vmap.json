@@ -1,0 +1,24 @@
+{
+  "models": { "ILA":"m0" , "VERILOG": "m1" },
+  "state mapping": { 
+    "word" :  "word",
+    "word_sum" : "word_sum",
+    "word_sum_shit" : "word_sum_shit"
+   },
+
+  "interface mapping": {
+  	 "rst":"**RESET**", 
+  	 "clk":"**CLOCK**",
+  	 "func":"**KEEP**",
+  	 "shit":"**KEEP**",
+  	 "inWord":"**KEEP**",
+  	 "result":"**SO**"
+  },
+  // the following line has no use, it is just a case of finding wire
+  "mapping control" : [
+    "rst == 1 |-> ##[1:3] rst == 0",
+    "rst == 1 |=> func == 1",
+    "func == 1 |-> ##[1:3] func == 0"
+   ]  
+}
+

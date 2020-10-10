@@ -1,0 +1,2 @@
+all:
+	iverilog tb.v

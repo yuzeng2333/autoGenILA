@@ -1,9 +1,20 @@
 #1:
-state = x
-key = x
+rst = 0
+wr = 1
+addr = 16'hff00
+data_in = x
+stb = 1
+R:
+\aes_reg_key0_i.reg_out
+\aes_reg_ctr_i.reg_out
+\aes_reg_opaddr_i.reg_out
+\aes_reg_oplen_i.reg_out
 W:
-out(skip) 21
+aes_out(skip) 21
 $NOP:
-state = x
-key = x
+rst = 0
+wr = 0
+addr = 0
+data_in = x
+stb = 0
 *RESET:

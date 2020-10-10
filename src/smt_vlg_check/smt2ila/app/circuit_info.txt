@@ -1,0 +1,15 @@
+addr__:__16
+data_in__:__8
+rst__:__1
+stb__:__1
+wr__:__1
+xram_ack__:__1
+xram_data_in__:__8
+aes_reg_key0_i_DOT_reg_out__:__128, YES
+aes_out__:__128, YES
+uaes_ctr__:__128, YES
+aes_reg_ctr_i_DOT_reg_out__:__128
+aes_reg_opaddr_i_DOT_reg_out__:__16
+aes_reg_oplen_i_DOT_reg_out__:__16
+#moduleName:aes_top
+#dirName:/workspace/research/ILA/autoGenILA/src/func_extract/test/aes/aes_top

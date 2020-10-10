@@ -32,16 +32,16 @@
 
 
 module word_adder(clk, rst, func, inWord, result);
-  wire [8:0] _0_;
-  wire _1_;
+  logic [8:0] _0_;
+  logic _1_;
   input clk;
-  wire enable;
+  logic enable;
   input [1:0] func;
   input [8:0] inWord;
   output [8:0] result;
   input rst;
-  reg [8:0] word;
-  wire [8:0] word_next;
+  logic [8:0] word;
+  logic [8:0] word_next;
   assign _1_ = func == 1'h1;
   assign enable = func == 2'h2;
   always @(posedge clk)

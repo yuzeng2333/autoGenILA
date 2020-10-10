@@ -1,0 +1,2 @@
+(define-fun INV ( (|key| (_ BitVec 128)) (|s0| (_ BitVec 128)) (|state| (_ BitVec 128))  ) (_ BitVec 128)
+  (bvadd #x00000000000000000000000000000000 (bvxor |state| |key|)))

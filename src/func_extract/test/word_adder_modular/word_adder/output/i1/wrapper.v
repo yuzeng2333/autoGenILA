@@ -14,14 +14,17 @@ clk,
 dummy_reset,
 rst,
 __ILA_SO_enable,
+__ILA_SO_func,
+__ILA_SO_inWord,
 __ILA_SO_result,
-__ILA_SO_word,
+__ILA_SO_word__n,
 __m0__,
 __m1__,
 __m2__,
 __m3__,
 __m4__,
 __m5__,
+__m6__,
 result,
 __CYCLE_CNT__,
 __START__,
@@ -36,14 +39,17 @@ input            clk;
 input            dummy_reset;
 input            rst;
 output            __ILA_SO_enable;
+output      [1:0] __ILA_SO_func;
+output      [8:0] __ILA_SO_inWord;
 output      [8:0] __ILA_SO_result;
-output      [8:0] __ILA_SO_word;
+output      [8:0] __ILA_SO_word__n;
 output            __m0__;
 output            __m1__;
 output            __m2__;
 output            __m3__;
 output            __m4__;
 output            __m5__;
+output            __m6__;
 output      [8:0] result;
 output reg      [3:0] __CYCLE_CNT__;
 output reg            __START__;
@@ -55,8 +61,10 @@ wire            __2ndIEND__;
 (* keep *) wire            __EDCOND__;
 (* keep *) wire            __IEND__;
 (* keep *) wire            __ILA_SO_enable;
+(* keep *) wire      [1:0] __ILA_SO_func;
+(* keep *) wire      [8:0] __ILA_SO_inWord;
 (* keep *) wire      [8:0] __ILA_SO_result;
-(* keep *) wire      [8:0] __ILA_SO_word;
+(* keep *) wire      [8:0] __ILA_SO_word__n;
 (* keep *) wire            __ILA_bar_decode_of_i1__;
 (* keep *) wire            __ILA_bar_valid__;
 (* keep *) wire            __ISSUE__;
@@ -68,6 +76,7 @@ wire            __2ndIEND__;
 (* keep *) wire            __m3__;
 (* keep *) wire            __m4__;
 (* keep *) wire            __m5__;
+(* keep *) wire            __m6__;
 wire            clk;
 (* keep *) wire            dummy_reset;
 (* keep *) wire      [8:0] result;
@@ -97,11 +106,12 @@ always @(posedge clk) begin
 if (rst) __RESETED__ <= 1;
 end
 assign __m0__ = m1.enable == __ILA_SO_enable ;
-assign __m1__ = m1.result == __ILA_SO_result ;
-assign __m2__ = m1.word == __ILA_SO_word ;
-assign __m3__ = m1.enable == __ILA_SO_enable ;
-assign __m4__ = m1.result == __ILA_SO_result ;
-assign __m5__ = m1.word == __ILA_SO_word ;
+assign __m1__ = m1.func == __ILA_SO_func ;
+assign __m2__ = m1.inWord == __ILA_SO_inWord ;
+assign __m3__ = m1.result == __ILA_SO_result ;
+assign __m4__ = m1.word_n == __ILA_SO_word__n ;
+assign __m5__ = m1.enable == __ILA_SO_enable ;
+assign __m6__ = m1.result == __ILA_SO_result ;
 assign __EDCOND__ = (`false|| ( __CYCLE_CNT__ == 4'd4)) && __STARTED__  ;
 assign __IEND__ = (`false|| ( __CYCLE_CNT__ == 4'd4)) && __STARTED__ && __RESETED__ && (~ __ENDED__) ;
 assign __ISSUE__ = 1 ;
@@ -112,9 +122,11 @@ bar__DOT__i1 m0 (
    .rst(rst),
    .__ILA_bar_decode_of_i1__(__ILA_bar_decode_of_i1__),
    .__ILA_bar_valid__(__ILA_bar_valid__),
+   .func(__ILA_SO_func),
+   .inWord(__ILA_SO_inWord),
    .enable(__ILA_SO_enable),
    .result(__ILA_SO_result),
-   .word(__ILA_SO_word),
+   .word__n(__ILA_SO_word__n),
    .__COUNTER_start__n0()
 );
 word_adder m1(

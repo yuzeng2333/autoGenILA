@@ -37,6 +37,12 @@ ss:
 ss1:
 	./build/func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/aes_short_s 1
 
+1281:
+	./build/func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/aes_128 1
+
+128:
+	./build/func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/aes_128 0
+
 aes1:
 	./build/func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/aes 1
 
@@ -60,3 +66,6 @@ or:
 
 or1:
 	./build/func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/one_round 1
+
+acc:
+	./build/func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/accum 1

@@ -1,0 +1,200 @@
+#1#out#20
+(goals
+(goal
+  (= |out| |out|))
+)
+#1#k9b#20
+(goals
+(goal
+  (= |k9b| |k9b|))
+)
+#1#s9#20
+(goals
+(goal
+  (= |s9| |s9|))
+)
+#1#k9#20
+(goals
+(goal
+  (= |k9| |k9|))
+)
+#1#k8b#20
+(goals
+(goal
+  (= |k8b| |k8b|))
+)
+#1#s8#20
+(goals
+(goal
+  (= |s8| |s8|))
+)
+#1#k8#20
+(goals
+(goal
+  (= |k8| |k8|))
+)
+#1#k8#20
+(goals
+(goal
+  (= |k8| |k8|))
+)
+#1#k7b#20
+(goals
+(goal
+  (= |k7b| |k7b|))
+)
+#1#s7#20
+(goals
+(goal
+  (= |s7| |s7|))
+)
+#1#k7#20
+(goals
+(goal
+  (= |k7| |k7|))
+)
+#1#k7#20
+(goals
+(goal
+  (= |k7| |k7|))
+)
+#1#k6b#20
+(goals
+(goal
+  (= |k6b| |k6b|))
+)
+#1#s6#20
+(goals
+(goal
+  (= |s6| |s6|))
+)
+#1#k6#20
+(goals
+(goal
+  (= |k6| |k6|))
+)
+#1#k6#20
+(goals
+(goal
+  (= |k6| |k6|))
+)
+#1#k5b#20
+(goals
+(goal
+  (= |k5b| |k5b|))
+)
+#1#s5#20
+(goals
+(goal
+  (= |s5| |s5|))
+)
+#1#k5#20
+(goals
+(goal
+  (= |k5| |k5|))
+)
+#1#k5#20
+(goals
+(goal
+  (= |k5| |k5|))
+)
+#1#k4b#20
+(goals
+(goal
+  (= |k4b| |k4b|))
+)
+#1#s4#20
+(goals
+(goal
+  (= |s4| |s4|))
+)
+#1#k4#20
+(goals
+(goal
+  (= |k4| |k4|))
+)
+#1#k4#20
+(goals
+(goal
+  (= |k4| |k4|))
+)
+#1#k3b#20
+(goals
+(goal
+  (= |k3b| |k3b|))
+)
+#1#s3#20
+(goals
+(goal
+  (= |s3| |s3|))
+)
+#1#k3#20
+(goals
+(goal
+  (= |k3| |k3|))
+)
+#1#k3#20
+(goals
+(goal
+  (= |k3| |k3|))
+)
+#1#k2b#20
+(goals
+(goal
+  (= |k2b| |k2b|))
+)
+#1#s2#20
+(goals
+(goal
+  (= |s2| |s2|))
+)
+#1#k2#20
+(goals
+(goal
+  (= |k2| |k2|))
+)
+#1#k2#20
+(goals
+(goal
+  (= |k2| |k2|))
+)
+#1#k1b#20
+(goals
+(goal
+  (= |k1b| |k1b|))
+)
+#1#s1#20
+(goals
+(goal
+  (= |s1| |s1|))
+)
+#1#k1#20
+(goals
+(goal
+  (= |k1| |k1|))
+)
+#1#k1#20
+(goals
+(goal
+  (= |k1| |k1|))
+)
+#1#k0b#20
+(goals
+(goal
+  (= |k0b| |k0b|))
+)
+#1#s0#20
+(goals
+(goal
+  (= |s0| (bvxor |state| |key|)))
+)
+#1#k0#20
+(goals
+(goal
+  (= |k0| |key|))
+)
+#1#k0#20
+(goals
+(goal
+  (= |k0| |key|))
+)

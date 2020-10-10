@@ -1,0 +1,3 @@
+(define-fun INV_enable () (_ BitVec 1)
+  (#b1)
+)

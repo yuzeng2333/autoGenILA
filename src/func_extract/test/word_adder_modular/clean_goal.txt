@@ -1,6 +1,5 @@
 #1#result#3
 (goals
 (goal
-  (= |result| (adder #b1 |word|)))
+  (= |result| (|adder__result__#0| #b1 |word|)))
 )
-assume -name zy_assume0 {__START__ == 1 |-> (rst == 1'd0 && func == 2'd2  ##1 ( inWord == 9'd0 && func == 2'd0 && rst == 1'd0  )[*5] ) }

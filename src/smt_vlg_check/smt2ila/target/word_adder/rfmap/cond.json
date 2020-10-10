@@ -1,0 +1,9 @@
+{
+  "global invaraints": [ ],
+  "instructions": [
+    {
+      "instruction": "i1",
+      "ready bound": 4
+    }
+  ]
+}
