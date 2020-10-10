@@ -152,6 +152,7 @@ std::unordered_map<std::string, uint32_t> fangyuanCaseSliceWidth; // width of ea
 std::unordered_map<std::string, uint32_t> g_destVersion;
 std::unordered_map<std::string, std::pair<std::string, bool>> g_moduleRst;
 std::unordered_map<std::string, std::string> g_moduleClk;
+std::map<uint32_t, std::string> g_sig2regMap;
 VarWidth varWidth;
 VarWidth funcVarWidth;
 unsigned long int NEW_VAR = 0;
@@ -2442,10 +2443,17 @@ bool extract_concat(std::string line, std::ofstream &output, std::string &return
 void gen_assert_property(std::ofstream &output) {
   if(!isTop)
     return;
+  std::string allTaintsAreZero = "";
   for(auto out: moduleOutputs) {
     // check_cond is to be assigned in property file
-    output << "assert property( !check_cond || "+out+_t+" == 0 );" << std::endl;
+    allTaintsAreZero = allTaintsAreZero + out+_t+" == 0 || ";
   }
+  if(allTaintsAreZero.length() > 4) {
+    allTaintsAreZero.pop_back();
+    allTaintsAreZero.pop_back();
+    allTaintsAreZero.pop_back();
+  }
+  output << "assert -name {allTaintsAreZero} { !check_cond || "+allTaintsAreZero+" } -update_db;" << std::endl;
 }
 
 

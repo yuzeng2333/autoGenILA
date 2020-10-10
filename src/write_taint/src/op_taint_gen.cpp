@@ -158,8 +158,12 @@ void reg_taint_gen(std::string line, std::ofstream &output) {
   output << blank << "logic " + var + "_r_flag ;" << std::endl;
 
   if(isTrueReg(var) && !g_use_value_change) {
-    output << blank << "assign " + var + _sig + " = " + toStr(g_next_sig) + " ;" << std::endl;
-    output << blank << "assign " + var + _t + " = " + var + _tz + " | " + extend("YZC["+toStr(g_next_sig++)+"]", width); + " ;" << std::endl;
+    uint32_t localSig = g_next_sig++;
+    output << blank << "assign " + var + _sig + " = " + toStr(localSig) + " ;" << std::endl;
+    output << blank << "assign " + var + _t + " = " + var + _tz + " | " + extend("YZC["+toStr(localSig)+"]", width) + " ;" << std::endl;
+    if(g_sig2regMap.find(localSig) !=  g_sig2regMap.end()) {
+      toCout("Error: signature already exists in the map: "+toStr(localSig));
+    }
   }
   if(g_use_reset_taint)
     output << blank << "logic " + var + "_reset ;" << std::endl;
