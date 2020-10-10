@@ -187,6 +187,7 @@ bool g_use_sig = false;
 // set the read flag only if reg's value is not reset value
 bool g_set_rflag_if_not_rst_val = true; 
 std::string _t="_T";
+std::string _tz="_TZ";
 std::string _r="_R";
 std::string _x="_X";
 std::string _c="_C";
@@ -2439,44 +2440,11 @@ bool extract_concat(std::string line, std::ofstream &output, std::string &return
 
 
 void gen_assert_property(std::ofstream &output) {
-  std::regex pRFlag("(\\S*)_r_flag");
-  std::smatch m;
-  std::smatch match;
-  if(!g_write_assert) {
-    for(std::string out: flagOutputs) {
-      if(std::regex_search(out, m, pRFlag)) {
-        //std::string var = m.str(1);
-        //checkCond(std::regex_match(var, match, pRFlag), "Error: pRFlag is not matched: "+m.str(1));
-        std::string rstVal; 
-        if(g_use_vcd_parser)
-          rstVal = g_rstValMap[moduleName][m.str(1)];
-        if(rstVal.empty()) rstVal = "0";
-        if(!isMem(m.str(1)) && g_double_assert) {
-          if(g_use_vcd_parser)
-            output << "  assert property( " + out + " == 0 || " + m.str(1) + "_PREV_VAL1 == " + rstVal + " );" << std::endl;
-          else if(g_set_rflag_if_not_rst_val)
-          //else if(true)
-            output << "  assert property( " + out + " == 0 );" << std::endl;
-          else
-            output << "  assert property( " + out + " == 0 || " + m.str(1) + "_PREV_VAL1 == " + m.str(1) + "_PREV_VAL2 );" << std::endl;
-        }
-        else
-          output << "  assert property( " + out + " == 0 );" << std::endl;
-      }
-    }
-  }
-  
-  // generate properties for checking written ASV by each instruction
-  if(g_write_assert && isTop) {
-    std::ifstream input(g_path+"/ILA/asv.txt");
-    if(!input.is_open()) {
-      toCout("Error: asv.txt file is not opened: "+g_path+"/ILA/asv.txt");
-      abort();
-    }
-    std::string asv;
-    while(std::getline(input, asv)) {
-      output << "  assert property( " + asv + "_t_flag == 0 );" << std::endl;
-    }
+  if(!isTop)
+    return;
+  for(auto out: moduleOutputs) {
+    // check_cond is to be assigned in property file
+    output << "assert property( !check_cond || "+out+_t+" == 0 );" << std::endl;
   }
 }
 

@@ -80,6 +80,7 @@ extern bool g_use_sig;
 extern bool g_use_value_change;
 extern bool g_set_rflag_if_not_rst_val;
 extern std::string _t;
+extern std::string _tz;
 extern std::string _r;
 extern std::string _x;
 extern std::string _c;
