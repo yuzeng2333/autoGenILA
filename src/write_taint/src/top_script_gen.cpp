@@ -1,4 +1,5 @@
 #include "global_data.h"
+#include "top_script_gen.h"
 
 #define el std::endl
 #define toStr(a) std::to_string(a)
@@ -42,6 +43,7 @@ void top_script_gen() {
     bool hasThreeAssum = false;    
     uint32_t sig = it->first;
     std::string reg = it->second;
+    correct_brackets(reg);
     if(sig == 0) {
       outFile << "assume -name {a1} {YZC["+toStr(totalReg-1)+":1] == 0} -update_db" << el;
       outFile << "assume -name {a2} {YZC[0] == issue_cond} -update_db" << el;
@@ -69,4 +71,16 @@ void top_script_gen() {
   outFile << "close $fd" << el;
   outFile << "date" << el;
   outFile.close();
+}
+
+
+void correct_brackets(std::string &reg) {
+  if(reg.find("[") != std::string::npos) {
+    uint32_t pos = reg.find("[");
+    reg = reg.substr(0, pos) + "\\[" + reg.substr(pos+1);
+  }
+  if(reg.find("]") != std::string::npos) {
+    uint32_t pos = reg.find("]");
+    reg = reg.substr(0, pos) + "\\]" + reg.substr(pos+1);
+  }
 }
