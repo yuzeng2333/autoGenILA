@@ -1600,7 +1600,7 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
   if(isNum(op1AndSlice)) {
     toCout("Warning: constant number found in RHS of nonblocking: "+line);
     output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " ) begin" << std::endl;
-    output << blank + dest + _tz + " \t\t<= 0 ;" << std::endl;
+    output << blank + dest + _t + " \t\t<= 0 ;" << std::endl;
     output << blank + dest + "_t_flag \t\t<= 0 ;" << std::endl;
     output << blank + dest + "_r_flag \t\t<= 0 ;" << std::endl;
     output << blank + "end" << std::endl;

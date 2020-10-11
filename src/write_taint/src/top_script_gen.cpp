@@ -36,16 +36,16 @@ void top_script_gen() {
     std::string reg = it->second;
     if(sig == 0) {
       outFile << "assume -name {a1} {YZC["+toStr(totalReg-1)+":1] == 0} -update_db" << el;
-      outFile << "assume -name {a2} {!issue_cond || YZC[0] == 1} -update_db" << el;
+      outFile << "assume -name {a2} {YZC[0] == issue_cond} -update_db" << el;
     }
     else if(sig == totalReg - 1) {
       outFile << "assume -name {a1} {YZC["+toStr(totalReg-2)+":0] == 0} -update_db" << el;      
-      outFile << "assume -name {a2} {!issue_cond || YZC["+toStr(totalReg-1)+"] == 1} -update_db" << el;
+      outFile << "assume -name {a2} {YZC["+toStr(totalReg-1)+"] == issue_cond} -update_db" << el;
     }
     else {
       outFile << "assume -name {a1} {YZC["+toStr(sig-1)+":0] == 0} -update_db" << el;      
       outFile << "assume -name {a2} {YZC["+toStr(totalReg-1)+":"+toStr(sig+1)+"] == 0} -update_db" << el;
-      outFile << "assume -name {a3} {!issue_cond || YZC["+toStr(sig)+"] == 1} -update_db" << el;
+      outFile << "assume -name {a3} {YZC["+toStr(sig)+"] == issue_cond} -update_db" << el;
       hasThreeAssum = true;
     }
     outFile << "prove -bg -all" << el;
