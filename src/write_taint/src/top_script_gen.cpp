@@ -9,15 +9,21 @@ bool useAllEngine=false;
 void gen_assert_property(std::ofstream &output) {
   if(!isTop)
     return;
-  std::string allTaintsAreZero = "";
-  for(auto out: moduleOutputs) {
-    // check_cond is to be assigned in property file
-    allTaintsAreZero = allTaintsAreZero + out+_t+" == 0 && ";
+  std::ifstream inFile(g_path+"/assert.txt");
+  std::string allTaintsAreZero = "";  
+  if(!inFile.is_open()) {
+    for(auto out: moduleOutputs) {
+      // check_cond is to be assigned in property file
+      allTaintsAreZero = allTaintsAreZero + out+_t+" == 0 && ";
+    }
+    if(allTaintsAreZero.length() > 4) {
+      allTaintsAreZero.pop_back();
+      allTaintsAreZero.pop_back();
+      allTaintsAreZero.pop_back();
+    }
   }
-  if(allTaintsAreZero.length() > 4) {
-    allTaintsAreZero.pop_back();
-    allTaintsAreZero.pop_back();
-    allTaintsAreZero.pop_back();
+  else {
+    std::getline(inFile, allTaintsAreZero);
   }
   output << "assert -name {allTaintsAreZero} { !check_cond || ( "+allTaintsAreZero+" ) } -update_db;" << std::endl;
 }
@@ -26,8 +32,10 @@ void gen_assert_property(std::ofstream &output) {
 void top_script_gen() {
   std::ofstream outFile(g_path+"/top_script.tcl");
   uint32_t totalReg = g_next_sig;
-  if(useAllEngine) outFile << "set_engine_mode {Hp Ht Bm J Q3 U L B K AB D I AD M N AM G C AG G2 C2 Hps Hts Tri}" << el;
+  if(useAllEngine) outFile << "set_engine_mode {Hp Ht Bm J Q3 U L B K AB D I AD M N AM G C AG G2 C2 Hps Hts Tri R}" << el;
   outFile << "set fd [open asv_result.txt w]" << el;
+  outFile << "set time1 [date]" << el;
+  outFile << "puts $fd ${time1}" << el;
   outFile << "source script.tcl" << el;
   gen_assert_property(outFile);
   for(auto it = g_sig2regMap.begin(); it != g_sig2regMap.end(); it++) {
@@ -48,7 +56,7 @@ void top_script_gen() {
       outFile << "assume -name {a3} {YZC["+toStr(sig)+"] == issue_cond} -update_db" << el;
       hasThreeAssum = true;
     }
-    outFile << "prove -bg -all" << el;
+    outFile << "prove -all" << el;
     outFile << "set res [get_property_info -list status allTaintsAreZero]" << el;
     outFile << "puts $fd \""+reg+": ${res}\"" << el;
     outFile << "assume -remove a1" << el;
@@ -56,6 +64,8 @@ void top_script_gen() {
     if(hasThreeAssum) outFile << "assume -remove a3" << el;
     outFile << el;
   }
+  outFile << "set time2 [date]" << el;
+  outFile << "puts $fd ${time2}" << el;
   outFile << "close $fd" << el;
   outFile << "date" << el;
   outFile.close();
