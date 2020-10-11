@@ -26,8 +26,8 @@ void gen_assert_property(std::ofstream &output) {
 void top_script_gen() {
   std::ofstream outFile(g_path+"/top_script.tcl");
   uint32_t totalReg = g_next_sig;
-  if(useAllEngine) outFile << "set_engine_mode {Hp Ht Bm J Q3 U L YZC B K AB D I AD M N AM G C AG G2 C2 Hps Hts Tri}" << el;
-  outFile << "set fd [open result.txt w]" << el;
+  if(useAllEngine) outFile << "set_engine_mode {Hp Ht Bm J Q3 U L B K AB D I AD M N AM G C AG G2 C2 Hps Hts Tri}" << el;
+  outFile << "set fd [open asv_result.txt w]" << el;
   outFile << "source script.tcl" << el;
   gen_assert_property(outFile);
   for(auto it = g_sig2regMap.begin(); it != g_sig2regMap.end(); it++) {
@@ -49,13 +49,14 @@ void top_script_gen() {
       hasThreeAssum = true;
     }
     outFile << "prove -bg -all" << el;
-    outFile << "set res {get_property_info -list status allTaintsAreZero}" << el;
-    outFile << "if{$res==\"cex\"} {puts $fd \""+reg+"\"}" << el;
+    outFile << "set res [get_property_info -list status allTaintsAreZero]" << el;
+    outFile << "puts $fd \""+reg+": ${res}\"" << el;
     outFile << "assume -remove a1" << el;
     outFile << "assume -remove a2" << el;
     if(hasThreeAssum) outFile << "assume -remove a3" << el;
     outFile << el;
   }
   outFile << "close $fd" << el;
+  outFile << "date" << el;
   outFile.close();
 }
