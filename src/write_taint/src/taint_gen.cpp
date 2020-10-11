@@ -1276,6 +1276,10 @@ void merge_taints(std::string fileName) {
   //}
   //output << " ;" << std::endl;
 
+  if(isTop) {
+    output  << "logic ["+toStr(g_next_sig)+":0] YZC;" << std::endl;
+  }
+
   output << "endmodule" << std::endl;
   output.close();
 }
