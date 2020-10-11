@@ -1261,7 +1261,6 @@ void merge_taints(std::string fileName) {
     output << mem + "_r_flag [" + toStr(len-1) + "] ;" << std::endl;
   }
 
-  gen_assert_property(output);
   if(g_hasRst)
     output << "  assign rst_zy = "+get_recent_rst()+" ;" << std::endl;
 
@@ -2437,23 +2436,6 @@ bool extract_concat(std::string line, std::ofstream &output, std::string &return
     return false;
   } // end of if
   return true; // true means no concatenation
-}
-
-
-void gen_assert_property(std::ofstream &output) {
-  if(!isTop)
-    return;
-  std::string allTaintsAreZero = "";
-  for(auto out: moduleOutputs) {
-    // check_cond is to be assigned in property file
-    allTaintsAreZero = allTaintsAreZero + out+_t+" == 0 || ";
-  }
-  if(allTaintsAreZero.length() > 4) {
-    allTaintsAreZero.pop_back();
-    allTaintsAreZero.pop_back();
-    allTaintsAreZero.pop_back();
-  }
-  output << "assert -name {allTaintsAreZero} { !check_cond || "+allTaintsAreZero+" } -update_db;" << std::endl;
 }
 
 
