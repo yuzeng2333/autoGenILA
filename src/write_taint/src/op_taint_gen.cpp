@@ -165,7 +165,10 @@ void reg_taint_gen(std::string line, std::ofstream &output) {
       toCout("Error: signature already exists in the map: "+toStr(localSig));
       abort();
     }
-    g_sig2regMap.emplace(localSig, moduleName+"."var);
+    if(isTop)
+      g_sig2regMap.emplace(localSig, var);
+    else
+      g_sig2regMap.emplace(localSig, moduleName+"."+var);
   }
   if(g_use_reset_taint)
     output << blank << "logic " + var + "_reset ;" << std::endl;

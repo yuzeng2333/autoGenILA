@@ -1685,7 +1685,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     for(auto localPair: caseAssignPairs) {
       split_slice(localPair.second, rhs, rhsSlice);
       uint32_t pos = localPair.first.find("1");
-      uint32_t idx = localPair.length() - pos - 1;
+      uint32_t idx = localPair.first.length() - pos - 1;
       output << blank + "    " + localPair.first + " :" << std::endl;
       output << blank + "      " + dest+_t+destSlice + " = " + rhs + _t + rhsSlice + " | " + extend(s+_t+"["+toStr(idx)+"]", destWidthNum) + ";" << std::endl;
     }
