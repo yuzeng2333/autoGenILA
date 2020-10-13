@@ -10,6 +10,7 @@
 
 /* Global data */
 extern std::string moduleName;
+extern std::string g_moduleName;
 extern std::vector<std::string> moduleInputs;
 extern std::vector<std::string> moduleOutputs;
 extern std::vector<std::string> extendInputs;
@@ -38,7 +39,9 @@ extern std::unordered_map<std::string, uint32_t> g_destVersion;
 extern std::unordered_map<std::string, std::unordered_map<std::string, std::string>> g_instance2moduleMap;
 extern std::unordered_map<std::string, std::pair<std::string, bool>> g_moduleRst;
 extern std::unordered_map<std::string, std::string> g_moduleClk;
-extern std::map<uint32_t, std::string> g_sig2regMap;
+extern std::map<uint32_t, std::string> g_yzc2regMap;
+extern std::unordered_map<std::string, std::unordered_map<std::string, uint32_t>> g_mod2RegYzc;
+extern std::unordered_map<std::string, std::unordered_map<std::string, std::pair<std::string, uint32_t>>> g_mod2instYzc;
 extern std::map<std::string, std::unordered_map<std::string, std::string>> g_rstValMap;
 extern std::map<std::string, std::string> g_finalRegCondMap;
 // pass_info
@@ -95,6 +98,7 @@ extern std::string idxedModuleName;
 extern uint32_t g_reg_count;
 extern uint32_t g_sig_width; // == log2(g_reg_count);
 extern uint32_t g_next_sig;
+extern uint32_t g_yzcNxtIdx;
 extern uint32_t CONSTANT_SIG_NUM;
 extern std::string CONSTANT_SIG;
 extern std::string RESET_SIG;

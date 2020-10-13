@@ -1,10 +1,11 @@
 #include "global_data.h"
+#include "helper.h"
 #include "top_script_gen.h"
 
 #define el std::endl
 #define toStr(a) std::to_string(a)
 
-bool useAllEngine=false;
+bool useAllEngine=true;
 
 
 void gen_assert_property(std::ofstream &output) {
@@ -31,19 +32,20 @@ void gen_assert_property(std::ofstream &output) {
 
 // for each register, change YZC, and run jg
 void top_script_gen() {
+  fill_yzc2regMap(g_topModule, g_topModule, 0);
   std::ofstream outFile(g_path+"/top_script.tcl");
   uint32_t totalReg = g_next_sig;
   if(useAllEngine) outFile << "set_engine_mode {Hp Ht Bm J Q3 U L B K AB D I AD M N AM G C AG G2 C2 Hps Hts Tri R}" << el;
-  outFile << "set fd [open asv_result.txt w]" << el;
-  outFile << "set time1 [date]" << el;
-  outFile << "puts $fd ${time1}" << el;
+  //outFile << "set time1 [date]" << el;
+  //outFile << "puts $fd ${time1}" << el;
   outFile << "source script.tcl" << el;
   gen_assert_property(outFile);
-  for(auto it = g_sig2regMap.begin(); it != g_sig2regMap.end(); it++) {
+  for(auto it = g_yzc2regMap.begin(); it != g_yzc2regMap.end(); it++) {
     bool hasThreeAssum = false;    
     uint32_t sig = it->first;
     std::string reg = it->second;
     correct_brackets(reg);
+    outFile << "set fd [open asv_result.txt a]" << el;    
     if(sig == 0) {
       outFile << "assume -name {a1} {YZC["+toStr(totalReg-1)+":1] == 0} -update_db" << el;
       outFile << "assume -name {a2} {YZC[0] == issue_cond} -update_db" << el;
@@ -61,15 +63,15 @@ void top_script_gen() {
     outFile << "prove -all" << el;
     outFile << "set res [get_property_info -list status allTaintsAreZero]" << el;
     outFile << "puts $fd \""+reg+": ${res}\"" << el;
+    outFile << "close $fd" << el;
     outFile << "assume -remove a1" << el;
     outFile << "assume -remove a2" << el;
     if(hasThreeAssum) outFile << "assume -remove a3" << el;
+
     outFile << el;
   }
-  outFile << "set time2 [date]" << el;
   outFile << "puts $fd ${time2}" << el;
   outFile << "close $fd" << el;
-  outFile << "date" << el;
   outFile.close();
 }
 
@@ -82,5 +84,20 @@ void correct_brackets(std::string &reg) {
   if(reg.find("]") != std::string::npos) {
     uint32_t pos = reg.find("]");
     reg = reg.substr(0, pos) + "\\]" + reg.substr(pos+1);
+  }
+}
+
+
+// figure out which reg corresponds to each YZC
+void fill_yzc2regMap(const std::string &localModName, const std::string &localInstName, uint32_t beginIdx) {
+  if(g_mod2RegYzc.find(localModName) == g_mod2RegYzc.end())
+    toCout("Error: module is not in g_mod2RegYzc: "+localModName);
+  for(auto it = g_mod2RegYzc[localModName].begin(); it != g_mod2RegYzc[localModName].end(); it++) {
+    g_yzc2regMap.emplace(beginIdx+it->second, localInstName+"."+it->first);
+  }
+  if(g_mod2instYzc.find(localModName) == g_mod2instYzc.end())
+    return;
+  for(auto it = g_mod2instYzc[localModName].begin(); it != g_mod2instYzc[localModName].end(); it++) {
+    fill_yzc2regMap(it->second.first, localInstName+"."+it->first, it->second.second);
   }
 }

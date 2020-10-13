@@ -125,6 +125,7 @@ std::regex pHex("(\\d+)'h([\\dabcdefx\\?]+)");
 
 /* Global data */
 std::string moduleName;
+std::string g_moduleName;
 std::vector<std::string> moduleInputs;
 std::vector<std::string> moduleOutputs;
 std::vector<std::string> extendInputs;
@@ -152,7 +153,14 @@ std::unordered_map<std::string, uint32_t> fangyuanCaseSliceWidth; // width of ea
 std::unordered_map<std::string, uint32_t> g_destVersion;
 std::unordered_map<std::string, std::pair<std::string, bool>> g_moduleRst;
 std::unordered_map<std::string, std::string> g_moduleClk;
-std::map<uint32_t, std::string> g_sig2regMap;
+// for allocating YZC
+std::unordered_map<std::string, uint32_t> g_modTotalRegCnt; // how many regs each module has, including regs in submodules
+uint32_t g_yzcNxtIdx;
+std::map<uint32_t, std::string> g_yzc2regMap; // Filled at the very end
+std::unordered_map<std::string, std::unordered_map<std::string, uint32_t>> g_mod2RegYzc;
+// first string is moduleName, second string is instance name, third string is corresponding submodule name, int is begin YZC
+std::unordered_map<std::string, std::unordered_map<std::string, std::pair<std::string, uint32_t>>> g_mod2instYzc;
+
 VarWidth varWidth;
 VarWidth funcVarWidth;
 unsigned long int NEW_VAR = 0;
@@ -229,6 +237,7 @@ void clean_global_data(uint32_t totalRegCnt, uint32_t nextSig) {
   memDims.clear();
   varWidth.clear();
   funcVarWidth.clear();
+  g_yzcNxtIdx = 0;
   NEW_VAR = 0;
   NEW_FANGYUAN = 0;
   USELESS_VAR = 0;
@@ -856,6 +865,7 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   std::smatch m;
   if ( std::regex_match(line, m, pModule) ) {
     moduleName = m.str(2);
+    g_moduleName = m.str(2);
     return NONE;
   }
   else if (std::regex_match(line, m, pInput)) {
@@ -1078,8 +1088,6 @@ void add_file_taints(std::string fileName, std::map<std::string, std::vector<std
   // Reserve first line for module declaration
   while( std::getline(input, line) ) {
     toCout(line);
-    if(moduleName.compare("HLS_cdp_icvt_core") == 0 && line.find("IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl") != std::string::npos)
-      //toCout(line);
     lineNo++;
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       add_case_taints_limited(input, output, line);
@@ -1276,12 +1284,11 @@ void merge_taints(std::string fileName) {
   //}
   //output << " ;" << std::endl;
 
-  if(isTop) {
-    output  << "logic ["+toStr(g_next_sig)+":0] YZC;" << std::endl;
-  }
-
   output << "endmodule" << std::endl;
   output.close();
+
+  // update g_modTotalRegCnt
+  g_modTotalRegCnt.emplace(moduleName, g_yzcNxtIdx);
 }
 
 
@@ -1332,6 +1339,8 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
     }
     out << "0 ;" << std::endl;
   }
+  // declarations for YZC
+  out << "  logic ["+toStr(g_yzcNxtIdx-1)+":0] YZC;" << std::endl;
   while( std::getline(in, line) ) {
     out << line << std::endl;
   }
@@ -1829,8 +1838,10 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     auto lastPair = caseAssignPairs.back();
     caseAssignPairs.pop_back();
     for(auto localPair: caseAssignPairs) {
+      uint32_t pos = localPair.first.find("1");
+      uint32_t idx = localPair.first.length() - pos - 1;
       output << blank + "    " + localPair.first + " :" << std::endl;
-      output << blank + "      " + dest+_t+destSlice+" = " + extend("| "+s+_t+sSlice, destWidthNum) + " ;" << std::endl;
+      output << blank + "      " + dest+_t+destSlice+" = " + extend(s+_t+"["+toStr(idx)+"]", destWidthNum) + " ;" << std::endl;
     }
     output << blank + "    default:" << std::endl;
     output << blank + "      " +  dest+_t+destSlice+" = " + a + _t+ " " + aSlice + " | " + extend("| "+s+_t+sSlice, destWidthNum) + " ;" << std::endl;
@@ -1902,8 +1913,10 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     caseAssignPairs.pop_back();
     for(auto localPair: caseAssignPairs) {
       split_slice(localPair.second, rhs, rhsSlice);
+      uint32_t pos = localPair.first.find("1");
+      uint32_t idx = localPair.first.length() - pos - 1;
       output << blank + "    " + localPair.first + " :" << std::endl;
-      output << blank + "      " + dest+_t+destSlice+" = " + rhs + _t+" " + rhsSlice + " | " + extend("| "+s+_t+sSlice, destWidthNum) + " ;" << std::endl;
+      output << blank + "      " + dest+_t+destSlice+" = " + rhs + _t+" " + rhsSlice + " | " + extend(s+_t+"["+toStr(idx)+"]", destWidthNum) + " ;" << std::endl;
     }
     output << blank + "    default:" << std::endl;
     output << blank + "      "+dest+_t+destSlice+" = "+ extend("| "+s+_t+sSlice, destWidthNum) + " ;" << std::endl;
@@ -1990,8 +2003,10 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     auto lastPair = caseAssignPairs.back();
     caseAssignPairs.pop_back();
     for(auto localPair: caseAssignPairs) {
+      uint32_t pos = localPair.first.find("1");
+      uint32_t idx = localPair.first.length() - pos - 1;
       output << blank + "    " + localPair.first + " :" << std::endl;
-      output << blank + "      " + dest+_t+destSlice+" = " + extend("| "+s+_t+sSlice, destWidthNum) + " ;" << std::endl;
+      output << blank + "      " + dest+_t+destSlice+" = " + extend(s+_t+"["+toStr(idx)+"]", destWidthNum) + " ;" << std::endl;
     }
     output << blank + "    default:" << std::endl;
     output << blank + "      " + dest+_t+destSlice+" = " + extend("| "+s+_t+sSlice, destWidthNum) + " ;" << std::endl;
@@ -2115,12 +2130,10 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
     toCout("Error in matching module definition!");
     abort();
   }
-  std::string moduleName = m.str(2);
-  //if(moduleName.compare("adder_32bit") == 0)
-  //  toCout("find adder_32bit!");
-
+  std::string localModuleName = m.str(2);
   std::string instanceName = m.str(3);
-  if( moduleInputsMap.find(moduleName) == moduleInputsMap.end() ) {
+
+  if( moduleInputsMap.find(localModuleName) == moduleInputsMap.end() ) {
     toCout("Error: IO ports of sub-modules not found!");
     abort();
   }
@@ -2143,7 +2156,7 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
   std::unordered_map<std::string, std::vector<uint32_t>> input2SignalVerMap;
   std::unordered_map<std::string, std::vector<bool>> inputSignalIsNewMap;
   
-  for(std::string input: moduleInputsMap[moduleName]) {
+  for(std::string input: moduleInputsMap[localModuleName]) {
     if(input.compare(g_recentClk) == 0 || input.compare("rst_zy") == 0 || input.compare("INSTR_IN_ZY") == 0 )
       continue;
     if( port2SignalMap.find(input) == port2SignalMap.end() ) {
@@ -2189,11 +2202,22 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
   //}
 
   // printed extended module instantiation
-  output << "// module: "+moduleName << std::endl;
+  output << "// module: "+localModuleName << std::endl;
   output << moduleFirstLine << std::endl;
+  // add connection to YZC
+  if(g_modTotalRegCnt[localModuleName] > 0) {
+    uint32_t beginIdx = g_yzcNxtIdx;
+    if(g_mod2instYzc.find(g_moduleName) == g_mod2instYzc.end()) 
+      g_mod2instYzc.emplace(g_moduleName, std::unordered_map<std::string, std::pair<std::string, uint32_t>>{{instanceName, std::make_pair(localModuleName, beginIdx)}} );
+    else
+      g_mod2instYzc[g_moduleName].emplace(instanceName, std::make_pair(localModuleName, beginIdx));
+    uint32_t endIdx = g_yzcNxtIdx + g_modTotalRegCnt[localModuleName] - 1;
+    g_yzcNxtIdx = g_yzcNxtIdx + g_modTotalRegCnt[localModuleName];
+    output << "    .YZC(YZC["+toStr(endIdx)+":"+toStr(beginIdx)+"])," << std::endl;
+  }
   std::string newLogic;
   std::vector<std::string> newLogicVec;
-  for(std::string inPort: moduleInputsMap[moduleName]) {
+  for(std::string inPort: moduleInputsMap[localModuleName]) {
     if(inPort.compare(g_recentClk) == 0 || g_clk_set.find(inPort) != g_clk_set.end())
       continue;
     if(inPort.compare("rst_zy") == 0) {
@@ -2244,7 +2268,7 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
       output << "    ." + inPort + _sig + " ()," << std::endl;
     }
   }
-  for(std::string outPort: moduleOutputsMap[moduleName]) {
+  for(std::string outPort: moduleOutputsMap[localModuleName]) {
     if( !port2SignalMap[outPort].empty() ) {
       output << "    ." + outPort + _t + " ( " + get_lhs_taint_list(port2SignalMap[outPort], _t, newLogic) + " )," << std::endl;
       newLogicVec.push_back(newLogic);      
