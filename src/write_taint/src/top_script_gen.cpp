@@ -90,10 +90,10 @@ void correct_brackets(std::string &reg) {
 
 // figure out which reg corresponds to each YZC
 void fill_yzc2regMap(const std::string &localModName, const std::string &localInstName, uint32_t beginIdx) {
-  if(g_mod2RegYzc.find(localModName) == g_mod2RegYzc.end())
-    toCout("Error: module is not in g_mod2RegYzc: "+localModName);
-  for(auto it = g_mod2RegYzc[localModName].begin(); it != g_mod2RegYzc[localModName].end(); it++) {
-    g_yzc2regMap.emplace(beginIdx+it->second, localInstName+"."+it->first);
+  if(g_mod2RegYzc.find(localModName) != g_mod2RegYzc.end()) {
+    for(auto it = g_mod2RegYzc[localModName].begin(); it != g_mod2RegYzc[localModName].end(); it++) {
+      g_yzc2regMap.emplace(beginIdx+it->second, localInstName+"."+it->first);
+    }
   }
   if(g_mod2instYzc.find(localModName) == g_mod2instYzc.end())
     return;
