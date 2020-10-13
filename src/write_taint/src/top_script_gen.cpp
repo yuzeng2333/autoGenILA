@@ -34,7 +34,7 @@ void gen_assert_property(std::ofstream &output) {
 void top_script_gen() {
   fill_yzc2regMap(g_topModule, g_topModule, 0);
   std::ofstream outFile(g_path+"/top_script.tcl");
-  uint32_t totalReg = g_next_sig;
+  uint32_t totalReg = g_yzcNxtIdx;
   if(useAllEngine) outFile << "set_engine_mode {Hp Ht Bm J Q3 U L B K AB D I AD M N AM G C AG G2 C2 Hps Hts Tri R}" << el;
   //outFile << "set time1 [date]" << el;
   //outFile << "puts $fd ${time1}" << el;
@@ -45,7 +45,8 @@ void top_script_gen() {
     uint32_t sig = it->first;
     std::string reg = it->second;
     correct_brackets(reg);
-    outFile << "set fd [open asv_result.txt a]" << el;    
+    outFile << "set fd [open asv_result.txt a]" << el;
+    outFile << "puts \"target register: "+reg+"\""<< el;
     if(sig == 0) {
       outFile << "assume -name {a1} {YZC["+toStr(totalReg-1)+":1] == 0} -update_db" << el;
       outFile << "assume -name {a2} {YZC[0] == issue_cond} -update_db" << el;
@@ -98,6 +99,6 @@ void fill_yzc2regMap(const std::string &localModName, const std::string &localIn
   if(g_mod2instYzc.find(localModName) == g_mod2instYzc.end())
     return;
   for(auto it = g_mod2instYzc[localModName].begin(); it != g_mod2instYzc[localModName].end(); it++) {
-    fill_yzc2regMap(it->second.first, localInstName+"."+it->first, it->second.second);
+    fill_yzc2regMap(it->second.first, localInstName+"."+it->first, beginIdx+it->second.second);
   }
 }

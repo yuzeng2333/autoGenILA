@@ -1304,6 +1304,7 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
     moduleInputs.push_back("rst_zy");
     toCout("No reset signal found in "+moduleName+", check it!!");
   }
+  moduleInputs.push_back("YZC");
   out << "module " + moduleName + " ( ";
   for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) {
     out << *it + " , ";
@@ -1333,14 +1334,14 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
     out << "  logic INSTR_IN_ZY;" << std::endl;
     out << "  assign INSTR_IN_ZY = ";
     for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) {
-      if((*it).compare(g_recentClk) == 0 || (*it).compare(g_recentRst) == 0 || (*it).compare("rst_zy") == 0)
+      if((*it).compare(g_recentClk) == 0 || (*it).compare(g_recentRst) == 0 || (*it).compare("rst_zy") == 0 || (*it).compare("YZC") == 0)
         continue;
       out << *it + _t + " > 0 || ";
     }
     out << "0 ;" << std::endl;
   }
   // declarations for YZC
-  out << "  logic ["+toStr(g_yzcNxtIdx-1)+":0] YZC;" << std::endl;
+  out << "  input ["+toStr(g_yzcNxtIdx-1)+":0] YZC;" << std::endl;
   while( std::getline(in, line) ) {
     out << line << std::endl;
   }
@@ -2157,7 +2158,7 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
   std::unordered_map<std::string, std::vector<bool>> inputSignalIsNewMap;
   
   for(std::string input: moduleInputsMap[localModuleName]) {
-    if(input.compare(g_recentClk) == 0 || input.compare("rst_zy") == 0 || input.compare("INSTR_IN_ZY") == 0 )
+    if(input.compare(g_recentClk) == 0 || input.compare("rst_zy") == 0 || input.compare("INSTR_IN_ZY") == 0 || input.compare("YZC") == 0 )
       continue;
     if( port2SignalMap.find(input) == port2SignalMap.end() ) {
       toCout("Error: the module input has not been seen before: "+input);
@@ -2218,7 +2219,7 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
   std::string newLogic;
   std::vector<std::string> newLogicVec;
   for(std::string inPort: moduleInputsMap[localModuleName]) {
-    if(inPort.compare(g_recentClk) == 0 || g_clk_set.find(inPort) != g_clk_set.end())
+    if(inPort.compare(g_recentClk) == 0 || g_clk_set.find(inPort) != g_clk_set.end() || inPort.compare("YZC") == 0)
       continue;
     if(inPort.compare("rst_zy") == 0) {
       output << "    .rst_zy(rst_zy)," << std::endl;
