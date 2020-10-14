@@ -152,6 +152,10 @@ std::unordered_map<std::string, uint32_t> fangyuanCaseSliceWidth; // width of ea
 std::unordered_map<std::string, uint32_t> g_destVersion;
 std::unordered_map<std::string, std::pair<std::string, bool>> g_moduleRst;
 std::unordered_map<std::string, std::string> g_moduleClk;
+// for generating assert names, first is module name, second is instance name, third is sub-mod name
+std::unordered_map<std::string, std::unordered_map<std::string, std::string>> g_mod2instMap;
+// key is module name, value is vector of asserted regs in this module
+std::unordered_map<std::string, std::vector<std::string>> g_mod2assertMap;
 VarWidth varWidth;
 VarWidth funcVarWidth;
 unsigned long int NEW_VAR = 0;
@@ -2116,12 +2120,19 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
     toCout("Error in matching module definition!");
     abort();
   }
-  std::string moduleName = m.str(2);
-  //if(moduleName.compare("adder_32bit") == 0)
+  std::string localModuleName = m.str(2);
+  //if(localModuleName.compare("adder_32bit") == 0)
   //  toCout("find adder_32bit!");
 
   std::string instanceName = m.str(3);
-  if( moduleInputsMap.find(moduleName) == moduleInputsMap.end() ) {
+  if(g_mod2instMap.find(moduleName) != g_mod2instMap.end()) {
+    toCout("Error: module already in g_mod2instMap: "+moduleName);
+    abort();
+  }
+  else {
+    g_mod2instMap.emplace(moduleName, std::unordered_map<std::string, std::string>{{instanceName, localModuleName}});
+  }
+  if( moduleInputsMap.find(localModuleName) == moduleInputsMap.end() ) {
     toCout("Error: IO ports of sub-modules not found!");
     abort();
   }
@@ -2144,7 +2155,7 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
   std::unordered_map<std::string, std::vector<uint32_t>> input2SignalVerMap;
   std::unordered_map<std::string, std::vector<bool>> inputSignalIsNewMap;
   
-  for(std::string input: moduleInputsMap[moduleName]) {
+  for(std::string input: moduleInputsMap[localModuleName]) {
     if(input.compare(g_recentClk) == 0 || input.compare("rst_zy") == 0 || input.compare("INSTR_IN_ZY") == 0 )
       continue;
     if( port2SignalMap.find(input) == port2SignalMap.end() ) {
@@ -2190,11 +2201,11 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
   //}
 
   // printed extended module instantiation
-  output << "// module: "+moduleName << std::endl;
+  output << "// module: "+localModuleName << std::endl;
   output << moduleFirstLine << std::endl;
   std::string newLogic;
   std::vector<std::string> newLogicVec;
-  for(std::string inPort: moduleInputsMap[moduleName]) {
+  for(std::string inPort: moduleInputsMap[localModuleName]) {
     if(inPort.compare(g_recentClk) == 0 || g_clk_set.find(inPort) != g_clk_set.end())
       continue;
     if(inPort.compare("rst_zy") == 0) {
@@ -2245,7 +2256,7 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
       output << "    ." + inPort + _sig + " ()," << std::endl;
     }
   }
-  for(std::string outPort: moduleOutputsMap[moduleName]) {
+  for(std::string outPort: moduleOutputsMap[localModuleName]) {
     if( !port2SignalMap[outPort].empty() ) {
       output << "    ." + outPort + _t + " ( " + get_lhs_taint_list(port2SignalMap[outPort], _t, newLogic) + " )," << std::endl;
       newLogicVec.push_back(newLogic);      
@@ -2450,10 +2461,12 @@ void gen_assert_property(std::ofstream &output) {
   std::regex pRFlag("(\\S*)_r_flag");
   std::smatch m;
   std::smatch match;
+  g_mod2assertMap.emplace(moduleName, std::vector<std::string>{});
   if(!g_write_assert) {
     for(std::string out: flagOutputs) {
       if(std::regex_search(out, m, pRFlag)) {
-        //std::string var = m.str(1);
+        std::string var = m.str(1);        
+        g_mod2assertMap[moduleName].push_back(var);
         //checkCond(std::regex_match(var, match, pRFlag), "Error: pRFlag is not matched: "+m.str(1));
         std::string rstVal; 
         if(g_use_vcd_parser)
@@ -2526,6 +2539,27 @@ void collect_case_dest(const std::string &line) {
   std::string dest, destSlice;
   split_slice(destAndSlice, dest, destSlice);
   g_iteDest.insert(dest);
+}
+
+
+void assert_reg_map_gen() {
+  std::ofstream output(g_path+"/assert_reg_map.txt");
+  map_gen(g_topModule, g_topModule, output);
+}
+
+
+void map_gen(std::string moduleName, std::string instanceName, std::ofstream &output) {
+  uint32_t i = 1;
+  if(g_mod2assertMap.find(moduleName) != g_mod2assertMap.end()) {
+    for(auto it = g_mod2assertMap[moduleName].begin(); it != g_mod2assertMap[moduleName].end(); it++) {
+      output << instanceName+"._assert_"+toStr(i++)+" : "+*it << std::endl;
+    }
+  }
+  if(g_mod2instMap.find(moduleName) != g_mod2instMap.end()) {
+    for(auto it = g_mod2instMap[moduleName].begin(); it != g_mod2instMap[moduleName].end(); it++) {
+      map_gen(it->second, instanceName+"."+it->first, output);
+    }
+  }
 }
 
 
