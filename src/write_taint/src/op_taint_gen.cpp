@@ -134,7 +134,12 @@ void reg_taint_gen(std::string line, std::ofstream &output) {
 
   if(isTrueReg(var) && !g_use_value_change) {
     uint32_t localSig = g_yzcNxtIdx++;
-    output << blank << "assign " + var + _t + " = " + var + _tz + " | " + extend("YZC["+toStr(localSig)+"]", width) + " ;" << std::endl;
+    std::string rstVal = g_rstValMap[moduleName][var];
+    if(rstVal.empty()) {
+      toCout("Error: cannot find reset value for: "+moduleName+"."+var);
+      abort();
+    }
+    output << blank << "assign " + var + _t + " = " + var + _tz + " | " + extend("YZC["+toStr(localSig)+"] && "+var+" != "+rstVal, width) + " ;" << std::endl;
     if(g_mod2RegYzc.find(moduleName) == g_mod2RegYzc.end())
       g_mod2RegYzc.emplace(moduleName, std::unordered_map<std::string, uint32_t>{{var, localSig}});
     else
