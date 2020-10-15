@@ -6,7 +6,7 @@
 #define toStr(a) std::to_string(a)
 
 bool useAllEngine=true;
-
+std::unordered_map<std::string, std::string> assert2regMap;
 
 void gen_assert_property(std::ofstream &output) {
   if(!isTop)
