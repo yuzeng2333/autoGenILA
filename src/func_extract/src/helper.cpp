@@ -437,3 +437,35 @@ std::string purify_line(const std::string &line) {
   lastPart = purify_line(lastPart);
   return firstPart + "|" + var + "|" + lastPart;
 }
+
+
+// the input must be of the form: 3'hx+5'h7+...
+expr mixed_value_expr(std::string value, context &c) {
+  if(value.find("+") == std::string::npos) {
+    return single_expr(value, c);
+  }
+  else {
+    uint32_t pos = value.find("+");
+    return concat(single_expr(value.substr(0, pos), c), mixed_value_expr(value.substr(pos+1), c));
+  }
+}
+
+expr single_expr(std::string value, context &c) {
+  assert(value.find("x") == std::string::npos);
+  std::regex pX("^(\\d+)'[hb]x$");
+  std::smatch m;
+  if(std::regex_match(value, m, pX)) {
+    std::string widthStr = m.str(1);
+    uint32_t width = std::stoi(widthStr);
+    return c.bv_const((widthStr+"'bx").c_str(), width);
+  }
+  else if(is_number(value)) {
+    uint32_t pos = value.find("'");
+    std::string widthStr = value.substr(0, pos);
+    uint32_t width = std::stoi(widthStr);
+    return c.bv_val(hdb2int(value), width);
+  }
+  else {
+    toCout("Error: unexpected value for mixed_value_expr: "+value);
+  }
+}

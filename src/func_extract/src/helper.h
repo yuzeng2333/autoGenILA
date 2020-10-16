@@ -89,4 +89,8 @@ std::string purify_var_name(std::string name);
 bool isLetter(const char &c);
 
 std::string purify_line(const std::string &line);
+
+expr mixed_value_expr(std::string value, context &c);
+
+expr single_expr(std::string value, context &c);
 #endif
