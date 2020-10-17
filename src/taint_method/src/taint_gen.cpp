@@ -46,10 +46,10 @@ std::regex pLt          (to_re("^(\\s*)assign (NAME) = (NAME) > (NAME)(\\s*)?;$"
 std::regex pLe          (to_re("^(\\s*)assign (NAME) = (NAME) >= (NAME)(\\s*)?;$"));
 std::regex pSt          (to_re("^(\\s*)assign (NAME) = (NAME) < (NAME)(\\s*)?;$"));
 std::regex pSe          (to_re("^(\\s*)assign (NAME) = (NAME) <= (NAME)(\\s*)?;$"));
-std::regex pSignedLt    (to_re("^(\\s*)assign (NAME) = $signed\((NAME)\) > $signed\((NAME)\)(\\s*)?;$"));
-std::regex pSignedLe    (to_re("^(\\s*)assign (NAME) = $signed\((NAME)\) >= $signed\((NAME)\)(\\s*)?;$"));
-std::regex pSignedSt    (to_re("^(\\s*)assign (NAME) = $signed\((NAME)\) < $signed\((NAME)\)(\\s*)?;$"));
-std::regex pSignedSe    (to_re("^(\\s*)assign (NAME) = $signed\((NAME)\) <= $signed\((NAME)\)(\\s*)?;$"));
+std::regex pSignedLt    (to_re("^(\\s*)assign (NAME) = \\$signed\((NAME)\) > \\$signed\((NAME)\)(\\s*)?;$"));
+std::regex pSignedLe    (to_re("^(\\s*)assign (NAME) = \\$signed\((NAME)\) >= \\$signed\((NAME)\)(\\s*)?;$"));
+std::regex pSignedSt    (to_re("^(\\s*)assign (NAME) = \\$signed\((NAME)\) < \\$signed\((NAME)\)(\\s*)?;$"));
+std::regex pSignedSe    (to_re("^(\\s*)assign (NAME) = \\$signed\((NAME)\) <= \\$signed\((NAME)\)(\\s*)?;$"));
 std::regex pBitOr       (to_re("^(\\s*)assign (NAME) = (NAME) \\| (NAME)(\\s*)?;$"));
 std::regex pBitExOr     (to_re("^(\\s*)assign (NAME) = (NAME) \\^ (NAME)(\\s*)?;$"));
 std::regex pBitAnd      (to_re("^(\\s*)assign (NAME) = (NAME) & (NAME)(\\s*)?;$"));
