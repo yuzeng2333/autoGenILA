@@ -235,7 +235,7 @@ void read_in_instructions(std::string fileName) {
             auto pos = line.find("=");
             std::string signalName = line.substr(0, pos-1);
             std::string encoding = line.substr(pos+2);
-            if(encoding != "x" && !is_number(encoding) && encoding != "DIRTY") {
+            if(!check_input_val(encoding)) {
               toCout("Encoding is not x or number[1], line is: "+line);
               abort();
             }
@@ -255,7 +255,7 @@ void read_in_instructions(std::string fileName) {
             auto pos = line.find("=");
             std::string signalName = line.substr(0, pos-1);
             std::string encoding = line.substr(pos+2);
-            if(encoding != "x" && !is_number(encoding) && encoding != "DIRTY") {
+            if(!check_input_val(encoding)) {
               toCout("Encoding is not x or number[2], line is: "+line);
               abort();
             }
@@ -303,7 +303,7 @@ void read_in_instructions(std::string fileName) {
             auto pos = line.find("=");
             std::string signalName = line.substr(0, pos-1);
             std::string encoding = line.substr(pos+2);
-            if(encoding != "x" && !is_number(encoding)) {
+            if(!check_input_val(encoding)) {
               toCout("Encoding is not x or number[3], line is: "+line);
               abort();
             }
@@ -316,7 +316,7 @@ void read_in_instructions(std::string fileName) {
             auto pos = line.find("=");
             std::string signalName = line.substr(0, pos-1);
             std::string encoding = line.substr(pos+2);
-            if(encoding != "x" && !is_number(encoding)) {
+            if(!check_input_val(encoding)) {
               toCout("Encoding is not x or number[4], line is: "+line);
               abort();
             }

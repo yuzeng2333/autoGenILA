@@ -469,3 +469,17 @@ expr single_expr(std::string value, context &c) {
     toCout("Error: unexpected value for mixed_value_expr: "+value);
   }
 }
+
+
+bool check_input_val(std::string value) {
+  std::regex pX("^(\\d+)'[b|h]x$");
+  std::smatch m;
+  if(value == "x" || is_number(value) || value != "DIRTY" || std::regex_match(value, m, pX))
+    return true;
+  else if(value.find("+") != std::string::npos) {
+    uint32_t pos = value.find("+");
+    return check_input_val(value.substr(0, pos)) && check_input_val(value.substr(pos+1));
+  }
+  else
+    return false;
+}

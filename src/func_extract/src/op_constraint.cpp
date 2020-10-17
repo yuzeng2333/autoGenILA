@@ -161,6 +161,9 @@ expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver 
           g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
           return mixed_value_expr(localVal, c);
         }
+        else {
+          toCout("Error: unexpected input value: "+localVal);
+        }
       }
       // FIXME: not sure if this is the best way
       else if(localVal == "DIRTY") {
@@ -187,10 +190,18 @@ expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver 
       std::string localVal = g_nopInstr[dest];
       uint32_t localWidth = get_var_slice_width(dest);
       if(localVal != "x") {
-        assert(is_number(localVal));
-        toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give "+localVal+" to "+timed_name(dest, timeIdx));
-        g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
-        return c.bv_val(hdb2int(localVal), localWidth);
+        if(is_number(localVal)) {
+          toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give "+localVal+" to "+timed_name(dest, timeIdx));
+          g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
+          return c.bv_val(hdb2int(localVal), localWidth);
+        }
+        else if(localVal.find("+") != std::string::npos){
+          toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%B Give "+localVal+" to "+timed_name(dest, timeIdx));
+          g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
+          return mixed_value_expr(localVal, c);
+        }
+        else
+          toCout("Error: unexpected input value: "+localVal);          
       }
     }
   }
