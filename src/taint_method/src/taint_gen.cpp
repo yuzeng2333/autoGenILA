@@ -46,6 +46,10 @@ std::regex pLt          (to_re("^(\\s*)assign (NAME) = (NAME) > (NAME)(\\s*)?;$"
 std::regex pLe          (to_re("^(\\s*)assign (NAME) = (NAME) >= (NAME)(\\s*)?;$"));
 std::regex pSt          (to_re("^(\\s*)assign (NAME) = (NAME) < (NAME)(\\s*)?;$"));
 std::regex pSe          (to_re("^(\\s*)assign (NAME) = (NAME) <= (NAME)(\\s*)?;$"));
+std::regex pSignedLt    (to_re("^(\\s*)assign (NAME) = $signed\((NAME)\) > $signed\((NAME)\)(\\s*)?;$"));
+std::regex pSignedLe    (to_re("^(\\s*)assign (NAME) = $signed\((NAME)\) >= $signed\((NAME)\)(\\s*)?;$"));
+std::regex pSignedSt    (to_re("^(\\s*)assign (NAME) = $signed\((NAME)\) < $signed\((NAME)\)(\\s*)?;$"));
+std::regex pSignedSe    (to_re("^(\\s*)assign (NAME) = $signed\((NAME)\) <= $signed\((NAME)\)(\\s*)?;$"));
 std::regex pBitOr       (to_re("^(\\s*)assign (NAME) = (NAME) \\| (NAME)(\\s*)?;$"));
 std::regex pBitExOr     (to_re("^(\\s*)assign (NAME) = (NAME) \\^ (NAME)(\\s*)?;$"));
 std::regex pBitAnd      (to_re("^(\\s*)assign (NAME) = (NAME) & (NAME)(\\s*)?;$"));
@@ -892,6 +896,10 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
             || std::regex_match(line, m, pLe)
             || std::regex_match(line, m, pSt)
             || std::regex_match(line, m, pSe)
+            || std::regex_match(line, m, pSignedLt)
+            || std::regex_match(line, m, pSignedLe)
+            || std::regex_match(line, m, pSignedSt)
+            || std::regex_match(line, m, pSignedSe)
             || std::regex_match(line, m, pOr)
             || std::regex_match(line, m, pBitOr)
             || std::regex_match(line, m, pBitExOr)
