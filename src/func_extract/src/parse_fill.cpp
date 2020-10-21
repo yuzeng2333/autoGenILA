@@ -88,7 +88,7 @@ void parse_verilog(std::string fileName) {
   std::string line;
   std::smatch match;
   while( std::getline(input, line) ) {
-    if(line.find("state_out") != std::string::npos) {
+    if(line.find("assign alu_shr") != std::string::npos) {
       toCout("Found it");
     }
     if( line.find("module") != std::string::npos ) {

@@ -588,6 +588,18 @@ bool check_two_op(std::string line, std::string &op, std::string &dest, std::str
   else if ( std::regex_match(line, m, pBitAnd)) {
     op = "&";
   }
+  else if ( std::regex_match(line, m, pLeftShift) ) {
+    op = "<<";
+  }
+  else if ( std::regex_match(line, m, pRightShift) ) {
+    op = ">>";
+  }
+  else if ( std::regex_match(line, m, pSignedRightShift) ) {
+    op = ">>>";
+  }
+  else if ( std::regex_match(line, m, pSignedLeftShift) ) {
+    op = "<<<";
+  }
   else if ( std::regex_match(line, m, pBitOrRed2) ) {
     abort(); // needs to add support in two_op_constraint
     //since this op is same as pBitOr. 
@@ -621,6 +633,22 @@ bool check_two_op(std::string line, std::string &op, std::string &dest, std::str
   }
   else if ( std::regex_match(line, m, pSe) ) {
     op = "<=";
+    isReduceOp = true;
+  }
+  else if ( std::regex_match(line, m, pSignedLt) ) {
+    op = "$>";
+    isReduceOp = true;
+  }
+  else if ( std::regex_match(line, m, pSignedLe) ) {
+    op = "$>=";
+    isReduceOp = true;
+  }
+  else if ( std::regex_match(line, m, pSignedSt) ) {
+    op = "$<";
+    isReduceOp = true;
+  }
+  else if ( std::regex_match(line, m, pSignedSe) ) {
+    op = "$<=";
     isReduceOp = true;
   }
   else if ( std::regex_match(line, m, pEq)
