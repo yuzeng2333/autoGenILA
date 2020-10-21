@@ -479,11 +479,13 @@ expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
     push_dirty_queue(node, timeIdx);
     if(!isSolve) {
       uint32_t localWidth = get_var_slice_width(dest);
+      std::string localRstVal;
       if(g_rstVal.find(dest) == g_rstVal.end()) {
-        toCout("Error: cannot find reset value for: "+dest);
-        abort();
+        toCout("Warning: cannot find reset value for: "+dest);
+        localRstVal = "0";
       }
-      std::string localRstVal = g_rstVal[dest];      
+      else
+        localRstVal = g_rstVal[dest];      
       if(!is_number(localRstVal)) {
         if(is_all_x(localRstVal))
           localRstVal = "0";

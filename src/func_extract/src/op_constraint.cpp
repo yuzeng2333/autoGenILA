@@ -1143,6 +1143,12 @@ expr make_z3_expr(solver &s, goal &g, context &c, std::string op, expr& destExpr
       s.add( destExpr == retExpr );
     return retExpr;
   }
+  else if(op == "&") {
+    expr retExpr = ite(~op1Expr == 0, c.bv_val(1, 1), c.bv_val(0, 1));
+    if(isSolve) 
+      s.add( destExpr == retExpr );
+    return retExpr;
+  }
   else {
     toCout("Not supported 1-op in make_z3_expr, op is: "+op);
     abort();
