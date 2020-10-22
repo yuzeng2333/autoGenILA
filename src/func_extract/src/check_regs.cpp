@@ -193,7 +193,6 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint
     // g_existedExpr must be cleared because reg_#bound needs to be expanded
     g_existedExpr.clear();
 
-    toCout("-------- toStr 0");
     toCoutVerb("### Begin bound: "+ toStr(bound));
     goal g(c);
     for(std::string rootReg: varToExpand) {
@@ -232,7 +231,6 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint
       model m = s.get_model();
       uint32_t j = 0;
       // only block values for varriables in CLEAN_QUEUE
-      toCout("-------- toStr 1");
       toCout("+++++++ Solution found for "+destAndSlice+", bound: "+toStr(int(bound))+" +++++++++");
       g_outFile << "+++++++ Solution found for "+destAndSlice+", bound: "+toStr(int(bound))+" +++++++++" << std::endl;
 
@@ -290,7 +288,6 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint
       toCout("*************************  Update function for "+destAndSlice);
       std::cout << r << std::endl;
       g_outFile << r << std::endl;
-      toCout("-------- toStr 2");
       goalFile << "#"+toStr(instrIdx)+"#"+destAndSlice+"#"+toStr(bound) << std::endl;
       goalFile << r << std::endl;
       // if two goals are the same, then check the two solutions. If any
@@ -383,7 +380,6 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint
       z3Res = (s.check() == sat);
     }
     assert(bound <= bound_limit);
-    toCout("-------- toStr 3");    
     toCout("------- No more solution found within the bound: "+toStr(bound)+" ----------");
     g_outFile << "------- No more solution found within the bound: "+toStr(bound)+" ----------" << std::endl;
     if(lastHasSolution && !curHasSolution) return; // terminate if has solution in lower bound but no solution in current bound

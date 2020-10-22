@@ -948,7 +948,7 @@ expr make_z3_expr(solver &s, goal &g, context &c, std::string op, const expr& de
     return retExpr;
   }
   else if(op == "&&") {
-    expr retExpr = ( ite(op1Expr > 0, c.bv_val(1, 1), c.bv_val(0, 1)) & ite(op2Expr > 0, c.bv_val(1, 1), c.bv_val(0, 1)) );
+    expr retExpr = ( ite(ugt(op1Expr, 0), c.bv_val(1, 1), c.bv_val(0, 1)) & ite(ugt(op2Expr, 0), c.bv_val(1, 1), c.bv_val(0, 1)) );
     if(isSolve)  {
       s.add( destExpr == retExpr );
       if(g_print_solver) {      
