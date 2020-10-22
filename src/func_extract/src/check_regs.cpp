@@ -193,6 +193,7 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint
     // g_existedExpr must be cleared because reg_#bound needs to be expanded
     g_existedExpr.clear();
 
+    toCout("-------- toStr 0");
     toCoutVerb("### Begin bound: "+ toStr(bound));
     goal g(c);
     for(std::string rootReg: varToExpand) {
@@ -231,8 +232,9 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint
       model m = s.get_model();
       uint32_t j = 0;
       // only block values for varriables in CLEAN_QUEUE
-      toCout("+++++++ Solution found for "+destAndSlice+", bound: "+toStr(bound)+" +++++++++");
-      g_outFile << "+++++++ Solution found for "+destAndSlice+", bound: "+toStr(bound)+" +++++++++" << std::endl;
+      toCout("-------- toStr 1");
+      toCout("+++++++ Solution found for "+destAndSlice+", bound: "+toStr(int(bound))+" +++++++++");
+      g_outFile << "+++++++ Solution found for "+destAndSlice+", bound: "+toStr(int(bound))+" +++++++++" << std::endl;
 
       std::vector<std::pair<std::string, uint32_t>> varIdxPairVec;
       for (uint32_t i = 0; i < m.size(); i++)
@@ -243,15 +245,21 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint
         func_decl v = m[pair.second];
         assert(v.arity() == 0);
         std::string var = v.name().str();
+        if(var == "instr_bne___#1_T") {
+          toCout("Find it");
+        }
         assert(var == pair.first);
         // check if current is reg and has reset value
         expr tmp = m.get_const_interp(v);
-        if( g_rstVal.find(pure(var)) != g_rstVal.end() && !is_taint(var))
-          if(tmp == c.bv_val(hdb2int(g_rstVal[pure(var)]), get_var_slice_width(pure(var)))) {
+        if( g_rstVal.find(pure(var)) != g_rstVal.end() && !is_taint(var)) {
+          std::string localVal = g_rstVal[pure(var)];
+          localVal = is_number(localVal) ? localVal : "0";
+          if(tmp == c.bv_val(hdb2int(localVal), get_var_slice_width(pure(var)))) {
             g_resetedReg.insert(var);
             expr *tmpPnt = new expr(m.get_const_interp(v));
             INPUT_EXPR_VAL.emplace(var, tmpPnt);
           }
+        }
 
         if(!is_taint(var) && ( isInput(pure(var)) || isAs(pure(var)) )) {
           std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ " << v.name() << " = " << m.get_const_interp(v) << "\n";
@@ -282,6 +290,7 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint
       toCout("*************************  Update function for "+destAndSlice);
       std::cout << r << std::endl;
       g_outFile << r << std::endl;
+      toCout("-------- toStr 2");
       goalFile << "#"+toStr(instrIdx)+"#"+destAndSlice+"#"+toStr(bound) << std::endl;
       goalFile << r << std::endl;
       // if two goals are the same, then check the two solutions. If any
@@ -374,6 +383,7 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint
       z3Res = (s.check() == sat);
     }
     assert(bound <= bound_limit);
+    toCout("-------- toStr 3");    
     toCout("------- No more solution found within the bound: "+toStr(bound)+" ----------");
     g_outFile << "------- No more solution found within the bound: "+toStr(bound)+" ----------" << std::endl;
     if(lastHasSolution && !curHasSolution) return; // terminate if has solution in lower bound but no solution in current bound
