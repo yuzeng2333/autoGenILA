@@ -303,15 +303,17 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
 
   expr zero = c.bv_val(0, destWidthNum);
   bool sameWidth = (op1WidthNum == destWidthNum) && (op1WidthNum == op2WidthNum);
+  bool opWider = opWidthNum > destWidthNum;
   //assert(isReduceOp || destWidthNum >= opWidthNum);
 
   // taint expression
   if(isSolve) {
     if(!op1IsReadRoot && !op2IsReadRoot) {
       if(!isReduceOp) {
-        if(sameWidth) s.add(destExpr_t == (op1Expr_t | op2Expr_t));
-        else          s.add(destExpr_t.extract(opWidthNum-1, 0) == ( zext(op1Expr_t, opWidthNum - op1WidthNum) | zext(op2Expr_t, opWidthNum - op2WidthNum) ));          
-        //else          s.add(destExpr_t == ( zext(op1Expr_t, destWidthNum - op1WidthNum) | zext(op2Expr_t, destWidthNum - op2WidthNum) ));          
+        if(sameWidth)     s.add(destExpr_t == (op1Expr_t | op2Expr_t));
+        else if(!opWider) s.add(destExpr_t.extract(opWidthNum-1, 0) == ( zext(op1Expr_t, opWidthNum - op1WidthNum) | zext(op2Expr_t, opWidthNum - op2WidthNum) ));
+        else              s.add(destExpr_t == (zext(op1Expr_t, opWidthNum - op1WidthNum) | zext(op2Expr_t, opWidthNum - op2WidthNum)).extract(destWidthNum-1, 0)  );
+
         if(g_print_solver) toCout("Add-Solver: "+get_name(destExpr_t)+" == "+get_name(op1Expr_t) + " | "+ get_name(op2Expr_t));
       }
       else {

@@ -575,6 +575,7 @@ bool check_two_op(std::string line, std::string &op, std::string &dest, std::str
   }
   else if ( std::regex_match(line, m, pAnd)) {
     op = "&&";
+    isReduceOp = true;
   }
   else if ( std::regex_match(line, m, pOr)) {
     op = "||";
