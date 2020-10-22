@@ -186,6 +186,8 @@ void read_in_instructions(std::string fileName) {
   bool firstWord = true;
   bool firstSignalSeen = false;
   while(std::getline(input, line)) {
+    if(line.substr(0, 2) == "//")
+      continue;
     if(line.substr(0, 4) == "#CLK") {
       std::string clk = line.substr(5);
       remove_two_end_space(clk);
