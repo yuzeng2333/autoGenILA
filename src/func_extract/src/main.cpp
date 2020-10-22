@@ -64,6 +64,7 @@ int main(int argc, char *argv[]) {
   inv_gen();
   build_ast_tree();
   check_all_regs();
+  print_time();  
   clean_goal();
   make_dirs(g_path);
   pseudo_vlg_gen();  

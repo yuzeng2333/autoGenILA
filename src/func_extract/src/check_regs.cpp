@@ -444,7 +444,7 @@ expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
     toCout("Error: first child's dest is empty: "+node->dest);
     abort();
   }
-  assert(!is_number(node->childVec.front()->dest));
+  //assert(!is_number(node->childVec.front()->dest));
 
   if(timeIdx <= bound) {
     toCoutVerb("Add nb constraint for: " + dest+" ------  time: "+toStr(timeIdx));

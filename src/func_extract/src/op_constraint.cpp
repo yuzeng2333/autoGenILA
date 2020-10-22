@@ -296,9 +296,14 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   bool op1IsReadRoot = false;
   bool op2IsReadRoot = false;
 
+  toCout("two op for "+destAndSlice);
+  if(destAndSlice == "_0294_") {
+    toCout("Find it: "+destAndSlice);
+  }
+
   expr zero = c.bv_val(0, destWidthNum);
   bool sameWidth = (op1WidthNum == destWidthNum) && (op1WidthNum == op2WidthNum);
-  assert(isReduceOp || destWidthNum >= opWidthNum);
+  //assert(isReduceOp || destWidthNum >= opWidthNum);
 
   // taint expression
   if(isSolve) {
@@ -553,7 +558,7 @@ expr src_concat_op_constraint(astNode* const node, uint32_t timeIdx, context &c,
   uint32_t destLo = get_lgc_lo(destAndSlice);
   expr destExpr = var_expr(destAndSlice, timeIdx, c, false);//add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve).extract(destHi, destLo);
   expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
-  if(node->dest == "fangyuan0" ) {
+  if(node->dest == "fangyuan10" ) {
     toCoutVerb("Found it!");
   }
   // analyze index of srcVec
@@ -930,8 +935,18 @@ expr func_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
 template <class EXPR1, class EXPR2>
 expr make_z3_expr(solver &s, goal &g, context &c, std::string op, const expr& destExpr, EXPR1& op1Expr, EXPR2& op2Expr, bool isSolve, uint32_t destWidth, uint32_t op1Width, uint32_t op2Width) {
   uint32_t opWidth = std::max(op1Width, op2Width);
-  if(op == "&&" || op == "&") {
+  if(op == "&") {
     expr retExpr = ( zext(op1Expr, destWidth-op1Width) & zext(op2Expr, destWidth-op2Width) );
+    if(isSolve)  {
+      s.add( destExpr == retExpr );
+      if(g_print_solver) {      
+        toCout("Add-Solver: "+get_name(destExpr)+" == ( "+get_name(op1Expr)+" & "+get_name(op2Expr)+" )" );
+      }
+    }
+    return retExpr;
+  }
+  else if(op == "&&") {
+    expr retExpr = ( ite(op1Expr > 0, c.bv_val(1, 1), c.bv_val(0, 1)) & ite(op2Expr > 0, c.bv_val(1, 1), c.bv_val(0, 1)) );
     if(isSolve)  {
       s.add( destExpr == retExpr );
       if(g_print_solver) {      
@@ -1102,7 +1117,12 @@ expr make_z3_expr(solver &s, goal &g, context &c, std::string op, const expr& de
     return retExpr;
   }
   else if(op == ">>>") {
-    expr retExpr = ashr( zext(op1Expr, destWidth-op1Width), zext(op2Expr, destWidth-op2Width) );
+    expr retExpr(c);
+    if(destWidth >= op1Width)
+      retExpr = ashr( zext(op1Expr, destWidth-op1Width), zext(op2Expr, destWidth-op2Width) );
+    else
+      retExpr = ashr( op1Expr, zext(op2Expr, op1Width-op2Width) ).extract(destWidth-1, 0);
+
     if(isSolve)  {
       s.add( destExpr == retExpr );
       if(g_print_solver) {      
