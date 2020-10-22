@@ -141,7 +141,7 @@ expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver 
       return destExpr;
     } 
     // if input instruction should be given to the input ports
-    else if(timeIdx >= bound+2-g_currInstrInfo.instrEncoding.begin()->second.size()) {
+    else if(timeIdx >= bound+2-g_instr_len) {
       if(g_currInstrInfo.instrEncoding.find(dest) == g_currInstrInfo.instrEncoding.end()) {
         toCout("Error: input signal not found for current instruction: "+dest);
         abort();

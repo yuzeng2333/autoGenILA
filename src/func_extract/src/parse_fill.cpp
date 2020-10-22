@@ -13,6 +13,7 @@ std::unordered_map<std::string, std::string> g_nbTable;
 std::unordered_map<std::string, std::pair<std::string, std::vector<std::pair<std::string, std::string>>>> g_caseTable;
 std::unordered_map<std::string, FuncInfo_t> g_funcTable;
 uint32_t g_new_var;
+uint32_t g_instr_len;
 //std::unordered_map<std::string, astNode*> g_asSliceRoot;
 std::unordered_map<std::string, astNode*> g_varNode;
 // each element is a map from input signal to its value
@@ -174,6 +175,7 @@ void read_in_instructions(std::string fileName) {
   moduleAs.clear();
   g_instrInfo.clear();
   g_rstVal.clear();
+  g_instr_len = 0;
   std::ifstream input(fileName);
   if(!input.is_open()) {
     toCout("Error: cannot open file: "+fileName);
@@ -209,7 +211,7 @@ void read_in_instructions(std::string fileName) {
       }
       state = FirstSignal;
     }
-    else if(line.front() == '(') {
+    else if(line.front() == '(') { // (n) is used to express instr word in cycle n
       if(!is_number(line.substr(1, line.length()-2))) {
         toCout("Error: parse instr.txt failed! # is not followed by intruction ID: "+line);
         abort();
@@ -232,6 +234,7 @@ void read_in_instructions(std::string fileName) {
       switch(state) {
         case FirstSignal:
           {
+            g_instr_len++;
             if(firstSignalSeen)
               firstWord = false;
             auto pos = line.find("=");
