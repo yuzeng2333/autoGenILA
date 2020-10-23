@@ -186,7 +186,7 @@ bool g_remove_adff = false;
 bool g_use_value_change = false;
 // TODO: set this configurations!
 // // for func_extract, split long bitVec into multiple short ones
-bool g_split_long_num = false;
+bool g_split_long_num = true;
 // if true, add (reg_PREV_VAL == rst_val) into assertion
 bool g_use_vcd_parser = false;
 bool g_write_assert = false; // for find written ASV
@@ -2347,6 +2347,9 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
  * declare a new variable representing the concatenated input*/
 // if a long number(>32bit) is found, split it if g_split_long_num is true
 bool extract_concat(std::string line, std::ofstream &output, std::string &returnedStmt, std::string &fangyuanDeclaration, std::string &fangyuanAssign, bool isFuncCall) {
+  if(line.find("alu_out") != std::string::npos) {
+    toCout("find it");
+  }
   std::string retStr = "";
   std::smatch m;
   int blankNo = line.find('a', 0);  

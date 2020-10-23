@@ -1456,6 +1456,7 @@ std::string split_long_bit_vec(std::string varList) {
   if(varList.find(",") == std::string::npos)
     return varList;
 
+  bool isBool;
   while(varList.find(", ", lastPos) != std::string::npos) {
     size_t end = varList.find(", ", lastPos);
     std::string var = varList.substr(lastPos, end-lastPos);
@@ -1464,23 +1465,44 @@ std::string split_long_bit_vec(std::string varList) {
       ret = ret + var + ", ";
       continue;
     }
-    if(!std::regex_match(var, m, pBin)) {
-      toCout("Error: non-binary number found in concat: "+var+", "+varList);
+    if(std::regex_match(var, m, pBin)) {
+      uint32_t width = std::stoi(m.str(1));
+      std::string num = m.str(2);
+      if(width < 31) {
+        ret = ret + var + ", ";
+        continue;
+      }
+      // split into multiple 16 bit number
+      size_t pos = 0;
+      while(pos < width) {
+        uint32_t subWidth = std::min(16, int(width-pos));
+        std::string subVar = toStr(subWidth)+"'b"+num.substr(pos, subWidth);
+        pos += 16;
+        ret = ret + subVar + ", ";
+      }
+    }
+    else if(std::regex_match(var, m, pHex)) {
+      uint32_t width = std::stoi(m.str(1));
+      std::string num = m.str(2);
+      if(width < 31) {
+        ret = ret + var + ", ";
+        continue;
+      }
+      // split into multiple 16 bit number
+      size_t pos = 0;
+      while(pos < width/4) {
+        uint32_t subWidth = std::min(16, int(width-pos*4));
+        uint32_t bit = 0;
+        if(subWidth % 4 != 0) bit = 1;
+        std::string subVar = toStr(subWidth)+"'h"+num.substr(pos, bit+subWidth/4);
+        //assert(subWidth % 4 == 0);
+        pos += 4;
+        ret = ret + subVar + ", ";
+      }
+    }
+    else {
+      toCout("Error: number does not match any pattern: "+var);
       abort();
-    }
-    uint32_t width = std::stoi(m.str(1));
-    std::string num = m.str(2);
-    if(width < 31) {
-      ret = ret + var + ", ";
-      continue;
-    }
-    // split into multiple 16 bit number
-    size_t pos = 0;
-    while(pos < width) {
-      uint32_t subWidth = std::min(16, int(width-pos));
-      std::string subVar = toStr(subWidth)+"'b"+num.substr(pos, subWidth);
-      pos += 16;
-      ret = ret + subVar + ", ";
     }
   } // end of while
 
@@ -1490,24 +1512,50 @@ std::string split_long_bit_vec(std::string varList) {
     ret = ret + var;
     return ret;
   }
-  if(!std::regex_match(var, m, pBin)) {
-    toCout("Error: non-binary number found in concat: "+var+", "+varList);
+  if(std::regex_match(var, m, pBin)) {
+    uint32_t width = std::stoi(m.str(1));  
+    std::string num = m.str(2);
+    if(width < 31) {
+      ret = ret + var;
+      return ret;
+    }
+    // split into multiple 16 bit number
+    size_t pos = 0;
+    while(pos < width) {
+      uint32_t subWidth = std::min(16, int(width-pos));
+      std::string subVar = toStr(subWidth)+"'b"+num.substr(pos, subWidth);
+      pos += 16;
+      //toCout("pos: "+toStr(pos));
+      ret = ret + subVar + ", ";
+    }
+  }
+  else if(std::regex_match(var, m, pHex)) {
+    uint32_t width = std::stoi(m.str(1));
+    //toCout("width: "+toStr(width));
+    //toCout("var: "+var);
+    std::string num = m.str(2);
+    if(width < 31) {
+      ret = ret + var;
+      return ret;
+    }
+    // split into multiple 16 bit number
+    size_t pos = 0;
+    while(pos < width/4) {
+      //toCout("begin ite, pos: "+toStr(pos));
+      uint32_t subWidth = std::min(16, int(width-pos));
+      std::string subVar = toStr(subWidth)+"'h"+num.substr(pos, subWidth/4);
+      assert(subWidth % 4 == 0);      
+      pos += 4;
+      //toCout("pos: "+toStr(pos));      
+      ret = ret + subVar + ", ";
+    }
+  }
+  else {
+    toCout("Error: number does not match any pattern: "+var);
     abort();
   }
-  uint32_t width = std::stoi(m.str(1));  
-  std::string num = m.str(2);
-  if(width < 31) {
-    ret = ret + var;
-    return ret;
-  }
-  // split into multiple 16 bit number
-  size_t pos = 0;
-  while(pos < width) {
-    uint32_t subWidth = std::min(16, int(width-pos));
-    std::string subVar = toStr(subWidth)+"'b"+num.substr(pos, subWidth);
-    pos += 16;
-    ret = ret + subVar + ", ";
-  }
+
+  assert(ret.length() > 3);
   ret.pop_back();
   ret.pop_back();
   return ret;
