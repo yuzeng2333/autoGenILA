@@ -159,7 +159,7 @@ expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver 
           // if the value is a combination of x and numbers
           toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%B Give "+localVal+" to "+timed_name(dest, timeIdx));
           g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
-          return mixed_value_expr(localVal, c);
+          return mixed_value_expr(localVal, c, dest, 0);
         }
         else {
           toCout("Error: unexpected input value: "+localVal);
@@ -198,7 +198,7 @@ expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver 
         else if(localVal.find("+") != std::string::npos){
           toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%B Give "+localVal+" to "+timed_name(dest, timeIdx));
           g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
-          return mixed_value_expr(localVal, c);
+          return mixed_value_expr(localVal, c, dest, 0);
         }
         else
           toCout("Error: unexpected input value: "+localVal);          

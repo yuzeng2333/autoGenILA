@@ -67,9 +67,9 @@ int main(int argc, char *argv[]) {
   print_time();  
   clean_goal();
   make_dirs(g_path);
-  pseudo_vlg_gen();  
-  define_fun_gen(g_path+"/clean_sub_goals.txt");
+  define_fun_gen(g_path+"/clean_sub_goals.txt");  
   auxiliary_files_gen(g_path, g_maxDelay);
+  pseudo_vlg_gen();
   clean_file(g_path+"/design.v", true);
   print_time();
   //time_t my_time2 = time(NULL);

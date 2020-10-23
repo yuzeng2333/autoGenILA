@@ -90,9 +90,9 @@ bool isLetter(const char &c);
 
 std::string purify_line(const std::string &line);
 
-expr mixed_value_expr(std::string value, context &c);
+expr mixed_value_expr(std::string value, context &c, std::string varName, uint32_t idx);
 
-expr single_expr(std::string value, context &c);
+expr single_expr(std::string value, context &c, std::string varName, uint32_t idx);
 
 bool check_input_val(std::string value);
 #endif
