@@ -53,7 +53,7 @@ void check_all_regs() {
             check_single_reg_and_slice(regAndSlice, cycleCnt-1, i-1);
       else {// if the writeASV is to be skipped
         simplify_goal(oneWriteAsv, cycleCnt-1, i-1);
-        simplify_goal_without_submodules(oneWriteAsv, cycleCnt-1, i-1);
+        //simplify_goal_without_submodules(oneWriteAsv, cycleCnt-1, i-1);
         g_maxDelay = cycleCnt;
       }
     }
@@ -73,6 +73,7 @@ void clean_data() {
 // By default, there already exists one non-blocking for every reg
 // so last timeIdx = bound + 1, or in2out delay = bound + 1
 void simplify_goal(std::string destAndSlice, uint32_t bound, uint32_t instrIdx) {
+  g_ignoreSubModules = false;
   g_skipCheck = true;
   clean_data();
   std::ofstream goalFile;
@@ -85,7 +86,7 @@ void simplify_goal(std::string destAndSlice, uint32_t bound, uint32_t instrIdx) 
     abort();
   } 
   expr destNextExpr = add_constraint(g_varNode[destAndSlice], 0, c, s, g, bound, /*isSolve=*/false);
-  expr destExpr_g = var_expr(destAndSlice, 1000, c, false);
+  expr destExpr_g = var_expr(destAndSlice, 1000+bound, c, false);
   g.add( destExpr_g == destNextExpr ); 
   //add_all_clean_constraints(c, s, g, bound, /*isSolve=*/false);
   tactic t(c, "simplify");
