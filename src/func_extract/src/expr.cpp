@@ -488,6 +488,8 @@ void module_expr(std::string firstLine, std::ifstream &input) {
     size_t pos = in.find("_#_");
     std::string port = in.substr(0, pos);
     std::string wire = in.substr(pos+3);
+    remove_two_end_space(port);
+    remove_two_end_space(wire);
     funcInfo.inputs.push_back(wire);
     g_wire2ModulePort[instanceName].emplace(wire, port);
   }
@@ -495,6 +497,8 @@ void module_expr(std::string firstLine, std::ifstream &input) {
     size_t pos = out.find("_#_");
     std::string port = out.substr(0, pos);    
     std::string wire = out.substr(pos+3);
+    remove_two_end_space(port);    
+    remove_two_end_space(wire);    
     g_funcTable.emplace(wire, funcInfo);
     g_wire2ModulePort[instanceName].emplace(wire, port);    
   }

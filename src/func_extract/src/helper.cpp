@@ -177,7 +177,11 @@ bool is_case_dest(std::string var) {
 }
 
 bool is_func_output(std::string var) {
-  return g_funcTable.find(var) != g_funcTable.end();
+  if(g_funcTable.find(var) != g_funcTable.end())
+    return true;
+  if(g_funcTable.find(var+" ") != g_funcTable.end())
+    return true;
+  return false;
 }
 
 uint32_t get_pos_of_one(std::string value) {
@@ -411,8 +415,7 @@ std::string purify_var_name(std::string name) {
       else if(c == '\\')
         ret += "_BKSLSH_";
       else {
-        toCout("Error: not matched char: "+std::string(1, c));
-        abort();
+        toCout("Warning: not matched char: "+std::string(1, c));
       }
     }
   }

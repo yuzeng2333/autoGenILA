@@ -593,7 +593,7 @@ expr src_concat_op_constraint(astNode* const node, uint32_t timeIdx, context &c,
 
 expr add_one_concat_expr(astNode* const node, uint32_t nxtIdx, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve, bool isTaint ) {
   //if(node->dest == "fangyuan1" && nxtIdx == 0) {
-  if(node->dest.find("fangyuan35") != std::string::npos ) {
+  if(node->dest.find("fangyuan63") != std::string::npos ) {
     toCoutVerb("Found it!");
   }
   expr firstSrcExpr(c);
@@ -835,6 +835,9 @@ expr case_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
 
 
 expr add_one_case_branch_expr(astNode* const node, expr &caseExpr, uint32_t idx, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
+  if(node->dest == "alu_out") {
+    toCout("Find alu_out");
+  }
   astNode *assignNode;
   std::string assignVarAndSlice = node->srcVec[idx+1];
   uint32_t hi = get_lgc_hi(assignVarAndSlice);

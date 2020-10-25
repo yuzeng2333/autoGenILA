@@ -5,6 +5,7 @@
 
 // global variables
 std::set<std::string> moduleAs;
+std::set<std::string> moduleWriteAs;
 std::unordered_map<std::string, std::vector<std::string>> reg2Slices;
 std::unordered_map<std::string, uint32_t> reg2timeIdx;
 std::unordered_map<std::string, std::string> g_ssaTable;
@@ -48,6 +49,7 @@ void clear_global_vars() {
   g_caseTable.clear();
   varWidth.clear();
   moduleAs.clear();
+  moduleWriteAs.clear();
   reg2Slices.clear();
   g_new_var = 0;
 }
