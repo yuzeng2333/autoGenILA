@@ -190,6 +190,8 @@ void read_in_instructions(std::string fileName) {
   bool firstWord = true;
   bool firstSignalSeen = false;
   while(std::getline(input, line)) {
+    if(line.empty())
+      continue;
     if(line.substr(0, 2) == "//")
       continue;
     if(line.substr(0, 4) == "#CLK") {
