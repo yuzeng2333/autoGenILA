@@ -22,6 +22,10 @@ expr bool_expr(std::string var, uint32_t timeIdx, context &c, bool isTaint=false
 
 expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve);
 
+expr mixed_value_expr(std::string value, context &c, std::string varName, uint32_t timeIdx, uint32_t idx);
+
+expr single_expr(std::string value, context &c, std::string varName, uint32_t timeIdx, uint32_t idx);
+
 expr num_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, bool isSolve);
 
 expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve);

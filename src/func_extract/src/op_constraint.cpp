@@ -159,7 +159,7 @@ expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver 
           // if the value is a combination of x and numbers
           toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%B Give "+localVal+" to "+timed_name(dest, timeIdx));
           g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
-          return mixed_value_expr(localVal, c, dest, 0);
+          return mixed_value_expr(localVal, c, dest, timeIdx, 0);
         }
         else {
           toCout("Error: unexpected input value: "+localVal);
@@ -198,7 +198,7 @@ expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver 
         else if(localVal.find("+") != std::string::npos){
           toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%B Give "+localVal+" to "+timed_name(dest, timeIdx));
           g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
-          return mixed_value_expr(localVal, c, dest, 0);
+          return mixed_value_expr(localVal, c, dest, timeIdx, 0);
         }
         else
           toCout("Error: unexpected input value: "+localVal);          
@@ -206,6 +206,41 @@ expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver 
     }
   }
   return destExpr;
+}
+
+
+// the input must be of the form: 3'hx+5'h7+...
+// idx is the start index of slice
+expr mixed_value_expr(std::string value, context &c, std::string varName, uint32_t timeIdx, uint32_t idx) {
+  if(value.find("+") == std::string::npos) {
+    return single_expr(value, c, varName, timeIdx, idx);
+  }
+  else {
+    uint32_t pos = value.find("+");
+    return concat(single_expr(value.substr(0, pos), c, varName, timeIdx, idx), mixed_value_expr(value.substr(pos+1), c, varName, timeIdx, idx+1));
+  }
+}
+
+expr single_expr(std::string value, context &c, std::string varName, uint32_t timeIdx, uint32_t idx) {
+  //assert(value.find("x") == std::string::npos);
+  std::regex pX("^(\\d+)'[hb]x$");
+  std::smatch m;
+  if(std::regex_match(value, m, pX)) {
+    std::string widthStr = m.str(1);
+    uint32_t localWidth = std::stoi(widthStr);
+    uint32_t totalWidth = get_var_slice_width(varName);
+    std::string varTimed = varName + "___#" + toStr(timeIdx);
+    return c.bv_const((varTimed).c_str(), totalWidth).extract(idx, idx-localWidth+1);
+  }
+  else if(is_number(value)) {
+    uint32_t pos = value.find("'");
+    std::string widthStr = value.substr(0, pos);
+    uint32_t width = std::stoi(widthStr);
+    return c.bv_val(hdb2int(value), width);
+  }
+  else {
+    toCout("Error: unexpected value for mixed_value_expr: "+value);
+  }
 }
 
 

@@ -442,38 +442,6 @@ std::string purify_line(const std::string &line) {
 }
 
 
-// the input must be of the form: 3'hx+5'h7+...
-expr mixed_value_expr(std::string value, context &c, std::string varName, uint32_t idx) {
-  if(value.find("+") == std::string::npos) {
-    return single_expr(value, c, varName, idx);
-  }
-  else {
-    uint32_t pos = value.find("+");
-    return concat(single_expr(value.substr(0, pos), c, varName, idx), mixed_value_expr(value.substr(pos+1), c, varName, idx+1));
-  }
-}
-
-expr single_expr(std::string value, context &c, std::string varName, uint32_t idx) {
-  //assert(value.find("x") == std::string::npos);
-  std::regex pX("^(\\d+)'[hb]x$");
-  std::smatch m;
-  if(std::regex_match(value, m, pX)) {
-    std::string widthStr = m.str(1);
-    uint32_t width = std::stoi(widthStr);
-    return c.bv_const((varName+"__"+widthStr+"'bx__"+toStr(idx)).c_str(), width);
-  }
-  else if(is_number(value)) {
-    uint32_t pos = value.find("'");
-    std::string widthStr = value.substr(0, pos);
-    uint32_t width = std::stoi(widthStr);
-    return c.bv_val(hdb2int(value), width);
-  }
-  else {
-    toCout("Error: unexpected value for mixed_value_expr: "+value);
-  }
-}
-
-
 bool check_input_val(std::string value) {
   std::regex pX("^(\\d+)'[b|h]x$");
   std::smatch m;
