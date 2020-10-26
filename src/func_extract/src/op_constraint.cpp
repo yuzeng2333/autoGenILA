@@ -159,7 +159,7 @@ expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver 
           // if the value is a combination of x and numbers
           toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%B Give "+localVal+" to "+timed_name(dest, timeIdx));
           g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
-          return mixed_value_expr(localVal, c, dest, timeIdx, 0);
+          return mixed_value_expr(localVal, c, dest, timeIdx, localWidth);
         }
         else {
           toCout("Error: unexpected input value: "+localVal);
@@ -198,7 +198,7 @@ expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver 
         else if(localVal.find("+") != std::string::npos){
           toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%B Give "+localVal+" to "+timed_name(dest, timeIdx));
           g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
-          return mixed_value_expr(localVal, c, dest, timeIdx, 0);
+          return mixed_value_expr(localVal, c, dest, timeIdx, localWidth);
         }
         else
           toCout("Error: unexpected input value: "+localVal);          
@@ -217,7 +217,11 @@ expr mixed_value_expr(std::string value, context &c, std::string varName, uint32
   }
   else {
     uint32_t pos = value.find("+");
-    return concat(single_expr(value.substr(0, pos), c, varName, timeIdx, idx), mixed_value_expr(value.substr(pos+1), c, varName, timeIdx, idx+1));
+    uint32_t primePos = value.find("'");
+    std::string widthStr = value.substr(0, primePos);
+    remove_two_end_space(widthStr);
+    uint32_t localWidth = std::stoi(widthStr);
+    return concat(single_expr(value.substr(0, pos), c, varName, timeIdx, idx), mixed_value_expr(value.substr(pos+1), c, varName, timeIdx, idx-localWidth));
   }
 }
 

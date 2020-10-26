@@ -37,6 +37,10 @@ uint32_t g_maxDelay = 0;
 void check_all_regs() {
   toCout("### Begin check_all_regs");
   toCoutVerb("###### Begin checking SAT! ");
+  // clean goal file
+  std::ofstream goalFile;
+  goalFile.open(g_path+"/goal.txt");
+  goalFile.close();
   uint32_t i = 1;
   for(auto instrInfo : g_instrInfo) {
     toCout("---  BEGIN INSTRUCTION #"+toStr(i++)+" ---");
@@ -77,7 +81,7 @@ void simplify_goal(std::string destAndSlice, uint32_t bound, uint32_t instrIdx) 
   g_skipCheck = true;
   clean_data();
   std::ofstream goalFile;
-  goalFile.open(g_path+"/goal.txt");
+  goalFile.open(g_path+"/goal.txt", std::ofstream::app);
   context c;
   solver s(c);
   goal g(c); 
