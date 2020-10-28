@@ -191,7 +191,7 @@ bool g_split_long_num = true;
 bool g_use_vcd_parser = false;
 bool g_write_assert = false; // for find written ASV
 bool g_double_assert = false; // to enable having PREV_VAL in assert
-bool g_use_sig = false;
+bool g_use_sig = true;
 // set the read flag only if reg's value is not reset value
 bool g_set_rflag_if_not_rst_val = true; 
 std::string _t="_T";
@@ -2134,8 +2134,7 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
 
   std::string instanceName = m.str(3);
   if(g_mod2instMap.find(moduleName) != g_mod2instMap.end()) {
-    toCout("Error: module already in g_mod2instMap: "+moduleName);
-    abort();
+    g_mod2instMap[moduleName].emplace(instanceName, localModuleName);
   }
   else {
     g_mod2instMap.emplace(moduleName, std::unordered_map<std::string, std::string>{{instanceName, localModuleName}});
