@@ -8,6 +8,9 @@
 // 1st argument is file name
 // 2rd is whether to do process_path_info
 int main(int argc, char *argv[]) {
+  std::ofstream timeFile("./time.txt");
+  time_t my_time1 = time(NULL);
+  timeFile << my_time1 << std::endl;
   std::string fileName = argv[1];
   bool doProcessPathInfo;
   doProcessPathInfo = false;
@@ -46,7 +49,11 @@ int main(int argc, char *argv[]) {
       continue;
     output << "`include \"../RTL/" + subModule + "_NEW.v.clean.tainted.final\"" << std::endl;
   }
+  assert_reg_map_gen();
   output.close();
+  time_t my_time2 = time(NULL);
+  timeFile << my_time2 << std::endl;
+  timeFile.close();
   return 0;
 }
 
