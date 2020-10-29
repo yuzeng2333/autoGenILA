@@ -192,6 +192,7 @@ bool g_use_vcd_parser = false;
 bool g_write_assert = false; // for find written ASV
 bool g_double_assert = false; // to enable having PREV_VAL in assert
 bool g_use_sig = true;
+bool g_use_taint_rst = true;
 // set the read flag only if reg's value is not reset value
 bool g_set_rflag_if_not_rst_val = true; 
 std::string _t="_T";
@@ -199,6 +200,7 @@ std::string _r="_R";
 std::string _x="_X";
 std::string _c="_C";
 std::string _sig="_S";
+std::string TAINT_RST="zy_taint_rst";
 std::string srcConcatFeature = " = {";
 std::string bothConcatFeature = "} = {";
 std::string g_gatedClkFileName = "gated_clk.txt";
@@ -1302,6 +1304,7 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
   }
   if(!g_hasRst) {
     moduleInputs.push_back("rst_zy");
+    if(g_use_taint_rst) moduleInputs.push_back(TAINT_RST);
     toCout("No reset signal found in "+moduleName+", check it!!");
   }
   out << "module " + moduleName + " ( ";
@@ -1326,6 +1329,7 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
     out << "  input rst_zy;" << std::endl;
   else
     out << "  logic rst_zy;" << std::endl;
+  if(g_use_taint_rst) out << "  input "+TAINT_RST+";" << std::endl;
   out << "  integer i;" << std::endl;
   if(!isTop)
     out << "  input INSTR_IN_ZY;" << std::endl;
@@ -1333,7 +1337,7 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
     out << "  logic INSTR_IN_ZY;" << std::endl;
     out << "  assign INSTR_IN_ZY = ";
     for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) {
-      if((*it).compare(g_recentClk) == 0 || (*it).compare(g_recentRst) == 0 || (*it).compare("rst_zy") == 0)
+      if((*it).compare(g_recentClk) == 0 || (*it).compare(g_recentRst) == 0 || (*it).compare("rst_zy") == 0 || (*it).compare(TAINT_RST) == 0)
         continue;
       out << *it + _t + " > 0 || ";
     }
@@ -2163,7 +2167,7 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
   std::unordered_map<std::string, std::vector<bool>> inputSignalIsNewMap;
   
   for(std::string input: moduleInputsMap[localModuleName]) {
-    if(input.compare(g_recentClk) == 0 || input.compare("rst_zy") == 0 || input.compare("INSTR_IN_ZY") == 0 )
+    if(input.compare(g_recentClk) == 0 || input.compare("rst_zy") == 0 || input.compare("INSTR_IN_ZY") == 0 || input.compare(TAINT_RST) == 0 )
       continue;
     if( port2SignalMap.find(input) == port2SignalMap.end() ) {
       toCout("Error: the module input has not been seen before: "+input);
@@ -2221,6 +2225,10 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
     }
     if(inPort.compare("INSTR_IN_ZY") == 0) {
       output << "    .INSTR_IN_ZY(INSTR_IN_ZY)," << std::endl;
+      continue;
+    }
+    if(inPort.compare(TAINT_RST) == 0) {
+      output << "    ."+TAINT_RST+"("+TAINT_RST+")," << std::endl;
       continue;
     }
     if( !port2SignalMap[inPort].empty() ) {
