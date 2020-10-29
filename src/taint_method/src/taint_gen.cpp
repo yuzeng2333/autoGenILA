@@ -193,6 +193,7 @@ bool g_write_assert = false; // for find written ASV
 bool g_double_assert = false; // to enable having PREV_VAL in assert
 bool g_use_sig = true;
 bool g_use_taint_rst = true;
+bool g_use_end_sig = true;
 // set the read flag only if reg's value is not reset value
 bool g_set_rflag_if_not_rst_val = true; 
 std::string _t="_T";
@@ -201,6 +202,7 @@ std::string _x="_X";
 std::string _c="_C";
 std::string _sig="_S";
 std::string TAINT_RST="zy_taint_rst";
+std::string END_SIG="zy_end_sig";
 std::string srcConcatFeature = " = {";
 std::string bothConcatFeature = "} = {";
 std::string g_gatedClkFileName = "gated_clk.txt";
@@ -2499,6 +2501,8 @@ void gen_assert_property(std::ofstream &output) {
           else
             output << "  assert property( " + out + " == 0 || " + m.str(1) + "_PREV_VAL1 == " + m.str(1) + "_PREV_VAL2 );" << std::endl;
         }
+        else if(g_use_end_sig)
+          output << "  assert property( " + out + " == 0 || " + END_SIG + ");" << std::endl;          
         else
           output << "  assert property( " + out + " == 0 );" << std::endl;
       }
