@@ -1302,9 +1302,9 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
   if(!isTop) {
     moduleInputs.push_back("INSTR_IN_ZY");    
   }
+  if(g_use_taint_rst) moduleInputs.push_back(TAINT_RST);  
   if(!g_hasRst) {
     moduleInputs.push_back("rst_zy");
-    if(g_use_taint_rst) moduleInputs.push_back(TAINT_RST);
     toCout("No reset signal found in "+moduleName+", check it!!");
   }
   out << "module " + moduleName + " ( ";
