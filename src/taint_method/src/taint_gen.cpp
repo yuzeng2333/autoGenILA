@@ -1305,6 +1305,7 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
     moduleInputs.push_back("INSTR_IN_ZY");    
   }
   if(g_use_taint_rst) moduleInputs.push_back(TAINT_RST);  
+  if(g_use_end_sig) moduleInputs.push_back(END_SIG);  
   if(!g_hasRst) {
     moduleInputs.push_back("rst_zy");
     toCout("No reset signal found in "+moduleName+", check it!!");
@@ -1332,6 +1333,7 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
   else
     out << "  logic rst_zy;" << std::endl;
   if(g_use_taint_rst) out << "  input "+TAINT_RST+";" << std::endl;
+  if(g_use_end_sig) out << "  input "+END_SIG+";" << std::endl;
   out << "  integer i;" << std::endl;
   if(!isTop)
     out << "  input INSTR_IN_ZY;" << std::endl;
@@ -1339,7 +1341,7 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
     out << "  logic INSTR_IN_ZY;" << std::endl;
     out << "  assign INSTR_IN_ZY = ";
     for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) {
-      if((*it).compare(g_recentClk) == 0 || (*it).compare(g_recentRst) == 0 || (*it).compare("rst_zy") == 0 || (*it).compare(TAINT_RST) == 0)
+      if((*it).compare(g_recentClk) == 0 || (*it).compare(g_recentRst) == 0 || (*it).compare("rst_zy") == 0 || (*it).compare(TAINT_RST) == 0 || (*it).compare(END_SIG) == 0)
         continue;
       out << *it + _t + " > 0 || ";
     }
@@ -2169,7 +2171,7 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
   std::unordered_map<std::string, std::vector<bool>> inputSignalIsNewMap;
   
   for(std::string input: moduleInputsMap[localModuleName]) {
-    if(input.compare(g_recentClk) == 0 || input.compare("rst_zy") == 0 || input.compare("INSTR_IN_ZY") == 0 || input.compare(TAINT_RST) == 0 )
+    if(input.compare(g_recentClk) == 0 || input.compare("rst_zy") == 0 || input.compare("INSTR_IN_ZY") == 0 || input.compare(TAINT_RST) == 0 || input.compare(END_SIG) == 0)
       continue;
     if( port2SignalMap.find(input) == port2SignalMap.end() ) {
       toCout("Error: the module input has not been seen before: "+input);
@@ -2231,6 +2233,10 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
     }
     if(inPort.compare(TAINT_RST) == 0) {
       output << "    ."+TAINT_RST+"("+TAINT_RST+")," << std::endl;
+      continue;
+    }
+    if(inPort.compare(END_SIG) == 0) {
+      output << "    ."+END_SIG+"("+END_SIG+")," << std::endl;
       continue;
     }
     if( !port2SignalMap[inPort].empty() ) {
