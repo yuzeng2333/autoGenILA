@@ -116,7 +116,7 @@ std::string separate_modules(std::string fileName, std::vector<std::string> &mod
       std::string localModuleName = m.str(2);
       std::string instanceName = m.str(3);
       if(g_instance2moduleMap.find(moduleName) == g_instance2moduleMap.end()) {
-        g_instance2moduleMap.emplace(moduleName, std::unordered_map<std::string, std::string>{});
+        g_instance2moduleMap.emplace(moduleName, std::unordered_map<std::string, std::string>{{instanceName, localModuleName}});
       }
       else {
         if(g_instance2moduleMap[moduleName].find(instanceName) != g_instance2moduleMap[moduleName].end()) {

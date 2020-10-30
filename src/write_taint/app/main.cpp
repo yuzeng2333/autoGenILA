@@ -2,6 +2,7 @@
 #include "../src/global_data.h"
 #include "../src/helper.h"
 #include "../src/vcd_parser.h"
+#include "../src/top_script_gen.h"
 #include "main.h"
 
 
@@ -47,6 +48,7 @@ int main(int argc, char *argv[]) {
     output << "`include \"../RTL/" + subModule + "_NEW.v.clean.tainted.final\"" << std::endl;
   }
   output.close();
+  top_script_gen();
   return 0;
 }
 
@@ -109,7 +111,7 @@ std::string separate_modules(std::string fileName, std::vector<std::string> &mod
       std::string localModuleName = m.str(2);
       std::string instanceName = m.str(3);
       if(g_instance2moduleMap.find(moduleName) == g_instance2moduleMap.end()) {
-        g_instance2moduleMap.emplace(moduleName, std::unordered_map<std::string, std::string>{});
+        g_instance2moduleMap.emplace(moduleName, std::unordered_map<std::string, std::string>{{instanceName, localModuleName}});
       }
       else {
         if(g_instance2moduleMap[moduleName].find(instanceName) != g_instance2moduleMap[moduleName].end()) {
@@ -158,6 +160,7 @@ std::string separate_modules(std::string fileName, std::vector<std::string> &mod
 
 
 void add_taint_bottom_up(std::string path, std::string module, std::map<std::string, bool> &moduleReady, std::map<std::string, std::vector<std::string>> &childModules, std::string g_topModule, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap, std::map<std::string, std::vector<std::string>> &moduleRFlagsMap, uint32_t totalRegCnt, uint32_t &nextSig, bool doProcessPathInfo) {
+  uint32_t totalRegInstanceCnt = 0;
   if( moduleReady[module] == true )
     return;
   if( childModules.find(module) == childModules.end() ) {
