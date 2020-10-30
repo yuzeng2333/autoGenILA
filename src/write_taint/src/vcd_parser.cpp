@@ -29,12 +29,16 @@ void hierarchical_vcd_parser(std::string fileName) {
   std::smatch m;
   bool isFirstInstance = true;
   while(std::getline(input, line)) {
+    if(line == "bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n240")
+      toCout("Find it!");
     toCout(line);
     if(line.substr(0, 6).compare("$scope") == 0) {
       if(!std::regex_match(line, m, pScope)) {
         continue;
       }
       std::string curInstance = m.str(1);
+      if(curInstance == "final_round")
+        toCout("Found it!");
       uint32_t idx = 0;
       instanceNameStack.push(curInstance);
       if(isFirstInstance) {
@@ -68,6 +72,8 @@ void hierarchical_vcd_parser(std::string fileName) {
         continue;
       std::string name = m.str(2);
       std::string var = m.str(3);
+      if(var == "state_out")
+        toCout("Find it");
       nameVarMap.emplace(name, std::make_pair(moduleNameStack.top(), var));
     }
     else if(state == readValue) {
@@ -77,7 +83,7 @@ void hierarchical_vcd_parser(std::string fileName) {
         toCout("Error: "+name+" is not found in map");
         abort();
       }
-      if(name == "n14") {
+      if(name == "n240") {
         toCoutVerb("Found cpu_state");
       }
 
@@ -91,6 +97,8 @@ void hierarchical_vcd_parser(std::string fileName) {
       auto moduleVarPair = nameVarMap[name];
       std::string modName = moduleVarPair.first;
       std::string varName = moduleVarPair.second;
+      if(modName == "final_round" && varName == "state_out")
+        toCout("Find it");
       if(g_rstValMap.find(modName) == g_rstValMap.end())
         g_rstValMap.emplace(modName, std::unordered_map<std::string, std::string>{{varName, rstVal}});
       else if(g_rstValMap[modName].find(varName) == g_rstValMap[modName].end())

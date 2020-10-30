@@ -35,6 +35,7 @@ void top_script_gen() {
   fill_yzc2regMap(g_topModule, g_topModule, 0);
   std::ofstream outFile(g_path+"/top_script.tcl");
   uint32_t totalReg = g_yzcNxtIdx;
+  outFile << "add assertion, and change script.tcl name" << std::endl;
   if(useAllEngine) outFile << "set_engine_mode {Hp Ht Bm J Q3 U L B K AB D I AD M N AM G C AG G2 C2 Hps Hts Tri R}" << el;
   //outFile << "set time1 [date]" << el;
   //outFile << "puts $fd ${time1}" << el;
