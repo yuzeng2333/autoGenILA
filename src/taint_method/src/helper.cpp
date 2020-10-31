@@ -241,7 +241,7 @@ uint32_t find_version_num(std::string opAndSlice, bool &isNew, std::ofstream &ou
       if(freeBitsVec.size() > 0) {
         output << "  assign "+add_taint(freeBitsVec, _r+toStr(verNum-1)) + " = 0;" << std::endl;
         output << "  assign "+add_taint(freeBitsVec, _x+toStr(verNum-1)) + " = 0;" << std::endl;
-        //output << "  assign "+add_taint(freeBitsVec, _c+toStr(verNum-1)) + " = 0;" << std::endl;
+        output << "  assign "+add_taint(freeBitsVec, _c+toStr(verNum-1)) + " = 0;" << std::endl;
       }
       nextVersion[op]++;
       nxtVerBits[op].clear();
@@ -1388,14 +1388,9 @@ std::string extract_bin(std::string num, uint32_t highIdx, uint32_t lowIdx) {
   else if(std::regex_match(num, m, pHex)) {
     uint32_t width = std::stoi(m.str(1));
     std::string bits = m.str(2);
-
-    uint32_t highRes = (width-1-highIdx) % 4;
-    uint32_t highDvd = (width-1-highIdx) / 4;
-    uint32_t lowDvd = (width-1-lowIdx) / 4;
-
-    std::string subBits = bits.substr(highDvd, lowDvd-highDvd+1);
-    std::string binSubBits = hex2bin(subBits);
-    return binSubBits.substr(highRes, highIdx-lowIdx+1);
+    std::string binBits = hex2bin(bits);
+    binBits = binBits.substr(binBits.length()-width);
+    return binBits.substr(width-highIdx-1, highIdx-lowIdx+1);
   }
   else {
     toCout("Error: input num for extract_bin is not binary or hex: "+num);
