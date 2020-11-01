@@ -191,10 +191,10 @@ bool g_split_long_num = true;
 bool g_use_vcd_parser = false;
 bool g_write_assert = false; // for find written ASV
 bool g_double_assert = false; // to enable having PREV_VAL in assert
-bool g_use_sig = true;
+bool g_use_sig = false;
 bool g_use_taint_rst = false; // used when start from arbitraty state, only reset taints
-bool g_use_end_sig = true; // used to end verification after a certain time of instruction begins
-bool g_wt_keeped = false;
+bool g_use_end_sig = false; // used to end verification after a certain time of instruction begins
+bool g_wt_keeped = true;
 // set the read flag only if reg's value is not reset value
 bool g_set_rflag_if_not_rst_val = true; 
 std::string _t="_T";
@@ -1143,7 +1143,7 @@ void merge_taints(std::string fileName) {
       output << "      "+it->first+_r+" [i] = (";
       for (uint32_t i = 0; i < it->second - 1; i++) {
         if(g_has_read_taint) {
-          output << it->first + _x + std::to_string(i) + " [i] & ";
+          //output << it->first + _x + std::to_string(i) + " [i] & ";
           output << it->first + _r + std::to_string(i) + " [i] ) | ( ";
         }
         else { // if do not want read taint
@@ -1151,11 +1151,11 @@ void merge_taints(std::string fileName) {
         }
       }
       if(g_has_read_taint) {
-        output << it->first + _x + std::to_string(it->second - 1) + " [i] & ";
+        //output << it->first + _x + std::to_string(it->second - 1) + " [i] & ";
         output << it->first + _r + std::to_string(it->second - 1) + " [i] );" << std::endl;
       }
       else {
-        output << it->first + _x + std::to_string(it->second - 1) + " [i] );" << std::endl;
+        //output << it->first + _x + std::to_string(it->second - 1) + " [i] );" << std::endl;
       }
       output << "    end" << std::endl;
       output << "  end" << std::endl;
@@ -1164,21 +1164,21 @@ void merge_taints(std::string fileName) {
       output << "  assign " + it->first + _r+" = ( ";
       for (uint32_t i = 0; i < it->second - 1; i++) {
         if(g_has_read_taint) {
-          output << it->first + _x + std::to_string(i) + " & ";
+          //output << it->first + _x + std::to_string(i) + " & ";
           //output << it->first + _c + std::to_string(i) + " & ";
           output << it->first + _r + std::to_string(i) + " ) | ( ";
         }
         else {
-          output << it->first + _x + std::to_string(i) + " ) | ( ";
+          //output << it->first + _x + std::to_string(i) + " ) | ( ";
         }
       }
       if(g_has_read_taint) {      
-        output << it->first + _x + std::to_string(it->second - 1) + " & ";
+        //output << it->first + _x + std::to_string(it->second - 1) + " & ";
         //output << it->first + _c + std::to_string(it->second - 1) + " & ";
         output << it->first + _r + std::to_string(it->second - 1) + " );" << std::endl;
       }
       else {
-        output << it->first + _x + std::to_string(it->second - 1) + " );" << std::endl;
+        //output << it->first + _x + std::to_string(it->second - 1) + " );" << std::endl;
       }
     }
   }
