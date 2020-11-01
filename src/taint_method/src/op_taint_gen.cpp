@@ -1644,18 +1644,20 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
   // _t
   std::string taintRst;
   if(g_use_taint_rst) taintRst = "|| "+TAINT_RST+" ";
+  std::string dest_t_Or = "";
+  if(g_wt_keeped) dest_t_Or = dest + _t + destSlice + " | ";
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
   if(!replaceSig) {
     if (g_hasRst)
-      output << blank + dest + _t + destSlice + " \t\t<= " + get_recent_rst() + taintRst + " ? 0 : ( " + op1 + _t + op1Slice + " & ( " + dest + _t + destSlice + " | " + op1 + _x + op1Ver + op1Slice + " ));" << std::endl;
+      output << blank + dest + _t + destSlice + " \t\t<= " + get_recent_rst() + taintRst + " ? 0 : ( " + op1 + _t + op1Slice + " & ( " + dest_t_Or + op1 + _x + op1Ver + op1Slice + " ));" << std::endl;
     else 
-      output << blank + dest + _t + destSlice + " \t\t<= rst_zy " + taintRst + "? 0 : ( " + op1 + _t + " & ( " + dest + _t + destSlice + " | " +  op1 + _x + op1Ver + op1Slice + " ));" << std::endl;
+      output << blank + dest + _t + destSlice + " \t\t<= rst_zy " + taintRst + "? 0 : ( " + op1 + _t + " & ( " + dest_t_Or +  op1 + _x + op1Ver + op1Slice + " ));" << std::endl;
   }
   else {
     if (g_hasRst)
-      output << blank + dest + _t + destSlice + " \t\t<= " + get_recent_rst() + taintRst + " ? 0 : ( " + op1+_t+op1Slice + " & ( " + dest + _t + destSlice + " | " + extend( "!("+repeatCond+")", localWidthNum ) + " ));" << std::endl;
+      output << blank + dest + _t + destSlice + " \t\t<= " + get_recent_rst() + taintRst + " ? 0 : ( " + op1+_t+op1Slice + " & ( " + dest_t_Or + extend( "!("+repeatCond+")", localWidthNum ) + " ));" << std::endl;
     else 
-      output << blank + dest + _t + destSlice + " \t\t<= rst_zy " + taintRst + "? 0 : ( " + op1 + _t + " & ( " + dest + _t + destSlice + " | " + extend( "!("+repeatCond+")", localWidthNum ) + " ));" << std::endl;
+      output << blank + dest + _t + destSlice + " \t\t<= rst_zy " + taintRst + "? 0 : ( " + op1 + _t + " & ( " + dest_t_Or + extend( "!("+repeatCond+")", localWidthNum ) + " ));" << std::endl;
   }
 
 
@@ -1780,12 +1782,15 @@ void nonblockconcat_taint_gen(std::string line, std::ofstream &output) {
   std::string sigCheck = "";
   std::string taintRst;  
   if(g_use_taint_rst) taintRst = "|| "+TAINT_RST+" ";  
+  std::string dest_t_Or = "";
+  if(g_wt_keeped) dest_t_Or = dest + _t + " | ";
   if(!g_use_value_change)
     sigCheck = dest+_sig+" != { "+updateList+" } | ";
+
   if (g_hasRst)  
-    output << blank + dest + _t + " \t\t<= " + get_recent_rst() + taintRst + "? 0 : ({ " + updateTList +" } & ( " + dest + _t + " | " + extend(sigCheck+destAndSlice+" != "+updateList, localWidthNum) + " ));" << std::endl;
+    output << blank + dest + _t + " \t\t<= " + get_recent_rst() + taintRst + "? 0 : ({ " + updateTList +" } & ( " + dest_t_Or + extend(sigCheck+destAndSlice+" != "+updateList, localWidthNum) + " ));" << std::endl;
   else
-    output << blank + dest + _t + " \t\t<= rst_zy "+taintRst+"? 0 : ({ " + updateTList +" } & ( " + dest + _t + " | " + extend(sigCheck+destAndSlice+" != "+updateList, localWidthNum) + " ));" << std::endl;
+    output << blank + dest + _t + " \t\t<= rst_zy "+taintRst+"? 0 : ({ " + updateTList +" } & ( " + dest_t_Or + extend(sigCheck+destAndSlice+" != "+updateList, localWidthNum) + " ));" << std::endl;
 
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
   if (g_hasRst)    
@@ -1861,6 +1866,9 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
 
 
     // assume: if src is num, the cond must be rst.
+    std::string dest_t_Or = "";
+    if(g_wt_keeped) dest_t_Or = dest + _t + " " + destSlice + " | ";
+
     if(isNum(src)) {
       hasRst = true;
       rst = condAndSlice;
@@ -1876,7 +1884,7 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
         output << blank + "if (" + condAndSlice + ") " + dest + "_t_flag " + destSlice + " <= " + dest + "_t_flag " + destSlice + " ? 1 : (" + src + _t+" " + srcSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + destAndSlice + " != " + srcAndSlice + " );" << std::endl;
       }
       else {
-        output << blank + "if (" + condAndSlice + ") " + dest + _t + " " + destSlice + " <= ( " + src + _t+" " + srcSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + dest + _t + " " + destSlice + " | " + extend( dest+_sig+" != "+src+_sig, localWidthNum ) + " );" << std::endl;
+        output << blank + "if (" + condAndSlice + ") " + dest + _t + " " + destSlice + " <= ( " + src + _t+" " + srcSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + dest_t_Or + extend( dest+_sig+" != "+src+_sig, localWidthNum ) + " );" << std::endl;
         output << blank + "if (" + condAndSlice + ") " + dest + "_t_flag " + destSlice + " <= " + dest + "_t_flag " + destSlice + " ? 1 : (" + src + _t + " " + srcSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + extend( dest+_sig+" != "+src+_sig, localWidthNum ) + " );" << std::endl;
       }
 

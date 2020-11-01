@@ -192,8 +192,9 @@ bool g_use_vcd_parser = false;
 bool g_write_assert = false; // for find written ASV
 bool g_double_assert = false; // to enable having PREV_VAL in assert
 bool g_use_sig = true;
-bool g_use_taint_rst = false;
-bool g_use_end_sig = false;
+bool g_use_taint_rst = false; // used when start from arbitraty state, only reset taints
+bool g_use_end_sig = true; // used to end verification after a certain time of instruction begins
+bool g_wt_keeped = false;
 // set the read flag only if reg's value is not reset value
 bool g_set_rflag_if_not_rst_val = true; 
 std::string _t="_T";
