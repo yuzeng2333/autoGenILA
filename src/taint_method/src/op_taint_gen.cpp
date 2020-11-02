@@ -342,6 +342,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
   bool isAnd = false;
   bool isBitAnd = false;
   bool isBitOr = false;
+  bool isShift = false;
   if( std::regex_match(line, m, pOr) )
     isOR = true;
   if( std::regex_match(line, m, pAnd) )
@@ -361,11 +362,13 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
             || std::regex_match(line, m, pBitOr)
             || std::regex_match(line, m, pBitExOr)
             || std::regex_match(line, m, pBitAnd)
-            || std::regex_match(line, m, pLeftShift) 
-            || std::regex_match(line, m, pRightShift) 
-            || std::regex_match(line, m, pSignedRightShift)
-            || std::regex_match(line, m, pSignedLeftShift) 
-            || std::regex_match(line, m, pBitOrRed2) ) {} 
+            || std::regex_match(line, m, pBitOrRed2) ) {}
+  else if ( std::regex_match(line, m, pLeftShift)
+              || std::regex_match(line, m, pRightShift)
+              || std::regex_match(line, m, pSignedRightShift)
+              || std::regex_match(line, m, pSignedLeftShift) ) {
+    isShift = true;
+  }
   else if ( std::regex_match(line, m, pEq)
               || std::regex_match(line, m, pEq3)
               || std::regex_match(line, m, pNeq)
@@ -409,6 +412,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
   std::string op2HighIdx  = toStr(op2IdxPair.first);
   std::string op2LowIdx   = toStr(op2IdxPair.second);
 
+  uint32_t destWidthNum = get_var_slice_width(destAndSlice);
   uint32_t op1LocalWidthNum = get_var_slice_width(op1AndSlice);
   uint32_t op2LocalWidthNum = get_var_slice_width(op2AndSlice);
 
@@ -447,7 +451,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
 
     /* make assignments */
     /* FIXME: the width of op1/op2 and dest are not necessarily the same */
-    if(!isReduceOp)
+    if(!isReduceOp && !isShift)
       if(isAnd)
         output << blank << "assign " + dest + _t + destSlice + " = ( " + op1 + _t + op1Slice + " && " + op2AndSlice + " ) | ( " + op2 + _t + op2Slice + " && " + op1AndSlice + " ) ;" << std::endl;
       else if(isOR)
@@ -458,27 +462,34 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
         output << blank << "assign " + dest + _t + destSlice + " = ( " + op1 + _t + op1Slice + " & ~" + op2AndSlice + " ) | ( " + op2 + _t + op2Slice + " & ~" + op1AndSlice + " ) ;" << std::endl;
       else
         output << blank << "assign " + dest + _t + destSlice + " = " + op1 + _t + op1Slice + " | " + op2 + _t + op2Slice + " ;" << std::endl;
-    else
+    else if(isReduceOp)
       output << blank << "assign " + dest + _t + destSlice + " = (| " + op1 + _t + op1Slice + " ) | (|" + op2 + _t + op2Slice + " ) ;" << std::endl;
+    else if(isShift)
+      output << blank << "assign " + dest + _t + destSlice + " = " + extend("(| " + op1 + _t + op1Slice + " ) | (|" + op2 + _t + op2Slice + " )", destWidthNum) + " ;" << std::endl;
+
 
     if ( isOutput(dest) && isTop ) {
       //output << blank << "assign " + op1 + _c + sndVer + op1Slice + " = "+extend("1'b1", op1LocalWidthNum)+" ;" << std::endl;
       //output << blank << "assign " + op2 + _c + thdVer + op2Slice + " = "+extend("1'b1", op2LocalWidthNum)+" ;" << std::endl;
-      if(!isReduceOp) {
+      if(!isReduceOp && !isShift) {
         output << blank << "assign " + op1 + _r + sndVer + op1Slice + " = " + dest + _r + destSlice + " ;" << std::endl;
         output << blank << "assign " + op2 + _r + thdVer + op2Slice + " = " + dest + _r + destSlice + " ;" << std::endl;
         // TODO: check if the RHS is correct 
         //output << blank << "assign " + op1 + _x + sndVer + op1Slice + " = " + dest + _r + destSlice + " ;" << std::endl;
         //output << blank << "assign " + op2 + _x + thdVer + op2Slice + " = " + dest + _r + destSlice + " ;" << std::endl;  
       }
-      else {
+      else if(isReduceOp) {
         output << blank << "assign " + op1 + _r + sndVer + op1Slice + " = " + extend(dest+_r+destSlice, op1LocalWidthNum) +  " ;" << std::endl;
         output << blank << "assign " + op2 + _r + thdVer + op2Slice + " = " + extend(dest+_r+destSlice, op2LocalWidthNum) +  " ;" << std::endl;
         //output << blank << "assign " + op1 + _x + sndVer + op1Slice + " = " + extend(dest+_r+destSlice, op1LocalWidthNum) +  " ;" << std::endl;
         //output << blank << "assign " + op2 + _x + thdVer + op2Slice + " = " + extend(dest+_r+destSlice, op2LocalWidthNum) +  " ;" << std::endl;
       }
+      else if(isShift) {
+        output << blank << "assign " + op1 + _r + sndVer + op1Slice + " = " + extend("| "+dest+_r+destSlice, op1LocalWidthNum) +  " ;" << std::endl;
+        output << blank << "assign " + op2 + _r + thdVer + op2Slice + " = " + extend("| "+dest+_r+destSlice, op2LocalWidthNum) +  " ;" << std::endl;
+      }
     }
-    else if (!isReduceOp){
+    else if (!isReduceOp && !isShift){
       //output << blank << "assign " + op1 + _c + sndVer + op1Slice + " = " + dest + _c + destSlice + " ;" << std::endl;
       //output << blank << "assign " + op1 + _x + sndVer + op1Slice + " = " + dest + _x + destSlice + " ;" << std::endl; 
       //output << blank << "assign " + op2 + _c + thdVer + op2Slice + " = " + dest + _c + destSlice + " ;" << std::endl;
@@ -505,7 +516,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
         output << blank << "assign " + op2 + _r + thdVer + op2Slice + " = " + dest + _r + destSlice + " ;" << std::endl;
       }
     }
-    else { // if dest is not output and op is reduceOp
+    else if(isReduceOp){ // if dest is not output and op is reduceOp
       //output << blank << "assign " + op1 + _c + sndVer + op1Slice + " = " + extend(dest+_c+destSlice, op1LocalWidthNum) + " ;" << std::endl;
       output << blank << "assign " + op1 + _r + sndVer + op1Slice + " = " + extend(dest+_r+destSlice, op1LocalWidthNum) + " ;" << std::endl;
       //output << blank << "assign " + op1 + _x + sndVer + op1Slice + " = " + extend(dest+_x+destSlice, op1LocalWidthNum) + " ;" << std::endl; 
@@ -514,9 +525,13 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
       output << blank << "assign " + op2 + _r + thdVer + op2Slice + " = " + extend(dest+_r+destSlice, op2LocalWidthNum) + " ;" << std::endl;
       //output << blank << "assign " + op2 + _x + thdVer + op2Slice + " = " + extend(dest+_x+destSlice, op2LocalWidthNum) + " ;" << std::endl;
     }
+    else if(isShift) {
+      output << blank << "assign " + op1 + _r + sndVer + op1Slice + " = " + extend("| "+dest+_r+destSlice, op1LocalWidthNum) +  " ;" << std::endl;
+      output << blank << "assign " + op2 + _r + thdVer + op2Slice + " = " + extend("| "+dest+_r+destSlice, op2LocalWidthNum) +  " ;" << std::endl;
+    }
   } 
   else if (!op1IsNum && op2IsNum) { // 2-op
-
+    assert(!isShift);
     // _sig
     if(!g_use_value_change)
       output << blank + "assign " + dest + _sig + " = 0 ;" << std::endl;
@@ -565,6 +580,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
     //}
   }
   else if (op1IsNum && !op2IsNum) { // 2-op
+    assert(!isShift);
     // _sig
     if(!g_use_value_change)
       output << blank + "assign " + dest + _sig + " = 0 ;" << std::endl;
