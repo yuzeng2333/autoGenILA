@@ -142,7 +142,6 @@ std::set<std::string> g_iteDest;
 std::set<std::string> g_wire2reg;
 std::set<std::string> g_operators{"+", "-", "*", "/","%", "&&", "||", "==", "===", "!=", ">", ">=", "<", "<=", "|", "^", "&", "+:", "-:", "<<", ">>", "<<<", ">>>", "~", "!", "&", "~&", "~|", "~^", "^", "?", "<=", "always", "function"};
 std::set<std::string> g_clk_set;
-std::set<std::string> g_unused_inputs;
 std::string clockName;
 std::string resetName;
 std::vector<std::string> rTaints;
@@ -1081,7 +1080,6 @@ void add_file_taints(std::string fileName, std::map<std::string, std::vector<std
     g_recentRst = g_moduleRst[moduleName].first;
     g_recentRst_positive = g_moduleRst[moduleName].second;
   }
-  g_unused_inputs.clear();
 
   long long int lineNo = 0;
   std::ifstream input(fileName);
@@ -1698,9 +1696,6 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
   bool aIsNum = isNum(a);
   bool bIsNum = isNum(b);
 
-  if(g_unused_inputs.find(s) != g_unused_inputs.end()) g_unused_inputs.erase(s);
-  if(g_unused_inputs.find(a) != g_unused_inputs.end()) g_unused_inputs.erase(a);
-  if(g_unused_inputs.find(b) != g_unused_inputs.end()) g_unused_inputs.erase(b);
 
   // assignmen for dest and s variables
   destWidthNum = get_var_slice_width(destAndSlice);
