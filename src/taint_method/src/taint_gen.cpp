@@ -142,6 +142,7 @@ std::set<std::string> g_iteDest;
 std::set<std::string> g_wire2reg;
 std::set<std::string> g_operators{"+", "-", "*", "/","%", "&&", "||", "==", "===", "!=", ">", ">=", "<", "<=", "|", "^", "&", "+:", "-:", "<<", ">>", "<<<", ">>>", "~", "!", "&", "~&", "~|", "~^", "^", "?", "<=", "always", "function"};
 std::set<std::string> g_clk_set;
+std::set<std::string> g_unused_inputs;
 std::string clockName;
 std::string resetName;
 std::vector<std::string> rTaints;
@@ -1080,6 +1081,7 @@ void add_file_taints(std::string fileName, std::map<std::string, std::vector<std
     g_recentRst = g_moduleRst[moduleName].first;
     g_recentRst_positive = g_moduleRst[moduleName].second;
   }
+  g_unused_inputs.clear();
 
   long long int lineNo = 0;
   std::ifstream input(fileName);
@@ -1212,11 +1214,28 @@ void merge_taints(std::string fileName) {
       //outputStr = outputStr + wire + _x+ " , ";        
     }
   }
+  for (auto input : moduleInputs) {
+    if ( nextVersion.find(input) == nextVersion.end() )   
+      outputStr = outputStr + input + _r+ " , ";
+  }
   if(outputStr.length() > 2) {
     outputStr.pop_back();
     outputStr.pop_back();
     output << "  assign { " + outputStr + " } = 0;" << std::endl; 
   }
+
+  // gounded unused inputs
+  //output << " // ground read taints for unused inputs" << std::endl;
+  //outputStr = "";
+  //for (auto input : g_unused_inputs) {
+  //  outputStr = outputStr + input + _r+ " , ";
+  //}
+  //if(outputStr.length() > 2) {
+  //  outputStr.pop_back();
+  //  outputStr.pop_back();
+  //  output << "  assign { " + outputStr + " } = 0;" << std::endl; 
+  //}
+
 
   //idxedModuleName = moduleName;
   //if(g_rstValMap.find(moduleName) == g_rstValMap.end()) {
@@ -1678,6 +1697,10 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
 
   bool aIsNum = isNum(a);
   bool bIsNum = isNum(b);
+
+  if(g_unused_inputs.find(s) != g_unused_inputs.end()) g_unused_inputs.erase(s);
+  if(g_unused_inputs.find(a) != g_unused_inputs.end()) g_unused_inputs.erase(a);
+  if(g_unused_inputs.find(b) != g_unused_inputs.end()) g_unused_inputs.erase(b);
 
   // assignmen for dest and s variables
   destWidthNum = get_var_slice_width(destAndSlice);

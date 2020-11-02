@@ -22,6 +22,7 @@ void input_taint_gen(std::string line, std::ofstream &output) {
   std::string blank = m.str(1);
   std::string slice = m.str(2);
   std::string var = m.str(3);
+  g_unused_inputs.insert(var);
   bool isClk = false, isRst = false;
   if(!g_hasRst) {
     if(var.compare("rst") == 0
@@ -393,7 +394,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
   std::string op1AndSlice = m.str(3);
   std::string op2AndSlice = m.str(4);
   //assert_info(!isTop || !isOutput(op1AndSlice), "two_op:op1 is output, line: "+line);
-  //assert_info(!isTop || !isOutput(op2AndSlice), "two_op:op2 is output, line: "+line);  
+  //assert_info(!isTop || !isOutput(op2AndSlice), "two_op:op2 is output, line: "+line);
 
   split_slice(destAndSlice, dest, destSlice);
   if(isReduceOp)
@@ -419,6 +420,8 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
   auto op1BoundPair = varWidth.get_idx_pair(op1, line);
   auto op2BoundPair = varWidth.get_idx_pair(op2, line);
 
+  if(g_unused_inputs.find(op1) != g_unused_inputs.end()) g_unused_inputs.erase(op1);
+  if(g_unused_inputs.find(op2) != g_unused_inputs.end()) g_unused_inputs.erase(op2);
   //output << blank + "assign " + dest + _sig + " = 0;" << std::endl;
 
   if (!op1IsNum && !op2IsNum) { // 2-op
@@ -659,6 +662,8 @@ void one_op_taint_gen(std::string line, std::ofstream &output) {
   if(std::regex_match(line, m, pNone) && isNum(op1AndSlice))
     toCout("WARNING!! Number found in RHS of Non operation!!  "+line);
 
+  if(g_unused_inputs.find(op1) != g_unused_inputs.end()) g_unused_inputs.erase(op1);
+
   // assume memory slices can only be used in simple assignment statements11
   // also assume each memory slice is used only once
   if(isMem(op1)) {
@@ -786,6 +791,9 @@ void sel_op_taint_gen(std::string line, std::ofstream &output) {
   uint32_t localWidth = get_var_slice_width(destAndSlice);
   uint32_t op2Width = get_var_slice_width(op2AndSlice);
   std::string sndVer;
+
+  if(g_unused_inputs.find(op1) != g_unused_inputs.end()) g_unused_inputs.erase(op1);
+  if(g_unused_inputs.find(op2) != g_unused_inputs.end()) g_unused_inputs.erase(op2);
 
   //output << blank + "assign " + dest + _sig + " = 0;" << std::endl;  
  
@@ -990,6 +998,8 @@ void reduce_one_op_taint_gen(std::string line, std::ofstream &output) {
   uint32_t sndVerNum = find_version_num(op1AndSlice, op1IsNew, output);
   std::string sndVer = std::to_string(sndVerNum);
 
+  if(g_unused_inputs.find(op1) != g_unused_inputs.end()) g_unused_inputs.erase(op1);
+
   /* declare new wires */
   if(op1IsNew) {
     //output << blank << "logic [" + op1HighIdx + ":" + op1LowIdx + "] " + op1 + _c + sndVer + " ;" << std::endl;
@@ -1053,6 +1063,7 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
     assert(!isMem(v));
     //assert_info(!isTop || !isOutput(v), "mult_op_taint_gen:"+v+" is output, line: "+line);      
     destWidthNum += get_var_slice_width(v);
+    if(g_unused_inputs.find(v) != g_unused_inputs.end()) g_unused_inputs.erase(v);
   }
   if (destWidthNum != get_var_slice_width(destAndSlice)) {
     toCout("width mismatch in mult_op function!");
@@ -1256,6 +1267,7 @@ void both_concat_op_taint_gen(std::string line, std::ofstream &output) {
   parse_var_list(srcList, srcVec);
   for(std::string src: srcVec) { 
     assert(!isMem(src));
+    if(g_unused_inputs.find(src) != g_unused_inputs.end()) g_unused_inputs.erase(src);
     //assert_info(!isTop || !isOutput(src), "both_concat_taint_gen:"+src+" is output, line: "+line);  
   }
 
@@ -1364,6 +1376,7 @@ void dest_concat_op_taint_gen(std::string line, std::ofstream &output) {
   std::string src, srcSlice;
   split_slice(srcAndSlice, src, srcSlice);
   assert(!isMem(src));
+  if(g_unused_inputs.find(src) != g_unused_inputs.end()) g_unused_inputs.erase(src);
 
   //std::string destTList = std::regex_replace(destList, pVarNameGroup, "$1_t$3 ");
   std::string destTList = get_lhs_taint_list(destList, _t, output);
@@ -1447,6 +1460,9 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
   std::string op2HighIdx  = toStr(op2IdxPair.first);
   std::string op2LowIdx   = toStr(op2IdxPair.second);
 
+  if(g_unused_inputs.find(cond) != g_unused_inputs.end()) g_unused_inputs.erase(cond);
+  if(g_unused_inputs.find(op1) != g_unused_inputs.end()) g_unused_inputs.erase(op1);
+  if(g_unused_inputs.find(op2) != g_unused_inputs.end()) g_unused_inputs.erase(op2);
 
   bool op1IsNum = isNum(op1AndSlice);
   bool op2IsNum = isNum(op2AndSlice);
@@ -1583,6 +1599,8 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
   std::string op1, op1Slice;
   split_slice(op1AndSlice, op1, op1Slice);
   split_slice(destAndSlice, dest, destSlice);
+
+  if(g_unused_inputs.find(op1) != g_unused_inputs.end()) g_unused_inputs.erase(op1);
 
   if(isNum(op1AndSlice)) {
     toCout("Warning: constant number found in RHS of nonblocking: "+line);
@@ -1772,6 +1790,7 @@ void nonblockconcat_taint_gen(std::string line, std::ofstream &output) {
   parse_var_list(updateList, updateVec);
   for(auto update: updateVec) {
     assert(!isMem(update));
+    if(g_unused_inputs.find(update) != g_unused_inputs.end()) g_unused_inputs.erase(update);
     //assert_info(!isTop || !isOutput(update), "nonblockconcat_taint_gen:"+update+" is output, line: "+line);
   }
 
@@ -1860,6 +1879,8 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
   bool isFirstLine = true;
   std::vector<std::string> nonConstAssign;
   std::string taintRst;  
+  if(g_unused_inputs.find(src) != g_unused_inputs.end()) g_unused_inputs.erase(src);
+
   if(g_use_taint_rst) taintRst = "|| "+TAINT_RST+" ";
 
   do{
@@ -1967,6 +1988,7 @@ void nonblockif2_taint_gen(std::string line, std::string always_line, std::ifstr
   std::string src, srcSlice;
   bool isFirstLine = true;
   std::vector<std::string> nonConstAssign;
+  if(g_unused_inputs.find(src) != g_unused_inputs.end()) g_unused_inputs.erase(src);  
   std::string taintRst;  
   if(g_use_taint_rst) taintRst = "|| "+TAINT_RST+" ";
 
@@ -2086,6 +2108,7 @@ void always_star_taint_gen(std::string firstLine, std::ifstream &input, std::ofs
   std::string op1, op1Slice;
   split_slice(destAndSlice, dest, destSlice);
   split_slice(op1AndSlice, op1, op1Slice);
+  if(g_unused_inputs.find(op1) != g_unused_inputs.end()) g_unused_inputs.erase(op1);
   uint32_t destWidth = get_var_slice_width(destAndSlice);
 
   //_r
