@@ -1114,31 +1114,6 @@ void add_file_taints(std::string fileName, std::map<std::string, std::vector<std
 void merge_taints(std::string fileName) {
   std::ofstream output(fileName, std::fstream::app);
 
-  //for(std::string var: moduleTrueRegs) {
-  //  uint32_t width = get_var_slice_width(var);
-  //  if(isMem(var))
-  //    continue;
-  //  std::string rstVal;
-  //  if(g_use_vcd_parser)
-  //    rstVal = g_rstValMap[moduleName][var];
-  //  if(rstVal.empty()) rstVal = "0";
-  //  output << "  always @( posedge " + g_recentClk + " ) begin" << std::endl;
-  //  if(g_hasRst) {
-  //    output << "    if( " + get_recent_rst() + " ) " + var + "_PREV_VAL1 <= " + rstVal + " ;" << std::endl;
-  //    if(!g_use_vcd_parser)
-  //      output << "    if( " + get_recent_rst() + " ) " + var + "_PREV_VAL2 <= " + rstVal + " ;" << std::endl;
-  //  }
-  //  else {
-  //    output << "    if( rst_zy ) " + var + "_PREV_VAL1 <= " + rstVal + " ;" << std::endl;
-  //    if(!g_use_vcd_parser)  
-  //      output << "    if( rst_zy ) " + var + "_PREV_VAL2 <= " + rstVal + " ;" << std::endl;
-  //  }
-  //  output << "    if( INSTR_IN_ZY ) " + var + "_PREV_VAL1 <= " + var + " ;"<< std::endl;
-  //  if(!g_use_vcd_parser)
-  //    output << "    if( INSTR_IN_ZY ) " + var + "_PREV_VAL2 <= " + var + "_PREV_VAL1 ;" << std::endl;
-  //  output << "  end" << std::endl;
-  //}
-
   if(g_hasRst)
     output << "  assign rst_zy = "+get_recent_rst()+" ;" << std::endl;
 

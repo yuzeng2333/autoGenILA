@@ -286,6 +286,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
   bool isAnd = false;
   bool isBitAnd = false;
   bool isBitOr = false;
+  bool isShift = false;
   if( std::regex_match(line, m, pOr) )
     isOR = true;
   if( std::regex_match(line, m, pAnd) )
@@ -305,11 +306,13 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
             || std::regex_match(line, m, pBitOr)
             || std::regex_match(line, m, pBitExOr)
             || std::regex_match(line, m, pBitAnd)
-            || std::regex_match(line, m, pLeftShift) 
-            || std::regex_match(line, m, pRightShift) 
-            || std::regex_match(line, m, pSignedRightShift)
-            || std::regex_match(line, m, pSignedLeftShift) 
-            || std::regex_match(line, m, pBitOrRed2) ) {} 
+            || std::regex_match(line, m, pBitOrRed2) ) {}
+  else if ( std::regex_match(line, m, pLeftShift)
+              || std::regex_match(line, m, pRightShift)
+              || std::regex_match(line, m, pSignedRightShift)
+              || std::regex_match(line, m, pSignedLeftShift) ) {
+    isShift = true;
+  }
   else if ( std::regex_match(line, m, pEq)
               || std::regex_match(line, m, pEq3)
               || std::regex_match(line, m, pNeq)
@@ -353,6 +356,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
   std::string op2HighIdx  = toStr(op2IdxPair.first);
   std::string op2LowIdx   = toStr(op2IdxPair.second);
 
+  uint32_t destWidthNum = get_var_slice_width(destAndSlice);  
   uint32_t op1LocalWidthNum = get_var_slice_width(op1AndSlice);
   uint32_t op2LocalWidthNum = get_var_slice_width(op2AndSlice);
 
@@ -373,7 +377,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
 
     /* make assignments */
     /* FIXME: the width of op1/op2 and dest are not necessarily the same */
-    if(!isReduceOp)
+    if(!isReduceOp && !isShift)
       if(isAnd)
         output << blank << "assign " + dest + _t + destSlice + " = ( " + op1 + _t + op1Slice + " && " + op2AndSlice + " ) | ( " + op2 + _t + op2Slice + " && " + op1AndSlice + " ) ;" << std::endl;
       else if(isOR)
@@ -384,10 +388,14 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
         output << blank << "assign " + dest + _t + destSlice + " = ( " + op1 + _t + op1Slice + " & ~" + op2AndSlice + " ) | ( " + op2 + _t + op2Slice + " & ~" + op1AndSlice + " ) ;" << std::endl;
       else
         output << blank << "assign " + dest + _t + destSlice + " = " + op1 + _t + op1Slice + " | " + op2 + _t + op2Slice + " ;" << std::endl;
-    else
+    else if(isReduceOp)
       output << blank << "assign " + dest + _t + destSlice + " = (| " + op1 + _t + op1Slice + " ) | (|" + op2 + _t + op2Slice + " ) ;" << std::endl;
+    else if(isShift)
+      output << blank << "assign " + dest + _t + destSlice + " = " + extend("(| " + op1 + _t + op1Slice + " ) | (|" + op2 + _t + op2Slice + " )", destWidthNum) + " ;" << std::endl;
+      
   } 
   else if (!op1IsNum && op2IsNum) { // 2-op
+    assert(!isShift);    
     bool op1IsNew;
     uint32_t sndVerNum = find_version_num(op1AndSlice, op1IsNew, output);
     std::string sndVer = std::to_string(sndVerNum);
@@ -405,6 +413,8 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
 
     if(isReduceOp)    
       output << blank << "assign " + dest + _t + destSlice + " = | " + op2 + _t + op2Slice + " ;" << std::endl;
+    else if(isShift)
+      output << blank << "assign " + dest + _t + destSlice + " = " + extend("| " + op2 + _t + op2Slice, destWidthNum) + " ;" << std::endl;
     else 
       output << blank << "assign " + dest + _t + destSlice + " = " + op2 + _t + op2Slice + " ;" << std::endl;
   }
