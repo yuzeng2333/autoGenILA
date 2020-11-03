@@ -580,7 +580,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
     //}
   }
   else if (op1IsNum && !op2IsNum) { // 2-op
-    assert(!isShift);
+    //assert(!isShift);
     // _sig
     if(!g_use_value_change)
       output << blank + "assign " + dest + _sig + " = 0 ;" << std::endl;
@@ -598,29 +598,37 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
 
     if(isReduceOp)    
       output << blank << "assign " + dest + _t + destSlice + " = | " + op2 + _t + op2Slice + " ;" << std::endl;
-    else 
+    else if(isShift)
+      output << blank << "assign " + dest + _t + destSlice + " = " + extend("| " + op2 + _t + op2Slice, destWidthNum) + " ;" << std::endl;
+    else
       output << blank << "assign " + dest + _t + destSlice + " = " + op2 + _t + op2Slice + " ;" << std::endl;
 
     if ( isOutput(dest) && isTop ) {
       //output << blank << "assign " + op2 + _c + thdVer + op2Slice + " = "+extend("1'b1", op2LocalWidthNum)+" ;" << std::endl;
-      if(!isReduceOp) {
+      if(!isReduceOp && !isShift) {
         output << blank << "assign " + op2 + _r + thdVer + op2Slice + " = " + dest + _r + destSlice + " ;" << std::endl;  
         //output << blank << "assign " + op2 + _x + thdVer + op2Slice + " = " + dest + _r + destSlice + " ;" << std::endl;  
       }
-      else {
+      else if(isReduceOp){
         output << blank << "assign " + op2 + _r + thdVer + op2Slice + " = " + extend(dest+_r+destSlice, op2LocalWidthNum) +  " ;" << std::endl;
         //output << blank << "assign " + op2 + _x + thdVer + op2Slice + " = " + extend(dest+_r+destSlice, op2LocalWidthNum) +  " ;" << std::endl;
       }
+      else if(isShift) {
+        output << blank << "assign " + op2 + _r + thdVer + op2Slice + " = " + extend("| "+dest+_r+destSlice, op2LocalWidthNum) +  " ;" << std::endl;
+      }
     }
-    else if(!isReduceOp) {
+    else if(!isReduceOp && !isShift) {
       //output << blank << "assign " + op2 + _c + thdVer + op2Slice + " = " + dest + _c + destSlice + " ;" << std::endl;
       output << blank << "assign " + op2 + _r + thdVer + op2Slice + " = " + dest + _r + destSlice + " ;" << std::endl;
       //output << blank << "assign " + op2 + _x + thdVer + op2Slice + " = " + dest + _x + destSlice + " ;" << std::endl;
     }
-    else {
+    else if(isReduceOp){
       //output << blank << "assign " + op2 + _c + thdVer + op2Slice + " = " + extend(dest+_c+destSlice, op2LocalWidthNum) + " ;" << std::endl; 
       output << blank << "assign " + op2 + _r + thdVer + op2Slice + " = " + extend(dest+_r+destSlice, op2LocalWidthNum) + " ;" << std::endl;
       //output << blank << "assign " + op2 + _x + thdVer + op2Slice + " = " + extend(dest+_x+destSlice, op2LocalWidthNum) + " ;" << std::endl;
+    }
+    else if(isShift) {
+      output << blank << "assign " + op2 + _r + thdVer + op2Slice + " = " + extend("| "+dest+_r+destSlice, op2LocalWidthNum) +  " ;" << std::endl;
     }
     //if(op2IsNew) {
     //ground_wires(op2+"_c"+thdVer, op2IdxPair, op2Slice, blank, output);
