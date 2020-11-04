@@ -26,6 +26,7 @@ void input_taint_gen(std::string line, std::ofstream &output) {
   if(!g_hasRst) {
     if(var.compare("rst") == 0
         || var.compare("i_rst") == 0
+        || var.compare("RST") == 0
         || var.compare("reset") == 0 ) {
       g_hasRst = true;
       g_rst_pos = true;
@@ -33,8 +34,10 @@ void input_taint_gen(std::string line, std::ofstream &output) {
       isClk = true;
     }
     else if ( var.compare("reset_n") == 0
-                || var.compare("resetn") == 0
-                || var.compare("rstn") == 0 ) {
+            || var.compare("resetn") == 0
+            || var.compare("rstn") == 0 
+            || var.compare("RSTN") == 0 
+            || var.compare("RST_N") == 0) {
       g_hasRst = true;
       g_rst_pos = false;
       g_recentRst = var;

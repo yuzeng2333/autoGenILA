@@ -197,11 +197,11 @@ bool g_use_end_sig = false; // used to end verification after a certain time of 
 bool g_wt_keeped = true;
 // set the read flag only if reg's value is not reset value
 bool g_set_rflag_if_not_rst_val = true; 
-std::string _t="_T";
-std::string _r="_R";
-std::string _x="_X";
-std::string _c="_C";
-std::string _sig="_S";
+std::string _t="__T";
+std::string _r="__R";
+std::string _x="__X";
+std::string _c="__C";
+std::string _sig="__S";
 std::string TAINT_RST="zy_taint_rst";
 std::string END_SIG="zy_end_sig";
 std::string srcConcatFeature = " = {";
