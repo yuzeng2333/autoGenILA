@@ -1243,29 +1243,31 @@ void merge_taints(std::string fileName) {
   //  }
   //  idxedModuleName = moduleName + "_1";
   //}
-  for(std::string var: moduleTrueRegs) {
-    uint32_t width = get_var_slice_width(var);
-    if(isMem(var))
-      continue;
-    std::string rstVal;
-    if(g_use_vcd_parser)
-      rstVal = g_rstValMap[moduleName][var];
-    if(rstVal.empty()) rstVal = "0";
-    output << "  always @( posedge " + g_recentClk + " ) begin" << std::endl;
-    if(g_hasRst) {
-      output << "    if( " + get_recent_rst() + " ) " + var + "_PREV_VAL1 <= " + rstVal + " ;" << std::endl;
+  if(g_double_assert) {
+    for(std::string var: moduleTrueRegs) {
+      uint32_t width = get_var_slice_width(var);
+      if(isMem(var))
+        continue;
+      std::string rstVal;
+      if(g_use_vcd_parser)
+        rstVal = g_rstValMap[moduleName][var];
+      if(rstVal.empty()) rstVal = "0";
+      output << "  always @( posedge " + g_recentClk + " ) begin" << std::endl;
+      if(g_hasRst) {
+        output << "    if( " + get_recent_rst() + " ) " + var + "_PREV_VAL1 <= " + rstVal + " ;" << std::endl;
+        if(!g_use_vcd_parser)
+          output << "    if( " + get_recent_rst() + " ) " + var + "_PREV_VAL2 <= " + rstVal + " ;" << std::endl;
+      }
+      else {
+        output << "    if( rst_zy ) " + var + "_PREV_VAL1 <= " + rstVal + " ;" << std::endl;
+        if(!g_use_vcd_parser)  
+          output << "    if( rst_zy ) " + var + "_PREV_VAL2 <= " + rstVal + " ;" << std::endl;
+      }
+      output << "    if( INSTR_IN_ZY ) " + var + "_PREV_VAL1 <= " + var + " ;"<< std::endl;
       if(!g_use_vcd_parser)
-        output << "    if( " + get_recent_rst() + " ) " + var + "_PREV_VAL2 <= " + rstVal + " ;" << std::endl;
+        output << "    if( INSTR_IN_ZY ) " + var + "_PREV_VAL2 <= " + var + "_PREV_VAL1 ;" << std::endl;
+      output << "  end" << std::endl;
     }
-    else {
-      output << "    if( rst_zy ) " + var + "_PREV_VAL1 <= " + rstVal + " ;" << std::endl;
-      if(!g_use_vcd_parser)  
-        output << "    if( rst_zy ) " + var + "_PREV_VAL2 <= " + rstVal + " ;" << std::endl;
-    }
-    output << "    if( INSTR_IN_ZY ) " + var + "_PREV_VAL1 <= " + var + " ;"<< std::endl;
-    if(!g_use_vcd_parser)
-      output << "    if( INSTR_IN_ZY ) " + var + "_PREV_VAL2 <= " + var + "_PREV_VAL1 ;" << std::endl;
-    output << "  end" << std::endl;
   }
 
   // some bits of taints are still floating
@@ -2230,7 +2232,7 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
       std::string signalHighIdx = toStr(signalIdxPair.first);
       std::string signalLowIdx = toStr(signalIdxPair.second);
       if(isNewVec[i]) {
-        output << "  logic [" + signalHighIdx + ":" + signalLowIdx + "] " + signal + _r + toStr(signalVerVec[i])   + " ;" << std::endl;
+        output << "  logic [" + signalHighIdx + ":" + signalLowIdx + "] " + signal + _r + toStr(signalVerVec[i++])   + " ;" << std::endl;
         //output << "  logic [" + signalHighIdx + ":" + signalLowIdx + "] " + signal + _x + toStr(signalVerVec[i])   + " ;" << std::endl;
         //output << "  logic [" + signalHighIdx + ":" + signalLowIdx + "] " + signal + _c + toStr(signalVerVec[i++]) + " ;" << std::endl;
       }
