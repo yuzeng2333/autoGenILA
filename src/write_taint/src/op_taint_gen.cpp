@@ -56,6 +56,7 @@ void input_taint_gen(std::string line, std::ofstream &output) {
             || var.find("clock") != std::string::npos 
             || var.find("CLOCK") != std::string::npos 
             || var.find("CLK") != std::string::npos && var.find("EN") == std::string::npos ) {
+      if(var.length() > 8) continue;      
       toCout("================================================  Find potential unexpected clk signal: "+var+" in module: "+moduleName);
       g_recentClk = var;
     }
@@ -67,6 +68,7 @@ void input_taint_gen(std::string line, std::ofstream &output) {
             || var.find("RESETN") != std::string::npos
             || var.find("RESET_N") != std::string::npos
             || var.find("reset_n") != std::string::npos ) {
+      if(var.length() > 8) continue;      
       toCout("================================================  Find potential unexpected rstn signal: "+var+" in module: "+moduleName);
       g_hasRst = true;
       g_rst_pos = false;
@@ -77,6 +79,7 @@ void input_taint_gen(std::string line, std::ofstream &output) {
             || var.find("reset") != std::string::npos 
             || var.find("RST") != std::string::npos 
             || var.find("RESET") != std::string::npos ) {
+      if(var.length() > 8) continue;      
       toCout("================================================  Find potential unexpected rst signal: "+var+" in module: "+moduleName);
       g_hasRst = true;
       g_rst_pos = true;
