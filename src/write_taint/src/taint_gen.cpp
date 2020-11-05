@@ -1751,7 +1751,7 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
       output << "    ." + inPort + _t + " ( " + get_rhs_taint_list(port2SignalMap[inPort], _t) + " )," << std::endl;
     }
     else {  // if the connected signal is empty
-      output << "    ." + inPort + _t + " ()," << std::endl; 
+      output << "    ." + inPort + _t + " (0)," << std::endl; 
     }
   }
   for(std::string outPort: moduleOutputsMap[localModuleName]) {

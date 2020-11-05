@@ -2300,12 +2300,12 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
       }
     }
     else {  // if the connected signal is empty
-      output << "    ." + inPort + _t + " ()," << std::endl; 
+      output << "    ." + inPort + _t + " (0)," << std::endl; 
       output << "    ." + inPort + _r + " ()," << std::endl; 
       //output << "    ." + inPort + _x + " ()," << std::endl; 
       //output << "    ." + inPort + _c + " ()," << std::endl;
       if(!g_use_value_change)
-      output << "    ." + inPort + _sig + " ()," << std::endl;
+      output << "    ." + inPort + _sig + " (0)," << std::endl;
     }
   }
   for(std::string outPort: moduleOutputsMap[localModuleName]) {
@@ -2339,7 +2339,7 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
     }
     else {
       output << "    ." + outPort + _t + " ()," << std::endl; 
-      output << "    ." + outPort + _r + "0 ()," << std::endl; 
+      output << "    ." + outPort + _r + "0 (0)," << std::endl; 
       //output << "    ." + outPort + _x + "0 ()," << std::endl; 
       //output << "    ." + outPort + _c + "0 ()," << std::endl;
       if(!g_use_value_change)
