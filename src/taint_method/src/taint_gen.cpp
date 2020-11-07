@@ -68,6 +68,8 @@ std::regex pSignedLeftShift   (to_re("^(\\s*)assign (NAME) = (NAME) <<< (NAME)(\
 std::regex pNone        (to_re("^(\\s*)assign (NAME) = (NAME)(\\s*)?;$"));
 std::regex pNoneNoAssign(to_re("^(\\s*)(NAME) = (NAME)(\\s*)?;$"));
 std::regex pInvert      (to_re("^(\\s*)assign (NAME) = \\~ (NAME)(\\s*)?;$"));
+std::regex pMinus       (to_re("^(\\s*)assign (NAME) = - (NAME)(\\s*)?;$"));
+std::regex pPlus        (to_re("^(\\s*)assign (NAME) = + (NAME)(\\s*)?;$"));
 /* reduce 1 op */
 std::regex pNot         (to_re("^(\\s*)assign (NAME) = ! (NAME)(\\s*)?;$"));
 std::regex pRedOr       (to_re("^(\\s*)assign (NAME) = \\| (NAME)(\\s*)?;$"));
@@ -193,7 +195,7 @@ bool g_write_assert = false; // for find written ASV
 bool g_double_assert = false; // to enable having PREV_VAL in assert
 bool g_use_sig = false;
 bool g_use_taint_rst = false; // used when start from arbitraty state, only reset taints
-bool g_use_end_sig = false; // used to end verification after a certain time of instruction begins
+bool g_use_end_sig = true; // used to end verification after a certain time of instruction begins
 bool g_wt_keeped = true;
 // set the read flag only if reg's value is not reset value
 bool g_set_rflag_if_not_rst_val = true; 
@@ -918,6 +920,8 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   } // end of 2-operator
   /* 1-operator assignment */
   else if (std::regex_match(line, m, pInvert) 
+            || std::regex_match(line, m, pPlus) 
+            || std::regex_match(line, m, pMinus) 
             || std::regex_match(line, m, pNone)) {
     return ONE_OP;
   }

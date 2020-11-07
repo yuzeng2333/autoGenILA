@@ -656,6 +656,8 @@ void one_op_taint_gen(std::string line, std::ofstream &output) {
   std::smatch m;
   bool isNone = false;
   if (std::regex_match(line, m, pNone) 
+        || std::regex_match(line, m, pPlus)
+        || std::regex_match(line, m, pMinus)
         || std::regex_match(line, m, pInvert)){}
   else 
     return;
