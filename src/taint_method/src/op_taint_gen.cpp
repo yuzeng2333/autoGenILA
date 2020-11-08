@@ -1472,9 +1472,13 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
   bool op2IsNum = isNum(op2AndSlice);
 
   bool condIsNew;
-  uint32_t condVerNum = find_version_num(condAndSlice, condIsNew, output);
-  // for the condition variable, condWidth should be 1
-  std::string condVer = std::to_string(condVerNum);
+  uint32_t condVerNum;
+  std::string condVer;
+  if(!condIsNum) {
+    condVerNum = find_version_num(condAndSlice, condIsNew, output);
+    condVer = std::to_string(condVerNum);
+  }
+
   if(condIsNew && !condIsNum) {
     //output << blank << "logic [" + condHighIdx + ":" + condLowIdx + "] " + cond + _c + condVer + " ;" << std::endl;
     output << blank << "logic [" + condHighIdx + ":" + condLowIdx + "] " + cond + _r + condVer + " ;" << std::endl;

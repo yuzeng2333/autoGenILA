@@ -1742,7 +1742,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     output << blank + "end" << std::endl;
 
     // print _sig function
-    if(!g_use_value_change) {
+    if(!g_use_value_change && b.find("fangyuan") != std::string::npos) {
       uint32_t caseNum = 0;
       output << blank + "always @( "+a+_sig+" or "+b+_sig+" or "+s+" ) begin" << std::endl;
       output << blank + "  casez ("+sAndSlice+")" << std::endl;
@@ -1758,6 +1758,8 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
       output << blank + "end" << std::endl;
       checkCond(caseNum == fangyuanItemNum[rhs], "case number does not equal fangyuan item number!, var: "+rhs+" , caseNum:"+toStr(caseNum)+" , itemNum:"+toStr(fangyuanItemNum[rhs]));
     }
+    else if(!g_use_value_change)
+      output << "  assign " + dest + _sig + " = 0 ;" << std::endl;
 
     // print _r function
     if(sIsNew) {
@@ -1964,7 +1966,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
 
 
     // _sig
-    if(!g_use_value_change) {
+    if(!g_use_value_change && b.find("fangyuan") != std::string::npos) {
       uint32_t caseNum = 0;
       output << blank + "always @( "+b+_sig+" or "+s+" ) begin" << std::endl;
       output << blank + "  casez ("+sAndSlice+")" << std::endl;
@@ -1979,6 +1981,8 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
       output << blank + "  endcase" << std::endl;
       output << blank + "end" << std::endl;
     }
+    else if(!g_use_value_change)
+      output << "  assign " + dest + _sig + " = 0 ;" << std::endl;
 
     // print _r function
     output << blank + "reg [" + sWidth + "-1:0] " + s + _r + sVer + " ;" << std::endl;
