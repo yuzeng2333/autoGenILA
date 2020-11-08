@@ -193,17 +193,16 @@ bool g_split_long_num = true;
 bool g_use_vcd_parser = false;
 bool g_write_assert = false; // for find written ASV
 bool g_double_assert = false; // to enable having PREV_VAL in assert
-bool g_use_sig = false;
 bool g_use_taint_rst = false; // used when start from arbitraty state, only reset taints
-bool g_use_end_sig = true; // used to end verification after a certain time of instruction begins
-bool g_wt_keeped = true;
+bool g_use_end_sig = false; // used to end verification after a certain time of instruction begins
+bool g_wt_keeped = false;
 // set the read flag only if reg's value is not reset value
 bool g_set_rflag_if_not_rst_val = true; 
-std::string _t="__T";
-std::string _r="__R";
-std::string _x="__X";
-std::string _c="__C";
-std::string _sig="__S";
+std::string _t="_T";
+std::string _r="_R";
+std::string _x="_X";
+std::string _c="_C";
+std::string _sig="_S";
 std::string TAINT_RST="zy_taint_rst";
 std::string END_SIG="zy_end_sig";
 std::string srcConcatFeature = " = {";
@@ -1363,13 +1362,13 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
     out << "  input INSTR_IN_ZY;" << std::endl;
   else {
     out << "  logic INSTR_IN_ZY;" << std::endl;
-    out << "  assign INSTR_IN_ZY = ";
-    for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) {
-      if((*it).compare(g_recentClk) == 0 || (*it).compare(g_recentRst) == 0 || (*it).compare("rst_zy") == 0 || (*it).compare(TAINT_RST) == 0 || (*it).compare(END_SIG) == 0)
-        continue;
-      out << *it + _t + " > 0 || ";
-    }
-    out << "0 ;" << std::endl;
+    //out << "  assign INSTR_IN_ZY = ";
+    //for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) {
+    //  if((*it).compare(g_recentClk) == 0 || (*it).compare(g_recentRst) == 0 || (*it).compare("rst_zy") == 0 || (*it).compare(TAINT_RST) == 0 || (*it).compare(END_SIG) == 0)
+    //    continue;
+    //  out << *it + _t + " > 0 || ";
+    //}
+    //out << "0 ;" << std::endl;
   }
   while( std::getline(in, line) ) {
     out << line << std::endl;
@@ -1600,7 +1599,8 @@ void remove_function_wrapper(std::string firstLine, std::ifstream &input, std::o
       split_slice(localPair.second, rhs, rhsSlice);
       output << blank + "    " + localPair.first + " :" << std::endl;
       output << blank + "      " + result + " = " + b + rhsSlice + " ;" << std::endl;
-      checkCond(b.find("fangyuan") != std::string::npos, "RHS in case is not fangyuan! "+ b);
+      // FIXME: figure out why this check is important? 
+      //checkCond(b.find("fangyuan") != std::string::npos, "RHS in case is not fangyuan! "+ b);
       //fill_in_pass_relation(b+rhsSlice, result, localPair.first);
     }
     output << blank + "    default:" << std::endl;

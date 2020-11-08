@@ -1467,6 +1467,7 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
   std::string op2LowIdx   = toStr(op2IdxPair.second);
 
 
+  bool condIsNum = isNum(condAndSlice);
   bool op1IsNum = isNum(op1AndSlice);
   bool op2IsNum = isNum(op2AndSlice);
 
@@ -1474,7 +1475,7 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
   uint32_t condVerNum = find_version_num(condAndSlice, condIsNew, output);
   // for the condition variable, condWidth should be 1
   std::string condVer = std::to_string(condVerNum);
-  if(condIsNew) {
+  if(condIsNew && !condIsNum) {
     //output << blank << "logic [" + condHighIdx + ":" + condLowIdx + "] " + cond + _c + condVer + " ;" << std::endl;
     output << blank << "logic [" + condHighIdx + ":" + condLowIdx + "] " + cond + _r + condVer + " ;" << std::endl;
     //output << blank << "logic [" + condHighIdx + ":" + condLowIdx + "] " + cond + _x + condVer + " ;" << std::endl;
@@ -1486,11 +1487,15 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
 
   // FIXME: the following may be wrong. The best way is to add this part to pass_info
   bool printSig = true;
-  output << blank << "assign " + cond + _r + condVer + condSlice + " = ( | "+dest+_r+destSlice+" ) && " + op1AndSlice + " != " + op2AndSlice + " ;" << std::endl;
+  if(!condIsNum) output << blank << "assign " + cond + _r + condVer + condSlice + " = ( | "+dest+_r+destSlice+" ) && " + op1AndSlice + " != " + op2AndSlice + " ;" << std::endl;
 
   if (!op1IsNum && !op2IsNum) { // ite
     /* Assgin new versions */
-    output << blank << "assign " + dest + _t + destSlice + " = " + condAndSlice + " ? ( " + extend(cond+_t+" "+condSlice, localWidthNum) + " | " + op1 + _t + op1Slice + " ) : ( " + extend(cond+_t+" "+condSlice, localWidthNum) + " | " + op2 + _t + op2Slice + " );" << std::endl;
+    if(!condIsNum)
+      output << blank << "assign " + dest + _t + destSlice + " = " + condAndSlice + " ? ( " + extend(cond+_t+" "+condSlice, localWidthNum) + " | " + op1 + _t + op1Slice + " ) : ( " + extend(cond+_t+" "+condSlice, localWidthNum) + " | " + op2 + _t + op2Slice + " );" << std::endl;
+    else
+      output << blank << "assign " + dest + _t + destSlice + " = " + condAndSlice + " ? ( " + op1 + _t + op1Slice + " ) : ( " + op2 + _t + op2Slice + " );" << std::endl;
+
 
     if(printSig && !g_use_value_change) 
       output << blank << "assign " + dest + _sig + " = " + condAndSlice + " ? " + op1 + _sig + " : " + op2 + _sig + " ;" << std::endl;
@@ -1524,6 +1529,7 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
 
   } 
   else if (!op1IsNum && op2IsNum) { // ite
+    assert(!condIsNum);
     bool op1IsNew;
     uint32_t thdVerNum = find_version_num(op1AndSlice, op1IsNew, output);
     std::string thdVer = std::to_string(thdVerNum);
@@ -1547,6 +1553,7 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
     }
   }
   else if (op1IsNum && !op2IsNum) { // ite
+    assert(!condIsNum);    
     bool op2IsNew;    
     uint32_t fthVerNum = find_version_num(op2AndSlice, op2IsNew, output);
     std::string fthVer = std::to_string(fthVerNum);
@@ -1571,6 +1578,7 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
     }
   }
   else {
+    assert(!condIsNum);    
     /* when both inputs are constants */
     output << blank << "assign " + dest + _t + destSlice + " = " + extend(cond+_t+" "+condSlice, localWidthNum) + " ;" << std::endl;
     if(printSig && !g_use_value_change) {
@@ -1680,7 +1688,7 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
   std::string taintRst;
   if(g_use_taint_rst) taintRst = "|| "+TAINT_RST+" ";
   std::string dest_t_Or = "";
-  if(g_wt_keeped) dest_t_Or = dest + _t + destSlice + " | ";
+  if(g_wt_keeped) dest_t_Or = "(INSTR_IN_ZY ? 0 :" + dest + _t + destSlice + ") | ";
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
   if(!replaceSig) {
     if (g_hasRst)
@@ -1818,7 +1826,8 @@ void nonblockconcat_taint_gen(std::string line, std::ofstream &output) {
   std::string taintRst;  
   if(g_use_taint_rst) taintRst = "|| "+TAINT_RST+" ";  
   std::string dest_t_Or = "";
-  if(g_wt_keeped) dest_t_Or = dest + _t + " | ";
+  //if(g_wt_keeped) dest_t_Or = dest + _t + " | ";
+  if(g_wt_keeped) dest_t_Or = "(INSTR_IN_ZY ? 0 :" + dest + _t + ") | ";
   if(!g_use_value_change)
     sigCheck = dest+_sig+" != { "+updateList+" } | ";
 
@@ -1902,7 +1911,7 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
 
     // assume: if src is num, the cond must be rst.
     std::string dest_t_Or = "";
-    if(g_wt_keeped) dest_t_Or = dest + _t + " " + destSlice + " | ";
+    if(g_wt_keeped) dest_t_Or = "(INSTR_IN_ZY ? 0 :" + dest + _t + " " + destSlice + ") | ";
 
     if(isNum(src)) {
       hasRst = true;
