@@ -8,7 +8,7 @@
 #include <unordered_map>
 //#include "global_data_struct.h"
 
-void hierarchical_vcd_parser(std::string fileName);
+void hierarchical_vcd_parser(std::string fileName, std::map<std::string, std::unordered_map<std::string, std::string>>& valMap);
 
 bool same_module(const std::string& name1, const std::string& name2);
 

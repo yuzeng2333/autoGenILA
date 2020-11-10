@@ -199,6 +199,7 @@ bool g_wt_keeped = false;
 bool g_special_equal_taint = true;
 // set the read flag only if reg's value is not reset value
 bool g_set_rflag_if_not_rst_val = true; 
+bool g_set_rflag_if_not_norm_val = true; 
 std::string _t="_T";
 std::string _r="_R";
 std::string _x="_X";

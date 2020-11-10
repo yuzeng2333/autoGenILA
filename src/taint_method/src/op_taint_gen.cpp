@@ -1754,10 +1754,15 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
   if(g_set_rflag_if_not_rst_val) {
     if(g_rstValMap[moduleName].find(dest) == g_rstValMap[moduleName].end()) {
       toCout("Warning: cannot find in g_rstValMap for module: "+moduleName+", var: "+dest);
-      neqRst = " && ("+dest+" != 0)";
+      neqRst = " && ("+dest+" != 0";
     }
     else
-      neqRst = " && ("+dest+" != "+g_rstValMap[moduleName][dest]+")";
+      neqRst = " && ("+dest+" != "+g_rstValMap[moduleName][dest];
+    if(g_set_rflag_if_not_norm_val) {
+      if(g_normValMap[moduleName].find(dest) != g_normValMap[moduleName].end())
+        neqRst = neqRst + " && "+dest+" != "+g_normValMap[moduleName][dest];
+    }
+    neqRst = neqRst + " )";
   }
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
   if(!g_use_zy_count)
@@ -1866,10 +1871,15 @@ void nonblockconcat_taint_gen(std::string line, std::ofstream &output) {
   if(g_set_rflag_if_not_rst_val) {
     if(g_rstValMap[moduleName].find(dest) == g_rstValMap[moduleName].end()) {
       toCout("Warning: cannot find in g_rstValMap for module: "+moduleName+", var: "+dest);
-      neqRst = " && "+dest+" != 0";      
+      neqRst = " && ("+dest+" != 0";
     }
     else
-      neqRst = " && "+dest+" != "+g_rstValMap[moduleName][dest];
+      neqRst = " && ("+dest+" != "+g_rstValMap[moduleName][dest];
+    if(g_set_rflag_if_not_norm_val) {
+      if(g_normValMap[moduleName].find(dest) != g_normValMap[moduleName].end())
+        neqRst = neqRst + " && "+dest+" != "+g_normValMap[moduleName][dest];
+    }
+    neqRst = neqRst + " )";
   }
   if(!g_use_zy_count)
     if (g_hasRst)    

@@ -6,13 +6,14 @@
 
 // the first key is module name, the second key is variable name
 std::map<std::string, std::unordered_map<std::string, std::string>> g_rstValMap;
+std::map<std::string, std::unordered_map<std::string, std::string>> g_normValMap;
 // first key is module name: which module the instance is within
 // second key is instance name. Value is the corresponding module name
 std::unordered_map<std::string, std::unordered_map<std::string, std::string>> g_instance2moduleMap;
 
 // Assumption: different instances of same module would 
 // have same reset value for same register.
-void hierarchical_vcd_parser(std::string fileName) {
+void hierarchical_vcd_parser(std::string fileName, std::map<std::string, std::unordered_map<std::string, std::string>>& valMap) {
   // key is nXXX, pair is <moduleName, varName>
   std::unordered_map<std::string, std::pair<std::string, std::string>> nameVarMap;
   std::stack<std::string> instanceNameStack;
@@ -91,12 +92,12 @@ void hierarchical_vcd_parser(std::string fileName) {
       auto moduleVarPair = nameVarMap[name];
       std::string modName = moduleVarPair.first;
       std::string varName = moduleVarPair.second;
-      if(g_rstValMap.find(modName) == g_rstValMap.end())
-        g_rstValMap.emplace(modName, std::unordered_map<std::string, std::string>{{varName, rstVal}});
-      else if(g_rstValMap[modName].find(varName) == g_rstValMap[modName].end())
-        g_rstValMap[modName].emplace(varName, rstVal);
+      if(valMap.find(modName) == valMap.end())
+        valMap.emplace(modName, std::unordered_map<std::string, std::string>{{varName, rstVal}});
+      else if(valMap[modName].find(varName) == valMap[modName].end())
+        valMap[modName].emplace(varName, rstVal);
       else
-        g_rstValMap[modName][varName] = rstVal;
+        valMap[modName][varName] = rstVal;
     }
   } // end of while
   // FIXME: do not check temprally
