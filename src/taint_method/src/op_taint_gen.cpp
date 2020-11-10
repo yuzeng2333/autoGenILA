@@ -565,7 +565,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
 
     if(isReduceOp)
       if (isEq && g_special_equal_taint)
-        output << blank << "assign " + dest + _t + destSlice + " = ((| " + op1 + _t + op1Slice + " ) | (|" + op2 + _t + op2Slice + " )) & ( "+op1AndSlice+" == "+op2AndSlice+" ) ;" << std::endl;
+        output << blank << "assign " + dest + _t + destSlice + " = (| " + op1 + _t + op1Slice + " ) & ( "+op1AndSlice+" == "+op2AndSlice+" ) ;" << std::endl;
       else
         output << blank << "assign " + dest + _t + destSlice + " = | " + op1 + _t + op1Slice + " ;" << std::endl;
     else
@@ -617,7 +617,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
 
     if(isReduceOp)    
       if (isEq && g_special_equal_taint)
-        output << blank << "assign " + dest + _t + destSlice + " = ((| " + op1 + _t + op1Slice + " ) | (|" + op2 + _t + op2Slice + " )) & ( "+op1AndSlice+" == "+op2AndSlice+" ) ;" << std::endl;
+        output << blank << "assign " + dest + _t + destSlice + " = (|" + op2 + _t + op2Slice + " ) & ( "+op1AndSlice+" == "+op2AndSlice+" ) ;" << std::endl;
       else
         output << blank << "assign " + dest + _t + destSlice + " = | " + op2 + _t + op2Slice + " ;" << std::endl;
     else if(isShift)
