@@ -195,11 +195,11 @@ bool g_write_assert = false; // for find written ASV
 bool g_double_assert = false; // to enable having PREV_VAL in assert
 bool g_use_taint_rst = false; // used when start from arbitraty state, only reset taints
 bool g_use_end_sig = false; // used to end verification after a certain time of instruction begins
-bool g_wt_keeped = false;
-bool g_special_equal_taint = true;
+bool g_wt_keeped = true; // INSTR_IN_ZY needs to be defined
+bool g_special_equal_taint = false;
 // set the read flag only if reg's value is not reset value
 bool g_set_rflag_if_not_rst_val = true; 
-bool g_set_rflag_if_not_norm_val = true; 
+bool g_set_rflag_if_not_norm_val = false; 
 std::string _t="_T";
 std::string _r="_R";
 std::string _x="_X";

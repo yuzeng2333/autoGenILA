@@ -1705,7 +1705,7 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
   std::string taintRst;
   if(g_use_taint_rst) taintRst = "|| "+TAINT_RST+" ";
   std::string dest_t_Or = "";
-  if(g_wt_keeped) dest_t_Or = "(INSTR_IN_ZY ? 0 :" + dest + _t + destSlice + ") | ";
+  if(g_wt_keeped) dest_t_Or = "( INSTR_IN_ZY ? 0 :" + dest + _t + destSlice + " ) | ";
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
   if(!replaceSig) {
     if (g_hasRst)
@@ -1849,7 +1849,7 @@ void nonblockconcat_taint_gen(std::string line, std::ofstream &output) {
   if(g_use_taint_rst) taintRst = "|| "+TAINT_RST+" ";  
   std::string dest_t_Or = "";
   //if(g_wt_keeped) dest_t_Or = dest + _t + " | ";
-  if(g_wt_keeped) dest_t_Or = "(INSTR_IN_ZY ? 0 :" + dest + _t + ") | ";
+  if(g_wt_keeped) dest_t_Or = "( INSTR_IN_ZY ? 0 :" + dest + _t + " ) | ";
   if(!g_use_value_change)
     sigCheck = dest+_sig+" != { "+updateList+" } | ";
 
@@ -1938,7 +1938,7 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
 
     // assume: if src is num, the cond must be rst.
     std::string dest_t_Or = "";
-    if(g_wt_keeped) dest_t_Or = "(INSTR_IN_ZY ? 0 :" + dest + _t + " " + destSlice + ") | ";
+    if(g_wt_keeped) dest_t_Or = "( INSTR_IN_ZY ? 0 :" + dest + _t + " " + destSlice + " ) | ";
 
     if(isNum(src)) {
       hasRst = true;
