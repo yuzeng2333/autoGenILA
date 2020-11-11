@@ -193,6 +193,7 @@ bool g_use_vcd_parser = false;
 bool g_write_assert = false; // for find written ASV
 bool g_double_assert = false; // to enable having PREV_VAL in assert
 bool g_use_sig = false;
+bool g_special_equal_taint = true;
 // set the read flag only if reg's value is not reset value
 bool g_set_rflag_if_not_rst_val = true; 
 std::string _t="_T";

@@ -296,14 +296,17 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
   bool isBitAnd = false;
   bool isBitOr = false;
   bool isShift = false;
+  bool isEq = false;  
   if( std::regex_match(line, m, pOr) )
     isOR = true;
-  if( std::regex_match(line, m, pAnd) )
+  else if( std::regex_match(line, m, pAnd) )
     isAnd = true;
-  if( std::regex_match(line, m, pBitAnd) )
+  else if( std::regex_match(line, m, pBitAnd) )
     isBitAnd = true;
-  if( std::regex_match(line, m, pBitOr) )
+  else if( std::regex_match(line, m, pBitOr) )
     isBitOr = true;
+  else if( std::regex_match(line, m, pEq) )
+    isEq = true;
 
   if (std::regex_match(line, m, pAdd)
             || std::regex_match(line, m, pSub)
@@ -398,7 +401,10 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
       else
         output << blank << "assign " + dest + _t + destSlice + " = " + op1 + _t + op1Slice + " | " + op2 + _t + op2Slice + " ;" << std::endl;
     else if(isReduceOp)
-      output << blank << "assign " + dest + _t + destSlice + " = (| " + op1 + _t + op1Slice + " ) | (|" + op2 + _t + op2Slice + " ) ;" << std::endl;
+      if (isEq && g_special_equal_taint)
+        output << blank << "assign " + dest + _t + destSlice + " = ((| " + op1 + _t + op1Slice + " ) | (|" + op2 + _t + op2Slice + " )) & ( "+op1AndSlice+" == "+op2AndSlice+" ) ;" << std::endl;
+      else
+        output << blank << "assign " + dest + _t + destSlice + " = (| " + op1 + _t + op1Slice + " ) | (|" + op2 + _t + op2Slice + " ) ;" << std::endl;
     else if(isShift)
       output << blank << "assign " + dest + _t + destSlice + " = " + extend("(| " + op1 + _t + op1Slice + " ) | (|" + op2 + _t + op2Slice + " )", destWidthNum) + " ;" << std::endl;
       
@@ -410,7 +416,10 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
     std::string sndVer = std::to_string(sndVerNum);
 
     if(isReduceOp)
-      output << blank << "assign " + dest + _t + destSlice + " = | " + op1 + _t + op1Slice + " ;" << std::endl;
+      if (isEq && g_special_equal_taint)
+        output << blank << "assign " + dest + _t + destSlice + " = (| " + op1 + _t + op1Slice + " ) & ( "+op1AndSlice+" == "+op2AndSlice+" ) ;" << std::endl;
+      else
+        output << blank << "assign " + dest + _t + destSlice + " = | " + op1 + _t + op1Slice + " ;" << std::endl;
     else
       output << blank << "assign " + dest + _t + destSlice + " = " + op1 + _t + op1Slice + " ;" << std::endl;
 
@@ -421,7 +430,10 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
     std::string thdVer = std::to_string(thdVerNum);
 
     if(isReduceOp)    
-      output << blank << "assign " + dest + _t + destSlice + " = | " + op2 + _t + op2Slice + " ;" << std::endl;
+      if (isEq && g_special_equal_taint)
+        output << blank << "assign " + dest + _t + destSlice + " = (|" + op2 + _t + op2Slice + " ) & ( "+op1AndSlice+" == "+op2AndSlice+" ) ;" << std::endl;
+      else
+        output << blank << "assign " + dest + _t + destSlice + " = | " + op2 + _t + op2Slice + " ;" << std::endl;
     else if(isShift)
       output << blank << "assign " + dest + _t + destSlice + " = " + extend("| " + op2 + _t + op2Slice, destWidthNum) + " ;" << std::endl;
     else 
@@ -429,6 +441,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
   }
   else {
     std::cout << "!!! Warning: both two operators are constants" << std::endl;
+    output << blank << "assign " + dest + _t + destSlice + " = 0 ;" << std::endl;    
   }
 }
 
@@ -852,14 +865,17 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
   std::string op2HighIdx  = toStr(op2IdxPair.first);
   std::string op2LowIdx   = toStr(op2IdxPair.second);
 
-
+  bool condIsNum = isNum(condAndSlice);
   bool op1IsNum = isNum(op1AndSlice);
   bool op2IsNum = isNum(op2AndSlice);
 
   bool condIsNew;
-  uint32_t condVerNum = find_version_num(condAndSlice, condIsNew, output);
-  // for the condition variable, condWidth should be 1
-  std::string condVer = std::to_string(condVerNum);
+  uint32_t condVerNum;
+  std::string condVer;
+  if(!condIsNum) {
+    condVerNum = find_version_num(condAndSlice, condIsNew, output);
+    condVer = std::to_string(condVerNum);
+  }
   
   uint32_t condSliceWidth = get_width(condSlice);
 
@@ -872,7 +888,11 @@ void ite_taint_gen(std::string line, std::ofstream &output) {
 
   if (!op1IsNum && !op2IsNum) { // ite
     /* Assgin new versions */
-    output << blank << "assign " + dest + _t + destSlice + " = " + condAndSlice + " ? ( " + extend(cond+_t+" "+condSlice, localWidthNum) + " | " + op1 + _t + op1Slice + " ) : ( " + extend(cond+_t+" "+condSlice, localWidthNum) + " | " + op2 + _t + op2Slice + " );" << std::endl;
+    if(!condIsNum)    
+      output << blank << "assign " + dest + _t + destSlice + " = " + condAndSlice + " ? ( " + extend(cond+_t+" "+condSlice, localWidthNum) + " | " + op1 + _t + op1Slice + " ) : ( " + extend(cond+_t+" "+condSlice, localWidthNum) + " | " + op2 + _t + op2Slice + " );" << std::endl;
+    else
+      output << blank << "assign " + dest + _t + destSlice + " = " + condAndSlice + " ? ( " + op1 + _t + op1Slice + " ) : ( " + op2 + _t + op2Slice + " );" << std::endl;
+
 
     uint32_t thdVerNum, fthVerNum;
     bool op1IsNew, op2IsNew;
