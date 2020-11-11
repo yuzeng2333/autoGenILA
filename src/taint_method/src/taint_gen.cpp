@@ -195,11 +195,11 @@ bool g_write_assert = false; // for find written ASV
 bool g_double_assert = false; // to enable having PREV_VAL in assert
 bool g_use_taint_rst = false; // used when start from arbitraty state, only reset taints
 bool g_use_end_sig = false; // used to end verification after a certain time of instruction begins
-bool g_wt_keeped = true; // INSTR_IN_ZY needs to be defined
-bool g_special_equal_taint = false;
+bool g_wt_keeped = true; // INSTR_IN_ZY needs to be defined, TODO: enable it for 8051
+bool g_special_equal_taint = false; // TODO: enable it for biRISCV
 // set the read flag only if reg's value is not reset value
 bool g_set_rflag_if_not_rst_val = true; 
-bool g_set_rflag_if_not_norm_val = false; 
+bool g_set_rflag_if_not_norm_val = false; // TODO: enable it for biRISCV
 std::string _t="_T";
 std::string _r="_R";
 std::string _x="_X";
@@ -1364,13 +1364,13 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
     out << "  input INSTR_IN_ZY;" << std::endl;
   else {
     out << "  logic INSTR_IN_ZY;" << std::endl;
-    //out << "  assign INSTR_IN_ZY = ";
-    //for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) {
-    //  if((*it).compare(g_recentClk) == 0 || (*it).compare(g_recentRst) == 0 || (*it).compare("rst_zy") == 0 || (*it).compare(TAINT_RST) == 0 || (*it).compare(END_SIG) == 0)
-    //    continue;
-    //  out << *it + _t + " > 0 || ";
-    //}
-    //out << "0 ;" << std::endl;
+    out << "  assign INSTR_IN_ZY = ";
+    for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) {
+      if((*it).compare(g_recentClk) == 0 || (*it).compare(g_recentRst) == 0 || (*it).compare("rst_zy") == 0 || (*it).compare(TAINT_RST) == 0 || (*it).compare(END_SIG) == 0)
+        continue;
+      out << *it + _t + " > 0 || ";
+    }
+    out << "0 ;" << std::endl;
   }
   while( std::getline(in, line) ) {
     out << line << std::endl;
