@@ -661,6 +661,8 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
   }
   else {
     std::cout << "!!! Warning: both two operators are constants" << std::endl;
+    output << blank << "assign " + dest + _t + destSlice + " = 0 ;" << std::endl;
+    output << blank + "assign " + dest + _sig + " = 0 ;" << std::endl;    
   }
 }
 
