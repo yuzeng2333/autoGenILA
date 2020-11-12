@@ -1343,7 +1343,7 @@ void remove_function_wrapper(std::string firstLine, std::ifstream &input, std::o
       split_slice(localPair.second, rhs, rhsSlice);
       output << blank + "    " + localPair.first + " :" << std::endl;
       output << blank + "      " + result + " = " + b + rhsSlice + " ;" << std::endl;
-      checkCond(b.find("fangyuan") != std::string::npos, "RHS in case is not fangyuan! "+ b);
+      //checkCond(b.find("fangyuan") != std::string::npos, "RHS in case is not fangyuan! "+ b);
       //fill_in_pass_relation(b+rhsSlice, result, localPair.first);
     }
     output << blank + "    default:" << std::endl;
