@@ -48,10 +48,10 @@ RM = /opt/cmake-3.14.4-Linux-x86_64/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /workspace/research/ILA/autoGenILA/src/taint_method
+CMAKE_SOURCE_DIR = /workspace/research/ILA/autoGenILA/src/write_taint
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /workspace/research/ILA/autoGenILA/src/taint_method/build
+CMAKE_BINARY_DIR = /workspace/research/ILA/autoGenILA/src/write_taint/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -80,9 +80,9 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /workspace/research/ILA/autoGenILA/src/taint_method/build/CMakeFiles /workspace/research/ILA/autoGenILA/src/taint_method/build/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /workspace/research/ILA/autoGenILA/src/write_taint/build/CMakeFiles /workspace/research/ILA/autoGenILA/src/write_taint/build/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /workspace/research/ILA/autoGenILA/src/taint_method/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /workspace/research/ILA/autoGenILA/src/write_taint/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -283,6 +283,36 @@ src/taint_gen.cpp.s:
 	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/src/taint_gen.cpp.s
 .PHONY : src/taint_gen.cpp.s
 
+src/top_script_gen.o: src/top_script_gen.cpp.o
+
+.PHONY : src/top_script_gen.o
+
+# target to build an object file
+src/top_script_gen.cpp.o:
+	$(MAKE) -f CMakeFiles/taint_gen.dir/build.make CMakeFiles/taint_gen.dir/src/top_script_gen.cpp.o
+	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/src/top_script_gen.cpp.o
+.PHONY : src/top_script_gen.cpp.o
+
+src/top_script_gen.i: src/top_script_gen.cpp.i
+
+.PHONY : src/top_script_gen.i
+
+# target to preprocess a source file
+src/top_script_gen.cpp.i:
+	$(MAKE) -f CMakeFiles/taint_gen.dir/build.make CMakeFiles/taint_gen.dir/src/top_script_gen.cpp.i
+	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/src/top_script_gen.cpp.i
+.PHONY : src/top_script_gen.cpp.i
+
+src/top_script_gen.s: src/top_script_gen.cpp.s
+
+.PHONY : src/top_script_gen.s
+
+# target to generate assembly for a file
+src/top_script_gen.cpp.s:
+	$(MAKE) -f CMakeFiles/taint_gen.dir/build.make CMakeFiles/taint_gen.dir/src/top_script_gen.cpp.s
+	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/src/top_script_gen.cpp.s
+.PHONY : src/top_script_gen.cpp.s
+
 src/varWidth.o: src/varWidth.cpp.o
 
 .PHONY : src/varWidth.o
@@ -368,6 +398,9 @@ help:
 	@echo "... src/taint_gen.o"
 	@echo "... src/taint_gen.i"
 	@echo "... src/taint_gen.s"
+	@echo "... src/top_script_gen.o"
+	@echo "... src/top_script_gen.i"
+	@echo "... src/top_script_gen.s"
 	@echo "... src/varWidth.o"
 	@echo "... src/varWidth.i"
 	@echo "... src/varWidth.s"

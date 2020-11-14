@@ -65,6 +65,8 @@ void top_script_gen() {
     outFile << "prove -all" << el;
     outFile << "set res [get_property_info -list status allTaintsAreZero]" << el;
     outFile << "puts $fd \""+reg+": ${res}\"" << el;
+    outFile << "set date [exec date]"<< el;
+    outFile << "puts $fd ${date}" << el;
     outFile << "close $fd" << el;
     outFile << "assume -remove a1" << el;
     outFile << "assume -remove a2" << el;

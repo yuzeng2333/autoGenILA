@@ -30,6 +30,13 @@ CMakeFiles/TaintGenLib.dir/src/taint_gen.cpp.o: ../src/taint_gen.cpp
 CMakeFiles/TaintGenLib.dir/src/taint_gen.cpp.o: ../src/taint_gen.h
 CMakeFiles/TaintGenLib.dir/src/taint_gen.cpp.o: ../src/varWidth.h
 
+CMakeFiles/TaintGenLib.dir/src/top_script_gen.cpp.o: ../src/global_data.h
+CMakeFiles/TaintGenLib.dir/src/top_script_gen.cpp.o: ../src/helper.h
+CMakeFiles/TaintGenLib.dir/src/top_script_gen.cpp.o: ../src/pass_info.h
+CMakeFiles/TaintGenLib.dir/src/top_script_gen.cpp.o: ../src/top_script_gen.cpp
+CMakeFiles/TaintGenLib.dir/src/top_script_gen.cpp.o: ../src/top_script_gen.h
+CMakeFiles/TaintGenLib.dir/src/top_script_gen.cpp.o: ../src/varWidth.h
+
 CMakeFiles/TaintGenLib.dir/src/varWidth.cpp.o: ../src/global_data.h
 CMakeFiles/TaintGenLib.dir/src/varWidth.cpp.o: ../src/helper.h
 CMakeFiles/TaintGenLib.dir/src/varWidth.cpp.o: ../src/pass_info.h

@@ -146,6 +146,8 @@ extern std::regex pNot;
 extern std::regex pNone;     
 extern std::regex pNoneNoAssign;  
 extern std::regex pInvert;
+extern std::regex pMinus;
+extern std::regex pPlus;
 /* reduce 1 op */
 extern std::regex pRedOr; 
 extern std::regex pRedAnd; 

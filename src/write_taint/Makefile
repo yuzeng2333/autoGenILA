@@ -20,10 +20,10 @@ case:
 	./build/taint_gen /workspace/research/ILA/autoGenILA/naiveEg/case/case.v
 
 128:
-	./build/taint_gen /workspace/research/ILA/autoGenILA/AES/Verilog/aes_128_yosys.v
+	./build/taint_gen /workspace/research/ILA/autoGenILA/AES/Verilog_wr/aes_128_yosys.v
 
 aes:
-	./build/taint_gen /workspace/research/ILA/autoGenILA/AES/Verilog/aes_top_yosys.v
+	./build/taint_gen /workspace/research/ILA/autoGenILA/AES/Verilog_wr/aes_top_yosys.v
 
 exp:
 	./build/taint_gen ./experiment/experiment.v
@@ -32,37 +32,40 @@ pid:
 	./build/taint_gen /workspace/research/ILA/autoGenILA/PID/SYN/PID_short.v
 
 gb:
-	./build/taint_gen /workspace/research/ILA/autoGenILA/GB/SYN/gb_yosys.v
+	./build/taint_gen /workspace/research/ILA/autoGenILA/GB/SYN_wr/gb_yosys.v
 
 csimple:
 	./build/taint_gen /workspace/research/ILA/autoGenILA/naiveEg/case_simple/case.v
 
 rbm:
-	./build/taint_gen /workspace/research/ILA/autoGenILA/RBM/SYN/rbm_yosys.v
+	./build/taint_gen /workspace/research/ILA/autoGenILA/RBM/SYN_wr/rbm_acc_yosys.v
 
 8051:
-	./build/taint_gen /workspace/research/ILA/autoGenILA/8051/trunk/rtl/SYN/oc8051_yosys.v
+	./build/taint_gen /workspace/research/ILA/autoGenILA/8051/trunk/rtl/SYN_WR/oc8051_yosys.v
 
 riscv:
-	./build/taint_gen /workspace/research/ILA/autoGenILA/picorv32/SYN/picorv32_yosys.v
+	./build/taint_gen /workspace/research/ILA/autoGenILA/picorv32/SYN_wr/picorv32_yosys.v
 
 piccolo:
-	./build/taint_gen /workspace/research/ILA/autoGenILA/Piccolo-iu/verilog-cpu-old/SYN/piccolo_yosys.v
+	./build/taint_gen /workspace/research/ILA/autoGenILA/Piccolo-iu/verilog-cpu-old/SYN_wr/piccolo_yosys.v
 
 sha_core:
-	./build/taint_gen /workspace/research/ILA/autoGenILA/SHA/SYN/sha_simp.v
+	./build/taint_gen /workspace/research/ILA/autoGenILA/SHA/SYN_wr/sha_simp.v
 
 sha:
-	./build/taint_gen /workspace/research/ILA/autoGenILA/SHA/SYN/sha_yosys.v
+	./build/taint_gen /workspace/research/ILA/autoGenILA/SHA/SYN_wr/sha_yosys.v
 
 vpipe:
 	./build/taint_gen /workspace/research/ILA/autoGenILA/vpipe/SYN/vpipe_yosys.v
 
 dla:
-	./build/taint_gen /workspace/research/ILA/autoGenILA/NVDLA/SYN/nvdla_yosys.v
+	./build/taint_gen /workspace/research/ILA/autoGenILA/NVDLA/SYN_wr/nvdla_yosys.v
 
 fsm:
 	./build/taint_gen /workspace/research/ILA/autoGenILA/naiveEg/fsm/fsm_yosys.v
 
 wcase:
 	./build/taint_gen /workspace/research/ILA/autoGenILA/naiveEg/word_sum_case/word_adder_yosys.v
+
+bi:
+	./build/taint_gen /workspace/research/ILA/autoGenILA/biriscv/SYN_wr/biriscv_yosys.v

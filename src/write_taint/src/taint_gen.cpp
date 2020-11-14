@@ -64,6 +64,8 @@ std::regex pSignedLeftShift   (to_re("^(\\s*)assign (NAME) = (NAME) <<< (NAME)(\
 std::regex pNone        (to_re("^(\\s*)assign (NAME) = (NAME)(\\s*)?;$"));
 std::regex pNoneNoAssign(to_re("^(\\s*)(NAME) = (NAME)(\\s*)?;$"));
 std::regex pInvert      (to_re("^(\\s*)assign (NAME) = \\~ (NAME)(\\s*)?;$"));
+std::regex pMinus       (to_re("^(\\s*)assign (NAME) = - (NAME)(\\s*)?;$"));
+std::regex pPlus        (to_re("^(\\s*)assign (NAME) = + (NAME)(\\s*)?;$"));
 /* reduce 1 op */
 std::regex pNot         (to_re("^(\\s*)assign (NAME) = ! (NAME)(\\s*)?;$"));
 std::regex pRedOr       (to_re("^(\\s*)assign (NAME) = \\| (NAME)(\\s*)?;$"));
@@ -914,6 +916,8 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   } // end of 2-operator
   /* 1-operator assignment */
   else if (std::regex_match(line, m, pInvert) 
+            || std::regex_match(line, m, pPlus) 
+            || std::regex_match(line, m, pMinus) 
             || std::regex_match(line, m, pNone)) {
     return ONE_OP;
   }
@@ -1115,7 +1119,7 @@ void add_file_taints(std::string fileName, std::map<std::string, std::vector<std
 void merge_taints(std::string fileName) {
   std::ofstream output(fileName, std::fstream::app);
 
-  if(g_hasRst)
+  if(g_hasRst && isTop)
     output << "  assign rst_zy = "+get_recent_rst()+" ;" << std::endl;
 
   // write_taint_exist
@@ -1146,9 +1150,8 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
   if(!isTop) {
     moduleInputs.push_back("INSTR_IN_ZY");    
   }
-  if(!g_hasRst) {
+  if(!isTop) {
     moduleInputs.push_back("rst_zy");
-    toCout("No reset signal found in "+moduleName+", check it!!");
   }
   moduleInputs.push_back("YZC");
   out << "module " + moduleName + " ( ";
@@ -1169,7 +1172,7 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
   }
   out << extendOutputs.back() + " );" << std::endl;
   // if no reset, add a reset
-  if(!g_hasRst) 
+  if(!isTop) 
     out << "  input rst_zy;" << std::endl;
   else
     out << "  logic rst_zy;" << std::endl;

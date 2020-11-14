@@ -1,4 +1,4 @@
-# Install script for directory: /workspace/research/ILA/autoGenILA/src/taint_method
+# Install script for directory: /workspace/research/ILA/autoGenILA/src/write_taint
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/workspace/research/ILA/autoGenILA/src/taint_method/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/workspace/research/ILA/autoGenILA/src/write_taint/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

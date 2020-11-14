@@ -450,6 +450,8 @@ void one_op_taint_gen(std::string line, std::ofstream &output) {
   std::smatch m;
   bool isNone = false;
   if (std::regex_match(line, m, pNone) 
+        || std::regex_match(line, m, pPlus)
+        || std::regex_match(line, m, pMinus)
         || std::regex_match(line, m, pInvert)){}
   else 
     return;
@@ -978,16 +980,10 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
   // _t
   output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;
   if(!replaceSig) {
-    if (g_hasRst)
-      output << blank + dest + _tz + destSlice + " \t\t<= " + get_recent_rst() + " ? 0 : ( " + op1 + _t + op1Slice + " );" << std::endl;
-    else 
-      output << blank + dest + _tz + destSlice + " \t\t<= rst_zy ? 0 : ( " + op1 + _t + " );" << std::endl;
+    output << blank + dest + _tz + destSlice + " \t\t<= rst_zy ? 0 : ( " + op1 + _t + " );" << std::endl;
   }
   else {
-    if (g_hasRst)
-      output << blank + dest + _tz + destSlice + " \t\t<= " + get_recent_rst() + " ? 0 : ( " + op1+_t+op1Slice + " & " + extend( "!("+repeatCond+")", localWidthNum ) + " );" << std::endl;
-    else 
-      output << blank + dest + _tz + destSlice + " \t\t<= rst_zy ? 0 : ( " + op1 + _t + " & " + extend( "!("+repeatCond+")", localWidthNum ) + " );" << std::endl;
+    output << blank + dest + _tz + destSlice + " \t\t<= rst_zy ? 0 : ( " + op1 + _t + " & " + extend( "!("+repeatCond+")", localWidthNum ) + " );" << std::endl;
   }
 }
 
@@ -1038,10 +1034,7 @@ void nonblockconcat_taint_gen(std::string line, std::ofstream &output) {
   std::string sigCheck = "";
   if(!g_use_value_change)
     sigCheck = dest+_sig+" != { "+updateList+" } | ";
-  if (g_hasRst)  
-    output << blank + dest + _tz + " \t\t<= " + get_recent_rst() + " ? 0 : ({ " + updateTList +" } & " + extend(sigCheck+destAndSlice+" != "+updateList, localWidthNum) + ");" << std::endl;
-  else
-    output << blank + dest + _tz + " \t\t<= rst_zy ? 0 : ({ " + updateTList +" } & " + extend(sigCheck+destAndSlice+" != "+updateList, localWidthNum) + ");" << std::endl;
+  output << blank + dest + _tz + " \t\t<= rst_zy ? 0 : ({ " + updateTList +" } & " + extend(sigCheck+destAndSlice+" != "+updateList, localWidthNum) + ");" << std::endl;
 
 }
 

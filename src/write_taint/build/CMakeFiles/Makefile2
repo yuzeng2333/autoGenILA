@@ -59,10 +59,10 @@ RM = /opt/cmake-3.14.4-Linux-x86_64/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /workspace/research/ILA/autoGenILA/src/taint_method
+CMAKE_SOURCE_DIR = /workspace/research/ILA/autoGenILA/src/write_taint
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /workspace/research/ILA/autoGenILA/src/taint_method/build
+CMAKE_BINARY_DIR = /workspace/research/ILA/autoGenILA/src/write_taint/build
 
 #=============================================================================
 # Target rules for target CMakeFiles/taint_gen.dir
@@ -71,7 +71,7 @@ CMAKE_BINARY_DIR = /workspace/research/ILA/autoGenILA/src/taint_method/build
 CMakeFiles/taint_gen.dir/all:
 	$(MAKE) -f CMakeFiles/taint_gen.dir/build.make CMakeFiles/taint_gen.dir/depend
 	$(MAKE) -f CMakeFiles/taint_gen.dir/build.make CMakeFiles/taint_gen.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/workspace/research/ILA/autoGenILA/src/taint_method/build/CMakeFiles --progress-num=8,9,10,11,12,13,14,15 "Built target taint_gen"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/workspace/research/ILA/autoGenILA/src/write_taint/build/CMakeFiles --progress-num=9,10,11,12,13,14,15,16,17 "Built target taint_gen"
 .PHONY : CMakeFiles/taint_gen.dir/all
 
 # Include target in all.
@@ -81,9 +81,9 @@ all: CMakeFiles/taint_gen.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/taint_gen.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /workspace/research/ILA/autoGenILA/src/taint_method/build/CMakeFiles 8
+	$(CMAKE_COMMAND) -E cmake_progress_start /workspace/research/ILA/autoGenILA/src/write_taint/build/CMakeFiles 9
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/taint_gen.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /workspace/research/ILA/autoGenILA/src/taint_method/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /workspace/research/ILA/autoGenILA/src/write_taint/build/CMakeFiles 0
 .PHONY : CMakeFiles/taint_gen.dir/rule
 
 # Convenience name for target.
@@ -108,7 +108,7 @@ clean: CMakeFiles/taint_gen.dir/clean
 CMakeFiles/TaintGenLib.dir/all:
 	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/depend
 	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/workspace/research/ILA/autoGenILA/src/taint_method/build/CMakeFiles --progress-num=1,2,3,4,5,6,7 "Built target TaintGenLib"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/workspace/research/ILA/autoGenILA/src/write_taint/build/CMakeFiles --progress-num=1,2,3,4,5,6,7,8 "Built target TaintGenLib"
 .PHONY : CMakeFiles/TaintGenLib.dir/all
 
 # Include target in all.
@@ -118,9 +118,9 @@ all: CMakeFiles/TaintGenLib.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/TaintGenLib.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /workspace/research/ILA/autoGenILA/src/taint_method/build/CMakeFiles 7
+	$(CMAKE_COMMAND) -E cmake_progress_start /workspace/research/ILA/autoGenILA/src/write_taint/build/CMakeFiles 8
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/TaintGenLib.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /workspace/research/ILA/autoGenILA/src/taint_method/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /workspace/research/ILA/autoGenILA/src/write_taint/build/CMakeFiles 0
 .PHONY : CMakeFiles/TaintGenLib.dir/rule
 
 # Convenience name for target.
