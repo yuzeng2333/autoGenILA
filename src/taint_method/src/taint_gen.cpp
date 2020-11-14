@@ -195,7 +195,7 @@ bool g_write_assert = false; // for find written ASV
 bool g_double_assert = false; // to enable having PREV_VAL in assert
 bool g_use_taint_rst = false; // used when start from arbitraty state, only reset taints
 bool g_use_end_sig = true; // used to end verification after a certain time of instruction begins, TODO: enable it for 8051
-bool g_wt_keeped = true; // INSTR_IN_ZY needs to be defined, TODO: enable it for 8051
+bool g_wt_keeped = false; // INSTR_IN_ZY needs to be defined, TODO: enable it for 8051
 bool g_special_equal_taint = false; // TODO: enable it for biRISCV
 // set the read flag only if reg's value is not reset value
 bool g_set_rflag_if_not_rst_val = true; 
@@ -1248,32 +1248,32 @@ void merge_taints(std::string fileName) {
   //  }
   //  idxedModuleName = moduleName + "_1";
   //}
-  if(g_double_assert) {
-    for(std::string var: moduleTrueRegs) {
-      uint32_t width = get_var_slice_width(var);
-      if(isMem(var))
-        continue;
-      std::string rstVal;
-      if(g_use_vcd_parser)
-        rstVal = g_rstValMap[moduleName][var];
-      if(rstVal.empty()) rstVal = "0";
-      output << "  always @( posedge " + g_recentClk + " ) begin" << std::endl;
-      if(g_hasRst) {
-        output << "    if( " + get_recent_rst() + " ) " + var + "_PREV_VAL1 <= " + rstVal + " ;" << std::endl;
-        if(!g_use_vcd_parser)
-          output << "    if( " + get_recent_rst() + " ) " + var + "_PREV_VAL2 <= " + rstVal + " ;" << std::endl;
-      }
-      else {
-        output << "    if( rst_zy ) " + var + "_PREV_VAL1 <= " + rstVal + " ;" << std::endl;
-        if(!g_use_vcd_parser)  
-          output << "    if( rst_zy ) " + var + "_PREV_VAL2 <= " + rstVal + " ;" << std::endl;
-      }
-      output << "    if( INSTR_IN_ZY ) " + var + "_PREV_VAL1 <= " + var + " ;"<< std::endl;
-      if(!g_use_vcd_parser)
-        output << "    if( INSTR_IN_ZY ) " + var + "_PREV_VAL2 <= " + var + "_PREV_VAL1 ;" << std::endl;
-      output << "  end" << std::endl;
-    }
-  }
+  //if(g_double_assert) {
+  //  for(std::string var: moduleTrueRegs) {
+  //    uint32_t width = get_var_slice_width(var);
+  //    if(isMem(var))
+  //      continue;
+  //    std::string rstVal;
+  //    if(g_use_vcd_parser)
+  //      rstVal = g_rstValMap[moduleName][var];
+  //    if(rstVal.empty()) rstVal = "0";
+  //    output << "  always @( posedge " + g_recentClk + " ) begin" << std::endl;
+  //    if(g_hasRst) {
+  //      output << "    if( " + get_recent_rst() + " ) " + var + "_PREV_VAL1 <= " + rstVal + " ;" << std::endl;
+  //      if(!g_use_vcd_parser)
+  //        output << "    if( " + get_recent_rst() + " ) " + var + "_PREV_VAL2 <= " + rstVal + " ;" << std::endl;
+  //    }
+  //    else {
+  //      output << "    if( rst_zy ) " + var + "_PREV_VAL1 <= " + rstVal + " ;" << std::endl;
+  //      if(!g_use_vcd_parser)  
+  //        output << "    if( rst_zy ) " + var + "_PREV_VAL2 <= " + rstVal + " ;" << std::endl;
+  //    }
+  //    output << "    if( INSTR_IN_ZY ) " + var + "_PREV_VAL1 <= " + var + " ;"<< std::endl;
+  //    if(!g_use_vcd_parser)
+  //      output << "    if( INSTR_IN_ZY ) " + var + "_PREV_VAL2 <= " + var + "_PREV_VAL1 ;" << std::endl;
+  //    output << "  end" << std::endl;
+  //  }
+  //}
 
   // some bits of taints are still floating
   //output << "// ground floating taints" << std::endl;
@@ -1301,7 +1301,7 @@ void merge_taints(std::string fileName) {
   }
 
   gen_assert_property(output);
-  if(g_hasRst)
+  if(g_hasRst && isTop)
     output << "  assign rst_zy = "+get_recent_rst()+" ;" << std::endl;
 
   // write_taint_exist
@@ -1331,10 +1331,7 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
   }
   if(g_use_taint_rst) moduleInputs.push_back(TAINT_RST);  
   if(g_use_end_sig) moduleInputs.push_back(END_SIG);  
-  if(!g_hasRst) {
-    moduleInputs.push_back("rst_zy");
-    toCout("No reset signal found in "+moduleName+", check it!!");
-  }
+  if(!isTop) moduleInputs.push_back("rst_zy");
   out << "module " + moduleName + " ( ";
   for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) {
     out << *it + " , ";
@@ -1353,10 +1350,10 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
   }
   out << extendOutputs.back() + " );" << std::endl;
   // if no reset, add a reset
-  if(!g_hasRst) 
-    out << "  input rst_zy;" << std::endl;
-  else
+  if(isTop)
     out << "  logic rst_zy;" << std::endl;
+  else
+    out << "  input rst_zy;" << std::endl;
   if(g_use_taint_rst) out << "  input "+TAINT_RST+";" << std::endl;
   if(g_use_end_sig) out << "  input "+END_SIG+";" << std::endl;
   out << "  integer i;" << std::endl;
@@ -2255,6 +2252,7 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
   //}
 
   // printed extended module instantiation
+  std::vector<std::string> toAssignZero;
   output << "// module: "+localModuleName << std::endl;
   output << moduleFirstLine << std::endl;
   std::string newLogic;
@@ -2332,8 +2330,10 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
         if(!isNum(varAndSlice)) {
           std::vector<std::string> varVec;
           parse_var_list(varAndSlice, varVec);
-          if(varVec.size() > 1)
+          if(varVec.size() > 1) {
             varConnect = "";
+            toAssignZero.push_back(get_rhs_taint_list(varAndSlice, _sig, true));
+          }
           else
             varConnect = get_rhs_taint_list(varAndSlice, _sig, true);
         }
@@ -2371,6 +2371,10 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
   lineToPrint.pop_back();
   output << lineToPrint << std::endl;
   output << "  );" << std::endl;
+
+  // assign unconnected signatures
+  for(std::string unwiredSig: toAssignZero)
+    output << "  assign "+unwiredSig + " = 0 ;" << std::endl;
 
   for(std::string oneNewLogic: newLogicVec)
     if(!oneNewLogic.empty())
