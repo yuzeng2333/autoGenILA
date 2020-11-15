@@ -1153,7 +1153,7 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
   if(!isTop) {
     moduleInputs.push_back("rst_zy");
   }
-  moduleInputs.push_back("YZC");
+  if(g_yzcNxtIdx > 0) moduleInputs.push_back("YZC");
   out << "module " + moduleName + " ( ";
   for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) {
     out << *it + " , ";
@@ -1190,7 +1190,7 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
     out << "0 ;" << std::endl;
   }
   // declarations for YZC
-  out << "  input ["+toStr(g_yzcNxtIdx-1)+":0] YZC;" << std::endl;
+  if(g_yzcNxtIdx > 0) out << "  input ["+toStr(g_yzcNxtIdx-1)+":0] YZC;" << std::endl;
   while( std::getline(in, line) ) {
     out << line << std::endl;
   }
