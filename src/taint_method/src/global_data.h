@@ -85,6 +85,7 @@ extern bool g_set_rflag_if_not_norm_val;
 extern bool g_use_taint_rst;
 extern bool g_wt_keeped;
 extern bool g_special_equal_taint;
+extern bool g_use_does_keep;
 extern std::string _t;
 extern std::string _r;
 extern std::string _x;

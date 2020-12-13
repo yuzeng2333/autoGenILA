@@ -200,6 +200,7 @@ bool g_special_equal_taint = false; // TODO: enable it for biRISCV
 // set the read flag only if reg's value is not reset value
 bool g_set_rflag_if_not_rst_val = true; 
 bool g_set_rflag_if_not_norm_val = false; // TODO: enable it for biRISCV
+bool g_use_does_keep = true;  // TODO: consider enable it
 std::string _t="_T";
 std::string _r="_R";
 std::string _x="_X";
@@ -861,13 +862,19 @@ void add_line_taints(std::string line, std::ofstream &output, std::ifstream &inp
 
 // FIXME: maybe set t-taint and r-taint to clear if reg value is not changed
 int parse_verilog_line(std::string line, bool ignoreWrongOp) {
+  // for the purpose of parse, remove potential $sign()
+  std::smatch m;
+  std::regex pSigned("\\$signed\\((\\S+)\\)");
+  if(line.find("$signed") != std::string::npos) {
+    line = std::regex_replace(line, pSigned, "$1");
+    //toCout("line to be matched: "+line);
+  }
   if(line.empty())
     return NONE;
   if(line.substr(0, 1) == "X") {
     toCout("begin debug");
     ignoreWrongOp = true;
   }
-  std::smatch m;
   if ( std::regex_match(line, m, pModule) ) {
     moduleName = m.str(2);
     return NONE;
@@ -2526,10 +2533,12 @@ void gen_assert_property(std::ofstream &output) {
   std::smatch m;
   std::smatch match;
   g_mod2assertMap.emplace(moduleName, std::vector<std::string>{});
+  std::string DOES_KEEP = "";
   if(!g_write_assert) {
     for(std::string out: flagOutputs) {
       if(std::regex_search(out, m, pRFlag)) {
         std::string var = m.str(1);        
+        if(g_use_does_keep) DOES_KEEP = " || " + var + "_DOES_KEEP == 0";
         g_mod2assertMap[moduleName].push_back(var);
         //checkCond(std::regex_match(var, match, pRFlag), "Error: pRFlag is not matched: "+m.str(1));
         std::string rstVal; 
@@ -2546,9 +2555,9 @@ void gen_assert_property(std::ofstream &output) {
             output << "  assert property( " + out + " == 0 || " + m.str(1) + "_PREV_VAL1 == " + m.str(1) + "_PREV_VAL2 );" << std::endl;
         }
         else if(g_use_end_sig)
-          output << "  assert property( " + out + " == 0 || " + END_SIG + ");" << std::endl;          
+          output << "  assert property( " + out + " == 0 || " + END_SIG + DOES_KEEP + ");" << std::endl;          
         else
-          output << "  assert property( " + out + " == 0 );" << std::endl;
+          output << "  assert property( " + out + " == 0" + DOES_KEEP + ");" << std::endl;
       }
     }
   }

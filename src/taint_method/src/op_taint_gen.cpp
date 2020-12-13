@@ -144,9 +144,13 @@ void reg_taint_gen(std::string line, std::ofstream &output) {
   moduleRegs.push_back(var);
   output << blank << "logic " + slice + " " + var + _t + " ;" << std::endl;
 
-  output << blank << "logic " + slice + " " + var + "_PREV_VAL1 ;" << std::endl; 
-  if(!g_use_vcd_parser)
-    output << blank << "logic " + slice + " " + var + "_PREV_VAL2 ;" << std::endl; 
+  if(g_double_assert) {
+    output << blank << "logic " + slice + " " + var + "_PREV_VAL1 ;" << std::endl; 
+    if(!g_use_vcd_parser)
+      output << blank << "logic " + slice + " " + var + "_PREV_VAL2 ;" << std::endl; 
+  }
+
+  if(g_use_does_keep) output <<  "  logic " + slice + " " +var + "_DOES_KEEP = 0 ;"  << std::endl;
 
   if(!isOutput(var)) { // maybe later declared as output
     output << blank << "logic " + slice + " " + var + _r + " ;" << std::endl;
@@ -197,9 +201,11 @@ void mem_taint_gen(std::string line, std::ofstream &output) {
   moduleMems.emplace(var, varLen);
   //assert_info(!isTop || !isOutput(var), "mem_taint_gen:var is output, line: "+line);  
   output << blank << "logic " + slice + " " + var + _t + " " + sliceTop + " ;" << std::endl;
-  output << blank << "logic " + slice + " " + var + "_PREV_VAL1 " + sliceTop + " ;" << std::endl;
-  if(!g_use_vcd_parser)
-    output << blank << "logic " + slice + " " + var + "_PREV_VAL2 " + sliceTop + " ;" << std::endl;
+  if(g_double_assert) {
+    output << blank << "logic " + slice + " " + var + "_PREV_VAL1 " + sliceTop + " ;" << std::endl;
+    if(!g_use_vcd_parser)
+      output << blank << "logic " + slice + " " + var + "_PREV_VAL2 " + sliceTop + " ;" << std::endl;
+  }
   output << blank << "logic " + sliceTop + " " + var + "_t_flag ;" << std::endl;
   output << blank << "logic " + sliceTop + " " + var + "_r_flag ;" << std::endl;
   //output << blank << "logic " + slice + " " + var + _c + " " + sliceTop + " ;" << std::endl;
@@ -349,6 +355,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
   bool isBitOr = false;
   bool isShift = false;
   bool isEq = false;
+  bool isSub = false;
   if( std::regex_match(line, m, pOr) )
     isOR = true;
   else if( std::regex_match(line, m, pAnd) )
@@ -359,7 +366,8 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
     isBitOr = true;
   else if( std::regex_match(line, m, pEq) )
     isEq = true;
-
+  else if( std::regex_match(line, m, pSub) )
+    isSub = true;
 
   if (std::regex_match(line, m, pAdd)
             || std::regex_match(line, m, pSub)
@@ -1689,12 +1697,18 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
   //else
   //  output << blank.substr(0, blank.length()-4) + "assign " + op1 + _x + op1Ver + op1Slice + " = " + extend("1'b1", localWidthNum) + " ;" << std::endl; 
 
-
+  bool canKeepValue=true;
   // _r
   if(g_iteDest.find(op1) != g_iteDest.end())
     output << blank.substr(0, blank.length()-4) + "assign " + op1 + _r + op1Ver + op1Slice + " = " + op1 + _t + op1Slice + " & " + extend(dest+_sig+" != "+op1+_sig, localWidthNum) + " ;" << std::endl;
-  else
+  else {
+    canKeepValue = false;
     output << blank.substr(0, blank.length()-4) + "assign " + op1 + _r + op1Ver + op1Slice + " = 0 ;" << std::endl;
+    std::ofstream notASVOutput;
+    notASVOutput.open("./not_asv.txt", std::fstream::app);
+    notASVOutput << dest << std::endl;
+    notASVOutput.close();
+  }
 
   // _c
   //output << blank.substr(0, blank.length()-4) + "assign " + op1 + _c + op1Ver + op1Slice + " = " + extend("1'b1", localWidthNum) + " ;" << std::endl;
@@ -1758,6 +1772,13 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
     else
       output << blank + dest + "_reset \t<= rst_zy ? 1 : " + destAndSlice+" != "+op1AndSlice + " ? 0 : " + dest + "_reset ;" << std::endl;
   }
+
+  // assign NEVER_KEEP
+  if(g_use_does_keep) {
+    output << "  always @(posedge " + g_recentClk +")" << std::endl;
+    output << "    " + dest + "_DOES_KEEP <= rst_zy ? 0 : " + dest + "_DOES_KEEP || (INSTR_IN_ZY && " + dest + _sig + " == " + op1 + _sig + ") ;" << std::endl;
+  }
+
 }
 
 
