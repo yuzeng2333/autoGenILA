@@ -42,6 +42,7 @@ void top_script_gen() {
   outFile << "source script.tcl" << el;
   gen_assert_property(outFile);
   for(auto it = g_yzc2regMap.begin(); it != g_yzc2regMap.end(); it++) {
+  //for(auto it = g_yzc2regMap.rbegin(); it != g_yzc2regMap.rend(); it++) {
     bool hasThreeAssum = false;    
     uint32_t sig = it->first;
     std::string reg = it->second;
@@ -62,7 +63,7 @@ void top_script_gen() {
       outFile << "assume -name {a3} {YZC["+toStr(sig)+"] == issue_cond} -update_db" << el;
       hasThreeAssum = true;
     }
-    outFile << "prove -all" << el;
+    outFile << "prove -time_limit 2h -all" << el;
     outFile << "set res [get_property_info -list status allTaintsAreZero]" << el;
     outFile << "puts $fd \""+reg+": ${res}\"" << el;
     outFile << "set date [exec date]"<< el;

@@ -195,10 +195,10 @@ bool g_use_vcd_parser = false;
 bool g_write_assert = false; // for find written ASV
 bool g_double_assert = false; // to enable having PREV_VAL in assert
 bool g_use_sig = false;
-bool g_special_equal_taint = true;
+bool g_special_equal_taint = false;
 // set the read flag only if reg's value is not reset value
 bool g_set_rflag_if_not_rst_val = true; 
-std::string _t="_T";
+std::string _t="_T"; // TODO: change taints for piccolo
 std::string _tz="_TZ";
 std::string _r="_R";
 std::string _x="_X";
@@ -1121,6 +1121,9 @@ void merge_taints(std::string fileName) {
 
   if(g_hasRst && isTop)
     output << "  assign rst_zy = "+get_recent_rst()+" ;" << std::endl;
+  else {
+    toCout("Error: Cannot find rst signal!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+  }
 
   // write_taint_exist
   //output << "  logic write_taint_exist = 0";

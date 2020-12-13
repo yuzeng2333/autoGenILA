@@ -56,7 +56,7 @@ void input_taint_gen(std::string line, std::ofstream &output) {
             || var.find("clock") != std::string::npos 
             || var.find("CLOCK") != std::string::npos 
             || var.find("CLK") != std::string::npos && var.find("EN") == std::string::npos ) {
-      if(var.length() <= 8) {    
+      if(var.length() <= 8 && var != "rclk" && var != "tclk") {    
         toCout("================================================  Find potential unexpected clk signal: "+var+" in module: "+moduleName);
         g_recentClk = var;
       }
@@ -68,26 +68,22 @@ void input_taint_gen(std::string line, std::ofstream &output) {
             || var.find("RST_N") != std::string::npos
             || var.find("RESETN") != std::string::npos
             || var.find("RESET_N") != std::string::npos
-            || var.find("reset_n") != std::string::npos ) {
-      if(var.length() <= 8) {     
-        toCout("================================================  Find potential unexpected rstn signal: "+var+" in module: "+moduleName);
-        g_hasRst = true;
-        g_rst_pos = false;
-        g_recentRst = var;
-        isRst = true;
-      }
+            || var.find("reset_n") != std::string::npos ) {    
+      toCout("================================================  Find potential unexpected rstn signal: "+var+" in module: "+moduleName);
+      g_hasRst = true;
+      g_rst_pos = false;
+      g_recentRst = var;
+      isRst = true;
     }
     else if(var.find("rst") != std::string::npos
             || var.find("reset") != std::string::npos 
             || var.find("RST") != std::string::npos 
             || var.find("RESET") != std::string::npos ) {
-      if(var.length() <= 8) {      
-        toCout("================================================  Find potential unexpected rst signal: "+var+" in module: "+moduleName);
-        g_hasRst = true;
-        g_rst_pos = true;
-        g_recentRst = var;
-        isRst = true;
-      }
+      toCout("================================================  Find potential unexpected rst signal: "+var+" in module: "+moduleName);
+      g_hasRst = true;
+      g_rst_pos = true;
+      g_recentRst = var;
+      isRst = true;
     }
   }
   g_clk_set.insert(g_recentClk);
@@ -176,8 +172,10 @@ void reg_taint_gen(std::string line, std::ofstream &output) {
 // TODO: add sig for mem
 void mem_taint_gen(std::string line, std::ofstream &output) {
   std::smatch m;
-  if ( !std::regex_match(line, m, pMem )) 
-    return;
+  if ( !std::regex_match(line, m, pMem )) {
+    toCout("Error: cannot match pMem: "+line);
+    abort();
+  }
   std::string blank = m.str(1);
   std::string slice = m.str(2);  
   std::string var = m.str(3);
@@ -188,9 +186,9 @@ void mem_taint_gen(std::string line, std::ofstream &output) {
   moduleMems.emplace(var, varLen);
   //assert_info(!isTop || !isOutput(var), "mem_taint_gen:var is output, line: "+line);  
   output << blank << "logic " + slice + " " + var + _t + " " + sliceTop + " ;" << std::endl;
-  output << blank << "logic " + slice + " " + var + "_PREV_VAL1 " + sliceTop + " ;" << std::endl;
-  if(!g_use_vcd_parser)
-    output << blank << "logic " + slice + " " + var + "_PREV_VAL2 " + sliceTop + " ;" << std::endl;
+  //output << blank << "logic " + slice + " " + var + "_PREV_VAL1 " + sliceTop + " ;" << std::endl;
+  //if(!g_use_vcd_parser)
+  //  output << blank << "logic " + slice + " " + var + "_PREV_VAL2 " + sliceTop + " ;" << std::endl;
 
   if (!did_clean_file) {
     bool insertDone;
@@ -447,6 +445,7 @@ void two_op_taint_gen(std::string line, std::ofstream &output) {
 
 
 void one_op_taint_gen(std::string line, std::ofstream &output) {
+  toCout("one_op!");
   std::smatch m;
   bool isNone = false;
   if (std::regex_match(line, m, pNone) 
@@ -463,11 +462,21 @@ void one_op_taint_gen(std::string line, std::ofstream &output) {
   std::string dest, destSlice;
   std::string op1, op1Slice;
   std::string op1AndSlice = m.str(3);
-  uint32_t op1WidthNum = get_var_slice_width(op1AndSlice);
+
   //assert_info(!isTop || !isOutput(op1AndSlice), "one_op_taint_gen:op1 is output, line: "+line);  
-  
+ 
+  toCout("split "+m.str(2));
+  toCout("split "+op1AndSlice);
   split_slice(m.str(2), dest, destSlice);
   split_slice(op1AndSlice, op1, op1Slice);
+
+  uint32_t op1WidthNum;
+  if(isMem(op1)) {
+    auto dimPair = memDims[op1];
+    //op1WidthNum = get_var;  
+  }
+  else
+    op1WidthNum = get_var_slice_width(op1AndSlice);
   std::string sndVer;
   if(std::regex_match(line, m, pNone) && isNum(op1AndSlice))
     toCout("WARNING!! Number found in RHS of Non operation!!  "+line);
@@ -487,9 +496,19 @@ void one_op_taint_gen(std::string line, std::ofstream &output) {
     auto slicePair = memDims[op1];
     std::string slice = slicePair.first;
     std::string sliceTop = slicePair.second;
-    std::string highIdx = toStr(get_end(sliceTop));
+    std::string highIdx = toStr(get_end(slice));
+    uint32_t highIdxNum = std::stoi(highIdx);
 
-    output << blank + "assign " + dest + _t + destSlice + " = " + op1 + _t + op1Slice + " ;" << std::endl;
+
+    std::string pureSlice = op1Slice;
+    remove_two_end_space(pureSlice);
+    
+    pureSlice = pureSlice.substr(1, pureSlice.length()-2);
+    if(!isNum(pureSlice))
+      output << blank + "assign " + dest + _t + destSlice + " = " + op1 + _t + op1Slice + " | " + extend("| "+pureSlice+_t, highIdxNum+1) + " ;" << std::endl;
+    else
+      output << blank + "assign " + dest + _t + destSlice + " = " + op1 + _t + op1Slice + " ;" << std::endl;
+    return;
   }
 
   if (std::regex_match(line, m, pNone)) 
@@ -1076,7 +1095,7 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
     split_slice(condAndSlice, cond, condSlice);
     assert_info(isMem(dest), "dest is: "+dest);
 
-    uint32_t localWidthNum = get_var_slice_width(destAndSlice);
+    //uint32_t localWidthNum = get_var_slice_width(destAndSlice);
 
     // assume: if src is num, the cond must be rst.
     if(isNum(src)) {
@@ -1086,12 +1105,12 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
     else {
       nonConstAssign.push_back(line);
       uint32_t localWidthNum = get_var_slice_width(srcAndSlice);
-      output << blank + "if (" + get_recent_rst() + ") " + dest + _tz + " " + destSlice + " <= 0 ;" << std::endl;
+      output << blank + "if (" + get_recent_rst() + ") " + dest + _t + " " + destSlice + " <= 0 ;" << std::endl;
       if(g_use_value_change) {
-        output << blank + "if (" + condAndSlice + ") " + dest + _tz + " " + destSlice + " <= ( " + src + _t+" " + srcSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + destAndSlice + " != " + srcAndSlice + " );" << std::endl;
+        output << blank + "if (" + condAndSlice + ") " + dest + _t + " " + destSlice + " <= ( " + src + _t+" " + srcSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + destAndSlice + " != " + srcAndSlice + " );" << std::endl;
       }
       else {
-        output << blank + "if (" + condAndSlice + ") " + dest + _tz + " " + destSlice + " <= ( " + src + _t+" " + srcSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + extend( dest+_sig+" != "+src+_sig, localWidthNum ) + " );" << std::endl;
+        output << blank + "if (" + condAndSlice + ") " + dest + _t + " " + destSlice + " <= ( " + src + _t+" " + srcSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " );" << std::endl;
       }
     }
   } while( std::getline(input, line) && std::regex_match(line, m, pNonblockIf) );
@@ -1156,9 +1175,9 @@ void nonblockif2_taint_gen(std::string line, std::string always_line, std::ifstr
 
     nonConstAssign.push_back(line);
     uint32_t localWidthNum = get_var_slice_width(srcAndSlice);
-    output << blank + "if (" + get_recent_rst() + ") " + dest + _tz + " <= 0 ;" << std::endl;
+    output << blank + "if (" + get_recent_rst() + ") " + dest + _t + " <= 0 ;" << std::endl;
     // for mem always use value change
-    output << blank + "if (" + condAndSlice + ") " + dest + _tz + " " + destSlice + " <= ( " + src + _t + " " + srcSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " | " + extend(idxVar+_t, localWidthNum) + " ) & ( " + dest + destSlice + " != " + srcAndSlice + " );" << std::endl;
+    output << blank + "if (" + condAndSlice + ") " + dest + _t + " " + destSlice + " <= ( " + src + _t + " " + srcSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " | " + extend(idxVar+_t, localWidthNum) + " );" << std::endl;
 
     std::string neqRst = "";
     if(g_set_rflag_if_not_rst_val) {

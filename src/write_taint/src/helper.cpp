@@ -1508,3 +1508,20 @@ std::string split_long_bit_vec(std::string varList) {
   ret.pop_back();
   return ret;
 }
+
+
+void remove_back_space(std::string &str) {
+  while(str.back() == ' ')
+    str.pop_back();
+}
+
+
+void remove_front_space(std::string &str) {
+  size_t pos = str.find_first_not_of(" ");
+  str = str.substr(pos);
+}
+
+void remove_two_end_space(std::string &str) {
+  remove_front_space(str);
+  remove_back_space(str);
+}

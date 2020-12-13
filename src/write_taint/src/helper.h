@@ -149,4 +149,11 @@ std::string extract_bin(std::string num, uint32_t highIdx, uint32_t lowIdx);
 std::string hex2bin(std::string hexNum);
 
 std::string split_long_bit_vec(std::string varList);
+
+void remove_back_space(std::string &str);
+
+void remove_front_space(std::string &str);
+
+void remove_two_end_space(std::string &str);
+
 #endif
