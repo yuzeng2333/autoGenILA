@@ -1175,6 +1175,16 @@ expr make_z3_expr(solver &s, goal &g, context &c, std::string op, const expr& de
     }
     return retExpr;
   }
+  else if(op == "*") {
+    expr retExpr = ( zext(op1Expr, destWidth-op1Width) * zext(op2Expr, destWidth-op2Width) );
+    if(isSolve)  {
+      s.add( destExpr == retExpr );
+      if(g_print_solver) {      
+        toCout("Add-Solver: "+get_name(destExpr)+" == ( "+get_name(op1Expr)+" * "+get_name(op2Expr)+" )" );
+      }
+    }
+    return retExpr;
+  }
   else if(op == "<<") {
     expr retExpr = shl( zext(op1Expr, destWidth-op1Width), zext(op2Expr, destWidth-op2Width) );
     if(isSolve)  {
