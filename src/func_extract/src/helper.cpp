@@ -8,13 +8,14 @@
 using namespace z3;
 
 bool isAs(std::string var) {
-  auto it = std::find( moduleAs.begin(), moduleAs.end(), var );
-  return it != moduleAs.end();
+  auto it = std::find( g_moduleAs.begin(), g_moduleAs.end(), var );
+  return it != g_moduleAs.end();
 }
 
 
 // convert a string number, in hex|decimal|binary form, into uint32_t
 uint32_t hdb2int(std::string num) {
+  num = remove_signed(num);
   std::regex pHex("^(\\d+)'h([\\dabcdefx\\?]+)$");
   std::regex pDec("^(\\d+)'d([\\dx\\?]+)$");
   std::regex pBin("^(\\d+)'b([01x\\?]+)$");
@@ -192,9 +193,10 @@ uint32_t get_pos_of_one(std::string value) {
   if(value.find("?") == std::string::npos 
       || value.find("b") == std::string::npos) {
     toCout("Error: case value is not in the correct form: "+value);
-    abort();    
+    abort();
   }
-  size_t pos = value.find("1");
+  size_t posB = value.find("b");
+  size_t pos = value.find("1", posB+1);
   size_t pos2 = value.find("1", pos+1);
   if(pos2 != std::string::npos) {
     toCout("Error: found 2 1 in the case value: "+value);
@@ -208,6 +210,7 @@ uint32_t get_pos_of_one(std::string value) {
 // This function is a little counter-intuitive
 // get logical hi
 uint32_t get_lgc_hi(std::string varAndSlice) {
+  varAndSlice = remove_signed(varAndSlice);
   std::smatch m;
   std::regex pHex("^(\\d+)'h([\\dabcdefx\\?]+)\\s*$");
   std::regex pDec("^(\\d+)'d([\\dx\\?]+)\\s*$");
@@ -223,12 +226,10 @@ uint32_t get_lgc_hi(std::string varAndSlice) {
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
   if(!varSlice.empty()) {
-    if(is_sliced(var)) {
-      auto it = std::find(reg2Slices[var].begin(), reg2Slices[var].end(), varAndSlice);
-      if(it != reg2Slices[var].end())
-        return get_end(varSlice) - get_begin(varSlice);
-    }
-    return get_end(varSlice);
+    if(has_direct_assignment(varAndSlice))
+      return get_end(varSlice) - get_begin(varSlice);
+    else
+      return get_end(varSlice);
   }
   auto idxPairs = varWidth.get_idx_pair(var, "find_version_num for: "+var);
   return idxPairs.first;
@@ -237,6 +238,7 @@ uint32_t get_lgc_hi(std::string varAndSlice) {
 
 // get literal hi
 uint32_t get_ltr_hi(std::string varAndSlice) {
+  varAndSlice = remove_signed(varAndSlice);  
   std::smatch m;
   std::regex pHex("^(\\d+)'h([\\dabcdefx\\?]+)$");
   std::regex pDec("^(\\d+)'d([\\dx\\?]+)$");
@@ -259,18 +261,17 @@ uint32_t get_ltr_hi(std::string varAndSlice) {
 
 
 uint32_t get_lgc_lo(std::string varAndSlice) {
+  varAndSlice = remove_signed(varAndSlice);  
   if(is_number(varAndSlice))
     return 0;
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
 
   if(!varSlice.empty()) {
-    if(is_sliced(var)) {
-      auto it = std::find(reg2Slices[var].begin(), reg2Slices[var].end(), varAndSlice);
-      if(it != reg2Slices[var].end())
-        return 0;
-    }
-    return get_begin(varSlice);
+    if(has_direct_assignment(varAndSlice))
+      return 0;
+    else
+      return get_begin(varSlice);
   }
   auto idxPairs = varWidth.get_idx_pair(var, "find_version_num for: "+var);
   return idxPairs.second;
@@ -278,6 +279,7 @@ uint32_t get_lgc_lo(std::string varAndSlice) {
 
 
 uint32_t get_ltr_lo(std::string varAndSlice) {
+  varAndSlice = remove_signed(varAndSlice);  
   if(is_number(varAndSlice))
     return 0;
   std::string var, varSlice;
@@ -291,21 +293,30 @@ uint32_t get_ltr_lo(std::string varAndSlice) {
 
 
 bool is_number(const std::string& s) {
-  if(isNum(s)) return true; 
-  std::string::const_iterator it = s.begin();
-  while (it != s.end() && std::isdigit(*it)) ++it;
-  return !s.empty() && it == s.end();
+  std::string num = s;
+  num = remove_signed(num);
+  if(isNum(num)) return true; 
+  std::string::const_iterator it = num.begin();
+  while (it != num.end() && std::isdigit(*it)) ++it;
+  return !num.empty() && it == num.end();
 }
 
 
-bool is_sliced(std::string varAndSlice) {
+// summary: check if a variable's slice is assigned directly
+// input: varAndSlice must have slice
+bool has_direct_assignment(std::string varAndSlice) {
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
-  return reg2Slices.find(var) != reg2Slices.end();
+  bool withinReg2Slices = g_reg2Slices.find(var) != g_reg2Slices.end();
+  if(varSlice.empty()) {
+    toCout("Error: expecting slice for input: "+varAndSlice);
+  }
+  return withinReg2Slices && std::find(g_reg2Slices[var].begin(), g_reg2Slices[var].end(), varAndSlice) != g_reg2Slices[var].end();
 }
 
 
 uint32_t get_num_len(std::string num) {
+  num = remove_signed(num);  
   std::regex pHex("^(\\d+)'h([\\dabcdefx\\?]+)$");
   std::regex pDec("^(\\d+)'d([\\dx\\?]+)$");
   std::regex pBin("^(\\d+)'b([01x\\?]+)$"); 
@@ -454,3 +465,25 @@ bool check_input_val(std::string value) {
   else
     return false;
 }
+
+
+/// <summary> Expand bitwidth of input expr, according to its represented bits and total bits of its represented variable </summary>
+/// <param name="varExpr"> input expr </param>  
+/// <param name="varExprBits"> bits of input expr </param>  
+/// <param name="varSlice"> bits/slice of the variable representedby varExpr </param>  
+/// <returns> expr with extended bits </returns>   
+//expr extend_expr(expr varExpr, std::string varExprBits, std::string varSlice, context &c) {
+//  uint32_t varExprHi = get_end(varExprBits);
+//  uint32_t varExprLo = get_begin(varExprBits);
+//  uint32_t varSliceHi = get_end(varSlice);
+//  uint32_t varSliceLo = get_begin(varSlice);
+//  if(varExprHi > varSliceHi || varExprLo < varSliceLo) {
+//    toCout("Error: bit range of input expr is outside of bitwidth of var!");
+//    abort();
+//  }
+//  if(varExprHi == varSliceHi && varExprLo == varSliceLo) {
+//    return varExpr;
+//  }
+//  else if(varExprHi == varSliceHi && varExprLo > varSliceLo)
+//    return concat(varExpr, c.bv_val(0, ));
+//}

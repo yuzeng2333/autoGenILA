@@ -34,8 +34,9 @@ void clean_verilog(std::string fileName) {
       case SEL: // convert non-fixed range select to case
         {
           std::smatch m;
-          if(!std::regex_match(line, m, pSel1)) {
-            toCout("Error: does not match pSel1 in clean_verilog:"+line);
+          if(!std::regex_match(line, m, pSel1)
+              && !std::regex_match(line, m, pSel2)) {
+            toCout("Error: does not match pSel1 && pSel2 in clean_verilog:"+line);
             abort();
           }
           std::string dest = m.str(2);

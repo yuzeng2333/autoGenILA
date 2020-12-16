@@ -519,14 +519,14 @@ bool compareSlice(std::string destAndSlice1, std::string destAndSlice2) {
 void put_into_reg2Slice(std::string destAndSlice) {
   std::string dest, destSlice;
   split_slice(destAndSlice, dest, destSlice);
-  // if the destAndSlice has slice, put it into the reg2Slices map
+  // if the destAndSlice has slice, put it into the g_reg2Slices map
   if(!destSlice.empty()) {
-    if(reg2Slices.find(dest) == reg2Slices.end()) {
-      reg2Slices.emplace(dest, std::vector<std::string>{destAndSlice});
+    if(g_reg2Slices.find(dest) == g_reg2Slices.end()) {
+      g_reg2Slices.emplace(dest, std::vector<std::string>{destAndSlice});
     }
     else {
-      reg2Slices[dest].push_back(destAndSlice);
-      std::sort(reg2Slices[dest].begin(), reg2Slices[dest].end(), compareSlice);
+      g_reg2Slices[dest].push_back(destAndSlice);
+      std::sort(g_reg2Slices[dest].begin(), g_reg2Slices[dest].end(), compareSlice);
     }
   }
 }

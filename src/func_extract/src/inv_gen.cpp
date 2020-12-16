@@ -24,6 +24,3 @@ void inv_gen() {
   }
   output.close();
 }
-
-
-

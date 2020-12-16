@@ -4,9 +4,9 @@
 #include "../../taint_method/src/global_data.h"
 
 // global variables
-std::set<std::string> moduleAs;
+std::set<std::string> g_moduleAs;
 std::set<std::string> moduleWriteAs;
-std::unordered_map<std::string, std::vector<std::string>> reg2Slices;
+std::unordered_map<std::string, std::vector<std::string>> g_reg2Slices;
 std::unordered_map<std::string, uint32_t> reg2timeIdx;
 std::unordered_map<std::string, std::string> g_ssaTable;
 // non-blocking assignment table
@@ -48,9 +48,9 @@ void clear_global_vars() {
   g_nbTable.clear();
   g_caseTable.clear();
   varWidth.clear();
-  moduleAs.clear();
+  g_moduleAs.clear();
   moduleWriteAs.clear();
-  reg2Slices.clear();
+  g_reg2Slices.clear();
   g_new_var = 0;
 }
 
@@ -174,7 +174,7 @@ void parse_verilog(std::string fileName) {
 // parsed result is in g_instrInfo
 void read_in_instructions(std::string fileName) {
   toCout("### Begin read in instr info");
-  moduleAs.clear();
+  g_moduleAs.clear();
   g_instrInfo.clear();
   g_rstVal.clear();
   g_instr_len = 0;
@@ -278,14 +278,14 @@ void read_in_instructions(std::string fileName) {
           {
             if(line.find(" ") == std::string::npos) {
               g_instrInfo.back().writeASV.insert(std::make_pair(0, line));
-              moduleAs.insert(line);
+              g_moduleAs.insert(line);
             }
             else {
               size_t pos = line.find(" ");
               if(pos == line.length() - 1) {
                 line.pop_back();
                 g_instrInfo.back().writeASV.insert(std::make_pair(0, line));
-                moduleAs.insert(line);
+                g_moduleAs.insert(line);
               }
               std::string cycleCnt = line.substr(pos+1);
               if(!is_number(cycleCnt)) {
@@ -299,13 +299,13 @@ void read_in_instructions(std::string fileName) {
                 g_instrInfo.back().skipWriteASV.insert(asName);                
               }
               g_instrInfo.back().writeASV.insert(std::make_pair(uint32_t(std::stoi(cycleCnt)), asName));
-              moduleAs.insert(asName);
+              g_moduleAs.insert(asName);
             }
           }
           break;
         case ReadASV:
           g_instrInfo.back().readASV.insert(line);
-          moduleAs.insert(line);
+          g_moduleAs.insert(line);
           break;
         case ReadNOP:
           {

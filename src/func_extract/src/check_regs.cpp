@@ -50,12 +50,12 @@ void check_all_regs() {
       uint32_t cycleCnt = pair.first;
       std::string oneWriteAsv = pair.second;
       if(instrInfo.skipWriteASV.find(oneWriteAsv) == instrInfo.skipWriteASV.end())
-        if(reg2Slices.find(oneWriteAsv) == reg2Slices.end())
+        if(g_reg2Slices.find(oneWriteAsv) == g_reg2Slices.end())
           check_single_reg_and_slice(oneWriteAsv, cycleCnt-1, i-1);
         else
-          for(std::string regAndSlice: reg2Slices[oneWriteAsv])
+          for(std::string regAndSlice: g_reg2Slices[oneWriteAsv])
             check_single_reg_and_slice(regAndSlice, cycleCnt-1, i-1);
-      else {// if the writeASV is to be skipped
+      else {// if SAT solving of writeASV is to be skipped
         simplify_goal(oneWriteAsv, cycleCnt-1, i-1);
         //simplify_goal_without_submodules(oneWriteAsv, cycleCnt-1, i-1);
         g_maxDelay = cycleCnt;
@@ -396,35 +396,40 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint
 }
 
 
+
+/// return: if node->dest is a slice, which means the slice is directly assigned, 
+//            it just returns expr for the slice. Otherwise, it returns expr for
+//            the whole var.
 expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
-  std::string var = node->dest;
-  expr destExpr = var_expr(var, timeIdx, c, false);  
-  expr destExpr_t = var_expr(var, timeIdx, c, true);  
-  if(var.find("_07_") != std::string::npos) {
-    toCout("%%%%%%%%%%%%% Found _07_");
+  // Attention: varAndSlice might have a slice, a directly-assigned varAndSlice
+  std::string varAndSlice = node->dest;
+  if(varAndSlice == "_4131_[35]") {
+    toCout("find _4131_[35]");
   }
-  if(g_existedExpr.find(timed_name(var, timeIdx)) != g_existedExpr.end() ) {
+  expr destExpr = var_expr(varAndSlice, timeIdx, c, false);  
+  expr destExpr_t = var_expr(varAndSlice, timeIdx, c, true);  
+
+  if(g_existedExpr.find(timed_name(varAndSlice, timeIdx)) != g_existedExpr.end() ) {
     if(isSolve)
-      return var_expr(var, timeIdx, c, false);
+      return var_expr(varAndSlice, timeIdx, c, false);
     else
-      return *g_existedExpr[timed_name(var, timeIdx)];
+      return *g_existedExpr[timed_name(varAndSlice, timeIdx)];
   }
 
   expr retExpr(c);
-  if ( isInput(var) ) { // input_t is always 0
+  if ( isInput(varAndSlice) ) { // input_t is always 0
     retExpr = input_constraint(node, timeIdx, c, s, g, bound, isSolve);
   }
-
-  else if( isReg(var) ) { // AS case is moved to add_nb_constraint
+  else if( isReg(varAndSlice) ) { // AS case is moved to add_nb_constraint
     retExpr = add_nb_constraint(node, timeIdx, c, s, g, bound, isSolve);
   }
-  else if( is_number(var) ) { // num_t is always 0
+  else if( is_number(varAndSlice) ) { // num_t is always 0
     retExpr = num_constraint(node, timeIdx, c, s, g, isSolve);
   }
-  else if( is_case_dest(var) ) {
+  else if( is_case_dest(varAndSlice) ) {
     retExpr = case_constraint(node, timeIdx, c, s, g, bound, isSolve);
   }
-  else if( is_func_output(var) ) {
+  else if( is_func_output(varAndSlice) ) {
     retExpr = func_constraint(node, timeIdx, c, s, g, bound, isSolve);
   }
   else { // it is wire
@@ -432,11 +437,11 @@ expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s
   }
   if(isSolve) {
     expr* newExprPnt = NULL;    
-    g_existedExpr.emplace(timed_name(var, timeIdx), newExprPnt);
+    g_existedExpr.emplace(timed_name(varAndSlice, timeIdx), newExprPnt);
   }
   else {
     expr* newExprPnt = new expr(retExpr);
-    g_existedExpr.emplace(timed_name(var, timeIdx), newExprPnt);
+    g_existedExpr.emplace(timed_name(varAndSlice, timeIdx), newExprPnt);
   }
   return retExpr;
 }

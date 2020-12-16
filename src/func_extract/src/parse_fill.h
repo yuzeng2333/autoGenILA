@@ -38,8 +38,8 @@ struct ModuleInfo_t {
 };
 
 extern std::unordered_map<std::string, std::string> g_ssaTable;
-extern std::set<std::string> moduleAs;
-extern std::unordered_map<std::string, std::vector<std::string>> reg2Slices;
+extern std::set<std::string> g_moduleAs;
+extern std::unordered_map<std::string, std::vector<std::string>> g_reg2Slices;
 extern std::unordered_map<std::string, uint32_t> reg2timeIdx;
 extern std::unordered_map<std::string, std::string> g_nbTable;
 extern std::unordered_map<std::string, std::pair<std::string, std::vector<std::pair<std::string, std::string>>>> g_caseTable;

@@ -1044,6 +1044,7 @@ std::string parse_case_statements(std::vector<std::pair<std::string, std::string
   auto caseBegin = input.tellg();  
   std::string line;
   std::smatch m;
+  std::string firstLine = "";
 
   bool readSwitchValue = true;
   std::string pairValue;
@@ -1060,6 +1061,7 @@ std::string parse_case_statements(std::vector<std::pair<std::string, std::string
       }
     }
     else {
+      if(firstLine.empty()) firstLine = line;      
       readSwitchValue = true;
       if( !std::regex_match(line, m, pBlock) ) {
         std::cout << "!! Error in parsing case !!" << std::endl;
@@ -1077,7 +1079,10 @@ std::string parse_case_statements(std::vector<std::pair<std::string, std::string
   returnVar = m.str(2);
   caseAssignPairs.emplace_back(pairValue, pairAssign);
   std::getline(input, line);
-  assert(line.find("endcase", 0) != std::string::npos);
+  if(line.find("endcase", 0) == std::string::npos){
+    toCout("Error: endcase is not found, first line is: "+firstLine);
+    abort();
+  }
   if(returnBegin) input.seekg(caseBegin);
   return returnVar;
 }

@@ -40,7 +40,7 @@ void build_tree_for_single_as(std::string regAndSlice);
 
 void add_node(std::string var, uint32_t timeIdx, astNode* const node, bool varIsDest);
 
-void add_child_node(std::string varAndSlice, uint32_t timeIdx, astNode* const node);
+void add_child_node(std::string varAndSlice, uint32_t timeIdx, astNode* const parentNode);
 
 void add_sliced_node(std::string varAndSlice, uint32_t timeIdx, astNode* const node);
 

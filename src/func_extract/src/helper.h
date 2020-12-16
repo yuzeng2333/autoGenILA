@@ -64,7 +64,7 @@ uint32_t get_ltr_lo(std::string varAndSlice);
 
 bool is_number(const std::string& s);
 
-bool is_sliced(std::string varAndSlice);
+bool is_assigned_in_slices(std::string varAndSlice);
 
 uint32_t get_num_len(std::string num);
 
@@ -91,4 +91,6 @@ bool isLetter(const char &c);
 std::string purify_line(const std::string &line);
 
 bool check_input_val(std::string value);
+
+bool has_direct_assignment(std::string varAndSlice);
 #endif
