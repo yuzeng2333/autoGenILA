@@ -11,7 +11,7 @@ void vcd_parser(std::string fileName) {
     return;
   }
   toCout("### Begin vcd_parser");
-  std::regex pName("^\\$var [wireg]+ (\\d+) (\\S+) (\\S+) \\$end$");
+  std::regex pName("^\\$var [wireg]+ (\\d+) (\\S+) (\\S+) (\\[[0-9:]+\\])? \\$end$");
   std::string line;
   std::ifstream input(fileName);
   enum State {readName, readValue};
@@ -22,6 +22,9 @@ void vcd_parser(std::string fileName) {
     //if(line.compare("b00000000 n3") == 0) {
     //  toCout("Find it");
     //}
+    if(line.find("pc_x_q") != std::string::npos) {
+        toCout("Find it");
+    }
     if(line.substr(0, 6).compare("$scope") == 0) {
       state = readName;
       continue;
@@ -36,7 +39,10 @@ void vcd_parser(std::string fileName) {
       }
       std::string name = m.str(2);
       std::string var = m.str(3);
-      if(var.find("S4_0.S_0.out") != std::string::npos) {
+      if(var.find("fetch0_pc_i") != std::string::npos) {
+        toCout("Find it");
+      }
+      if(var.find("pc_x_q") != std::string::npos) {
         toCout("Find it");
       }
       if(isTrueReg(var))
@@ -52,13 +58,13 @@ void vcd_parser(std::string fileName) {
         uint32_t rstValWidth = rstVal.length();
         rstVal = std::to_string(rstValWidth)+"'b"+rstVal;
         std::string name = line.substr(blankPos+1);
-        if(name == "n3") {
+        if(name == "6J") {
           toCout("Find it");
         }
         if(g_nameVarMap.find(name) == g_nameVarMap.end())
           continue;
         std::string var = g_nameVarMap[name];
-        if(var.find("reset_q") != std::string::npos) {
+        if(var.find("fetch0_pc_i") != std::string::npos) {
           toCout("Found it!");
         }
         if(g_rstVal.find(var) == g_rstVal.end())
