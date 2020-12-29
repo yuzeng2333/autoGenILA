@@ -290,6 +290,10 @@ void add_two_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
     abort();
   }
 
+  if(op == ">>>") {
+    toCout("Found it!");
+  }
+
   //if(destAndSlice.compare("adr_check") == 0) {
   //  toCout("Found adr_check");
   //}
@@ -568,6 +572,7 @@ void add_func_node(std::string var, uint32_t timeIdx, astNode* const node) {
 
 
 bool check_two_op(std::string line, std::string &op, std::string &dest, std::string &op1, std::string &op2, bool &isReduceOp) {
+  line = remove_signed(line);
   isReduceOp = false;
   std::smatch m;
   if ( std::regex_match(line, m, pAdd)) {

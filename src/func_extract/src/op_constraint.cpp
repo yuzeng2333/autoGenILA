@@ -285,8 +285,8 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   bool isReduceOp = node->isReduceOp;
   assert(node->srcVec.size() == 2);
   std::string destAndSlice = node->dest;
-  if(destAndSlice == "_3235_") {
-    toCout("find 3235");
+  if(destAndSlice == "_1880_") {
+    toCout("find 1880");
   }
   std::string op1AndSlice = node->srcVec[0];
   std::string op2AndSlice = node->srcVec[1];
@@ -1176,7 +1176,16 @@ expr make_z3_expr(solver &s, goal &g, context &c, std::string op, const expr& de
     return retExpr;
   }
   else if(op == "*") {
-    expr retExpr = ( zext(op1Expr, destWidth-op1Width) * zext(op2Expr, destWidth-op2Width) );
+    expr retExpr(c);
+    if(destWidth >= op1Width && destWidth >= op2Width)
+      retExpr = ( zext(op1Expr, destWidth-op1Width) * zext(op2Expr, destWidth-op2Width) );
+    else if(destWidth < op1Width && destWidth >= op2Width)
+      retExpr = ( op1Expr.extract(destWidth-1, 0) * zext(op2Expr, destWidth-op2Width) );
+    else if(destWidth >= op1Width && destWidth < op2Width)
+      retExpr = ( zext(op1Expr, destWidth-op1Width) * op2Expr.extract(destWidth-1, 0) );
+    else //(destWidth < op1Width && destWidth < op2Width)
+      retExpr = ( op1Expr.extract(destWidth-1, 0) * op2Expr.extract(destWidth-1, 0) );
+
     if(isSolve)  {
       s.add( destExpr == retExpr );
       if(g_print_solver) {      
@@ -1254,6 +1263,12 @@ expr make_z3_expr(solver &s, goal &g, context &c, std::string op, expr& destExpr
   }
   else if(op == "&") {
     expr retExpr = ite(~op1Expr == 0, c.bv_val(1, 1), c.bv_val(0, 1));
+    if(isSolve) 
+      s.add( destExpr == retExpr );
+    return retExpr;
+  }
+  else if(op == "-") {
+    expr retExpr = - op1Expr;
     if(isSolve) 
       s.add( destExpr == retExpr );
     return retExpr;

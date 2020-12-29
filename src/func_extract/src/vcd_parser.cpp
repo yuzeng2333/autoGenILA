@@ -4,13 +4,14 @@
 
 std::unordered_map<std::string, std::string> g_nameVarMap;
 
+/// This function does not deal with hierarchial designs(with multiple scopes)
 void vcd_parser(std::string fileName) {
   if(!g_rstVal.empty()) {
     toCout("Reset value is manually specified!");
     return;
   }
   toCout("### Begin vcd_parser");
-  std::regex pName("^\\$var wire (\\d+) (n\\d+) (\\S+) \\$end$");
+  std::regex pName("^\\$var [wireg]+ (\\d+) (\\S+) (\\S+) \\$end$");
   std::string line;
   std::ifstream input(fileName);
   enum State {readName, readValue};
@@ -18,12 +19,9 @@ void vcd_parser(std::string fileName) {
   std::smatch m;
   while(std::getline(input, line)) {
     //toCout(line);
-    if(line.compare("b00000000 n3") == 0) {
-      toCout("Find it");
-    }
-    if(line.find("multiplier_16x16bit_pipelined.reg") != std::string::npos) {
-      toCout("Found it");
-    }
+    //if(line.compare("b00000000 n3") == 0) {
+    //  toCout("Find it");
+    //}
     if(line.substr(0, 6).compare("$scope") == 0) {
       state = readName;
       continue;
@@ -47,22 +45,38 @@ void vcd_parser(std::string fileName) {
         g_nameVarMap.emplace(name, "\\"+var);
     }
     else if(state == readValue) {
-      uint32_t blankPos = line.find(" "); 
-      std::string rstVal = line.substr(1, blankPos-1);
-      std::string name = line.substr(blankPos+1);
-      if(name == "n3") {
-        toCout("Find it");
+      if(line.front() == 'b') {
+        uint32_t blankPos = line.find(" ");
+        std::string rstVal = line.substr(1, blankPos-1);
+        // add binary symbol prefix
+        uint32_t rstValWidth = rstVal.length();
+        rstVal = std::to_string(rstValWidth)+"'b"+rstVal;
+        std::string name = line.substr(blankPos+1);
+        if(name == "n3") {
+          toCout("Find it");
+        }
+        if(g_nameVarMap.find(name) == g_nameVarMap.end())
+          continue;
+        std::string var = g_nameVarMap[name];
+        if(var.find("reset_q") != std::string::npos) {
+          toCout("Found it!");
+        }
+        if(g_rstVal.find(var) == g_rstVal.end())
+          g_rstVal.emplace(var, rstVal);
+        else
+          g_rstVal[var] = rstVal;
       }
-      if(g_nameVarMap.find(name) == g_nameVarMap.end())
-        continue;
-      std::string var = g_nameVarMap[name];
-      //if(var.compare("state_0") == 0) {
-      //  toCoutVerb("Found it!");
-      //}
-      if(g_rstVal.find(var) == g_rstVal.end())
-        g_rstVal.emplace(var, rstVal);
-      else
-        g_rstVal[var] = rstVal;
+      else if(line.front() == '0' || line.front() == '1') {
+        std::string rstVal = std::string(1, line.front());
+        std::string name = line.substr(1);
+        if(g_nameVarMap.find(name) == g_nameVarMap.end())
+          continue;
+        std::string var = g_nameVarMap[name];
+        if(g_rstVal.find(var) == g_rstVal.end())
+          g_rstVal.emplace(var, rstVal);
+        else
+          g_rstVal[var] = rstVal;
+      }
     }
   }
 }

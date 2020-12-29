@@ -493,6 +493,9 @@ expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   }
   else {
     push_dirty_queue(node, timeIdx);
+    if(dest.find("reset_q") != std::string::npos) {
+      toCout("Found reset_q");
+    }
     if(!isSolve) {
       uint32_t localWidth = get_var_slice_width(dest);
       std::string localRstVal;
