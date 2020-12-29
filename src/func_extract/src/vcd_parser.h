@@ -6,3 +6,5 @@
 //#include "global_data_struct.h"
 
 void vcd_parser(std::string fileName);
+
+void print_rst_val();

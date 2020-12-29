@@ -21,7 +21,7 @@ std::unordered_map<std::string, astNode*> g_varNode;
 // x means the value can be arbitrary
 std::vector<struct instrInfo> g_instrInfo;
 std::unordered_map<std::string, std::string> g_nopInstr;
-std::unordered_map<std::string, std::string> g_rstVal;
+std::map<std::string, std::string> g_rstVal;
 std::unordered_map<std::string, ModuleInfo_t> g_allModuleInfo;
 // first key is instance name, second key is wire name
 std::unordered_map<std::string, std::unordered_map<std::string, std::string>> g_wire2ModulePort;

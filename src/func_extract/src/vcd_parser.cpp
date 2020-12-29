@@ -11,7 +11,7 @@ void vcd_parser(std::string fileName) {
     return;
   }
   toCout("### Begin vcd_parser");
-  std::regex pName("^\\$var [wireg]+ (\\d+) (\\S+) (\\S+) (\\[[0-9:]+\\])? \\$end$");
+  std::regex pName("^\\$var reg (\\d+) (\\S+) (\\S+) (\\[[0-9:]+\\] )?\\$end$");
   std::string line;
   std::ifstream input(fileName);
   enum State {readName, readValue};
@@ -22,7 +22,7 @@ void vcd_parser(std::string fileName) {
     //if(line.compare("b00000000 n3") == 0) {
     //  toCout("Find it");
     //}
-    if(line.find("pc_x_q") != std::string::npos) {
+    if(line.find("u_csr.branch_q") != std::string::npos) {
         toCout("Find it");
     }
     if(line.substr(0, 6).compare("$scope") == 0) {
@@ -39,7 +39,7 @@ void vcd_parser(std::string fileName) {
       }
       std::string name = m.str(2);
       std::string var = m.str(3);
-      if(var.find("fetch0_pc_i") != std::string::npos) {
+      if(var.find("branch_q") != std::string::npos) {
         toCout("Find it");
       }
       if(var.find("pc_x_q") != std::string::npos) {
@@ -55,8 +55,6 @@ void vcd_parser(std::string fileName) {
         uint32_t blankPos = line.find(" ");
         std::string rstVal = line.substr(1, blankPos-1);
         // add binary symbol prefix
-        uint32_t rstValWidth = rstVal.length();
-        rstVal = std::to_string(rstValWidth)+"'b"+rstVal;
         std::string name = line.substr(blankPos+1);
         if(name == "6J") {
           toCout("Find it");
@@ -64,6 +62,11 @@ void vcd_parser(std::string fileName) {
         if(g_nameVarMap.find(name) == g_nameVarMap.end())
           continue;
         std::string var = g_nameVarMap[name];
+        if(var.find("branch_q") != std::string::npos) {
+          toCout("Find it");
+        }
+        uint32_t rstValWidth = get_var_slice_width(var);
+        rstVal = std::to_string(rstValWidth)+"'b"+rstVal;
         if(var.find("fetch0_pc_i") != std::string::npos) {
           toCout("Found it!");
         }
@@ -84,5 +87,14 @@ void vcd_parser(std::string fileName) {
           g_rstVal[var] = rstVal;
       }
     }
+  }
+  print_rst_val();
+}
+
+
+void print_rst_val() {
+  std::ofstream output("./rst_vals.txt");
+  for(auto pair : g_rstVal) {
+    output << pair.first + "\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + pair.second << std::endl;
   }
 }
