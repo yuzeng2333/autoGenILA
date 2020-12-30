@@ -79,13 +79,13 @@ expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTain
       return c.bv_val(0, localWidth);
     }
     else {
-      uint32_t localNum = hdb2int(var);
+      uint64_t localNum = hdb2int(var);
       if(localNum > 4294967295) {
         toCout("Error: too large number is found : "+var);
         abort();
       }
       varTimed = var + "___#" + toStr(timeIdx) + "_"+toStr(localWidth)+"b";      
-      return c.bv_val(hdb2int(var), localWidth);
+      return long_bv_val(var, c);
     }
   }
   else if(width == 0) { // if is not num

@@ -13,6 +13,30 @@ bool isAs(std::string var) {
 }
 
 
+expr long_bv_val(std::string var, context &c) {
+  uint32_t width = get_var_slice_width(var);
+  if(width <= 32) 
+    return c.bv_val(hdb2int(var), width);
+
+  expr ret = c.bv_val(hdb2int(var.substr(32)), 32);
+  width -= 32;
+  size_t pos = 32;  
+  while(width > 32) {
+    std::string subVar = var.substr(pos, 32);
+    pos += 32;
+    width -= 32;
+    expr nextNum = c.bv_val(hdb2int(subVar), 32);
+    ret = concat(ret, nextNum);
+  }
+
+  // deal with the remaining bits
+  std::string subVar = var.substr(pos);
+  expr nextNum = c.bv_val(hdb2int(subVar), width);
+  ret = concat(ret, nextNum);
+  return ret;
+}
+
+
 // convert a string number, in hex|decimal|binary form, into uint32_t
 uint32_t hdb2int(std::string num) {
   num = remove_signed(num);

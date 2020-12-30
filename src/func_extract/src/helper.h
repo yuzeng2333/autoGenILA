@@ -12,6 +12,8 @@ using namespace z3;
 
 bool isAs(std::string var);
 
+expr long_bv_val(std::string var, context &c);
+
 uint32_t hdb2int(std::string num);
 
 uint32_t hex2int(std::string num);
