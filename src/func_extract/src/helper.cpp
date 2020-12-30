@@ -14,7 +14,8 @@ bool isAs(std::string var) {
 
 
 expr long_bv_val(std::string var, context &c) {
-  uint32_t width = get_var_slice_width(var);
+  assert(is_number(var));
+  uint32_t width = get_num_len(var);
   if(width <= 32) 
     return c.bv_val(hdb2int(var), width);
 
