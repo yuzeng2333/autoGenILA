@@ -70,6 +70,8 @@ bool is_assigned_in_slices(std::string varAndSlice);
 
 uint32_t get_num_len(std::string num);
 
+bool is_bin(std::string bv);
+
 bool is_all_zero(std::string);
 
 bool replace(std::string& str, const std::string& from, const std::string& to);
@@ -95,4 +97,12 @@ std::string purify_line(const std::string &line);
 bool check_input_val(std::string value);
 
 bool has_direct_assignment(std::string varAndSlice);
+
+std::string zero_extend_num(std::string num);
+
+std::string formedHex2bin(std::string num);
+
+bool is_hex(std::string num);
+
+int try_stoi(std::string num);
 #endif

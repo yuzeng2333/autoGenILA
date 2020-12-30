@@ -19,6 +19,8 @@ expr long_bv_val(std::string var, context &c) {
   if(width <= 32) 
     return c.bv_val(hdb2int(var), width);
 
+  if(is_hex(var)) var = formedHex2bin(var);
+  var = zero_extend_num(var);
   expr ret = c.bv_val(hdb2int(var.substr(32)), 32);
   width -= 32;
   size_t pos = 32;  
@@ -58,7 +60,7 @@ uint32_t hdb2int(std::string num) {
     return bin2int(pureNum);    
   }
   else 
-    return std::stoi(num);
+    return try_stoi(num);
 }
 
 uint32_t hex2int(std::string num) {
@@ -82,6 +84,82 @@ uint32_t hex2int(std::string num) {
   }
   return res;
 }
+
+
+std::string formedHex2bin(std::string num) {
+  std::regex pHex("^(\\d+)'h([\\dabcdefx\\?]+)$");
+  std::smatch m;
+  if(!std::regex_match(num, m, pHex)) {
+    toCout("Error: input to hex2bin is not hex:" +num);
+  }
+  uint32_t width = try_stoi(m.str(1));
+  std::string pureNum = m.str(2);
+  std::string ret="";
+  for(char &c: pureNum) {
+    switch(c) {
+      case 'f':
+        ret += "1111";
+        break;
+      case 'e':
+        ret += "1110";        
+        break;
+      case 'd':
+        ret += "1101";        
+        break;      
+      case 'c':
+        ret += "1100";        
+        break;      
+      case 'b':
+        ret += "1011";        
+        break;      
+      case 'a':
+        ret += "1010";        
+        break;      
+      case '9':
+        ret += "1001";        
+        break;      
+      case '8':
+        ret += "1000";        
+        break;      
+      case '7':
+        ret += "0111";        
+        break;      
+      case '6':
+        ret += "0110";        
+        break;      
+      case '5':
+        ret += "0101";
+        break;      
+      case '4':
+        ret += "0100";
+        break;      
+      case '3':
+        ret += "0011";
+        break;
+      case '2':
+        ret += "0010";        
+        break;
+      case '1':
+        ret += "0001";        
+        break;
+      case '0':
+        ret += "0000";        
+        break;
+    }
+  }
+  if(ret.length() > width)
+    return m.str(1) + "'b" + ret.substr(ret.length()-width);
+  else
+    return m.str(1) + "'b" + ret;
+}
+
+
+bool is_hex(std::string num) {
+  std::regex pHex("^(\\d+)'h([\\dabcdefx\\?]+)$");
+  std::smatch m;
+  return std::regex_match(num, m, pHex);
+}
+
 
 uint32_t bin2int(std::string num) {
   uint32_t res = 0;
@@ -192,9 +270,9 @@ uint32_t get_time(std::string var) {
   uint32_t pos = var.find("___#");
   uint32_t len = var.length();
   if(var.back() == 'T')
-    return std::stoi(var.substr(pos+4, len-2));
+    return try_stoi(var.substr(pos+4, len-2));
   else
-    return std::stoi(var.substr(pos+4));
+    return try_stoi(var.substr(pos+4));
 }
 
 
@@ -246,7 +324,7 @@ uint32_t get_lgc_hi(std::string varAndSlice) {
       toCout("Error: input number for get_lgc_hi is not binary or hex: "+varAndSlice);
     }
     std::string bitNum = m.str(1);
-    return std::stoi(bitNum)-1;
+    return try_stoi(bitNum)-1;
   }
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
@@ -274,7 +352,7 @@ uint32_t get_ltr_hi(std::string varAndSlice) {
       toCout("Error: input number for get_ltr_hi is not binary or hex: "+varAndSlice);
     }
     std::string bitNum = m.str(1);
-    return std::stoi(bitNum)-1;
+    return try_stoi(bitNum)-1;
   }
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
@@ -349,11 +427,38 @@ uint32_t get_num_len(std::string num) {
   if(std::regex_match(num, m, pHex)
       || std::regex_match(num, m, pDec)
       || std::regex_match(num, m, pBin))
-    return std::stoi(m.str(1));
+    return try_stoi(m.str(1));
+  else if(is_number(num) && is_bin(num)) {
+    return num.length();
+  }
   else {
     toCout("Error: input to get_num_len is not num:"+ num);
     abort();
   }
+}
+
+
+std::string zero_extend_num(std::string num) {
+  std::regex pBin("^(\\d+)'b([01x\\?]+)$"); 
+  std::smatch m;
+  if(std::regex_match(num, m, pBin)) {
+    int width = try_stoi(m.str(1));
+    std::string pureNum = m.str(2);
+    return m.str(1) + "'b" + std::string(width - pureNum.length(), 0) + pureNum;
+  }
+  else {
+    toCout("Error: unsupported form of number:"+ num);
+    abort();
+  }
+}
+
+
+bool is_bin(std::string bv) {
+  for(char &c : bv) {
+    if(c != '0' && c != '1')
+      return false;
+  }
+  return true;
 }
 
 
@@ -489,6 +594,17 @@ bool check_input_val(std::string value) {
   }
   else
     return false;
+}
+
+
+int try_stoi(std::string num) {
+  int ret;
+  try {
+    ret = std::stoi(num);
+  } catch(const std::exception& e) {
+    toCout("Error for stoi, input is: "+num);
+  }
+  return ret;
 }
 
 
