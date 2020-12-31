@@ -13,19 +13,21 @@ bool isAs(std::string var) {
 }
 
 
-expr long_bv_val(std::string var, context &c) {
-  assert(is_number(var));
-  uint32_t width = get_num_len(var);
+expr long_bv_val(std::string formedBinVar, context &c) {
+  assert(is_number(formedBinVar));
+  uint32_t width = get_num_len(formedBinVar);
   if(width <= 32) 
-    return c.bv_val(hdb2int(var), width);
+    return c.bv_val(hdb2int(formedBinVar), width);
 
-  if(is_hex(var)) var = formedHex2bin(var);
-  var = zero_extend_num(var);
-  expr ret = c.bv_val(hdb2int(var.substr(32)), 32);
+  if(is_hex(formedBinVar)) formedBinVar = formedHex2bin(formedBinVar);
+  formedBinVar = zero_extend_num(formedBinVar);
+  std::string pureNum = get_pure_num(formedBinVar);
+
+  expr ret = c.bv_val(hdb2int(pureNum.substr(0, 32)), 32);
   width -= 32;
   size_t pos = 32;  
   while(width > 32) {
-    std::string subVar = var.substr(pos, 32);
+    std::string subVar = pureNum.substr(pos, 32);
     pos += 32;
     width -= 32;
     expr nextNum = c.bv_val(hdb2int(subVar), 32);
@@ -33,7 +35,7 @@ expr long_bv_val(std::string var, context &c) {
   }
 
   // deal with the remaining bits
-  std::string subVar = var.substr(pos);
+  std::string subVar = pureNum.substr(pos);
   expr nextNum = c.bv_val(hdb2int(subVar), width);
   ret = concat(ret, nextNum);
   return ret;
@@ -83,6 +85,22 @@ uint32_t hex2int(std::string num) {
       res += (*it - '0');
   }
   return res;
+}
+
+
+std::string get_pure_num(std::string formedNum) {
+  std::regex pHex("^(\\d+)'h([\\dabcdefx\\?]+)\\s*$");
+  std::regex pDec("^(\\d+)'d([\\dx\\?]+)\\s*$");
+  std::regex pBin("^(\\d+)'b([01x\\?]+)\\s*$");
+  std::smatch m;
+  if (std::regex_match(formedNum, m, pHex)
+      || std::regex_match(formedNum, m, pBin )
+      || std::regex_match(formedNum, m, pDec )) {
+    return m.str(2);
+  }
+  else {
+    toCout("Error: not expected formed number: "+formedNum);
+  }
 }
 
 
@@ -444,7 +462,7 @@ std::string zero_extend_num(std::string num) {
   if(std::regex_match(num, m, pBin)) {
     int width = try_stoi(m.str(1));
     std::string pureNum = m.str(2);
-    return m.str(1) + "'b" + std::string(width - pureNum.length(), 0) + pureNum;
+    return m.str(1) + "'b" + std::string(width - pureNum.length(), '0') + pureNum;
   }
   else {
     toCout("Error: unsupported form of number:"+ num);

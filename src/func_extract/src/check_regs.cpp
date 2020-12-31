@@ -452,6 +452,9 @@ expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   if(dest.compare("kp") == 0 && timeIdx == bound) {
     toCout("target reg found! time: "+toStr(timeIdx));
   }
+  if(dest.find("u_fifo.ram_q") != std::string::npos) {
+    toCout("Find it!");
+  }
   expr destExpr = var_expr(dest, timeIdx, c, false);
   expr destExpr_g(c);
   expr destNextExpr(c);
@@ -462,7 +465,7 @@ expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   }
   //assert(!is_number(node->childVec.front()->dest));
 
-  if(timeIdx <= bound) {
+  if(timeIdx < bound) {
     toCoutVerb("Add nb constraint for: " + dest+" ------  time: "+toStr(timeIdx));
     std::string destNext = node->srcVec.front();
 

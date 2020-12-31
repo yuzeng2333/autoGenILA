@@ -105,4 +105,6 @@ std::string formedHex2bin(std::string num);
 bool is_hex(std::string num);
 
 int try_stoi(std::string num);
+
+std::string get_pure_num(std::string formedNum);
 #endif
