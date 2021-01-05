@@ -7,6 +7,8 @@
 #include <algorithm>
 #include <cstdlib>
 
+using namespace syntaxPatterns;
+
 namespace taintGen {
 
 bool VarWidth::var_width_insert(std::string var, uint32_t begin, uint32_t end) {

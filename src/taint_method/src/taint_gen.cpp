@@ -17,108 +17,15 @@
 
 #define toStr(a) std::to_string(a)
 
-namespace taintGen {
 
 /* TODO:
  *  1. If a slice of a word is used, how to define its _t, _r, ...?
  *  Now I just do not distinguish slice and the whole word.
  * */
 
-/* declarations */
-std::regex pModule      (to_re("^(\\s*)module (NAME)\\(.+\\);$"));
-std::regex pInput       (to_re("^(\\s*)input (\\[\\d+\\:0\\] )?(NAME)(\\s*)?;$"));
-std::regex pOutput      (to_re("^(\\s*)output (\\[\\d+\\:0\\] )?(NAME)(\\s*)?;$"));
-std::regex pReg         (to_re("^(\\s*)reg (\\[\\d+\\:\\d+\\] )?(NAME)(\\s*)?;$"));
-std::regex pRegConst    (to_re("^(\\s*)reg (\\[\\d+\\:\\d+\\] )?(NAME)(\\s*)= (NUM)(\\s*)?;$"));
-std::regex pWire        (to_re("^(\\s*)wire (\\[\\d+\\:\\d+\\] )?(NAME)(\\s*)?;$"));
-std::regex pMem         (to_re("^(\\s*)reg (\\[\\d+\\:\\d+\\]) (NAME) (\\[\\d+\\:\\d+\\]);$"));
-/* 2 operators */
-std::regex pAdd         (to_re("^(\\s*)assign (NAME) = (NAME) \\+ (NAME)(\\s*)?;$"));
-std::regex pSub         (to_re("^(\\s*)assign (NAME) = (NAME) - (NAME)(\\s*)?;$"));
-std::regex pMult        (to_re("^(\\s*)assign (NAME) = (NAME) \\* (NAME)(\\s*)?;$"));
-std::regex pDvd         (to_re("^(\\s*)assign (NAME) = (NAME) \\/ (NAME)(\\s*)?;$"));
-std::regex pMod         (to_re("^(\\s*)assign (NAME) = (NAME) \\% (NAME)(\\s*)?;$"));
-std::regex pAnd         (to_re("^(\\s*)assign (NAME) = (NAME) && (NAME)(\\s*)?;$"));
-std::regex pOr          (to_re("^(\\s*)assign (NAME) = (NAME) \\|\\| (NAME)(\\s*)?;$"));
-std::regex pEq          (to_re("^(\\s*)assign (NAME) = (NAME) == (NAME)(\\s*)?;$"));
-std::regex pEq3         (to_re("^(\\s*)assign (NAME) = (NAME) === (NAME)(\\s*)?;$"));
-std::regex pNeq         (to_re("^(\\s*)assign (NAME) = (NAME) != (NAME)(\\s*)?;$"));
-std::regex pLt          (to_re("^(\\s*)assign (NAME) = (NAME) > (NAME)(\\s*)?;$"));
-std::regex pLe          (to_re("^(\\s*)assign (NAME) = (NAME) >= (NAME)(\\s*)?;$"));
-std::regex pSt          (to_re("^(\\s*)assign (NAME) = (NAME) < (NAME)(\\s*)?;$"));
-std::regex pSe          (to_re("^(\\s*)assign (NAME) = (NAME) <= (NAME)(\\s*)?;$"));
-std::regex pSignedLt    (to_re("^(\\s*)assign (NAME) = \\$signed\\((NAME)\\) > \\$signed\\((NAME)\\)(\\s*)?;$"));
-std::regex pSignedLe    (to_re("^(\\s*)assign (NAME) = \\$signed\\((NAME)\\) >= \\$signed\\((NAME)\\)(\\s*)?;$"));
-std::regex pSignedSt    (to_re("^(\\s*)assign (NAME) = \\$signed\\((NAME)\\) < \\$signed\\((NAME)\\)(\\s*)?;$"));
-std::regex pSignedSe    (to_re("^(\\s*)assign (NAME) = \\$signed\\((NAME)\\) <= \\$signed\\((NAME)\\)(\\s*)?;$"));
-std::regex pBitOr       (to_re("^(\\s*)assign (NAME) = (NAME) \\| (NAME)(\\s*)?;$"));
-std::regex pBitExOr     (to_re("^(\\s*)assign (NAME) = (NAME) \\^ (NAME)(\\s*)?;$"));
-std::regex pBitAnd      (to_re("^(\\s*)assign (NAME) = (NAME) & (NAME)(\\s*)?;$"));
-std::regex pSel1        (to_re("^(\\s*)assign (NAME) = (NAME)(\\[\\$signed\\((NAME)\\) \\+\\: (INT)\\])(\\s*)?;$"));
-std::regex pSel2        (to_re("^(\\s*)assign (NAME) = (NAME)(\\[(NAME) \\+\\: (INT)\\])(\\s*)?;$"));
-std::regex pSel3        (to_re("^(\\s*)assign (NAME) = (NAME)(\\[\\$signed\\((NAME)\\) \\-\\: (INT)\\])(\\s*)?;$"));
-std::regex pSel4        (to_re("^(\\s*)assign (NAME) = (NAME)(\\[(NAME) \\-\\: (INT)\\])(\\s*)?;$"));
-std::regex pSel5        (to_re("^(\\s*)assign (NAME) = (NAME)(\\[(INT) \\: (INT)\\])(\\s*)?;$"));
-std::regex pDbSel       (to_re("^(\\s*)assign (NAME) = (NAME)(\\[(NAME)\\[(\\d+):(\\d+)\\]\\])$"));
-std::regex pBitOrRed2   (to_re("^(\\s*)assign (NAME) = \\| \\{ (NAME), (NAME) \\}(\\s*)?;$"));
-std::regex pLeftShift   (to_re("^(\\s*)assign (NAME) = (NAME) << (NAME)(\\s*)?;$"));
-std::regex pRightShift  (to_re("^(\\s*)assign (NAME) = (NAME) >> (NAME)(\\s*)?;$"));
-std::regex pSignedRightShift  (to_re("^(\\s*)assign (NAME) = (?:\\$signed\\()?(NAME)(?:\\))? >>> (NAME)(\\s*)?;$"));
-std::regex pSignedLeftShift   (to_re("^(\\s*)assign (NAME) = (NAME) <<< (NAME)(\\s*)?;$"));
-/* 1 operator */
-std::regex pNone        (to_re("^(\\s*)assign (NAME) = (NAME)(\\s*)?;$"));
-std::regex pNoneNoAssign(to_re("^(\\s*)(NAME) = (NAME)(\\s*)?;$"));
-std::regex pInvert      (to_re("^(\\s*)assign (NAME) = \\~ (NAME)(\\s*)?;$"));
-std::regex pMinus       (to_re("^(\\s*)assign (NAME) = - (NAME)(\\s*)?;$"));
-std::regex pPlus        (to_re("^(\\s*)assign (NAME) = + (NAME)(\\s*)?;$"));
-/* reduce 1 op */
-std::regex pNot         (to_re("^(\\s*)assign (NAME) = ! (NAME)(\\s*)?;$"));
-std::regex pRedOr       (to_re("^(\\s*)assign (NAME) = \\| (NAME)(\\s*)?;$"));
-std::regex pRedAnd      (to_re("^(\\s*)assign (NAME) = & (NAME)(\\s*)?;$"));
-std::regex pRedNand     (to_re("^(\\s*)assign (NAME) = \\~& (NAME)(\\s*)?;$"));
-std::regex pRedNor      (to_re("^(\\s*)assign (NAME) = \\~\\| (NAME)(\\s*)?;$"));
-std::regex pRedXor      (to_re("^(\\s*)assign (NAME) = \\^ (NAME)(\\s*)?;$"));
-std::regex pRedXnor     (to_re("^(\\s*)assign (NAME) = \\~\\^ (NAME)(\\s*)?;$"));
-/* ite */
-std::regex pIte         (to_re("^(\\s*)assign (NAME) = (NAME) \\? (NAME) \\: (NAME)(\\s*)?;$"));
-std::regex pDestAndSlice("^(\\s*)assign ([\aa-zA-Z0-9_\\.\\$\\\\'\\[\\]]+)(\\s*\\[\\d+(\\:\\d+)?\\]) = (.+)$");
-// Assume: always come  s with posedge or negedge
-std::regex pAlwaysClk   (to_re("^(\\s*)always @\\(posedge (NAME)\\)(?: begin)?$"));
-std::regex pAlwaysClkRst(to_re("^(\\s*)always @\\(posedge (NAME) or (?:posedge|negedge) (NAME)(\\s?)\\)$"));
-std::regex pAlwaysComb  (to_re("^(\\s*)always @\\(NAME or NAME(?: or NAME)?\\) begin$"));
-std::regex pAlwaysFake  (to_re("^(\\s*)always @\\(negedge 1'bx\\)(?: begin)?$"));
-std::regex pAlwaysStar  (to_re("^(\\s*)always @\\*$"));
-std::regex pAlwaysNeg   (to_re("^(\\s*)always @\\(negedge (NAME)\\)$"));
-std::regex pEnd         ("^(\\s*)end$");
-std::regex pEndmodule   ("^(\\s*)endmodule$");
-/* non-blocking assignment */
-std::regex pNonblock    (to_re("^(\\s*)(NAME) (?:\\s)?<= (NAME)(\\s*)?;$"));
-std::regex pNonblockConcat    (to_re("^(\\s*)(NAME) <= \\{(.+)\\}(\\s*)?;$"));
-std::regex pNonblockIf  (to_re("^(\\s*)if \\((NAME)\\) (NAME) <= (NAME)(\\s*)?;$"));
-std::regex pNonblockIf2 (to_re("^(\\s*)if \\((NAME)\\) ([a-zA-Z0-9]+)(\\[([a-zA-Z0-9]+)\\[(\\d+)\\]\\]) <= (NAME)(\\s*)?;$"));
-/* function */
-std::regex pFunctionDef   (to_re("^(\\s*)function (\\[\\d+\\:0\\] )?(NAME)(\\s*)?;$"));
-std::regex pEndfunction   (to_re("^(\\s*)endfunction$"));
-std::regex pFunctionCall  (to_re("^(\\s*)assign (NAME) = (NAME)\\((.*)\\)(\\s*)?;$"));
-/* module instantiation */
-std::regex pModuleBegin   (to_re("^(\\s*)(NAME) (NAME) \\($"));
-std::regex pModulePort    (to_re("^(\\s*)\\.(NAME)\\((.*)\\),?$"));
-std::regex pModuleEnd     (to_re("^(\\s*)\\);$"));
-/* control keywords */
-// case
-std::regex pCase      (to_re("^(\\s*)case(\\S)? \\((NAME)\\)"));
-std::regex pEndcase   (to_re("^(\\s*)endcase$"));
-std::regex pDefault   (to_re("^(\\s*)default\\:$"));
-std::regex pBlock     (to_re("^(\\s*)(NAME) = (NAME)(\\s*)?;$"));
-// if else
-std::regex pIf        (to_re("^(\\s*)if \\((.*)\\)$"));
-std::regex pElse      (to_re("^(\\s*)else$"));
-/* multiple/un-certain # of ops */
-//std::regex pBitExOrConcat (to_re("^(\\s*)assign (NAME) = \\{\\} \\^ (NAME)(\\s*)?;$"));
-std::regex pSrcConcat (to_re("^(\\s*)assign (NAME) = \\{ ((?:NAME, )*NAME) \\}\\s?;$"));
-// here actually src can be only one var
-std::regex pSrcDestBothConcat(to_re("^(\\s*)assign \\{ ((?:NAME(?:\\s)?, )+NAME)\\s*\\} = \\{ ((?:NAME(?:\\s)?, )*NAME) \\}(\\s*)?;$"));
-std::regex pDestConcat(to_re("^(\\s*)assign \\{ ((?:NAME(?:\\s)?, )+NAME)\\s*\\} = (NAME)(\\s*)?;$"));
+namespace taintGen {
+
+using namespace syntaxPatterns;
 
 /* Milicious */
 /* pVarName also exists in to_re(), and parse_var_list() */

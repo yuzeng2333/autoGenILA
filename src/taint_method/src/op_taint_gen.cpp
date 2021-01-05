@@ -15,6 +15,8 @@
 #define toStr(a) std::to_string(a)
 // configurations:
 
+using namespace syntaxPatterns;
+
 namespace taintGen {
 
 void input_taint_gen(std::string line, std::ofstream &output) {

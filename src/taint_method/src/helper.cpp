@@ -16,6 +16,8 @@
 
 #define toStr(a) std::to_string(a)
 
+using namespace syntaxPatterns;
+
 namespace taintGen {
 
 bool isNum(std::string name) {

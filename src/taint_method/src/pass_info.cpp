@@ -5,6 +5,8 @@
 
 #define toStr(a) std::to_string(a)
 
+using namespace syntaxPatterns;
+
 namespace taintGen {
 
 ///// Data structures used in this file
