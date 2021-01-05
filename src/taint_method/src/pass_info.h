@@ -10,6 +10,7 @@
 #include <assert.h>
 #include <string>
 
+namespace taintGen {
 
 // used to store all the information of case statements.
 struct caseStruct {
@@ -72,5 +73,7 @@ void go_backward(std::string startVarAndSlice, std::vector<std::pair<std::string
 bool isTrueReg(std::string var);
 
 bool isSliceList(std::string passExprStoreItem);
+
+} // end of namespace taintGen
 
 #endif

@@ -17,6 +17,7 @@
 
 #define toStr(a) std::to_string(a)
 
+namespace taintGen {
 
 /* TODO:
  *  1. If a slice of a word is used, how to define its _t, _r, ...?
@@ -198,7 +199,7 @@ bool g_use_end_sig = true; // used to end verification after a certain time of i
 bool g_wt_keeped = false; // INSTR_IN_ZY needs to be defined, TODO: enable it for 8051
 bool g_special_equal_taint = false; // TODO: enable it for biRISCV
 // set the read flag only if reg's value is not reset value
-bool g_set_rflag_if_not_rst_val = true; 
+bool g_set_rflag_if_not_rst_val = false;  // TODO: usually enable it 
 bool g_set_rflag_if_not_norm_val = false; // TODO: enable it for biRISCV
 bool g_use_does_keep = true;  // TODO: consider enable it
 std::string _t="_T";
@@ -863,12 +864,8 @@ void add_line_taints(std::string line, std::ofstream &output, std::ifstream &inp
 // FIXME: maybe set t-taint and r-taint to clear if reg value is not changed
 int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   // for the purpose of parse, remove potential $sign()
+  //line = remove_signed(line);
   std::smatch m;
-  std::regex pSigned("\\$signed\\((\\S+)\\)");
-  if(line.find("$signed") != std::string::npos) {
-    line = std::regex_replace(line, pSigned, "$1");
-    //toCout("line to be matched: "+line);
-  }
   if(line.empty())
     return NONE;
   if(line.substr(0, 1) == "X") {
@@ -2685,3 +2682,5 @@ int taint_gen(std::string fileName, uint32_t stage, bool isTopIn, std::map<std::
   toCout("*** Finish add taint for module: "+fileName);  
   return 0;
 }
+
+} // end of namespace taintGen

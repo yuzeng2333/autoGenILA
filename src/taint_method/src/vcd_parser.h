@@ -8,6 +8,8 @@
 #include <unordered_map>
 //#include "global_data_struct.h"
 
+namespace taintGen {
+
 void hierarchical_vcd_parser(std::string fileName, std::map<std::string, std::unordered_map<std::string, std::string>>& valMap);
 
 bool same_module(const std::string& name1, const std::string& name2);
@@ -20,16 +22,4 @@ bool check_rst_value(std::map<std::string, std::unordered_map<std::string, std::
 
 bool is_zero(std::string s);
 
-
-//class InstanceTreeNode {
-//private:
-//  std::string instanceName;
-//  std::string moduleName;
-//  std::vector<InstanceTreeNode*> childInstance;
-//
-//public:
-//  void append_child(InstanceTreeNode *child);
-//  void set_instance_name(std::string instanceName);
-//  void set_module_name(std::string moduleName);
-//  std::string get_module_name();
-//};
+} // end of namespace taintGen

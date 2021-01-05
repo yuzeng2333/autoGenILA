@@ -5,6 +5,8 @@
 #include "helper.h"
 #include "varWidth.h"
 
+namespace taintGen {
+
 void input_taint_gen(std::string line, std::ofstream &output);
 
 void reg_taint_gen(std::string line, std::ofstream &output);
@@ -59,4 +61,7 @@ void two_op_taint_gen_func(std::string line, std::ofstream &output, std::unorder
 void one_op_taint_gen_func(std::string line, std::ofstream &output, std::unordered_map<std::string, uint32_t> &versionMap, std::string taintBits);
 
 void ite_taint_gen_func(std::string line, std::ofstream &output, std::unordered_map<std::string, uint32_t> &versionMap, std::string taintBits);  
+
+} // end of namespace taintGen
+
 #endif

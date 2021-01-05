@@ -4,6 +4,8 @@
 
 #define toStr(a) std::to_string(a)
 
+namespace taintGen {
+
 // the first key is module name, the second key is variable name
 std::map<std::string, std::unordered_map<std::string, std::string>> g_rstValMap;
 std::map<std::string, std::unordered_map<std::string, std::string>> g_normValMap;
@@ -189,40 +191,4 @@ bool is_zero(std::string s) {
   return !s.empty() && it == s.end();
 }
 
-
-//InstanceTreeNode::InstanceTreeNode() {
-//  instanceName = "";
-//  moduleName = "";
-//  childInstance =  std::vector<InstanceTreeNode*>{};
-//};
-//
-//
-//InstanceTreeNode::InstanceTreeNode(std::string instanceNameIn, std::string moduleNameIn) {
-//  instanceName = instanceNameIn;
-//  moduleName = moduleNameIn;
-//  childInstance =  std::vector<InstanceTreeNode*>{};
-//};
-//
-//
-//void InstanceTreeNode::append_child(InstanceTreeNode *child) {
-//  if(childInstance.find(child) != childInstance.end())
-//    return;
-//  childInstance.push_back(child);
-//}
-//
-//
-//std::string InstanceTreeNode::get_module_name() {
-//  return moduleName;
-//}
-//
-//
-//void InstanceTreeNode::set_instance_name(std::string instanceNameIn) {
-//  instanceName = instanceNameIn;
-//  return;
-//}
-//
-//
-//void InstanceTreeNode::set_module_name(std::string moduleNameIn) {
-//  moduleName = moduleNameIn;
-//  return;
-//}
+} // end of namespace taintGen

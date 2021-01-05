@@ -8,6 +8,8 @@
 #include <regex>
 #include <set>
 
+namespace taintGen {
+
 /* Global data */
 extern std::string moduleName;
 extern std::vector<std::string> moduleInputs;
@@ -205,5 +207,7 @@ extern std::regex pNumExist;
 extern std::regex pBin;
 extern std::regex pHex;
 extern bool g_verb;
+
+} // end of namespace taintGen
 
 #endif

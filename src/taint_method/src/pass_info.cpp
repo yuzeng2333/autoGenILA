@@ -5,6 +5,8 @@
 
 #define toStr(a) std::to_string(a)
 
+namespace taintGen {
+
 ///// Data structures used in this file
 
 /* in g_forwardMap, key is dest, not destAndSlice. But the lines you get might have srcAndSlice instead of src */
@@ -1146,3 +1148,5 @@ bool isSliceList(std::string passExprStoreItem) {
   else 
     return false;
 }
+
+} // end of namespace taintGen

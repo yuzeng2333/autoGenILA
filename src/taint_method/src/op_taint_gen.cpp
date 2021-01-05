@@ -15,6 +15,8 @@
 #define toStr(a) std::to_string(a)
 // configurations:
 
+namespace taintGen {
+
 void input_taint_gen(std::string line, std::ofstream &output) {
   std::smatch m;
   if (!std::regex_match(line, m, pInput))
@@ -2287,3 +2289,5 @@ void always_clkrst_taint_gen(std::string firstLine, std::ifstream &input, std::o
   // generate taints 
   nonblock_taint_gen(sndAssign, output);
 }
+
+} // end of namespace taintGen

@@ -7,6 +7,8 @@
 #include <algorithm>
 #include <cstdlib>
 
+namespace taintGen {
+
 bool VarWidth::var_width_insert(std::string var, uint32_t begin, uint32_t end) {
   // remove all blanks
   std::regex pName("(\\s*)?(\\S+)(\\s*)?");
@@ -164,4 +166,6 @@ bool VarWidth::check_key(std::string var, std::string line) {
 void VarWidth::clear() {
   internalVarWidth.clear();
 }
+
+} // end of namespace taintGen
 #endif

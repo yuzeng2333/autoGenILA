@@ -8,6 +8,8 @@
 #include "global_data.h"
 #include "varWidth.h"
 
+namespace taintGen {
+
 #define INPUT           1 
 #define REG             2
 #define WIRE            3
@@ -94,4 +96,6 @@ void assert_reg_map_gen();
 void map_gen(std::string moduleName, std::string instanceName, std::ofstream &output);
 
 int taint_gen(std::string fileName, uint32_t stage, bool isTopIn, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap, std::map<std::string, std::vector<std::string>> &moduleRFlagsMap, uint32_t totalRegCnt, uint32_t &nextSig, bool doProcessPathInfo);
+
+} // end of namespace taintGen
 #endif

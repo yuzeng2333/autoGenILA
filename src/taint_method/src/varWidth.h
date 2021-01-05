@@ -4,6 +4,8 @@
 #include <string>
 #include <utility>
 
+namespace taintGen {
+
 class VarWidth {
 private:
   /* ATTENTION: the pair value is in the order as declared. The first one is not necessarily higher. */
@@ -22,4 +24,5 @@ public:
   void clear();
 };
 
+} // end of namespace taintGen
 #endif

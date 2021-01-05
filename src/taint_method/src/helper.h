@@ -4,6 +4,8 @@
 #include <string>
 #include "global_data.h"
 
+namespace taintGen {
+
 bool isNum(std::string name);
 
 bool isOutput(std::string var);
@@ -149,4 +151,12 @@ std::string extract_bin(std::string num, uint32_t highIdx, uint32_t lowIdx);
 std::string hex2bin(std::string hexNum);
 
 std::string split_long_bit_vec(std::string varList);
+
+std::string remove_signed(std::string &line);
+
+std::string split_long_hex(std::string var, uint32_t width, std::string num, std::string strToConcat);
+
+std::string split_long_bin(std::string var, uint32_t width, std::string num, std::string strToConcat);
+
+} // end of namespace taintGen
 #endif

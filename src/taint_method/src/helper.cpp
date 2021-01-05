@@ -16,6 +16,8 @@
 
 #define toStr(a) std::to_string(a)
 
+namespace taintGen {
+
 bool isNum(std::string name) {
   std::smatch m;
   while(name.back() == ' ')
@@ -88,11 +90,11 @@ bool isMem(std::string varAndSlice) {
 
 std::string to_re(std::string input) {
   std::regex pNameBraces("\\(NAME\\)");
-  std::string varNameBraces("([\a\ba-zA-Z0-9_=\\.\\$\\\\'\\[\\]\\(]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?(?: \\))?)(?:\\s)?");
+  std::string varNameBraces("([\a\ba-zA-Z0-9_=\\.\\$\\\\'\\[\\]\\(\\)]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?)(?:\\s)?");
   auto res = std::regex_replace(input, pNameBraces, varNameBraces);
 
   std::regex pName("NAME");
-  std::string varName("[\a\ba-zA-Z0-9_\\.\\$\\\\'\\[\\]\\(]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?(?: \\))?(?:\\s)?");
+  std::string varName("[\a\ba-zA-Z0-9_=\\.\\$\\\\'\\[\\]\\(\\)]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?(?:\\s)?");
   res = std::regex_replace(res, pName, varName);
 
   std::regex pNUM("NUM");
@@ -526,6 +528,7 @@ std::string get_nth_var_in_list(std::string list, uint32_t idx) {
 
 // the most general function for getting width
 uint32_t get_var_slice_width(std::string varAndSlice) {
+  varAndSlice = remove_signed(varAndSlice);
   if( varAndSlice.empty() )
     return 0;
   if(isNum(varAndSlice)) {
@@ -1468,37 +1471,12 @@ std::string split_long_bit_vec(std::string varList) {
     if(std::regex_match(var, m, pBin)) {
       uint32_t width = std::stoi(m.str(1));
       std::string num = m.str(2);
-      if(width < 31) {
-        ret = ret + var + ", ";
-        continue;
-      }
-      // split into multiple 16 bit number
-      size_t pos = 0;
-      while(pos < width) {
-        uint32_t subWidth = std::min(16, int(width-pos));
-        std::string subVar = toStr(subWidth)+"'b"+num.substr(pos, subWidth);
-        pos += 16;
-        ret = ret + subVar + ", ";
-      }
+      ret = split_long_bin(var, width, num, ret);
     }
     else if(std::regex_match(var, m, pHex)) {
       uint32_t width = std::stoi(m.str(1));
       std::string num = m.str(2);
-      if(width < 31) {
-        ret = ret + var + ", ";
-        continue;
-      }
-      // split into multiple 16 bit number
-      size_t pos = 0;
-      while(pos < width/4) {
-        uint32_t subWidth = std::min(16, int(width-pos*4));
-        uint32_t bit = 0;
-        if(subWidth % 4 != 0) bit = 1;
-        std::string subVar = toStr(subWidth)+"'h"+num.substr(pos, bit+subWidth/4);
-        //assert(subWidth % 4 == 0);
-        pos += 4;
-        ret = ret + subVar + ", ";
-      }
+      ret = split_long_hex(var, width, num, ret);
     }
     else {
       toCout("Error: number does not match any pattern: "+var);
@@ -1513,42 +1491,14 @@ std::string split_long_bit_vec(std::string varList) {
     return ret;
   }
   if(std::regex_match(var, m, pBin)) {
-    uint32_t width = std::stoi(m.str(1));  
+    uint32_t width = std::stoi(m.str(1));
     std::string num = m.str(2);
-    if(width < 31) {
-      ret = ret + var;
-      return ret;
-    }
-    // split into multiple 16 bit number
-    size_t pos = 0;
-    while(pos < width) {
-      uint32_t subWidth = std::min(16, int(width-pos));
-      std::string subVar = toStr(subWidth)+"'b"+num.substr(pos, subWidth);
-      pos += 16;
-      //toCout("pos: "+toStr(pos));
-      ret = ret + subVar + ", ";
-    }
+    ret = split_long_bin(var, width, num, ret);
   }
   else if(std::regex_match(var, m, pHex)) {
     uint32_t width = std::stoi(m.str(1));
-    //toCout("width: "+toStr(width));
-    //toCout("var: "+var);
     std::string num = m.str(2);
-    if(width < 31) {
-      ret = ret + var;
-      return ret;
-    }
-    // split into multiple 16 bit number
-    size_t pos = 0;
-    while(pos < width/4) {
-      //toCout("begin ite, pos: "+toStr(pos));
-      uint32_t subWidth = std::min(16, int(width-pos));
-      std::string subVar = toStr(subWidth)+"'h"+num.substr(pos, subWidth/4);
-      assert(subWidth % 4 == 0);      
-      pos += 4;
-      //toCout("pos: "+toStr(pos));      
-      ret = ret + subVar + ", ";
-    }
+    ret = split_long_hex(var, width, num, ret);
   }
   else {
     toCout("Error: number does not match any pattern: "+var);
@@ -1557,6 +1507,62 @@ std::string split_long_bit_vec(std::string varList) {
 
   assert(ret.length() > 3);
   ret.pop_back();
+  if(ret.back() != ',') {
+    toCout("Error: the last char is not comma: "+ret);
+    abort();
+  }
   ret.pop_back();
   return ret;
 }
+
+
+std::string remove_signed(std::string &line) {
+  std::smatch m;
+  std::regex pSigned("\\$signed\\((\\S+)\\)");
+  if(line.find("$signed") != std::string::npos) {
+    return std::regex_replace(line, pSigned, "$1");
+    //toCout("line to be matched: "+line);
+  }
+  else return line;
+}
+
+
+std::string split_long_hex(std::string var, uint32_t width, std::string num, std::string strToConcat) {
+  if(width < 31) {
+    strToConcat = strToConcat + var + ", ";
+    return strToConcat;
+  }
+  // split into multiple 16 bit number
+  size_t pos = 0;
+  while(pos < width/4) {
+    //toCout("begin ite, pos: "+toStr(pos));
+    uint32_t subWidth = std::min(16, int(width-pos*4));
+    std::string subVar;
+    if(subWidth == 16) subVar = toStr(subWidth)+"'h"+num.substr(pos, subWidth/4);
+    else subVar = toStr(subWidth)+"'h"+num.substr(pos);    
+    pos += 4;
+    //toCout("pos: "+toStr(pos));      
+    strToConcat = strToConcat + subVar + ", ";
+  }
+  return strToConcat;
+}
+
+
+std::string split_long_bin(std::string var, uint32_t width, std::string num, std::string strToConcat) {
+  if(width < 31) {
+    strToConcat = strToConcat + var + ", ";
+    return strToConcat;
+  }
+  // split into multiple 16 bit number
+  size_t pos = 0;
+  while(pos < width) {
+    uint32_t subWidth = std::min(16, int(width-pos));
+    std::string subVar = toStr(subWidth)+"'b"+num.substr(pos, subWidth);
+    pos += 16;
+    //toCout("pos: "+toStr(pos));
+    strToConcat = strToConcat + subVar + ", ";
+  }
+  return strToConcat;
+}
+
+} // end of namespace taintGen
