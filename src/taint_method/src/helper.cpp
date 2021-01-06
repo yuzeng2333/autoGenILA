@@ -530,7 +530,7 @@ std::string get_nth_var_in_list(std::string list, uint32_t idx) {
 
 
 // the most general function for getting width
-uint32_t get_var_slice_width(std::string varAndSlice) {
+uint32_t get_var_slice_width(std::string varAndSlice, VarWidth &varWidthIn) {
   varAndSlice = remove_signed(varAndSlice);
   if( varAndSlice.empty() )
     return 0;
@@ -559,8 +559,7 @@ uint32_t get_var_slice_width(std::string varAndSlice) {
       totalWidth = get_width(varSlice);
   }
   else {
-    //std::cout << "varWdith:" + varWidth[var] << std::endl;
-    auto v = varWidth.get_from_var_width(var, varAndSlice);
+    auto v = varWidthIn.get_from_var_width(var, varAndSlice);
     if (v == 0) {
       toCout("0 width found!");
       abort();
