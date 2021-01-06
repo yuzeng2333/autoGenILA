@@ -10,6 +10,11 @@ using namespace taintGen;
 
 namespace funcExtract {
 
+std::regex pHex("^(\\d+)'h([\\dabcdefx\\?]+)$");
+std::regex pDec("^(\\d+)'d([\\dx\\?]+)$");
+std::regex pBin("^(\\d+)'b([01x\\?]+)$");
+
+
 bool isAs(std::string var) {
   auto it = std::find( g_moduleAs.begin(), g_moduleAs.end(), var );
   return it != g_moduleAs.end();
@@ -18,6 +23,10 @@ bool isAs(std::string var) {
 
 expr long_bv_val(std::string formedBinVar, context &c) {
   assert(is_number(formedBinVar));
+  if(!is_formed_num(formedBinVar)) {
+    toCout("Error: input to long_bv_val is not well-formed number: "+formedBinVar);
+    abort();
+  }
   uint32_t width = get_num_len(formedBinVar);
   if(width <= 32) 
     return c.bv_val(hdb2int(formedBinVar), width);
@@ -45,12 +54,17 @@ expr long_bv_val(std::string formedBinVar, context &c) {
 }
 
 
+bool is_formed_num(std::string num) {
+  std::smatch m;
+  return std::regex_match(num, m, pHex)
+          || std::regex_match(num, m, pBin)
+          || std::regex_match(num, m, pDec);
+}
+
+
 // convert a string number, in hex|decimal|binary form, into uint32_t
 uint32_t hdb2int(std::string num) {
   num = remove_signed(num);
-  std::regex pHex("^(\\d+)'h([\\dabcdefx\\?]+)$");
-  std::regex pDec("^(\\d+)'d([\\dx\\?]+)$");
-  std::regex pBin("^(\\d+)'b([01x\\?]+)$");
   std::smatch m;
   if(std::regex_match(num, m, pDec)) {
     std::string pureNum = m.str(2);
@@ -92,9 +106,6 @@ uint32_t hex2int(std::string num) {
 
 
 std::string get_pure_num(std::string formedNum) {
-  std::regex pHex("^(\\d+)'h([\\dabcdefx\\?]+)\\s*$");
-  std::regex pDec("^(\\d+)'d([\\dx\\?]+)\\s*$");
-  std::regex pBin("^(\\d+)'b([01x\\?]+)\\s*$");
   std::smatch m;
   if (std::regex_match(formedNum, m, pHex)
       || std::regex_match(formedNum, m, pBin )
@@ -108,7 +119,6 @@ std::string get_pure_num(std::string formedNum) {
 
 
 std::string formedHex2bin(std::string num) {
-  std::regex pHex("^(\\d+)'h([\\dabcdefx\\?]+)$");
   std::smatch m;
   if(!std::regex_match(num, m, pHex)) {
     toCout("Error: input to hex2bin is not hex:" +num);
@@ -176,7 +186,6 @@ std::string formedHex2bin(std::string num) {
 
 
 bool is_hex(std::string num) {
-  std::regex pHex("^(\\d+)'h([\\dabcdefx\\?]+)$");
   std::smatch m;
   return std::regex_match(num, m, pHex);
 }
@@ -336,9 +345,6 @@ uint32_t get_pos_of_one(std::string value) {
 uint32_t get_lgc_hi(std::string varAndSlice) {
   varAndSlice = remove_signed(varAndSlice);
   std::smatch m;
-  std::regex pHex("^(\\d+)'h([\\dabcdefx\\?]+)\\s*$");
-  std::regex pDec("^(\\d+)'d([\\dx\\?]+)\\s*$");
-  std::regex pBin("^(\\d+)'b([01x\\?]+)\\s*$");
   if(is_number(varAndSlice)) {
     if(!std::regex_match(varAndSlice, m, pBin)
         && !std::regex_match(varAndSlice, m, pHex)) {
@@ -364,9 +370,6 @@ uint32_t get_lgc_hi(std::string varAndSlice) {
 uint32_t get_ltr_hi(std::string varAndSlice) {
   varAndSlice = remove_signed(varAndSlice);  
   std::smatch m;
-  std::regex pHex("^(\\d+)'h([\\dabcdefx\\?]+)$");
-  std::regex pDec("^(\\d+)'d([\\dx\\?]+)$");
-  std::regex pBin("^(\\d+)'b([01x\\?]+)$");
   if(is_number(varAndSlice)) {
     if(!std::regex_match(varAndSlice, m, pBin)
         && !std::regex_match(varAndSlice, m, pHex)) {
@@ -420,6 +423,11 @@ bool is_number(const std::string& s) {
   std::string num = s;
   num = remove_signed(num);
   if(isNum(num)) return true; 
+  return is_all_digits(num);
+}
+
+
+bool is_all_digits(const std::string& num) {
   std::string::const_iterator it = num.begin();
   while (it != num.end() && std::isdigit(*it)) ++it;
   return !num.empty() && it == num.end();
@@ -441,9 +449,6 @@ bool has_direct_assignment(std::string varAndSlice) {
 
 uint32_t get_num_len(std::string num) {
   num = remove_signed(num);  
-  std::regex pHex("^(\\d+)'h([\\dabcdefx\\?]+)$");
-  std::regex pDec("^(\\d+)'d([\\dx\\?]+)$");
-  std::regex pBin("^(\\d+)'b([01x\\?]+)$"); 
   std::smatch m;
   if(std::regex_match(num, m, pHex)
       || std::regex_match(num, m, pDec)

@@ -520,7 +520,7 @@ expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
           abort();
         }
       }
-      toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Replaced with "+localRstVal+": "+timed_name(dest, timeIdx));
+      toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Replaced with "+toStr(localWidth)+"'b"+localRstVal+": "+timed_name(dest, timeIdx));
       return var_expr(localRstVal, timeIdx, c, false, localWidth); 
     }
   }

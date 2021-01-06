@@ -86,8 +86,13 @@ expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTain
         toCout("Error: too large number is found : "+var);
         abort();
       }
-      varTimed = var + "___#" + toStr(timeIdx) + "_"+toStr(localWidth)+"b";      
-      return long_bv_val(var, c);
+      varTimed = var + "___#" + toStr(timeIdx) + "_"+toStr(localWidth)+"b";
+      if(is_formed_num(var))
+        return long_bv_val(var, c);
+      else if(is_all_digits(var))
+        return long_bv_val(toStr(localWidth)+"'b"+var, c);
+      else
+        toCout("Error: var in var_expr is not number: "+var);
     }
   }
   else if(width == 0) { // if is not num
@@ -287,8 +292,8 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   bool isReduceOp = node->isReduceOp;
   assert(node->srcVec.size() == 2);
   std::string destAndSlice = node->dest;
-  if(destAndSlice == "_1880_") {
-    toCout("find 1880");
+  if(destAndSlice == "_1163_") {
+    toCout("find 1163");
   }
   std::string op1AndSlice = node->srcVec[0];
   std::string op2AndSlice = node->srcVec[1];
@@ -710,7 +715,11 @@ expr ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   std::string op1, op1Slice;
   std::string op2, op2Slice;
 
-  if(destAndSlice.compare("_0123_") == 0) {
+  if(destAndSlice.find("u_issue.u_pipe_ctrl.mem_result_e2_i") != std::string::npos) {
+    toCoutVerb("Found it!");
+  }
+
+  if(destAndSlice.find("u_lsu.u_lsu_request.data_out_o") != std::string::npos) {
     toCoutVerb("Found it!");
   }
 

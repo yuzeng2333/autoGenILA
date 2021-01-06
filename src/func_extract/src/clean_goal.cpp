@@ -25,7 +25,6 @@ void clean_goal_file(std::string fileName, std::string outFileName) {
   uint32_t bound;
   uint32_t assumIdx = 0;
   while(std::getline(input, line)) {
-    toCout(line);
     if(line.front() == '#') {
       size_t pos2 = line.find("#", 1);
       size_t pos3 = line.find("#", pos2+1);

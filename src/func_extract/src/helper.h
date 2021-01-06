@@ -12,9 +12,15 @@ using namespace z3;
 
 namespace funcExtract {
 
+extern std::regex pHex;
+extern std::regex pDec;
+extern std::regex pBin;
+
 bool isAs(std::string var);
 
 expr long_bv_val(std::string var, context &c);
+
+bool is_formed_num(std::string num);
 
 uint32_t hdb2int(std::string num);
 
@@ -67,6 +73,8 @@ uint32_t get_lgc_lo(std::string varAndSlice);
 uint32_t get_ltr_lo(std::string varAndSlice);
 
 bool is_number(const std::string& s);
+
+bool is_all_digits(const std::string& num);
 
 bool is_assigned_in_slices(std::string varAndSlice);
 
