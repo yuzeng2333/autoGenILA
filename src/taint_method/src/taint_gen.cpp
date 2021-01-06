@@ -27,16 +27,6 @@ namespace taintGen {
 
 using namespace syntaxPatterns;
 
-/* Milicious */
-/* pVarName also exists in to_re(), and parse_var_list() */
-std::regex pVarAndSlice("([\aa-zA-Z0-9_\\.\\$\\\\'\\[\\]]+)(\\s*\\[\\d+(\\:\\d+)?\\])");
-std::regex pVarName("([\aa-zA-Z0-9_\\.\\$\\\\'\\[\\]]+)(\\s*\\[\\d+(\\:\\d+)?\\])?");
-std::regex pVarNameGroup("([\aa-zA-Z0-9_\\.\\$\\\\'\\[\\]]+)(?:(\\s*)(\\[\\d+(\\:\\d+)?\\]))?");
-std::regex pNum("^(\\d+)'(h|d|b)[\\dabcdefx\\?]+$");
-std::regex pNumExist("(\\d+)'(h|d|b)[\\dabcdef\\?]+");
-std::regex pBin("(\\d+)'b([01]+)");
-std::regex pHex("(\\d+)'h([\\dabcdefx\\?]+)");
-
 /* Global data */
 std::string moduleName;
 std::vector<std::string> moduleInputs;

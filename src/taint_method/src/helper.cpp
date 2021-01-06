@@ -10,6 +10,7 @@
 #include <assert.h>
 #include <unordered_map>
 #include "helper.h"
+#include "taint_gen.h"
 #include <algorithm>
 #include <math.h>
 /* help functions */
@@ -1565,6 +1566,131 @@ std::string split_long_bin(std::string var, uint32_t width, std::string num, std
     strToConcat = strToConcat + subVar + ", ";
   }
   return strToConcat;
+}
+
+
+void fill_var_width(const std::string &line, VarWidth &varWidth) {
+  uint32_t choice = parse_verilog_line(line, true);
+  std::smatch m;
+  bool inFunc = false;
+  switch (choice) {
+    case INPUT:
+      {
+        std::regex_match(line, m, pInput);
+        std::string slice = m.str(2);
+        std::string var = m.str(3);
+        bool insertDone = false;
+        if(!inFunc) {
+          if(!slice.empty())
+            insertDone = varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+          else
+            insertDone = varWidth.var_width_insert(var, 0, 0);
+        }
+        else {
+          if(!slice.empty())
+            insertDone = funcVarWidth.force_insert(var, get_end(slice), get_begin(slice));
+          else
+            insertDone = funcVarWidth.force_insert(var, 0, 0);
+        }     
+        if (!insertDone) {
+          std::cout << "insert failed in input case:" + line << std::endl;
+          std::cout << "m.str(2):" + m.str(2) << std::endl;
+          std::cout << "m.str(3):" + m.str(3) << std::endl;
+        }
+      }
+      break;
+    case REG:
+      {
+        if(!std::regex_match(line, m, pReg)
+            && !std::regex_match(line, m, pRegConst) ) {
+          toCout("Error in matching pReg or pRegConst: "+line);
+          abort();
+        }
+        std::string slice = m.str(2);
+        std::string var = m.str(3);
+        bool insertDone = false;
+        if(!inFunc) {
+          if(!slice.empty())
+            insertDone = varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+          else
+            insertDone = varWidth.var_width_insert(var, 0, 0);
+        }
+        else {
+          if(!slice.empty())
+            insertDone = funcVarWidth.force_insert(var, get_end(slice), get_begin(slice));
+          else
+            insertDone = funcVarWidth.force_insert(var, 0, 0);
+        }
+        if (!insertDone) {
+          std::cout << "insert failed in reg case:" + line << std::endl;
+          std::cout << "m.str(2):" + m.str(2) << std::endl;
+          std::cout << "m.str(3):" + m.str(3) << std::endl;
+        }
+      }
+      break;
+    case WIRE:
+      {
+        std::regex_match(line, m, pWire);
+        std::string slice = m.str(2);
+        std::string var = m.str(3);
+        bool insertDone = false;
+        if(!inFunc) {
+          if(!slice.empty())
+            insertDone = varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+          else
+            insertDone = varWidth.var_width_insert(var, 0, 0);
+        }
+        else {
+          if(!slice.empty())
+            insertDone = funcVarWidth.force_insert(var, get_end(slice), get_begin(slice));
+          else
+            insertDone = funcVarWidth.force_insert(var, 0, 0);
+        }
+        if (!insertDone) {
+          std::cout << "insert failed in wire case:" + line << std::endl;
+          std::cout << "m.str(2):" + m.str(2) << std::endl;
+          std::cout << "m.str(3):" + m.str(3) << std::endl;
+        }
+      }
+      break;
+    case OUTPUT:
+      {
+        std::regex_match(line, m, pOutput);
+        std::string slice = m.str(2);
+        std::string var = m.str(3);
+        bool insertDone = false;
+        if(!inFunc) {
+          if(!slice.empty())
+            insertDone = varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+          else
+            insertDone = varWidth.var_width_insert(var, 0, 0);
+        }
+        else {
+          if(!slice.empty())
+            insertDone = funcVarWidth.force_insert(var, get_end(slice), get_begin(slice));
+          else
+            insertDone = funcVarWidth.force_insert(var, 0, 0);
+        }
+        if (!insertDone) {
+          std::cout << "insert failed in output case:" + line << std::endl;
+          std::cout << "m.str(2):" + m.str(2) << std::endl;
+          std::cout << "m.str(3):" + m.str(3) << std::endl;
+        }
+      }
+      break;
+    case FUNCDEF:
+      {
+        inFunc = true;
+      }
+      break;
+    case FUNCEND:
+      {
+        inFunc = false;
+      }
+      break;
+    default:
+      break;
+  }
 }
 
 } // end of namespace taintGen
