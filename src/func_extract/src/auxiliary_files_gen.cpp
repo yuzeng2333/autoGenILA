@@ -6,6 +6,10 @@
 #include "../../taint_method/src/helper.h"
 //#include "../../smt_vlg_check/smt2ila/app/smt_to_vlg.h"
 
+using namespace taintGen;
+
+namespace funcExtract {
+
 #define el std::endl
 #define toStr(a) std::to_string(a)
 
@@ -344,3 +348,4 @@ uint32_t find_key(const std::map<uint32_t, std::string> &idx2varMap, const std::
 //  }
 //}
 
+} // end of namespace funcExtract

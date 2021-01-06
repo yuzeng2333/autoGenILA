@@ -13,6 +13,7 @@
 using namespace z3;
 //extern std::regex pTwoOp;
 
+namespace funcExtract {
 
 expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTaint, uint32_t width=0);
 
@@ -58,4 +59,6 @@ expr make_z3_expr(solver &s, goal &g, context &c, std::string op, expr& destExpr
 bool is_bool_op(std::string op);
 
 void set_zero(solver& s, expr &e);
+
+} // end of namespace funcExtract
 #endif

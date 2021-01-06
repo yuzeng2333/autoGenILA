@@ -5,6 +5,10 @@
 #include "global_data_struct.h"
 
 using namespace z3;
+using namespace taintGen;
+
+namespace funcExtract {
+
 #define SV std::vector<std::string>
 #define toStr(a) std::to_string(a)
 
@@ -747,3 +751,5 @@ void print_time() {
   // ctime() used to give the present time 
   printf("%s", ctime(&my_time)); 
 }
+
+} // end of namespace funcExtract

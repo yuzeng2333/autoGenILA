@@ -6,6 +6,9 @@
 #define toStr(a) std::to_string(a)
 
 using namespace z3;
+using namespace taintGen;
+
+namespace funcExtract {
 
 bool isAs(std::string var) {
   auto it = std::find( g_moduleAs.begin(), g_moduleAs.end(), var );
@@ -23,20 +26,20 @@ expr long_bv_val(std::string formedBinVar, context &c) {
   formedBinVar = zero_extend_num(formedBinVar);
   std::string pureNum = get_pure_num(formedBinVar);
 
-  expr ret = c.bv_val(hdb2int(pureNum.substr(0, 32)), 32);
+  expr ret = c.bv_val(bin2int(pureNum.substr(0, 32)), 32);
   width -= 32;
   size_t pos = 32;  
   while(width > 32) {
     std::string subVar = pureNum.substr(pos, 32);
     pos += 32;
     width -= 32;
-    expr nextNum = c.bv_val(hdb2int(subVar), 32);
+    expr nextNum = c.bv_val(bin2int(subVar), 32);
     ret = concat(ret, nextNum);
   }
 
   // deal with the remaining bits
   std::string subVar = pureNum.substr(pos);
-  expr nextNum = c.bv_val(hdb2int(subVar), width);
+  expr nextNum = c.bv_val(bin2int(subVar), width);
   ret = concat(ret, nextNum);
   return ret;
 }
@@ -646,3 +649,5 @@ int try_stoi(std::string num) {
 //  else if(varExprHi == varSliceHi && varExprLo > varSliceLo)
 //    return concat(varExpr, c.bv_val(0, ));
 //}
+
+} // end of namespace funcExtract

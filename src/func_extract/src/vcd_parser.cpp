@@ -2,6 +2,10 @@
 #include "helper.h"
 #include "global_data_struct.h"
 
+using namespace taintGen;
+
+namespace funcExtract {
+
 std::unordered_map<std::string, std::string> g_nameVarMap;
 
 /// This function does not deal with hierarchial designs(with multiple scopes)
@@ -98,3 +102,5 @@ void print_rst_val() {
     output << pair.first + "\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + pair.second << std::endl;
   }
 }
+
+} // end of namespace funcExtract

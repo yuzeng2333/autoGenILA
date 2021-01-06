@@ -17,10 +17,17 @@
 #include "../../taint_method/src/global_data.h"
 #include "../../taint_method/src/helper.h"
 
+
+namespace funcExtract {
+
 bool g_print_solver;
 std::ofstream g_outFile;
 std::string g_pj_path = "/workspace/research/ILA/autoGenILA/src/";
 
+}
+
+using namespace funcExtract;
+using namespace taintGen;
 
 // Needed input files:
 // 1. instr.txt
@@ -35,7 +42,7 @@ int main(int argc, char *argv[]) {
   std::string time(ctime(&my_time));
   g_outFile << "Start time: "+time << std::endl;
   toCout("Begin main!");
-  g_verb = false;
+  g_verb = true;
   g_print_solver = false;
   g_remove_adff = true;
   g_split_long_num = true;

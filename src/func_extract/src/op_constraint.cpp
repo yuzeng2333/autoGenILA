@@ -23,6 +23,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 using namespace z3;
+using namespace taintGen;
+
+namespace funcExtract {
 
 /* this function is used for expanding vars used as ITE conditions */
 //void var_expand(std::string varAndSlice, uint32_t timeIdx, context &c, solver &s) {
@@ -44,7 +47,6 @@ expr var_width_expr(std::string var, uint32_t width, context &c) {
 
 
 // returned _t is 0 for number, returned var is its value for int
-// if 
 expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTaint, uint32_t width) {
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
@@ -354,8 +356,6 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   //bool op2IsReadRoot = is_root(op2AndSlice) && is_read_asv(op2AndSlice) && timeIdx == bound + 1;
   bool op1IsReadRoot = false;
   bool op2IsReadRoot = false;
-
-  toCout("two op for "+destAndSlice);
 
   expr zero = c.bv_val(0, destWidthNum);
   bool sameWidth = (op1WidthNum == destWidthNum) && (op1WidthNum == op2WidthNum);
@@ -1302,3 +1302,5 @@ void set_zero(solver& s, expr &e) {
     }
   }
 }
+
+} // end of namespace funcExtract

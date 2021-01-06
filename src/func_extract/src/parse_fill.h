@@ -14,6 +14,7 @@
 #include "../../taint_method/src/helper.h"
 #include "../../taint_method/src/varWidth.h"
 
+namespace funcExtract {
 
 struct instrInfo {
   std::unordered_map<std::string, std::vector<std::string>> instrEncoding;
@@ -45,7 +46,7 @@ extern std::unordered_map<std::string, std::string> g_nbTable;
 extern std::unordered_map<std::string, std::pair<std::string, std::vector<std::pair<std::string, std::string>>>> g_caseTable;
 extern std::unordered_map<std::string, FuncInfo_t> g_funcTable;
 extern uint32_t g_new_var;
-extern VarWidth varWidth;
+extern taintGen::VarWidth varWidth;
 extern std::regex pSingleLine;
 extern std::regex pNbLine;
 extern std::unordered_map<std::string, astNode*> g_asSliceRoot;
@@ -63,4 +64,6 @@ void read_in_instructions(std::string fileName);
 void read_module_info();
 
 void read_top_module_info();
+
+} // end of namespace funcExtract
 #endif

@@ -21,6 +21,8 @@ typedef uint32_t type;
 // 3. Therefore, each slice should have its own node. And the childVec contains
 // nodes for all slices of RHS variables.
 
+namespace funcExtract {
+
 struct astNode{
   uint32_t type;
   std::string dest;
@@ -80,5 +82,6 @@ bool check_one_op(std::string line, std::string &op, std::string &dest, std::str
 bool check_sel_op(std::string line, std::string &op, std::string &dest, std::string &op1, std::string &op2, std::string &integer);
 
 bool check_reduce_one_op(std::string line, std::string &op, std::string &dest, std::string &op1);
-#endif
 
+} // end of namespace funcExtract
+#endif

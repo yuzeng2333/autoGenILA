@@ -6,6 +6,8 @@
 
 using namespace z3;
 
+namespace funcExtract {
+
 extern std::unordered_map<astNode*, uint32_t> CLEAN_QUEUE;
 extern std::unordered_map<astNode*, uint32_t> DIRTY_QUEUE;
 extern std::unordered_map<std::string, expr*> INPUT_EXPR_VAL;
@@ -35,5 +37,6 @@ extern std::string g_mem2acclData;
 extern std::string g_accl2memAddr;
 extern std::string g_accl2memData;
 extern uint32_t g_instr_len;
-//extern std::string g_path;
+
+} // end of namespace funcExtract
 #endif

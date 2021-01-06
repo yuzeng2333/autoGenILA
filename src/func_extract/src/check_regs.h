@@ -17,6 +17,8 @@
 
 using namespace z3;
 
+namespace funcExtract {
+
 extern uint32_t bound_limit;
 extern bool g_ignoreSubModules;
 extern uint32_t g_maxDelay;
@@ -62,4 +64,7 @@ bool is_in_dirty_queue(std::string var);
 void add_nop(context &c, solver &s, uint32_t bound);
 
 void print_time(); 
+
+} // end of namespace funcExtract
+
 #endif

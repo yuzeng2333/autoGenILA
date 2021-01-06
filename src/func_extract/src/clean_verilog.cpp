@@ -4,6 +4,11 @@
 
 #define toStr(a) std::to_string(a)
 
+using namespace taintGen;
+using namespace syntaxPatterns;
+
+namespace funcExtract {
+
 // generate a clean Verilog file for smtlib-verilog equiv checking
 void clean_verilog(std::string fileName) {
   toCout("### Begin clean_verilog");
@@ -61,3 +66,5 @@ void clean_verilog(std::string fileName) {
     }
   }
 }
+
+} // end of namespace funcExtract

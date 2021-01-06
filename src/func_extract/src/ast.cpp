@@ -2,6 +2,11 @@
 #include "parse_fill.h"
 #include "helper.h"
 
+using namespace syntaxPatterns;
+using namespace taintGen;
+
+namespace funcExtract {
+
 #define SV std::vector<std::string>
 #define PV std::vector<astNode*>
 #define toStr(a) std::to_string(a)
@@ -768,3 +773,5 @@ bool check_reduce_one_op(std::string line, std::string &op, std::string &dest, s
   op1 = m.str(3);
   return true;
 }
+
+} // end of namespace funcExtract

@@ -4,6 +4,10 @@
 #include "helper.h"
 #define toStr(a) std::to_string(a)
 
+using namespace taintGen;
+
+namespace funcExtract {
+
 std::regex pDest (to_re("^#\\d+#(NAME)#\\d+$"));
 
 void define_fun_gen(std::string fileName) {
@@ -146,4 +150,4 @@ void remove_all_extra_backslash(std::string &line) {
     remove_extra_backslash(line);
 }
 
-
+} // end of namespace funcExtract

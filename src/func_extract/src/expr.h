@@ -12,6 +12,7 @@
 #include "../../taint_method/src/helper.h"
 #include <assert.h>
 
+namespace funcExtract {
 
 void input_expr(std::string line);
 
@@ -44,4 +45,6 @@ void case_expr(std::string line, std::ifstream &input);
 void module_expr(std::string line, std::ifstream &input);
 
 void put_into_reg2Slice(std::string destAndSlice);
+
+} // end of namespace funcExtract
 #endif

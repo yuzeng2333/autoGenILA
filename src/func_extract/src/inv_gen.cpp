@@ -4,6 +4,10 @@
 
 #define toStr(a) std::to_string(a)
 
+using namespace taintGen;
+
+namespace funcExtract {
+
 /// generate invariance needed for checking equivalence of two RTL
 /// for each register that is not ASV, set it to rst value
 void inv_gen() {
@@ -24,3 +28,5 @@ void inv_gen() {
   }
   output.close();
 }
+
+} // end of namespace funcExtract

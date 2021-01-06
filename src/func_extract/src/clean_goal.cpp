@@ -5,6 +5,10 @@
 
 #define toStr(a) std::to_string(a)
 
+using namespace taintGen;
+
+namespace funcExtract {
+
 void clean_goal() {
   toCout("### Begin clean_goal");  
   clean_goal_file(g_path+"/goal.txt", g_path+"/clean_goal.txt");
@@ -106,3 +110,5 @@ std::string get_zero(uint32_t width) {
   }
   return ret;
 }
+
+} // end of namespace funcExtract

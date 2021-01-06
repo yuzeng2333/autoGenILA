@@ -3,6 +3,11 @@
 #include "helper.h"
 #include "../../taint_method/src/global_data.h"
 
+using namespace taintGen;
+using namespace syntaxPatterns;
+
+namespace funcExtract {
+
 // global variables
 std::set<std::string> g_moduleAs;
 std::set<std::string> moduleWriteAs;
@@ -28,6 +33,7 @@ std::unordered_map<std::string, std::unordered_map<std::string, std::string>> g_
 std::unordered_map<std::string, std::string> g_ins2modMap;
 std::unordered_map<std::string, uint32_t> g_moduleOutportTime;
 std::unordered_map<std::string, uint32_t> g_moduleInportTime;
+VarWidth varWidth;
 
 std::string g_mem2acclData;
 std::string g_accl2memAddr;
@@ -430,3 +436,4 @@ void read_top_module_info() {
   }
 } 
 
+} // end of namespace funcExtract

@@ -10,6 +10,8 @@
 
 using namespace z3;
 
+namespace funcExtract {
+
 bool isAs(std::string var);
 
 expr long_bv_val(std::string var, context &c);
@@ -107,4 +109,7 @@ bool is_hex(std::string num);
 int try_stoi(std::string num);
 
 std::string get_pure_num(std::string formedNum);
+
+} // end of namespace funcExtract
+
 #endif

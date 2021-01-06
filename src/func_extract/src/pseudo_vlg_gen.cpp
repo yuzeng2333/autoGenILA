@@ -4,6 +4,10 @@
 #include "../../taint_method/src/global_data.h"
 #define toStr(a) std::to_string(a)
 
+using namespace taintGen;
+
+namespace funcExtract {
+
 void pseudo_vlg_gen() {
   toCout("### Begin generate pseudo verilog file");
   std::ofstream output(g_path+"/"+moduleName+"/verilog/pseudo_vlg.v");
@@ -68,3 +72,5 @@ void pseudo_vlg_gen() {
   }
   output << "endmodule" << std::endl;
 }
+
+} // end of namespace funcExtract

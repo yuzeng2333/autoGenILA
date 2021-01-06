@@ -11,7 +11,10 @@
 //
 /////////////////////////////////////////////////////////////////
 
+using namespace taintGen;
+using namespace syntaxPatterns;
 
+namespace funcExtract {
 
 void input_expr(std::string line) {
   std::smatch m;
@@ -530,3 +533,5 @@ void put_into_reg2Slice(std::string destAndSlice) {
     }
   }
 }
+
+} // end of namespace funcExtract
