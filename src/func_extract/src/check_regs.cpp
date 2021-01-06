@@ -161,7 +161,7 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint
   g_rootNode = destAndSlice;
   clean_data();
   toCout("========== Begin check SAT for: "+destAndSlice+" ==========");
-  uint32_t regWidth = get_var_slice_width(destAndSlice);
+  uint32_t regWidth = get_var_slice_width_simp(destAndSlice);
   CURRENT_VAR = destAndSlice;
   uint32_t bound = boundIn > 0 ? boundIn : 0;
   bound_limit = boundIn+2;
@@ -261,7 +261,7 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint
         if( g_rstVal.find(pure(var)) != g_rstVal.end() && !is_taint(var)) {
           std::string localVal = g_rstVal[pure(var)];
           localVal = is_number(localVal) ? localVal : "0";
-          if(tmp == c.bv_val(hdb2int(localVal), get_var_slice_width(pure(var)))) {
+          if(tmp == c.bv_val(hdb2int(localVal), get_var_slice_width_simp(pure(var)))) {
             g_resetedReg.insert(var);
             expr *tmpPnt = new expr(m.get_const_interp(v));
             INPUT_EXPR_VAL.emplace(var, tmpPnt);
@@ -319,7 +319,7 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint
       // fix values for variables in changedVal
       //for(auto timedVar: changedVal) {
       //  std::string pureVar = pure(timedVar);
-      //  uint32_t localWidth = get_var_slice_width(pureVar);
+      //  uint32_t localWidth = get_var_slice_width_simp(pureVar);
       //  expr localExpr = c.bv_const(timedVar.c_str(), localWidth);
       //  s.add( localExpr == *INPUT_EXPR_VAL[timedVar] );
       //  toCout("######## Fix "+timedVar );
@@ -504,7 +504,7 @@ expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
       toCout("Found reset_q");
     }
     if(!isSolve) {
-      uint32_t localWidth = get_var_slice_width(dest);
+      uint32_t localWidth = get_var_slice_width_simp(dest);
       std::string localRstVal;
       if(g_rstVal.find(dest) == g_rstVal.end()) {
         toCout("Warning: cannot find reset value for: "+dest);
@@ -620,7 +620,7 @@ void add_dirty_constraint(astNode* const node, uint32_t timeIdx, context &c, sol
   }
   std::string dest, destSlice;
   split_slice(destAndSlice, dest, destSlice);
-  uint32_t destWidth = get_var_slice_width(destAndSlice);
+  uint32_t destWidth = get_var_slice_width_simp(destAndSlice);
   expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);  
   expr destExpr = var_expr(destAndSlice, timeIdx, c, false);
   //assert(g_rstVal.find(dest) != g_rstVal.end());
@@ -670,7 +670,7 @@ void add_input_values(context &c, solver &s, uint32_t bound) {
   for(auto pair: g_currInstrInfo.instrEncoding) {
     for(uint32_t i = 0; i < encodingSize; i++) {
       expr singleInput = var_expr(pair.first, bound+1-i, c, false);
-      uint32_t width = get_var_slice_width(pair.first);
+      uint32_t width = get_var_slice_width_simp(pair.first);
       expr localVal(c);
       if(pair.second[i] == "x")
         localVal = var_expr("1'd0", bound+1-i, c, false, width);
@@ -691,7 +691,7 @@ void add_nop(context &c, solver &s, uint32_t bound) {
     for(auto it = g_nopInstr.begin(); it != g_nopInstr.end(); it++) {
       expr singleInput = var_expr(it->first, b, c, false);     
       expr singleInput_t = var_expr(it->first, b, c, true);     
-      uint32_t width = get_var_slice_width(it->first);   
+      uint32_t width = get_var_slice_width_simp(it->first);   
       if(!is_number(it->second)){
         toCout("!!!!!!!!!!!!!!!  Warning: non-number value found for NOP instruction!");
       }

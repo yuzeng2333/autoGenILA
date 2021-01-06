@@ -110,6 +110,7 @@ int try_stoi(std::string num);
 
 std::string get_pure_num(std::string formedNum);
 
+uint32_t get_var_slice_width_simp( std::string varAndSlice);
 } // end of namespace funcExtract
 
 #endif

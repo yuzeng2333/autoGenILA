@@ -55,8 +55,8 @@ expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTain
   if(varAndSlice.find("_CASE_") == std::string::npos 
       && !is_number(varAndSlice) 
       && isTaint && width > 0 
-      && width != get_var_slice_width(varAndSlice)) {
-    toCout("Error: input taint width does not equal var's width: "+toStr(get_var_slice_width(varAndSlice))+", "+toStr(width));
+      && width != get_var_slice_width_simp(varAndSlice)) {
+    toCout("Error: input taint width does not equal var's width: "+toStr(get_var_slice_width_simp(varAndSlice))+", "+toStr(width));
     abort();
   }
   if(width == 0) {
@@ -64,13 +64,13 @@ expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTain
       localWidth = get_num_len(varAndSlice);
     }
     else
-      localWidth = get_var_slice_width(varAndSlice);
+      localWidth = get_var_slice_width_simp(varAndSlice);
   }
   else
     localWidth = width;
 
   uint32_t varWidthNum;
-  if(width == 0) varWidthNum = get_var_slice_width(var);
+  if(width == 0) varWidthNum = get_var_slice_width_simp(var);
 
   if(is_number(var)) {
     if(localWidth > 32) {
@@ -116,12 +116,12 @@ expr var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, bool isTain
 
 expr bv_val(std::string var, context &c) {
   assert(is_number(var));
-  return c.bv_val(hdb2int(var), get_var_slice_width(var));
+  return c.bv_val(hdb2int(var), get_var_slice_width_simp(var));
 }
 
 
 expr bool_expr(std::string var, uint32_t timeIdx, context &c, bool isTaint) {
-  assert(get_var_slice_width(var) == 1);
+  assert(get_var_slice_width_simp(var) == 1);
   std::string varTimed;
   if(isTaint)
     varTimed = var + "___#" + toStr(timeIdx) + _t;
@@ -168,7 +168,7 @@ expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver 
       }
       uint32_t wordIdx = bound+1-timeIdx;
       std::string localVal = g_currInstrInfo.instrEncoding[dest][wordIdx];
-      uint32_t localWidth = get_var_slice_width(dest);
+      uint32_t localWidth = get_var_slice_width_simp(dest);
       if(localVal != "x" && localVal != "DIRTY") {
         if(is_number(localVal)) {
           toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%B Give "+localVal+" to "+timed_name(dest, timeIdx));
@@ -193,7 +193,7 @@ expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver 
           //return destExpr;
         }
         std::string localVal = g_nopInstr[dest];
-        uint32_t localWidth = get_var_slice_width(dest);
+        uint32_t localWidth = get_var_slice_width_simp(dest);
         if(localVal != "x") {
           assert(is_number(localVal));
           toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give "+localVal+" to "+timed_name(dest, timeIdx));
@@ -208,7 +208,7 @@ expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver 
         return destExpr;
       }
       std::string localVal = g_nopInstr[dest];
-      uint32_t localWidth = get_var_slice_width(dest);
+      uint32_t localWidth = get_var_slice_width_simp(dest);
       if(localVal != "x") {
         if(is_number(localVal)) {
           toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give "+localVal+" to "+timed_name(dest, timeIdx));
@@ -252,7 +252,7 @@ expr single_expr(std::string value, context &c, std::string varName, uint32_t ti
   if(std::regex_match(value, m, pX)) {
     std::string widthStr = m.str(1);
     uint32_t localWidth = std::stoi(widthStr);
-    uint32_t totalWidth = get_var_slice_width(varName);
+    uint32_t totalWidth = get_var_slice_width_simp(varName);
     std::string varTimed = varName + "___#" + toStr(timeIdx);
     return c.bv_const((varTimed).c_str(), totalWidth).extract(idx, idx-localWidth+1);
   }
@@ -316,9 +316,9 @@ expr two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   expr destExpr(c);
   destExpr = var_expr(destAndSlice, timeIdx, c, false);
 
-  uint32_t destWidthNum = get_var_slice_width(destAndSlice);
-  uint32_t op1WidthNum = get_var_slice_width(op1AndSlice);
-  uint32_t op2WidthNum = get_var_slice_width(op2AndSlice);
+  uint32_t destWidthNum = get_var_slice_width_simp(destAndSlice);
+  uint32_t op1WidthNum = get_var_slice_width_simp(op1AndSlice);
+  uint32_t op2WidthNum = get_var_slice_width_simp(op2AndSlice);
   uint32_t opWidthNum = std::max(op1WidthNum, op2WidthNum);
   uint32_t localWidthNum = std::max( opWidthNum, destWidthNum );
   // assume the destWidth is not smaller than opWidth
@@ -547,8 +547,8 @@ expr sel_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   expr destExpr(c);
   destExpr = var_expr(destAndSlice, timeIdx, c, false);
 
-  uint32_t op1WidthNum = get_var_slice_width(op1AndSlice);
-  uint32_t op2WidthNum = get_var_slice_width(op2AndSlice);
+  uint32_t op1WidthNum = get_var_slice_width_simp(op1AndSlice);
+  uint32_t op2WidthNum = get_var_slice_width_simp(op2AndSlice);
   expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true);
   expr op2Expr_t = var_expr(op2AndSlice, timeIdx, c, true);
   expr op1Expr(c);
@@ -748,10 +748,10 @@ expr ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   uint32_t op1WidthNum;
   uint32_t op2WidthNum;
   std::string destWidth;
-  destWidthNum = get_var_slice_width(destAndSlice);
-  op1WidthNum = get_var_slice_width(op1AndSlice);
-  op2WidthNum = get_var_slice_width(op2AndSlice);
-  uint32_t condWidth = get_var_slice_width(condAndSlice);
+  destWidthNum = get_var_slice_width_simp(destAndSlice);
+  op1WidthNum = get_var_slice_width_simp(op1AndSlice);
+  op2WidthNum = get_var_slice_width_simp(op2AndSlice);
+  uint32_t condWidth = get_var_slice_width_simp(condAndSlice);
   destWidth = std::to_string(destWidthNum);
 
   bool op1IsReadRoot = is_root(op1AndSlice) && is_read_asv(op1AndSlice);
@@ -848,7 +848,7 @@ expr case_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
     for(uint32_t i = node->srcVec.size()-1; i > 0; i--) {
       if(i % 2 == 0) { // this is assign var
         assignVarAndSlice = node->srcVec[i];
-        localWidth = get_var_slice_width(assignVarAndSlice);
+        localWidth = get_var_slice_width_simp(assignVarAndSlice);
       }
       else { // this is case value
         caseValue = node->srcVec[i];
@@ -934,7 +934,7 @@ expr add_one_case_branch_expr(astNode* const node, expr &caseExpr, uint32_t idx,
     //uint32_t caseHi = get_lgc_hi(caseVarAndSlice);
     //uint32_t caseLo = get_lgc_lo(caseVarAndSlice);
     //if(std::exp2(caseHi-caseLo+1) == ((node->srcVec.size()-3)/2)) {
-    //  return var_expr(0, timeIdx, c, false, get_var_slice_width(assignVarAndSlice));
+    //  return var_expr(0, timeIdx, c, false, get_var_slice_width_simp(assignVarAndSlice));
     //}
     assignNode = node->childVec[2];
     if(isNum(assignVarAndSlice))
@@ -943,7 +943,7 @@ expr add_one_case_branch_expr(astNode* const node, expr &caseExpr, uint32_t idx,
       //if(isSolve)
         return add_constraint(assignNode, timeIdx, c, s, g, bound, isSolve).extract(hi, lo);
       //else {
-      //  uint32_t localWidth = get_var_slice_width(assignVarAndSlice);
+      //  uint32_t localWidth = get_var_slice_width_simp(assignVarAndSlice);
       //  return var_expr("0", timeIdx, c, false, localWidth);
       //}
     }
@@ -955,7 +955,7 @@ expr func_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
   std::string destAndSlice = node->dest;
   g_moduleOutportTime.emplace(destAndSlice, timeIdx);
   toCout("Func constraint for:"+destAndSlice);  
-  uint32_t width = get_var_slice_width(destAndSlice);
+  uint32_t width = get_var_slice_width_simp(destAndSlice);
   std::string instanceName = node->op;
   std::string moduleName = g_ins2modMap[instanceName];
   ModuleInfo_t moduleInfo = g_allModuleInfo[moduleName];
@@ -968,7 +968,7 @@ expr func_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
   if(!g_ignoreSubModules) {
     sort_vector sorts(c);
     for(std::string &var: node->srcVec) {
-      sorts.push_back(c.bv_sort(get_var_slice_width(var)));
+      sorts.push_back(c.bv_sort(get_var_slice_width_simp(var)));
     }
     uint32_t inputNo = node->srcVec.size();
     func_decl subModule = function(moduleName+"__"+outPort+"__#"+toStr(timeIdx), sorts, c.bv_sort(width));

@@ -33,7 +33,7 @@ std::unordered_map<std::string, std::unordered_map<std::string, std::string>> g_
 std::unordered_map<std::string, std::string> g_ins2modMap;
 std::unordered_map<std::string, uint32_t> g_moduleOutportTime;
 std::unordered_map<std::string, uint32_t> g_moduleInportTime;
-VarWidth varWidth;
+VarWidth g_varWidth;
 
 std::string g_mem2acclData;
 std::string g_accl2memAddr;
@@ -53,7 +53,7 @@ void clear_global_vars() {
   g_ssaTable.clear();
   g_nbTable.clear();
   g_caseTable.clear();
-  varWidth.clear();
+  g_varWidth.clear();
   g_moduleAs.clear();
   moduleWriteAs.clear();
   g_reg2Slices.clear();
@@ -97,9 +97,10 @@ void parse_verilog(std::string fileName) {
   std::string line;
   std::smatch match;
   while( std::getline(input, line) ) {
-    if(line.find("assign alu_shr") != std::string::npos) {
-      toCout("Found it");
+    if(line.find("_0699_") != std::string::npos) {
+      toCout("Find it!");
     }
+    fill_var_width(line, g_varWidth);
     if( line.find("module") != std::string::npos ) {
       std::regex_match(line, match, pModule);
       moduleName = match.str(1);

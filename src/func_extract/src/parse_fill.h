@@ -46,7 +46,7 @@ extern std::unordered_map<std::string, std::string> g_nbTable;
 extern std::unordered_map<std::string, std::pair<std::string, std::vector<std::pair<std::string, std::string>>>> g_caseTable;
 extern std::unordered_map<std::string, FuncInfo_t> g_funcTable;
 extern uint32_t g_new_var;
-extern taintGen::VarWidth varWidth;
+extern taintGen::VarWidth g_varWidth;
 extern std::regex pSingleLine;
 extern std::regex pNbLine;
 extern std::unordered_map<std::string, astNode*> g_asSliceRoot;

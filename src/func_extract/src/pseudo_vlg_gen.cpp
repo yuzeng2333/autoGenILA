@@ -29,7 +29,7 @@ void pseudo_vlg_gen() {
     }
     if(declaredVar.find(in) == declaredVar.end()) {
       declaredVar.insert(in);
-      uint32_t inWidth = get_var_slice_width(in);
+      uint32_t inWidth = get_var_slice_width_simp(in);
       output << "  input ["+toStr(inWidth-1)+":0] "+in+" ;" << std::endl;
     }
   }
@@ -40,7 +40,7 @@ void pseudo_vlg_gen() {
     }
     if(declaredVar.find(out) == declaredVar.end()) {
       declaredVar.insert(out);
-      uint32_t outWidth = get_var_slice_width(out);
+      uint32_t outWidth = get_var_slice_width_simp(out);
       output << "  output ["+toStr(outWidth-1)+":0] "+out+" ;" << std::endl;
     }
   }
@@ -52,7 +52,7 @@ void pseudo_vlg_gen() {
     }
     if(declaredVar.find(var) == declaredVar.end()) {
       declaredVar.insert(var);      
-      uint32_t varWidth = get_var_slice_width(var);
+      uint32_t varWidth = get_var_slice_width_simp(var);
       var = purify_var_name(var);
       output << "  reg ["+toStr(varWidth-1)+":0] "+var+" ;" << std::endl;
     }
@@ -65,7 +65,7 @@ void pseudo_vlg_gen() {
     //}
     if(declaredVar.find(var) == declaredVar.end()) {    
       declaredVar.insert(var);      
-      uint32_t varWidth = get_var_slice_width(var);
+      uint32_t varWidth = get_var_slice_width_simp(var);
       var = purify_var_name(var);
       output << "  reg ["+toStr(varWidth-1)+":0] "+var+" ;" << std::endl;
     }

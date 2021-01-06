@@ -27,9 +27,9 @@ void input_expr(std::string line) {
 
   bool insertDone;
   if(!slice.empty())
-    insertDone = varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+    insertDone = g_varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
   else
-    insertDone = varWidth.var_width_insert(var, 0, 0);
+    insertDone = g_varWidth.var_width_insert(var, 0, 0);
   if (!insertDone) {
     std::cout << "insert failed in input case:" + line << std::endl;
     std::cout << "m.str(2):" + m.str(2) << std::endl;
@@ -55,9 +55,9 @@ void reg_expr(std::string line) {
 
   bool insertDone;
   if(!slice.empty())
-    insertDone = varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+    insertDone = g_varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
   else
-    insertDone = varWidth.var_width_insert(var, 0, 0);
+    insertDone = g_varWidth.var_width_insert(var, 0, 0);
   if (!insertDone) {
     std::cout << "insert failed in reg case:" + line << std::endl;
     std::cout << "m.str(2):" + m.str(2) << std::endl;
@@ -77,9 +77,9 @@ void wire_expr(std::string line) {
 
   bool insertDone;
   if(!slice.empty())
-    insertDone = varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+    insertDone = g_varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
   else
-    insertDone = varWidth.var_width_insert(var, 0, 0);
+    insertDone = g_varWidth.var_width_insert(var, 0, 0);
   if (!insertDone) {
     std::cout << "insert failed in wire case:" + line << std::endl;
     std::cout << "m.str(2):" + m.str(2) << std::endl;
@@ -104,9 +104,9 @@ void mem_expr(std::string line) {
 
   bool insertDone;
   if(!slice.empty())
-    insertDone = varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+    insertDone = g_varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
   else
-    insertDone = varWidth.var_width_insert(var, 0, 0);
+    insertDone = g_varWidth.var_width_insert(var, 0, 0);
   if (!insertDone) {
     std::cout << "insert failed in mem case:" + line << std::endl;
     std::cout << "m.str(2):" + m.str(2) << std::endl;
@@ -135,9 +135,9 @@ void output_expr(std::string line) {
 
   bool insertDone;
   if(!slice.empty())
-    insertDone = varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+    insertDone = g_varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
   else
-    insertDone = varWidth.var_width_insert(var, 0, 0);
+    insertDone = g_varWidth.var_width_insert(var, 0, 0);
   if (!insertDone) {
     std::cout << "insert failed in output case:" + line << std::endl;
     std::cout << "m.str(2):" + m.str(2) << std::endl;
@@ -192,13 +192,13 @@ void both_concat_expr(std::string line) {
       toCout("Unexpected ");
       abort();
     }
-    destTotalWidthNum += get_var_slice_width(destAndSlice);
+    destTotalWidthNum += get_var_slice_width_simp(destAndSlice);
   }
 
   uint32_t startIdx = destTotalWidthNum - 1;
   uint32_t endIdx;
   moduleWires.insert("yuzeng"+yuzengIdxStr);
-  varWidth.var_width_insert("yuzeng"+yuzengIdxStr, startIdx, 0);
+  g_varWidth.var_width_insert("yuzeng"+yuzengIdxStr, startIdx, 0);
   std::string newAssign = "  assign yuzeng"+yuzengIdxStr+" = "+srcList+" ;";
 
   auto ret = g_ssaTable.emplace("yuzeng"+yuzengIdxStr, line);
@@ -207,12 +207,12 @@ void both_concat_expr(std::string line) {
   
   // if there is number in the list
   for (std::string destAndSlice: destVec) {
-    uint32_t destLocalWidthNum = get_var_slice_width(destAndSlice);
+    uint32_t destLocalWidthNum = get_var_slice_width_simp(destAndSlice);
     endIdx = startIdx - destLocalWidthNum + 1;
     if(!is_number(destAndSlice)) {
       split_slice(destAndSlice, dest, destSlice);
 
-      auto destIdxPair = varWidth.get_idx_pair(dest, line);
+      auto destIdxPair = g_varWidth.get_idx_pair(dest, line);
       std::string destHighIdx  = toStr(destIdxPair.first);
       std::string destLowIdx   = toStr(destIdxPair.second);
 
@@ -254,7 +254,7 @@ void dest_concat_expr(std::string line) {
       toCout("Unexpected ");
       abort();
     }
-    destTotalWidthNum += get_var_slice_width(destAndSlice);
+    destTotalWidthNum += get_var_slice_width_simp(destAndSlice);
   }
 
   uint32_t startIdx = destTotalWidthNum - 1;
@@ -262,7 +262,7 @@ void dest_concat_expr(std::string line) {
   
   // if there is number in the list
   for (std::string destAndSlice: destVec) {
-    uint32_t destLocalWidthNum = get_var_slice_width(destAndSlice);
+    uint32_t destLocalWidthNum = get_var_slice_width_simp(destAndSlice);
     //uint32_t hi = get_lgc_hi(destAndSlice);
     //uint32_t lo = get_lgc_lo(destAndSlice);
     //assert(hi >= lo);
@@ -350,9 +350,9 @@ void nonblockif_expr(std::string line, std::ifstream &input) {
   std::string yuzengIdx = toStr(g_new_var++);
   std::string destNext = "yuzeng"+yuzengIdx;
   moduleWires.insert("yuzeng"+yuzengIdx);
-  uint32_t localWidth = get_var_slice_width(destAndSlice);
+  uint32_t localWidth = get_var_slice_width_simp(destAndSlice);
   bool insertDone;
-    insertDone = varWidth.var_width_insert(destNext, localWidth-1, 0);
+    insertDone = g_varWidth.var_width_insert(destNext, localWidth-1, 0);
   if (!insertDone) {
     std::cout << "insert failed: " + line << std::endl;
   }
@@ -393,7 +393,7 @@ void always_if_else_expr(std::string line, std::ifstream &input) {
   }
   std::string destAndSlice = m.str(2);
   std::string src1AndSlice = m.str(3);
-  uint32_t src1Width = get_var_slice_width(src1AndSlice);
+  uint32_t src1Width = get_var_slice_width_simp(src1AndSlice);
 
   std::string dest, destSlice;
   split_slice(destAndSlice, dest, destSlice);
@@ -411,14 +411,14 @@ void always_if_else_expr(std::string line, std::ifstream &input) {
     abort();
   }
   std::string src2AndSlice = m.str(3);
-  uint32_t src2Width = get_var_slice_width(src2AndSlice);
+  uint32_t src2Width = get_var_slice_width_simp(src2AndSlice);
   uint32_t localWidth = std::max(src1Width, src2Width);
 
   std::string yuzengIdx = toStr(g_new_var++);
   std::string destNext = "yuzeng"+yuzengIdx;
   moduleWires.insert("yuzeng"+yuzengIdx);
   bool insertDone;
-    insertDone = varWidth.var_width_insert(destNext, localWidth-1, 0);
+    insertDone = g_varWidth.var_width_insert(destNext, localWidth-1, 0);
   if (!insertDone) {
     std::cout << "insert failed: " + line << std::endl;
   }

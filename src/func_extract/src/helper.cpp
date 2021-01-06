@@ -210,7 +210,7 @@ void record_expr(expr varExpr) {
 
 // extend e to len
 expr sext_full(expr const& e, uint32_t len) {
-  uint32_t eLen = get_var_slice_width(pure(get_name(e)));
+  uint32_t eLen = get_var_slice_width_simp(pure(get_name(e)));
   if(eLen == len)
     return e; 
   else
@@ -274,7 +274,7 @@ bool has_explicit_value(std::string input) {
 
 
 uint32_t expr_len(expr &e) {
-  return get_var_slice_width(pure(get_name(e)));
+  return get_var_slice_width_simp(pure(get_name(e)));
 }
 
 
@@ -355,7 +355,7 @@ uint32_t get_lgc_hi(std::string varAndSlice) {
     else
       return get_end(varSlice);
   }
-  auto idxPairs = varWidth.get_idx_pair(var, "find_version_num for: "+var);
+  auto idxPairs = g_varWidth.get_idx_pair(var, "find_version_num for: "+var);
   return idxPairs.first;
 }
 
@@ -379,7 +379,7 @@ uint32_t get_ltr_hi(std::string varAndSlice) {
   split_slice(varAndSlice, var, varSlice);
   if(!varSlice.empty())
     return get_end(varSlice);
-  auto idxPairs = varWidth.get_idx_pair(var, "find_version_num for: "+var);
+  auto idxPairs = g_varWidth.get_idx_pair(var, "find_version_num for: "+var);
   return idxPairs.first;
 }
 
@@ -397,7 +397,7 @@ uint32_t get_lgc_lo(std::string varAndSlice) {
     else
       return get_begin(varSlice);
   }
-  auto idxPairs = varWidth.get_idx_pair(var, "find_version_num for: "+var);
+  auto idxPairs = g_varWidth.get_idx_pair(var, "find_version_num for: "+var);
   return idxPairs.second;
 }
 
@@ -411,7 +411,7 @@ uint32_t get_ltr_lo(std::string varAndSlice) {
 
   if(!varSlice.empty())
     return get_begin(varSlice);
-  auto idxPairs = varWidth.get_idx_pair(var, "find_version_num for: "+var);
+  auto idxPairs = g_varWidth.get_idx_pair(var, "find_version_num for: "+var);
   return idxPairs.second;
 }
 
@@ -629,25 +629,8 @@ int try_stoi(std::string num) {
 }
 
 
-/// <summary> Expand bitwidth of input expr, according to its represented bits and total bits of its represented variable </summary>
-/// <param name="varExpr"> input expr </param>  
-/// <param name="varExprBits"> bits of input expr </param>  
-/// <param name="varSlice"> bits/slice of the variable representedby varExpr </param>  
-/// <returns> expr with extended bits </returns>   
-//expr extend_expr(expr varExpr, std::string varExprBits, std::string varSlice, context &c) {
-//  uint32_t varExprHi = get_end(varExprBits);
-//  uint32_t varExprLo = get_begin(varExprBits);
-//  uint32_t varSliceHi = get_end(varSlice);
-//  uint32_t varSliceLo = get_begin(varSlice);
-//  if(varExprHi > varSliceHi || varExprLo < varSliceLo) {
-//    toCout("Error: bit range of input expr is outside of bitwidth of var!");
-//    abort();
-//  }
-//  if(varExprHi == varSliceHi && varExprLo == varSliceLo) {
-//    return varExpr;
-//  }
-//  else if(varExprHi == varSliceHi && varExprLo > varSliceLo)
-//    return concat(varExpr, c.bv_val(0, ));
-//}
+uint32_t get_var_slice_width_simp( std::string varAndSlice) {
+  return get_var_slice_width( varAndSlice, g_varWidth);
+}
 
 } // end of namespace funcExtract

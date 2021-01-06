@@ -117,18 +117,18 @@ void auxiliary_files_gen(const std::string &path, uint32_t delay) {
   for(auto as = moduleInputs.begin(); as != moduleInputs.end(); as++) {
     if((*as).compare(g_recentClk) == 0 || (*as).compare(g_recentRst) == 0)
       continue;
-    uint32_t width = get_var_slice_width(*as);
+    uint32_t width = get_var_slice_width_simp(*as);
     infoFile << *as+"__:__"+toStr(width) << std::endl;
   }
 
   for(auto as = g_regWithFunc.begin(); as != g_regWithFunc.end(); as++) {
-    uint32_t width = get_var_slice_width(*as);
+    uint32_t width = get_var_slice_width_simp(*as);
     std::string var = purify_var_name(*as);
     infoFile << var+"__:__"+toStr(width)+", YES" << std::endl;
   }
 
   for(auto as = g_moduleAs.begin(); as != g_moduleAs.end(); as++) {
-    uint32_t width = get_var_slice_width(*as);
+    uint32_t width = get_var_slice_width_simp(*as);
     if(g_regWithFunc.find(*as) == g_regWithFunc.end()) {
       std::string var = purify_var_name(*as);
       infoFile << var+"__:__"+toStr(width) << std::endl;

@@ -49,7 +49,7 @@ void clean_verilog(std::string fileName) {
           std::string cond = m.str(5);
           std::string width = m.str(6);
           uint32_t widthNum = std::stoi(width);
-          uint32_t srcWidth = get_var_slice_width(src);
+          uint32_t srcWidth = get_var_slice_width_simp(src);
           uint32_t assignNo = srcWidth-widthNum+1;
           output << "  always @("+src+" or "+cond+") begin" << std::endl;
           output << "    casez ("+cond+")" << std::endl;          

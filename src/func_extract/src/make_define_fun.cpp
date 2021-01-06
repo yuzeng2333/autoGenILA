@@ -45,7 +45,7 @@ void define_fun_gen(std::string fileName) {
       if(destName.substr(0, 2) == "\\\\") {
         pureDestName = destName.substr(1);
       }
-      uint32_t destWidth = get_var_slice_width(pureDestName);
+      uint32_t destWidth = get_var_slice_width_simp(pureDestName);
       //output << "(define-fun INV_"+destName+" ( "+args+" ) (_ BitVec "+toStr(destWidth)+")" << std::endl;
       output << "(define-fun INV ( "+args+" ) (_ BitVec "+toStr(destWidth)+")" << std::endl;
     }
@@ -64,7 +64,7 @@ void define_fun_gen(std::string fileName) {
       if(destName.substr(0, 2) == "\\\\") {      
         pureDestName = destName.substr(1);
       }
-      uint32_t destWidth = get_var_slice_width(pureDestName);
+      uint32_t destWidth = get_var_slice_width_simp(pureDestName);
       std::string middlePart;
       if(destWidth % 4 == 0)
         middlePart = "bvadd #x"+make_zeros(destWidth/4);
@@ -120,7 +120,7 @@ void collect_args(std::unordered_map<std::string, std::set<std::string>> &dest2A
 void make_args_list(const std::set<std::string> &argSet, std::string &argList) {
   argList.clear();
   for(auto it = argSet.begin(); it != argSet.end(); it++) {
-    uint32_t width = get_var_slice_width(*it);
+    uint32_t width = get_var_slice_width_simp(*it);
     std::string var = *it;
     var = purify_var_name(var);
     argList += "(|"+var+"| (_ BitVec "+toStr(width)+")) ";

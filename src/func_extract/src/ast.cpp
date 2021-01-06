@@ -33,7 +33,7 @@ void build_ast_tree() {
 void build_tree_for_single_as(std::string regAndSlice) {
   //g_visitedNode.clear();
   toCoutVerb("### Begin build: "+regAndSlice);
-  uint32_t regWidth = get_var_slice_width(regAndSlice);
+  uint32_t regWidth = get_var_slice_width_simp(regAndSlice);
   astNode* root;
   if(g_visitedNode.find(regAndSlice) == g_visitedNode.end())
     root = new astNode;
@@ -147,7 +147,7 @@ void add_sliced_node(std::string varAndSlice, uint32_t timeIdx, astNode* const n
   auto srcVec = g_reg2Slices[var];
   uint32_t srcHi = get_ltr_hi(srcVec.front());
   uint32_t srcLo = get_ltr_lo(srcVec.back());
-  auto idxPairs = varWidth.get_idx_pair(var, "add_sliced_node for:"+var);
+  auto idxPairs = g_varWidth.get_idx_pair(var, "add_sliced_node for:"+var);
   uint32_t destHi = idxPairs.first;
   uint32_t destLo = idxPairs.second;
 
@@ -182,8 +182,8 @@ void add_nb_node(std::string regAndSlice, uint32_t timeIdx, astNode* const node)
   if(std::regex_match(destAssign, m, pNonblock)) {
     std::string destNext = m.str(3);
     remove_two_end_space(destNext);
-    uint32_t destNextWidth = get_var_slice_width(destNext);
-    uint32_t destWidth = get_var_slice_width(regAndSlice);
+    uint32_t destNextWidth = get_var_slice_width_simp(destNext);
+    uint32_t destWidth = get_var_slice_width_simp(regAndSlice);
 
     node->type = NONBLOCK;
     node->dest = regAndSlice;
@@ -311,9 +311,9 @@ void add_two_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   split_slice(op2AndSlice, op2, op2Slice);
   remove_two_end_space(op1AndSlice);
   remove_two_end_space(op2AndSlice);
-  uint32_t destAndSliceWidth = get_var_slice_width(destAndSlice);
-  uint32_t op1AndSliceWidth = get_var_slice_width(op1AndSlice);
-  uint32_t op2AndSliceWidth = get_var_slice_width(op2AndSlice);
+  uint32_t destAndSliceWidth = get_var_slice_width_simp(destAndSlice);
+  uint32_t op1AndSliceWidth = get_var_slice_width_simp(op1AndSlice);
+  uint32_t op2AndSliceWidth = get_var_slice_width_simp(op2AndSlice);
 
   node->type = TWO_OP;
   node->dest = destAndSlice;
@@ -397,7 +397,7 @@ void add_ite_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
 
   uint32_t localWidthNum;
   std::string localWidth;
-  localWidthNum = get_var_slice_width(destAndSlice);
+  localWidthNum = get_var_slice_width_simp(destAndSlice);
 
   localWidth = std::to_string(localWidthNum);
 
@@ -464,7 +464,7 @@ void add_sel_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   split_slice(destAndSlice, dest, destSlice);
   split_slice(op1AndSlice, op1, op1Slice);
   split_slice(op2AndSlice, op2, op2Slice);
-  uint32_t destAndSliceWidth = get_var_slice_width(destAndSlice);
+  uint32_t destAndSliceWidth = get_var_slice_width_simp(destAndSlice);
   remove_two_end_space(op1AndSlice);
   remove_two_end_space(op2AndSlice);
 
