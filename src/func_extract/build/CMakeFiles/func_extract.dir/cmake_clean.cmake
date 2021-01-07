@@ -12,7 +12,6 @@ file(REMOVE_RECURSE
   "CMakeFiles/func_extract.dir/src/op_constraint.cpp.o"
   "CMakeFiles/func_extract.dir/src/parse_fill.cpp.o"
   "CMakeFiles/func_extract.dir/src/pseudo_vlg_gen.cpp.o"
-  "CMakeFiles/func_extract.dir/src/trial.cpp.o"
   "CMakeFiles/func_extract.dir/src/vcd_parser.cpp.o"
   "func_extract.pdb"
   "func_extract"

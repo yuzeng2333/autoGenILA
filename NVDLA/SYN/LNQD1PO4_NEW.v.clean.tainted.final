@@ -1,0 +1,54 @@
+module LNQD1PO4 ( D , EN , INSTR_IN_ZY , rst_zy , D_T , D_S , EN_T , EN_S , Q_R0 , Q_C0 , Q_X0 , Q , D_R , D_X , D_C , EN_R , EN_X , EN_C , Q_T , Q_S );
+  input rst_zy;
+  integer i;
+  input INSTR_IN_ZY;
+  input D;
+  input D_T ;
+  input [13:0] D_S ;
+  output D_R ;
+  output D_X ;
+  output D_C ;
+  input EN;
+  input EN_T ;
+  input [13:0] EN_S ;
+  output EN_R ;
+  output EN_X ;
+  output EN_C ;
+  output Q;
+  logic Q ;
+  output Q_T ;
+  logic Q_T ;
+  logic Q_R ;
+  logic Q_C ;
+  logic Q_X ;
+  logic [13:0] Q_S ;
+  input Q_R0 ;
+  input Q_C0 ;
+  input Q_X0 ;
+  output [13:0] Q_S ;
+  logic Q;
+  logic  Q_T ;
+  logic  Q_PREV_VAL1 ;
+  logic  Q_PREV_VAL2 ;
+  logic Q_t_flag ;
+  logic Q_r_flag ;
+  assign Q_S = 16 ;
+  always @(negedge EN)
+      Q <= D;
+  assign Q_T = 0;
+  assign Q_r_flag = 0;
+  assign Q_t_flag = 0;
+  assign Q_C = ( Q_C0 );
+  assign Q_X = ( Q_X0 );
+  assign Q_R = ( Q_X0 & Q_R0 );
+ // ground taints for floating regs
+ // ground taints for unused wires
+  always @( posedge  ) begin
+    if( rst_zy ) Q_PREV_VAL1 <= 0 ;
+    if( rst_zy ) Q_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) Q_PREV_VAL1 <= Q ;
+    if( INSTR_IN_ZY ) Q_PREV_VAL2 <= Q_PREV_VAL1 ;
+  end
+ // ground taints for unused wire slices
+  assert property( Q_r_flag == 0 || Q_PREV_VAL1 == Q_PREV_VAL2 );
+endmodule

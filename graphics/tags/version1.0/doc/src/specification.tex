@@ -1,0 +1,733 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{hyperref}
+
+\usepackage{graphicx}
+\usepackage{listings}
+
+\author{Per Lenander, Anton Fosselius}
+\title{ORSoC Graphics accelerator Specification}
+\begin{document}
+
+\maketitle
+
+\begin{center}
+\includegraphics[scale=1.0]{../pictures/OpenCores}
+\end{center}
+
+\begin{center}
+\includegraphics[scale=0.50]{../pictures/wb_compatible}
+\end{center}
+
+\newpage
+
+\section*{Revision history}
+\begin{tabular}{|p{1cm}|p{2cm}|p{3cm}|p{7cm}|}
+\hline \textbf{Rev.} & \textbf{Date} & \textbf{Author} & \textbf{Description} \\
+\hline 
+\hline 0.1.0 & 23/3/2012 & Per Lenander & Initial draft \\
+\hline 
+\end{tabular} 
+\newpage
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+The ORSoC Graphics accelerator allows the user to do advanced vector rendering and 2D blitting to a memory area. The core supports simple operations such as drawing textures, lines and filling rectangular areas with color.
+
+This IP Core is designed to integrate with the OpenRISC processor through a Wishbone bus interface. The core itself has no means of displaying the information rendered, for this purpose it should work alongside a display component, such as the enhanced VGA/LCD IP core found on OpenCores.
+
+\subsection{Features}
+\begin{itemize}
+\item 32-bit Wishbone bus interface
+\item Integrates with enhanced VGA/LCD IP core
+\item Support for 8, 16 and 32 bit color depth modes
+\item Support for variable resolution
+\item Acceleration of simple fill and line operations
+\item Acceleration of memory copy operations
+\item Textures can be saved to video memory
+\item Vector transformation and rasterization
+\item Clipping/Scissoring
+\item Alpha blending and colorkeying
+\item Requires ~1800 Slice LUTs (Xilinx ISE 13.4)
+\end{itemize}
+
+\subsection{IP Core directory structure}
+A basic overview of the contents of the IP core source folder can be found in figure \ref{fig:directory}. The \textbf{rtl} folder also contains files for implementing the component in ORPSoCv2.
+
+\begin{figure}
+\begin{center}
+\includegraphics[scale=0.5]{../pictures/directory}
+\caption{Directory structure of the ORSoC graphics accelerator.}
+\label{fig:directory}
+\end{center}
+\end{figure}
+
+\section{Architecture}
+\subsection{Overview}
+A basic topology of how the orgfx is connected to the VGA driver and OpenRisc core is shown in figure \ref{fig:topology}. The orgfx has three wishbone interfaces: one read/write port that is used to communicate with the host CPU. One read port that reads texture/alpha blending information from the RAM and one write port to write pixel information to the RAM.
+
+\begin{figure}
+\begin{center}
+\includegraphics[scale=0.60]{../pictures/topology}
+\caption{Overview of the ORPSoCv2's wishbone interconnection.}
+\label{fig:topology}
+\end{center}
+\end{figure}
+
+\subsection{Concepts}
+This section describes a few basic terms used in this document.
+
+\textbf{Video memory} -- The orgfx component writes pixels one by one to an external memory, usually a SDRAM or DDR RAM chip. The CPU should also have access to this memory space to be able to write pixels directly (the easiest way to load textures).
+
+\textbf{Render target} -- The render target, defined by the target base and size registers, describes the area to which all operations render pixels. It is possible to change the base address and size, enabling render-to-texture and double buffering.
+
+\textbf{Surface/Texture} -- Any memory area that can be rendered to, including the render target, is considered a surface. A surface is defined by it's base address and size. There are two main surfaces that the orgfx device handles: the render target and the currently active texture. Swapping between different textures has to be done in software. The operation of setting the current render target or texture is referred to as \textit{binding}.
+
+\textbf{Source, Destination and Clip rectangles} -- There are three sets of rectangles that affect rendering, each described by two points. The first point sets the beginning of the rectangle, while the second point sets the pixel after the end of the rectangle. This way, a rectangle exactly filling the screen would be (0,0,640,480) at 640x480 resolution. See figure \ref{fig:SrcClipDest};
+
+\textbf{Source rectangle} -- The source rectangle defines what pixels should be read from a texture during textured operations. The points are defined in the coordinates of the currently bound texture. This way sections of a texture can be drawn (good for tile maps or bitmap fonts).
+
+\textbf{Destination rectangle} -- The destination rectangle defines where operations such as draw pixel and draw line will draw pixels, in the coordinates of the render target.
+
+\textbf{Clip rectangle} -- The clip rectangle defines an area within the current render target which is valid to draw to. Any pixels outside this rectangle are discarded in the rasterization step. Pixels outside of the render target are automatically discarded.
+
+\begin{figure}
+\begin{center}
+\includegraphics[scale=0.50]{../pictures/SrcClipDest}
+\caption{1. Texture, 2. Source, 3. Render target, 4. Clip, 5. Destination}
+\label{fig:SrcClipDest}
+\end{center}
+\end{figure}
+
+\subsection{Instruction fifo}
+All wishbone writes sent to the slave interface will pass through an instruction fifo. If the device is in the busy state (when the pipeline is active) the instruction will be queued instead of being set immediately. This is important to take into account when reading from registers, since an operation that changes the register being read might be queued. To find out if the device is busy, poll the status register and check if the busy bit is high.
+
+\subsection{Pipeline}
+Currently the pipeline begins with the \textbf{rasterizer}, its purpose is to convert points into pixels. When there are a request to write a rectangle, the \textbf{rasterizer} receives two points and outputs all the pixels between those points. The pixels generated by the \textbf{rasterizer} in recieved by the \textbf{fragment processor}. In the \textbf{fragment processor} the pixel gets a color either by a pre-set color or from a texture (via the \textbf{wishbone read} from the \textbf{memory}). The colored pixel is then sent to the \textbf{blender} which handles alpha blending. If alpha is enabled, the \textbf{blender} will read from the address in the \textbf{memory} where the pixel is going to be drawn. Then the new color is calculated based on the pixel color and the alpha value. The pixel is then passed on to the \textbf{renderer} which calculates the address in the memory where the pixel is going to be written. The pixel is then passed on to the \textbf{wishbone write} interface and finally to the render target in the \textbf{memory}.
+
+\begin{figure}
+\begin{center}
+\includegraphics[scale=0.35]{../pictures/pipeline}
+\caption{Picture of the orgfx pipeline}
+\label{fig:pipeline}
+\end{center}
+\end{figure}
+
+\subsection{Description of core modules}
+
+\subsubsection{Wishbone slave}
+The wishbone slave handles all communication from the main OpenRISC processor (or other master cpu). This component holds all the registers, and the instruction fifo that sets them. This component can be in one of two states: \textit{busy} or \textit{wait}. It enters the busy state when a pipeline operation is initialized, and returns to the wait state when the operation is finished.
+
+\subsubsection{Vector processor}
+This module is a stub for future releases.
+
+\subsubsection{Rasterizer}
+This module generates pixel coordinates for several different operations.
+
+\subsubsection{Fragment processor}
+The fragment processor adds color to the pixel generated by the rasterizer. If texturing is disabled, a color supplied from the color register is used. If texturing is enabled on the other hand, the u v coordinates supplied by the rasterizer are used to fetch a pixel from the active texture. If colorkeying is enabled and the fetched color matches the color key, the current pixel is discarded.
+
+\subsubsection{Blender}
+The blender module performs alpha blending if this is enabled. The module fetches the color of the pixel that the current operation will write to, and the mixes the value of the target color and the color from the fragment processor using the following algorithm:
+
+\begin{quote}
+$ color_{out} = color_{in} * alpha + color_{target} * (1 - alpha) $
+\end{quote}
+
+Where alpha is a value between 0 (transparent) and 1 (opaque). If alpha blending is disabled the pixel is passed on unmodified.
+
+\subsubsection{Wishbone arbiter}
+Since two parts of the pipeline (fragment and blender) needs to access video memory, the arbiter makes certain only one of them can access the reader at once. The blender has the highest priority.
+
+\subsubsection{Wishbone master read}
+The wishbone reader handles all reads from video memory.
+
+\subsubsection{Renderer}
+The renderer calculates the memory address of the target pixel.
+
+\subsubsection{Wishbone master write}
+The wishbone master handles all writes to the video memory.
+
+\section{IO Ports}
+The Core has three wishbone interfaces:
+
+\begin{itemize}
+\item Wishbone slave -- connects to the data bus of the OpenRISC processor. In the case of ORPSoC, this bus is connected through an arbiter.
+\item Wishbone master read-only -- connects to a video memory port with read access. Used for fetching textures and during blending.
+\item Wishbone master write-only -- connects to a video memory port with write access. Used for rendering pixels to the framebuffer.
+\end{itemize}
+
+There is an interrupt enabled that can be connected to the interrupt pins on the or1200 CPU (in the supplied orpsoc\_top it is connected to or1200\_pic\_ints[9]). For this interrupt to trigger, the correct bits in the control register has to be set.
+
+\section{Registers}
+\begin{tabular}{|l|l|l|l|l|}
+\hline \textbf{Name} & \textbf{Addr} & \textbf{Width} & \textbf{Access} & \textbf{Description} \\ 
+\hline
+\hline Control & 0x00 & 32 & RW & Control register \\
+\hline Status & 0x04 & 32 & R & Status register \\
+\hline Src Pixel0 & 0x08 & 32 & RW & Source pixel0 register \\
+\hline Src Pixel1 & 0x0c & 32 & RW & Source pixel1 register \\
+\hline Dest Pixel0 & 0x10 & 32 & RW & Destination pixel0 register \\
+\hline Dest Pixel1 & 0x14 & 32 & RW & Destination pixel1 register \\
+\hline Clip Pixel0 & 0x18 & 32 & RW & Clip pixel0 register \\
+\hline Clip Pixel1 & 0x1c & 32 & RW & Clip pixel1 register \\
+\hline Color & 0x20 & 32 & RW & Color register \\
+\hline Target Base & 0x24 & 32 & RW & Render target base address \\
+\hline Target Size & 0x28 & 32 & RW & Render target width/height register \\
+\hline Tex0 Base & 0x2C & 32 & RW & Texture0 base \\
+\hline Tex0 Size & 0x30 & 32 & RW & Texture0 size \\
+\hline Alpha & 0x34 & 32 & RW & Global alpha register \\
+\hline Colorkey & 0x38 & 32 & RW & Colorkey register \\
+\hline 
+\end{tabular} 
+\\\\
+Each register is described in detail in the following sections, with information about what the purpose of each bit in the register is. The default value provided for each register is set when the device receives a reset signal.
+
+\subsection{Control Register (CTRL\_REG)}
+\begin{tabular}{|l|l|l|}
+\hline \textbf{Bit \#} & \textbf{Access} & \textbf{Description} \\ 
+\hline
+\hline [31:10] & - & Reserved \\
+\hline [9] & RW & Line write \\
+\hline [8] & RW & Rect write \\
+\hline [7:5] & - & Reserved \\
+\hline [4] & RW & Colorkey enable \\
+\hline [3] & RW & Blending enable \\
+\hline [2] & RW & Texture0 enable \\
+\hline [1:0] & RW & Color depth \\
+\hline 
+\end{tabular}
+\\\\
+\textbf{Default value:} 0x00
+
+Color depth is defined as follows:
+
+\begin{tabular}{|l|l|}
+\hline \textbf{Mode} & \textbf{Color depth}\\ 
+\hline
+\hline 00 & 8 bit \\
+\hline 01 & 16 bit \\
+\hline 10 & 24 bit (not supported) \\
+\hline 11 & 32 bit \\
+\hline 
+\end{tabular} \\
+
+\subsection{Status Register (STATUS\_REG)}
+\begin{tabular}{|l|l|l|}
+\hline \textbf{Bit \#} & \textbf{Access} & \textbf{Description} \\ 
+\hline
+\hline [31:1] & R & Reserved \\
+\hline [0] & R & Busy pin (high when busy) \\
+\hline 
+\end{tabular}
+\\\\
+\textbf{Default value:} 0x00
+
+\subsection{Source Pixel position 0 Register (SRC\_P0)}
+\begin{tabular}{|l|l|l|}
+\hline \textbf{Bit \#} & \textbf{Access} & \textbf{Description} \\ 
+\hline
+\hline [31:16] & RW & x \\
+\hline [15:0] & RW & y \\
+\hline 
+\end{tabular}
+\\\\
+\textbf{Default value:} 0x00
+
+The source pixels are used to define a specific area in a texture to draw.
+
+\subsection{Source Pixel position 1 Register (SRC\_P1)}
+\begin{tabular}{|l|l|l|}
+\hline \textbf{Bit \#} & \textbf{Access} & \textbf{Description} \\ 
+\hline
+\hline [31:16] & RW & x \\
+\hline [15:0] & RW & y \\
+\hline 
+\end{tabular}
+\\\\
+\textbf{Default value:} 0x00
+
+\subsection{Destination Pixel position 0 Register (DEST\_P0)}
+\begin{tabular}{|l|l|l|}
+\hline \textbf{Bit \#} & \textbf{Access} & \textbf{Description} \\ 
+\hline
+\hline [31:16] & RW & x \\
+\hline [15:0] & RW & y \\
+\hline 
+\end{tabular}
+\\\\
+\textbf{Default value:} 0x00
+
+\subsection{Destination Pixel position 1 Register (DEST\_P1)}
+\begin{tabular}{|l|l|l|}
+\hline \textbf{Bit \#} & \textbf{Access} & \textbf{Description} \\ 
+\hline
+\hline [31:16] & RW & x \\
+\hline [15:0] & RW & y \\
+\hline 
+\end{tabular}
+\\\\
+\textbf{Default value:} 0x00
+
+\subsection{Clip Pixel position 0 Register (CLIP\_P0)}
+\begin{tabular}{|l|l|l|}
+\hline \textbf{Bit \#} & \textbf{Access} & \textbf{Description} \\ 
+\hline
+\hline [31:16] & RW & x \\
+\hline [15:0] & RW & y \\
+\hline 
+\end{tabular}
+\\\\
+\textbf{Default value:} 0x00
+
+\subsection{Clip Pixel position 1 Register (CLIP\_P1)}
+\begin{tabular}{|l|l|l|}
+\hline \textbf{Bit \#} & \textbf{Access} & \textbf{Description} \\ 
+\hline
+\hline [31:16] & RW & x \\
+\hline [15:0] & RW & y \\
+\hline 
+\end{tabular}
+\\\\
+\textbf{Default value:} 0x00
+
+\subsection{Color Register (color)}
+\begin{tabular}{|l|l|l|}
+\hline \textbf{Bit \#} & \textbf{Access} & \textbf{Description} \\ 
+\hline
+\hline [31:0] & RW & Color bits \\
+\hline 
+\end{tabular}
+\\\\
+\textbf{Default value:} 0x00
+
+There are several color modes available (set in \textit{video mode register}):
+
+\begin{tabular}{|l|l|l|}
+\hline \textbf{Mode} & \textbf{Format} \\ 
+\hline
+\hline 32bpp & [31:24] is alpha channel. [23:16] is R, [15:8] is G and [7:0] is B \\
+%\hline 24bpp & [31:24] is unused. [23:16] is R, [15:8] is G and [7:0] is B \\
+\hline 16bpp & [15:11] is R, [10:5] is B and [4:0] is G\\
+\hline 8bpp gray & [7:0] sets both R, G and B values \\
+\hline 8bpp palette & [7:0] sets the color index in the palette \\
+\hline 
+\end{tabular}
+\\\\
+
+\subsection{Target addr Register (TADR\_REG)}
+\begin{tabular}{|l|l|l|}
+\hline \textbf{Bit \#} & \textbf{Access} & \textbf{Description} \\ 
+\hline
+\hline [31:2] & RW & Video Memory Address \\
+\hline [1:0] & - & Nothing \\
+\hline 
+\end{tabular}
+\\\\
+\textbf{Default value:} 0x00
+
+\subsection{Target size Register (TSZE\_REG)}
+\begin{tabular}{|l|l|l|}
+\hline \textbf{Bit \#} & \textbf{Access} & \textbf{Description} \\ 
+\hline
+\hline [31:16] & RW & Width \\
+\hline [15:0] & RW & Height \\
+\hline 
+\end{tabular}
+\\\\
+\textbf{Default value:} 0x00
+
+\subsection{Tex0 Base}
+\begin{tabular}{|l|l|l|}
+\hline \textbf{Bit \#} & \textbf{Access} & \textbf{Description} \\ 
+\hline
+\hline [31:2] & RW & Video Memory Address \\
+\hline [1:0] & - & Nothing \\
+\hline 
+\end{tabular}
+\\\\
+\textbf{Default value:} 0x00
+
+\subsection{Tex0 Size}
+\begin{tabular}{|l|l|l|}
+\hline \textbf{Bit \#} & \textbf{Access} & \textbf{Description} \\ 
+\hline
+\hline [31:16] & RW & Width \\
+\hline [15:0] & RW & Height \\
+\hline 
+\end{tabular}
+\\\\
+\textbf{Default value:} 0x00
+
+\subsection{Alpha}
+\begin{tabular}{|l|l|l|}
+\hline \textbf{Bit \#} & \textbf{Access} & \textbf{Description} \\ 
+\hline
+\hline [31:8] & - & Reserved \\
+\hline [7:0] & RW & Global alpha \\
+\hline 
+\end{tabular}
+\\\\
+\textbf{Default value:} 0xff
+
+The global alpha value is used in all rendering when alpha blending is enabled. \textbf{0xff} is full opacity, while \textbf{0x00} is full transparency (nothing rendered).
+
+\subsection{Colorkey}
+\begin{tabular}{|l|l|l|}
+\hline \textbf{Bit \#} & \textbf{Access} & \textbf{Description} \\ 
+\hline
+\hline [31:0] & RW & Colorkey \\
+\hline 
+\end{tabular}
+\\\\
+\textbf{Default value:} 0x00
+
+By setting a colorkey certain pixels in a texture can be discarded in the fragment stage, providing a hard transparency. Depending on the color depth, a mask is applied to the color. Using 8 bit color, only the 8 least significant bits in the colorkey will be compared with the texture color during the check. The colorkey enable bit in the control register must be set to enable this functionality.
+
+\section{Operation}
+All hardware accelerated operations draw pixels to the currently active surface (defined by TADR\_REG and TSZE\_REG). These operations are all affected by clip\_p0 and clip\_p1. No pixels that fall outside the clipping rectangle will be rasterized.
+
+\subsection{Draw pixel}
+\textbf{Input needed:} dest\_p0, color\\
+Orgfx have no hardware-support for writing a single pixel to the video memory. However the software API makes this operation possible by writing directly to the memory. Since the video memory can point to both the framebuffer and to textures, the same operation can be used to draw an arbitrary pixel to the screen and to load a texture into video memory.
+
+\subsection{Fill rect}
+\textbf{Input needed:} ctrl, dest\_p0, dest\_p1, color, [src\_p0, src\_p1]\\
+Fill rect will fill the area of a rectangle created between the pixel dest\_p0 and  dest\_p1 with color. If texturing is enabled, color will be taken from the active texture in the area between src\_p0 and src\_p1. This operation is hardware accelerated, and is activated by setting the Rect write bit in the control register.
+
+\subsection{Line}
+\textbf{Input needed:} dest\_p0, dest\_p1, color\\
+Line will draw a line between the pixels dest\_p0 and dest\_p1 with color. This operation is hardware accelerated.
+
+\subsection{Vector operations...}
+
+\section{Clocks}
+The wishbone slave uses the system wishbone bus clock at 50 Mhz, while the rest of the pipeline and the wishbone interfaces to the memory runs at 100Mhz.
+
+\section{Driver interface}
+The ORSoC graphics accelerator offers three different APIs to code against, two for bare metal when coding directly against the processor, and a Linux kernel module. The extended bare metal interface is a wrapper around the basic bare metal API, and makes coding easier by reducing the number of calls. The drawback is lesser control over the graphics card.
+
+\subsection{newlib}
+The basic library is provided in \textbf{oc\_gfx.h} and \textbf{oc\_gfx.c}.
+
+The bare metal library declares a structure that can hold surfaces (both framebuffers and textures). Many functions take a pointer to one of these structures.
+\begin{lstlisting}
+struct oc_gfx_surface
+{
+	unsigned int addr;
+	unsigned int w;
+	unsigned int h;
+};
+\end{lstlisting}
+
+\subsubsection{oc\_gfx\_init}
+\textbf{Description:} The oc\_gfx\_init must be called first to get other oc\_gfx commands to work properly.
+\begin{lstlisting}
+void oc_gfx_init(unsigned int memoryArea);
+\end{lstlisting}
+
+\subsubsection{oc\_vga\_set\_videomode}
+\textbf{Description:} Sets the video mode, width, height, bpp.
+\begin{lstlisting}
+void oc_gfx_set_videomode(unsigned int width, 
+                          unsigned int height, 
+                          unsigned char bpp);
+\end{lstlisting}
+
+\subsubsection{oc\_vga\_set\_vbara}
+\textbf{Description:} Assign a memory address to "Video Base Address Register A".
+\begin{lstlisting}
+void oc_vga_set_vbara(unsigned int addr);
+\end{lstlisting}
+
+\subsubsection{oc\_vga\_set\_vbarb}
+\textbf{Description:} Assign a memory address to "Video Base Address Register B".
+\begin{lstlisting}
+void oc_vga_set_vbarb(unsigned int addr);
+\end{lstlisting}
+
+\subsubsection{oc\_vga\_bank\_switch}
+\textbf{Description:} Switches the framebuffer.
+\begin{lstlisting}
+void oc_vga_bank_switch();
+\end{lstlisting}
+
+\subsubsection{oc\_gfx\_init\_surface}
+\textbf{Description:} Initialize a surface and return a control structure for it. This function increments an internal video memory stack pointer, so each surface will be allocated after the previous one in memory (starting at memoryArea set by oc\_gfx\_init). There is currently no memory management in place to recycle surface memory once it is no longer in use. The first surface initialized will point to the same memory that the video controller reads from, so it should be initialized with the width and height of the screen.
+\begin{lstlisting}
+struct oc_gfx_surface
+  oc_gfx_init_surface(unsigned int width,
+                      unsigned int height);
+\end{lstlisting}
+
+\subsubsection{oc\_gfx\_bind\_rendertarget}
+\textbf{Description:} Binds a surface as the active render target. This function \textit{must} be called before any drawing operations can be performed.
+\begin{lstlisting}
+void oc_gfx_bind_rendertarget(struct oc_gfx_surface *surface);
+\end{lstlisting}
+
+\subsubsection{oc\_gfx\_cliprect}
+\textbf{Description:} Sets the clipping rect. No pixels will be drawn outside of this rect (useful for restricting draws to a specific area of the render target). oc\_gfx\_bind\_rendertarget will reset the clipping rect to the size of the surface.
+\begin{lstlisting}
+inline void oc_gfx_cliprect(unsigned int x0,
+                            unsigned int y0,
+                            unsigned int x1,
+                            unsigned int y1);
+\end{lstlisting}
+
+\subsubsection{oc\_gfx\_srcrect}
+\textbf{Description:} Sets the source rectangle that will be used by texturing operations. This allows for only drawing a small part of a texture. oc\_gfx\_bind\_tex0 will reset this to the size of the texture.
+\begin{lstlisting}
+inline void oc_gfx_srcrect(unsigned int x0,
+                           unsigned int y0,
+                           unsigned int x1,
+                           unsigned int y1);
+\end{lstlisting}
+
+\subsubsection{oc\_gfx\_set\_pixel}
+\textbf{Description:} Set a pixel on coordinate x,y to color. This is done in software by direct memory writes. This operation is not affected by the clipping rect!
+\begin{lstlisting}
+inline void oc_gfx_set_pixel(unsigned int x, 
+                             unsigned int y, 
+                             unsigned int color);
+\end{lstlisting}
+
+\subsubsection{oc\_gfx\_memcpy}
+\textbf{Description:} Copies memory from the processor to the video memory. Size is in 32-bit words. This function is intended to work with the output array of the sprite converter utility to load images into memory. Remember to bind a texture as the render target first!
+\begin{lstlisting}
+void oc_gfx_memcpy(unsigned int mem[],
+                   unsigned int size);
+\end{lstlisting}
+
+\subsubsection{oc\_gfx\_set\_color}
+\textbf{Description:} Sets the current drawing color.
+\begin{lstlisting}
+inline void oc_gfx_set_color(unsigned int color);
+\end{lstlisting}
+
+\subsubsection{oc\_gfx\_rect}
+\textbf{Description:} Draws a rect from x0,y0 to x1,y1 and fills it with the current drawing color. If texturing is enabled, the current texture will be drawn instead.
+\begin{lstlisting}
+inline void oc_gfx_rect(unsigned int x0, 
+                        unsigned int y0, 
+                        unsigned int x1, 
+                        unsigned int y1);
+\end{lstlisting}
+
+\subsubsection{oc\_gfx\_line}
+\textbf{Description:} Draws a line from x0,y0 to x1,y1 with the current drawing color. If texturing is enabled, the first pixel of the current texture will be drawn instead.
+\begin{lstlisting}
+inline void oc_gfx_line(unsigned int x0, 
+                        unsigned int y0, 
+                        unsigned int x1, 
+                        unsigned int y1);
+\end{lstlisting}
+
+\subsubsection{oc\_gfx\_enable\_tex0}
+\textbf{Description:} Enables or disables texturing.
+\begin{lstlisting}
+void oc_gfx_enable_tex0(unsigned int enable);
+\end{lstlisting}
+
+\subsubsection{oc\_gfx\_bind\_tex0}
+\textbf{Description:} Binds a surface as the current texture. Will reset the source rect.
+\begin{lstlisting}
+void oc_gfx_bind_tex0(struct oc_gfx_surface* surface);
+\end{lstlisting}
+
+
+\subsubsection{oc\_gfx\_enable\_alpha}
+\textbf{Description:} Enables or disables alpha blending.
+\begin{lstlisting}
+void oc_gfx_enable_alpha(unsigned int enable);
+\end{lstlisting}
+
+\subsubsection{oc\_gfx\_set\_alpha}
+\textbf{Description:} Sets the alpha blending value.
+\begin{lstlisting}
+void oc_gfx_set_alpha(unsigned int alpha);
+\end{lstlisting}
+
+\subsubsection{oc\_gfx\_enable\_colorkey}
+\textbf{Description:} Enables or disables colorkey.
+\begin{lstlisting}
+void oc_gfx_enable_colorkey(unsigned int enable);
+\end{lstlisting}
+
+\subsubsection{oc\_gfx\_set\_colorkey}
+\textbf{Description:} Sets the colorkey color.
+\begin{lstlisting}
+void oc_gfx_set_colorkey(unsigned int colorkey);
+\end{lstlisting}
+
+\subsection{Extended newlib}
+The extended library is provided in \textbf{oc\_gfx\_plus.h} and \textbf{oc\_gfx\_plus.c}, but \textbf{oc\_gfx.c} also has to be compiled for it to work.
+
+Instead of using surface structs directly, the extended API hides surface management by returning id tags for each surface. The screen surface (defined by id -1) is handled as a single surface, even when double buffering is enabled.
+
+The driver defines the number of available surfaces (not counting the screen) with a static define. Change this if the default value is too low for your application.
+
+\subsubsection{oc\_gfxplus\_init}
+\textbf{Description:} Initializes the screen with the supplied video mode and returns an id for the screen.
+\begin{lstlisting}
+int oc_gfxplus_init(unsigned int width,
+                    unsigned int height,
+                    unsigned char bpp,
+                    unsigned char doubleBuffering);
+\end{lstlisting}
+
+\subsubsection{oc\_gfxplus\_init\_surface}
+\textbf{Description:} Unlike the basic API, this function both initializes a surface and loads a prepared image to it in one function call. The return value is an id that can be used to bind the surface. It changes render target during operation, but switches back to the last render target on completion. Since the screen(s) are already initialized by a call to init, they do not need to be loaded using this function.
+\begin{lstlisting}
+int oc_gfxplus_init_surface(unsigned int width,
+                            unsigned int height,
+                            unsigned int mem[]);
+\end{lstlisting}
+
+\subsubsection{oc\_gfxplus\_bind\_rendertarget}
+\textbf{Description:} Binds a surface as the current render target.
+\begin{lstlisting}
+void oc_gfxplus_bind_rendertarget(int surface);
+\end{lstlisting}
+
+\subsubsection{oc\_gfxplus\_flip}
+\textbf{Description:} Swaps which buffer to draw on when using double buffering. Needs to be called once before anything shows up on screen!
+\begin{lstlisting}
+void oc_gfxplus_flip();
+\end{lstlisting}
+
+\subsubsection{oc\_gfxplus\_clip}
+\textbf{Description:} Sets the current clipping rect. This is reset to the size of the new render target when oc\_gfxplus\_bind\_rendertarget is called.
+\begin{lstlisting}
+inline void oc_gfxplus_clip(unsigned int x0,
+                            unsigned int y0,
+                            unsigned int x1,
+                            unsigned int y1);
+\end{lstlisting}
+
+\subsubsection{oc\_gfxplus\_fill}
+\textbf{Description:} Draws a rectangle to the current render target with a flat color.
+\begin{lstlisting}
+void oc_gfxplus_fill(unsigned int x0,
+                     unsigned int y0,
+                     unsigned int x1,
+                     unsigned int y1,
+                     unsigned int color);
+\end{lstlisting}
+
+\subsubsection{oc\_gfxplus\_line}
+\textbf{Description:} Draws a line from x0,y0 to x1,y1 to the current render target with a flat color.
+\begin{lstlisting}
+void oc_gfxplus_line(unsigned int x0,
+                     unsigned int y0,
+                     unsigned int x1,
+                     unsigned int y1,
+                     unsigned int color);
+\end{lstlisting}
+
+\subsubsection{oc\_gfxplus\_draw\_surface}
+\textbf{Description:} Draws a texture to the current render target.
+\begin{lstlisting}
+void oc_gfxplus_draw_surface(unsigned int x0,
+                             unsigned int y0,
+                             unsigned int surface);
+\end{lstlisting}
+
+\subsubsection{oc\_gfxplus\_draw\_surface\_section}
+\textbf{Description:} Draws a section of a texture defined by src0, src1 to the current render target.
+\begin{lstlisting}
+void oc_gfxplus_draw_surface_section(unsigned int x0,
+                                     unsigned int y0,
+                                     unsigned int srcx0,
+                                     unsigned int srcy0,
+                                     unsigned int srcx1,
+                                     unsigned int srcy1,
+                                     unsigned int surface);
+\end{lstlisting}
+
+
+\subsubsection{oc\_gfxplus\_colorkey}
+\textbf{Description:} Sets the colorkey color and enables or disables the use of the colorkey.
+\begin{lstlisting}
+void oc_gfxplus_colorkey(unsigned int colorkey, 
+                         unsigned int enable);
+\end{lstlisting}
+
+\subsubsection{oc\_gfxplus\_alpha}
+\textbf{Description:} Sets the alpha value and enables or disables the use of the alpha blending.
+\begin{lstlisting}
+void oc_gfxplus_alpha(unsigned int alpha, 
+                      unsigned int enable);
+\end{lstlisting}
+
+\subsection{Linux}
+The current version of the core does not have a Linux driver.
+
+\subsection{Utilities}
+\subsubsection{Sprite Maker}
+Since there is no libraries for loading images in the bare metal driver, a utility program is provided that converts an image into a format that can be loaded to the graphics accelerator. The Sprite Maker utility uses SDL and SDL\_image to load images, and supports loading several basic formats, such as bmp, jpg, png, gif etc. The utility supports writing to 8-, 16-, 24- and 32-bits-per-pixel (must match the format set by oc\_gfx\_set\_videomode). The width of the loaded image must be a multiple of 4 pixels (8 bpp), 2 pixels (16 bpp) or 1 bpp (24, 32 bpp) respectively.
+
+The resulting output of the utility is a header file that can be included into your program. This header declares an array, which can be copied to memory and be used as a texture.
+
+This is sample shows how the converter utility can be used:
+
+\begin{lstlisting}
+./spritemaker image.png [bpp]
+\end{lstlisting}
+
+If bpp is not provided, the utility uses 8 bits-per-pixel. For an example of how to use the output of the converter, see section \ref{sec:examples}.
+
+\section{Programming examples}
+\label{sec:examples}
+The following piece of code shows how to use the extended interface for a bare metal implementation on the ORPSoCv2 platform. Bahamut\_cc.png.h is a 186 by 248 pixel image with a pinkish background (rgb code ff00ff, or f81f in 16 bit). The header file is generated by the sprite maker utility at 16 bit color depth.
+
+\begin{lstlisting}
+#include "oc_gfx_plus.h"
+
+#include "Bahamut_cc.png.h"
+
+int main(void)
+{
+    int i;
+
+    // Initialize screen to 640x480-16@60
+    // No double buffering
+    int screen = oc_gfxplus_init(640, 480, 16, 0);
+
+    // Initialize dragon sprite
+    int bahamut_sprite =
+        oc_gfxplus_init_surface(186, 248, Bahamut_cc);
+
+    // Activate colorkeying
+    oc_gfxplus_colorkey(0xf81f, 1);
+
+    // Clear screen, white color
+    oc_gfxplus_fill(0,0,640,480,0xffff);
+    // Draw a few lines with different colors
+    oc_gfxplus_line(200,100,10,10,0xf000);
+    oc_gfxplus_line(200,100,351,31,0x0ff0);
+    oc_gfxplus_line(200,100,121,231,0x00f0);
+    oc_gfxplus_line(200,100,321,231,0xf00f);
+    
+    // Draw the dragon at different alpha settings
+    oc_gfxplus_alpha(64,1);
+    oc_gfxplus_draw_surface(100, 100, bahamut_sprite);
+    oc_gfxplus_alpha(128,1);
+    oc_gfxplus_draw_surface(120, 102, bahamut_sprite);
+    oc_gfxplus_alpha(255,1);
+    oc_gfxplus_draw_surface(140, 104, bahamut_sprite);
+
+    while(1);
+}
+\end{lstlisting}
+
+
+%\bibliographystyle{abbrv}
+%\bibliography{../../ref}
+
+\end{document}

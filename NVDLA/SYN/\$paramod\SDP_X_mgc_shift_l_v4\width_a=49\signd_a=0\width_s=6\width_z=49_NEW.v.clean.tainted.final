@@ -1,0 +1,56 @@
+module \$paramod\SDP_X_mgc_shift_l_v4\width_a=49\signd_a=0\width_s=6\width_z=49 ( a , s , INSTR_IN_ZY , rst_zy , a_T , a_S , s_T , s_S , z_R0 , z_C0 , z_X0 , z , a_R , a_X , a_C , s_R , s_X , s_C , z_T , z_S );
+  input rst_zy;
+  integer i;
+  input INSTR_IN_ZY;
+  input [48:0] a;
+  input [48:0] a_T ;
+  input [13:0] a_S ;
+  output [48:0] a_R ;
+  output [48:0] a_X ;
+  output [48:0] a_C ;
+  input [5:0] s;
+  input [5:0] s_T ;
+  input [13:0] s_S ;
+  output [5:0] s_R ;
+  output [5:0] s_X ;
+  output [5:0] s_C ;
+  output [48:0] z;
+  logic [48:0] z ;
+  output [48:0] z_T ;
+  logic [48:0] z_T ;
+  logic [48:0] z_R ;
+  logic [48:0] z_C ;
+  logic [48:0] z_X ;
+  logic [13:0] z_S ;
+  input [48:0] z_R0 ;
+  input [48:0] z_C0 ;
+  input [48:0] z_X0 ;
+  output [13:0] z_S ;
+  assign z = a <<< s;
+  assign z_S = 0 ;
+  logic [48:0] a_C0 ;
+  logic [48:0] a_R0 ;
+  logic [48:0] a_X0 ;
+  logic [5:0] s_C0 ;
+  logic [5:0] s_R0 ;
+  logic [5:0] s_X0 ;
+  assign z_T = a_T | s_T ;
+  assign a_C0 = z_C ;
+  assign a_X0 = z_X ;
+  assign s_C0 = z_C ;
+  assign s_X0 = z_X ;
+  assign a_R0 = z_R | ( z_C & s_T );
+  assign s_R0 = z_R | ( z_C & a_T );
+  assign s_C = ( s_C0 );
+  assign a_C = ( a_C0 );
+  assign z_C = ( z_C0 );
+  assign s_X = ( s_X0 );
+  assign a_X = ( a_X0 );
+  assign z_X = ( z_X0 );
+  assign s_R = ( s_X0 & s_R0 );
+  assign a_R = ( a_X0 & a_R0 );
+  assign z_R = ( z_X0 & z_R0 );
+ // ground taints for floating regs
+ // ground taints for unused wires
+ // ground taints for unused wire slices
+endmodule

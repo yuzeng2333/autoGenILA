@@ -253,6 +253,36 @@ src/pass_info.cpp.s:
 	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/src/pass_info.cpp.s
 .PHONY : src/pass_info.cpp.s
 
+src/syntax_patterns.o: src/syntax_patterns.cpp.o
+
+.PHONY : src/syntax_patterns.o
+
+# target to build an object file
+src/syntax_patterns.cpp.o:
+	$(MAKE) -f CMakeFiles/taint_gen.dir/build.make CMakeFiles/taint_gen.dir/src/syntax_patterns.cpp.o
+	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/src/syntax_patterns.cpp.o
+.PHONY : src/syntax_patterns.cpp.o
+
+src/syntax_patterns.i: src/syntax_patterns.cpp.i
+
+.PHONY : src/syntax_patterns.i
+
+# target to preprocess a source file
+src/syntax_patterns.cpp.i:
+	$(MAKE) -f CMakeFiles/taint_gen.dir/build.make CMakeFiles/taint_gen.dir/src/syntax_patterns.cpp.i
+	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/src/syntax_patterns.cpp.i
+.PHONY : src/syntax_patterns.cpp.i
+
+src/syntax_patterns.s: src/syntax_patterns.cpp.s
+
+.PHONY : src/syntax_patterns.s
+
+# target to generate assembly for a file
+src/syntax_patterns.cpp.s:
+	$(MAKE) -f CMakeFiles/taint_gen.dir/build.make CMakeFiles/taint_gen.dir/src/syntax_patterns.cpp.s
+	$(MAKE) -f CMakeFiles/TaintGenLib.dir/build.make CMakeFiles/TaintGenLib.dir/src/syntax_patterns.cpp.s
+.PHONY : src/syntax_patterns.cpp.s
+
 src/taint_gen.o: src/taint_gen.cpp.o
 
 .PHONY : src/taint_gen.o
@@ -365,6 +395,9 @@ help:
 	@echo "... src/pass_info.o"
 	@echo "... src/pass_info.i"
 	@echo "... src/pass_info.s"
+	@echo "... src/syntax_patterns.o"
+	@echo "... src/syntax_patterns.i"
+	@echo "... src/syntax_patterns.s"
 	@echo "... src/taint_gen.o"
 	@echo "... src/taint_gen.i"
 	@echo "... src/taint_gen.s"

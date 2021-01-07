@@ -1,0 +1,2863 @@
+  logic [767:0] _00_;
+  logic [767:0] _00__T ;
+  logic [767:0] _00__R ;
+  logic [767:0] _00__C ;
+  logic [767:0] _00__X ;
+  logic [13:0] _00__S ;
+  logic [767:0] _01_;
+  logic [767:0] _01__T ;
+  logic [767:0] _01__R ;
+  logic [767:0] _01__C ;
+  logic [767:0] _01__X ;
+  logic [13:0] _01__S ;
+  logic [767:0] _02_;
+  logic [767:0] _02__T ;
+  logic [767:0] _02__R ;
+  logic [767:0] _02__C ;
+  logic [767:0] _02__X ;
+  logic [13:0] _02__S ;
+  logic [767:0] _03_;
+  logic [767:0] _03__T ;
+  logic [767:0] _03__R ;
+  logic [767:0] _03__C ;
+  logic [767:0] _03__X ;
+  logic [13:0] _03__S ;
+  logic [543:0] _04_;
+  logic [543:0] _04__T ;
+  logic [543:0] _04__R ;
+  logic [543:0] _04__C ;
+  logic [543:0] _04__X ;
+  logic [13:0] _04__S ;
+  logic [543:0] _05_;
+  logic [543:0] _05__T ;
+  logic [543:0] _05__R ;
+  logic [543:0] _05__C ;
+  logic [543:0] _05__X ;
+  logic [13:0] _05__S ;
+  logic [543:0] _06_;
+  logic [543:0] _06__T ;
+  logic [543:0] _06__R ;
+  logic [543:0] _06__C ;
+  logic [543:0] _06__X ;
+  logic [13:0] _06__S ;
+  logic [543:0] _07_;
+  logic [543:0] _07__T ;
+  logic [543:0] _07__R ;
+  logic [543:0] _07__C ;
+  logic [543:0] _07__X ;
+  logic [13:0] _07__S ;
+  logic [767:0] _08_;
+  logic [767:0] _08__T ;
+  logic [767:0] _08__R ;
+  logic [767:0] _08__C ;
+  logic [767:0] _08__X ;
+  logic [13:0] _08__S ;
+  logic [767:0] _09_;
+  logic [767:0] _09__T ;
+  logic [767:0] _09__R ;
+  logic [767:0] _09__C ;
+  logic [767:0] _09__X ;
+  logic [13:0] _09__S ;
+  logic [767:0] _10_;
+  logic [767:0] _10__T ;
+  logic [767:0] _10__R ;
+  logic [767:0] _10__C ;
+  logic [767:0] _10__X ;
+  logic [13:0] _10__S ;
+  logic [767:0] _11_;
+  logic [767:0] _11__T ;
+  logic [767:0] _11__R ;
+  logic [767:0] _11__C ;
+  logic [767:0] _11__X ;
+  logic [13:0] _11__S ;
+  logic [543:0] _12_;
+  logic [543:0] _12__T ;
+  logic [543:0] _12__R ;
+  logic [543:0] _12__C ;
+  logic [543:0] _12__X ;
+  logic [13:0] _12__S ;
+  logic [543:0] _13_;
+  logic [543:0] _13__T ;
+  logic [543:0] _13__R ;
+  logic [543:0] _13__C ;
+  logic [543:0] _13__X ;
+  logic [13:0] _13__S ;
+  logic [543:0] _14_;
+  logic [543:0] _14__T ;
+  logic [543:0] _14__R ;
+  logic [543:0] _14__C ;
+  logic [543:0] _14__X ;
+  logic [13:0] _14__S ;
+  logic [543:0] _15_;
+  logic [543:0] _15__T ;
+  logic [543:0] _15__R ;
+  logic [543:0] _15__C ;
+  logic [543:0] _15__X ;
+  logic [13:0] _15__S ;
+  logic [767:0] _16_;
+  logic [767:0] _16__T ;
+  logic [767:0] _16__R ;
+  logic [767:0] _16__C ;
+  logic [767:0] _16__X ;
+  logic [13:0] _16__S ;
+  logic [767:0] _17_;
+  logic [767:0] _17__T ;
+  logic [767:0] _17__R ;
+  logic [767:0] _17__C ;
+  logic [767:0] _17__X ;
+  logic [13:0] _17__S ;
+  logic [767:0] _18_;
+  logic [767:0] _18__T ;
+  logic [767:0] _18__R ;
+  logic [767:0] _18__C ;
+  logic [767:0] _18__X ;
+  logic [13:0] _18__S ;
+  logic [767:0] _19_;
+  logic [767:0] _19__T ;
+  logic [767:0] _19__R ;
+  logic [767:0] _19__C ;
+  logic [767:0] _19__X ;
+  logic [13:0] _19__S ;
+  logic [543:0] _20_;
+  logic [543:0] _20__T ;
+  logic [543:0] _20__R ;
+  logic [543:0] _20__C ;
+  logic [543:0] _20__X ;
+  logic [13:0] _20__S ;
+  logic [543:0] _21_;
+  logic [543:0] _21__T ;
+  logic [543:0] _21__R ;
+  logic [543:0] _21__C ;
+  logic [543:0] _21__X ;
+  logic [13:0] _21__S ;
+  logic [543:0] _22_;
+  logic [543:0] _22__T ;
+  logic [543:0] _22__R ;
+  logic [543:0] _22__C ;
+  logic [543:0] _22__X ;
+  logic [13:0] _22__S ;
+  logic [543:0] _23_;
+  logic [543:0] _23__T ;
+  logic [543:0] _23__R ;
+  logic [543:0] _23__C ;
+  logic [543:0] _23__X ;
+  logic [13:0] _23__S ;
+  input [4:0] abuf_rd_addr;
+  input [4:0] abuf_rd_addr_T ;
+  input [13:0] abuf_rd_addr_S ;
+  output [4:0] abuf_rd_addr_R ;
+  output [4:0] abuf_rd_addr_X ;
+  output [4:0] abuf_rd_addr_C ;
+  output [767:0] abuf_rd_data_0;
+  logic [767:0] abuf_rd_data_0 ;
+  output [767:0] abuf_rd_data_0_T ;
+  logic [767:0] abuf_rd_data_0_T ;
+  logic [767:0] abuf_rd_data_0_R ;
+  logic [767:0] abuf_rd_data_0_C ;
+  logic [767:0] abuf_rd_data_0_X ;
+  logic [13:0] abuf_rd_data_0_S ;
+  input [767:0] abuf_rd_data_0_R0 ;
+  input [767:0] abuf_rd_data_0_C0 ;
+  input [767:0] abuf_rd_data_0_X0 ;
+  output [13:0] abuf_rd_data_0_S ;
+  logic [767:0] abuf_rd_data_0;
+  logic [767:0]  abuf_rd_data_0_T ;
+  logic [767:0]  abuf_rd_data_0_PREV_VAL1 ;
+  logic [767:0]  abuf_rd_data_0_PREV_VAL2 ;
+  logic abuf_rd_data_0_t_flag ;
+  logic abuf_rd_data_0_r_flag ;
+  assign abuf_rd_data_0_S = 946 ;
+  logic [767:0] abuf_rd_data_0_w;
+  logic [767:0] abuf_rd_data_0_w_T ;
+  logic [767:0] abuf_rd_data_0_w_R ;
+  logic [767:0] abuf_rd_data_0_w_C ;
+  logic [767:0] abuf_rd_data_0_w_X ;
+  logic [13:0] abuf_rd_data_0_w_S ;
+  output [767:0] abuf_rd_data_1;
+  logic [767:0] abuf_rd_data_1 ;
+  output [767:0] abuf_rd_data_1_T ;
+  logic [767:0] abuf_rd_data_1_T ;
+  logic [767:0] abuf_rd_data_1_R ;
+  logic [767:0] abuf_rd_data_1_C ;
+  logic [767:0] abuf_rd_data_1_X ;
+  logic [13:0] abuf_rd_data_1_S ;
+  input [767:0] abuf_rd_data_1_R0 ;
+  input [767:0] abuf_rd_data_1_C0 ;
+  input [767:0] abuf_rd_data_1_X0 ;
+  output [13:0] abuf_rd_data_1_S ;
+  logic [767:0] abuf_rd_data_1;
+  logic [767:0]  abuf_rd_data_1_T ;
+  logic [767:0]  abuf_rd_data_1_PREV_VAL1 ;
+  logic [767:0]  abuf_rd_data_1_PREV_VAL2 ;
+  logic abuf_rd_data_1_t_flag ;
+  logic abuf_rd_data_1_r_flag ;
+  assign abuf_rd_data_1_S = 947 ;
+  logic [767:0] abuf_rd_data_1_w;
+  logic [767:0] abuf_rd_data_1_w_T ;
+  logic [767:0] abuf_rd_data_1_w_R ;
+  logic [767:0] abuf_rd_data_1_w_C ;
+  logic [767:0] abuf_rd_data_1_w_X ;
+  logic [13:0] abuf_rd_data_1_w_S ;
+  output [767:0] abuf_rd_data_2;
+  logic [767:0] abuf_rd_data_2 ;
+  output [767:0] abuf_rd_data_2_T ;
+  logic [767:0] abuf_rd_data_2_T ;
+  logic [767:0] abuf_rd_data_2_R ;
+  logic [767:0] abuf_rd_data_2_C ;
+  logic [767:0] abuf_rd_data_2_X ;
+  logic [13:0] abuf_rd_data_2_S ;
+  input [767:0] abuf_rd_data_2_R0 ;
+  input [767:0] abuf_rd_data_2_C0 ;
+  input [767:0] abuf_rd_data_2_X0 ;
+  output [13:0] abuf_rd_data_2_S ;
+  logic [767:0] abuf_rd_data_2;
+  logic [767:0]  abuf_rd_data_2_T ;
+  logic [767:0]  abuf_rd_data_2_PREV_VAL1 ;
+  logic [767:0]  abuf_rd_data_2_PREV_VAL2 ;
+  logic abuf_rd_data_2_t_flag ;
+  logic abuf_rd_data_2_r_flag ;
+  assign abuf_rd_data_2_S = 948 ;
+  logic [767:0] abuf_rd_data_2_w;
+  logic [767:0] abuf_rd_data_2_w_T ;
+  logic [767:0] abuf_rd_data_2_w_R ;
+  logic [767:0] abuf_rd_data_2_w_C ;
+  logic [767:0] abuf_rd_data_2_w_X ;
+  logic [13:0] abuf_rd_data_2_w_S ;
+  output [767:0] abuf_rd_data_3;
+  logic [767:0] abuf_rd_data_3 ;
+  output [767:0] abuf_rd_data_3_T ;
+  logic [767:0] abuf_rd_data_3_T ;
+  logic [767:0] abuf_rd_data_3_R ;
+  logic [767:0] abuf_rd_data_3_C ;
+  logic [767:0] abuf_rd_data_3_X ;
+  logic [13:0] abuf_rd_data_3_S ;
+  input [767:0] abuf_rd_data_3_R0 ;
+  input [767:0] abuf_rd_data_3_C0 ;
+  input [767:0] abuf_rd_data_3_X0 ;
+  output [13:0] abuf_rd_data_3_S ;
+  logic [767:0] abuf_rd_data_3;
+  logic [767:0]  abuf_rd_data_3_T ;
+  logic [767:0]  abuf_rd_data_3_PREV_VAL1 ;
+  logic [767:0]  abuf_rd_data_3_PREV_VAL2 ;
+  logic abuf_rd_data_3_t_flag ;
+  logic abuf_rd_data_3_r_flag ;
+  assign abuf_rd_data_3_S = 949 ;
+  logic [767:0] abuf_rd_data_3_w;
+  logic [767:0] abuf_rd_data_3_w_T ;
+  logic [767:0] abuf_rd_data_3_w_R ;
+  logic [767:0] abuf_rd_data_3_w_C ;
+  logic [767:0] abuf_rd_data_3_w_X ;
+  logic [13:0] abuf_rd_data_3_w_S ;
+  output [543:0] abuf_rd_data_4;
+  logic [543:0] abuf_rd_data_4 ;
+  output [543:0] abuf_rd_data_4_T ;
+  logic [543:0] abuf_rd_data_4_T ;
+  logic [543:0] abuf_rd_data_4_R ;
+  logic [543:0] abuf_rd_data_4_C ;
+  logic [543:0] abuf_rd_data_4_X ;
+  logic [13:0] abuf_rd_data_4_S ;
+  input [543:0] abuf_rd_data_4_R0 ;
+  input [543:0] abuf_rd_data_4_C0 ;
+  input [543:0] abuf_rd_data_4_X0 ;
+  output [13:0] abuf_rd_data_4_S ;
+  logic [543:0] abuf_rd_data_4;
+  logic [543:0]  abuf_rd_data_4_T ;
+  logic [543:0]  abuf_rd_data_4_PREV_VAL1 ;
+  logic [543:0]  abuf_rd_data_4_PREV_VAL2 ;
+  logic abuf_rd_data_4_t_flag ;
+  logic abuf_rd_data_4_r_flag ;
+  assign abuf_rd_data_4_S = 950 ;
+  logic [543:0] abuf_rd_data_4_w;
+  logic [543:0] abuf_rd_data_4_w_T ;
+  logic [543:0] abuf_rd_data_4_w_R ;
+  logic [543:0] abuf_rd_data_4_w_C ;
+  logic [543:0] abuf_rd_data_4_w_X ;
+  logic [13:0] abuf_rd_data_4_w_S ;
+  output [543:0] abuf_rd_data_5;
+  logic [543:0] abuf_rd_data_5 ;
+  output [543:0] abuf_rd_data_5_T ;
+  logic [543:0] abuf_rd_data_5_T ;
+  logic [543:0] abuf_rd_data_5_R ;
+  logic [543:0] abuf_rd_data_5_C ;
+  logic [543:0] abuf_rd_data_5_X ;
+  logic [13:0] abuf_rd_data_5_S ;
+  input [543:0] abuf_rd_data_5_R0 ;
+  input [543:0] abuf_rd_data_5_C0 ;
+  input [543:0] abuf_rd_data_5_X0 ;
+  output [13:0] abuf_rd_data_5_S ;
+  logic [543:0] abuf_rd_data_5;
+  logic [543:0]  abuf_rd_data_5_T ;
+  logic [543:0]  abuf_rd_data_5_PREV_VAL1 ;
+  logic [543:0]  abuf_rd_data_5_PREV_VAL2 ;
+  logic abuf_rd_data_5_t_flag ;
+  logic abuf_rd_data_5_r_flag ;
+  assign abuf_rd_data_5_S = 951 ;
+  logic [543:0] abuf_rd_data_5_w;
+  logic [543:0] abuf_rd_data_5_w_T ;
+  logic [543:0] abuf_rd_data_5_w_R ;
+  logic [543:0] abuf_rd_data_5_w_C ;
+  logic [543:0] abuf_rd_data_5_w_X ;
+  logic [13:0] abuf_rd_data_5_w_S ;
+  output [543:0] abuf_rd_data_6;
+  logic [543:0] abuf_rd_data_6 ;
+  output [543:0] abuf_rd_data_6_T ;
+  logic [543:0] abuf_rd_data_6_T ;
+  logic [543:0] abuf_rd_data_6_R ;
+  logic [543:0] abuf_rd_data_6_C ;
+  logic [543:0] abuf_rd_data_6_X ;
+  logic [13:0] abuf_rd_data_6_S ;
+  input [543:0] abuf_rd_data_6_R0 ;
+  input [543:0] abuf_rd_data_6_C0 ;
+  input [543:0] abuf_rd_data_6_X0 ;
+  output [13:0] abuf_rd_data_6_S ;
+  logic [543:0] abuf_rd_data_6;
+  logic [543:0]  abuf_rd_data_6_T ;
+  logic [543:0]  abuf_rd_data_6_PREV_VAL1 ;
+  logic [543:0]  abuf_rd_data_6_PREV_VAL2 ;
+  logic abuf_rd_data_6_t_flag ;
+  logic abuf_rd_data_6_r_flag ;
+  assign abuf_rd_data_6_S = 952 ;
+  logic [543:0] abuf_rd_data_6_w;
+  logic [543:0] abuf_rd_data_6_w_T ;
+  logic [543:0] abuf_rd_data_6_w_R ;
+  logic [543:0] abuf_rd_data_6_w_C ;
+  logic [543:0] abuf_rd_data_6_w_X ;
+  logic [13:0] abuf_rd_data_6_w_S ;
+  output [543:0] abuf_rd_data_7;
+  logic [543:0] abuf_rd_data_7 ;
+  output [543:0] abuf_rd_data_7_T ;
+  logic [543:0] abuf_rd_data_7_T ;
+  logic [543:0] abuf_rd_data_7_R ;
+  logic [543:0] abuf_rd_data_7_C ;
+  logic [543:0] abuf_rd_data_7_X ;
+  logic [13:0] abuf_rd_data_7_S ;
+  input [543:0] abuf_rd_data_7_R0 ;
+  input [543:0] abuf_rd_data_7_C0 ;
+  input [543:0] abuf_rd_data_7_X0 ;
+  output [13:0] abuf_rd_data_7_S ;
+  logic [543:0] abuf_rd_data_7;
+  logic [543:0]  abuf_rd_data_7_T ;
+  logic [543:0]  abuf_rd_data_7_PREV_VAL1 ;
+  logic [543:0]  abuf_rd_data_7_PREV_VAL2 ;
+  logic abuf_rd_data_7_t_flag ;
+  logic abuf_rd_data_7_r_flag ;
+  assign abuf_rd_data_7_S = 953 ;
+  logic [543:0] abuf_rd_data_7_w;
+  logic [543:0] abuf_rd_data_7_w_T ;
+  logic [543:0] abuf_rd_data_7_w_R ;
+  logic [543:0] abuf_rd_data_7_w_C ;
+  logic [543:0] abuf_rd_data_7_w_X ;
+  logic [13:0] abuf_rd_data_7_w_S ;
+  logic [767:0] abuf_rd_data_ecc_0;
+  logic [767:0] abuf_rd_data_ecc_0_T ;
+  logic [767:0] abuf_rd_data_ecc_0_R ;
+  logic [767:0] abuf_rd_data_ecc_0_C ;
+  logic [767:0] abuf_rd_data_ecc_0_X ;
+  logic [13:0] abuf_rd_data_ecc_0_S ;
+  logic [767:0] abuf_rd_data_ecc_1;
+  logic [767:0] abuf_rd_data_ecc_1_T ;
+  logic [767:0] abuf_rd_data_ecc_1_R ;
+  logic [767:0] abuf_rd_data_ecc_1_C ;
+  logic [767:0] abuf_rd_data_ecc_1_X ;
+  logic [13:0] abuf_rd_data_ecc_1_S ;
+  logic [767:0] abuf_rd_data_ecc_2;
+  logic [767:0] abuf_rd_data_ecc_2_T ;
+  logic [767:0] abuf_rd_data_ecc_2_R ;
+  logic [767:0] abuf_rd_data_ecc_2_C ;
+  logic [767:0] abuf_rd_data_ecc_2_X ;
+  logic [13:0] abuf_rd_data_ecc_2_S ;
+  logic [767:0] abuf_rd_data_ecc_3;
+  logic [767:0] abuf_rd_data_ecc_3_T ;
+  logic [767:0] abuf_rd_data_ecc_3_R ;
+  logic [767:0] abuf_rd_data_ecc_3_C ;
+  logic [767:0] abuf_rd_data_ecc_3_X ;
+  logic [13:0] abuf_rd_data_ecc_3_S ;
+  logic [543:0] abuf_rd_data_ecc_4;
+  logic [543:0] abuf_rd_data_ecc_4_T ;
+  logic [543:0] abuf_rd_data_ecc_4_R ;
+  logic [543:0] abuf_rd_data_ecc_4_C ;
+  logic [543:0] abuf_rd_data_ecc_4_X ;
+  logic [13:0] abuf_rd_data_ecc_4_S ;
+  logic [543:0] abuf_rd_data_ecc_5;
+  logic [543:0] abuf_rd_data_ecc_5_T ;
+  logic [543:0] abuf_rd_data_ecc_5_R ;
+  logic [543:0] abuf_rd_data_ecc_5_C ;
+  logic [543:0] abuf_rd_data_ecc_5_X ;
+  logic [13:0] abuf_rd_data_ecc_5_S ;
+  logic [543:0] abuf_rd_data_ecc_6;
+  logic [543:0] abuf_rd_data_ecc_6_T ;
+  logic [543:0] abuf_rd_data_ecc_6_R ;
+  logic [543:0] abuf_rd_data_ecc_6_C ;
+  logic [543:0] abuf_rd_data_ecc_6_X ;
+  logic [13:0] abuf_rd_data_ecc_6_S ;
+  logic [543:0] abuf_rd_data_ecc_7;
+  logic [543:0] abuf_rd_data_ecc_7_T ;
+  logic [543:0] abuf_rd_data_ecc_7_R ;
+  logic [543:0] abuf_rd_data_ecc_7_C ;
+  logic [543:0] abuf_rd_data_ecc_7_X ;
+  logic [13:0] abuf_rd_data_ecc_7_S ;
+  input [7:0] abuf_rd_en;
+  input [7:0] abuf_rd_en_T ;
+  input [13:0] abuf_rd_en_S ;
+  output [7:0] abuf_rd_en_R ;
+  output [7:0] abuf_rd_en_X ;
+  output [7:0] abuf_rd_en_C ;
+  logic [7:0] abuf_rd_en_d1;
+  logic [7:0]  abuf_rd_en_d1_T ;
+  logic [7:0]  abuf_rd_en_d1_PREV_VAL1 ;
+  logic [7:0]  abuf_rd_en_d1_PREV_VAL2 ;
+  logic [7:0]  abuf_rd_en_d1_R ;
+  logic [7:0]  abuf_rd_en_d1_X ;
+  logic [7:0]  abuf_rd_en_d1_C ;
+  logic [13:0] abuf_rd_en_d1_S ;
+  logic abuf_rd_en_d1_t_flag ;
+  logic abuf_rd_en_d1_r_flag ;
+  assign abuf_rd_en_d1_S = 954 ;
+  logic [7:0] abuf_rd_en_d2;
+  logic [7:0]  abuf_rd_en_d2_T ;
+  logic [7:0]  abuf_rd_en_d2_PREV_VAL1 ;
+  logic [7:0]  abuf_rd_en_d2_PREV_VAL2 ;
+  logic [7:0]  abuf_rd_en_d2_R ;
+  logic [7:0]  abuf_rd_en_d2_X ;
+  logic [7:0]  abuf_rd_en_d2_C ;
+  logic [13:0] abuf_rd_en_d2_S ;
+  logic abuf_rd_en_d2_t_flag ;
+  logic abuf_rd_en_d2_r_flag ;
+  assign abuf_rd_en_d2_S = 955 ;
+  logic [767:0] abuf_rd_raw_data_0;
+  logic [767:0] abuf_rd_raw_data_0_T ;
+  logic [767:0] abuf_rd_raw_data_0_R ;
+  logic [767:0] abuf_rd_raw_data_0_C ;
+  logic [767:0] abuf_rd_raw_data_0_X ;
+  logic [13:0] abuf_rd_raw_data_0_S ;
+  logic [767:0] abuf_rd_raw_data_0_d2;
+  logic [767:0]  abuf_rd_raw_data_0_d2_T ;
+  logic [767:0]  abuf_rd_raw_data_0_d2_PREV_VAL1 ;
+  logic [767:0]  abuf_rd_raw_data_0_d2_PREV_VAL2 ;
+  logic [767:0]  abuf_rd_raw_data_0_d2_R ;
+  logic [767:0]  abuf_rd_raw_data_0_d2_X ;
+  logic [767:0]  abuf_rd_raw_data_0_d2_C ;
+  logic [13:0] abuf_rd_raw_data_0_d2_S ;
+  logic abuf_rd_raw_data_0_d2_t_flag ;
+  logic abuf_rd_raw_data_0_d2_r_flag ;
+  assign abuf_rd_raw_data_0_d2_S = 956 ;
+  logic [767:0] abuf_rd_raw_data_1;
+  logic [767:0] abuf_rd_raw_data_1_T ;
+  logic [767:0] abuf_rd_raw_data_1_R ;
+  logic [767:0] abuf_rd_raw_data_1_C ;
+  logic [767:0] abuf_rd_raw_data_1_X ;
+  logic [13:0] abuf_rd_raw_data_1_S ;
+  logic [767:0] abuf_rd_raw_data_1_d2;
+  logic [767:0]  abuf_rd_raw_data_1_d2_T ;
+  logic [767:0]  abuf_rd_raw_data_1_d2_PREV_VAL1 ;
+  logic [767:0]  abuf_rd_raw_data_1_d2_PREV_VAL2 ;
+  logic [767:0]  abuf_rd_raw_data_1_d2_R ;
+  logic [767:0]  abuf_rd_raw_data_1_d2_X ;
+  logic [767:0]  abuf_rd_raw_data_1_d2_C ;
+  logic [13:0] abuf_rd_raw_data_1_d2_S ;
+  logic abuf_rd_raw_data_1_d2_t_flag ;
+  logic abuf_rd_raw_data_1_d2_r_flag ;
+  assign abuf_rd_raw_data_1_d2_S = 957 ;
+  logic [767:0] abuf_rd_raw_data_2;
+  logic [767:0] abuf_rd_raw_data_2_T ;
+  logic [767:0] abuf_rd_raw_data_2_R ;
+  logic [767:0] abuf_rd_raw_data_2_C ;
+  logic [767:0] abuf_rd_raw_data_2_X ;
+  logic [13:0] abuf_rd_raw_data_2_S ;
+  logic [767:0] abuf_rd_raw_data_2_d2;
+  logic [767:0]  abuf_rd_raw_data_2_d2_T ;
+  logic [767:0]  abuf_rd_raw_data_2_d2_PREV_VAL1 ;
+  logic [767:0]  abuf_rd_raw_data_2_d2_PREV_VAL2 ;
+  logic [767:0]  abuf_rd_raw_data_2_d2_R ;
+  logic [767:0]  abuf_rd_raw_data_2_d2_X ;
+  logic [767:0]  abuf_rd_raw_data_2_d2_C ;
+  logic [13:0] abuf_rd_raw_data_2_d2_S ;
+  logic abuf_rd_raw_data_2_d2_t_flag ;
+  logic abuf_rd_raw_data_2_d2_r_flag ;
+  assign abuf_rd_raw_data_2_d2_S = 958 ;
+  logic [767:0] abuf_rd_raw_data_3;
+  logic [767:0] abuf_rd_raw_data_3_T ;
+  logic [767:0] abuf_rd_raw_data_3_R ;
+  logic [767:0] abuf_rd_raw_data_3_C ;
+  logic [767:0] abuf_rd_raw_data_3_X ;
+  logic [13:0] abuf_rd_raw_data_3_S ;
+  logic [767:0] abuf_rd_raw_data_3_d2;
+  logic [767:0]  abuf_rd_raw_data_3_d2_T ;
+  logic [767:0]  abuf_rd_raw_data_3_d2_PREV_VAL1 ;
+  logic [767:0]  abuf_rd_raw_data_3_d2_PREV_VAL2 ;
+  logic [767:0]  abuf_rd_raw_data_3_d2_R ;
+  logic [767:0]  abuf_rd_raw_data_3_d2_X ;
+  logic [767:0]  abuf_rd_raw_data_3_d2_C ;
+  logic [13:0] abuf_rd_raw_data_3_d2_S ;
+  logic abuf_rd_raw_data_3_d2_t_flag ;
+  logic abuf_rd_raw_data_3_d2_r_flag ;
+  assign abuf_rd_raw_data_3_d2_S = 959 ;
+  logic [543:0] abuf_rd_raw_data_4;
+  logic [543:0] abuf_rd_raw_data_4_T ;
+  logic [543:0] abuf_rd_raw_data_4_R ;
+  logic [543:0] abuf_rd_raw_data_4_C ;
+  logic [543:0] abuf_rd_raw_data_4_X ;
+  logic [13:0] abuf_rd_raw_data_4_S ;
+  logic [543:0] abuf_rd_raw_data_4_d2;
+  logic [543:0]  abuf_rd_raw_data_4_d2_T ;
+  logic [543:0]  abuf_rd_raw_data_4_d2_PREV_VAL1 ;
+  logic [543:0]  abuf_rd_raw_data_4_d2_PREV_VAL2 ;
+  logic [543:0]  abuf_rd_raw_data_4_d2_R ;
+  logic [543:0]  abuf_rd_raw_data_4_d2_X ;
+  logic [543:0]  abuf_rd_raw_data_4_d2_C ;
+  logic [13:0] abuf_rd_raw_data_4_d2_S ;
+  logic abuf_rd_raw_data_4_d2_t_flag ;
+  logic abuf_rd_raw_data_4_d2_r_flag ;
+  assign abuf_rd_raw_data_4_d2_S = 960 ;
+  logic [543:0] abuf_rd_raw_data_5;
+  logic [543:0] abuf_rd_raw_data_5_T ;
+  logic [543:0] abuf_rd_raw_data_5_R ;
+  logic [543:0] abuf_rd_raw_data_5_C ;
+  logic [543:0] abuf_rd_raw_data_5_X ;
+  logic [13:0] abuf_rd_raw_data_5_S ;
+  logic [543:0] abuf_rd_raw_data_5_d2;
+  logic [543:0]  abuf_rd_raw_data_5_d2_T ;
+  logic [543:0]  abuf_rd_raw_data_5_d2_PREV_VAL1 ;
+  logic [543:0]  abuf_rd_raw_data_5_d2_PREV_VAL2 ;
+  logic [543:0]  abuf_rd_raw_data_5_d2_R ;
+  logic [543:0]  abuf_rd_raw_data_5_d2_X ;
+  logic [543:0]  abuf_rd_raw_data_5_d2_C ;
+  logic [13:0] abuf_rd_raw_data_5_d2_S ;
+  logic abuf_rd_raw_data_5_d2_t_flag ;
+  logic abuf_rd_raw_data_5_d2_r_flag ;
+  assign abuf_rd_raw_data_5_d2_S = 961 ;
+  logic [543:0] abuf_rd_raw_data_6;
+  logic [543:0] abuf_rd_raw_data_6_T ;
+  logic [543:0] abuf_rd_raw_data_6_R ;
+  logic [543:0] abuf_rd_raw_data_6_C ;
+  logic [543:0] abuf_rd_raw_data_6_X ;
+  logic [13:0] abuf_rd_raw_data_6_S ;
+  logic [543:0] abuf_rd_raw_data_6_d2;
+  logic [543:0]  abuf_rd_raw_data_6_d2_T ;
+  logic [543:0]  abuf_rd_raw_data_6_d2_PREV_VAL1 ;
+  logic [543:0]  abuf_rd_raw_data_6_d2_PREV_VAL2 ;
+  logic [543:0]  abuf_rd_raw_data_6_d2_R ;
+  logic [543:0]  abuf_rd_raw_data_6_d2_X ;
+  logic [543:0]  abuf_rd_raw_data_6_d2_C ;
+  logic [13:0] abuf_rd_raw_data_6_d2_S ;
+  logic abuf_rd_raw_data_6_d2_t_flag ;
+  logic abuf_rd_raw_data_6_d2_r_flag ;
+  assign abuf_rd_raw_data_6_d2_S = 962 ;
+  logic [543:0] abuf_rd_raw_data_7;
+  logic [543:0] abuf_rd_raw_data_7_T ;
+  logic [543:0] abuf_rd_raw_data_7_R ;
+  logic [543:0] abuf_rd_raw_data_7_C ;
+  logic [543:0] abuf_rd_raw_data_7_X ;
+  logic [13:0] abuf_rd_raw_data_7_S ;
+  logic [543:0] abuf_rd_raw_data_7_d2;
+  logic [543:0]  abuf_rd_raw_data_7_d2_T ;
+  logic [543:0]  abuf_rd_raw_data_7_d2_PREV_VAL1 ;
+  logic [543:0]  abuf_rd_raw_data_7_d2_PREV_VAL2 ;
+  logic [543:0]  abuf_rd_raw_data_7_d2_R ;
+  logic [543:0]  abuf_rd_raw_data_7_d2_X ;
+  logic [543:0]  abuf_rd_raw_data_7_d2_C ;
+  logic [13:0] abuf_rd_raw_data_7_d2_S ;
+  logic abuf_rd_raw_data_7_d2_t_flag ;
+  logic abuf_rd_raw_data_7_d2_r_flag ;
+  assign abuf_rd_raw_data_7_d2_S = 963 ;
+  logic [7:0] abuf_rd_reg_en;
+  logic [7:0] abuf_rd_reg_en_T ;
+  logic [7:0] abuf_rd_reg_en_R ;
+  logic [7:0] abuf_rd_reg_en_C ;
+  logic [7:0] abuf_rd_reg_en_X ;
+  logic [13:0] abuf_rd_reg_en_S ;
+  input [4:0] abuf_wr_addr;
+  input [4:0] abuf_wr_addr_T ;
+  input [13:0] abuf_wr_addr_S ;
+  output [4:0] abuf_wr_addr_R ;
+  output [4:0] abuf_wr_addr_X ;
+  output [4:0] abuf_wr_addr_C ;
+  logic [4:0] abuf_wr_addr_d1;
+  logic [4:0]  abuf_wr_addr_d1_T ;
+  logic [4:0]  abuf_wr_addr_d1_PREV_VAL1 ;
+  logic [4:0]  abuf_wr_addr_d1_PREV_VAL2 ;
+  logic [4:0]  abuf_wr_addr_d1_R ;
+  logic [4:0]  abuf_wr_addr_d1_X ;
+  logic [4:0]  abuf_wr_addr_d1_C ;
+  logic [13:0] abuf_wr_addr_d1_S ;
+  logic abuf_wr_addr_d1_t_flag ;
+  logic abuf_wr_addr_d1_r_flag ;
+  assign abuf_wr_addr_d1_S = 964 ;
+  input [767:0] abuf_wr_data_0;
+  input [767:0] abuf_wr_data_0_T ;
+  input [13:0] abuf_wr_data_0_S ;
+  output [767:0] abuf_wr_data_0_R ;
+  output [767:0] abuf_wr_data_0_X ;
+  output [767:0] abuf_wr_data_0_C ;
+  logic [767:0] abuf_wr_data_0_d1;
+  logic [767:0]  abuf_wr_data_0_d1_T ;
+  logic [767:0]  abuf_wr_data_0_d1_PREV_VAL1 ;
+  logic [767:0]  abuf_wr_data_0_d1_PREV_VAL2 ;
+  logic [767:0]  abuf_wr_data_0_d1_R ;
+  logic [767:0]  abuf_wr_data_0_d1_X ;
+  logic [767:0]  abuf_wr_data_0_d1_C ;
+  logic [13:0] abuf_wr_data_0_d1_S ;
+  logic abuf_wr_data_0_d1_t_flag ;
+  logic abuf_wr_data_0_d1_r_flag ;
+  assign abuf_wr_data_0_d1_S = 965 ;
+  logic [767:0] abuf_wr_data_0_d1_w;
+  logic [767:0] abuf_wr_data_0_d1_w_T ;
+  logic [767:0] abuf_wr_data_0_d1_w_R ;
+  logic [767:0] abuf_wr_data_0_d1_w_C ;
+  logic [767:0] abuf_wr_data_0_d1_w_X ;
+  logic [13:0] abuf_wr_data_0_d1_w_S ;
+  input [767:0] abuf_wr_data_1;
+  input [767:0] abuf_wr_data_1_T ;
+  input [13:0] abuf_wr_data_1_S ;
+  output [767:0] abuf_wr_data_1_R ;
+  output [767:0] abuf_wr_data_1_X ;
+  output [767:0] abuf_wr_data_1_C ;
+  logic [767:0] abuf_wr_data_1_d1;
+  logic [767:0]  abuf_wr_data_1_d1_T ;
+  logic [767:0]  abuf_wr_data_1_d1_PREV_VAL1 ;
+  logic [767:0]  abuf_wr_data_1_d1_PREV_VAL2 ;
+  logic [767:0]  abuf_wr_data_1_d1_R ;
+  logic [767:0]  abuf_wr_data_1_d1_X ;
+  logic [767:0]  abuf_wr_data_1_d1_C ;
+  logic [13:0] abuf_wr_data_1_d1_S ;
+  logic abuf_wr_data_1_d1_t_flag ;
+  logic abuf_wr_data_1_d1_r_flag ;
+  assign abuf_wr_data_1_d1_S = 966 ;
+  logic [767:0] abuf_wr_data_1_d1_w;
+  logic [767:0] abuf_wr_data_1_d1_w_T ;
+  logic [767:0] abuf_wr_data_1_d1_w_R ;
+  logic [767:0] abuf_wr_data_1_d1_w_C ;
+  logic [767:0] abuf_wr_data_1_d1_w_X ;
+  logic [13:0] abuf_wr_data_1_d1_w_S ;
+  input [767:0] abuf_wr_data_2;
+  input [767:0] abuf_wr_data_2_T ;
+  input [13:0] abuf_wr_data_2_S ;
+  output [767:0] abuf_wr_data_2_R ;
+  output [767:0] abuf_wr_data_2_X ;
+  output [767:0] abuf_wr_data_2_C ;
+  logic [767:0] abuf_wr_data_2_d1;
+  logic [767:0]  abuf_wr_data_2_d1_T ;
+  logic [767:0]  abuf_wr_data_2_d1_PREV_VAL1 ;
+  logic [767:0]  abuf_wr_data_2_d1_PREV_VAL2 ;
+  logic [767:0]  abuf_wr_data_2_d1_R ;
+  logic [767:0]  abuf_wr_data_2_d1_X ;
+  logic [767:0]  abuf_wr_data_2_d1_C ;
+  logic [13:0] abuf_wr_data_2_d1_S ;
+  logic abuf_wr_data_2_d1_t_flag ;
+  logic abuf_wr_data_2_d1_r_flag ;
+  assign abuf_wr_data_2_d1_S = 967 ;
+  logic [767:0] abuf_wr_data_2_d1_w;
+  logic [767:0] abuf_wr_data_2_d1_w_T ;
+  logic [767:0] abuf_wr_data_2_d1_w_R ;
+  logic [767:0] abuf_wr_data_2_d1_w_C ;
+  logic [767:0] abuf_wr_data_2_d1_w_X ;
+  logic [13:0] abuf_wr_data_2_d1_w_S ;
+  input [767:0] abuf_wr_data_3;
+  input [767:0] abuf_wr_data_3_T ;
+  input [13:0] abuf_wr_data_3_S ;
+  output [767:0] abuf_wr_data_3_R ;
+  output [767:0] abuf_wr_data_3_X ;
+  output [767:0] abuf_wr_data_3_C ;
+  logic [767:0] abuf_wr_data_3_d1;
+  logic [767:0]  abuf_wr_data_3_d1_T ;
+  logic [767:0]  abuf_wr_data_3_d1_PREV_VAL1 ;
+  logic [767:0]  abuf_wr_data_3_d1_PREV_VAL2 ;
+  logic [767:0]  abuf_wr_data_3_d1_R ;
+  logic [767:0]  abuf_wr_data_3_d1_X ;
+  logic [767:0]  abuf_wr_data_3_d1_C ;
+  logic [13:0] abuf_wr_data_3_d1_S ;
+  logic abuf_wr_data_3_d1_t_flag ;
+  logic abuf_wr_data_3_d1_r_flag ;
+  assign abuf_wr_data_3_d1_S = 968 ;
+  logic [767:0] abuf_wr_data_3_d1_w;
+  logic [767:0] abuf_wr_data_3_d1_w_T ;
+  logic [767:0] abuf_wr_data_3_d1_w_R ;
+  logic [767:0] abuf_wr_data_3_d1_w_C ;
+  logic [767:0] abuf_wr_data_3_d1_w_X ;
+  logic [13:0] abuf_wr_data_3_d1_w_S ;
+  input [543:0] abuf_wr_data_4;
+  input [543:0] abuf_wr_data_4_T ;
+  input [13:0] abuf_wr_data_4_S ;
+  output [543:0] abuf_wr_data_4_R ;
+  output [543:0] abuf_wr_data_4_X ;
+  output [543:0] abuf_wr_data_4_C ;
+  logic [543:0] abuf_wr_data_4_d1;
+  logic [543:0]  abuf_wr_data_4_d1_T ;
+  logic [543:0]  abuf_wr_data_4_d1_PREV_VAL1 ;
+  logic [543:0]  abuf_wr_data_4_d1_PREV_VAL2 ;
+  logic [543:0]  abuf_wr_data_4_d1_R ;
+  logic [543:0]  abuf_wr_data_4_d1_X ;
+  logic [543:0]  abuf_wr_data_4_d1_C ;
+  logic [13:0] abuf_wr_data_4_d1_S ;
+  logic abuf_wr_data_4_d1_t_flag ;
+  logic abuf_wr_data_4_d1_r_flag ;
+  assign abuf_wr_data_4_d1_S = 969 ;
+  logic [543:0] abuf_wr_data_4_d1_w;
+  logic [543:0] abuf_wr_data_4_d1_w_T ;
+  logic [543:0] abuf_wr_data_4_d1_w_R ;
+  logic [543:0] abuf_wr_data_4_d1_w_C ;
+  logic [543:0] abuf_wr_data_4_d1_w_X ;
+  logic [13:0] abuf_wr_data_4_d1_w_S ;
+  input [543:0] abuf_wr_data_5;
+  input [543:0] abuf_wr_data_5_T ;
+  input [13:0] abuf_wr_data_5_S ;
+  output [543:0] abuf_wr_data_5_R ;
+  output [543:0] abuf_wr_data_5_X ;
+  output [543:0] abuf_wr_data_5_C ;
+  logic [543:0] abuf_wr_data_5_d1;
+  logic [543:0]  abuf_wr_data_5_d1_T ;
+  logic [543:0]  abuf_wr_data_5_d1_PREV_VAL1 ;
+  logic [543:0]  abuf_wr_data_5_d1_PREV_VAL2 ;
+  logic [543:0]  abuf_wr_data_5_d1_R ;
+  logic [543:0]  abuf_wr_data_5_d1_X ;
+  logic [543:0]  abuf_wr_data_5_d1_C ;
+  logic [13:0] abuf_wr_data_5_d1_S ;
+  logic abuf_wr_data_5_d1_t_flag ;
+  logic abuf_wr_data_5_d1_r_flag ;
+  assign abuf_wr_data_5_d1_S = 970 ;
+  logic [543:0] abuf_wr_data_5_d1_w;
+  logic [543:0] abuf_wr_data_5_d1_w_T ;
+  logic [543:0] abuf_wr_data_5_d1_w_R ;
+  logic [543:0] abuf_wr_data_5_d1_w_C ;
+  logic [543:0] abuf_wr_data_5_d1_w_X ;
+  logic [13:0] abuf_wr_data_5_d1_w_S ;
+  input [543:0] abuf_wr_data_6;
+  input [543:0] abuf_wr_data_6_T ;
+  input [13:0] abuf_wr_data_6_S ;
+  output [543:0] abuf_wr_data_6_R ;
+  output [543:0] abuf_wr_data_6_X ;
+  output [543:0] abuf_wr_data_6_C ;
+  logic [543:0] abuf_wr_data_6_d1;
+  logic [543:0]  abuf_wr_data_6_d1_T ;
+  logic [543:0]  abuf_wr_data_6_d1_PREV_VAL1 ;
+  logic [543:0]  abuf_wr_data_6_d1_PREV_VAL2 ;
+  logic [543:0]  abuf_wr_data_6_d1_R ;
+  logic [543:0]  abuf_wr_data_6_d1_X ;
+  logic [543:0]  abuf_wr_data_6_d1_C ;
+  logic [13:0] abuf_wr_data_6_d1_S ;
+  logic abuf_wr_data_6_d1_t_flag ;
+  logic abuf_wr_data_6_d1_r_flag ;
+  assign abuf_wr_data_6_d1_S = 971 ;
+  logic [543:0] abuf_wr_data_6_d1_w;
+  logic [543:0] abuf_wr_data_6_d1_w_T ;
+  logic [543:0] abuf_wr_data_6_d1_w_R ;
+  logic [543:0] abuf_wr_data_6_d1_w_C ;
+  logic [543:0] abuf_wr_data_6_d1_w_X ;
+  logic [13:0] abuf_wr_data_6_d1_w_S ;
+  input [543:0] abuf_wr_data_7;
+  input [543:0] abuf_wr_data_7_T ;
+  input [13:0] abuf_wr_data_7_S ;
+  output [543:0] abuf_wr_data_7_R ;
+  output [543:0] abuf_wr_data_7_X ;
+  output [543:0] abuf_wr_data_7_C ;
+  logic [543:0] abuf_wr_data_7_d1;
+  logic [543:0]  abuf_wr_data_7_d1_T ;
+  logic [543:0]  abuf_wr_data_7_d1_PREV_VAL1 ;
+  logic [543:0]  abuf_wr_data_7_d1_PREV_VAL2 ;
+  logic [543:0]  abuf_wr_data_7_d1_R ;
+  logic [543:0]  abuf_wr_data_7_d1_X ;
+  logic [543:0]  abuf_wr_data_7_d1_C ;
+  logic [13:0] abuf_wr_data_7_d1_S ;
+  logic abuf_wr_data_7_d1_t_flag ;
+  logic abuf_wr_data_7_d1_r_flag ;
+  assign abuf_wr_data_7_d1_S = 972 ;
+  logic [543:0] abuf_wr_data_7_d1_w;
+  logic [543:0] abuf_wr_data_7_d1_w_T ;
+  logic [543:0] abuf_wr_data_7_d1_w_R ;
+  logic [543:0] abuf_wr_data_7_d1_w_C ;
+  logic [543:0] abuf_wr_data_7_d1_w_X ;
+  logic [13:0] abuf_wr_data_7_d1_w_S ;
+  input [7:0] abuf_wr_en;
+  input [7:0] abuf_wr_en_T ;
+  input [13:0] abuf_wr_en_S ;
+  output [7:0] abuf_wr_en_R ;
+  output [7:0] abuf_wr_en_X ;
+  output [7:0] abuf_wr_en_C ;
+  logic [7:0] abuf_wr_en_d1;
+  logic [7:0]  abuf_wr_en_d1_T ;
+  logic [7:0]  abuf_wr_en_d1_PREV_VAL1 ;
+  logic [7:0]  abuf_wr_en_d1_PREV_VAL2 ;
+  logic [7:0]  abuf_wr_en_d1_R ;
+  logic [7:0]  abuf_wr_en_d1_X ;
+  logic [7:0]  abuf_wr_en_d1_C ;
+  logic [13:0] abuf_wr_en_d1_S ;
+  logic abuf_wr_en_d1_t_flag ;
+  logic abuf_wr_en_d1_r_flag ;
+  assign abuf_wr_en_d1_S = 973 ;
+  logic [7:0] abuf_wr_en_d1_w;
+  logic [7:0] abuf_wr_en_d1_w_T ;
+  logic [7:0] abuf_wr_en_d1_w_R ;
+  logic [7:0] abuf_wr_en_d1_w_C ;
+  logic [7:0] abuf_wr_en_d1_w_X ;
+  logic [13:0] abuf_wr_en_d1_w_S ;
+  input nvdla_core_clk;
+  input nvdla_core_clk_T ;
+  input [13:0] nvdla_core_clk_S ;
+  output nvdla_core_clk_R ;
+  output nvdla_core_clk_X ;
+  output nvdla_core_clk_C ;
+  input nvdla_core_rstn;
+  input nvdla_core_rstn_T ;
+  input [13:0] nvdla_core_rstn_S ;
+  output nvdla_core_rstn_R ;
+  output nvdla_core_rstn_X ;
+  output nvdla_core_rstn_C ;
+  input [31:0] pwrbus_ram_pd;
+  input [31:0] pwrbus_ram_pd_T ;
+  input [13:0] pwrbus_ram_pd_S ;
+  output [31:0] pwrbus_ram_pd_R ;
+  output [31:0] pwrbus_ram_pd_X ;
+  output [31:0] pwrbus_ram_pd_C ;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_data_7 <= _07_;
+  logic [543:0] _07__X0 ;
+  logic [543:0] _07__R0 ;
+  logic [543:0] _07__C0 ;
+  assign _07__X0 = { 544{ abuf_rd_data_7_S != _07__S }} ;
+  assign _07__R0 = 0 ;
+  assign _07__C0 = 0 ;
+  always @( posedge nvdla_core_clk )
+      abuf_rd_data_7_T 		<= !nvdla_core_rstn ? 0 : ( _07__T & _07__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_data_7_t_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_data_7_t_flag ? 1 : | _07__T & ( | _07__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_data_7_r_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_data_7_r_flag ? 1 : abuf_rd_data_7_t_flag ? 0 : ( | abuf_rd_data_7_R ) ;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_data_6 <= _06_;
+  logic [543:0] _06__X0 ;
+  logic [543:0] _06__R0 ;
+  logic [543:0] _06__C0 ;
+  assign _06__X0 = { 544{ abuf_rd_data_6_S != _06__S }} ;
+  assign _06__R0 = 0 ;
+  assign _06__C0 = 0 ;
+  always @( posedge nvdla_core_clk )
+      abuf_rd_data_6_T 		<= !nvdla_core_rstn ? 0 : ( _06__T & _06__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_data_6_t_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_data_6_t_flag ? 1 : | _06__T & ( | _06__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_data_6_r_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_data_6_r_flag ? 1 : abuf_rd_data_6_t_flag ? 0 : ( | abuf_rd_data_6_R ) ;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_data_5 <= _05_;
+  logic [543:0] _05__X0 ;
+  logic [543:0] _05__R0 ;
+  logic [543:0] _05__C0 ;
+  assign _05__X0 = { 544{ abuf_rd_data_5_S != _05__S }} ;
+  assign _05__R0 = 0 ;
+  assign _05__C0 = 0 ;
+  always @( posedge nvdla_core_clk )
+      abuf_rd_data_5_T 		<= !nvdla_core_rstn ? 0 : ( _05__T & _05__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_data_5_t_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_data_5_t_flag ? 1 : | _05__T & ( | _05__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_data_5_r_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_data_5_r_flag ? 1 : abuf_rd_data_5_t_flag ? 0 : ( | abuf_rd_data_5_R ) ;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_data_4 <= _04_;
+  logic [543:0] _04__X0 ;
+  logic [543:0] _04__R0 ;
+  logic [543:0] _04__C0 ;
+  assign _04__X0 = { 544{ abuf_rd_data_4_S != _04__S }} ;
+  assign _04__R0 = 0 ;
+  assign _04__C0 = 0 ;
+  always @( posedge nvdla_core_clk )
+      abuf_rd_data_4_T 		<= !nvdla_core_rstn ? 0 : ( _04__T & _04__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_data_4_t_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_data_4_t_flag ? 1 : | _04__T & ( | _04__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_data_4_r_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_data_4_r_flag ? 1 : abuf_rd_data_4_t_flag ? 0 : ( | abuf_rd_data_4_R ) ;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_data_3 <= _03_;
+  logic [767:0] _03__X0 ;
+  logic [767:0] _03__R0 ;
+  logic [767:0] _03__C0 ;
+  assign _03__X0 = { 768{ abuf_rd_data_3_S != _03__S }} ;
+  assign _03__R0 = 0 ;
+  assign _03__C0 = 0 ;
+  always @( posedge nvdla_core_clk )
+      abuf_rd_data_3_T 		<= !nvdla_core_rstn ? 0 : ( _03__T & _03__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_data_3_t_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_data_3_t_flag ? 1 : | _03__T & ( | _03__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_data_3_r_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_data_3_r_flag ? 1 : abuf_rd_data_3_t_flag ? 0 : ( | abuf_rd_data_3_R ) ;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_data_2 <= _02_;
+  logic [767:0] _02__X0 ;
+  logic [767:0] _02__R0 ;
+  logic [767:0] _02__C0 ;
+  assign _02__X0 = { 768{ abuf_rd_data_2_S != _02__S }} ;
+  assign _02__R0 = 0 ;
+  assign _02__C0 = 0 ;
+  always @( posedge nvdla_core_clk )
+      abuf_rd_data_2_T 		<= !nvdla_core_rstn ? 0 : ( _02__T & _02__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_data_2_t_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_data_2_t_flag ? 1 : | _02__T & ( | _02__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_data_2_r_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_data_2_r_flag ? 1 : abuf_rd_data_2_t_flag ? 0 : ( | abuf_rd_data_2_R ) ;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_data_1 <= _01_;
+  logic [767:0] _01__X0 ;
+  logic [767:0] _01__R0 ;
+  logic [767:0] _01__C0 ;
+  assign _01__X0 = { 768{ abuf_rd_data_1_S != _01__S }} ;
+  assign _01__R0 = 0 ;
+  assign _01__C0 = 0 ;
+  always @( posedge nvdla_core_clk )
+      abuf_rd_data_1_T 		<= !nvdla_core_rstn ? 0 : ( _01__T & _01__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_data_1_t_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_data_1_t_flag ? 1 : | _01__T & ( | _01__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_data_1_r_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_data_1_r_flag ? 1 : abuf_rd_data_1_t_flag ? 0 : ( | abuf_rd_data_1_R ) ;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_data_0 <= _00_;
+  logic [767:0] _00__X0 ;
+  logic [767:0] _00__R0 ;
+  logic [767:0] _00__C0 ;
+  assign _00__X0 = { 768{ abuf_rd_data_0_S != _00__S }} ;
+  assign _00__R0 = 0 ;
+  assign _00__C0 = 0 ;
+  always @( posedge nvdla_core_clk )
+      abuf_rd_data_0_T 		<= !nvdla_core_rstn ? 0 : ( _00__T & _00__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_data_0_t_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_data_0_t_flag ? 1 : | _00__T & ( | _00__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_data_0_r_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_data_0_r_flag ? 1 : abuf_rd_data_0_t_flag ? 0 : ( | abuf_rd_data_0_R ) ;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_raw_data_7_d2 <= _15_;
+  logic [543:0] _15__X0 ;
+  logic [543:0] _15__R0 ;
+  logic [543:0] _15__C0 ;
+  assign _15__X0 = { 544{ abuf_rd_raw_data_7_d2_S != _15__S }} ;
+  assign _15__R0 = 0 ;
+  assign _15__C0 = 0 ;
+  always @( posedge nvdla_core_clk )
+      abuf_rd_raw_data_7_d2_T 		<= !nvdla_core_rstn ? 0 : ( _15__T & _15__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_raw_data_7_d2_t_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_raw_data_7_d2_t_flag ? 1 : | _15__T & ( | _15__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_raw_data_7_d2_r_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_raw_data_7_d2_r_flag ? 1 : abuf_rd_raw_data_7_d2_t_flag ? 0 : ( | abuf_rd_raw_data_7_d2_R ) ;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_raw_data_6_d2 <= _14_;
+  logic [543:0] _14__X0 ;
+  logic [543:0] _14__R0 ;
+  logic [543:0] _14__C0 ;
+  assign _14__X0 = { 544{ abuf_rd_raw_data_6_d2_S != _14__S }} ;
+  assign _14__R0 = 0 ;
+  assign _14__C0 = 0 ;
+  always @( posedge nvdla_core_clk )
+      abuf_rd_raw_data_6_d2_T 		<= !nvdla_core_rstn ? 0 : ( _14__T & _14__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_raw_data_6_d2_t_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_raw_data_6_d2_t_flag ? 1 : | _14__T & ( | _14__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_raw_data_6_d2_r_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_raw_data_6_d2_r_flag ? 1 : abuf_rd_raw_data_6_d2_t_flag ? 0 : ( | abuf_rd_raw_data_6_d2_R ) ;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_raw_data_5_d2 <= _13_;
+  logic [543:0] _13__X0 ;
+  logic [543:0] _13__R0 ;
+  logic [543:0] _13__C0 ;
+  assign _13__X0 = { 544{ abuf_rd_raw_data_5_d2_S != _13__S }} ;
+  assign _13__R0 = 0 ;
+  assign _13__C0 = 0 ;
+  always @( posedge nvdla_core_clk )
+      abuf_rd_raw_data_5_d2_T 		<= !nvdla_core_rstn ? 0 : ( _13__T & _13__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_raw_data_5_d2_t_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_raw_data_5_d2_t_flag ? 1 : | _13__T & ( | _13__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_raw_data_5_d2_r_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_raw_data_5_d2_r_flag ? 1 : abuf_rd_raw_data_5_d2_t_flag ? 0 : ( | abuf_rd_raw_data_5_d2_R ) ;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_raw_data_4_d2 <= _12_;
+  logic [543:0] _12__X0 ;
+  logic [543:0] _12__R0 ;
+  logic [543:0] _12__C0 ;
+  assign _12__X0 = { 544{ abuf_rd_raw_data_4_d2_S != _12__S }} ;
+  assign _12__R0 = 0 ;
+  assign _12__C0 = 0 ;
+  always @( posedge nvdla_core_clk )
+      abuf_rd_raw_data_4_d2_T 		<= !nvdla_core_rstn ? 0 : ( _12__T & _12__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_raw_data_4_d2_t_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_raw_data_4_d2_t_flag ? 1 : | _12__T & ( | _12__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_raw_data_4_d2_r_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_raw_data_4_d2_r_flag ? 1 : abuf_rd_raw_data_4_d2_t_flag ? 0 : ( | abuf_rd_raw_data_4_d2_R ) ;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_raw_data_3_d2 <= _11_;
+  logic [767:0] _11__X0 ;
+  logic [767:0] _11__R0 ;
+  logic [767:0] _11__C0 ;
+  assign _11__X0 = { 768{ abuf_rd_raw_data_3_d2_S != _11__S }} ;
+  assign _11__R0 = 0 ;
+  assign _11__C0 = 0 ;
+  always @( posedge nvdla_core_clk )
+      abuf_rd_raw_data_3_d2_T 		<= !nvdla_core_rstn ? 0 : ( _11__T & _11__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_raw_data_3_d2_t_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_raw_data_3_d2_t_flag ? 1 : | _11__T & ( | _11__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_raw_data_3_d2_r_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_raw_data_3_d2_r_flag ? 1 : abuf_rd_raw_data_3_d2_t_flag ? 0 : ( | abuf_rd_raw_data_3_d2_R ) ;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_raw_data_2_d2 <= _10_;
+  logic [767:0] _10__X0 ;
+  logic [767:0] _10__R0 ;
+  logic [767:0] _10__C0 ;
+  assign _10__X0 = { 768{ abuf_rd_raw_data_2_d2_S != _10__S }} ;
+  assign _10__R0 = 0 ;
+  assign _10__C0 = 0 ;
+  always @( posedge nvdla_core_clk )
+      abuf_rd_raw_data_2_d2_T 		<= !nvdla_core_rstn ? 0 : ( _10__T & _10__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_raw_data_2_d2_t_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_raw_data_2_d2_t_flag ? 1 : | _10__T & ( | _10__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_raw_data_2_d2_r_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_raw_data_2_d2_r_flag ? 1 : abuf_rd_raw_data_2_d2_t_flag ? 0 : ( | abuf_rd_raw_data_2_d2_R ) ;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_raw_data_1_d2 <= _09_;
+  logic [767:0] _09__X0 ;
+  logic [767:0] _09__R0 ;
+  logic [767:0] _09__C0 ;
+  assign _09__X0 = { 768{ abuf_rd_raw_data_1_d2_S != _09__S }} ;
+  assign _09__R0 = 0 ;
+  assign _09__C0 = 0 ;
+  always @( posedge nvdla_core_clk )
+      abuf_rd_raw_data_1_d2_T 		<= !nvdla_core_rstn ? 0 : ( _09__T & _09__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_raw_data_1_d2_t_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_raw_data_1_d2_t_flag ? 1 : | _09__T & ( | _09__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_raw_data_1_d2_r_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_raw_data_1_d2_r_flag ? 1 : abuf_rd_raw_data_1_d2_t_flag ? 0 : ( | abuf_rd_raw_data_1_d2_R ) ;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_raw_data_0_d2 <= _08_;
+  logic [767:0] _08__X0 ;
+  logic [767:0] _08__R0 ;
+  logic [767:0] _08__C0 ;
+  assign _08__X0 = { 768{ abuf_rd_raw_data_0_d2_S != _08__S }} ;
+  assign _08__R0 = 0 ;
+  assign _08__C0 = 0 ;
+  always @( posedge nvdla_core_clk )
+      abuf_rd_raw_data_0_d2_T 		<= !nvdla_core_rstn ? 0 : ( _08__T & _08__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_raw_data_0_d2_t_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_raw_data_0_d2_t_flag ? 1 : | _08__T & ( | _08__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_raw_data_0_d2_r_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_raw_data_0_d2_r_flag ? 1 : abuf_rd_raw_data_0_d2_t_flag ? 0 : ( | abuf_rd_raw_data_0_d2_R ) ;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      abuf_rd_en_d2 <= 8'b00000000;
+    else
+      abuf_rd_en_d2 <= abuf_rd_en_d1;
+  logic [7:0] abuf_rd_en_d1_X0 ;
+  logic [7:0] abuf_rd_en_d1_R0 ;
+  logic [7:0] abuf_rd_en_d1_C0 ;
+  assign abuf_rd_en_d1_X0 = { 8{ abuf_rd_en_d2_S != abuf_rd_en_d1_S }} ;
+  assign abuf_rd_en_d1_R0 = 0 ;
+  assign abuf_rd_en_d1_C0 = 0 ;
+  always @( posedge nvdla_core_clk )
+      abuf_rd_en_d2_T 		<= !nvdla_core_rstn ? 0 : ( abuf_rd_en_d1_T & abuf_rd_en_d1_X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_en_d2_t_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_en_d2_t_flag ? 1 : | abuf_rd_en_d1_T & ( | abuf_rd_en_d1_X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_en_d2_r_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_en_d2_r_flag ? 1 : abuf_rd_en_d2_t_flag ? 0 : ( | abuf_rd_en_d2_R ) ;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      abuf_rd_en_d1 <= 8'b00000000;
+    else
+      abuf_rd_en_d1 <= abuf_rd_en;
+  logic [7:0] abuf_rd_en_X0 ;
+  logic [7:0] abuf_rd_en_R0 ;
+  logic [7:0] abuf_rd_en_C0 ;
+  assign abuf_rd_en_X0 = { 8{ abuf_rd_en_d1_S != abuf_rd_en_S }} ;
+  assign abuf_rd_en_R0 = 0 ;
+  assign abuf_rd_en_C0 = 0 ;
+  always @( posedge nvdla_core_clk )
+      abuf_rd_en_d1_T 		<= !nvdla_core_rstn ? 0 : ( abuf_rd_en_T & abuf_rd_en_X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_en_d1_t_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_en_d1_t_flag ? 1 : | abuf_rd_en_T & ( | abuf_rd_en_X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_rd_en_d1_r_flag 	<= !nvdla_core_rstn ? 0 : abuf_rd_en_d1_r_flag ? 1 : abuf_rd_en_d1_t_flag ? 0 : ( | abuf_rd_en_d1_R ) ;
+  always @(posedge nvdla_core_clk)
+      abuf_wr_data_7_d1 <= _23_;
+  logic [543:0] _23__X0 ;
+  logic [543:0] _23__R0 ;
+  logic [543:0] _23__C0 ;
+  assign _23__X0 = { 544{ abuf_wr_data_7_d1_S != _23__S }} ;
+  assign _23__R0 = 0 ;
+  assign _23__C0 = 0 ;
+  always @( posedge nvdla_core_clk )
+      abuf_wr_data_7_d1_T 		<= !nvdla_core_rstn ? 0 : ( _23__T & _23__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_wr_data_7_d1_t_flag 	<= !nvdla_core_rstn ? 0 : abuf_wr_data_7_d1_t_flag ? 1 : | _23__T & ( | _23__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_wr_data_7_d1_r_flag 	<= !nvdla_core_rstn ? 0 : abuf_wr_data_7_d1_r_flag ? 1 : abuf_wr_data_7_d1_t_flag ? 0 : ( | abuf_wr_data_7_d1_R ) ;
+  always @(posedge nvdla_core_clk)
+      abuf_wr_data_6_d1 <= _22_;
+  logic [543:0] _22__X0 ;
+  logic [543:0] _22__R0 ;
+  logic [543:0] _22__C0 ;
+  assign _22__X0 = { 544{ abuf_wr_data_6_d1_S != _22__S }} ;
+  assign _22__R0 = 0 ;
+  assign _22__C0 = 0 ;
+  always @( posedge nvdla_core_clk )
+      abuf_wr_data_6_d1_T 		<= !nvdla_core_rstn ? 0 : ( _22__T & _22__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_wr_data_6_d1_t_flag 	<= !nvdla_core_rstn ? 0 : abuf_wr_data_6_d1_t_flag ? 1 : | _22__T & ( | _22__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_wr_data_6_d1_r_flag 	<= !nvdla_core_rstn ? 0 : abuf_wr_data_6_d1_r_flag ? 1 : abuf_wr_data_6_d1_t_flag ? 0 : ( | abuf_wr_data_6_d1_R ) ;
+  always @(posedge nvdla_core_clk)
+      abuf_wr_data_5_d1 <= _21_;
+  logic [543:0] _21__X0 ;
+  logic [543:0] _21__R0 ;
+  logic [543:0] _21__C0 ;
+  assign _21__X0 = { 544{ abuf_wr_data_5_d1_S != _21__S }} ;
+  assign _21__R0 = 0 ;
+  assign _21__C0 = 0 ;
+  always @( posedge nvdla_core_clk )
+      abuf_wr_data_5_d1_T 		<= !nvdla_core_rstn ? 0 : ( _21__T & _21__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_wr_data_5_d1_t_flag 	<= !nvdla_core_rstn ? 0 : abuf_wr_data_5_d1_t_flag ? 1 : | _21__T & ( | _21__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_wr_data_5_d1_r_flag 	<= !nvdla_core_rstn ? 0 : abuf_wr_data_5_d1_r_flag ? 1 : abuf_wr_data_5_d1_t_flag ? 0 : ( | abuf_wr_data_5_d1_R ) ;
+  always @(posedge nvdla_core_clk)
+      abuf_wr_data_4_d1 <= _20_;
+  logic [543:0] _20__X0 ;
+  logic [543:0] _20__R0 ;
+  logic [543:0] _20__C0 ;
+  assign _20__X0 = { 544{ abuf_wr_data_4_d1_S != _20__S }} ;
+  assign _20__R0 = 0 ;
+  assign _20__C0 = 0 ;
+  always @( posedge nvdla_core_clk )
+      abuf_wr_data_4_d1_T 		<= !nvdla_core_rstn ? 0 : ( _20__T & _20__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_wr_data_4_d1_t_flag 	<= !nvdla_core_rstn ? 0 : abuf_wr_data_4_d1_t_flag ? 1 : | _20__T & ( | _20__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_wr_data_4_d1_r_flag 	<= !nvdla_core_rstn ? 0 : abuf_wr_data_4_d1_r_flag ? 1 : abuf_wr_data_4_d1_t_flag ? 0 : ( | abuf_wr_data_4_d1_R ) ;
+  always @(posedge nvdla_core_clk)
+      abuf_wr_data_3_d1 <= _19_;
+  logic [767:0] _19__X0 ;
+  logic [767:0] _19__R0 ;
+  logic [767:0] _19__C0 ;
+  assign _19__X0 = { 768{ abuf_wr_data_3_d1_S != _19__S }} ;
+  assign _19__R0 = 0 ;
+  assign _19__C0 = 0 ;
+  always @( posedge nvdla_core_clk )
+      abuf_wr_data_3_d1_T 		<= !nvdla_core_rstn ? 0 : ( _19__T & _19__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_wr_data_3_d1_t_flag 	<= !nvdla_core_rstn ? 0 : abuf_wr_data_3_d1_t_flag ? 1 : | _19__T & ( | _19__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_wr_data_3_d1_r_flag 	<= !nvdla_core_rstn ? 0 : abuf_wr_data_3_d1_r_flag ? 1 : abuf_wr_data_3_d1_t_flag ? 0 : ( | abuf_wr_data_3_d1_R ) ;
+  always @(posedge nvdla_core_clk)
+      abuf_wr_data_2_d1 <= _18_;
+  logic [767:0] _18__X0 ;
+  logic [767:0] _18__R0 ;
+  logic [767:0] _18__C0 ;
+  assign _18__X0 = { 768{ abuf_wr_data_2_d1_S != _18__S }} ;
+  assign _18__R0 = 0 ;
+  assign _18__C0 = 0 ;
+  always @( posedge nvdla_core_clk )
+      abuf_wr_data_2_d1_T 		<= !nvdla_core_rstn ? 0 : ( _18__T & _18__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_wr_data_2_d1_t_flag 	<= !nvdla_core_rstn ? 0 : abuf_wr_data_2_d1_t_flag ? 1 : | _18__T & ( | _18__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_wr_data_2_d1_r_flag 	<= !nvdla_core_rstn ? 0 : abuf_wr_data_2_d1_r_flag ? 1 : abuf_wr_data_2_d1_t_flag ? 0 : ( | abuf_wr_data_2_d1_R ) ;
+  always @(posedge nvdla_core_clk)
+      abuf_wr_data_1_d1 <= _17_;
+  logic [767:0] _17__X0 ;
+  logic [767:0] _17__R0 ;
+  logic [767:0] _17__C0 ;
+  assign _17__X0 = { 768{ abuf_wr_data_1_d1_S != _17__S }} ;
+  assign _17__R0 = 0 ;
+  assign _17__C0 = 0 ;
+  always @( posedge nvdla_core_clk )
+      abuf_wr_data_1_d1_T 		<= !nvdla_core_rstn ? 0 : ( _17__T & _17__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_wr_data_1_d1_t_flag 	<= !nvdla_core_rstn ? 0 : abuf_wr_data_1_d1_t_flag ? 1 : | _17__T & ( | _17__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_wr_data_1_d1_r_flag 	<= !nvdla_core_rstn ? 0 : abuf_wr_data_1_d1_r_flag ? 1 : abuf_wr_data_1_d1_t_flag ? 0 : ( | abuf_wr_data_1_d1_R ) ;
+  always @(posedge nvdla_core_clk)
+      abuf_wr_data_0_d1 <= _16_;
+  logic [767:0] _16__X0 ;
+  logic [767:0] _16__R0 ;
+  logic [767:0] _16__C0 ;
+  assign _16__X0 = { 768{ abuf_wr_data_0_d1_S != _16__S }} ;
+  assign _16__R0 = 0 ;
+  assign _16__C0 = 0 ;
+  always @( posedge nvdla_core_clk )
+      abuf_wr_data_0_d1_T 		<= !nvdla_core_rstn ? 0 : ( _16__T & _16__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_wr_data_0_d1_t_flag 	<= !nvdla_core_rstn ? 0 : abuf_wr_data_0_d1_t_flag ? 1 : | _16__T & ( | _16__X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_wr_data_0_d1_r_flag 	<= !nvdla_core_rstn ? 0 : abuf_wr_data_0_d1_r_flag ? 1 : abuf_wr_data_0_d1_t_flag ? 0 : ( | abuf_wr_data_0_d1_R ) ;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      abuf_wr_addr_d1 <= 5'b00000;
+    else
+      abuf_wr_addr_d1 <= abuf_wr_addr;
+  logic [4:0] abuf_wr_addr_X0 ;
+  logic [4:0] abuf_wr_addr_R0 ;
+  logic [4:0] abuf_wr_addr_C0 ;
+  assign abuf_wr_addr_X0 = { 5{ abuf_wr_addr_d1_S != abuf_wr_addr_S }} ;
+  assign abuf_wr_addr_R0 = 0 ;
+  assign abuf_wr_addr_C0 = 0 ;
+  always @( posedge nvdla_core_clk )
+      abuf_wr_addr_d1_T 		<= !nvdla_core_rstn ? 0 : ( abuf_wr_addr_T & abuf_wr_addr_X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_wr_addr_d1_t_flag 	<= !nvdla_core_rstn ? 0 : abuf_wr_addr_d1_t_flag ? 1 : | abuf_wr_addr_T & ( | abuf_wr_addr_X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_wr_addr_d1_r_flag 	<= !nvdla_core_rstn ? 0 : abuf_wr_addr_d1_r_flag ? 1 : abuf_wr_addr_d1_t_flag ? 0 : ( | abuf_wr_addr_d1_R ) ;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      abuf_wr_en_d1 <= 8'b00000000;
+    else
+      abuf_wr_en_d1 <= abuf_wr_en;
+  logic [7:0] abuf_wr_en_X0 ;
+  logic [7:0] abuf_wr_en_R0 ;
+  logic [7:0] abuf_wr_en_C0 ;
+  assign abuf_wr_en_X0 = { 8{ abuf_wr_en_d1_S != abuf_wr_en_S }} ;
+  assign abuf_wr_en_R0 = 0 ;
+  assign abuf_wr_en_C0 = 0 ;
+  always @( posedge nvdla_core_clk )
+      abuf_wr_en_d1_T 		<= !nvdla_core_rstn ? 0 : ( abuf_wr_en_T & abuf_wr_en_X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_wr_en_d1_t_flag 	<= !nvdla_core_rstn ? 0 : abuf_wr_en_d1_t_flag ? 1 : | abuf_wr_en_T & ( | abuf_wr_en_X0 );
+  always @( posedge nvdla_core_clk )
+      abuf_wr_en_d1_r_flag 	<= !nvdla_core_rstn ? 0 : abuf_wr_en_d1_r_flag ? 1 : abuf_wr_en_d1_t_flag ? 0 : ( | abuf_wr_en_d1_R ) ;
+  assign _07_ = abuf_rd_en_d2[7] ? abuf_rd_raw_data_7_d2 : abuf_rd_data_7;
+  logic [7:0] abuf_rd_en_d2_C0 ;
+  logic [7:0] abuf_rd_en_d2_R0 ;
+  logic [7:0] abuf_rd_en_d2_X0 ;
+  assign abuf_rd_en_d2_C0 [7] = | _07__C ;
+  assign abuf_rd_en_d2_X0 [7] = | _07__X ;
+  assign _07__T = abuf_rd_en_d2[7] ? ( { 544{ abuf_rd_en_d2_T  [7] }} | abuf_rd_raw_data_7_d2_T ) : ( { 544{ abuf_rd_en_d2_T  [7] }} | abuf_rd_data_7_T );
+  assign _07__S = abuf_rd_en_d2[7] ? abuf_rd_raw_data_7_d2_S : abuf_rd_data_7_S ;
+  assign abuf_rd_en_d2_R0 [7] = ( | (_07__R | ( _07__C & ( { 544{ abuf_rd_en_d2[7] }} & abuf_rd_raw_data_7_d2_T | { 544{ !abuf_rd_en_d2[7] }} & abuf_rd_data_7_T )))) && abuf_rd_raw_data_7_d2 != abuf_rd_data_7 ;
+  logic [543:0] abuf_rd_raw_data_7_d2_C0 ;
+  logic [543:0] abuf_rd_raw_data_7_d2_R0 ;
+  logic [543:0] abuf_rd_raw_data_7_d2_X0 ;
+  assign abuf_rd_raw_data_7_d2_C0 = { 544{ abuf_rd_en_d2[7] }} ;
+  assign abuf_rd_raw_data_7_d2_R0 = { 544{ abuf_rd_en_d2[7] }} & ( _07__R | ( { 544{ abuf_rd_en_d2_T  [7] }} & _07__C ));
+  assign abuf_rd_raw_data_7_d2_X0 = { 544{ abuf_rd_en_d2[7] }} & _07__X ;
+  logic [543:0] abuf_rd_data_7_C1 ;
+  logic [543:0] abuf_rd_data_7_R1 ;
+  logic [543:0] abuf_rd_data_7_X1 ;
+  assign abuf_rd_data_7_C1 = { 544{ !abuf_rd_en_d2[7] }} ;
+  assign abuf_rd_data_7_R1 = { 544{ !abuf_rd_en_d2[7] }} & ( _07__R | ( { 544{ abuf_rd_en_d2_T  [7] }} & _07__C ));
+  assign abuf_rd_data_7_X1 = { 544{ !abuf_rd_en_d2[7] }} & _07__X ;
+  assign _06_ = abuf_rd_en_d2[6] ? abuf_rd_raw_data_6_d2 : abuf_rd_data_6;
+  assign abuf_rd_en_d2_C0 [6] = | _06__C ;
+  assign abuf_rd_en_d2_X0 [6] = | _06__X ;
+  assign _06__T = abuf_rd_en_d2[6] ? ( { 544{ abuf_rd_en_d2_T  [6] }} | abuf_rd_raw_data_6_d2_T ) : ( { 544{ abuf_rd_en_d2_T  [6] }} | abuf_rd_data_6_T );
+  assign _06__S = abuf_rd_en_d2[6] ? abuf_rd_raw_data_6_d2_S : abuf_rd_data_6_S ;
+  assign abuf_rd_en_d2_R0 [6] = ( | (_06__R | ( _06__C & ( { 544{ abuf_rd_en_d2[6] }} & abuf_rd_raw_data_6_d2_T | { 544{ !abuf_rd_en_d2[6] }} & abuf_rd_data_6_T )))) && abuf_rd_raw_data_6_d2 != abuf_rd_data_6 ;
+  logic [543:0] abuf_rd_raw_data_6_d2_C0 ;
+  logic [543:0] abuf_rd_raw_data_6_d2_R0 ;
+  logic [543:0] abuf_rd_raw_data_6_d2_X0 ;
+  assign abuf_rd_raw_data_6_d2_C0 = { 544{ abuf_rd_en_d2[6] }} ;
+  assign abuf_rd_raw_data_6_d2_R0 = { 544{ abuf_rd_en_d2[6] }} & ( _06__R | ( { 544{ abuf_rd_en_d2_T  [6] }} & _06__C ));
+  assign abuf_rd_raw_data_6_d2_X0 = { 544{ abuf_rd_en_d2[6] }} & _06__X ;
+  logic [543:0] abuf_rd_data_6_C1 ;
+  logic [543:0] abuf_rd_data_6_R1 ;
+  logic [543:0] abuf_rd_data_6_X1 ;
+  assign abuf_rd_data_6_C1 = { 544{ !abuf_rd_en_d2[6] }} ;
+  assign abuf_rd_data_6_R1 = { 544{ !abuf_rd_en_d2[6] }} & ( _06__R | ( { 544{ abuf_rd_en_d2_T  [6] }} & _06__C ));
+  assign abuf_rd_data_6_X1 = { 544{ !abuf_rd_en_d2[6] }} & _06__X ;
+  assign _05_ = abuf_rd_en_d2[5] ? abuf_rd_raw_data_5_d2 : abuf_rd_data_5;
+  assign abuf_rd_en_d2_C0 [5] = | _05__C ;
+  assign abuf_rd_en_d2_X0 [5] = | _05__X ;
+  assign _05__T = abuf_rd_en_d2[5] ? ( { 544{ abuf_rd_en_d2_T  [5] }} | abuf_rd_raw_data_5_d2_T ) : ( { 544{ abuf_rd_en_d2_T  [5] }} | abuf_rd_data_5_T );
+  assign _05__S = abuf_rd_en_d2[5] ? abuf_rd_raw_data_5_d2_S : abuf_rd_data_5_S ;
+  assign abuf_rd_en_d2_R0 [5] = ( | (_05__R | ( _05__C & ( { 544{ abuf_rd_en_d2[5] }} & abuf_rd_raw_data_5_d2_T | { 544{ !abuf_rd_en_d2[5] }} & abuf_rd_data_5_T )))) && abuf_rd_raw_data_5_d2 != abuf_rd_data_5 ;
+  logic [543:0] abuf_rd_raw_data_5_d2_C0 ;
+  logic [543:0] abuf_rd_raw_data_5_d2_R0 ;
+  logic [543:0] abuf_rd_raw_data_5_d2_X0 ;
+  assign abuf_rd_raw_data_5_d2_C0 = { 544{ abuf_rd_en_d2[5] }} ;
+  assign abuf_rd_raw_data_5_d2_R0 = { 544{ abuf_rd_en_d2[5] }} & ( _05__R | ( { 544{ abuf_rd_en_d2_T  [5] }} & _05__C ));
+  assign abuf_rd_raw_data_5_d2_X0 = { 544{ abuf_rd_en_d2[5] }} & _05__X ;
+  logic [543:0] abuf_rd_data_5_C1 ;
+  logic [543:0] abuf_rd_data_5_R1 ;
+  logic [543:0] abuf_rd_data_5_X1 ;
+  assign abuf_rd_data_5_C1 = { 544{ !abuf_rd_en_d2[5] }} ;
+  assign abuf_rd_data_5_R1 = { 544{ !abuf_rd_en_d2[5] }} & ( _05__R | ( { 544{ abuf_rd_en_d2_T  [5] }} & _05__C ));
+  assign abuf_rd_data_5_X1 = { 544{ !abuf_rd_en_d2[5] }} & _05__X ;
+  assign _04_ = abuf_rd_en_d2[4] ? abuf_rd_raw_data_4_d2 : abuf_rd_data_4;
+  assign abuf_rd_en_d2_C0 [4] = | _04__C ;
+  assign abuf_rd_en_d2_X0 [4] = | _04__X ;
+  assign _04__T = abuf_rd_en_d2[4] ? ( { 544{ abuf_rd_en_d2_T  [4] }} | abuf_rd_raw_data_4_d2_T ) : ( { 544{ abuf_rd_en_d2_T  [4] }} | abuf_rd_data_4_T );
+  assign _04__S = abuf_rd_en_d2[4] ? abuf_rd_raw_data_4_d2_S : abuf_rd_data_4_S ;
+  assign abuf_rd_en_d2_R0 [4] = ( | (_04__R | ( _04__C & ( { 544{ abuf_rd_en_d2[4] }} & abuf_rd_raw_data_4_d2_T | { 544{ !abuf_rd_en_d2[4] }} & abuf_rd_data_4_T )))) && abuf_rd_raw_data_4_d2 != abuf_rd_data_4 ;
+  logic [543:0] abuf_rd_raw_data_4_d2_C0 ;
+  logic [543:0] abuf_rd_raw_data_4_d2_R0 ;
+  logic [543:0] abuf_rd_raw_data_4_d2_X0 ;
+  assign abuf_rd_raw_data_4_d2_C0 = { 544{ abuf_rd_en_d2[4] }} ;
+  assign abuf_rd_raw_data_4_d2_R0 = { 544{ abuf_rd_en_d2[4] }} & ( _04__R | ( { 544{ abuf_rd_en_d2_T  [4] }} & _04__C ));
+  assign abuf_rd_raw_data_4_d2_X0 = { 544{ abuf_rd_en_d2[4] }} & _04__X ;
+  logic [543:0] abuf_rd_data_4_C1 ;
+  logic [543:0] abuf_rd_data_4_R1 ;
+  logic [543:0] abuf_rd_data_4_X1 ;
+  assign abuf_rd_data_4_C1 = { 544{ !abuf_rd_en_d2[4] }} ;
+  assign abuf_rd_data_4_R1 = { 544{ !abuf_rd_en_d2[4] }} & ( _04__R | ( { 544{ abuf_rd_en_d2_T  [4] }} & _04__C ));
+  assign abuf_rd_data_4_X1 = { 544{ !abuf_rd_en_d2[4] }} & _04__X ;
+  assign _03_ = abuf_rd_en_d2[3] ? abuf_rd_raw_data_3_d2 : abuf_rd_data_3;
+  assign abuf_rd_en_d2_C0 [3] = | _03__C ;
+  assign abuf_rd_en_d2_X0 [3] = | _03__X ;
+  assign _03__T = abuf_rd_en_d2[3] ? ( { 768{ abuf_rd_en_d2_T  [3] }} | abuf_rd_raw_data_3_d2_T ) : ( { 768{ abuf_rd_en_d2_T  [3] }} | abuf_rd_data_3_T );
+  assign _03__S = abuf_rd_en_d2[3] ? abuf_rd_raw_data_3_d2_S : abuf_rd_data_3_S ;
+  assign abuf_rd_en_d2_R0 [3] = ( | (_03__R | ( _03__C & ( { 768{ abuf_rd_en_d2[3] }} & abuf_rd_raw_data_3_d2_T | { 768{ !abuf_rd_en_d2[3] }} & abuf_rd_data_3_T )))) && abuf_rd_raw_data_3_d2 != abuf_rd_data_3 ;
+  logic [767:0] abuf_rd_raw_data_3_d2_C0 ;
+  logic [767:0] abuf_rd_raw_data_3_d2_R0 ;
+  logic [767:0] abuf_rd_raw_data_3_d2_X0 ;
+  assign abuf_rd_raw_data_3_d2_C0 = { 768{ abuf_rd_en_d2[3] }} ;
+  assign abuf_rd_raw_data_3_d2_R0 = { 768{ abuf_rd_en_d2[3] }} & ( _03__R | ( { 768{ abuf_rd_en_d2_T  [3] }} & _03__C ));
+  assign abuf_rd_raw_data_3_d2_X0 = { 768{ abuf_rd_en_d2[3] }} & _03__X ;
+  logic [767:0] abuf_rd_data_3_C1 ;
+  logic [767:0] abuf_rd_data_3_R1 ;
+  logic [767:0] abuf_rd_data_3_X1 ;
+  assign abuf_rd_data_3_C1 = { 768{ !abuf_rd_en_d2[3] }} ;
+  assign abuf_rd_data_3_R1 = { 768{ !abuf_rd_en_d2[3] }} & ( _03__R | ( { 768{ abuf_rd_en_d2_T  [3] }} & _03__C ));
+  assign abuf_rd_data_3_X1 = { 768{ !abuf_rd_en_d2[3] }} & _03__X ;
+  assign _02_ = abuf_rd_en_d2[2] ? abuf_rd_raw_data_2_d2 : abuf_rd_data_2;
+  assign abuf_rd_en_d2_C0 [2] = | _02__C ;
+  assign abuf_rd_en_d2_X0 [2] = | _02__X ;
+  assign _02__T = abuf_rd_en_d2[2] ? ( { 768{ abuf_rd_en_d2_T  [2] }} | abuf_rd_raw_data_2_d2_T ) : ( { 768{ abuf_rd_en_d2_T  [2] }} | abuf_rd_data_2_T );
+  assign _02__S = abuf_rd_en_d2[2] ? abuf_rd_raw_data_2_d2_S : abuf_rd_data_2_S ;
+  assign abuf_rd_en_d2_R0 [2] = ( | (_02__R | ( _02__C & ( { 768{ abuf_rd_en_d2[2] }} & abuf_rd_raw_data_2_d2_T | { 768{ !abuf_rd_en_d2[2] }} & abuf_rd_data_2_T )))) && abuf_rd_raw_data_2_d2 != abuf_rd_data_2 ;
+  logic [767:0] abuf_rd_raw_data_2_d2_C0 ;
+  logic [767:0] abuf_rd_raw_data_2_d2_R0 ;
+  logic [767:0] abuf_rd_raw_data_2_d2_X0 ;
+  assign abuf_rd_raw_data_2_d2_C0 = { 768{ abuf_rd_en_d2[2] }} ;
+  assign abuf_rd_raw_data_2_d2_R0 = { 768{ abuf_rd_en_d2[2] }} & ( _02__R | ( { 768{ abuf_rd_en_d2_T  [2] }} & _02__C ));
+  assign abuf_rd_raw_data_2_d2_X0 = { 768{ abuf_rd_en_d2[2] }} & _02__X ;
+  logic [767:0] abuf_rd_data_2_C1 ;
+  logic [767:0] abuf_rd_data_2_R1 ;
+  logic [767:0] abuf_rd_data_2_X1 ;
+  assign abuf_rd_data_2_C1 = { 768{ !abuf_rd_en_d2[2] }} ;
+  assign abuf_rd_data_2_R1 = { 768{ !abuf_rd_en_d2[2] }} & ( _02__R | ( { 768{ abuf_rd_en_d2_T  [2] }} & _02__C ));
+  assign abuf_rd_data_2_X1 = { 768{ !abuf_rd_en_d2[2] }} & _02__X ;
+  assign _01_ = abuf_rd_en_d2[1] ? abuf_rd_raw_data_1_d2 : abuf_rd_data_1;
+  assign abuf_rd_en_d2_C0 [1] = | _01__C ;
+  assign abuf_rd_en_d2_X0 [1] = | _01__X ;
+  assign _01__T = abuf_rd_en_d2[1] ? ( { 768{ abuf_rd_en_d2_T  [1] }} | abuf_rd_raw_data_1_d2_T ) : ( { 768{ abuf_rd_en_d2_T  [1] }} | abuf_rd_data_1_T );
+  assign _01__S = abuf_rd_en_d2[1] ? abuf_rd_raw_data_1_d2_S : abuf_rd_data_1_S ;
+  assign abuf_rd_en_d2_R0 [1] = ( | (_01__R | ( _01__C & ( { 768{ abuf_rd_en_d2[1] }} & abuf_rd_raw_data_1_d2_T | { 768{ !abuf_rd_en_d2[1] }} & abuf_rd_data_1_T )))) && abuf_rd_raw_data_1_d2 != abuf_rd_data_1 ;
+  logic [767:0] abuf_rd_raw_data_1_d2_C0 ;
+  logic [767:0] abuf_rd_raw_data_1_d2_R0 ;
+  logic [767:0] abuf_rd_raw_data_1_d2_X0 ;
+  assign abuf_rd_raw_data_1_d2_C0 = { 768{ abuf_rd_en_d2[1] }} ;
+  assign abuf_rd_raw_data_1_d2_R0 = { 768{ abuf_rd_en_d2[1] }} & ( _01__R | ( { 768{ abuf_rd_en_d2_T  [1] }} & _01__C ));
+  assign abuf_rd_raw_data_1_d2_X0 = { 768{ abuf_rd_en_d2[1] }} & _01__X ;
+  logic [767:0] abuf_rd_data_1_C1 ;
+  logic [767:0] abuf_rd_data_1_R1 ;
+  logic [767:0] abuf_rd_data_1_X1 ;
+  assign abuf_rd_data_1_C1 = { 768{ !abuf_rd_en_d2[1] }} ;
+  assign abuf_rd_data_1_R1 = { 768{ !abuf_rd_en_d2[1] }} & ( _01__R | ( { 768{ abuf_rd_en_d2_T  [1] }} & _01__C ));
+  assign abuf_rd_data_1_X1 = { 768{ !abuf_rd_en_d2[1] }} & _01__X ;
+  assign _00_ = abuf_rd_en_d2[0] ? abuf_rd_raw_data_0_d2 : abuf_rd_data_0;
+  assign abuf_rd_en_d2_C0 [0] = | _00__C ;
+  assign abuf_rd_en_d2_X0 [0] = | _00__X ;
+  assign _00__T = abuf_rd_en_d2[0] ? ( { 768{ abuf_rd_en_d2_T  [0] }} | abuf_rd_raw_data_0_d2_T ) : ( { 768{ abuf_rd_en_d2_T  [0] }} | abuf_rd_data_0_T );
+  assign _00__S = abuf_rd_en_d2[0] ? abuf_rd_raw_data_0_d2_S : abuf_rd_data_0_S ;
+  assign abuf_rd_en_d2_R0 [0] = ( | (_00__R | ( _00__C & ( { 768{ abuf_rd_en_d2[0] }} & abuf_rd_raw_data_0_d2_T | { 768{ !abuf_rd_en_d2[0] }} & abuf_rd_data_0_T )))) && abuf_rd_raw_data_0_d2 != abuf_rd_data_0 ;
+  logic [767:0] abuf_rd_raw_data_0_d2_C0 ;
+  logic [767:0] abuf_rd_raw_data_0_d2_R0 ;
+  logic [767:0] abuf_rd_raw_data_0_d2_X0 ;
+  assign abuf_rd_raw_data_0_d2_C0 = { 768{ abuf_rd_en_d2[0] }} ;
+  assign abuf_rd_raw_data_0_d2_R0 = { 768{ abuf_rd_en_d2[0] }} & ( _00__R | ( { 768{ abuf_rd_en_d2_T  [0] }} & _00__C ));
+  assign abuf_rd_raw_data_0_d2_X0 = { 768{ abuf_rd_en_d2[0] }} & _00__X ;
+  logic [767:0] abuf_rd_data_0_C1 ;
+  logic [767:0] abuf_rd_data_0_R1 ;
+  logic [767:0] abuf_rd_data_0_X1 ;
+  assign abuf_rd_data_0_C1 = { 768{ !abuf_rd_en_d2[0] }} ;
+  assign abuf_rd_data_0_R1 = { 768{ !abuf_rd_en_d2[0] }} & ( _00__R | ( { 768{ abuf_rd_en_d2_T  [0] }} & _00__C ));
+  assign abuf_rd_data_0_X1 = { 768{ !abuf_rd_en_d2[0] }} & _00__X ;
+  assign _15_ = abuf_rd_en_d1[7] ? abuf_rd_data_ecc_7 : abuf_rd_raw_data_7_d2;
+  logic [7:0] abuf_rd_en_d1_C1 ;
+  logic [7:0] abuf_rd_en_d1_R1 ;
+  logic [7:0] abuf_rd_en_d1_X1 ;
+  assign abuf_rd_en_d1_C1 [7] = | _15__C ;
+  assign abuf_rd_en_d1_X1 [7] = | _15__X ;
+  assign _15__T = abuf_rd_en_d1[7] ? ( { 544{ abuf_rd_en_d1_T  [7] }} | abuf_rd_data_ecc_7_T ) : ( { 544{ abuf_rd_en_d1_T  [7] }} | abuf_rd_raw_data_7_d2_T );
+  assign _15__S = abuf_rd_en_d1[7] ? abuf_rd_data_ecc_7_S : abuf_rd_raw_data_7_d2_S ;
+  assign abuf_rd_en_d1_R1 [7] = ( | (_15__R | ( _15__C & ( { 544{ abuf_rd_en_d1[7] }} & abuf_rd_data_ecc_7_T | { 544{ !abuf_rd_en_d1[7] }} & abuf_rd_raw_data_7_d2_T )))) && abuf_rd_data_ecc_7 != abuf_rd_raw_data_7_d2 ;
+  logic [543:0] abuf_rd_data_ecc_7_C0 ;
+  logic [543:0] abuf_rd_data_ecc_7_R0 ;
+  logic [543:0] abuf_rd_data_ecc_7_X0 ;
+  assign abuf_rd_data_ecc_7_C0 = { 544{ abuf_rd_en_d1[7] }} ;
+  assign abuf_rd_data_ecc_7_R0 = { 544{ abuf_rd_en_d1[7] }} & ( _15__R | ( { 544{ abuf_rd_en_d1_T  [7] }} & _15__C ));
+  assign abuf_rd_data_ecc_7_X0 = { 544{ abuf_rd_en_d1[7] }} & _15__X ;
+  logic [543:0] abuf_rd_raw_data_7_d2_C1 ;
+  logic [543:0] abuf_rd_raw_data_7_d2_R1 ;
+  logic [543:0] abuf_rd_raw_data_7_d2_X1 ;
+  assign abuf_rd_raw_data_7_d2_C1 = { 544{ !abuf_rd_en_d1[7] }} ;
+  assign abuf_rd_raw_data_7_d2_R1 = { 544{ !abuf_rd_en_d1[7] }} & ( _15__R | ( { 544{ abuf_rd_en_d1_T  [7] }} & _15__C ));
+  assign abuf_rd_raw_data_7_d2_X1 = { 544{ !abuf_rd_en_d1[7] }} & _15__X ;
+  assign _14_ = abuf_rd_en_d1[6] ? abuf_rd_data_ecc_6 : abuf_rd_raw_data_6_d2;
+  assign abuf_rd_en_d1_C1 [6] = | _14__C ;
+  assign abuf_rd_en_d1_X1 [6] = | _14__X ;
+  assign _14__T = abuf_rd_en_d1[6] ? ( { 544{ abuf_rd_en_d1_T  [6] }} | abuf_rd_data_ecc_6_T ) : ( { 544{ abuf_rd_en_d1_T  [6] }} | abuf_rd_raw_data_6_d2_T );
+  assign _14__S = abuf_rd_en_d1[6] ? abuf_rd_data_ecc_6_S : abuf_rd_raw_data_6_d2_S ;
+  assign abuf_rd_en_d1_R1 [6] = ( | (_14__R | ( _14__C & ( { 544{ abuf_rd_en_d1[6] }} & abuf_rd_data_ecc_6_T | { 544{ !abuf_rd_en_d1[6] }} & abuf_rd_raw_data_6_d2_T )))) && abuf_rd_data_ecc_6 != abuf_rd_raw_data_6_d2 ;
+  logic [543:0] abuf_rd_data_ecc_6_C0 ;
+  logic [543:0] abuf_rd_data_ecc_6_R0 ;
+  logic [543:0] abuf_rd_data_ecc_6_X0 ;
+  assign abuf_rd_data_ecc_6_C0 = { 544{ abuf_rd_en_d1[6] }} ;
+  assign abuf_rd_data_ecc_6_R0 = { 544{ abuf_rd_en_d1[6] }} & ( _14__R | ( { 544{ abuf_rd_en_d1_T  [6] }} & _14__C ));
+  assign abuf_rd_data_ecc_6_X0 = { 544{ abuf_rd_en_d1[6] }} & _14__X ;
+  logic [543:0] abuf_rd_raw_data_6_d2_C1 ;
+  logic [543:0] abuf_rd_raw_data_6_d2_R1 ;
+  logic [543:0] abuf_rd_raw_data_6_d2_X1 ;
+  assign abuf_rd_raw_data_6_d2_C1 = { 544{ !abuf_rd_en_d1[6] }} ;
+  assign abuf_rd_raw_data_6_d2_R1 = { 544{ !abuf_rd_en_d1[6] }} & ( _14__R | ( { 544{ abuf_rd_en_d1_T  [6] }} & _14__C ));
+  assign abuf_rd_raw_data_6_d2_X1 = { 544{ !abuf_rd_en_d1[6] }} & _14__X ;
+  assign _13_ = abuf_rd_en_d1[5] ? abuf_rd_data_ecc_5 : abuf_rd_raw_data_5_d2;
+  assign abuf_rd_en_d1_C1 [5] = | _13__C ;
+  assign abuf_rd_en_d1_X1 [5] = | _13__X ;
+  assign _13__T = abuf_rd_en_d1[5] ? ( { 544{ abuf_rd_en_d1_T  [5] }} | abuf_rd_data_ecc_5_T ) : ( { 544{ abuf_rd_en_d1_T  [5] }} | abuf_rd_raw_data_5_d2_T );
+  assign _13__S = abuf_rd_en_d1[5] ? abuf_rd_data_ecc_5_S : abuf_rd_raw_data_5_d2_S ;
+  assign abuf_rd_en_d1_R1 [5] = ( | (_13__R | ( _13__C & ( { 544{ abuf_rd_en_d1[5] }} & abuf_rd_data_ecc_5_T | { 544{ !abuf_rd_en_d1[5] }} & abuf_rd_raw_data_5_d2_T )))) && abuf_rd_data_ecc_5 != abuf_rd_raw_data_5_d2 ;
+  logic [543:0] abuf_rd_data_ecc_5_C0 ;
+  logic [543:0] abuf_rd_data_ecc_5_R0 ;
+  logic [543:0] abuf_rd_data_ecc_5_X0 ;
+  assign abuf_rd_data_ecc_5_C0 = { 544{ abuf_rd_en_d1[5] }} ;
+  assign abuf_rd_data_ecc_5_R0 = { 544{ abuf_rd_en_d1[5] }} & ( _13__R | ( { 544{ abuf_rd_en_d1_T  [5] }} & _13__C ));
+  assign abuf_rd_data_ecc_5_X0 = { 544{ abuf_rd_en_d1[5] }} & _13__X ;
+  logic [543:0] abuf_rd_raw_data_5_d2_C1 ;
+  logic [543:0] abuf_rd_raw_data_5_d2_R1 ;
+  logic [543:0] abuf_rd_raw_data_5_d2_X1 ;
+  assign abuf_rd_raw_data_5_d2_C1 = { 544{ !abuf_rd_en_d1[5] }} ;
+  assign abuf_rd_raw_data_5_d2_R1 = { 544{ !abuf_rd_en_d1[5] }} & ( _13__R | ( { 544{ abuf_rd_en_d1_T  [5] }} & _13__C ));
+  assign abuf_rd_raw_data_5_d2_X1 = { 544{ !abuf_rd_en_d1[5] }} & _13__X ;
+  assign _12_ = abuf_rd_en_d1[4] ? abuf_rd_data_ecc_4 : abuf_rd_raw_data_4_d2;
+  assign abuf_rd_en_d1_C1 [4] = | _12__C ;
+  assign abuf_rd_en_d1_X1 [4] = | _12__X ;
+  assign _12__T = abuf_rd_en_d1[4] ? ( { 544{ abuf_rd_en_d1_T  [4] }} | abuf_rd_data_ecc_4_T ) : ( { 544{ abuf_rd_en_d1_T  [4] }} | abuf_rd_raw_data_4_d2_T );
+  assign _12__S = abuf_rd_en_d1[4] ? abuf_rd_data_ecc_4_S : abuf_rd_raw_data_4_d2_S ;
+  assign abuf_rd_en_d1_R1 [4] = ( | (_12__R | ( _12__C & ( { 544{ abuf_rd_en_d1[4] }} & abuf_rd_data_ecc_4_T | { 544{ !abuf_rd_en_d1[4] }} & abuf_rd_raw_data_4_d2_T )))) && abuf_rd_data_ecc_4 != abuf_rd_raw_data_4_d2 ;
+  logic [543:0] abuf_rd_data_ecc_4_C0 ;
+  logic [543:0] abuf_rd_data_ecc_4_R0 ;
+  logic [543:0] abuf_rd_data_ecc_4_X0 ;
+  assign abuf_rd_data_ecc_4_C0 = { 544{ abuf_rd_en_d1[4] }} ;
+  assign abuf_rd_data_ecc_4_R0 = { 544{ abuf_rd_en_d1[4] }} & ( _12__R | ( { 544{ abuf_rd_en_d1_T  [4] }} & _12__C ));
+  assign abuf_rd_data_ecc_4_X0 = { 544{ abuf_rd_en_d1[4] }} & _12__X ;
+  logic [543:0] abuf_rd_raw_data_4_d2_C1 ;
+  logic [543:0] abuf_rd_raw_data_4_d2_R1 ;
+  logic [543:0] abuf_rd_raw_data_4_d2_X1 ;
+  assign abuf_rd_raw_data_4_d2_C1 = { 544{ !abuf_rd_en_d1[4] }} ;
+  assign abuf_rd_raw_data_4_d2_R1 = { 544{ !abuf_rd_en_d1[4] }} & ( _12__R | ( { 544{ abuf_rd_en_d1_T  [4] }} & _12__C ));
+  assign abuf_rd_raw_data_4_d2_X1 = { 544{ !abuf_rd_en_d1[4] }} & _12__X ;
+  assign _11_ = abuf_rd_en_d1[3] ? abuf_rd_data_ecc_3 : abuf_rd_raw_data_3_d2;
+  assign abuf_rd_en_d1_C1 [3] = | _11__C ;
+  assign abuf_rd_en_d1_X1 [3] = | _11__X ;
+  assign _11__T = abuf_rd_en_d1[3] ? ( { 768{ abuf_rd_en_d1_T  [3] }} | abuf_rd_data_ecc_3_T ) : ( { 768{ abuf_rd_en_d1_T  [3] }} | abuf_rd_raw_data_3_d2_T );
+  assign _11__S = abuf_rd_en_d1[3] ? abuf_rd_data_ecc_3_S : abuf_rd_raw_data_3_d2_S ;
+  assign abuf_rd_en_d1_R1 [3] = ( | (_11__R | ( _11__C & ( { 768{ abuf_rd_en_d1[3] }} & abuf_rd_data_ecc_3_T | { 768{ !abuf_rd_en_d1[3] }} & abuf_rd_raw_data_3_d2_T )))) && abuf_rd_data_ecc_3 != abuf_rd_raw_data_3_d2 ;
+  logic [767:0] abuf_rd_data_ecc_3_C0 ;
+  logic [767:0] abuf_rd_data_ecc_3_R0 ;
+  logic [767:0] abuf_rd_data_ecc_3_X0 ;
+  assign abuf_rd_data_ecc_3_C0 = { 768{ abuf_rd_en_d1[3] }} ;
+  assign abuf_rd_data_ecc_3_R0 = { 768{ abuf_rd_en_d1[3] }} & ( _11__R | ( { 768{ abuf_rd_en_d1_T  [3] }} & _11__C ));
+  assign abuf_rd_data_ecc_3_X0 = { 768{ abuf_rd_en_d1[3] }} & _11__X ;
+  logic [767:0] abuf_rd_raw_data_3_d2_C1 ;
+  logic [767:0] abuf_rd_raw_data_3_d2_R1 ;
+  logic [767:0] abuf_rd_raw_data_3_d2_X1 ;
+  assign abuf_rd_raw_data_3_d2_C1 = { 768{ !abuf_rd_en_d1[3] }} ;
+  assign abuf_rd_raw_data_3_d2_R1 = { 768{ !abuf_rd_en_d1[3] }} & ( _11__R | ( { 768{ abuf_rd_en_d1_T  [3] }} & _11__C ));
+  assign abuf_rd_raw_data_3_d2_X1 = { 768{ !abuf_rd_en_d1[3] }} & _11__X ;
+  assign _10_ = abuf_rd_en_d1[2] ? abuf_rd_data_ecc_2 : abuf_rd_raw_data_2_d2;
+  assign abuf_rd_en_d1_C1 [2] = | _10__C ;
+  assign abuf_rd_en_d1_X1 [2] = | _10__X ;
+  assign _10__T = abuf_rd_en_d1[2] ? ( { 768{ abuf_rd_en_d1_T  [2] }} | abuf_rd_data_ecc_2_T ) : ( { 768{ abuf_rd_en_d1_T  [2] }} | abuf_rd_raw_data_2_d2_T );
+  assign _10__S = abuf_rd_en_d1[2] ? abuf_rd_data_ecc_2_S : abuf_rd_raw_data_2_d2_S ;
+  assign abuf_rd_en_d1_R1 [2] = ( | (_10__R | ( _10__C & ( { 768{ abuf_rd_en_d1[2] }} & abuf_rd_data_ecc_2_T | { 768{ !abuf_rd_en_d1[2] }} & abuf_rd_raw_data_2_d2_T )))) && abuf_rd_data_ecc_2 != abuf_rd_raw_data_2_d2 ;
+  logic [767:0] abuf_rd_data_ecc_2_C0 ;
+  logic [767:0] abuf_rd_data_ecc_2_R0 ;
+  logic [767:0] abuf_rd_data_ecc_2_X0 ;
+  assign abuf_rd_data_ecc_2_C0 = { 768{ abuf_rd_en_d1[2] }} ;
+  assign abuf_rd_data_ecc_2_R0 = { 768{ abuf_rd_en_d1[2] }} & ( _10__R | ( { 768{ abuf_rd_en_d1_T  [2] }} & _10__C ));
+  assign abuf_rd_data_ecc_2_X0 = { 768{ abuf_rd_en_d1[2] }} & _10__X ;
+  logic [767:0] abuf_rd_raw_data_2_d2_C1 ;
+  logic [767:0] abuf_rd_raw_data_2_d2_R1 ;
+  logic [767:0] abuf_rd_raw_data_2_d2_X1 ;
+  assign abuf_rd_raw_data_2_d2_C1 = { 768{ !abuf_rd_en_d1[2] }} ;
+  assign abuf_rd_raw_data_2_d2_R1 = { 768{ !abuf_rd_en_d1[2] }} & ( _10__R | ( { 768{ abuf_rd_en_d1_T  [2] }} & _10__C ));
+  assign abuf_rd_raw_data_2_d2_X1 = { 768{ !abuf_rd_en_d1[2] }} & _10__X ;
+  assign _09_ = abuf_rd_en_d1[1] ? abuf_rd_data_ecc_1 : abuf_rd_raw_data_1_d2;
+  assign abuf_rd_en_d1_C1 [1] = | _09__C ;
+  assign abuf_rd_en_d1_X1 [1] = | _09__X ;
+  assign _09__T = abuf_rd_en_d1[1] ? ( { 768{ abuf_rd_en_d1_T  [1] }} | abuf_rd_data_ecc_1_T ) : ( { 768{ abuf_rd_en_d1_T  [1] }} | abuf_rd_raw_data_1_d2_T );
+  assign _09__S = abuf_rd_en_d1[1] ? abuf_rd_data_ecc_1_S : abuf_rd_raw_data_1_d2_S ;
+  assign abuf_rd_en_d1_R1 [1] = ( | (_09__R | ( _09__C & ( { 768{ abuf_rd_en_d1[1] }} & abuf_rd_data_ecc_1_T | { 768{ !abuf_rd_en_d1[1] }} & abuf_rd_raw_data_1_d2_T )))) && abuf_rd_data_ecc_1 != abuf_rd_raw_data_1_d2 ;
+  logic [767:0] abuf_rd_data_ecc_1_C0 ;
+  logic [767:0] abuf_rd_data_ecc_1_R0 ;
+  logic [767:0] abuf_rd_data_ecc_1_X0 ;
+  assign abuf_rd_data_ecc_1_C0 = { 768{ abuf_rd_en_d1[1] }} ;
+  assign abuf_rd_data_ecc_1_R0 = { 768{ abuf_rd_en_d1[1] }} & ( _09__R | ( { 768{ abuf_rd_en_d1_T  [1] }} & _09__C ));
+  assign abuf_rd_data_ecc_1_X0 = { 768{ abuf_rd_en_d1[1] }} & _09__X ;
+  logic [767:0] abuf_rd_raw_data_1_d2_C1 ;
+  logic [767:0] abuf_rd_raw_data_1_d2_R1 ;
+  logic [767:0] abuf_rd_raw_data_1_d2_X1 ;
+  assign abuf_rd_raw_data_1_d2_C1 = { 768{ !abuf_rd_en_d1[1] }} ;
+  assign abuf_rd_raw_data_1_d2_R1 = { 768{ !abuf_rd_en_d1[1] }} & ( _09__R | ( { 768{ abuf_rd_en_d1_T  [1] }} & _09__C ));
+  assign abuf_rd_raw_data_1_d2_X1 = { 768{ !abuf_rd_en_d1[1] }} & _09__X ;
+  assign _08_ = abuf_rd_en_d1[0] ? abuf_rd_data_ecc_0 : abuf_rd_raw_data_0_d2;
+  assign abuf_rd_en_d1_C1 [0] = | _08__C ;
+  assign abuf_rd_en_d1_X1 [0] = | _08__X ;
+  assign _08__T = abuf_rd_en_d1[0] ? ( { 768{ abuf_rd_en_d1_T  [0] }} | abuf_rd_data_ecc_0_T ) : ( { 768{ abuf_rd_en_d1_T  [0] }} | abuf_rd_raw_data_0_d2_T );
+  assign _08__S = abuf_rd_en_d1[0] ? abuf_rd_data_ecc_0_S : abuf_rd_raw_data_0_d2_S ;
+  assign abuf_rd_en_d1_R1 [0] = ( | (_08__R | ( _08__C & ( { 768{ abuf_rd_en_d1[0] }} & abuf_rd_data_ecc_0_T | { 768{ !abuf_rd_en_d1[0] }} & abuf_rd_raw_data_0_d2_T )))) && abuf_rd_data_ecc_0 != abuf_rd_raw_data_0_d2 ;
+  logic [767:0] abuf_rd_data_ecc_0_C0 ;
+  logic [767:0] abuf_rd_data_ecc_0_R0 ;
+  logic [767:0] abuf_rd_data_ecc_0_X0 ;
+  assign abuf_rd_data_ecc_0_C0 = { 768{ abuf_rd_en_d1[0] }} ;
+  assign abuf_rd_data_ecc_0_R0 = { 768{ abuf_rd_en_d1[0] }} & ( _08__R | ( { 768{ abuf_rd_en_d1_T  [0] }} & _08__C ));
+  assign abuf_rd_data_ecc_0_X0 = { 768{ abuf_rd_en_d1[0] }} & _08__X ;
+  logic [767:0] abuf_rd_raw_data_0_d2_C1 ;
+  logic [767:0] abuf_rd_raw_data_0_d2_R1 ;
+  logic [767:0] abuf_rd_raw_data_0_d2_X1 ;
+  assign abuf_rd_raw_data_0_d2_C1 = { 768{ !abuf_rd_en_d1[0] }} ;
+  assign abuf_rd_raw_data_0_d2_R1 = { 768{ !abuf_rd_en_d1[0] }} & ( _08__R | ( { 768{ abuf_rd_en_d1_T  [0] }} & _08__C ));
+  assign abuf_rd_raw_data_0_d2_X1 = { 768{ !abuf_rd_en_d1[0] }} & _08__X ;
+  assign _23_ = abuf_wr_en[7] ? abuf_wr_data_7 : abuf_wr_data_7_d1;
+  logic [7:0] abuf_wr_en_C1 ;
+  logic [7:0] abuf_wr_en_R1 ;
+  logic [7:0] abuf_wr_en_X1 ;
+  assign abuf_wr_en_C1 [7] = | _23__C ;
+  assign abuf_wr_en_X1 [7] = | _23__X ;
+  assign _23__T = abuf_wr_en[7] ? ( { 544{ abuf_wr_en_T  [7] }} | abuf_wr_data_7_T ) : ( { 544{ abuf_wr_en_T  [7] }} | abuf_wr_data_7_d1_T );
+  assign _23__S = abuf_wr_en[7] ? abuf_wr_data_7_S : abuf_wr_data_7_d1_S ;
+  assign abuf_wr_en_R1 [7] = ( | (_23__R | ( _23__C & ( { 544{ abuf_wr_en[7] }} & abuf_wr_data_7_T | { 544{ !abuf_wr_en[7] }} & abuf_wr_data_7_d1_T )))) && abuf_wr_data_7 != abuf_wr_data_7_d1 ;
+  logic [543:0] abuf_wr_data_7_C0 ;
+  logic [543:0] abuf_wr_data_7_R0 ;
+  logic [543:0] abuf_wr_data_7_X0 ;
+  assign abuf_wr_data_7_C0 = { 544{ abuf_wr_en[7] }} ;
+  assign abuf_wr_data_7_R0 = { 544{ abuf_wr_en[7] }} & ( _23__R | ( { 544{ abuf_wr_en_T  [7] }} & _23__C ));
+  assign abuf_wr_data_7_X0 = { 544{ abuf_wr_en[7] }} & _23__X ;
+  logic [543:0] abuf_wr_data_7_d1_C0 ;
+  logic [543:0] abuf_wr_data_7_d1_R0 ;
+  logic [543:0] abuf_wr_data_7_d1_X0 ;
+  assign abuf_wr_data_7_d1_C0 = { 544{ !abuf_wr_en[7] }} ;
+  assign abuf_wr_data_7_d1_R0 = { 544{ !abuf_wr_en[7] }} & ( _23__R | ( { 544{ abuf_wr_en_T  [7] }} & _23__C ));
+  assign abuf_wr_data_7_d1_X0 = { 544{ !abuf_wr_en[7] }} & _23__X ;
+  assign _22_ = abuf_wr_en[6] ? abuf_wr_data_6 : abuf_wr_data_6_d1;
+  assign abuf_wr_en_C1 [6] = | _22__C ;
+  assign abuf_wr_en_X1 [6] = | _22__X ;
+  assign _22__T = abuf_wr_en[6] ? ( { 544{ abuf_wr_en_T  [6] }} | abuf_wr_data_6_T ) : ( { 544{ abuf_wr_en_T  [6] }} | abuf_wr_data_6_d1_T );
+  assign _22__S = abuf_wr_en[6] ? abuf_wr_data_6_S : abuf_wr_data_6_d1_S ;
+  assign abuf_wr_en_R1 [6] = ( | (_22__R | ( _22__C & ( { 544{ abuf_wr_en[6] }} & abuf_wr_data_6_T | { 544{ !abuf_wr_en[6] }} & abuf_wr_data_6_d1_T )))) && abuf_wr_data_6 != abuf_wr_data_6_d1 ;
+  logic [543:0] abuf_wr_data_6_C0 ;
+  logic [543:0] abuf_wr_data_6_R0 ;
+  logic [543:0] abuf_wr_data_6_X0 ;
+  assign abuf_wr_data_6_C0 = { 544{ abuf_wr_en[6] }} ;
+  assign abuf_wr_data_6_R0 = { 544{ abuf_wr_en[6] }} & ( _22__R | ( { 544{ abuf_wr_en_T  [6] }} & _22__C ));
+  assign abuf_wr_data_6_X0 = { 544{ abuf_wr_en[6] }} & _22__X ;
+  logic [543:0] abuf_wr_data_6_d1_C0 ;
+  logic [543:0] abuf_wr_data_6_d1_R0 ;
+  logic [543:0] abuf_wr_data_6_d1_X0 ;
+  assign abuf_wr_data_6_d1_C0 = { 544{ !abuf_wr_en[6] }} ;
+  assign abuf_wr_data_6_d1_R0 = { 544{ !abuf_wr_en[6] }} & ( _22__R | ( { 544{ abuf_wr_en_T  [6] }} & _22__C ));
+  assign abuf_wr_data_6_d1_X0 = { 544{ !abuf_wr_en[6] }} & _22__X ;
+  assign _21_ = abuf_wr_en[5] ? abuf_wr_data_5 : abuf_wr_data_5_d1;
+  assign abuf_wr_en_C1 [5] = | _21__C ;
+  assign abuf_wr_en_X1 [5] = | _21__X ;
+  assign _21__T = abuf_wr_en[5] ? ( { 544{ abuf_wr_en_T  [5] }} | abuf_wr_data_5_T ) : ( { 544{ abuf_wr_en_T  [5] }} | abuf_wr_data_5_d1_T );
+  assign _21__S = abuf_wr_en[5] ? abuf_wr_data_5_S : abuf_wr_data_5_d1_S ;
+  assign abuf_wr_en_R1 [5] = ( | (_21__R | ( _21__C & ( { 544{ abuf_wr_en[5] }} & abuf_wr_data_5_T | { 544{ !abuf_wr_en[5] }} & abuf_wr_data_5_d1_T )))) && abuf_wr_data_5 != abuf_wr_data_5_d1 ;
+  logic [543:0] abuf_wr_data_5_C0 ;
+  logic [543:0] abuf_wr_data_5_R0 ;
+  logic [543:0] abuf_wr_data_5_X0 ;
+  assign abuf_wr_data_5_C0 = { 544{ abuf_wr_en[5] }} ;
+  assign abuf_wr_data_5_R0 = { 544{ abuf_wr_en[5] }} & ( _21__R | ( { 544{ abuf_wr_en_T  [5] }} & _21__C ));
+  assign abuf_wr_data_5_X0 = { 544{ abuf_wr_en[5] }} & _21__X ;
+  logic [543:0] abuf_wr_data_5_d1_C0 ;
+  logic [543:0] abuf_wr_data_5_d1_R0 ;
+  logic [543:0] abuf_wr_data_5_d1_X0 ;
+  assign abuf_wr_data_5_d1_C0 = { 544{ !abuf_wr_en[5] }} ;
+  assign abuf_wr_data_5_d1_R0 = { 544{ !abuf_wr_en[5] }} & ( _21__R | ( { 544{ abuf_wr_en_T  [5] }} & _21__C ));
+  assign abuf_wr_data_5_d1_X0 = { 544{ !abuf_wr_en[5] }} & _21__X ;
+  assign _20_ = abuf_wr_en[4] ? abuf_wr_data_4 : abuf_wr_data_4_d1;
+  assign abuf_wr_en_C1 [4] = | _20__C ;
+  assign abuf_wr_en_X1 [4] = | _20__X ;
+  assign _20__T = abuf_wr_en[4] ? ( { 544{ abuf_wr_en_T  [4] }} | abuf_wr_data_4_T ) : ( { 544{ abuf_wr_en_T  [4] }} | abuf_wr_data_4_d1_T );
+  assign _20__S = abuf_wr_en[4] ? abuf_wr_data_4_S : abuf_wr_data_4_d1_S ;
+  assign abuf_wr_en_R1 [4] = ( | (_20__R | ( _20__C & ( { 544{ abuf_wr_en[4] }} & abuf_wr_data_4_T | { 544{ !abuf_wr_en[4] }} & abuf_wr_data_4_d1_T )))) && abuf_wr_data_4 != abuf_wr_data_4_d1 ;
+  logic [543:0] abuf_wr_data_4_C0 ;
+  logic [543:0] abuf_wr_data_4_R0 ;
+  logic [543:0] abuf_wr_data_4_X0 ;
+  assign abuf_wr_data_4_C0 = { 544{ abuf_wr_en[4] }} ;
+  assign abuf_wr_data_4_R0 = { 544{ abuf_wr_en[4] }} & ( _20__R | ( { 544{ abuf_wr_en_T  [4] }} & _20__C ));
+  assign abuf_wr_data_4_X0 = { 544{ abuf_wr_en[4] }} & _20__X ;
+  logic [543:0] abuf_wr_data_4_d1_C0 ;
+  logic [543:0] abuf_wr_data_4_d1_R0 ;
+  logic [543:0] abuf_wr_data_4_d1_X0 ;
+  assign abuf_wr_data_4_d1_C0 = { 544{ !abuf_wr_en[4] }} ;
+  assign abuf_wr_data_4_d1_R0 = { 544{ !abuf_wr_en[4] }} & ( _20__R | ( { 544{ abuf_wr_en_T  [4] }} & _20__C ));
+  assign abuf_wr_data_4_d1_X0 = { 544{ !abuf_wr_en[4] }} & _20__X ;
+  assign _19_ = abuf_wr_en[3] ? abuf_wr_data_3 : abuf_wr_data_3_d1;
+  assign abuf_wr_en_C1 [3] = | _19__C ;
+  assign abuf_wr_en_X1 [3] = | _19__X ;
+  assign _19__T = abuf_wr_en[3] ? ( { 768{ abuf_wr_en_T  [3] }} | abuf_wr_data_3_T ) : ( { 768{ abuf_wr_en_T  [3] }} | abuf_wr_data_3_d1_T );
+  assign _19__S = abuf_wr_en[3] ? abuf_wr_data_3_S : abuf_wr_data_3_d1_S ;
+  assign abuf_wr_en_R1 [3] = ( | (_19__R | ( _19__C & ( { 768{ abuf_wr_en[3] }} & abuf_wr_data_3_T | { 768{ !abuf_wr_en[3] }} & abuf_wr_data_3_d1_T )))) && abuf_wr_data_3 != abuf_wr_data_3_d1 ;
+  logic [767:0] abuf_wr_data_3_C0 ;
+  logic [767:0] abuf_wr_data_3_R0 ;
+  logic [767:0] abuf_wr_data_3_X0 ;
+  assign abuf_wr_data_3_C0 = { 768{ abuf_wr_en[3] }} ;
+  assign abuf_wr_data_3_R0 = { 768{ abuf_wr_en[3] }} & ( _19__R | ( { 768{ abuf_wr_en_T  [3] }} & _19__C ));
+  assign abuf_wr_data_3_X0 = { 768{ abuf_wr_en[3] }} & _19__X ;
+  logic [767:0] abuf_wr_data_3_d1_C0 ;
+  logic [767:0] abuf_wr_data_3_d1_R0 ;
+  logic [767:0] abuf_wr_data_3_d1_X0 ;
+  assign abuf_wr_data_3_d1_C0 = { 768{ !abuf_wr_en[3] }} ;
+  assign abuf_wr_data_3_d1_R0 = { 768{ !abuf_wr_en[3] }} & ( _19__R | ( { 768{ abuf_wr_en_T  [3] }} & _19__C ));
+  assign abuf_wr_data_3_d1_X0 = { 768{ !abuf_wr_en[3] }} & _19__X ;
+  assign _18_ = abuf_wr_en[2] ? abuf_wr_data_2 : abuf_wr_data_2_d1;
+  assign abuf_wr_en_C1 [2] = | _18__C ;
+  assign abuf_wr_en_X1 [2] = | _18__X ;
+  assign _18__T = abuf_wr_en[2] ? ( { 768{ abuf_wr_en_T  [2] }} | abuf_wr_data_2_T ) : ( { 768{ abuf_wr_en_T  [2] }} | abuf_wr_data_2_d1_T );
+  assign _18__S = abuf_wr_en[2] ? abuf_wr_data_2_S : abuf_wr_data_2_d1_S ;
+  assign abuf_wr_en_R1 [2] = ( | (_18__R | ( _18__C & ( { 768{ abuf_wr_en[2] }} & abuf_wr_data_2_T | { 768{ !abuf_wr_en[2] }} & abuf_wr_data_2_d1_T )))) && abuf_wr_data_2 != abuf_wr_data_2_d1 ;
+  logic [767:0] abuf_wr_data_2_C0 ;
+  logic [767:0] abuf_wr_data_2_R0 ;
+  logic [767:0] abuf_wr_data_2_X0 ;
+  assign abuf_wr_data_2_C0 = { 768{ abuf_wr_en[2] }} ;
+  assign abuf_wr_data_2_R0 = { 768{ abuf_wr_en[2] }} & ( _18__R | ( { 768{ abuf_wr_en_T  [2] }} & _18__C ));
+  assign abuf_wr_data_2_X0 = { 768{ abuf_wr_en[2] }} & _18__X ;
+  logic [767:0] abuf_wr_data_2_d1_C0 ;
+  logic [767:0] abuf_wr_data_2_d1_R0 ;
+  logic [767:0] abuf_wr_data_2_d1_X0 ;
+  assign abuf_wr_data_2_d1_C0 = { 768{ !abuf_wr_en[2] }} ;
+  assign abuf_wr_data_2_d1_R0 = { 768{ !abuf_wr_en[2] }} & ( _18__R | ( { 768{ abuf_wr_en_T  [2] }} & _18__C ));
+  assign abuf_wr_data_2_d1_X0 = { 768{ !abuf_wr_en[2] }} & _18__X ;
+  assign _17_ = abuf_wr_en[1] ? abuf_wr_data_1 : abuf_wr_data_1_d1;
+  assign abuf_wr_en_C1 [1] = | _17__C ;
+  assign abuf_wr_en_X1 [1] = | _17__X ;
+  assign _17__T = abuf_wr_en[1] ? ( { 768{ abuf_wr_en_T  [1] }} | abuf_wr_data_1_T ) : ( { 768{ abuf_wr_en_T  [1] }} | abuf_wr_data_1_d1_T );
+  assign _17__S = abuf_wr_en[1] ? abuf_wr_data_1_S : abuf_wr_data_1_d1_S ;
+  assign abuf_wr_en_R1 [1] = ( | (_17__R | ( _17__C & ( { 768{ abuf_wr_en[1] }} & abuf_wr_data_1_T | { 768{ !abuf_wr_en[1] }} & abuf_wr_data_1_d1_T )))) && abuf_wr_data_1 != abuf_wr_data_1_d1 ;
+  logic [767:0] abuf_wr_data_1_C0 ;
+  logic [767:0] abuf_wr_data_1_R0 ;
+  logic [767:0] abuf_wr_data_1_X0 ;
+  assign abuf_wr_data_1_C0 = { 768{ abuf_wr_en[1] }} ;
+  assign abuf_wr_data_1_R0 = { 768{ abuf_wr_en[1] }} & ( _17__R | ( { 768{ abuf_wr_en_T  [1] }} & _17__C ));
+  assign abuf_wr_data_1_X0 = { 768{ abuf_wr_en[1] }} & _17__X ;
+  logic [767:0] abuf_wr_data_1_d1_C0 ;
+  logic [767:0] abuf_wr_data_1_d1_R0 ;
+  logic [767:0] abuf_wr_data_1_d1_X0 ;
+  assign abuf_wr_data_1_d1_C0 = { 768{ !abuf_wr_en[1] }} ;
+  assign abuf_wr_data_1_d1_R0 = { 768{ !abuf_wr_en[1] }} & ( _17__R | ( { 768{ abuf_wr_en_T  [1] }} & _17__C ));
+  assign abuf_wr_data_1_d1_X0 = { 768{ !abuf_wr_en[1] }} & _17__X ;
+  assign _16_ = abuf_wr_en[0] ? abuf_wr_data_0 : abuf_wr_data_0_d1;
+  assign abuf_wr_en_C1 [0] = | _16__C ;
+  assign abuf_wr_en_X1 [0] = | _16__X ;
+  assign _16__T = abuf_wr_en[0] ? ( { 768{ abuf_wr_en_T  [0] }} | abuf_wr_data_0_T ) : ( { 768{ abuf_wr_en_T  [0] }} | abuf_wr_data_0_d1_T );
+  assign _16__S = abuf_wr_en[0] ? abuf_wr_data_0_S : abuf_wr_data_0_d1_S ;
+  assign abuf_wr_en_R1 [0] = ( | (_16__R | ( _16__C & ( { 768{ abuf_wr_en[0] }} & abuf_wr_data_0_T | { 768{ !abuf_wr_en[0] }} & abuf_wr_data_0_d1_T )))) && abuf_wr_data_0 != abuf_wr_data_0_d1 ;
+  logic [767:0] abuf_wr_data_0_C0 ;
+  logic [767:0] abuf_wr_data_0_R0 ;
+  logic [767:0] abuf_wr_data_0_X0 ;
+  assign abuf_wr_data_0_C0 = { 768{ abuf_wr_en[0] }} ;
+  assign abuf_wr_data_0_R0 = { 768{ abuf_wr_en[0] }} & ( _16__R | ( { 768{ abuf_wr_en_T  [0] }} & _16__C ));
+  assign abuf_wr_data_0_X0 = { 768{ abuf_wr_en[0] }} & _16__X ;
+  logic [767:0] abuf_wr_data_0_d1_C0 ;
+  logic [767:0] abuf_wr_data_0_d1_R0 ;
+  logic [767:0] abuf_wr_data_0_d1_X0 ;
+  assign abuf_wr_data_0_d1_C0 = { 768{ !abuf_wr_en[0] }} ;
+  assign abuf_wr_data_0_d1_R0 = { 768{ !abuf_wr_en[0] }} & ( _16__R | ( { 768{ abuf_wr_en_T  [0] }} & _16__C ));
+  assign abuf_wr_data_0_d1_X0 = { 768{ !abuf_wr_en[0] }} & _16__X ;
+  logic [0:0] nvdla_core_clk_R0 ;
+  logic [0:0] nvdla_core_clk_X0 ;
+  logic [0:0] nvdla_core_clk_C0 ;
+  logic [767:0] abuf_wr_data_0_d1_R1 ;
+  logic [767:0] abuf_wr_data_0_d1_X1 ;
+  logic [767:0] abuf_wr_data_0_d1_C1 ;
+  logic [31:0] pwrbus_ram_pd_R0 ;
+  logic [31:0] pwrbus_ram_pd_X0 ;
+  logic [31:0] pwrbus_ram_pd_C0 ;
+  logic [4:0] abuf_rd_addr_R0 ;
+  logic [4:0] abuf_rd_addr_X0 ;
+  logic [4:0] abuf_rd_addr_C0 ;
+  logic [7:0] abuf_rd_en_R1 ;
+  logic [7:0] abuf_rd_en_X1 ;
+  logic [7:0] abuf_rd_en_C1 ;
+  logic [4:0] abuf_wr_addr_d1_R0 ;
+  logic [4:0] abuf_wr_addr_d1_X0 ;
+  logic [4:0] abuf_wr_addr_d1_C0 ;
+  logic [7:0] abuf_wr_en_d1_R0 ;
+  logic [7:0] abuf_wr_en_d1_X0 ;
+  logic [7:0] abuf_wr_en_d1_C0 ;
+// module: nv_ram_rws_32x768
+  nv_ram_rws_32x768 u_accu_abuf_0 (
+    .clk_T (  nvdla_core_clk_T  ),
+    .clk_R (  nvdla_core_clk_R0  ),
+    .clk_X (  nvdla_core_clk_X0  ),
+    .clk_C (  nvdla_core_clk_C0  ),
+    .clk_S (  nvdla_core_clk_S  ),
+    .di_T (  abuf_wr_data_0_d1_T  ),
+    .di_R (  abuf_wr_data_0_d1_R1  ),
+    .di_X (  abuf_wr_data_0_d1_X1  ),
+    .di_C (  abuf_wr_data_0_d1_C1  ),
+    .di_S (  abuf_wr_data_0_d1_S  ),
+    .pwrbus_ram_pd_T (  pwrbus_ram_pd_T  ),
+    .pwrbus_ram_pd_R (  pwrbus_ram_pd_R0  ),
+    .pwrbus_ram_pd_X (  pwrbus_ram_pd_X0  ),
+    .pwrbus_ram_pd_C (  pwrbus_ram_pd_C0  ),
+    .pwrbus_ram_pd_S (  pwrbus_ram_pd_S  ),
+    .ra_T (  abuf_rd_addr_T  ),
+    .ra_R (  abuf_rd_addr_R0  ),
+    .ra_X (  abuf_rd_addr_X0  ),
+    .ra_C (  abuf_rd_addr_C0  ),
+    .ra_S (  abuf_rd_addr_S  ),
+    .re_T (  abuf_rd_en_T [0]  ),
+    .re_R (  abuf_rd_en_R1 [0]  ),
+    .re_X (  abuf_rd_en_X1 [0]  ),
+    .re_C (  abuf_rd_en_C1 [0]  ),
+    .re_S (  abuf_rd_en_S [0]  ),
+    .wa_T (  abuf_wr_addr_d1_T  ),
+    .wa_R (  abuf_wr_addr_d1_R0  ),
+    .wa_X (  abuf_wr_addr_d1_X0  ),
+    .wa_C (  abuf_wr_addr_d1_C0  ),
+    .wa_S (  abuf_wr_addr_d1_S  ),
+    .we_T (  abuf_wr_en_d1_T [0]  ),
+    .we_R (  abuf_wr_en_d1_R0 [0]  ),
+    .we_X (  abuf_wr_en_d1_X0 [0]  ),
+    .we_C (  abuf_wr_en_d1_C0 [0]  ),
+    .we_S (  abuf_wr_en_d1_S [0]  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .dout_T (  abuf_rd_data_ecc_0_T  ),
+    .dout_R0 (  abuf_rd_data_ecc_0_R  ),
+    .dout_X0 (  abuf_rd_data_ecc_0_X  ),
+    .dout_C0 (  abuf_rd_data_ecc_0_C  ),
+    .dout_S ( abuf_rd_data_ecc_0_S ),
+    .we ( abuf_wr_en_d1[0] ),
+    .wa ( abuf_wr_addr_d1 ),
+    .re ( abuf_rd_en[0] ),
+    .di ( abuf_wr_data_0_d1 ),
+    .clk ( nvdla_core_clk ),
+    .pwrbus_ram_pd ( pwrbus_ram_pd ),
+    .dout ( abuf_rd_data_ecc_0 ),
+    .ra ( abuf_rd_addr )
+  );
+  logic [0:0] nvdla_core_clk_R1 ;
+  logic [0:0] nvdla_core_clk_X1 ;
+  logic [0:0] nvdla_core_clk_C1 ;
+  logic [767:0] abuf_wr_data_1_d1_R1 ;
+  logic [767:0] abuf_wr_data_1_d1_X1 ;
+  logic [767:0] abuf_wr_data_1_d1_C1 ;
+  logic [31:0] pwrbus_ram_pd_R1 ;
+  logic [31:0] pwrbus_ram_pd_X1 ;
+  logic [31:0] pwrbus_ram_pd_C1 ;
+  logic [4:0] abuf_rd_addr_R1 ;
+  logic [4:0] abuf_rd_addr_X1 ;
+  logic [4:0] abuf_rd_addr_C1 ;
+  logic [4:0] abuf_wr_addr_d1_R1 ;
+  logic [4:0] abuf_wr_addr_d1_X1 ;
+  logic [4:0] abuf_wr_addr_d1_C1 ;
+// module: nv_ram_rws_32x768
+  nv_ram_rws_32x768 u_accu_abuf_1 (
+    .clk_T (  nvdla_core_clk_T  ),
+    .clk_R (  nvdla_core_clk_R1  ),
+    .clk_X (  nvdla_core_clk_X1  ),
+    .clk_C (  nvdla_core_clk_C1  ),
+    .clk_S (  nvdla_core_clk_S  ),
+    .di_T (  abuf_wr_data_1_d1_T  ),
+    .di_R (  abuf_wr_data_1_d1_R1  ),
+    .di_X (  abuf_wr_data_1_d1_X1  ),
+    .di_C (  abuf_wr_data_1_d1_C1  ),
+    .di_S (  abuf_wr_data_1_d1_S  ),
+    .pwrbus_ram_pd_T (  pwrbus_ram_pd_T  ),
+    .pwrbus_ram_pd_R (  pwrbus_ram_pd_R1  ),
+    .pwrbus_ram_pd_X (  pwrbus_ram_pd_X1  ),
+    .pwrbus_ram_pd_C (  pwrbus_ram_pd_C1  ),
+    .pwrbus_ram_pd_S (  pwrbus_ram_pd_S  ),
+    .ra_T (  abuf_rd_addr_T  ),
+    .ra_R (  abuf_rd_addr_R1  ),
+    .ra_X (  abuf_rd_addr_X1  ),
+    .ra_C (  abuf_rd_addr_C1  ),
+    .ra_S (  abuf_rd_addr_S  ),
+    .re_T (  abuf_rd_en_T [1]  ),
+    .re_R (  abuf_rd_en_R1 [1]  ),
+    .re_X (  abuf_rd_en_X1 [1]  ),
+    .re_C (  abuf_rd_en_C1 [1]  ),
+    .re_S (  abuf_rd_en_S [1]  ),
+    .wa_T (  abuf_wr_addr_d1_T  ),
+    .wa_R (  abuf_wr_addr_d1_R1  ),
+    .wa_X (  abuf_wr_addr_d1_X1  ),
+    .wa_C (  abuf_wr_addr_d1_C1  ),
+    .wa_S (  abuf_wr_addr_d1_S  ),
+    .we_T (  abuf_wr_en_d1_T [1]  ),
+    .we_R (  abuf_wr_en_d1_R0 [1]  ),
+    .we_X (  abuf_wr_en_d1_X0 [1]  ),
+    .we_C (  abuf_wr_en_d1_C0 [1]  ),
+    .we_S (  abuf_wr_en_d1_S [1]  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .dout_T (  abuf_rd_data_ecc_1_T  ),
+    .dout_R0 (  abuf_rd_data_ecc_1_R  ),
+    .dout_X0 (  abuf_rd_data_ecc_1_X  ),
+    .dout_C0 (  abuf_rd_data_ecc_1_C  ),
+    .dout_S ( abuf_rd_data_ecc_1_S ),
+    .we ( abuf_wr_en_d1[1] ),
+    .wa ( abuf_wr_addr_d1 ),
+    .re ( abuf_rd_en[1] ),
+    .di ( abuf_wr_data_1_d1 ),
+    .clk ( nvdla_core_clk ),
+    .pwrbus_ram_pd ( pwrbus_ram_pd ),
+    .dout ( abuf_rd_data_ecc_1 ),
+    .ra ( abuf_rd_addr )
+  );
+  logic [0:0] nvdla_core_clk_R2 ;
+  logic [0:0] nvdla_core_clk_X2 ;
+  logic [0:0] nvdla_core_clk_C2 ;
+  logic [767:0] abuf_wr_data_2_d1_R1 ;
+  logic [767:0] abuf_wr_data_2_d1_X1 ;
+  logic [767:0] abuf_wr_data_2_d1_C1 ;
+  logic [31:0] pwrbus_ram_pd_R2 ;
+  logic [31:0] pwrbus_ram_pd_X2 ;
+  logic [31:0] pwrbus_ram_pd_C2 ;
+  logic [4:0] abuf_rd_addr_R2 ;
+  logic [4:0] abuf_rd_addr_X2 ;
+  logic [4:0] abuf_rd_addr_C2 ;
+  logic [4:0] abuf_wr_addr_d1_R2 ;
+  logic [4:0] abuf_wr_addr_d1_X2 ;
+  logic [4:0] abuf_wr_addr_d1_C2 ;
+// module: nv_ram_rws_32x768
+  nv_ram_rws_32x768 u_accu_abuf_2 (
+    .clk_T (  nvdla_core_clk_T  ),
+    .clk_R (  nvdla_core_clk_R2  ),
+    .clk_X (  nvdla_core_clk_X2  ),
+    .clk_C (  nvdla_core_clk_C2  ),
+    .clk_S (  nvdla_core_clk_S  ),
+    .di_T (  abuf_wr_data_2_d1_T  ),
+    .di_R (  abuf_wr_data_2_d1_R1  ),
+    .di_X (  abuf_wr_data_2_d1_X1  ),
+    .di_C (  abuf_wr_data_2_d1_C1  ),
+    .di_S (  abuf_wr_data_2_d1_S  ),
+    .pwrbus_ram_pd_T (  pwrbus_ram_pd_T  ),
+    .pwrbus_ram_pd_R (  pwrbus_ram_pd_R2  ),
+    .pwrbus_ram_pd_X (  pwrbus_ram_pd_X2  ),
+    .pwrbus_ram_pd_C (  pwrbus_ram_pd_C2  ),
+    .pwrbus_ram_pd_S (  pwrbus_ram_pd_S  ),
+    .ra_T (  abuf_rd_addr_T  ),
+    .ra_R (  abuf_rd_addr_R2  ),
+    .ra_X (  abuf_rd_addr_X2  ),
+    .ra_C (  abuf_rd_addr_C2  ),
+    .ra_S (  abuf_rd_addr_S  ),
+    .re_T (  abuf_rd_en_T [2]  ),
+    .re_R (  abuf_rd_en_R1 [2]  ),
+    .re_X (  abuf_rd_en_X1 [2]  ),
+    .re_C (  abuf_rd_en_C1 [2]  ),
+    .re_S (  abuf_rd_en_S [2]  ),
+    .wa_T (  abuf_wr_addr_d1_T  ),
+    .wa_R (  abuf_wr_addr_d1_R2  ),
+    .wa_X (  abuf_wr_addr_d1_X2  ),
+    .wa_C (  abuf_wr_addr_d1_C2  ),
+    .wa_S (  abuf_wr_addr_d1_S  ),
+    .we_T (  abuf_wr_en_d1_T [2]  ),
+    .we_R (  abuf_wr_en_d1_R0 [2]  ),
+    .we_X (  abuf_wr_en_d1_X0 [2]  ),
+    .we_C (  abuf_wr_en_d1_C0 [2]  ),
+    .we_S (  abuf_wr_en_d1_S [2]  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .dout_T (  abuf_rd_data_ecc_2_T  ),
+    .dout_R0 (  abuf_rd_data_ecc_2_R  ),
+    .dout_X0 (  abuf_rd_data_ecc_2_X  ),
+    .dout_C0 (  abuf_rd_data_ecc_2_C  ),
+    .dout_S ( abuf_rd_data_ecc_2_S ),
+    .we ( abuf_wr_en_d1[2] ),
+    .wa ( abuf_wr_addr_d1 ),
+    .re ( abuf_rd_en[2] ),
+    .di ( abuf_wr_data_2_d1 ),
+    .clk ( nvdla_core_clk ),
+    .pwrbus_ram_pd ( pwrbus_ram_pd ),
+    .dout ( abuf_rd_data_ecc_2 ),
+    .ra ( abuf_rd_addr )
+  );
+  logic [0:0] nvdla_core_clk_R3 ;
+  logic [0:0] nvdla_core_clk_X3 ;
+  logic [0:0] nvdla_core_clk_C3 ;
+  logic [767:0] abuf_wr_data_3_d1_R1 ;
+  logic [767:0] abuf_wr_data_3_d1_X1 ;
+  logic [767:0] abuf_wr_data_3_d1_C1 ;
+  logic [31:0] pwrbus_ram_pd_R3 ;
+  logic [31:0] pwrbus_ram_pd_X3 ;
+  logic [31:0] pwrbus_ram_pd_C3 ;
+  logic [4:0] abuf_rd_addr_R3 ;
+  logic [4:0] abuf_rd_addr_X3 ;
+  logic [4:0] abuf_rd_addr_C3 ;
+  logic [4:0] abuf_wr_addr_d1_R3 ;
+  logic [4:0] abuf_wr_addr_d1_X3 ;
+  logic [4:0] abuf_wr_addr_d1_C3 ;
+// module: nv_ram_rws_32x768
+  nv_ram_rws_32x768 u_accu_abuf_3 (
+    .clk_T (  nvdla_core_clk_T  ),
+    .clk_R (  nvdla_core_clk_R3  ),
+    .clk_X (  nvdla_core_clk_X3  ),
+    .clk_C (  nvdla_core_clk_C3  ),
+    .clk_S (  nvdla_core_clk_S  ),
+    .di_T (  abuf_wr_data_3_d1_T  ),
+    .di_R (  abuf_wr_data_3_d1_R1  ),
+    .di_X (  abuf_wr_data_3_d1_X1  ),
+    .di_C (  abuf_wr_data_3_d1_C1  ),
+    .di_S (  abuf_wr_data_3_d1_S  ),
+    .pwrbus_ram_pd_T (  pwrbus_ram_pd_T  ),
+    .pwrbus_ram_pd_R (  pwrbus_ram_pd_R3  ),
+    .pwrbus_ram_pd_X (  pwrbus_ram_pd_X3  ),
+    .pwrbus_ram_pd_C (  pwrbus_ram_pd_C3  ),
+    .pwrbus_ram_pd_S (  pwrbus_ram_pd_S  ),
+    .ra_T (  abuf_rd_addr_T  ),
+    .ra_R (  abuf_rd_addr_R3  ),
+    .ra_X (  abuf_rd_addr_X3  ),
+    .ra_C (  abuf_rd_addr_C3  ),
+    .ra_S (  abuf_rd_addr_S  ),
+    .re_T (  abuf_rd_en_T [3]  ),
+    .re_R (  abuf_rd_en_R1 [3]  ),
+    .re_X (  abuf_rd_en_X1 [3]  ),
+    .re_C (  abuf_rd_en_C1 [3]  ),
+    .re_S (  abuf_rd_en_S [3]  ),
+    .wa_T (  abuf_wr_addr_d1_T  ),
+    .wa_R (  abuf_wr_addr_d1_R3  ),
+    .wa_X (  abuf_wr_addr_d1_X3  ),
+    .wa_C (  abuf_wr_addr_d1_C3  ),
+    .wa_S (  abuf_wr_addr_d1_S  ),
+    .we_T (  abuf_wr_en_d1_T [3]  ),
+    .we_R (  abuf_wr_en_d1_R0 [3]  ),
+    .we_X (  abuf_wr_en_d1_X0 [3]  ),
+    .we_C (  abuf_wr_en_d1_C0 [3]  ),
+    .we_S (  abuf_wr_en_d1_S [3]  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .dout_T (  abuf_rd_data_ecc_3_T  ),
+    .dout_R0 (  abuf_rd_data_ecc_3_R  ),
+    .dout_X0 (  abuf_rd_data_ecc_3_X  ),
+    .dout_C0 (  abuf_rd_data_ecc_3_C  ),
+    .dout_S ( abuf_rd_data_ecc_3_S ),
+    .we ( abuf_wr_en_d1[3] ),
+    .wa ( abuf_wr_addr_d1 ),
+    .re ( abuf_rd_en[3] ),
+    .di ( abuf_wr_data_3_d1 ),
+    .clk ( nvdla_core_clk ),
+    .pwrbus_ram_pd ( pwrbus_ram_pd ),
+    .dout ( abuf_rd_data_ecc_3 ),
+    .ra ( abuf_rd_addr )
+  );
+  logic [0:0] nvdla_core_clk_R4 ;
+  logic [0:0] nvdla_core_clk_X4 ;
+  logic [0:0] nvdla_core_clk_C4 ;
+  logic [543:0] abuf_wr_data_4_d1_R1 ;
+  logic [543:0] abuf_wr_data_4_d1_X1 ;
+  logic [543:0] abuf_wr_data_4_d1_C1 ;
+  logic [31:0] pwrbus_ram_pd_R4 ;
+  logic [31:0] pwrbus_ram_pd_X4 ;
+  logic [31:0] pwrbus_ram_pd_C4 ;
+  logic [4:0] abuf_rd_addr_R4 ;
+  logic [4:0] abuf_rd_addr_X4 ;
+  logic [4:0] abuf_rd_addr_C4 ;
+  logic [4:0] abuf_wr_addr_d1_R4 ;
+  logic [4:0] abuf_wr_addr_d1_X4 ;
+  logic [4:0] abuf_wr_addr_d1_C4 ;
+// module: nv_ram_rws_32x544
+  nv_ram_rws_32x544 u_accu_abuf_4 (
+    .clk_T (  nvdla_core_clk_T  ),
+    .clk_R (  nvdla_core_clk_R4  ),
+    .clk_X (  nvdla_core_clk_X4  ),
+    .clk_C (  nvdla_core_clk_C4  ),
+    .clk_S (  nvdla_core_clk_S  ),
+    .di_T (  abuf_wr_data_4_d1_T  ),
+    .di_R (  abuf_wr_data_4_d1_R1  ),
+    .di_X (  abuf_wr_data_4_d1_X1  ),
+    .di_C (  abuf_wr_data_4_d1_C1  ),
+    .di_S (  abuf_wr_data_4_d1_S  ),
+    .pwrbus_ram_pd_T (  pwrbus_ram_pd_T  ),
+    .pwrbus_ram_pd_R (  pwrbus_ram_pd_R4  ),
+    .pwrbus_ram_pd_X (  pwrbus_ram_pd_X4  ),
+    .pwrbus_ram_pd_C (  pwrbus_ram_pd_C4  ),
+    .pwrbus_ram_pd_S (  pwrbus_ram_pd_S  ),
+    .ra_T (  abuf_rd_addr_T  ),
+    .ra_R (  abuf_rd_addr_R4  ),
+    .ra_X (  abuf_rd_addr_X4  ),
+    .ra_C (  abuf_rd_addr_C4  ),
+    .ra_S (  abuf_rd_addr_S  ),
+    .re_T (  abuf_rd_en_T [4]  ),
+    .re_R (  abuf_rd_en_R1 [4]  ),
+    .re_X (  abuf_rd_en_X1 [4]  ),
+    .re_C (  abuf_rd_en_C1 [4]  ),
+    .re_S (  abuf_rd_en_S [4]  ),
+    .wa_T (  abuf_wr_addr_d1_T  ),
+    .wa_R (  abuf_wr_addr_d1_R4  ),
+    .wa_X (  abuf_wr_addr_d1_X4  ),
+    .wa_C (  abuf_wr_addr_d1_C4  ),
+    .wa_S (  abuf_wr_addr_d1_S  ),
+    .we_T (  abuf_wr_en_d1_T [4]  ),
+    .we_R (  abuf_wr_en_d1_R0 [4]  ),
+    .we_X (  abuf_wr_en_d1_X0 [4]  ),
+    .we_C (  abuf_wr_en_d1_C0 [4]  ),
+    .we_S (  abuf_wr_en_d1_S [4]  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .dout_T (  abuf_rd_data_ecc_4_T  ),
+    .dout_R0 (  abuf_rd_data_ecc_4_R  ),
+    .dout_X0 (  abuf_rd_data_ecc_4_X  ),
+    .dout_C0 (  abuf_rd_data_ecc_4_C  ),
+    .dout_S ( abuf_rd_data_ecc_4_S ),
+    .we ( abuf_wr_en_d1[4] ),
+    .wa ( abuf_wr_addr_d1 ),
+    .re ( abuf_rd_en[4] ),
+    .di ( abuf_wr_data_4_d1 ),
+    .clk ( nvdla_core_clk ),
+    .pwrbus_ram_pd ( pwrbus_ram_pd ),
+    .dout ( abuf_rd_data_ecc_4 ),
+    .ra ( abuf_rd_addr )
+  );
+  logic [0:0] nvdla_core_clk_R5 ;
+  logic [0:0] nvdla_core_clk_X5 ;
+  logic [0:0] nvdla_core_clk_C5 ;
+  logic [543:0] abuf_wr_data_5_d1_R1 ;
+  logic [543:0] abuf_wr_data_5_d1_X1 ;
+  logic [543:0] abuf_wr_data_5_d1_C1 ;
+  logic [31:0] pwrbus_ram_pd_R5 ;
+  logic [31:0] pwrbus_ram_pd_X5 ;
+  logic [31:0] pwrbus_ram_pd_C5 ;
+  logic [4:0] abuf_rd_addr_R5 ;
+  logic [4:0] abuf_rd_addr_X5 ;
+  logic [4:0] abuf_rd_addr_C5 ;
+  logic [4:0] abuf_wr_addr_d1_R5 ;
+  logic [4:0] abuf_wr_addr_d1_X5 ;
+  logic [4:0] abuf_wr_addr_d1_C5 ;
+// module: nv_ram_rws_32x544
+  nv_ram_rws_32x544 u_accu_abuf_5 (
+    .clk_T (  nvdla_core_clk_T  ),
+    .clk_R (  nvdla_core_clk_R5  ),
+    .clk_X (  nvdla_core_clk_X5  ),
+    .clk_C (  nvdla_core_clk_C5  ),
+    .clk_S (  nvdla_core_clk_S  ),
+    .di_T (  abuf_wr_data_5_d1_T  ),
+    .di_R (  abuf_wr_data_5_d1_R1  ),
+    .di_X (  abuf_wr_data_5_d1_X1  ),
+    .di_C (  abuf_wr_data_5_d1_C1  ),
+    .di_S (  abuf_wr_data_5_d1_S  ),
+    .pwrbus_ram_pd_T (  pwrbus_ram_pd_T  ),
+    .pwrbus_ram_pd_R (  pwrbus_ram_pd_R5  ),
+    .pwrbus_ram_pd_X (  pwrbus_ram_pd_X5  ),
+    .pwrbus_ram_pd_C (  pwrbus_ram_pd_C5  ),
+    .pwrbus_ram_pd_S (  pwrbus_ram_pd_S  ),
+    .ra_T (  abuf_rd_addr_T  ),
+    .ra_R (  abuf_rd_addr_R5  ),
+    .ra_X (  abuf_rd_addr_X5  ),
+    .ra_C (  abuf_rd_addr_C5  ),
+    .ra_S (  abuf_rd_addr_S  ),
+    .re_T (  abuf_rd_en_T [5]  ),
+    .re_R (  abuf_rd_en_R1 [5]  ),
+    .re_X (  abuf_rd_en_X1 [5]  ),
+    .re_C (  abuf_rd_en_C1 [5]  ),
+    .re_S (  abuf_rd_en_S [5]  ),
+    .wa_T (  abuf_wr_addr_d1_T  ),
+    .wa_R (  abuf_wr_addr_d1_R5  ),
+    .wa_X (  abuf_wr_addr_d1_X5  ),
+    .wa_C (  abuf_wr_addr_d1_C5  ),
+    .wa_S (  abuf_wr_addr_d1_S  ),
+    .we_T (  abuf_wr_en_d1_T [5]  ),
+    .we_R (  abuf_wr_en_d1_R0 [5]  ),
+    .we_X (  abuf_wr_en_d1_X0 [5]  ),
+    .we_C (  abuf_wr_en_d1_C0 [5]  ),
+    .we_S (  abuf_wr_en_d1_S [5]  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .dout_T (  abuf_rd_data_ecc_5_T  ),
+    .dout_R0 (  abuf_rd_data_ecc_5_R  ),
+    .dout_X0 (  abuf_rd_data_ecc_5_X  ),
+    .dout_C0 (  abuf_rd_data_ecc_5_C  ),
+    .dout_S ( abuf_rd_data_ecc_5_S ),
+    .we ( abuf_wr_en_d1[5] ),
+    .wa ( abuf_wr_addr_d1 ),
+    .re ( abuf_rd_en[5] ),
+    .di ( abuf_wr_data_5_d1 ),
+    .clk ( nvdla_core_clk ),
+    .pwrbus_ram_pd ( pwrbus_ram_pd ),
+    .dout ( abuf_rd_data_ecc_5 ),
+    .ra ( abuf_rd_addr )
+  );
+  logic [0:0] nvdla_core_clk_R6 ;
+  logic [0:0] nvdla_core_clk_X6 ;
+  logic [0:0] nvdla_core_clk_C6 ;
+  logic [543:0] abuf_wr_data_6_d1_R1 ;
+  logic [543:0] abuf_wr_data_6_d1_X1 ;
+  logic [543:0] abuf_wr_data_6_d1_C1 ;
+  logic [31:0] pwrbus_ram_pd_R6 ;
+  logic [31:0] pwrbus_ram_pd_X6 ;
+  logic [31:0] pwrbus_ram_pd_C6 ;
+  logic [4:0] abuf_rd_addr_R6 ;
+  logic [4:0] abuf_rd_addr_X6 ;
+  logic [4:0] abuf_rd_addr_C6 ;
+  logic [4:0] abuf_wr_addr_d1_R6 ;
+  logic [4:0] abuf_wr_addr_d1_X6 ;
+  logic [4:0] abuf_wr_addr_d1_C6 ;
+// module: nv_ram_rws_32x544
+  nv_ram_rws_32x544 u_accu_abuf_6 (
+    .clk_T (  nvdla_core_clk_T  ),
+    .clk_R (  nvdla_core_clk_R6  ),
+    .clk_X (  nvdla_core_clk_X6  ),
+    .clk_C (  nvdla_core_clk_C6  ),
+    .clk_S (  nvdla_core_clk_S  ),
+    .di_T (  abuf_wr_data_6_d1_T  ),
+    .di_R (  abuf_wr_data_6_d1_R1  ),
+    .di_X (  abuf_wr_data_6_d1_X1  ),
+    .di_C (  abuf_wr_data_6_d1_C1  ),
+    .di_S (  abuf_wr_data_6_d1_S  ),
+    .pwrbus_ram_pd_T (  pwrbus_ram_pd_T  ),
+    .pwrbus_ram_pd_R (  pwrbus_ram_pd_R6  ),
+    .pwrbus_ram_pd_X (  pwrbus_ram_pd_X6  ),
+    .pwrbus_ram_pd_C (  pwrbus_ram_pd_C6  ),
+    .pwrbus_ram_pd_S (  pwrbus_ram_pd_S  ),
+    .ra_T (  abuf_rd_addr_T  ),
+    .ra_R (  abuf_rd_addr_R6  ),
+    .ra_X (  abuf_rd_addr_X6  ),
+    .ra_C (  abuf_rd_addr_C6  ),
+    .ra_S (  abuf_rd_addr_S  ),
+    .re_T (  abuf_rd_en_T [6]  ),
+    .re_R (  abuf_rd_en_R1 [6]  ),
+    .re_X (  abuf_rd_en_X1 [6]  ),
+    .re_C (  abuf_rd_en_C1 [6]  ),
+    .re_S (  abuf_rd_en_S [6]  ),
+    .wa_T (  abuf_wr_addr_d1_T  ),
+    .wa_R (  abuf_wr_addr_d1_R6  ),
+    .wa_X (  abuf_wr_addr_d1_X6  ),
+    .wa_C (  abuf_wr_addr_d1_C6  ),
+    .wa_S (  abuf_wr_addr_d1_S  ),
+    .we_T (  abuf_wr_en_d1_T [6]  ),
+    .we_R (  abuf_wr_en_d1_R0 [6]  ),
+    .we_X (  abuf_wr_en_d1_X0 [6]  ),
+    .we_C (  abuf_wr_en_d1_C0 [6]  ),
+    .we_S (  abuf_wr_en_d1_S [6]  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .dout_T (  abuf_rd_data_ecc_6_T  ),
+    .dout_R0 (  abuf_rd_data_ecc_6_R  ),
+    .dout_X0 (  abuf_rd_data_ecc_6_X  ),
+    .dout_C0 (  abuf_rd_data_ecc_6_C  ),
+    .dout_S ( abuf_rd_data_ecc_6_S ),
+    .we ( abuf_wr_en_d1[6] ),
+    .wa ( abuf_wr_addr_d1 ),
+    .re ( abuf_rd_en[6] ),
+    .di ( abuf_wr_data_6_d1 ),
+    .clk ( nvdla_core_clk ),
+    .pwrbus_ram_pd ( pwrbus_ram_pd ),
+    .dout ( abuf_rd_data_ecc_6 ),
+    .ra ( abuf_rd_addr )
+  );
+  logic [0:0] nvdla_core_clk_R7 ;
+  logic [0:0] nvdla_core_clk_X7 ;
+  logic [0:0] nvdla_core_clk_C7 ;
+  logic [543:0] abuf_wr_data_7_d1_R1 ;
+  logic [543:0] abuf_wr_data_7_d1_X1 ;
+  logic [543:0] abuf_wr_data_7_d1_C1 ;
+  logic [31:0] pwrbus_ram_pd_R7 ;
+  logic [31:0] pwrbus_ram_pd_X7 ;
+  logic [31:0] pwrbus_ram_pd_C7 ;
+  logic [4:0] abuf_rd_addr_R7 ;
+  logic [4:0] abuf_rd_addr_X7 ;
+  logic [4:0] abuf_rd_addr_C7 ;
+  logic [4:0] abuf_wr_addr_d1_R7 ;
+  logic [4:0] abuf_wr_addr_d1_X7 ;
+  logic [4:0] abuf_wr_addr_d1_C7 ;
+// module: nv_ram_rws_32x544
+  nv_ram_rws_32x544 u_accu_abuf_7 (
+    .clk_T (  nvdla_core_clk_T  ),
+    .clk_R (  nvdla_core_clk_R7  ),
+    .clk_X (  nvdla_core_clk_X7  ),
+    .clk_C (  nvdla_core_clk_C7  ),
+    .clk_S (  nvdla_core_clk_S  ),
+    .di_T (  abuf_wr_data_7_d1_T  ),
+    .di_R (  abuf_wr_data_7_d1_R1  ),
+    .di_X (  abuf_wr_data_7_d1_X1  ),
+    .di_C (  abuf_wr_data_7_d1_C1  ),
+    .di_S (  abuf_wr_data_7_d1_S  ),
+    .pwrbus_ram_pd_T (  pwrbus_ram_pd_T  ),
+    .pwrbus_ram_pd_R (  pwrbus_ram_pd_R7  ),
+    .pwrbus_ram_pd_X (  pwrbus_ram_pd_X7  ),
+    .pwrbus_ram_pd_C (  pwrbus_ram_pd_C7  ),
+    .pwrbus_ram_pd_S (  pwrbus_ram_pd_S  ),
+    .ra_T (  abuf_rd_addr_T  ),
+    .ra_R (  abuf_rd_addr_R7  ),
+    .ra_X (  abuf_rd_addr_X7  ),
+    .ra_C (  abuf_rd_addr_C7  ),
+    .ra_S (  abuf_rd_addr_S  ),
+    .re_T (  abuf_rd_en_T [7]  ),
+    .re_R (  abuf_rd_en_R1 [7]  ),
+    .re_X (  abuf_rd_en_X1 [7]  ),
+    .re_C (  abuf_rd_en_C1 [7]  ),
+    .re_S (  abuf_rd_en_S [7]  ),
+    .wa_T (  abuf_wr_addr_d1_T  ),
+    .wa_R (  abuf_wr_addr_d1_R7  ),
+    .wa_X (  abuf_wr_addr_d1_X7  ),
+    .wa_C (  abuf_wr_addr_d1_C7  ),
+    .wa_S (  abuf_wr_addr_d1_S  ),
+    .we_T (  abuf_wr_en_d1_T [7]  ),
+    .we_R (  abuf_wr_en_d1_R0 [7]  ),
+    .we_X (  abuf_wr_en_d1_X0 [7]  ),
+    .we_C (  abuf_wr_en_d1_C0 [7]  ),
+    .we_S (  abuf_wr_en_d1_S [7]  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .dout_T (  abuf_rd_data_ecc_7_T  ),
+    .dout_R0 (  abuf_rd_data_ecc_7_R  ),
+    .dout_X0 (  abuf_rd_data_ecc_7_X  ),
+    .dout_C0 (  abuf_rd_data_ecc_7_C  ),
+    .dout_S ( abuf_rd_data_ecc_7_S ),
+    .we ( abuf_wr_en_d1[7] ),
+    .wa ( abuf_wr_addr_d1 ),
+    .re ( abuf_rd_en[7] ),
+    .di ( abuf_wr_data_7_d1 ),
+    .clk ( nvdla_core_clk ),
+    .pwrbus_ram_pd ( pwrbus_ram_pd ),
+    .dout ( abuf_rd_data_ecc_7 ),
+    .ra ( abuf_rd_addr )
+  );
+  assign abuf_rd_data_0_w = abuf_rd_raw_data_0_d2;
+  logic [767:0] abuf_rd_raw_data_0_d2_C2 ;
+  logic [767:0] abuf_rd_raw_data_0_d2_R2 ;
+  logic [767:0] abuf_rd_raw_data_0_d2_X2 ;
+  assign abuf_rd_data_0_w_T = abuf_rd_raw_data_0_d2_T ;
+  assign abuf_rd_raw_data_0_d2_C2 = abuf_rd_data_0_w_C ;
+  assign abuf_rd_raw_data_0_d2_R2 = abuf_rd_data_0_w_R ;
+  assign abuf_rd_raw_data_0_d2_X2 = abuf_rd_data_0_w_X ;
+  assign abuf_rd_data_0_w_S = abuf_rd_raw_data_0_d2_S ;
+  assign abuf_rd_data_1_w = abuf_rd_raw_data_1_d2;
+  logic [767:0] abuf_rd_raw_data_1_d2_C2 ;
+  logic [767:0] abuf_rd_raw_data_1_d2_R2 ;
+  logic [767:0] abuf_rd_raw_data_1_d2_X2 ;
+  assign abuf_rd_data_1_w_T = abuf_rd_raw_data_1_d2_T ;
+  assign abuf_rd_raw_data_1_d2_C2 = abuf_rd_data_1_w_C ;
+  assign abuf_rd_raw_data_1_d2_R2 = abuf_rd_data_1_w_R ;
+  assign abuf_rd_raw_data_1_d2_X2 = abuf_rd_data_1_w_X ;
+  assign abuf_rd_data_1_w_S = abuf_rd_raw_data_1_d2_S ;
+  assign abuf_rd_data_2_w = abuf_rd_raw_data_2_d2;
+  logic [767:0] abuf_rd_raw_data_2_d2_C2 ;
+  logic [767:0] abuf_rd_raw_data_2_d2_R2 ;
+  logic [767:0] abuf_rd_raw_data_2_d2_X2 ;
+  assign abuf_rd_data_2_w_T = abuf_rd_raw_data_2_d2_T ;
+  assign abuf_rd_raw_data_2_d2_C2 = abuf_rd_data_2_w_C ;
+  assign abuf_rd_raw_data_2_d2_R2 = abuf_rd_data_2_w_R ;
+  assign abuf_rd_raw_data_2_d2_X2 = abuf_rd_data_2_w_X ;
+  assign abuf_rd_data_2_w_S = abuf_rd_raw_data_2_d2_S ;
+  assign abuf_rd_data_3_w = abuf_rd_raw_data_3_d2;
+  logic [767:0] abuf_rd_raw_data_3_d2_C2 ;
+  logic [767:0] abuf_rd_raw_data_3_d2_R2 ;
+  logic [767:0] abuf_rd_raw_data_3_d2_X2 ;
+  assign abuf_rd_data_3_w_T = abuf_rd_raw_data_3_d2_T ;
+  assign abuf_rd_raw_data_3_d2_C2 = abuf_rd_data_3_w_C ;
+  assign abuf_rd_raw_data_3_d2_R2 = abuf_rd_data_3_w_R ;
+  assign abuf_rd_raw_data_3_d2_X2 = abuf_rd_data_3_w_X ;
+  assign abuf_rd_data_3_w_S = abuf_rd_raw_data_3_d2_S ;
+  assign abuf_rd_data_4_w = abuf_rd_raw_data_4_d2;
+  logic [543:0] abuf_rd_raw_data_4_d2_C2 ;
+  logic [543:0] abuf_rd_raw_data_4_d2_R2 ;
+  logic [543:0] abuf_rd_raw_data_4_d2_X2 ;
+  assign abuf_rd_data_4_w_T = abuf_rd_raw_data_4_d2_T ;
+  assign abuf_rd_raw_data_4_d2_C2 = abuf_rd_data_4_w_C ;
+  assign abuf_rd_raw_data_4_d2_R2 = abuf_rd_data_4_w_R ;
+  assign abuf_rd_raw_data_4_d2_X2 = abuf_rd_data_4_w_X ;
+  assign abuf_rd_data_4_w_S = abuf_rd_raw_data_4_d2_S ;
+  assign abuf_rd_data_5_w = abuf_rd_raw_data_5_d2;
+  logic [543:0] abuf_rd_raw_data_5_d2_C2 ;
+  logic [543:0] abuf_rd_raw_data_5_d2_R2 ;
+  logic [543:0] abuf_rd_raw_data_5_d2_X2 ;
+  assign abuf_rd_data_5_w_T = abuf_rd_raw_data_5_d2_T ;
+  assign abuf_rd_raw_data_5_d2_C2 = abuf_rd_data_5_w_C ;
+  assign abuf_rd_raw_data_5_d2_R2 = abuf_rd_data_5_w_R ;
+  assign abuf_rd_raw_data_5_d2_X2 = abuf_rd_data_5_w_X ;
+  assign abuf_rd_data_5_w_S = abuf_rd_raw_data_5_d2_S ;
+  assign abuf_rd_data_6_w = abuf_rd_raw_data_6_d2;
+  logic [543:0] abuf_rd_raw_data_6_d2_C2 ;
+  logic [543:0] abuf_rd_raw_data_6_d2_R2 ;
+  logic [543:0] abuf_rd_raw_data_6_d2_X2 ;
+  assign abuf_rd_data_6_w_T = abuf_rd_raw_data_6_d2_T ;
+  assign abuf_rd_raw_data_6_d2_C2 = abuf_rd_data_6_w_C ;
+  assign abuf_rd_raw_data_6_d2_R2 = abuf_rd_data_6_w_R ;
+  assign abuf_rd_raw_data_6_d2_X2 = abuf_rd_data_6_w_X ;
+  assign abuf_rd_data_6_w_S = abuf_rd_raw_data_6_d2_S ;
+  assign abuf_rd_data_7_w = abuf_rd_raw_data_7_d2;
+  logic [543:0] abuf_rd_raw_data_7_d2_C2 ;
+  logic [543:0] abuf_rd_raw_data_7_d2_R2 ;
+  logic [543:0] abuf_rd_raw_data_7_d2_X2 ;
+  assign abuf_rd_data_7_w_T = abuf_rd_raw_data_7_d2_T ;
+  assign abuf_rd_raw_data_7_d2_C2 = abuf_rd_data_7_w_C ;
+  assign abuf_rd_raw_data_7_d2_R2 = abuf_rd_data_7_w_R ;
+  assign abuf_rd_raw_data_7_d2_X2 = abuf_rd_data_7_w_X ;
+  assign abuf_rd_data_7_w_S = abuf_rd_raw_data_7_d2_S ;
+  assign abuf_rd_raw_data_0 = abuf_rd_data_ecc_0;
+  logic [767:0] abuf_rd_data_ecc_0_C1 ;
+  logic [767:0] abuf_rd_data_ecc_0_R1 ;
+  logic [767:0] abuf_rd_data_ecc_0_X1 ;
+  assign abuf_rd_raw_data_0_T = abuf_rd_data_ecc_0_T ;
+  assign abuf_rd_data_ecc_0_C1 = abuf_rd_raw_data_0_C ;
+  assign abuf_rd_data_ecc_0_R1 = abuf_rd_raw_data_0_R ;
+  assign abuf_rd_data_ecc_0_X1 = abuf_rd_raw_data_0_X ;
+  assign abuf_rd_raw_data_0_S = abuf_rd_data_ecc_0_S ;
+  assign abuf_rd_raw_data_1 = abuf_rd_data_ecc_1;
+  logic [767:0] abuf_rd_data_ecc_1_C1 ;
+  logic [767:0] abuf_rd_data_ecc_1_R1 ;
+  logic [767:0] abuf_rd_data_ecc_1_X1 ;
+  assign abuf_rd_raw_data_1_T = abuf_rd_data_ecc_1_T ;
+  assign abuf_rd_data_ecc_1_C1 = abuf_rd_raw_data_1_C ;
+  assign abuf_rd_data_ecc_1_R1 = abuf_rd_raw_data_1_R ;
+  assign abuf_rd_data_ecc_1_X1 = abuf_rd_raw_data_1_X ;
+  assign abuf_rd_raw_data_1_S = abuf_rd_data_ecc_1_S ;
+  assign abuf_rd_raw_data_2 = abuf_rd_data_ecc_2;
+  logic [767:0] abuf_rd_data_ecc_2_C1 ;
+  logic [767:0] abuf_rd_data_ecc_2_R1 ;
+  logic [767:0] abuf_rd_data_ecc_2_X1 ;
+  assign abuf_rd_raw_data_2_T = abuf_rd_data_ecc_2_T ;
+  assign abuf_rd_data_ecc_2_C1 = abuf_rd_raw_data_2_C ;
+  assign abuf_rd_data_ecc_2_R1 = abuf_rd_raw_data_2_R ;
+  assign abuf_rd_data_ecc_2_X1 = abuf_rd_raw_data_2_X ;
+  assign abuf_rd_raw_data_2_S = abuf_rd_data_ecc_2_S ;
+  assign abuf_rd_raw_data_3 = abuf_rd_data_ecc_3;
+  logic [767:0] abuf_rd_data_ecc_3_C1 ;
+  logic [767:0] abuf_rd_data_ecc_3_R1 ;
+  logic [767:0] abuf_rd_data_ecc_3_X1 ;
+  assign abuf_rd_raw_data_3_T = abuf_rd_data_ecc_3_T ;
+  assign abuf_rd_data_ecc_3_C1 = abuf_rd_raw_data_3_C ;
+  assign abuf_rd_data_ecc_3_R1 = abuf_rd_raw_data_3_R ;
+  assign abuf_rd_data_ecc_3_X1 = abuf_rd_raw_data_3_X ;
+  assign abuf_rd_raw_data_3_S = abuf_rd_data_ecc_3_S ;
+  assign abuf_rd_raw_data_4 = abuf_rd_data_ecc_4;
+  logic [543:0] abuf_rd_data_ecc_4_C1 ;
+  logic [543:0] abuf_rd_data_ecc_4_R1 ;
+  logic [543:0] abuf_rd_data_ecc_4_X1 ;
+  assign abuf_rd_raw_data_4_T = abuf_rd_data_ecc_4_T ;
+  assign abuf_rd_data_ecc_4_C1 = abuf_rd_raw_data_4_C ;
+  assign abuf_rd_data_ecc_4_R1 = abuf_rd_raw_data_4_R ;
+  assign abuf_rd_data_ecc_4_X1 = abuf_rd_raw_data_4_X ;
+  assign abuf_rd_raw_data_4_S = abuf_rd_data_ecc_4_S ;
+  assign abuf_rd_raw_data_5 = abuf_rd_data_ecc_5;
+  logic [543:0] abuf_rd_data_ecc_5_C1 ;
+  logic [543:0] abuf_rd_data_ecc_5_R1 ;
+  logic [543:0] abuf_rd_data_ecc_5_X1 ;
+  assign abuf_rd_raw_data_5_T = abuf_rd_data_ecc_5_T ;
+  assign abuf_rd_data_ecc_5_C1 = abuf_rd_raw_data_5_C ;
+  assign abuf_rd_data_ecc_5_R1 = abuf_rd_raw_data_5_R ;
+  assign abuf_rd_data_ecc_5_X1 = abuf_rd_raw_data_5_X ;
+  assign abuf_rd_raw_data_5_S = abuf_rd_data_ecc_5_S ;
+  assign abuf_rd_raw_data_6 = abuf_rd_data_ecc_6;
+  logic [543:0] abuf_rd_data_ecc_6_C1 ;
+  logic [543:0] abuf_rd_data_ecc_6_R1 ;
+  logic [543:0] abuf_rd_data_ecc_6_X1 ;
+  assign abuf_rd_raw_data_6_T = abuf_rd_data_ecc_6_T ;
+  assign abuf_rd_data_ecc_6_C1 = abuf_rd_raw_data_6_C ;
+  assign abuf_rd_data_ecc_6_R1 = abuf_rd_raw_data_6_R ;
+  assign abuf_rd_data_ecc_6_X1 = abuf_rd_raw_data_6_X ;
+  assign abuf_rd_raw_data_6_S = abuf_rd_data_ecc_6_S ;
+  assign abuf_rd_raw_data_7 = abuf_rd_data_ecc_7;
+  logic [543:0] abuf_rd_data_ecc_7_C1 ;
+  logic [543:0] abuf_rd_data_ecc_7_R1 ;
+  logic [543:0] abuf_rd_data_ecc_7_X1 ;
+  assign abuf_rd_raw_data_7_T = abuf_rd_data_ecc_7_T ;
+  assign abuf_rd_data_ecc_7_C1 = abuf_rd_raw_data_7_C ;
+  assign abuf_rd_data_ecc_7_R1 = abuf_rd_raw_data_7_R ;
+  assign abuf_rd_data_ecc_7_X1 = abuf_rd_raw_data_7_X ;
+  assign abuf_rd_raw_data_7_S = abuf_rd_data_ecc_7_S ;
+  assign abuf_rd_reg_en = abuf_rd_en_d2;
+  logic [7:0] abuf_rd_en_d2_C1 ;
+  logic [7:0] abuf_rd_en_d2_R1 ;
+  logic [7:0] abuf_rd_en_d2_X1 ;
+  assign abuf_rd_reg_en_T = abuf_rd_en_d2_T ;
+  assign abuf_rd_en_d2_C1 = abuf_rd_reg_en_C ;
+  assign abuf_rd_en_d2_R1 = abuf_rd_reg_en_R ;
+  assign abuf_rd_en_d2_X1 = abuf_rd_reg_en_X ;
+  assign abuf_rd_reg_en_S = abuf_rd_en_d2_S ;
+  assign abuf_wr_data_0_d1_w = abuf_wr_data_0;
+  logic [767:0] abuf_wr_data_0_C1 ;
+  logic [767:0] abuf_wr_data_0_R1 ;
+  logic [767:0] abuf_wr_data_0_X1 ;
+  assign abuf_wr_data_0_d1_w_T = abuf_wr_data_0_T ;
+  assign abuf_wr_data_0_C1 = abuf_wr_data_0_d1_w_C ;
+  assign abuf_wr_data_0_R1 = abuf_wr_data_0_d1_w_R ;
+  assign abuf_wr_data_0_X1 = abuf_wr_data_0_d1_w_X ;
+  assign abuf_wr_data_0_d1_w_S = abuf_wr_data_0_S ;
+  assign abuf_wr_data_1_d1_w = abuf_wr_data_1;
+  logic [767:0] abuf_wr_data_1_C1 ;
+  logic [767:0] abuf_wr_data_1_R1 ;
+  logic [767:0] abuf_wr_data_1_X1 ;
+  assign abuf_wr_data_1_d1_w_T = abuf_wr_data_1_T ;
+  assign abuf_wr_data_1_C1 = abuf_wr_data_1_d1_w_C ;
+  assign abuf_wr_data_1_R1 = abuf_wr_data_1_d1_w_R ;
+  assign abuf_wr_data_1_X1 = abuf_wr_data_1_d1_w_X ;
+  assign abuf_wr_data_1_d1_w_S = abuf_wr_data_1_S ;
+  assign abuf_wr_data_2_d1_w = abuf_wr_data_2;
+  logic [767:0] abuf_wr_data_2_C1 ;
+  logic [767:0] abuf_wr_data_2_R1 ;
+  logic [767:0] abuf_wr_data_2_X1 ;
+  assign abuf_wr_data_2_d1_w_T = abuf_wr_data_2_T ;
+  assign abuf_wr_data_2_C1 = abuf_wr_data_2_d1_w_C ;
+  assign abuf_wr_data_2_R1 = abuf_wr_data_2_d1_w_R ;
+  assign abuf_wr_data_2_X1 = abuf_wr_data_2_d1_w_X ;
+  assign abuf_wr_data_2_d1_w_S = abuf_wr_data_2_S ;
+  assign abuf_wr_data_3_d1_w = abuf_wr_data_3;
+  logic [767:0] abuf_wr_data_3_C1 ;
+  logic [767:0] abuf_wr_data_3_R1 ;
+  logic [767:0] abuf_wr_data_3_X1 ;
+  assign abuf_wr_data_3_d1_w_T = abuf_wr_data_3_T ;
+  assign abuf_wr_data_3_C1 = abuf_wr_data_3_d1_w_C ;
+  assign abuf_wr_data_3_R1 = abuf_wr_data_3_d1_w_R ;
+  assign abuf_wr_data_3_X1 = abuf_wr_data_3_d1_w_X ;
+  assign abuf_wr_data_3_d1_w_S = abuf_wr_data_3_S ;
+  assign abuf_wr_data_4_d1_w = abuf_wr_data_4;
+  logic [543:0] abuf_wr_data_4_C1 ;
+  logic [543:0] abuf_wr_data_4_R1 ;
+  logic [543:0] abuf_wr_data_4_X1 ;
+  assign abuf_wr_data_4_d1_w_T = abuf_wr_data_4_T ;
+  assign abuf_wr_data_4_C1 = abuf_wr_data_4_d1_w_C ;
+  assign abuf_wr_data_4_R1 = abuf_wr_data_4_d1_w_R ;
+  assign abuf_wr_data_4_X1 = abuf_wr_data_4_d1_w_X ;
+  assign abuf_wr_data_4_d1_w_S = abuf_wr_data_4_S ;
+  assign abuf_wr_data_5_d1_w = abuf_wr_data_5;
+  logic [543:0] abuf_wr_data_5_C1 ;
+  logic [543:0] abuf_wr_data_5_R1 ;
+  logic [543:0] abuf_wr_data_5_X1 ;
+  assign abuf_wr_data_5_d1_w_T = abuf_wr_data_5_T ;
+  assign abuf_wr_data_5_C1 = abuf_wr_data_5_d1_w_C ;
+  assign abuf_wr_data_5_R1 = abuf_wr_data_5_d1_w_R ;
+  assign abuf_wr_data_5_X1 = abuf_wr_data_5_d1_w_X ;
+  assign abuf_wr_data_5_d1_w_S = abuf_wr_data_5_S ;
+  assign abuf_wr_data_6_d1_w = abuf_wr_data_6;
+  logic [543:0] abuf_wr_data_6_C1 ;
+  logic [543:0] abuf_wr_data_6_R1 ;
+  logic [543:0] abuf_wr_data_6_X1 ;
+  assign abuf_wr_data_6_d1_w_T = abuf_wr_data_6_T ;
+  assign abuf_wr_data_6_C1 = abuf_wr_data_6_d1_w_C ;
+  assign abuf_wr_data_6_R1 = abuf_wr_data_6_d1_w_R ;
+  assign abuf_wr_data_6_X1 = abuf_wr_data_6_d1_w_X ;
+  assign abuf_wr_data_6_d1_w_S = abuf_wr_data_6_S ;
+  assign abuf_wr_data_7_d1_w = abuf_wr_data_7;
+  logic [543:0] abuf_wr_data_7_C1 ;
+  logic [543:0] abuf_wr_data_7_R1 ;
+  logic [543:0] abuf_wr_data_7_X1 ;
+  assign abuf_wr_data_7_d1_w_T = abuf_wr_data_7_T ;
+  assign abuf_wr_data_7_C1 = abuf_wr_data_7_d1_w_C ;
+  assign abuf_wr_data_7_R1 = abuf_wr_data_7_d1_w_R ;
+  assign abuf_wr_data_7_X1 = abuf_wr_data_7_d1_w_X ;
+  assign abuf_wr_data_7_d1_w_S = abuf_wr_data_7_S ;
+  assign abuf_wr_en_d1_w = abuf_wr_en;
+  logic [7:0] abuf_wr_en_C2 ;
+  logic [7:0] abuf_wr_en_R2 ;
+  logic [7:0] abuf_wr_en_X2 ;
+  assign abuf_wr_en_d1_w_T = abuf_wr_en_T ;
+  assign abuf_wr_en_C2 = abuf_wr_en_d1_w_C ;
+  assign abuf_wr_en_R2 = abuf_wr_en_d1_w_R ;
+  assign abuf_wr_en_X2 = abuf_wr_en_d1_w_X ;
+  assign abuf_wr_en_d1_w_S = abuf_wr_en_S ;
+  assign abuf_wr_en_d1_C = ( abuf_wr_en_d1_C0 );
+  assign abuf_wr_addr_d1_C = ( abuf_wr_addr_d1_C0 ) | ( abuf_wr_addr_d1_C1 ) | ( abuf_wr_addr_d1_C2 ) | ( abuf_wr_addr_d1_C3 ) | ( abuf_wr_addr_d1_C4 ) | ( abuf_wr_addr_d1_C5 ) | ( abuf_wr_addr_d1_C6 ) | ( abuf_wr_addr_d1_C7 );
+  assign abuf_rd_addr_C = ( abuf_rd_addr_C0 ) | ( abuf_rd_addr_C1 ) | ( abuf_rd_addr_C2 ) | ( abuf_rd_addr_C3 ) | ( abuf_rd_addr_C4 ) | ( abuf_rd_addr_C5 ) | ( abuf_rd_addr_C6 ) | ( abuf_rd_addr_C7 );
+  assign pwrbus_ram_pd_C = ( pwrbus_ram_pd_C0 ) | ( pwrbus_ram_pd_C1 ) | ( pwrbus_ram_pd_C2 ) | ( pwrbus_ram_pd_C3 ) | ( pwrbus_ram_pd_C4 ) | ( pwrbus_ram_pd_C5 ) | ( pwrbus_ram_pd_C6 ) | ( pwrbus_ram_pd_C7 );
+  assign nvdla_core_clk_C = ( nvdla_core_clk_C0 ) | ( nvdla_core_clk_C1 ) | ( nvdla_core_clk_C2 ) | ( nvdla_core_clk_C3 ) | ( nvdla_core_clk_C4 ) | ( nvdla_core_clk_C5 ) | ( nvdla_core_clk_C6 ) | ( nvdla_core_clk_C7 );
+  assign abuf_wr_data_0_d1_C = ( abuf_wr_data_0_d1_C0 ) | ( abuf_wr_data_0_d1_C1 );
+  assign abuf_wr_data_0_C = ( abuf_wr_data_0_C0 ) | ( abuf_wr_data_0_C1 );
+  assign abuf_wr_data_1_d1_C = ( abuf_wr_data_1_d1_C0 ) | ( abuf_wr_data_1_d1_C1 );
+  assign abuf_wr_data_1_C = ( abuf_wr_data_1_C0 ) | ( abuf_wr_data_1_C1 );
+  assign abuf_wr_data_2_d1_C = ( abuf_wr_data_2_d1_C0 ) | ( abuf_wr_data_2_d1_C1 );
+  assign abuf_wr_data_2_C = ( abuf_wr_data_2_C0 ) | ( abuf_wr_data_2_C1 );
+  assign abuf_wr_data_3_d1_C = ( abuf_wr_data_3_d1_C0 ) | ( abuf_wr_data_3_d1_C1 );
+  assign abuf_wr_data_3_C = ( abuf_wr_data_3_C0 ) | ( abuf_wr_data_3_C1 );
+  assign abuf_wr_data_4_d1_C = ( abuf_wr_data_4_d1_C0 ) | ( abuf_wr_data_4_d1_C1 );
+  assign abuf_wr_data_4_C = ( abuf_wr_data_4_C0 ) | ( abuf_wr_data_4_C1 );
+  assign abuf_wr_data_5_d1_C = ( abuf_wr_data_5_d1_C0 ) | ( abuf_wr_data_5_d1_C1 );
+  assign abuf_wr_data_5_C = ( abuf_wr_data_5_C0 ) | ( abuf_wr_data_5_C1 );
+  assign abuf_wr_data_6_d1_C = ( abuf_wr_data_6_d1_C0 ) | ( abuf_wr_data_6_d1_C1 );
+  assign abuf_wr_data_6_C = ( abuf_wr_data_6_C0 ) | ( abuf_wr_data_6_C1 );
+  assign abuf_wr_data_7_d1_C = ( abuf_wr_data_7_d1_C0 ) | ( abuf_wr_data_7_d1_C1 );
+  assign abuf_wr_data_7_C = ( abuf_wr_data_7_C0 ) | ( abuf_wr_data_7_C1 );
+  assign abuf_rd_data_ecc_0_C = ( abuf_rd_data_ecc_0_C0 ) | ( abuf_rd_data_ecc_0_C1 );
+  assign abuf_rd_data_ecc_1_C = ( abuf_rd_data_ecc_1_C0 ) | ( abuf_rd_data_ecc_1_C1 );
+  assign abuf_rd_data_ecc_2_C = ( abuf_rd_data_ecc_2_C0 ) | ( abuf_rd_data_ecc_2_C1 );
+  assign abuf_rd_data_ecc_3_C = ( abuf_rd_data_ecc_3_C0 ) | ( abuf_rd_data_ecc_3_C1 );
+  assign abuf_rd_data_ecc_4_C = ( abuf_rd_data_ecc_4_C0 ) | ( abuf_rd_data_ecc_4_C1 );
+  assign abuf_rd_data_ecc_5_C = ( abuf_rd_data_ecc_5_C0 ) | ( abuf_rd_data_ecc_5_C1 );
+  assign abuf_rd_data_ecc_6_C = ( abuf_rd_data_ecc_6_C0 ) | ( abuf_rd_data_ecc_6_C1 );
+  assign abuf_rd_data_ecc_7_C = ( abuf_rd_data_ecc_7_C0 ) | ( abuf_rd_data_ecc_7_C1 );
+  assign abuf_rd_raw_data_0_d2_C = ( abuf_rd_raw_data_0_d2_C0 ) | ( abuf_rd_raw_data_0_d2_C1 ) | ( abuf_rd_raw_data_0_d2_C2 );
+  assign abuf_rd_raw_data_1_d2_C = ( abuf_rd_raw_data_1_d2_C0 ) | ( abuf_rd_raw_data_1_d2_C1 ) | ( abuf_rd_raw_data_1_d2_C2 );
+  assign abuf_rd_raw_data_2_d2_C = ( abuf_rd_raw_data_2_d2_C0 ) | ( abuf_rd_raw_data_2_d2_C1 ) | ( abuf_rd_raw_data_2_d2_C2 );
+  assign abuf_rd_raw_data_3_d2_C = ( abuf_rd_raw_data_3_d2_C0 ) | ( abuf_rd_raw_data_3_d2_C1 ) | ( abuf_rd_raw_data_3_d2_C2 );
+  assign abuf_rd_raw_data_4_d2_C = ( abuf_rd_raw_data_4_d2_C0 ) | ( abuf_rd_raw_data_4_d2_C1 ) | ( abuf_rd_raw_data_4_d2_C2 );
+  assign abuf_rd_raw_data_5_d2_C = ( abuf_rd_raw_data_5_d2_C0 ) | ( abuf_rd_raw_data_5_d2_C1 ) | ( abuf_rd_raw_data_5_d2_C2 );
+  assign abuf_rd_raw_data_6_d2_C = ( abuf_rd_raw_data_6_d2_C0 ) | ( abuf_rd_raw_data_6_d2_C1 ) | ( abuf_rd_raw_data_6_d2_C2 );
+  assign abuf_rd_raw_data_7_d2_C = ( abuf_rd_raw_data_7_d2_C0 ) | ( abuf_rd_raw_data_7_d2_C1 ) | ( abuf_rd_raw_data_7_d2_C2 );
+  assign abuf_rd_en_d2_C = ( abuf_rd_en_d2_C0 ) | ( abuf_rd_en_d2_C1 );
+  assign abuf_wr_en_C = ( abuf_wr_en_C0 ) | ( abuf_wr_en_C1 ) | ( abuf_wr_en_C2 );
+  assign abuf_wr_addr_C = ( abuf_wr_addr_C0 );
+  assign _16__C = ( _16__C0 );
+  assign _17__C = ( _17__C0 );
+  assign _18__C = ( _18__C0 );
+  assign _19__C = ( _19__C0 );
+  assign _20__C = ( _20__C0 );
+  assign _21__C = ( _21__C0 );
+  assign _22__C = ( _22__C0 );
+  assign _23__C = ( _23__C0 );
+  assign abuf_rd_en_C = ( abuf_rd_en_C0 ) | ( abuf_rd_en_C1 );
+  assign abuf_rd_en_d1_C = ( abuf_rd_en_d1_C0 ) | ( abuf_rd_en_d1_C1 );
+  assign _08__C = ( _08__C0 );
+  assign _09__C = ( _09__C0 );
+  assign _10__C = ( _10__C0 );
+  assign _11__C = ( _11__C0 );
+  assign _12__C = ( _12__C0 );
+  assign _13__C = ( _13__C0 );
+  assign _14__C = ( _14__C0 );
+  assign _15__C = ( _15__C0 );
+  assign _00__C = ( _00__C0 );
+  assign _01__C = ( _01__C0 );
+  assign _02__C = ( _02__C0 );
+  assign _03__C = ( _03__C0 );
+  assign _04__C = ( _04__C0 );
+  assign _05__C = ( _05__C0 );
+  assign _06__C = ( _06__C0 );
+  assign _07__C = ( _07__C0 );
+  assign abuf_rd_data_7_C = ( abuf_rd_data_7_C0 ) | ( abuf_rd_data_7_C1 );
+  assign abuf_rd_data_6_C = ( abuf_rd_data_6_C0 ) | ( abuf_rd_data_6_C1 );
+  assign abuf_rd_data_5_C = ( abuf_rd_data_5_C0 ) | ( abuf_rd_data_5_C1 );
+  assign abuf_rd_data_4_C = ( abuf_rd_data_4_C0 ) | ( abuf_rd_data_4_C1 );
+  assign abuf_rd_data_3_C = ( abuf_rd_data_3_C0 ) | ( abuf_rd_data_3_C1 );
+  assign abuf_rd_data_2_C = ( abuf_rd_data_2_C0 ) | ( abuf_rd_data_2_C1 );
+  assign abuf_rd_data_1_C = ( abuf_rd_data_1_C0 ) | ( abuf_rd_data_1_C1 );
+  assign abuf_rd_data_0_C = ( abuf_rd_data_0_C0 ) | ( abuf_rd_data_0_C1 );
+  assign abuf_wr_en_d1_X = ( abuf_wr_en_d1_X0 );
+  assign abuf_wr_addr_d1_X = ( abuf_wr_addr_d1_X0 ) | ( abuf_wr_addr_d1_X1 ) | ( abuf_wr_addr_d1_X2 ) | ( abuf_wr_addr_d1_X3 ) | ( abuf_wr_addr_d1_X4 ) | ( abuf_wr_addr_d1_X5 ) | ( abuf_wr_addr_d1_X6 ) | ( abuf_wr_addr_d1_X7 );
+  assign abuf_rd_addr_X = ( abuf_rd_addr_X0 ) | ( abuf_rd_addr_X1 ) | ( abuf_rd_addr_X2 ) | ( abuf_rd_addr_X3 ) | ( abuf_rd_addr_X4 ) | ( abuf_rd_addr_X5 ) | ( abuf_rd_addr_X6 ) | ( abuf_rd_addr_X7 );
+  assign pwrbus_ram_pd_X = ( pwrbus_ram_pd_X0 ) | ( pwrbus_ram_pd_X1 ) | ( pwrbus_ram_pd_X2 ) | ( pwrbus_ram_pd_X3 ) | ( pwrbus_ram_pd_X4 ) | ( pwrbus_ram_pd_X5 ) | ( pwrbus_ram_pd_X6 ) | ( pwrbus_ram_pd_X7 );
+  assign nvdla_core_clk_X = ( nvdla_core_clk_X0 ) | ( nvdla_core_clk_X1 ) | ( nvdla_core_clk_X2 ) | ( nvdla_core_clk_X3 ) | ( nvdla_core_clk_X4 ) | ( nvdla_core_clk_X5 ) | ( nvdla_core_clk_X6 ) | ( nvdla_core_clk_X7 );
+  assign abuf_wr_data_0_d1_X = ( abuf_wr_data_0_d1_X0 ) | ( abuf_wr_data_0_d1_X1 );
+  assign abuf_wr_data_0_X = ( abuf_wr_data_0_X0 ) | ( abuf_wr_data_0_X1 );
+  assign abuf_wr_data_1_d1_X = ( abuf_wr_data_1_d1_X0 ) | ( abuf_wr_data_1_d1_X1 );
+  assign abuf_wr_data_1_X = ( abuf_wr_data_1_X0 ) | ( abuf_wr_data_1_X1 );
+  assign abuf_wr_data_2_d1_X = ( abuf_wr_data_2_d1_X0 ) | ( abuf_wr_data_2_d1_X1 );
+  assign abuf_wr_data_2_X = ( abuf_wr_data_2_X0 ) | ( abuf_wr_data_2_X1 );
+  assign abuf_wr_data_3_d1_X = ( abuf_wr_data_3_d1_X0 ) | ( abuf_wr_data_3_d1_X1 );
+  assign abuf_wr_data_3_X = ( abuf_wr_data_3_X0 ) | ( abuf_wr_data_3_X1 );
+  assign abuf_wr_data_4_d1_X = ( abuf_wr_data_4_d1_X0 ) | ( abuf_wr_data_4_d1_X1 );
+  assign abuf_wr_data_4_X = ( abuf_wr_data_4_X0 ) | ( abuf_wr_data_4_X1 );
+  assign abuf_wr_data_5_d1_X = ( abuf_wr_data_5_d1_X0 ) | ( abuf_wr_data_5_d1_X1 );
+  assign abuf_wr_data_5_X = ( abuf_wr_data_5_X0 ) | ( abuf_wr_data_5_X1 );
+  assign abuf_wr_data_6_d1_X = ( abuf_wr_data_6_d1_X0 ) | ( abuf_wr_data_6_d1_X1 );
+  assign abuf_wr_data_6_X = ( abuf_wr_data_6_X0 ) | ( abuf_wr_data_6_X1 );
+  assign abuf_wr_data_7_d1_X = ( abuf_wr_data_7_d1_X0 ) | ( abuf_wr_data_7_d1_X1 );
+  assign abuf_wr_data_7_X = ( abuf_wr_data_7_X0 ) | ( abuf_wr_data_7_X1 );
+  assign abuf_rd_data_ecc_0_X = ( abuf_rd_data_ecc_0_X0 ) | ( abuf_rd_data_ecc_0_X1 );
+  assign abuf_rd_data_ecc_1_X = ( abuf_rd_data_ecc_1_X0 ) | ( abuf_rd_data_ecc_1_X1 );
+  assign abuf_rd_data_ecc_2_X = ( abuf_rd_data_ecc_2_X0 ) | ( abuf_rd_data_ecc_2_X1 );
+  assign abuf_rd_data_ecc_3_X = ( abuf_rd_data_ecc_3_X0 ) | ( abuf_rd_data_ecc_3_X1 );
+  assign abuf_rd_data_ecc_4_X = ( abuf_rd_data_ecc_4_X0 ) | ( abuf_rd_data_ecc_4_X1 );
+  assign abuf_rd_data_ecc_5_X = ( abuf_rd_data_ecc_5_X0 ) | ( abuf_rd_data_ecc_5_X1 );
+  assign abuf_rd_data_ecc_6_X = ( abuf_rd_data_ecc_6_X0 ) | ( abuf_rd_data_ecc_6_X1 );
+  assign abuf_rd_data_ecc_7_X = ( abuf_rd_data_ecc_7_X0 ) | ( abuf_rd_data_ecc_7_X1 );
+  assign abuf_rd_raw_data_0_d2_X = ( abuf_rd_raw_data_0_d2_X0 ) | ( abuf_rd_raw_data_0_d2_X1 ) | ( abuf_rd_raw_data_0_d2_X2 );
+  assign abuf_rd_raw_data_1_d2_X = ( abuf_rd_raw_data_1_d2_X0 ) | ( abuf_rd_raw_data_1_d2_X1 ) | ( abuf_rd_raw_data_1_d2_X2 );
+  assign abuf_rd_raw_data_2_d2_X = ( abuf_rd_raw_data_2_d2_X0 ) | ( abuf_rd_raw_data_2_d2_X1 ) | ( abuf_rd_raw_data_2_d2_X2 );
+  assign abuf_rd_raw_data_3_d2_X = ( abuf_rd_raw_data_3_d2_X0 ) | ( abuf_rd_raw_data_3_d2_X1 ) | ( abuf_rd_raw_data_3_d2_X2 );
+  assign abuf_rd_raw_data_4_d2_X = ( abuf_rd_raw_data_4_d2_X0 ) | ( abuf_rd_raw_data_4_d2_X1 ) | ( abuf_rd_raw_data_4_d2_X2 );
+  assign abuf_rd_raw_data_5_d2_X = ( abuf_rd_raw_data_5_d2_X0 ) | ( abuf_rd_raw_data_5_d2_X1 ) | ( abuf_rd_raw_data_5_d2_X2 );
+  assign abuf_rd_raw_data_6_d2_X = ( abuf_rd_raw_data_6_d2_X0 ) | ( abuf_rd_raw_data_6_d2_X1 ) | ( abuf_rd_raw_data_6_d2_X2 );
+  assign abuf_rd_raw_data_7_d2_X = ( abuf_rd_raw_data_7_d2_X0 ) | ( abuf_rd_raw_data_7_d2_X1 ) | ( abuf_rd_raw_data_7_d2_X2 );
+  assign abuf_rd_en_d2_X = ( abuf_rd_en_d2_X0 ) | ( abuf_rd_en_d2_X1 );
+  assign abuf_wr_en_X = ( abuf_wr_en_X0 ) | ( abuf_wr_en_X1 ) | ( abuf_wr_en_X2 );
+  assign abuf_wr_addr_X = ( abuf_wr_addr_X0 );
+  assign _16__X = ( _16__X0 );
+  assign _17__X = ( _17__X0 );
+  assign _18__X = ( _18__X0 );
+  assign _19__X = ( _19__X0 );
+  assign _20__X = ( _20__X0 );
+  assign _21__X = ( _21__X0 );
+  assign _22__X = ( _22__X0 );
+  assign _23__X = ( _23__X0 );
+  assign abuf_rd_en_X = ( abuf_rd_en_X0 ) | ( abuf_rd_en_X1 );
+  assign abuf_rd_en_d1_X = ( abuf_rd_en_d1_X0 ) | ( abuf_rd_en_d1_X1 );
+  assign _08__X = ( _08__X0 );
+  assign _09__X = ( _09__X0 );
+  assign _10__X = ( _10__X0 );
+  assign _11__X = ( _11__X0 );
+  assign _12__X = ( _12__X0 );
+  assign _13__X = ( _13__X0 );
+  assign _14__X = ( _14__X0 );
+  assign _15__X = ( _15__X0 );
+  assign _00__X = ( _00__X0 );
+  assign _01__X = ( _01__X0 );
+  assign _02__X = ( _02__X0 );
+  assign _03__X = ( _03__X0 );
+  assign _04__X = ( _04__X0 );
+  assign _05__X = ( _05__X0 );
+  assign _06__X = ( _06__X0 );
+  assign _07__X = ( _07__X0 );
+  assign abuf_rd_data_7_X = ( abuf_rd_data_7_X0 ) | ( abuf_rd_data_7_X1 );
+  assign abuf_rd_data_6_X = ( abuf_rd_data_6_X0 ) | ( abuf_rd_data_6_X1 );
+  assign abuf_rd_data_5_X = ( abuf_rd_data_5_X0 ) | ( abuf_rd_data_5_X1 );
+  assign abuf_rd_data_4_X = ( abuf_rd_data_4_X0 ) | ( abuf_rd_data_4_X1 );
+  assign abuf_rd_data_3_X = ( abuf_rd_data_3_X0 ) | ( abuf_rd_data_3_X1 );
+  assign abuf_rd_data_2_X = ( abuf_rd_data_2_X0 ) | ( abuf_rd_data_2_X1 );
+  assign abuf_rd_data_1_X = ( abuf_rd_data_1_X0 ) | ( abuf_rd_data_1_X1 );
+  assign abuf_rd_data_0_X = ( abuf_rd_data_0_X0 ) | ( abuf_rd_data_0_X1 );
+  assign abuf_wr_en_d1_R = ( abuf_wr_en_d1_X0 & abuf_wr_en_d1_R0 );
+  assign abuf_wr_addr_d1_R = ( abuf_wr_addr_d1_X0 & abuf_wr_addr_d1_R0 ) | ( abuf_wr_addr_d1_X1 & abuf_wr_addr_d1_R1 ) | ( abuf_wr_addr_d1_X2 & abuf_wr_addr_d1_R2 ) | ( abuf_wr_addr_d1_X3 & abuf_wr_addr_d1_R3 ) | ( abuf_wr_addr_d1_X4 & abuf_wr_addr_d1_R4 ) | ( abuf_wr_addr_d1_X5 & abuf_wr_addr_d1_R5 ) | ( abuf_wr_addr_d1_X6 & abuf_wr_addr_d1_R6 ) | ( abuf_wr_addr_d1_X7 & abuf_wr_addr_d1_R7 );
+  assign abuf_rd_addr_R = ( abuf_rd_addr_X0 & abuf_rd_addr_R0 ) | ( abuf_rd_addr_X1 & abuf_rd_addr_R1 ) | ( abuf_rd_addr_X2 & abuf_rd_addr_R2 ) | ( abuf_rd_addr_X3 & abuf_rd_addr_R3 ) | ( abuf_rd_addr_X4 & abuf_rd_addr_R4 ) | ( abuf_rd_addr_X5 & abuf_rd_addr_R5 ) | ( abuf_rd_addr_X6 & abuf_rd_addr_R6 ) | ( abuf_rd_addr_X7 & abuf_rd_addr_R7 );
+  assign pwrbus_ram_pd_R = ( pwrbus_ram_pd_X0 & pwrbus_ram_pd_R0 ) | ( pwrbus_ram_pd_X1 & pwrbus_ram_pd_R1 ) | ( pwrbus_ram_pd_X2 & pwrbus_ram_pd_R2 ) | ( pwrbus_ram_pd_X3 & pwrbus_ram_pd_R3 ) | ( pwrbus_ram_pd_X4 & pwrbus_ram_pd_R4 ) | ( pwrbus_ram_pd_X5 & pwrbus_ram_pd_R5 ) | ( pwrbus_ram_pd_X6 & pwrbus_ram_pd_R6 ) | ( pwrbus_ram_pd_X7 & pwrbus_ram_pd_R7 );
+  assign nvdla_core_clk_R = ( nvdla_core_clk_X0 & nvdla_core_clk_R0 ) | ( nvdla_core_clk_X1 & nvdla_core_clk_R1 ) | ( nvdla_core_clk_X2 & nvdla_core_clk_R2 ) | ( nvdla_core_clk_X3 & nvdla_core_clk_R3 ) | ( nvdla_core_clk_X4 & nvdla_core_clk_R4 ) | ( nvdla_core_clk_X5 & nvdla_core_clk_R5 ) | ( nvdla_core_clk_X6 & nvdla_core_clk_R6 ) | ( nvdla_core_clk_X7 & nvdla_core_clk_R7 );
+  assign abuf_wr_data_0_d1_R = ( abuf_wr_data_0_d1_X0 & abuf_wr_data_0_d1_R0 ) | ( abuf_wr_data_0_d1_X1 & abuf_wr_data_0_d1_R1 );
+  assign abuf_wr_data_0_R = ( abuf_wr_data_0_X0 & abuf_wr_data_0_R0 ) | ( abuf_wr_data_0_X1 & abuf_wr_data_0_R1 );
+  assign abuf_wr_data_1_d1_R = ( abuf_wr_data_1_d1_X0 & abuf_wr_data_1_d1_R0 ) | ( abuf_wr_data_1_d1_X1 & abuf_wr_data_1_d1_R1 );
+  assign abuf_wr_data_1_R = ( abuf_wr_data_1_X0 & abuf_wr_data_1_R0 ) | ( abuf_wr_data_1_X1 & abuf_wr_data_1_R1 );
+  assign abuf_wr_data_2_d1_R = ( abuf_wr_data_2_d1_X0 & abuf_wr_data_2_d1_R0 ) | ( abuf_wr_data_2_d1_X1 & abuf_wr_data_2_d1_R1 );
+  assign abuf_wr_data_2_R = ( abuf_wr_data_2_X0 & abuf_wr_data_2_R0 ) | ( abuf_wr_data_2_X1 & abuf_wr_data_2_R1 );
+  assign abuf_wr_data_3_d1_R = ( abuf_wr_data_3_d1_X0 & abuf_wr_data_3_d1_R0 ) | ( abuf_wr_data_3_d1_X1 & abuf_wr_data_3_d1_R1 );
+  assign abuf_wr_data_3_R = ( abuf_wr_data_3_X0 & abuf_wr_data_3_R0 ) | ( abuf_wr_data_3_X1 & abuf_wr_data_3_R1 );
+  assign abuf_wr_data_4_d1_R = ( abuf_wr_data_4_d1_X0 & abuf_wr_data_4_d1_R0 ) | ( abuf_wr_data_4_d1_X1 & abuf_wr_data_4_d1_R1 );
+  assign abuf_wr_data_4_R = ( abuf_wr_data_4_X0 & abuf_wr_data_4_R0 ) | ( abuf_wr_data_4_X1 & abuf_wr_data_4_R1 );
+  assign abuf_wr_data_5_d1_R = ( abuf_wr_data_5_d1_X0 & abuf_wr_data_5_d1_R0 ) | ( abuf_wr_data_5_d1_X1 & abuf_wr_data_5_d1_R1 );
+  assign abuf_wr_data_5_R = ( abuf_wr_data_5_X0 & abuf_wr_data_5_R0 ) | ( abuf_wr_data_5_X1 & abuf_wr_data_5_R1 );
+  assign abuf_wr_data_6_d1_R = ( abuf_wr_data_6_d1_X0 & abuf_wr_data_6_d1_R0 ) | ( abuf_wr_data_6_d1_X1 & abuf_wr_data_6_d1_R1 );
+  assign abuf_wr_data_6_R = ( abuf_wr_data_6_X0 & abuf_wr_data_6_R0 ) | ( abuf_wr_data_6_X1 & abuf_wr_data_6_R1 );
+  assign abuf_wr_data_7_d1_R = ( abuf_wr_data_7_d1_X0 & abuf_wr_data_7_d1_R0 ) | ( abuf_wr_data_7_d1_X1 & abuf_wr_data_7_d1_R1 );
+  assign abuf_wr_data_7_R = ( abuf_wr_data_7_X0 & abuf_wr_data_7_R0 ) | ( abuf_wr_data_7_X1 & abuf_wr_data_7_R1 );
+  assign abuf_rd_data_ecc_0_R = ( abuf_rd_data_ecc_0_X0 & abuf_rd_data_ecc_0_R0 ) | ( abuf_rd_data_ecc_0_X1 & abuf_rd_data_ecc_0_R1 );
+  assign abuf_rd_data_ecc_1_R = ( abuf_rd_data_ecc_1_X0 & abuf_rd_data_ecc_1_R0 ) | ( abuf_rd_data_ecc_1_X1 & abuf_rd_data_ecc_1_R1 );
+  assign abuf_rd_data_ecc_2_R = ( abuf_rd_data_ecc_2_X0 & abuf_rd_data_ecc_2_R0 ) | ( abuf_rd_data_ecc_2_X1 & abuf_rd_data_ecc_2_R1 );
+  assign abuf_rd_data_ecc_3_R = ( abuf_rd_data_ecc_3_X0 & abuf_rd_data_ecc_3_R0 ) | ( abuf_rd_data_ecc_3_X1 & abuf_rd_data_ecc_3_R1 );
+  assign abuf_rd_data_ecc_4_R = ( abuf_rd_data_ecc_4_X0 & abuf_rd_data_ecc_4_R0 ) | ( abuf_rd_data_ecc_4_X1 & abuf_rd_data_ecc_4_R1 );
+  assign abuf_rd_data_ecc_5_R = ( abuf_rd_data_ecc_5_X0 & abuf_rd_data_ecc_5_R0 ) | ( abuf_rd_data_ecc_5_X1 & abuf_rd_data_ecc_5_R1 );
+  assign abuf_rd_data_ecc_6_R = ( abuf_rd_data_ecc_6_X0 & abuf_rd_data_ecc_6_R0 ) | ( abuf_rd_data_ecc_6_X1 & abuf_rd_data_ecc_6_R1 );
+  assign abuf_rd_data_ecc_7_R = ( abuf_rd_data_ecc_7_X0 & abuf_rd_data_ecc_7_R0 ) | ( abuf_rd_data_ecc_7_X1 & abuf_rd_data_ecc_7_R1 );
+  assign abuf_rd_raw_data_0_d2_R = ( abuf_rd_raw_data_0_d2_X0 & abuf_rd_raw_data_0_d2_R0 ) | ( abuf_rd_raw_data_0_d2_X1 & abuf_rd_raw_data_0_d2_R1 ) | ( abuf_rd_raw_data_0_d2_X2 & abuf_rd_raw_data_0_d2_R2 );
+  assign abuf_rd_raw_data_1_d2_R = ( abuf_rd_raw_data_1_d2_X0 & abuf_rd_raw_data_1_d2_R0 ) | ( abuf_rd_raw_data_1_d2_X1 & abuf_rd_raw_data_1_d2_R1 ) | ( abuf_rd_raw_data_1_d2_X2 & abuf_rd_raw_data_1_d2_R2 );
+  assign abuf_rd_raw_data_2_d2_R = ( abuf_rd_raw_data_2_d2_X0 & abuf_rd_raw_data_2_d2_R0 ) | ( abuf_rd_raw_data_2_d2_X1 & abuf_rd_raw_data_2_d2_R1 ) | ( abuf_rd_raw_data_2_d2_X2 & abuf_rd_raw_data_2_d2_R2 );
+  assign abuf_rd_raw_data_3_d2_R = ( abuf_rd_raw_data_3_d2_X0 & abuf_rd_raw_data_3_d2_R0 ) | ( abuf_rd_raw_data_3_d2_X1 & abuf_rd_raw_data_3_d2_R1 ) | ( abuf_rd_raw_data_3_d2_X2 & abuf_rd_raw_data_3_d2_R2 );
+  assign abuf_rd_raw_data_4_d2_R = ( abuf_rd_raw_data_4_d2_X0 & abuf_rd_raw_data_4_d2_R0 ) | ( abuf_rd_raw_data_4_d2_X1 & abuf_rd_raw_data_4_d2_R1 ) | ( abuf_rd_raw_data_4_d2_X2 & abuf_rd_raw_data_4_d2_R2 );
+  assign abuf_rd_raw_data_5_d2_R = ( abuf_rd_raw_data_5_d2_X0 & abuf_rd_raw_data_5_d2_R0 ) | ( abuf_rd_raw_data_5_d2_X1 & abuf_rd_raw_data_5_d2_R1 ) | ( abuf_rd_raw_data_5_d2_X2 & abuf_rd_raw_data_5_d2_R2 );
+  assign abuf_rd_raw_data_6_d2_R = ( abuf_rd_raw_data_6_d2_X0 & abuf_rd_raw_data_6_d2_R0 ) | ( abuf_rd_raw_data_6_d2_X1 & abuf_rd_raw_data_6_d2_R1 ) | ( abuf_rd_raw_data_6_d2_X2 & abuf_rd_raw_data_6_d2_R2 );
+  assign abuf_rd_raw_data_7_d2_R = ( abuf_rd_raw_data_7_d2_X0 & abuf_rd_raw_data_7_d2_R0 ) | ( abuf_rd_raw_data_7_d2_X1 & abuf_rd_raw_data_7_d2_R1 ) | ( abuf_rd_raw_data_7_d2_X2 & abuf_rd_raw_data_7_d2_R2 );
+  assign abuf_rd_en_d2_R = ( abuf_rd_en_d2_X0 & abuf_rd_en_d2_R0 ) | ( abuf_rd_en_d2_X1 & abuf_rd_en_d2_R1 );
+  assign abuf_wr_en_R = ( abuf_wr_en_X0 & abuf_wr_en_R0 ) | ( abuf_wr_en_X1 & abuf_wr_en_R1 ) | ( abuf_wr_en_X2 & abuf_wr_en_R2 );
+  assign abuf_wr_addr_R = ( abuf_wr_addr_X0 & abuf_wr_addr_R0 );
+  assign _16__R = ( _16__X0 & _16__R0 );
+  assign _17__R = ( _17__X0 & _17__R0 );
+  assign _18__R = ( _18__X0 & _18__R0 );
+  assign _19__R = ( _19__X0 & _19__R0 );
+  assign _20__R = ( _20__X0 & _20__R0 );
+  assign _21__R = ( _21__X0 & _21__R0 );
+  assign _22__R = ( _22__X0 & _22__R0 );
+  assign _23__R = ( _23__X0 & _23__R0 );
+  assign abuf_rd_en_R = ( abuf_rd_en_X0 & abuf_rd_en_R0 ) | ( abuf_rd_en_X1 & abuf_rd_en_R1 );
+  assign abuf_rd_en_d1_R = ( abuf_rd_en_d1_X0 & abuf_rd_en_d1_R0 ) | ( abuf_rd_en_d1_X1 & abuf_rd_en_d1_R1 );
+  assign _08__R = ( _08__X0 & _08__R0 );
+  assign _09__R = ( _09__X0 & _09__R0 );
+  assign _10__R = ( _10__X0 & _10__R0 );
+  assign _11__R = ( _11__X0 & _11__R0 );
+  assign _12__R = ( _12__X0 & _12__R0 );
+  assign _13__R = ( _13__X0 & _13__R0 );
+  assign _14__R = ( _14__X0 & _14__R0 );
+  assign _15__R = ( _15__X0 & _15__R0 );
+  assign _00__R = ( _00__X0 & _00__R0 );
+  assign _01__R = ( _01__X0 & _01__R0 );
+  assign _02__R = ( _02__X0 & _02__R0 );
+  assign _03__R = ( _03__X0 & _03__R0 );
+  assign _04__R = ( _04__X0 & _04__R0 );
+  assign _05__R = ( _05__X0 & _05__R0 );
+  assign _06__R = ( _06__X0 & _06__R0 );
+  assign _07__R = ( _07__X0 & _07__R0 );
+  assign abuf_rd_data_7_R = ( abuf_rd_data_7_X0 & abuf_rd_data_7_R0 ) | ( abuf_rd_data_7_X1 & abuf_rd_data_7_R1 );
+  assign abuf_rd_data_6_R = ( abuf_rd_data_6_X0 & abuf_rd_data_6_R0 ) | ( abuf_rd_data_6_X1 & abuf_rd_data_6_R1 );
+  assign abuf_rd_data_5_R = ( abuf_rd_data_5_X0 & abuf_rd_data_5_R0 ) | ( abuf_rd_data_5_X1 & abuf_rd_data_5_R1 );
+  assign abuf_rd_data_4_R = ( abuf_rd_data_4_X0 & abuf_rd_data_4_R0 ) | ( abuf_rd_data_4_X1 & abuf_rd_data_4_R1 );
+  assign abuf_rd_data_3_R = ( abuf_rd_data_3_X0 & abuf_rd_data_3_R0 ) | ( abuf_rd_data_3_X1 & abuf_rd_data_3_R1 );
+  assign abuf_rd_data_2_R = ( abuf_rd_data_2_X0 & abuf_rd_data_2_R0 ) | ( abuf_rd_data_2_X1 & abuf_rd_data_2_R1 );
+  assign abuf_rd_data_1_R = ( abuf_rd_data_1_X0 & abuf_rd_data_1_R0 ) | ( abuf_rd_data_1_X1 & abuf_rd_data_1_R1 );
+  assign abuf_rd_data_0_R = ( abuf_rd_data_0_X0 & abuf_rd_data_0_R0 ) | ( abuf_rd_data_0_X1 & abuf_rd_data_0_R1 );
+ // ground taints for floating regs
+ // ground taints for unused wires
+  assign { abuf_rd_data_0_w_R , abuf_rd_data_0_w_C , abuf_rd_data_0_w_X , abuf_rd_data_1_w_R , abuf_rd_data_1_w_C , abuf_rd_data_1_w_X , abuf_rd_data_2_w_R , abuf_rd_data_2_w_C , abuf_rd_data_2_w_X , abuf_rd_data_3_w_R , abuf_rd_data_3_w_C , abuf_rd_data_3_w_X , abuf_rd_data_4_w_R , abuf_rd_data_4_w_C , abuf_rd_data_4_w_X , abuf_rd_data_5_w_R , abuf_rd_data_5_w_C , abuf_rd_data_5_w_X , abuf_rd_data_6_w_R , abuf_rd_data_6_w_C , abuf_rd_data_6_w_X , abuf_rd_data_7_w_R , abuf_rd_data_7_w_C , abuf_rd_data_7_w_X , abuf_rd_raw_data_0_R , abuf_rd_raw_data_0_C , abuf_rd_raw_data_0_X , abuf_rd_raw_data_1_R , abuf_rd_raw_data_1_C , abuf_rd_raw_data_1_X , abuf_rd_raw_data_2_R , abuf_rd_raw_data_2_C , abuf_rd_raw_data_2_X , abuf_rd_raw_data_3_R , abuf_rd_raw_data_3_C , abuf_rd_raw_data_3_X , abuf_rd_raw_data_4_R , abuf_rd_raw_data_4_C , abuf_rd_raw_data_4_X , abuf_rd_raw_data_5_R , abuf_rd_raw_data_5_C , abuf_rd_raw_data_5_X , abuf_rd_raw_data_6_R , abuf_rd_raw_data_6_C , abuf_rd_raw_data_6_X , abuf_rd_raw_data_7_R , abuf_rd_raw_data_7_C , abuf_rd_raw_data_7_X , abuf_rd_reg_en_R , abuf_rd_reg_en_C , abuf_rd_reg_en_X , abuf_wr_data_0_d1_w_R , abuf_wr_data_0_d1_w_C , abuf_wr_data_0_d1_w_X , abuf_wr_data_1_d1_w_R , abuf_wr_data_1_d1_w_C , abuf_wr_data_1_d1_w_X , abuf_wr_data_2_d1_w_R , abuf_wr_data_2_d1_w_C , abuf_wr_data_2_d1_w_X , abuf_wr_data_3_d1_w_R , abuf_wr_data_3_d1_w_C , abuf_wr_data_3_d1_w_X , abuf_wr_data_4_d1_w_R , abuf_wr_data_4_d1_w_C , abuf_wr_data_4_d1_w_X , abuf_wr_data_5_d1_w_R , abuf_wr_data_5_d1_w_C , abuf_wr_data_5_d1_w_X , abuf_wr_data_6_d1_w_R , abuf_wr_data_6_d1_w_C , abuf_wr_data_6_d1_w_X , abuf_wr_data_7_d1_w_R , abuf_wr_data_7_d1_w_C , abuf_wr_data_7_d1_w_X , abuf_wr_en_d1_w_R , abuf_wr_en_d1_w_C , abuf_wr_en_d1_w_X  } = 0;
+  always @( posedge nvdla_core_clk ) begin
+    if( !nvdla_core_rstn ) abuf_rd_data_7_PREV_VAL1 <= 0 ;
+    if( !nvdla_core_rstn ) abuf_rd_data_7_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) abuf_rd_data_7_PREV_VAL1 <= abuf_rd_data_7 ;
+    if( INSTR_IN_ZY ) abuf_rd_data_7_PREV_VAL2 <= abuf_rd_data_7_PREV_VAL1 ;
+  end
+  always @( posedge nvdla_core_clk ) begin
+    if( !nvdla_core_rstn ) abuf_rd_data_6_PREV_VAL1 <= 0 ;
+    if( !nvdla_core_rstn ) abuf_rd_data_6_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) abuf_rd_data_6_PREV_VAL1 <= abuf_rd_data_6 ;
+    if( INSTR_IN_ZY ) abuf_rd_data_6_PREV_VAL2 <= abuf_rd_data_6_PREV_VAL1 ;
+  end
+  always @( posedge nvdla_core_clk ) begin
+    if( !nvdla_core_rstn ) abuf_rd_data_5_PREV_VAL1 <= 0 ;
+    if( !nvdla_core_rstn ) abuf_rd_data_5_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) abuf_rd_data_5_PREV_VAL1 <= abuf_rd_data_5 ;
+    if( INSTR_IN_ZY ) abuf_rd_data_5_PREV_VAL2 <= abuf_rd_data_5_PREV_VAL1 ;
+  end
+  always @( posedge nvdla_core_clk ) begin
+    if( !nvdla_core_rstn ) abuf_rd_data_4_PREV_VAL1 <= 0 ;
+    if( !nvdla_core_rstn ) abuf_rd_data_4_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) abuf_rd_data_4_PREV_VAL1 <= abuf_rd_data_4 ;
+    if( INSTR_IN_ZY ) abuf_rd_data_4_PREV_VAL2 <= abuf_rd_data_4_PREV_VAL1 ;
+  end
+  always @( posedge nvdla_core_clk ) begin
+    if( !nvdla_core_rstn ) abuf_rd_data_3_PREV_VAL1 <= 0 ;
+    if( !nvdla_core_rstn ) abuf_rd_data_3_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) abuf_rd_data_3_PREV_VAL1 <= abuf_rd_data_3 ;
+    if( INSTR_IN_ZY ) abuf_rd_data_3_PREV_VAL2 <= abuf_rd_data_3_PREV_VAL1 ;
+  end
+  always @( posedge nvdla_core_clk ) begin
+    if( !nvdla_core_rstn ) abuf_rd_data_2_PREV_VAL1 <= 0 ;
+    if( !nvdla_core_rstn ) abuf_rd_data_2_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) abuf_rd_data_2_PREV_VAL1 <= abuf_rd_data_2 ;
+    if( INSTR_IN_ZY ) abuf_rd_data_2_PREV_VAL2 <= abuf_rd_data_2_PREV_VAL1 ;
+  end
+  always @( posedge nvdla_core_clk ) begin
+    if( !nvdla_core_rstn ) abuf_rd_data_1_PREV_VAL1 <= 0 ;
+    if( !nvdla_core_rstn ) abuf_rd_data_1_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) abuf_rd_data_1_PREV_VAL1 <= abuf_rd_data_1 ;
+    if( INSTR_IN_ZY ) abuf_rd_data_1_PREV_VAL2 <= abuf_rd_data_1_PREV_VAL1 ;
+  end
+  always @( posedge nvdla_core_clk ) begin
+    if( !nvdla_core_rstn ) abuf_rd_data_0_PREV_VAL1 <= 0 ;
+    if( !nvdla_core_rstn ) abuf_rd_data_0_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) abuf_rd_data_0_PREV_VAL1 <= abuf_rd_data_0 ;
+    if( INSTR_IN_ZY ) abuf_rd_data_0_PREV_VAL2 <= abuf_rd_data_0_PREV_VAL1 ;
+  end
+  always @( posedge nvdla_core_clk ) begin
+    if( !nvdla_core_rstn ) abuf_rd_raw_data_7_d2_PREV_VAL1 <= 0 ;
+    if( !nvdla_core_rstn ) abuf_rd_raw_data_7_d2_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) abuf_rd_raw_data_7_d2_PREV_VAL1 <= abuf_rd_raw_data_7_d2 ;
+    if( INSTR_IN_ZY ) abuf_rd_raw_data_7_d2_PREV_VAL2 <= abuf_rd_raw_data_7_d2_PREV_VAL1 ;
+  end
+  always @( posedge nvdla_core_clk ) begin
+    if( !nvdla_core_rstn ) abuf_rd_raw_data_6_d2_PREV_VAL1 <= 0 ;
+    if( !nvdla_core_rstn ) abuf_rd_raw_data_6_d2_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) abuf_rd_raw_data_6_d2_PREV_VAL1 <= abuf_rd_raw_data_6_d2 ;
+    if( INSTR_IN_ZY ) abuf_rd_raw_data_6_d2_PREV_VAL2 <= abuf_rd_raw_data_6_d2_PREV_VAL1 ;
+  end
+  always @( posedge nvdla_core_clk ) begin
+    if( !nvdla_core_rstn ) abuf_rd_raw_data_5_d2_PREV_VAL1 <= 0 ;
+    if( !nvdla_core_rstn ) abuf_rd_raw_data_5_d2_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) abuf_rd_raw_data_5_d2_PREV_VAL1 <= abuf_rd_raw_data_5_d2 ;
+    if( INSTR_IN_ZY ) abuf_rd_raw_data_5_d2_PREV_VAL2 <= abuf_rd_raw_data_5_d2_PREV_VAL1 ;
+  end
+  always @( posedge nvdla_core_clk ) begin
+    if( !nvdla_core_rstn ) abuf_rd_raw_data_4_d2_PREV_VAL1 <= 0 ;
+    if( !nvdla_core_rstn ) abuf_rd_raw_data_4_d2_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) abuf_rd_raw_data_4_d2_PREV_VAL1 <= abuf_rd_raw_data_4_d2 ;
+    if( INSTR_IN_ZY ) abuf_rd_raw_data_4_d2_PREV_VAL2 <= abuf_rd_raw_data_4_d2_PREV_VAL1 ;
+  end
+  always @( posedge nvdla_core_clk ) begin
+    if( !nvdla_core_rstn ) abuf_rd_raw_data_3_d2_PREV_VAL1 <= 0 ;
+    if( !nvdla_core_rstn ) abuf_rd_raw_data_3_d2_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) abuf_rd_raw_data_3_d2_PREV_VAL1 <= abuf_rd_raw_data_3_d2 ;
+    if( INSTR_IN_ZY ) abuf_rd_raw_data_3_d2_PREV_VAL2 <= abuf_rd_raw_data_3_d2_PREV_VAL1 ;
+  end
+  always @( posedge nvdla_core_clk ) begin
+    if( !nvdla_core_rstn ) abuf_rd_raw_data_2_d2_PREV_VAL1 <= 0 ;
+    if( !nvdla_core_rstn ) abuf_rd_raw_data_2_d2_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) abuf_rd_raw_data_2_d2_PREV_VAL1 <= abuf_rd_raw_data_2_d2 ;
+    if( INSTR_IN_ZY ) abuf_rd_raw_data_2_d2_PREV_VAL2 <= abuf_rd_raw_data_2_d2_PREV_VAL1 ;
+  end
+  always @( posedge nvdla_core_clk ) begin
+    if( !nvdla_core_rstn ) abuf_rd_raw_data_1_d2_PREV_VAL1 <= 0 ;
+    if( !nvdla_core_rstn ) abuf_rd_raw_data_1_d2_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) abuf_rd_raw_data_1_d2_PREV_VAL1 <= abuf_rd_raw_data_1_d2 ;
+    if( INSTR_IN_ZY ) abuf_rd_raw_data_1_d2_PREV_VAL2 <= abuf_rd_raw_data_1_d2_PREV_VAL1 ;
+  end
+  always @( posedge nvdla_core_clk ) begin
+    if( !nvdla_core_rstn ) abuf_rd_raw_data_0_d2_PREV_VAL1 <= 0 ;
+    if( !nvdla_core_rstn ) abuf_rd_raw_data_0_d2_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) abuf_rd_raw_data_0_d2_PREV_VAL1 <= abuf_rd_raw_data_0_d2 ;
+    if( INSTR_IN_ZY ) abuf_rd_raw_data_0_d2_PREV_VAL2 <= abuf_rd_raw_data_0_d2_PREV_VAL1 ;
+  end
+  always @( posedge nvdla_core_clk ) begin
+    if( !nvdla_core_rstn ) abuf_rd_en_d2_PREV_VAL1 <= 0 ;
+    if( !nvdla_core_rstn ) abuf_rd_en_d2_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) abuf_rd_en_d2_PREV_VAL1 <= abuf_rd_en_d2 ;
+    if( INSTR_IN_ZY ) abuf_rd_en_d2_PREV_VAL2 <= abuf_rd_en_d2_PREV_VAL1 ;
+  end
+  always @( posedge nvdla_core_clk ) begin
+    if( !nvdla_core_rstn ) abuf_rd_en_d1_PREV_VAL1 <= 0 ;
+    if( !nvdla_core_rstn ) abuf_rd_en_d1_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) abuf_rd_en_d1_PREV_VAL1 <= abuf_rd_en_d1 ;
+    if( INSTR_IN_ZY ) abuf_rd_en_d1_PREV_VAL2 <= abuf_rd_en_d1_PREV_VAL1 ;
+  end
+  always @( posedge nvdla_core_clk ) begin
+    if( !nvdla_core_rstn ) abuf_wr_data_7_d1_PREV_VAL1 <= 0 ;
+    if( !nvdla_core_rstn ) abuf_wr_data_7_d1_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) abuf_wr_data_7_d1_PREV_VAL1 <= abuf_wr_data_7_d1 ;
+    if( INSTR_IN_ZY ) abuf_wr_data_7_d1_PREV_VAL2 <= abuf_wr_data_7_d1_PREV_VAL1 ;
+  end
+  always @( posedge nvdla_core_clk ) begin
+    if( !nvdla_core_rstn ) abuf_wr_data_6_d1_PREV_VAL1 <= 0 ;
+    if( !nvdla_core_rstn ) abuf_wr_data_6_d1_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) abuf_wr_data_6_d1_PREV_VAL1 <= abuf_wr_data_6_d1 ;
+    if( INSTR_IN_ZY ) abuf_wr_data_6_d1_PREV_VAL2 <= abuf_wr_data_6_d1_PREV_VAL1 ;
+  end
+  always @( posedge nvdla_core_clk ) begin
+    if( !nvdla_core_rstn ) abuf_wr_data_5_d1_PREV_VAL1 <= 0 ;
+    if( !nvdla_core_rstn ) abuf_wr_data_5_d1_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) abuf_wr_data_5_d1_PREV_VAL1 <= abuf_wr_data_5_d1 ;
+    if( INSTR_IN_ZY ) abuf_wr_data_5_d1_PREV_VAL2 <= abuf_wr_data_5_d1_PREV_VAL1 ;
+  end
+  always @( posedge nvdla_core_clk ) begin
+    if( !nvdla_core_rstn ) abuf_wr_data_4_d1_PREV_VAL1 <= 0 ;
+    if( !nvdla_core_rstn ) abuf_wr_data_4_d1_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) abuf_wr_data_4_d1_PREV_VAL1 <= abuf_wr_data_4_d1 ;
+    if( INSTR_IN_ZY ) abuf_wr_data_4_d1_PREV_VAL2 <= abuf_wr_data_4_d1_PREV_VAL1 ;
+  end
+  always @( posedge nvdla_core_clk ) begin
+    if( !nvdla_core_rstn ) abuf_wr_data_3_d1_PREV_VAL1 <= 0 ;
+    if( !nvdla_core_rstn ) abuf_wr_data_3_d1_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) abuf_wr_data_3_d1_PREV_VAL1 <= abuf_wr_data_3_d1 ;
+    if( INSTR_IN_ZY ) abuf_wr_data_3_d1_PREV_VAL2 <= abuf_wr_data_3_d1_PREV_VAL1 ;
+  end
+  always @( posedge nvdla_core_clk ) begin
+    if( !nvdla_core_rstn ) abuf_wr_data_2_d1_PREV_VAL1 <= 0 ;
+    if( !nvdla_core_rstn ) abuf_wr_data_2_d1_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) abuf_wr_data_2_d1_PREV_VAL1 <= abuf_wr_data_2_d1 ;
+    if( INSTR_IN_ZY ) abuf_wr_data_2_d1_PREV_VAL2 <= abuf_wr_data_2_d1_PREV_VAL1 ;
+  end
+  always @( posedge nvdla_core_clk ) begin
+    if( !nvdla_core_rstn ) abuf_wr_data_1_d1_PREV_VAL1 <= 0 ;
+    if( !nvdla_core_rstn ) abuf_wr_data_1_d1_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) abuf_wr_data_1_d1_PREV_VAL1 <= abuf_wr_data_1_d1 ;
+    if( INSTR_IN_ZY ) abuf_wr_data_1_d1_PREV_VAL2 <= abuf_wr_data_1_d1_PREV_VAL1 ;
+  end
+  always @( posedge nvdla_core_clk ) begin
+    if( !nvdla_core_rstn ) abuf_wr_data_0_d1_PREV_VAL1 <= 0 ;
+    if( !nvdla_core_rstn ) abuf_wr_data_0_d1_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) abuf_wr_data_0_d1_PREV_VAL1 <= abuf_wr_data_0_d1 ;
+    if( INSTR_IN_ZY ) abuf_wr_data_0_d1_PREV_VAL2 <= abuf_wr_data_0_d1_PREV_VAL1 ;
+  end
+  always @( posedge nvdla_core_clk ) begin
+    if( !nvdla_core_rstn ) abuf_wr_addr_d1_PREV_VAL1 <= 0 ;
+    if( !nvdla_core_rstn ) abuf_wr_addr_d1_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) abuf_wr_addr_d1_PREV_VAL1 <= abuf_wr_addr_d1 ;
+    if( INSTR_IN_ZY ) abuf_wr_addr_d1_PREV_VAL2 <= abuf_wr_addr_d1_PREV_VAL1 ;
+  end
+  always @( posedge nvdla_core_clk ) begin
+    if( !nvdla_core_rstn ) abuf_wr_en_d1_PREV_VAL1 <= 0 ;
+    if( !nvdla_core_rstn ) abuf_wr_en_d1_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) abuf_wr_en_d1_PREV_VAL1 <= abuf_wr_en_d1 ;
+    if( INSTR_IN_ZY ) abuf_wr_en_d1_PREV_VAL2 <= abuf_wr_en_d1_PREV_VAL1 ;
+  end
+ // ground taints for unused wire slices
+  assert property( abuf_rd_data_0_r_flag == 0 || abuf_rd_data_0_PREV_VAL1 == abuf_rd_data_0_PREV_VAL2 );
+  assert property( abuf_rd_data_1_r_flag == 0 || abuf_rd_data_1_PREV_VAL1 == abuf_rd_data_1_PREV_VAL2 );
+  assert property( abuf_rd_data_2_r_flag == 0 || abuf_rd_data_2_PREV_VAL1 == abuf_rd_data_2_PREV_VAL2 );
+  assert property( abuf_rd_data_3_r_flag == 0 || abuf_rd_data_3_PREV_VAL1 == abuf_rd_data_3_PREV_VAL2 );
+  assert property( abuf_rd_data_4_r_flag == 0 || abuf_rd_data_4_PREV_VAL1 == abuf_rd_data_4_PREV_VAL2 );
+  assert property( abuf_rd_data_5_r_flag == 0 || abuf_rd_data_5_PREV_VAL1 == abuf_rd_data_5_PREV_VAL2 );
+  assert property( abuf_rd_data_6_r_flag == 0 || abuf_rd_data_6_PREV_VAL1 == abuf_rd_data_6_PREV_VAL2 );
+  assert property( abuf_rd_data_7_r_flag == 0 || abuf_rd_data_7_PREV_VAL1 == abuf_rd_data_7_PREV_VAL2 );
+  assert property( abuf_rd_en_d1_r_flag == 0 || abuf_rd_en_d1_PREV_VAL1 == abuf_rd_en_d1_PREV_VAL2 );
+  assert property( abuf_rd_en_d2_r_flag == 0 || abuf_rd_en_d2_PREV_VAL1 == abuf_rd_en_d2_PREV_VAL2 );
+  assert property( abuf_rd_raw_data_0_d2_r_flag == 0 || abuf_rd_raw_data_0_d2_PREV_VAL1 == abuf_rd_raw_data_0_d2_PREV_VAL2 );
+  assert property( abuf_rd_raw_data_1_d2_r_flag == 0 || abuf_rd_raw_data_1_d2_PREV_VAL1 == abuf_rd_raw_data_1_d2_PREV_VAL2 );
+  assert property( abuf_rd_raw_data_2_d2_r_flag == 0 || abuf_rd_raw_data_2_d2_PREV_VAL1 == abuf_rd_raw_data_2_d2_PREV_VAL2 );
+  assert property( abuf_rd_raw_data_3_d2_r_flag == 0 || abuf_rd_raw_data_3_d2_PREV_VAL1 == abuf_rd_raw_data_3_d2_PREV_VAL2 );
+  assert property( abuf_rd_raw_data_4_d2_r_flag == 0 || abuf_rd_raw_data_4_d2_PREV_VAL1 == abuf_rd_raw_data_4_d2_PREV_VAL2 );
+  assert property( abuf_rd_raw_data_5_d2_r_flag == 0 || abuf_rd_raw_data_5_d2_PREV_VAL1 == abuf_rd_raw_data_5_d2_PREV_VAL2 );
+  assert property( abuf_rd_raw_data_6_d2_r_flag == 0 || abuf_rd_raw_data_6_d2_PREV_VAL1 == abuf_rd_raw_data_6_d2_PREV_VAL2 );
+  assert property( abuf_rd_raw_data_7_d2_r_flag == 0 || abuf_rd_raw_data_7_d2_PREV_VAL1 == abuf_rd_raw_data_7_d2_PREV_VAL2 );
+  assert property( abuf_wr_addr_d1_r_flag == 0 || abuf_wr_addr_d1_PREV_VAL1 == abuf_wr_addr_d1_PREV_VAL2 );
+  assert property( abuf_wr_data_0_d1_r_flag == 0 || abuf_wr_data_0_d1_PREV_VAL1 == abuf_wr_data_0_d1_PREV_VAL2 );
+  assert property( abuf_wr_data_1_d1_r_flag == 0 || abuf_wr_data_1_d1_PREV_VAL1 == abuf_wr_data_1_d1_PREV_VAL2 );
+  assert property( abuf_wr_data_2_d1_r_flag == 0 || abuf_wr_data_2_d1_PREV_VAL1 == abuf_wr_data_2_d1_PREV_VAL2 );
+  assert property( abuf_wr_data_3_d1_r_flag == 0 || abuf_wr_data_3_d1_PREV_VAL1 == abuf_wr_data_3_d1_PREV_VAL2 );
+  assert property( abuf_wr_data_4_d1_r_flag == 0 || abuf_wr_data_4_d1_PREV_VAL1 == abuf_wr_data_4_d1_PREV_VAL2 );
+  assert property( abuf_wr_data_5_d1_r_flag == 0 || abuf_wr_data_5_d1_PREV_VAL1 == abuf_wr_data_5_d1_PREV_VAL2 );
+  assert property( abuf_wr_data_6_d1_r_flag == 0 || abuf_wr_data_6_d1_PREV_VAL1 == abuf_wr_data_6_d1_PREV_VAL2 );
+  assert property( abuf_wr_data_7_d1_r_flag == 0 || abuf_wr_data_7_d1_PREV_VAL1 == abuf_wr_data_7_d1_PREV_VAL2 );
+  assert property( abuf_wr_en_d1_r_flag == 0 || abuf_wr_en_d1_PREV_VAL1 == abuf_wr_en_d1_PREV_VAL2 );
+  assign rst_zy = !nvdla_core_rstn ;
+endmodule

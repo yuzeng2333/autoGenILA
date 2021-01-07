@@ -1,0 +1,11 @@
+module \$paramod\FP32_SUB_mgc_out_stdreg_wait_v1\rscid=3\width=32 (ld, vd, d, lz, vz, z);
+  input [31:0] d;
+  input ld;
+  output lz;
+  output vd;
+  input vz;
+  output [31:0] z;
+  assign lz = ld;
+  assign vd = vz;
+  assign z = d;
+endmodule

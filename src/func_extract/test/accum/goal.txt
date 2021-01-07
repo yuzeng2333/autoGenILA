@@ -1,10 +1,11 @@
-#1#timer#15
+#1#sum#15
 (goals
 (goal
-  (let ((a!1 (ite (= (ite (= |data___#16| #b000)
-                          |data___#16|
-                          (bvadd #b111 |data___#16|))
-                     #b000)
+  (let ((a!1 (= (ite (= |data___#16| #b000)
+                     |data___#16|
+                     (bvadd #b111 |data___#16|))
+                #b000)))
+  (let ((a!2 (ite a!1
                   (ite (= |data___#16| #b000)
                        |data___#16|
                        (bvadd #b111 |data___#16|))
@@ -12,44 +13,50 @@
                          (ite (= |data___#16| #b000)
                               |data___#16|
                               (bvadd #b111 |data___#16|)))))
-        (a!7 (ite (= (ite (= |data___#16| #b000)
-                          |data___#16|
-                          (bvadd #b111 |data___#16|))
-                     #b001)
-                  (ite (= |data___#16| #b001) #b110 #b111)
-                  (bvadd #b001 (ite (= |data___#16| #b001) #b110 #b111)))))
-  (let ((a!2 (ite (= (ite (= a!1 #b000) a!1 (bvadd #b111 a!1)) #b000)
-                  (ite (= a!1 #b000) a!1 (bvadd #b111 a!1))
-                  (bvadd #b111 (ite (= a!1 #b000) a!1 (bvadd #b111 a!1)))))
-        (a!8 (ite (= (ite (= a!1 #b000) a!1 (bvadd #b111 a!1)) #b001)
-                  (ite (= a!1 #b001) a!7 (bvadd #b001 a!7))
-                  (bvadd #b001 (ite (= a!1 #b001) a!7 (bvadd #b001 a!7))))))
-  (let ((a!3 (ite (= (ite (= a!2 #b000) a!2 (bvadd #b111 a!2)) #b000)
+        (a!15 (ite a!1
+                   (ite (= |data___#16| #b000) #b000 #b001)
+                   (bvadd #b001 (ite (= |data___#16| #b000) #b000 #b001)))))
+  (let ((a!3 (= (ite (= a!2 #b000) a!2 (bvadd #b111 a!2)) #b000)))
+  (let ((a!4 (ite a!3
                   (ite (= a!2 #b000) a!2 (bvadd #b111 a!2))
                   (bvadd #b111 (ite (= a!2 #b000) a!2 (bvadd #b111 a!2)))))
-        (a!9 (ite (= (ite (= a!2 #b000) a!2 (bvadd #b111 a!2)) #b001)
-                  (ite (= a!2 #b001) a!8 (bvadd #b001 a!8))
-                  (bvadd #b001 (ite (= a!2 #b001) a!8 (bvadd #b001 a!8))))))
-  (let ((a!4 (ite (= (ite (= a!3 #b000) a!3 (bvadd #b111 a!3)) #b000)
-                  (ite (= a!3 #b000) a!3 (bvadd #b111 a!3))
-                  (bvadd #b111 (ite (= a!3 #b000) a!3 (bvadd #b111 a!3)))))
-        (a!10 (ite (= (ite (= a!3 #b000) a!3 (bvadd #b111 a!3)) #b001)
-                   (ite (= a!3 #b001) a!9 (bvadd #b001 a!9))
-                   (bvadd #b001 (ite (= a!3 #b001) a!9 (bvadd #b001 a!9))))))
-  (let ((a!5 (ite (= (ite (= a!4 #b000) a!4 (bvadd #b111 a!4)) #b000)
+        (a!16 (ite a!3
+                   (ite (= a!2 #b000) a!15 (bvadd #b001 a!15))
+                   (bvadd #b001 (ite (= a!2 #b000) a!15 (bvadd #b001 a!15))))))
+  (let ((a!5 (= (ite (= a!4 #b000) a!4 (bvadd #b111 a!4)) #b000)))
+  (let ((a!6 (ite a!5
                   (ite (= a!4 #b000) a!4 (bvadd #b111 a!4))
                   (bvadd #b111 (ite (= a!4 #b000) a!4 (bvadd #b111 a!4)))))
-        (a!11 (ite (= (ite (= a!4 #b000) a!4 (bvadd #b111 a!4)) #b001)
-                   (ite (= a!4 #b001) a!10 (bvadd #b001 a!10))
-                   (bvadd #b001 (ite (= a!4 #b001) a!10 (bvadd #b001 a!10))))))
-  (let ((a!6 (ite (= (ite (= a!5 #b000) a!5 (bvadd #b111 a!5)) #b000)
-                  (ite (= a!5 #b000) a!5 (bvadd #b111 a!5))
-                  (bvadd #b111 (ite (= a!5 #b000) a!5 (bvadd #b111 a!5)))))
-        (a!12 (ite (= (ite (= a!5 #b000) a!5 (bvadd #b111 a!5)) #b001)
-                   (ite (= a!5 #b001) a!11 (bvadd #b001 a!11))
-                   (bvadd #b001 (ite (= a!5 #b001) a!11 (bvadd #b001 a!11))))))
-  (let ((a!13 (ite (= (ite (= a!6 #b000) a!6 (bvadd #b111 a!6)) #b001)
-                   (ite (= a!6 #b001) a!12 (bvadd #b001 a!12))
-                   (bvadd #b001 (ite (= a!6 #b001) a!12 (bvadd #b001 a!12))))))
-    (= |timer___#1000| a!13)))))))))
+        (a!17 (ite a!5
+                   (ite (= a!4 #b000) a!16 (bvadd #b001 a!16))
+                   (bvadd #b001 (ite (= a!4 #b000) a!16 (bvadd #b001 a!16))))))
+  (let ((a!7 (= (ite (= a!6 #b000) a!6 (bvadd #b111 a!6)) #b000)))
+  (let ((a!8 (ite a!7
+                  (ite (= a!6 #b000) a!6 (bvadd #b111 a!6))
+                  (bvadd #b111 (ite (= a!6 #b000) a!6 (bvadd #b111 a!6)))))
+        (a!18 (ite a!7
+                   (ite (= a!6 #b000) a!17 (bvadd #b001 a!17))
+                   (bvadd #b001 (ite (= a!6 #b000) a!17 (bvadd #b001 a!17))))))
+  (let ((a!9 (= (ite (= a!8 #b000) a!8 (bvadd #b111 a!8)) #b000)))
+  (let ((a!10 (ite a!9
+                   (ite (= a!8 #b000) a!8 (bvadd #b111 a!8))
+                   (bvadd #b111 (ite (= a!8 #b000) a!8 (bvadd #b111 a!8)))))
+        (a!19 (ite a!9
+                   (ite (= a!8 #b000) a!18 (bvadd #b001 a!18))
+                   (bvadd #b001 (ite (= a!8 #b000) a!18 (bvadd #b001 a!18))))))
+  (let ((a!11 (= (ite (= a!10 #b000) a!10 (bvadd #b111 a!10)) #b000)))
+  (let ((a!12 (ite a!11
+                   (ite (= a!10 #b000) a!10 (bvadd #b111 a!10))
+                   (bvadd #b111 (ite (= a!10 #b000) a!10 (bvadd #b111 a!10)))))
+        (a!20 (ite a!11
+                   (ite (= a!10 #b000) a!19 (bvadd #b001 a!19))
+                   (bvadd #b001 (ite (= a!10 #b000) a!19 (bvadd #b001 a!19))))))
+  (let ((a!13 (= (ite (= a!12 #b000) a!12 (bvadd #b111 a!12)) #b000)))
+  (let ((a!14 (ite a!13
+                   (ite (= a!12 #b000) a!12 (bvadd #b111 a!12))
+                   (bvadd #b111 (ite (= a!12 #b000) a!12 (bvadd #b111 a!12)))))
+        (a!21 (ite a!13
+                   (ite (= a!12 #b000) a!20 (bvadd #b001 a!20))
+                   (bvadd #b001 (ite (= a!12 #b000) a!20 (bvadd #b001 a!20))))))
+    (= |sum___#1015| (ite (= a!14 #b000) a!21 (bvadd #b001 a!21))))))))))))))))))
 )

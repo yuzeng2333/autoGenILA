@@ -1,0 +1,329 @@
+  input [31:0] cfg_alu_in_rsc_z;
+  input [31:0] cfg_alu_in_rsc_z_T ;
+  input [13:0] cfg_alu_in_rsc_z_S ;
+  output [31:0] cfg_alu_in_rsc_z_R ;
+  output [31:0] cfg_alu_in_rsc_z_X ;
+  output [31:0] cfg_alu_in_rsc_z_C ;
+  input [15:0] cfg_mul_in_rsc_z;
+  input [15:0] cfg_mul_in_rsc_z_T ;
+  input [13:0] cfg_mul_in_rsc_z_S ;
+  output [15:0] cfg_mul_in_rsc_z_R ;
+  output [15:0] cfg_mul_in_rsc_z_X ;
+  output [15:0] cfg_mul_in_rsc_z_C ;
+  input [1:0] cfg_precision_rsc_z;
+  input [1:0] cfg_precision_rsc_z_T ;
+  input [13:0] cfg_precision_rsc_z_S ;
+  output [1:0] cfg_precision_rsc_z_R ;
+  output [1:0] cfg_precision_rsc_z_X ;
+  output [1:0] cfg_precision_rsc_z_C ;
+  input [5:0] cfg_truncate_rsc_z;
+  input [5:0] cfg_truncate_rsc_z_T ;
+  input [13:0] cfg_truncate_rsc_z_S ;
+  output [5:0] cfg_truncate_rsc_z_R ;
+  output [5:0] cfg_truncate_rsc_z_X ;
+  output [5:0] cfg_truncate_rsc_z_C ;
+  output chn_data_in_rsc_lz;
+  logic chn_data_in_rsc_lz ;
+  output chn_data_in_rsc_lz_T ;
+  logic chn_data_in_rsc_lz_T ;
+  logic chn_data_in_rsc_lz_R ;
+  logic chn_data_in_rsc_lz_C ;
+  logic chn_data_in_rsc_lz_X ;
+  logic [13:0] chn_data_in_rsc_lz_S ;
+  input chn_data_in_rsc_lz_R0 ;
+  input chn_data_in_rsc_lz_C0 ;
+  input chn_data_in_rsc_lz_X0 ;
+  output [13:0] chn_data_in_rsc_lz_S ;
+  input chn_data_in_rsc_vz;
+  input chn_data_in_rsc_vz_T ;
+  input [13:0] chn_data_in_rsc_vz_S ;
+  output chn_data_in_rsc_vz_R ;
+  output chn_data_in_rsc_vz_X ;
+  output chn_data_in_rsc_vz_C ;
+  input [49:0] chn_data_in_rsc_z;
+  input [49:0] chn_data_in_rsc_z_T ;
+  input [13:0] chn_data_in_rsc_z_S ;
+  output [49:0] chn_data_in_rsc_z_R ;
+  output [49:0] chn_data_in_rsc_z_X ;
+  output [49:0] chn_data_in_rsc_z_C ;
+  logic chn_data_in_rsci_oswt;
+  logic chn_data_in_rsci_oswt_T ;
+  logic chn_data_in_rsci_oswt_R ;
+  logic chn_data_in_rsci_oswt_C ;
+  logic chn_data_in_rsci_oswt_X ;
+  logic [13:0] chn_data_in_rsci_oswt_S ;
+  logic chn_data_in_rsci_oswt_unreg;
+  logic chn_data_in_rsci_oswt_unreg_T ;
+  logic chn_data_in_rsci_oswt_unreg_R ;
+  logic chn_data_in_rsci_oswt_unreg_C ;
+  logic chn_data_in_rsci_oswt_unreg_X ;
+  logic [13:0] chn_data_in_rsci_oswt_unreg_S ;
+  output chn_data_out_rsc_lz;
+  logic chn_data_out_rsc_lz ;
+  output chn_data_out_rsc_lz_T ;
+  logic chn_data_out_rsc_lz_T ;
+  logic chn_data_out_rsc_lz_R ;
+  logic chn_data_out_rsc_lz_C ;
+  logic chn_data_out_rsc_lz_X ;
+  logic [13:0] chn_data_out_rsc_lz_S ;
+  input chn_data_out_rsc_lz_R0 ;
+  input chn_data_out_rsc_lz_C0 ;
+  input chn_data_out_rsc_lz_X0 ;
+  output [13:0] chn_data_out_rsc_lz_S ;
+  input chn_data_out_rsc_vz;
+  input chn_data_out_rsc_vz_T ;
+  input [13:0] chn_data_out_rsc_vz_S ;
+  output chn_data_out_rsc_vz_R ;
+  output chn_data_out_rsc_vz_X ;
+  output chn_data_out_rsc_vz_C ;
+  output [17:0] chn_data_out_rsc_z;
+  logic [17:0] chn_data_out_rsc_z ;
+  output [17:0] chn_data_out_rsc_z_T ;
+  logic [17:0] chn_data_out_rsc_z_T ;
+  logic [17:0] chn_data_out_rsc_z_R ;
+  logic [17:0] chn_data_out_rsc_z_C ;
+  logic [17:0] chn_data_out_rsc_z_X ;
+  logic [13:0] chn_data_out_rsc_z_S ;
+  input [17:0] chn_data_out_rsc_z_R0 ;
+  input [17:0] chn_data_out_rsc_z_C0 ;
+  input [17:0] chn_data_out_rsc_z_X0 ;
+  output [13:0] chn_data_out_rsc_z_S ;
+  logic chn_data_out_rsci_oswt;
+  logic chn_data_out_rsci_oswt_T ;
+  logic chn_data_out_rsci_oswt_R ;
+  logic chn_data_out_rsci_oswt_C ;
+  logic chn_data_out_rsci_oswt_X ;
+  logic [13:0] chn_data_out_rsci_oswt_S ;
+  logic chn_data_out_rsci_oswt_unreg;
+  logic chn_data_out_rsci_oswt_unreg_T ;
+  logic chn_data_out_rsci_oswt_unreg_R ;
+  logic chn_data_out_rsci_oswt_unreg_C ;
+  logic chn_data_out_rsci_oswt_unreg_X ;
+  logic [13:0] chn_data_out_rsci_oswt_unreg_S ;
+  input nvdla_core_clk;
+  input nvdla_core_clk_T ;
+  input [13:0] nvdla_core_clk_S ;
+  output nvdla_core_clk_R ;
+  output nvdla_core_clk_X ;
+  output nvdla_core_clk_C ;
+  input nvdla_core_rstn;
+  input nvdla_core_rstn_T ;
+  input [13:0] nvdla_core_rstn_S ;
+  output nvdla_core_rstn_R ;
+  output nvdla_core_rstn_X ;
+  output nvdla_core_rstn_C ;
+  logic [31:0] cfg_alu_in_rsc_z_R0 ;
+  logic [31:0] cfg_alu_in_rsc_z_X0 ;
+  logic [31:0] cfg_alu_in_rsc_z_C0 ;
+  logic [15:0] cfg_mul_in_rsc_z_R0 ;
+  logic [15:0] cfg_mul_in_rsc_z_X0 ;
+  logic [15:0] cfg_mul_in_rsc_z_C0 ;
+  logic [1:0] cfg_precision_rsc_z_R0 ;
+  logic [1:0] cfg_precision_rsc_z_X0 ;
+  logic [1:0] cfg_precision_rsc_z_C0 ;
+  logic [5:0] cfg_truncate_rsc_z_R0 ;
+  logic [5:0] cfg_truncate_rsc_z_X0 ;
+  logic [5:0] cfg_truncate_rsc_z_C0 ;
+  logic [0:0] chn_data_in_rsc_vz_R0 ;
+  logic [0:0] chn_data_in_rsc_vz_X0 ;
+  logic [0:0] chn_data_in_rsc_vz_C0 ;
+  logic [49:0] chn_data_in_rsc_z_R0 ;
+  logic [49:0] chn_data_in_rsc_z_X0 ;
+  logic [49:0] chn_data_in_rsc_z_C0 ;
+  logic [0:0] chn_data_in_rsci_oswt_R0 ;
+  logic [0:0] chn_data_in_rsci_oswt_X0 ;
+  logic [0:0] chn_data_in_rsci_oswt_C0 ;
+  logic [0:0] chn_data_out_rsc_vz_R0 ;
+  logic [0:0] chn_data_out_rsc_vz_X0 ;
+  logic [0:0] chn_data_out_rsc_vz_C0 ;
+  logic [0:0] chn_data_out_rsci_oswt_R0 ;
+  logic [0:0] chn_data_out_rsci_oswt_X0 ;
+  logic [0:0] chn_data_out_rsci_oswt_C0 ;
+  logic [0:0] nvdla_core_rstn_R0 ;
+  logic [0:0] nvdla_core_rstn_X0 ;
+  logic [0:0] nvdla_core_rstn_C0 ;
+// module: HLS_cdp_ocvt_core
+  HLS_cdp_ocvt_core HLS_cdp_ocvt_core_inst (
+    .cfg_alu_in_rsc_z_T (  cfg_alu_in_rsc_z_T  ),
+    .cfg_alu_in_rsc_z_R (  cfg_alu_in_rsc_z_R0  ),
+    .cfg_alu_in_rsc_z_X (  cfg_alu_in_rsc_z_X0  ),
+    .cfg_alu_in_rsc_z_C (  cfg_alu_in_rsc_z_C0  ),
+    .cfg_alu_in_rsc_z_S (  cfg_alu_in_rsc_z_S  ),
+    .cfg_mul_in_rsc_z_T (  cfg_mul_in_rsc_z_T  ),
+    .cfg_mul_in_rsc_z_R (  cfg_mul_in_rsc_z_R0  ),
+    .cfg_mul_in_rsc_z_X (  cfg_mul_in_rsc_z_X0  ),
+    .cfg_mul_in_rsc_z_C (  cfg_mul_in_rsc_z_C0  ),
+    .cfg_mul_in_rsc_z_S (  cfg_mul_in_rsc_z_S  ),
+    .cfg_precision_rsc_z_T (  cfg_precision_rsc_z_T  ),
+    .cfg_precision_rsc_z_R (  cfg_precision_rsc_z_R0  ),
+    .cfg_precision_rsc_z_X (  cfg_precision_rsc_z_X0  ),
+    .cfg_precision_rsc_z_C (  cfg_precision_rsc_z_C0  ),
+    .cfg_precision_rsc_z_S (  cfg_precision_rsc_z_S  ),
+    .cfg_truncate_rsc_z_T (  cfg_truncate_rsc_z_T  ),
+    .cfg_truncate_rsc_z_R (  cfg_truncate_rsc_z_R0  ),
+    .cfg_truncate_rsc_z_X (  cfg_truncate_rsc_z_X0  ),
+    .cfg_truncate_rsc_z_C (  cfg_truncate_rsc_z_C0  ),
+    .cfg_truncate_rsc_z_S (  cfg_truncate_rsc_z_S  ),
+    .chn_data_in_rsc_vz_T (  chn_data_in_rsc_vz_T  ),
+    .chn_data_in_rsc_vz_R (  chn_data_in_rsc_vz_R0  ),
+    .chn_data_in_rsc_vz_X (  chn_data_in_rsc_vz_X0  ),
+    .chn_data_in_rsc_vz_C (  chn_data_in_rsc_vz_C0  ),
+    .chn_data_in_rsc_vz_S (  chn_data_in_rsc_vz_S  ),
+    .chn_data_in_rsc_z_T (  chn_data_in_rsc_z_T  ),
+    .chn_data_in_rsc_z_R (  chn_data_in_rsc_z_R0  ),
+    .chn_data_in_rsc_z_X (  chn_data_in_rsc_z_X0  ),
+    .chn_data_in_rsc_z_C (  chn_data_in_rsc_z_C0  ),
+    .chn_data_in_rsc_z_S (  chn_data_in_rsc_z_S  ),
+    .chn_data_in_rsci_oswt_T (  chn_data_in_rsci_oswt_T  ),
+    .chn_data_in_rsci_oswt_R (  chn_data_in_rsci_oswt_R0  ),
+    .chn_data_in_rsci_oswt_X (  chn_data_in_rsci_oswt_X0  ),
+    .chn_data_in_rsci_oswt_C (  chn_data_in_rsci_oswt_C0  ),
+    .chn_data_in_rsci_oswt_S (  chn_data_in_rsci_oswt_S  ),
+    .chn_data_out_rsc_vz_T (  chn_data_out_rsc_vz_T  ),
+    .chn_data_out_rsc_vz_R (  chn_data_out_rsc_vz_R0  ),
+    .chn_data_out_rsc_vz_X (  chn_data_out_rsc_vz_X0  ),
+    .chn_data_out_rsc_vz_C (  chn_data_out_rsc_vz_C0  ),
+    .chn_data_out_rsc_vz_S (  chn_data_out_rsc_vz_S  ),
+    .chn_data_out_rsci_oswt_T (  chn_data_out_rsci_oswt_T  ),
+    .chn_data_out_rsci_oswt_R (  chn_data_out_rsci_oswt_R0  ),
+    .chn_data_out_rsci_oswt_X (  chn_data_out_rsci_oswt_X0  ),
+    .chn_data_out_rsci_oswt_C (  chn_data_out_rsci_oswt_C0  ),
+    .chn_data_out_rsci_oswt_S (  chn_data_out_rsci_oswt_S  ),
+    .nvdla_core_rstn_T (  nvdla_core_rstn_T  ),
+    .nvdla_core_rstn_R (  nvdla_core_rstn_R0  ),
+    .nvdla_core_rstn_X (  nvdla_core_rstn_X0  ),
+    .nvdla_core_rstn_C (  nvdla_core_rstn_C0  ),
+    .nvdla_core_rstn_S (  nvdla_core_rstn_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .chn_data_in_rsc_lz_T (  chn_data_in_rsc_lz_T  ),
+    .chn_data_in_rsc_lz_R0 (  chn_data_in_rsc_lz_R  ),
+    .chn_data_in_rsc_lz_X0 (  chn_data_in_rsc_lz_X  ),
+    .chn_data_in_rsc_lz_C0 (  chn_data_in_rsc_lz_C  ),
+    .chn_data_in_rsc_lz_S ( chn_data_in_rsc_lz_S ),
+    .chn_data_in_rsci_oswt_unreg_T (  chn_data_in_rsci_oswt_unreg_T  ),
+    .chn_data_in_rsci_oswt_unreg_R0 (  chn_data_in_rsci_oswt_unreg_R  ),
+    .chn_data_in_rsci_oswt_unreg_X0 (  chn_data_in_rsci_oswt_unreg_X  ),
+    .chn_data_in_rsci_oswt_unreg_C0 (  chn_data_in_rsci_oswt_unreg_C  ),
+    .chn_data_in_rsci_oswt_unreg_S ( chn_data_in_rsci_oswt_unreg_S ),
+    .chn_data_out_rsc_lz_T (  chn_data_out_rsc_lz_T  ),
+    .chn_data_out_rsc_lz_R0 (  chn_data_out_rsc_lz_R  ),
+    .chn_data_out_rsc_lz_X0 (  chn_data_out_rsc_lz_X  ),
+    .chn_data_out_rsc_lz_C0 (  chn_data_out_rsc_lz_C  ),
+    .chn_data_out_rsc_lz_S ( chn_data_out_rsc_lz_S ),
+    .chn_data_out_rsc_z_T (  chn_data_out_rsc_z_T  ),
+    .chn_data_out_rsc_z_R0 (  chn_data_out_rsc_z_R  ),
+    .chn_data_out_rsc_z_X0 (  chn_data_out_rsc_z_X  ),
+    .chn_data_out_rsc_z_C0 (  chn_data_out_rsc_z_C  ),
+    .chn_data_out_rsc_z_S ( chn_data_out_rsc_z_S ),
+    .chn_data_out_rsci_oswt_unreg_T (  chn_data_out_rsci_oswt_unreg_T  ),
+    .chn_data_out_rsci_oswt_unreg_R0 (  chn_data_out_rsci_oswt_unreg_R  ),
+    .chn_data_out_rsci_oswt_unreg_X0 (  chn_data_out_rsci_oswt_unreg_X  ),
+    .chn_data_out_rsci_oswt_unreg_C0 (  chn_data_out_rsci_oswt_unreg_C  ),
+    .chn_data_out_rsci_oswt_unreg_S ( chn_data_out_rsci_oswt_unreg_S ),
+    .nvdla_core_clk ( nvdla_core_clk ),
+    .chn_data_in_rsc_lz ( chn_data_in_rsc_lz ),
+    .cfg_precision_rsc_z ( cfg_precision_rsc_z ),
+    .cfg_mul_in_rsc_z ( cfg_mul_in_rsc_z ),
+    .chn_data_out_rsci_oswt ( chn_data_out_rsci_oswt ),
+    .chn_data_out_rsc_z ( chn_data_out_rsc_z ),
+    .chn_data_in_rsc_z ( chn_data_in_rsc_z ),
+    .cfg_truncate_rsc_z ( cfg_truncate_rsc_z ),
+    .chn_data_in_rsci_oswt ( chn_data_in_rsci_oswt ),
+    .chn_data_in_rsc_vz ( chn_data_in_rsc_vz ),
+    .nvdla_core_rstn ( nvdla_core_rstn ),
+    .chn_data_out_rsci_oswt_unreg ( chn_data_out_rsci_oswt_unreg ),
+    .cfg_alu_in_rsc_z ( cfg_alu_in_rsc_z ),
+    .chn_data_in_rsci_oswt_unreg ( chn_data_in_rsci_oswt_unreg ),
+    .chn_data_out_rsc_vz ( chn_data_out_rsc_vz ),
+    .chn_data_out_rsc_lz ( chn_data_out_rsc_lz )
+  );
+  logic [0:0] chn_data_in_rsci_oswt_unreg_R0 ;
+  logic [0:0] chn_data_in_rsci_oswt_unreg_X0 ;
+  logic [0:0] chn_data_in_rsci_oswt_unreg_C0 ;
+// module: CDP_OCVT_chn_data_in_rsci_unreg
+  CDP_OCVT_chn_data_in_rsci_unreg chn_data_in_rsci_unreg_inst (
+    .in_0_T (  chn_data_in_rsci_oswt_unreg_T  ),
+    .in_0_R (  chn_data_in_rsci_oswt_unreg_R0  ),
+    .in_0_X (  chn_data_in_rsci_oswt_unreg_X0  ),
+    .in_0_C (  chn_data_in_rsci_oswt_unreg_C0  ),
+    .in_0_S (  chn_data_in_rsci_oswt_unreg_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .outsig_T (  chn_data_in_rsci_oswt_T  ),
+    .outsig_R0 (  chn_data_in_rsci_oswt_R  ),
+    .outsig_X0 (  chn_data_in_rsci_oswt_X  ),
+    .outsig_C0 (  chn_data_in_rsci_oswt_C  ),
+    .outsig_S ( chn_data_in_rsci_oswt_S ),
+    .outsig ( chn_data_in_rsci_oswt ),
+    .in_0 ( chn_data_in_rsci_oswt_unreg )
+  );
+  logic [0:0] chn_data_out_rsci_oswt_unreg_R0 ;
+  logic [0:0] chn_data_out_rsci_oswt_unreg_X0 ;
+  logic [0:0] chn_data_out_rsci_oswt_unreg_C0 ;
+// module: CDP_OCVT_chn_data_out_rsci_unreg
+  CDP_OCVT_chn_data_out_rsci_unreg chn_data_out_rsci_unreg_inst (
+    .in_0_T (  chn_data_out_rsci_oswt_unreg_T  ),
+    .in_0_R (  chn_data_out_rsci_oswt_unreg_R0  ),
+    .in_0_X (  chn_data_out_rsci_oswt_unreg_X0  ),
+    .in_0_C (  chn_data_out_rsci_oswt_unreg_C0  ),
+    .in_0_S (  chn_data_out_rsci_oswt_unreg_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .outsig_T (  chn_data_out_rsci_oswt_T  ),
+    .outsig_R0 (  chn_data_out_rsci_oswt_R  ),
+    .outsig_X0 (  chn_data_out_rsci_oswt_X  ),
+    .outsig_C0 (  chn_data_out_rsci_oswt_C  ),
+    .outsig_S ( chn_data_out_rsci_oswt_S ),
+    .outsig ( chn_data_out_rsci_oswt ),
+    .in_0 ( chn_data_out_rsci_oswt_unreg )
+  );
+  assign chn_data_out_rsci_oswt_unreg_C = ( chn_data_out_rsci_oswt_unreg_C0 );
+  assign chn_data_in_rsci_oswt_unreg_C = ( chn_data_in_rsci_oswt_unreg_C0 );
+  assign nvdla_core_rstn_C = ( nvdla_core_rstn_C0 );
+  assign chn_data_out_rsci_oswt_C = ( chn_data_out_rsci_oswt_C0 );
+  assign chn_data_out_rsc_vz_C = ( chn_data_out_rsc_vz_C0 );
+  assign chn_data_in_rsci_oswt_C = ( chn_data_in_rsci_oswt_C0 );
+  assign chn_data_in_rsc_z_C = ( chn_data_in_rsc_z_C0 );
+  assign chn_data_in_rsc_vz_C = ( chn_data_in_rsc_vz_C0 );
+  assign cfg_truncate_rsc_z_C = ( cfg_truncate_rsc_z_C0 );
+  assign cfg_precision_rsc_z_C = ( cfg_precision_rsc_z_C0 );
+  assign cfg_mul_in_rsc_z_C = ( cfg_mul_in_rsc_z_C0 );
+  assign cfg_alu_in_rsc_z_C = ( cfg_alu_in_rsc_z_C0 );
+  assign chn_data_out_rsc_z_C = ( chn_data_out_rsc_z_C0 );
+  assign chn_data_out_rsc_lz_C = ( chn_data_out_rsc_lz_C0 );
+  assign chn_data_in_rsc_lz_C = ( chn_data_in_rsc_lz_C0 );
+  assign chn_data_out_rsci_oswt_unreg_X = ( chn_data_out_rsci_oswt_unreg_X0 );
+  assign chn_data_in_rsci_oswt_unreg_X = ( chn_data_in_rsci_oswt_unreg_X0 );
+  assign nvdla_core_rstn_X = ( nvdla_core_rstn_X0 );
+  assign chn_data_out_rsci_oswt_X = ( chn_data_out_rsci_oswt_X0 );
+  assign chn_data_out_rsc_vz_X = ( chn_data_out_rsc_vz_X0 );
+  assign chn_data_in_rsci_oswt_X = ( chn_data_in_rsci_oswt_X0 );
+  assign chn_data_in_rsc_z_X = ( chn_data_in_rsc_z_X0 );
+  assign chn_data_in_rsc_vz_X = ( chn_data_in_rsc_vz_X0 );
+  assign cfg_truncate_rsc_z_X = ( cfg_truncate_rsc_z_X0 );
+  assign cfg_precision_rsc_z_X = ( cfg_precision_rsc_z_X0 );
+  assign cfg_mul_in_rsc_z_X = ( cfg_mul_in_rsc_z_X0 );
+  assign cfg_alu_in_rsc_z_X = ( cfg_alu_in_rsc_z_X0 );
+  assign chn_data_out_rsc_z_X = ( chn_data_out_rsc_z_X0 );
+  assign chn_data_out_rsc_lz_X = ( chn_data_out_rsc_lz_X0 );
+  assign chn_data_in_rsc_lz_X = ( chn_data_in_rsc_lz_X0 );
+  assign chn_data_out_rsci_oswt_unreg_R = ( chn_data_out_rsci_oswt_unreg_X0 & chn_data_out_rsci_oswt_unreg_R0 );
+  assign chn_data_in_rsci_oswt_unreg_R = ( chn_data_in_rsci_oswt_unreg_X0 & chn_data_in_rsci_oswt_unreg_R0 );
+  assign nvdla_core_rstn_R = ( nvdla_core_rstn_X0 & nvdla_core_rstn_R0 );
+  assign chn_data_out_rsci_oswt_R = ( chn_data_out_rsci_oswt_X0 & chn_data_out_rsci_oswt_R0 );
+  assign chn_data_out_rsc_vz_R = ( chn_data_out_rsc_vz_X0 & chn_data_out_rsc_vz_R0 );
+  assign chn_data_in_rsci_oswt_R = ( chn_data_in_rsci_oswt_X0 & chn_data_in_rsci_oswt_R0 );
+  assign chn_data_in_rsc_z_R = ( chn_data_in_rsc_z_X0 & chn_data_in_rsc_z_R0 );
+  assign chn_data_in_rsc_vz_R = ( chn_data_in_rsc_vz_X0 & chn_data_in_rsc_vz_R0 );
+  assign cfg_truncate_rsc_z_R = ( cfg_truncate_rsc_z_X0 & cfg_truncate_rsc_z_R0 );
+  assign cfg_precision_rsc_z_R = ( cfg_precision_rsc_z_X0 & cfg_precision_rsc_z_R0 );
+  assign cfg_mul_in_rsc_z_R = ( cfg_mul_in_rsc_z_X0 & cfg_mul_in_rsc_z_R0 );
+  assign cfg_alu_in_rsc_z_R = ( cfg_alu_in_rsc_z_X0 & cfg_alu_in_rsc_z_R0 );
+  assign chn_data_out_rsc_z_R = ( chn_data_out_rsc_z_X0 & chn_data_out_rsc_z_R0 );
+  assign chn_data_out_rsc_lz_R = ( chn_data_out_rsc_lz_X0 & chn_data_out_rsc_lz_R0 );
+  assign chn_data_in_rsc_lz_R = ( chn_data_in_rsc_lz_X0 & chn_data_in_rsc_lz_R0 );
+ // ground taints for floating regs
+ // ground taints for unused wires
+ // ground taints for unused wire slices
+  assign rst_zy = !nvdla_core_rstn ;
+endmodule

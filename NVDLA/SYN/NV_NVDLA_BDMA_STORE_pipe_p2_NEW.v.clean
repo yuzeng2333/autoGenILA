@@ -1,0 +1,77 @@
+module NV_NVDLA_BDMA_STORE_pipe_p2(nvdla_core_clk, nvdla_core_rstn, cv_int_rd_rsp_pd, cv_int_rd_rsp_valid, dma_rd_rsp_rdy, cv_dma_rd_rsp_pd, cv_dma_rd_rsp_vld, cv_int_rd_rsp_ready);
+  wire [513:0] _00_;
+  wire _01_;
+  wire [513:0] _02_;
+  wire _03_;
+  wire _04_;
+  wire _05_;
+  wire _06_;
+  wire _07_;
+  wire _08_;
+  output [513:0] cv_dma_rd_rsp_pd;
+  output cv_dma_rd_rsp_vld;
+  input [513:0] cv_int_rd_rsp_pd;
+  output cv_int_rd_rsp_ready;
+  input cv_int_rd_rsp_valid;
+  input dma_rd_rsp_rdy;
+  input nvdla_core_clk;
+  input nvdla_core_rstn;
+  wire p2_assert_clk;
+  reg [513:0] p2_pipe_data;
+  wire [513:0] p2_pipe_rand_data;
+  wire p2_pipe_rand_ready;
+  wire p2_pipe_rand_valid;
+  reg p2_pipe_ready;
+  wire p2_pipe_ready_bc;
+  wire [513:0] p2_pipe_skid_data;
+  wire p2_pipe_skid_ready;
+  wire p2_pipe_skid_valid;
+  reg p2_pipe_valid;
+  wire p2_skid_catch;
+  reg [513:0] p2_skid_data;
+  wire p2_skid_ready;
+  wire p2_skid_ready_flop;
+  reg p2_skid_valid;
+  assign _04_ = p2_pipe_ready_bc && cv_int_rd_rsp_valid;
+  assign _05_ = p2_pipe_valid && p2_pipe_ready;
+  assign p2_skid_catch = _05_ && _07_;
+  assign _06_ = ! p2_pipe_valid;
+  assign _07_ = ! dma_rd_rsp_rdy;
+  assign _08_ = ! p2_skid_catch;
+  assign p2_pipe_ready_bc = p2_pipe_ready || _06_;
+  always @(posedge nvdla_core_clk)
+      p2_skid_data <= _02_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      p2_pipe_ready <= 1'b1;
+    else
+      p2_pipe_ready <= p2_skid_ready;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      p2_skid_valid <= 1'b0;
+    else
+      p2_skid_valid <= _03_;
+  always @(posedge nvdla_core_clk)
+      p2_pipe_data <= _00_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      p2_pipe_valid <= 1'b0;
+    else
+      p2_pipe_valid <= _01_;
+  assign _01_ = p2_pipe_ready_bc ? cv_int_rd_rsp_valid : 1'b1;
+  assign _00_ = _04_ ? cv_int_rd_rsp_pd : p2_pipe_data;
+  assign p2_skid_ready = p2_skid_valid ? dma_rd_rsp_rdy : _08_;
+  assign _03_ = p2_skid_valid ? _07_ : p2_skid_catch;
+  assign _02_ = p2_skid_catch ? p2_pipe_data : p2_skid_data;
+  assign cv_dma_rd_rsp_vld = p2_pipe_ready ? p2_pipe_valid : p2_skid_valid;
+  assign cv_dma_rd_rsp_pd = p2_pipe_ready ? p2_pipe_data : p2_skid_data;
+  assign cv_int_rd_rsp_ready = p2_pipe_ready_bc;
+  assign p2_assert_clk = nvdla_core_clk;
+  assign p2_pipe_rand_data = cv_int_rd_rsp_pd;
+  assign p2_pipe_rand_ready = p2_pipe_ready_bc;
+  assign p2_pipe_rand_valid = cv_int_rd_rsp_valid;
+  assign p2_pipe_skid_data = cv_dma_rd_rsp_pd;
+  assign p2_pipe_skid_ready = dma_rd_rsp_rdy;
+  assign p2_pipe_skid_valid = cv_dma_rd_rsp_vld;
+  assign p2_skid_ready_flop = p2_pipe_ready;
+endmodule

@@ -2,6 +2,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/taint_gen.dir/src/helper.cpp.o"
   "CMakeFiles/taint_gen.dir/src/op_taint_gen.cpp.o"
   "CMakeFiles/taint_gen.dir/src/pass_info.cpp.o"
+  "CMakeFiles/taint_gen.dir/src/syntax_patterns.cpp.o"
   "CMakeFiles/taint_gen.dir/src/taint_gen.cpp.o"
   "CMakeFiles/taint_gen.dir/src/varWidth.cpp.o"
   "CMakeFiles/taint_gen.dir/src/vcd_parser.cpp.o"

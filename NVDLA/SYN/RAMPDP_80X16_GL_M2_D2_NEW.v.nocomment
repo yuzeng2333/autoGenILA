@@ -1,0 +1,116 @@
+module RAMPDP_80X16_GL_M2_D2(WE, CLK, IDDQ, SVOP_0, SVOP_1, SVOP_2, SVOP_3, SVOP_4, SVOP_5, SVOP_6, SVOP_7, WD_15, WD_14, WD_13, WD_12, WD_11, WD_10, WD_9, WD_8, WD_7, WD_6, WD_5, WD_4, WD_3, WD_2, WD_1, WD_0, RD_15, RD_14, RD_13, RD_12, RD_11, RD_10, RD_9, RD_8, RD_7, RD_6, RD_5, RD_4, RD_3, RD_2, RD_1, RD_0, RE, RADR_6, RADR_5, RADR_4, RADR_3, RADR_2, RADR_1, RADR_0, WADR_6, WADR_5, WADR_4, WADR_3, WADR_2, WADR_1, WADR_0, SLEEP_EN_7, SLEEP_EN_6, SLEEP_EN_5, SLEEP_EN_4, SLEEP_EN_3, SLEEP_EN_2, SLEEP_EN_1, SLEEP_EN_0, RET_EN);
+  wire [15:0] _0_;
+  input CLK;
+  wire GND;
+  input IDDQ;
+  wire [6:0] RA;
+  input RADR_0;
+  input RADR_1;
+  input RADR_2;
+  input RADR_3;
+  input RADR_4;
+  input RADR_5;
+  input RADR_6;
+  wire [15:0] RD;
+  output RD_0;
+  output RD_1;
+  output RD_10;
+  output RD_11;
+  output RD_12;
+  output RD_13;
+  output RD_14;
+  output RD_15;
+  output RD_2;
+  output RD_3;
+  output RD_4;
+  output RD_5;
+  output RD_6;
+  output RD_7;
+  output RD_8;
+  output RD_9;
+  input RE;
+  input RET_EN;
+  wire [7:0] SLEEP_EN;
+  input SLEEP_EN_0;
+  input SLEEP_EN_1;
+  input SLEEP_EN_2;
+  input SLEEP_EN_3;
+  input SLEEP_EN_4;
+  input SLEEP_EN_5;
+  input SLEEP_EN_6;
+  input SLEEP_EN_7;
+  wire [7:0] SVOP;
+  input SVOP_0;
+  input SVOP_1;
+  input SVOP_2;
+  input SVOP_3;
+  input SVOP_4;
+  input SVOP_5;
+  input SVOP_6;
+  input SVOP_7;
+  wire VDD;
+  wire [6:0] WA;
+  input WADR_0;
+  input WADR_1;
+  input WADR_2;
+  input WADR_3;
+  input WADR_4;
+  input WADR_5;
+  input WADR_6;
+  wire [15:0] WD;
+  input WD_0;
+  input WD_1;
+  input WD_10;
+  input WD_11;
+  input WD_12;
+  input WD_13;
+  input WD_14;
+  input WD_15;
+  input WD_2;
+  input WD_3;
+  input WD_4;
+  input WD_5;
+  input WD_6;
+  input WD_7;
+  input WD_8;
+  input WD_9;
+  input WE;
+  wire clamp_rd;
+  wire clobber_array;
+  wire clobber_flops;
+  wire clobber_x;
+  wire [15:0] fangyuan0;
+  assign fangyuan0 = { RD_15, RD_14, RD_13, RD_12, RD_11, RD_10, RD_9, RD_8, RD_7, RD_6, RD_5, RD_4, RD_3, RD_2, RD_1, RD_0 };
+
+  assign fangyuan0 = RD & _0_;
+  wire [15:0] fangyuan1;
+  assign fangyuan1 = { SLEEP_EN_7, SLEEP_EN_7, SLEEP_EN_7, SLEEP_EN_7, SLEEP_EN_7, SLEEP_EN_7, SLEEP_EN_7, SLEEP_EN_7, SLEEP_EN_7, SLEEP_EN_7, SLEEP_EN_7, SLEEP_EN_7, SLEEP_EN_7, SLEEP_EN_7, SLEEP_EN_7, SLEEP_EN_7 };
+
+  assign _0_ = ~ fangyuan1;
+  RAM_BANK_RAMPDP_80X16_GL_M2_D2 ITOP (
+    .CLK(CLK),
+    .IDDQ(IDDQ),
+    .RA({ 1'b0, RADR_6, RADR_5, RADR_4, RADR_3, RADR_2, RADR_1, RADR_0 }),
+    .RD(RD),
+    .RE(RE),
+    .RET_EN(RET_EN),
+    .SLEEP_EN({ SLEEP_EN_7, SLEEP_EN_6, SLEEP_EN_5, SLEEP_EN_4, SLEEP_EN_3, SLEEP_EN_2, SLEEP_EN_1, SLEEP_EN_0 }),
+    .SVOP({ SVOP_7, SVOP_6, SVOP_5, SVOP_4, SVOP_3, SVOP_2, SVOP_1, SVOP_0 }),
+    .WA({ 1'b0, WADR_6, WADR_5, WADR_4, WADR_3, WADR_2, WADR_1, WADR_0 }),
+    .WD({ WD_15, WD_14, WD_13, WD_12, WD_11, WD_10, WD_9, WD_8, WD_7, WD_6, WD_5, WD_4, WD_3, WD_2, WD_1, WD_0 }),
+    .WE(WE),
+    .clobber_array(1'b0),
+    .clobber_flops(1'b0)
+  );
+  assign GND = 1'b0;
+  assign RA = { RADR_6, RADR_5, RADR_4, RADR_3, RADR_2, RADR_1, RADR_0 };
+  assign SLEEP_EN = { SLEEP_EN_7, SLEEP_EN_6, SLEEP_EN_5, SLEEP_EN_4, SLEEP_EN_3, SLEEP_EN_2, SLEEP_EN_1, SLEEP_EN_0 };
+  assign SVOP = { SVOP_7, SVOP_6, SVOP_5, SVOP_4, SVOP_3, SVOP_2, SVOP_1, SVOP_0 };
+  assign VDD = 1'b1;
+  assign WA = { WADR_6, WADR_5, WADR_4, WADR_3, WADR_2, WADR_1, WADR_0 };
+  assign WD = { WD_15, WD_14, WD_13, WD_12, WD_11, WD_10, WD_9, WD_8, WD_7, WD_6, WD_5, WD_4, WD_3, WD_2, WD_1, WD_0 };
+  assign clamp_rd = SLEEP_EN_7;
+  assign clobber_array = 1'b0;
+  assign clobber_flops = 1'b0;
+  assign clobber_x = 1'b0;
+endmodule

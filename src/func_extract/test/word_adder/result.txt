@@ -1,20 +1,23 @@
 Begin main!
-Start time: Thu Aug 27 21:31:31 2020
+Start time: Tue Dec 29 11:32:05 2020
 
 +++++++ Solution found for word, bound: 0 +++++++++
 _01____#1 = #b000000000
 _01____#1_T = #b000000000
 _06____#1 = #b1
 _06____#1_T = #b0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ func___#0 = #b10
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ func___#1 = #b01
 func___#1_T = #b00
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ inWord___#0 = #b000000000
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ inWord___#1 = #b000000000
 inWord___#1_T = #b000000000
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rst___#0 = #b0
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rst___#1 = #b0
 rst___#1_T = #b0
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ word___#0 = #b000000000
 word___#0_T = #b000000000
-word___#1_T = #b111111111
+word___#1_T = #b000000000
 word_next___#1 = #b000000000
 word_next___#1_T = #b000000000
 input value for rst___#1: bv
@@ -24,59 +27,6 @@ input value for func___#1: bv
   (= |word___#100| |inWord___#1|))
 )
 ------- No more solution found within the bound: 0 ----------
-+++++++ Solution found for word, bound: 1 +++++++++
-_01____#1 = #b000000000
-_01____#1_T = #b000000000
-_01____#2 = #b000000000
-_01____#2_T = #b000000000
-_06____#1 = #b0
-_06____#1_T = #b0
-_06____#2 = #b1
-_06____#2_T = #b0
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ func___#1 = #b00
-func___#1_T = #b00
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ func___#2 = #b01
-func___#2_T = #b00
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ inWord___#1 = #b000000000
-inWord___#1_T = #b000000000
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ inWord___#2 = #b000000000
-inWord___#2_T = #b000000000
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rst___#1 = #b0
-rst___#1_T = #b0
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rst___#2 = #b0
-rst___#2_T = #b0
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ word___#0 = #b000000000
-word___#0_T = #b000000000
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ word___#1 = #b000000000
-word___#1_T = #b000000000
-word___#2_T = #b111111111
-word_next___#1 = #b000000000
-word_next___#1_T = #b000000000
-word_next___#2 = #b000000000
-word_next___#2_T = #b000000000
-input value for rst___#1: bv
-input value for func___#1: bv
-input value for rst___#2: bv
-input value for func___#2: bv
-(goals
-(goal
-  (= |word___#100| |inWord___#2|))
-)
 ------- No more solution found within the bound: 1 ----------
-Give 1'd0 to rst___#1
-Give 2'd0 to func___#1
-Give 1'd0 to rst___#2
-Give 2'd0 to func___#2
-Give 1'd0 to rst___#3
-Give 2'd0 to func___#3
-Give 1'd0 to rst___#4
-Give 2'd2 to func___#4
-Give 9'd0 to inWord___#3
-Give 9'd0 to inWord___#2
-(goals
-(goal
-  (= |word_sum___#100|
-     (bvadd (concat #x00 ((_ extract 2 2) |word___#4|))
-            (concat #x00 ((_ extract 1 1) |word___#4|))
-            (concat #x00 ((_ extract 0 0) |word___#4|)))))
-)
+------- No more solution found within the bound: 3 ----------
+------- No more solution found within the bound: 4 ----------

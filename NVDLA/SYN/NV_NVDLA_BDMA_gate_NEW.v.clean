@@ -1,0 +1,27 @@
+module NV_NVDLA_BDMA_gate(csb2gate_slcg_en, dla_clk_ovr_on_sync, global_clk_ovr_on_sync, ld2gate_slcg_en, nvdla_core_clk, nvdla_core_rstn, st2gate_slcg_en, tmc2slcg_disable_clock_gating, nvdla_gated_clk);
+  wire _0_;
+  wire _1_;
+  wire _2_;
+  input csb2gate_slcg_en;
+  input dla_clk_ovr_on_sync;
+  input global_clk_ovr_on_sync;
+  input ld2gate_slcg_en;
+  input nvdla_core_clk;
+  wire nvdla_core_clk_slcg_0_en;
+  input nvdla_core_rstn;
+  output nvdla_gated_clk;
+  wire slcg_en;
+  input st2gate_slcg_en;
+  input tmc2slcg_disable_clock_gating;
+  assign _0_ = slcg_en | dla_clk_ovr_on_sync;
+  assign _1_ = tmc2slcg_disable_clock_gating | global_clk_ovr_on_sync;
+  assign nvdla_core_clk_slcg_0_en = _0_ | _1_;
+  assign _2_ = csb2gate_slcg_en | ld2gate_slcg_en;
+  assign slcg_en = _2_ | st2gate_slcg_en;
+  NV_CLK_gate_power nvdla_core_clk_slcg_0 (
+    .clk(nvdla_core_clk),
+    .clk_en(nvdla_core_clk_slcg_0_en),
+    .clk_gated(nvdla_gated_clk),
+    .reset_(nvdla_core_rstn)
+  );
+endmodule

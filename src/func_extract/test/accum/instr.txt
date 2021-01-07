@@ -3,7 +3,7 @@ rst = 1'd0
 start = 1'd1
 data = x
 W:
-timer(skip) 16
+sum(skip) 16
 $NOP:
 rst = 1'd0
 start = 1'd0

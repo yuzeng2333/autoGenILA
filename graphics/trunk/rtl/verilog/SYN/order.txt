@@ -1,0 +1,1 @@
+\$paramod\basic_fifo\fifo_width=42\fifo_bit_depth=10_NEW.v.clean

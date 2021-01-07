@@ -1,0 +1,11 @@
+module \$paramod\CSC_mgc_out_stdreg_wait_v1\rscid=4\width=256 (ld, vd, d, lz, vz, z);
+  input [255:0] d;
+  input ld;
+  output lz;
+  output vd;
+  input vz;
+  output [255:0] z;
+  assign lz = ld;
+  assign vd = vz;
+  assign z = d;
+endmodule

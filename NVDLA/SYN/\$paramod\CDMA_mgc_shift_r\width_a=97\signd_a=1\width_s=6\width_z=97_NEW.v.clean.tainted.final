@@ -1,0 +1,34 @@
+module \$paramod\CDMA_mgc_shift_r\width_a=97\signd_a=1\width_s=6\width_z=97 ( a , s , INSTR_IN_ZY , rst_zy , a_T , a_S , s_T , s_S , z_R0 , z , a_R , s_R , z_T , z_S );
+  input rst_zy;
+  integer i;
+  input INSTR_IN_ZY;
+  input [96:0] a;
+  input [96:0] a_T ;
+  output [96:0] a_R ;
+  input [13:0] a_S ;
+  input [5:0] s;
+  input [5:0] s_T ;
+  output [5:0] s_R ;
+  input [13:0] s_S ;
+  output [96:0] z;
+  logic [96:0] z ;
+  output [96:0] z_T ;
+  logic [96:0] z_T ;
+  logic [96:0] z_R ;
+  logic [13:0] z_S ;
+  input [96:0] z_R0 ;
+  output [13:0] z_S ;
+ assign z = a >>> s;
+ assign z_S = 0 ;
+ logic [96:0] a_R0 ;
+ logic [5:0] s_R0 ;
+ assign z_T = { 97{ (| a_T ) | (|s_T ) }} ;
+ assign a_R0 = { 97{ | z_R }} ;
+ assign s_R0 = { 6{ | z_R }} ;
+  assign s_R = ( s_R0 );
+  assign a_R = ( a_R0 );
+  assign z_R = ( z_R0 );
+ // ground taints for floating regs
+ // ground taints for unused wires
+ // ground taints for unused wire slices
+endmodule

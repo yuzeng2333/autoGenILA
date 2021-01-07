@@ -1,0 +1,314 @@
+module HLS_uint16_to_fp17_core(nvdla_core_clk, nvdla_core_rstn, chn_a_rsc_z, chn_a_rsc_vz, chn_a_rsc_lz, chn_o_rsc_z, chn_o_rsc_vz, chn_o_rsc_lz, chn_a_rsci_oswt, chn_a_rsci_oswt_unreg, chn_o_rsci_oswt, chn_o_rsci_oswt_unreg);
+  wire [4:0] _000_;
+  wire _001_;
+  wire _002_;
+  wire _003_;
+  wire [4:0] _004_;
+  wire [9:0] _005_;
+  wire _006_;
+  wire _007_;
+  wire [4:0] _008_;
+  wire _009_;
+  wire _010_;
+  wire _011_;
+  wire _012_;
+  wire _013_;
+  wire _014_;
+  wire _015_;
+  wire _016_;
+  wire _017_;
+  wire _018_;
+  wire [9:0] _019_;
+  wire [9:0] _020_;
+  wire [9:0] _021_;
+  wire _022_;
+  wire _023_;
+  wire _024_;
+  wire [5:0] _025_;
+  wire _026_;
+  wire _027_;
+  wire _028_;
+  wire _029_;
+  wire _030_;
+  wire _031_;
+  wire _032_;
+  wire _033_;
+  wire _034_;
+  wire _035_;
+  wire _036_;
+  wire _037_;
+  wire _038_;
+  wire _039_;
+  wire [4:0] _040_;
+  wire _041_;
+  wire _042_;
+  wire _043_;
+  wire _044_;
+  wire _045_;
+  wire _046_;
+  wire _047_;
+  wire _048_;
+  wire _049_;
+  wire _050_;
+  wire _051_;
+  wire _052_;
+  wire _053_;
+  wire [4:0] FpFractionToFloat_16U_6U_10U_if_else_else_else_acc_nl;
+  wire FpFractionToFloat_16U_6U_10U_if_else_else_if_acc_itm_4_1;
+  wire [4:0] FpFractionToFloat_16U_6U_10U_if_else_else_if_acc_nl;
+  wire FpFractionToFloat_16U_6U_10U_if_else_if_acc_itm_5_1;
+  wire [5:0] FpFractionToFloat_16U_6U_10U_if_else_if_acc_nl;
+  wire FpFractionToFloat_16U_6U_10U_if_else_mux_1_nl;
+  wire [4:0] FpFractionToFloat_16U_6U_10U_nor_1_nl;
+  wire FpFractionToFloat_16U_6U_10U_unequal_tmp;
+  wire [10:0] FpMantRNE_17U_11U_else_ac_int_cctor_sva;
+  reg FpMantRNE_17U_11U_else_and_svs;
+  wire FpMantRNE_17U_11U_else_and_svs_mx0w0;
+  wire FpMantRNE_17U_11U_else_and_svs_mx1;
+  wire FpMantRNE_17U_11U_else_carry_sva;
+  wire [16:0] FpMantRNE_17U_11U_i_data_sva;
+  wire and_4_mdf;
+  wire and_52_nl;
+  wire and_53_nl;
+  wire and_dcpl_2;
+  wire and_dcpl_22;
+  wire and_dcpl_7;
+  wire [4:0] and_nl;
+  output chn_a_rsc_lz;
+  input chn_a_rsc_vz;
+  input [15:0] chn_a_rsc_z;
+  wire chn_a_rsci_bawt;
+  wire [15:0] chn_a_rsci_d_mxwt;
+  reg chn_a_rsci_iswt0;
+  reg chn_a_rsci_ld_core_psct;
+  wire chn_a_rsci_ld_core_psct_mx0c0;
+  input chn_a_rsci_oswt;
+  output chn_a_rsci_oswt_unreg;
+  wire chn_a_rsci_wen_comp;
+  output chn_o_rsc_lz;
+  input chn_o_rsc_vz;
+  output [16:0] chn_o_rsc_z;
+  wire chn_o_rsci_bawt;
+  reg [4:0] chn_o_rsci_d_14_10;
+  reg [9:0] chn_o_rsci_d_9_0;
+  input chn_o_rsci_oswt;
+  output chn_o_rsci_oswt_unreg;
+  wire chn_o_rsci_wen_comp;
+  wire core_wen;
+  wire core_wten;
+  wire [1:0] fsm_output;
+  wire [4:0] libraries_leading_sign_16_0_584ce9c19228fa5400845cefe3e6770649bb_1;
+  wire [4:0] mux_3_nl;
+  wire [9:0] mux_4_nl;
+  wire mux_tmp;
+  wire nand_8_nl;
+  wire [5:0] nl_FpFractionToFloat_16U_6U_10U_if_else_else_else_acc_nl;
+  wire [5:0] nl_FpFractionToFloat_16U_6U_10U_if_else_else_if_acc_nl;
+  wire [6:0] nl_FpFractionToFloat_16U_6U_10U_if_else_if_acc_nl;
+  wire [5:0] nl_FpFractionToFloat_16U_6U_10U_if_shifted_frac_p1_lshift_rg_s;
+  wire [11:0] nl_FpMantRNE_17U_11U_else_ac_int_cctor_sva;
+  wire [14:0] nl_HLS_uint16_to_fp17_core_chn_o_rsci_inst_chn_o_rsci_d;
+  wire nor_9_nl;
+  wire not_41_nl;
+  input nvdla_core_clk;
+  input nvdla_core_rstn;
+  wire or_cse;
+  wire or_dcpl_1;
+  wire or_tmp_7;
+  reg reg_chn_o_rsci_iswt0_cse;
+  reg reg_chn_o_rsci_ld_core_psct_cse;
+  assign nl_FpFractionToFloat_16U_6U_10U_if_shifted_frac_p1_lshift_rg_s = libraries_leading_sign_16_0_584ce9c19228fa5400845cefe3e6770649bb_1 + 1'b1;
+  wire [5:0] fangyuan0;
+  assign fangyuan0 = { 1'b1, libraries_leading_sign_16_0_584ce9c19228fa5400845cefe3e6770649bb_1 };
+
+  assign FpFractionToFloat_16U_6U_10U_if_else_if_acc_nl = fangyuan0 + 1'b1;
+  wire [4:0] fangyuan1;
+  assign fangyuan1 = { 1'b1, libraries_leading_sign_16_0_584ce9c19228fa5400845cefe3e6770649bb_1[4:1] };
+
+  assign FpFractionToFloat_16U_6U_10U_if_else_else_if_acc_nl = fangyuan1 + 1'b1;
+  assign FpMantRNE_17U_11U_else_ac_int_cctor_sva = FpMantRNE_17U_11U_i_data_sva[16:6] + FpMantRNE_17U_11U_else_carry_sva;
+  assign FpFractionToFloat_16U_6U_10U_if_else_else_else_acc_nl = _025_[4:0] + 5'b11111;
+  assign _009_ = FpFractionToFloat_16U_6U_10U_if_else_if_acc_nl[5] & FpMantRNE_17U_11U_else_and_svs_mx1;
+  assign _010_ = FpMantRNE_17U_11U_else_and_svs_mx1 & _028_;
+  assign not_41_nl = _029_ & FpFractionToFloat_16U_6U_10U_unequal_tmp;
+  assign FpMantRNE_17U_11U_else_and_svs_mx0w0 = FpMantRNE_17U_11U_else_carry_sva & _026_;
+  assign FpMantRNE_17U_11U_else_carry_sva = FpMantRNE_17U_11U_i_data_sva[5] & _048_;
+  assign _011_ = FpFractionToFloat_16U_6U_10U_if_else_mux_1_nl & FpFractionToFloat_16U_6U_10U_unequal_tmp;
+  assign and_4_mdf = chn_a_rsci_bawt & or_cse;
+  assign and_dcpl_2 = chn_o_rsci_bawt & reg_chn_o_rsci_ld_core_psct_cse;
+  assign _012_ = _031_ & reg_chn_o_rsci_ld_core_psct_cse;
+  assign _013_ = _032_ & chn_a_rsci_bawt;
+  assign and_dcpl_7 = and_dcpl_2 & _033_;
+  assign or_tmp_7 = and_4_mdf & fsm_output[1];
+  assign _014_ = _034_ & fsm_output[1];
+  assign _015_ = core_wen & chn_a_rsci_ld_core_psct_mx0c0;
+  assign _016_ = and_dcpl_2 & chn_a_rsci_bawt;
+  assign _017_ = _036_ & fsm_output[0];
+  assign _018_ = core_wen & _037_;
+  wire [9:0] fangyuan2;
+  assign fangyuan2 = { _038_, _038_, _038_, _038_, _038_, _038_, _038_, _038_, _038_, _038_ };
+
+  assign _019_ = mux_4_nl & fangyuan2;
+  wire [9:0] fangyuan3;
+  assign fangyuan3 = { FpFractionToFloat_16U_6U_10U_unequal_tmp, FpFractionToFloat_16U_6U_10U_unequal_tmp, FpFractionToFloat_16U_6U_10U_unequal_tmp, FpFractionToFloat_16U_6U_10U_unequal_tmp, FpFractionToFloat_16U_6U_10U_unequal_tmp, FpFractionToFloat_16U_6U_10U_unequal_tmp, FpFractionToFloat_16U_6U_10U_unequal_tmp, FpFractionToFloat_16U_6U_10U_unequal_tmp, FpFractionToFloat_16U_6U_10U_unequal_tmp, FpFractionToFloat_16U_6U_10U_unequal_tmp };
+
+  assign _020_ = _019_ & fangyuan3;
+  wire [9:0] fangyuan4;
+  assign fangyuan4 = { _011_, _011_, _011_, _011_, _011_, _011_, _011_, _011_, _011_, _011_ };
+
+  assign _021_ = _020_ & fangyuan4;
+  assign _022_ = core_wen & _039_;
+  assign _023_ = core_wen & _051_;
+  assign _024_ = core_wen & _042_;
+  assign and_53_nl = FpMantRNE_17U_11U_else_and_svs_mx1 & _038_;
+  assign and_52_nl = FpMantRNE_17U_11U_else_and_svs_mx1 & not_41_nl;
+  assign _026_ = FpMantRNE_17U_11U_i_data_sva[16:6] == 11'b11111111111;
+  assign and_dcpl_22 = ! chn_a_rsci_d_mxwt;
+  assign FpFractionToFloat_16U_6U_10U_unequal_tmp = | chn_a_rsci_d_mxwt;
+  assign _027_ = ~ FpMantRNE_17U_11U_else_and_svs_mx1;
+  assign nor_9_nl = ~ _043_;
+  assign nand_8_nl = ~ _009_;
+  assign _028_ = ~ FpFractionToFloat_16U_6U_10U_if_else_if_acc_nl[5];
+  assign _029_ = ~ _010_;
+  assign _030_ = ~ reg_chn_o_rsci_ld_core_psct_cse;
+  assign _031_ = ~ chn_o_rsci_bawt;
+  assign _032_ = ~ _012_;
+  assign or_dcpl_1 = ~ _013_;
+  assign _033_ = ~ chn_a_rsci_bawt;
+  assign _034_ = ~ and_4_mdf;
+  assign _035_ = ~ _014_;
+  assign _036_ = ~ _016_;
+  assign _037_ = ~ _049_;
+  assign _038_ = ~ mux_tmp;
+  assign _039_ = ~ _050_;
+  assign _040_ = ~ _008_;
+  assign _041_ = ~ and_dcpl_7;
+  assign _042_ = ~ _053_;
+  assign _025_[4:0] = ~ libraries_leading_sign_16_0_584ce9c19228fa5400845cefe3e6770649bb_1;
+  assign FpFractionToFloat_16U_6U_10U_nor_1_nl = ~ _000_;
+  assign _043_ = FpFractionToFloat_16U_6U_10U_if_else_if_acc_nl[5] | _027_;
+  assign _044_ = FpMantRNE_17U_11U_i_data_sva[0] | FpMantRNE_17U_11U_i_data_sva[1];
+  assign _045_ = _044_ | FpMantRNE_17U_11U_i_data_sva[2];
+  assign _046_ = _045_ | FpMantRNE_17U_11U_i_data_sva[3];
+  assign _047_ = _046_ | FpMantRNE_17U_11U_i_data_sva[4];
+  assign _048_ = _047_ | FpMantRNE_17U_11U_i_data_sva[6];
+  assign or_cse = chn_o_rsci_bawt | _030_;
+  assign chn_a_rsci_ld_core_psct_mx0c0 = and_4_mdf | fsm_output[0];
+  assign _049_ = or_dcpl_1 | _017_;
+  assign _050_ = or_dcpl_1 | fsm_output[0];
+  assign _051_ = or_tmp_7 | and_dcpl_7;
+  assign _052_ = and_dcpl_22 | or_dcpl_1;
+  assign _053_ = _052_ | fsm_output[0];
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      FpMantRNE_17U_11U_else_and_svs <= 1'b0;
+    else
+      FpMantRNE_17U_11U_else_and_svs <= _001_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      reg_chn_o_rsci_ld_core_psct_cse <= 1'b0;
+    else
+      reg_chn_o_rsci_ld_core_psct_cse <= _007_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      chn_o_rsci_d_14_10 <= 5'b00000;
+    else
+      chn_o_rsci_d_14_10 <= _004_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      chn_o_rsci_d_9_0 <= 10'b0000000000;
+    else
+      chn_o_rsci_d_9_0 <= _005_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      chn_a_rsci_ld_core_psct <= 1'b0;
+    else
+      chn_a_rsci_ld_core_psct <= _003_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      chn_a_rsci_iswt0 <= 1'b0;
+    else
+      chn_a_rsci_iswt0 <= _002_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      reg_chn_o_rsci_iswt0_cse <= 1'b0;
+    else
+      reg_chn_o_rsci_iswt0_cse <= _006_;
+  assign and_nl = not_41_nl ? mux_3_nl : 5'b00000;
+  assign mux_3_nl = and_52_nl ? libraries_leading_sign_16_0_584ce9c19228fa5400845cefe3e6770649bb_1 : FpFractionToFloat_16U_6U_10U_nor_1_nl;
+  assign _000_ = FpFractionToFloat_16U_6U_10U_if_else_else_if_acc_nl[4] ? FpFractionToFloat_16U_6U_10U_if_else_else_else_acc_nl : 5'b11111;
+  assign mux_4_nl = and_53_nl ? FpMantRNE_17U_11U_else_ac_int_cctor_sva[10:1] : FpMantRNE_17U_11U_else_ac_int_cctor_sva[9:0];
+  assign FpFractionToFloat_16U_6U_10U_if_else_mux_1_nl = FpMantRNE_17U_11U_else_and_svs_mx1 ? FpFractionToFloat_16U_6U_10U_if_else_if_acc_nl[5] : FpFractionToFloat_16U_6U_10U_if_else_else_if_acc_nl[4];
+  assign FpMantRNE_17U_11U_else_and_svs_mx1 = and_dcpl_22 ? FpMantRNE_17U_11U_else_and_svs : FpMantRNE_17U_11U_else_and_svs_mx0w0;
+  assign mux_tmp = FpFractionToFloat_16U_6U_10U_if_else_else_if_acc_nl[4] ? nor_9_nl : nand_8_nl;
+  assign _001_ = _024_ ? FpMantRNE_17U_11U_else_and_svs_mx0w0 : FpMantRNE_17U_11U_else_and_svs;
+  assign _007_ = _023_ ? _041_ : reg_chn_o_rsci_ld_core_psct_cse;
+  assign _008_ = _011_ ? and_nl : 5'b11111;
+  assign _004_ = _022_ ? _040_ : chn_o_rsci_d_14_10;
+  assign _005_ = _018_ ? _021_ : chn_o_rsci_d_9_0;
+  assign _003_ = _015_ ? chn_a_rsci_ld_core_psct_mx0c0 : chn_a_rsci_ld_core_psct;
+  assign _006_ = core_wen ? or_tmp_7 : reg_chn_o_rsci_iswt0_cse;
+  assign _002_ = core_wen ? _035_ : chn_a_rsci_iswt0;
+  \$paramod\UINT16_TO_FP17_mgc_shift_l_v4\width_a=16\signd_a=0\width_s=6\width_z=17 FpFractionToFloat_16U_6U_10U_if_shifted_frac_p1_lshift_rg (
+    .a(chn_a_rsci_d_mxwt),
+    .s(nl_FpFractionToFloat_16U_6U_10U_if_shifted_frac_p1_lshift_rg_s),
+    .z(FpMantRNE_17U_11U_i_data_sva)
+  );
+  HLS_uint16_to_fp17_core_chn_a_rsci HLS_uint16_to_fp17_core_chn_a_rsci_inst (
+    .chn_a_rsc_lz(chn_a_rsc_lz),
+    .chn_a_rsc_vz(chn_a_rsc_vz),
+    .chn_a_rsc_z(chn_a_rsc_z),
+    .chn_a_rsci_bawt(chn_a_rsci_bawt),
+    .chn_a_rsci_d_mxwt(chn_a_rsci_d_mxwt),
+    .chn_a_rsci_iswt0(chn_a_rsci_iswt0),
+    .chn_a_rsci_ld_core_psct(chn_a_rsci_ld_core_psct),
+    .chn_a_rsci_oswt(chn_a_rsci_oswt),
+    .chn_a_rsci_wen_comp(chn_a_rsci_wen_comp),
+    .core_wen(core_wen),
+    .core_wten(core_wten),
+    .nvdla_core_clk(nvdla_core_clk),
+    .nvdla_core_rstn(nvdla_core_rstn)
+  );
+  HLS_uint16_to_fp17_core_chn_o_rsci HLS_uint16_to_fp17_core_chn_o_rsci_inst (
+    .chn_o_rsc_lz(chn_o_rsc_lz),
+    .chn_o_rsc_vz(chn_o_rsc_vz),
+    .chn_o_rsc_z(chn_o_rsc_z),
+    .chn_o_rsci_bawt(chn_o_rsci_bawt),
+    .chn_o_rsci_d({ 2'b00, chn_o_rsci_d_14_10, chn_o_rsci_d_9_0 }),
+    .chn_o_rsci_iswt0(reg_chn_o_rsci_iswt0_cse),
+    .chn_o_rsci_ld_core_psct(reg_chn_o_rsci_ld_core_psct_cse),
+    .chn_o_rsci_oswt(chn_o_rsci_oswt),
+    .chn_o_rsci_wen_comp(chn_o_rsci_wen_comp),
+    .core_wen(core_wen),
+    .core_wten(core_wten),
+    .nvdla_core_clk(nvdla_core_clk),
+    .nvdla_core_rstn(nvdla_core_rstn)
+  );
+  HLS_uint16_to_fp17_core_core_fsm HLS_uint16_to_fp17_core_core_fsm_inst (
+    .core_wen(core_wen),
+    .fsm_output(fsm_output),
+    .nvdla_core_clk(nvdla_core_clk),
+    .nvdla_core_rstn(nvdla_core_rstn)
+  );
+  HLS_uint16_to_fp17_core_staller HLS_uint16_to_fp17_core_staller_inst (
+    .chn_a_rsci_wen_comp(chn_a_rsci_wen_comp),
+    .chn_o_rsci_wen_comp(chn_o_rsci_wen_comp),
+    .core_wen(core_wen),
+    .core_wten(core_wten),
+    .nvdla_core_clk(nvdla_core_clk),
+    .nvdla_core_rstn(nvdla_core_rstn)
+  );
+  UINT16_TO_FP17_leading_sign_16_0 leading_sign_16_0_rg (
+    .mantissa(chn_a_rsci_d_mxwt),
+    .rtn(libraries_leading_sign_16_0_584ce9c19228fa5400845cefe3e6770649bb_1)
+  );
+  assign FpFractionToFloat_16U_6U_10U_if_else_else_if_acc_itm_4_1 = FpFractionToFloat_16U_6U_10U_if_else_else_if_acc_nl[4];
+  assign FpFractionToFloat_16U_6U_10U_if_else_if_acc_itm_5_1 = FpFractionToFloat_16U_6U_10U_if_else_if_acc_nl[5];
+  assign chn_a_rsci_oswt_unreg = or_tmp_7;
+  assign chn_o_rsci_oswt_unreg = and_dcpl_2;
+  assign nl_FpFractionToFloat_16U_6U_10U_if_else_else_else_acc_nl[4:0] = FpFractionToFloat_16U_6U_10U_if_else_else_else_acc_nl;
+  assign nl_FpFractionToFloat_16U_6U_10U_if_else_else_if_acc_nl[4:0] = FpFractionToFloat_16U_6U_10U_if_else_else_if_acc_nl;
+  assign nl_FpFractionToFloat_16U_6U_10U_if_else_if_acc_nl[5:0] = FpFractionToFloat_16U_6U_10U_if_else_if_acc_nl;
+  assign nl_FpMantRNE_17U_11U_else_ac_int_cctor_sva[10:0] = FpMantRNE_17U_11U_else_ac_int_cctor_sva;
+  assign nl_HLS_uint16_to_fp17_core_chn_o_rsci_inst_chn_o_rsci_d = { chn_o_rsci_d_14_10, chn_o_rsci_d_9_0 };
+endmodule

@@ -1,0 +1,11 @@
+module \$paramod\CDP_OCVT_mgc_out_stdreg_wait_v1\rscid=6\width=18 (ld, vd, d, lz, vz, z);
+  input [17:0] d;
+  input ld;
+  output lz;
+  output vd;
+  input vz;
+  output [17:0] z;
+  assign lz = ld;
+  assign vd = vz;
+  assign z = d;
+endmodule

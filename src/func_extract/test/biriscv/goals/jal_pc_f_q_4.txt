@@ -1,0 +1,5 @@
+#1#\u_frontend.u_fetch.pc_f_q#3
+(goals
+(goal
+  (= |\\u_frontend.u_fetch.pc_f_q___#1003| #x800010d8))
+)

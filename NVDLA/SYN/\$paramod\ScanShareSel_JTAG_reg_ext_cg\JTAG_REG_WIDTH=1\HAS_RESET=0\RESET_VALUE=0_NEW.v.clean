@@ -1,0 +1,41 @@
+module \$paramod\ScanShareSel_JTAG_reg_ext_cg\JTAG_REG_WIDTH=1\HAS_RESET=0\RESET_VALUE=0 (D, clk, reset_, scanin, sel, shiftDR, Q, scanout);
+  input D;
+  output Q;
+  wire Q_conn;
+  input clk;
+  wire clk_wire;
+  wire next_Q;
+  wire qualified_scanen_wire;
+  wire qualified_scanin_wire;
+  input reset_;
+  wire scanen_wire;
+  input scanin;
+  wire scanin_wire;
+  output scanout;
+  wire scanout_wire;
+  input sel;
+  input shiftDR;
+  assign Q_conn = sel ? scanin : scanin_wire;
+  assign qualified_scanen_wire = sel ? shiftDR : scanen_wire;
+  SDFQD1 \Jreg_ff[0].SSS.nr (
+    .CP(clk),
+    .D(D),
+    .Q(Q),
+    .SE(qualified_scanen_wire),
+    .SI(Q_conn)
+  );
+  NV_BLKBOX_SRC0 UJ_testInst_ess_scanen_buf (
+    .Y(scanen_wire)
+  );
+  NV_BLKBOX_SRC0 UJ_testInst_ess_scanin_buf (
+    .Y(scanin_wire)
+  );
+  NV_BLKBOX_BUFFER UJ_testInst_ess_scanout_buf (
+    .A(Q),
+    .Y(scanout)
+  );
+  assign clk_wire = clk;
+  assign next_Q = D;
+  assign qualified_scanin_wire = Q_conn;
+  assign scanout_wire = Q;
+endmodule

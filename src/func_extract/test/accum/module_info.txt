@@ -1,0 +1,4 @@
+adder:
+out {
+  in: 1
+}

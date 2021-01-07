@@ -7,6 +7,7 @@ CMakeFiles/taint_gen.dir/app/main.cpp.o: ../src/global_data.h
 CMakeFiles/taint_gen.dir/app/main.cpp.o: ../src/helper.h
 CMakeFiles/taint_gen.dir/app/main.cpp.o: ../src/op_taint_gen.h
 CMakeFiles/taint_gen.dir/app/main.cpp.o: ../src/pass_info.h
+CMakeFiles/taint_gen.dir/app/main.cpp.o: ../src/syntax_patterns.h
 CMakeFiles/taint_gen.dir/app/main.cpp.o: ../src/taint_gen.h
 CMakeFiles/taint_gen.dir/app/main.cpp.o: ../src/varWidth.h
 CMakeFiles/taint_gen.dir/app/main.cpp.o: ../src/vcd_parser.h
@@ -14,7 +15,10 @@ CMakeFiles/taint_gen.dir/app/main.cpp.o: ../src/vcd_parser.h
 CMakeFiles/taint_gen.dir/src/helper.cpp.o: ../src/global_data.h
 CMakeFiles/taint_gen.dir/src/helper.cpp.o: ../src/helper.cpp
 CMakeFiles/taint_gen.dir/src/helper.cpp.o: ../src/helper.h
+CMakeFiles/taint_gen.dir/src/helper.cpp.o: ../src/op_taint_gen.h
 CMakeFiles/taint_gen.dir/src/helper.cpp.o: ../src/pass_info.h
+CMakeFiles/taint_gen.dir/src/helper.cpp.o: ../src/syntax_patterns.h
+CMakeFiles/taint_gen.dir/src/helper.cpp.o: ../src/taint_gen.h
 CMakeFiles/taint_gen.dir/src/helper.cpp.o: ../src/varWidth.h
 
 CMakeFiles/taint_gen.dir/src/op_taint_gen.cpp.o: ../src/global_data.h
@@ -22,6 +26,7 @@ CMakeFiles/taint_gen.dir/src/op_taint_gen.cpp.o: ../src/helper.h
 CMakeFiles/taint_gen.dir/src/op_taint_gen.cpp.o: ../src/op_taint_gen.cpp
 CMakeFiles/taint_gen.dir/src/op_taint_gen.cpp.o: ../src/op_taint_gen.h
 CMakeFiles/taint_gen.dir/src/op_taint_gen.cpp.o: ../src/pass_info.h
+CMakeFiles/taint_gen.dir/src/op_taint_gen.cpp.o: ../src/syntax_patterns.h
 CMakeFiles/taint_gen.dir/src/op_taint_gen.cpp.o: ../src/varWidth.h
 
 CMakeFiles/taint_gen.dir/src/pass_info.cpp.o: ../src/global_data.h
@@ -29,13 +34,22 @@ CMakeFiles/taint_gen.dir/src/pass_info.cpp.o: ../src/helper.h
 CMakeFiles/taint_gen.dir/src/pass_info.cpp.o: ../src/op_taint_gen.h
 CMakeFiles/taint_gen.dir/src/pass_info.cpp.o: ../src/pass_info.cpp
 CMakeFiles/taint_gen.dir/src/pass_info.cpp.o: ../src/pass_info.h
+CMakeFiles/taint_gen.dir/src/pass_info.cpp.o: ../src/syntax_patterns.h
 CMakeFiles/taint_gen.dir/src/pass_info.cpp.o: ../src/taint_gen.h
 CMakeFiles/taint_gen.dir/src/pass_info.cpp.o: ../src/varWidth.h
+
+CMakeFiles/taint_gen.dir/src/syntax_patterns.cpp.o: ../src/global_data.h
+CMakeFiles/taint_gen.dir/src/syntax_patterns.cpp.o: ../src/helper.h
+CMakeFiles/taint_gen.dir/src/syntax_patterns.cpp.o: ../src/pass_info.h
+CMakeFiles/taint_gen.dir/src/syntax_patterns.cpp.o: ../src/syntax_patterns.cpp
+CMakeFiles/taint_gen.dir/src/syntax_patterns.cpp.o: ../src/syntax_patterns.h
+CMakeFiles/taint_gen.dir/src/syntax_patterns.cpp.o: ../src/varWidth.h
 
 CMakeFiles/taint_gen.dir/src/taint_gen.cpp.o: ../src/global_data.h
 CMakeFiles/taint_gen.dir/src/taint_gen.cpp.o: ../src/helper.h
 CMakeFiles/taint_gen.dir/src/taint_gen.cpp.o: ../src/op_taint_gen.h
 CMakeFiles/taint_gen.dir/src/taint_gen.cpp.o: ../src/pass_info.h
+CMakeFiles/taint_gen.dir/src/taint_gen.cpp.o: ../src/syntax_patterns.h
 CMakeFiles/taint_gen.dir/src/taint_gen.cpp.o: ../src/taint_gen.cpp
 CMakeFiles/taint_gen.dir/src/taint_gen.cpp.o: ../src/taint_gen.h
 CMakeFiles/taint_gen.dir/src/taint_gen.cpp.o: ../src/varWidth.h
@@ -43,12 +57,14 @@ CMakeFiles/taint_gen.dir/src/taint_gen.cpp.o: ../src/varWidth.h
 CMakeFiles/taint_gen.dir/src/varWidth.cpp.o: ../src/global_data.h
 CMakeFiles/taint_gen.dir/src/varWidth.cpp.o: ../src/helper.h
 CMakeFiles/taint_gen.dir/src/varWidth.cpp.o: ../src/pass_info.h
+CMakeFiles/taint_gen.dir/src/varWidth.cpp.o: ../src/syntax_patterns.h
 CMakeFiles/taint_gen.dir/src/varWidth.cpp.o: ../src/varWidth.cpp
 CMakeFiles/taint_gen.dir/src/varWidth.cpp.o: ../src/varWidth.h
 
 CMakeFiles/taint_gen.dir/src/vcd_parser.cpp.o: ../src/global_data.h
 CMakeFiles/taint_gen.dir/src/vcd_parser.cpp.o: ../src/helper.h
 CMakeFiles/taint_gen.dir/src/vcd_parser.cpp.o: ../src/pass_info.h
+CMakeFiles/taint_gen.dir/src/vcd_parser.cpp.o: ../src/syntax_patterns.h
 CMakeFiles/taint_gen.dir/src/vcd_parser.cpp.o: ../src/varWidth.h
 CMakeFiles/taint_gen.dir/src/vcd_parser.cpp.o: ../src/vcd_parser.cpp
 CMakeFiles/taint_gen.dir/src/vcd_parser.cpp.o: ../src/vcd_parser.h

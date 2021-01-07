@@ -485,33 +485,6 @@ src/pseudo_vlg_gen.cpp.s:
 	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/pseudo_vlg_gen.cpp.s
 .PHONY : src/pseudo_vlg_gen.cpp.s
 
-src/trial.o: src/trial.cpp.o
-
-.PHONY : src/trial.o
-
-# target to build an object file
-src/trial.cpp.o:
-	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/trial.cpp.o
-.PHONY : src/trial.cpp.o
-
-src/trial.i: src/trial.cpp.i
-
-.PHONY : src/trial.i
-
-# target to preprocess a source file
-src/trial.cpp.i:
-	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/trial.cpp.i
-.PHONY : src/trial.cpp.i
-
-src/trial.s: src/trial.cpp.s
-
-.PHONY : src/trial.s
-
-# target to generate assembly for a file
-src/trial.cpp.s:
-	$(MAKE) -f CMakeFiles/func_extract.dir/build.make CMakeFiles/func_extract.dir/src/trial.cpp.s
-.PHONY : src/trial.cpp.s
-
 src/vcd_parser.o: src/vcd_parser.cpp.o
 
 .PHONY : src/vcd_parser.o
@@ -588,9 +561,6 @@ help:
 	@echo "... src/pseudo_vlg_gen.o"
 	@echo "... src/pseudo_vlg_gen.i"
 	@echo "... src/pseudo_vlg_gen.s"
-	@echo "... src/trial.o"
-	@echo "... src/trial.i"
-	@echo "... src/trial.s"
 	@echo "... src/vcd_parser.o"
 	@echo "... src/vcd_parser.i"
 	@echo "... src/vcd_parser.s"

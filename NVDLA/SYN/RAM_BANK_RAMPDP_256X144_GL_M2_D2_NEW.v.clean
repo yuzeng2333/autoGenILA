@@ -1,0 +1,194 @@
+module RAM_BANK_RAMPDP_256X144_GL_M2_D2(WE, CLK, IDDQ, SVOP, WD, RD, RE, RA, WA, SLEEP_EN, RET_EN, clobber_array, clobber_flops);
+  wire _00_;
+  wire [143:0] _01_;
+  wire _02_;
+  wire [143:0] _03_;
+  wire _04_;
+  wire _05_;
+  wire _06_;
+  wire _07_;
+  wire _08_;
+  wire _09_;
+  wire _10_;
+  wire _11_;
+  wire [143:0] _12_;
+  wire [143:0] _13_;
+  wire _14_;
+  wire _15_;
+  wire _16_;
+  wire _17_;
+  wire _18_;
+  wire _19_;
+  wire _20_;
+  wire _21_;
+  wire _22_;
+  wire [143:0] _23_;
+  wire [143:0] _24_;
+  wire [143:0] BADBIT;
+  wire CAPT_DIS;
+  wire CLAMPB;
+  input CLK;
+  input IDDQ;
+  wire [511:0] PDEC0;
+  wire [511:0] PDEC1;
+  wire [511:0] PDEC2;
+  input [7:0] RA;
+  reg [7:0] RADR;
+  wire RADRCLK;
+  wire [7:0] RADRSWI;
+  output [143:0] RD;
+  wire RDBYP;
+  wire [143:0] RDBYPASS;
+  input RE;
+  wire RECLK;
+  input RET_EN;
+  reg RE_LATB;
+  wire RdClk0;
+  wire RdClk1;
+  wire [143:0] SHFT;
+  input [7:0] SLEEP_EN;
+  input [7:0] SVOP;
+  input [7:0] WA;
+  wire WADRCLK;
+  reg [7:0] WAFF;
+  input [143:0] WD;
+  wire [143:0] WDBQ;
+  wire [143:0] WDBQ_pr;
+  wire [143:0] WDQ;
+  reg [143:0] WDQ_pr;
+  input WE;
+  wire WECLK;
+  reg WE_FF;
+  reg WE_LATB;
+  wire [143:0] WMNQ;
+  wire [143:0] WMNexp;
+  wire WRDCLK;
+  wire WrClk0;
+  wire WrClk1;
+  input clobber_array;
+  input clobber_flops;
+  reg [143:0] dout;
+  wire [143:0] dout0;
+  wire [143:0] dout1;
+  wire empadd;
+  wire [143:0] force_x;
+  wire [7:0] fusePDEC0;
+  wire [7:0] fusePDEC1;
+  wire [7:0] fusePDEC2;
+  wire fuseien;
+  wire latffclk;
+  wire legal;
+  wire re_se;
+  wire [143:0] rmuxd0;
+  wire [143:0] rmuxd1;
+  wire [143:0] sel_normal;
+  wire [143:0] sel_redun;
+  wire tiedvalid;
+  wire we_se;
+  assign _04_ = we_se & CLK;
+  assign WADRCLK = _04_ & _16_;
+  assign RADRCLK = re_se & CLK;
+  assign _05_ = re_se & CLAMPB;
+  assign _06_ = _05_ & _16_;
+  assign _07_ = _06_ & _17_;
+  assign RECLK = _07_ & CLK;
+  assign _08_ = WE_FF & CLAMPB;
+  assign _09_ = _08_ & _16_;
+  assign _10_ = _09_ & _17_;
+  assign WECLK = _10_ & _20_;
+  assign _11_ = _18_ & _16_;
+  assign _01_ = WD & 144'b111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111;
+  assign _12_ = 144'b111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111 & dout;
+  assign _13_ = 1'b0 & WDQ_pr;
+  assign RdClk0 = RECLK & _21_;
+  assign RdClk1 = RECLK & RADR[0];
+  assign WrClk0 = WECLK & _22_;
+  assign WrClk1 = WECLK & WAFF[0];
+  wire [143:0] fangyuan0;
+  assign fangyuan0 = { RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0, RdClk0 };
+
+  assign rmuxd0 = fangyuan0 & _23_;
+  wire [143:0] fangyuan1;
+  assign fangyuan1 = { RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1, RdClk1 };
+
+  assign rmuxd1 = fangyuan1 & _24_;
+  assign _14_ = _19_ & _16_;
+  assign _15_ = CLK & _16_;
+  always @*
+    if (RECLK)
+      dout = _03_;
+  always @*
+    if (_11_)
+      RADR = RA;
+  always @*
+    if (_15_)
+      WE_FF = we_se;
+  always @*
+    if (_14_)
+      RE_LATB = _00_;
+  always @*
+    if (_14_)
+      WE_LATB = _02_;
+  assign _16_ = ! clobber_flops;
+  assign _17_ = ! RET_EN;
+  assign _18_ = ! RADRCLK;
+  assign _19_ = ! CLK;
+  assign we_se = ~ WE_LATB;
+  assign re_se = ~ RE_LATB;
+  assign _20_ = ~ CLK;
+  assign WDBQ = ~ WDQ_pr;
+  assign _21_ = ~ RADR[0];
+  assign _22_ = ~ WAFF[0];
+  assign _23_ = ~ dout0;
+  assign _24_ = ~ dout1;
+  assign CLAMPB = ~ IDDQ;
+  assign _00_ = ~ RE;
+  assign _02_ = ~ WE;
+  assign WMNQ = WDQ_pr | WDBQ;
+  assign RD = _12_ | _13_;
+  assign _03_ = rmuxd0 | rmuxd1;
+  always @(posedge WADRCLK)
+      WDQ_pr <= _01_;
+  always @(posedge WADRCLK)
+      WAFF <= WA;
+  \$paramod\RAMPDP_256X144_GL_M2_D2_ram\words=128\bits=144\addrs=7 iow0 (
+    .radr(RADR[7:1]),
+    .rout_B(dout0),
+    .wadr(WAFF[7:1]),
+    .wrclk(WrClk0),
+    .wrdata(WDQ_pr),
+    .wrmaskn(WMNQ)
+  );
+  \$paramod\RAMPDP_256X144_GL_M2_D2_ram\words=128\bits=144\addrs=7 iow1 (
+    .radr(RADR[7:1]),
+    .rout_B(dout1),
+    .wadr(WAFF[7:1]),
+    .wrclk(WrClk1),
+    .wrdata(WDQ_pr),
+    .wrmaskn(WMNQ)
+  );
+  assign BADBIT = 144'b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
+  assign CAPT_DIS = 1'b0;
+  assign PDEC0 = 512'b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
+  assign PDEC1 = 512'b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
+  assign PDEC2 = 512'b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
+  assign RADRSWI = RADR;
+  assign RDBYP = 1'b0;
+  assign RDBYPASS = 144'b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
+  assign SHFT = 144'b111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111;
+  assign WDBQ_pr = WDBQ;
+  assign WDQ = WDQ_pr;
+  assign WMNexp = 144'b111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111;
+  assign WRDCLK = WADRCLK;
+  assign empadd = 1'b0;
+  assign force_x = 144'b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
+  assign fusePDEC0 = 8'b00000000;
+  assign fusePDEC1 = 8'b00000000;
+  assign fusePDEC2 = 8'b00000000;
+  assign fuseien = 1'b0;
+  assign latffclk = CLK;
+  assign legal = 1'b1;
+  assign sel_normal = 144'b111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111;
+  assign sel_redun = 144'b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
+  assign tiedvalid = 1'b1;
+endmodule

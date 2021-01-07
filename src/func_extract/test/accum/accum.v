@@ -9,7 +9,7 @@ module accum(clk, rst, data, start, sum, finish, timer);
 
   reg [2:0] cnt;
   wire [2:0] cnt_nxt = start ? data : (cnt > 0) ? cnt - 1 : cnt;
-  wire [2:0] sum_nxt = start ? 0 : cnt > 0 ? sum + 1 : sum;
+  wire [2:0] sum_nxt = start ? 0 : cnt > 0 ? res : sum;
   wire finish_nxt = cnt == 1;
 
   always @(posedge clk) begin
@@ -32,5 +32,12 @@ module accum(clk, rst, data, start, sum, finish, timer);
     else
       timer <= timer_nxt;
   end
+
+  wire [2:0] res;
+  adder u0 (
+    .clk(clk),
+    .in(sum),
+    .out(res)
+  );
 
 endmodule

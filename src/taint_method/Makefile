@@ -49,6 +49,9 @@ riscv:
 piccolo:
 	./build/taint_gen /workspace/research/ILA/autoGenILA/Piccolo-iu/verilog-cpu-old/SYN/piccolo_yosys.v
 
+pcl:
+	./build/taint_gen /workspace/research/ILA/autoGenILA/Piccolo-iu/verilog/SYN/piccolo_yosys.v
+
 sha_core:
 	./build/taint_gen /workspace/research/ILA/autoGenILA/SHA/SYN/sha_simp.v
 
@@ -66,3 +69,9 @@ fsm:
 
 wcase:
 	./build/taint_gen /workspace/research/ILA/autoGenILA/naiveEg/word_sum_case/word_adder_yosys.v
+
+gfx:
+	./build/taint_gen /workspace/research/ILA/autoGenILA/graphics/trunk/rtl/verilog/SYN/gfx_yosys.v
+
+bi:
+	./build/taint_gen /workspace/research/ILA/autoGenILA/biriscv/SYN/biriscv_yosys.v

@@ -1,0 +1,4 @@
+/workspace/research/ILA/autoGenILA/src/vcd_preprocess/build/CMakeFiles/rebuild_cache.dir
+/workspace/research/ILA/autoGenILA/src/vcd_preprocess/build/CMakeFiles/edit_cache.dir
+/workspace/research/ILA/autoGenILA/src/vcd_preprocess/build/CMakeFiles/vcd_pre.dir
+/workspace/research/ILA/autoGenILA/src/vcd_preprocess/build/CMakeFiles/test.dir

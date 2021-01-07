@@ -1,0 +1,43 @@
+[*]
+[*] GTKWave Analyzer v3.3.45 (w)1999-2012 BSI
+[*] Mon Jul 22 09:26:49 2013
+[*]
+[dumpfile] "/dev/shm/uart2BusTop_bin_tb.fst"
+[dumpfile_mtime] "Mon Jul 22 09:26:41 2013"
+[dumpfile_size] 146929
+[savefile] "/run/media/smuller/DATA/Projects/uart2bus/sim/ghdl/uart2BusTop_bin_tb.sav"
+[timestart] 0
+[size] 1680 974
+[pos] -1 -1
+*-38.645287 83900000000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 210
+[signals_width] 255
+[sst_expanded] 1
+[sst_vpaned_height] 286
+@28
+uut.clr
+uut.clk
+@200
+-Asynchronous serial link
+@28
+uut.serin
+uut.serout
+@200
+-Internal bus
+@22
+intaddress[7:0]
+intrddata[7:0]
+@28
+intread
+@22
+intwrdata[7:0]
+@28
+intwrite
+@200
+-Other internal signals
+@28
+newrxdata
+@23
+recvdata[7:0]
+[pattern_trace] 1
+[pattern_trace] 0

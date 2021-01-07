@@ -1,13 +1,13 @@
 read_verilog -sv accum.v
+read_verilog -sv adder.v
 prep -top accum 
 
 hierarchy -check
+setattr -mod -set keep_hierarchy 1 adder
 proc
 opt
 opt_expr -mux_undef
 opt
-opt
-flatten;
 memory -nordff
 proc
 opt;;

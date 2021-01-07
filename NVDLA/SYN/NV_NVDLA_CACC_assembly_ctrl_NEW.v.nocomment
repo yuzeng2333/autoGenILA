@@ -1,0 +1,818 @@
+module NV_NVDLA_CACC_assembly_ctrl(nvdla_core_clk, nvdla_core_rstn, dp2reg_done, mac_a2accu_pd, mac_a2accu_pvld, mac_b2accu_pd, mac_b2accu_pvld, reg2dp_clip_truncate, reg2dp_conv_mode, reg2dp_op_en, reg2dp_proc_precision, abuf_rd_addr, abuf_rd_en, accu_ctrl_pd, accu_ctrl_ram_valid, accu_ctrl_valid, cfg_in_en_mask, cfg_is_fp, cfg_is_int, cfg_is_int8, cfg_is_wg, cfg_truncate, slcg_cell_en, wait_for_op_en);
+  wire [4:0] _000_;
+  wire [4:0] _001_;
+  wire _002_;
+  wire _003_;
+  wire [8:0] _004_;
+  wire [6:0] _005_;
+  wire [4:0] _006_;
+  wire _007_;
+  wire [191:0] _008_;
+  wire _009_;
+  wire [3:0] _010_;
+  wire [15:0] _011_;
+  wire [15:0] _012_;
+  wire [15:0] _013_;
+  wire [15:0] _014_;
+  wire [15:0] _015_;
+  wire [15:0] _016_;
+  wire [15:0] _017_;
+  wire [15:0] _018_;
+  wire [7:0] _019_;
+  wire _020_;
+  wire _021_;
+  wire _022_;
+  wire [3:0] _023_;
+  wire [3:0] _024_;
+  wire [3:0] _025_;
+  wire [8:0] _026_;
+  wire _027_;
+  wire _028_;
+  wire _029_;
+  wire _030_;
+  wire _031_;
+  wire _032_;
+  wire _033_;
+  wire _034_;
+  wire _035_;
+  wire _036_;
+  wire _037_;
+  wire _038_;
+  wire _039_;
+  wire _040_;
+  wire _041_;
+  wire _042_;
+  wire _043_;
+  wire _044_;
+  wire _045_;
+  wire _046_;
+  wire _047_;
+  wire _048_;
+  wire _049_;
+  wire _050_;
+  wire [7:0] _051_;
+  wire [7:0] _052_;
+  wire [7:0] _053_;
+  wire _054_;
+  wire _055_;
+  wire [191:0] _056_;
+  wire [24:0] _057_;
+  wire [126:0] _058_;
+  wire [24:0] _059_;
+  wire [95:0] _060_;
+  wire [639:0] _061_;
+  wire _062_;
+  wire _063_;
+  wire _064_;
+  wire [7:0] _065_;
+  wire [127:0] _066_;
+  wire [127:0] _067_;
+  wire _068_;
+  wire _069_;
+  wire _070_;
+  wire _071_;
+  wire [7:0] _072_;
+  wire _073_;
+  wire _074_;
+  wire _075_;
+  wire _076_;
+  wire [7:0] _077_;
+  wire [7:0] _078_;
+  wire _079_;
+  wire [127:0] _080_;
+  wire [63:0] _081_;
+  output [4:0] abuf_rd_addr;
+  output [7:0] abuf_rd_en;
+  wire [4:0] accu_addr;
+  wire [4:0] accu_addr_d0;
+  reg [4:0] accu_addr_d1;
+  reg [4:0] accu_addr_d2;
+  wire [4:0] accu_batch_index;
+  wire accu_channel_end;
+  wire accu_channel_end_d0;
+  reg accu_channel_end_d1;
+  reg accu_channel_end_d2;
+  reg [8:0] accu_channel_st;
+  wire accu_channel_st_w;
+  reg [6:0] accu_cnt;
+  wire [6:0] accu_cnt_inc;
+  wire [6:0] accu_cnt_w;
+  reg [4:0] accu_ctrl_addr;
+  reg accu_ctrl_channel_end;
+  reg [191:0] accu_ctrl_dlv_elem_mask;
+  reg accu_ctrl_layer_end;
+  reg [3:0] accu_ctrl_mode;
+  output [339:0] accu_ctrl_pd;
+  reg [15:0] accu_ctrl_ram_sel_0;
+  reg [15:0] accu_ctrl_ram_sel_1;
+  reg [15:0] accu_ctrl_ram_sel_2;
+  reg [15:0] accu_ctrl_ram_sel_3;
+  reg [15:0] accu_ctrl_ram_sel_4;
+  reg [15:0] accu_ctrl_ram_sel_5;
+  reg [15:0] accu_ctrl_ram_sel_6;
+  reg [15:0] accu_ctrl_ram_sel_7;
+  output [191:0] accu_ctrl_ram_valid;
+  reg [7:0] accu_ctrl_rd_mask;
+  reg accu_ctrl_stripe_end;
+  output accu_ctrl_valid;
+  reg accu_ctrl_valid;
+  wire accu_ctrl_valid_d0;
+  reg accu_ctrl_valid_d1;
+  reg accu_ctrl_valid_d2;
+  wire accu_layer_end;
+  wire accu_layer_end_d0;
+  reg accu_layer_end_d1;
+  reg accu_layer_end_d2;
+  reg [3:0] accu_mode_d0;
+  reg [3:0] accu_mode_d1;
+  reg [3:0] accu_mode_d2;
+  reg [8:0] accu_pd;
+  reg accu_ram_sel_0_d0;
+  reg accu_ram_sel_0_d1;
+  reg accu_ram_sel_0_d2;
+  wire accu_ram_sel_0_w;
+  reg accu_ram_sel_1_d0;
+  reg accu_ram_sel_1_d1;
+  reg accu_ram_sel_1_d2;
+  wire accu_ram_sel_1_w;
+  reg accu_ram_sel_2_d0;
+  reg accu_ram_sel_2_d1;
+  reg accu_ram_sel_2_d2;
+  wire accu_ram_sel_2_w;
+  reg accu_ram_sel_3_d0;
+  reg accu_ram_sel_3_d1;
+  reg accu_ram_sel_3_d2;
+  wire accu_ram_sel_3_w;
+  reg accu_ram_sel_4_d0;
+  reg accu_ram_sel_4_d1;
+  reg accu_ram_sel_4_d2;
+  wire accu_ram_sel_4_w;
+  reg accu_ram_sel_5_d0;
+  reg accu_ram_sel_5_d1;
+  reg accu_ram_sel_5_d2;
+  wire accu_ram_sel_5_w;
+  reg accu_ram_sel_6_d0;
+  reg accu_ram_sel_6_d1;
+  reg accu_ram_sel_6_d2;
+  wire accu_ram_sel_6_w;
+  reg accu_ram_sel_7_d0;
+  reg accu_ram_sel_7_d1;
+  reg accu_ram_sel_7_d2;
+  wire accu_ram_sel_7_w;
+  wire accu_ram_valid;
+  wire accu_ram_valid_d0;
+  reg accu_ram_valid_d1;
+  reg accu_ram_valid_d2;
+  wire [7:0] accu_rd_en;
+  reg [7:0] accu_rd_mask;
+  wire [7:0] accu_rd_mask_d0;
+  reg [7:0] accu_rd_mask_d1;
+  reg [7:0] accu_rd_mask_d2;
+  wire [7:0] accu_rd_mask_w;
+  wire [3:0] accu_rd_sel_w;
+  wire accu_stripe_end;
+  wire accu_stripe_end_d0;
+  reg accu_stripe_end_d1;
+  reg accu_stripe_end_d2;
+  wire accu_stripe_st;
+  wire [8:0] accu_valid;
+  output [191:0] cfg_in_en_mask;
+  reg [191:0] cfg_in_en_mask;
+  wire [191:0] cfg_in_en_mask_w;
+  output [24:0] cfg_is_fp;
+  reg [24:0] cfg_is_fp;
+  output [24:0] cfg_is_int;
+  reg [24:0] cfg_is_int;
+  output [126:0] cfg_is_int8;
+  reg [126:0] cfg_is_int8;
+  output [95:0] cfg_is_wg;
+  reg [95:0] cfg_is_wg;
+  output [639:0] cfg_truncate;
+  reg [639:0] cfg_truncate;
+  reg cfg_winograd;
+  input dp2reg_done;
+  wire is_fp16;
+  wire is_int8;
+  wire is_winograd;
+  wire is_x1;
+  wire is_x2;
+  wire is_x4;
+  wire is_x8;
+  wire layer_st;
+  input [8:0] mac_a2accu_pd;
+  input mac_a2accu_pvld;
+  input [8:0] mac_b2accu_pd;
+  input mac_b2accu_pvld;
+  input nvdla_core_clk;
+  input nvdla_core_rstn;
+  wire [4:0] pre_accu_addr;
+  wire pre_accu_channel_end;
+  wire pre_accu_ctrl_valid;
+  wire pre_accu_layer_end;
+  wire [3:0] pre_accu_mode;
+  wire pre_accu_ram_sel_0;
+  wire pre_accu_ram_sel_1;
+  wire pre_accu_ram_sel_2;
+  wire pre_accu_ram_sel_3;
+  wire pre_accu_ram_sel_4;
+  wire pre_accu_ram_sel_5;
+  wire pre_accu_ram_sel_6;
+  wire pre_accu_ram_sel_7;
+  wire pre_accu_ram_valid;
+  wire [7:0] pre_accu_rd_mask;
+  wire pre_accu_stripe_end;
+  input [4:0] reg2dp_clip_truncate;
+  input reg2dp_conv_mode;
+  input reg2dp_op_en;
+  input [1:0] reg2dp_proc_precision;
+  output [3:0] slcg_cell_en;
+  reg [3:0] slcg_cell_en_d1;
+  reg [3:0] slcg_cell_en_d2;
+  reg [3:0] slcg_cell_en_d3;
+  wire [3:0] slcg_cell_en_w;
+  output wait_for_op_en;
+  reg wait_for_op_en;
+  wire wait_for_op_en_w;
+  assign accu_cnt_inc = accu_cnt + 1'b1;
+  assign is_x1 = _070_ & _071_;
+  assign is_x2 = is_int8 & _071_;
+  assign is_x4 = _070_ & reg2dp_conv_mode;
+  assign is_x8 = is_int8 & reg2dp_conv_mode;
+  assign slcg_cell_en_w[0] = reg2dp_op_en & _069_;
+  assign _063_ = reg2dp_op_en & reg2dp_conv_mode;
+  assign slcg_cell_en_w[1] = _063_ & _069_;
+  assign slcg_cell_en_w[2] = reg2dp_op_en & is_fp16;
+  assign slcg_cell_en_w[3] = _063_ & is_fp16;
+  assign layer_st = wait_for_op_en & reg2dp_op_en;
+  assign _064_ = accu_valid[0] & accu_pd[6];
+  assign accu_ram_sel_1_w = accu_rd_mask_w[1] & _075_;
+  assign accu_ram_sel_2_w = accu_rd_mask_w[2] & _075_;
+  assign accu_ram_sel_3_w = accu_rd_mask_w[3] & _075_;
+  assign accu_ram_sel_5_w = accu_rd_mask_w[5] & is_x2;
+  assign accu_ram_sel_6_w = accu_rd_mask_w[6] & is_x2;
+  assign accu_ram_sel_7_w = accu_rd_mask_w[7] & is_x2;
+  wire [7:0] fangyuan0;
+  assign fangyuan0 = { accu_valid[0], accu_valid[0], accu_valid[0], accu_valid[0], accu_valid[0], accu_valid[0], accu_valid[0], accu_valid[0] };
+
+  assign _065_ = fangyuan0 & _072_;
+  assign abuf_rd_en = _065_ & accu_rd_mask;
+  assign accu_ram_valid = accu_valid[0] & _073_;
+  assign is_int8 = ! reg2dp_proc_precision;
+  assign is_fp16 = reg2dp_proc_precision == 2'b10;
+  assign _069_ = ~ is_fp16;
+  assign _070_ = ~ is_int8;
+  assign _071_ = ~ reg2dp_conv_mode;
+  assign _072_ = ~ accu_channel_st[7:0];
+  assign _073_ = ~ accu_channel_st[8];
+  assign _068_ = layer_st | accu_valid[0];
+  assign _074_ = layer_st | accu_pd[6];
+  assign _075_ = is_x1 | is_x2;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ctrl_dlv_elem_mask <= 192'b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
+    else
+      accu_ctrl_dlv_elem_mask <= _008_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ctrl_ram_sel_7 <= 16'b0000000000000000;
+    else
+      accu_ctrl_ram_sel_7 <= _018_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ctrl_ram_sel_6 <= 16'b0000000000000000;
+    else
+      accu_ctrl_ram_sel_6 <= _017_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ctrl_ram_sel_5 <= 16'b0000000000000000;
+    else
+      accu_ctrl_ram_sel_5 <= _016_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ctrl_ram_sel_4 <= 16'b0000000000000000;
+    else
+      accu_ctrl_ram_sel_4 <= _015_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ctrl_ram_sel_3 <= 16'b0000000000000000;
+    else
+      accu_ctrl_ram_sel_3 <= _014_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ctrl_ram_sel_2 <= 16'b0000000000000000;
+    else
+      accu_ctrl_ram_sel_2 <= _013_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ctrl_ram_sel_1 <= 16'b0000000000000000;
+    else
+      accu_ctrl_ram_sel_1 <= _012_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ctrl_ram_sel_0 <= 16'b0000000000000000;
+    else
+      accu_ctrl_ram_sel_0 <= _011_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ctrl_layer_end <= 1'b0;
+    else
+      accu_ctrl_layer_end <= _009_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ctrl_channel_end <= 1'b0;
+    else
+      accu_ctrl_channel_end <= _007_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ctrl_stripe_end <= 1'b0;
+    else
+      accu_ctrl_stripe_end <= _020_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ctrl_rd_mask <= 8'b00000000;
+    else
+      accu_ctrl_rd_mask <= _019_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ctrl_mode <= 4'b0000;
+    else
+      accu_ctrl_mode <= _010_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ctrl_addr <= 5'b00000;
+    else
+      accu_ctrl_addr <= _006_;
+  reg [0:0] \accu_ctrl_ram_valid_reg[0] ;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      \accu_ctrl_ram_valid_reg[0] <= 1'b0;
+    else
+      \accu_ctrl_ram_valid_reg[0] <= accu_ram_valid_d2;
+  assign accu_ctrl_ram_valid[0] = \accu_ctrl_ram_valid_reg[0] ;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ctrl_valid <= 1'b0;
+    else
+      accu_ctrl_valid <= accu_ctrl_valid_d2;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ram_sel_7_d2 <= 1'b0;
+    else
+      accu_ram_sel_7_d2 <= _050_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ram_sel_6_d2 <= 1'b0;
+    else
+      accu_ram_sel_6_d2 <= _047_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ram_sel_5_d2 <= 1'b0;
+    else
+      accu_ram_sel_5_d2 <= _044_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ram_sel_4_d2 <= 1'b0;
+    else
+      accu_ram_sel_4_d2 <= _041_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ram_sel_3_d2 <= 1'b0;
+    else
+      accu_ram_sel_3_d2 <= _038_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ram_sel_2_d2 <= 1'b0;
+    else
+      accu_ram_sel_2_d2 <= _035_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ram_sel_1_d2 <= 1'b0;
+    else
+      accu_ram_sel_1_d2 <= _032_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ram_sel_0_d2 <= 1'b0;
+    else
+      accu_ram_sel_0_d2 <= _029_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_layer_end_d2 <= 1'b0;
+    else
+      accu_layer_end_d2 <= _022_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_channel_end_d2 <= 1'b0;
+    else
+      accu_channel_end_d2 <= _003_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_stripe_end_d2 <= 1'b0;
+    else
+      accu_stripe_end_d2 <= _055_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_rd_mask_d2 <= 8'b00000000;
+    else
+      accu_rd_mask_d2 <= _053_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_mode_d2 <= 4'b0000;
+    else
+      accu_mode_d2 <= _025_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_addr_d2 <= 5'b00000;
+    else
+      accu_addr_d2 <= _001_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ram_valid_d2 <= 1'b0;
+    else
+      accu_ram_valid_d2 <= accu_ram_valid_d1;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ctrl_valid_d2 <= 1'b0;
+    else
+      accu_ctrl_valid_d2 <= accu_ctrl_valid_d1;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ram_sel_7_d1 <= 1'b0;
+    else
+      accu_ram_sel_7_d1 <= _049_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ram_sel_6_d1 <= 1'b0;
+    else
+      accu_ram_sel_6_d1 <= _046_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ram_sel_5_d1 <= 1'b0;
+    else
+      accu_ram_sel_5_d1 <= _043_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ram_sel_4_d1 <= 1'b0;
+    else
+      accu_ram_sel_4_d1 <= _040_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ram_sel_3_d1 <= 1'b0;
+    else
+      accu_ram_sel_3_d1 <= _037_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ram_sel_2_d1 <= 1'b0;
+    else
+      accu_ram_sel_2_d1 <= _034_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ram_sel_1_d1 <= 1'b0;
+    else
+      accu_ram_sel_1_d1 <= _031_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ram_sel_0_d1 <= 1'b0;
+    else
+      accu_ram_sel_0_d1 <= _028_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_layer_end_d1 <= 1'b0;
+    else
+      accu_layer_end_d1 <= _021_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_channel_end_d1 <= 1'b0;
+    else
+      accu_channel_end_d1 <= _002_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_stripe_end_d1 <= 1'b0;
+    else
+      accu_stripe_end_d1 <= _054_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_rd_mask_d1 <= 8'b00000000;
+    else
+      accu_rd_mask_d1 <= _052_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_mode_d1 <= 4'b0000;
+    else
+      accu_mode_d1 <= _024_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_addr_d1 <= 5'b00000;
+    else
+      accu_addr_d1 <= _000_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ram_valid_d1 <= 1'b0;
+    else
+      accu_ram_valid_d1 <= accu_ram_valid;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ctrl_valid_d1 <= 1'b0;
+    else
+      accu_ctrl_valid_d1 <= accu_valid[0];
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      cfg_in_en_mask <= 192'b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
+    else
+      cfg_in_en_mask <= _056_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      cfg_is_int8 <= 127'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
+    else
+      cfg_is_int8 <= _058_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      cfg_is_wg <= 96'b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
+    else
+      cfg_is_wg <= _060_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      cfg_is_int <= 25'b1111111111111111111111111;
+    else
+      cfg_is_int <= _059_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      cfg_is_fp <= 25'b0000000000000000000000000;
+    else
+      cfg_is_fp <= _057_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      cfg_truncate <= 640'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
+    else
+      cfg_truncate <= _061_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      cfg_winograd <= 1'b0;
+    else
+      cfg_winograd <= _062_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ram_sel_7_d0 <= 1'b0;
+    else
+      accu_ram_sel_7_d0 <= _048_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ram_sel_6_d0 <= 1'b0;
+    else
+      accu_ram_sel_6_d0 <= _045_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ram_sel_5_d0 <= 1'b0;
+    else
+      accu_ram_sel_5_d0 <= _042_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ram_sel_4_d0 <= 1'b0;
+    else
+      accu_ram_sel_4_d0 <= _039_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ram_sel_3_d0 <= 1'b0;
+    else
+      accu_ram_sel_3_d0 <= _036_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ram_sel_2_d0 <= 1'b0;
+    else
+      accu_ram_sel_2_d0 <= _033_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ram_sel_1_d0 <= 1'b0;
+    else
+      accu_ram_sel_1_d0 <= _030_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_ram_sel_0_d0 <= 1'b0;
+    else
+      accu_ram_sel_0_d0 <= _027_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_mode_d0 <= 4'b0001;
+    else
+      accu_mode_d0 <= _023_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_rd_mask <= 8'b00000000;
+    else
+      accu_rd_mask <= _051_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_channel_st <= 9'b111111111;
+    else
+      accu_channel_st <= _004_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_cnt <= 7'b0000000;
+    else
+      accu_cnt <= _005_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      wait_for_op_en <= 1'b1;
+    else
+      wait_for_op_en <= wait_for_op_en_w;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      slcg_cell_en_d3 <= 4'b0000;
+    else
+      slcg_cell_en_d3 <= slcg_cell_en_d2;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      slcg_cell_en_d2 <= 4'b0000;
+    else
+      slcg_cell_en_d2 <= slcg_cell_en_d1;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      slcg_cell_en_d1 <= 4'b0000;
+    else
+      slcg_cell_en_d1 <= slcg_cell_en_w;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      accu_pd <= 9'b000000000;
+    else
+      accu_pd <= _026_;
+  reg [0:0] \accu_valid_reg[0] ;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      \accu_valid_reg[0] <= 1'b0;
+    else
+      \accu_valid_reg[0] <= mac_a2accu_pvld;
+  assign accu_valid[0] = \accu_valid_reg[0] ;
+  wire [191:0] fangyuan1;
+  assign fangyuan1 = { accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2, accu_channel_end_d2 };
+
+  assign _008_ = accu_ctrl_valid_d2 ? fangyuan1 : accu_ctrl_dlv_elem_mask;
+  wire [15:0] fangyuan2;
+  assign fangyuan2 = { accu_ram_sel_7_d2, accu_ram_sel_7_d2, accu_ram_sel_7_d2, accu_ram_sel_7_d2, accu_ram_sel_7_d2, accu_ram_sel_7_d2, accu_ram_sel_7_d2, accu_ram_sel_7_d2, accu_ram_sel_7_d2, accu_ram_sel_7_d2, accu_ram_sel_7_d2, accu_ram_sel_7_d2, accu_ram_sel_7_d2, accu_ram_sel_7_d2, accu_ram_sel_7_d2, accu_ram_sel_7_d2 };
+
+  assign _018_ = accu_ctrl_valid_d2 ? fangyuan2 : accu_ctrl_ram_sel_7;
+  wire [15:0] fangyuan3;
+  assign fangyuan3 = { accu_ram_sel_6_d2, accu_ram_sel_6_d2, accu_ram_sel_6_d2, accu_ram_sel_6_d2, accu_ram_sel_6_d2, accu_ram_sel_6_d2, accu_ram_sel_6_d2, accu_ram_sel_6_d2, accu_ram_sel_6_d2, accu_ram_sel_6_d2, accu_ram_sel_6_d2, accu_ram_sel_6_d2, accu_ram_sel_6_d2, accu_ram_sel_6_d2, accu_ram_sel_6_d2, accu_ram_sel_6_d2 };
+
+  assign _017_ = accu_ctrl_valid_d2 ? fangyuan3 : accu_ctrl_ram_sel_6;
+  wire [15:0] fangyuan4;
+  assign fangyuan4 = { accu_ram_sel_5_d2, accu_ram_sel_5_d2, accu_ram_sel_5_d2, accu_ram_sel_5_d2, accu_ram_sel_5_d2, accu_ram_sel_5_d2, accu_ram_sel_5_d2, accu_ram_sel_5_d2, accu_ram_sel_5_d2, accu_ram_sel_5_d2, accu_ram_sel_5_d2, accu_ram_sel_5_d2, accu_ram_sel_5_d2, accu_ram_sel_5_d2, accu_ram_sel_5_d2, accu_ram_sel_5_d2 };
+
+  assign _016_ = accu_ctrl_valid_d2 ? fangyuan4 : accu_ctrl_ram_sel_5;
+  wire [15:0] fangyuan5;
+  assign fangyuan5 = { accu_ram_sel_4_d2, accu_ram_sel_4_d2, accu_ram_sel_4_d2, accu_ram_sel_4_d2, accu_ram_sel_4_d2, accu_ram_sel_4_d2, accu_ram_sel_4_d2, accu_ram_sel_4_d2, accu_ram_sel_4_d2, accu_ram_sel_4_d2, accu_ram_sel_4_d2, accu_ram_sel_4_d2, accu_ram_sel_4_d2, accu_ram_sel_4_d2, accu_ram_sel_4_d2, accu_ram_sel_4_d2 };
+
+  assign _015_ = accu_ctrl_valid_d2 ? fangyuan5 : accu_ctrl_ram_sel_4;
+  wire [15:0] fangyuan6;
+  assign fangyuan6 = { accu_ram_sel_3_d2, accu_ram_sel_3_d2, accu_ram_sel_3_d2, accu_ram_sel_3_d2, accu_ram_sel_3_d2, accu_ram_sel_3_d2, accu_ram_sel_3_d2, accu_ram_sel_3_d2, accu_ram_sel_3_d2, accu_ram_sel_3_d2, accu_ram_sel_3_d2, accu_ram_sel_3_d2, accu_ram_sel_3_d2, accu_ram_sel_3_d2, accu_ram_sel_3_d2, accu_ram_sel_3_d2 };
+
+  assign _014_ = accu_ctrl_valid_d2 ? fangyuan6 : accu_ctrl_ram_sel_3;
+  wire [15:0] fangyuan7;
+  assign fangyuan7 = { accu_ram_sel_2_d2, accu_ram_sel_2_d2, accu_ram_sel_2_d2, accu_ram_sel_2_d2, accu_ram_sel_2_d2, accu_ram_sel_2_d2, accu_ram_sel_2_d2, accu_ram_sel_2_d2, accu_ram_sel_2_d2, accu_ram_sel_2_d2, accu_ram_sel_2_d2, accu_ram_sel_2_d2, accu_ram_sel_2_d2, accu_ram_sel_2_d2, accu_ram_sel_2_d2, accu_ram_sel_2_d2 };
+
+  assign _013_ = accu_ctrl_valid_d2 ? fangyuan7 : accu_ctrl_ram_sel_2;
+  wire [15:0] fangyuan8;
+  assign fangyuan8 = { accu_ram_sel_1_d2, accu_ram_sel_1_d2, accu_ram_sel_1_d2, accu_ram_sel_1_d2, accu_ram_sel_1_d2, accu_ram_sel_1_d2, accu_ram_sel_1_d2, accu_ram_sel_1_d2, accu_ram_sel_1_d2, accu_ram_sel_1_d2, accu_ram_sel_1_d2, accu_ram_sel_1_d2, accu_ram_sel_1_d2, accu_ram_sel_1_d2, accu_ram_sel_1_d2, accu_ram_sel_1_d2 };
+
+  assign _012_ = accu_ctrl_valid_d2 ? fangyuan8 : accu_ctrl_ram_sel_1;
+  wire [15:0] fangyuan9;
+  assign fangyuan9 = { accu_ram_sel_0_d2, accu_ram_sel_0_d2, accu_ram_sel_0_d2, accu_ram_sel_0_d2, accu_ram_sel_0_d2, accu_ram_sel_0_d2, accu_ram_sel_0_d2, accu_ram_sel_0_d2, accu_ram_sel_0_d2, accu_ram_sel_0_d2, accu_ram_sel_0_d2, accu_ram_sel_0_d2, accu_ram_sel_0_d2, accu_ram_sel_0_d2, accu_ram_sel_0_d2, accu_ram_sel_0_d2 };
+
+  assign _011_ = accu_ctrl_valid_d2 ? fangyuan9 : accu_ctrl_ram_sel_0;
+  assign _009_ = accu_ctrl_valid_d2 ? accu_layer_end_d2 : accu_ctrl_layer_end;
+  assign _007_ = accu_ctrl_valid_d2 ? accu_channel_end_d2 : accu_ctrl_channel_end;
+  assign _020_ = accu_ctrl_valid_d2 ? accu_stripe_end_d2 : accu_ctrl_stripe_end;
+  assign _019_ = accu_ctrl_valid_d2 ? accu_rd_mask_d2 : accu_ctrl_rd_mask;
+  assign _010_ = accu_ctrl_valid_d2 ? accu_mode_d2 : accu_ctrl_mode;
+  assign _006_ = accu_ctrl_valid_d2 ? accu_addr_d2 : accu_ctrl_addr;
+  assign _050_ = accu_ctrl_valid_d1 ? accu_ram_sel_7_d1 : accu_ram_sel_7_d2;
+  assign _047_ = accu_ctrl_valid_d1 ? accu_ram_sel_6_d1 : accu_ram_sel_6_d2;
+  assign _044_ = accu_ctrl_valid_d1 ? accu_ram_sel_5_d1 : accu_ram_sel_5_d2;
+  assign _041_ = accu_ctrl_valid_d1 ? accu_ram_sel_4_d1 : accu_ram_sel_4_d2;
+  assign _038_ = accu_ctrl_valid_d1 ? accu_ram_sel_3_d1 : accu_ram_sel_3_d2;
+  assign _035_ = accu_ctrl_valid_d1 ? accu_ram_sel_2_d1 : accu_ram_sel_2_d2;
+  assign _032_ = accu_ctrl_valid_d1 ? accu_ram_sel_1_d1 : accu_ram_sel_1_d2;
+  assign _029_ = accu_ctrl_valid_d1 ? accu_ram_sel_0_d1 : accu_ram_sel_0_d2;
+  assign _022_ = accu_ctrl_valid_d1 ? accu_layer_end_d1 : accu_layer_end_d2;
+  assign _003_ = accu_ctrl_valid_d1 ? accu_channel_end_d1 : accu_channel_end_d2;
+  assign _055_ = accu_ctrl_valid_d1 ? accu_stripe_end_d1 : accu_stripe_end_d2;
+  assign _053_ = accu_ctrl_valid_d1 ? accu_rd_mask_d1 : accu_rd_mask_d2;
+  assign _025_ = accu_ctrl_valid_d1 ? accu_mode_d1 : accu_mode_d2;
+  assign _001_ = accu_ctrl_valid_d1 ? accu_addr_d1 : accu_addr_d2;
+  assign _049_ = accu_valid[0] ? accu_ram_sel_7_d0 : accu_ram_sel_7_d1;
+  assign _046_ = accu_valid[0] ? accu_ram_sel_6_d0 : accu_ram_sel_6_d1;
+  assign _043_ = accu_valid[0] ? accu_ram_sel_5_d0 : accu_ram_sel_5_d1;
+  assign _040_ = accu_valid[0] ? accu_ram_sel_4_d0 : accu_ram_sel_4_d1;
+  assign _037_ = accu_valid[0] ? accu_ram_sel_3_d0 : accu_ram_sel_3_d1;
+  assign _034_ = accu_valid[0] ? accu_ram_sel_2_d0 : accu_ram_sel_2_d1;
+  assign _031_ = accu_valid[0] ? accu_ram_sel_1_d0 : accu_ram_sel_1_d1;
+  assign _028_ = accu_valid[0] ? accu_ram_sel_0_d0 : accu_ram_sel_0_d1;
+  assign _021_ = accu_valid[0] ? accu_pd[8] : accu_layer_end_d1;
+  assign _002_ = accu_valid[0] ? accu_pd[7] : accu_channel_end_d1;
+  assign _054_ = accu_valid[0] ? accu_pd[6] : accu_stripe_end_d1;
+  assign _052_ = accu_valid[0] ? accu_rd_mask : accu_rd_mask_d1;
+  assign _024_ = accu_valid[0] ? accu_mode_d0 : accu_mode_d1;
+  assign _000_ = accu_valid[0] ? accu_addr_d0 : accu_addr_d1;
+  assign _056_ = layer_st ? cfg_in_en_mask_w : cfg_in_en_mask;
+  wire [126:0] fangyuan10;
+  assign fangyuan10 = { is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8, is_int8 };
+
+  assign _058_ = layer_st ? fangyuan10 : cfg_is_int8;
+  wire [95:0] fangyuan11;
+  assign fangyuan11 = { reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode, reg2dp_conv_mode };
+
+  assign _060_ = layer_st ? fangyuan11 : cfg_is_wg;
+  wire [24:0] fangyuan12;
+  assign fangyuan12 = { _069_, _069_, _069_, _069_, _069_, _069_, _069_, _069_, _069_, _069_, _069_, _069_, _069_, _069_, _069_, _069_, _069_, _069_, _069_, _069_, _069_, _069_, _069_, _069_, _069_ };
+
+  assign _059_ = layer_st ? fangyuan12 : cfg_is_int;
+  wire [24:0] fangyuan13;
+  assign fangyuan13 = { is_fp16, is_fp16, is_fp16, is_fp16, is_fp16, is_fp16, is_fp16, is_fp16, is_fp16, is_fp16, is_fp16, is_fp16, is_fp16, is_fp16, is_fp16, is_fp16, is_fp16, is_fp16, is_fp16, is_fp16, is_fp16, is_fp16, is_fp16, is_fp16, is_fp16 };
+
+  assign _057_ = layer_st ? fangyuan13 : cfg_is_fp;
+  wire [639:0] fangyuan14;
+  assign fangyuan14 = { reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate, reg2dp_clip_truncate };
+
+  assign _061_ = layer_st ? fangyuan14 : cfg_truncate;
+  assign _062_ = layer_st ? reg2dp_conv_mode : cfg_winograd;
+  assign _048_ = _068_ ? accu_ram_sel_7_w : accu_ram_sel_7_d0;
+  assign _045_ = _068_ ? accu_ram_sel_6_w : accu_ram_sel_6_d0;
+  assign _042_ = _068_ ? accu_ram_sel_5_w : accu_ram_sel_5_d0;
+  assign _039_ = _068_ ? accu_rd_mask_w[4] : accu_ram_sel_4_d0;
+  assign _036_ = _068_ ? accu_ram_sel_3_w : accu_ram_sel_3_d0;
+  assign _033_ = _068_ ? accu_ram_sel_2_w : accu_ram_sel_2_d0;
+  assign _030_ = _068_ ? accu_ram_sel_1_w : accu_ram_sel_1_d0;
+  assign _027_ = _068_ ? accu_rd_mask_w[0] : accu_ram_sel_0_d0;
+  wire [3:0] fangyuan15;
+  assign fangyuan15 = { is_x8, is_x4, is_x2, is_x1 };
+
+  assign _023_ = layer_st ? fangyuan15 : accu_mode_d0;
+  assign _051_ = _068_ ? accu_rd_mask_w : accu_rd_mask;
+  wire [8:0] fangyuan16;
+  assign fangyuan16 = { accu_channel_st_w, accu_channel_st_w, accu_channel_st_w, accu_channel_st_w, accu_channel_st_w, accu_channel_st_w, accu_channel_st_w, accu_channel_st_w, accu_channel_st_w };
+
+  assign _004_ = _068_ ? fangyuan16 : accu_channel_st;
+  assign _005_ = _068_ ? accu_cnt_w : accu_cnt;
+  assign _026_ = mac_a2accu_pvld ? mac_a2accu_pd : accu_pd;
+  assign accu_rd_sel_w = 1'b1 << accu_cnt_w[1:0];
+  assign _076_ = reg2dp_op_en ? 1'b0 : wait_for_op_en;
+  assign wait_for_op_en_w = dp2reg_done ? 1'b1 : _076_;
+  assign accu_cnt_w = _074_ ? 7'b0000000 : accu_cnt_inc;
+  assign accu_addr_d0 = cfg_winograd ? accu_cnt[4:0] : accu_cnt[6:2];
+  wire [7:0] fangyuan17;
+  assign fangyuan17 = { accu_rd_sel_w, accu_rd_sel_w };
+  wire [7:0] fangyuan18;
+  assign fangyuan18 = { 4'b0000, accu_rd_sel_w };
+
+  assign _077_ = is_x2 ? fangyuan17 : fangyuan18;
+  assign _078_ = is_x4 ? 8'b00001111 : _077_;
+  assign accu_rd_mask_w = is_x8 ? 8'b11111111 : _078_;
+  assign _079_ = _064_ ? accu_pd[7] : accu_channel_st[8];
+  assign accu_channel_st_w = layer_st ? 1'b1 : _079_;
+  assign _066_[79:0] = is_x2 ? 80'b11111111111111110000000000000000000000000000000000000000000000001111111111111111 : 80'b00000000000000000000000000000000000000000000000000000000000000001111111111111111;
+  assign _067_[79:0] = is_x4 ? 80'b00000000000000001111111111111111111111111111111111111111111111111111111111111111 : _066_[79:0];
+  wire [127:0] fangyuan19;
+  assign fangyuan19 = { 48'b000000000000000000000000000000000000000000000000, _067_[79:0] };
+
+  assign _080_ = is_x8 ? 128'b11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111 : fangyuan19;
+  assign cfg_in_en_mask_w[127:0] = is_fp16 ? 128'b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 : _080_;
+  assign _081_ = is_x1 ? 64'b0000000000000000000000000000000000000000000000001111111111111111 : 64'b1111111111111111111111111111111111111111111111111111111111111111;
+  assign cfg_in_en_mask_w[191:128] = is_fp16 ? _081_ : 64'b0000000000000000000000000000000000000000000000000000000000000000;
+  assign _066_[127:80] = 48'b000000000000000000000000000000000000000000000000;
+  assign _067_[127:80] = 48'b000000000000000000000000000000000000000000000000;
+  assign abuf_rd_addr = accu_addr_d0;
+  assign accu_addr = accu_addr_d0;
+  assign accu_batch_index = accu_pd[4:0];
+  assign accu_channel_end = accu_pd[7];
+  assign accu_channel_end_d0 = accu_pd[7];
+  assign accu_ctrl_pd = { accu_ctrl_dlv_elem_mask, accu_ctrl_ram_sel_7, accu_ctrl_ram_sel_6, accu_ctrl_ram_sel_5, accu_ctrl_ram_sel_4, accu_ctrl_ram_sel_3, accu_ctrl_ram_sel_2, accu_ctrl_ram_sel_1, accu_ctrl_ram_sel_0, accu_ctrl_layer_end, accu_ctrl_channel_end, accu_ctrl_stripe_end, accu_ctrl_rd_mask, accu_ctrl_mode, accu_ctrl_addr };
+  assign accu_ctrl_ram_valid[191:1] = { accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0], accu_ctrl_ram_valid[0] };
+  assign accu_ctrl_valid_d0 = accu_valid[0];
+  assign accu_layer_end = accu_pd[8];
+  assign accu_layer_end_d0 = accu_pd[8];
+  assign accu_ram_sel_0_w = accu_rd_mask_w[0];
+  assign accu_ram_sel_4_w = accu_rd_mask_w[4];
+  assign accu_ram_valid_d0 = accu_ram_valid;
+  assign accu_rd_en = abuf_rd_en;
+  assign accu_rd_mask_d0 = accu_rd_mask;
+  assign accu_stripe_end = accu_pd[6];
+  assign accu_stripe_end_d0 = accu_pd[6];
+  assign accu_stripe_st = accu_pd[5];
+  assign accu_valid[8:1] = { accu_valid[0], accu_valid[0], accu_valid[0], accu_valid[0], accu_valid[0], accu_valid[0], accu_valid[0], accu_valid[0] };
+  assign is_winograd = reg2dp_conv_mode;
+  assign pre_accu_addr = accu_addr_d2;
+  assign pre_accu_channel_end = accu_channel_end_d2;
+  assign pre_accu_ctrl_valid = accu_ctrl_valid_d2;
+  assign pre_accu_layer_end = accu_layer_end_d2;
+  assign pre_accu_mode = accu_mode_d2;
+  assign pre_accu_ram_sel_0 = accu_ram_sel_0_d2;
+  assign pre_accu_ram_sel_1 = accu_ram_sel_1_d2;
+  assign pre_accu_ram_sel_2 = accu_ram_sel_2_d2;
+  assign pre_accu_ram_sel_3 = accu_ram_sel_3_d2;
+  assign pre_accu_ram_sel_4 = accu_ram_sel_4_d2;
+  assign pre_accu_ram_sel_5 = accu_ram_sel_5_d2;
+  assign pre_accu_ram_sel_6 = accu_ram_sel_6_d2;
+  assign pre_accu_ram_sel_7 = accu_ram_sel_7_d2;
+  assign pre_accu_ram_valid = accu_ram_valid_d2;
+  assign pre_accu_rd_mask = accu_rd_mask_d2;
+  assign pre_accu_stripe_end = accu_stripe_end_d2;
+  assign slcg_cell_en = slcg_cell_en_d3;
+endmodule

@@ -30,11 +30,11 @@ void input_expr(std::string line) {
     insertDone = g_varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
   else
     insertDone = g_varWidth.var_width_insert(var, 0, 0);
-  if (!insertDone) {
-    std::cout << "insert failed in input case:" + line << std::endl;
-    std::cout << "m.str(2):" + m.str(2) << std::endl;
-    std::cout << "m.str(3):" + m.str(3) << std::endl;
-  }
+  //if (!insertDone) {
+  //  std::cout << "insert failed in input case:" + line << std::endl;
+  //  std::cout << "m.str(2):" + m.str(2) << std::endl;
+  //  std::cout << "m.str(3):" + m.str(3) << std::endl;
+  //}
 }
 
 
@@ -58,11 +58,11 @@ void reg_expr(std::string line) {
     insertDone = g_varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
   else
     insertDone = g_varWidth.var_width_insert(var, 0, 0);
-  if (!insertDone) {
-    std::cout << "insert failed in reg case:" + line << std::endl;
-    std::cout << "m.str(2):" + m.str(2) << std::endl;
-    std::cout << "m.str(3):" + m.str(3) << std::endl;
-  }
+  //if (!insertDone) {
+  //  std::cout << "insert failed in reg case:" + line << std::endl;
+  //  std::cout << "m.str(2):" + m.str(2) << std::endl;
+  //  std::cout << "m.str(3):" + m.str(3) << std::endl;
+  //}
 }
 
 
@@ -80,11 +80,11 @@ void wire_expr(std::string line) {
     insertDone = g_varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
   else
     insertDone = g_varWidth.var_width_insert(var, 0, 0);
-  if (!insertDone) {
-    std::cout << "insert failed in wire case:" + line << std::endl;
-    std::cout << "m.str(2):" + m.str(2) << std::endl;
-    std::cout << "m.str(3):" + m.str(3) << std::endl;
-  }
+  //if (!insertDone) {
+  //  std::cout << "insert failed in wire case:" + line << std::endl;
+  //  std::cout << "m.str(2):" + m.str(2) << std::endl;
+  //  std::cout << "m.str(3):" + m.str(3) << std::endl;
+  //}
 }
 
 
@@ -107,11 +107,11 @@ void mem_expr(std::string line) {
     insertDone = g_varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
   else
     insertDone = g_varWidth.var_width_insert(var, 0, 0);
-  if (!insertDone) {
-    std::cout << "insert failed in mem case:" + line << std::endl;
-    std::cout << "m.str(2):" + m.str(2) << std::endl;
-    std::cout << "m.str(3):" + m.str(3) << std::endl;
-  }
+  //if (!insertDone) {
+  //  std::cout << "insert failed in mem case:" + line << std::endl;
+  //  std::cout << "m.str(2):" + m.str(2) << std::endl;
+  //  std::cout << "m.str(3):" + m.str(3) << std::endl;
+  //}
 }
 
 
@@ -138,11 +138,11 @@ void output_expr(std::string line) {
     insertDone = g_varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
   else
     insertDone = g_varWidth.var_width_insert(var, 0, 0);
-  if (!insertDone) {
-    std::cout << "insert failed in output case:" + line << std::endl;
-    std::cout << "m.str(2):" + m.str(2) << std::endl;
-    std::cout << "m.str(3):" + m.str(3) << std::endl;
-  }
+  //if (!insertDone) {
+  //  std::cout << "insert failed in output case:" + line << std::endl;
+  //  std::cout << "m.str(2):" + m.str(2) << std::endl;
+  //  std::cout << "m.str(3):" + m.str(3) << std::endl;
+  //}
 }
 
 

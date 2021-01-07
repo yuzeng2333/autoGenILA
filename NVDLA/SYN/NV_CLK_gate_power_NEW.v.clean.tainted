@@ -1,0 +1,82 @@
+  input clk;
+  input clk_T ;
+  input [13:0] clk_S ;
+  output clk_R ;
+  output clk_X ;
+  output clk_C ;
+  input clk_en;
+  input clk_en_T ;
+  input [13:0] clk_en_S ;
+  output clk_en_R ;
+  output clk_en_X ;
+  output clk_en_C ;
+  output clk_gated;
+  logic clk_gated ;
+  output clk_gated_T ;
+  logic clk_gated_T ;
+  logic clk_gated_R ;
+  logic clk_gated_C ;
+  logic clk_gated_X ;
+  logic [13:0] clk_gated_S ;
+  input clk_gated_R0 ;
+  input clk_gated_C0 ;
+  input clk_gated_X0 ;
+  output [13:0] clk_gated_S ;
+  input reset_;
+  input reset__T ;
+  input [13:0] reset__S ;
+  output reset__R ;
+  output reset__X ;
+  output reset__C ;
+  logic [0:0] clk_R0 ;
+  logic [0:0] clk_X0 ;
+  logic [0:0] clk_C0 ;
+  logic [0:0] clk_en_R0 ;
+  logic [0:0] clk_en_X0 ;
+  logic [0:0] clk_en_C0 ;
+// module: CKLNQD12
+  CKLNQD12 p_clkgate (
+    .CP_T (  clk_T  ),
+    .CP_R (  clk_R0  ),
+    .CP_X (  clk_X0  ),
+    .CP_C (  clk_C0  ),
+    .CP_S (  clk_S  ),
+    .E_T (  clk_en_T  ),
+    .E_R (  clk_en_R0  ),
+    .E_X (  clk_en_X0  ),
+    .E_C (  clk_en_C0  ),
+    .E_S (  clk_en_S  ),
+    .TE_T (  1'h0  ),
+    .TE_R (  nouse_zy0  ),
+    .TE_X (  nouse_zy1  ),
+    .TE_C (  nouse_zy2  ),
+    .TE_S ( 1'h0 ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Q_T (  clk_gated_T  ),
+    .Q_R0 (  clk_gated_R  ),
+    .Q_X0 (  clk_gated_X  ),
+    .Q_C0 (  clk_gated_C  ),
+    .Q_S ( clk_gated_S ),
+    .TE ( 1'b0 ),
+    .Q ( clk_gated ),
+    .CP ( clk ),
+    .E ( clk_en )
+  );
+  logic [1-1:0] nouse_zy0 ;
+  logic [1-1:0] nouse_zy1 ;
+  logic [1-1:0] nouse_zy2 ;
+  assign clk_en_C = ( clk_en_C0 );
+  assign clk_C = ( clk_C0 );
+  assign clk_gated_C = ( clk_gated_C0 );
+  assign clk_en_X = ( clk_en_X0 );
+  assign clk_X = ( clk_X0 );
+  assign clk_gated_X = ( clk_gated_X0 );
+  assign clk_en_R = ( clk_en_X0 & clk_en_R0 );
+  assign clk_R = ( clk_X0 & clk_R0 );
+  assign clk_gated_R = ( clk_gated_X0 & clk_gated_R0 );
+ // ground taints for floating regs
+ // ground taints for unused wires
+ // ground taints for unused wire slices
+  assign rst_zy = reset_ ;
+endmodule

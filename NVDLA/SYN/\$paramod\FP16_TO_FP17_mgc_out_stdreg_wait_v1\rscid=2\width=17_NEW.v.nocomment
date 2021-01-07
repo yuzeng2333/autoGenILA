@@ -1,0 +1,11 @@
+module \$paramod\FP16_TO_FP17_mgc_out_stdreg_wait_v1\rscid=2\width=17 (ld, vd, d, lz, vz, z);
+  input [16:0] d;
+  input ld;
+  output lz;
+  output vd;
+  input vz;
+  output [16:0] z;
+  assign lz = ld;
+  assign vd = vz;
+  assign z = d;
+endmodule

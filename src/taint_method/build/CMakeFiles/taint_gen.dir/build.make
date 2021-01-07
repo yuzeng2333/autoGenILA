@@ -96,9 +96,22 @@ CMakeFiles/taint_gen.dir/src/pass_info.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/taint_gen.dir/src/pass_info.cpp.s"
 	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /workspace/research/ILA/autoGenILA/src/taint_method/src/pass_info.cpp -o CMakeFiles/taint_gen.dir/src/pass_info.cpp.s
 
+CMakeFiles/taint_gen.dir/src/syntax_patterns.cpp.o: CMakeFiles/taint_gen.dir/flags.make
+CMakeFiles/taint_gen.dir/src/syntax_patterns.cpp.o: ../src/syntax_patterns.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/taint_method/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/taint_gen.dir/src/syntax_patterns.cpp.o"
+	/usr/bin/g++-9  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/taint_gen.dir/src/syntax_patterns.cpp.o -c /workspace/research/ILA/autoGenILA/src/taint_method/src/syntax_patterns.cpp
+
+CMakeFiles/taint_gen.dir/src/syntax_patterns.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/taint_gen.dir/src/syntax_patterns.cpp.i"
+	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /workspace/research/ILA/autoGenILA/src/taint_method/src/syntax_patterns.cpp > CMakeFiles/taint_gen.dir/src/syntax_patterns.cpp.i
+
+CMakeFiles/taint_gen.dir/src/syntax_patterns.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/taint_gen.dir/src/syntax_patterns.cpp.s"
+	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /workspace/research/ILA/autoGenILA/src/taint_method/src/syntax_patterns.cpp -o CMakeFiles/taint_gen.dir/src/syntax_patterns.cpp.s
+
 CMakeFiles/taint_gen.dir/src/taint_gen.cpp.o: CMakeFiles/taint_gen.dir/flags.make
 CMakeFiles/taint_gen.dir/src/taint_gen.cpp.o: ../src/taint_gen.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/taint_method/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/taint_gen.dir/src/taint_gen.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/taint_method/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/taint_gen.dir/src/taint_gen.cpp.o"
 	/usr/bin/g++-9  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/taint_gen.dir/src/taint_gen.cpp.o -c /workspace/research/ILA/autoGenILA/src/taint_method/src/taint_gen.cpp
 
 CMakeFiles/taint_gen.dir/src/taint_gen.cpp.i: cmake_force
@@ -111,7 +124,7 @@ CMakeFiles/taint_gen.dir/src/taint_gen.cpp.s: cmake_force
 
 CMakeFiles/taint_gen.dir/src/varWidth.cpp.o: CMakeFiles/taint_gen.dir/flags.make
 CMakeFiles/taint_gen.dir/src/varWidth.cpp.o: ../src/varWidth.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/taint_method/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/taint_gen.dir/src/varWidth.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/taint_method/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/taint_gen.dir/src/varWidth.cpp.o"
 	/usr/bin/g++-9  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/taint_gen.dir/src/varWidth.cpp.o -c /workspace/research/ILA/autoGenILA/src/taint_method/src/varWidth.cpp
 
 CMakeFiles/taint_gen.dir/src/varWidth.cpp.i: cmake_force
@@ -124,7 +137,7 @@ CMakeFiles/taint_gen.dir/src/varWidth.cpp.s: cmake_force
 
 CMakeFiles/taint_gen.dir/src/vcd_parser.cpp.o: CMakeFiles/taint_gen.dir/flags.make
 CMakeFiles/taint_gen.dir/src/vcd_parser.cpp.o: ../src/vcd_parser.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/taint_method/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/taint_gen.dir/src/vcd_parser.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/taint_method/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/taint_gen.dir/src/vcd_parser.cpp.o"
 	/usr/bin/g++-9  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/taint_gen.dir/src/vcd_parser.cpp.o -c /workspace/research/ILA/autoGenILA/src/taint_method/src/vcd_parser.cpp
 
 CMakeFiles/taint_gen.dir/src/vcd_parser.cpp.i: cmake_force
@@ -137,7 +150,7 @@ CMakeFiles/taint_gen.dir/src/vcd_parser.cpp.s: cmake_force
 
 CMakeFiles/taint_gen.dir/app/main.cpp.o: CMakeFiles/taint_gen.dir/flags.make
 CMakeFiles/taint_gen.dir/app/main.cpp.o: ../app/main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/taint_method/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/taint_gen.dir/app/main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/research/ILA/autoGenILA/src/taint_method/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/taint_gen.dir/app/main.cpp.o"
 	/usr/bin/g++-9  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/taint_gen.dir/app/main.cpp.o -c /workspace/research/ILA/autoGenILA/src/taint_method/app/main.cpp
 
 CMakeFiles/taint_gen.dir/app/main.cpp.i: cmake_force
@@ -153,6 +166,7 @@ taint_gen_OBJECTS = \
 "CMakeFiles/taint_gen.dir/src/helper.cpp.o" \
 "CMakeFiles/taint_gen.dir/src/op_taint_gen.cpp.o" \
 "CMakeFiles/taint_gen.dir/src/pass_info.cpp.o" \
+"CMakeFiles/taint_gen.dir/src/syntax_patterns.cpp.o" \
 "CMakeFiles/taint_gen.dir/src/taint_gen.cpp.o" \
 "CMakeFiles/taint_gen.dir/src/varWidth.cpp.o" \
 "CMakeFiles/taint_gen.dir/src/vcd_parser.cpp.o" \
@@ -164,13 +178,14 @@ taint_gen_EXTERNAL_OBJECTS =
 taint_gen: CMakeFiles/taint_gen.dir/src/helper.cpp.o
 taint_gen: CMakeFiles/taint_gen.dir/src/op_taint_gen.cpp.o
 taint_gen: CMakeFiles/taint_gen.dir/src/pass_info.cpp.o
+taint_gen: CMakeFiles/taint_gen.dir/src/syntax_patterns.cpp.o
 taint_gen: CMakeFiles/taint_gen.dir/src/taint_gen.cpp.o
 taint_gen: CMakeFiles/taint_gen.dir/src/varWidth.cpp.o
 taint_gen: CMakeFiles/taint_gen.dir/src/vcd_parser.cpp.o
 taint_gen: CMakeFiles/taint_gen.dir/app/main.cpp.o
 taint_gen: CMakeFiles/taint_gen.dir/build.make
 taint_gen: CMakeFiles/taint_gen.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/workspace/research/ILA/autoGenILA/src/taint_method/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Linking CXX executable taint_gen"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/workspace/research/ILA/autoGenILA/src/taint_method/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Linking CXX executable taint_gen"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/taint_gen.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

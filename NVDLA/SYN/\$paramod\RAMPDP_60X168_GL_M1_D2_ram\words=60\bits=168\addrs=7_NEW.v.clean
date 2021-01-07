@@ -1,0 +1,1285 @@
+module \$paramod\RAMPDP_60X168_GL_M1_D2_ram\words=60\bits=168\addrs=7 (wadr, wrclk, wrmaskn, wrdata, radr, rout_B);
+  wire [167:0] _000_;
+  wire _001_;
+  wire _002_;
+  wire _003_;
+  wire _004_;
+  wire _005_;
+  wire _006_;
+  wire _007_;
+  wire _008_;
+  wire _009_;
+  wire _010_;
+  wire _011_;
+  wire _012_;
+  wire _013_;
+  wire _014_;
+  wire _015_;
+  wire _016_;
+  wire _017_;
+  wire _018_;
+  wire _019_;
+  wire _020_;
+  wire _021_;
+  wire _022_;
+  wire _023_;
+  wire _024_;
+  wire _025_;
+  wire _026_;
+  wire _027_;
+  wire _028_;
+  wire _029_;
+  wire _030_;
+  wire _031_;
+  wire _032_;
+  wire _033_;
+  wire _034_;
+  wire _035_;
+  wire _036_;
+  wire _037_;
+  wire _038_;
+  wire _039_;
+  wire _040_;
+  wire _041_;
+  wire _042_;
+  wire _043_;
+  wire _044_;
+  wire _045_;
+  wire _046_;
+  wire _047_;
+  wire _048_;
+  wire _049_;
+  wire _050_;
+  wire _051_;
+  wire _052_;
+  wire _053_;
+  wire _054_;
+  wire _055_;
+  wire _056_;
+  wire _057_;
+  wire _058_;
+  wire _059_;
+  wire _060_;
+  wire _061_;
+  wire _062_;
+  wire _063_;
+  wire _064_;
+  wire _065_;
+  wire _066_;
+  wire _067_;
+  wire _068_;
+  wire _069_;
+  wire _070_;
+  wire _071_;
+  wire _072_;
+  wire _073_;
+  wire _074_;
+  wire _075_;
+  wire _076_;
+  wire _077_;
+  wire _078_;
+  wire _079_;
+  wire _080_;
+  wire _081_;
+  wire _082_;
+  wire _083_;
+  wire _084_;
+  wire _085_;
+  wire _086_;
+  wire _087_;
+  wire _088_;
+  wire _089_;
+  wire _090_;
+  wire _091_;
+  wire _092_;
+  wire _093_;
+  wire _094_;
+  wire _095_;
+  wire _096_;
+  wire _097_;
+  wire _098_;
+  wire _099_;
+  wire _100_;
+  wire _101_;
+  wire _102_;
+  wire _103_;
+  wire _104_;
+  wire _105_;
+  wire _106_;
+  wire _107_;
+  wire _108_;
+  wire _109_;
+  wire _110_;
+  wire _111_;
+  wire _112_;
+  wire _113_;
+  wire _114_;
+  wire _115_;
+  wire _116_;
+  wire _117_;
+  wire _118_;
+  wire _119_;
+  wire _120_;
+  wire _121_;
+  wire _122_;
+  wire _123_;
+  wire _124_;
+  wire _125_;
+  wire _126_;
+  wire _127_;
+  wire _128_;
+  wire _129_;
+  wire _130_;
+  wire _131_;
+  wire _132_;
+  wire _133_;
+  wire _134_;
+  wire _135_;
+  wire _136_;
+  wire _137_;
+  wire _138_;
+  wire _139_;
+  wire _140_;
+  wire _141_;
+  wire _142_;
+  wire _143_;
+  wire _144_;
+  wire _145_;
+  wire _146_;
+  wire _147_;
+  wire _148_;
+  wire _149_;
+  wire _150_;
+  wire _151_;
+  wire _152_;
+  wire _153_;
+  wire _154_;
+  wire _155_;
+  wire _156_;
+  wire _157_;
+  wire _158_;
+  wire _159_;
+  wire _160_;
+  wire _161_;
+  wire _162_;
+  wire _163_;
+  wire _164_;
+  wire _165_;
+  wire _166_;
+  wire _167_;
+  wire _168_;
+  wire _169_;
+  wire _170_;
+  wire _171_;
+  wire _172_;
+  wire _173_;
+  wire _174_;
+  wire _175_;
+  wire _176_;
+  wire _177_;
+  wire _178_;
+  wire _179_;
+  wire _180_;
+  wire _181_;
+  wire _182_;
+  wire _183_;
+  wire _184_;
+  wire _185_;
+  wire _186_;
+  wire _187_;
+  wire _188_;
+  wire _189_;
+  wire _190_;
+  wire _191_;
+  wire _192_;
+  wire _193_;
+  wire _194_;
+  wire _195_;
+  wire _196_;
+  wire _197_;
+  wire _198_;
+  wire _199_;
+  wire _200_;
+  wire _201_;
+  wire _202_;
+  wire _203_;
+  wire _204_;
+  wire _205_;
+  wire _206_;
+  wire _207_;
+  wire _208_;
+  wire _209_;
+  wire _210_;
+  wire _211_;
+  wire _212_;
+  wire _213_;
+  wire _214_;
+  wire _215_;
+  wire _216_;
+  wire _217_;
+  wire _218_;
+  wire _219_;
+  wire _220_;
+  wire _221_;
+  wire _222_;
+  wire _223_;
+  wire _224_;
+  wire _225_;
+  wire _226_;
+  wire _227_;
+  wire _228_;
+  wire _229_;
+  wire _230_;
+  wire _231_;
+  wire _232_;
+  wire _233_;
+  wire _234_;
+  wire _235_;
+  wire _236_;
+  wire _237_;
+  wire _238_;
+  wire _239_;
+  wire _240_;
+  wire _241_;
+  wire _242_;
+  wire _243_;
+  wire _244_;
+  wire _245_;
+  wire _246_;
+  wire _247_;
+  wire _248_;
+  wire _249_;
+  wire _250_;
+  wire _251_;
+  wire _252_;
+  wire _253_;
+  wire _254_;
+  wire _255_;
+  wire _256_;
+  wire _257_;
+  wire _258_;
+  wire _259_;
+  wire _260_;
+  wire _261_;
+  wire _262_;
+  wire _263_;
+  wire _264_;
+  wire _265_;
+  wire _266_;
+  wire _267_;
+  wire _268_;
+  wire _269_;
+  wire _270_;
+  wire _271_;
+  wire _272_;
+  wire _273_;
+  wire _274_;
+  wire _275_;
+  wire _276_;
+  wire _277_;
+  wire _278_;
+  wire _279_;
+  wire _280_;
+  wire _281_;
+  wire _282_;
+  wire _283_;
+  wire _284_;
+  wire _285_;
+  wire _286_;
+  wire _287_;
+  wire _288_;
+  wire _289_;
+  wire _290_;
+  wire _291_;
+  wire _292_;
+  wire _293_;
+  wire _294_;
+  wire _295_;
+  wire _296_;
+  wire _297_;
+  wire _298_;
+  wire _299_;
+  wire _300_;
+  wire _301_;
+  wire _302_;
+  wire _303_;
+  wire _304_;
+  wire _305_;
+  wire _306_;
+  wire _307_;
+  wire _308_;
+  wire _309_;
+  wire _310_;
+  wire _311_;
+  wire _312_;
+  wire _313_;
+  wire _314_;
+  wire _315_;
+  wire _316_;
+  wire _317_;
+  wire _318_;
+  wire _319_;
+  wire _320_;
+  wire _321_;
+  wire _322_;
+  wire _323_;
+  wire _324_;
+  wire _325_;
+  wire _326_;
+  wire _327_;
+  wire _328_;
+  wire _329_;
+  wire _330_;
+  wire _331_;
+  wire _332_;
+  wire _333_;
+  wire _334_;
+  wire _335_;
+  wire _336_;
+  wire _337_;
+  wire _338_;
+  wire _339_;
+  wire _340_;
+  wire _341_;
+  wire _342_;
+  wire _343_;
+  wire _344_;
+  wire _345_;
+  wire _346_;
+  wire _347_;
+  wire _348_;
+  wire _349_;
+  wire _350_;
+  wire _351_;
+  wire _352_;
+  wire _353_;
+  wire _354_;
+  wire _355_;
+  wire _356_;
+  wire _357_;
+  wire _358_;
+  wire _359_;
+  wire _360_;
+  reg [167:0] \arr[0] ;
+  reg [167:0] \arr[10] ;
+  reg [167:0] \arr[11] ;
+  reg [167:0] \arr[12] ;
+  reg [167:0] \arr[13] ;
+  reg [167:0] \arr[14] ;
+  reg [167:0] \arr[15] ;
+  reg [167:0] \arr[16] ;
+  reg [167:0] \arr[17] ;
+  reg [167:0] \arr[18] ;
+  reg [167:0] \arr[19] ;
+  reg [167:0] \arr[1] ;
+  reg [167:0] \arr[20] ;
+  reg [167:0] \arr[21] ;
+  reg [167:0] \arr[22] ;
+  reg [167:0] \arr[23] ;
+  reg [167:0] \arr[24] ;
+  reg [167:0] \arr[25] ;
+  reg [167:0] \arr[26] ;
+  reg [167:0] \arr[27] ;
+  reg [167:0] \arr[28] ;
+  reg [167:0] \arr[29] ;
+  reg [167:0] \arr[2] ;
+  reg [167:0] \arr[30] ;
+  reg [167:0] \arr[31] ;
+  reg [167:0] \arr[32] ;
+  reg [167:0] \arr[33] ;
+  reg [167:0] \arr[34] ;
+  reg [167:0] \arr[35] ;
+  reg [167:0] \arr[36] ;
+  reg [167:0] \arr[37] ;
+  reg [167:0] \arr[38] ;
+  reg [167:0] \arr[39] ;
+  reg [167:0] \arr[3] ;
+  reg [167:0] \arr[40] ;
+  reg [167:0] \arr[41] ;
+  reg [167:0] \arr[42] ;
+  reg [167:0] \arr[43] ;
+  reg [167:0] \arr[44] ;
+  reg [167:0] \arr[45] ;
+  reg [167:0] \arr[46] ;
+  reg [167:0] \arr[47] ;
+  reg [167:0] \arr[48] ;
+  reg [167:0] \arr[49] ;
+  reg [167:0] \arr[4] ;
+  reg [167:0] \arr[50] ;
+  reg [167:0] \arr[51] ;
+  reg [167:0] \arr[52] ;
+  reg [167:0] \arr[53] ;
+  reg [167:0] \arr[54] ;
+  reg [167:0] \arr[55] ;
+  reg [167:0] \arr[56] ;
+  reg [167:0] \arr[57] ;
+  reg [167:0] \arr[58] ;
+  reg [167:0] \arr[59] ;
+  reg [167:0] \arr[5] ;
+  reg [167:0] \arr[6] ;
+  reg [167:0] \arr[7] ;
+  reg [167:0] \arr[8] ;
+  reg [167:0] \arr[9] ;
+  wire [167:0] bre;
+  wire [167:0] bwe;
+  input [6:0] radr;
+  wire [167:0] rdarr;
+  output [167:0] rout_B;
+  input [6:0] wadr;
+  input wrclk;
+  input [167:0] wrdata;
+  input [167:0] wrmaskn;
+  assign _001_ = ~ wrclk;
+  assign _002_ = ~ _360_;
+  assign _004_ = ~ _359_;
+  assign _006_ = ~ _358_;
+  assign _008_ = ~ _357_;
+  assign _010_ = ~ _356_;
+  assign _012_ = ~ _355_;
+  assign _014_ = ~ _354_;
+  assign _016_ = ~ _353_;
+  assign _018_ = ~ _352_;
+  assign _020_ = ~ _351_;
+  assign _022_ = ~ _350_;
+  assign _024_ = ~ _349_;
+  assign _026_ = ~ _348_;
+  assign _028_ = ~ _347_;
+  assign _030_ = ~ _346_;
+  assign _032_ = ~ _345_;
+  assign _034_ = ~ _344_;
+  assign _036_ = ~ _343_;
+  assign _038_ = ~ _342_;
+  assign _040_ = ~ _341_;
+  assign _042_ = ~ _340_;
+  assign _044_ = ~ _339_;
+  assign _046_ = ~ _338_;
+  assign _048_ = ~ _337_;
+  assign _050_ = ~ _336_;
+  assign _052_ = ~ _335_;
+  assign _054_ = ~ _334_;
+  assign _056_ = ~ _333_;
+  assign _058_ = ~ _332_;
+  assign _060_ = ~ _331_;
+  assign _062_ = ~ _330_;
+  assign _064_ = ~ _329_;
+  assign _066_ = ~ _328_;
+  assign _068_ = ~ _327_;
+  assign _070_ = ~ _326_;
+  assign _072_ = ~ _325_;
+  assign _074_ = ~ _324_;
+  assign _076_ = ~ _323_;
+  assign _078_ = ~ _322_;
+  assign _080_ = ~ _321_;
+  assign _082_ = ~ _320_;
+  assign _084_ = ~ _319_;
+  assign _086_ = ~ _318_;
+  assign _088_ = ~ _317_;
+  assign _090_ = ~ _316_;
+  assign _092_ = ~ _315_;
+  assign _094_ = ~ _314_;
+  assign _096_ = ~ _313_;
+  assign _098_ = ~ _312_;
+  assign _100_ = ~ _311_;
+  assign _102_ = ~ _310_;
+  assign _104_ = ~ _309_;
+  assign _106_ = ~ _308_;
+  assign _108_ = ~ _307_;
+  assign _110_ = ~ _306_;
+  assign _112_ = ~ _305_;
+  assign _114_ = ~ _304_;
+  assign _116_ = ~ _303_;
+  assign _118_ = ~ _302_;
+  assign _120_ = ~ _301_;
+  wire [1:0] fangyuan0;
+  assign fangyuan0 = { _001_, _182_ };
+
+  assign _122_ = | fangyuan0;
+  wire [1:0] fangyuan1;
+  assign fangyuan1 = { _001_, _183_ };
+
+  assign _123_ = | fangyuan1;
+  wire [1:0] fangyuan2;
+  assign fangyuan2 = { _001_, _184_ };
+
+  assign _124_ = | fangyuan2;
+  wire [1:0] fangyuan3;
+  assign fangyuan3 = { _001_, _185_ };
+
+  assign _125_ = | fangyuan3;
+  wire [1:0] fangyuan4;
+  assign fangyuan4 = { _001_, _186_ };
+
+  assign _126_ = | fangyuan4;
+  wire [1:0] fangyuan5;
+  assign fangyuan5 = { _001_, _187_ };
+
+  assign _127_ = | fangyuan5;
+  wire [1:0] fangyuan6;
+  assign fangyuan6 = { _001_, _188_ };
+
+  assign _128_ = | fangyuan6;
+  wire [1:0] fangyuan7;
+  assign fangyuan7 = { _001_, _189_ };
+
+  assign _129_ = | fangyuan7;
+  wire [1:0] fangyuan8;
+  assign fangyuan8 = { _001_, _190_ };
+
+  assign _130_ = | fangyuan8;
+  wire [1:0] fangyuan9;
+  assign fangyuan9 = { _001_, _191_ };
+
+  assign _131_ = | fangyuan9;
+  wire [1:0] fangyuan10;
+  assign fangyuan10 = { _001_, _192_ };
+
+  assign _132_ = | fangyuan10;
+  wire [1:0] fangyuan11;
+  assign fangyuan11 = { _001_, _193_ };
+
+  assign _133_ = | fangyuan11;
+  wire [1:0] fangyuan12;
+  assign fangyuan12 = { _001_, _194_ };
+
+  assign _134_ = | fangyuan12;
+  wire [1:0] fangyuan13;
+  assign fangyuan13 = { _001_, _195_ };
+
+  assign _135_ = | fangyuan13;
+  wire [1:0] fangyuan14;
+  assign fangyuan14 = { _001_, _196_ };
+
+  assign _136_ = | fangyuan14;
+  wire [1:0] fangyuan15;
+  assign fangyuan15 = { _001_, _197_ };
+
+  assign _137_ = | fangyuan15;
+  wire [1:0] fangyuan16;
+  assign fangyuan16 = { _001_, _198_ };
+
+  assign _138_ = | fangyuan16;
+  wire [1:0] fangyuan17;
+  assign fangyuan17 = { _001_, _199_ };
+
+  assign _139_ = | fangyuan17;
+  wire [1:0] fangyuan18;
+  assign fangyuan18 = { _001_, _200_ };
+
+  assign _140_ = | fangyuan18;
+  wire [1:0] fangyuan19;
+  assign fangyuan19 = { _001_, _201_ };
+
+  assign _141_ = | fangyuan19;
+  wire [1:0] fangyuan20;
+  assign fangyuan20 = { _001_, _202_ };
+
+  assign _142_ = | fangyuan20;
+  wire [1:0] fangyuan21;
+  assign fangyuan21 = { _001_, _203_ };
+
+  assign _143_ = | fangyuan21;
+  wire [1:0] fangyuan22;
+  assign fangyuan22 = { _001_, _204_ };
+
+  assign _144_ = | fangyuan22;
+  wire [1:0] fangyuan23;
+  assign fangyuan23 = { _001_, _205_ };
+
+  assign _145_ = | fangyuan23;
+  wire [1:0] fangyuan24;
+  assign fangyuan24 = { _001_, _206_ };
+
+  assign _146_ = | fangyuan24;
+  wire [1:0] fangyuan25;
+  assign fangyuan25 = { _001_, _207_ };
+
+  assign _147_ = | fangyuan25;
+  wire [1:0] fangyuan26;
+  assign fangyuan26 = { _001_, _208_ };
+
+  assign _148_ = | fangyuan26;
+  wire [1:0] fangyuan27;
+  assign fangyuan27 = { _001_, _209_ };
+
+  assign _149_ = | fangyuan27;
+  wire [1:0] fangyuan28;
+  assign fangyuan28 = { _001_, _210_ };
+
+  assign _150_ = | fangyuan28;
+  wire [1:0] fangyuan29;
+  assign fangyuan29 = { _001_, _211_ };
+
+  assign _151_ = | fangyuan29;
+  wire [1:0] fangyuan30;
+  assign fangyuan30 = { _001_, _212_ };
+
+  assign _152_ = | fangyuan30;
+  wire [1:0] fangyuan31;
+  assign fangyuan31 = { _001_, _213_ };
+
+  assign _153_ = | fangyuan31;
+  wire [1:0] fangyuan32;
+  assign fangyuan32 = { _001_, _214_ };
+
+  assign _154_ = | fangyuan32;
+  wire [1:0] fangyuan33;
+  assign fangyuan33 = { _001_, _215_ };
+
+  assign _155_ = | fangyuan33;
+  wire [1:0] fangyuan34;
+  assign fangyuan34 = { _001_, _216_ };
+
+  assign _156_ = | fangyuan34;
+  wire [1:0] fangyuan35;
+  assign fangyuan35 = { _001_, _217_ };
+
+  assign _157_ = | fangyuan35;
+  wire [1:0] fangyuan36;
+  assign fangyuan36 = { _001_, _218_ };
+
+  assign _158_ = | fangyuan36;
+  wire [1:0] fangyuan37;
+  assign fangyuan37 = { _001_, _219_ };
+
+  assign _159_ = | fangyuan37;
+  wire [1:0] fangyuan38;
+  assign fangyuan38 = { _001_, _220_ };
+
+  assign _160_ = | fangyuan38;
+  wire [1:0] fangyuan39;
+  assign fangyuan39 = { _001_, _221_ };
+
+  assign _161_ = | fangyuan39;
+  wire [1:0] fangyuan40;
+  assign fangyuan40 = { _001_, _222_ };
+
+  assign _162_ = | fangyuan40;
+  wire [1:0] fangyuan41;
+  assign fangyuan41 = { _001_, _223_ };
+
+  assign _163_ = | fangyuan41;
+  wire [1:0] fangyuan42;
+  assign fangyuan42 = { _001_, _224_ };
+
+  assign _164_ = | fangyuan42;
+  wire [1:0] fangyuan43;
+  assign fangyuan43 = { _001_, _225_ };
+
+  assign _165_ = | fangyuan43;
+  wire [1:0] fangyuan44;
+  assign fangyuan44 = { _001_, _226_ };
+
+  assign _166_ = | fangyuan44;
+  wire [1:0] fangyuan45;
+  assign fangyuan45 = { _001_, _227_ };
+
+  assign _167_ = | fangyuan45;
+  wire [1:0] fangyuan46;
+  assign fangyuan46 = { _001_, _228_ };
+
+  assign _168_ = | fangyuan46;
+  wire [1:0] fangyuan47;
+  assign fangyuan47 = { _001_, _229_ };
+
+  assign _169_ = | fangyuan47;
+  wire [1:0] fangyuan48;
+  assign fangyuan48 = { _001_, _230_ };
+
+  assign _170_ = | fangyuan48;
+  wire [1:0] fangyuan49;
+  assign fangyuan49 = { _001_, _231_ };
+
+  assign _171_ = | fangyuan49;
+  wire [1:0] fangyuan50;
+  assign fangyuan50 = { _001_, _232_ };
+
+  assign _172_ = | fangyuan50;
+  wire [1:0] fangyuan51;
+  assign fangyuan51 = { _001_, _233_ };
+
+  assign _173_ = | fangyuan51;
+  wire [1:0] fangyuan52;
+  assign fangyuan52 = { _001_, _234_ };
+
+  assign _174_ = | fangyuan52;
+  wire [1:0] fangyuan53;
+  assign fangyuan53 = { _001_, _235_ };
+
+  assign _175_ = | fangyuan53;
+  wire [1:0] fangyuan54;
+  assign fangyuan54 = { _001_, _236_ };
+
+  assign _176_ = | fangyuan54;
+  wire [1:0] fangyuan55;
+  assign fangyuan55 = { _001_, _237_ };
+
+  assign _177_ = | fangyuan55;
+  wire [1:0] fangyuan56;
+  assign fangyuan56 = { _001_, _238_ };
+
+  assign _178_ = | fangyuan56;
+  wire [1:0] fangyuan57;
+  assign fangyuan57 = { _001_, _239_ };
+
+  assign _179_ = | fangyuan57;
+  wire [1:0] fangyuan58;
+  assign fangyuan58 = { _001_, _240_ };
+
+  assign _180_ = | fangyuan58;
+  wire [1:0] fangyuan59;
+  assign fangyuan59 = { _001_, _241_ };
+
+  assign _181_ = | fangyuan59;
+  assign _182_ = wrclk & _002_;
+  assign _183_ = wrclk & _004_;
+  assign _184_ = wrclk & _006_;
+  assign _185_ = wrclk & _008_;
+  assign _186_ = wrclk & _010_;
+  assign _187_ = wrclk & _012_;
+  assign _188_ = wrclk & _014_;
+  assign _189_ = wrclk & _016_;
+  assign _190_ = wrclk & _018_;
+  assign _191_ = wrclk & _020_;
+  assign _192_ = wrclk & _022_;
+  assign _193_ = wrclk & _024_;
+  assign _194_ = wrclk & _026_;
+  assign _195_ = wrclk & _028_;
+  assign _196_ = wrclk & _030_;
+  assign _197_ = wrclk & _032_;
+  assign _198_ = wrclk & _034_;
+  assign _199_ = wrclk & _036_;
+  assign _200_ = wrclk & _038_;
+  assign _201_ = wrclk & _040_;
+  assign _202_ = wrclk & _042_;
+  assign _203_ = wrclk & _044_;
+  assign _204_ = wrclk & _046_;
+  assign _205_ = wrclk & _048_;
+  assign _206_ = wrclk & _050_;
+  assign _207_ = wrclk & _052_;
+  assign _208_ = wrclk & _054_;
+  assign _209_ = wrclk & _056_;
+  assign _210_ = wrclk & _058_;
+  assign _211_ = wrclk & _060_;
+  assign _212_ = wrclk & _062_;
+  assign _213_ = wrclk & _064_;
+  assign _214_ = wrclk & _066_;
+  assign _215_ = wrclk & _068_;
+  assign _216_ = wrclk & _070_;
+  assign _217_ = wrclk & _072_;
+  assign _218_ = wrclk & _074_;
+  assign _219_ = wrclk & _076_;
+  assign _220_ = wrclk & _078_;
+  assign _221_ = wrclk & _080_;
+  assign _222_ = wrclk & _082_;
+  assign _223_ = wrclk & _084_;
+  assign _224_ = wrclk & _086_;
+  assign _225_ = wrclk & _088_;
+  assign _226_ = wrclk & _090_;
+  assign _227_ = wrclk & _092_;
+  assign _228_ = wrclk & _094_;
+  assign _229_ = wrclk & _096_;
+  assign _230_ = wrclk & _098_;
+  assign _231_ = wrclk & _100_;
+  assign _232_ = wrclk & _102_;
+  assign _233_ = wrclk & _104_;
+  assign _234_ = wrclk & _106_;
+  assign _235_ = wrclk & _108_;
+  assign _236_ = wrclk & _110_;
+  assign _237_ = wrclk & _112_;
+  assign _238_ = wrclk & _114_;
+  assign _239_ = wrclk & _116_;
+  assign _240_ = wrclk & _118_;
+  assign _241_ = wrclk & _120_;
+  assign _003_ = ~ _122_;
+  always @*
+    if (_003_)
+      \arr[0] = wrdata;
+  assign _005_ = ~ _123_;
+  always @*
+    if (_005_)
+      \arr[1] = wrdata;
+  assign _007_ = ~ _124_;
+  always @*
+    if (_007_)
+      \arr[2] = wrdata;
+  assign _009_ = ~ _125_;
+  always @*
+    if (_009_)
+      \arr[3] = wrdata;
+  assign _011_ = ~ _126_;
+  always @*
+    if (_011_)
+      \arr[4] = wrdata;
+  assign _013_ = ~ _127_;
+  always @*
+    if (_013_)
+      \arr[5] = wrdata;
+  assign _015_ = ~ _128_;
+  always @*
+    if (_015_)
+      \arr[6] = wrdata;
+  assign _017_ = ~ _129_;
+  always @*
+    if (_017_)
+      \arr[7] = wrdata;
+  assign _019_ = ~ _130_;
+  always @*
+    if (_019_)
+      \arr[8] = wrdata;
+  assign _021_ = ~ _131_;
+  always @*
+    if (_021_)
+      \arr[9] = wrdata;
+  assign _023_ = ~ _132_;
+  always @*
+    if (_023_)
+      \arr[10] = wrdata;
+  assign _025_ = ~ _133_;
+  always @*
+    if (_025_)
+      \arr[11] = wrdata;
+  assign _027_ = ~ _134_;
+  always @*
+    if (_027_)
+      \arr[12] = wrdata;
+  assign _029_ = ~ _135_;
+  always @*
+    if (_029_)
+      \arr[13] = wrdata;
+  assign _031_ = ~ _136_;
+  always @*
+    if (_031_)
+      \arr[14] = wrdata;
+  assign _033_ = ~ _137_;
+  always @*
+    if (_033_)
+      \arr[15] = wrdata;
+  assign _035_ = ~ _138_;
+  always @*
+    if (_035_)
+      \arr[16] = wrdata;
+  assign _037_ = ~ _139_;
+  always @*
+    if (_037_)
+      \arr[17] = wrdata;
+  assign _039_ = ~ _140_;
+  always @*
+    if (_039_)
+      \arr[18] = wrdata;
+  assign _041_ = ~ _141_;
+  always @*
+    if (_041_)
+      \arr[19] = wrdata;
+  assign _043_ = ~ _142_;
+  always @*
+    if (_043_)
+      \arr[20] = wrdata;
+  assign _045_ = ~ _143_;
+  always @*
+    if (_045_)
+      \arr[21] = wrdata;
+  assign _047_ = ~ _144_;
+  always @*
+    if (_047_)
+      \arr[22] = wrdata;
+  assign _049_ = ~ _145_;
+  always @*
+    if (_049_)
+      \arr[23] = wrdata;
+  assign _051_ = ~ _146_;
+  always @*
+    if (_051_)
+      \arr[24] = wrdata;
+  assign _053_ = ~ _147_;
+  always @*
+    if (_053_)
+      \arr[25] = wrdata;
+  assign _055_ = ~ _148_;
+  always @*
+    if (_055_)
+      \arr[26] = wrdata;
+  assign _057_ = ~ _149_;
+  always @*
+    if (_057_)
+      \arr[27] = wrdata;
+  assign _059_ = ~ _150_;
+  always @*
+    if (_059_)
+      \arr[28] = wrdata;
+  assign _061_ = ~ _151_;
+  always @*
+    if (_061_)
+      \arr[29] = wrdata;
+  assign _063_ = ~ _152_;
+  always @*
+    if (_063_)
+      \arr[30] = wrdata;
+  assign _065_ = ~ _153_;
+  always @*
+    if (_065_)
+      \arr[31] = wrdata;
+  assign _067_ = ~ _154_;
+  always @*
+    if (_067_)
+      \arr[32] = wrdata;
+  assign _069_ = ~ _155_;
+  always @*
+    if (_069_)
+      \arr[33] = wrdata;
+  assign _071_ = ~ _156_;
+  always @*
+    if (_071_)
+      \arr[34] = wrdata;
+  assign _073_ = ~ _157_;
+  always @*
+    if (_073_)
+      \arr[35] = wrdata;
+  assign _075_ = ~ _158_;
+  always @*
+    if (_075_)
+      \arr[36] = wrdata;
+  assign _077_ = ~ _159_;
+  always @*
+    if (_077_)
+      \arr[37] = wrdata;
+  assign _079_ = ~ _160_;
+  always @*
+    if (_079_)
+      \arr[38] = wrdata;
+  assign _081_ = ~ _161_;
+  always @*
+    if (_081_)
+      \arr[39] = wrdata;
+  assign _083_ = ~ _162_;
+  always @*
+    if (_083_)
+      \arr[40] = wrdata;
+  assign _085_ = ~ _163_;
+  always @*
+    if (_085_)
+      \arr[41] = wrdata;
+  assign _087_ = ~ _164_;
+  always @*
+    if (_087_)
+      \arr[42] = wrdata;
+  assign _089_ = ~ _165_;
+  always @*
+    if (_089_)
+      \arr[43] = wrdata;
+  assign _091_ = ~ _166_;
+  always @*
+    if (_091_)
+      \arr[44] = wrdata;
+  assign _093_ = ~ _167_;
+  always @*
+    if (_093_)
+      \arr[45] = wrdata;
+  assign _095_ = ~ _168_;
+  always @*
+    if (_095_)
+      \arr[46] = wrdata;
+  assign _097_ = ~ _169_;
+  always @*
+    if (_097_)
+      \arr[47] = wrdata;
+  assign _099_ = ~ _170_;
+  always @*
+    if (_099_)
+      \arr[48] = wrdata;
+  assign _101_ = ~ _171_;
+  always @*
+    if (_101_)
+      \arr[49] = wrdata;
+  assign _103_ = ~ _172_;
+  always @*
+    if (_103_)
+      \arr[50] = wrdata;
+  assign _105_ = ~ _173_;
+  always @*
+    if (_105_)
+      \arr[51] = wrdata;
+  assign _107_ = ~ _174_;
+  always @*
+    if (_107_)
+      \arr[52] = wrdata;
+  assign _109_ = ~ _175_;
+  always @*
+    if (_109_)
+      \arr[53] = wrdata;
+  assign _111_ = ~ _176_;
+  always @*
+    if (_111_)
+      \arr[54] = wrdata;
+  assign _113_ = ~ _177_;
+  always @*
+    if (_113_)
+      \arr[55] = wrdata;
+  assign _115_ = ~ _178_;
+  always @*
+    if (_115_)
+      \arr[56] = wrdata;
+  assign _117_ = ~ _179_;
+  always @*
+    if (_117_)
+      \arr[57] = wrdata;
+  assign _119_ = ~ _180_;
+  always @*
+    if (_119_)
+      \arr[58] = wrdata;
+  assign _121_ = ~ _181_;
+  always @*
+    if (_121_)
+      \arr[59] = wrdata;
+  assign rout_B = ~ _000_;
+  wire [9911:0] fangyuan60;
+  assign fangyuan60 = { \arr[1] , \arr[2] , \arr[3] , \arr[4] , \arr[5] , \arr[6] , \arr[7] , \arr[8] , \arr[9] , \arr[10] , \arr[11] , \arr[12] , \arr[13] , \arr[14] , \arr[15] , \arr[16] , \arr[17] , \arr[18] , \arr[19] , \arr[20] , \arr[21] , \arr[22] , \arr[23] , \arr[24] , \arr[25] , \arr[26] , \arr[27] , \arr[28] , \arr[29] , \arr[30] , \arr[31] , \arr[32] , \arr[33] , \arr[34] , \arr[35] , \arr[36] , \arr[37] , \arr[38] , \arr[39] , \arr[40] , \arr[41] , \arr[42] , \arr[43] , \arr[44] , \arr[45] , \arr[46] , \arr[47] , \arr[48] , \arr[49] , \arr[50] , \arr[51] , \arr[52] , \arr[53] , \arr[54] , \arr[55] , \arr[56] , \arr[57] , \arr[58] , \arr[59] };
+  wire [58:0] fangyuan61;
+  assign fangyuan61 = { _300_, _299_, _298_, _297_, _296_, _295_, _294_, _293_, _292_, _291_, _290_, _289_, _288_, _287_, _286_, _285_, _284_, _283_, _282_, _281_, _280_, _279_, _278_, _277_, _276_, _275_, _274_, _273_, _272_, _271_, _270_, _269_, _268_, _267_, _266_, _265_, _264_, _263_, _262_, _261_, _260_, _259_, _258_, _257_, _256_, _255_, _254_, _253_, _252_, _251_, _250_, _249_, _248_, _247_, _246_, _245_, _244_, _243_, _242_ };
+
+  always @(\arr[0] or fangyuan60 or fangyuan61) begin
+    casez (fangyuan61)
+      59'b??????????????????????????????????????????????????????????1 :
+        _000_ = fangyuan60 [167:0] ;
+      59'b?????????????????????????????????????????????????????????1? :
+        _000_ = fangyuan60 [335:168] ;
+      59'b????????????????????????????????????????????????????????1?? :
+        _000_ = fangyuan60 [503:336] ;
+      59'b???????????????????????????????????????????????????????1??? :
+        _000_ = fangyuan60 [671:504] ;
+      59'b??????????????????????????????????????????????????????1???? :
+        _000_ = fangyuan60 [839:672] ;
+      59'b?????????????????????????????????????????????????????1????? :
+        _000_ = fangyuan60 [1007:840] ;
+      59'b????????????????????????????????????????????????????1?????? :
+        _000_ = fangyuan60 [1175:1008] ;
+      59'b???????????????????????????????????????????????????1??????? :
+        _000_ = fangyuan60 [1343:1176] ;
+      59'b??????????????????????????????????????????????????1???????? :
+        _000_ = fangyuan60 [1511:1344] ;
+      59'b?????????????????????????????????????????????????1????????? :
+        _000_ = fangyuan60 [1679:1512] ;
+      59'b????????????????????????????????????????????????1?????????? :
+        _000_ = fangyuan60 [1847:1680] ;
+      59'b???????????????????????????????????????????????1??????????? :
+        _000_ = fangyuan60 [2015:1848] ;
+      59'b??????????????????????????????????????????????1???????????? :
+        _000_ = fangyuan60 [2183:2016] ;
+      59'b?????????????????????????????????????????????1????????????? :
+        _000_ = fangyuan60 [2351:2184] ;
+      59'b????????????????????????????????????????????1?????????????? :
+        _000_ = fangyuan60 [2519:2352] ;
+      59'b???????????????????????????????????????????1??????????????? :
+        _000_ = fangyuan60 [2687:2520] ;
+      59'b??????????????????????????????????????????1???????????????? :
+        _000_ = fangyuan60 [2855:2688] ;
+      59'b?????????????????????????????????????????1????????????????? :
+        _000_ = fangyuan60 [3023:2856] ;
+      59'b????????????????????????????????????????1?????????????????? :
+        _000_ = fangyuan60 [3191:3024] ;
+      59'b???????????????????????????????????????1??????????????????? :
+        _000_ = fangyuan60 [3359:3192] ;
+      59'b??????????????????????????????????????1???????????????????? :
+        _000_ = fangyuan60 [3527:3360] ;
+      59'b?????????????????????????????????????1????????????????????? :
+        _000_ = fangyuan60 [3695:3528] ;
+      59'b????????????????????????????????????1?????????????????????? :
+        _000_ = fangyuan60 [3863:3696] ;
+      59'b???????????????????????????????????1??????????????????????? :
+        _000_ = fangyuan60 [4031:3864] ;
+      59'b??????????????????????????????????1???????????????????????? :
+        _000_ = fangyuan60 [4199:4032] ;
+      59'b?????????????????????????????????1????????????????????????? :
+        _000_ = fangyuan60 [4367:4200] ;
+      59'b????????????????????????????????1?????????????????????????? :
+        _000_ = fangyuan60 [4535:4368] ;
+      59'b???????????????????????????????1??????????????????????????? :
+        _000_ = fangyuan60 [4703:4536] ;
+      59'b??????????????????????????????1???????????????????????????? :
+        _000_ = fangyuan60 [4871:4704] ;
+      59'b?????????????????????????????1????????????????????????????? :
+        _000_ = fangyuan60 [5039:4872] ;
+      59'b????????????????????????????1?????????????????????????????? :
+        _000_ = fangyuan60 [5207:5040] ;
+      59'b???????????????????????????1??????????????????????????????? :
+        _000_ = fangyuan60 [5375:5208] ;
+      59'b??????????????????????????1???????????????????????????????? :
+        _000_ = fangyuan60 [5543:5376] ;
+      59'b?????????????????????????1????????????????????????????????? :
+        _000_ = fangyuan60 [5711:5544] ;
+      59'b????????????????????????1?????????????????????????????????? :
+        _000_ = fangyuan60 [5879:5712] ;
+      59'b???????????????????????1??????????????????????????????????? :
+        _000_ = fangyuan60 [6047:5880] ;
+      59'b??????????????????????1???????????????????????????????????? :
+        _000_ = fangyuan60 [6215:6048] ;
+      59'b?????????????????????1????????????????????????????????????? :
+        _000_ = fangyuan60 [6383:6216] ;
+      59'b????????????????????1?????????????????????????????????????? :
+        _000_ = fangyuan60 [6551:6384] ;
+      59'b???????????????????1??????????????????????????????????????? :
+        _000_ = fangyuan60 [6719:6552] ;
+      59'b??????????????????1???????????????????????????????????????? :
+        _000_ = fangyuan60 [6887:6720] ;
+      59'b?????????????????1????????????????????????????????????????? :
+        _000_ = fangyuan60 [7055:6888] ;
+      59'b????????????????1?????????????????????????????????????????? :
+        _000_ = fangyuan60 [7223:7056] ;
+      59'b???????????????1??????????????????????????????????????????? :
+        _000_ = fangyuan60 [7391:7224] ;
+      59'b??????????????1???????????????????????????????????????????? :
+        _000_ = fangyuan60 [7559:7392] ;
+      59'b?????????????1????????????????????????????????????????????? :
+        _000_ = fangyuan60 [7727:7560] ;
+      59'b????????????1?????????????????????????????????????????????? :
+        _000_ = fangyuan60 [7895:7728] ;
+      59'b???????????1??????????????????????????????????????????????? :
+        _000_ = fangyuan60 [8063:7896] ;
+      59'b??????????1???????????????????????????????????????????????? :
+        _000_ = fangyuan60 [8231:8064] ;
+      59'b?????????1????????????????????????????????????????????????? :
+        _000_ = fangyuan60 [8399:8232] ;
+      59'b????????1?????????????????????????????????????????????????? :
+        _000_ = fangyuan60 [8567:8400] ;
+      59'b???????1??????????????????????????????????????????????????? :
+        _000_ = fangyuan60 [8735:8568] ;
+      59'b??????1???????????????????????????????????????????????????? :
+        _000_ = fangyuan60 [8903:8736] ;
+      59'b?????1????????????????????????????????????????????????????? :
+        _000_ = fangyuan60 [9071:8904] ;
+      59'b????1?????????????????????????????????????????????????????? :
+        _000_ = fangyuan60 [9239:9072] ;
+      59'b???1??????????????????????????????????????????????????????? :
+        _000_ = fangyuan60 [9407:9240] ;
+      59'b??1???????????????????????????????????????????????????????? :
+        _000_ = fangyuan60 [9575:9408] ;
+      59'b?1????????????????????????????????????????????????????????? :
+        _000_ = fangyuan60 [9743:9576] ;
+      59'b1?????????????????????????????????????????????????????????? :
+        _000_ = fangyuan60 [9911:9744] ;
+      default:
+        _000_ = \arr[0] ;
+    endcase
+  end
+  assign _242_ = radr[5:0] == 6'b111011;
+  assign _243_ = radr[5:0] == 6'b111010;
+  assign _244_ = radr[5:0] == 6'b111001;
+  assign _245_ = radr[5:0] == 6'b111000;
+  assign _246_ = radr[5:0] == 6'b110111;
+  assign _247_ = radr[5:0] == 6'b110110;
+  assign _248_ = radr[5:0] == 6'b110101;
+  assign _249_ = radr[5:0] == 6'b110100;
+  assign _250_ = radr[5:0] == 6'b110011;
+  assign _251_ = radr[5:0] == 6'b110010;
+  assign _252_ = radr[5:0] == 6'b110001;
+  assign _253_ = radr[5:0] == 6'b110000;
+  assign _254_ = radr[5:0] == 6'b101111;
+  assign _255_ = radr[5:0] == 6'b101110;
+  assign _256_ = radr[5:0] == 6'b101101;
+  assign _257_ = radr[5:0] == 6'b101100;
+  assign _258_ = radr[5:0] == 6'b101011;
+  assign _259_ = radr[5:0] == 6'b101010;
+  assign _260_ = radr[5:0] == 6'b101001;
+  assign _261_ = radr[5:0] == 6'b101000;
+  assign _262_ = radr[5:0] == 6'b100111;
+  assign _263_ = radr[5:0] == 6'b100110;
+  assign _264_ = radr[5:0] == 6'b100101;
+  assign _265_ = radr[5:0] == 6'b100100;
+  assign _266_ = radr[5:0] == 6'b100011;
+  assign _267_ = radr[5:0] == 6'b100010;
+  assign _268_ = radr[5:0] == 6'b100001;
+  assign _269_ = radr[5:0] == 6'b100000;
+  assign _270_ = radr[5:0] == 5'b11111;
+  assign _271_ = radr[5:0] == 5'b11110;
+  assign _272_ = radr[5:0] == 5'b11101;
+  assign _273_ = radr[5:0] == 5'b11100;
+  assign _274_ = radr[5:0] == 5'b11011;
+  assign _275_ = radr[5:0] == 5'b11010;
+  assign _276_ = radr[5:0] == 5'b11001;
+  assign _277_ = radr[5:0] == 5'b11000;
+  assign _278_ = radr[5:0] == 5'b10111;
+  assign _279_ = radr[5:0] == 5'b10110;
+  assign _280_ = radr[5:0] == 5'b10101;
+  assign _281_ = radr[5:0] == 5'b10100;
+  assign _282_ = radr[5:0] == 5'b10011;
+  assign _283_ = radr[5:0] == 5'b10010;
+  assign _284_ = radr[5:0] == 5'b10001;
+  assign _285_ = radr[5:0] == 5'b10000;
+  assign _286_ = radr[5:0] == 4'b1111;
+  assign _287_ = radr[5:0] == 4'b1110;
+  assign _288_ = radr[5:0] == 4'b1101;
+  assign _289_ = radr[5:0] == 4'b1100;
+  assign _290_ = radr[5:0] == 4'b1011;
+  assign _291_ = radr[5:0] == 4'b1010;
+  assign _292_ = radr[5:0] == 4'b1001;
+  assign _293_ = radr[5:0] == 4'b1000;
+  assign _294_ = radr[5:0] == 3'b111;
+  assign _295_ = radr[5:0] == 3'b110;
+  assign _296_ = radr[5:0] == 3'b101;
+  assign _297_ = radr[5:0] == 3'b100;
+  assign _298_ = radr[5:0] == 2'b11;
+  assign _299_ = radr[5:0] == 2'b10;
+  assign _300_ = radr[5:0] == 1'b1;
+  assign _301_ = wadr[5:0] == 6'b111011;
+  assign _302_ = wadr[5:0] == 6'b111010;
+  assign _303_ = wadr[5:0] == 6'b111001;
+  assign _304_ = wadr[5:0] == 6'b111000;
+  assign _305_ = wadr[5:0] == 6'b110111;
+  assign _306_ = wadr[5:0] == 6'b110110;
+  assign _307_ = wadr[5:0] == 6'b110101;
+  assign _308_ = wadr[5:0] == 6'b110100;
+  assign _309_ = wadr[5:0] == 6'b110011;
+  assign _310_ = wadr[5:0] == 6'b110010;
+  assign _311_ = wadr[5:0] == 6'b110001;
+  assign _312_ = wadr[5:0] == 6'b110000;
+  assign _313_ = wadr[5:0] == 6'b101111;
+  assign _314_ = wadr[5:0] == 6'b101110;
+  assign _315_ = wadr[5:0] == 6'b101101;
+  assign _316_ = wadr[5:0] == 6'b101100;
+  assign _317_ = wadr[5:0] == 6'b101011;
+  assign _318_ = wadr[5:0] == 6'b101010;
+  assign _319_ = wadr[5:0] == 6'b101001;
+  assign _320_ = wadr[5:0] == 6'b101000;
+  assign _321_ = wadr[5:0] == 6'b100111;
+  assign _322_ = wadr[5:0] == 6'b100110;
+  assign _323_ = wadr[5:0] == 6'b100101;
+  assign _324_ = wadr[5:0] == 6'b100100;
+  assign _325_ = wadr[5:0] == 6'b100011;
+  assign _326_ = wadr[5:0] == 6'b100010;
+  assign _327_ = wadr[5:0] == 6'b100001;
+  assign _328_ = wadr[5:0] == 6'b100000;
+  assign _329_ = wadr[5:0] == 5'b11111;
+  assign _330_ = wadr[5:0] == 5'b11110;
+  assign _331_ = wadr[5:0] == 5'b11101;
+  assign _332_ = wadr[5:0] == 5'b11100;
+  assign _333_ = wadr[5:0] == 5'b11011;
+  assign _334_ = wadr[5:0] == 5'b11010;
+  assign _335_ = wadr[5:0] == 5'b11001;
+  assign _336_ = wadr[5:0] == 5'b11000;
+  assign _337_ = wadr[5:0] == 5'b10111;
+  assign _338_ = wadr[5:0] == 5'b10110;
+  assign _339_ = wadr[5:0] == 5'b10101;
+  assign _340_ = wadr[5:0] == 5'b10100;
+  assign _341_ = wadr[5:0] == 5'b10011;
+  assign _342_ = wadr[5:0] == 5'b10010;
+  assign _343_ = wadr[5:0] == 5'b10001;
+  assign _344_ = wadr[5:0] == 5'b10000;
+  assign _345_ = wadr[5:0] == 4'b1111;
+  assign _346_ = wadr[5:0] == 4'b1110;
+  assign _347_ = wadr[5:0] == 4'b1101;
+  assign _348_ = wadr[5:0] == 4'b1100;
+  assign _349_ = wadr[5:0] == 4'b1011;
+  assign _350_ = wadr[5:0] == 4'b1010;
+  assign _351_ = wadr[5:0] == 4'b1001;
+  assign _352_ = wadr[5:0] == 4'b1000;
+  assign _353_ = wadr[5:0] == 3'b111;
+  assign _354_ = wadr[5:0] == 3'b110;
+  assign _355_ = wadr[5:0] == 3'b101;
+  assign _356_ = wadr[5:0] == 3'b100;
+  assign _357_ = wadr[5:0] == 2'b11;
+  assign _358_ = wadr[5:0] == 2'b10;
+  assign _359_ = wadr[5:0] == 1'b1;
+  assign _360_ = ! wadr[5:0];
+  assign bre = 168'b111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111;
+  assign bwe = wrmaskn;
+  assign rdarr = rout_B;
+endmodule

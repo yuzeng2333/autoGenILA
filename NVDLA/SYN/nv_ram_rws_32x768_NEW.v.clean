@@ -1,0 +1,377 @@
+module nv_ram_rws_32x768(clk, ra, re, dout, wa, we, di, pwrbus_ram_pd);
+  wire DFT_clamp;
+  wire SI;
+  wire SO_int_net;
+  wire ary_atpg_ctl;
+  wire ary_read_inh;
+  input clk;
+  wire debug_mode;
+  input [767:0] di;
+  output [767:0] dout;
+  wire iddq_mode;
+  wire jtag_readonly_mode;
+  wire [1:0] mbist_Di_w0;
+  wire [767:0] mbist_Do_r0_int_net;
+  wire [4:0] mbist_Ra_r0;
+  wire [4:0] mbist_Wa_w0;
+  wire mbist_ce_r0_0_0;
+  wire mbist_ce_r0_0_288;
+  wire mbist_ce_r0_0_576;
+  wire mbist_en_sync;
+  wire mbist_ramaccess_rst_;
+  wire mbist_we_w0_0_0;
+  wire mbist_we_w0_0_288;
+  wire mbist_we_w0_0_576;
+  wire pre_SI;
+  wire pre_ary_atpg_ctl;
+  wire pre_ary_read_inh;
+  wire pre_debug_mode;
+  wire pre_iddq_mode;
+  wire pre_jtag_readonly_mode;
+  wire pre_mbist_Di_w0_0;
+  wire pre_mbist_Di_w0_1;
+  wire pre_mbist_Ra_r0_0;
+  wire pre_mbist_Ra_r0_1;
+  wire pre_mbist_Ra_r0_2;
+  wire pre_mbist_Ra_r0_3;
+  wire pre_mbist_Ra_r0_4;
+  wire pre_mbist_Wa_w0_0;
+  wire pre_mbist_Wa_w0_1;
+  wire pre_mbist_Wa_w0_2;
+  wire pre_mbist_Wa_w0_3;
+  wire pre_mbist_Wa_w0_4;
+  wire pre_mbist_ce_r0_0_0;
+  wire pre_mbist_ce_r0_0_288;
+  wire pre_mbist_ce_r0_0_576;
+  wire pre_mbist_en_sync;
+  wire pre_mbist_ramaccess_rst_;
+  wire pre_mbist_we_w0_0_0;
+  wire pre_mbist_we_w0_0_288;
+  wire pre_mbist_we_w0_0_576;
+  wire pre_scan_en;
+  wire pre_scan_ramtms;
+  wire pre_shiftDR;
+  wire pre_updateDR;
+  wire pre_write_inh;
+  input [31:0] pwrbus_ram_pd;
+  input [4:0] ra;
+  input re;
+  wire scan_en;
+  wire scan_ramtms;
+  wire shiftDR;
+  wire [7:0] svop;
+  wire updateDR;
+  input [4:0] wa;
+  input we;
+  wire write_inh;
+  NV_BLKBOX_SRC0 UI_enableDFTmode_async_ld_buf (
+    .Y(DFT_clamp)
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_SI (
+    .A1(pre_SI),
+    .A2(DFT_clamp),
+    .Z(SI)
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_ary_atpg_ctl (
+    .A1(pre_ary_atpg_ctl),
+    .A2(DFT_clamp),
+    .Z(ary_atpg_ctl)
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_ary_read_inh (
+    .A1(pre_ary_read_inh),
+    .A2(DFT_clamp),
+    .Z(ary_read_inh)
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_debug_mode (
+    .A1(pre_debug_mode),
+    .A2(DFT_clamp),
+    .Z(debug_mode)
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_iddq_mode (
+    .A1(pre_iddq_mode),
+    .A2(DFT_clamp),
+    .Z(iddq_mode)
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_jtag_readonly_mode (
+    .A1(pre_jtag_readonly_mode),
+    .A2(DFT_clamp),
+    .Z(jtag_readonly_mode)
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_Di_w0_0 (
+    .A1(pre_mbist_Di_w0_0),
+    .A2(DFT_clamp),
+    .Z(mbist_Di_w0[0])
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_Di_w0_1 (
+    .A1(pre_mbist_Di_w0_1),
+    .A2(DFT_clamp),
+    .Z(mbist_Di_w0[1])
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_Ra_r0_0 (
+    .A1(pre_mbist_Ra_r0_0),
+    .A2(DFT_clamp),
+    .Z(mbist_Ra_r0[0])
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_Ra_r0_1 (
+    .A1(pre_mbist_Ra_r0_1),
+    .A2(DFT_clamp),
+    .Z(mbist_Ra_r0[1])
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_Ra_r0_2 (
+    .A1(pre_mbist_Ra_r0_2),
+    .A2(DFT_clamp),
+    .Z(mbist_Ra_r0[2])
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_Ra_r0_3 (
+    .A1(pre_mbist_Ra_r0_3),
+    .A2(DFT_clamp),
+    .Z(mbist_Ra_r0[3])
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_Ra_r0_4 (
+    .A1(pre_mbist_Ra_r0_4),
+    .A2(DFT_clamp),
+    .Z(mbist_Ra_r0[4])
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_Wa_w0_0 (
+    .A1(pre_mbist_Wa_w0_0),
+    .A2(DFT_clamp),
+    .Z(mbist_Wa_w0[0])
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_Wa_w0_1 (
+    .A1(pre_mbist_Wa_w0_1),
+    .A2(DFT_clamp),
+    .Z(mbist_Wa_w0[1])
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_Wa_w0_2 (
+    .A1(pre_mbist_Wa_w0_2),
+    .A2(DFT_clamp),
+    .Z(mbist_Wa_w0[2])
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_Wa_w0_3 (
+    .A1(pre_mbist_Wa_w0_3),
+    .A2(DFT_clamp),
+    .Z(mbist_Wa_w0[3])
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_Wa_w0_4 (
+    .A1(pre_mbist_Wa_w0_4),
+    .A2(DFT_clamp),
+    .Z(mbist_Wa_w0[4])
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_ce_r0_0_0 (
+    .A1(pre_mbist_ce_r0_0_0),
+    .A2(DFT_clamp),
+    .Z(mbist_ce_r0_0_0)
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_ce_r0_0_288 (
+    .A1(pre_mbist_ce_r0_0_288),
+    .A2(DFT_clamp),
+    .Z(mbist_ce_r0_0_288)
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_ce_r0_0_576 (
+    .A1(pre_mbist_ce_r0_0_576),
+    .A2(DFT_clamp),
+    .Z(mbist_ce_r0_0_576)
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_en_sync (
+    .A1(pre_mbist_en_sync),
+    .A2(DFT_clamp),
+    .Z(mbist_en_sync)
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_ramaccess_rst_ (
+    .A1(pre_mbist_ramaccess_rst_),
+    .A2(DFT_clamp),
+    .Z(mbist_ramaccess_rst_)
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_we_w0_0_0 (
+    .A1(pre_mbist_we_w0_0_0),
+    .A2(DFT_clamp),
+    .Z(mbist_we_w0_0_0)
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_we_w0_0_288 (
+    .A1(pre_mbist_we_w0_0_288),
+    .A2(DFT_clamp),
+    .Z(mbist_we_w0_0_288)
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_we_w0_0_576 (
+    .A1(pre_mbist_we_w0_0_576),
+    .A2(DFT_clamp),
+    .Z(mbist_we_w0_0_576)
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_scan_en (
+    .A1(pre_scan_en),
+    .A2(DFT_clamp),
+    .Z(scan_en)
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_scan_ramtms (
+    .A1(pre_scan_ramtms),
+    .A2(DFT_clamp),
+    .Z(scan_ramtms)
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_shiftDR (
+    .A1(pre_shiftDR),
+    .A2(DFT_clamp),
+    .Z(shiftDR)
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_updateDR (
+    .A1(pre_updateDR),
+    .A2(DFT_clamp),
+    .Z(updateDR)
+  );
+  AN2D4PO4 UJ_DFTQUALIFIER_write_inh (
+    .A1(pre_write_inh),
+    .A2(DFT_clamp),
+    .Z(write_inh)
+  );
+  \$paramod\nv_ram_rws_32x768_logic\FORCE_CONTENTION_ASSERTION_RESET_ACTIVE=1'0 r_nv_ram_rws_32x768 (
+    .SI(SI),
+    .SO_int_net(SO_int_net),
+    .ary_atpg_ctl(ary_atpg_ctl),
+    .ary_read_inh(ary_read_inh),
+    .clk(clk),
+    .debug_mode(debug_mode),
+    .di(di),
+    .dout(dout),
+    .iddq_mode(iddq_mode),
+    .jtag_readonly_mode(jtag_readonly_mode),
+    .mbist_Di_w0(mbist_Di_w0),
+    .mbist_Do_r0_int_net(mbist_Do_r0_int_net),
+    .mbist_Ra_r0(mbist_Ra_r0),
+    .mbist_Wa_w0(mbist_Wa_w0),
+    .mbist_ce_r0_0_0(mbist_ce_r0_0_0),
+    .mbist_ce_r0_0_288(mbist_ce_r0_0_288),
+    .mbist_ce_r0_0_576(mbist_ce_r0_0_576),
+    .mbist_en_sync(mbist_en_sync),
+    .mbist_ramaccess_rst_(mbist_ramaccess_rst_),
+    .mbist_we_w0_0_0(mbist_we_w0_0_0),
+    .mbist_we_w0_0_288(mbist_we_w0_0_288),
+    .mbist_we_w0_0_576(mbist_we_w0_0_576),
+    .pwrbus_ram_pd(pwrbus_ram_pd),
+    .ra(ra),
+    .re(re),
+    .scan_en(scan_en),
+    .scan_ramtms(scan_ramtms),
+    .shiftDR(shiftDR),
+    .svop(svop),
+    .updateDR(updateDR),
+    .wa(wa),
+    .we(we),
+    .write_inh(write_inh)
+  );
+  NV_BLKBOX_SRC0_X testInst_SI (
+    .Y(pre_SI)
+  );
+  NV_BLKBOX_SRC0_X testInst_ary_atpg_ctl (
+    .Y(pre_ary_atpg_ctl)
+  );
+  NV_BLKBOX_SRC0_X testInst_ary_read_inh (
+    .Y(pre_ary_read_inh)
+  );
+  NV_BLKBOX_SRC0_X testInst_debug_mode (
+    .Y(pre_debug_mode)
+  );
+  NV_BLKBOX_SRC0_X testInst_iddq_mode (
+    .Y(pre_iddq_mode)
+  );
+  NV_BLKBOX_SRC0_X testInst_jtag_readonly_mode (
+    .Y(pre_jtag_readonly_mode)
+  );
+  NV_BLKBOX_SRC0_X testInst_mbist_Di_w0_0 (
+    .Y(pre_mbist_Di_w0_0)
+  );
+  NV_BLKBOX_SRC0_X testInst_mbist_Di_w0_1 (
+    .Y(pre_mbist_Di_w0_1)
+  );
+  NV_BLKBOX_SRC0_X testInst_mbist_Ra_r0_0 (
+    .Y(pre_mbist_Ra_r0_0)
+  );
+  NV_BLKBOX_SRC0_X testInst_mbist_Ra_r0_1 (
+    .Y(pre_mbist_Ra_r0_1)
+  );
+  NV_BLKBOX_SRC0_X testInst_mbist_Ra_r0_2 (
+    .Y(pre_mbist_Ra_r0_2)
+  );
+  NV_BLKBOX_SRC0_X testInst_mbist_Ra_r0_3 (
+    .Y(pre_mbist_Ra_r0_3)
+  );
+  NV_BLKBOX_SRC0_X testInst_mbist_Ra_r0_4 (
+    .Y(pre_mbist_Ra_r0_4)
+  );
+  NV_BLKBOX_SRC0_X testInst_mbist_Wa_w0_0 (
+    .Y(pre_mbist_Wa_w0_0)
+  );
+  NV_BLKBOX_SRC0_X testInst_mbist_Wa_w0_1 (
+    .Y(pre_mbist_Wa_w0_1)
+  );
+  NV_BLKBOX_SRC0_X testInst_mbist_Wa_w0_2 (
+    .Y(pre_mbist_Wa_w0_2)
+  );
+  NV_BLKBOX_SRC0_X testInst_mbist_Wa_w0_3 (
+    .Y(pre_mbist_Wa_w0_3)
+  );
+  NV_BLKBOX_SRC0_X testInst_mbist_Wa_w0_4 (
+    .Y(pre_mbist_Wa_w0_4)
+  );
+  NV_BLKBOX_SRC0_X testInst_mbist_ce_r0_0_0 (
+    .Y(pre_mbist_ce_r0_0_0)
+  );
+  NV_BLKBOX_SRC0_X testInst_mbist_ce_r0_0_288 (
+    .Y(pre_mbist_ce_r0_0_288)
+  );
+  NV_BLKBOX_SRC0_X testInst_mbist_ce_r0_0_576 (
+    .Y(pre_mbist_ce_r0_0_576)
+  );
+  NV_BLKBOX_SRC0_X testInst_mbist_en_sync (
+    .Y(pre_mbist_en_sync)
+  );
+  NV_BLKBOX_SRC0_X testInst_mbist_ramaccess_rst_ (
+    .Y(pre_mbist_ramaccess_rst_)
+  );
+  NV_BLKBOX_SRC0_X testInst_mbist_we_w0_0_0 (
+    .Y(pre_mbist_we_w0_0_0)
+  );
+  NV_BLKBOX_SRC0_X testInst_mbist_we_w0_0_288 (
+    .Y(pre_mbist_we_w0_0_288)
+  );
+  NV_BLKBOX_SRC0_X testInst_mbist_we_w0_0_576 (
+    .Y(pre_mbist_we_w0_0_576)
+  );
+  NV_BLKBOX_SRC0_X testInst_scan_en (
+    .Y(pre_scan_en)
+  );
+  NV_BLKBOX_SRC0_X testInst_scan_ramtms (
+    .Y(pre_scan_ramtms)
+  );
+  NV_BLKBOX_SRC0_X testInst_shiftDR (
+    .Y(pre_shiftDR)
+  );
+  NV_BLKBOX_SRC0 testInst_svop_0 (
+    .Y(svop[0])
+  );
+  NV_BLKBOX_SRC0 testInst_svop_1 (
+    .Y(svop[1])
+  );
+  NV_BLKBOX_SRC0 testInst_svop_2 (
+    .Y(svop[2])
+  );
+  NV_BLKBOX_SRC0 testInst_svop_3 (
+    .Y(svop[3])
+  );
+  NV_BLKBOX_SRC0 testInst_svop_4 (
+    .Y(svop[4])
+  );
+  NV_BLKBOX_SRC0 testInst_svop_5 (
+    .Y(svop[5])
+  );
+  NV_BLKBOX_SRC0 testInst_svop_6 (
+    .Y(svop[6])
+  );
+  NV_BLKBOX_SRC0 testInst_svop_7 (
+    .Y(svop[7])
+  );
+  NV_BLKBOX_SRC0_X testInst_updateDR (
+    .Y(pre_updateDR)
+  );
+  NV_BLKBOX_SRC0_X testInst_write_inh (
+    .Y(pre_write_inh)
+  );
+endmodule

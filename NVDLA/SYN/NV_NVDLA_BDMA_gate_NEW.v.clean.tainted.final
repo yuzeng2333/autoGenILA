@@ -1,0 +1,253 @@
+module NV_NVDLA_BDMA_gate ( csb2gate_slcg_en , dla_clk_ovr_on_sync , global_clk_ovr_on_sync , ld2gate_slcg_en , nvdla_core_clk , nvdla_core_rstn , st2gate_slcg_en , tmc2slcg_disable_clock_gating , INSTR_IN_ZY , csb2gate_slcg_en_T , csb2gate_slcg_en_S , dla_clk_ovr_on_sync_T , dla_clk_ovr_on_sync_S , global_clk_ovr_on_sync_T , global_clk_ovr_on_sync_S , ld2gate_slcg_en_T , ld2gate_slcg_en_S , nvdla_core_clk_T , nvdla_core_clk_S , nvdla_core_rstn_T , nvdla_core_rstn_S , nvdla_gated_clk_R0 , nvdla_gated_clk_C0 , nvdla_gated_clk_X0 , st2gate_slcg_en_T , st2gate_slcg_en_S , tmc2slcg_disable_clock_gating_T , tmc2slcg_disable_clock_gating_S , nvdla_gated_clk , csb2gate_slcg_en_R , csb2gate_slcg_en_X , csb2gate_slcg_en_C , dla_clk_ovr_on_sync_R , dla_clk_ovr_on_sync_X , dla_clk_ovr_on_sync_C , global_clk_ovr_on_sync_R , global_clk_ovr_on_sync_X , global_clk_ovr_on_sync_C , ld2gate_slcg_en_R , ld2gate_slcg_en_X , ld2gate_slcg_en_C , nvdla_core_clk_R , nvdla_core_clk_X , nvdla_core_clk_C , nvdla_core_rstn_R , nvdla_core_rstn_X , nvdla_core_rstn_C , nvdla_gated_clk_T , nvdla_gated_clk_S , st2gate_slcg_en_R , st2gate_slcg_en_X , st2gate_slcg_en_C , tmc2slcg_disable_clock_gating_R , tmc2slcg_disable_clock_gating_X , tmc2slcg_disable_clock_gating_C );
+  logic rst_zy;
+  integer i;
+  input INSTR_IN_ZY;
+  logic _0_;
+  logic _0__T ;
+  logic _0__R ;
+  logic _0__C ;
+  logic _0__X ;
+  logic [13:0] _0__S ;
+  logic _1_;
+  logic _1__T ;
+  logic _1__R ;
+  logic _1__C ;
+  logic _1__X ;
+  logic [13:0] _1__S ;
+  logic _2_;
+  logic _2__T ;
+  logic _2__R ;
+  logic _2__C ;
+  logic _2__X ;
+  logic [13:0] _2__S ;
+  input csb2gate_slcg_en;
+  input csb2gate_slcg_en_T ;
+  input [13:0] csb2gate_slcg_en_S ;
+  output csb2gate_slcg_en_R ;
+  output csb2gate_slcg_en_X ;
+  output csb2gate_slcg_en_C ;
+  input dla_clk_ovr_on_sync;
+  input dla_clk_ovr_on_sync_T ;
+  input [13:0] dla_clk_ovr_on_sync_S ;
+  output dla_clk_ovr_on_sync_R ;
+  output dla_clk_ovr_on_sync_X ;
+  output dla_clk_ovr_on_sync_C ;
+  input global_clk_ovr_on_sync;
+  input global_clk_ovr_on_sync_T ;
+  input [13:0] global_clk_ovr_on_sync_S ;
+  output global_clk_ovr_on_sync_R ;
+  output global_clk_ovr_on_sync_X ;
+  output global_clk_ovr_on_sync_C ;
+  input ld2gate_slcg_en;
+  input ld2gate_slcg_en_T ;
+  input [13:0] ld2gate_slcg_en_S ;
+  output ld2gate_slcg_en_R ;
+  output ld2gate_slcg_en_X ;
+  output ld2gate_slcg_en_C ;
+  input nvdla_core_clk;
+  input nvdla_core_clk_T ;
+  input [13:0] nvdla_core_clk_S ;
+  output nvdla_core_clk_R ;
+  output nvdla_core_clk_X ;
+  output nvdla_core_clk_C ;
+  logic nvdla_core_clk_slcg_0_en;
+  logic nvdla_core_clk_slcg_0_en_T ;
+  logic nvdla_core_clk_slcg_0_en_R ;
+  logic nvdla_core_clk_slcg_0_en_C ;
+  logic nvdla_core_clk_slcg_0_en_X ;
+  logic [13:0] nvdla_core_clk_slcg_0_en_S ;
+  input nvdla_core_rstn;
+  input nvdla_core_rstn_T ;
+  input [13:0] nvdla_core_rstn_S ;
+  output nvdla_core_rstn_R ;
+  output nvdla_core_rstn_X ;
+  output nvdla_core_rstn_C ;
+  output nvdla_gated_clk;
+  logic nvdla_gated_clk ;
+  output nvdla_gated_clk_T ;
+  logic nvdla_gated_clk_T ;
+  logic nvdla_gated_clk_R ;
+  logic nvdla_gated_clk_C ;
+  logic nvdla_gated_clk_X ;
+  logic [13:0] nvdla_gated_clk_S ;
+  input nvdla_gated_clk_R0 ;
+  input nvdla_gated_clk_C0 ;
+  input nvdla_gated_clk_X0 ;
+  output [13:0] nvdla_gated_clk_S ;
+  logic slcg_en;
+  logic slcg_en_T ;
+  logic slcg_en_R ;
+  logic slcg_en_C ;
+  logic slcg_en_X ;
+  logic [13:0] slcg_en_S ;
+  input st2gate_slcg_en;
+  input st2gate_slcg_en_T ;
+  input [13:0] st2gate_slcg_en_S ;
+  output st2gate_slcg_en_R ;
+  output st2gate_slcg_en_X ;
+  output st2gate_slcg_en_C ;
+  input tmc2slcg_disable_clock_gating;
+  input tmc2slcg_disable_clock_gating_T ;
+  input [13:0] tmc2slcg_disable_clock_gating_S ;
+  output tmc2slcg_disable_clock_gating_R ;
+  output tmc2slcg_disable_clock_gating_X ;
+  output tmc2slcg_disable_clock_gating_C ;
+  assign _0_ = slcg_en | dla_clk_ovr_on_sync;
+  assign _0__S = 0 ;
+  logic [0:0] slcg_en_C0 ;
+  logic [0:0] slcg_en_R0 ;
+  logic [0:0] slcg_en_X0 ;
+  logic [0:0] dla_clk_ovr_on_sync_C0 ;
+  logic [0:0] dla_clk_ovr_on_sync_R0 ;
+  logic [0:0] dla_clk_ovr_on_sync_X0 ;
+  assign _0__T = slcg_en_T | dla_clk_ovr_on_sync_T ;
+  assign slcg_en_C0 = _0__C ;
+  assign slcg_en_X0 = _0__X ;
+  assign dla_clk_ovr_on_sync_C0 = _0__C ;
+  assign dla_clk_ovr_on_sync_X0 = _0__X ;
+  assign slcg_en_R0 = ( _0__R | _0__C & dla_clk_ovr_on_sync_T ) & { 1{ dla_clk_ovr_on_sync != 1'b1 }} ;
+  assign dla_clk_ovr_on_sync_R0 = ( _0__R | _0__C & slcg_en_T ) & { 1{ slcg_en != 1'b1 }} ;
+  assign _1_ = tmc2slcg_disable_clock_gating | global_clk_ovr_on_sync;
+  assign _1__S = 0 ;
+  logic [0:0] tmc2slcg_disable_clock_gating_C0 ;
+  logic [0:0] tmc2slcg_disable_clock_gating_R0 ;
+  logic [0:0] tmc2slcg_disable_clock_gating_X0 ;
+  logic [0:0] global_clk_ovr_on_sync_C0 ;
+  logic [0:0] global_clk_ovr_on_sync_R0 ;
+  logic [0:0] global_clk_ovr_on_sync_X0 ;
+  assign _1__T = tmc2slcg_disable_clock_gating_T | global_clk_ovr_on_sync_T ;
+  assign tmc2slcg_disable_clock_gating_C0 = _1__C ;
+  assign tmc2slcg_disable_clock_gating_X0 = _1__X ;
+  assign global_clk_ovr_on_sync_C0 = _1__C ;
+  assign global_clk_ovr_on_sync_X0 = _1__X ;
+  assign tmc2slcg_disable_clock_gating_R0 = ( _1__R | _1__C & global_clk_ovr_on_sync_T ) & { 1{ global_clk_ovr_on_sync != 1'b1 }} ;
+  assign global_clk_ovr_on_sync_R0 = ( _1__R | _1__C & tmc2slcg_disable_clock_gating_T ) & { 1{ tmc2slcg_disable_clock_gating != 1'b1 }} ;
+  assign nvdla_core_clk_slcg_0_en = _0_ | _1_;
+  assign nvdla_core_clk_slcg_0_en_S = 0 ;
+  logic [0:0] _0__C0 ;
+  logic [0:0] _0__R0 ;
+  logic [0:0] _0__X0 ;
+  logic [0:0] _1__C0 ;
+  logic [0:0] _1__R0 ;
+  logic [0:0] _1__X0 ;
+  assign nvdla_core_clk_slcg_0_en_T = _0__T | _1__T ;
+  assign _0__C0 = nvdla_core_clk_slcg_0_en_C ;
+  assign _0__X0 = nvdla_core_clk_slcg_0_en_X ;
+  assign _1__C0 = nvdla_core_clk_slcg_0_en_C ;
+  assign _1__X0 = nvdla_core_clk_slcg_0_en_X ;
+  assign _0__R0 = ( nvdla_core_clk_slcg_0_en_R | nvdla_core_clk_slcg_0_en_C & _1__T ) & { 1{ _1_ != 1'b1 }} ;
+  assign _1__R0 = ( nvdla_core_clk_slcg_0_en_R | nvdla_core_clk_slcg_0_en_C & _0__T ) & { 1{ _0_ != 1'b1 }} ;
+  assign _2_ = csb2gate_slcg_en | ld2gate_slcg_en;
+  assign _2__S = 0 ;
+  logic [0:0] csb2gate_slcg_en_C0 ;
+  logic [0:0] csb2gate_slcg_en_R0 ;
+  logic [0:0] csb2gate_slcg_en_X0 ;
+  logic [0:0] ld2gate_slcg_en_C0 ;
+  logic [0:0] ld2gate_slcg_en_R0 ;
+  logic [0:0] ld2gate_slcg_en_X0 ;
+  assign _2__T = csb2gate_slcg_en_T | ld2gate_slcg_en_T ;
+  assign csb2gate_slcg_en_C0 = _2__C ;
+  assign csb2gate_slcg_en_X0 = _2__X ;
+  assign ld2gate_slcg_en_C0 = _2__C ;
+  assign ld2gate_slcg_en_X0 = _2__X ;
+  assign csb2gate_slcg_en_R0 = ( _2__R | _2__C & ld2gate_slcg_en_T ) & { 1{ ld2gate_slcg_en != 1'b1 }} ;
+  assign ld2gate_slcg_en_R0 = ( _2__R | _2__C & csb2gate_slcg_en_T ) & { 1{ csb2gate_slcg_en != 1'b1 }} ;
+  assign slcg_en = _2_ | st2gate_slcg_en;
+  assign slcg_en_S = 0 ;
+  logic [0:0] _2__C0 ;
+  logic [0:0] _2__R0 ;
+  logic [0:0] _2__X0 ;
+  logic [0:0] st2gate_slcg_en_C0 ;
+  logic [0:0] st2gate_slcg_en_R0 ;
+  logic [0:0] st2gate_slcg_en_X0 ;
+  assign slcg_en_T = _2__T | st2gate_slcg_en_T ;
+  assign _2__C0 = slcg_en_C ;
+  assign _2__X0 = slcg_en_X ;
+  assign st2gate_slcg_en_C0 = slcg_en_C ;
+  assign st2gate_slcg_en_X0 = slcg_en_X ;
+  assign _2__R0 = ( slcg_en_R | slcg_en_C & st2gate_slcg_en_T ) & { 1{ st2gate_slcg_en != 1'b1 }} ;
+  assign st2gate_slcg_en_R0 = ( slcg_en_R | slcg_en_C & _2__T ) & { 1{ _2_ != 1'b1 }} ;
+  logic [0:0] nvdla_core_clk_R0 ;
+  logic [0:0] nvdla_core_clk_X0 ;
+  logic [0:0] nvdla_core_clk_C0 ;
+  logic [0:0] nvdla_core_clk_slcg_0_en_R0 ;
+  logic [0:0] nvdla_core_clk_slcg_0_en_X0 ;
+  logic [0:0] nvdla_core_clk_slcg_0_en_C0 ;
+  logic [0:0] nvdla_core_rstn_R0 ;
+  logic [0:0] nvdla_core_rstn_X0 ;
+  logic [0:0] nvdla_core_rstn_C0 ;
+// module: NV_CLK_gate_power
+  NV_CLK_gate_power nvdla_core_clk_slcg_0 (
+    .clk_T (  nvdla_core_clk_T  ),
+    .clk_R (  nvdla_core_clk_R0  ),
+    .clk_X (  nvdla_core_clk_X0  ),
+    .clk_C (  nvdla_core_clk_C0  ),
+    .clk_S (  nvdla_core_clk_S  ),
+    .clk_en_T (  nvdla_core_clk_slcg_0_en_T  ),
+    .clk_en_R (  nvdla_core_clk_slcg_0_en_R0  ),
+    .clk_en_X (  nvdla_core_clk_slcg_0_en_X0  ),
+    .clk_en_C (  nvdla_core_clk_slcg_0_en_C0  ),
+    .clk_en_S (  nvdla_core_clk_slcg_0_en_S  ),
+    .reset__T (  nvdla_core_rstn_T  ),
+    .reset__R (  nvdla_core_rstn_R0  ),
+    .reset__X (  nvdla_core_rstn_X0  ),
+    .reset__C (  nvdla_core_rstn_C0  ),
+    .reset__S (  nvdla_core_rstn_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .clk_gated_T (  nvdla_gated_clk_T  ),
+    .clk_gated_R0 (  nvdla_gated_clk_R  ),
+    .clk_gated_X0 (  nvdla_gated_clk_X  ),
+    .clk_gated_C0 (  nvdla_gated_clk_C  ),
+    .clk_gated_S ( nvdla_gated_clk_S ),
+    .clk ( nvdla_core_clk ),
+    .reset_ ( nvdla_core_rstn ),
+    .clk_gated ( nvdla_gated_clk ),
+    .clk_en ( nvdla_core_clk_slcg_0_en )
+  );
+  assign nvdla_core_rstn_C = ( nvdla_core_rstn_C0 );
+  assign nvdla_core_clk_slcg_0_en_C = ( nvdla_core_clk_slcg_0_en_C0 );
+  assign nvdla_core_clk_C = ( nvdla_core_clk_C0 );
+  assign st2gate_slcg_en_C = ( st2gate_slcg_en_C0 );
+  assign _2__C = ( _2__C0 );
+  assign ld2gate_slcg_en_C = ( ld2gate_slcg_en_C0 );
+  assign csb2gate_slcg_en_C = ( csb2gate_slcg_en_C0 );
+  assign _1__C = ( _1__C0 );
+  assign _0__C = ( _0__C0 );
+  assign global_clk_ovr_on_sync_C = ( global_clk_ovr_on_sync_C0 );
+  assign tmc2slcg_disable_clock_gating_C = ( tmc2slcg_disable_clock_gating_C0 );
+  assign dla_clk_ovr_on_sync_C = ( dla_clk_ovr_on_sync_C0 );
+  assign slcg_en_C = ( slcg_en_C0 );
+  assign nvdla_gated_clk_C = ( nvdla_gated_clk_C0 );
+  assign nvdla_core_rstn_X = ( nvdla_core_rstn_X0 );
+  assign nvdla_core_clk_slcg_0_en_X = ( nvdla_core_clk_slcg_0_en_X0 );
+  assign nvdla_core_clk_X = ( nvdla_core_clk_X0 );
+  assign st2gate_slcg_en_X = ( st2gate_slcg_en_X0 );
+  assign _2__X = ( _2__X0 );
+  assign ld2gate_slcg_en_X = ( ld2gate_slcg_en_X0 );
+  assign csb2gate_slcg_en_X = ( csb2gate_slcg_en_X0 );
+  assign _1__X = ( _1__X0 );
+  assign _0__X = ( _0__X0 );
+  assign global_clk_ovr_on_sync_X = ( global_clk_ovr_on_sync_X0 );
+  assign tmc2slcg_disable_clock_gating_X = ( tmc2slcg_disable_clock_gating_X0 );
+  assign dla_clk_ovr_on_sync_X = ( dla_clk_ovr_on_sync_X0 );
+  assign slcg_en_X = ( slcg_en_X0 );
+  assign nvdla_gated_clk_X = ( nvdla_gated_clk_X0 );
+  assign nvdla_core_rstn_R = ( nvdla_core_rstn_X0 & nvdla_core_rstn_R0 );
+  assign nvdla_core_clk_slcg_0_en_R = ( nvdla_core_clk_slcg_0_en_X0 & nvdla_core_clk_slcg_0_en_R0 );
+  assign nvdla_core_clk_R = ( nvdla_core_clk_X0 & nvdla_core_clk_R0 );
+  assign st2gate_slcg_en_R = ( st2gate_slcg_en_X0 & st2gate_slcg_en_R0 );
+  assign _2__R = ( _2__X0 & _2__R0 );
+  assign ld2gate_slcg_en_R = ( ld2gate_slcg_en_X0 & ld2gate_slcg_en_R0 );
+  assign csb2gate_slcg_en_R = ( csb2gate_slcg_en_X0 & csb2gate_slcg_en_R0 );
+  assign _1__R = ( _1__X0 & _1__R0 );
+  assign _0__R = ( _0__X0 & _0__R0 );
+  assign global_clk_ovr_on_sync_R = ( global_clk_ovr_on_sync_X0 & global_clk_ovr_on_sync_R0 );
+  assign tmc2slcg_disable_clock_gating_R = ( tmc2slcg_disable_clock_gating_X0 & tmc2slcg_disable_clock_gating_R0 );
+  assign dla_clk_ovr_on_sync_R = ( dla_clk_ovr_on_sync_X0 & dla_clk_ovr_on_sync_R0 );
+  assign slcg_en_R = ( slcg_en_X0 & slcg_en_R0 );
+  assign nvdla_gated_clk_R = ( nvdla_gated_clk_X0 & nvdla_gated_clk_R0 );
+ // ground taints for floating regs
+ // ground taints for unused wires
+ // ground taints for unused wire slices
+  assign rst_zy = !nvdla_core_rstn ;
+endmodule

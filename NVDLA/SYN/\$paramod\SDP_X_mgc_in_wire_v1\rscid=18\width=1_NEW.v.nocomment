@@ -1,0 +1,5 @@
+module \$paramod\SDP_X_mgc_in_wire_v1\rscid=18\width=1 (d, z);
+  output d;
+  input z;
+  assign d = z;
+endmodule

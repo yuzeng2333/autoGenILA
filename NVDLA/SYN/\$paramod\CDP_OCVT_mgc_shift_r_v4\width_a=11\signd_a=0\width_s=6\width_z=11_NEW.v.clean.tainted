@@ -1,0 +1,40 @@
+  input [10:0] a;
+  input [10:0] a_T ;
+  output [10:0] a_R ;
+  input [13:0] a_S ;
+  input [5:0] s;
+  input [5:0] s_T ;
+  output [5:0] s_R ;
+  input [13:0] s_S ;
+  output [10:0] z;
+  logic [10:0] z ;
+  output [10:0] z_T ;
+  logic [10:0] z_T ;
+  logic [10:0] z_R ;
+  logic [13:0] z_S ;
+  input [10:0] z_R0 ;
+  output [13:0] z_S ;
+  logic [11:0] fangyuan0;
+  logic [11:0] fangyuan0_T ;
+  logic [11:0] fangyuan0_R ;
+  assign fangyuan0 = { 1'b0, a };
+  assign fangyuan0_T = {  1'h0 , a_T  };
+  logic [13:0] fangyuan0_S ;
+  assign fangyuan0_S = 0 ;
+  logic [10:0] a_R0 ;
+  assign a_R0 = fangyuan0_R [10:0] ;
+ assign z = fangyuan0 >>> s;
+ assign z_S = 0 ;
+ logic [11:0] fangyuan0_R0 ;
+ logic [5:0] s_R0 ;
+ assign z_T = { 11{ (| fangyuan0_T ) | (|s_T ) }} ;
+ assign fangyuan0_R0 = { 12{ | z_R }} ;
+ assign s_R0 = { 6{ | z_R }} ;
+  assign s_R = ( s_R0 );
+  assign fangyuan0_R = ( fangyuan0_R0 );
+  assign a_R = ( a_R0 );
+  assign z_R = ( z_R0 );
+ // ground taints for floating regs
+ // ground taints for unused wires
+ // ground taints for unused wire slices
+endmodule

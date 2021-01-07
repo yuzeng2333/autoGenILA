@@ -1,0 +1,71 @@
+  input CDN;
+  input CDN_T ;
+  input [13:0] CDN_S ;
+  output CDN_R ;
+  output CDN_X ;
+  output CDN_C ;
+  input CP;
+  input CP_T ;
+  input [13:0] CP_S ;
+  output CP_R ;
+  output CP_X ;
+  output CP_C ;
+  input D;
+  input D_T ;
+  input [13:0] D_S ;
+  output D_R ;
+  output D_X ;
+  output D_C ;
+  output Q;
+  logic Q ;
+  output Q_T ;
+  logic Q_T ;
+  logic Q_R ;
+  logic Q_C ;
+  logic Q_X ;
+  logic [13:0] Q_S ;
+  input Q_R0 ;
+  input Q_C0 ;
+  input Q_X0 ;
+  output [13:0] Q_S ;
+  logic Q;
+  logic  Q_T ;
+  logic  Q_PREV_VAL1 ;
+  logic  Q_PREV_VAL2 ;
+  logic Q_t_flag ;
+  logic Q_r_flag ;
+  assign Q_S = 15 ;
+  always @(posedge CP or negedge CDN)
+    if (!CDN)
+      Q <= 1'b0;
+    else
+      Q <= D;
+  logic [0:0] D_X0 ;
+  logic [0:0] D_R0 ;
+  logic [0:0] D_C0 ;
+  assign D_X0 = { 1{ Q_S != D_S }} ;
+  assign D_R0 = 0 ;
+  assign D_C0 = 0 ;
+  always @( posedge CP )
+      Q_T 		<= rst_zy ? 0 : ( D_T & D_X0 );
+  always @( posedge CP )
+      Q_t_flag 	<= rst_zy ? 0 : Q_t_flag ? 1 : | D_T & ( | D_X0 );
+  always @( posedge CP )
+      Q_r_flag 	<= rst_zy ? 0 : Q_r_flag ? 1 : Q_t_flag ? 0 : ( | Q_R ) ;
+  assign D_C = ( D_C0 );
+  assign Q_C = ( Q_C0 );
+  assign D_X = ( D_X0 );
+  assign Q_X = ( Q_X0 );
+  assign D_R = ( D_X0 & D_R0 );
+  assign Q_R = ( Q_X0 & Q_R0 );
+ // ground taints for floating regs
+ // ground taints for unused wires
+  always @( posedge CP ) begin
+    if( rst_zy ) Q_PREV_VAL1 <= 0 ;
+    if( rst_zy ) Q_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) Q_PREV_VAL1 <= Q ;
+    if( INSTR_IN_ZY ) Q_PREV_VAL2 <= Q_PREV_VAL1 ;
+  end
+ // ground taints for unused wire slices
+  assert property( Q_r_flag == 0 || Q_PREV_VAL1 == Q_PREV_VAL2 );
+endmodule

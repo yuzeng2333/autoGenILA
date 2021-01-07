@@ -1,0 +1,164 @@
+module NV_NVDLA_CACC_CALC_int8(nvdla_core_clk, nvdla_core_rstn, cfg_truncate, in_data, in_op, in_op_valid, in_sel, in_valid, out_final_data, out_final_sat, out_final_valid, out_partial_data, out_partial_valid);
+  wire _00_;
+  wire [34:0] _01_;
+  wire [31:0] _02_;
+  wire _03_;
+  wire [33:0] _04_;
+  wire _05_;
+  wire _06_;
+  wire _07_;
+  wire _08_;
+  wire _09_;
+  wire _10_;
+  wire _11_;
+  wire _12_;
+  wire _13_;
+  wire _14_;
+  wire _15_;
+  wire _16_;
+  wire _17_;
+  wire _18_;
+  input [4:0] cfg_truncate;
+  wire [21:0] di_pd;
+  wire [31:0] i_final_result;
+  wire i_final_vld;
+  wire i_guide;
+  wire [33:0] i_partial_result;
+  wire i_partial_vld;
+  wire i_point5;
+  wire [31:0] i_pos_pd;
+  wire [33:0] i_pre_sft_pd;
+  wire [32:0] i_sat_bits;
+  wire [33:0] i_sat_pd;
+  reg i_sat_sel;
+  wire i_sat_sign;
+  reg i_sat_vld;
+  wire i_sel;
+  wire [31:0] i_sft_max;
+  wire i_sft_need_sat;
+  wire [32:0] i_sft_pd;
+  wire [14:0] i_stick;
+  wire i_sum_msb;
+  reg [34:0] i_sum_pd;
+  wire [34:0] i_sum_pd_nxt;
+  wire i_sum_sign;
+  wire [31:0] i_tru_pd;
+  wire i_vld;
+  input [21:0] in_data;
+  wire [33:0] in_mask_op;
+  input [33:0] in_op;
+  input in_op_valid;
+  input in_sel;
+  input in_valid;
+  input nvdla_core_clk;
+  input nvdla_core_rstn;
+  wire [33:0] oi_pd;
+  output [31:0] out_final_data;
+  reg [31:0] out_final_data;
+  output out_final_sat;
+  reg out_final_sat;
+  output out_final_valid;
+  reg out_final_valid;
+  output [33:0] out_partial_data;
+  reg [33:0] out_partial_data;
+  output out_partial_valid;
+  reg out_partial_valid;
+  assign i_sum_pd_nxt = $signed(in_data) + $signed(oi_pd);
+  assign i_tru_pd = i_sft_pd[31:0] + i_point5;
+  assign _05_ = i_sum_pd[34] & _10_;
+  assign _06_ = _09_ & _17_;
+  assign _07_ = _09_ & _16_;
+  assign _08_ = i_sat_sel & i_guide;
+  assign i_point5 = _08_ & _13_;
+  assign i_partial_vld = i_sat_vld & _11_;
+  assign i_final_vld = i_sat_vld & i_sat_sel;
+  assign _03_ = i_final_vld & i_sft_need_sat;
+  assign _09_ = ~ i_sum_pd[34];
+  assign _10_ = ~ _15_;
+  assign _11_ = ~ i_sat_sel;
+  assign _12_ = _05_ | _06_;
+  assign i_sft_need_sat = _12_ | _07_;
+  assign _13_ = _09_ | _18_;
+  always @(posedge nvdla_core_clk)
+      out_final_data <= _02_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      out_final_sat <= 1'b0;
+    else
+      out_final_sat <= _03_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      out_final_valid <= 1'b0;
+    else
+      out_final_valid <= i_final_vld;
+  always @(posedge nvdla_core_clk)
+      out_partial_data <= _04_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      out_partial_valid <= 1'b0;
+    else
+      out_partial_valid <= i_partial_vld;
+  always @(posedge nvdla_core_clk)
+      i_sum_pd <= _01_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      i_sat_sel <= 1'b0;
+    else
+      i_sat_sel <= _00_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      i_sat_vld <= 1'b0;
+    else
+      i_sat_vld <= in_valid;
+  assign _02_ = i_final_vld ? i_final_result : out_final_data;
+  wire [33:0] fangyuan0;
+  assign fangyuan0 = { i_sum_pd[34], i_sat_bits };
+
+  assign _04_ = i_partial_vld ? fangyuan0 : out_partial_data;
+  wire [32:0] fangyuan1;
+  assign fangyuan1 = { _09_, _09_, _09_, _09_, _09_, _09_, _09_, _09_, _09_, _09_, _09_, _09_, _09_, _09_, _09_, _09_, _09_, _09_, _09_, _09_, _09_, _09_, _09_, _09_, _09_, _09_, _09_, _09_, _09_, _09_, _09_, _09_, _09_ };
+
+  assign i_sat_bits = _14_ ? fangyuan1 : i_sum_pd[32:0];
+  assign _01_ = in_valid ? i_sum_pd_nxt : i_sum_pd;
+  assign _00_ = in_valid ? in_sel : i_sat_sel;
+  wire [1:0] fangyuan2;
+  assign fangyuan2 = { i_sft_pd[31], i_sft_pd[32] };
+
+  assign _15_ = & fangyuan2;
+  wire [31:0] fangyuan3;
+  assign fangyuan3 = { i_point5, i_sft_pd[0], i_sft_pd[1], i_sft_pd[2], i_sft_pd[3], i_sft_pd[4], i_sft_pd[5], i_sft_pd[6], i_sft_pd[7], i_sft_pd[8], i_sft_pd[9], i_sft_pd[10], i_sft_pd[11], i_sft_pd[12], i_sft_pd[13], i_sft_pd[14], i_sft_pd[15], i_sft_pd[16], i_sft_pd[17], i_sft_pd[18], i_sft_pd[19], i_sft_pd[20], i_sft_pd[21], i_sft_pd[22], i_sft_pd[23], i_sft_pd[24], i_sft_pd[25], i_sft_pd[26], i_sft_pd[27], i_sft_pd[28], i_sft_pd[29], i_sft_pd[30] };
+
+  assign _16_ = & fangyuan3;
+  wire [1:0] fangyuan4;
+  assign fangyuan4 = { i_sft_pd[31], i_sft_pd[32] };
+
+  assign _17_ = | fangyuan4;
+  wire [14:0] fangyuan5;
+  assign fangyuan5 = { i_stick[0], i_stick[1], i_stick[2], i_stick[3], i_stick[4], i_stick[5], i_stick[6], i_stick[7], i_stick[8], i_stick[9], i_stick[10], i_stick[11], i_stick[12], i_stick[13], i_stick[14] };
+
+  assign _18_ = | fangyuan5;
+  wire [48:0] fangyuan6;
+  assign fangyuan6 = { i_sft_pd, i_guide, i_stick };
+  wire [49:0] fangyuan7;
+  assign fangyuan7 = { i_pre_sft_pd, 16'b0000000000000000 };
+
+  assign fangyuan6 = $signed(fangyuan7) >>> cfg_truncate;
+  wire [33:0] fangyuan8;
+  assign fangyuan8 = { i_sum_pd[34], i_sat_bits };
+
+  assign i_pre_sft_pd = i_sat_sel ? fangyuan8 : 34'b0000000000000000000000000000000000;
+  assign i_sft_max = i_sum_pd[34] ? 32'd2147483648 : 32'd2147483647;
+  assign i_final_result = i_sft_need_sat ? i_sft_max : i_tru_pd;
+  assign oi_pd = in_op_valid ? in_op : 34'b0000000000000000000000000000000000;
+  assign _14_ = i_sum_pd[34] ^ i_sum_pd[33];
+  assign di_pd = in_data;
+  assign i_partial_result = { i_sum_pd[34], i_sat_bits };
+  assign i_pos_pd = i_tru_pd;
+  assign i_sat_pd = { i_sum_pd[34], i_sat_bits };
+  assign i_sat_sign = i_sum_pd[34];
+  assign i_sel = in_sel;
+  assign i_sum_msb = i_sum_pd[33];
+  assign i_sum_sign = i_sum_pd[34];
+  assign i_vld = in_valid;
+  assign in_mask_op = oi_pd;
+endmodule

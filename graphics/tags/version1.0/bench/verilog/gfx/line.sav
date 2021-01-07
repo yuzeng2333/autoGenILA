@@ -1,0 +1,44 @@
+[*]
+[*] GTKWave Analyzer v3.3.32 (w)1999-2012 BSI
+[*] Tue Mar 13 13:52:33 2012
+[*]
+[dumpfile] "/home/maiden/Creative/Svn/orgfx/bench/verilog/gfx/line.vcd"
+[dumpfile_mtime] "Tue Mar 13 13:52:05 2012"
+[dumpfile_size] 14931
+[savefile] "/home/maiden/Creative/Svn/orgfx/bench/verilog/gfx/line.sav"
+[timestart] 0
+[size] 1278 715
+[pos] -1 -1
+*-6.000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] line_bench.
+[sst_width] 225
+[signals_width] 206
+[sst_expanded] 1
+[sst_vpaned_height] 301
+@28
+line_bench.bresenham.busy_o
+line_bench.bresenham.clk_i
+@22
+line_bench.bresenham.delta_major_i[15:0]
+line_bench.bresenham.delta_minor_i[15:0]
+@28
+line_bench.bresenham.draw_line_i
+@22
+line_bench.bresenham.eps[31:0]
+line_bench.bresenham.eps_delta_minor[31:0]
+line_bench.bresenham.major_goal[15:0]
+line_bench.bresenham.major_o[15:0]
+line_bench.bresenham.minor_o[15:0]
+@28
+line_bench.bresenham.minor_slope_positive_i
+@22
+line_bench.bresenham.pixel0_x_i[15:0]
+line_bench.bresenham.pixel0_y_i[15:0]
+line_bench.bresenham.pixel1_x_i[15:0]
+line_bench.bresenham.pixel1_y_i[15:0]
+@28
+line_bench.bresenham.read_pixel_i
+line_bench.bresenham.rst_i
+line_bench.bresenham.x_major_i
+[pattern_trace] 1
+[pattern_trace] 0

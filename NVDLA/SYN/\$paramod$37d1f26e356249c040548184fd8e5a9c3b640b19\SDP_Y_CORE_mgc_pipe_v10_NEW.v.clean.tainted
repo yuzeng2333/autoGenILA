@@ -1,0 +1,128 @@
+  input arst;
+  input arst_T ;
+  output arst_R ;
+  input [13:0] arst_S ;
+  input clk;
+  input clk_T ;
+  output clk_R ;
+  input [13:0] clk_S ;
+  output [127:0] din;
+  logic [127:0] din ;
+  output [127:0] din_T ;
+  logic [127:0] din_T ;
+  logic [127:0] din_R ;
+  logic [13:0] din_S ;
+  input [127:0] din_R0 ;
+  output [13:0] din_S ;
+  input [127:0] dout;
+  input [127:0] dout_T ;
+  output [127:0] dout_R ;
+  input [13:0] dout_S ;
+  input en;
+  input en_T ;
+  output en_R ;
+  input [13:0] en_S ;
+  input ldin;
+  input ldin_T ;
+  output ldin_R ;
+  input [13:0] ldin_S ;
+  input ldout;
+  input ldout_T ;
+  output ldout_R ;
+  input [13:0] ldout_S ;
+  output sd;
+  logic sd ;
+  output sd_T ;
+  logic sd_T ;
+  logic sd_R ;
+  logic [13:0] sd_S ;
+  input sd_R0 ;
+  output [13:0] sd_S ;
+  input srst;
+  input srst_T ;
+  output srst_R ;
+  input [13:0] srst_S ;
+  output vdin;
+  logic vdin ;
+  output vdin_T ;
+  logic vdin_T ;
+  logic vdin_R ;
+  logic [13:0] vdin_S ;
+  input vdin_R0 ;
+  output [13:0] vdin_S ;
+  output vdout;
+  logic vdout ;
+  output vdout_T ;
+  logic vdout_T ;
+  logic vdout_R ;
+  logic [13:0] vdout_S ;
+  input vdout_R0 ;
+  output [13:0] vdout_S ;
+  logic [0:0] arst_R0 ;
+  logic [0:0] clk_R0 ;
+  logic [127:0] dout_R0 ;
+  logic [0:0] en_R0 ;
+  logic [0:0] ldout_R0 ;
+  logic [0:0] srst_R0 ;
+  logic [0:0] ldin_R0 ;
+// module: \$paramod$c1e7e655535fcf29fb884f102c236cde3614a520\SDP_Y_CORE_mgc_out_fifo_wait_core_v9
+  \$paramod$c1e7e655535fcf29fb884f102c236cde3614a520\SDP_Y_CORE_mgc_out_fifo_wait_core_v9 FIFO (
+    .arst_T (  arst_T  ),
+    .arst_R (  arst_R0  ),
+    .arst_S (  arst_S  ),
+    .d_T (  dout_T  ),
+    .d_R (  dout_R0  ),
+    .d_S (  dout_S  ),
+    .en_T (  en_T  ),
+    .en_R (  en_R0  ),
+    .en_S (  en_S  ),
+    .ld_T (  ldout_T  ),
+    .ld_R (  ldout_R0  ),
+    .ld_S (  ldout_S  ),
+    .srst_T (  srst_T  ),
+    .srst_R (  srst_R0  ),
+    .srst_S (  srst_S  ),
+    .vz_T (  ldin_T  ),
+    .vz_R (  ldin_R0  ),
+    .vz_S (  ldin_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .lz_T (  vdin_T  ),
+    .lz_R0 (  vdin_R  ),
+    .lz_S (  vdin_S  ),
+    .sd_T (  sd_T  ),
+    .sd_R0 (  sd_R  ),
+    .sd_S (  sd_S  ),
+    .vd_T (  vdout_T  ),
+    .vd_R0 (  vdout_R  ),
+    .vd_S (  vdout_S  ),
+    .z_T (  din_T  ),
+    .z_R0 (  din_R  ),
+    .z_S (  din_S  ),
+    .z ( din ),
+    .vz ( ldin ),
+    .sd ( sd ),
+    .lz ( vdin ),
+    .srst ( srst ),
+    .d ( dout ),
+    .arst ( arst ),
+    .vd ( vdout ),
+    .en ( en ),
+    .clk ( clk ),
+    .ld ( ldout )
+  );
+  assign ldin_R = ( ldin_R0 );
+  assign srst_R = ( srst_R0 );
+  assign ldout_R = ( ldout_R0 );
+  assign en_R = ( en_R0 );
+  assign dout_R = ( dout_R0 );
+  assign clk_R = ( clk_R0 );
+  assign arst_R = ( arst_R0 );
+  assign vdout_R = ( vdout_R0 );
+  assign vdin_R = ( vdin_R0 );
+  assign sd_R = ( sd_R0 );
+  assign din_R = ( din_R0 );
+ // ground taints for floating regs
+ // ground taints for unused wires
+ // ground taints for unused wire slices
+  assign rst_zy = arst ;
+endmodule

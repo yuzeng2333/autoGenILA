@@ -1,0 +1,77 @@
+#1:
+(1)
+//mem_i_inst_i = 24'b0+8'h13+32'h000010b7 LUI
+//mem_i_inst_i = 24'b0+8'h13+7'b0+5'h2+5'h3+3'b0+5'h1+5'hc+2'b11 ADD
+mem_i_inst_i = 20'h1+5'h1+5'h1b+2'b11
+rst_i = 0
+mem_i_accept_i = 1
+mem_i_valid_i = 1
+mem_i_error_i = 0
+intr_i = 0
+reset_vector_i = 32'h80000000
+cpu_id_i = 0
+mem_d_data_rd_i = x
+mem_d_accept_i = 1
+mem_d_ack_i = 0
+mem_d_error_i = 0
+mem_d_resp_tag_i = x
+R:
+\u_fetch.pc_f_q
+\u_issue.u_regfile.REGFILE.reg_r10_q
+\u_issue.u_regfile.REGFILE.reg_r11_q
+\u_issue.u_regfile.REGFILE.reg_r12_q
+\u_issue.u_regfile.REGFILE.reg_r13_q
+\u_issue.u_regfile.REGFILE.reg_r14_q
+\u_issue.u_regfile.REGFILE.reg_r15_q
+\u_issue.u_regfile.REGFILE.reg_r16_q
+\u_issue.u_regfile.REGFILE.reg_r17_q
+\u_issue.u_regfile.REGFILE.reg_r18_q
+\u_issue.u_regfile.REGFILE.reg_r19_q
+\u_issue.u_regfile.REGFILE.reg_r1_q 
+\u_issue.u_regfile.REGFILE.reg_r20_q
+\u_issue.u_regfile.REGFILE.reg_r21_q
+\u_issue.u_regfile.REGFILE.reg_r22_q
+\u_issue.u_regfile.REGFILE.reg_r23_q
+\u_issue.u_regfile.REGFILE.reg_r24_q
+\u_issue.u_regfile.REGFILE.reg_r25_q
+\u_issue.u_regfile.REGFILE.reg_r26_q
+\u_issue.u_regfile.REGFILE.reg_r27_q
+\u_issue.u_regfile.REGFILE.reg_r28_q
+\u_issue.u_regfile.REGFILE.reg_r29_q
+\u_issue.u_regfile.REGFILE.reg_r2_q 
+\u_issue.u_regfile.REGFILE.reg_r30_q
+\u_issue.u_regfile.REGFILE.reg_r31_q
+\u_issue.u_regfile.REGFILE.reg_r3_q 
+\u_issue.u_regfile.REGFILE.reg_r4_q 
+\u_issue.u_regfile.REGFILE.reg_r5_q 
+\u_issue.u_regfile.REGFILE.reg_r6_q 
+\u_issue.u_regfile.REGFILE.reg_r7_q 
+\u_issue.u_regfile.REGFILE.reg_r8_q 
+\u_issue.u_regfile.REGFILE.reg_r9_q 
+W:
+\u_issue.u_pipe_ctrl.alu_result_e1_i(skip) 2
+//\u_exec.u_alu.alu_b_i(skip) 1
+//opcode_opcode_w(skip) 1
+//\u_issue.u_regfile.REGFILE.reg_r1_q(skip) 4
+//\u_frontend.u_decode.fetch_in_instr_i(skip) 1
+//\u_frontend.u_decode.fetch_in_instr_i(skip) 2
+//\u_frontend.u_decode.fetch_in_valid_i(skip) 1
+//\u_frontend.u_decode.u_fifo.pc_q[0](skip) 1
+//\u_frontend.u_decode.u_fifo.pc_q[0](skip) 2
+//\u_frontend.u_decode.u_fifo.ram_q[0](skip) 1
+//\u_frontend.u_decode.u_fifo.ram_q[0](skip) 2
+//\u_exec0.jimm20_r(skip) 2
+$NOP:
+mem_i_inst_i = 25'b0+5'b00100+2'b11
+rst_i = 0
+mem_i_accept_i = 1
+mem_i_valid_i = 1
+mem_i_error_i = 0
+intr_i = 0
+reset_vector_i = 32'h80000000
+cpu_id_i = 0
+mem_d_data_rd_i = x
+mem_d_accept_i = 1
+mem_d_ack_i = 0
+mem_d_error_i = 0
+mem_d_resp_tag_i = x

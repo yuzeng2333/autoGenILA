@@ -1,0 +1,25 @@
+module HLS_fp32_sub_core_chn_o_rsci_chn_o_wait_dp(nvdla_core_clk, nvdla_core_rstn, chn_o_rsci_oswt, chn_o_rsci_bawt, chn_o_rsci_wen_comp, chn_o_rsci_biwt, chn_o_rsci_bdwt);
+  wire _00_;
+  wire _01_;
+  wire _02_;
+  wire _03_;
+  output chn_o_rsci_bawt;
+  reg chn_o_rsci_bcwt;
+  input chn_o_rsci_bdwt;
+  input chn_o_rsci_biwt;
+  input chn_o_rsci_oswt;
+  output chn_o_rsci_wen_comp;
+  input nvdla_core_clk;
+  input nvdla_core_rstn;
+  assign _01_ = ~ chn_o_rsci_oswt;
+  assign _02_ = ~ chn_o_rsci_bawt;
+  assign _00_ = ~ _03_;
+  assign chn_o_rsci_bawt = chn_o_rsci_biwt | chn_o_rsci_bcwt;
+  assign chn_o_rsci_wen_comp = _01_ | chn_o_rsci_bawt;
+  assign _03_ = _02_ | chn_o_rsci_bdwt;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      chn_o_rsci_bcwt <= 1'b0;
+    else
+      chn_o_rsci_bcwt <= _00_;
+endmodule

@@ -1,0 +1,32 @@
+read_verilog ../gfx/blender_bench.v     
+read_verilog ../gfx/bresenham_bench.v
+read_verilog ../gfx/clip_bench.v
+read_verilog ../gfx/color_bench.v
+read_verilog ../gfx/cuvz_bench.v
+read_verilog ../gfx/div_bench.v
+read_verilog ../gfx/fifo_bench.v
+read_verilog ../gfx/fragment_bench.v
+read_verilog ../gfx/gfx_bench.v
+read_verilog ../gfx/interp_bench.v
+read_verilog ../gfx/line_bench.v
+read_verilog ../gfx/raster_bench.v
+read_verilog ../gfx/renderer_bench.v
+read_verilog ../gfx/timescale.v
+read_verilog ../gfx/transform_bench.v
+read_verilog ../gfx/triangle_bench.v
+read_verilog ../gfx/wbm_arbiter_bench.v
+read_verilog ../gfx/wbm_r_bench.v
+read_verilog ../gfx/wbm_w_bench.v      
+
+prep -top PID
+
+hierarchy -check
+proc
+opt
+opt_expr -mux_undef
+opt
+memory -nordff
+proc
+opt;;
+opt_clean
+write_verilog -nohex -noattr PID_short.v

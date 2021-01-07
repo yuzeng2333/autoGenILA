@@ -1,0 +1,2174 @@
+module \$paramod\nv_ram_rwsp_160x514_logic\FORCE_CONTENTION_ASSERTION_RESET_ACTIVE=1'1 (SI, SO_int_net, ary_atpg_ctl, ary_read_inh, clk, debug_mode, di, dout, iddq_mode, jtag_readonly_mode, mbist_Di_w0, mbist_Do_r0_int_net, mbist_Ra_r0, mbist_Wa_w0, mbist_ce_r0_0_0, mbist_ce_r0_0_144, mbist_ce_r0_0_288, mbist_ce_r0_0_432, mbist_en_sync, mbist_ramaccess_rst_, mbist_we_w0_0_0, mbist_we_w0_0_144, mbist_we_w0_0_288, mbist_we_w0_0_432, ore, pwrbus_ram_pd, ra, re, scan_en, scan_ramtms, shiftDR, svop, test_mode, updateDR, wa, we, write_inh);
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1116" *)
+  wire _000_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1308" *)
+  wire _001_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1918" *)
+  wire _002_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1918" *)
+  wire _003_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1918" *)
+  wire _004_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1918" *)
+  wire _005_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:2000" *)
+  wire _006_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:271" *)
+  wire _007_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:272" *)
+  wire _008_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:290" *)
+  wire _009_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:291" *)
+  wire _010_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:309" *)
+  wire _011_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:310" *)
+  wire _012_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:328" *)
+  wire _013_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:329" *)
+  wire _014_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:416" *)
+  wire _015_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:434" *)
+  wire _016_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:452" *)
+  wire _017_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:470" *)
+  wire _018_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1115" *)
+  wire _019_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1116" *)
+  wire _020_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1304" *)
+  wire _021_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1467" *)
+  wire _022_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1656" *)
+  wire _023_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1757" *)
+  wire _024_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1918" *)
+  wire _025_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:226" *)
+  wire _026_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:600" *)
+  wire _027_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:763" *)
+  wire _028_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:952" *)
+  wire _029_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1918" *)
+  wire _030_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1918" *)
+  wire _031_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1918" *)
+  wire _032_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1918" *)
+  wire _033_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1918" *)
+  wire _034_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1918" *)
+  wire _035_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:192" *)
+  wire _036_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1948" *)
+  wire _037_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:2000" *)
+  wire _038_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1918" *)
+  wire _039_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1948" *)
+  wire _040_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:360" *)
+  wire [7:0] D_Ra_reg_r0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1920" *)
+  wire Data_reg_SO_r0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:168" *)
+  wire [513:0] Data_reg_r0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:2001" *)
+  wire [513:0] Data_reg_r0_D;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:2002" *)
+  wire [513:0] Data_reg_r0_Q;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:378" *)
+  wire Ra_reg_SO_r0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:348" *)
+  wire [7:0] Ra_reg_r0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:349" *)
+  wire [7:0] Ra_reg_r0_A;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:349" *)
+  wire [7:0] Ra_reg_r0_B;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:350" *)
+  wire Ra_reg_r0_S;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:83" *)
+  input SI;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:84" *)
+  output SO_int_net;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:257" *)
+  wire Wa_reg_SO_w0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:231" *)
+  wire [7:0] Wa_reg_w0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:232" *)
+  wire [7:0] Wa_reg_w0_A;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:232" *)
+  wire [7:0] Wa_reg_w0_B;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:233" *)
+  wire Wa_reg_w0_S;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:501" *)
+  wire [143:0] Wdata_0_0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:526" *)
+  wire [287:144] Wdata_0_144;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:551" *)
+  wire [431:288] Wdata_0_288;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:576" *)
+  wire [513:432] Wdata_0_432;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:382" *)
+  wire access_en_r_0_0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:390" *)
+  wire access_en_r_0_144;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:398" *)
+  wire access_en_r_0_288;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:406" *)
+  wire access_en_r_0_432;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:383" *)
+  reg access_en_r_1p_0_0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:391" *)
+  reg access_en_r_1p_0_144;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:399" *)
+  reg access_en_r_1p_0_288;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:407" *)
+  reg access_en_r_1p_0_432;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:227" *)
+  wire access_en_w;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:85" *)
+  input ary_atpg_ctl;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:86" *)
+  input ary_read_inh;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1918" *)
+  wire captureDR_r0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:87" *)
+  input clk;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:190" *)
+  wire clk_en_core_0_0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:193" *)
+  wire clk_en_core_0_144;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:196" *)
+  wire clk_en_core_0_288;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:199" *)
+  wire clk_en_core_0_432;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:494" *)
+  wire [7:0] cs_end_val_0_0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:519" *)
+  wire [7:0] cs_end_val_0_144;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:544" *)
+  wire [7:0] cs_end_val_0_288;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:569" *)
+  wire [7:0] cs_end_val_0_432;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:492" *)
+  wire [7:0] cs_start_val_0_0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:517" *)
+  wire [7:0] cs_start_val_0_144;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:542" *)
+  wire [7:0] cs_start_val_0_288;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:567" *)
+  wire [7:0] cs_start_val_0_432;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1925" *)
+  wire [513:0] data_regq;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:88" *)
+  input debug_mode;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:159" *)
+  wire debug_mode_sync;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:345" *)
+  wire dft_capdr_r;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:229" *)
+  wire dft_capdr_w;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:160" *)
+  wire dft_rst_gated_clk;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:89" *)
+  input [513:0] di;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:90" *)
+  output [513:0] dout;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:508" *)
+  wire [143:0] dout_0_0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:533" *)
+  wire [287:144] dout_0_144;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:558" *)
+  wire [431:288] dout_0_288;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:583" *)
+  wire [513:432] dout_0_432;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:191" *)
+  wire gated_clk_core_0_0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:194" *)
+  wire gated_clk_core_0_144;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:197" *)
+  wire gated_clk_core_0_288;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:200" *)
+  wire gated_clk_core_0_432;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1999" *)
+  wire gated_clk_jtag_Data_reg_r0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1947" *)
+  wire gated_clk_jtag_Wa_reg_w0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:91" *)
+  input iddq_mode;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:92" *)
+  input jtag_readonly_mode;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:148" *)
+  wire la_bist_clkr0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:147" *)
+  wire la_bist_clkw0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:93" *)
+  input [1:0] mbist_Di_w0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:94" *)
+  output [513:0] mbist_Do_r0_int_net;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:95" *)
+  input [7:0] mbist_Ra_r0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:96" *)
+  input [7:0] mbist_Wa_w0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:97" *)
+  input mbist_ce_r0_0_0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1910" *)
+  reg mbist_ce_r0_0_0_1p;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:98" *)
+  input mbist_ce_r0_0_144;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1912" *)
+  reg mbist_ce_r0_0_144_1p;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:99" *)
+  input mbist_ce_r0_0_288;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1914" *)
+  reg mbist_ce_r0_0_288_1p;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:100" *)
+  input mbist_ce_r0_0_432;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1916" *)
+  reg mbist_ce_r0_0_432_1p;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:164" *)
+  wire mbist_en_r;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:101" *)
+  input mbist_en_sync;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:102" *)
+  input mbist_ramaccess_rst_;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:103" *)
+  input mbist_we_w0_0_0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:104" *)
+  input mbist_we_w0_0_144;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:105" *)
+  input mbist_we_w0_0_288;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:106" *)
+  input mbist_we_w0_0_432;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:215" *)
+  wire [513:0] muxed_Di_w0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:216" *)
+  wire [513:0] muxed_Di_w0_A;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:216" *)
+  wire [513:0] muxed_Di_w0_B;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:219" *)
+  wire muxed_Di_w0_S;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:361" *)
+  wire [7:0] muxed_Ra_r0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:362" *)
+  wire [7:0] muxed_Ra_r0_A;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:362" *)
+  wire [7:0] muxed_Ra_r0_B;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:363" *)
+  wire muxed_Ra_r0_S;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:243" *)
+  wire [7:0] muxed_Wa_w0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:244" *)
+  wire [7:0] muxed_Wa_w0_A;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:244" *)
+  wire [7:0] muxed_Wa_w0_B;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:245" *)
+  wire muxed_Wa_w0_S;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:417" *)
+  wire muxed_re_r0_0_0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:418" *)
+  wire muxed_re_r0_0_0_A;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:418" *)
+  wire muxed_re_r0_0_0_B;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:419" *)
+  wire muxed_re_r0_0_0_S;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:435" *)
+  wire muxed_re_r0_0_144;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:436" *)
+  wire muxed_re_r0_0_144_A;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:436" *)
+  wire muxed_re_r0_0_144_B;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:437" *)
+  wire muxed_re_r0_0_144_S;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:453" *)
+  wire muxed_re_r0_0_288;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:454" *)
+  wire muxed_re_r0_0_288_A;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:454" *)
+  wire muxed_re_r0_0_288_B;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:455" *)
+  wire muxed_re_r0_0_288_S;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:471" *)
+  wire muxed_re_r0_0_432;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:472" *)
+  wire muxed_re_r0_0_432_A;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:472" *)
+  wire muxed_re_r0_0_432_B;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:473" *)
+  wire muxed_re_r0_0_432_S;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:273" *)
+  wire muxed_we_w0_0_0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:274" *)
+  wire muxed_we_w0_0_0_A;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:274" *)
+  wire muxed_we_w0_0_0_B;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:275" *)
+  wire muxed_we_w0_0_0_S;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:292" *)
+  wire muxed_we_w0_0_144;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:293" *)
+  wire muxed_we_w0_0_144_A;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:293" *)
+  wire muxed_we_w0_0_144_B;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:294" *)
+  wire muxed_we_w0_0_144_S;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:311" *)
+  wire muxed_we_w0_0_288;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:312" *)
+  wire muxed_we_w0_0_288_A;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:312" *)
+  wire muxed_we_w0_0_288_B;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:313" *)
+  wire muxed_we_w0_0_288_S;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:330" *)
+  wire muxed_we_w0_0_432;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:331" *)
+  wire muxed_we_w0_0_432_A;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:331" *)
+  wire muxed_we_w0_0_432_B;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:332" *)
+  wire muxed_we_w0_0_432_S;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:107" *)
+  input ore;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:604" *)
+  wire piece_re_0_0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:956" *)
+  wire piece_re_0_144;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1308" *)
+  wire piece_re_0_288;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1660" *)
+  wire piece_re_0_432;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:226" *)
+  wire posedge_updateDR_sync;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:347" *)
+  wire [7:0] pre_Ra_reg_r0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:230" *)
+  wire [7:0] pre_Wa_reg_w0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:203" *)
+  wire [513:0] pre_muxed_Di_w0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:204" *)
+  wire [513:0] pre_muxed_Di_w0_A;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:204" *)
+  wire [513:0] pre_muxed_Di_w0_B;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:205" *)
+  wire pre_muxed_Di_w0_S;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:413" *)
+  wire pre_re_r0_0_0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:431" *)
+  wire pre_re_r0_0_144;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:449" *)
+  wire pre_re_r0_0_288;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:467" *)
+  wire pre_re_r0_0_432;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:269" *)
+  wire pre_we_w0_0_0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:288" *)
+  wire pre_we_w0_0_144;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:307" *)
+  wire pre_we_w0_0_288;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:326" *)
+  wire pre_we_w0_0_432;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:108" *)
+  input [31:0] pwrbus_ram_pd;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:170" *)
+  wire [513:0] r0_OutputMuxDataOut;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:109" *)
+  input [7:0] ra;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:505" *)
+  wire [7:0] ra_0_0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:530" *)
+  wire [7:0] ra_0_144;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:555" *)
+  wire [7:0] ra_0_288;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:580" *)
+  wire [7:0] ra_0_432;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:379" *)
+  wire [7:0] radr_q;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:607" *)
+  wire [143:0] ramDataOut_0_0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:959" *)
+  wire [287:144] ramDataOut_0_144;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1311" *)
+  wire [431:288] ramDataOut_0_288;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1663" *)
+  wire [513:432] ramDataOut_0_432;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:146" *)
+  wire ram_bypass;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1876" *)
+  wire [513:0] ram_r0_OutputMuxDataOut;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:110" *)
+  input re;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:175" *)
+  wire re_0_0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:429" *)
+  wire re_0_0_q;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:179" *)
+  wire re_0_144;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:447" *)
+  wire re_0_144_q;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:183" *)
+  wire re_0_288;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:465" *)
+  wire re_0_288_q;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:187" *)
+  wire re_0_432;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:483" *)
+  wire re_0_432_q;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:261" *)
+  wire re_reg_SO_r0_0_0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:263" *)
+  wire re_reg_SO_r0_0_144;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:265" *)
+  wire re_reg_SO_r0_0_288;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:267" *)
+  wire re_reg_SO_r0_0_432;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:381" *)
+  wire re_reg_r0_0_0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:389" *)
+  wire re_reg_r0_0_144;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:397" *)
+  wire re_reg_r0_0_288;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:405" *)
+  wire re_reg_r0_0_432;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:121" *)
+  wire ret_en;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:111" *)
+  input scan_en;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:112" *)
+  input scan_ramtms;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:113" *)
+  input shiftDR;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:120" *)
+  wire [7:0] sleep_en;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:2010" *)
+  wire so_Data_reg_r0_257_2;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:2004" *)
+  wire so_Data_reg_r0_513_258;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:114" *)
+  input [7:0] svop;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:115" *)
+  input test_mode;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:116" *)
+  input updateDR;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:150" *)
+  wire updateDR_sync;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:152" *)
+  reg updateDR_sync_1p;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:117" *)
+  input [7:0] wa;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:498" *)
+  wire [7:0] wa_0_0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:523" *)
+  wire [7:0] wa_0_144;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:548" *)
+  wire [7:0] wa_0_288;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:573" *)
+  wire [7:0] wa_0_432;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:258" *)
+  wire [7:0] wadr_q;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:118" *)
+  input we;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:173" *)
+  wire we_0_0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:285" *)
+  wire we_0_0_q;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:177" *)
+  wire we_0_144;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:304" *)
+  wire we_0_144_q;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:181" *)
+  wire we_0_288;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:323" *)
+  wire we_0_288_q;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:185" *)
+  wire we_0_432;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:342" *)
+  wire we_0_432_q;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:260" *)
+  wire we_reg_SO_w0_0_0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:262" *)
+  wire we_reg_SO_w0_0_144;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:264" *)
+  wire we_reg_SO_w0_0_288;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:266" *)
+  wire we_reg_SO_w0_0_432;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:268" *)
+  wire we_reg_w0_0_0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:287" *)
+  wire we_reg_w0_0_144;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:306" *)
+  wire we_reg_w0_0_288;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:325" *)
+  wire we_reg_w0_0_432;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:600" *)
+  wire web_0_0;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:952" *)
+  wire web_0_144;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1304" *)
+  wire web_0_288;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1656" *)
+  wire web_0_432;
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:119" *)
+  input write_inh;
+  assign _001_ = scan_en & (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1308" *) jtag_readonly_mode;
+  assign _000_ = muxed_Ra_r0[7] & (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1468" *) _020_;
+  assign _002_ = ore & (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1918" *) _025_;
+  assign _003_ = _002_ & (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1918" *) Ra_reg_r0_S;
+  assign _005_ = mbist_en_r & (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1918" *) _035_;
+  assign _006_ = debug_mode_sync & (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:2000" *) shiftDR;
+  assign posedge_updateDR_sync = updateDR_sync & (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:226" *) _026_;
+  assign _007_ = posedge_updateDR_sync & (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:271" *) we_0_0_q;
+  assign _008_ = mbist_en_r & (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:272" *) mbist_we_w0_0_0;
+  assign _009_ = posedge_updateDR_sync & (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:290" *) we_0_144_q;
+  assign _010_ = mbist_en_r & (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:291" *) mbist_we_w0_0_144;
+  assign _011_ = posedge_updateDR_sync & (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:309" *) we_0_288_q;
+  assign _012_ = mbist_en_r & (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:310" *) mbist_we_w0_0_288;
+  assign _013_ = posedge_updateDR_sync & (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:328" *) we_0_432_q;
+  assign _014_ = mbist_en_r & (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:329" *) mbist_we_w0_0_432;
+  assign access_en_r_0_0 = posedge_updateDR_sync & (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:382" *) re_0_0_q;
+  assign access_en_r_0_144 = posedge_updateDR_sync & (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:390" *) re_0_144_q;
+  assign access_en_r_0_288 = posedge_updateDR_sync & (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:398" *) re_0_288_q;
+  assign access_en_r_0_432 = posedge_updateDR_sync & (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:406" *) re_0_432_q;
+  assign _015_ = mbist_en_r & (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:416" *) mbist_ce_r0_0_0;
+  assign _016_ = mbist_en_r & (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:434" *) mbist_ce_r0_0_144;
+  assign _017_ = mbist_en_r & (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:452" *) mbist_ce_r0_0_288;
+  assign _018_ = mbist_en_r & (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:470" *) mbist_ce_r0_0_432;
+  assign _019_ = ! (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1115" *) web_0_144;
+  assign _020_ = ! (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1116" *) test_mode;
+  assign _021_ = ! (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1304" *) muxed_we_w0_0_288;
+  assign _022_ = ! (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1467" *) web_0_288;
+  assign _023_ = ! (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1656" *) muxed_we_w0_0_432;
+  assign _024_ = ! (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1757" *) web_0_432;
+  assign _025_ = ! (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1918" *) mbist_en_r;
+  assign Ra_reg_r0_S = ! (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1918" *) debug_mode_sync;
+  assign _026_ = ! (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:226" *) updateDR_sync_1p;
+  assign _027_ = ! (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:600" *) muxed_we_w0_0_0;
+  assign _028_ = ! (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:763" *) web_0_0;
+  assign _029_ = ! (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:952" *) muxed_we_w0_0_144;
+  assign _030_ = _003_ || (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1918" *) _039_;
+  assign web_0_288 = _021_ | (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1304" *) write_inh;
+  assign piece_re_0_288 = muxed_re_r0_0_288 | (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1308" *) _001_;
+  assign ram_bypass = scan_ramtms | (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:146" *) ary_read_inh;
+  assign web_0_432 = _023_ | (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1656" *) write_inh;
+  assign piece_re_0_432 = muxed_re_r0_0_432 | (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1660" *) _001_;
+  assign muxed_re_r0_0_432_S = mbist_en_r | (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:171" *) debug_mode_sync;
+  assign clk_en_core_0_0 = re | (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:190" *) we;
+  assign _031_ = access_en_r_1p_0_0 | (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1918" *) access_en_r_1p_0_144;
+  assign _032_ = _031_ | (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1918" *) access_en_r_1p_0_288;
+  assign _004_ = _032_ | (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1918" *) access_en_r_1p_0_432;
+  assign _033_ = mbist_ce_r0_0_0_1p | (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1918" *) mbist_ce_r0_0_144_1p;
+  assign _034_ = _033_ | (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1918" *) mbist_ce_r0_0_288_1p;
+  assign _035_ = _034_ | (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1918" *) mbist_ce_r0_0_432_1p;
+  assign captureDR_r0 = ary_atpg_ctl | (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1918" *) _030_;
+  assign _036_ = muxed_re_r0_0_432_S | (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:192" *) scan_en;
+  assign _037_ = mbist_en_r | (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1948" *) ary_atpg_ctl;
+  assign _038_ = captureDR_r0 | (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:2000" *) _006_;
+  assign web_0_0 = _027_ | (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:600" *) write_inh;
+  assign piece_re_0_0 = muxed_re_r0_0_0 | (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:604" *) _001_;
+  assign web_0_144 = _029_ | (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:952" *) write_inh;
+  assign piece_re_0_144 = muxed_re_r0_0_144 | (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:956" *) _001_;
+  always @(posedge la_bist_clkr0)
+      mbist_ce_r0_0_432_1p <= mbist_ce_r0_0_432;
+  always @(posedge la_bist_clkr0)
+      mbist_ce_r0_0_288_1p <= mbist_ce_r0_0_288;
+  always @(posedge la_bist_clkr0)
+      mbist_ce_r0_0_144_1p <= mbist_ce_r0_0_144;
+  always @(posedge la_bist_clkr0)
+      mbist_ce_r0_0_0_1p <= mbist_ce_r0_0_0;
+  always @(posedge la_bist_clkr0 or negedge mbist_ramaccess_rst_)
+    if (!mbist_ramaccess_rst_)
+      access_en_r_1p_0_432 <= 1'b0;
+    else
+      access_en_r_1p_0_432 <= access_en_r_0_432;
+  always @(posedge la_bist_clkr0 or negedge mbist_ramaccess_rst_)
+    if (!mbist_ramaccess_rst_)
+      access_en_r_1p_0_288 <= 1'b0;
+    else
+      access_en_r_1p_0_288 <= access_en_r_0_288;
+  always @(posedge la_bist_clkr0 or negedge mbist_ramaccess_rst_)
+    if (!mbist_ramaccess_rst_)
+      access_en_r_1p_0_144 <= 1'b0;
+    else
+      access_en_r_1p_0_144 <= access_en_r_0_144;
+  always @(posedge la_bist_clkr0 or negedge mbist_ramaccess_rst_)
+    if (!mbist_ramaccess_rst_)
+      access_en_r_1p_0_0 <= 1'b0;
+    else
+      access_en_r_1p_0_0 <= access_en_r_0_0;
+  always @(posedge la_bist_clkr0 or negedge mbist_ramaccess_rst_)
+    if (!mbist_ramaccess_rst_)
+      updateDR_sync_1p <= 1'b0;
+    else
+      updateDR_sync_1p <= updateDR_sync;
+  assign muxed_re_r0_0_432 = muxed_re_r0_0_432_S ? (* full_case = 32'd1 *) (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:480|./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:478" *) muxed_re_r0_0_432_B : re;
+  assign muxed_re_r0_0_288 = muxed_re_r0_0_432_S ? (* full_case = 32'd1 *) (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:462|./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:460" *) muxed_re_r0_0_288_B : re;
+  assign muxed_re_r0_0_144 = muxed_re_r0_0_432_S ? (* full_case = 32'd1 *) (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:444|./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:442" *) muxed_re_r0_0_144_B : re;
+  assign muxed_re_r0_0_0 = muxed_re_r0_0_432_S ? (* full_case = 32'd1 *) (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:426|./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:424" *) muxed_re_r0_0_0_B : re;
+  assign muxed_Ra_r0 = muxed_re_r0_0_432_S ? (* full_case = 32'd1 *) (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:370|./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:368" *) muxed_Ra_r0_B : ra;
+  assign muxed_Ra_r0_B = debug_mode_sync ? (* full_case = 32'd1 *) (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:357|./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:355" *) Ra_reg_r0_A : mbist_Ra_r0;
+  assign muxed_we_w0_0_432 = muxed_re_r0_0_432_S ? (* full_case = 32'd1 *) (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:339|./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:337" *) muxed_we_w0_0_432_B : we;
+  assign muxed_we_w0_0_288 = muxed_re_r0_0_432_S ? (* full_case = 32'd1 *) (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:320|./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:318" *) muxed_we_w0_0_288_B : we;
+  assign muxed_we_w0_0_144 = muxed_re_r0_0_432_S ? (* full_case = 32'd1 *) (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:301|./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:299" *) muxed_we_w0_0_144_B : we;
+  assign muxed_we_w0_0_0 = muxed_re_r0_0_432_S ? (* full_case = 32'd1 *) (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:282|./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:280" *) muxed_we_w0_0_0_B : we;
+  assign muxed_Wa_w0 = muxed_re_r0_0_432_S ? (* full_case = 32'd1 *) (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:252|./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:250" *) muxed_Wa_w0_B : wa;
+  assign muxed_Wa_w0_B = debug_mode_sync ? (* full_case = 32'd1 *) (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:240|./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:238" *) Wa_reg_w0_A : mbist_Wa_w0;
+  assign muxed_Di_w0 = muxed_re_r0_0_432_S ? (* full_case = 32'd1 *) (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:223|./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:221" *) muxed_Di_w0_B : di;
+  assign muxed_Di_w0_B = debug_mode_sync ? (* full_case = 32'd1 *) (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:212|./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:210" *) Data_reg_r0_Q : { mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0 };
+  assign Data_reg_r0_D[143:0] = ram_bypass ? (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1881" *) muxed_Di_w0[143:0] : dout_0_0;
+  assign Data_reg_r0_D[287:144] = ram_bypass ? (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1889" *) muxed_Di_w0[287:144] : dout_0_144;
+  assign Data_reg_r0_D[431:288] = ram_bypass ? (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1897" *) muxed_Di_w0[431:288] : dout_0_288;
+  assign Data_reg_r0_D[513:432] = ram_bypass ? (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1905" *) muxed_Di_w0[513:432] : dout_0_432;
+  assign _039_ = debug_mode_sync ? (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1918" *) _004_ : _005_;
+  assign _040_ = debug_mode_sync ? (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1948" *) shiftDR : _037_;
+  assign muxed_we_w0_0_0_B = debug_mode_sync ? (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:272" *) _007_ : _008_;
+  assign muxed_we_w0_0_144_B = debug_mode_sync ? (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:291" *) _009_ : _010_;
+  assign muxed_we_w0_0_288_B = debug_mode_sync ? (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:310" *) _011_ : _012_;
+  assign muxed_we_w0_0_432_B = debug_mode_sync ? (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:329" *) _013_ : _014_;
+  assign muxed_re_r0_0_0_B = debug_mode_sync ? (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:416" *) access_en_r_0_0 : _015_;
+  assign muxed_re_r0_0_144_B = debug_mode_sync ? (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:434" *) access_en_r_0_144 : _016_;
+  assign muxed_re_r0_0_288_B = debug_mode_sync ? (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:452" *) access_en_r_0_288 : _017_;
+  assign muxed_re_r0_0_432_B = debug_mode_sync ? (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:470" *) access_en_r_0_432 : _018_;
+  (* module_not_derived = 32'd1 *)
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:161" *)
+  CKLNQD12PO4 CLK_GATE_clk (
+    .CP(clk),
+    .E(mbist_ramaccess_rst_),
+    .Q(dft_rst_gated_clk),
+    .TE(scan_en)
+  );
+  (* module_not_derived = 32'd1 *)
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:192" *)
+  CKLNQD12PO4 UJ_clk_gate_core_0_0 (
+    .CP(clk),
+    .E(clk_en_core_0_0),
+    .Q(gated_clk_core_0_0),
+    .TE(_036_)
+  );
+  (* module_not_derived = 32'd1 *)
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:195" *)
+  CKLNQD12PO4 UJ_clk_gate_core_0_144 (
+    .CP(clk),
+    .E(clk_en_core_0_0),
+    .Q(gated_clk_core_0_144),
+    .TE(_036_)
+  );
+  (* module_not_derived = 32'd1 *)
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:198" *)
+  CKLNQD12PO4 UJ_clk_gate_core_0_288 (
+    .CP(clk),
+    .E(clk_en_core_0_0),
+    .Q(gated_clk_core_0_288),
+    .TE(_036_)
+  );
+  (* module_not_derived = 32'd1 *)
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:201" *)
+  CKLNQD12PO4 UJ_clk_gate_core_0_432 (
+    .CP(clk),
+    .E(clk_en_core_0_0),
+    .Q(gated_clk_core_0_432),
+    .TE(_036_)
+  );
+  (* module_not_derived = 32'd1 *)
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:2000" *)
+  CKLNQD12PO4 UJ_clk_jtag_Data_reg_r0 (
+    .CP(clk),
+    .E(_038_),
+    .Q(gated_clk_jtag_Data_reg_r0),
+    .TE(scan_en)
+  );
+  (* module_not_derived = 32'd1 *)
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1948" *)
+  CKLNQD12PO4 UJ_clk_jtag_Wa_reg_w0 (
+    .CP(clk),
+    .E(_040_),
+    .Q(gated_clk_jtag_Wa_reg_w0),
+    .TE(scan_en)
+  );
+  (* module_not_derived = 32'd1 *)
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:171" *)
+  CKLNQD12PO4 UJ_la_bist_clkw0_gate (
+    .CP(clk),
+    .E(muxed_re_r0_0_432_S),
+    .Q(la_bist_clkr0),
+    .TE(scan_en)
+  );
+  (* module_not_derived = 32'd1 *)
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:162" *)
+  sync2d_c_pp debug_mode_synchronizer (
+    .clk(dft_rst_gated_clk),
+    .clr_(mbist_ramaccess_rst_),
+    .d(debug_mode),
+    .q(debug_mode_sync)
+  );
+  (* module_not_derived = 32'd1 *)
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:166" *)
+  p_SDFCNQD1PO4 mbist_en_flop (
+    .CDN(mbist_ramaccess_rst_),
+    .CP(dft_rst_gated_clk),
+    .D(mbist_en_sync),
+    .Q(mbist_en_r)
+  );
+  (* module_not_derived = 32'd1 *)
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:609" *)
+  RAMPDP_160X144_GL_M2_D2 ram_Inst_160X144_0_0 (
+    .CLK(gated_clk_core_0_0),
+    .IDDQ(iddq_mode),
+    .RADR_0(muxed_Ra_r0[0]),
+    .RADR_1(muxed_Ra_r0[1]),
+    .RADR_2(muxed_Ra_r0[2]),
+    .RADR_3(muxed_Ra_r0[3]),
+    .RADR_4(muxed_Ra_r0[4]),
+    .RADR_5(muxed_Ra_r0[5]),
+    .RADR_6(muxed_Ra_r0[6]),
+    .RADR_7(_000_),
+    .RD_0(dout_0_0[0]),
+    .RD_1(dout_0_0[1]),
+    .RD_10(dout_0_0[10]),
+    .RD_100(dout_0_0[100]),
+    .RD_101(dout_0_0[101]),
+    .RD_102(dout_0_0[102]),
+    .RD_103(dout_0_0[103]),
+    .RD_104(dout_0_0[104]),
+    .RD_105(dout_0_0[105]),
+    .RD_106(dout_0_0[106]),
+    .RD_107(dout_0_0[107]),
+    .RD_108(dout_0_0[108]),
+    .RD_109(dout_0_0[109]),
+    .RD_11(dout_0_0[11]),
+    .RD_110(dout_0_0[110]),
+    .RD_111(dout_0_0[111]),
+    .RD_112(dout_0_0[112]),
+    .RD_113(dout_0_0[113]),
+    .RD_114(dout_0_0[114]),
+    .RD_115(dout_0_0[115]),
+    .RD_116(dout_0_0[116]),
+    .RD_117(dout_0_0[117]),
+    .RD_118(dout_0_0[118]),
+    .RD_119(dout_0_0[119]),
+    .RD_12(dout_0_0[12]),
+    .RD_120(dout_0_0[120]),
+    .RD_121(dout_0_0[121]),
+    .RD_122(dout_0_0[122]),
+    .RD_123(dout_0_0[123]),
+    .RD_124(dout_0_0[124]),
+    .RD_125(dout_0_0[125]),
+    .RD_126(dout_0_0[126]),
+    .RD_127(dout_0_0[127]),
+    .RD_128(dout_0_0[128]),
+    .RD_129(dout_0_0[129]),
+    .RD_13(dout_0_0[13]),
+    .RD_130(dout_0_0[130]),
+    .RD_131(dout_0_0[131]),
+    .RD_132(dout_0_0[132]),
+    .RD_133(dout_0_0[133]),
+    .RD_134(dout_0_0[134]),
+    .RD_135(dout_0_0[135]),
+    .RD_136(dout_0_0[136]),
+    .RD_137(dout_0_0[137]),
+    .RD_138(dout_0_0[138]),
+    .RD_139(dout_0_0[139]),
+    .RD_14(dout_0_0[14]),
+    .RD_140(dout_0_0[140]),
+    .RD_141(dout_0_0[141]),
+    .RD_142(dout_0_0[142]),
+    .RD_143(dout_0_0[143]),
+    .RD_15(dout_0_0[15]),
+    .RD_16(dout_0_0[16]),
+    .RD_17(dout_0_0[17]),
+    .RD_18(dout_0_0[18]),
+    .RD_19(dout_0_0[19]),
+    .RD_2(dout_0_0[2]),
+    .RD_20(dout_0_0[20]),
+    .RD_21(dout_0_0[21]),
+    .RD_22(dout_0_0[22]),
+    .RD_23(dout_0_0[23]),
+    .RD_24(dout_0_0[24]),
+    .RD_25(dout_0_0[25]),
+    .RD_26(dout_0_0[26]),
+    .RD_27(dout_0_0[27]),
+    .RD_28(dout_0_0[28]),
+    .RD_29(dout_0_0[29]),
+    .RD_3(dout_0_0[3]),
+    .RD_30(dout_0_0[30]),
+    .RD_31(dout_0_0[31]),
+    .RD_32(dout_0_0[32]),
+    .RD_33(dout_0_0[33]),
+    .RD_34(dout_0_0[34]),
+    .RD_35(dout_0_0[35]),
+    .RD_36(dout_0_0[36]),
+    .RD_37(dout_0_0[37]),
+    .RD_38(dout_0_0[38]),
+    .RD_39(dout_0_0[39]),
+    .RD_4(dout_0_0[4]),
+    .RD_40(dout_0_0[40]),
+    .RD_41(dout_0_0[41]),
+    .RD_42(dout_0_0[42]),
+    .RD_43(dout_0_0[43]),
+    .RD_44(dout_0_0[44]),
+    .RD_45(dout_0_0[45]),
+    .RD_46(dout_0_0[46]),
+    .RD_47(dout_0_0[47]),
+    .RD_48(dout_0_0[48]),
+    .RD_49(dout_0_0[49]),
+    .RD_5(dout_0_0[5]),
+    .RD_50(dout_0_0[50]),
+    .RD_51(dout_0_0[51]),
+    .RD_52(dout_0_0[52]),
+    .RD_53(dout_0_0[53]),
+    .RD_54(dout_0_0[54]),
+    .RD_55(dout_0_0[55]),
+    .RD_56(dout_0_0[56]),
+    .RD_57(dout_0_0[57]),
+    .RD_58(dout_0_0[58]),
+    .RD_59(dout_0_0[59]),
+    .RD_6(dout_0_0[6]),
+    .RD_60(dout_0_0[60]),
+    .RD_61(dout_0_0[61]),
+    .RD_62(dout_0_0[62]),
+    .RD_63(dout_0_0[63]),
+    .RD_64(dout_0_0[64]),
+    .RD_65(dout_0_0[65]),
+    .RD_66(dout_0_0[66]),
+    .RD_67(dout_0_0[67]),
+    .RD_68(dout_0_0[68]),
+    .RD_69(dout_0_0[69]),
+    .RD_7(dout_0_0[7]),
+    .RD_70(dout_0_0[70]),
+    .RD_71(dout_0_0[71]),
+    .RD_72(dout_0_0[72]),
+    .RD_73(dout_0_0[73]),
+    .RD_74(dout_0_0[74]),
+    .RD_75(dout_0_0[75]),
+    .RD_76(dout_0_0[76]),
+    .RD_77(dout_0_0[77]),
+    .RD_78(dout_0_0[78]),
+    .RD_79(dout_0_0[79]),
+    .RD_8(dout_0_0[8]),
+    .RD_80(dout_0_0[80]),
+    .RD_81(dout_0_0[81]),
+    .RD_82(dout_0_0[82]),
+    .RD_83(dout_0_0[83]),
+    .RD_84(dout_0_0[84]),
+    .RD_85(dout_0_0[85]),
+    .RD_86(dout_0_0[86]),
+    .RD_87(dout_0_0[87]),
+    .RD_88(dout_0_0[88]),
+    .RD_89(dout_0_0[89]),
+    .RD_9(dout_0_0[9]),
+    .RD_90(dout_0_0[90]),
+    .RD_91(dout_0_0[91]),
+    .RD_92(dout_0_0[92]),
+    .RD_93(dout_0_0[93]),
+    .RD_94(dout_0_0[94]),
+    .RD_95(dout_0_0[95]),
+    .RD_96(dout_0_0[96]),
+    .RD_97(dout_0_0[97]),
+    .RD_98(dout_0_0[98]),
+    .RD_99(dout_0_0[99]),
+    .RE(piece_re_0_0),
+    .RET_EN(pwrbus_ram_pd[8]),
+    .SLEEP_EN_0(pwrbus_ram_pd[0]),
+    .SLEEP_EN_1(pwrbus_ram_pd[1]),
+    .SLEEP_EN_2(pwrbus_ram_pd[2]),
+    .SLEEP_EN_3(pwrbus_ram_pd[3]),
+    .SLEEP_EN_4(pwrbus_ram_pd[4]),
+    .SLEEP_EN_5(pwrbus_ram_pd[5]),
+    .SLEEP_EN_6(pwrbus_ram_pd[6]),
+    .SLEEP_EN_7(pwrbus_ram_pd[7]),
+    .SVOP_0(svop[0]),
+    .SVOP_1(svop[1]),
+    .SVOP_2(svop[2]),
+    .SVOP_3(svop[3]),
+    .SVOP_4(svop[4]),
+    .SVOP_5(svop[5]),
+    .SVOP_6(svop[6]),
+    .SVOP_7(svop[7]),
+    .WADR_0(muxed_Wa_w0[0]),
+    .WADR_1(muxed_Wa_w0[1]),
+    .WADR_2(muxed_Wa_w0[2]),
+    .WADR_3(muxed_Wa_w0[3]),
+    .WADR_4(muxed_Wa_w0[4]),
+    .WADR_5(muxed_Wa_w0[5]),
+    .WADR_6(muxed_Wa_w0[6]),
+    .WADR_7(muxed_Wa_w0[7]),
+    .WD_0(muxed_Di_w0[0]),
+    .WD_1(muxed_Di_w0[1]),
+    .WD_10(muxed_Di_w0[10]),
+    .WD_100(muxed_Di_w0[100]),
+    .WD_101(muxed_Di_w0[101]),
+    .WD_102(muxed_Di_w0[102]),
+    .WD_103(muxed_Di_w0[103]),
+    .WD_104(muxed_Di_w0[104]),
+    .WD_105(muxed_Di_w0[105]),
+    .WD_106(muxed_Di_w0[106]),
+    .WD_107(muxed_Di_w0[107]),
+    .WD_108(muxed_Di_w0[108]),
+    .WD_109(muxed_Di_w0[109]),
+    .WD_11(muxed_Di_w0[11]),
+    .WD_110(muxed_Di_w0[110]),
+    .WD_111(muxed_Di_w0[111]),
+    .WD_112(muxed_Di_w0[112]),
+    .WD_113(muxed_Di_w0[113]),
+    .WD_114(muxed_Di_w0[114]),
+    .WD_115(muxed_Di_w0[115]),
+    .WD_116(muxed_Di_w0[116]),
+    .WD_117(muxed_Di_w0[117]),
+    .WD_118(muxed_Di_w0[118]),
+    .WD_119(muxed_Di_w0[119]),
+    .WD_12(muxed_Di_w0[12]),
+    .WD_120(muxed_Di_w0[120]),
+    .WD_121(muxed_Di_w0[121]),
+    .WD_122(muxed_Di_w0[122]),
+    .WD_123(muxed_Di_w0[123]),
+    .WD_124(muxed_Di_w0[124]),
+    .WD_125(muxed_Di_w0[125]),
+    .WD_126(muxed_Di_w0[126]),
+    .WD_127(muxed_Di_w0[127]),
+    .WD_128(muxed_Di_w0[128]),
+    .WD_129(muxed_Di_w0[129]),
+    .WD_13(muxed_Di_w0[13]),
+    .WD_130(muxed_Di_w0[130]),
+    .WD_131(muxed_Di_w0[131]),
+    .WD_132(muxed_Di_w0[132]),
+    .WD_133(muxed_Di_w0[133]),
+    .WD_134(muxed_Di_w0[134]),
+    .WD_135(muxed_Di_w0[135]),
+    .WD_136(muxed_Di_w0[136]),
+    .WD_137(muxed_Di_w0[137]),
+    .WD_138(muxed_Di_w0[138]),
+    .WD_139(muxed_Di_w0[139]),
+    .WD_14(muxed_Di_w0[14]),
+    .WD_140(muxed_Di_w0[140]),
+    .WD_141(muxed_Di_w0[141]),
+    .WD_142(muxed_Di_w0[142]),
+    .WD_143(muxed_Di_w0[143]),
+    .WD_15(muxed_Di_w0[15]),
+    .WD_16(muxed_Di_w0[16]),
+    .WD_17(muxed_Di_w0[17]),
+    .WD_18(muxed_Di_w0[18]),
+    .WD_19(muxed_Di_w0[19]),
+    .WD_2(muxed_Di_w0[2]),
+    .WD_20(muxed_Di_w0[20]),
+    .WD_21(muxed_Di_w0[21]),
+    .WD_22(muxed_Di_w0[22]),
+    .WD_23(muxed_Di_w0[23]),
+    .WD_24(muxed_Di_w0[24]),
+    .WD_25(muxed_Di_w0[25]),
+    .WD_26(muxed_Di_w0[26]),
+    .WD_27(muxed_Di_w0[27]),
+    .WD_28(muxed_Di_w0[28]),
+    .WD_29(muxed_Di_w0[29]),
+    .WD_3(muxed_Di_w0[3]),
+    .WD_30(muxed_Di_w0[30]),
+    .WD_31(muxed_Di_w0[31]),
+    .WD_32(muxed_Di_w0[32]),
+    .WD_33(muxed_Di_w0[33]),
+    .WD_34(muxed_Di_w0[34]),
+    .WD_35(muxed_Di_w0[35]),
+    .WD_36(muxed_Di_w0[36]),
+    .WD_37(muxed_Di_w0[37]),
+    .WD_38(muxed_Di_w0[38]),
+    .WD_39(muxed_Di_w0[39]),
+    .WD_4(muxed_Di_w0[4]),
+    .WD_40(muxed_Di_w0[40]),
+    .WD_41(muxed_Di_w0[41]),
+    .WD_42(muxed_Di_w0[42]),
+    .WD_43(muxed_Di_w0[43]),
+    .WD_44(muxed_Di_w0[44]),
+    .WD_45(muxed_Di_w0[45]),
+    .WD_46(muxed_Di_w0[46]),
+    .WD_47(muxed_Di_w0[47]),
+    .WD_48(muxed_Di_w0[48]),
+    .WD_49(muxed_Di_w0[49]),
+    .WD_5(muxed_Di_w0[5]),
+    .WD_50(muxed_Di_w0[50]),
+    .WD_51(muxed_Di_w0[51]),
+    .WD_52(muxed_Di_w0[52]),
+    .WD_53(muxed_Di_w0[53]),
+    .WD_54(muxed_Di_w0[54]),
+    .WD_55(muxed_Di_w0[55]),
+    .WD_56(muxed_Di_w0[56]),
+    .WD_57(muxed_Di_w0[57]),
+    .WD_58(muxed_Di_w0[58]),
+    .WD_59(muxed_Di_w0[59]),
+    .WD_6(muxed_Di_w0[6]),
+    .WD_60(muxed_Di_w0[60]),
+    .WD_61(muxed_Di_w0[61]),
+    .WD_62(muxed_Di_w0[62]),
+    .WD_63(muxed_Di_w0[63]),
+    .WD_64(muxed_Di_w0[64]),
+    .WD_65(muxed_Di_w0[65]),
+    .WD_66(muxed_Di_w0[66]),
+    .WD_67(muxed_Di_w0[67]),
+    .WD_68(muxed_Di_w0[68]),
+    .WD_69(muxed_Di_w0[69]),
+    .WD_7(muxed_Di_w0[7]),
+    .WD_70(muxed_Di_w0[70]),
+    .WD_71(muxed_Di_w0[71]),
+    .WD_72(muxed_Di_w0[72]),
+    .WD_73(muxed_Di_w0[73]),
+    .WD_74(muxed_Di_w0[74]),
+    .WD_75(muxed_Di_w0[75]),
+    .WD_76(muxed_Di_w0[76]),
+    .WD_77(muxed_Di_w0[77]),
+    .WD_78(muxed_Di_w0[78]),
+    .WD_79(muxed_Di_w0[79]),
+    .WD_8(muxed_Di_w0[8]),
+    .WD_80(muxed_Di_w0[80]),
+    .WD_81(muxed_Di_w0[81]),
+    .WD_82(muxed_Di_w0[82]),
+    .WD_83(muxed_Di_w0[83]),
+    .WD_84(muxed_Di_w0[84]),
+    .WD_85(muxed_Di_w0[85]),
+    .WD_86(muxed_Di_w0[86]),
+    .WD_87(muxed_Di_w0[87]),
+    .WD_88(muxed_Di_w0[88]),
+    .WD_89(muxed_Di_w0[89]),
+    .WD_9(muxed_Di_w0[9]),
+    .WD_90(muxed_Di_w0[90]),
+    .WD_91(muxed_Di_w0[91]),
+    .WD_92(muxed_Di_w0[92]),
+    .WD_93(muxed_Di_w0[93]),
+    .WD_94(muxed_Di_w0[94]),
+    .WD_95(muxed_Di_w0[95]),
+    .WD_96(muxed_Di_w0[96]),
+    .WD_97(muxed_Di_w0[97]),
+    .WD_98(muxed_Di_w0[98]),
+    .WD_99(muxed_Di_w0[99]),
+    .WE(_028_)
+  );
+  (* module_not_derived = 32'd1 *)
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:961" *)
+  RAMPDP_160X144_GL_M2_D2 ram_Inst_160X144_0_144 (
+    .CLK(gated_clk_core_0_144),
+    .IDDQ(iddq_mode),
+    .RADR_0(muxed_Ra_r0[0]),
+    .RADR_1(muxed_Ra_r0[1]),
+    .RADR_2(muxed_Ra_r0[2]),
+    .RADR_3(muxed_Ra_r0[3]),
+    .RADR_4(muxed_Ra_r0[4]),
+    .RADR_5(muxed_Ra_r0[5]),
+    .RADR_6(muxed_Ra_r0[6]),
+    .RADR_7(_000_),
+    .RD_0(dout_0_144[144]),
+    .RD_1(dout_0_144[145]),
+    .RD_10(dout_0_144[154]),
+    .RD_100(dout_0_144[244]),
+    .RD_101(dout_0_144[245]),
+    .RD_102(dout_0_144[246]),
+    .RD_103(dout_0_144[247]),
+    .RD_104(dout_0_144[248]),
+    .RD_105(dout_0_144[249]),
+    .RD_106(dout_0_144[250]),
+    .RD_107(dout_0_144[251]),
+    .RD_108(dout_0_144[252]),
+    .RD_109(dout_0_144[253]),
+    .RD_11(dout_0_144[155]),
+    .RD_110(dout_0_144[254]),
+    .RD_111(dout_0_144[255]),
+    .RD_112(dout_0_144[256]),
+    .RD_113(dout_0_144[257]),
+    .RD_114(dout_0_144[258]),
+    .RD_115(dout_0_144[259]),
+    .RD_116(dout_0_144[260]),
+    .RD_117(dout_0_144[261]),
+    .RD_118(dout_0_144[262]),
+    .RD_119(dout_0_144[263]),
+    .RD_12(dout_0_144[156]),
+    .RD_120(dout_0_144[264]),
+    .RD_121(dout_0_144[265]),
+    .RD_122(dout_0_144[266]),
+    .RD_123(dout_0_144[267]),
+    .RD_124(dout_0_144[268]),
+    .RD_125(dout_0_144[269]),
+    .RD_126(dout_0_144[270]),
+    .RD_127(dout_0_144[271]),
+    .RD_128(dout_0_144[272]),
+    .RD_129(dout_0_144[273]),
+    .RD_13(dout_0_144[157]),
+    .RD_130(dout_0_144[274]),
+    .RD_131(dout_0_144[275]),
+    .RD_132(dout_0_144[276]),
+    .RD_133(dout_0_144[277]),
+    .RD_134(dout_0_144[278]),
+    .RD_135(dout_0_144[279]),
+    .RD_136(dout_0_144[280]),
+    .RD_137(dout_0_144[281]),
+    .RD_138(dout_0_144[282]),
+    .RD_139(dout_0_144[283]),
+    .RD_14(dout_0_144[158]),
+    .RD_140(dout_0_144[284]),
+    .RD_141(dout_0_144[285]),
+    .RD_142(dout_0_144[286]),
+    .RD_143(dout_0_144[287]),
+    .RD_15(dout_0_144[159]),
+    .RD_16(dout_0_144[160]),
+    .RD_17(dout_0_144[161]),
+    .RD_18(dout_0_144[162]),
+    .RD_19(dout_0_144[163]),
+    .RD_2(dout_0_144[146]),
+    .RD_20(dout_0_144[164]),
+    .RD_21(dout_0_144[165]),
+    .RD_22(dout_0_144[166]),
+    .RD_23(dout_0_144[167]),
+    .RD_24(dout_0_144[168]),
+    .RD_25(dout_0_144[169]),
+    .RD_26(dout_0_144[170]),
+    .RD_27(dout_0_144[171]),
+    .RD_28(dout_0_144[172]),
+    .RD_29(dout_0_144[173]),
+    .RD_3(dout_0_144[147]),
+    .RD_30(dout_0_144[174]),
+    .RD_31(dout_0_144[175]),
+    .RD_32(dout_0_144[176]),
+    .RD_33(dout_0_144[177]),
+    .RD_34(dout_0_144[178]),
+    .RD_35(dout_0_144[179]),
+    .RD_36(dout_0_144[180]),
+    .RD_37(dout_0_144[181]),
+    .RD_38(dout_0_144[182]),
+    .RD_39(dout_0_144[183]),
+    .RD_4(dout_0_144[148]),
+    .RD_40(dout_0_144[184]),
+    .RD_41(dout_0_144[185]),
+    .RD_42(dout_0_144[186]),
+    .RD_43(dout_0_144[187]),
+    .RD_44(dout_0_144[188]),
+    .RD_45(dout_0_144[189]),
+    .RD_46(dout_0_144[190]),
+    .RD_47(dout_0_144[191]),
+    .RD_48(dout_0_144[192]),
+    .RD_49(dout_0_144[193]),
+    .RD_5(dout_0_144[149]),
+    .RD_50(dout_0_144[194]),
+    .RD_51(dout_0_144[195]),
+    .RD_52(dout_0_144[196]),
+    .RD_53(dout_0_144[197]),
+    .RD_54(dout_0_144[198]),
+    .RD_55(dout_0_144[199]),
+    .RD_56(dout_0_144[200]),
+    .RD_57(dout_0_144[201]),
+    .RD_58(dout_0_144[202]),
+    .RD_59(dout_0_144[203]),
+    .RD_6(dout_0_144[150]),
+    .RD_60(dout_0_144[204]),
+    .RD_61(dout_0_144[205]),
+    .RD_62(dout_0_144[206]),
+    .RD_63(dout_0_144[207]),
+    .RD_64(dout_0_144[208]),
+    .RD_65(dout_0_144[209]),
+    .RD_66(dout_0_144[210]),
+    .RD_67(dout_0_144[211]),
+    .RD_68(dout_0_144[212]),
+    .RD_69(dout_0_144[213]),
+    .RD_7(dout_0_144[151]),
+    .RD_70(dout_0_144[214]),
+    .RD_71(dout_0_144[215]),
+    .RD_72(dout_0_144[216]),
+    .RD_73(dout_0_144[217]),
+    .RD_74(dout_0_144[218]),
+    .RD_75(dout_0_144[219]),
+    .RD_76(dout_0_144[220]),
+    .RD_77(dout_0_144[221]),
+    .RD_78(dout_0_144[222]),
+    .RD_79(dout_0_144[223]),
+    .RD_8(dout_0_144[152]),
+    .RD_80(dout_0_144[224]),
+    .RD_81(dout_0_144[225]),
+    .RD_82(dout_0_144[226]),
+    .RD_83(dout_0_144[227]),
+    .RD_84(dout_0_144[228]),
+    .RD_85(dout_0_144[229]),
+    .RD_86(dout_0_144[230]),
+    .RD_87(dout_0_144[231]),
+    .RD_88(dout_0_144[232]),
+    .RD_89(dout_0_144[233]),
+    .RD_9(dout_0_144[153]),
+    .RD_90(dout_0_144[234]),
+    .RD_91(dout_0_144[235]),
+    .RD_92(dout_0_144[236]),
+    .RD_93(dout_0_144[237]),
+    .RD_94(dout_0_144[238]),
+    .RD_95(dout_0_144[239]),
+    .RD_96(dout_0_144[240]),
+    .RD_97(dout_0_144[241]),
+    .RD_98(dout_0_144[242]),
+    .RD_99(dout_0_144[243]),
+    .RE(piece_re_0_144),
+    .RET_EN(pwrbus_ram_pd[8]),
+    .SLEEP_EN_0(pwrbus_ram_pd[0]),
+    .SLEEP_EN_1(pwrbus_ram_pd[1]),
+    .SLEEP_EN_2(pwrbus_ram_pd[2]),
+    .SLEEP_EN_3(pwrbus_ram_pd[3]),
+    .SLEEP_EN_4(pwrbus_ram_pd[4]),
+    .SLEEP_EN_5(pwrbus_ram_pd[5]),
+    .SLEEP_EN_6(pwrbus_ram_pd[6]),
+    .SLEEP_EN_7(pwrbus_ram_pd[7]),
+    .SVOP_0(svop[0]),
+    .SVOP_1(svop[1]),
+    .SVOP_2(svop[2]),
+    .SVOP_3(svop[3]),
+    .SVOP_4(svop[4]),
+    .SVOP_5(svop[5]),
+    .SVOP_6(svop[6]),
+    .SVOP_7(svop[7]),
+    .WADR_0(muxed_Wa_w0[0]),
+    .WADR_1(muxed_Wa_w0[1]),
+    .WADR_2(muxed_Wa_w0[2]),
+    .WADR_3(muxed_Wa_w0[3]),
+    .WADR_4(muxed_Wa_w0[4]),
+    .WADR_5(muxed_Wa_w0[5]),
+    .WADR_6(muxed_Wa_w0[6]),
+    .WADR_7(muxed_Wa_w0[7]),
+    .WD_0(muxed_Di_w0[144]),
+    .WD_1(muxed_Di_w0[145]),
+    .WD_10(muxed_Di_w0[154]),
+    .WD_100(muxed_Di_w0[244]),
+    .WD_101(muxed_Di_w0[245]),
+    .WD_102(muxed_Di_w0[246]),
+    .WD_103(muxed_Di_w0[247]),
+    .WD_104(muxed_Di_w0[248]),
+    .WD_105(muxed_Di_w0[249]),
+    .WD_106(muxed_Di_w0[250]),
+    .WD_107(muxed_Di_w0[251]),
+    .WD_108(muxed_Di_w0[252]),
+    .WD_109(muxed_Di_w0[253]),
+    .WD_11(muxed_Di_w0[155]),
+    .WD_110(muxed_Di_w0[254]),
+    .WD_111(muxed_Di_w0[255]),
+    .WD_112(muxed_Di_w0[256]),
+    .WD_113(muxed_Di_w0[257]),
+    .WD_114(muxed_Di_w0[258]),
+    .WD_115(muxed_Di_w0[259]),
+    .WD_116(muxed_Di_w0[260]),
+    .WD_117(muxed_Di_w0[261]),
+    .WD_118(muxed_Di_w0[262]),
+    .WD_119(muxed_Di_w0[263]),
+    .WD_12(muxed_Di_w0[156]),
+    .WD_120(muxed_Di_w0[264]),
+    .WD_121(muxed_Di_w0[265]),
+    .WD_122(muxed_Di_w0[266]),
+    .WD_123(muxed_Di_w0[267]),
+    .WD_124(muxed_Di_w0[268]),
+    .WD_125(muxed_Di_w0[269]),
+    .WD_126(muxed_Di_w0[270]),
+    .WD_127(muxed_Di_w0[271]),
+    .WD_128(muxed_Di_w0[272]),
+    .WD_129(muxed_Di_w0[273]),
+    .WD_13(muxed_Di_w0[157]),
+    .WD_130(muxed_Di_w0[274]),
+    .WD_131(muxed_Di_w0[275]),
+    .WD_132(muxed_Di_w0[276]),
+    .WD_133(muxed_Di_w0[277]),
+    .WD_134(muxed_Di_w0[278]),
+    .WD_135(muxed_Di_w0[279]),
+    .WD_136(muxed_Di_w0[280]),
+    .WD_137(muxed_Di_w0[281]),
+    .WD_138(muxed_Di_w0[282]),
+    .WD_139(muxed_Di_w0[283]),
+    .WD_14(muxed_Di_w0[158]),
+    .WD_140(muxed_Di_w0[284]),
+    .WD_141(muxed_Di_w0[285]),
+    .WD_142(muxed_Di_w0[286]),
+    .WD_143(muxed_Di_w0[287]),
+    .WD_15(muxed_Di_w0[159]),
+    .WD_16(muxed_Di_w0[160]),
+    .WD_17(muxed_Di_w0[161]),
+    .WD_18(muxed_Di_w0[162]),
+    .WD_19(muxed_Di_w0[163]),
+    .WD_2(muxed_Di_w0[146]),
+    .WD_20(muxed_Di_w0[164]),
+    .WD_21(muxed_Di_w0[165]),
+    .WD_22(muxed_Di_w0[166]),
+    .WD_23(muxed_Di_w0[167]),
+    .WD_24(muxed_Di_w0[168]),
+    .WD_25(muxed_Di_w0[169]),
+    .WD_26(muxed_Di_w0[170]),
+    .WD_27(muxed_Di_w0[171]),
+    .WD_28(muxed_Di_w0[172]),
+    .WD_29(muxed_Di_w0[173]),
+    .WD_3(muxed_Di_w0[147]),
+    .WD_30(muxed_Di_w0[174]),
+    .WD_31(muxed_Di_w0[175]),
+    .WD_32(muxed_Di_w0[176]),
+    .WD_33(muxed_Di_w0[177]),
+    .WD_34(muxed_Di_w0[178]),
+    .WD_35(muxed_Di_w0[179]),
+    .WD_36(muxed_Di_w0[180]),
+    .WD_37(muxed_Di_w0[181]),
+    .WD_38(muxed_Di_w0[182]),
+    .WD_39(muxed_Di_w0[183]),
+    .WD_4(muxed_Di_w0[148]),
+    .WD_40(muxed_Di_w0[184]),
+    .WD_41(muxed_Di_w0[185]),
+    .WD_42(muxed_Di_w0[186]),
+    .WD_43(muxed_Di_w0[187]),
+    .WD_44(muxed_Di_w0[188]),
+    .WD_45(muxed_Di_w0[189]),
+    .WD_46(muxed_Di_w0[190]),
+    .WD_47(muxed_Di_w0[191]),
+    .WD_48(muxed_Di_w0[192]),
+    .WD_49(muxed_Di_w0[193]),
+    .WD_5(muxed_Di_w0[149]),
+    .WD_50(muxed_Di_w0[194]),
+    .WD_51(muxed_Di_w0[195]),
+    .WD_52(muxed_Di_w0[196]),
+    .WD_53(muxed_Di_w0[197]),
+    .WD_54(muxed_Di_w0[198]),
+    .WD_55(muxed_Di_w0[199]),
+    .WD_56(muxed_Di_w0[200]),
+    .WD_57(muxed_Di_w0[201]),
+    .WD_58(muxed_Di_w0[202]),
+    .WD_59(muxed_Di_w0[203]),
+    .WD_6(muxed_Di_w0[150]),
+    .WD_60(muxed_Di_w0[204]),
+    .WD_61(muxed_Di_w0[205]),
+    .WD_62(muxed_Di_w0[206]),
+    .WD_63(muxed_Di_w0[207]),
+    .WD_64(muxed_Di_w0[208]),
+    .WD_65(muxed_Di_w0[209]),
+    .WD_66(muxed_Di_w0[210]),
+    .WD_67(muxed_Di_w0[211]),
+    .WD_68(muxed_Di_w0[212]),
+    .WD_69(muxed_Di_w0[213]),
+    .WD_7(muxed_Di_w0[151]),
+    .WD_70(muxed_Di_w0[214]),
+    .WD_71(muxed_Di_w0[215]),
+    .WD_72(muxed_Di_w0[216]),
+    .WD_73(muxed_Di_w0[217]),
+    .WD_74(muxed_Di_w0[218]),
+    .WD_75(muxed_Di_w0[219]),
+    .WD_76(muxed_Di_w0[220]),
+    .WD_77(muxed_Di_w0[221]),
+    .WD_78(muxed_Di_w0[222]),
+    .WD_79(muxed_Di_w0[223]),
+    .WD_8(muxed_Di_w0[152]),
+    .WD_80(muxed_Di_w0[224]),
+    .WD_81(muxed_Di_w0[225]),
+    .WD_82(muxed_Di_w0[226]),
+    .WD_83(muxed_Di_w0[227]),
+    .WD_84(muxed_Di_w0[228]),
+    .WD_85(muxed_Di_w0[229]),
+    .WD_86(muxed_Di_w0[230]),
+    .WD_87(muxed_Di_w0[231]),
+    .WD_88(muxed_Di_w0[232]),
+    .WD_89(muxed_Di_w0[233]),
+    .WD_9(muxed_Di_w0[153]),
+    .WD_90(muxed_Di_w0[234]),
+    .WD_91(muxed_Di_w0[235]),
+    .WD_92(muxed_Di_w0[236]),
+    .WD_93(muxed_Di_w0[237]),
+    .WD_94(muxed_Di_w0[238]),
+    .WD_95(muxed_Di_w0[239]),
+    .WD_96(muxed_Di_w0[240]),
+    .WD_97(muxed_Di_w0[241]),
+    .WD_98(muxed_Di_w0[242]),
+    .WD_99(muxed_Di_w0[243]),
+    .WE(_019_)
+  );
+  (* module_not_derived = 32'd1 *)
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1313" *)
+  RAMPDP_160X144_GL_M2_D2 ram_Inst_160X144_0_288 (
+    .CLK(gated_clk_core_0_288),
+    .IDDQ(iddq_mode),
+    .RADR_0(muxed_Ra_r0[0]),
+    .RADR_1(muxed_Ra_r0[1]),
+    .RADR_2(muxed_Ra_r0[2]),
+    .RADR_3(muxed_Ra_r0[3]),
+    .RADR_4(muxed_Ra_r0[4]),
+    .RADR_5(muxed_Ra_r0[5]),
+    .RADR_6(muxed_Ra_r0[6]),
+    .RADR_7(_000_),
+    .RD_0(dout_0_288[288]),
+    .RD_1(dout_0_288[289]),
+    .RD_10(dout_0_288[298]),
+    .RD_100(dout_0_288[388]),
+    .RD_101(dout_0_288[389]),
+    .RD_102(dout_0_288[390]),
+    .RD_103(dout_0_288[391]),
+    .RD_104(dout_0_288[392]),
+    .RD_105(dout_0_288[393]),
+    .RD_106(dout_0_288[394]),
+    .RD_107(dout_0_288[395]),
+    .RD_108(dout_0_288[396]),
+    .RD_109(dout_0_288[397]),
+    .RD_11(dout_0_288[299]),
+    .RD_110(dout_0_288[398]),
+    .RD_111(dout_0_288[399]),
+    .RD_112(dout_0_288[400]),
+    .RD_113(dout_0_288[401]),
+    .RD_114(dout_0_288[402]),
+    .RD_115(dout_0_288[403]),
+    .RD_116(dout_0_288[404]),
+    .RD_117(dout_0_288[405]),
+    .RD_118(dout_0_288[406]),
+    .RD_119(dout_0_288[407]),
+    .RD_12(dout_0_288[300]),
+    .RD_120(dout_0_288[408]),
+    .RD_121(dout_0_288[409]),
+    .RD_122(dout_0_288[410]),
+    .RD_123(dout_0_288[411]),
+    .RD_124(dout_0_288[412]),
+    .RD_125(dout_0_288[413]),
+    .RD_126(dout_0_288[414]),
+    .RD_127(dout_0_288[415]),
+    .RD_128(dout_0_288[416]),
+    .RD_129(dout_0_288[417]),
+    .RD_13(dout_0_288[301]),
+    .RD_130(dout_0_288[418]),
+    .RD_131(dout_0_288[419]),
+    .RD_132(dout_0_288[420]),
+    .RD_133(dout_0_288[421]),
+    .RD_134(dout_0_288[422]),
+    .RD_135(dout_0_288[423]),
+    .RD_136(dout_0_288[424]),
+    .RD_137(dout_0_288[425]),
+    .RD_138(dout_0_288[426]),
+    .RD_139(dout_0_288[427]),
+    .RD_14(dout_0_288[302]),
+    .RD_140(dout_0_288[428]),
+    .RD_141(dout_0_288[429]),
+    .RD_142(dout_0_288[430]),
+    .RD_143(dout_0_288[431]),
+    .RD_15(dout_0_288[303]),
+    .RD_16(dout_0_288[304]),
+    .RD_17(dout_0_288[305]),
+    .RD_18(dout_0_288[306]),
+    .RD_19(dout_0_288[307]),
+    .RD_2(dout_0_288[290]),
+    .RD_20(dout_0_288[308]),
+    .RD_21(dout_0_288[309]),
+    .RD_22(dout_0_288[310]),
+    .RD_23(dout_0_288[311]),
+    .RD_24(dout_0_288[312]),
+    .RD_25(dout_0_288[313]),
+    .RD_26(dout_0_288[314]),
+    .RD_27(dout_0_288[315]),
+    .RD_28(dout_0_288[316]),
+    .RD_29(dout_0_288[317]),
+    .RD_3(dout_0_288[291]),
+    .RD_30(dout_0_288[318]),
+    .RD_31(dout_0_288[319]),
+    .RD_32(dout_0_288[320]),
+    .RD_33(dout_0_288[321]),
+    .RD_34(dout_0_288[322]),
+    .RD_35(dout_0_288[323]),
+    .RD_36(dout_0_288[324]),
+    .RD_37(dout_0_288[325]),
+    .RD_38(dout_0_288[326]),
+    .RD_39(dout_0_288[327]),
+    .RD_4(dout_0_288[292]),
+    .RD_40(dout_0_288[328]),
+    .RD_41(dout_0_288[329]),
+    .RD_42(dout_0_288[330]),
+    .RD_43(dout_0_288[331]),
+    .RD_44(dout_0_288[332]),
+    .RD_45(dout_0_288[333]),
+    .RD_46(dout_0_288[334]),
+    .RD_47(dout_0_288[335]),
+    .RD_48(dout_0_288[336]),
+    .RD_49(dout_0_288[337]),
+    .RD_5(dout_0_288[293]),
+    .RD_50(dout_0_288[338]),
+    .RD_51(dout_0_288[339]),
+    .RD_52(dout_0_288[340]),
+    .RD_53(dout_0_288[341]),
+    .RD_54(dout_0_288[342]),
+    .RD_55(dout_0_288[343]),
+    .RD_56(dout_0_288[344]),
+    .RD_57(dout_0_288[345]),
+    .RD_58(dout_0_288[346]),
+    .RD_59(dout_0_288[347]),
+    .RD_6(dout_0_288[294]),
+    .RD_60(dout_0_288[348]),
+    .RD_61(dout_0_288[349]),
+    .RD_62(dout_0_288[350]),
+    .RD_63(dout_0_288[351]),
+    .RD_64(dout_0_288[352]),
+    .RD_65(dout_0_288[353]),
+    .RD_66(dout_0_288[354]),
+    .RD_67(dout_0_288[355]),
+    .RD_68(dout_0_288[356]),
+    .RD_69(dout_0_288[357]),
+    .RD_7(dout_0_288[295]),
+    .RD_70(dout_0_288[358]),
+    .RD_71(dout_0_288[359]),
+    .RD_72(dout_0_288[360]),
+    .RD_73(dout_0_288[361]),
+    .RD_74(dout_0_288[362]),
+    .RD_75(dout_0_288[363]),
+    .RD_76(dout_0_288[364]),
+    .RD_77(dout_0_288[365]),
+    .RD_78(dout_0_288[366]),
+    .RD_79(dout_0_288[367]),
+    .RD_8(dout_0_288[296]),
+    .RD_80(dout_0_288[368]),
+    .RD_81(dout_0_288[369]),
+    .RD_82(dout_0_288[370]),
+    .RD_83(dout_0_288[371]),
+    .RD_84(dout_0_288[372]),
+    .RD_85(dout_0_288[373]),
+    .RD_86(dout_0_288[374]),
+    .RD_87(dout_0_288[375]),
+    .RD_88(dout_0_288[376]),
+    .RD_89(dout_0_288[377]),
+    .RD_9(dout_0_288[297]),
+    .RD_90(dout_0_288[378]),
+    .RD_91(dout_0_288[379]),
+    .RD_92(dout_0_288[380]),
+    .RD_93(dout_0_288[381]),
+    .RD_94(dout_0_288[382]),
+    .RD_95(dout_0_288[383]),
+    .RD_96(dout_0_288[384]),
+    .RD_97(dout_0_288[385]),
+    .RD_98(dout_0_288[386]),
+    .RD_99(dout_0_288[387]),
+    .RE(piece_re_0_288),
+    .RET_EN(pwrbus_ram_pd[8]),
+    .SLEEP_EN_0(pwrbus_ram_pd[0]),
+    .SLEEP_EN_1(pwrbus_ram_pd[1]),
+    .SLEEP_EN_2(pwrbus_ram_pd[2]),
+    .SLEEP_EN_3(pwrbus_ram_pd[3]),
+    .SLEEP_EN_4(pwrbus_ram_pd[4]),
+    .SLEEP_EN_5(pwrbus_ram_pd[5]),
+    .SLEEP_EN_6(pwrbus_ram_pd[6]),
+    .SLEEP_EN_7(pwrbus_ram_pd[7]),
+    .SVOP_0(svop[0]),
+    .SVOP_1(svop[1]),
+    .SVOP_2(svop[2]),
+    .SVOP_3(svop[3]),
+    .SVOP_4(svop[4]),
+    .SVOP_5(svop[5]),
+    .SVOP_6(svop[6]),
+    .SVOP_7(svop[7]),
+    .WADR_0(muxed_Wa_w0[0]),
+    .WADR_1(muxed_Wa_w0[1]),
+    .WADR_2(muxed_Wa_w0[2]),
+    .WADR_3(muxed_Wa_w0[3]),
+    .WADR_4(muxed_Wa_w0[4]),
+    .WADR_5(muxed_Wa_w0[5]),
+    .WADR_6(muxed_Wa_w0[6]),
+    .WADR_7(muxed_Wa_w0[7]),
+    .WD_0(muxed_Di_w0[288]),
+    .WD_1(muxed_Di_w0[289]),
+    .WD_10(muxed_Di_w0[298]),
+    .WD_100(muxed_Di_w0[388]),
+    .WD_101(muxed_Di_w0[389]),
+    .WD_102(muxed_Di_w0[390]),
+    .WD_103(muxed_Di_w0[391]),
+    .WD_104(muxed_Di_w0[392]),
+    .WD_105(muxed_Di_w0[393]),
+    .WD_106(muxed_Di_w0[394]),
+    .WD_107(muxed_Di_w0[395]),
+    .WD_108(muxed_Di_w0[396]),
+    .WD_109(muxed_Di_w0[397]),
+    .WD_11(muxed_Di_w0[299]),
+    .WD_110(muxed_Di_w0[398]),
+    .WD_111(muxed_Di_w0[399]),
+    .WD_112(muxed_Di_w0[400]),
+    .WD_113(muxed_Di_w0[401]),
+    .WD_114(muxed_Di_w0[402]),
+    .WD_115(muxed_Di_w0[403]),
+    .WD_116(muxed_Di_w0[404]),
+    .WD_117(muxed_Di_w0[405]),
+    .WD_118(muxed_Di_w0[406]),
+    .WD_119(muxed_Di_w0[407]),
+    .WD_12(muxed_Di_w0[300]),
+    .WD_120(muxed_Di_w0[408]),
+    .WD_121(muxed_Di_w0[409]),
+    .WD_122(muxed_Di_w0[410]),
+    .WD_123(muxed_Di_w0[411]),
+    .WD_124(muxed_Di_w0[412]),
+    .WD_125(muxed_Di_w0[413]),
+    .WD_126(muxed_Di_w0[414]),
+    .WD_127(muxed_Di_w0[415]),
+    .WD_128(muxed_Di_w0[416]),
+    .WD_129(muxed_Di_w0[417]),
+    .WD_13(muxed_Di_w0[301]),
+    .WD_130(muxed_Di_w0[418]),
+    .WD_131(muxed_Di_w0[419]),
+    .WD_132(muxed_Di_w0[420]),
+    .WD_133(muxed_Di_w0[421]),
+    .WD_134(muxed_Di_w0[422]),
+    .WD_135(muxed_Di_w0[423]),
+    .WD_136(muxed_Di_w0[424]),
+    .WD_137(muxed_Di_w0[425]),
+    .WD_138(muxed_Di_w0[426]),
+    .WD_139(muxed_Di_w0[427]),
+    .WD_14(muxed_Di_w0[302]),
+    .WD_140(muxed_Di_w0[428]),
+    .WD_141(muxed_Di_w0[429]),
+    .WD_142(muxed_Di_w0[430]),
+    .WD_143(muxed_Di_w0[431]),
+    .WD_15(muxed_Di_w0[303]),
+    .WD_16(muxed_Di_w0[304]),
+    .WD_17(muxed_Di_w0[305]),
+    .WD_18(muxed_Di_w0[306]),
+    .WD_19(muxed_Di_w0[307]),
+    .WD_2(muxed_Di_w0[290]),
+    .WD_20(muxed_Di_w0[308]),
+    .WD_21(muxed_Di_w0[309]),
+    .WD_22(muxed_Di_w0[310]),
+    .WD_23(muxed_Di_w0[311]),
+    .WD_24(muxed_Di_w0[312]),
+    .WD_25(muxed_Di_w0[313]),
+    .WD_26(muxed_Di_w0[314]),
+    .WD_27(muxed_Di_w0[315]),
+    .WD_28(muxed_Di_w0[316]),
+    .WD_29(muxed_Di_w0[317]),
+    .WD_3(muxed_Di_w0[291]),
+    .WD_30(muxed_Di_w0[318]),
+    .WD_31(muxed_Di_w0[319]),
+    .WD_32(muxed_Di_w0[320]),
+    .WD_33(muxed_Di_w0[321]),
+    .WD_34(muxed_Di_w0[322]),
+    .WD_35(muxed_Di_w0[323]),
+    .WD_36(muxed_Di_w0[324]),
+    .WD_37(muxed_Di_w0[325]),
+    .WD_38(muxed_Di_w0[326]),
+    .WD_39(muxed_Di_w0[327]),
+    .WD_4(muxed_Di_w0[292]),
+    .WD_40(muxed_Di_w0[328]),
+    .WD_41(muxed_Di_w0[329]),
+    .WD_42(muxed_Di_w0[330]),
+    .WD_43(muxed_Di_w0[331]),
+    .WD_44(muxed_Di_w0[332]),
+    .WD_45(muxed_Di_w0[333]),
+    .WD_46(muxed_Di_w0[334]),
+    .WD_47(muxed_Di_w0[335]),
+    .WD_48(muxed_Di_w0[336]),
+    .WD_49(muxed_Di_w0[337]),
+    .WD_5(muxed_Di_w0[293]),
+    .WD_50(muxed_Di_w0[338]),
+    .WD_51(muxed_Di_w0[339]),
+    .WD_52(muxed_Di_w0[340]),
+    .WD_53(muxed_Di_w0[341]),
+    .WD_54(muxed_Di_w0[342]),
+    .WD_55(muxed_Di_w0[343]),
+    .WD_56(muxed_Di_w0[344]),
+    .WD_57(muxed_Di_w0[345]),
+    .WD_58(muxed_Di_w0[346]),
+    .WD_59(muxed_Di_w0[347]),
+    .WD_6(muxed_Di_w0[294]),
+    .WD_60(muxed_Di_w0[348]),
+    .WD_61(muxed_Di_w0[349]),
+    .WD_62(muxed_Di_w0[350]),
+    .WD_63(muxed_Di_w0[351]),
+    .WD_64(muxed_Di_w0[352]),
+    .WD_65(muxed_Di_w0[353]),
+    .WD_66(muxed_Di_w0[354]),
+    .WD_67(muxed_Di_w0[355]),
+    .WD_68(muxed_Di_w0[356]),
+    .WD_69(muxed_Di_w0[357]),
+    .WD_7(muxed_Di_w0[295]),
+    .WD_70(muxed_Di_w0[358]),
+    .WD_71(muxed_Di_w0[359]),
+    .WD_72(muxed_Di_w0[360]),
+    .WD_73(muxed_Di_w0[361]),
+    .WD_74(muxed_Di_w0[362]),
+    .WD_75(muxed_Di_w0[363]),
+    .WD_76(muxed_Di_w0[364]),
+    .WD_77(muxed_Di_w0[365]),
+    .WD_78(muxed_Di_w0[366]),
+    .WD_79(muxed_Di_w0[367]),
+    .WD_8(muxed_Di_w0[296]),
+    .WD_80(muxed_Di_w0[368]),
+    .WD_81(muxed_Di_w0[369]),
+    .WD_82(muxed_Di_w0[370]),
+    .WD_83(muxed_Di_w0[371]),
+    .WD_84(muxed_Di_w0[372]),
+    .WD_85(muxed_Di_w0[373]),
+    .WD_86(muxed_Di_w0[374]),
+    .WD_87(muxed_Di_w0[375]),
+    .WD_88(muxed_Di_w0[376]),
+    .WD_89(muxed_Di_w0[377]),
+    .WD_9(muxed_Di_w0[297]),
+    .WD_90(muxed_Di_w0[378]),
+    .WD_91(muxed_Di_w0[379]),
+    .WD_92(muxed_Di_w0[380]),
+    .WD_93(muxed_Di_w0[381]),
+    .WD_94(muxed_Di_w0[382]),
+    .WD_95(muxed_Di_w0[383]),
+    .WD_96(muxed_Di_w0[384]),
+    .WD_97(muxed_Di_w0[385]),
+    .WD_98(muxed_Di_w0[386]),
+    .WD_99(muxed_Di_w0[387]),
+    .WE(_022_)
+  );
+  (* module_not_derived = 32'd1 *)
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1665" *)
+  RAMPDP_160X82_GL_M2_D2 ram_Inst_160X82_0_432 (
+    .CLK(gated_clk_core_0_432),
+    .IDDQ(iddq_mode),
+    .RADR_0(muxed_Ra_r0[0]),
+    .RADR_1(muxed_Ra_r0[1]),
+    .RADR_2(muxed_Ra_r0[2]),
+    .RADR_3(muxed_Ra_r0[3]),
+    .RADR_4(muxed_Ra_r0[4]),
+    .RADR_5(muxed_Ra_r0[5]),
+    .RADR_6(muxed_Ra_r0[6]),
+    .RADR_7(_000_),
+    .RD_0(dout_0_432[432]),
+    .RD_1(dout_0_432[433]),
+    .RD_10(dout_0_432[442]),
+    .RD_11(dout_0_432[443]),
+    .RD_12(dout_0_432[444]),
+    .RD_13(dout_0_432[445]),
+    .RD_14(dout_0_432[446]),
+    .RD_15(dout_0_432[447]),
+    .RD_16(dout_0_432[448]),
+    .RD_17(dout_0_432[449]),
+    .RD_18(dout_0_432[450]),
+    .RD_19(dout_0_432[451]),
+    .RD_2(dout_0_432[434]),
+    .RD_20(dout_0_432[452]),
+    .RD_21(dout_0_432[453]),
+    .RD_22(dout_0_432[454]),
+    .RD_23(dout_0_432[455]),
+    .RD_24(dout_0_432[456]),
+    .RD_25(dout_0_432[457]),
+    .RD_26(dout_0_432[458]),
+    .RD_27(dout_0_432[459]),
+    .RD_28(dout_0_432[460]),
+    .RD_29(dout_0_432[461]),
+    .RD_3(dout_0_432[435]),
+    .RD_30(dout_0_432[462]),
+    .RD_31(dout_0_432[463]),
+    .RD_32(dout_0_432[464]),
+    .RD_33(dout_0_432[465]),
+    .RD_34(dout_0_432[466]),
+    .RD_35(dout_0_432[467]),
+    .RD_36(dout_0_432[468]),
+    .RD_37(dout_0_432[469]),
+    .RD_38(dout_0_432[470]),
+    .RD_39(dout_0_432[471]),
+    .RD_4(dout_0_432[436]),
+    .RD_40(dout_0_432[472]),
+    .RD_41(dout_0_432[473]),
+    .RD_42(dout_0_432[474]),
+    .RD_43(dout_0_432[475]),
+    .RD_44(dout_0_432[476]),
+    .RD_45(dout_0_432[477]),
+    .RD_46(dout_0_432[478]),
+    .RD_47(dout_0_432[479]),
+    .RD_48(dout_0_432[480]),
+    .RD_49(dout_0_432[481]),
+    .RD_5(dout_0_432[437]),
+    .RD_50(dout_0_432[482]),
+    .RD_51(dout_0_432[483]),
+    .RD_52(dout_0_432[484]),
+    .RD_53(dout_0_432[485]),
+    .RD_54(dout_0_432[486]),
+    .RD_55(dout_0_432[487]),
+    .RD_56(dout_0_432[488]),
+    .RD_57(dout_0_432[489]),
+    .RD_58(dout_0_432[490]),
+    .RD_59(dout_0_432[491]),
+    .RD_6(dout_0_432[438]),
+    .RD_60(dout_0_432[492]),
+    .RD_61(dout_0_432[493]),
+    .RD_62(dout_0_432[494]),
+    .RD_63(dout_0_432[495]),
+    .RD_64(dout_0_432[496]),
+    .RD_65(dout_0_432[497]),
+    .RD_66(dout_0_432[498]),
+    .RD_67(dout_0_432[499]),
+    .RD_68(dout_0_432[500]),
+    .RD_69(dout_0_432[501]),
+    .RD_7(dout_0_432[439]),
+    .RD_70(dout_0_432[502]),
+    .RD_71(dout_0_432[503]),
+    .RD_72(dout_0_432[504]),
+    .RD_73(dout_0_432[505]),
+    .RD_74(dout_0_432[506]),
+    .RD_75(dout_0_432[507]),
+    .RD_76(dout_0_432[508]),
+    .RD_77(dout_0_432[509]),
+    .RD_78(dout_0_432[510]),
+    .RD_79(dout_0_432[511]),
+    .RD_8(dout_0_432[440]),
+    .RD_80(dout_0_432[512]),
+    .RD_81(dout_0_432[513]),
+    .RD_9(dout_0_432[441]),
+    .RE(piece_re_0_432),
+    .RET_EN(pwrbus_ram_pd[8]),
+    .SLEEP_EN_0(pwrbus_ram_pd[0]),
+    .SLEEP_EN_1(pwrbus_ram_pd[1]),
+    .SLEEP_EN_2(pwrbus_ram_pd[2]),
+    .SLEEP_EN_3(pwrbus_ram_pd[3]),
+    .SLEEP_EN_4(pwrbus_ram_pd[4]),
+    .SLEEP_EN_5(pwrbus_ram_pd[5]),
+    .SLEEP_EN_6(pwrbus_ram_pd[6]),
+    .SLEEP_EN_7(pwrbus_ram_pd[7]),
+    .SVOP_0(svop[0]),
+    .SVOP_1(svop[1]),
+    .SVOP_2(svop[2]),
+    .SVOP_3(svop[3]),
+    .SVOP_4(svop[4]),
+    .SVOP_5(svop[5]),
+    .SVOP_6(svop[6]),
+    .SVOP_7(svop[7]),
+    .WADR_0(muxed_Wa_w0[0]),
+    .WADR_1(muxed_Wa_w0[1]),
+    .WADR_2(muxed_Wa_w0[2]),
+    .WADR_3(muxed_Wa_w0[3]),
+    .WADR_4(muxed_Wa_w0[4]),
+    .WADR_5(muxed_Wa_w0[5]),
+    .WADR_6(muxed_Wa_w0[6]),
+    .WADR_7(muxed_Wa_w0[7]),
+    .WD_0(muxed_Di_w0[432]),
+    .WD_1(muxed_Di_w0[433]),
+    .WD_10(muxed_Di_w0[442]),
+    .WD_11(muxed_Di_w0[443]),
+    .WD_12(muxed_Di_w0[444]),
+    .WD_13(muxed_Di_w0[445]),
+    .WD_14(muxed_Di_w0[446]),
+    .WD_15(muxed_Di_w0[447]),
+    .WD_16(muxed_Di_w0[448]),
+    .WD_17(muxed_Di_w0[449]),
+    .WD_18(muxed_Di_w0[450]),
+    .WD_19(muxed_Di_w0[451]),
+    .WD_2(muxed_Di_w0[434]),
+    .WD_20(muxed_Di_w0[452]),
+    .WD_21(muxed_Di_w0[453]),
+    .WD_22(muxed_Di_w0[454]),
+    .WD_23(muxed_Di_w0[455]),
+    .WD_24(muxed_Di_w0[456]),
+    .WD_25(muxed_Di_w0[457]),
+    .WD_26(muxed_Di_w0[458]),
+    .WD_27(muxed_Di_w0[459]),
+    .WD_28(muxed_Di_w0[460]),
+    .WD_29(muxed_Di_w0[461]),
+    .WD_3(muxed_Di_w0[435]),
+    .WD_30(muxed_Di_w0[462]),
+    .WD_31(muxed_Di_w0[463]),
+    .WD_32(muxed_Di_w0[464]),
+    .WD_33(muxed_Di_w0[465]),
+    .WD_34(muxed_Di_w0[466]),
+    .WD_35(muxed_Di_w0[467]),
+    .WD_36(muxed_Di_w0[468]),
+    .WD_37(muxed_Di_w0[469]),
+    .WD_38(muxed_Di_w0[470]),
+    .WD_39(muxed_Di_w0[471]),
+    .WD_4(muxed_Di_w0[436]),
+    .WD_40(muxed_Di_w0[472]),
+    .WD_41(muxed_Di_w0[473]),
+    .WD_42(muxed_Di_w0[474]),
+    .WD_43(muxed_Di_w0[475]),
+    .WD_44(muxed_Di_w0[476]),
+    .WD_45(muxed_Di_w0[477]),
+    .WD_46(muxed_Di_w0[478]),
+    .WD_47(muxed_Di_w0[479]),
+    .WD_48(muxed_Di_w0[480]),
+    .WD_49(muxed_Di_w0[481]),
+    .WD_5(muxed_Di_w0[437]),
+    .WD_50(muxed_Di_w0[482]),
+    .WD_51(muxed_Di_w0[483]),
+    .WD_52(muxed_Di_w0[484]),
+    .WD_53(muxed_Di_w0[485]),
+    .WD_54(muxed_Di_w0[486]),
+    .WD_55(muxed_Di_w0[487]),
+    .WD_56(muxed_Di_w0[488]),
+    .WD_57(muxed_Di_w0[489]),
+    .WD_58(muxed_Di_w0[490]),
+    .WD_59(muxed_Di_w0[491]),
+    .WD_6(muxed_Di_w0[438]),
+    .WD_60(muxed_Di_w0[492]),
+    .WD_61(muxed_Di_w0[493]),
+    .WD_62(muxed_Di_w0[494]),
+    .WD_63(muxed_Di_w0[495]),
+    .WD_64(muxed_Di_w0[496]),
+    .WD_65(muxed_Di_w0[497]),
+    .WD_66(muxed_Di_w0[498]),
+    .WD_67(muxed_Di_w0[499]),
+    .WD_68(muxed_Di_w0[500]),
+    .WD_69(muxed_Di_w0[501]),
+    .WD_7(muxed_Di_w0[439]),
+    .WD_70(muxed_Di_w0[502]),
+    .WD_71(muxed_Di_w0[503]),
+    .WD_72(muxed_Di_w0[504]),
+    .WD_73(muxed_Di_w0[505]),
+    .WD_74(muxed_Di_w0[506]),
+    .WD_75(muxed_Di_w0[507]),
+    .WD_76(muxed_Di_w0[508]),
+    .WD_77(muxed_Di_w0[509]),
+    .WD_78(muxed_Di_w0[510]),
+    .WD_79(muxed_Di_w0[511]),
+    .WD_8(muxed_Di_w0[440]),
+    .WD_80(muxed_Di_w0[512]),
+    .WD_81(muxed_Di_w0[513]),
+    .WD_9(muxed_Di_w0[441]),
+    .WE(_024_)
+  );
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:2016" *)
+  \$paramod\ScanShareSel_JTAG_reg_ext_cg\JTAG_REG_WIDTH=2\HAS_RESET=0\RESET_VALUE=0  testInst_Data_reg_r0_1_0 (
+    .D(Data_reg_r0_D[1:0]),
+    .Q(Data_reg_r0_Q[1:0]),
+    .clk(gated_clk_jtag_Data_reg_r0),
+    .reset_(1'b1),
+    .scanin(so_Data_reg_r0_257_2),
+    .scanout(Data_reg_SO_r0),
+    .sel(debug_mode),
+    .shiftDR(shiftDR)
+  );
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:2011" *)
+  \$paramod\ScanShareSel_JTAG_reg_ext_cg\JTAG_REG_WIDTH=256\HAS_RESET=0\RESET_VALUE=0  testInst_Data_reg_r0_257_2 (
+    .D(Data_reg_r0_D[257:2]),
+    .Q(Data_reg_r0_Q[257:2]),
+    .clk(gated_clk_jtag_Data_reg_r0),
+    .reset_(1'b1),
+    .scanin(so_Data_reg_r0_513_258),
+    .scanout(so_Data_reg_r0_257_2),
+    .sel(debug_mode),
+    .shiftDR(shiftDR)
+  );
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:2005" *)
+  \$paramod\ScanShareSel_JTAG_reg_ext_cg\JTAG_REG_WIDTH=256\HAS_RESET=0\RESET_VALUE=0  testInst_Data_reg_r0_513_258 (
+    .D(Data_reg_r0_D[513:258]),
+    .Q(Data_reg_r0_Q[513:258]),
+    .clk(gated_clk_jtag_Data_reg_r0),
+    .reset_(1'b1),
+    .scanin(re_reg_SO_r0_0_432),
+    .scanout(so_Data_reg_r0_513_258),
+    .sel(debug_mode),
+    .shiftDR(shiftDR)
+  );
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1974" *)
+  \$paramod\ScanShareSel_JTAG_reg_ext_cg\JTAG_REG_WIDTH=8\HAS_RESET=0\RESET_VALUE=0  testInst_Ra_reg_r0 (
+    .D(muxed_Ra_r0),
+    .Q(Ra_reg_r0_A),
+    .clk(gated_clk_jtag_Wa_reg_w0),
+    .reset_(1'b1),
+    .scanin(we_reg_SO_w0_0_432),
+    .scanout(Ra_reg_SO_r0),
+    .sel(debug_mode),
+    .shiftDR(shiftDR)
+  );
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1949" *)
+  \$paramod\ScanShareSel_JTAG_reg_ext_cg\JTAG_REG_WIDTH=8\HAS_RESET=0\RESET_VALUE=0  testInst_Wa_reg_w0 (
+    .D(muxed_Wa_w0),
+    .Q(Wa_reg_w0_A),
+    .clk(gated_clk_jtag_Wa_reg_w0),
+    .reset_(1'b1),
+    .scanin(SI),
+    .scanout(Wa_reg_SO_w0),
+    .sel(debug_mode),
+    .shiftDR(shiftDR)
+  );
+  (* module_not_derived = 32'd1 *)
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1936" *)
+  LNQD1PO4 testInst_ram_access_lockup (
+    .D(Data_reg_SO_r0),
+    .EN(la_bist_clkr0),
+    .Q(SO_int_net)
+  );
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1979" *)
+  \$paramod\ScanShareSel_JTAG_reg_ext_cg\JTAG_REG_WIDTH=1\HAS_RESET=0\RESET_VALUE=0  testInst_re_reg_r0_0_0 (
+    .D(muxed_re_r0_0_0),
+    .Q(re_0_0_q),
+    .clk(gated_clk_jtag_Wa_reg_w0),
+    .reset_(1'b1),
+    .scanin(Ra_reg_SO_r0),
+    .scanout(re_reg_SO_r0_0_0),
+    .sel(debug_mode),
+    .shiftDR(shiftDR)
+  );
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1984" *)
+  \$paramod\ScanShareSel_JTAG_reg_ext_cg\JTAG_REG_WIDTH=1\HAS_RESET=0\RESET_VALUE=0  testInst_re_reg_r0_0_144 (
+    .D(muxed_re_r0_0_144),
+    .Q(re_0_144_q),
+    .clk(gated_clk_jtag_Wa_reg_w0),
+    .reset_(1'b1),
+    .scanin(re_reg_SO_r0_0_0),
+    .scanout(re_reg_SO_r0_0_144),
+    .sel(debug_mode),
+    .shiftDR(shiftDR)
+  );
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1989" *)
+  \$paramod\ScanShareSel_JTAG_reg_ext_cg\JTAG_REG_WIDTH=1\HAS_RESET=0\RESET_VALUE=0  testInst_re_reg_r0_0_288 (
+    .D(muxed_re_r0_0_288),
+    .Q(re_0_288_q),
+    .clk(gated_clk_jtag_Wa_reg_w0),
+    .reset_(1'b1),
+    .scanin(re_reg_SO_r0_0_144),
+    .scanout(re_reg_SO_r0_0_288),
+    .sel(debug_mode),
+    .shiftDR(shiftDR)
+  );
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1994" *)
+  \$paramod\ScanShareSel_JTAG_reg_ext_cg\JTAG_REG_WIDTH=1\HAS_RESET=0\RESET_VALUE=0  testInst_re_reg_r0_0_432 (
+    .D(muxed_re_r0_0_432),
+    .Q(re_0_432_q),
+    .clk(gated_clk_jtag_Wa_reg_w0),
+    .reset_(1'b1),
+    .scanin(re_reg_SO_r0_0_288),
+    .scanout(re_reg_SO_r0_0_432),
+    .sel(debug_mode),
+    .shiftDR(shiftDR)
+  );
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1954" *)
+  \$paramod\ScanShareSel_JTAG_reg_ext_cg\JTAG_REG_WIDTH=1\HAS_RESET=0\RESET_VALUE=0  testInst_we_reg_w0_0_0 (
+    .D(muxed_we_w0_0_0),
+    .Q(we_0_0_q),
+    .clk(gated_clk_jtag_Wa_reg_w0),
+    .reset_(1'b1),
+    .scanin(Wa_reg_SO_w0),
+    .scanout(we_reg_SO_w0_0_0),
+    .sel(debug_mode),
+    .shiftDR(shiftDR)
+  );
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1959" *)
+  \$paramod\ScanShareSel_JTAG_reg_ext_cg\JTAG_REG_WIDTH=1\HAS_RESET=0\RESET_VALUE=0  testInst_we_reg_w0_0_144 (
+    .D(muxed_we_w0_0_144),
+    .Q(we_0_144_q),
+    .clk(gated_clk_jtag_Wa_reg_w0),
+    .reset_(1'b1),
+    .scanin(we_reg_SO_w0_0_0),
+    .scanout(we_reg_SO_w0_0_144),
+    .sel(debug_mode),
+    .shiftDR(shiftDR)
+  );
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1964" *)
+  \$paramod\ScanShareSel_JTAG_reg_ext_cg\JTAG_REG_WIDTH=1\HAS_RESET=0\RESET_VALUE=0  testInst_we_reg_w0_0_288 (
+    .D(muxed_we_w0_0_288),
+    .Q(we_0_288_q),
+    .clk(gated_clk_jtag_Wa_reg_w0),
+    .reset_(1'b1),
+    .scanin(we_reg_SO_w0_0_144),
+    .scanout(we_reg_SO_w0_0_288),
+    .sel(debug_mode),
+    .shiftDR(shiftDR)
+  );
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:1969" *)
+  \$paramod\ScanShareSel_JTAG_reg_ext_cg\JTAG_REG_WIDTH=1\HAS_RESET=0\RESET_VALUE=0  testInst_we_reg_w0_0_432 (
+    .D(muxed_we_w0_0_432),
+    .Q(we_0_432_q),
+    .clk(gated_clk_jtag_Wa_reg_w0),
+    .reset_(1'b1),
+    .scanin(we_reg_SO_w0_0_288),
+    .scanout(we_reg_SO_w0_0_432),
+    .sel(debug_mode),
+    .shiftDR(shiftDR)
+  );
+  (* module_not_derived = 32'd1 *)
+  (* src = "./vmod/rams/synth/nv_ram_rwsp_160x514_logic.v:151" *)
+  sync2d_c_pp updateDR_synchronizer (
+    .clk(la_bist_clkr0),
+    .clr_(mbist_ramaccess_rst_),
+    .d(updateDR),
+    .q(updateDR_sync)
+  );
+  assign D_Ra_reg_r0 = muxed_Ra_r0;
+  assign Data_reg_r0 = Data_reg_r0_Q;
+  assign Ra_reg_r0 = muxed_Ra_r0_B;
+  assign Ra_reg_r0_B = mbist_Ra_r0;
+  assign Wa_reg_w0 = muxed_Wa_w0_B;
+  assign Wa_reg_w0_B = mbist_Wa_w0;
+  assign Wa_reg_w0_S = Ra_reg_r0_S;
+  assign Wdata_0_0 = muxed_Di_w0[143:0];
+  assign Wdata_0_144 = muxed_Di_w0[287:144];
+  assign Wdata_0_288 = muxed_Di_w0[431:288];
+  assign Wdata_0_432 = muxed_Di_w0[513:432];
+  assign access_en_w = posedge_updateDR_sync;
+  assign clk_en_core_0_144 = clk_en_core_0_0;
+  assign clk_en_core_0_288 = clk_en_core_0_0;
+  assign clk_en_core_0_432 = clk_en_core_0_0;
+  assign cs_end_val_0_0 = 8'b10011111;
+  assign cs_end_val_0_144 = 8'b10011111;
+  assign cs_end_val_0_288 = 8'b10011111;
+  assign cs_end_val_0_432 = 8'b10011111;
+  assign cs_start_val_0_0 = 8'b00000000;
+  assign cs_start_val_0_144 = 8'b00000000;
+  assign cs_start_val_0_288 = 8'b00000000;
+  assign cs_start_val_0_432 = 8'b00000000;
+  assign data_regq = Data_reg_r0_Q;
+  assign dft_capdr_r = ary_atpg_ctl;
+  assign dft_capdr_w = ary_atpg_ctl;
+  assign dout = Data_reg_r0_Q;
+  assign la_bist_clkw0 = la_bist_clkr0;
+  assign mbist_Do_r0_int_net = Data_reg_r0_Q;
+  assign muxed_Di_w0_A = di;
+  assign muxed_Di_w0_S = muxed_re_r0_0_432_S;
+  assign muxed_Ra_r0_A = ra;
+  assign muxed_Ra_r0_S = muxed_re_r0_0_432_S;
+  assign muxed_Wa_w0_A = wa;
+  assign muxed_Wa_w0_S = muxed_re_r0_0_432_S;
+  assign muxed_re_r0_0_0_A = re;
+  assign muxed_re_r0_0_0_S = muxed_re_r0_0_432_S;
+  assign muxed_re_r0_0_144_A = re;
+  assign muxed_re_r0_0_144_S = muxed_re_r0_0_432_S;
+  assign muxed_re_r0_0_288_A = re;
+  assign muxed_re_r0_0_288_S = muxed_re_r0_0_432_S;
+  assign muxed_re_r0_0_432_A = re;
+  assign muxed_we_w0_0_0_A = we;
+  assign muxed_we_w0_0_0_S = muxed_re_r0_0_432_S;
+  assign muxed_we_w0_0_144_A = we;
+  assign muxed_we_w0_0_144_S = muxed_re_r0_0_432_S;
+  assign muxed_we_w0_0_288_A = we;
+  assign muxed_we_w0_0_288_S = muxed_re_r0_0_432_S;
+  assign muxed_we_w0_0_432_A = we;
+  assign muxed_we_w0_0_432_S = muxed_re_r0_0_432_S;
+  assign pre_Ra_reg_r0 = Ra_reg_r0_A;
+  assign pre_Wa_reg_w0 = Wa_reg_w0_A;
+  assign pre_muxed_Di_w0 = muxed_Di_w0_B;
+  assign pre_muxed_Di_w0_A = Data_reg_r0_Q;
+  assign pre_muxed_Di_w0_B = { mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0 };
+  assign pre_muxed_Di_w0_S = Ra_reg_r0_S;
+  assign pre_re_r0_0_0 = muxed_re_r0_0_0_B;
+  assign pre_re_r0_0_144 = muxed_re_r0_0_144_B;
+  assign pre_re_r0_0_288 = muxed_re_r0_0_288_B;
+  assign pre_re_r0_0_432 = muxed_re_r0_0_432_B;
+  assign pre_we_w0_0_0 = muxed_we_w0_0_0_B;
+  assign pre_we_w0_0_144 = muxed_we_w0_0_144_B;
+  assign pre_we_w0_0_288 = muxed_we_w0_0_288_B;
+  assign pre_we_w0_0_432 = muxed_we_w0_0_432_B;
+  assign r0_OutputMuxDataOut = Data_reg_r0_D;
+  assign ra_0_0 = muxed_Ra_r0;
+  assign ra_0_144 = muxed_Ra_r0;
+  assign ra_0_288 = muxed_Ra_r0;
+  assign ra_0_432 = muxed_Ra_r0;
+  assign radr_q = Ra_reg_r0_A;
+  assign ramDataOut_0_0 = dout_0_0;
+  assign ramDataOut_0_144 = dout_0_144;
+  assign ramDataOut_0_288 = dout_0_288;
+  assign ramDataOut_0_432 = dout_0_432;
+  assign ram_r0_OutputMuxDataOut = Data_reg_r0_D;
+  assign re_0_0 = re;
+  assign re_0_144 = re;
+  assign re_0_288 = re;
+  assign re_0_432 = re;
+  assign re_reg_r0_0_0 = re_0_0_q;
+  assign re_reg_r0_0_144 = re_0_144_q;
+  assign re_reg_r0_0_288 = re_0_288_q;
+  assign re_reg_r0_0_432 = re_0_432_q;
+  assign ret_en = pwrbus_ram_pd[8];
+  assign sleep_en = pwrbus_ram_pd[7:0];
+  assign wa_0_0 = muxed_Wa_w0;
+  assign wa_0_144 = muxed_Wa_w0;
+  assign wa_0_288 = muxed_Wa_w0;
+  assign wa_0_432 = muxed_Wa_w0;
+  assign wadr_q = Wa_reg_w0_A;
+  assign we_0_0 = we;
+  assign we_0_144 = we;
+  assign we_0_288 = we;
+  assign we_0_432 = we;
+  assign we_reg_w0_0_0 = we_0_0_q;
+  assign we_reg_w0_0_144 = we_0_144_q;
+  assign we_reg_w0_0_288 = we_0_288_q;
+  assign we_reg_w0_0_432 = we_0_432_q;
+endmodule

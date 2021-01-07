@@ -530,7 +530,7 @@ std::string get_nth_var_in_list(std::string list, uint32_t idx) {
 
 
 // the most general function for getting width
-uint32_t get_var_slice_width(std::string varAndSlice, VarWidth &varWidthIn) {
+uint32_t get_var_slice_width( std::string varAndSlice, VarWidth &varWidthIn) {
   varAndSlice = remove_signed(varAndSlice);
   if( varAndSlice.empty() )
     return 0;
@@ -1591,11 +1591,11 @@ void fill_var_width(const std::string &line, VarWidth &varWidth) {
           else
             insertDone = funcVarWidth.force_insert(var, 0, 0);
         }     
-        if (!insertDone) {
-          std::cout << "insert failed in input case:" + line << std::endl;
-          std::cout << "m.str(2):" + m.str(2) << std::endl;
-          std::cout << "m.str(3):" + m.str(3) << std::endl;
-        }
+        //if (!insertDone) {
+        //  std::cout << "insert failed in input case:" + line << std::endl;
+        //  std::cout << "m.str(2):" + m.str(2) << std::endl;
+        //  std::cout << "m.str(3):" + m.str(3) << std::endl;
+        //}
       }
       break;
     case REG:
@@ -1620,11 +1620,11 @@ void fill_var_width(const std::string &line, VarWidth &varWidth) {
           else
             insertDone = funcVarWidth.force_insert(var, 0, 0);
         }
-        if (!insertDone) {
-          std::cout << "insert failed in reg case:" + line << std::endl;
-          std::cout << "m.str(2):" + m.str(2) << std::endl;
-          std::cout << "m.str(3):" + m.str(3) << std::endl;
-        }
+        //if (!insertDone) {
+        //  std::cout << "insert failed in reg case:" + line << std::endl;
+        //  std::cout << "m.str(2):" + m.str(2) << std::endl;
+        //  std::cout << "m.str(3):" + m.str(3) << std::endl;
+        //}
       }
       break;
     case WIRE:
@@ -1645,11 +1645,11 @@ void fill_var_width(const std::string &line, VarWidth &varWidth) {
           else
             insertDone = funcVarWidth.force_insert(var, 0, 0);
         }
-        if (!insertDone) {
-          std::cout << "insert failed in wire case:" + line << std::endl;
-          std::cout << "m.str(2):" + m.str(2) << std::endl;
-          std::cout << "m.str(3):" + m.str(3) << std::endl;
-        }
+        //if (!insertDone) {
+        //  std::cout << "insert failed in wire case:" + line << std::endl;
+        //  std::cout << "m.str(2):" + m.str(2) << std::endl;
+        //  std::cout << "m.str(3):" + m.str(3) << std::endl;
+        //}
       }
       break;
     case OUTPUT:
@@ -1670,11 +1670,11 @@ void fill_var_width(const std::string &line, VarWidth &varWidth) {
           else
             insertDone = funcVarWidth.force_insert(var, 0, 0);
         }
-        if (!insertDone) {
-          std::cout << "insert failed in output case:" + line << std::endl;
-          std::cout << "m.str(2):" + m.str(2) << std::endl;
-          std::cout << "m.str(3):" + m.str(3) << std::endl;
-        }
+        //if (!insertDone) {
+        //  std::cout << "insert failed in output case:" + line << std::endl;
+        //  std::cout << "m.str(2):" + m.str(2) << std::endl;
+        //  std::cout << "m.str(3):" + m.str(3) << std::endl;
+        //}
       }
       break;
     case FUNCDEF:

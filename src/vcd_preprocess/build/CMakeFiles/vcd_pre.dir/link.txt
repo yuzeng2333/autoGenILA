@@ -1,0 +1,1 @@
+/usr/bin/c++  -O0 -Wall -g   -rdynamic CMakeFiles/vcd_pre.dir/main.cpp.o  -o vcd_pre  -L/workspace/research/ILA/autoGenILA/util/verilog-vcd-parser/build -Wl,-rpath,/workspace/research/ILA/autoGenILA/util/verilog-vcd-parser/build -lverilog-vcd-parser 

@@ -1,0 +1,11 @@
+module \$paramod\SDP_Y_CORE_mgc_in_wire_wait_v1\rscid=1\width=128 (ld, vd, d, lz, vz, z);
+  output [127:0] d;
+  input ld;
+  output lz;
+  output vd;
+  input vz;
+  input [127:0] z;
+  assign d = z;
+  assign lz = ld;
+  assign vd = vz;
+endmodule

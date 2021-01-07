@@ -1,0 +1,8 @@
+module \$paramod\CDP_ICVT_mgc_shift_l_v4\width_a=9\signd_a=1\width_s=5\width_z=10 (a, s, z);
+  input [8:0] a;
+  input [4:0] s;
+  output [9:0] z;
+  wire [9:0] fangyuan0;
+  assign fangyuan0 = { a[8], a };
+  assign z = fangyuan0 <<< s;
+endmodule

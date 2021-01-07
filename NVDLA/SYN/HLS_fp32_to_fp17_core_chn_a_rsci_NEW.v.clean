@@ -1,0 +1,52 @@
+module HLS_fp32_to_fp17_core_chn_a_rsci(nvdla_core_clk, nvdla_core_rstn, chn_a_rsc_z, chn_a_rsc_vz, chn_a_rsc_lz, chn_a_rsci_oswt, core_wen, chn_a_rsci_iswt0, chn_a_rsci_bawt, chn_a_rsci_wen_comp, chn_a_rsci_ld_core_psct, chn_a_rsci_d_mxwt, core_wten);
+  output chn_a_rsc_lz;
+  input chn_a_rsc_vz;
+  input [31:0] chn_a_rsc_z;
+  output chn_a_rsci_bawt;
+  wire chn_a_rsci_bdwt;
+  wire chn_a_rsci_biwt;
+  wire [31:0] chn_a_rsci_d;
+  output [31:0] chn_a_rsci_d_mxwt;
+  input chn_a_rsci_iswt0;
+  input chn_a_rsci_ld_core_psct;
+  wire chn_a_rsci_ld_core_sct;
+  input chn_a_rsci_oswt;
+  wire chn_a_rsci_vd;
+  output chn_a_rsci_wen_comp;
+  input core_wen;
+  input core_wten;
+  input nvdla_core_clk;
+  input nvdla_core_rstn;
+  HLS_fp32_to_fp17_core_chn_a_rsci_chn_a_wait_ctrl HLS_fp32_to_fp17_core_chn_a_rsci_chn_a_wait_ctrl_inst (
+    .chn_a_rsci_bdwt(chn_a_rsci_bdwt),
+    .chn_a_rsci_biwt(chn_a_rsci_biwt),
+    .chn_a_rsci_iswt0(chn_a_rsci_iswt0),
+    .chn_a_rsci_ld_core_psct(chn_a_rsci_ld_core_psct),
+    .chn_a_rsci_ld_core_sct(chn_a_rsci_ld_core_sct),
+    .chn_a_rsci_oswt(chn_a_rsci_oswt),
+    .chn_a_rsci_vd(chn_a_rsci_vd),
+    .core_wen(core_wen),
+    .core_wten(core_wten),
+    .nvdla_core_clk(nvdla_core_clk),
+    .nvdla_core_rstn(nvdla_core_rstn)
+  );
+  HLS_fp32_to_fp17_core_chn_a_rsci_chn_a_wait_dp HLS_fp32_to_fp17_core_chn_a_rsci_chn_a_wait_dp_inst (
+    .chn_a_rsci_bawt(chn_a_rsci_bawt),
+    .chn_a_rsci_bdwt(chn_a_rsci_bdwt),
+    .chn_a_rsci_biwt(chn_a_rsci_biwt),
+    .chn_a_rsci_d(chn_a_rsci_d),
+    .chn_a_rsci_d_mxwt(chn_a_rsci_d_mxwt),
+    .chn_a_rsci_oswt(chn_a_rsci_oswt),
+    .chn_a_rsci_wen_comp(chn_a_rsci_wen_comp),
+    .nvdla_core_clk(nvdla_core_clk),
+    .nvdla_core_rstn(nvdla_core_rstn)
+  );
+  \$paramod\FP32_TO_FP17_mgc_in_wire_wait_v1\rscid=1\width=32 chn_a_rsci (
+    .d(chn_a_rsci_d),
+    .ld(chn_a_rsci_ld_core_sct),
+    .lz(chn_a_rsc_lz),
+    .vd(chn_a_rsci_vd),
+    .vz(chn_a_rsc_vz),
+    .z(chn_a_rsc_z)
+  );
+endmodule

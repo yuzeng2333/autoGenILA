@@ -1,0 +1,393 @@
+module \$paramod\nv_ram_rwsp_256x11_logic\FORCE_CONTENTION_ASSERTION_RESET_ACTIVE=1'1 (SI, SO_int_net, ary_atpg_ctl, ary_read_inh, clk, debug_mode, di, dout, iddq_mode, jtag_readonly_mode, mbist_Di_w0, mbist_Do_r0_int_net, mbist_Ra_r0, mbist_Wa_w0, mbist_ce_r0, mbist_en_sync, mbist_ramaccess_rst_, mbist_we_w0, ore, pwrbus_ram_pd, ra, re, scan_en, scan_ramtms, shiftDR, svop, updateDR, wa, we, write_inh);
+  wire _00_;
+  wire _01_;
+  wire _02_;
+  wire _03_;
+  wire _04_;
+  wire _05_;
+  wire _06_;
+  wire _07_;
+  wire _08_;
+  wire _09_;
+  wire _10_;
+  wire _11_;
+  wire _12_;
+  wire _13_;
+  wire _14_;
+  wire _15_;
+  wire _16_;
+  wire _17_;
+  wire [7:0] D_Ra_reg_r0;
+  wire Data_reg_SO_r0;
+  wire [10:0] Data_reg_r0;
+  wire Ra_reg_SO_r0;
+  wire [7:0] Ra_reg_r0;
+  wire [7:0] Ra_reg_r0_A;
+  wire [7:0] Ra_reg_r0_B;
+  wire Ra_reg_r0_S;
+  input SI;
+  output SO_int_net;
+  wire Wa_reg_SO_w0;
+  wire [7:0] Wa_reg_w0;
+  wire [7:0] Wa_reg_w0_A;
+  wire [7:0] Wa_reg_w0_B;
+  wire Wa_reg_w0_S;
+  wire [10:0] Wdata;
+  wire access_en_r;
+  reg access_en_r_1p;
+  wire access_en_w;
+  input ary_atpg_ctl;
+  input ary_read_inh;
+  wire captureDR_r0;
+  input clk;
+  wire clk_en_core;
+  wire [10:0] data_regq;
+  input debug_mode;
+  wire debug_mode_sync;
+  wire dft_capdr_r;
+  wire dft_capdr_w;
+  wire dft_rst_gated_clk;
+  input [10:0] di;
+  output [10:0] dout;
+  wire [10:0] dout_0_0;
+  wire gated_clk_core;
+  wire gated_clk_jtag_Data_reg_r0;
+  wire gated_clk_jtag_Wa_reg_w0;
+  input iddq_mode;
+  input jtag_readonly_mode;
+  wire la_bist_clkr0;
+  wire la_bist_clkw0;
+  input [1:0] mbist_Di_w0;
+  output [10:0] mbist_Do_r0_int_net;
+  input [7:0] mbist_Ra_r0;
+  input [7:0] mbist_Wa_w0;
+  input mbist_ce_r0;
+  reg mbist_ce_r0_1p;
+  wire mbist_en_r;
+  input mbist_en_sync;
+  input mbist_ramaccess_rst_;
+  input mbist_we_w0;
+  wire [10:0] muxed_Di_w0;
+  wire [10:0] muxed_Di_w0_A;
+  wire [10:0] muxed_Di_w0_B;
+  wire muxed_Di_w0_S;
+  wire [7:0] muxed_Ra_r0;
+  wire [7:0] muxed_Ra_r0_A;
+  wire [7:0] muxed_Ra_r0_B;
+  wire muxed_Ra_r0_S;
+  wire [7:0] muxed_Wa_w0;
+  wire [7:0] muxed_Wa_w0_A;
+  wire [7:0] muxed_Wa_w0_B;
+  wire muxed_Wa_w0_S;
+  wire muxed_re_r0;
+  wire muxed_re_r0_A;
+  wire muxed_re_r0_B;
+  wire muxed_re_r0_S;
+  wire muxed_we_w0;
+  wire muxed_we_w0_A;
+  wire muxed_we_w0_B;
+  wire muxed_we_w0_S;
+  input ore;
+  wire piece_re;
+  wire posedge_updateDR_sync;
+  wire [7:0] pre_Ra_reg_r0;
+  wire [7:0] pre_Wa_reg_w0;
+  wire [10:0] pre_muxed_Di_w0;
+  wire [10:0] pre_muxed_Di_w0_A;
+  wire [10:0] pre_muxed_Di_w0_B;
+  wire pre_muxed_Di_w0_S;
+  wire pre_re_r0;
+  wire pre_we_w0;
+  input [31:0] pwrbus_ram_pd;
+  wire [10:0] r0_OutputMuxDataOut;
+  input [7:0] ra;
+  wire [7:0] ra_0_0;
+  wire [7:0] radr_q;
+  wire [10:0] ramDataOut;
+  wire ram_bypass;
+  wire [10:0] ram_r0_OutputMuxDataOut;
+  input re;
+  wire re_0_0;
+  wire re_q;
+  wire re_reg_SO_r0;
+  wire re_reg_r0;
+  wire ret_en;
+  input scan_en;
+  input scan_ramtms;
+  input shiftDR;
+  wire [7:0] sleep_en;
+  input [7:0] svop;
+  input updateDR;
+  wire updateDR_sync;
+  reg updateDR_sync_1p;
+  input [7:0] wa;
+  wire [7:0] wa_0_0;
+  wire [7:0] wadr_q;
+  input we;
+  wire we_0_0;
+  wire we_q;
+  wire we_reg_SO_w0;
+  wire we_reg_w0;
+  wire web;
+  input write_inh;
+  assign posedge_updateDR_sync = updateDR_sync & _08_;
+  assign _00_ = posedge_updateDR_sync & we_q;
+  assign _01_ = mbist_en_r & mbist_we_w0;
+  assign access_en_r = posedge_updateDR_sync & re_q;
+  assign _02_ = mbist_en_r & mbist_ce_r0;
+  assign _03_ = scan_en & jtag_readonly_mode;
+  assign _04_ = ore & _11_;
+  assign _05_ = _04_ & pre_muxed_Di_w0_S;
+  assign _06_ = mbist_en_r & mbist_ce_r0_1p;
+  assign _07_ = debug_mode_sync & shiftDR;
+  assign pre_muxed_Di_w0_S = ! debug_mode_sync;
+  assign _08_ = ! updateDR_sync_1p;
+  assign _09_ = ! muxed_we_w0;
+  assign _10_ = ! web;
+  assign _11_ = ! mbist_en_r;
+  assign _12_ = _05_ || _16_;
+  assign ram_bypass = scan_ramtms | ary_read_inh;
+  assign muxed_re_r0_S = mbist_en_r | debug_mode_sync;
+  assign clk_en_core = re | we;
+  assign _13_ = muxed_re_r0_S | scan_en;
+  assign web = _09_ | write_inh;
+  assign piece_re = muxed_re_r0 | _03_;
+  assign captureDR_r0 = ary_atpg_ctl | _12_;
+  assign _14_ = mbist_en_r | ary_atpg_ctl;
+  assign _15_ = captureDR_r0 | _07_;
+  always @(posedge la_bist_clkr0)
+      mbist_ce_r0_1p <= mbist_ce_r0;
+  always @(posedge la_bist_clkr0 or negedge mbist_ramaccess_rst_)
+    if (!mbist_ramaccess_rst_)
+      access_en_r_1p <= 1'b0;
+    else
+      access_en_r_1p <= access_en_r;
+  always @(posedge la_bist_clkr0 or negedge mbist_ramaccess_rst_)
+    if (!mbist_ramaccess_rst_)
+      updateDR_sync_1p <= 1'b0;
+    else
+      updateDR_sync_1p <= updateDR_sync;
+  assign muxed_re_r0 = muxed_re_r0_S ? muxed_re_r0_B : re;
+  assign muxed_Ra_r0 = muxed_re_r0_S ? muxed_Ra_r0_B : ra;
+  assign muxed_Ra_r0_B = debug_mode_sync ? Ra_reg_r0_A : mbist_Ra_r0;
+  assign muxed_we_w0 = muxed_re_r0_S ? muxed_we_w0_B : we;
+  assign muxed_Wa_w0 = muxed_re_r0_S ? muxed_Wa_w0_B : wa;
+  assign muxed_Wa_w0_B = debug_mode_sync ? Wa_reg_w0_A : mbist_Wa_w0;
+  assign Wdata = muxed_re_r0_S ? muxed_Di_w0_B : di;
+  wire [10:0] fangyuan0;
+  assign fangyuan0 = { mbist_Di_w0[0], mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0 };
+
+  assign muxed_Di_w0_B = debug_mode_sync ? data_regq : fangyuan0;
+  assign muxed_we_w0_B = debug_mode_sync ? _00_ : _01_;
+  assign muxed_re_r0_B = debug_mode_sync ? access_en_r : _02_;
+  assign r0_OutputMuxDataOut = ram_bypass ? Wdata : dout_0_0;
+  assign _16_ = debug_mode_sync ? access_en_r_1p : _06_;
+  assign _17_ = debug_mode_sync ? shiftDR : _14_;
+  CKLNQD12PO4 CLK_GATE_clk (
+    .CP(clk),
+    .E(mbist_ramaccess_rst_),
+    .Q(dft_rst_gated_clk),
+    .TE(scan_en)
+  );
+  CKLNQD12PO4 UJ_clk_gate_core (
+    .CP(clk),
+    .E(clk_en_core),
+    .Q(gated_clk_core),
+    .TE(_13_)
+  );
+  CKLNQD12PO4 UJ_clk_jtag_Data_reg_r0 (
+    .CP(clk),
+    .E(_15_),
+    .Q(gated_clk_jtag_Data_reg_r0),
+    .TE(scan_en)
+  );
+  CKLNQD12PO4 UJ_clk_jtag_Wa_reg_w0 (
+    .CP(clk),
+    .E(_17_),
+    .Q(gated_clk_jtag_Wa_reg_w0),
+    .TE(scan_en)
+  );
+  CKLNQD12PO4 UJ_la_bist_clkw0_gate (
+    .CP(clk),
+    .E(muxed_re_r0_S),
+    .Q(la_bist_clkr0),
+    .TE(scan_en)
+  );
+  sync2d_c_pp debug_mode_synchronizer (
+    .clk(dft_rst_gated_clk),
+    .clr_(mbist_ramaccess_rst_),
+    .d(debug_mode),
+    .q(debug_mode_sync)
+  );
+  p_SDFCNQD1PO4 mbist_en_flop (
+    .CDN(mbist_ramaccess_rst_),
+    .CP(dft_rst_gated_clk),
+    .D(mbist_en_sync),
+    .Q(mbist_en_r)
+  );
+  RAMPDP_256X11_GL_M4_D2 ram_Inst_256X11 (
+    .CLK(gated_clk_core),
+    .IDDQ(iddq_mode),
+    .RADR_0(muxed_Ra_r0[0]),
+    .RADR_1(muxed_Ra_r0[1]),
+    .RADR_2(muxed_Ra_r0[2]),
+    .RADR_3(muxed_Ra_r0[3]),
+    .RADR_4(muxed_Ra_r0[4]),
+    .RADR_5(muxed_Ra_r0[5]),
+    .RADR_6(muxed_Ra_r0[6]),
+    .RADR_7(muxed_Ra_r0[7]),
+    .RD_0(dout_0_0[0]),
+    .RD_1(dout_0_0[1]),
+    .RD_10(dout_0_0[10]),
+    .RD_2(dout_0_0[2]),
+    .RD_3(dout_0_0[3]),
+    .RD_4(dout_0_0[4]),
+    .RD_5(dout_0_0[5]),
+    .RD_6(dout_0_0[6]),
+    .RD_7(dout_0_0[7]),
+    .RD_8(dout_0_0[8]),
+    .RD_9(dout_0_0[9]),
+    .RE(piece_re),
+    .RET_EN(pwrbus_ram_pd[8]),
+    .SLEEP_EN_0(pwrbus_ram_pd[0]),
+    .SLEEP_EN_1(pwrbus_ram_pd[1]),
+    .SLEEP_EN_2(pwrbus_ram_pd[2]),
+    .SLEEP_EN_3(pwrbus_ram_pd[3]),
+    .SLEEP_EN_4(pwrbus_ram_pd[4]),
+    .SLEEP_EN_5(pwrbus_ram_pd[5]),
+    .SLEEP_EN_6(pwrbus_ram_pd[6]),
+    .SLEEP_EN_7(pwrbus_ram_pd[7]),
+    .SVOP_0(svop[0]),
+    .SVOP_1(svop[1]),
+    .SVOP_2(svop[2]),
+    .SVOP_3(svop[3]),
+    .SVOP_4(svop[4]),
+    .SVOP_5(svop[5]),
+    .SVOP_6(svop[6]),
+    .SVOP_7(svop[7]),
+    .WADR_0(muxed_Wa_w0[0]),
+    .WADR_1(muxed_Wa_w0[1]),
+    .WADR_2(muxed_Wa_w0[2]),
+    .WADR_3(muxed_Wa_w0[3]),
+    .WADR_4(muxed_Wa_w0[4]),
+    .WADR_5(muxed_Wa_w0[5]),
+    .WADR_6(muxed_Wa_w0[6]),
+    .WADR_7(muxed_Wa_w0[7]),
+    .WD_0(Wdata[0]),
+    .WD_1(Wdata[1]),
+    .WD_10(Wdata[10]),
+    .WD_2(Wdata[2]),
+    .WD_3(Wdata[3]),
+    .WD_4(Wdata[4]),
+    .WD_5(Wdata[5]),
+    .WD_6(Wdata[6]),
+    .WD_7(Wdata[7]),
+    .WD_8(Wdata[8]),
+    .WD_9(Wdata[9]),
+    .WE(_10_)
+  );
+  \$paramod\ScanShareSel_JTAG_reg_ext_cg\JTAG_REG_WIDTH=11\HAS_RESET=0\RESET_VALUE=0 testInst_Data_reg_r0 (
+    .D(r0_OutputMuxDataOut),
+    .Q(data_regq),
+    .clk(gated_clk_jtag_Data_reg_r0),
+    .reset_(1'b1),
+    .scanin(re_reg_SO_r0),
+    .scanout(Data_reg_SO_r0),
+    .sel(debug_mode),
+    .shiftDR(shiftDR)
+  );
+  \$paramod\ScanShareSel_JTAG_reg_ext_cg\JTAG_REG_WIDTH=8\HAS_RESET=0\RESET_VALUE=0 testInst_Ra_reg_r0 (
+    .D(muxed_Ra_r0),
+    .Q(Ra_reg_r0_A),
+    .clk(gated_clk_jtag_Wa_reg_w0),
+    .reset_(1'b1),
+    .scanin(we_reg_SO_w0),
+    .scanout(Ra_reg_SO_r0),
+    .sel(debug_mode),
+    .shiftDR(shiftDR)
+  );
+  \$paramod\ScanShareSel_JTAG_reg_ext_cg\JTAG_REG_WIDTH=8\HAS_RESET=0\RESET_VALUE=0 testInst_Wa_reg_w0 (
+    .D(muxed_Wa_w0),
+    .Q(Wa_reg_w0_A),
+    .clk(gated_clk_jtag_Wa_reg_w0),
+    .reset_(1'b1),
+    .scanin(SI),
+    .scanout(Wa_reg_SO_w0),
+    .sel(debug_mode),
+    .shiftDR(shiftDR)
+  );
+  LNQD1PO4 testInst_ram_access_lockup (
+    .D(Data_reg_SO_r0),
+    .EN(la_bist_clkr0),
+    .Q(SO_int_net)
+  );
+  \$paramod\ScanShareSel_JTAG_reg_ext_cg\JTAG_REG_WIDTH=1\HAS_RESET=0\RESET_VALUE=0 testInst_re_reg_r0 (
+    .D(muxed_re_r0),
+    .Q(re_q),
+    .clk(gated_clk_jtag_Wa_reg_w0),
+    .reset_(1'b1),
+    .scanin(Ra_reg_SO_r0),
+    .scanout(re_reg_SO_r0),
+    .sel(debug_mode),
+    .shiftDR(shiftDR)
+  );
+  \$paramod\ScanShareSel_JTAG_reg_ext_cg\JTAG_REG_WIDTH=1\HAS_RESET=0\RESET_VALUE=0 testInst_we_reg_w0 (
+    .D(muxed_we_w0),
+    .Q(we_q),
+    .clk(gated_clk_jtag_Wa_reg_w0),
+    .reset_(1'b1),
+    .scanin(Wa_reg_SO_w0),
+    .scanout(we_reg_SO_w0),
+    .sel(debug_mode),
+    .shiftDR(shiftDR)
+  );
+  sync2d_c_pp updateDR_synchronizer (
+    .clk(la_bist_clkr0),
+    .clr_(mbist_ramaccess_rst_),
+    .d(updateDR),
+    .q(updateDR_sync)
+  );
+  assign D_Ra_reg_r0 = muxed_Ra_r0;
+  assign Data_reg_r0 = data_regq;
+  assign Ra_reg_r0 = muxed_Ra_r0_B;
+  assign Ra_reg_r0_B = mbist_Ra_r0;
+  assign Ra_reg_r0_S = pre_muxed_Di_w0_S;
+  assign Wa_reg_w0 = muxed_Wa_w0_B;
+  assign Wa_reg_w0_B = mbist_Wa_w0;
+  assign Wa_reg_w0_S = pre_muxed_Di_w0_S;
+  assign access_en_w = posedge_updateDR_sync;
+  assign dft_capdr_r = ary_atpg_ctl;
+  assign dft_capdr_w = ary_atpg_ctl;
+  assign dout = data_regq;
+  assign la_bist_clkw0 = la_bist_clkr0;
+  assign mbist_Do_r0_int_net = data_regq;
+  assign muxed_Di_w0 = Wdata;
+  assign muxed_Di_w0_A = di;
+  assign muxed_Di_w0_S = muxed_re_r0_S;
+  assign muxed_Ra_r0_A = ra;
+  assign muxed_Ra_r0_S = muxed_re_r0_S;
+  assign muxed_Wa_w0_A = wa;
+  assign muxed_Wa_w0_S = muxed_re_r0_S;
+  assign muxed_re_r0_A = re;
+  assign muxed_we_w0_A = we;
+  assign muxed_we_w0_S = muxed_re_r0_S;
+  assign pre_Ra_reg_r0 = Ra_reg_r0_A;
+  assign pre_Wa_reg_w0 = Wa_reg_w0_A;
+  assign pre_muxed_Di_w0 = muxed_Di_w0_B;
+  assign pre_muxed_Di_w0_A = data_regq;
+  assign pre_muxed_Di_w0_B = { mbist_Di_w0[0], mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0, mbist_Di_w0 };
+  assign pre_re_r0 = muxed_re_r0_B;
+  assign pre_we_w0 = muxed_we_w0_B;
+  assign ra_0_0 = muxed_Ra_r0;
+  assign radr_q = Ra_reg_r0_A;
+  assign ramDataOut = dout_0_0;
+  assign ram_r0_OutputMuxDataOut = r0_OutputMuxDataOut;
+  assign re_0_0 = re;
+  assign re_reg_r0 = re_q;
+  assign ret_en = pwrbus_ram_pd[8];
+  assign sleep_en = pwrbus_ram_pd[7:0];
+  assign wa_0_0 = muxed_Wa_w0;
+  assign wadr_q = Wa_reg_w0_A;
+  assign we_0_0 = we;
+  assign we_reg_w0 = we_q;
+endmodule

@@ -12,8 +12,9 @@ using namespace ilang;
 
 int main(int argc, char *argv[]) {
   // include gen function
-  smt_to_vlg(argv[1]);
+  //smt_to_vlg(argv[1]);
   //aes_s_gen();
+  word_sum_gen();
   return 0;
 }
 
@@ -26,20 +27,20 @@ void word_sum_gen() {
 
   auto i1 = m.NewInstr("i1");
   {
-    i1.SetUpdate(word_sum, LoadSmtExprFromFile("../smtlib2in/spec.smtlib", m) );
+    i1.SetUpdate(word_sum, LoadSmtExprFromFile("./smtlib2in/spec.smtlib", m) );
 
-    std::ofstream fout("../ila2Vlg/out.v");
+    std::ofstream fout("./ila2Vlg/out.v");
     i1.ExportToVerilog(fout);
   }
 
   
   VerilogVerificationTargetGenerator vg(
       {},                                                   // no include
-      {"../verilog/test.v"},     // vlog files
+      {"./verilog/test.v"},     // vlog files
       "word_adder",              // top_module_name
-      "../rfmap/vmap.json", // variable mapping
-      "../rfmap/cond.json",
-      "../output/", // output path
+      "./rfmap/vmap.json", // variable mapping
+      "./rfmap/cond.json",
+      "./output/", // output path
       m.get(),
       VerilogVerificationTargetGenerator::backend_selector::JASPERGOLD);
 

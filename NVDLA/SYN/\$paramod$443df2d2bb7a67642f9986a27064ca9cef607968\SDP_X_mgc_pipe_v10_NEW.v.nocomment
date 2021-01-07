@@ -1,0 +1,26 @@
+module \$paramod$443df2d2bb7a67642f9986a27064ca9cef607968\SDP_X_mgc_pipe_v10 (clk, en, arst, srst, ldin, vdin, din, ldout, vdout, dout, sd);
+  input arst;
+  input clk;
+  output [511:0] din;
+  input [511:0] dout;
+  input en;
+  input ldin;
+  input ldout;
+  output sd;
+  input srst;
+  output vdin;
+  output vdout;
+  \$paramod$4ba9e6fe1073eca6fe5630c3ecd84b2acaf79af4\SDP_X_mgc_out_fifo_wait_core_v9 FIFO (
+    .arst(arst),
+    .clk(clk),
+    .d(dout),
+    .en(en),
+    .ld(ldout),
+    .lz(vdin),
+    .sd(sd),
+    .srst(srst),
+    .vd(vdout),
+    .vz(ldin),
+    .z(din)
+  );
+endmodule

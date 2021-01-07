@@ -1,0 +1,5 @@
+module \$paramod\SDP_Y_CVT_mgc_in_wire_v1\rscid=2\width=1 (d, z);
+  output d;
+  input z;
+  assign d = z;
+endmodule

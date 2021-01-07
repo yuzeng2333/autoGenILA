@@ -1,0 +1,41 @@
+module NV_BLKBOX_BUFFER ( A , INSTR_IN_ZY , rst_zy , A_T , A_S , Y_R0 , Y_C0 , Y_X0 , Y , A_R , A_X , A_C , Y_T , Y_S );
+  input rst_zy;
+  integer i;
+  input INSTR_IN_ZY;
+  input A;
+  input A_T ;
+  input [13:0] A_S ;
+  output A_R ;
+  output A_X ;
+  output A_C ;
+  output Y;
+  logic Y ;
+  output Y_T ;
+  logic Y_T ;
+  logic Y_R ;
+  logic Y_C ;
+  logic Y_X ;
+  logic [13:0] Y_S ;
+  input Y_R0 ;
+  input Y_C0 ;
+  input Y_X0 ;
+  output [13:0] Y_S ;
+  assign Y = A;
+  logic [0:0] A_C0 ;
+  logic [0:0] A_R0 ;
+  logic [0:0] A_X0 ;
+  assign Y_T = A_T ;
+  assign A_C0 = Y_C ;
+  assign A_R0 = Y_R ;
+  assign A_X0 = Y_X ;
+  assign Y_S = A_S ;
+  assign A_C = ( A_C0 );
+  assign Y_C = ( Y_C0 );
+  assign A_X = ( A_X0 );
+  assign Y_X = ( Y_X0 );
+  assign A_R = ( A_X0 & A_R0 );
+  assign Y_R = ( Y_X0 & Y_R0 );
+ // ground taints for floating regs
+ // ground taints for unused wires
+ // ground taints for unused wire slices
+endmodule

@@ -1,0 +1,15 @@
+module \$paramod\SDP_Y_INP_mgc_shift_br_v4\width_a=65\signd_a=1\width_s=5\width_z=81 (a, s, z);
+  wire [4:0] _0_;
+  wire [80:0] _1_;
+  wire [80:0] _2_;
+  input [64:0] a;
+  input [4:0] s;
+  output [80:0] z;
+  assign _0_ = ~ s;
+  assign z = s[4] ? _1_ : _2_;
+  wire [80:0] fangyuan0;
+  assign fangyuan0 = { a[64], a[64], a[64], a[64], a[64], a[64], a[64], a[64], a[64], a[64], a[64], a[64], a[64], a[64], a[64], a, 1'b0 };
+
+  assign _1_ = fangyuan0 <<< _0_;
+  assign _2_ = $signed(a) >>> s;
+endmodule

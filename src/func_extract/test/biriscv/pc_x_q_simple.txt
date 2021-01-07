@@ -1,0 +1,5 @@
+#1#\u_issue.pc_x_q#2
+(goals
+(goal
+  (= |\\u_issue.pc_x_q___#1002| #x800010d8))
+)

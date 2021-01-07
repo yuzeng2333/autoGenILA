@@ -1,0 +1,41 @@
+{
+  "models": { "ILA":"m0", "VERILOG": "m1" },
+  "state mapping": {
+      "addr": "addr",
+      "data_in": "data_in",
+      "rst": "rst",
+      "stb": "stb",
+      "wr": "wr",
+      "xram_data_in": "xram_data_in",
+      "aes_top_0_DOT_aes_reg_key0_i_DOT_reg_out": "aes_top_0_DOT_aes_reg_key0_i_DOT_reg_out",
+      "aes_top_0_DOT_uaes_ctr": "aes_top_0_DOT_uaes_ctr",
+      "aes_top_0_DOT_aes_reg_ctr_i_DOT_reg_out": "aes_top_0_DOT_aes_reg_ctr_i_DOT_reg_out",
+      "aes_top_0_DOT_aes_reg_opaddr_i_DOT_reg_out": "aes_top_0_DOT_aes_reg_opaddr_i_DOT_reg_out",
+      "aes_top_0_DOT_aes_reg_oplen_i_DOT_reg_out": "aes_top_0_DOT_aes_reg_oplen_i_DOT_reg_out",
+      "data_fifo_DOT_r0": "data_fifo_DOT_r0",
+      "data_fifo_DOT_r0": "data_fifo_DOT_r0"
+    },
+
+  "interface mapping": {
+      "addr":"**KEEP**",
+      "data_in":"**KEEP**",
+      "rst":"**KEEP**",
+      "stb":"**KEEP**",
+      "wr":"**KEEP**",
+      "xram_data_in":"**KEEP**",
+      "ack":"**SO**",
+      "addr_fifo_out":"**SO**",
+      "aes_addr":"**SO**",
+      "aes_ctr":"**SO**",
+      "aes_key0":"**SO**",
+      "aes_len":"**SO**",
+      "aes_state":"**SO**",
+      "aes_step":"**SO**",
+      "data_fifo_out":"**SO**",
+      "data_out":"**SO**",
+      "wr_fifo_out":"**SO**",
+      "clk":"**CLOCK**"
+  },
+  "mapping control": [
+   ]
+}

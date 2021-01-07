@@ -1,0 +1,309 @@
+module NV_NVDLA_CACC_assembly_buffer(nvdla_core_clk, nvdla_core_rstn, abuf_rd_addr, abuf_rd_en, abuf_wr_addr, abuf_wr_data_0, abuf_wr_data_1, abuf_wr_data_2, abuf_wr_data_3, abuf_wr_data_4, abuf_wr_data_5, abuf_wr_data_6, abuf_wr_data_7, abuf_wr_en, pwrbus_ram_pd, abuf_rd_data_0, abuf_rd_data_1, abuf_rd_data_2, abuf_rd_data_3, abuf_rd_data_4, abuf_rd_data_5, abuf_rd_data_6, abuf_rd_data_7);
+  wire [767:0] _00_;
+  wire [767:0] _01_;
+  wire [767:0] _02_;
+  wire [767:0] _03_;
+  wire [543:0] _04_;
+  wire [543:0] _05_;
+  wire [543:0] _06_;
+  wire [543:0] _07_;
+  wire [767:0] _08_;
+  wire [767:0] _09_;
+  wire [767:0] _10_;
+  wire [767:0] _11_;
+  wire [543:0] _12_;
+  wire [543:0] _13_;
+  wire [543:0] _14_;
+  wire [543:0] _15_;
+  wire [767:0] _16_;
+  wire [767:0] _17_;
+  wire [767:0] _18_;
+  wire [767:0] _19_;
+  wire [543:0] _20_;
+  wire [543:0] _21_;
+  wire [543:0] _22_;
+  wire [543:0] _23_;
+  input [4:0] abuf_rd_addr;
+  output [767:0] abuf_rd_data_0;
+  reg [767:0] abuf_rd_data_0;
+  wire [767:0] abuf_rd_data_0_w;
+  output [767:0] abuf_rd_data_1;
+  reg [767:0] abuf_rd_data_1;
+  wire [767:0] abuf_rd_data_1_w;
+  output [767:0] abuf_rd_data_2;
+  reg [767:0] abuf_rd_data_2;
+  wire [767:0] abuf_rd_data_2_w;
+  output [767:0] abuf_rd_data_3;
+  reg [767:0] abuf_rd_data_3;
+  wire [767:0] abuf_rd_data_3_w;
+  output [543:0] abuf_rd_data_4;
+  reg [543:0] abuf_rd_data_4;
+  wire [543:0] abuf_rd_data_4_w;
+  output [543:0] abuf_rd_data_5;
+  reg [543:0] abuf_rd_data_5;
+  wire [543:0] abuf_rd_data_5_w;
+  output [543:0] abuf_rd_data_6;
+  reg [543:0] abuf_rd_data_6;
+  wire [543:0] abuf_rd_data_6_w;
+  output [543:0] abuf_rd_data_7;
+  reg [543:0] abuf_rd_data_7;
+  wire [543:0] abuf_rd_data_7_w;
+  wire [767:0] abuf_rd_data_ecc_0;
+  wire [767:0] abuf_rd_data_ecc_1;
+  wire [767:0] abuf_rd_data_ecc_2;
+  wire [767:0] abuf_rd_data_ecc_3;
+  wire [543:0] abuf_rd_data_ecc_4;
+  wire [543:0] abuf_rd_data_ecc_5;
+  wire [543:0] abuf_rd_data_ecc_6;
+  wire [543:0] abuf_rd_data_ecc_7;
+  input [7:0] abuf_rd_en;
+  reg [7:0] abuf_rd_en_d1;
+  reg [7:0] abuf_rd_en_d2;
+  wire [767:0] abuf_rd_raw_data_0;
+  reg [767:0] abuf_rd_raw_data_0_d2;
+  wire [767:0] abuf_rd_raw_data_1;
+  reg [767:0] abuf_rd_raw_data_1_d2;
+  wire [767:0] abuf_rd_raw_data_2;
+  reg [767:0] abuf_rd_raw_data_2_d2;
+  wire [767:0] abuf_rd_raw_data_3;
+  reg [767:0] abuf_rd_raw_data_3_d2;
+  wire [543:0] abuf_rd_raw_data_4;
+  reg [543:0] abuf_rd_raw_data_4_d2;
+  wire [543:0] abuf_rd_raw_data_5;
+  reg [543:0] abuf_rd_raw_data_5_d2;
+  wire [543:0] abuf_rd_raw_data_6;
+  reg [543:0] abuf_rd_raw_data_6_d2;
+  wire [543:0] abuf_rd_raw_data_7;
+  reg [543:0] abuf_rd_raw_data_7_d2;
+  wire [7:0] abuf_rd_reg_en;
+  input [4:0] abuf_wr_addr;
+  reg [4:0] abuf_wr_addr_d1;
+  input [767:0] abuf_wr_data_0;
+  reg [767:0] abuf_wr_data_0_d1;
+  wire [767:0] abuf_wr_data_0_d1_w;
+  input [767:0] abuf_wr_data_1;
+  reg [767:0] abuf_wr_data_1_d1;
+  wire [767:0] abuf_wr_data_1_d1_w;
+  input [767:0] abuf_wr_data_2;
+  reg [767:0] abuf_wr_data_2_d1;
+  wire [767:0] abuf_wr_data_2_d1_w;
+  input [767:0] abuf_wr_data_3;
+  reg [767:0] abuf_wr_data_3_d1;
+  wire [767:0] abuf_wr_data_3_d1_w;
+  input [543:0] abuf_wr_data_4;
+  reg [543:0] abuf_wr_data_4_d1;
+  wire [543:0] abuf_wr_data_4_d1_w;
+  input [543:0] abuf_wr_data_5;
+  reg [543:0] abuf_wr_data_5_d1;
+  wire [543:0] abuf_wr_data_5_d1_w;
+  input [543:0] abuf_wr_data_6;
+  reg [543:0] abuf_wr_data_6_d1;
+  wire [543:0] abuf_wr_data_6_d1_w;
+  input [543:0] abuf_wr_data_7;
+  reg [543:0] abuf_wr_data_7_d1;
+  wire [543:0] abuf_wr_data_7_d1_w;
+  input [7:0] abuf_wr_en;
+  reg [7:0] abuf_wr_en_d1;
+  wire [7:0] abuf_wr_en_d1_w;
+  input nvdla_core_clk;
+  input nvdla_core_rstn;
+  input [31:0] pwrbus_ram_pd;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_data_7 <= _07_;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_data_6 <= _06_;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_data_5 <= _05_;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_data_4 <= _04_;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_data_3 <= _03_;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_data_2 <= _02_;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_data_1 <= _01_;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_data_0 <= _00_;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_raw_data_7_d2 <= _15_;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_raw_data_6_d2 <= _14_;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_raw_data_5_d2 <= _13_;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_raw_data_4_d2 <= _12_;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_raw_data_3_d2 <= _11_;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_raw_data_2_d2 <= _10_;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_raw_data_1_d2 <= _09_;
+  always @(posedge nvdla_core_clk)
+      abuf_rd_raw_data_0_d2 <= _08_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      abuf_rd_en_d2 <= 8'b00000000;
+    else
+      abuf_rd_en_d2 <= abuf_rd_en_d1;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      abuf_rd_en_d1 <= 8'b00000000;
+    else
+      abuf_rd_en_d1 <= abuf_rd_en;
+  always @(posedge nvdla_core_clk)
+      abuf_wr_data_7_d1 <= _23_;
+  always @(posedge nvdla_core_clk)
+      abuf_wr_data_6_d1 <= _22_;
+  always @(posedge nvdla_core_clk)
+      abuf_wr_data_5_d1 <= _21_;
+  always @(posedge nvdla_core_clk)
+      abuf_wr_data_4_d1 <= _20_;
+  always @(posedge nvdla_core_clk)
+      abuf_wr_data_3_d1 <= _19_;
+  always @(posedge nvdla_core_clk)
+      abuf_wr_data_2_d1 <= _18_;
+  always @(posedge nvdla_core_clk)
+      abuf_wr_data_1_d1 <= _17_;
+  always @(posedge nvdla_core_clk)
+      abuf_wr_data_0_d1 <= _16_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      abuf_wr_addr_d1 <= 5'b00000;
+    else
+      abuf_wr_addr_d1 <= abuf_wr_addr;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      abuf_wr_en_d1 <= 8'b00000000;
+    else
+      abuf_wr_en_d1 <= abuf_wr_en;
+  assign _07_ = abuf_rd_en_d2[7] ? abuf_rd_raw_data_7_d2 : abuf_rd_data_7;
+  assign _06_ = abuf_rd_en_d2[6] ? abuf_rd_raw_data_6_d2 : abuf_rd_data_6;
+  assign _05_ = abuf_rd_en_d2[5] ? abuf_rd_raw_data_5_d2 : abuf_rd_data_5;
+  assign _04_ = abuf_rd_en_d2[4] ? abuf_rd_raw_data_4_d2 : abuf_rd_data_4;
+  assign _03_ = abuf_rd_en_d2[3] ? abuf_rd_raw_data_3_d2 : abuf_rd_data_3;
+  assign _02_ = abuf_rd_en_d2[2] ? abuf_rd_raw_data_2_d2 : abuf_rd_data_2;
+  assign _01_ = abuf_rd_en_d2[1] ? abuf_rd_raw_data_1_d2 : abuf_rd_data_1;
+  assign _00_ = abuf_rd_en_d2[0] ? abuf_rd_raw_data_0_d2 : abuf_rd_data_0;
+  assign _15_ = abuf_rd_en_d1[7] ? abuf_rd_data_ecc_7 : abuf_rd_raw_data_7_d2;
+  assign _14_ = abuf_rd_en_d1[6] ? abuf_rd_data_ecc_6 : abuf_rd_raw_data_6_d2;
+  assign _13_ = abuf_rd_en_d1[5] ? abuf_rd_data_ecc_5 : abuf_rd_raw_data_5_d2;
+  assign _12_ = abuf_rd_en_d1[4] ? abuf_rd_data_ecc_4 : abuf_rd_raw_data_4_d2;
+  assign _11_ = abuf_rd_en_d1[3] ? abuf_rd_data_ecc_3 : abuf_rd_raw_data_3_d2;
+  assign _10_ = abuf_rd_en_d1[2] ? abuf_rd_data_ecc_2 : abuf_rd_raw_data_2_d2;
+  assign _09_ = abuf_rd_en_d1[1] ? abuf_rd_data_ecc_1 : abuf_rd_raw_data_1_d2;
+  assign _08_ = abuf_rd_en_d1[0] ? abuf_rd_data_ecc_0 : abuf_rd_raw_data_0_d2;
+  assign _23_ = abuf_wr_en[7] ? abuf_wr_data_7 : abuf_wr_data_7_d1;
+  assign _22_ = abuf_wr_en[6] ? abuf_wr_data_6 : abuf_wr_data_6_d1;
+  assign _21_ = abuf_wr_en[5] ? abuf_wr_data_5 : abuf_wr_data_5_d1;
+  assign _20_ = abuf_wr_en[4] ? abuf_wr_data_4 : abuf_wr_data_4_d1;
+  assign _19_ = abuf_wr_en[3] ? abuf_wr_data_3 : abuf_wr_data_3_d1;
+  assign _18_ = abuf_wr_en[2] ? abuf_wr_data_2 : abuf_wr_data_2_d1;
+  assign _17_ = abuf_wr_en[1] ? abuf_wr_data_1 : abuf_wr_data_1_d1;
+  assign _16_ = abuf_wr_en[0] ? abuf_wr_data_0 : abuf_wr_data_0_d1;
+  nv_ram_rws_32x768 u_accu_abuf_0 (
+    .clk(nvdla_core_clk),
+    .di(abuf_wr_data_0_d1),
+    .dout(abuf_rd_data_ecc_0),
+    .pwrbus_ram_pd(pwrbus_ram_pd),
+    .ra(abuf_rd_addr),
+    .re(abuf_rd_en[0]),
+    .wa(abuf_wr_addr_d1),
+    .we(abuf_wr_en_d1[0])
+  );
+  nv_ram_rws_32x768 u_accu_abuf_1 (
+    .clk(nvdla_core_clk),
+    .di(abuf_wr_data_1_d1),
+    .dout(abuf_rd_data_ecc_1),
+    .pwrbus_ram_pd(pwrbus_ram_pd),
+    .ra(abuf_rd_addr),
+    .re(abuf_rd_en[1]),
+    .wa(abuf_wr_addr_d1),
+    .we(abuf_wr_en_d1[1])
+  );
+  nv_ram_rws_32x768 u_accu_abuf_2 (
+    .clk(nvdla_core_clk),
+    .di(abuf_wr_data_2_d1),
+    .dout(abuf_rd_data_ecc_2),
+    .pwrbus_ram_pd(pwrbus_ram_pd),
+    .ra(abuf_rd_addr),
+    .re(abuf_rd_en[2]),
+    .wa(abuf_wr_addr_d1),
+    .we(abuf_wr_en_d1[2])
+  );
+  nv_ram_rws_32x768 u_accu_abuf_3 (
+    .clk(nvdla_core_clk),
+    .di(abuf_wr_data_3_d1),
+    .dout(abuf_rd_data_ecc_3),
+    .pwrbus_ram_pd(pwrbus_ram_pd),
+    .ra(abuf_rd_addr),
+    .re(abuf_rd_en[3]),
+    .wa(abuf_wr_addr_d1),
+    .we(abuf_wr_en_d1[3])
+  );
+  nv_ram_rws_32x544 u_accu_abuf_4 (
+    .clk(nvdla_core_clk),
+    .di(abuf_wr_data_4_d1),
+    .dout(abuf_rd_data_ecc_4),
+    .pwrbus_ram_pd(pwrbus_ram_pd),
+    .ra(abuf_rd_addr),
+    .re(abuf_rd_en[4]),
+    .wa(abuf_wr_addr_d1),
+    .we(abuf_wr_en_d1[4])
+  );
+  nv_ram_rws_32x544 u_accu_abuf_5 (
+    .clk(nvdla_core_clk),
+    .di(abuf_wr_data_5_d1),
+    .dout(abuf_rd_data_ecc_5),
+    .pwrbus_ram_pd(pwrbus_ram_pd),
+    .ra(abuf_rd_addr),
+    .re(abuf_rd_en[5]),
+    .wa(abuf_wr_addr_d1),
+    .we(abuf_wr_en_d1[5])
+  );
+  nv_ram_rws_32x544 u_accu_abuf_6 (
+    .clk(nvdla_core_clk),
+    .di(abuf_wr_data_6_d1),
+    .dout(abuf_rd_data_ecc_6),
+    .pwrbus_ram_pd(pwrbus_ram_pd),
+    .ra(abuf_rd_addr),
+    .re(abuf_rd_en[6]),
+    .wa(abuf_wr_addr_d1),
+    .we(abuf_wr_en_d1[6])
+  );
+  nv_ram_rws_32x544 u_accu_abuf_7 (
+    .clk(nvdla_core_clk),
+    .di(abuf_wr_data_7_d1),
+    .dout(abuf_rd_data_ecc_7),
+    .pwrbus_ram_pd(pwrbus_ram_pd),
+    .ra(abuf_rd_addr),
+    .re(abuf_rd_en[7]),
+    .wa(abuf_wr_addr_d1),
+    .we(abuf_wr_en_d1[7])
+  );
+  assign abuf_rd_data_0_w = abuf_rd_raw_data_0_d2;
+  assign abuf_rd_data_1_w = abuf_rd_raw_data_1_d2;
+  assign abuf_rd_data_2_w = abuf_rd_raw_data_2_d2;
+  assign abuf_rd_data_3_w = abuf_rd_raw_data_3_d2;
+  assign abuf_rd_data_4_w = abuf_rd_raw_data_4_d2;
+  assign abuf_rd_data_5_w = abuf_rd_raw_data_5_d2;
+  assign abuf_rd_data_6_w = abuf_rd_raw_data_6_d2;
+  assign abuf_rd_data_7_w = abuf_rd_raw_data_7_d2;
+  assign abuf_rd_raw_data_0 = abuf_rd_data_ecc_0;
+  assign abuf_rd_raw_data_1 = abuf_rd_data_ecc_1;
+  assign abuf_rd_raw_data_2 = abuf_rd_data_ecc_2;
+  assign abuf_rd_raw_data_3 = abuf_rd_data_ecc_3;
+  assign abuf_rd_raw_data_4 = abuf_rd_data_ecc_4;
+  assign abuf_rd_raw_data_5 = abuf_rd_data_ecc_5;
+  assign abuf_rd_raw_data_6 = abuf_rd_data_ecc_6;
+  assign abuf_rd_raw_data_7 = abuf_rd_data_ecc_7;
+  assign abuf_rd_reg_en = abuf_rd_en_d2;
+  assign abuf_wr_data_0_d1_w = abuf_wr_data_0;
+  assign abuf_wr_data_1_d1_w = abuf_wr_data_1;
+  assign abuf_wr_data_2_d1_w = abuf_wr_data_2;
+  assign abuf_wr_data_3_d1_w = abuf_wr_data_3;
+  assign abuf_wr_data_4_d1_w = abuf_wr_data_4;
+  assign abuf_wr_data_5_d1_w = abuf_wr_data_5;
+  assign abuf_wr_data_6_d1_w = abuf_wr_data_6;
+  assign abuf_wr_data_7_d1_w = abuf_wr_data_7;
+  assign abuf_wr_en_d1_w = abuf_wr_en;
+endmodule

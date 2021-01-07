@@ -4,7 +4,8 @@
 #include "../src/vcd_parser.h"
 #include "main.h"
 
-
+using namespace taintGen;
+using namespace syntaxPatterns;
 // 1st argument is file name
 // 2rd is whether to do process_path_info
 int main(int argc, char *argv[]) {
@@ -33,7 +34,8 @@ int main(int argc, char *argv[]) {
   uint32_t nextSig = 0;
   std::cout << "Begin read in clkrst!" << std::endl; //1
   read_in_clkrst(fileName, "clk_rst.txt");
-  hierarchical_vcd_parser(g_path+"/rst.vcd");
+  hierarchical_vcd_parser(g_path+"/rst.vcd", g_rstValMap);
+  hierarchical_vcd_parser(g_path+"/norm.vcd", g_normValMap);
   for(auto moduleName: modules) { 
     moduleReady.emplace(moduleName, false);
   }

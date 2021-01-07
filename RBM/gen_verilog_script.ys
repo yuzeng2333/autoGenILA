@@ -1,9 +1,9 @@
 read_verilog -sv ./Verilog/mem_rbm_0_cmos32soi_rtl.v
 read_verilog -sv ./Verilog/rbm_0_cmos32soi_rtl.v
-read_verilog -sv ./Verilog/SRAM2S_1024X16.v
-read_verilog -sv ./Verilog/SRAM2S_1024X32.v
-read_verilog -sv ./Verilog/SRAM2S_128X16.v
-read_verilog -sv ./Verilog/SRAM2S_8192X16.v
+read_verilog -sv ./Verilog/SRAM2S_1024X16_simp.v
+read_verilog -sv ./Verilog/SRAM2S_1024X32_simp.v
+read_verilog -sv ./Verilog/SRAM2S_128X16_simp.v
+read_verilog -sv ./Verilog/SRAM2S_8192X16_simp.v
 read_verilog -sv ./Verilog/top_rbm_0_cmos32soi_rtl.v
 prep -top rbm_0_top_cmos32soi_rtl
 

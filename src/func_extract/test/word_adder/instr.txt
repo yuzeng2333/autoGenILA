@@ -9,7 +9,7 @@ rst = 1'd0
 func = 2'd2
 inWord = x
 W:
-word_sum(skip) 4
+word_sum 4
 R:
 word
 word_sum

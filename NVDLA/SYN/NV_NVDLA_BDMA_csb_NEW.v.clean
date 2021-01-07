@@ -1,0 +1,511 @@
+module NV_NVDLA_BDMA_csb(nvdla_core_clk, nvdla_core_rstn, csb2bdma_req_pd, csb2bdma_req_pvld, csb2ld_rdy, dma_write_stall_count, ld2csb_grp0_dma_stall_inc, ld2csb_grp1_dma_stall_inc, ld2csb_idle, pwrbus_ram_pd, st2csb_grp0_done, st2csb_grp1_done, st2csb_idle, bdma2csb_resp_pd, bdma2csb_resp_valid, bdma2glb_done_intr_pd, csb2bdma_req_prdy, csb2gate_slcg_en, csb2ld_vld, dma_write_stall_count_cen, reg2dp_cmd_dst_ram_type, reg2dp_cmd_interrupt, reg2dp_cmd_interrupt_ptr, reg2dp_cmd_src_ram_type, reg2dp_dst_addr_high_v8, reg2dp_dst_addr_low_v32, reg2dp_dst_line_stride, reg2dp_dst_surf_stride, reg2dp_line_repeat_number, reg2dp_line_size, reg2dp_src_addr_high_v8, reg2dp_src_addr_low_v32, reg2dp_src_line_stride, reg2dp_src_surf_stride, reg2dp_surf_repeat_number);
+  wire [33:0] _000_;
+  wire [4:0] _001_;
+  wire _002_;
+  wire _003_;
+  wire [31:0] _004_;
+  wire [31:0] _005_;
+  wire [4:0] _006_;
+  wire _007_;
+  wire [62:0] _008_;
+  wire _009_;
+  wire _010_;
+  wire [31:0] _011_;
+  wire [31:0] _012_;
+  wire _013_;
+  wire [31:0] _014_;
+  wire [31:0] _015_;
+  wire [4:0] _016_;
+  wire [32:0] _017_;
+  wire [32:0] _018_;
+  wire _019_;
+  wire [31:0] _020_;
+  wire [32:0] _021_;
+  wire _022_;
+  wire _023_;
+  wire _024_;
+  wire _025_;
+  wire [31:0] _026_;
+  wire [31:0] _027_;
+  wire [31:0] _028_;
+  wire [31:0] _029_;
+  wire _030_;
+  wire _031_;
+  wire _032_;
+  wire _033_;
+  wire _034_;
+  wire [4:0] _035_;
+  wire [4:0] _036_;
+  wire [4:0] _037_;
+  wire [4:0] _038_;
+  wire _039_;
+  wire [4:0] _040_;
+  output [33:0] bdma2csb_resp_pd;
+  reg [33:0] bdma2csb_resp_pd;
+  output bdma2csb_resp_valid;
+  reg bdma2csb_resp_valid;
+  output [1:0] bdma2glb_done_intr_pd;
+  reg [1:0] bdma2glb_done_intr_pd;
+  wire cmd_launch_rdy;
+  wire cmd_launch_vld;
+  input [62:0] csb2bdma_req_pd;
+  output csb2bdma_req_prdy;
+  input csb2bdma_req_pvld;
+  output csb2gate_slcg_en;
+  input csb2ld_rdy;
+  output csb2ld_vld;
+  wire [288:0] csb_fifo_rd_pd;
+  wire csb_fifo_rd_prdy;
+  wire csb_fifo_rd_pvld;
+  wire [4:0] csb_fifo_wr_count;
+  wire csb_fifo_wr_idle;
+  wire [288:0] csb_fifo_wr_pd;
+  wire csb_fifo_wr_prdy;
+  wire csb_fifo_wr_pvld;
+  wire csb_idle;
+  wire csb_processing;
+  reg csb_processing_d;
+  wire dma_read_stall_count_cen;
+  input [31:0] dma_write_stall_count;
+  output dma_write_stall_count_cen;
+  reg [4:0] gather_count;
+  reg gather_ptr;
+  wire gather_rdy;
+  wire gather_to_launch;
+  reg gather_vld;
+  wire grp0_cmd_launch;
+  reg grp0_cmd_launch_trigger;
+  wire grp0_read_stall_cnt_adv;
+  reg [31:0] grp0_read_stall_cnt_cnt_cur;
+  wire [33:0] grp0_read_stall_cnt_cnt_ext;
+  wire [31:0] grp0_read_stall_cnt_cnt_inc;
+  wire [31:0] grp0_read_stall_cnt_cnt_mod;
+  wire [31:0] grp0_read_stall_cnt_cnt_new;
+  wire [31:0] grp0_read_stall_cnt_cnt_nxt;
+  wire [31:0] grp0_read_stall_count;
+  wire grp0_read_stall_count_dec;
+  wire grp1_cmd_launch;
+  reg grp1_cmd_launch_trigger;
+  wire grp1_read_stall_cnt_adv;
+  reg [31:0] grp1_read_stall_cnt_cnt_cur;
+  wire [33:0] grp1_read_stall_cnt_cnt_ext;
+  wire [31:0] grp1_read_stall_cnt_cnt_inc;
+  wire [31:0] grp1_read_stall_cnt_cnt_mod;
+  wire [31:0] grp1_read_stall_cnt_cnt_new;
+  wire [31:0] grp1_read_stall_cnt_cnt_nxt;
+  wire [31:0] grp1_read_stall_count;
+  wire grp1_read_stall_count_dec;
+  wire is_last_cmd;
+  wire is_last_cmd_rdy;
+  reg [4:0] launch_count;
+  reg launch_ptr;
+  wire launch_rdy;
+  wire launch_vld;
+  input ld2csb_grp0_dma_stall_inc;
+  input ld2csb_grp1_dma_stall_inc;
+  input ld2csb_idle;
+  wire load_idle;
+  wire mon_csb_fifo_rd_pvld;
+  wire mon_csb_fifo_wr_prdy;
+  wire nvdla_bdma_cfg_cmd_0_dst_ram_type;
+  wire nvdla_bdma_cfg_cmd_0_src_ram_type;
+  wire [31:0] nvdla_bdma_cfg_dst_addr_high_0_v8;
+  wire [26:0] nvdla_bdma_cfg_dst_addr_low_0_v32;
+  wire [26:0] nvdla_bdma_cfg_dst_line_0_stride;
+  wire [26:0] nvdla_bdma_cfg_dst_surf_0_stride;
+  wire nvdla_bdma_cfg_launch0_0_grp0_launch;
+  wire nvdla_bdma_cfg_launch0_0_grp0_launch_trigger;
+  wire nvdla_bdma_cfg_launch1_0_grp1_launch;
+  wire nvdla_bdma_cfg_launch1_0_grp1_launch_trigger;
+  wire [12:0] nvdla_bdma_cfg_line_0_size;
+  wire [23:0] nvdla_bdma_cfg_line_repeat_0_number;
+  wire nvdla_bdma_cfg_op_0_en;
+  wire nvdla_bdma_cfg_op_0_en_trigger;
+  wire [31:0] nvdla_bdma_cfg_src_addr_high_0_v8;
+  wire [26:0] nvdla_bdma_cfg_src_addr_low_0_v32;
+  wire [26:0] nvdla_bdma_cfg_src_line_0_stride;
+  wire [26:0] nvdla_bdma_cfg_src_surf_0_stride;
+  wire nvdla_bdma_cfg_status_0_stall_count_en;
+  wire [23:0] nvdla_bdma_cfg_surf_repeat_0_number;
+  wire [7:0] nvdla_bdma_status_0_free_slot;
+  wire nvdla_bdma_status_0_grp0_busy;
+  wire nvdla_bdma_status_0_grp1_busy;
+  wire nvdla_bdma_status_0_idle;
+  wire [31:0] nvdla_bdma_status_grp0_read_stall_0_count;
+  wire [31:0] nvdla_bdma_status_grp0_write_stall_0_count;
+  wire [31:0] nvdla_bdma_status_grp1_read_stall_0_count;
+  wire [31:0] nvdla_bdma_status_grp1_write_stall_0_count;
+  input nvdla_core_clk;
+  input nvdla_core_rstn;
+  reg op_en_trigger;
+  input [31:0] pwrbus_ram_pd;
+  output reg2dp_cmd_dst_ram_type;
+  output reg2dp_cmd_interrupt;
+  output reg2dp_cmd_interrupt_ptr;
+  output reg2dp_cmd_src_ram_type;
+  output [31:0] reg2dp_dst_addr_high_v8;
+  output [26:0] reg2dp_dst_addr_low_v32;
+  output [26:0] reg2dp_dst_line_stride;
+  output [26:0] reg2dp_dst_surf_stride;
+  output [23:0] reg2dp_line_repeat_number;
+  output [12:0] reg2dp_line_size;
+  output [31:0] reg2dp_src_addr_high_v8;
+  output [26:0] reg2dp_src_addr_low_v32;
+  output [26:0] reg2dp_src_line_stride;
+  output [26:0] reg2dp_src_surf_stride;
+  output [23:0] reg2dp_surf_repeat_number;
+  wire [11:0] reg_offset;
+  wire [31:0] reg_rd_data;
+  wire [31:0] reg_wr_data;
+  wire reg_wr_en;
+  wire [21:0] req_addr;
+  wire [1:0] req_level_NC;
+  wire req_nposted;
+  reg [62:0] req_pd;
+  wire req_srcpriv_NC;
+  reg req_vld;
+  wire [31:0] req_wdat;
+  wire [3:0] req_wrbe_NC;
+  wire req_write;
+  wire [32:0] rsp_pd;
+  wire rsp_rd_error;
+  wire [16:0] rsp_rd_pd;
+  wire [16:0] rsp_rd_rdat;
+  wire rsp_rd_vld;
+  wire rsp_vld;
+  wire rsp_wr_error;
+  wire [32:0] rsp_wr_pd;
+  wire [31:0] rsp_wr_rdat;
+  wire rsp_wr_vld;
+  reg slcg_en;
+  input st2csb_grp0_done;
+  input st2csb_grp1_done;
+  input st2csb_idle;
+  reg status_grp0_busy;
+  wire status_grp0_clr;
+  reg [31:0] status_grp0_read_stall_count;
+  wire status_grp0_set;
+  reg [31:0] status_grp0_write_stall_count;
+  reg status_grp1_busy;
+  wire status_grp1_clr;
+  reg [31:0] status_grp1_read_stall_count;
+  wire status_grp1_set;
+  reg [31:0] status_grp1_write_stall_count;
+  wire store_idle;
+  assign _016_ = gather_count + 1'b1;
+  assign grp0_read_stall_cnt_cnt_inc = grp0_read_stall_cnt_cnt_cur + 1'b1;
+  assign grp1_read_stall_cnt_cnt_inc = grp1_read_stall_cnt_cnt_cur + 1'b1;
+  assign rsp_rd_vld = req_vld & _024_;
+  wire [31:0] fangyuan0;
+  assign fangyuan0 = { _021_[31:17], rsp_rd_pd };
+  wire [31:0] fangyuan1;
+  assign fangyuan1 = { rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld };
+
+  assign fangyuan0 = fangyuan1 & reg_rd_data;
+  assign reg_wr_en = req_vld & req_pd[54];
+  assign rsp_wr_vld = reg_wr_en & req_pd[55];
+  wire [32:0] fangyuan2;
+  assign fangyuan2 = { rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld, rsp_rd_vld };
+  wire [31:0] fangyuan3;
+  assign fangyuan3 = { _021_[31:17], rsp_rd_pd };
+
+  assign _017_ = fangyuan2 & fangyuan3;
+  wire [32:0] fangyuan4;
+  assign fangyuan4 = { rsp_wr_vld, rsp_wr_vld, rsp_wr_vld, rsp_wr_vld, rsp_wr_vld, rsp_wr_vld, rsp_wr_vld, rsp_wr_vld, rsp_wr_vld, rsp_wr_vld, rsp_wr_vld, rsp_wr_vld, rsp_wr_vld, rsp_wr_vld, rsp_wr_vld, rsp_wr_vld, rsp_wr_vld, rsp_wr_vld, rsp_wr_vld, rsp_wr_vld, rsp_wr_vld, rsp_wr_vld, rsp_wr_vld, rsp_wr_vld, rsp_wr_vld, rsp_wr_vld, rsp_wr_vld, rsp_wr_vld, rsp_wr_vld, rsp_wr_vld, rsp_wr_vld, rsp_wr_vld, rsp_wr_vld };
+
+  assign _018_ = fangyuan4 & 1'b0;
+  assign csb_fifo_wr_pvld = op_en_trigger & nvdla_bdma_cfg_op_0_en;
+  assign grp0_cmd_launch = grp0_cmd_launch_trigger & nvdla_bdma_cfg_launch0_0_grp0_launch;
+  assign grp1_cmd_launch = grp1_cmd_launch_trigger & nvdla_bdma_cfg_launch1_0_grp1_launch;
+  assign gather_to_launch = gather_vld & gather_rdy;
+  assign is_last_cmd_rdy = csb2ld_rdy & is_last_cmd;
+  assign _019_ = st2csb_idle & ld2csb_idle;
+  assign nvdla_bdma_status_0_idle = _019_ & csb_fifo_wr_idle;
+  assign is_last_cmd = launch_count == 1'b1;
+  assign _022_ = ! gather_vld;
+  assign _023_ = ! launch_vld;
+  assign cmd_launch_rdy = gather_rdy || _022_;
+  assign gather_rdy = _023_ || is_last_cmd_rdy;
+  assign launch_vld = | launch_count;
+  assign _024_ = ~ req_pd[54];
+  assign rsp_vld = rsp_rd_vld | rsp_wr_vld;
+  assign rsp_pd = _017_ | _018_;
+  assign cmd_launch_vld = grp0_cmd_launch | grp1_cmd_launch;
+  assign _025_ = cmd_launch_vld | gather_vld;
+  assign csb_processing = _025_ | launch_vld;
+  assign _009_ = csb_processing | csb_processing_d;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      slcg_en <= 1'b0;
+    else
+      slcg_en <= _009_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      csb_processing_d <= 1'b0;
+    else
+      csb_processing_d <= csb_processing;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      bdma2glb_done_intr_pd[1] <= 1'b0;
+    else
+      bdma2glb_done_intr_pd[1] <= st2csb_grp1_done;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      bdma2glb_done_intr_pd[0] <= 1'b0;
+    else
+      bdma2glb_done_intr_pd[0] <= st2csb_grp0_done;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      status_grp1_write_stall_count <= 32'd0;
+    else
+      status_grp1_write_stall_count <= _015_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      status_grp0_write_stall_count <= 32'd0;
+    else
+      status_grp0_write_stall_count <= _012_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      status_grp1_read_stall_count <= 32'd0;
+    else
+      status_grp1_read_stall_count <= _014_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      status_grp0_read_stall_count <= 32'd0;
+    else
+      status_grp0_read_stall_count <= _011_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      grp1_read_stall_cnt_cnt_cur <= 32'd0;
+    else
+      grp1_read_stall_cnt_cnt_cur <= _005_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      grp0_read_stall_cnt_cnt_cur <= 32'd0;
+    else
+      grp0_read_stall_cnt_cnt_cur <= _004_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      status_grp1_busy <= 1'b0;
+    else
+      status_grp1_busy <= _013_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      status_grp0_busy <= 1'b0;
+    else
+      status_grp0_busy <= _010_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      launch_count <= 5'b00000;
+    else
+      launch_count <= _006_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      launch_ptr <= 1'b0;
+    else
+      launch_ptr <= _007_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      gather_ptr <= 1'b0;
+    else
+      gather_ptr <= _002_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      gather_vld <= 1'b0;
+    else
+      gather_vld <= _003_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      gather_count <= 5'b00000;
+    else
+      gather_count <= _001_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      grp1_cmd_launch_trigger <= 1'b0;
+    else
+      grp1_cmd_launch_trigger <= nvdla_bdma_cfg_launch1_0_grp1_launch_trigger;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      grp0_cmd_launch_trigger <= 1'b0;
+    else
+      grp0_cmd_launch_trigger <= nvdla_bdma_cfg_launch0_0_grp0_launch_trigger;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      op_en_trigger <= 1'b0;
+    else
+      op_en_trigger <= nvdla_bdma_cfg_op_0_en_trigger;
+  always @(posedge nvdla_core_clk)
+      bdma2csb_resp_pd <= _000_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      bdma2csb_resp_valid <= 1'b0;
+    else
+      bdma2csb_resp_valid <= rsp_vld;
+  always @(posedge nvdla_core_clk)
+      req_pd <= _008_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      req_vld <= 1'b0;
+    else
+      req_vld <= csb2bdma_req_pvld;
+  assign _026_ = st2csb_grp1_done ? dma_write_stall_count : status_grp1_write_stall_count;
+  assign _015_ = grp1_cmd_launch ? 32'd0 : _026_;
+  assign _027_ = st2csb_grp0_done ? dma_write_stall_count : status_grp0_write_stall_count;
+  assign _012_ = grp0_cmd_launch ? 32'd0 : _027_;
+  assign _028_ = st2csb_grp1_done ? grp1_read_stall_cnt_cnt_cur : status_grp1_read_stall_count;
+  assign _014_ = grp1_cmd_launch ? 32'd0 : _028_;
+  assign _029_ = st2csb_grp0_done ? grp0_read_stall_cnt_cnt_cur : status_grp0_read_stall_count;
+  assign _011_ = grp0_cmd_launch ? 32'd0 : _029_;
+  assign _005_ = nvdla_bdma_cfg_status_0_stall_count_en ? grp1_read_stall_cnt_cnt_nxt : grp1_read_stall_cnt_cnt_cur;
+  assign _004_ = nvdla_bdma_cfg_status_0_stall_count_en ? grp0_read_stall_cnt_cnt_nxt : grp0_read_stall_cnt_cnt_cur;
+  assign _030_ = st2csb_grp1_done ? 1'b0 : status_grp1_busy;
+  assign _013_ = grp1_cmd_launch ? 1'b1 : _030_;
+  assign _031_ = st2csb_grp0_done ? 1'b0 : status_grp0_busy;
+  assign _010_ = grp0_cmd_launch ? 1'b1 : _031_;
+  assign _032_ = gather_vld ? gather_ptr : launch_ptr;
+  assign _033_ = is_last_cmd ? _032_ : launch_ptr;
+  assign _034_ = csb2ld_rdy ? _033_ : launch_ptr;
+  assign _007_ = launch_vld ? _034_ : _032_;
+  assign _035_ = gather_vld ? gather_count : launch_count;
+  assign _036_ = gather_vld ? gather_count : _020_[4:0];
+  assign _037_ = is_last_cmd ? _036_ : _020_[4:0];
+  assign _038_ = csb2ld_rdy ? _037_ : launch_count;
+  assign _006_ = launch_vld ? _038_ : _035_;
+  assign _039_ = grp1_cmd_launch ? 1'b1 : gather_ptr;
+  assign _002_ = grp0_cmd_launch ? 1'b0 : _039_;
+  assign _003_ = cmd_launch_rdy ? cmd_launch_vld : gather_vld;
+  assign _040_ = csb_fifo_wr_pvld ? _016_ : gather_count;
+  wire [4:0] fangyuan5;
+  assign fangyuan5 = { 4'b0000, csb_fifo_wr_pvld };
+
+  assign _001_ = gather_to_launch ? fangyuan5 : _040_;
+  wire [33:0] fangyuan6;
+  assign fangyuan6 = { rsp_wr_vld, rsp_pd };
+
+  assign _000_ = rsp_vld ? fangyuan6 : bdma2csb_resp_pd;
+  assign _008_ = csb2bdma_req_pvld ? csb2bdma_req_pd : req_pd;
+  wire [5:0] fangyuan7;
+  assign fangyuan7 = { nvdla_bdma_status_0_free_slot[7], nvdla_bdma_status_0_free_slot[4:0] };
+
+  assign fangyuan7 = 5'b10100 - csb_fifo_wr_count;
+  assign _020_[4:0] = launch_count - 1'b1;
+  assign grp0_read_stall_cnt_cnt_new = ld2csb_grp0_dma_stall_inc ? grp0_read_stall_cnt_cnt_inc : grp0_read_stall_cnt_cnt_cur;
+  assign grp0_read_stall_cnt_cnt_nxt = st2csb_grp0_done ? 32'd0 : grp0_read_stall_cnt_cnt_new;
+  assign grp1_read_stall_cnt_cnt_new = ld2csb_grp1_dma_stall_inc ? grp1_read_stall_cnt_cnt_inc : grp1_read_stall_cnt_cnt_cur;
+  assign grp1_read_stall_cnt_cnt_nxt = st2csb_grp1_done ? 32'd0 : grp1_read_stall_cnt_cnt_new;
+  NV_NVDLA_BDMA_LOAD_csb_fifo csb_fifo (
+    .csb_fifo_rd_pd(csb_fifo_rd_pd),
+    .csb_fifo_rd_prdy(csb2ld_rdy),
+    .csb_fifo_rd_pvld(csb_fifo_rd_pvld),
+    .csb_fifo_wr_count(csb_fifo_wr_count),
+    .csb_fifo_wr_idle(csb_fifo_wr_idle),
+    .csb_fifo_wr_pd({ nvdla_bdma_cfg_src_addr_low_0_v32, nvdla_bdma_cfg_src_addr_high_0_v8, nvdla_bdma_cfg_dst_addr_low_0_v32, nvdla_bdma_cfg_dst_addr_high_0_v8, nvdla_bdma_cfg_line_0_size, nvdla_bdma_cfg_cmd_0_src_ram_type, nvdla_bdma_cfg_cmd_0_dst_ram_type, nvdla_bdma_cfg_line_repeat_0_number, nvdla_bdma_cfg_src_line_0_stride, nvdla_bdma_cfg_dst_line_0_stride, nvdla_bdma_cfg_surf_repeat_0_number, nvdla_bdma_cfg_src_surf_0_stride, nvdla_bdma_cfg_dst_surf_0_stride }),
+    .csb_fifo_wr_prdy(csb_fifo_wr_prdy),
+    .csb_fifo_wr_pvld(csb_fifo_wr_pvld),
+    .nvdla_core_clk(nvdla_core_clk),
+    .nvdla_core_rstn(nvdla_core_rstn),
+    .pwrbus_ram_pd(pwrbus_ram_pd)
+  );
+  NV_NVDLA_BDMA_reg u_NV_NVDLA_BDMA_reg (
+    .nvdla_bdma_cfg_cmd_0_dst_ram_type(nvdla_bdma_cfg_cmd_0_dst_ram_type),
+    .nvdla_bdma_cfg_cmd_0_src_ram_type(nvdla_bdma_cfg_cmd_0_src_ram_type),
+    .nvdla_bdma_cfg_dst_addr_high_0_v8(nvdla_bdma_cfg_dst_addr_high_0_v8),
+    .nvdla_bdma_cfg_dst_addr_low_0_v32(nvdla_bdma_cfg_dst_addr_low_0_v32),
+    .nvdla_bdma_cfg_dst_line_0_stride(nvdla_bdma_cfg_dst_line_0_stride),
+    .nvdla_bdma_cfg_dst_surf_0_stride(nvdla_bdma_cfg_dst_surf_0_stride),
+    .nvdla_bdma_cfg_launch0_0_grp0_launch(nvdla_bdma_cfg_launch0_0_grp0_launch),
+    .nvdla_bdma_cfg_launch0_0_grp0_launch_trigger(nvdla_bdma_cfg_launch0_0_grp0_launch_trigger),
+    .nvdla_bdma_cfg_launch1_0_grp1_launch(nvdla_bdma_cfg_launch1_0_grp1_launch),
+    .nvdla_bdma_cfg_launch1_0_grp1_launch_trigger(nvdla_bdma_cfg_launch1_0_grp1_launch_trigger),
+    .nvdla_bdma_cfg_line_0_size(nvdla_bdma_cfg_line_0_size),
+    .nvdla_bdma_cfg_line_repeat_0_number(nvdla_bdma_cfg_line_repeat_0_number),
+    .nvdla_bdma_cfg_op_0_en(nvdla_bdma_cfg_op_0_en),
+    .nvdla_bdma_cfg_op_0_en_trigger(nvdla_bdma_cfg_op_0_en_trigger),
+    .nvdla_bdma_cfg_src_addr_high_0_v8(nvdla_bdma_cfg_src_addr_high_0_v8),
+    .nvdla_bdma_cfg_src_addr_low_0_v32(nvdla_bdma_cfg_src_addr_low_0_v32),
+    .nvdla_bdma_cfg_src_line_0_stride(nvdla_bdma_cfg_src_line_0_stride),
+    .nvdla_bdma_cfg_src_surf_0_stride(nvdla_bdma_cfg_src_surf_0_stride),
+    .nvdla_bdma_cfg_status_0_stall_count_en(nvdla_bdma_cfg_status_0_stall_count_en),
+    .nvdla_bdma_cfg_surf_repeat_0_number(nvdla_bdma_cfg_surf_repeat_0_number),
+    .nvdla_bdma_status_0_free_slot({ nvdla_bdma_status_0_free_slot[7], nvdla_bdma_status_0_free_slot[7], nvdla_bdma_status_0_free_slot[7], nvdla_bdma_status_0_free_slot[4:0] }),
+    .nvdla_bdma_status_0_grp0_busy(status_grp0_busy),
+    .nvdla_bdma_status_0_grp1_busy(status_grp1_busy),
+    .nvdla_bdma_status_0_idle(nvdla_bdma_status_0_idle),
+    .nvdla_bdma_status_grp0_read_stall_0_count(status_grp0_read_stall_count),
+    .nvdla_bdma_status_grp0_write_stall_0_count(status_grp0_write_stall_count),
+    .nvdla_bdma_status_grp1_read_stall_0_count(status_grp1_read_stall_count),
+    .nvdla_bdma_status_grp1_write_stall_0_count(status_grp1_write_stall_count),
+    .nvdla_core_clk(nvdla_core_clk),
+    .nvdla_core_rstn(nvdla_core_rstn),
+    .reg_offset({ req_pd[9:0], 2'b00 }),
+    .reg_rd_data(reg_rd_data),
+    .reg_wr_data(req_pd[53:22]),
+    .reg_wr_en(reg_wr_en)
+  );
+  assign { _021_[32], _021_[16:0] } = { 1'b0, rsp_rd_pd };
+  assign _021_[32] = { 1'b0 };
+  assign _021_[16:0] = { rsp_rd_pd };
+  assign csb2bdma_req_prdy = 1'b1;
+  assign csb2gate_slcg_en = slcg_en;
+  assign csb2ld_vld = launch_vld;
+  assign csb_fifo_rd_prdy = csb2ld_rdy;
+  assign csb_fifo_wr_pd = { nvdla_bdma_cfg_src_addr_low_0_v32, nvdla_bdma_cfg_src_addr_high_0_v8, nvdla_bdma_cfg_dst_addr_low_0_v32, nvdla_bdma_cfg_dst_addr_high_0_v8, nvdla_bdma_cfg_line_0_size, nvdla_bdma_cfg_cmd_0_src_ram_type, nvdla_bdma_cfg_cmd_0_dst_ram_type, nvdla_bdma_cfg_line_repeat_0_number, nvdla_bdma_cfg_src_line_0_stride, nvdla_bdma_cfg_dst_line_0_stride, nvdla_bdma_cfg_surf_repeat_0_number, nvdla_bdma_cfg_src_surf_0_stride, nvdla_bdma_cfg_dst_surf_0_stride };
+  assign csb_idle = csb_fifo_wr_idle;
+  assign dma_read_stall_count_cen = nvdla_bdma_cfg_status_0_stall_count_en;
+  assign dma_write_stall_count_cen = nvdla_bdma_cfg_status_0_stall_count_en;
+  assign grp0_read_stall_cnt_adv = ld2csb_grp0_dma_stall_inc;
+  assign grp0_read_stall_cnt_cnt_ext = { 2'b00, grp0_read_stall_cnt_cnt_cur };
+  assign grp0_read_stall_cnt_cnt_mod = grp0_read_stall_cnt_cnt_inc;
+  assign grp0_read_stall_count = grp0_read_stall_cnt_cnt_cur;
+  assign grp0_read_stall_count_dec = 1'b0;
+  assign grp1_read_stall_cnt_adv = ld2csb_grp1_dma_stall_inc;
+  assign grp1_read_stall_cnt_cnt_ext = { 2'b00, grp1_read_stall_cnt_cnt_cur };
+  assign grp1_read_stall_cnt_cnt_mod = grp1_read_stall_cnt_cnt_inc;
+  assign grp1_read_stall_count = grp1_read_stall_cnt_cnt_cur;
+  assign grp1_read_stall_count_dec = 1'b0;
+  assign launch_rdy = csb2ld_rdy;
+  assign load_idle = ld2csb_idle;
+  assign mon_csb_fifo_rd_pvld = csb_fifo_rd_pvld;
+  assign mon_csb_fifo_wr_prdy = csb_fifo_wr_prdy;
+  assign nvdla_bdma_status_0_free_slot[6:5] = { nvdla_bdma_status_0_free_slot[7], nvdla_bdma_status_0_free_slot[7] };
+  assign nvdla_bdma_status_0_grp0_busy = status_grp0_busy;
+  assign nvdla_bdma_status_0_grp1_busy = status_grp1_busy;
+  assign nvdla_bdma_status_grp0_read_stall_0_count = status_grp0_read_stall_count;
+  assign nvdla_bdma_status_grp0_write_stall_0_count = status_grp0_write_stall_count;
+  assign nvdla_bdma_status_grp1_read_stall_0_count = status_grp1_read_stall_count;
+  assign nvdla_bdma_status_grp1_write_stall_0_count = status_grp1_write_stall_count;
+  assign reg2dp_cmd_dst_ram_type = csb_fifo_rd_pd[156];
+  assign reg2dp_cmd_interrupt = is_last_cmd_rdy;
+  assign reg2dp_cmd_interrupt_ptr = launch_ptr;
+  assign reg2dp_cmd_src_ram_type = csb_fifo_rd_pd[157];
+  assign reg2dp_dst_addr_high_v8 = csb_fifo_rd_pd[202:171];
+  assign reg2dp_dst_addr_low_v32 = csb_fifo_rd_pd[229:203];
+  assign reg2dp_dst_line_stride = csb_fifo_rd_pd[104:78];
+  assign reg2dp_dst_surf_stride = csb_fifo_rd_pd[26:0];
+  assign reg2dp_line_repeat_number = csb_fifo_rd_pd[155:132];
+  assign reg2dp_line_size = csb_fifo_rd_pd[170:158];
+  assign reg2dp_src_addr_high_v8 = csb_fifo_rd_pd[261:230];
+  assign reg2dp_src_addr_low_v32 = csb_fifo_rd_pd[288:262];
+  assign reg2dp_src_line_stride = csb_fifo_rd_pd[131:105];
+  assign reg2dp_src_surf_stride = csb_fifo_rd_pd[53:27];
+  assign reg2dp_surf_repeat_number = csb_fifo_rd_pd[77:54];
+  assign reg_offset = { req_pd[9:0], 2'b00 };
+  assign reg_wr_data = req_pd[53:22];
+  assign req_addr = req_pd[21:0];
+  assign req_level_NC = req_pd[62:61];
+  assign req_nposted = req_pd[55];
+  assign req_srcpriv_NC = req_pd[56];
+  assign req_wdat = req_pd[53:22];
+  assign req_wrbe_NC = req_pd[60:57];
+  assign req_write = req_pd[54];
+  assign rsp_rd_error = 1'b0;
+  assign rsp_rd_rdat = rsp_rd_pd;
+  assign rsp_wr_error = 1'b0;
+  assign rsp_wr_pd = 33'b000000000000000000000000000000000;
+  assign rsp_wr_rdat = 32'd0;
+  assign status_grp0_clr = st2csb_grp0_done;
+  assign status_grp0_set = grp0_cmd_launch;
+  assign status_grp1_clr = st2csb_grp1_done;
+  assign status_grp1_set = grp1_cmd_launch;
+  assign store_idle = st2csb_idle;
+endmodule

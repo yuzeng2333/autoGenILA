@@ -38,7 +38,7 @@ csimple:
 	./build/taint_gen /workspace/research/ILA/autoGenILA/naiveEg/case_simple/case.v
 
 rbm:
-	./build/taint_gen /workspace/research/ILA/autoGenILA/RBM/SYN_wr/rbm_acc_yosys.v
+	./build/taint_gen /workspace/research/ILA/autoGenILA/RBM/SYN_wr/rbm_yosys.v
 
 8051:
 	./build/taint_gen /workspace/research/ILA/autoGenILA/8051/trunk/rtl/SYN_WR/oc8051_yosys.v

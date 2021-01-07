@@ -1,0 +1,1028 @@
+module HLS_fp32_to_fp17_core(nvdla_core_clk, nvdla_core_rstn, chn_a_rsc_z, chn_a_rsc_vz, chn_a_rsc_lz, chn_o_rsc_z, chn_o_rsc_vz, chn_o_rsc_lz, chn_a_rsci_oswt, chn_a_rsci_oswt_unreg, chn_o_rsci_oswt, chn_o_rsci_oswt_unreg);
+  wire _000_;
+  wire _001_;
+  wire _002_;
+  wire [9:0] _003_;
+  wire [9:0] _004_;
+  wire _005_;
+  wire [10:0] _006_;
+  wire _007_;
+  wire _008_;
+  wire _009_;
+  wire _010_;
+  wire [4:0] _011_;
+  wire _012_;
+  wire [28:0] _013_;
+  wire _014_;
+  wire _015_;
+  wire [9:0] _016_;
+  wire [2:0] _017_;
+  wire _018_;
+  wire _019_;
+  wire _020_;
+  wire _021_;
+  wire _022_;
+  wire _023_;
+  wire _024_;
+  wire _025_;
+  wire _026_;
+  wire _027_;
+  wire _028_;
+  wire _029_;
+  wire _030_;
+  wire _031_;
+  wire _032_;
+  wire _033_;
+  wire _034_;
+  wire [4:0] _035_;
+  wire _036_;
+  wire _037_;
+  wire [9:0] _038_;
+  wire _039_;
+  wire _040_;
+  wire _041_;
+  wire _042_;
+  wire _043_;
+  wire _044_;
+  wire [9:0] _045_;
+  wire [9:0] _046_;
+  wire [4:0] _047_;
+  wire _048_;
+  wire _049_;
+  wire _050_;
+  wire _051_;
+  wire _052_;
+  wire _053_;
+  wire _054_;
+  wire _055_;
+  wire _056_;
+  wire _057_;
+  wire _058_;
+  wire _059_;
+  wire _060_;
+  wire _061_;
+  wire _062_;
+  wire _063_;
+  wire _064_;
+  wire _065_;
+  wire _066_;
+  wire _067_;
+  wire _068_;
+  wire _069_;
+  wire _070_;
+  wire _071_;
+  wire _072_;
+  wire _073_;
+  wire _074_;
+  wire _075_;
+  wire _076_;
+  wire _077_;
+  wire _078_;
+  wire _079_;
+  wire _080_;
+  wire _081_;
+  wire [4:0] _082_;
+  wire [4:0] _083_;
+  wire [4:0] _084_;
+  wire [4:0] _085_;
+  wire _086_;
+  wire _087_;
+  wire _088_;
+  wire _089_;
+  wire _090_;
+  wire _091_;
+  wire _092_;
+  wire _093_;
+  wire _094_;
+  wire _095_;
+  wire _096_;
+  wire _097_;
+  wire _098_;
+  wire _099_;
+  wire _100_;
+  wire _101_;
+  wire _102_;
+  wire _103_;
+  wire _104_;
+  wire _105_;
+  wire _106_;
+  wire _107_;
+  wire [3:0] _108_;
+  wire _109_;
+  wire _110_;
+  wire _111_;
+  wire _112_;
+  wire _113_;
+  wire _114_;
+  wire _115_;
+  wire _116_;
+  wire _117_;
+  wire _118_;
+  wire _119_;
+  wire _120_;
+  wire _121_;
+  wire _122_;
+  wire _123_;
+  wire _124_;
+  wire _125_;
+  wire _126_;
+  wire _127_;
+  wire _128_;
+  wire _129_;
+  wire _130_;
+  wire _131_;
+  wire _132_;
+  wire _133_;
+  wire _134_;
+  wire _135_;
+  wire _136_;
+  wire _137_;
+  wire _138_;
+  wire _139_;
+  wire _140_;
+  wire _141_;
+  wire _142_;
+  wire [7:0] _143_;
+  wire _144_;
+  wire _145_;
+  wire _146_;
+  wire _147_;
+  wire _148_;
+  wire _149_;
+  wire _150_;
+  wire _151_;
+  wire _152_;
+  wire _153_;
+  wire _154_;
+  wire _155_;
+  wire _156_;
+  wire _157_;
+  wire _158_;
+  wire _159_;
+  wire _160_;
+  wire _161_;
+  wire _162_;
+  wire _163_;
+  wire _164_;
+  wire _165_;
+  wire _166_;
+  wire _167_;
+  wire _168_;
+  wire _169_;
+  wire _170_;
+  wire _171_;
+  wire _172_;
+  wire _173_;
+  wire _174_;
+  wire _175_;
+  wire _176_;
+  wire _177_;
+  wire _178_;
+  wire _179_;
+  wire _180_;
+  wire _181_;
+  wire _182_;
+  wire _183_;
+  wire _184_;
+  wire _185_;
+  wire _186_;
+  wire _187_;
+  wire _188_;
+  wire _189_;
+  wire _190_;
+  wire _191_;
+  wire _192_;
+  wire _193_;
+  wire _194_;
+  wire [4:0] _195_;
+  wire [4:0] _196_;
+  wire [4:0] _197_;
+  wire _198_;
+  wire _199_;
+  wire _200_;
+  wire _201_;
+  wire _202_;
+  wire _203_;
+  wire _204_;
+  wire _205_;
+  wire _206_;
+  wire _207_;
+  wire _208_;
+  wire _209_;
+  wire _210_;
+  wire _211_;
+  wire _212_;
+  wire _213_;
+  wire _214_;
+  wire _215_;
+  wire _216_;
+  wire _217_;
+  wire _218_;
+  wire _219_;
+  wire _220_;
+  wire _221_;
+  wire _222_;
+  wire _223_;
+  wire _224_;
+  wire _225_;
+  wire _226_;
+  wire Fp32ToFp17_and_1_cse;
+  reg FpMantDecShiftRight_23U_8U_10U_carry_and_itm_2;
+  wire [22:0] FpMantDecShiftRight_23U_8U_10U_guard_bits_22_0_sva;
+  wire [4:0] FpMantDecShiftRight_23U_8U_10U_guard_mask_acc_1_psp_sva;
+  wire [23:0] FpMantDecShiftRight_23U_8U_10U_guard_mask_sva;
+  wire FpMantDecShiftRight_23U_8U_10U_i_mant_s_and_cse;
+  wire [23:0] FpMantDecShiftRight_23U_8U_10U_i_mant_s_rshift_itm;
+  reg [10:0] FpMantDecShiftRight_23U_8U_10U_i_mant_s_slc_FpMantDecShiftRight_23U_8U_10U_i_mant_s_rshift_23_13_itm_2;
+  wire [22:0] FpMantDecShiftRight_23U_8U_10U_least_bits_22_0_sva;
+  wire [23:0] FpMantDecShiftRight_23U_8U_10U_least_mask_sva;
+  wire [10:0] FpMantDecShiftRight_23U_8U_10U_o_mant_sum_sva;
+  wire [22:0] FpMantDecShiftRight_23U_8U_10U_stick_bits_22_0_sva;
+  wire [22:0] FpMantDecShiftRight_23U_8U_10U_stick_mask_acc_nl;
+  wire [9:0] FpMantRNE_24U_11U_else_acc_nl;
+  reg FpMantRNE_24U_11U_else_and_svs;
+  reg FpMantRNE_24U_11U_else_and_svs_2;
+  wire FpMantRNE_24U_11U_else_and_svs_mx0w0;
+  reg FpMantRNE_24U_11U_else_and_svs_st_2;
+  reg FpMantRNE_24U_11U_else_carry_sva_2;
+  wire FpMantRNE_24U_11U_else_carry_sva_mx0w0;
+  reg [4:0] FpWidthDec_8U_23U_6U_10U_0U_1U_FpWidthDec_8U_23U_6U_10U_0U_1U_mux1h_itm_1_4_0_1;
+  reg FpWidthDec_8U_23U_6U_10U_0U_1U_FpWidthDec_8U_23U_6U_10U_0U_1U_mux1h_itm_1_5_1;
+  wire FpWidthDec_8U_23U_6U_10U_0U_1U_FpWidthDec_8U_23U_6U_10U_0U_1U_nor_ssc;
+  wire FpWidthDec_8U_23U_6U_10U_0U_1U_acc_itm_8_1;
+  wire [8:0] FpWidthDec_8U_23U_6U_10U_0U_1U_acc_nl;
+  wire FpWidthDec_8U_23U_6U_10U_0U_1U_and_1_m1c;
+  wire FpWidthDec_8U_23U_6U_10U_0U_1U_and_2_rgt;
+  wire FpWidthDec_8U_23U_6U_10U_0U_1U_and_3_rgt;
+  wire FpWidthDec_8U_23U_6U_10U_0U_1U_and_4_rgt;
+  wire FpWidthDec_8U_23U_6U_10U_0U_1U_and_5_rgt;
+  reg [28:0] FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_1_28_0_1;
+  reg FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_1_31_1;
+  reg FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_2_31_1;
+  reg [9:0] FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_2_9_0_1;
+  wire [9:0] FpWidthDec_8U_23U_6U_10U_0U_1U_else_2_FpWidthDec_8U_23U_6U_10U_0U_1U_else_2_FpWidthDec_8U_23U_6U_10U_0U_1U_else_2_nor_1_nl;
+  wire [4:0] FpWidthDec_8U_23U_6U_10U_0U_1U_else_2_FpWidthDec_8U_23U_6U_10U_0U_1U_else_2_and_nl;
+  wire [9:0] FpWidthDec_8U_23U_6U_10U_0U_1U_else_2_nor_nl;
+  wire FpWidthDec_8U_23U_6U_10U_0U_1U_else_and_tmp;
+  wire FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_itm_8_1;
+  wire [8:0] FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_nl;
+  wire FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_else_mux_2_nl;
+  reg [2:0] FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_i_shift_acc_psp_1_sva_2;
+  reg FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_3;
+  reg FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_4;
+  reg FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_st_3;
+  reg FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_st_4;
+  wire [9:0] FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_mux_1_nl;
+  wire FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_itm_7_1;
+  wire [7:0] FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_nl;
+  reg FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs;
+  reg FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_3;
+  reg FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_4;
+  reg FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_st_3;
+  reg FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_st_4;
+  wire FpWidthDec_8U_23U_6U_10U_0U_1U_if_and_cse;
+  reg FpWidthDec_8U_23U_6U_10U_0U_1U_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_acc_8_svs_4;
+  reg FpWidthDec_8U_23U_6U_10U_0U_1U_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_acc_8_svs_st_3;
+  wire FpWidthDec_8U_23U_6U_10U_0U_1U_is_inf_lpi_1_dfm_3_mx0w0;
+  reg FpWidthDec_8U_23U_6U_10U_0U_1U_is_inf_lpi_1_dfm_5;
+  wire FpWidthDec_8U_23U_6U_10U_0U_1U_is_zero_lpi_1_dfm_2;
+  wire FpWidthDec_8U_23U_6U_10U_0U_1U_nand_tmp;
+  wire [5:0] FpWidthDec_8U_23U_6U_10U_0U_1U_o_expo_sva_3;
+  reg IsNaN_8U_23U_IsNaN_8U_23U_nand_itm_2;
+  wire IsNaN_8U_23U_IsNaN_8U_23U_nand_tmp;
+  reg IsNaN_8U_23U_land_lpi_1_dfm_2;
+  reg IsNaN_8U_23U_nor_itm_2;
+  wire IsNaN_8U_23U_nor_tmp;
+  wire and_14_nl;
+  wire and_42_cse;
+  wire and_48_rgt;
+  wire and_50_rgt;
+  wire and_53_rgt;
+  wire and_76_nl;
+  wire and_77_cse;
+  wire and_80_nl;
+  wire and_81_nl;
+  wire and_82_nl;
+  wire and_86_nl;
+  wire and_dcpl_15;
+  wire and_dcpl_16;
+  wire and_dcpl_17;
+  wire and_dcpl_29;
+  wire and_dcpl_9;
+  wire and_nl;
+  wire and_tmp;
+  output chn_a_rsc_lz;
+  input chn_a_rsc_vz;
+  input [31:0] chn_a_rsc_z;
+  wire chn_a_rsci_bawt;
+  wire [31:0] chn_a_rsci_d_mxwt;
+  reg chn_a_rsci_iswt0;
+  reg chn_a_rsci_ld_core_psct;
+  wire chn_a_rsci_ld_core_psct_mx0c0;
+  input chn_a_rsci_oswt;
+  output chn_a_rsci_oswt_unreg;
+  wire chn_a_rsci_wen_comp;
+  wire chn_o_and_cse;
+  output chn_o_rsc_lz;
+  input chn_o_rsc_vz;
+  output [16:0] chn_o_rsc_z;
+  wire chn_o_rsci_bawt;
+  reg [4:0] chn_o_rsci_d_14_10;
+  reg chn_o_rsci_d_15;
+  reg chn_o_rsci_d_16;
+  reg [9:0] chn_o_rsci_d_9_0;
+  wire chn_o_rsci_d_9_0_mx0c1;
+  reg chn_o_rsci_iswt0;
+  input chn_o_rsci_oswt;
+  output chn_o_rsci_oswt_unreg;
+  wire chn_o_rsci_wen_comp;
+  wire core_wen;
+  wire core_wten;
+  wire [1:0] fsm_output;
+  wire main_stage_en_1;
+  reg main_stage_v_1;
+  wire main_stage_v_1_mx0c1;
+  reg main_stage_v_2;
+  wire main_stage_v_2_mx0c1;
+  wire mux_10_nl;
+  wire mux_11_nl;
+  wire mux_12_nl;
+  wire mux_14_nl;
+  wire mux_15_nl;
+  wire mux_16_nl;
+  wire mux_19_nl;
+  wire mux_20_nl;
+  wire mux_2_nl;
+  wire mux_3_nl;
+  wire mux_4_nl;
+  wire mux_5_nl;
+  wire mux_6_nl;
+  wire mux_7_nl;
+  wire mux_8_nl;
+  wire mux_9_nl;
+  wire mux_tmp;
+  wire mux_tmp_1;
+  wire mux_tmp_13;
+  wire mux_tmp_18;
+  wire nand_5_nl;
+  wire nand_6_nl;
+  wire [5:0] nl_FpMantDecShiftRight_23U_8U_10U_guard_mask_acc_1_psp_sva;
+  wire [4:0] nl_FpMantDecShiftRight_23U_8U_10U_guard_mask_lshift_rg_s;
+  wire [22:0] nl_FpMantDecShiftRight_23U_8U_10U_i_mant_s_rshift_rg_a;
+  wire [3:0] nl_FpMantDecShiftRight_23U_8U_10U_i_mant_s_rshift_rg_s;
+  wire [11:0] nl_FpMantDecShiftRight_23U_8U_10U_o_mant_sum_sva;
+  wire [23:0] nl_FpMantDecShiftRight_23U_8U_10U_stick_mask_acc_nl;
+  wire [10:0] nl_FpMantRNE_24U_11U_else_acc_nl;
+  wire [9:0] nl_FpWidthDec_8U_23U_6U_10U_0U_1U_acc_nl;
+  wire [9:0] nl_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_nl;
+  wire [2:0] nl_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_i_shift_acc_psp_1_sva_2;
+  wire [8:0] nl_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_nl;
+  wire [6:0] nl_FpWidthDec_8U_23U_6U_10U_0U_1U_o_expo_sva_3;
+  wire [16:0] nl_HLS_fp32_to_fp17_core_chn_o_rsci_inst_chn_o_rsci_d;
+  wire nor_16_cse;
+  wire nor_17_nl;
+  wire nor_19_nl;
+  wire nor_20_cse;
+  wire nor_21_nl;
+  wire nor_23_nl;
+  wire nor_25_nl;
+  wire nor_26_nl;
+  wire nor_27_nl;
+  wire nor_28_nl;
+  wire nor_32_nl;
+  wire nor_nl;
+  wire not_tmp_20;
+  input nvdla_core_clk;
+  input nvdla_core_rstn;
+  wire or_16_nl;
+  wire or_2_nl;
+  wire or_34_nl;
+  wire or_9_cse;
+  wire or_dcpl_11;
+  wire or_tmp_11;
+  wire or_tmp_24;
+  wire or_tmp_28;
+  wire or_tmp_3;
+  wire or_tmp_50;
+  wire or_tmp_9;
+  reg reg_chn_o_rsci_ld_core_psct_cse;
+  assign nl_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_i_shift_acc_psp_1_sva_2 = _108_[2:0] + 1'b1;
+  assign FpMantRNE_24U_11U_else_acc_nl = FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_1_28_0_1[22:13] + FpMantRNE_24U_11U_else_carry_sva_2;
+  assign nl_FpMantDecShiftRight_23U_8U_10U_guard_mask_lshift_rg_s = FpMantDecShiftRight_23U_8U_10U_guard_mask_acc_1_psp_sva + 5'b11111;
+  wire [8:0] fangyuan0;
+  assign fangyuan0 = { 1'b1, _143_ };
+
+  assign FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_nl = fangyuan0 + 7'b1100001;
+  assign FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_nl = chn_a_rsci_d_mxwt[30:24] + 8'b11010101;
+  assign FpWidthDec_8U_23U_6U_10U_0U_1U_acc_nl = chn_a_rsci_d_mxwt[30:23] + 9'b101100001;
+  assign FpMantDecShiftRight_23U_8U_10U_o_mant_sum_sva = FpMantDecShiftRight_23U_8U_10U_i_mant_s_slc_FpMantDecShiftRight_23U_8U_10U_i_mant_s_rshift_23_13_itm_2 + FpMantDecShiftRight_23U_8U_10U_carry_and_itm_2;
+  wire [5:0] fangyuan1;
+  assign fangyuan1 = { _001_, FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_1_28_0_1[27:23] };
+
+  assign FpWidthDec_8U_23U_6U_10U_0U_1U_o_expo_sva_3 = fangyuan1 + 1'b1;
+  assign FpMantDecShiftRight_23U_8U_10U_stick_mask_acc_nl = FpMantDecShiftRight_23U_8U_10U_guard_mask_sva[22:0] + 23'b11111111111111111111111;
+  wire [3:0] fangyuan2;
+  assign fangyuan2 = { FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_i_shift_acc_psp_1_sva_2, nl_FpMantDecShiftRight_23U_8U_10U_i_mant_s_rshift_rg_s[0] };
+
+  assign FpMantDecShiftRight_23U_8U_10U_guard_mask_acc_1_psp_sva = fangyuan2 + 4'b1101;
+  assign _049_ = _048_ & mux_5_nl;
+  assign _050_ = _048_ & mux_7_nl;
+  assign _051_ = _048_ & mux_9_nl;
+  assign _052_ = _048_ & mux_10_nl;
+  assign _053_ = core_wen & _153_;
+  assign _054_ = _154_ & _156_;
+  assign _055_ = _048_ & mux_15_nl;
+  assign _056_ = _048_ & mux_tmp_13;
+  assign _057_ = FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_else_mux_2_nl & _118_;
+  assign _058_ = _048_ & not_tmp_20;
+  assign _059_ = nor_16_cse & or_9_cse;
+  assign _060_ = core_wen & _158_;
+  assign _061_ = _060_ & mux_19_nl;
+  assign _062_ = core_wen & _161_;
+  assign _063_ = _062_ & not_tmp_20;
+  assign _064_ = core_wen & _162_;
+  assign _065_ = _064_ & mux_tmp;
+  assign _066_ = _048_ & mux_20_nl;
+  assign _067_ = and_dcpl_29 & _119_;
+  assign _068_ = _067_ & FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_nl[8];
+  assign _069_ = core_wen & _163_;
+  assign _070_ = _069_ & mux_tmp;
+  assign _071_ = core_wen & _121_;
+  assign _072_ = core_wen & _123_;
+  assign _073_ = or_tmp_9 & FpMantRNE_24U_11U_else_and_svs;
+  assign _074_ = _073_ & _172_;
+  assign and_nl = chn_a_rsci_bawt & _126_;
+  assign and_82_nl = or_tmp_11 & FpMantRNE_24U_11U_else_and_svs_2;
+  assign and_14_nl = FpWidthDec_8U_23U_6U_10U_0U_1U_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_acc_8_svs_st_3 & and_42_cse;
+  assign _075_ = or_9_cse & mux_tmp_18;
+  assign and_76_nl = _191_ & main_stage_v_2;
+  assign _076_ = FpWidthDec_8U_23U_6U_10U_0U_1U_acc_nl[8] & chn_a_rsci_bawt;
+  assign _077_ = or_tmp_11 & main_stage_v_1;
+  assign _078_ = _077_ & FpWidthDec_8U_23U_6U_10U_0U_1U_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_acc_8_svs_st_3;
+  assign _079_ = _078_ & _139_;
+  assign _080_ = _079_ & FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_st_3;
+  assign _081_ = _080_ & _140_;
+  assign and_86_nl = _081_ & FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_3;
+  wire [4:0] fangyuan3;
+  assign fangyuan3 = { FpWidthDec_8U_23U_6U_10U_0U_1U_and_5_rgt, FpWidthDec_8U_23U_6U_10U_0U_1U_and_5_rgt, FpWidthDec_8U_23U_6U_10U_0U_1U_and_5_rgt, FpWidthDec_8U_23U_6U_10U_0U_1U_and_5_rgt, FpWidthDec_8U_23U_6U_10U_0U_1U_and_5_rgt };
+
+  assign _082_ = 5'b11110 & fangyuan3;
+  wire [4:0] fangyuan4;
+  assign fangyuan4 = { FpWidthDec_8U_23U_6U_10U_0U_1U_and_3_rgt, FpWidthDec_8U_23U_6U_10U_0U_1U_and_3_rgt, FpWidthDec_8U_23U_6U_10U_0U_1U_and_3_rgt, FpWidthDec_8U_23U_6U_10U_0U_1U_and_3_rgt, FpWidthDec_8U_23U_6U_10U_0U_1U_and_3_rgt };
+
+  assign _083_ = FpWidthDec_8U_23U_6U_10U_0U_1U_o_expo_sva_3[4:0] & fangyuan4;
+  wire [4:0] fangyuan5;
+  assign fangyuan5 = { FpWidthDec_8U_23U_6U_10U_0U_1U_and_2_rgt, FpWidthDec_8U_23U_6U_10U_0U_1U_and_2_rgt, FpWidthDec_8U_23U_6U_10U_0U_1U_and_2_rgt, FpWidthDec_8U_23U_6U_10U_0U_1U_and_2_rgt, FpWidthDec_8U_23U_6U_10U_0U_1U_and_2_rgt };
+
+  assign _084_ = FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_1_28_0_1[27:23] & fangyuan5;
+  wire [4:0] fangyuan6;
+  assign fangyuan6 = { FpWidthDec_8U_23U_6U_10U_0U_1U_and_4_rgt, FpWidthDec_8U_23U_6U_10U_0U_1U_and_4_rgt, FpWidthDec_8U_23U_6U_10U_0U_1U_and_4_rgt, FpWidthDec_8U_23U_6U_10U_0U_1U_and_4_rgt, FpWidthDec_8U_23U_6U_10U_0U_1U_and_4_rgt };
+
+  assign _085_ = 1'b1 & fangyuan6;
+  assign chn_o_and_cse = core_wen & _141_;
+  assign FpWidthDec_8U_23U_6U_10U_0U_1U_if_and_cse = _048_ & mux_tmp;
+  assign and_42_cse = or_9_cse & main_stage_v_1;
+  assign FpMantDecShiftRight_23U_8U_10U_i_mant_s_and_cse = _048_ & mux_11_nl;
+  assign _048_ = core_wen & _116_;
+  assign Fp32ToFp17_and_1_cse = _048_ & mux_16_nl;
+  assign and_77_cse = FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_4 & FpWidthDec_8U_23U_6U_10U_0U_1U_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_acc_8_svs_4;
+  assign and_48_rgt = or_tmp_11 & or_9_cse;
+  assign FpWidthDec_8U_23U_6U_10U_0U_1U_and_4_rgt = FpWidthDec_8U_23U_6U_10U_0U_1U_FpWidthDec_8U_23U_6U_10U_0U_1U_nor_ssc & _116_;
+  assign _086_ = _142_ & FpWidthDec_8U_23U_6U_10U_0U_1U_and_1_m1c;
+  assign FpWidthDec_8U_23U_6U_10U_0U_1U_and_2_rgt = _086_ & _116_;
+  assign _087_ = FpMantRNE_24U_11U_else_and_svs_2 & FpWidthDec_8U_23U_6U_10U_0U_1U_and_1_m1c;
+  assign FpWidthDec_8U_23U_6U_10U_0U_1U_and_3_rgt = _087_ & _116_;
+  assign FpWidthDec_8U_23U_6U_10U_0U_1U_and_5_rgt = FpWidthDec_8U_23U_6U_10U_0U_1U_is_inf_lpi_1_dfm_3_mx0w0 & _116_;
+  assign and_50_rgt = or_9_cse & _122_;
+  assign and_53_rgt = or_dcpl_11 & or_9_cse;
+  assign FpMantRNE_24U_11U_else_and_svs_mx0w0 = FpMantRNE_24U_11U_else_carry_sva_mx0w0 & _109_;
+  assign _088_ = _110_ & FpMantRNE_24U_11U_else_and_svs_2;
+  assign _089_ = _088_ & FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_3;
+  assign _090_ = _089_ & _140_;
+  assign _091_ = FpWidthDec_8U_23U_6U_10U_0U_1U_nand_tmp & FpWidthDec_8U_23U_6U_10U_0U_1U_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_acc_8_svs_st_3;
+  assign FpMantRNE_24U_11U_else_carry_sva_mx0w0 = chn_a_rsci_d_mxwt[12] & _216_;
+  assign FpWidthDec_8U_23U_6U_10U_0U_1U_is_zero_lpi_1_dfm_2 = _218_ & FpWidthDec_8U_23U_6U_10U_0U_1U_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_acc_8_svs_4;
+  assign main_stage_en_1 = chn_a_rsci_bawt & or_9_cse;
+  assign FpMantDecShiftRight_23U_8U_10U_guard_bits_22_0_sva = FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_1_28_0_1[22:0] & FpMantDecShiftRight_23U_8U_10U_guard_mask_sva[22:0];
+  assign FpMantDecShiftRight_23U_8U_10U_stick_bits_22_0_sva = FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_1_28_0_1[22:0] & FpMantDecShiftRight_23U_8U_10U_stick_mask_acc_nl;
+  assign FpMantDecShiftRight_23U_8U_10U_least_bits_22_0_sva = FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_1_28_0_1[22:0] & FpMantDecShiftRight_23U_8U_10U_least_mask_sva[22:0];
+  assign FpWidthDec_8U_23U_6U_10U_0U_1U_and_1_m1c = FpWidthDec_8U_23U_6U_10U_0U_1U_else_and_tmp & _091_;
+  assign FpWidthDec_8U_23U_6U_10U_0U_1U_else_and_tmp = FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_3 & _140_;
+  assign and_dcpl_29 = FpWidthDec_8U_23U_6U_10U_0U_1U_acc_nl[8] & or_9_cse;
+  assign and_tmp = and_dcpl_29 & chn_a_rsci_bawt;
+  assign and_80_nl = FpWidthDec_8U_23U_6U_10U_0U_1U_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_acc_8_svs_4 & main_stage_v_2;
+  assign _092_ = and_80_nl & reg_chn_o_rsci_ld_core_psct_cse;
+  assign and_81_nl = _092_ & _145_;
+  assign _093_ = FpWidthDec_8U_23U_6U_10U_0U_1U_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_acc_8_svs_st_3 & FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_3;
+  assign _094_ = or_9_cse & or_tmp_28;
+  assign _095_ = FpWidthDec_8U_23U_6U_10U_0U_1U_nand_tmp & FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_3;
+  assign _096_ = _095_ & FpWidthDec_8U_23U_6U_10U_0U_1U_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_acc_8_svs_st_3;
+  assign _097_ = _096_ & _140_;
+  assign and_dcpl_9 = _145_ & reg_chn_o_rsci_ld_core_psct_cse;
+  assign and_dcpl_15 = or_9_cse & main_stage_v_2;
+  assign and_dcpl_16 = chn_o_rsci_bawt & reg_chn_o_rsci_ld_core_psct_cse;
+  assign and_dcpl_17 = and_dcpl_16 & _133_;
+  assign or_tmp_50 = main_stage_en_1 & fsm_output[1];
+  assign chn_o_rsci_d_9_0_mx0c1 = and_dcpl_15 & _147_;
+  assign _098_ = main_stage_v_1 & _120_;
+  assign main_stage_v_1_mx0c1 = _098_ & or_9_cse;
+  assign _099_ = or_9_cse & _002_;
+  assign main_stage_v_2_mx0c1 = _099_ & main_stage_v_2;
+  assign _100_ = _148_ & fsm_output[1];
+  assign _101_ = core_wen & chn_a_rsci_ld_core_psct_mx0c0;
+  assign _102_ = FpWidthDec_8U_23U_6U_10U_0U_1U_FpWidthDec_8U_23U_6U_10U_0U_1U_mux1h_itm_1_5_1 & _150_;
+  assign _103_ = and_dcpl_15 & IsNaN_8U_23U_land_lpi_1_dfm_2;
+  assign _104_ = core_wen & _224_;
+  assign _105_ = core_wen & _225_;
+  assign _106_ = core_wen & _226_;
+  assign _107_ = _048_ & mux_3_nl;
+  assign _109_ = chn_a_rsci_d_mxwt[22:13] == 10'b1111111111;
+  assign _110_ = FpWidthDec_8U_23U_6U_10U_0U_1U_o_expo_sva_3 == 6'b111111;
+  assign _111_ = chn_a_rsci_d_mxwt[30:23] == 8'b11111111;
+  assign _112_ = | FpMantDecShiftRight_23U_8U_10U_guard_bits_22_0_sva;
+  assign _113_ = | FpMantDecShiftRight_23U_8U_10U_stick_bits_22_0_sva;
+  assign _114_ = | FpMantDecShiftRight_23U_8U_10U_least_bits_22_0_sva;
+  assign _115_ = | chn_a_rsci_d_mxwt[22:0];
+  assign _116_ = ~ and_dcpl_9;
+  assign _117_ = ~ main_stage_v_2_mx0c1;
+  assign _119_ = ~ FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_nl[7];
+  assign _120_ = ~ chn_a_rsci_bawt;
+  assign _121_ = ~ _166_;
+  assign _122_ = ~ FpWidthDec_8U_23U_6U_10U_0U_1U_acc_nl[8];
+  assign _123_ = ~ _168_;
+  assign FpWidthDec_8U_23U_6U_10U_0U_1U_else_2_nor_nl = ~ _003_;
+  assign FpWidthDec_8U_23U_6U_10U_0U_1U_else_2_FpWidthDec_8U_23U_6U_10U_0U_1U_else_2_FpWidthDec_8U_23U_6U_10U_0U_1U_else_2_nor_1_nl = ~ _004_;
+  assign _108_[2:0] = ~ chn_a_rsci_d_mxwt[26:24];
+  assign _000_ = ~ or_tmp_3;
+  assign _124_ = ~ and_tmp;
+  assign nor_nl = ~ _169_;
+  assign _125_ = ~ FpWidthDec_8U_23U_6U_10U_0U_1U_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_acc_8_svs_st_3;
+  assign _126_ = ~ _074_;
+  assign _127_ = ~ FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_3;
+  assign _128_ = ~ _173_;
+  assign _129_ = ~ FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_st_3;
+  assign _130_ = ~ _175_;
+  assign _002_ = ~ main_stage_v_1;
+  assign nor_32_nl = ~ _178_;
+  assign _131_ = ~ FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_nl[8];
+  assign nor_28_nl = ~ _179_;
+  assign nor_27_nl = ~ _182_;
+  assign _132_ = ~ FpWidthDec_8U_23U_6U_10U_0U_1U_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_acc_8_svs_4;
+  assign _133_ = ~ main_stage_v_2;
+  assign _134_ = ~ reg_chn_o_rsci_ld_core_psct_cse;
+  assign nor_23_nl = ~ _187_;
+  assign _001_ = ~ FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_1_28_0_1[28];
+  assign nand_5_nl = ~ _075_;
+  assign nor_19_nl = ~ _188_;
+  assign _135_ = ~ FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_4;
+  assign _136_ = ~ _190_;
+  assign _137_ = ~ or_tmp_9;
+  assign _138_ = ~ _076_;
+  assign nor_17_nl = ~ _194_;
+  assign _139_ = ~ FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_st_3;
+  assign _140_ = ~ FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_3;
+  assign nl_FpMantDecShiftRight_23U_8U_10U_i_mant_s_rshift_rg_s[0] = ~ FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_1_28_0_1[23];
+  assign _141_ = ~ _198_;
+  assign nor_25_nl = ~ _201_;
+  assign nor_26_nl = ~ _204_;
+  assign nor_16_cse = ~ or_tmp_11;
+  assign nor_20_cse = ~ or_9_cse;
+  assign _142_ = ~ FpMantRNE_24U_11U_else_and_svs_2;
+  assign _143_ = ~ chn_a_rsci_d_mxwt[30:23];
+  assign FpWidthDec_8U_23U_6U_10U_0U_1U_nand_tmp = ~ _090_;
+  assign FpWidthDec_8U_23U_6U_10U_0U_1U_is_inf_lpi_1_dfm_3_mx0w0 = ~ _091_;
+  assign IsNaN_8U_23U_nor_tmp = ~ _115_;
+  assign IsNaN_8U_23U_IsNaN_8U_23U_nand_tmp = ~ _111_;
+  assign _144_ = ~ _217_;
+  assign FpWidthDec_8U_23U_6U_10U_0U_1U_FpWidthDec_8U_23U_6U_10U_0U_1U_nor_ssc = ~ _118_;
+  assign _145_ = ~ chn_o_rsci_bawt;
+  assign _146_ = ~ _077_;
+  assign nand_6_nl = ~ _094_;
+  assign nor_21_nl = ~ _219_;
+  assign _147_ = ~ IsNaN_8U_23U_land_lpi_1_dfm_2;
+  assign _148_ = ~ main_stage_en_1;
+  assign _149_ = ~ _100_;
+  assign _150_ = ~ FpWidthDec_8U_23U_6U_10U_0U_1U_is_zero_lpi_1_dfm_2;
+  assign _151_ = ~ and_dcpl_17;
+  assign _152_ = ~ main_stage_v_1_mx0c1;
+  assign _153_ = and_42_cse | main_stage_v_2_mx0c1;
+  assign _154_ = _112_ | FpMantDecShiftRight_23U_8U_10U_guard_mask_sva[23];
+  assign _155_ = _113_ | _114_;
+  assign _156_ = _155_ | FpMantDecShiftRight_23U_8U_10U_least_mask_sva[23];
+  assign _157_ = _057_ | FpWidthDec_8U_23U_6U_10U_0U_1U_is_inf_lpi_1_dfm_3_mx0w0;
+  assign _158_ = _059_ | and_48_rgt;
+  assign _159_ = FpWidthDec_8U_23U_6U_10U_0U_1U_and_4_rgt | FpWidthDec_8U_23U_6U_10U_0U_1U_and_2_rgt;
+  assign _160_ = _159_ | FpWidthDec_8U_23U_6U_10U_0U_1U_and_3_rgt;
+  assign _161_ = _160_ | FpWidthDec_8U_23U_6U_10U_0U_1U_and_5_rgt;
+  assign _162_ = and_dcpl_29 | and_50_rgt;
+  assign _163_ = _068_ | and_53_rgt;
+  assign _164_ = and_dcpl_9 | _120_;
+  assign _165_ = _164_ | or_dcpl_11;
+  assign _166_ = _165_ | fsm_output[0];
+  assign _167_ = _164_ | _122_;
+  assign _168_ = _167_ | fsm_output[0];
+  assign or_2_nl = FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_nl[8] | FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_nl[7];
+  assign _169_ = or_2_nl | _124_;
+  assign _170_ = FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_st_3 | FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_st_3;
+  assign _171_ = _170_ | _125_;
+  assign _172_ = FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_nl[7] | _122_;
+  assign _173_ = FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_3 | _127_;
+  assign _174_ = _128_ | _129_;
+  assign _175_ = _174_ | FpMantRNE_24U_11U_else_and_svs_st_2;
+  assign _176_ = _130_ | _125_;
+  assign _177_ = _176_ | FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_st_3;
+  assign _178_ = _177_ | _002_;
+  assign or_16_nl = _131_ | FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_nl[7];
+  assign _179_ = or_16_nl | _124_;
+  assign _180_ = _129_ | FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_st_3;
+  assign _181_ = _180_ | _125_;
+  assign _182_ = FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_nl[7] | _124_;
+  assign _183_ = FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_st_3 | _125_;
+  assign _184_ = FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_st_4 | _132_;
+  assign _185_ = _184_ | _133_;
+  assign _186_ = _185_ | _134_;
+  assign _187_ = _186_ | chn_o_rsci_bawt;
+  assign _188_ = nor_20_cse | mux_tmp_18;
+  assign _189_ = and_77_cse | FpWidthDec_8U_23U_6U_10U_0U_1U_is_inf_lpi_1_dfm_5;
+  assign _190_ = _189_ | _135_;
+  assign _191_ = _136_ | IsNaN_8U_23U_land_lpi_1_dfm_2;
+  assign _192_ = _137_ | _131_;
+  assign _193_ = _192_ | FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_nl[7];
+  assign _194_ = _193_ | _138_;
+  assign _195_ = _082_ | _083_;
+  assign _196_ = _195_ | _084_;
+  assign _197_ = _196_ | _085_;
+  assign _198_ = and_dcpl_9 | _133_;
+  assign or_9_cse = _134_ | chn_o_rsci_bawt;
+  assign _199_ = _002_ | _125_;
+  assign _200_ = _199_ | FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_st_3;
+  assign _201_ = _200_ | FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_st_3;
+  assign _202_ = _133_ | _132_;
+  assign _203_ = _202_ | FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_st_4;
+  assign _204_ = _203_ | FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_st_4;
+  assign or_tmp_11 = IsNaN_8U_23U_IsNaN_8U_23U_nand_itm_2 | IsNaN_8U_23U_nor_itm_2;
+  assign _205_ = chn_a_rsci_d_mxwt[0] | chn_a_rsci_d_mxwt[1];
+  assign _206_ = _205_ | chn_a_rsci_d_mxwt[2];
+  assign _207_ = _206_ | chn_a_rsci_d_mxwt[3];
+  assign _208_ = _207_ | chn_a_rsci_d_mxwt[4];
+  assign _209_ = _208_ | chn_a_rsci_d_mxwt[5];
+  assign _210_ = _209_ | chn_a_rsci_d_mxwt[6];
+  assign _211_ = _210_ | chn_a_rsci_d_mxwt[7];
+  assign _212_ = _211_ | chn_a_rsci_d_mxwt[8];
+  assign _213_ = _212_ | chn_a_rsci_d_mxwt[9];
+  assign _214_ = _213_ | chn_a_rsci_d_mxwt[10];
+  assign _215_ = _214_ | chn_a_rsci_d_mxwt[11];
+  assign _216_ = _215_ | chn_a_rsci_d_mxwt[13];
+  assign _217_ = FpMantDecShiftRight_23U_8U_10U_o_mant_sum_sva[10] | FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_4;
+  assign _218_ = _144_ | FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_4;
+  assign _118_ = FpWidthDec_8U_23U_6U_10U_0U_1U_else_and_tmp | FpWidthDec_8U_23U_6U_10U_0U_1U_is_inf_lpi_1_dfm_3_mx0w0;
+  assign or_tmp_3 = or_9_cse | _002_;
+  assign or_tmp_9 = IsNaN_8U_23U_IsNaN_8U_23U_nand_tmp | IsNaN_8U_23U_nor_tmp;
+  assign or_tmp_24 = nor_20_cse | main_stage_v_1;
+  assign or_tmp_28 = _093_ | _146_;
+  assign _219_ = nor_20_cse | or_tmp_28;
+  assign _220_ = and_77_cse | IsNaN_8U_23U_land_lpi_1_dfm_2;
+  assign _221_ = _220_ | _133_;
+  assign _222_ = _002_ | IsNaN_8U_23U_nor_itm_2;
+  assign or_34_nl = _222_ | IsNaN_8U_23U_IsNaN_8U_23U_nand_itm_2;
+  assign or_dcpl_11 = _172_ | _131_;
+  assign chn_a_rsci_ld_core_psct_mx0c0 = main_stage_en_1 | fsm_output[0];
+  assign _223_ = _102_ | IsNaN_8U_23U_land_lpi_1_dfm_2;
+  assign _224_ = _103_ | chn_o_rsci_d_9_0_mx0c1;
+  assign _225_ = and_dcpl_15 | and_dcpl_17;
+  assign _226_ = or_tmp_50 | main_stage_v_1_mx0c1;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs <= 1'b0;
+    else
+      FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs <= _022_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      FpMantRNE_24U_11U_else_and_svs <= 1'b0;
+    else
+      FpMantRNE_24U_11U_else_and_svs <= _007_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      FpMantRNE_24U_11U_else_and_svs_2 <= 1'b0;
+    else
+      FpMantRNE_24U_11U_else_and_svs_2 <= _008_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      FpMantRNE_24U_11U_else_carry_sva_2 <= 1'b0;
+    else
+      FpMantRNE_24U_11U_else_carry_sva_2 <= _010_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_3 <= 1'b0;
+    else
+      FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_3 <= _023_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      FpWidthDec_8U_23U_6U_10U_0U_1U_FpWidthDec_8U_23U_6U_10U_0U_1U_mux1h_itm_1_4_0_1 <= 5'b00000;
+    else
+      FpWidthDec_8U_23U_6U_10U_0U_1U_FpWidthDec_8U_23U_6U_10U_0U_1U_mux1h_itm_1_4_0_1 <= _011_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_2_9_0_1 <= 10'b0000000000;
+    else
+      FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_2_9_0_1 <= _016_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      FpWidthDec_8U_23U_6U_10U_0U_1U_is_inf_lpi_1_dfm_5 <= 1'b0;
+    else
+      FpWidthDec_8U_23U_6U_10U_0U_1U_is_inf_lpi_1_dfm_5 <= _029_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      IsNaN_8U_23U_land_lpi_1_dfm_2 <= 1'b0;
+    else
+      IsNaN_8U_23U_land_lpi_1_dfm_2 <= _031_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_4 <= 1'b0;
+    else
+      FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_4 <= _019_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      FpWidthDec_8U_23U_6U_10U_0U_1U_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_acc_8_svs_4 <= 1'b0;
+    else
+      FpWidthDec_8U_23U_6U_10U_0U_1U_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_acc_8_svs_4 <= _027_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_4 <= 1'b0;
+    else
+      FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_4 <= _024_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_2_31_1 <= 1'b0;
+    else
+      FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_2_31_1 <= _015_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      FpWidthDec_8U_23U_6U_10U_0U_1U_FpWidthDec_8U_23U_6U_10U_0U_1U_mux1h_itm_1_5_1 <= 1'b0;
+    else
+      FpWidthDec_8U_23U_6U_10U_0U_1U_FpWidthDec_8U_23U_6U_10U_0U_1U_mux1h_itm_1_5_1 <= _012_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_st_4 <= 1'b0;
+    else
+      FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_st_4 <= _026_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_st_4 <= 1'b0;
+    else
+      FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_st_4 <= _021_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      FpMantDecShiftRight_23U_8U_10U_i_mant_s_slc_FpMantDecShiftRight_23U_8U_10U_i_mant_s_rshift_23_13_itm_2 <= 11'b00000000000;
+    else
+      FpMantDecShiftRight_23U_8U_10U_i_mant_s_slc_FpMantDecShiftRight_23U_8U_10U_i_mant_s_rshift_23_13_itm_2 <= _006_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      FpMantDecShiftRight_23U_8U_10U_carry_and_itm_2 <= 1'b0;
+    else
+      FpMantDecShiftRight_23U_8U_10U_carry_and_itm_2 <= _005_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      main_stage_v_2 <= 1'b0;
+    else
+      main_stage_v_2 <= _041_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      IsNaN_8U_23U_nor_itm_2 <= 1'b0;
+    else
+      IsNaN_8U_23U_nor_itm_2 <= _032_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      IsNaN_8U_23U_IsNaN_8U_23U_nand_itm_2 <= 1'b0;
+    else
+      IsNaN_8U_23U_IsNaN_8U_23U_nand_itm_2 <= _030_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_3 <= 1'b0;
+    else
+      FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_3 <= _018_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      FpWidthDec_8U_23U_6U_10U_0U_1U_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_acc_8_svs_st_3 <= 1'b0;
+    else
+      FpWidthDec_8U_23U_6U_10U_0U_1U_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_acc_8_svs_st_3 <= _028_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_1_31_1 <= 1'b0;
+    else
+      FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_1_31_1 <= _014_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_st_3 <= 1'b0;
+    else
+      FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_st_3 <= _025_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_st_3 <= 1'b0;
+    else
+      FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_st_3 <= _020_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      FpMantRNE_24U_11U_else_and_svs_st_2 <= 1'b0;
+    else
+      FpMantRNE_24U_11U_else_and_svs_st_2 <= _009_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_1_28_0_1 <= 29'b00000000000000000000000000000;
+    else
+      FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_1_28_0_1 <= _013_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_i_shift_acc_psp_1_sva_2 <= 3'b000;
+    else
+      FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_i_shift_acc_psp_1_sva_2 <= _017_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      main_stage_v_1 <= 1'b0;
+    else
+      main_stage_v_1 <= _040_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      reg_chn_o_rsci_ld_core_psct_cse <= 1'b0;
+    else
+      reg_chn_o_rsci_ld_core_psct_cse <= _042_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      chn_o_rsci_d_9_0 <= 10'b0000000000;
+    else
+      chn_o_rsci_d_9_0 <= _038_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      chn_o_rsci_d_16 <= 1'b0;
+    else
+      chn_o_rsci_d_16 <= _037_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      chn_o_rsci_d_15 <= 1'b0;
+    else
+      chn_o_rsci_d_15 <= _036_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      chn_o_rsci_d_14_10 <= 5'b00000;
+    else
+      chn_o_rsci_d_14_10 <= _035_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      chn_a_rsci_ld_core_psct <= 1'b0;
+    else
+      chn_a_rsci_ld_core_psct <= _034_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      chn_o_rsci_iswt0 <= 1'b0;
+    else
+      chn_o_rsci_iswt0 <= _039_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      chn_a_rsci_iswt0 <= 1'b0;
+    else
+      chn_a_rsci_iswt0 <= _033_;
+  assign mux_20_nl = or_9_cse ? nor_17_nl : and_86_nl;
+  assign mux_19_nl = and_76_nl ? nand_5_nl : nor_19_nl;
+  assign FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_else_mux_2_nl = FpMantRNE_24U_11U_else_and_svs_2 ? FpWidthDec_8U_23U_6U_10U_0U_1U_o_expo_sva_3[5] : _001_;
+  assign mux_15_nl = FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_st_3 ? nor_23_nl : mux_14_nl;
+  assign mux_14_nl = FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_st_4 ? and_14_nl : mux_tmp_13;
+  assign mux_10_nl = FpWidthDec_8U_23U_6U_10U_0U_1U_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_acc_8_svs_st_3 ? mux_tmp_1 : and_tmp;
+  assign mux_9_nl = _183_ ? nor_27_nl : mux_8_nl;
+  assign mux_8_nl = FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_nl[7] ? _000_ : mux_tmp_1;
+  assign mux_7_nl = _181_ ? nor_28_nl : mux_6_nl;
+  assign mux_6_nl = or_16_nl ? _000_ : mux_tmp_1;
+  assign mux_5_nl = or_9_cse ? and_nl : mux_4_nl;
+  assign mux_4_nl = and_82_nl ? nor_32_nl : main_stage_v_1;
+  assign mux_3_nl = _171_ ? nor_nl : mux_2_nl;
+  assign mux_2_nl = or_2_nl ? _000_ : mux_tmp_1;
+  assign _004_ = FpWidthDec_8U_23U_6U_10U_0U_1U_is_zero_lpi_1_dfm_2 ? 10'b1111111111 : FpWidthDec_8U_23U_6U_10U_0U_1U_else_2_nor_nl;
+  assign _003_ = FpWidthDec_8U_23U_6U_10U_0U_1U_is_inf_lpi_1_dfm_5 ? 10'b1111111111 : FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_mux_1_nl;
+  assign FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_mux_1_nl = FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_4 ? FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_2_9_0_1 : FpMantDecShiftRight_23U_8U_10U_o_mant_sum_sva[9:0];
+  assign FpWidthDec_8U_23U_6U_10U_0U_1U_else_2_FpWidthDec_8U_23U_6U_10U_0U_1U_else_2_and_nl = FpWidthDec_8U_23U_6U_10U_0U_1U_is_zero_lpi_1_dfm_2 ? 5'b00000 : FpWidthDec_8U_23U_6U_10U_0U_1U_FpWidthDec_8U_23U_6U_10U_0U_1U_mux1h_itm_1_4_0_1;
+  assign mux_tmp_18 = _097_ ? _002_ : or_34_nl;
+  assign not_tmp_20 = _221_ ? nor_21_nl : nand_6_nl;
+  assign mux_tmp_13 = FpWidthDec_8U_23U_6U_10U_0U_1U_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_acc_8_svs_st_3 ? mux_12_nl : and_81_nl;
+  assign mux_12_nl = and_80_nl ? or_tmp_24 : and_42_cse;
+  assign mux_tmp_1 = FpWidthDec_8U_23U_6U_10U_0U_1U_acc_nl[8] ? mux_tmp : _000_;
+  assign mux_tmp = or_9_cse ? chn_a_rsci_bawt : main_stage_v_1;
+  assign mux_16_nl = main_stage_v_2 ? or_tmp_24 : and_42_cse;
+  assign mux_11_nl = or_9_cse ? nor_25_nl : nor_26_nl;
+  assign _022_ = _072_ ? FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_nl[7] : FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs;
+  assign _007_ = _071_ ? FpMantRNE_24U_11U_else_and_svs_mx0w0 : FpMantRNE_24U_11U_else_and_svs;
+  assign _044_ = and_53_rgt ? FpMantRNE_24U_11U_else_and_svs : FpMantRNE_24U_11U_else_and_svs_mx0w0;
+  assign _008_ = _070_ ? _044_ : FpMantRNE_24U_11U_else_and_svs_2;
+  assign _010_ = _066_ ? FpMantRNE_24U_11U_else_carry_sva_mx0w0 : FpMantRNE_24U_11U_else_carry_sva_2;
+  assign _043_ = and_50_rgt ? FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs : FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_nl[7];
+  assign _023_ = _065_ ? _043_ : FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_3;
+  assign _011_ = _063_ ? _197_ : FpWidthDec_8U_23U_6U_10U_0U_1U_FpWidthDec_8U_23U_6U_10U_0U_1U_mux1h_itm_1_4_0_1;
+  assign _045_ = and_48_rgt ? FpMantRNE_24U_11U_else_acc_nl : FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_1_28_0_1[9:0];
+  assign _016_ = _061_ ? _045_ : FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_2_9_0_1;
+  assign _029_ = _058_ ? FpWidthDec_8U_23U_6U_10U_0U_1U_is_inf_lpi_1_dfm_3_mx0w0 : FpWidthDec_8U_23U_6U_10U_0U_1U_is_inf_lpi_1_dfm_5;
+  assign _012_ = Fp32ToFp17_and_1_cse ? _157_ : FpWidthDec_8U_23U_6U_10U_0U_1U_FpWidthDec_8U_23U_6U_10U_0U_1U_mux1h_itm_1_5_1;
+  assign _015_ = Fp32ToFp17_and_1_cse ? FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_1_31_1 : FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_2_31_1;
+  assign _024_ = Fp32ToFp17_and_1_cse ? FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_3 : FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_4;
+  assign _027_ = Fp32ToFp17_and_1_cse ? FpWidthDec_8U_23U_6U_10U_0U_1U_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_acc_8_svs_st_3 : FpWidthDec_8U_23U_6U_10U_0U_1U_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_acc_8_svs_4;
+  assign _019_ = Fp32ToFp17_and_1_cse ? FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_3 : FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_4;
+  assign _031_ = Fp32ToFp17_and_1_cse ? nor_16_cse : IsNaN_8U_23U_land_lpi_1_dfm_2;
+  assign _026_ = _056_ ? FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_st_3 : FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_st_4;
+  assign _021_ = _055_ ? FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_st_3 : FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_st_4;
+  assign _005_ = FpMantDecShiftRight_23U_8U_10U_i_mant_s_and_cse ? _054_ : FpMantDecShiftRight_23U_8U_10U_carry_and_itm_2;
+  assign _006_ = FpMantDecShiftRight_23U_8U_10U_i_mant_s_and_cse ? FpMantDecShiftRight_23U_8U_10U_i_mant_s_rshift_itm[23:13] : FpMantDecShiftRight_23U_8U_10U_i_mant_s_slc_FpMantDecShiftRight_23U_8U_10U_i_mant_s_rshift_23_13_itm_2;
+  assign _041_ = _053_ ? _117_ : main_stage_v_2;
+  assign _014_ = FpWidthDec_8U_23U_6U_10U_0U_1U_if_and_cse ? chn_a_rsci_d_mxwt[31] : FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_1_31_1;
+  assign _028_ = FpWidthDec_8U_23U_6U_10U_0U_1U_if_and_cse ? FpWidthDec_8U_23U_6U_10U_0U_1U_acc_nl[8] : FpWidthDec_8U_23U_6U_10U_0U_1U_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_acc_8_svs_st_3;
+  assign _018_ = FpWidthDec_8U_23U_6U_10U_0U_1U_if_and_cse ? FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_nl[8] : FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_3;
+  assign _030_ = FpWidthDec_8U_23U_6U_10U_0U_1U_if_and_cse ? IsNaN_8U_23U_IsNaN_8U_23U_nand_tmp : IsNaN_8U_23U_IsNaN_8U_23U_nand_itm_2;
+  assign _032_ = FpWidthDec_8U_23U_6U_10U_0U_1U_if_and_cse ? IsNaN_8U_23U_nor_tmp : IsNaN_8U_23U_nor_itm_2;
+  assign _025_ = _052_ ? FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_nl[7] : FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_7_svs_st_3;
+  assign _020_ = _051_ ? FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_nl[8] : FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_slc_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_8_svs_st_3;
+  assign _009_ = _050_ ? FpMantRNE_24U_11U_else_and_svs_mx0w0 : FpMantRNE_24U_11U_else_and_svs_st_2;
+  assign _013_ = _049_ ? chn_a_rsci_d_mxwt[28:0] : FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_1_28_0_1;
+  assign _017_ = _107_ ? nl_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_i_shift_acc_psp_1_sva_2 : FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_i_shift_acc_psp_1_sva_2;
+  assign _040_ = _106_ ? _152_ : main_stage_v_1;
+  assign _042_ = _105_ ? _151_ : reg_chn_o_rsci_ld_core_psct_cse;
+  assign _046_ = chn_o_rsci_d_9_0_mx0c1 ? FpWidthDec_8U_23U_6U_10U_0U_1U_else_2_FpWidthDec_8U_23U_6U_10U_0U_1U_else_2_FpWidthDec_8U_23U_6U_10U_0U_1U_else_2_nor_1_nl : FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_2_9_0_1;
+  assign _038_ = _104_ ? _046_ : chn_o_rsci_d_9_0;
+  assign _047_ = IsNaN_8U_23U_land_lpi_1_dfm_2 ? 5'b11111 : FpWidthDec_8U_23U_6U_10U_0U_1U_else_2_FpWidthDec_8U_23U_6U_10U_0U_1U_else_2_and_nl;
+  assign _035_ = chn_o_and_cse ? _047_ : chn_o_rsci_d_14_10;
+  assign _036_ = chn_o_and_cse ? _223_ : chn_o_rsci_d_15;
+  assign _037_ = chn_o_and_cse ? FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_2_31_1 : chn_o_rsci_d_16;
+  assign _034_ = _101_ ? chn_a_rsci_ld_core_psct_mx0c0 : chn_a_rsci_ld_core_psct;
+  assign _033_ = core_wen ? _149_ : chn_a_rsci_iswt0;
+  assign _039_ = core_wen ? and_dcpl_15 : chn_o_rsci_iswt0;
+  \$paramod\FP32_TO_FP17_mgc_shift_l_v4\width_a=1\signd_a=0\width_s=5\width_z=24 FpMantDecShiftRight_23U_8U_10U_guard_mask_lshift_rg (
+    .a(1'b1),
+    .s(nl_FpMantDecShiftRight_23U_8U_10U_guard_mask_lshift_rg_s),
+    .z(FpMantDecShiftRight_23U_8U_10U_guard_mask_sva)
+  );
+  \$paramod\FP32_TO_FP17_mgc_shift_r_v4\width_a=24\signd_a=0\width_s=4\width_z=24 FpMantDecShiftRight_23U_8U_10U_i_mant_s_rshift_rg (
+    .a({ 1'b1, FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_1_28_0_1[22:0] }),
+    .s({ FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_i_shift_acc_psp_1_sva_2, nl_FpMantDecShiftRight_23U_8U_10U_i_mant_s_rshift_rg_s[0] }),
+    .z(FpMantDecShiftRight_23U_8U_10U_i_mant_s_rshift_itm)
+  );
+  \$paramod\FP32_TO_FP17_mgc_shift_l_v4\width_a=1\signd_a=0\width_s=5\width_z=24 FpMantDecShiftRight_23U_8U_10U_least_mask_lshift_rg (
+    .a(1'b1),
+    .s(FpMantDecShiftRight_23U_8U_10U_guard_mask_acc_1_psp_sva),
+    .z(FpMantDecShiftRight_23U_8U_10U_least_mask_sva)
+  );
+  HLS_fp32_to_fp17_core_chn_a_rsci HLS_fp32_to_fp17_core_chn_a_rsci_inst (
+    .chn_a_rsc_lz(chn_a_rsc_lz),
+    .chn_a_rsc_vz(chn_a_rsc_vz),
+    .chn_a_rsc_z(chn_a_rsc_z),
+    .chn_a_rsci_bawt(chn_a_rsci_bawt),
+    .chn_a_rsci_d_mxwt(chn_a_rsci_d_mxwt),
+    .chn_a_rsci_iswt0(chn_a_rsci_iswt0),
+    .chn_a_rsci_ld_core_psct(chn_a_rsci_ld_core_psct),
+    .chn_a_rsci_oswt(chn_a_rsci_oswt),
+    .chn_a_rsci_wen_comp(chn_a_rsci_wen_comp),
+    .core_wen(core_wen),
+    .core_wten(core_wten),
+    .nvdla_core_clk(nvdla_core_clk),
+    .nvdla_core_rstn(nvdla_core_rstn)
+  );
+  HLS_fp32_to_fp17_core_chn_o_rsci HLS_fp32_to_fp17_core_chn_o_rsci_inst (
+    .chn_o_rsc_lz(chn_o_rsc_lz),
+    .chn_o_rsc_vz(chn_o_rsc_vz),
+    .chn_o_rsc_z(chn_o_rsc_z),
+    .chn_o_rsci_bawt(chn_o_rsci_bawt),
+    .chn_o_rsci_d({ chn_o_rsci_d_16, chn_o_rsci_d_15, chn_o_rsci_d_14_10, chn_o_rsci_d_9_0 }),
+    .chn_o_rsci_iswt0(chn_o_rsci_iswt0),
+    .chn_o_rsci_ld_core_psct(reg_chn_o_rsci_ld_core_psct_cse),
+    .chn_o_rsci_oswt(chn_o_rsci_oswt),
+    .chn_o_rsci_wen_comp(chn_o_rsci_wen_comp),
+    .core_wen(core_wen),
+    .core_wten(core_wten),
+    .nvdla_core_clk(nvdla_core_clk),
+    .nvdla_core_rstn(nvdla_core_rstn)
+  );
+  HLS_fp32_to_fp17_core_core_fsm HLS_fp32_to_fp17_core_core_fsm_inst (
+    .core_wen(core_wen),
+    .fsm_output(fsm_output),
+    .nvdla_core_clk(nvdla_core_clk),
+    .nvdla_core_rstn(nvdla_core_rstn)
+  );
+  HLS_fp32_to_fp17_core_staller HLS_fp32_to_fp17_core_staller_inst (
+    .chn_a_rsci_wen_comp(chn_a_rsci_wen_comp),
+    .chn_o_rsci_wen_comp(chn_o_rsci_wen_comp),
+    .core_wen(core_wen),
+    .core_wten(core_wten),
+    .nvdla_core_clk(nvdla_core_clk),
+    .nvdla_core_rstn(nvdla_core_rstn)
+  );
+  assign FpWidthDec_8U_23U_6U_10U_0U_1U_acc_itm_8_1 = FpWidthDec_8U_23U_6U_10U_0U_1U_acc_nl[8];
+  assign FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_itm_8_1 = FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_nl[8];
+  assign FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_itm_7_1 = FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_nl[7];
+  assign chn_a_rsci_oswt_unreg = or_tmp_50;
+  assign chn_o_rsci_oswt_unreg = and_dcpl_16;
+  assign nl_FpMantDecShiftRight_23U_8U_10U_guard_mask_acc_1_psp_sva[4:0] = FpMantDecShiftRight_23U_8U_10U_guard_mask_acc_1_psp_sva;
+  assign nl_FpMantDecShiftRight_23U_8U_10U_i_mant_s_rshift_rg_a = FpWidthDec_8U_23U_6U_10U_0U_1U_bits_sva_1_28_0_1[22:0];
+  assign nl_FpMantDecShiftRight_23U_8U_10U_i_mant_s_rshift_rg_s[3:1] = FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_if_i_shift_acc_psp_1_sva_2;
+  assign nl_FpMantDecShiftRight_23U_8U_10U_o_mant_sum_sva[10:0] = FpMantDecShiftRight_23U_8U_10U_o_mant_sum_sva;
+  assign nl_FpMantDecShiftRight_23U_8U_10U_stick_mask_acc_nl[22:0] = FpMantDecShiftRight_23U_8U_10U_stick_mask_acc_nl;
+  assign nl_FpMantRNE_24U_11U_else_acc_nl[9:0] = FpMantRNE_24U_11U_else_acc_nl;
+  assign nl_FpWidthDec_8U_23U_6U_10U_0U_1U_acc_nl[8:0] = FpWidthDec_8U_23U_6U_10U_0U_1U_acc_nl;
+  assign nl_FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_nl[8:0] = FpWidthDec_8U_23U_6U_10U_0U_1U_else_else_acc_nl;
+  assign nl_FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_nl[7:0] = FpWidthDec_8U_23U_6U_10U_0U_1U_else_if_acc_nl;
+  assign nl_FpWidthDec_8U_23U_6U_10U_0U_1U_o_expo_sva_3[5:0] = FpWidthDec_8U_23U_6U_10U_0U_1U_o_expo_sva_3;
+  assign nl_HLS_fp32_to_fp17_core_chn_o_rsci_inst_chn_o_rsci_d = { chn_o_rsci_d_16, chn_o_rsci_d_15, chn_o_rsci_d_14_10, chn_o_rsci_d_9_0 };
+endmodule

@@ -1,0 +1,11 @@
+module \$paramod\CDMA_mgc_out_stdreg_wait_v1\rscid=7\width=16 (ld, vd, d, lz, vz, z);
+  input [15:0] d;
+  input ld;
+  output lz;
+  output vd;
+  input vz;
+  output [15:0] z;
+  assign lz = ld;
+  assign vd = vz;
+  assign z = d;
+endmodule

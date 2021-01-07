@@ -1,0 +1,4 @@
+(define-fun INV ( (|inWord| (_ BitVec 9)) (|word_sum| (_ BitVec 9))  ) (_ BitVec 9)
+  (bvadd #b000000000
+     (bvadd (concat #x00 ((_ extract 2 2) |inWord|))
+            (concat #x00 ((_ extract 1 1) |inWord|)))))

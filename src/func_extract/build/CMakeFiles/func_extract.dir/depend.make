@@ -9,6 +9,7 @@ CMakeFiles/func_extract.dir/src/ast.cpp.o: /workspace/research/ILA/autoGenILA/sr
 CMakeFiles/func_extract.dir/src/ast.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/helper.h
 CMakeFiles/func_extract.dir/src/ast.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/op_taint_gen.h
 CMakeFiles/func_extract.dir/src/ast.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/pass_info.h
+CMakeFiles/func_extract.dir/src/ast.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/syntax_patterns.h
 CMakeFiles/func_extract.dir/src/ast.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/taint_gen.h
 CMakeFiles/func_extract.dir/src/ast.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/varWidth.h
 CMakeFiles/func_extract.dir/src/ast.cpp.o: /workspace/tools/z3-4.8.8/z3/src/api/c++/z3++.h
@@ -34,6 +35,7 @@ CMakeFiles/func_extract.dir/src/auxiliary_files_gen.cpp.o: /workspace/research/I
 CMakeFiles/func_extract.dir/src/auxiliary_files_gen.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/helper.h
 CMakeFiles/func_extract.dir/src/auxiliary_files_gen.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/op_taint_gen.h
 CMakeFiles/func_extract.dir/src/auxiliary_files_gen.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/pass_info.h
+CMakeFiles/func_extract.dir/src/auxiliary_files_gen.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/syntax_patterns.h
 CMakeFiles/func_extract.dir/src/auxiliary_files_gen.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/taint_gen.h
 CMakeFiles/func_extract.dir/src/auxiliary_files_gen.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/varWidth.h
 CMakeFiles/func_extract.dir/src/auxiliary_files_gen.cpp.o: /workspace/tools/z3-4.8.8/z3/src/api/c++/z3++.h
@@ -60,6 +62,7 @@ CMakeFiles/func_extract.dir/src/check_regs.cpp.o: /workspace/research/ILA/autoGe
 CMakeFiles/func_extract.dir/src/check_regs.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/helper.h
 CMakeFiles/func_extract.dir/src/check_regs.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/op_taint_gen.h
 CMakeFiles/func_extract.dir/src/check_regs.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/pass_info.h
+CMakeFiles/func_extract.dir/src/check_regs.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/syntax_patterns.h
 CMakeFiles/func_extract.dir/src/check_regs.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/taint_gen.h
 CMakeFiles/func_extract.dir/src/check_regs.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/varWidth.h
 CMakeFiles/func_extract.dir/src/check_regs.cpp.o: /workspace/tools/z3-4.8.8/z3/src/api/c++/z3++.h
@@ -85,6 +88,7 @@ CMakeFiles/func_extract.dir/src/clean_goal.cpp.o: /workspace/research/ILA/autoGe
 CMakeFiles/func_extract.dir/src/clean_goal.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/helper.h
 CMakeFiles/func_extract.dir/src/clean_goal.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/op_taint_gen.h
 CMakeFiles/func_extract.dir/src/clean_goal.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/pass_info.h
+CMakeFiles/func_extract.dir/src/clean_goal.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/syntax_patterns.h
 CMakeFiles/func_extract.dir/src/clean_goal.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/taint_gen.h
 CMakeFiles/func_extract.dir/src/clean_goal.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/varWidth.h
 CMakeFiles/func_extract.dir/src/clean_goal.cpp.o: /workspace/tools/z3-4.8.8/z3/src/api/c++/z3++.h
@@ -106,6 +110,7 @@ CMakeFiles/func_extract.dir/src/clean_verilog.cpp.o: /workspace/research/ILA/aut
 CMakeFiles/func_extract.dir/src/clean_verilog.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/helper.h
 CMakeFiles/func_extract.dir/src/clean_verilog.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/op_taint_gen.h
 CMakeFiles/func_extract.dir/src/clean_verilog.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/pass_info.h
+CMakeFiles/func_extract.dir/src/clean_verilog.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/syntax_patterns.h
 CMakeFiles/func_extract.dir/src/clean_verilog.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/taint_gen.h
 CMakeFiles/func_extract.dir/src/clean_verilog.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/varWidth.h
 CMakeFiles/func_extract.dir/src/clean_verilog.cpp.o: /workspace/tools/z3-4.8.8/z3/src/api/c++/z3++.h
@@ -131,6 +136,7 @@ CMakeFiles/func_extract.dir/src/expr.cpp.o: /workspace/research/ILA/autoGenILA/s
 CMakeFiles/func_extract.dir/src/expr.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/helper.h
 CMakeFiles/func_extract.dir/src/expr.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/op_taint_gen.h
 CMakeFiles/func_extract.dir/src/expr.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/pass_info.h
+CMakeFiles/func_extract.dir/src/expr.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/syntax_patterns.h
 CMakeFiles/func_extract.dir/src/expr.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/taint_gen.h
 CMakeFiles/func_extract.dir/src/expr.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/varWidth.h
 CMakeFiles/func_extract.dir/src/expr.cpp.o: /workspace/tools/z3-4.8.8/z3/src/api/c++/z3++.h
@@ -155,6 +161,7 @@ CMakeFiles/func_extract.dir/src/helper.cpp.o: /workspace/research/ILA/autoGenILA
 CMakeFiles/func_extract.dir/src/helper.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/helper.h
 CMakeFiles/func_extract.dir/src/helper.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/op_taint_gen.h
 CMakeFiles/func_extract.dir/src/helper.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/pass_info.h
+CMakeFiles/func_extract.dir/src/helper.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/syntax_patterns.h
 CMakeFiles/func_extract.dir/src/helper.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/taint_gen.h
 CMakeFiles/func_extract.dir/src/helper.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/varWidth.h
 CMakeFiles/func_extract.dir/src/helper.cpp.o: /workspace/tools/z3-4.8.8/z3/src/api/c++/z3++.h
@@ -179,6 +186,7 @@ CMakeFiles/func_extract.dir/src/inv_gen.cpp.o: /workspace/research/ILA/autoGenIL
 CMakeFiles/func_extract.dir/src/inv_gen.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/helper.h
 CMakeFiles/func_extract.dir/src/inv_gen.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/op_taint_gen.h
 CMakeFiles/func_extract.dir/src/inv_gen.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/pass_info.h
+CMakeFiles/func_extract.dir/src/inv_gen.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/syntax_patterns.h
 CMakeFiles/func_extract.dir/src/inv_gen.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/taint_gen.h
 CMakeFiles/func_extract.dir/src/inv_gen.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/varWidth.h
 CMakeFiles/func_extract.dir/src/inv_gen.cpp.o: /workspace/tools/z3-4.8.8/z3/src/api/c++/z3++.h
@@ -212,6 +220,7 @@ CMakeFiles/func_extract.dir/src/main.cpp.o: /workspace/research/ILA/autoGenILA/s
 CMakeFiles/func_extract.dir/src/main.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/helper.h
 CMakeFiles/func_extract.dir/src/main.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/op_taint_gen.h
 CMakeFiles/func_extract.dir/src/main.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/pass_info.h
+CMakeFiles/func_extract.dir/src/main.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/syntax_patterns.h
 CMakeFiles/func_extract.dir/src/main.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/taint_gen.h
 CMakeFiles/func_extract.dir/src/main.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/varWidth.h
 CMakeFiles/func_extract.dir/src/main.cpp.o: /workspace/tools/z3-4.8.8/z3/src/api/c++/z3++.h
@@ -236,6 +245,7 @@ CMakeFiles/func_extract.dir/src/make_define_fun.cpp.o: /workspace/research/ILA/a
 CMakeFiles/func_extract.dir/src/make_define_fun.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/helper.h
 CMakeFiles/func_extract.dir/src/make_define_fun.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/op_taint_gen.h
 CMakeFiles/func_extract.dir/src/make_define_fun.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/pass_info.h
+CMakeFiles/func_extract.dir/src/make_define_fun.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/syntax_patterns.h
 CMakeFiles/func_extract.dir/src/make_define_fun.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/taint_gen.h
 CMakeFiles/func_extract.dir/src/make_define_fun.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/varWidth.h
 CMakeFiles/func_extract.dir/src/make_define_fun.cpp.o: /workspace/tools/z3-4.8.8/z3/src/api/c++/z3++.h
@@ -262,6 +272,7 @@ CMakeFiles/func_extract.dir/src/op_constraint.cpp.o: /workspace/research/ILA/aut
 CMakeFiles/func_extract.dir/src/op_constraint.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/helper.h
 CMakeFiles/func_extract.dir/src/op_constraint.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/op_taint_gen.h
 CMakeFiles/func_extract.dir/src/op_constraint.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/pass_info.h
+CMakeFiles/func_extract.dir/src/op_constraint.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/syntax_patterns.h
 CMakeFiles/func_extract.dir/src/op_constraint.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/taint_gen.h
 CMakeFiles/func_extract.dir/src/op_constraint.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/varWidth.h
 CMakeFiles/func_extract.dir/src/op_constraint.cpp.o: /workspace/tools/z3-4.8.8/z3/src/api/c++/z3++.h
@@ -286,6 +297,7 @@ CMakeFiles/func_extract.dir/src/parse_fill.cpp.o: /workspace/research/ILA/autoGe
 CMakeFiles/func_extract.dir/src/parse_fill.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/helper.h
 CMakeFiles/func_extract.dir/src/parse_fill.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/op_taint_gen.h
 CMakeFiles/func_extract.dir/src/parse_fill.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/pass_info.h
+CMakeFiles/func_extract.dir/src/parse_fill.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/syntax_patterns.h
 CMakeFiles/func_extract.dir/src/parse_fill.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/taint_gen.h
 CMakeFiles/func_extract.dir/src/parse_fill.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/varWidth.h
 CMakeFiles/func_extract.dir/src/parse_fill.cpp.o: /workspace/tools/z3-4.8.8/z3/src/api/c++/z3++.h
@@ -310,6 +322,7 @@ CMakeFiles/func_extract.dir/src/pseudo_vlg_gen.cpp.o: /workspace/research/ILA/au
 CMakeFiles/func_extract.dir/src/pseudo_vlg_gen.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/helper.h
 CMakeFiles/func_extract.dir/src/pseudo_vlg_gen.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/op_taint_gen.h
 CMakeFiles/func_extract.dir/src/pseudo_vlg_gen.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/pass_info.h
+CMakeFiles/func_extract.dir/src/pseudo_vlg_gen.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/syntax_patterns.h
 CMakeFiles/func_extract.dir/src/pseudo_vlg_gen.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/taint_gen.h
 CMakeFiles/func_extract.dir/src/pseudo_vlg_gen.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/varWidth.h
 CMakeFiles/func_extract.dir/src/pseudo_vlg_gen.cpp.o: /workspace/tools/z3-4.8.8/z3/src/api/c++/z3++.h
@@ -325,8 +338,6 @@ CMakeFiles/func_extract.dir/src/pseudo_vlg_gen.cpp.o: /workspace/tools/z3-4.8.8/
 CMakeFiles/func_extract.dir/src/pseudo_vlg_gen.cpp.o: /workspace/tools/z3-4.8.8/z3/src/api/z3_rcf.h
 CMakeFiles/func_extract.dir/src/pseudo_vlg_gen.cpp.o: /workspace/tools/z3-4.8.8/z3/src/api/z3_spacer.h
 
-CMakeFiles/func_extract.dir/src/trial.cpp.o: ../src/trial.cpp
-
 CMakeFiles/func_extract.dir/src/vcd_parser.cpp.o: ../src/ast.h
 CMakeFiles/func_extract.dir/src/vcd_parser.cpp.o: ../src/global_data_struct.h
 CMakeFiles/func_extract.dir/src/vcd_parser.cpp.o: ../src/helper.h
@@ -336,6 +347,7 @@ CMakeFiles/func_extract.dir/src/vcd_parser.cpp.o: /workspace/research/ILA/autoGe
 CMakeFiles/func_extract.dir/src/vcd_parser.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/helper.h
 CMakeFiles/func_extract.dir/src/vcd_parser.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/op_taint_gen.h
 CMakeFiles/func_extract.dir/src/vcd_parser.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/pass_info.h
+CMakeFiles/func_extract.dir/src/vcd_parser.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/syntax_patterns.h
 CMakeFiles/func_extract.dir/src/vcd_parser.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/taint_gen.h
 CMakeFiles/func_extract.dir/src/vcd_parser.cpp.o: /workspace/research/ILA/autoGenILA/src/taint_method/src/varWidth.h
 CMakeFiles/func_extract.dir/src/vcd_parser.cpp.o: /workspace/tools/z3-4.8.8/z3/src/api/c++/z3++.h

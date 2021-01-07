@@ -1,0 +1,514 @@
+\u_frontend.u_decode.u_fifo.data0_out_o(skip) 1
+RESULT: 
+(goals
+(goal
+  (= |\\u_frontend.u_decode.u_fifo.data0_out_o___#1000| #x000010b7))
+)
+
+////
+\u_exec0.imm20_r(skip) 1
+(goals
+(goal
+  (= |\\u_exec0.imm20_r___#1000| #x00000000))
+)
+
+////
+fetch0_instr_w(skip) 1
+(goals
+(goal
+  (= |fetch0_instr_w___#1000| #x000010b7))
+)
+
+////
+\u_csr.opcode_opcode_i(skip) 1
+(goals
+(goal
+  (= |\\u_csr.opcode_opcode_i___#1000| #x00000000))
+)
+
+/////
+\u_issue.slot0_valid_r(skip) 1
+(goals
+(goal
+  (= |\\u_issue.slot0_valid_r___#1000| #b0))   // This variable is VERY important but wrong!
+)
+
+/////
+\u_issue.fetch0_valid_i(skip) 1
+(goals
+(goal
+  (= |\\u_issue.fetch0_valid_i___#1000| #b1))
+)
+
+///////
+\u_issue.fetch0_pc_i(skip) 1
+(goals
+(goal
+  (= |\\u_issue.fetch0_pc_i___#1000| #x00000000))
+)
+
+/////
+\u_issue.pc_x_q(skip) 1
+(goals
+(goal
+  (= |\\u_issue.pc_x_q___#1000| #x00000000))
+)
+
+/////
+fangyuan196(skip) 1
+(goals
+(goal
+  (= |fangyuan196___#1000| #b000000000000000000000000000000))
+)
+
+/////
+_3093_(skip) 1
+(goals
+(goal
+  (= |_3093____#1000| #b1))
+)
+
+/////
+_3282_(skip) 1
+(goals
+(goal
+  (= |_3282____#1000| #b1))    This is WRONG!!!
+)
+
+/////
+\u_issue.squash_w(skip) 1
+(goals
+(goal
+  (= |\\u_issue.squash_w___#1000| #b0))
+)
+
+
+/////
+\u_csr.branch_q(skip) 1
+(goals
+(goal
+  (= |\\u_csr.branch_q___#1000| #b1)) ??? why this is still 1 ???
+)
+
+////
+\u_csr.csr_branch_w(skip) 1
+(goals
+(goal
+  (= |\\u_csr.csr_branch_w___#1000| #b0)) // reset value is also 0
+)
+
+/////
+_3282_(skip) 1
+(goals
+(goal
+  (= |_3282____#1000| #b1)) 
+)
+
+/////
+\u_issue.squash_w(skip) 1
+(goals
+(goal
+  (= |\\u_issue.squash_w___#1000| #b0))
+)
+
+/////
+\u_csr.reset_q(skip) 1
+(goals
+(goal
+  (= |\\u_csr.reset_q___#1000| #b0))  // reset value is 0
+)
+
+
+
+///------------ After re-define reset values
+\u_issue.u_regfile.REGFILE.reg_r1_q(skip) 5
+(goals
+(goal
+  (= |\\u_issue.u_regfile.REGFILE.reg_r1_q___#1004|
+     |\\u_issue.u_regfile.REGFILE.reg_r1_q___#5|))
+)
+
+
+////
+\u_csr.opcode_opcode_i(skip) 1
+(goals
+(goal
+  (= |\\u_csr.opcode_opcode_i___#1000| #x00000000))
+)
+
+
+///
+\u_issue.slot0_valid_r(skip) 1
+(goals
+(goal
+  (= |\\u_issue.slot0_valid_r___#1000| #b0))
+)
+
+
+////
+\u_issue.squash_w(skip) 1
+(goals
+(goal
+  (= |\\u_issue.squash_w___#1000| #b0))
+)
+
+
+////
+\u_csr.branch_q(skip) 1
+(goals
+(goal
+  (= |\\u_csr.branch_q___#1000| #b0))
+)
+
+
+\u_issue.fetch0_valid_i(skip) 1
+(goals
+(goal
+  (= |\\u_issue.fetch0_valid_i___#1000| #b1))
+)
+
+\u_issue.fetch0_pc_i(skip) 1
+(goals
+(goal
+  (= |\\u_issue.fetch0_pc_i___#1000| #x80000030)) # This is different from previous case, but wrong!!
+)
+
+
+\u_issue.pc_x_q(skip) 1
+(goals
+(goal
+  (= |\\u_issue.pc_x_q___#1000| #x80000008))
+)
+
+
+\u_frontend.u_decode.u_fifo.pc_in_i(skip) 1
+(goals
+(goal
+  (= |\\u_frontend.u_decode.u_fifo.pc_in_i___#1000| #x80000040))
+)
+
+
+\u_frontend.u_fetch.skid_valid_q(skip) 1
+(goals
+(goal
+  (= |\\u_frontend.u_fetch.skid_valid_q___#1000| #b0))
+)
+
+
+\u_frontend.u_fetch.pc_d_q(skip) 1
+(goals
+(goal
+  (= |\\u_frontend.u_fetch.pc_d_q___#1000| #x80000040))
+)
+
+
+\u_frontend.u_fetch.pc_f_q(skip) 1
+(goals
+(goal
+  (= |\\u_frontend.u_fetch.pc_f_q___#1000| #x80000048)) # problem happens for assigment to pc_f_q
+)
+
+
+\u_frontend.fetch_pc_f_w(skip) 1
+(goals
+(goal
+  (= |\\u_frontend.fetch_pc_f_w___#1000| #x80000008))
+)
+
+
+\u_frontend.u_npc.next_pc_f_o(skip) 1
+(goals
+(goal
+  (= |\\u_frontend.u_npc.next_pc_f_o___#1000| #x80000010))
+)
+
+
+\u_frontend.u_fetch.branch_pc_w(skip) 1
+(goals
+(goal
+  (= |\\u_frontend.u_fetch.branch_pc_w___#1000| #x80000008))
+)
+
+
+// After using new vcd parser
+\u_issue.fetch0_pc_i(skip) 1
+(goals
+(goal
+  (= |\\u_issue.fetch0_pc_i___#1000| #x80000088))
+)
+
+\u_issue.slot0_valid_r(skip) 1
+(goals
+(goal
+  (= |\\u_issue.slot0_valid_r___#1000| #b0))
+)
+
+
+\u_issue.pc_x_q(skip) 1
+(goals
+(goal
+  (= |\\u_issue.pc_x_q___#1000| #x80000080))
+)
+
+
+\u_issue.dual_issue_w(skip) 1
+(goals
+(goal
+  (= |\\u_issue.dual_issue_w___#1000| #b0))
+)
+
+
+\u_issue.opcode_b_accept_r(skip) 1
+(goals
+(goal
+  (= |\\u_issue.opcode_b_accept_r___#1000| #b0))
+)
+
+\u_issue.opcode_b_issue_r(skip) 1
+(goals
+(goal
+  (= |\\u_issue.opcode_b_issue_r___#1000| #b0))
+)
+
+\u_issue.dual_issue_ok_w(skip) 1
+(goals
+(goal
+  (= |\\u_issue.dual_issue_ok_w___#1000| #b1))
+)
+
+\u_issue.opcode_a_accept_r(skip) 1
+(goals
+(goal
+  (= |\\u_issue.opcode_a_accept_r___#1000| #b0))
+)
+
+\u_issue.opcode_b_valid_r(skip) 1
+(goals
+(goal
+  (= |\\u_issue.opcode_b_valid_r___#1000| #b0))
+)
+
+
+///////////////////// After re-generate waveform with design.v
+(goals
+(goal
+  (= |\\u_issue.pc_x_q___#1000| #x800000d4))
+)
+
+(goals
+(goal
+  (= |\\u_issue.dual_issue_w___#1000| #b0))
+)
+
+
+(goals
+(goal
+  (= |\\u_issue.fetch0_pc_i___#1000| #x800000d0))
+)
+
+
+(goals
+(goal
+  (= |\\u_issue.slot1_valid_r___#1000| #b1))
+)
+
+
+(goals
+(goal
+  (= |\\u_issue.fetch1_pc_i___#1000| #x800000d4))
+)
+
+(goals
+(goal
+  (= |\\u_exec0.imm20_r___#1000| #x00000000))
+)
+
+(goals
+(goal
+  (= |\\u_exec1.imm20_r___#1000| #x00000000))
+)
+
+(goals
+(goal
+  (= |\\u_issue.single_issue_w___#1000| #b1))
+)
+
+
+(goals
+(goal
+  (= |\\u_issue.u_regfile.REGFILE.reg_r1_q___#1005|
+     |\\u_issue.u_regfile.REGFILE.reg_r1_q___#6|))
+)
+
+
+
+
+
+//////////////////// After adjusting to timeIdx < bound
+(goals
+(goal
+  (= |\\u_issue.dual_issue_w___#1000| #b0))
+)
+
+(goals
+(goal
+  (= |\\u_issue.fetch0_pc_i___#1000| #x800000d0))
+)
+
+(goals
+(goal
+  (= |\\u_issue.pc_x_q___#1000| #x800000d0))
+)
+
+(goals
+(goal
+  (= |\\u_issue.single_issue_w___#1000| #b1))
+)
+
+(goals
+(goal
+  (= |\\u_issue.fetch1_valid_i___#1000| #b1))
+)
+
+// dual_issue_w related signals
+//// 1st args
+(goals
+(goal
+  (= |\\u_issue.opcode_b_accept_r___#1000| #b0))
+)
+
+(goals
+(goal
+  (= |\\u_issue.opcode_b_issue_r___#1000| #b0))
+)
+
+(goals
+(goal
+  (= |\\u_issue.take_interrupt_i___#1000| #b0))
+)
+
+//// 2rd args
+(goals
+(goal
+  (= |\\u_issue.opcode_a_accept_r___#1000| #b1))
+)
+
+(goals
+(goal
+  (= |\\u_issue.opcode_b_valid_r___#1000| #b1))
+)
+
+(goals
+(goal
+  (= |\\u_issue.slot0_valid_r___#1000| #b1))
+)
+
+(goals
+(goal
+  (= |\\u_issue.slot1_valid_r___#1000| #b0))
+)
+
+
+
+
+
+
+######################(goals
+######################(goal
+######################  (= |\\u_issue.csr_pending_q___#1000| #b0))
+######################)
+######################
+######################(goals
+######################(goal
+######################  (= |\\u_issue.div_pending_q___#1000| #b0))
+######################)
+
+(goals
+(goal
+  (= |\\u_issue.dual_issue_ok_w___#1000| #b0)) ?????? This is problematic
+)
+
+#####################(goals
+#####################(goal
+#####################  (= |\\u_issue.lsu_stall_i___#1000| #b0))
+#####################)
+#####################
+#####################(goals
+#####################(goal
+#####################  (= |\\u_issue.stall_w___#1000| #b0))
+#####################)
+
+(goals
+(goal
+  (= |_3089____#1000| #b0))
+)
+
+(goals
+(goal
+  (= |_3278____#1000| #b0))
+)
+
+(goals
+(goal
+  (= |_3281____#1000| #b1))
+)
+
+(goals
+(goal
+  (= |_3296____#1000| #b0))
+)
+
+
+
+(goals
+(goal
+  (= |\\u_issue.issue_a_exec_w___#1000| #b0))
+)
+
+(goals
+(goal
+  (= |\\u_issue.issue_a_lsu_w___#1000| #b0))
+)
+
+(goals
+(goal
+  (= |\\u_issue.issue_a_mul_w___#1000| #b0))
+)
+
+(goals
+(goal
+  (= |\\u_issue.issue_b_branch_w___#1000| #b0))
+)
+
+(goals
+(goal
+  (= |\\u_issue.issue_b_exec_w___#1000| #b0))
+)
+
+(goals
+(goal
+  (= |\\u_issue.issue_b_lsu_w___#1000| #b0))
+)
+
+(goals
+(goal
+  (= |\\u_issue.issue_b_mul_w___#1000| #b0))
+)
+
+(goals
+(goal
+  (= |\\u_issue.pipe1_ok_w___#1000| #b0))
+)
+
+(goals
+(goal
+  (= |\\u_issue.dual_issue_w___#1000| #b0))
+)
+
+
+// After correcting bug in long_bv_val
+(goals
+(goal
+  (= |\\u_issue.dual_issue_w___#1000| #b1))
+)
+

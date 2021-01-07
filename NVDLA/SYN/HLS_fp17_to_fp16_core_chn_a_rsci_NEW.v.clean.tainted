@@ -1,0 +1,392 @@
+  output chn_a_rsc_lz;
+  logic chn_a_rsc_lz ;
+  output chn_a_rsc_lz_T ;
+  logic chn_a_rsc_lz_T ;
+  logic chn_a_rsc_lz_R ;
+  logic chn_a_rsc_lz_C ;
+  logic chn_a_rsc_lz_X ;
+  logic [13:0] chn_a_rsc_lz_S ;
+  input chn_a_rsc_lz_R0 ;
+  input chn_a_rsc_lz_C0 ;
+  input chn_a_rsc_lz_X0 ;
+  output [13:0] chn_a_rsc_lz_S ;
+  input chn_a_rsc_vz;
+  input chn_a_rsc_vz_T ;
+  input [13:0] chn_a_rsc_vz_S ;
+  output chn_a_rsc_vz_R ;
+  output chn_a_rsc_vz_X ;
+  output chn_a_rsc_vz_C ;
+  input [16:0] chn_a_rsc_z;
+  input [16:0] chn_a_rsc_z_T ;
+  input [13:0] chn_a_rsc_z_S ;
+  output [16:0] chn_a_rsc_z_R ;
+  output [16:0] chn_a_rsc_z_X ;
+  output [16:0] chn_a_rsc_z_C ;
+  output chn_a_rsci_bawt;
+  logic chn_a_rsci_bawt ;
+  output chn_a_rsci_bawt_T ;
+  logic chn_a_rsci_bawt_T ;
+  logic chn_a_rsci_bawt_R ;
+  logic chn_a_rsci_bawt_C ;
+  logic chn_a_rsci_bawt_X ;
+  logic [13:0] chn_a_rsci_bawt_S ;
+  input chn_a_rsci_bawt_R0 ;
+  input chn_a_rsci_bawt_C0 ;
+  input chn_a_rsci_bawt_X0 ;
+  output [13:0] chn_a_rsci_bawt_S ;
+  logic chn_a_rsci_bdwt;
+  logic chn_a_rsci_bdwt_T ;
+  logic chn_a_rsci_bdwt_R ;
+  logic chn_a_rsci_bdwt_C ;
+  logic chn_a_rsci_bdwt_X ;
+  logic [13:0] chn_a_rsci_bdwt_S ;
+  logic chn_a_rsci_biwt;
+  logic chn_a_rsci_biwt_T ;
+  logic chn_a_rsci_biwt_R ;
+  logic chn_a_rsci_biwt_C ;
+  logic chn_a_rsci_biwt_X ;
+  logic [13:0] chn_a_rsci_biwt_S ;
+  logic [16:0] chn_a_rsci_d;
+  logic [16:0] chn_a_rsci_d_T ;
+  logic [16:0] chn_a_rsci_d_R ;
+  logic [16:0] chn_a_rsci_d_C ;
+  logic [16:0] chn_a_rsci_d_X ;
+  logic [13:0] chn_a_rsci_d_S ;
+  output [16:0] chn_a_rsci_d_mxwt;
+  logic [16:0] chn_a_rsci_d_mxwt ;
+  output [16:0] chn_a_rsci_d_mxwt_T ;
+  logic [16:0] chn_a_rsci_d_mxwt_T ;
+  logic [16:0] chn_a_rsci_d_mxwt_R ;
+  logic [16:0] chn_a_rsci_d_mxwt_C ;
+  logic [16:0] chn_a_rsci_d_mxwt_X ;
+  logic [13:0] chn_a_rsci_d_mxwt_S ;
+  input [16:0] chn_a_rsci_d_mxwt_R0 ;
+  input [16:0] chn_a_rsci_d_mxwt_C0 ;
+  input [16:0] chn_a_rsci_d_mxwt_X0 ;
+  output [13:0] chn_a_rsci_d_mxwt_S ;
+  input chn_a_rsci_iswt0;
+  input chn_a_rsci_iswt0_T ;
+  input [13:0] chn_a_rsci_iswt0_S ;
+  output chn_a_rsci_iswt0_R ;
+  output chn_a_rsci_iswt0_X ;
+  output chn_a_rsci_iswt0_C ;
+  input chn_a_rsci_ld_core_psct;
+  input chn_a_rsci_ld_core_psct_T ;
+  input [13:0] chn_a_rsci_ld_core_psct_S ;
+  output chn_a_rsci_ld_core_psct_R ;
+  output chn_a_rsci_ld_core_psct_X ;
+  output chn_a_rsci_ld_core_psct_C ;
+  logic chn_a_rsci_ld_core_sct;
+  logic chn_a_rsci_ld_core_sct_T ;
+  logic chn_a_rsci_ld_core_sct_R ;
+  logic chn_a_rsci_ld_core_sct_C ;
+  logic chn_a_rsci_ld_core_sct_X ;
+  logic [13:0] chn_a_rsci_ld_core_sct_S ;
+  input chn_a_rsci_oswt;
+  input chn_a_rsci_oswt_T ;
+  input [13:0] chn_a_rsci_oswt_S ;
+  output chn_a_rsci_oswt_R ;
+  output chn_a_rsci_oswt_X ;
+  output chn_a_rsci_oswt_C ;
+  logic chn_a_rsci_vd;
+  logic chn_a_rsci_vd_T ;
+  logic chn_a_rsci_vd_R ;
+  logic chn_a_rsci_vd_C ;
+  logic chn_a_rsci_vd_X ;
+  logic [13:0] chn_a_rsci_vd_S ;
+  output chn_a_rsci_wen_comp;
+  logic chn_a_rsci_wen_comp ;
+  output chn_a_rsci_wen_comp_T ;
+  logic chn_a_rsci_wen_comp_T ;
+  logic chn_a_rsci_wen_comp_R ;
+  logic chn_a_rsci_wen_comp_C ;
+  logic chn_a_rsci_wen_comp_X ;
+  logic [13:0] chn_a_rsci_wen_comp_S ;
+  input chn_a_rsci_wen_comp_R0 ;
+  input chn_a_rsci_wen_comp_C0 ;
+  input chn_a_rsci_wen_comp_X0 ;
+  output [13:0] chn_a_rsci_wen_comp_S ;
+  input core_wen;
+  input core_wen_T ;
+  input [13:0] core_wen_S ;
+  output core_wen_R ;
+  output core_wen_X ;
+  output core_wen_C ;
+  input core_wten;
+  input core_wten_T ;
+  input [13:0] core_wten_S ;
+  output core_wten_R ;
+  output core_wten_X ;
+  output core_wten_C ;
+  input nvdla_core_clk;
+  input nvdla_core_clk_T ;
+  input [13:0] nvdla_core_clk_S ;
+  output nvdla_core_clk_R ;
+  output nvdla_core_clk_X ;
+  output nvdla_core_clk_C ;
+  input nvdla_core_rstn;
+  input nvdla_core_rstn_T ;
+  input [13:0] nvdla_core_rstn_S ;
+  output nvdla_core_rstn_R ;
+  output nvdla_core_rstn_X ;
+  output nvdla_core_rstn_C ;
+  logic [0:0] chn_a_rsci_iswt0_R0 ;
+  logic [0:0] chn_a_rsci_iswt0_X0 ;
+  logic [0:0] chn_a_rsci_iswt0_C0 ;
+  logic [0:0] chn_a_rsci_ld_core_psct_R0 ;
+  logic [0:0] chn_a_rsci_ld_core_psct_X0 ;
+  logic [0:0] chn_a_rsci_ld_core_psct_C0 ;
+  logic [0:0] chn_a_rsci_oswt_R0 ;
+  logic [0:0] chn_a_rsci_oswt_X0 ;
+  logic [0:0] chn_a_rsci_oswt_C0 ;
+  logic [0:0] chn_a_rsci_vd_R0 ;
+  logic [0:0] chn_a_rsci_vd_X0 ;
+  logic [0:0] chn_a_rsci_vd_C0 ;
+  logic [0:0] core_wen_R0 ;
+  logic [0:0] core_wen_X0 ;
+  logic [0:0] core_wen_C0 ;
+  logic [0:0] core_wten_R0 ;
+  logic [0:0] core_wten_X0 ;
+  logic [0:0] core_wten_C0 ;
+  logic [0:0] nvdla_core_rstn_R0 ;
+  logic [0:0] nvdla_core_rstn_X0 ;
+  logic [0:0] nvdla_core_rstn_C0 ;
+// module: HLS_fp17_to_fp16_core_chn_a_rsci_chn_a_wait_ctrl
+  HLS_fp17_to_fp16_core_chn_a_rsci_chn_a_wait_ctrl HLS_fp17_to_fp16_core_chn_a_rsci_chn_a_wait_ctrl_inst (
+    .chn_a_rsci_iswt0_T (  chn_a_rsci_iswt0_T  ),
+    .chn_a_rsci_iswt0_R (  chn_a_rsci_iswt0_R0  ),
+    .chn_a_rsci_iswt0_X (  chn_a_rsci_iswt0_X0  ),
+    .chn_a_rsci_iswt0_C (  chn_a_rsci_iswt0_C0  ),
+    .chn_a_rsci_iswt0_S (  chn_a_rsci_iswt0_S  ),
+    .chn_a_rsci_ld_core_psct_T (  chn_a_rsci_ld_core_psct_T  ),
+    .chn_a_rsci_ld_core_psct_R (  chn_a_rsci_ld_core_psct_R0  ),
+    .chn_a_rsci_ld_core_psct_X (  chn_a_rsci_ld_core_psct_X0  ),
+    .chn_a_rsci_ld_core_psct_C (  chn_a_rsci_ld_core_psct_C0  ),
+    .chn_a_rsci_ld_core_psct_S (  chn_a_rsci_ld_core_psct_S  ),
+    .chn_a_rsci_oswt_T (  chn_a_rsci_oswt_T  ),
+    .chn_a_rsci_oswt_R (  chn_a_rsci_oswt_R0  ),
+    .chn_a_rsci_oswt_X (  chn_a_rsci_oswt_X0  ),
+    .chn_a_rsci_oswt_C (  chn_a_rsci_oswt_C0  ),
+    .chn_a_rsci_oswt_S (  chn_a_rsci_oswt_S  ),
+    .chn_a_rsci_vd_T (  chn_a_rsci_vd_T  ),
+    .chn_a_rsci_vd_R (  chn_a_rsci_vd_R0  ),
+    .chn_a_rsci_vd_X (  chn_a_rsci_vd_X0  ),
+    .chn_a_rsci_vd_C (  chn_a_rsci_vd_C0  ),
+    .chn_a_rsci_vd_S (  chn_a_rsci_vd_S  ),
+    .core_wen_T (  core_wen_T  ),
+    .core_wen_R (  core_wen_R0  ),
+    .core_wen_X (  core_wen_X0  ),
+    .core_wen_C (  core_wen_C0  ),
+    .core_wen_S (  core_wen_S  ),
+    .core_wten_T (  core_wten_T  ),
+    .core_wten_R (  core_wten_R0  ),
+    .core_wten_X (  core_wten_X0  ),
+    .core_wten_C (  core_wten_C0  ),
+    .core_wten_S (  core_wten_S  ),
+    .nvdla_core_rstn_T (  nvdla_core_rstn_T  ),
+    .nvdla_core_rstn_R (  nvdla_core_rstn_R0  ),
+    .nvdla_core_rstn_X (  nvdla_core_rstn_X0  ),
+    .nvdla_core_rstn_C (  nvdla_core_rstn_C0  ),
+    .nvdla_core_rstn_S (  nvdla_core_rstn_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .chn_a_rsci_bdwt_T (  chn_a_rsci_bdwt_T  ),
+    .chn_a_rsci_bdwt_R0 (  chn_a_rsci_bdwt_R  ),
+    .chn_a_rsci_bdwt_X0 (  chn_a_rsci_bdwt_X  ),
+    .chn_a_rsci_bdwt_C0 (  chn_a_rsci_bdwt_C  ),
+    .chn_a_rsci_bdwt_S ( chn_a_rsci_bdwt_S ),
+    .chn_a_rsci_biwt_T (  chn_a_rsci_biwt_T  ),
+    .chn_a_rsci_biwt_R0 (  chn_a_rsci_biwt_R  ),
+    .chn_a_rsci_biwt_X0 (  chn_a_rsci_biwt_X  ),
+    .chn_a_rsci_biwt_C0 (  chn_a_rsci_biwt_C  ),
+    .chn_a_rsci_biwt_S ( chn_a_rsci_biwt_S ),
+    .chn_a_rsci_ld_core_sct_T (  chn_a_rsci_ld_core_sct_T  ),
+    .chn_a_rsci_ld_core_sct_R0 (  chn_a_rsci_ld_core_sct_R  ),
+    .chn_a_rsci_ld_core_sct_X0 (  chn_a_rsci_ld_core_sct_X  ),
+    .chn_a_rsci_ld_core_sct_C0 (  chn_a_rsci_ld_core_sct_C  ),
+    .chn_a_rsci_ld_core_sct_S ( chn_a_rsci_ld_core_sct_S ),
+    .nvdla_core_rstn ( nvdla_core_rstn ),
+    .nvdla_core_clk ( nvdla_core_clk ),
+    .core_wen ( core_wen ),
+    .chn_a_rsci_vd ( chn_a_rsci_vd ),
+    .core_wten ( core_wten ),
+    .chn_a_rsci_biwt ( chn_a_rsci_biwt ),
+    .chn_a_rsci_iswt0 ( chn_a_rsci_iswt0 ),
+    .chn_a_rsci_ld_core_psct ( chn_a_rsci_ld_core_psct ),
+    .chn_a_rsci_bdwt ( chn_a_rsci_bdwt ),
+    .chn_a_rsci_oswt ( chn_a_rsci_oswt ),
+    .chn_a_rsci_ld_core_sct ( chn_a_rsci_ld_core_sct )
+  );
+  logic [0:0] chn_a_rsci_bdwt_R0 ;
+  logic [0:0] chn_a_rsci_bdwt_X0 ;
+  logic [0:0] chn_a_rsci_bdwt_C0 ;
+  logic [0:0] chn_a_rsci_biwt_R0 ;
+  logic [0:0] chn_a_rsci_biwt_X0 ;
+  logic [0:0] chn_a_rsci_biwt_C0 ;
+  logic [16:0] chn_a_rsci_d_R0 ;
+  logic [16:0] chn_a_rsci_d_X0 ;
+  logic [16:0] chn_a_rsci_d_C0 ;
+  logic [0:0] chn_a_rsci_oswt_R1 ;
+  logic [0:0] chn_a_rsci_oswt_X1 ;
+  logic [0:0] chn_a_rsci_oswt_C1 ;
+  logic [0:0] nvdla_core_rstn_R1 ;
+  logic [0:0] nvdla_core_rstn_X1 ;
+  logic [0:0] nvdla_core_rstn_C1 ;
+// module: HLS_fp17_to_fp16_core_chn_a_rsci_chn_a_wait_dp
+  HLS_fp17_to_fp16_core_chn_a_rsci_chn_a_wait_dp HLS_fp17_to_fp16_core_chn_a_rsci_chn_a_wait_dp_inst (
+    .chn_a_rsci_bdwt_T (  chn_a_rsci_bdwt_T  ),
+    .chn_a_rsci_bdwt_R (  chn_a_rsci_bdwt_R0  ),
+    .chn_a_rsci_bdwt_X (  chn_a_rsci_bdwt_X0  ),
+    .chn_a_rsci_bdwt_C (  chn_a_rsci_bdwt_C0  ),
+    .chn_a_rsci_bdwt_S (  chn_a_rsci_bdwt_S  ),
+    .chn_a_rsci_biwt_T (  chn_a_rsci_biwt_T  ),
+    .chn_a_rsci_biwt_R (  chn_a_rsci_biwt_R0  ),
+    .chn_a_rsci_biwt_X (  chn_a_rsci_biwt_X0  ),
+    .chn_a_rsci_biwt_C (  chn_a_rsci_biwt_C0  ),
+    .chn_a_rsci_biwt_S (  chn_a_rsci_biwt_S  ),
+    .chn_a_rsci_d_T (  chn_a_rsci_d_T  ),
+    .chn_a_rsci_d_R (  chn_a_rsci_d_R0  ),
+    .chn_a_rsci_d_X (  chn_a_rsci_d_X0  ),
+    .chn_a_rsci_d_C (  chn_a_rsci_d_C0  ),
+    .chn_a_rsci_d_S (  chn_a_rsci_d_S  ),
+    .chn_a_rsci_oswt_T (  chn_a_rsci_oswt_T  ),
+    .chn_a_rsci_oswt_R (  chn_a_rsci_oswt_R1  ),
+    .chn_a_rsci_oswt_X (  chn_a_rsci_oswt_X1  ),
+    .chn_a_rsci_oswt_C (  chn_a_rsci_oswt_C1  ),
+    .chn_a_rsci_oswt_S (  chn_a_rsci_oswt_S  ),
+    .nvdla_core_rstn_T (  nvdla_core_rstn_T  ),
+    .nvdla_core_rstn_R (  nvdla_core_rstn_R1  ),
+    .nvdla_core_rstn_X (  nvdla_core_rstn_X1  ),
+    .nvdla_core_rstn_C (  nvdla_core_rstn_C1  ),
+    .nvdla_core_rstn_S (  nvdla_core_rstn_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .chn_a_rsci_bawt_T (  chn_a_rsci_bawt_T  ),
+    .chn_a_rsci_bawt_R0 (  chn_a_rsci_bawt_R  ),
+    .chn_a_rsci_bawt_X0 (  chn_a_rsci_bawt_X  ),
+    .chn_a_rsci_bawt_C0 (  chn_a_rsci_bawt_C  ),
+    .chn_a_rsci_bawt_S ( chn_a_rsci_bawt_S ),
+    .chn_a_rsci_d_mxwt_T (  chn_a_rsci_d_mxwt_T  ),
+    .chn_a_rsci_d_mxwt_R0 (  chn_a_rsci_d_mxwt_R  ),
+    .chn_a_rsci_d_mxwt_X0 (  chn_a_rsci_d_mxwt_X  ),
+    .chn_a_rsci_d_mxwt_C0 (  chn_a_rsci_d_mxwt_C  ),
+    .chn_a_rsci_d_mxwt_S ( chn_a_rsci_d_mxwt_S ),
+    .chn_a_rsci_wen_comp_T (  chn_a_rsci_wen_comp_T  ),
+    .chn_a_rsci_wen_comp_R0 (  chn_a_rsci_wen_comp_R  ),
+    .chn_a_rsci_wen_comp_X0 (  chn_a_rsci_wen_comp_X  ),
+    .chn_a_rsci_wen_comp_C0 (  chn_a_rsci_wen_comp_C  ),
+    .chn_a_rsci_wen_comp_S ( chn_a_rsci_wen_comp_S ),
+    .nvdla_core_clk ( nvdla_core_clk ),
+    .chn_a_rsci_oswt ( chn_a_rsci_oswt ),
+    .chn_a_rsci_bdwt ( chn_a_rsci_bdwt ),
+    .chn_a_rsci_bawt ( chn_a_rsci_bawt ),
+    .nvdla_core_rstn ( nvdla_core_rstn ),
+    .chn_a_rsci_wen_comp ( chn_a_rsci_wen_comp ),
+    .chn_a_rsci_d ( chn_a_rsci_d ),
+    .chn_a_rsci_biwt ( chn_a_rsci_biwt ),
+    .chn_a_rsci_d_mxwt ( chn_a_rsci_d_mxwt )
+  );
+  logic [0:0] chn_a_rsci_ld_core_sct_R0 ;
+  logic [0:0] chn_a_rsci_ld_core_sct_X0 ;
+  logic [0:0] chn_a_rsci_ld_core_sct_C0 ;
+  logic [0:0] chn_a_rsc_vz_R0 ;
+  logic [0:0] chn_a_rsc_vz_X0 ;
+  logic [0:0] chn_a_rsc_vz_C0 ;
+  logic [16:0] chn_a_rsc_z_R0 ;
+  logic [16:0] chn_a_rsc_z_X0 ;
+  logic [16:0] chn_a_rsc_z_C0 ;
+// module: \$paramod\FP17_TO_FP16_mgc_in_wire_wait_v1\rscid=1\width=17
+  \$paramod\FP17_TO_FP16_mgc_in_wire_wait_v1\rscid=1\width=17 chn_a_rsci (
+    .ld_T (  chn_a_rsci_ld_core_sct_T  ),
+    .ld_R (  chn_a_rsci_ld_core_sct_R0  ),
+    .ld_X (  chn_a_rsci_ld_core_sct_X0  ),
+    .ld_C (  chn_a_rsci_ld_core_sct_C0  ),
+    .ld_S (  chn_a_rsci_ld_core_sct_S  ),
+    .vz_T (  chn_a_rsc_vz_T  ),
+    .vz_R (  chn_a_rsc_vz_R0  ),
+    .vz_X (  chn_a_rsc_vz_X0  ),
+    .vz_C (  chn_a_rsc_vz_C0  ),
+    .vz_S (  chn_a_rsc_vz_S  ),
+    .z_T (  chn_a_rsc_z_T  ),
+    .z_R (  chn_a_rsc_z_R0  ),
+    .z_X (  chn_a_rsc_z_X0  ),
+    .z_C (  chn_a_rsc_z_C0  ),
+    .z_S (  chn_a_rsc_z_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .d_T (  chn_a_rsci_d_T  ),
+    .d_R0 (  chn_a_rsci_d_R  ),
+    .d_X0 (  chn_a_rsci_d_X  ),
+    .d_C0 (  chn_a_rsci_d_C  ),
+    .d_S ( chn_a_rsci_d_S ),
+    .lz_T (  chn_a_rsc_lz_T  ),
+    .lz_R0 (  chn_a_rsc_lz_R  ),
+    .lz_X0 (  chn_a_rsc_lz_X  ),
+    .lz_C0 (  chn_a_rsc_lz_C  ),
+    .lz_S ( chn_a_rsc_lz_S ),
+    .vd_T (  chn_a_rsci_vd_T  ),
+    .vd_R0 (  chn_a_rsci_vd_R  ),
+    .vd_X0 (  chn_a_rsci_vd_X  ),
+    .vd_C0 (  chn_a_rsci_vd_C  ),
+    .vd_S ( chn_a_rsci_vd_S ),
+    .z ( chn_a_rsc_z ),
+    .ld ( chn_a_rsci_ld_core_sct ),
+    .d ( chn_a_rsci_d ),
+    .lz ( chn_a_rsc_lz ),
+    .vd ( chn_a_rsci_vd ),
+    .vz ( chn_a_rsc_vz )
+  );
+  assign chn_a_rsc_z_C = ( chn_a_rsc_z_C0 );
+  assign chn_a_rsc_vz_C = ( chn_a_rsc_vz_C0 );
+  assign chn_a_rsci_ld_core_sct_C = ( chn_a_rsci_ld_core_sct_C0 );
+  assign chn_a_rsci_d_C = ( chn_a_rsci_d_C0 );
+  assign chn_a_rsci_biwt_C = ( chn_a_rsci_biwt_C0 );
+  assign chn_a_rsci_bdwt_C = ( chn_a_rsci_bdwt_C0 );
+  assign nvdla_core_rstn_C = ( nvdla_core_rstn_C0 ) | ( nvdla_core_rstn_C1 );
+  assign core_wten_C = ( core_wten_C0 );
+  assign core_wen_C = ( core_wen_C0 );
+  assign chn_a_rsci_vd_C = ( chn_a_rsci_vd_C0 );
+  assign chn_a_rsci_oswt_C = ( chn_a_rsci_oswt_C0 ) | ( chn_a_rsci_oswt_C1 );
+  assign chn_a_rsci_ld_core_psct_C = ( chn_a_rsci_ld_core_psct_C0 );
+  assign chn_a_rsci_iswt0_C = ( chn_a_rsci_iswt0_C0 );
+  assign chn_a_rsci_wen_comp_C = ( chn_a_rsci_wen_comp_C0 );
+  assign chn_a_rsci_d_mxwt_C = ( chn_a_rsci_d_mxwt_C0 );
+  assign chn_a_rsci_bawt_C = ( chn_a_rsci_bawt_C0 );
+  assign chn_a_rsc_lz_C = ( chn_a_rsc_lz_C0 );
+  assign chn_a_rsc_z_X = ( chn_a_rsc_z_X0 );
+  assign chn_a_rsc_vz_X = ( chn_a_rsc_vz_X0 );
+  assign chn_a_rsci_ld_core_sct_X = ( chn_a_rsci_ld_core_sct_X0 );
+  assign chn_a_rsci_d_X = ( chn_a_rsci_d_X0 );
+  assign chn_a_rsci_biwt_X = ( chn_a_rsci_biwt_X0 );
+  assign chn_a_rsci_bdwt_X = ( chn_a_rsci_bdwt_X0 );
+  assign nvdla_core_rstn_X = ( nvdla_core_rstn_X0 ) | ( nvdla_core_rstn_X1 );
+  assign core_wten_X = ( core_wten_X0 );
+  assign core_wen_X = ( core_wen_X0 );
+  assign chn_a_rsci_vd_X = ( chn_a_rsci_vd_X0 );
+  assign chn_a_rsci_oswt_X = ( chn_a_rsci_oswt_X0 ) | ( chn_a_rsci_oswt_X1 );
+  assign chn_a_rsci_ld_core_psct_X = ( chn_a_rsci_ld_core_psct_X0 );
+  assign chn_a_rsci_iswt0_X = ( chn_a_rsci_iswt0_X0 );
+  assign chn_a_rsci_wen_comp_X = ( chn_a_rsci_wen_comp_X0 );
+  assign chn_a_rsci_d_mxwt_X = ( chn_a_rsci_d_mxwt_X0 );
+  assign chn_a_rsci_bawt_X = ( chn_a_rsci_bawt_X0 );
+  assign chn_a_rsc_lz_X = ( chn_a_rsc_lz_X0 );
+  assign chn_a_rsc_z_R = ( chn_a_rsc_z_X0 & chn_a_rsc_z_R0 );
+  assign chn_a_rsc_vz_R = ( chn_a_rsc_vz_X0 & chn_a_rsc_vz_R0 );
+  assign chn_a_rsci_ld_core_sct_R = ( chn_a_rsci_ld_core_sct_X0 & chn_a_rsci_ld_core_sct_R0 );
+  assign chn_a_rsci_d_R = ( chn_a_rsci_d_X0 & chn_a_rsci_d_R0 );
+  assign chn_a_rsci_biwt_R = ( chn_a_rsci_biwt_X0 & chn_a_rsci_biwt_R0 );
+  assign chn_a_rsci_bdwt_R = ( chn_a_rsci_bdwt_X0 & chn_a_rsci_bdwt_R0 );
+  assign nvdla_core_rstn_R = ( nvdla_core_rstn_X0 & nvdla_core_rstn_R0 ) | ( nvdla_core_rstn_X1 & nvdla_core_rstn_R1 );
+  assign core_wten_R = ( core_wten_X0 & core_wten_R0 );
+  assign core_wen_R = ( core_wen_X0 & core_wen_R0 );
+  assign chn_a_rsci_vd_R = ( chn_a_rsci_vd_X0 & chn_a_rsci_vd_R0 );
+  assign chn_a_rsci_oswt_R = ( chn_a_rsci_oswt_X0 & chn_a_rsci_oswt_R0 ) | ( chn_a_rsci_oswt_X1 & chn_a_rsci_oswt_R1 );
+  assign chn_a_rsci_ld_core_psct_R = ( chn_a_rsci_ld_core_psct_X0 & chn_a_rsci_ld_core_psct_R0 );
+  assign chn_a_rsci_iswt0_R = ( chn_a_rsci_iswt0_X0 & chn_a_rsci_iswt0_R0 );
+  assign chn_a_rsci_wen_comp_R = ( chn_a_rsci_wen_comp_X0 & chn_a_rsci_wen_comp_R0 );
+  assign chn_a_rsci_d_mxwt_R = ( chn_a_rsci_d_mxwt_X0 & chn_a_rsci_d_mxwt_R0 );
+  assign chn_a_rsci_bawt_R = ( chn_a_rsci_bawt_X0 & chn_a_rsci_bawt_R0 );
+  assign chn_a_rsc_lz_R = ( chn_a_rsc_lz_X0 & chn_a_rsc_lz_R0 );
+ // ground taints for floating regs
+ // ground taints for unused wires
+ // ground taints for unused wire slices
+  assign rst_zy = !nvdla_core_rstn ;
+endmodule

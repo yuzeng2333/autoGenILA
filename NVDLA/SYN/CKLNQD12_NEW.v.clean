@@ -1,0 +1,12 @@
+module CKLNQD12(TE, E, CP, Q);
+  wire _0_;
+  input CP;
+  input E;
+  output Q;
+  input TE;
+  reg qd;
+  assign Q = CP & qd;
+  assign _0_ = TE | E;
+  always @(negedge CP)
+      qd <= _0_;
+endmodule

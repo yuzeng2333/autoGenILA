@@ -1,0 +1,36 @@
+module FP_SUM_BLOCK_pipe_p11(nvdla_core_clk, nvdla_core_rstn, stage2_pipe_in_pd_d2, stage2_pipe_in_rdy_d3, stage2_pipe_in_vld_d2, stage2_pipe_in_pd_d3, stage2_pipe_in_rdy_d2, stage2_pipe_in_vld_d3);
+  wire [63:0] _00_;
+  wire _01_;
+  wire _02_;
+  wire _03_;
+  input nvdla_core_clk;
+  input nvdla_core_rstn;
+  wire p11_assert_clk;
+  reg [63:0] p11_pipe_data;
+  wire p11_pipe_ready;
+  wire p11_pipe_ready_bc;
+  reg p11_pipe_valid;
+  input [63:0] stage2_pipe_in_pd_d2;
+  output [63:0] stage2_pipe_in_pd_d3;
+  output stage2_pipe_in_rdy_d2;
+  input stage2_pipe_in_rdy_d3;
+  input stage2_pipe_in_vld_d2;
+  output stage2_pipe_in_vld_d3;
+  assign _02_ = p11_pipe_ready_bc && stage2_pipe_in_vld_d2;
+  assign _03_ = ! p11_pipe_valid;
+  assign p11_pipe_ready_bc = stage2_pipe_in_rdy_d3 || _03_;
+  always @(posedge nvdla_core_clk)
+      p11_pipe_data <= _00_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      p11_pipe_valid <= 1'b0;
+    else
+      p11_pipe_valid <= _01_;
+  assign _01_ = p11_pipe_ready_bc ? stage2_pipe_in_vld_d2 : 1'b1;
+  assign _00_ = _02_ ? stage2_pipe_in_pd_d2 : p11_pipe_data;
+  assign p11_assert_clk = nvdla_core_clk;
+  assign p11_pipe_ready = stage2_pipe_in_rdy_d3;
+  assign stage2_pipe_in_pd_d3 = p11_pipe_data;
+  assign stage2_pipe_in_rdy_d2 = p11_pipe_ready_bc;
+  assign stage2_pipe_in_vld_d3 = p11_pipe_valid;
+endmodule

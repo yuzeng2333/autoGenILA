@@ -166,12 +166,14 @@ expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver 
       return destExpr;
     } 
     // if input instruction should be given to the input ports
-    else if(timeIdx + g_instr_len >= bound+2) {
+    // FIXME: bound+1 or bound+2???
+    else if(timeIdx + g_instr_len >= bound+1) {
       if(g_currInstrInfo.instrEncoding.find(dest) == g_currInstrInfo.instrEncoding.end()) {
         toCout("Error: input signal not found for current instruction: "+dest);
         abort();
       }
-      uint32_t wordIdx = bound+1-timeIdx;
+      //uint32_t wordIdx = bound+1-timeIdx;
+      uint32_t wordIdx = bound-timeIdx;
       std::string localVal = g_currInstrInfo.instrEncoding[dest][wordIdx];
       uint32_t localWidth = get_var_slice_width_simp(dest);
       if(localVal != "x" && localVal != "DIRTY") {

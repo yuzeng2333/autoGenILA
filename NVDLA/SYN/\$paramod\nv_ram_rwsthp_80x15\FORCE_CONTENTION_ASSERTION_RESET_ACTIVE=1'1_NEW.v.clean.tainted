@@ -1,0 +1,2193 @@
+  logic DFT_clamp;
+  logic DFT_clamp_T ;
+  logic DFT_clamp_R ;
+  logic DFT_clamp_C ;
+  logic DFT_clamp_X ;
+  logic [13:0] DFT_clamp_S ;
+  logic SI;
+  logic SI_T ;
+  logic SI_R ;
+  logic SI_C ;
+  logic SI_X ;
+  logic [13:0] SI_S ;
+  logic SO_int_net;
+  logic SO_int_net_T ;
+  logic SO_int_net_R ;
+  logic SO_int_net_C ;
+  logic SO_int_net_X ;
+  logic [13:0] SO_int_net_S ;
+  logic ary_atpg_ctl;
+  logic ary_atpg_ctl_T ;
+  logic ary_atpg_ctl_R ;
+  logic ary_atpg_ctl_C ;
+  logic ary_atpg_ctl_X ;
+  logic [13:0] ary_atpg_ctl_S ;
+  logic ary_read_inh;
+  logic ary_read_inh_T ;
+  logic ary_read_inh_R ;
+  logic ary_read_inh_C ;
+  logic ary_read_inh_X ;
+  logic [13:0] ary_read_inh_S ;
+  input byp_sel;
+  input byp_sel_T ;
+  input [13:0] byp_sel_S ;
+  output byp_sel_R ;
+  output byp_sel_X ;
+  output byp_sel_C ;
+  input clk;
+  input clk_T ;
+  input [13:0] clk_S ;
+  output clk_R ;
+  output clk_X ;
+  output clk_C ;
+  input [14:0] dbyp;
+  input [14:0] dbyp_T ;
+  input [13:0] dbyp_S ;
+  output [14:0] dbyp_R ;
+  output [14:0] dbyp_X ;
+  output [14:0] dbyp_C ;
+  logic debug_mode;
+  logic debug_mode_T ;
+  logic debug_mode_R ;
+  logic debug_mode_C ;
+  logic debug_mode_X ;
+  logic [13:0] debug_mode_S ;
+  input [14:0] di;
+  input [14:0] di_T ;
+  input [13:0] di_S ;
+  output [14:0] di_R ;
+  output [14:0] di_X ;
+  output [14:0] di_C ;
+  output [14:0] dout;
+  logic [14:0] dout ;
+  output [14:0] dout_T ;
+  logic [14:0] dout_T ;
+  logic [14:0] dout_R ;
+  logic [14:0] dout_C ;
+  logic [14:0] dout_X ;
+  logic [13:0] dout_S ;
+  input [14:0] dout_R0 ;
+  input [14:0] dout_C0 ;
+  input [14:0] dout_X0 ;
+  output [13:0] dout_S ;
+  logic iddq_mode;
+  logic iddq_mode_T ;
+  logic iddq_mode_R ;
+  logic iddq_mode_C ;
+  logic iddq_mode_X ;
+  logic [13:0] iddq_mode_S ;
+  logic jtag_readonly_mode;
+  logic jtag_readonly_mode_T ;
+  logic jtag_readonly_mode_R ;
+  logic jtag_readonly_mode_C ;
+  logic jtag_readonly_mode_X ;
+  logic [13:0] jtag_readonly_mode_S ;
+  logic [1:0] mbist_Di_w0;
+  logic [1:0] mbist_Di_w0_T ;
+  logic [1:0] mbist_Di_w0_R ;
+  logic [1:0] mbist_Di_w0_C ;
+  logic [1:0] mbist_Di_w0_X ;
+  logic [13:0] mbist_Di_w0_S ;
+  logic [14:0] mbist_Do_r0_int_net;
+  logic [14:0] mbist_Do_r0_int_net_T ;
+  logic [14:0] mbist_Do_r0_int_net_R ;
+  logic [14:0] mbist_Do_r0_int_net_C ;
+  logic [14:0] mbist_Do_r0_int_net_X ;
+  logic [13:0] mbist_Do_r0_int_net_S ;
+  logic [6:0] mbist_Ra_r0;
+  logic [6:0] mbist_Ra_r0_T ;
+  logic [6:0] mbist_Ra_r0_R ;
+  logic [6:0] mbist_Ra_r0_C ;
+  logic [6:0] mbist_Ra_r0_X ;
+  logic [13:0] mbist_Ra_r0_S ;
+  logic [6:0] mbist_Wa_w0;
+  logic [6:0] mbist_Wa_w0_T ;
+  logic [6:0] mbist_Wa_w0_R ;
+  logic [6:0] mbist_Wa_w0_C ;
+  logic [6:0] mbist_Wa_w0_X ;
+  logic [13:0] mbist_Wa_w0_S ;
+  logic mbist_ce_r0;
+  logic mbist_ce_r0_T ;
+  logic mbist_ce_r0_R ;
+  logic mbist_ce_r0_C ;
+  logic mbist_ce_r0_X ;
+  logic [13:0] mbist_ce_r0_S ;
+  logic mbist_en_sync;
+  logic mbist_en_sync_T ;
+  logic mbist_en_sync_R ;
+  logic mbist_en_sync_C ;
+  logic mbist_en_sync_X ;
+  logic [13:0] mbist_en_sync_S ;
+  logic mbist_ramaccess_rst_;
+  logic mbist_ramaccess_rst__T ;
+  logic mbist_ramaccess_rst__R ;
+  logic mbist_ramaccess_rst__C ;
+  logic mbist_ramaccess_rst__X ;
+  logic [13:0] mbist_ramaccess_rst__S ;
+  logic mbist_we_w0;
+  logic mbist_we_w0_T ;
+  logic mbist_we_w0_R ;
+  logic mbist_we_w0_C ;
+  logic mbist_we_w0_X ;
+  logic [13:0] mbist_we_w0_S ;
+  input ore;
+  input ore_T ;
+  input [13:0] ore_S ;
+  output ore_R ;
+  output ore_X ;
+  output ore_C ;
+  logic pre_SI;
+  logic pre_SI_T ;
+  logic pre_SI_R ;
+  logic pre_SI_C ;
+  logic pre_SI_X ;
+  logic [13:0] pre_SI_S ;
+  logic pre_ary_atpg_ctl;
+  logic pre_ary_atpg_ctl_T ;
+  logic pre_ary_atpg_ctl_R ;
+  logic pre_ary_atpg_ctl_C ;
+  logic pre_ary_atpg_ctl_X ;
+  logic [13:0] pre_ary_atpg_ctl_S ;
+  logic pre_ary_read_inh;
+  logic pre_ary_read_inh_T ;
+  logic pre_ary_read_inh_R ;
+  logic pre_ary_read_inh_C ;
+  logic pre_ary_read_inh_X ;
+  logic [13:0] pre_ary_read_inh_S ;
+  logic pre_debug_mode;
+  logic pre_debug_mode_T ;
+  logic pre_debug_mode_R ;
+  logic pre_debug_mode_C ;
+  logic pre_debug_mode_X ;
+  logic [13:0] pre_debug_mode_S ;
+  logic pre_iddq_mode;
+  logic pre_iddq_mode_T ;
+  logic pre_iddq_mode_R ;
+  logic pre_iddq_mode_C ;
+  logic pre_iddq_mode_X ;
+  logic [13:0] pre_iddq_mode_S ;
+  logic pre_jtag_readonly_mode;
+  logic pre_jtag_readonly_mode_T ;
+  logic pre_jtag_readonly_mode_R ;
+  logic pre_jtag_readonly_mode_C ;
+  logic pre_jtag_readonly_mode_X ;
+  logic [13:0] pre_jtag_readonly_mode_S ;
+  logic pre_mbist_Di_w0_0;
+  logic pre_mbist_Di_w0_0_T ;
+  logic pre_mbist_Di_w0_0_R ;
+  logic pre_mbist_Di_w0_0_C ;
+  logic pre_mbist_Di_w0_0_X ;
+  logic [13:0] pre_mbist_Di_w0_0_S ;
+  logic pre_mbist_Di_w0_1;
+  logic pre_mbist_Di_w0_1_T ;
+  logic pre_mbist_Di_w0_1_R ;
+  logic pre_mbist_Di_w0_1_C ;
+  logic pre_mbist_Di_w0_1_X ;
+  logic [13:0] pre_mbist_Di_w0_1_S ;
+  logic pre_mbist_Ra_r0_0;
+  logic pre_mbist_Ra_r0_0_T ;
+  logic pre_mbist_Ra_r0_0_R ;
+  logic pre_mbist_Ra_r0_0_C ;
+  logic pre_mbist_Ra_r0_0_X ;
+  logic [13:0] pre_mbist_Ra_r0_0_S ;
+  logic pre_mbist_Ra_r0_1;
+  logic pre_mbist_Ra_r0_1_T ;
+  logic pre_mbist_Ra_r0_1_R ;
+  logic pre_mbist_Ra_r0_1_C ;
+  logic pre_mbist_Ra_r0_1_X ;
+  logic [13:0] pre_mbist_Ra_r0_1_S ;
+  logic pre_mbist_Ra_r0_2;
+  logic pre_mbist_Ra_r0_2_T ;
+  logic pre_mbist_Ra_r0_2_R ;
+  logic pre_mbist_Ra_r0_2_C ;
+  logic pre_mbist_Ra_r0_2_X ;
+  logic [13:0] pre_mbist_Ra_r0_2_S ;
+  logic pre_mbist_Ra_r0_3;
+  logic pre_mbist_Ra_r0_3_T ;
+  logic pre_mbist_Ra_r0_3_R ;
+  logic pre_mbist_Ra_r0_3_C ;
+  logic pre_mbist_Ra_r0_3_X ;
+  logic [13:0] pre_mbist_Ra_r0_3_S ;
+  logic pre_mbist_Ra_r0_4;
+  logic pre_mbist_Ra_r0_4_T ;
+  logic pre_mbist_Ra_r0_4_R ;
+  logic pre_mbist_Ra_r0_4_C ;
+  logic pre_mbist_Ra_r0_4_X ;
+  logic [13:0] pre_mbist_Ra_r0_4_S ;
+  logic pre_mbist_Ra_r0_5;
+  logic pre_mbist_Ra_r0_5_T ;
+  logic pre_mbist_Ra_r0_5_R ;
+  logic pre_mbist_Ra_r0_5_C ;
+  logic pre_mbist_Ra_r0_5_X ;
+  logic [13:0] pre_mbist_Ra_r0_5_S ;
+  logic pre_mbist_Ra_r0_6;
+  logic pre_mbist_Ra_r0_6_T ;
+  logic pre_mbist_Ra_r0_6_R ;
+  logic pre_mbist_Ra_r0_6_C ;
+  logic pre_mbist_Ra_r0_6_X ;
+  logic [13:0] pre_mbist_Ra_r0_6_S ;
+  logic pre_mbist_Wa_w0_0;
+  logic pre_mbist_Wa_w0_0_T ;
+  logic pre_mbist_Wa_w0_0_R ;
+  logic pre_mbist_Wa_w0_0_C ;
+  logic pre_mbist_Wa_w0_0_X ;
+  logic [13:0] pre_mbist_Wa_w0_0_S ;
+  logic pre_mbist_Wa_w0_1;
+  logic pre_mbist_Wa_w0_1_T ;
+  logic pre_mbist_Wa_w0_1_R ;
+  logic pre_mbist_Wa_w0_1_C ;
+  logic pre_mbist_Wa_w0_1_X ;
+  logic [13:0] pre_mbist_Wa_w0_1_S ;
+  logic pre_mbist_Wa_w0_2;
+  logic pre_mbist_Wa_w0_2_T ;
+  logic pre_mbist_Wa_w0_2_R ;
+  logic pre_mbist_Wa_w0_2_C ;
+  logic pre_mbist_Wa_w0_2_X ;
+  logic [13:0] pre_mbist_Wa_w0_2_S ;
+  logic pre_mbist_Wa_w0_3;
+  logic pre_mbist_Wa_w0_3_T ;
+  logic pre_mbist_Wa_w0_3_R ;
+  logic pre_mbist_Wa_w0_3_C ;
+  logic pre_mbist_Wa_w0_3_X ;
+  logic [13:0] pre_mbist_Wa_w0_3_S ;
+  logic pre_mbist_Wa_w0_4;
+  logic pre_mbist_Wa_w0_4_T ;
+  logic pre_mbist_Wa_w0_4_R ;
+  logic pre_mbist_Wa_w0_4_C ;
+  logic pre_mbist_Wa_w0_4_X ;
+  logic [13:0] pre_mbist_Wa_w0_4_S ;
+  logic pre_mbist_Wa_w0_5;
+  logic pre_mbist_Wa_w0_5_T ;
+  logic pre_mbist_Wa_w0_5_R ;
+  logic pre_mbist_Wa_w0_5_C ;
+  logic pre_mbist_Wa_w0_5_X ;
+  logic [13:0] pre_mbist_Wa_w0_5_S ;
+  logic pre_mbist_Wa_w0_6;
+  logic pre_mbist_Wa_w0_6_T ;
+  logic pre_mbist_Wa_w0_6_R ;
+  logic pre_mbist_Wa_w0_6_C ;
+  logic pre_mbist_Wa_w0_6_X ;
+  logic [13:0] pre_mbist_Wa_w0_6_S ;
+  logic pre_mbist_ce_r0;
+  logic pre_mbist_ce_r0_T ;
+  logic pre_mbist_ce_r0_R ;
+  logic pre_mbist_ce_r0_C ;
+  logic pre_mbist_ce_r0_X ;
+  logic [13:0] pre_mbist_ce_r0_S ;
+  logic pre_mbist_en_sync;
+  logic pre_mbist_en_sync_T ;
+  logic pre_mbist_en_sync_R ;
+  logic pre_mbist_en_sync_C ;
+  logic pre_mbist_en_sync_X ;
+  logic [13:0] pre_mbist_en_sync_S ;
+  logic pre_mbist_ramaccess_rst_;
+  logic pre_mbist_ramaccess_rst__T ;
+  logic pre_mbist_ramaccess_rst__R ;
+  logic pre_mbist_ramaccess_rst__C ;
+  logic pre_mbist_ramaccess_rst__X ;
+  logic [13:0] pre_mbist_ramaccess_rst__S ;
+  logic pre_mbist_we_w0;
+  logic pre_mbist_we_w0_T ;
+  logic pre_mbist_we_w0_R ;
+  logic pre_mbist_we_w0_C ;
+  logic pre_mbist_we_w0_X ;
+  logic [13:0] pre_mbist_we_w0_S ;
+  logic pre_scan_en;
+  logic pre_scan_en_T ;
+  logic pre_scan_en_R ;
+  logic pre_scan_en_C ;
+  logic pre_scan_en_X ;
+  logic [13:0] pre_scan_en_S ;
+  logic pre_scan_ramtms;
+  logic pre_scan_ramtms_T ;
+  logic pre_scan_ramtms_R ;
+  logic pre_scan_ramtms_C ;
+  logic pre_scan_ramtms_X ;
+  logic [13:0] pre_scan_ramtms_S ;
+  logic pre_shiftDR;
+  logic pre_shiftDR_T ;
+  logic pre_shiftDR_R ;
+  logic pre_shiftDR_C ;
+  logic pre_shiftDR_X ;
+  logic [13:0] pre_shiftDR_S ;
+  logic pre_test_mode;
+  logic pre_test_mode_T ;
+  logic pre_test_mode_R ;
+  logic pre_test_mode_C ;
+  logic pre_test_mode_X ;
+  logic [13:0] pre_test_mode_S ;
+  logic pre_updateDR;
+  logic pre_updateDR_T ;
+  logic pre_updateDR_R ;
+  logic pre_updateDR_C ;
+  logic pre_updateDR_X ;
+  logic [13:0] pre_updateDR_S ;
+  logic pre_write_inh;
+  logic pre_write_inh_T ;
+  logic pre_write_inh_R ;
+  logic pre_write_inh_C ;
+  logic pre_write_inh_X ;
+  logic [13:0] pre_write_inh_S ;
+  input [31:0] pwrbus_ram_pd;
+  input [31:0] pwrbus_ram_pd_T ;
+  input [13:0] pwrbus_ram_pd_S ;
+  output [31:0] pwrbus_ram_pd_R ;
+  output [31:0] pwrbus_ram_pd_X ;
+  output [31:0] pwrbus_ram_pd_C ;
+  input [6:0] ra;
+  input [6:0] ra_T ;
+  input [13:0] ra_S ;
+  output [6:0] ra_R ;
+  output [6:0] ra_X ;
+  output [6:0] ra_C ;
+  input re;
+  input re_T ;
+  input [13:0] re_S ;
+  output re_R ;
+  output re_X ;
+  output re_C ;
+  logic scan_en;
+  logic scan_en_T ;
+  logic scan_en_R ;
+  logic scan_en_C ;
+  logic scan_en_X ;
+  logic [13:0] scan_en_S ;
+  logic scan_ramtms;
+  logic scan_ramtms_T ;
+  logic scan_ramtms_R ;
+  logic scan_ramtms_C ;
+  logic scan_ramtms_X ;
+  logic [13:0] scan_ramtms_S ;
+  logic shiftDR;
+  logic shiftDR_T ;
+  logic shiftDR_R ;
+  logic shiftDR_C ;
+  logic shiftDR_X ;
+  logic [13:0] shiftDR_S ;
+  logic [1:0] svop;
+  logic [1:0] svop_T ;
+  logic [1:0] svop_R ;
+  logic [1:0] svop_C ;
+  logic [1:0] svop_X ;
+  logic [13:0] svop_S ;
+  logic test_mode;
+  logic test_mode_T ;
+  logic test_mode_R ;
+  logic test_mode_C ;
+  logic test_mode_X ;
+  logic [13:0] test_mode_S ;
+  logic updateDR;
+  logic updateDR_T ;
+  logic updateDR_R ;
+  logic updateDR_C ;
+  logic updateDR_X ;
+  logic [13:0] updateDR_S ;
+  input [6:0] wa;
+  input [6:0] wa_T ;
+  input [13:0] wa_S ;
+  output [6:0] wa_R ;
+  output [6:0] wa_X ;
+  output [6:0] wa_C ;
+  input we;
+  input we_T ;
+  input [13:0] we_S ;
+  output we_R ;
+  output we_X ;
+  output we_C ;
+  logic write_inh;
+  logic write_inh_T ;
+  logic write_inh_R ;
+  logic write_inh_C ;
+  logic write_inh_X ;
+  logic [13:0] write_inh_S ;
+// module: NV_BLKBOX_SRC0
+  NV_BLKBOX_SRC0 UI_enableDFTmode_async_ld_buf (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  DFT_clamp_T  ),
+    .Y_R0 (  DFT_clamp_R  ),
+    .Y_X0 (  DFT_clamp_X  ),
+    .Y_C0 (  DFT_clamp_C  ),
+    .Y_S ( DFT_clamp_S ),
+    .Y ( DFT_clamp )
+  );
+  logic [0:0] pre_SI_R0 ;
+  logic [0:0] pre_SI_X0 ;
+  logic [0:0] pre_SI_C0 ;
+  logic [0:0] DFT_clamp_R0 ;
+  logic [0:0] DFT_clamp_X0 ;
+  logic [0:0] DFT_clamp_C0 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_SI (
+    .A1_T (  pre_SI_T  ),
+    .A1_R (  pre_SI_R0  ),
+    .A1_X (  pre_SI_X0  ),
+    .A1_C (  pre_SI_C0  ),
+    .A1_S (  pre_SI_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R0  ),
+    .A2_X (  DFT_clamp_X0  ),
+    .A2_C (  DFT_clamp_C0  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  SI_T  ),
+    .Z_R0 (  SI_R  ),
+    .Z_X0 (  SI_X  ),
+    .Z_C0 (  SI_C  ),
+    .Z_S ( SI_S ),
+    .Z ( SI ),
+    .A1 ( pre_SI ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_ary_atpg_ctl_R0 ;
+  logic [0:0] pre_ary_atpg_ctl_X0 ;
+  logic [0:0] pre_ary_atpg_ctl_C0 ;
+  logic [0:0] DFT_clamp_R1 ;
+  logic [0:0] DFT_clamp_X1 ;
+  logic [0:0] DFT_clamp_C1 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_ary_atpg_ctl (
+    .A1_T (  pre_ary_atpg_ctl_T  ),
+    .A1_R (  pre_ary_atpg_ctl_R0  ),
+    .A1_X (  pre_ary_atpg_ctl_X0  ),
+    .A1_C (  pre_ary_atpg_ctl_C0  ),
+    .A1_S (  pre_ary_atpg_ctl_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R1  ),
+    .A2_X (  DFT_clamp_X1  ),
+    .A2_C (  DFT_clamp_C1  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  ary_atpg_ctl_T  ),
+    .Z_R0 (  ary_atpg_ctl_R  ),
+    .Z_X0 (  ary_atpg_ctl_X  ),
+    .Z_C0 (  ary_atpg_ctl_C  ),
+    .Z_S ( ary_atpg_ctl_S ),
+    .Z ( ary_atpg_ctl ),
+    .A1 ( pre_ary_atpg_ctl ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_ary_read_inh_R0 ;
+  logic [0:0] pre_ary_read_inh_X0 ;
+  logic [0:0] pre_ary_read_inh_C0 ;
+  logic [0:0] DFT_clamp_R2 ;
+  logic [0:0] DFT_clamp_X2 ;
+  logic [0:0] DFT_clamp_C2 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_ary_read_inh (
+    .A1_T (  pre_ary_read_inh_T  ),
+    .A1_R (  pre_ary_read_inh_R0  ),
+    .A1_X (  pre_ary_read_inh_X0  ),
+    .A1_C (  pre_ary_read_inh_C0  ),
+    .A1_S (  pre_ary_read_inh_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R2  ),
+    .A2_X (  DFT_clamp_X2  ),
+    .A2_C (  DFT_clamp_C2  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  ary_read_inh_T  ),
+    .Z_R0 (  ary_read_inh_R  ),
+    .Z_X0 (  ary_read_inh_X  ),
+    .Z_C0 (  ary_read_inh_C  ),
+    .Z_S ( ary_read_inh_S ),
+    .Z ( ary_read_inh ),
+    .A1 ( pre_ary_read_inh ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_debug_mode_R0 ;
+  logic [0:0] pre_debug_mode_X0 ;
+  logic [0:0] pre_debug_mode_C0 ;
+  logic [0:0] DFT_clamp_R3 ;
+  logic [0:0] DFT_clamp_X3 ;
+  logic [0:0] DFT_clamp_C3 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_debug_mode (
+    .A1_T (  pre_debug_mode_T  ),
+    .A1_R (  pre_debug_mode_R0  ),
+    .A1_X (  pre_debug_mode_X0  ),
+    .A1_C (  pre_debug_mode_C0  ),
+    .A1_S (  pre_debug_mode_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R3  ),
+    .A2_X (  DFT_clamp_X3  ),
+    .A2_C (  DFT_clamp_C3  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  debug_mode_T  ),
+    .Z_R0 (  debug_mode_R  ),
+    .Z_X0 (  debug_mode_X  ),
+    .Z_C0 (  debug_mode_C  ),
+    .Z_S ( debug_mode_S ),
+    .Z ( debug_mode ),
+    .A1 ( pre_debug_mode ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_iddq_mode_R0 ;
+  logic [0:0] pre_iddq_mode_X0 ;
+  logic [0:0] pre_iddq_mode_C0 ;
+  logic [0:0] DFT_clamp_R4 ;
+  logic [0:0] DFT_clamp_X4 ;
+  logic [0:0] DFT_clamp_C4 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_iddq_mode (
+    .A1_T (  pre_iddq_mode_T  ),
+    .A1_R (  pre_iddq_mode_R0  ),
+    .A1_X (  pre_iddq_mode_X0  ),
+    .A1_C (  pre_iddq_mode_C0  ),
+    .A1_S (  pre_iddq_mode_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R4  ),
+    .A2_X (  DFT_clamp_X4  ),
+    .A2_C (  DFT_clamp_C4  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  iddq_mode_T  ),
+    .Z_R0 (  iddq_mode_R  ),
+    .Z_X0 (  iddq_mode_X  ),
+    .Z_C0 (  iddq_mode_C  ),
+    .Z_S ( iddq_mode_S ),
+    .Z ( iddq_mode ),
+    .A1 ( pre_iddq_mode ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_jtag_readonly_mode_R0 ;
+  logic [0:0] pre_jtag_readonly_mode_X0 ;
+  logic [0:0] pre_jtag_readonly_mode_C0 ;
+  logic [0:0] DFT_clamp_R5 ;
+  logic [0:0] DFT_clamp_X5 ;
+  logic [0:0] DFT_clamp_C5 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_jtag_readonly_mode (
+    .A1_T (  pre_jtag_readonly_mode_T  ),
+    .A1_R (  pre_jtag_readonly_mode_R0  ),
+    .A1_X (  pre_jtag_readonly_mode_X0  ),
+    .A1_C (  pre_jtag_readonly_mode_C0  ),
+    .A1_S (  pre_jtag_readonly_mode_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R5  ),
+    .A2_X (  DFT_clamp_X5  ),
+    .A2_C (  DFT_clamp_C5  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  jtag_readonly_mode_T  ),
+    .Z_R0 (  jtag_readonly_mode_R  ),
+    .Z_X0 (  jtag_readonly_mode_X  ),
+    .Z_C0 (  jtag_readonly_mode_C  ),
+    .Z_S ( jtag_readonly_mode_S ),
+    .Z ( jtag_readonly_mode ),
+    .A1 ( pre_jtag_readonly_mode ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_mbist_Di_w0_0_R0 ;
+  logic [0:0] pre_mbist_Di_w0_0_X0 ;
+  logic [0:0] pre_mbist_Di_w0_0_C0 ;
+  logic [0:0] DFT_clamp_R6 ;
+  logic [0:0] DFT_clamp_X6 ;
+  logic [0:0] DFT_clamp_C6 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_Di_w0_0 (
+    .A1_T (  pre_mbist_Di_w0_0_T  ),
+    .A1_R (  pre_mbist_Di_w0_0_R0  ),
+    .A1_X (  pre_mbist_Di_w0_0_X0  ),
+    .A1_C (  pre_mbist_Di_w0_0_C0  ),
+    .A1_S (  pre_mbist_Di_w0_0_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R6  ),
+    .A2_X (  DFT_clamp_X6  ),
+    .A2_C (  DFT_clamp_C6  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  mbist_Di_w0_T [0]  ),
+    .Z_R0 (  mbist_Di_w0_R [0]  ),
+    .Z_X0 (  mbist_Di_w0_X [0]  ),
+    .Z_C0 (  mbist_Di_w0_C [0]  ),
+    .Z_S ( mbist_Di_w0_S ),
+    .Z ( mbist_Di_w0[0] ),
+    .A1 ( pre_mbist_Di_w0_0 ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_mbist_Di_w0_1_R0 ;
+  logic [0:0] pre_mbist_Di_w0_1_X0 ;
+  logic [0:0] pre_mbist_Di_w0_1_C0 ;
+  logic [0:0] DFT_clamp_R7 ;
+  logic [0:0] DFT_clamp_X7 ;
+  logic [0:0] DFT_clamp_C7 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_Di_w0_1 (
+    .A1_T (  pre_mbist_Di_w0_1_T  ),
+    .A1_R (  pre_mbist_Di_w0_1_R0  ),
+    .A1_X (  pre_mbist_Di_w0_1_X0  ),
+    .A1_C (  pre_mbist_Di_w0_1_C0  ),
+    .A1_S (  pre_mbist_Di_w0_1_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R7  ),
+    .A2_X (  DFT_clamp_X7  ),
+    .A2_C (  DFT_clamp_C7  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  mbist_Di_w0_T [1]  ),
+    .Z_R0 (  mbist_Di_w0_R [1]  ),
+    .Z_X0 (  mbist_Di_w0_X [1]  ),
+    .Z_C0 (  mbist_Di_w0_C [1]  ),
+    .Z_S ( mbist_Di_w0_S ),
+    .Z ( mbist_Di_w0[1] ),
+    .A1 ( pre_mbist_Di_w0_1 ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_mbist_Ra_r0_0_R0 ;
+  logic [0:0] pre_mbist_Ra_r0_0_X0 ;
+  logic [0:0] pre_mbist_Ra_r0_0_C0 ;
+  logic [0:0] DFT_clamp_R8 ;
+  logic [0:0] DFT_clamp_X8 ;
+  logic [0:0] DFT_clamp_C8 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_Ra_r0_0 (
+    .A1_T (  pre_mbist_Ra_r0_0_T  ),
+    .A1_R (  pre_mbist_Ra_r0_0_R0  ),
+    .A1_X (  pre_mbist_Ra_r0_0_X0  ),
+    .A1_C (  pre_mbist_Ra_r0_0_C0  ),
+    .A1_S (  pre_mbist_Ra_r0_0_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R8  ),
+    .A2_X (  DFT_clamp_X8  ),
+    .A2_C (  DFT_clamp_C8  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  mbist_Ra_r0_T [0]  ),
+    .Z_R0 (  mbist_Ra_r0_R [0]  ),
+    .Z_X0 (  mbist_Ra_r0_X [0]  ),
+    .Z_C0 (  mbist_Ra_r0_C [0]  ),
+    .Z_S ( mbist_Ra_r0_S ),
+    .Z ( mbist_Ra_r0[0] ),
+    .A1 ( pre_mbist_Ra_r0_0 ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_mbist_Ra_r0_1_R0 ;
+  logic [0:0] pre_mbist_Ra_r0_1_X0 ;
+  logic [0:0] pre_mbist_Ra_r0_1_C0 ;
+  logic [0:0] DFT_clamp_R9 ;
+  logic [0:0] DFT_clamp_X9 ;
+  logic [0:0] DFT_clamp_C9 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_Ra_r0_1 (
+    .A1_T (  pre_mbist_Ra_r0_1_T  ),
+    .A1_R (  pre_mbist_Ra_r0_1_R0  ),
+    .A1_X (  pre_mbist_Ra_r0_1_X0  ),
+    .A1_C (  pre_mbist_Ra_r0_1_C0  ),
+    .A1_S (  pre_mbist_Ra_r0_1_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R9  ),
+    .A2_X (  DFT_clamp_X9  ),
+    .A2_C (  DFT_clamp_C9  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  mbist_Ra_r0_T [1]  ),
+    .Z_R0 (  mbist_Ra_r0_R [1]  ),
+    .Z_X0 (  mbist_Ra_r0_X [1]  ),
+    .Z_C0 (  mbist_Ra_r0_C [1]  ),
+    .Z_S ( mbist_Ra_r0_S ),
+    .Z ( mbist_Ra_r0[1] ),
+    .A1 ( pre_mbist_Ra_r0_1 ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_mbist_Ra_r0_2_R0 ;
+  logic [0:0] pre_mbist_Ra_r0_2_X0 ;
+  logic [0:0] pre_mbist_Ra_r0_2_C0 ;
+  logic [0:0] DFT_clamp_R10 ;
+  logic [0:0] DFT_clamp_X10 ;
+  logic [0:0] DFT_clamp_C10 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_Ra_r0_2 (
+    .A1_T (  pre_mbist_Ra_r0_2_T  ),
+    .A1_R (  pre_mbist_Ra_r0_2_R0  ),
+    .A1_X (  pre_mbist_Ra_r0_2_X0  ),
+    .A1_C (  pre_mbist_Ra_r0_2_C0  ),
+    .A1_S (  pre_mbist_Ra_r0_2_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R10  ),
+    .A2_X (  DFT_clamp_X10  ),
+    .A2_C (  DFT_clamp_C10  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  mbist_Ra_r0_T [2]  ),
+    .Z_R0 (  mbist_Ra_r0_R [2]  ),
+    .Z_X0 (  mbist_Ra_r0_X [2]  ),
+    .Z_C0 (  mbist_Ra_r0_C [2]  ),
+    .Z_S ( mbist_Ra_r0_S ),
+    .Z ( mbist_Ra_r0[2] ),
+    .A1 ( pre_mbist_Ra_r0_2 ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_mbist_Ra_r0_3_R0 ;
+  logic [0:0] pre_mbist_Ra_r0_3_X0 ;
+  logic [0:0] pre_mbist_Ra_r0_3_C0 ;
+  logic [0:0] DFT_clamp_R11 ;
+  logic [0:0] DFT_clamp_X11 ;
+  logic [0:0] DFT_clamp_C11 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_Ra_r0_3 (
+    .A1_T (  pre_mbist_Ra_r0_3_T  ),
+    .A1_R (  pre_mbist_Ra_r0_3_R0  ),
+    .A1_X (  pre_mbist_Ra_r0_3_X0  ),
+    .A1_C (  pre_mbist_Ra_r0_3_C0  ),
+    .A1_S (  pre_mbist_Ra_r0_3_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R11  ),
+    .A2_X (  DFT_clamp_X11  ),
+    .A2_C (  DFT_clamp_C11  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  mbist_Ra_r0_T [3]  ),
+    .Z_R0 (  mbist_Ra_r0_R [3]  ),
+    .Z_X0 (  mbist_Ra_r0_X [3]  ),
+    .Z_C0 (  mbist_Ra_r0_C [3]  ),
+    .Z_S ( mbist_Ra_r0_S ),
+    .Z ( mbist_Ra_r0[3] ),
+    .A1 ( pre_mbist_Ra_r0_3 ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_mbist_Ra_r0_4_R0 ;
+  logic [0:0] pre_mbist_Ra_r0_4_X0 ;
+  logic [0:0] pre_mbist_Ra_r0_4_C0 ;
+  logic [0:0] DFT_clamp_R12 ;
+  logic [0:0] DFT_clamp_X12 ;
+  logic [0:0] DFT_clamp_C12 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_Ra_r0_4 (
+    .A1_T (  pre_mbist_Ra_r0_4_T  ),
+    .A1_R (  pre_mbist_Ra_r0_4_R0  ),
+    .A1_X (  pre_mbist_Ra_r0_4_X0  ),
+    .A1_C (  pre_mbist_Ra_r0_4_C0  ),
+    .A1_S (  pre_mbist_Ra_r0_4_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R12  ),
+    .A2_X (  DFT_clamp_X12  ),
+    .A2_C (  DFT_clamp_C12  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  mbist_Ra_r0_T [4]  ),
+    .Z_R0 (  mbist_Ra_r0_R [4]  ),
+    .Z_X0 (  mbist_Ra_r0_X [4]  ),
+    .Z_C0 (  mbist_Ra_r0_C [4]  ),
+    .Z_S ( mbist_Ra_r0_S ),
+    .Z ( mbist_Ra_r0[4] ),
+    .A1 ( pre_mbist_Ra_r0_4 ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_mbist_Ra_r0_5_R0 ;
+  logic [0:0] pre_mbist_Ra_r0_5_X0 ;
+  logic [0:0] pre_mbist_Ra_r0_5_C0 ;
+  logic [0:0] DFT_clamp_R13 ;
+  logic [0:0] DFT_clamp_X13 ;
+  logic [0:0] DFT_clamp_C13 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_Ra_r0_5 (
+    .A1_T (  pre_mbist_Ra_r0_5_T  ),
+    .A1_R (  pre_mbist_Ra_r0_5_R0  ),
+    .A1_X (  pre_mbist_Ra_r0_5_X0  ),
+    .A1_C (  pre_mbist_Ra_r0_5_C0  ),
+    .A1_S (  pre_mbist_Ra_r0_5_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R13  ),
+    .A2_X (  DFT_clamp_X13  ),
+    .A2_C (  DFT_clamp_C13  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  mbist_Ra_r0_T [5]  ),
+    .Z_R0 (  mbist_Ra_r0_R [5]  ),
+    .Z_X0 (  mbist_Ra_r0_X [5]  ),
+    .Z_C0 (  mbist_Ra_r0_C [5]  ),
+    .Z_S ( mbist_Ra_r0_S ),
+    .Z ( mbist_Ra_r0[5] ),
+    .A1 ( pre_mbist_Ra_r0_5 ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_mbist_Ra_r0_6_R0 ;
+  logic [0:0] pre_mbist_Ra_r0_6_X0 ;
+  logic [0:0] pre_mbist_Ra_r0_6_C0 ;
+  logic [0:0] DFT_clamp_R14 ;
+  logic [0:0] DFT_clamp_X14 ;
+  logic [0:0] DFT_clamp_C14 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_Ra_r0_6 (
+    .A1_T (  pre_mbist_Ra_r0_6_T  ),
+    .A1_R (  pre_mbist_Ra_r0_6_R0  ),
+    .A1_X (  pre_mbist_Ra_r0_6_X0  ),
+    .A1_C (  pre_mbist_Ra_r0_6_C0  ),
+    .A1_S (  pre_mbist_Ra_r0_6_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R14  ),
+    .A2_X (  DFT_clamp_X14  ),
+    .A2_C (  DFT_clamp_C14  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  mbist_Ra_r0_T [6]  ),
+    .Z_R0 (  mbist_Ra_r0_R [6]  ),
+    .Z_X0 (  mbist_Ra_r0_X [6]  ),
+    .Z_C0 (  mbist_Ra_r0_C [6]  ),
+    .Z_S ( mbist_Ra_r0_S ),
+    .Z ( mbist_Ra_r0[6] ),
+    .A1 ( pre_mbist_Ra_r0_6 ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_mbist_Wa_w0_0_R0 ;
+  logic [0:0] pre_mbist_Wa_w0_0_X0 ;
+  logic [0:0] pre_mbist_Wa_w0_0_C0 ;
+  logic [0:0] DFT_clamp_R15 ;
+  logic [0:0] DFT_clamp_X15 ;
+  logic [0:0] DFT_clamp_C15 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_Wa_w0_0 (
+    .A1_T (  pre_mbist_Wa_w0_0_T  ),
+    .A1_R (  pre_mbist_Wa_w0_0_R0  ),
+    .A1_X (  pre_mbist_Wa_w0_0_X0  ),
+    .A1_C (  pre_mbist_Wa_w0_0_C0  ),
+    .A1_S (  pre_mbist_Wa_w0_0_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R15  ),
+    .A2_X (  DFT_clamp_X15  ),
+    .A2_C (  DFT_clamp_C15  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  mbist_Wa_w0_T [0]  ),
+    .Z_R0 (  mbist_Wa_w0_R [0]  ),
+    .Z_X0 (  mbist_Wa_w0_X [0]  ),
+    .Z_C0 (  mbist_Wa_w0_C [0]  ),
+    .Z_S ( mbist_Wa_w0_S ),
+    .Z ( mbist_Wa_w0[0] ),
+    .A1 ( pre_mbist_Wa_w0_0 ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_mbist_Wa_w0_1_R0 ;
+  logic [0:0] pre_mbist_Wa_w0_1_X0 ;
+  logic [0:0] pre_mbist_Wa_w0_1_C0 ;
+  logic [0:0] DFT_clamp_R16 ;
+  logic [0:0] DFT_clamp_X16 ;
+  logic [0:0] DFT_clamp_C16 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_Wa_w0_1 (
+    .A1_T (  pre_mbist_Wa_w0_1_T  ),
+    .A1_R (  pre_mbist_Wa_w0_1_R0  ),
+    .A1_X (  pre_mbist_Wa_w0_1_X0  ),
+    .A1_C (  pre_mbist_Wa_w0_1_C0  ),
+    .A1_S (  pre_mbist_Wa_w0_1_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R16  ),
+    .A2_X (  DFT_clamp_X16  ),
+    .A2_C (  DFT_clamp_C16  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  mbist_Wa_w0_T [1]  ),
+    .Z_R0 (  mbist_Wa_w0_R [1]  ),
+    .Z_X0 (  mbist_Wa_w0_X [1]  ),
+    .Z_C0 (  mbist_Wa_w0_C [1]  ),
+    .Z_S ( mbist_Wa_w0_S ),
+    .Z ( mbist_Wa_w0[1] ),
+    .A1 ( pre_mbist_Wa_w0_1 ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_mbist_Wa_w0_2_R0 ;
+  logic [0:0] pre_mbist_Wa_w0_2_X0 ;
+  logic [0:0] pre_mbist_Wa_w0_2_C0 ;
+  logic [0:0] DFT_clamp_R17 ;
+  logic [0:0] DFT_clamp_X17 ;
+  logic [0:0] DFT_clamp_C17 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_Wa_w0_2 (
+    .A1_T (  pre_mbist_Wa_w0_2_T  ),
+    .A1_R (  pre_mbist_Wa_w0_2_R0  ),
+    .A1_X (  pre_mbist_Wa_w0_2_X0  ),
+    .A1_C (  pre_mbist_Wa_w0_2_C0  ),
+    .A1_S (  pre_mbist_Wa_w0_2_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R17  ),
+    .A2_X (  DFT_clamp_X17  ),
+    .A2_C (  DFT_clamp_C17  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  mbist_Wa_w0_T [2]  ),
+    .Z_R0 (  mbist_Wa_w0_R [2]  ),
+    .Z_X0 (  mbist_Wa_w0_X [2]  ),
+    .Z_C0 (  mbist_Wa_w0_C [2]  ),
+    .Z_S ( mbist_Wa_w0_S ),
+    .Z ( mbist_Wa_w0[2] ),
+    .A1 ( pre_mbist_Wa_w0_2 ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_mbist_Wa_w0_3_R0 ;
+  logic [0:0] pre_mbist_Wa_w0_3_X0 ;
+  logic [0:0] pre_mbist_Wa_w0_3_C0 ;
+  logic [0:0] DFT_clamp_R18 ;
+  logic [0:0] DFT_clamp_X18 ;
+  logic [0:0] DFT_clamp_C18 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_Wa_w0_3 (
+    .A1_T (  pre_mbist_Wa_w0_3_T  ),
+    .A1_R (  pre_mbist_Wa_w0_3_R0  ),
+    .A1_X (  pre_mbist_Wa_w0_3_X0  ),
+    .A1_C (  pre_mbist_Wa_w0_3_C0  ),
+    .A1_S (  pre_mbist_Wa_w0_3_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R18  ),
+    .A2_X (  DFT_clamp_X18  ),
+    .A2_C (  DFT_clamp_C18  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  mbist_Wa_w0_T [3]  ),
+    .Z_R0 (  mbist_Wa_w0_R [3]  ),
+    .Z_X0 (  mbist_Wa_w0_X [3]  ),
+    .Z_C0 (  mbist_Wa_w0_C [3]  ),
+    .Z_S ( mbist_Wa_w0_S ),
+    .Z ( mbist_Wa_w0[3] ),
+    .A1 ( pre_mbist_Wa_w0_3 ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_mbist_Wa_w0_4_R0 ;
+  logic [0:0] pre_mbist_Wa_w0_4_X0 ;
+  logic [0:0] pre_mbist_Wa_w0_4_C0 ;
+  logic [0:0] DFT_clamp_R19 ;
+  logic [0:0] DFT_clamp_X19 ;
+  logic [0:0] DFT_clamp_C19 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_Wa_w0_4 (
+    .A1_T (  pre_mbist_Wa_w0_4_T  ),
+    .A1_R (  pre_mbist_Wa_w0_4_R0  ),
+    .A1_X (  pre_mbist_Wa_w0_4_X0  ),
+    .A1_C (  pre_mbist_Wa_w0_4_C0  ),
+    .A1_S (  pre_mbist_Wa_w0_4_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R19  ),
+    .A2_X (  DFT_clamp_X19  ),
+    .A2_C (  DFT_clamp_C19  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  mbist_Wa_w0_T [4]  ),
+    .Z_R0 (  mbist_Wa_w0_R [4]  ),
+    .Z_X0 (  mbist_Wa_w0_X [4]  ),
+    .Z_C0 (  mbist_Wa_w0_C [4]  ),
+    .Z_S ( mbist_Wa_w0_S ),
+    .Z ( mbist_Wa_w0[4] ),
+    .A1 ( pre_mbist_Wa_w0_4 ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_mbist_Wa_w0_5_R0 ;
+  logic [0:0] pre_mbist_Wa_w0_5_X0 ;
+  logic [0:0] pre_mbist_Wa_w0_5_C0 ;
+  logic [0:0] DFT_clamp_R20 ;
+  logic [0:0] DFT_clamp_X20 ;
+  logic [0:0] DFT_clamp_C20 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_Wa_w0_5 (
+    .A1_T (  pre_mbist_Wa_w0_5_T  ),
+    .A1_R (  pre_mbist_Wa_w0_5_R0  ),
+    .A1_X (  pre_mbist_Wa_w0_5_X0  ),
+    .A1_C (  pre_mbist_Wa_w0_5_C0  ),
+    .A1_S (  pre_mbist_Wa_w0_5_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R20  ),
+    .A2_X (  DFT_clamp_X20  ),
+    .A2_C (  DFT_clamp_C20  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  mbist_Wa_w0_T [5]  ),
+    .Z_R0 (  mbist_Wa_w0_R [5]  ),
+    .Z_X0 (  mbist_Wa_w0_X [5]  ),
+    .Z_C0 (  mbist_Wa_w0_C [5]  ),
+    .Z_S ( mbist_Wa_w0_S ),
+    .Z ( mbist_Wa_w0[5] ),
+    .A1 ( pre_mbist_Wa_w0_5 ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_mbist_Wa_w0_6_R0 ;
+  logic [0:0] pre_mbist_Wa_w0_6_X0 ;
+  logic [0:0] pre_mbist_Wa_w0_6_C0 ;
+  logic [0:0] DFT_clamp_R21 ;
+  logic [0:0] DFT_clamp_X21 ;
+  logic [0:0] DFT_clamp_C21 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_Wa_w0_6 (
+    .A1_T (  pre_mbist_Wa_w0_6_T  ),
+    .A1_R (  pre_mbist_Wa_w0_6_R0  ),
+    .A1_X (  pre_mbist_Wa_w0_6_X0  ),
+    .A1_C (  pre_mbist_Wa_w0_6_C0  ),
+    .A1_S (  pre_mbist_Wa_w0_6_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R21  ),
+    .A2_X (  DFT_clamp_X21  ),
+    .A2_C (  DFT_clamp_C21  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  mbist_Wa_w0_T [6]  ),
+    .Z_R0 (  mbist_Wa_w0_R [6]  ),
+    .Z_X0 (  mbist_Wa_w0_X [6]  ),
+    .Z_C0 (  mbist_Wa_w0_C [6]  ),
+    .Z_S ( mbist_Wa_w0_S ),
+    .Z ( mbist_Wa_w0[6] ),
+    .A1 ( pre_mbist_Wa_w0_6 ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_mbist_ce_r0_R0 ;
+  logic [0:0] pre_mbist_ce_r0_X0 ;
+  logic [0:0] pre_mbist_ce_r0_C0 ;
+  logic [0:0] DFT_clamp_R22 ;
+  logic [0:0] DFT_clamp_X22 ;
+  logic [0:0] DFT_clamp_C22 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_ce_r0 (
+    .A1_T (  pre_mbist_ce_r0_T  ),
+    .A1_R (  pre_mbist_ce_r0_R0  ),
+    .A1_X (  pre_mbist_ce_r0_X0  ),
+    .A1_C (  pre_mbist_ce_r0_C0  ),
+    .A1_S (  pre_mbist_ce_r0_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R22  ),
+    .A2_X (  DFT_clamp_X22  ),
+    .A2_C (  DFT_clamp_C22  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  mbist_ce_r0_T  ),
+    .Z_R0 (  mbist_ce_r0_R  ),
+    .Z_X0 (  mbist_ce_r0_X  ),
+    .Z_C0 (  mbist_ce_r0_C  ),
+    .Z_S ( mbist_ce_r0_S ),
+    .Z ( mbist_ce_r0 ),
+    .A1 ( pre_mbist_ce_r0 ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_mbist_en_sync_R0 ;
+  logic [0:0] pre_mbist_en_sync_X0 ;
+  logic [0:0] pre_mbist_en_sync_C0 ;
+  logic [0:0] DFT_clamp_R23 ;
+  logic [0:0] DFT_clamp_X23 ;
+  logic [0:0] DFT_clamp_C23 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_en_sync (
+    .A1_T (  pre_mbist_en_sync_T  ),
+    .A1_R (  pre_mbist_en_sync_R0  ),
+    .A1_X (  pre_mbist_en_sync_X0  ),
+    .A1_C (  pre_mbist_en_sync_C0  ),
+    .A1_S (  pre_mbist_en_sync_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R23  ),
+    .A2_X (  DFT_clamp_X23  ),
+    .A2_C (  DFT_clamp_C23  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  mbist_en_sync_T  ),
+    .Z_R0 (  mbist_en_sync_R  ),
+    .Z_X0 (  mbist_en_sync_X  ),
+    .Z_C0 (  mbist_en_sync_C  ),
+    .Z_S ( mbist_en_sync_S ),
+    .Z ( mbist_en_sync ),
+    .A1 ( pre_mbist_en_sync ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_mbist_ramaccess_rst__R0 ;
+  logic [0:0] pre_mbist_ramaccess_rst__X0 ;
+  logic [0:0] pre_mbist_ramaccess_rst__C0 ;
+  logic [0:0] DFT_clamp_R24 ;
+  logic [0:0] DFT_clamp_X24 ;
+  logic [0:0] DFT_clamp_C24 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_ramaccess_rst_ (
+    .A1_T (  pre_mbist_ramaccess_rst__T  ),
+    .A1_R (  pre_mbist_ramaccess_rst__R0  ),
+    .A1_X (  pre_mbist_ramaccess_rst__X0  ),
+    .A1_C (  pre_mbist_ramaccess_rst__C0  ),
+    .A1_S (  pre_mbist_ramaccess_rst__S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R24  ),
+    .A2_X (  DFT_clamp_X24  ),
+    .A2_C (  DFT_clamp_C24  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  mbist_ramaccess_rst__T  ),
+    .Z_R0 (  mbist_ramaccess_rst__R  ),
+    .Z_X0 (  mbist_ramaccess_rst__X  ),
+    .Z_C0 (  mbist_ramaccess_rst__C  ),
+    .Z_S ( mbist_ramaccess_rst__S ),
+    .Z ( mbist_ramaccess_rst_ ),
+    .A1 ( pre_mbist_ramaccess_rst_ ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_mbist_we_w0_R0 ;
+  logic [0:0] pre_mbist_we_w0_X0 ;
+  logic [0:0] pre_mbist_we_w0_C0 ;
+  logic [0:0] DFT_clamp_R25 ;
+  logic [0:0] DFT_clamp_X25 ;
+  logic [0:0] DFT_clamp_C25 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_mbist_we_w0 (
+    .A1_T (  pre_mbist_we_w0_T  ),
+    .A1_R (  pre_mbist_we_w0_R0  ),
+    .A1_X (  pre_mbist_we_w0_X0  ),
+    .A1_C (  pre_mbist_we_w0_C0  ),
+    .A1_S (  pre_mbist_we_w0_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R25  ),
+    .A2_X (  DFT_clamp_X25  ),
+    .A2_C (  DFT_clamp_C25  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  mbist_we_w0_T  ),
+    .Z_R0 (  mbist_we_w0_R  ),
+    .Z_X0 (  mbist_we_w0_X  ),
+    .Z_C0 (  mbist_we_w0_C  ),
+    .Z_S ( mbist_we_w0_S ),
+    .Z ( mbist_we_w0 ),
+    .A1 ( pre_mbist_we_w0 ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_scan_en_R0 ;
+  logic [0:0] pre_scan_en_X0 ;
+  logic [0:0] pre_scan_en_C0 ;
+  logic [0:0] DFT_clamp_R26 ;
+  logic [0:0] DFT_clamp_X26 ;
+  logic [0:0] DFT_clamp_C26 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_scan_en (
+    .A1_T (  pre_scan_en_T  ),
+    .A1_R (  pre_scan_en_R0  ),
+    .A1_X (  pre_scan_en_X0  ),
+    .A1_C (  pre_scan_en_C0  ),
+    .A1_S (  pre_scan_en_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R26  ),
+    .A2_X (  DFT_clamp_X26  ),
+    .A2_C (  DFT_clamp_C26  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  scan_en_T  ),
+    .Z_R0 (  scan_en_R  ),
+    .Z_X0 (  scan_en_X  ),
+    .Z_C0 (  scan_en_C  ),
+    .Z_S ( scan_en_S ),
+    .Z ( scan_en ),
+    .A1 ( pre_scan_en ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_scan_ramtms_R0 ;
+  logic [0:0] pre_scan_ramtms_X0 ;
+  logic [0:0] pre_scan_ramtms_C0 ;
+  logic [0:0] DFT_clamp_R27 ;
+  logic [0:0] DFT_clamp_X27 ;
+  logic [0:0] DFT_clamp_C27 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_scan_ramtms (
+    .A1_T (  pre_scan_ramtms_T  ),
+    .A1_R (  pre_scan_ramtms_R0  ),
+    .A1_X (  pre_scan_ramtms_X0  ),
+    .A1_C (  pre_scan_ramtms_C0  ),
+    .A1_S (  pre_scan_ramtms_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R27  ),
+    .A2_X (  DFT_clamp_X27  ),
+    .A2_C (  DFT_clamp_C27  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  scan_ramtms_T  ),
+    .Z_R0 (  scan_ramtms_R  ),
+    .Z_X0 (  scan_ramtms_X  ),
+    .Z_C0 (  scan_ramtms_C  ),
+    .Z_S ( scan_ramtms_S ),
+    .Z ( scan_ramtms ),
+    .A1 ( pre_scan_ramtms ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_shiftDR_R0 ;
+  logic [0:0] pre_shiftDR_X0 ;
+  logic [0:0] pre_shiftDR_C0 ;
+  logic [0:0] DFT_clamp_R28 ;
+  logic [0:0] DFT_clamp_X28 ;
+  logic [0:0] DFT_clamp_C28 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_shiftDR (
+    .A1_T (  pre_shiftDR_T  ),
+    .A1_R (  pre_shiftDR_R0  ),
+    .A1_X (  pre_shiftDR_X0  ),
+    .A1_C (  pre_shiftDR_C0  ),
+    .A1_S (  pre_shiftDR_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R28  ),
+    .A2_X (  DFT_clamp_X28  ),
+    .A2_C (  DFT_clamp_C28  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  shiftDR_T  ),
+    .Z_R0 (  shiftDR_R  ),
+    .Z_X0 (  shiftDR_X  ),
+    .Z_C0 (  shiftDR_C  ),
+    .Z_S ( shiftDR_S ),
+    .Z ( shiftDR ),
+    .A1 ( pre_shiftDR ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_test_mode_R0 ;
+  logic [0:0] pre_test_mode_X0 ;
+  logic [0:0] pre_test_mode_C0 ;
+  logic [0:0] DFT_clamp_R29 ;
+  logic [0:0] DFT_clamp_X29 ;
+  logic [0:0] DFT_clamp_C29 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_test_mode (
+    .A1_T (  pre_test_mode_T  ),
+    .A1_R (  pre_test_mode_R0  ),
+    .A1_X (  pre_test_mode_X0  ),
+    .A1_C (  pre_test_mode_C0  ),
+    .A1_S (  pre_test_mode_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R29  ),
+    .A2_X (  DFT_clamp_X29  ),
+    .A2_C (  DFT_clamp_C29  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  test_mode_T  ),
+    .Z_R0 (  test_mode_R  ),
+    .Z_X0 (  test_mode_X  ),
+    .Z_C0 (  test_mode_C  ),
+    .Z_S ( test_mode_S ),
+    .Z ( test_mode ),
+    .A1 ( pre_test_mode ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_updateDR_R0 ;
+  logic [0:0] pre_updateDR_X0 ;
+  logic [0:0] pre_updateDR_C0 ;
+  logic [0:0] DFT_clamp_R30 ;
+  logic [0:0] DFT_clamp_X30 ;
+  logic [0:0] DFT_clamp_C30 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_updateDR (
+    .A1_T (  pre_updateDR_T  ),
+    .A1_R (  pre_updateDR_R0  ),
+    .A1_X (  pre_updateDR_X0  ),
+    .A1_C (  pre_updateDR_C0  ),
+    .A1_S (  pre_updateDR_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R30  ),
+    .A2_X (  DFT_clamp_X30  ),
+    .A2_C (  DFT_clamp_C30  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  updateDR_T  ),
+    .Z_R0 (  updateDR_R  ),
+    .Z_X0 (  updateDR_X  ),
+    .Z_C0 (  updateDR_C  ),
+    .Z_S ( updateDR_S ),
+    .Z ( updateDR ),
+    .A1 ( pre_updateDR ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] pre_write_inh_R0 ;
+  logic [0:0] pre_write_inh_X0 ;
+  logic [0:0] pre_write_inh_C0 ;
+  logic [0:0] DFT_clamp_R31 ;
+  logic [0:0] DFT_clamp_X31 ;
+  logic [0:0] DFT_clamp_C31 ;
+// module: AN2D4PO4
+  AN2D4PO4 UJ_DFTQUALIFIER_write_inh (
+    .A1_T (  pre_write_inh_T  ),
+    .A1_R (  pre_write_inh_R0  ),
+    .A1_X (  pre_write_inh_X0  ),
+    .A1_C (  pre_write_inh_C0  ),
+    .A1_S (  pre_write_inh_S  ),
+    .A2_T (  DFT_clamp_T  ),
+    .A2_R (  DFT_clamp_R31  ),
+    .A2_X (  DFT_clamp_X31  ),
+    .A2_C (  DFT_clamp_C31  ),
+    .A2_S (  DFT_clamp_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Z_T (  write_inh_T  ),
+    .Z_R0 (  write_inh_R  ),
+    .Z_X0 (  write_inh_X  ),
+    .Z_C0 (  write_inh_C  ),
+    .Z_S ( write_inh_S ),
+    .Z ( write_inh ),
+    .A1 ( pre_write_inh ),
+    .A2 ( DFT_clamp )
+  );
+  logic [0:0] SI_R0 ;
+  logic [0:0] SI_X0 ;
+  logic [0:0] SI_C0 ;
+  logic [0:0] ary_atpg_ctl_R0 ;
+  logic [0:0] ary_atpg_ctl_X0 ;
+  logic [0:0] ary_atpg_ctl_C0 ;
+  logic [0:0] ary_read_inh_R0 ;
+  logic [0:0] ary_read_inh_X0 ;
+  logic [0:0] ary_read_inh_C0 ;
+  logic [0:0] byp_sel_R0 ;
+  logic [0:0] byp_sel_X0 ;
+  logic [0:0] byp_sel_C0 ;
+  logic [14:0] dbyp_R0 ;
+  logic [14:0] dbyp_X0 ;
+  logic [14:0] dbyp_C0 ;
+  logic [0:0] debug_mode_R0 ;
+  logic [0:0] debug_mode_X0 ;
+  logic [0:0] debug_mode_C0 ;
+  logic [14:0] di_R0 ;
+  logic [14:0] di_X0 ;
+  logic [14:0] di_C0 ;
+  logic [0:0] iddq_mode_R0 ;
+  logic [0:0] iddq_mode_X0 ;
+  logic [0:0] iddq_mode_C0 ;
+  logic [0:0] jtag_readonly_mode_R0 ;
+  logic [0:0] jtag_readonly_mode_X0 ;
+  logic [0:0] jtag_readonly_mode_C0 ;
+  logic [1:0] mbist_Di_w0_R0 ;
+  logic [1:0] mbist_Di_w0_X0 ;
+  logic [1:0] mbist_Di_w0_C0 ;
+  logic [6:0] mbist_Ra_r0_R0 ;
+  logic [6:0] mbist_Ra_r0_X0 ;
+  logic [6:0] mbist_Ra_r0_C0 ;
+  logic [6:0] mbist_Wa_w0_R0 ;
+  logic [6:0] mbist_Wa_w0_X0 ;
+  logic [6:0] mbist_Wa_w0_C0 ;
+  logic [0:0] mbist_ce_r0_R0 ;
+  logic [0:0] mbist_ce_r0_X0 ;
+  logic [0:0] mbist_ce_r0_C0 ;
+  logic [0:0] mbist_en_sync_R0 ;
+  logic [0:0] mbist_en_sync_X0 ;
+  logic [0:0] mbist_en_sync_C0 ;
+  logic [0:0] mbist_ramaccess_rst__R0 ;
+  logic [0:0] mbist_ramaccess_rst__X0 ;
+  logic [0:0] mbist_ramaccess_rst__C0 ;
+  logic [0:0] mbist_we_w0_R0 ;
+  logic [0:0] mbist_we_w0_X0 ;
+  logic [0:0] mbist_we_w0_C0 ;
+  logic [0:0] ore_R0 ;
+  logic [0:0] ore_X0 ;
+  logic [0:0] ore_C0 ;
+  logic [31:0] pwrbus_ram_pd_R0 ;
+  logic [31:0] pwrbus_ram_pd_X0 ;
+  logic [31:0] pwrbus_ram_pd_C0 ;
+  logic [6:0] ra_R0 ;
+  logic [6:0] ra_X0 ;
+  logic [6:0] ra_C0 ;
+  logic [0:0] re_R0 ;
+  logic [0:0] re_X0 ;
+  logic [0:0] re_C0 ;
+  logic [0:0] scan_en_R0 ;
+  logic [0:0] scan_en_X0 ;
+  logic [0:0] scan_en_C0 ;
+  logic [0:0] scan_ramtms_R0 ;
+  logic [0:0] scan_ramtms_X0 ;
+  logic [0:0] scan_ramtms_C0 ;
+  logic [0:0] shiftDR_R0 ;
+  logic [0:0] shiftDR_X0 ;
+  logic [0:0] shiftDR_C0 ;
+  logic [1:0] svop_R0 ;
+  logic [1:0] svop_X0 ;
+  logic [1:0] svop_C0 ;
+  logic [0:0] test_mode_R0 ;
+  logic [0:0] test_mode_X0 ;
+  logic [0:0] test_mode_C0 ;
+  logic [0:0] updateDR_R0 ;
+  logic [0:0] updateDR_X0 ;
+  logic [0:0] updateDR_C0 ;
+  logic [6:0] wa_R0 ;
+  logic [6:0] wa_X0 ;
+  logic [6:0] wa_C0 ;
+  logic [0:0] we_R0 ;
+  logic [0:0] we_X0 ;
+  logic [0:0] we_C0 ;
+  logic [0:0] write_inh_R0 ;
+  logic [0:0] write_inh_X0 ;
+  logic [0:0] write_inh_C0 ;
+// module: \$paramod\nv_ram_rwsthp_80x15_logic\FORCE_CONTENTION_ASSERTION_RESET_ACTIVE=1'1
+  \$paramod\nv_ram_rwsthp_80x15_logic\FORCE_CONTENTION_ASSERTION_RESET_ACTIVE=1'1 r_nv_ram_rwsthp_80x15 (
+    .SI_T (  SI_T  ),
+    .SI_R (  SI_R0  ),
+    .SI_X (  SI_X0  ),
+    .SI_C (  SI_C0  ),
+    .SI_S (  SI_S  ),
+    .ary_atpg_ctl_T (  ary_atpg_ctl_T  ),
+    .ary_atpg_ctl_R (  ary_atpg_ctl_R0  ),
+    .ary_atpg_ctl_X (  ary_atpg_ctl_X0  ),
+    .ary_atpg_ctl_C (  ary_atpg_ctl_C0  ),
+    .ary_atpg_ctl_S (  ary_atpg_ctl_S  ),
+    .ary_read_inh_T (  ary_read_inh_T  ),
+    .ary_read_inh_R (  ary_read_inh_R0  ),
+    .ary_read_inh_X (  ary_read_inh_X0  ),
+    .ary_read_inh_C (  ary_read_inh_C0  ),
+    .ary_read_inh_S (  ary_read_inh_S  ),
+    .byp_sel_T (  byp_sel_T  ),
+    .byp_sel_R (  byp_sel_R0  ),
+    .byp_sel_X (  byp_sel_X0  ),
+    .byp_sel_C (  byp_sel_C0  ),
+    .byp_sel_S (  byp_sel_S  ),
+    .dbyp_T (  dbyp_T  ),
+    .dbyp_R (  dbyp_R0  ),
+    .dbyp_X (  dbyp_X0  ),
+    .dbyp_C (  dbyp_C0  ),
+    .dbyp_S (  dbyp_S  ),
+    .debug_mode_T (  debug_mode_T  ),
+    .debug_mode_R (  debug_mode_R0  ),
+    .debug_mode_X (  debug_mode_X0  ),
+    .debug_mode_C (  debug_mode_C0  ),
+    .debug_mode_S (  debug_mode_S  ),
+    .di_T (  di_T  ),
+    .di_R (  di_R0  ),
+    .di_X (  di_X0  ),
+    .di_C (  di_C0  ),
+    .di_S (  di_S  ),
+    .iddq_mode_T (  iddq_mode_T  ),
+    .iddq_mode_R (  iddq_mode_R0  ),
+    .iddq_mode_X (  iddq_mode_X0  ),
+    .iddq_mode_C (  iddq_mode_C0  ),
+    .iddq_mode_S (  iddq_mode_S  ),
+    .jtag_readonly_mode_T (  jtag_readonly_mode_T  ),
+    .jtag_readonly_mode_R (  jtag_readonly_mode_R0  ),
+    .jtag_readonly_mode_X (  jtag_readonly_mode_X0  ),
+    .jtag_readonly_mode_C (  jtag_readonly_mode_C0  ),
+    .jtag_readonly_mode_S (  jtag_readonly_mode_S  ),
+    .mbist_Di_w0_T (  mbist_Di_w0_T  ),
+    .mbist_Di_w0_R (  mbist_Di_w0_R0  ),
+    .mbist_Di_w0_X (  mbist_Di_w0_X0  ),
+    .mbist_Di_w0_C (  mbist_Di_w0_C0  ),
+    .mbist_Di_w0_S (  mbist_Di_w0_S  ),
+    .mbist_Ra_r0_T (  mbist_Ra_r0_T  ),
+    .mbist_Ra_r0_R (  mbist_Ra_r0_R0  ),
+    .mbist_Ra_r0_X (  mbist_Ra_r0_X0  ),
+    .mbist_Ra_r0_C (  mbist_Ra_r0_C0  ),
+    .mbist_Ra_r0_S (  mbist_Ra_r0_S  ),
+    .mbist_Wa_w0_T (  mbist_Wa_w0_T  ),
+    .mbist_Wa_w0_R (  mbist_Wa_w0_R0  ),
+    .mbist_Wa_w0_X (  mbist_Wa_w0_X0  ),
+    .mbist_Wa_w0_C (  mbist_Wa_w0_C0  ),
+    .mbist_Wa_w0_S (  mbist_Wa_w0_S  ),
+    .mbist_ce_r0_T (  mbist_ce_r0_T  ),
+    .mbist_ce_r0_R (  mbist_ce_r0_R0  ),
+    .mbist_ce_r0_X (  mbist_ce_r0_X0  ),
+    .mbist_ce_r0_C (  mbist_ce_r0_C0  ),
+    .mbist_ce_r0_S (  mbist_ce_r0_S  ),
+    .mbist_en_sync_T (  mbist_en_sync_T  ),
+    .mbist_en_sync_R (  mbist_en_sync_R0  ),
+    .mbist_en_sync_X (  mbist_en_sync_X0  ),
+    .mbist_en_sync_C (  mbist_en_sync_C0  ),
+    .mbist_en_sync_S (  mbist_en_sync_S  ),
+    .mbist_ramaccess_rst__T (  mbist_ramaccess_rst__T  ),
+    .mbist_ramaccess_rst__R (  mbist_ramaccess_rst__R0  ),
+    .mbist_ramaccess_rst__X (  mbist_ramaccess_rst__X0  ),
+    .mbist_ramaccess_rst__C (  mbist_ramaccess_rst__C0  ),
+    .mbist_ramaccess_rst__S (  mbist_ramaccess_rst__S  ),
+    .mbist_we_w0_T (  mbist_we_w0_T  ),
+    .mbist_we_w0_R (  mbist_we_w0_R0  ),
+    .mbist_we_w0_X (  mbist_we_w0_X0  ),
+    .mbist_we_w0_C (  mbist_we_w0_C0  ),
+    .mbist_we_w0_S (  mbist_we_w0_S  ),
+    .ore_T (  ore_T  ),
+    .ore_R (  ore_R0  ),
+    .ore_X (  ore_X0  ),
+    .ore_C (  ore_C0  ),
+    .ore_S (  ore_S  ),
+    .pwrbus_ram_pd_T (  pwrbus_ram_pd_T  ),
+    .pwrbus_ram_pd_R (  pwrbus_ram_pd_R0  ),
+    .pwrbus_ram_pd_X (  pwrbus_ram_pd_X0  ),
+    .pwrbus_ram_pd_C (  pwrbus_ram_pd_C0  ),
+    .pwrbus_ram_pd_S (  pwrbus_ram_pd_S  ),
+    .ra_T (  ra_T  ),
+    .ra_R (  ra_R0  ),
+    .ra_X (  ra_X0  ),
+    .ra_C (  ra_C0  ),
+    .ra_S (  ra_S  ),
+    .re_T (  re_T  ),
+    .re_R (  re_R0  ),
+    .re_X (  re_X0  ),
+    .re_C (  re_C0  ),
+    .re_S (  re_S  ),
+    .scan_en_T (  scan_en_T  ),
+    .scan_en_R (  scan_en_R0  ),
+    .scan_en_X (  scan_en_X0  ),
+    .scan_en_C (  scan_en_C0  ),
+    .scan_en_S (  scan_en_S  ),
+    .scan_ramtms_T (  scan_ramtms_T  ),
+    .scan_ramtms_R (  scan_ramtms_R0  ),
+    .scan_ramtms_X (  scan_ramtms_X0  ),
+    .scan_ramtms_C (  scan_ramtms_C0  ),
+    .scan_ramtms_S (  scan_ramtms_S  ),
+    .shiftDR_T (  shiftDR_T  ),
+    .shiftDR_R (  shiftDR_R0  ),
+    .shiftDR_X (  shiftDR_X0  ),
+    .shiftDR_C (  shiftDR_C0  ),
+    .shiftDR_S (  shiftDR_S  ),
+    .svop_T (  svop_T  ),
+    .svop_R (  svop_R0  ),
+    .svop_X (  svop_X0  ),
+    .svop_C (  svop_C0  ),
+    .svop_S (  svop_S  ),
+    .test_mode_T (  test_mode_T  ),
+    .test_mode_R (  test_mode_R0  ),
+    .test_mode_X (  test_mode_X0  ),
+    .test_mode_C (  test_mode_C0  ),
+    .test_mode_S (  test_mode_S  ),
+    .updateDR_T (  updateDR_T  ),
+    .updateDR_R (  updateDR_R0  ),
+    .updateDR_X (  updateDR_X0  ),
+    .updateDR_C (  updateDR_C0  ),
+    .updateDR_S (  updateDR_S  ),
+    .wa_T (  wa_T  ),
+    .wa_R (  wa_R0  ),
+    .wa_X (  wa_X0  ),
+    .wa_C (  wa_C0  ),
+    .wa_S (  wa_S  ),
+    .we_T (  we_T  ),
+    .we_R (  we_R0  ),
+    .we_X (  we_X0  ),
+    .we_C (  we_C0  ),
+    .we_S (  we_S  ),
+    .write_inh_T (  write_inh_T  ),
+    .write_inh_R (  write_inh_R0  ),
+    .write_inh_X (  write_inh_X0  ),
+    .write_inh_C (  write_inh_C0  ),
+    .write_inh_S (  write_inh_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .SO_int_net_T (  SO_int_net_T  ),
+    .SO_int_net_R0 (  SO_int_net_R  ),
+    .SO_int_net_X0 (  SO_int_net_X  ),
+    .SO_int_net_C0 (  SO_int_net_C  ),
+    .SO_int_net_S ( SO_int_net_S ),
+    .dout_T (  dout_T  ),
+    .dout_R0 (  dout_R  ),
+    .dout_X0 (  dout_X  ),
+    .dout_C0 (  dout_C  ),
+    .dout_S ( dout_S ),
+    .mbist_Do_r0_int_net_T (  mbist_Do_r0_int_net_T  ),
+    .mbist_Do_r0_int_net_R0 (  mbist_Do_r0_int_net_R  ),
+    .mbist_Do_r0_int_net_X0 (  mbist_Do_r0_int_net_X  ),
+    .mbist_Do_r0_int_net_C0 (  mbist_Do_r0_int_net_C  ),
+    .mbist_Do_r0_int_net_S ( mbist_Do_r0_int_net_S ),
+    .updateDR ( updateDR ),
+    .scan_ramtms ( scan_ramtms ),
+    .re ( re ),
+    .debug_mode ( debug_mode ),
+    .SI ( SI ),
+    .mbist_Di_w0 ( mbist_Di_w0 ),
+    .we ( we ),
+    .dout ( dout ),
+    .dbyp ( dbyp ),
+    .di ( di ),
+    .clk ( clk ),
+    .test_mode ( test_mode ),
+    .svop ( svop ),
+    .ary_atpg_ctl ( ary_atpg_ctl ),
+    .iddq_mode ( iddq_mode ),
+    .mbist_ramaccess_rst_ ( mbist_ramaccess_rst_ ),
+    .write_inh ( write_inh ),
+    .byp_sel ( byp_sel ),
+    .mbist_Ra_r0 ( mbist_Ra_r0 ),
+    .wa ( wa ),
+    .SO_int_net ( SO_int_net ),
+    .ary_read_inh ( ary_read_inh ),
+    .mbist_en_sync ( mbist_en_sync ),
+    .jtag_readonly_mode ( jtag_readonly_mode ),
+    .mbist_Do_r0_int_net ( mbist_Do_r0_int_net ),
+    .mbist_Wa_w0 ( mbist_Wa_w0 ),
+    .mbist_ce_r0 ( mbist_ce_r0 ),
+    .mbist_we_w0 ( mbist_we_w0 ),
+    .shiftDR ( shiftDR ),
+    .ore ( ore ),
+    .scan_en ( scan_en ),
+    .pwrbus_ram_pd ( pwrbus_ram_pd ),
+    .ra ( ra )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_SI (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_SI_T  ),
+    .Y_R0 (  pre_SI_R  ),
+    .Y_X0 (  pre_SI_X  ),
+    .Y_C0 (  pre_SI_C  ),
+    .Y_S ( pre_SI_S ),
+    .Y ( pre_SI )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_ary_atpg_ctl (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_ary_atpg_ctl_T  ),
+    .Y_R0 (  pre_ary_atpg_ctl_R  ),
+    .Y_X0 (  pre_ary_atpg_ctl_X  ),
+    .Y_C0 (  pre_ary_atpg_ctl_C  ),
+    .Y_S ( pre_ary_atpg_ctl_S ),
+    .Y ( pre_ary_atpg_ctl )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_ary_read_inh (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_ary_read_inh_T  ),
+    .Y_R0 (  pre_ary_read_inh_R  ),
+    .Y_X0 (  pre_ary_read_inh_X  ),
+    .Y_C0 (  pre_ary_read_inh_C  ),
+    .Y_S ( pre_ary_read_inh_S ),
+    .Y ( pre_ary_read_inh )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_debug_mode (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_debug_mode_T  ),
+    .Y_R0 (  pre_debug_mode_R  ),
+    .Y_X0 (  pre_debug_mode_X  ),
+    .Y_C0 (  pre_debug_mode_C  ),
+    .Y_S ( pre_debug_mode_S ),
+    .Y ( pre_debug_mode )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_iddq_mode (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_iddq_mode_T  ),
+    .Y_R0 (  pre_iddq_mode_R  ),
+    .Y_X0 (  pre_iddq_mode_X  ),
+    .Y_C0 (  pre_iddq_mode_C  ),
+    .Y_S ( pre_iddq_mode_S ),
+    .Y ( pre_iddq_mode )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_jtag_readonly_mode (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_jtag_readonly_mode_T  ),
+    .Y_R0 (  pre_jtag_readonly_mode_R  ),
+    .Y_X0 (  pre_jtag_readonly_mode_X  ),
+    .Y_C0 (  pre_jtag_readonly_mode_C  ),
+    .Y_S ( pre_jtag_readonly_mode_S ),
+    .Y ( pre_jtag_readonly_mode )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_mbist_Di_w0_0 (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_mbist_Di_w0_0_T  ),
+    .Y_R0 (  pre_mbist_Di_w0_0_R  ),
+    .Y_X0 (  pre_mbist_Di_w0_0_X  ),
+    .Y_C0 (  pre_mbist_Di_w0_0_C  ),
+    .Y_S ( pre_mbist_Di_w0_0_S ),
+    .Y ( pre_mbist_Di_w0_0 )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_mbist_Di_w0_1 (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_mbist_Di_w0_1_T  ),
+    .Y_R0 (  pre_mbist_Di_w0_1_R  ),
+    .Y_X0 (  pre_mbist_Di_w0_1_X  ),
+    .Y_C0 (  pre_mbist_Di_w0_1_C  ),
+    .Y_S ( pre_mbist_Di_w0_1_S ),
+    .Y ( pre_mbist_Di_w0_1 )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_mbist_Ra_r0_0 (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_mbist_Ra_r0_0_T  ),
+    .Y_R0 (  pre_mbist_Ra_r0_0_R  ),
+    .Y_X0 (  pre_mbist_Ra_r0_0_X  ),
+    .Y_C0 (  pre_mbist_Ra_r0_0_C  ),
+    .Y_S ( pre_mbist_Ra_r0_0_S ),
+    .Y ( pre_mbist_Ra_r0_0 )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_mbist_Ra_r0_1 (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_mbist_Ra_r0_1_T  ),
+    .Y_R0 (  pre_mbist_Ra_r0_1_R  ),
+    .Y_X0 (  pre_mbist_Ra_r0_1_X  ),
+    .Y_C0 (  pre_mbist_Ra_r0_1_C  ),
+    .Y_S ( pre_mbist_Ra_r0_1_S ),
+    .Y ( pre_mbist_Ra_r0_1 )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_mbist_Ra_r0_2 (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_mbist_Ra_r0_2_T  ),
+    .Y_R0 (  pre_mbist_Ra_r0_2_R  ),
+    .Y_X0 (  pre_mbist_Ra_r0_2_X  ),
+    .Y_C0 (  pre_mbist_Ra_r0_2_C  ),
+    .Y_S ( pre_mbist_Ra_r0_2_S ),
+    .Y ( pre_mbist_Ra_r0_2 )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_mbist_Ra_r0_3 (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_mbist_Ra_r0_3_T  ),
+    .Y_R0 (  pre_mbist_Ra_r0_3_R  ),
+    .Y_X0 (  pre_mbist_Ra_r0_3_X  ),
+    .Y_C0 (  pre_mbist_Ra_r0_3_C  ),
+    .Y_S ( pre_mbist_Ra_r0_3_S ),
+    .Y ( pre_mbist_Ra_r0_3 )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_mbist_Ra_r0_4 (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_mbist_Ra_r0_4_T  ),
+    .Y_R0 (  pre_mbist_Ra_r0_4_R  ),
+    .Y_X0 (  pre_mbist_Ra_r0_4_X  ),
+    .Y_C0 (  pre_mbist_Ra_r0_4_C  ),
+    .Y_S ( pre_mbist_Ra_r0_4_S ),
+    .Y ( pre_mbist_Ra_r0_4 )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_mbist_Ra_r0_5 (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_mbist_Ra_r0_5_T  ),
+    .Y_R0 (  pre_mbist_Ra_r0_5_R  ),
+    .Y_X0 (  pre_mbist_Ra_r0_5_X  ),
+    .Y_C0 (  pre_mbist_Ra_r0_5_C  ),
+    .Y_S ( pre_mbist_Ra_r0_5_S ),
+    .Y ( pre_mbist_Ra_r0_5 )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_mbist_Ra_r0_6 (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_mbist_Ra_r0_6_T  ),
+    .Y_R0 (  pre_mbist_Ra_r0_6_R  ),
+    .Y_X0 (  pre_mbist_Ra_r0_6_X  ),
+    .Y_C0 (  pre_mbist_Ra_r0_6_C  ),
+    .Y_S ( pre_mbist_Ra_r0_6_S ),
+    .Y ( pre_mbist_Ra_r0_6 )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_mbist_Wa_w0_0 (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_mbist_Wa_w0_0_T  ),
+    .Y_R0 (  pre_mbist_Wa_w0_0_R  ),
+    .Y_X0 (  pre_mbist_Wa_w0_0_X  ),
+    .Y_C0 (  pre_mbist_Wa_w0_0_C  ),
+    .Y_S ( pre_mbist_Wa_w0_0_S ),
+    .Y ( pre_mbist_Wa_w0_0 )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_mbist_Wa_w0_1 (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_mbist_Wa_w0_1_T  ),
+    .Y_R0 (  pre_mbist_Wa_w0_1_R  ),
+    .Y_X0 (  pre_mbist_Wa_w0_1_X  ),
+    .Y_C0 (  pre_mbist_Wa_w0_1_C  ),
+    .Y_S ( pre_mbist_Wa_w0_1_S ),
+    .Y ( pre_mbist_Wa_w0_1 )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_mbist_Wa_w0_2 (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_mbist_Wa_w0_2_T  ),
+    .Y_R0 (  pre_mbist_Wa_w0_2_R  ),
+    .Y_X0 (  pre_mbist_Wa_w0_2_X  ),
+    .Y_C0 (  pre_mbist_Wa_w0_2_C  ),
+    .Y_S ( pre_mbist_Wa_w0_2_S ),
+    .Y ( pre_mbist_Wa_w0_2 )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_mbist_Wa_w0_3 (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_mbist_Wa_w0_3_T  ),
+    .Y_R0 (  pre_mbist_Wa_w0_3_R  ),
+    .Y_X0 (  pre_mbist_Wa_w0_3_X  ),
+    .Y_C0 (  pre_mbist_Wa_w0_3_C  ),
+    .Y_S ( pre_mbist_Wa_w0_3_S ),
+    .Y ( pre_mbist_Wa_w0_3 )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_mbist_Wa_w0_4 (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_mbist_Wa_w0_4_T  ),
+    .Y_R0 (  pre_mbist_Wa_w0_4_R  ),
+    .Y_X0 (  pre_mbist_Wa_w0_4_X  ),
+    .Y_C0 (  pre_mbist_Wa_w0_4_C  ),
+    .Y_S ( pre_mbist_Wa_w0_4_S ),
+    .Y ( pre_mbist_Wa_w0_4 )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_mbist_Wa_w0_5 (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_mbist_Wa_w0_5_T  ),
+    .Y_R0 (  pre_mbist_Wa_w0_5_R  ),
+    .Y_X0 (  pre_mbist_Wa_w0_5_X  ),
+    .Y_C0 (  pre_mbist_Wa_w0_5_C  ),
+    .Y_S ( pre_mbist_Wa_w0_5_S ),
+    .Y ( pre_mbist_Wa_w0_5 )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_mbist_Wa_w0_6 (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_mbist_Wa_w0_6_T  ),
+    .Y_R0 (  pre_mbist_Wa_w0_6_R  ),
+    .Y_X0 (  pre_mbist_Wa_w0_6_X  ),
+    .Y_C0 (  pre_mbist_Wa_w0_6_C  ),
+    .Y_S ( pre_mbist_Wa_w0_6_S ),
+    .Y ( pre_mbist_Wa_w0_6 )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_mbist_ce_r0 (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_mbist_ce_r0_T  ),
+    .Y_R0 (  pre_mbist_ce_r0_R  ),
+    .Y_X0 (  pre_mbist_ce_r0_X  ),
+    .Y_C0 (  pre_mbist_ce_r0_C  ),
+    .Y_S ( pre_mbist_ce_r0_S ),
+    .Y ( pre_mbist_ce_r0 )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_mbist_en_sync (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_mbist_en_sync_T  ),
+    .Y_R0 (  pre_mbist_en_sync_R  ),
+    .Y_X0 (  pre_mbist_en_sync_X  ),
+    .Y_C0 (  pre_mbist_en_sync_C  ),
+    .Y_S ( pre_mbist_en_sync_S ),
+    .Y ( pre_mbist_en_sync )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_mbist_ramaccess_rst_ (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_mbist_ramaccess_rst__T  ),
+    .Y_R0 (  pre_mbist_ramaccess_rst__R  ),
+    .Y_X0 (  pre_mbist_ramaccess_rst__X  ),
+    .Y_C0 (  pre_mbist_ramaccess_rst__C  ),
+    .Y_S ( pre_mbist_ramaccess_rst__S ),
+    .Y ( pre_mbist_ramaccess_rst_ )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_mbist_we_w0 (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_mbist_we_w0_T  ),
+    .Y_R0 (  pre_mbist_we_w0_R  ),
+    .Y_X0 (  pre_mbist_we_w0_X  ),
+    .Y_C0 (  pre_mbist_we_w0_C  ),
+    .Y_S ( pre_mbist_we_w0_S ),
+    .Y ( pre_mbist_we_w0 )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_scan_en (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_scan_en_T  ),
+    .Y_R0 (  pre_scan_en_R  ),
+    .Y_X0 (  pre_scan_en_X  ),
+    .Y_C0 (  pre_scan_en_C  ),
+    .Y_S ( pre_scan_en_S ),
+    .Y ( pre_scan_en )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_scan_ramtms (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_scan_ramtms_T  ),
+    .Y_R0 (  pre_scan_ramtms_R  ),
+    .Y_X0 (  pre_scan_ramtms_X  ),
+    .Y_C0 (  pre_scan_ramtms_C  ),
+    .Y_S ( pre_scan_ramtms_S ),
+    .Y ( pre_scan_ramtms )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_shiftDR (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_shiftDR_T  ),
+    .Y_R0 (  pre_shiftDR_R  ),
+    .Y_X0 (  pre_shiftDR_X  ),
+    .Y_C0 (  pre_shiftDR_C  ),
+    .Y_S ( pre_shiftDR_S ),
+    .Y ( pre_shiftDR )
+  );
+// module: NV_BLKBOX_SRC0
+  NV_BLKBOX_SRC0 testInst_svop_0 (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  svop_T [0]  ),
+    .Y_R0 (  svop_R [0]  ),
+    .Y_X0 (  svop_X [0]  ),
+    .Y_C0 (  svop_C [0]  ),
+    .Y_S ( svop_S ),
+    .Y ( svop[0] )
+  );
+// module: NV_BLKBOX_SRC0
+  NV_BLKBOX_SRC0 testInst_svop_1 (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  svop_T [1]  ),
+    .Y_R0 (  svop_R [1]  ),
+    .Y_X0 (  svop_X [1]  ),
+    .Y_C0 (  svop_C [1]  ),
+    .Y_S ( svop_S ),
+    .Y ( svop[1] )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_test_mode (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_test_mode_T  ),
+    .Y_R0 (  pre_test_mode_R  ),
+    .Y_X0 (  pre_test_mode_X  ),
+    .Y_C0 (  pre_test_mode_C  ),
+    .Y_S ( pre_test_mode_S ),
+    .Y ( pre_test_mode )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_updateDR (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_updateDR_T  ),
+    .Y_R0 (  pre_updateDR_R  ),
+    .Y_X0 (  pre_updateDR_X  ),
+    .Y_C0 (  pre_updateDR_C  ),
+    .Y_S ( pre_updateDR_S ),
+    .Y ( pre_updateDR )
+  );
+// module: NV_BLKBOX_SRC0_X
+  NV_BLKBOX_SRC0_X testInst_write_inh (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  pre_write_inh_T  ),
+    .Y_R0 (  pre_write_inh_R  ),
+    .Y_X0 (  pre_write_inh_X  ),
+    .Y_C0 (  pre_write_inh_C  ),
+    .Y_S ( pre_write_inh_S ),
+    .Y ( pre_write_inh )
+  );
+  assign write_inh_C = ( write_inh_C0 );
+  assign we_C = ( we_C0 );
+  assign wa_C = ( wa_C0 );
+  assign updateDR_C = ( updateDR_C0 );
+  assign test_mode_C = ( test_mode_C0 );
+  assign svop_C = ( svop_C0 );
+  assign shiftDR_C = ( shiftDR_C0 );
+  assign scan_ramtms_C = ( scan_ramtms_C0 );
+  assign scan_en_C = ( scan_en_C0 );
+  assign re_C = ( re_C0 );
+  assign ra_C = ( ra_C0 );
+  assign pwrbus_ram_pd_C = ( pwrbus_ram_pd_C0 );
+  assign ore_C = ( ore_C0 );
+  assign mbist_we_w0_C = ( mbist_we_w0_C0 );
+  assign mbist_ramaccess_rst__C = ( mbist_ramaccess_rst__C0 );
+  assign mbist_en_sync_C = ( mbist_en_sync_C0 );
+  assign mbist_ce_r0_C = ( mbist_ce_r0_C0 );
+  assign mbist_Wa_w0_C = ( mbist_Wa_w0_C0 );
+  assign mbist_Ra_r0_C = ( mbist_Ra_r0_C0 );
+  assign mbist_Di_w0_C = ( mbist_Di_w0_C0 );
+  assign jtag_readonly_mode_C = ( jtag_readonly_mode_C0 );
+  assign iddq_mode_C = ( iddq_mode_C0 );
+  assign di_C = ( di_C0 );
+  assign debug_mode_C = ( debug_mode_C0 );
+  assign dbyp_C = ( dbyp_C0 );
+  assign byp_sel_C = ( byp_sel_C0 );
+  assign ary_read_inh_C = ( ary_read_inh_C0 );
+  assign ary_atpg_ctl_C = ( ary_atpg_ctl_C0 );
+  assign SI_C = ( SI_C0 );
+  assign pre_write_inh_C = ( pre_write_inh_C0 );
+  assign pre_updateDR_C = ( pre_updateDR_C0 );
+  assign pre_test_mode_C = ( pre_test_mode_C0 );
+  assign pre_shiftDR_C = ( pre_shiftDR_C0 );
+  assign pre_scan_ramtms_C = ( pre_scan_ramtms_C0 );
+  assign pre_scan_en_C = ( pre_scan_en_C0 );
+  assign pre_mbist_we_w0_C = ( pre_mbist_we_w0_C0 );
+  assign pre_mbist_ramaccess_rst__C = ( pre_mbist_ramaccess_rst__C0 );
+  assign pre_mbist_en_sync_C = ( pre_mbist_en_sync_C0 );
+  assign pre_mbist_ce_r0_C = ( pre_mbist_ce_r0_C0 );
+  assign pre_mbist_Wa_w0_6_C = ( pre_mbist_Wa_w0_6_C0 );
+  assign pre_mbist_Wa_w0_5_C = ( pre_mbist_Wa_w0_5_C0 );
+  assign pre_mbist_Wa_w0_4_C = ( pre_mbist_Wa_w0_4_C0 );
+  assign pre_mbist_Wa_w0_3_C = ( pre_mbist_Wa_w0_3_C0 );
+  assign pre_mbist_Wa_w0_2_C = ( pre_mbist_Wa_w0_2_C0 );
+  assign pre_mbist_Wa_w0_1_C = ( pre_mbist_Wa_w0_1_C0 );
+  assign pre_mbist_Wa_w0_0_C = ( pre_mbist_Wa_w0_0_C0 );
+  assign pre_mbist_Ra_r0_6_C = ( pre_mbist_Ra_r0_6_C0 );
+  assign pre_mbist_Ra_r0_5_C = ( pre_mbist_Ra_r0_5_C0 );
+  assign pre_mbist_Ra_r0_4_C = ( pre_mbist_Ra_r0_4_C0 );
+  assign pre_mbist_Ra_r0_3_C = ( pre_mbist_Ra_r0_3_C0 );
+  assign pre_mbist_Ra_r0_2_C = ( pre_mbist_Ra_r0_2_C0 );
+  assign pre_mbist_Ra_r0_1_C = ( pre_mbist_Ra_r0_1_C0 );
+  assign pre_mbist_Ra_r0_0_C = ( pre_mbist_Ra_r0_0_C0 );
+  assign pre_mbist_Di_w0_1_C = ( pre_mbist_Di_w0_1_C0 );
+  assign pre_mbist_Di_w0_0_C = ( pre_mbist_Di_w0_0_C0 );
+  assign pre_jtag_readonly_mode_C = ( pre_jtag_readonly_mode_C0 );
+  assign pre_iddq_mode_C = ( pre_iddq_mode_C0 );
+  assign pre_debug_mode_C = ( pre_debug_mode_C0 );
+  assign pre_ary_read_inh_C = ( pre_ary_read_inh_C0 );
+  assign pre_ary_atpg_ctl_C = ( pre_ary_atpg_ctl_C0 );
+  assign DFT_clamp_C = ( DFT_clamp_C0 ) | ( DFT_clamp_C1 ) | ( DFT_clamp_C2 ) | ( DFT_clamp_C3 ) | ( DFT_clamp_C4 ) | ( DFT_clamp_C5 ) | ( DFT_clamp_C6 ) | ( DFT_clamp_C7 ) | ( DFT_clamp_C8 ) | ( DFT_clamp_C9 ) | ( DFT_clamp_C10 ) | ( DFT_clamp_C11 ) | ( DFT_clamp_C12 ) | ( DFT_clamp_C13 ) | ( DFT_clamp_C14 ) | ( DFT_clamp_C15 ) | ( DFT_clamp_C16 ) | ( DFT_clamp_C17 ) | ( DFT_clamp_C18 ) | ( DFT_clamp_C19 ) | ( DFT_clamp_C20 ) | ( DFT_clamp_C21 ) | ( DFT_clamp_C22 ) | ( DFT_clamp_C23 ) | ( DFT_clamp_C24 ) | ( DFT_clamp_C25 ) | ( DFT_clamp_C26 ) | ( DFT_clamp_C27 ) | ( DFT_clamp_C28 ) | ( DFT_clamp_C29 ) | ( DFT_clamp_C30 ) | ( DFT_clamp_C31 );
+  assign pre_SI_C = ( pre_SI_C0 );
+  assign dout_C = ( dout_C0 );
+  assign write_inh_X = ( write_inh_X0 );
+  assign we_X = ( we_X0 );
+  assign wa_X = ( wa_X0 );
+  assign updateDR_X = ( updateDR_X0 );
+  assign test_mode_X = ( test_mode_X0 );
+  assign svop_X = ( svop_X0 );
+  assign shiftDR_X = ( shiftDR_X0 );
+  assign scan_ramtms_X = ( scan_ramtms_X0 );
+  assign scan_en_X = ( scan_en_X0 );
+  assign re_X = ( re_X0 );
+  assign ra_X = ( ra_X0 );
+  assign pwrbus_ram_pd_X = ( pwrbus_ram_pd_X0 );
+  assign ore_X = ( ore_X0 );
+  assign mbist_we_w0_X = ( mbist_we_w0_X0 );
+  assign mbist_ramaccess_rst__X = ( mbist_ramaccess_rst__X0 );
+  assign mbist_en_sync_X = ( mbist_en_sync_X0 );
+  assign mbist_ce_r0_X = ( mbist_ce_r0_X0 );
+  assign mbist_Wa_w0_X = ( mbist_Wa_w0_X0 );
+  assign mbist_Ra_r0_X = ( mbist_Ra_r0_X0 );
+  assign mbist_Di_w0_X = ( mbist_Di_w0_X0 );
+  assign jtag_readonly_mode_X = ( jtag_readonly_mode_X0 );
+  assign iddq_mode_X = ( iddq_mode_X0 );
+  assign di_X = ( di_X0 );
+  assign debug_mode_X = ( debug_mode_X0 );
+  assign dbyp_X = ( dbyp_X0 );
+  assign byp_sel_X = ( byp_sel_X0 );
+  assign ary_read_inh_X = ( ary_read_inh_X0 );
+  assign ary_atpg_ctl_X = ( ary_atpg_ctl_X0 );
+  assign SI_X = ( SI_X0 );
+  assign pre_write_inh_X = ( pre_write_inh_X0 );
+  assign pre_updateDR_X = ( pre_updateDR_X0 );
+  assign pre_test_mode_X = ( pre_test_mode_X0 );
+  assign pre_shiftDR_X = ( pre_shiftDR_X0 );
+  assign pre_scan_ramtms_X = ( pre_scan_ramtms_X0 );
+  assign pre_scan_en_X = ( pre_scan_en_X0 );
+  assign pre_mbist_we_w0_X = ( pre_mbist_we_w0_X0 );
+  assign pre_mbist_ramaccess_rst__X = ( pre_mbist_ramaccess_rst__X0 );
+  assign pre_mbist_en_sync_X = ( pre_mbist_en_sync_X0 );
+  assign pre_mbist_ce_r0_X = ( pre_mbist_ce_r0_X0 );
+  assign pre_mbist_Wa_w0_6_X = ( pre_mbist_Wa_w0_6_X0 );
+  assign pre_mbist_Wa_w0_5_X = ( pre_mbist_Wa_w0_5_X0 );
+  assign pre_mbist_Wa_w0_4_X = ( pre_mbist_Wa_w0_4_X0 );
+  assign pre_mbist_Wa_w0_3_X = ( pre_mbist_Wa_w0_3_X0 );
+  assign pre_mbist_Wa_w0_2_X = ( pre_mbist_Wa_w0_2_X0 );
+  assign pre_mbist_Wa_w0_1_X = ( pre_mbist_Wa_w0_1_X0 );
+  assign pre_mbist_Wa_w0_0_X = ( pre_mbist_Wa_w0_0_X0 );
+  assign pre_mbist_Ra_r0_6_X = ( pre_mbist_Ra_r0_6_X0 );
+  assign pre_mbist_Ra_r0_5_X = ( pre_mbist_Ra_r0_5_X0 );
+  assign pre_mbist_Ra_r0_4_X = ( pre_mbist_Ra_r0_4_X0 );
+  assign pre_mbist_Ra_r0_3_X = ( pre_mbist_Ra_r0_3_X0 );
+  assign pre_mbist_Ra_r0_2_X = ( pre_mbist_Ra_r0_2_X0 );
+  assign pre_mbist_Ra_r0_1_X = ( pre_mbist_Ra_r0_1_X0 );
+  assign pre_mbist_Ra_r0_0_X = ( pre_mbist_Ra_r0_0_X0 );
+  assign pre_mbist_Di_w0_1_X = ( pre_mbist_Di_w0_1_X0 );
+  assign pre_mbist_Di_w0_0_X = ( pre_mbist_Di_w0_0_X0 );
+  assign pre_jtag_readonly_mode_X = ( pre_jtag_readonly_mode_X0 );
+  assign pre_iddq_mode_X = ( pre_iddq_mode_X0 );
+  assign pre_debug_mode_X = ( pre_debug_mode_X0 );
+  assign pre_ary_read_inh_X = ( pre_ary_read_inh_X0 );
+  assign pre_ary_atpg_ctl_X = ( pre_ary_atpg_ctl_X0 );
+  assign DFT_clamp_X = ( DFT_clamp_X0 ) | ( DFT_clamp_X1 ) | ( DFT_clamp_X2 ) | ( DFT_clamp_X3 ) | ( DFT_clamp_X4 ) | ( DFT_clamp_X5 ) | ( DFT_clamp_X6 ) | ( DFT_clamp_X7 ) | ( DFT_clamp_X8 ) | ( DFT_clamp_X9 ) | ( DFT_clamp_X10 ) | ( DFT_clamp_X11 ) | ( DFT_clamp_X12 ) | ( DFT_clamp_X13 ) | ( DFT_clamp_X14 ) | ( DFT_clamp_X15 ) | ( DFT_clamp_X16 ) | ( DFT_clamp_X17 ) | ( DFT_clamp_X18 ) | ( DFT_clamp_X19 ) | ( DFT_clamp_X20 ) | ( DFT_clamp_X21 ) | ( DFT_clamp_X22 ) | ( DFT_clamp_X23 ) | ( DFT_clamp_X24 ) | ( DFT_clamp_X25 ) | ( DFT_clamp_X26 ) | ( DFT_clamp_X27 ) | ( DFT_clamp_X28 ) | ( DFT_clamp_X29 ) | ( DFT_clamp_X30 ) | ( DFT_clamp_X31 );
+  assign pre_SI_X = ( pre_SI_X0 );
+  assign dout_X = ( dout_X0 );
+  assign write_inh_R = ( write_inh_X0 & write_inh_R0 );
+  assign we_R = ( we_X0 & we_R0 );
+  assign wa_R = ( wa_X0 & wa_R0 );
+  assign updateDR_R = ( updateDR_X0 & updateDR_R0 );
+  assign test_mode_R = ( test_mode_X0 & test_mode_R0 );
+  assign svop_R = ( svop_X0 & svop_R0 );
+  assign shiftDR_R = ( shiftDR_X0 & shiftDR_R0 );
+  assign scan_ramtms_R = ( scan_ramtms_X0 & scan_ramtms_R0 );
+  assign scan_en_R = ( scan_en_X0 & scan_en_R0 );
+  assign re_R = ( re_X0 & re_R0 );
+  assign ra_R = ( ra_X0 & ra_R0 );
+  assign pwrbus_ram_pd_R = ( pwrbus_ram_pd_X0 & pwrbus_ram_pd_R0 );
+  assign ore_R = ( ore_X0 & ore_R0 );
+  assign mbist_we_w0_R = ( mbist_we_w0_X0 & mbist_we_w0_R0 );
+  assign mbist_ramaccess_rst__R = ( mbist_ramaccess_rst__X0 & mbist_ramaccess_rst__R0 );
+  assign mbist_en_sync_R = ( mbist_en_sync_X0 & mbist_en_sync_R0 );
+  assign mbist_ce_r0_R = ( mbist_ce_r0_X0 & mbist_ce_r0_R0 );
+  assign mbist_Wa_w0_R = ( mbist_Wa_w0_X0 & mbist_Wa_w0_R0 );
+  assign mbist_Ra_r0_R = ( mbist_Ra_r0_X0 & mbist_Ra_r0_R0 );
+  assign mbist_Di_w0_R = ( mbist_Di_w0_X0 & mbist_Di_w0_R0 );
+  assign jtag_readonly_mode_R = ( jtag_readonly_mode_X0 & jtag_readonly_mode_R0 );
+  assign iddq_mode_R = ( iddq_mode_X0 & iddq_mode_R0 );
+  assign di_R = ( di_X0 & di_R0 );
+  assign debug_mode_R = ( debug_mode_X0 & debug_mode_R0 );
+  assign dbyp_R = ( dbyp_X0 & dbyp_R0 );
+  assign byp_sel_R = ( byp_sel_X0 & byp_sel_R0 );
+  assign ary_read_inh_R = ( ary_read_inh_X0 & ary_read_inh_R0 );
+  assign ary_atpg_ctl_R = ( ary_atpg_ctl_X0 & ary_atpg_ctl_R0 );
+  assign SI_R = ( SI_X0 & SI_R0 );
+  assign pre_write_inh_R = ( pre_write_inh_X0 & pre_write_inh_R0 );
+  assign pre_updateDR_R = ( pre_updateDR_X0 & pre_updateDR_R0 );
+  assign pre_test_mode_R = ( pre_test_mode_X0 & pre_test_mode_R0 );
+  assign pre_shiftDR_R = ( pre_shiftDR_X0 & pre_shiftDR_R0 );
+  assign pre_scan_ramtms_R = ( pre_scan_ramtms_X0 & pre_scan_ramtms_R0 );
+  assign pre_scan_en_R = ( pre_scan_en_X0 & pre_scan_en_R0 );
+  assign pre_mbist_we_w0_R = ( pre_mbist_we_w0_X0 & pre_mbist_we_w0_R0 );
+  assign pre_mbist_ramaccess_rst__R = ( pre_mbist_ramaccess_rst__X0 & pre_mbist_ramaccess_rst__R0 );
+  assign pre_mbist_en_sync_R = ( pre_mbist_en_sync_X0 & pre_mbist_en_sync_R0 );
+  assign pre_mbist_ce_r0_R = ( pre_mbist_ce_r0_X0 & pre_mbist_ce_r0_R0 );
+  assign pre_mbist_Wa_w0_6_R = ( pre_mbist_Wa_w0_6_X0 & pre_mbist_Wa_w0_6_R0 );
+  assign pre_mbist_Wa_w0_5_R = ( pre_mbist_Wa_w0_5_X0 & pre_mbist_Wa_w0_5_R0 );
+  assign pre_mbist_Wa_w0_4_R = ( pre_mbist_Wa_w0_4_X0 & pre_mbist_Wa_w0_4_R0 );
+  assign pre_mbist_Wa_w0_3_R = ( pre_mbist_Wa_w0_3_X0 & pre_mbist_Wa_w0_3_R0 );
+  assign pre_mbist_Wa_w0_2_R = ( pre_mbist_Wa_w0_2_X0 & pre_mbist_Wa_w0_2_R0 );
+  assign pre_mbist_Wa_w0_1_R = ( pre_mbist_Wa_w0_1_X0 & pre_mbist_Wa_w0_1_R0 );
+  assign pre_mbist_Wa_w0_0_R = ( pre_mbist_Wa_w0_0_X0 & pre_mbist_Wa_w0_0_R0 );
+  assign pre_mbist_Ra_r0_6_R = ( pre_mbist_Ra_r0_6_X0 & pre_mbist_Ra_r0_6_R0 );
+  assign pre_mbist_Ra_r0_5_R = ( pre_mbist_Ra_r0_5_X0 & pre_mbist_Ra_r0_5_R0 );
+  assign pre_mbist_Ra_r0_4_R = ( pre_mbist_Ra_r0_4_X0 & pre_mbist_Ra_r0_4_R0 );
+  assign pre_mbist_Ra_r0_3_R = ( pre_mbist_Ra_r0_3_X0 & pre_mbist_Ra_r0_3_R0 );
+  assign pre_mbist_Ra_r0_2_R = ( pre_mbist_Ra_r0_2_X0 & pre_mbist_Ra_r0_2_R0 );
+  assign pre_mbist_Ra_r0_1_R = ( pre_mbist_Ra_r0_1_X0 & pre_mbist_Ra_r0_1_R0 );
+  assign pre_mbist_Ra_r0_0_R = ( pre_mbist_Ra_r0_0_X0 & pre_mbist_Ra_r0_0_R0 );
+  assign pre_mbist_Di_w0_1_R = ( pre_mbist_Di_w0_1_X0 & pre_mbist_Di_w0_1_R0 );
+  assign pre_mbist_Di_w0_0_R = ( pre_mbist_Di_w0_0_X0 & pre_mbist_Di_w0_0_R0 );
+  assign pre_jtag_readonly_mode_R = ( pre_jtag_readonly_mode_X0 & pre_jtag_readonly_mode_R0 );
+  assign pre_iddq_mode_R = ( pre_iddq_mode_X0 & pre_iddq_mode_R0 );
+  assign pre_debug_mode_R = ( pre_debug_mode_X0 & pre_debug_mode_R0 );
+  assign pre_ary_read_inh_R = ( pre_ary_read_inh_X0 & pre_ary_read_inh_R0 );
+  assign pre_ary_atpg_ctl_R = ( pre_ary_atpg_ctl_X0 & pre_ary_atpg_ctl_R0 );
+  assign DFT_clamp_R = ( DFT_clamp_X0 & DFT_clamp_R0 ) | ( DFT_clamp_X1 & DFT_clamp_R1 ) | ( DFT_clamp_X2 & DFT_clamp_R2 ) | ( DFT_clamp_X3 & DFT_clamp_R3 ) | ( DFT_clamp_X4 & DFT_clamp_R4 ) | ( DFT_clamp_X5 & DFT_clamp_R5 ) | ( DFT_clamp_X6 & DFT_clamp_R6 ) | ( DFT_clamp_X7 & DFT_clamp_R7 ) | ( DFT_clamp_X8 & DFT_clamp_R8 ) | ( DFT_clamp_X9 & DFT_clamp_R9 ) | ( DFT_clamp_X10 & DFT_clamp_R10 ) | ( DFT_clamp_X11 & DFT_clamp_R11 ) | ( DFT_clamp_X12 & DFT_clamp_R12 ) | ( DFT_clamp_X13 & DFT_clamp_R13 ) | ( DFT_clamp_X14 & DFT_clamp_R14 ) | ( DFT_clamp_X15 & DFT_clamp_R15 ) | ( DFT_clamp_X16 & DFT_clamp_R16 ) | ( DFT_clamp_X17 & DFT_clamp_R17 ) | ( DFT_clamp_X18 & DFT_clamp_R18 ) | ( DFT_clamp_X19 & DFT_clamp_R19 ) | ( DFT_clamp_X20 & DFT_clamp_R20 ) | ( DFT_clamp_X21 & DFT_clamp_R21 ) | ( DFT_clamp_X22 & DFT_clamp_R22 ) | ( DFT_clamp_X23 & DFT_clamp_R23 ) | ( DFT_clamp_X24 & DFT_clamp_R24 ) | ( DFT_clamp_X25 & DFT_clamp_R25 ) | ( DFT_clamp_X26 & DFT_clamp_R26 ) | ( DFT_clamp_X27 & DFT_clamp_R27 ) | ( DFT_clamp_X28 & DFT_clamp_R28 ) | ( DFT_clamp_X29 & DFT_clamp_R29 ) | ( DFT_clamp_X30 & DFT_clamp_R30 ) | ( DFT_clamp_X31 & DFT_clamp_R31 );
+  assign pre_SI_R = ( pre_SI_X0 & pre_SI_R0 );
+  assign dout_R = ( dout_X0 & dout_R0 );
+ // ground taints for floating regs
+ // ground taints for unused wires
+  assign { SO_int_net_R , SO_int_net_C , SO_int_net_X , mbist_Do_r0_int_net_R , mbist_Do_r0_int_net_C , mbist_Do_r0_int_net_X  } = 0;
+ // ground taints for unused wire slices
+endmodule

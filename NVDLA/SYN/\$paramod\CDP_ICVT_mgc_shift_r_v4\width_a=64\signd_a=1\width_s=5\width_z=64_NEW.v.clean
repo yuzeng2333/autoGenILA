@@ -1,0 +1,6 @@
+module \$paramod\CDP_ICVT_mgc_shift_r_v4\width_a=64\signd_a=1\width_s=5\width_z=64 (a, s, z);
+  input [63:0] a;
+  input [4:0] s;
+  output [63:0] z;
+  assign z = $signed(a) >>> s;
+endmodule

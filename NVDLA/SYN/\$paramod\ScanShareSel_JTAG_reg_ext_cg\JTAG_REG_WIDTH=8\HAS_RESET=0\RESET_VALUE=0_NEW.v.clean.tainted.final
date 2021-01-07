@@ -1,0 +1,624 @@
+module \$paramod\ScanShareSel_JTAG_reg_ext_cg\JTAG_REG_WIDTH=8\HAS_RESET=0\RESET_VALUE=0 ( D , clk , reset_ , scanin , sel , shiftDR , INSTR_IN_ZY , D_T , D_S , Q_R0 , Q_C0 , Q_X0 , clk_T , clk_S , reset__T , reset__S , scanin_T , scanin_S , scanout_R0 , scanout_C0 , scanout_X0 , sel_T , sel_S , shiftDR_T , shiftDR_S , Q , scanout , D_R , D_X , D_C , Q_T , Q_S , clk_R , clk_X , clk_C , reset__R , reset__X , reset__C , scanin_R , scanin_X , scanin_C , scanout_T , scanout_S , sel_R , sel_X , sel_C , shiftDR_R , shiftDR_X , shiftDR_C );
+  logic rst_zy;
+  integer i;
+  input INSTR_IN_ZY;
+  input [7:0] D;
+  input [7:0] D_T ;
+  input [13:0] D_S ;
+  output [7:0] D_R ;
+  output [7:0] D_X ;
+  output [7:0] D_C ;
+  output [7:0] Q;
+  logic [7:0] Q ;
+  output [7:0] Q_T ;
+  logic [7:0] Q_T ;
+  logic [7:0] Q_R ;
+  logic [7:0] Q_C ;
+  logic [7:0] Q_X ;
+  logic [13:0] Q_S ;
+  input [7:0] Q_R0 ;
+  input [7:0] Q_C0 ;
+  input [7:0] Q_X0 ;
+  output [13:0] Q_S ;
+  logic [7:0] Q_conn;
+  logic [7:0] Q_conn_T ;
+  logic [7:0] Q_conn_R ;
+  logic [7:0] Q_conn_C ;
+  logic [7:0] Q_conn_X ;
+  logic [13:0] Q_conn_S ;
+  input clk;
+  input clk_T ;
+  input [13:0] clk_S ;
+  output clk_R ;
+  output clk_X ;
+  output clk_C ;
+  logic clk_wire;
+  logic clk_wire_T ;
+  logic clk_wire_R ;
+  logic clk_wire_C ;
+  logic clk_wire_X ;
+  logic [13:0] clk_wire_S ;
+  logic [7:0] next_Q;
+  logic [7:0] next_Q_T ;
+  logic [7:0] next_Q_R ;
+  logic [7:0] next_Q_C ;
+  logic [7:0] next_Q_X ;
+  logic [13:0] next_Q_S ;
+  logic qualified_scanen_wire;
+  logic qualified_scanen_wire_T ;
+  logic qualified_scanen_wire_R ;
+  logic qualified_scanen_wire_C ;
+  logic qualified_scanen_wire_X ;
+  logic [13:0] qualified_scanen_wire_S ;
+  logic qualified_scanin_wire;
+  logic qualified_scanin_wire_T ;
+  logic qualified_scanin_wire_R ;
+  logic qualified_scanin_wire_C ;
+  logic qualified_scanin_wire_X ;
+  logic [13:0] qualified_scanin_wire_S ;
+  input reset_;
+  input reset__T ;
+  input [13:0] reset__S ;
+  output reset__R ;
+  output reset__X ;
+  output reset__C ;
+  logic scanen_wire;
+  logic scanen_wire_T ;
+  logic scanen_wire_R ;
+  logic scanen_wire_C ;
+  logic scanen_wire_X ;
+  logic [13:0] scanen_wire_S ;
+  input scanin;
+  input scanin_T ;
+  input [13:0] scanin_S ;
+  output scanin_R ;
+  output scanin_X ;
+  output scanin_C ;
+  logic scanin_wire;
+  logic scanin_wire_T ;
+  logic scanin_wire_R ;
+  logic scanin_wire_C ;
+  logic scanin_wire_X ;
+  logic [13:0] scanin_wire_S ;
+  output scanout;
+  logic scanout ;
+  output scanout_T ;
+  logic scanout_T ;
+  logic scanout_R ;
+  logic scanout_C ;
+  logic scanout_X ;
+  logic [13:0] scanout_S ;
+  input scanout_R0 ;
+  input scanout_C0 ;
+  input scanout_X0 ;
+  output [13:0] scanout_S ;
+  logic scanout_wire;
+  logic scanout_wire_T ;
+  logic scanout_wire_R ;
+  logic scanout_wire_C ;
+  logic scanout_wire_X ;
+  logic [13:0] scanout_wire_S ;
+  input sel;
+  input sel_T ;
+  input [13:0] sel_S ;
+  output sel_R ;
+  output sel_X ;
+  output sel_C ;
+  input shiftDR;
+  input shiftDR_T ;
+  input [13:0] shiftDR_S ;
+  output shiftDR_R ;
+  output shiftDR_X ;
+  output shiftDR_C ;
+  assign qualified_scanin_wire = sel ? scanin : scanin_wire;
+  logic [0:0] sel_C0 ;
+  logic [0:0] sel_R0 ;
+  logic [0:0] sel_X0 ;
+  assign sel_C0 = | qualified_scanin_wire_C ;
+  assign sel_X0 = | qualified_scanin_wire_X ;
+  assign qualified_scanin_wire_T = sel ? ( { 1{ sel_T  }} | scanin_T ) : ( { 1{ sel_T  }} | scanin_wire_T );
+  assign qualified_scanin_wire_S = sel ? scanin_S : scanin_wire_S ;
+  assign sel_R0 = ( | (qualified_scanin_wire_R | ( qualified_scanin_wire_C & ( { 1{ sel }} & scanin_T | { 1{ !sel }} & scanin_wire_T )))) && scanin != scanin_wire ;
+  logic [0:0] scanin_C0 ;
+  logic [0:0] scanin_R0 ;
+  logic [0:0] scanin_X0 ;
+  assign scanin_C0 = { 1{ sel }} ;
+  assign scanin_R0 = { 1{ sel }} & ( qualified_scanin_wire_R | ( { 1{ sel_T  }} & qualified_scanin_wire_C ));
+  assign scanin_X0 = { 1{ sel }} & qualified_scanin_wire_X ;
+  logic [0:0] scanin_wire_C0 ;
+  logic [0:0] scanin_wire_R0 ;
+  logic [0:0] scanin_wire_X0 ;
+  assign scanin_wire_C0 = { 1{ !sel }} ;
+  assign scanin_wire_R0 = { 1{ !sel }} & ( qualified_scanin_wire_R | ( { 1{ sel_T  }} & qualified_scanin_wire_C ));
+  assign scanin_wire_X0 = { 1{ !sel }} & qualified_scanin_wire_X ;
+  assign qualified_scanen_wire = sel ? shiftDR : scanen_wire;
+  logic [0:0] sel_C1 ;
+  logic [0:0] sel_R1 ;
+  logic [0:0] sel_X1 ;
+  assign sel_C1 = | qualified_scanen_wire_C ;
+  assign sel_X1 = | qualified_scanen_wire_X ;
+  assign qualified_scanen_wire_T = sel ? ( { 1{ sel_T  }} | shiftDR_T ) : ( { 1{ sel_T  }} | scanen_wire_T );
+  assign qualified_scanen_wire_S = sel ? shiftDR_S : scanen_wire_S ;
+  assign sel_R1 = ( | (qualified_scanen_wire_R | ( qualified_scanen_wire_C & ( { 1{ sel }} & shiftDR_T | { 1{ !sel }} & scanen_wire_T )))) && shiftDR != scanen_wire ;
+  logic [0:0] shiftDR_C0 ;
+  logic [0:0] shiftDR_R0 ;
+  logic [0:0] shiftDR_X0 ;
+  assign shiftDR_C0 = { 1{ sel }} ;
+  assign shiftDR_R0 = { 1{ sel }} & ( qualified_scanen_wire_R | ( { 1{ sel_T  }} & qualified_scanen_wire_C ));
+  assign shiftDR_X0 = { 1{ sel }} & qualified_scanen_wire_X ;
+  logic [0:0] scanen_wire_C0 ;
+  logic [0:0] scanen_wire_R0 ;
+  logic [0:0] scanen_wire_X0 ;
+  assign scanen_wire_C0 = { 1{ !sel }} ;
+  assign scanen_wire_R0 = { 1{ !sel }} & ( qualified_scanen_wire_R | ( { 1{ sel_T  }} & qualified_scanen_wire_C ));
+  assign scanen_wire_X0 = { 1{ !sel }} & qualified_scanen_wire_X ;
+  logic [0:0] clk_R0 ;
+  logic [0:0] clk_X0 ;
+  logic [0:0] clk_C0 ;
+  logic [7:0] D_R0 ;
+  logic [7:0] D_X0 ;
+  logic [7:0] D_C0 ;
+  logic [0:0] qualified_scanen_wire_R0 ;
+  logic [0:0] qualified_scanen_wire_X0 ;
+  logic [0:0] qualified_scanen_wire_C0 ;
+  logic [7:0] Q_R1 ;
+  logic [7:0] Q_X1 ;
+  logic [7:0] Q_C1 ;
+// module: SDFQD1
+  SDFQD1 \Jreg_ff[0].SSS.nr (
+    .CP_T (  clk_T  ),
+    .CP_R (  clk_R0  ),
+    .CP_X (  clk_X0  ),
+    .CP_C (  clk_C0  ),
+    .CP_S (  clk_S  ),
+    .D_T (  D_T [0]  ),
+    .D_R (  D_R0 [0]  ),
+    .D_X (  D_X0 [0]  ),
+    .D_C (  D_C0 [0]  ),
+    .D_S (  D_S [0]  ),
+    .SE_T (  qualified_scanen_wire_T  ),
+    .SE_R (  qualified_scanen_wire_R0  ),
+    .SE_X (  qualified_scanen_wire_X0  ),
+    .SE_C (  qualified_scanen_wire_C0  ),
+    .SE_S (  qualified_scanen_wire_S  ),
+    .SI_T (  Q_T [1]  ),
+    .SI_R (  Q_R1 [1]  ),
+    .SI_X (  Q_X1 [1]  ),
+    .SI_C (  Q_C1 [1]  ),
+    .SI_S (  Q_S [1]  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Q_T (  scanout_wire_T  ),
+    .Q_R0 (  scanout_wire_R  ),
+    .Q_X0 (  scanout_wire_X  ),
+    .Q_C0 (  scanout_wire_C  ),
+    .Q_S ( scanout_wire_S ),
+    .SE ( qualified_scanen_wire ),
+    .SI ( Q[1] ),
+    .Q ( scanout_wire ),
+    .CP ( clk ),
+    .D ( D[0] )
+  );
+  logic [0:0] clk_R1 ;
+  logic [0:0] clk_X1 ;
+  logic [0:0] clk_C1 ;
+  logic [0:0] qualified_scanen_wire_R1 ;
+  logic [0:0] qualified_scanen_wire_X1 ;
+  logic [0:0] qualified_scanen_wire_C1 ;
+// module: SDFQD1
+  SDFQD1 \Jreg_ff[1].SSS.nr (
+    .CP_T (  clk_T  ),
+    .CP_R (  clk_R1  ),
+    .CP_X (  clk_X1  ),
+    .CP_C (  clk_C1  ),
+    .CP_S (  clk_S  ),
+    .D_T (  D_T [1]  ),
+    .D_R (  D_R0 [1]  ),
+    .D_X (  D_X0 [1]  ),
+    .D_C (  D_C0 [1]  ),
+    .D_S (  D_S [1]  ),
+    .SE_T (  qualified_scanen_wire_T  ),
+    .SE_R (  qualified_scanen_wire_R1  ),
+    .SE_X (  qualified_scanen_wire_X1  ),
+    .SE_C (  qualified_scanen_wire_C1  ),
+    .SE_S (  qualified_scanen_wire_S  ),
+    .SI_T (  Q_T [2]  ),
+    .SI_R (  Q_R1 [2]  ),
+    .SI_X (  Q_X1 [2]  ),
+    .SI_C (  Q_C1 [2]  ),
+    .SI_S (  Q_S [2]  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Q_T (  Q_T [1]  ),
+    .Q_R0 (  Q_R [1]  ),
+    .Q_X0 (  Q_X [1]  ),
+    .Q_C0 (  Q_C [1]  ),
+    .Q_S ( Q_S ),
+    .SE ( qualified_scanen_wire ),
+    .SI ( Q[2] ),
+    .Q ( Q[1] ),
+    .CP ( clk ),
+    .D ( D[1] )
+  );
+  logic [0:0] clk_R2 ;
+  logic [0:0] clk_X2 ;
+  logic [0:0] clk_C2 ;
+  logic [0:0] qualified_scanen_wire_R2 ;
+  logic [0:0] qualified_scanen_wire_X2 ;
+  logic [0:0] qualified_scanen_wire_C2 ;
+// module: SDFQD1
+  SDFQD1 \Jreg_ff[2].SSS.nr (
+    .CP_T (  clk_T  ),
+    .CP_R (  clk_R2  ),
+    .CP_X (  clk_X2  ),
+    .CP_C (  clk_C2  ),
+    .CP_S (  clk_S  ),
+    .D_T (  D_T [2]  ),
+    .D_R (  D_R0 [2]  ),
+    .D_X (  D_X0 [2]  ),
+    .D_C (  D_C0 [2]  ),
+    .D_S (  D_S [2]  ),
+    .SE_T (  qualified_scanen_wire_T  ),
+    .SE_R (  qualified_scanen_wire_R2  ),
+    .SE_X (  qualified_scanen_wire_X2  ),
+    .SE_C (  qualified_scanen_wire_C2  ),
+    .SE_S (  qualified_scanen_wire_S  ),
+    .SI_T (  Q_T [3]  ),
+    .SI_R (  Q_R1 [3]  ),
+    .SI_X (  Q_X1 [3]  ),
+    .SI_C (  Q_C1 [3]  ),
+    .SI_S (  Q_S [3]  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Q_T (  Q_T [2]  ),
+    .Q_R0 (  Q_R [2]  ),
+    .Q_X0 (  Q_X [2]  ),
+    .Q_C0 (  Q_C [2]  ),
+    .Q_S ( Q_S ),
+    .SE ( qualified_scanen_wire ),
+    .SI ( Q[3] ),
+    .Q ( Q[2] ),
+    .CP ( clk ),
+    .D ( D[2] )
+  );
+  logic [0:0] clk_R3 ;
+  logic [0:0] clk_X3 ;
+  logic [0:0] clk_C3 ;
+  logic [0:0] qualified_scanen_wire_R3 ;
+  logic [0:0] qualified_scanen_wire_X3 ;
+  logic [0:0] qualified_scanen_wire_C3 ;
+// module: SDFQD1
+  SDFQD1 \Jreg_ff[3].SSS.nr (
+    .CP_T (  clk_T  ),
+    .CP_R (  clk_R3  ),
+    .CP_X (  clk_X3  ),
+    .CP_C (  clk_C3  ),
+    .CP_S (  clk_S  ),
+    .D_T (  D_T [3]  ),
+    .D_R (  D_R0 [3]  ),
+    .D_X (  D_X0 [3]  ),
+    .D_C (  D_C0 [3]  ),
+    .D_S (  D_S [3]  ),
+    .SE_T (  qualified_scanen_wire_T  ),
+    .SE_R (  qualified_scanen_wire_R3  ),
+    .SE_X (  qualified_scanen_wire_X3  ),
+    .SE_C (  qualified_scanen_wire_C3  ),
+    .SE_S (  qualified_scanen_wire_S  ),
+    .SI_T (  Q_T [4]  ),
+    .SI_R (  Q_R1 [4]  ),
+    .SI_X (  Q_X1 [4]  ),
+    .SI_C (  Q_C1 [4]  ),
+    .SI_S (  Q_S [4]  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Q_T (  Q_T [3]  ),
+    .Q_R0 (  Q_R [3]  ),
+    .Q_X0 (  Q_X [3]  ),
+    .Q_C0 (  Q_C [3]  ),
+    .Q_S ( Q_S ),
+    .SE ( qualified_scanen_wire ),
+    .SI ( Q[4] ),
+    .Q ( Q[3] ),
+    .CP ( clk ),
+    .D ( D[3] )
+  );
+  logic [0:0] clk_R4 ;
+  logic [0:0] clk_X4 ;
+  logic [0:0] clk_C4 ;
+  logic [0:0] qualified_scanen_wire_R4 ;
+  logic [0:0] qualified_scanen_wire_X4 ;
+  logic [0:0] qualified_scanen_wire_C4 ;
+// module: SDFQD1
+  SDFQD1 \Jreg_ff[4].SSS.nr (
+    .CP_T (  clk_T  ),
+    .CP_R (  clk_R4  ),
+    .CP_X (  clk_X4  ),
+    .CP_C (  clk_C4  ),
+    .CP_S (  clk_S  ),
+    .D_T (  D_T [4]  ),
+    .D_R (  D_R0 [4]  ),
+    .D_X (  D_X0 [4]  ),
+    .D_C (  D_C0 [4]  ),
+    .D_S (  D_S [4]  ),
+    .SE_T (  qualified_scanen_wire_T  ),
+    .SE_R (  qualified_scanen_wire_R4  ),
+    .SE_X (  qualified_scanen_wire_X4  ),
+    .SE_C (  qualified_scanen_wire_C4  ),
+    .SE_S (  qualified_scanen_wire_S  ),
+    .SI_T (  Q_T [5]  ),
+    .SI_R (  Q_R1 [5]  ),
+    .SI_X (  Q_X1 [5]  ),
+    .SI_C (  Q_C1 [5]  ),
+    .SI_S (  Q_S [5]  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Q_T (  Q_T [4]  ),
+    .Q_R0 (  Q_R [4]  ),
+    .Q_X0 (  Q_X [4]  ),
+    .Q_C0 (  Q_C [4]  ),
+    .Q_S ( Q_S ),
+    .SE ( qualified_scanen_wire ),
+    .SI ( Q[5] ),
+    .Q ( Q[4] ),
+    .CP ( clk ),
+    .D ( D[4] )
+  );
+  logic [0:0] clk_R5 ;
+  logic [0:0] clk_X5 ;
+  logic [0:0] clk_C5 ;
+  logic [0:0] qualified_scanen_wire_R5 ;
+  logic [0:0] qualified_scanen_wire_X5 ;
+  logic [0:0] qualified_scanen_wire_C5 ;
+// module: SDFQD1
+  SDFQD1 \Jreg_ff[5].SSS.nr (
+    .CP_T (  clk_T  ),
+    .CP_R (  clk_R5  ),
+    .CP_X (  clk_X5  ),
+    .CP_C (  clk_C5  ),
+    .CP_S (  clk_S  ),
+    .D_T (  D_T [5]  ),
+    .D_R (  D_R0 [5]  ),
+    .D_X (  D_X0 [5]  ),
+    .D_C (  D_C0 [5]  ),
+    .D_S (  D_S [5]  ),
+    .SE_T (  qualified_scanen_wire_T  ),
+    .SE_R (  qualified_scanen_wire_R5  ),
+    .SE_X (  qualified_scanen_wire_X5  ),
+    .SE_C (  qualified_scanen_wire_C5  ),
+    .SE_S (  qualified_scanen_wire_S  ),
+    .SI_T (  Q_T [6]  ),
+    .SI_R (  Q_R1 [6]  ),
+    .SI_X (  Q_X1 [6]  ),
+    .SI_C (  Q_C1 [6]  ),
+    .SI_S (  Q_S [6]  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Q_T (  Q_T [5]  ),
+    .Q_R0 (  Q_R [5]  ),
+    .Q_X0 (  Q_X [5]  ),
+    .Q_C0 (  Q_C [5]  ),
+    .Q_S ( Q_S ),
+    .SE ( qualified_scanen_wire ),
+    .SI ( Q[6] ),
+    .Q ( Q[5] ),
+    .CP ( clk ),
+    .D ( D[5] )
+  );
+  logic [0:0] clk_R6 ;
+  logic [0:0] clk_X6 ;
+  logic [0:0] clk_C6 ;
+  logic [0:0] qualified_scanen_wire_R6 ;
+  logic [0:0] qualified_scanen_wire_X6 ;
+  logic [0:0] qualified_scanen_wire_C6 ;
+// module: SDFQD1
+  SDFQD1 \Jreg_ff[6].SSS.nr (
+    .CP_T (  clk_T  ),
+    .CP_R (  clk_R6  ),
+    .CP_X (  clk_X6  ),
+    .CP_C (  clk_C6  ),
+    .CP_S (  clk_S  ),
+    .D_T (  D_T [6]  ),
+    .D_R (  D_R0 [6]  ),
+    .D_X (  D_X0 [6]  ),
+    .D_C (  D_C0 [6]  ),
+    .D_S (  D_S [6]  ),
+    .SE_T (  qualified_scanen_wire_T  ),
+    .SE_R (  qualified_scanen_wire_R6  ),
+    .SE_X (  qualified_scanen_wire_X6  ),
+    .SE_C (  qualified_scanen_wire_C6  ),
+    .SE_S (  qualified_scanen_wire_S  ),
+    .SI_T (  Q_T [7]  ),
+    .SI_R (  Q_R1 [7]  ),
+    .SI_X (  Q_X1 [7]  ),
+    .SI_C (  Q_C1 [7]  ),
+    .SI_S (  Q_S [7]  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Q_T (  Q_T [6]  ),
+    .Q_R0 (  Q_R [6]  ),
+    .Q_X0 (  Q_X [6]  ),
+    .Q_C0 (  Q_C [6]  ),
+    .Q_S ( Q_S ),
+    .SE ( qualified_scanen_wire ),
+    .SI ( Q[7] ),
+    .Q ( Q[6] ),
+    .CP ( clk ),
+    .D ( D[6] )
+  );
+  logic [0:0] clk_R7 ;
+  logic [0:0] clk_X7 ;
+  logic [0:0] clk_C7 ;
+  logic [0:0] qualified_scanen_wire_R7 ;
+  logic [0:0] qualified_scanen_wire_X7 ;
+  logic [0:0] qualified_scanen_wire_C7 ;
+  logic [0:0] qualified_scanin_wire_R0 ;
+  logic [0:0] qualified_scanin_wire_X0 ;
+  logic [0:0] qualified_scanin_wire_C0 ;
+// module: SDFQD1
+  SDFQD1 \Jreg_ff[7].SSS.nr (
+    .CP_T (  clk_T  ),
+    .CP_R (  clk_R7  ),
+    .CP_X (  clk_X7  ),
+    .CP_C (  clk_C7  ),
+    .CP_S (  clk_S  ),
+    .D_T (  D_T [7]  ),
+    .D_R (  D_R0 [7]  ),
+    .D_X (  D_X0 [7]  ),
+    .D_C (  D_C0 [7]  ),
+    .D_S (  D_S [7]  ),
+    .SE_T (  qualified_scanen_wire_T  ),
+    .SE_R (  qualified_scanen_wire_R7  ),
+    .SE_X (  qualified_scanen_wire_X7  ),
+    .SE_C (  qualified_scanen_wire_C7  ),
+    .SE_S (  qualified_scanen_wire_S  ),
+    .SI_T (  qualified_scanin_wire_T  ),
+    .SI_R (  qualified_scanin_wire_R0  ),
+    .SI_X (  qualified_scanin_wire_X0  ),
+    .SI_C (  qualified_scanin_wire_C0  ),
+    .SI_S (  qualified_scanin_wire_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Q_T (  Q_T [7]  ),
+    .Q_R0 (  Q_R [7]  ),
+    .Q_X0 (  Q_X [7]  ),
+    .Q_C0 (  Q_C [7]  ),
+    .Q_S ( Q_S ),
+    .SE ( qualified_scanen_wire ),
+    .SI ( qualified_scanin_wire ),
+    .Q ( Q[7] ),
+    .CP ( clk ),
+    .D ( D[7] )
+  );
+// module: NV_BLKBOX_SRC0
+  NV_BLKBOX_SRC0 UJ_testInst_ess_scanen_buf (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  scanen_wire_T  ),
+    .Y_R0 (  scanen_wire_R  ),
+    .Y_X0 (  scanen_wire_X  ),
+    .Y_C0 (  scanen_wire_C  ),
+    .Y_S ( scanen_wire_S ),
+    .Y ( scanen_wire )
+  );
+// module: NV_BLKBOX_SRC0
+  NV_BLKBOX_SRC0 UJ_testInst_ess_scanin_buf (
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  scanin_wire_T  ),
+    .Y_R0 (  scanin_wire_R  ),
+    .Y_X0 (  scanin_wire_X  ),
+    .Y_C0 (  scanin_wire_C  ),
+    .Y_S ( scanin_wire_S ),
+    .Y ( scanin_wire )
+  );
+  logic [0:0] scanout_wire_R0 ;
+  logic [0:0] scanout_wire_X0 ;
+  logic [0:0] scanout_wire_C0 ;
+// module: NV_BLKBOX_BUFFER
+  NV_BLKBOX_BUFFER UJ_testInst_ess_scanout_buf (
+    .A_T (  scanout_wire_T  ),
+    .A_R (  scanout_wire_R0  ),
+    .A_X (  scanout_wire_X0  ),
+    .A_C (  scanout_wire_C0  ),
+    .A_S (  scanout_wire_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .Y_T (  scanout_T  ),
+    .Y_R0 (  scanout_R  ),
+    .Y_X0 (  scanout_X  ),
+    .Y_C0 (  scanout_C  ),
+    .Y_S ( scanout_S ),
+    .Y ( scanout ),
+    .A ( scanout_wire )
+  );
+  assign Q[0] = scanout_wire;
+  logic [0:0] scanout_wire_C1 ;
+  logic [0:0] scanout_wire_R1 ;
+  logic [0:0] scanout_wire_X1 ;
+  assign Q_T [0] = scanout_wire_T ;
+  assign scanout_wire_C1 = Q_C [0] ;
+  assign scanout_wire_R1 = Q_R [0] ;
+  assign scanout_wire_X1 = Q_X [0] ;
+  assign Q_S = scanout_wire_S ;
+  assign Q_conn = { qualified_scanin_wire, Q[7:1] };
+  assign Q_conn_T = {  qualified_scanin_wire_T , Q_T [7:1]  };
+  logic [13:0] Q_conn_S ;
+  assign Q_conn_S = 0 ;
+  logic [0:0] qualified_scanin_wire_R1 ;
+  logic [0:0] qualified_scanin_wire_X1 ;
+  logic [0:0] qualified_scanin_wire_C1 ;
+  assign qualified_scanin_wire_R1 = Q_conn_R [7:7] ;
+  assign qualified_scanin_wire_X1 = Q_conn_X [7:7] ;
+  assign qualified_scanin_wire_C1 = Q_conn_C [7:7] ;
+  assign { Q_R1 [0] } = 0;
+  assign { Q_X1 [0] } = 0;
+  assign { Q_C1 [0] } = 0;
+  logic [7:0] Q_R2 ;
+  logic [7:0] Q_X2 ;
+  logic [7:0] Q_C2 ;
+  assign Q_R2 [7:1] = Q_conn_R [6:0] ;
+  assign Q_X2 [7:1] = Q_conn_X [6:0] ;
+  assign Q_C2 [7:1] = Q_conn_C [6:0] ;
+  assign clk_wire = clk;
+  logic [0:0] clk_C8 ;
+  logic [0:0] clk_R8 ;
+  logic [0:0] clk_X8 ;
+  assign clk_wire_T = clk_T ;
+  assign clk_C8 = clk_wire_C ;
+  assign clk_R8 = clk_wire_R ;
+  assign clk_X8 = clk_wire_X ;
+  assign clk_wire_S = clk_S ;
+  assign next_Q = D;
+  logic [7:0] D_C1 ;
+  logic [7:0] D_R1 ;
+  logic [7:0] D_X1 ;
+  assign next_Q_T = D_T ;
+  assign D_C1 = next_Q_C ;
+  assign D_R1 = next_Q_R ;
+  assign D_X1 = next_Q_X ;
+  assign next_Q_S = D_S ;
+  assign scanout_wire_C = ( scanout_wire_C0 ) | ( scanout_wire_C1 );
+  assign qualified_scanin_wire_C = ( qualified_scanin_wire_C0 ) | ( qualified_scanin_wire_C1 );
+  assign qualified_scanen_wire_C = ( qualified_scanen_wire_C0 ) | ( qualified_scanen_wire_C1 ) | ( qualified_scanen_wire_C2 ) | ( qualified_scanen_wire_C3 ) | ( qualified_scanen_wire_C4 ) | ( qualified_scanen_wire_C5 ) | ( qualified_scanen_wire_C6 ) | ( qualified_scanen_wire_C7 );
+  assign D_C = ( D_C0 ) | ( D_C1 );
+  assign clk_C = ( clk_C0 ) | ( clk_C1 ) | ( clk_C2 ) | ( clk_C3 ) | ( clk_C4 ) | ( clk_C5 ) | ( clk_C6 ) | ( clk_C7 ) | ( clk_C8 );
+  assign scanen_wire_C = ( scanen_wire_C0 );
+  assign shiftDR_C = ( shiftDR_C0 );
+  assign scanin_wire_C = ( scanin_wire_C0 );
+  assign scanin_C = ( scanin_C0 );
+  assign sel_C = ( sel_C0 ) | ( sel_C1 );
+  assign scanout_C = ( scanout_C0 );
+  assign Q_C = ( Q_C0 ) | ( Q_C1 ) | ( Q_C2 );
+  assign scanout_wire_X = ( scanout_wire_X0 ) | ( scanout_wire_X1 );
+  assign qualified_scanin_wire_X = ( qualified_scanin_wire_X0 ) | ( qualified_scanin_wire_X1 );
+  assign qualified_scanen_wire_X = ( qualified_scanen_wire_X0 ) | ( qualified_scanen_wire_X1 ) | ( qualified_scanen_wire_X2 ) | ( qualified_scanen_wire_X3 ) | ( qualified_scanen_wire_X4 ) | ( qualified_scanen_wire_X5 ) | ( qualified_scanen_wire_X6 ) | ( qualified_scanen_wire_X7 );
+  assign D_X = ( D_X0 ) | ( D_X1 );
+  assign clk_X = ( clk_X0 ) | ( clk_X1 ) | ( clk_X2 ) | ( clk_X3 ) | ( clk_X4 ) | ( clk_X5 ) | ( clk_X6 ) | ( clk_X7 ) | ( clk_X8 );
+  assign scanen_wire_X = ( scanen_wire_X0 );
+  assign shiftDR_X = ( shiftDR_X0 );
+  assign scanin_wire_X = ( scanin_wire_X0 );
+  assign scanin_X = ( scanin_X0 );
+  assign sel_X = ( sel_X0 ) | ( sel_X1 );
+  assign scanout_X = ( scanout_X0 );
+  assign Q_X = ( Q_X0 ) | ( Q_X1 ) | ( Q_X2 );
+  assign scanout_wire_R = ( scanout_wire_X0 & scanout_wire_R0 ) | ( scanout_wire_X1 & scanout_wire_R1 );
+  assign qualified_scanin_wire_R = ( qualified_scanin_wire_X0 & qualified_scanin_wire_R0 ) | ( qualified_scanin_wire_X1 & qualified_scanin_wire_R1 );
+  assign qualified_scanen_wire_R = ( qualified_scanen_wire_X0 & qualified_scanen_wire_R0 ) | ( qualified_scanen_wire_X1 & qualified_scanen_wire_R1 ) | ( qualified_scanen_wire_X2 & qualified_scanen_wire_R2 ) | ( qualified_scanen_wire_X3 & qualified_scanen_wire_R3 ) | ( qualified_scanen_wire_X4 & qualified_scanen_wire_R4 ) | ( qualified_scanen_wire_X5 & qualified_scanen_wire_R5 ) | ( qualified_scanen_wire_X6 & qualified_scanen_wire_R6 ) | ( qualified_scanen_wire_X7 & qualified_scanen_wire_R7 );
+  assign D_R = ( D_X0 & D_R0 ) | ( D_X1 & D_R1 );
+  assign clk_R = ( clk_X0 & clk_R0 ) | ( clk_X1 & clk_R1 ) | ( clk_X2 & clk_R2 ) | ( clk_X3 & clk_R3 ) | ( clk_X4 & clk_R4 ) | ( clk_X5 & clk_R5 ) | ( clk_X6 & clk_R6 ) | ( clk_X7 & clk_R7 ) | ( clk_X8 & clk_R8 );
+  assign scanen_wire_R = ( scanen_wire_X0 & scanen_wire_R0 );
+  assign shiftDR_R = ( shiftDR_X0 & shiftDR_R0 );
+  assign scanin_wire_R = ( scanin_wire_X0 & scanin_wire_R0 );
+  assign scanin_R = ( scanin_X0 & scanin_R0 );
+  assign sel_R = ( sel_X0 & sel_R0 ) | ( sel_X1 & sel_R1 );
+  assign scanout_R = ( scanout_X0 & scanout_R0 );
+  assign Q_R = ( Q_X0 & Q_R0 ) | ( Q_X1 & Q_R1 ) | ( Q_X2 & Q_R2 );
+ // ground taints for floating regs
+ // ground taints for unused wires
+  assign { Q_conn_R , Q_conn_C , Q_conn_X , clk_wire_R , clk_wire_C , clk_wire_X , next_Q_R , next_Q_C , next_Q_X  } = 0;
+ // ground taints for unused wire slices
+  assign { Q_R2 [0] } = 0;
+  assign { Q_X2 [0] } = 0;
+  assign { Q_C2 [0] } = 0;
+  assign rst_zy = reset_ ;
+endmodule

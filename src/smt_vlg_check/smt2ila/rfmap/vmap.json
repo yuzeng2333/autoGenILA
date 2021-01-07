@@ -1,7 +1,7 @@
 {
   "models": { "ILA":"m0" , "VERILOG": "m1" },
   "state mapping": { 
-    "word" :  "word",
+    "word[2:0]" :  "word[2:0]",
     "word_sum" : "word_sum",
     "word_sum_shit" : "word_sum_shit"
    },

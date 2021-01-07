@@ -1,0 +1,36 @@
+module FP_SUM_BLOCK_pipe_p2(nvdla_core_clk, nvdla_core_rstn, fp16_dout_4_in_pd_d1, fp16_dout_4_in_rdy_d2, fp16_dout_4_in_vld_d1, fp16_dout_4_in_pd_d2, fp16_dout_4_in_rdy_d1, fp16_dout_4_in_vld_d2);
+  wire [31:0] _00_;
+  wire _01_;
+  wire _02_;
+  wire _03_;
+  input [31:0] fp16_dout_4_in_pd_d1;
+  output [31:0] fp16_dout_4_in_pd_d2;
+  output fp16_dout_4_in_rdy_d1;
+  input fp16_dout_4_in_rdy_d2;
+  input fp16_dout_4_in_vld_d1;
+  output fp16_dout_4_in_vld_d2;
+  input nvdla_core_clk;
+  input nvdla_core_rstn;
+  wire p2_assert_clk;
+  reg [31:0] p2_pipe_data;
+  wire p2_pipe_ready;
+  wire p2_pipe_ready_bc;
+  reg p2_pipe_valid;
+  assign _02_ = p2_pipe_ready_bc && fp16_dout_4_in_vld_d1;
+  assign _03_ = ! p2_pipe_valid;
+  assign p2_pipe_ready_bc = fp16_dout_4_in_rdy_d2 || _03_;
+  always @(posedge nvdla_core_clk)
+      p2_pipe_data <= _00_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      p2_pipe_valid <= 1'b0;
+    else
+      p2_pipe_valid <= _01_;
+  assign _01_ = p2_pipe_ready_bc ? fp16_dout_4_in_vld_d1 : 1'b1;
+  assign _00_ = _02_ ? fp16_dout_4_in_pd_d1 : p2_pipe_data;
+  assign fp16_dout_4_in_pd_d2 = p2_pipe_data;
+  assign fp16_dout_4_in_rdy_d1 = p2_pipe_ready_bc;
+  assign fp16_dout_4_in_vld_d2 = p2_pipe_valid;
+  assign p2_assert_clk = nvdla_core_clk;
+  assign p2_pipe_ready = fp16_dout_4_in_rdy_d2;
+endmodule

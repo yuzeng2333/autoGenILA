@@ -1,0 +1,12 @@
+module SDFQD1(SI, D, SE, CP, Q);
+  input CP;
+  input D;
+  output Q;
+  reg Q;
+  input SE;
+  input SI;
+  wire sel;
+  always @(posedge CP)
+      Q <= sel;
+  assign sel = SE ? SI : D;
+endmodule

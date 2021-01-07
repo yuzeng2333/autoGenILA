@@ -1,0 +1,6 @@
+module \$paramod\SDP_Y_IDX_mgc_shift_l_v4\width_a=1\signd_a=0\width_s=32\width_z=31 (a, s, z);
+  input a;
+  input [31:0] s;
+  output [30:0] z;
+  assign z = a <<< s;
+endmodule

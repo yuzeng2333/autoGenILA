@@ -30,17 +30,23 @@ module word_adder(clk, rst, func, inWord, result);
 
   assign result = word_sum;
 
+  initial begin
+    word      = 0;
+    word_sum  = 0;
+    counter   = 0;
+  end
+
   always @(posedge clk) begin
-    if(rst) begin
-      word      <= 0;
-      word_sum  <= 0;
-      counter   <= 0;
-    end
-    else begin
+    //if(rst) begin
+    //  word      <= 0;
+    //  word_sum  <= 0;
+    //  counter   <= 0;
+    //end
+    //else begin
       word      <= word_next    ;    
       word_sum  <= word_sum_next;
       counter   <= counter_next ;
-    end
+    //end
   end
 
 endmodule

@@ -1,0 +1,5 @@
+module \$paramod\CDP_OCVT_mgc_in_wire_v1\rscid=3\width=16 (d, z);
+  output [15:0] d;
+  input [15:0] z;
+  assign d = z;
+endmodule

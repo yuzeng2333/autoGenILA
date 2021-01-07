@@ -1,0 +1,41 @@
+module \$paramod\SDP_Y_CVT_mgc_in_wire_v1\rscid=6\width=1 ( z , INSTR_IN_ZY , rst_zy , d_R0 , d_C0 , d_X0 , z_T , z_S , d , d_T , d_S , z_R , z_X , z_C );
+  input rst_zy;
+  integer i;
+  input INSTR_IN_ZY;
+  output d;
+  logic d ;
+  output d_T ;
+  logic d_T ;
+  logic d_R ;
+  logic d_C ;
+  logic d_X ;
+  logic [13:0] d_S ;
+  input d_R0 ;
+  input d_C0 ;
+  input d_X0 ;
+  output [13:0] d_S ;
+  input z;
+  input z_T ;
+  input [13:0] z_S ;
+  output z_R ;
+  output z_X ;
+  output z_C ;
+  assign d = z;
+  logic [0:0] z_C0 ;
+  logic [0:0] z_R0 ;
+  logic [0:0] z_X0 ;
+  assign d_T = z_T ;
+  assign z_C0 = d_C ;
+  assign z_R0 = d_R ;
+  assign z_X0 = d_X ;
+  assign d_S = z_S ;
+  assign z_C = ( z_C0 );
+  assign d_C = ( d_C0 );
+  assign z_X = ( z_X0 );
+  assign d_X = ( d_X0 );
+  assign z_R = ( z_X0 & z_R0 );
+  assign d_R = ( d_X0 & d_R0 );
+ // ground taints for floating regs
+ // ground taints for unused wires
+ // ground taints for unused wire slices
+endmodule

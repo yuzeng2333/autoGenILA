@@ -6,11 +6,10 @@ module accum(clk, rst, data, start, sum, finish, timer);
   wire [2:0] _02_;
   wire [2:0] _03_;
   wire [2:0] _04_;
-  wire [2:0] _05_;
-  wire [31:0] _06_;
+  wire [31:0] _05_;
+  wire _06_;
   wire [31:0] _07_;
-  wire [31:0] _08_;
-  wire _09_;
+  wire [2:0] _08_;
   input clk;
   reg [2:0] cnt;
   wire [2:0] cnt_nxt;
@@ -18,6 +17,7 @@ module accum(clk, rst, data, start, sum, finish, timer);
   output finish;
   reg finish;
   wire finish_nxt;
+  wire [2:0] res;
   input rst;
   input start;
   output [2:0] sum;
@@ -26,10 +26,9 @@ module accum(clk, rst, data, start, sum, finish, timer);
   output [2:0] timer;
   reg [2:0] timer;
   wire [2:0] timer_nxt;
-  assign _04_ = sum + 1'b1;
-  assign _05_ = timer + 1'b1;
+  assign _04_ = timer + 1'b1;
   assign finish_nxt = cnt == 1'b1;
-  assign _09_ = cnt > 1'b0;
+  assign _06_ = cnt > 1'b0;
   always @(posedge clk)
       timer <= _03_;
   always @(posedge clk)
@@ -42,10 +41,15 @@ module accum(clk, rst, data, start, sum, finish, timer);
   assign _00_ = rst ? 3'b000 : cnt_nxt;
   assign _01_ = rst ? 1'b0 : finish_nxt;
   assign _02_ = rst ? 3'b000 : sum_nxt;
-  assign _06_[2:0] = cnt - 1'b1;
-  assign _07_[2:0] = _09_ ? _06_[2:0] : cnt;
+  assign _05_[2:0] = cnt - 1'b1;
+  assign _07_[2:0] = _06_ ? _05_[2:0] : cnt;
   assign cnt_nxt = start ? data : _07_[2:0];
-  assign _08_[2:0] = _09_ ? _04_ : sum;
-  assign sum_nxt = start ? 3'b000 : _08_[2:0];
-  assign timer_nxt = finish ? timer : _05_;
+  assign _08_ = _06_ ? res : sum;
+  assign sum_nxt = start ? 3'b000 : _08_;
+  assign timer_nxt = finish ? timer : _04_;
+  adder u0 (
+    .clk(clk),
+    .in(sum),
+    .out(res)
+  );
 endmodule

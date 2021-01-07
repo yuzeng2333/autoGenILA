@@ -1,0 +1,126 @@
+module HLS_fp17_to_fp32_core_core_fsm ( core_wen , nvdla_core_clk , nvdla_core_rstn , INSTR_IN_ZY , core_wen_T , core_wen_S , fsm_output_R0 , fsm_output_C0 , fsm_output_X0 , nvdla_core_clk_T , nvdla_core_clk_S , nvdla_core_rstn_T , nvdla_core_rstn_S , fsm_output , core_wen_R , core_wen_X , core_wen_C , fsm_output_T , fsm_output_S , nvdla_core_clk_R , nvdla_core_clk_X , nvdla_core_clk_C , nvdla_core_rstn_R , nvdla_core_rstn_X , nvdla_core_rstn_C );
+  logic rst_zy;
+  integer i;
+  input INSTR_IN_ZY;
+  logic _0_;
+  logic _0__T ;
+  logic _0__R ;
+  logic _0__C ;
+  logic _0__X ;
+  logic [13:0] _0__S ;
+  input core_wen;
+  input core_wen_T ;
+  input [13:0] core_wen_S ;
+  output core_wen_R ;
+  output core_wen_X ;
+  output core_wen_C ;
+  output [1:0] fsm_output;
+  logic [1:0] fsm_output ;
+  output [1:0] fsm_output_T ;
+  logic [1:0] fsm_output_T ;
+  logic [1:0] fsm_output_R ;
+  logic [1:0] fsm_output_C ;
+  logic [1:0] fsm_output_X ;
+  logic [13:0] fsm_output_S ;
+  input [1:0] fsm_output_R0 ;
+  input [1:0] fsm_output_C0 ;
+  input [1:0] fsm_output_X0 ;
+  output [13:0] fsm_output_S ;
+  input nvdla_core_clk;
+  input nvdla_core_clk_T ;
+  input [13:0] nvdla_core_clk_S ;
+  output nvdla_core_clk_R ;
+  output nvdla_core_clk_X ;
+  output nvdla_core_clk_C ;
+  input nvdla_core_rstn;
+  input nvdla_core_rstn_T ;
+  input [13:0] nvdla_core_rstn_S ;
+  output nvdla_core_rstn_R ;
+  output nvdla_core_rstn_X ;
+  output nvdla_core_rstn_C ;
+  logic state_var;
+  logic  state_var_T ;
+  logic  state_var_PREV_VAL1 ;
+  logic  state_var_PREV_VAL2 ;
+  logic  state_var_R ;
+  logic  state_var_X ;
+  logic  state_var_C ;
+  logic [13:0] state_var_S ;
+  logic state_var_t_flag ;
+  logic state_var_r_flag ;
+  assign state_var_S = 531 ;
+  logic state_var_NS;
+  logic state_var_NS_T ;
+  logic state_var_NS_R ;
+  logic state_var_NS_C ;
+  logic state_var_NS_X ;
+  logic [13:0] state_var_NS_S ;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      state_var <= 1'b0;
+    else
+      state_var <= _0_;
+  logic [0:0] _0__X0 ;
+  logic [0:0] _0__R0 ;
+  logic [0:0] _0__C0 ;
+  assign _0__X0 = { 1{ state_var_S != _0__S }} ;
+  assign _0__R0 = 0 ;
+  assign _0__C0 = 0 ;
+  always @( posedge nvdla_core_clk )
+      state_var_T 		<= !nvdla_core_rstn ? 0 : ( _0__T & _0__X0 );
+  always @( posedge nvdla_core_clk )
+      state_var_t_flag 	<= !nvdla_core_rstn ? 0 : state_var_t_flag ? 1 : | _0__T & ( | _0__X0 );
+  always @( posedge nvdla_core_clk )
+      state_var_r_flag 	<= !nvdla_core_rstn ? 0 : state_var_r_flag ? 1 : state_var_t_flag ? 0 : ( | state_var_R ) ;
+  assign _0_ = core_wen ? 1'b1 : state_var;
+  logic [0:0] core_wen_C0 ;
+  logic [0:0] core_wen_R0 ;
+  logic [0:0] core_wen_X0 ;
+  assign core_wen_C0 = | _0__C ;
+  assign core_wen_X0 = | _0__X ;
+  logic [0:0] state_var_C0 ;
+  logic [0:0] state_var_R0 ;
+  logic [0:0] state_var_X0 ;
+  assign state_var_C0 = { 1{ !core_wen }};
+  assign state_var_R0 = { 1{ !core_wen }} & ( _0__R | ( { 1{ core_wen_T  }} & _0__C ));
+  assign state_var_X0 = { 1{ !core_wen }} & _0__X ;
+  assign _0__T = core_wen ? { 1{ | core_wen_T  }} : ( { 1{ | core_wen_T  }} | state_var_T );
+  assign _0__S = core_wen ? core_wen_S : state_var_S ;
+  assign core_wen_R0 = ( | (_0__R | ( { 1{ !core_wen }} & state_var_T & _0__C ))) && 1'b1 != state_var ;
+  assign fsm_output = state_var ? 2'b10 : 2'b01;
+  logic [0:0] state_var_C1 ;
+  logic [0:0] state_var_R1 ;
+  logic [0:0] state_var_X1 ;
+  assign state_var_C1 = | fsm_output_C ;
+  assign state_var_X1 = | fsm_output_X ;
+  assign fsm_output_T = { 2{ state_var_T  }} ;
+  assign fsm_output_S = state_var_S ;
+  assign state_var_R1 = ( | fsm_output_R) && 2'b10 != 2'b01 ;
+  assign state_var_NS = 1'b1;
+  assign state_var_NS_T = 0 ;
+  assign state_var_NS_S = 14'b1 ;
+  assign state_var_C = ( state_var_C0 ) | ( state_var_C1 );
+  assign core_wen_C = ( core_wen_C0 );
+  assign _0__C = ( _0__C0 );
+  assign fsm_output_C = ( fsm_output_C0 );
+  assign state_var_X = ( state_var_X0 ) | ( state_var_X1 );
+  assign core_wen_X = ( core_wen_X0 );
+  assign _0__X = ( _0__X0 );
+  assign fsm_output_X = ( fsm_output_X0 );
+  assign state_var_R = ( state_var_X0 & state_var_R0 ) | ( state_var_X1 & state_var_R1 );
+  assign core_wen_R = ( core_wen_X0 & core_wen_R0 );
+  assign _0__R = ( _0__X0 & _0__R0 );
+  assign fsm_output_R = ( fsm_output_X0 & fsm_output_R0 );
+ // ground taints for floating regs
+ // ground taints for unused wires
+  assign { state_var_NS_R , state_var_NS_C , state_var_NS_X  } = 0;
+  always @( posedge nvdla_core_clk ) begin
+    if( !nvdla_core_rstn ) state_var_PREV_VAL1 <= 0 ;
+    if( !nvdla_core_rstn ) state_var_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) state_var_PREV_VAL1 <= state_var ;
+    if( INSTR_IN_ZY ) state_var_PREV_VAL2 <= state_var_PREV_VAL1 ;
+  end
+ // ground taints for unused wire slices
+  assert property( state_var_r_flag == 0 || state_var_PREV_VAL1 == state_var_PREV_VAL2 );
+  assign rst_zy = !nvdla_core_rstn ;
+endmodule

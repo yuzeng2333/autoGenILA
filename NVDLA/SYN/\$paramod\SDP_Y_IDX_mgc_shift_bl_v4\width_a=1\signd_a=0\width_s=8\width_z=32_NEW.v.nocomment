@@ -1,0 +1,12 @@
+module \$paramod\SDP_Y_IDX_mgc_shift_bl_v4\width_a=1\signd_a=0\width_s=8\width_z=32 (a, s, z);
+  wire [7:0] _0_;
+  wire [31:0] _1_;
+  wire [31:0] _2_;
+  input a;
+  input [7:0] s;
+  output [31:0] z;
+  assign _0_ = ~ s;
+  assign z = s[7] ? _2_ : _1_;
+  assign _1_ = a <<< s;
+  assign _2_ = $signed(1'b0) >>> _0_;
+endmodule

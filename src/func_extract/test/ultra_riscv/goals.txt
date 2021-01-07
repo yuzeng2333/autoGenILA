@@ -1,0 +1,28 @@
+---- jal:
+#1:
+(1)
+mem_i_inst_i = 20'h1+5'h1+5'h1b+2'b11
+rst_i = 0
+mem_i_accept_i = 1
+mem_i_valid_i = 1
+mem_i_error_i = 0
+intr_i = 0
+reset_vector_i = 32'h80000000
+cpu_id_i = 0
+mem_d_data_rd_i = x
+mem_d_accept_i = 1
+mem_d_ack_i = 0
+mem_d_error_i = 0
+mem_d_resp_tag_i = x
+R:
+\u_fetch.pc_f_q
+W:
+\u_fetch.pc_f_q(skip) 2
+
+(goals
+(goal
+  (= |\\u_fetch.pc_f_q___#1001|
+     (bvadd #x00000004 (concat ((_ extract 31 2) |\\u_fetch.pc_f_q___#1|) #b00))))
+)
+
+

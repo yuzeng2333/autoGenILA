@@ -69,3 +69,21 @@ or1:
 
 acc:
 	./build/func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/accum 1
+
+riscv1:
+	./build/func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/riscv 1
+
+riscv:
+	./build/func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/riscv 0
+
+bi1:
+	./build/func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/biriscv 1
+
+bi:
+	./build/func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/biriscv 0
+
+urv1:
+	./build/func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/ultra_riscv 1
+
+urv:
+	./build/func_extract /workspace/research/ILA/autoGenILA/src/func_extract/test/ultra_riscv 0

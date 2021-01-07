@@ -1,0 +1,12 @@
+Begin main!
+Start time: Wed Jan  6 22:29:54 2021
+
+Give 0 to rst_i___#1
+Give 0 to mem_d_ack_i___#1
+Give 0 to mem_i_error_i___#1
+Give 20'h1+5'h1+5'h1b+2'b11 to mem_i_inst_i___#1
+Give 0 to mem_d_error_i___#1
+(goals
+(goal
+  (= |\\u_issue.u_pipe_ctrl.alu_result_e1_i___#1001| #x80000068))
+)

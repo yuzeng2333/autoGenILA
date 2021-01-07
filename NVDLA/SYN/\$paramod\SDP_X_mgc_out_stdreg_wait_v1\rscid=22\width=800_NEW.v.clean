@@ -1,0 +1,11 @@
+module \$paramod\SDP_X_mgc_out_stdreg_wait_v1\rscid=22\width=800 (ld, vd, d, lz, vz, z);
+  input [799:0] d;
+  input ld;
+  output lz;
+  output vd;
+  input vz;
+  output [799:0] z;
+  assign lz = ld;
+  assign vd = vz;
+  assign z = d;
+endmodule

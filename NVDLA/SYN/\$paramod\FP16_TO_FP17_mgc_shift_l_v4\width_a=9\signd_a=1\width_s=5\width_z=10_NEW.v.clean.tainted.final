@@ -1,0 +1,47 @@
+module \$paramod\FP16_TO_FP17_mgc_shift_l_v4\width_a=9\signd_a=1\width_s=5\width_z=10 ( a , s , INSTR_IN_ZY , rst_zy , a_T , a_S , s_T , s_S , z_R0 , z , a_R , s_R , z_T , z_S );
+  input rst_zy;
+  integer i;
+  input INSTR_IN_ZY;
+  input [8:0] a;
+  input [8:0] a_T ;
+  output [8:0] a_R ;
+  input [13:0] a_S ;
+  input [4:0] s;
+  input [4:0] s_T ;
+  output [4:0] s_R ;
+  input [13:0] s_S ;
+  output [9:0] z;
+  logic [9:0] z ;
+  output [9:0] z_T ;
+  logic [9:0] z_T ;
+  logic [9:0] z_R ;
+  logic [13:0] z_S ;
+  input [9:0] z_R0 ;
+  output [13:0] z_S ;
+  logic [9:0] fangyuan0;
+  logic [9:0] fangyuan0_T ;
+  logic [9:0] fangyuan0_R ;
+  assign fangyuan0 = { a[8], a };
+  assign fangyuan0_T = {  a_T [8] , a_T  };
+  logic [13:0] fangyuan0_S ;
+  assign fangyuan0_S = 0 ;
+  logic [8:0] a_R0 ;
+  assign a_R0 [8:8] = fangyuan0_R [9:9] ;
+  assign { a_R0 [0], a_R0 [1], a_R0 [2], a_R0 [3], a_R0 [4], a_R0 [5], a_R0 [6], a_R0 [7] } = 0;
+  logic [8:0] a_R1 ;
+  assign a_R1 = fangyuan0_R [8:0] ;
+  assign z = fangyuan0 <<< s;
+  assign z_S = 0 ;
+  logic [9:0] fangyuan0_R0 ;
+  logic [4:0] s_R0 ;
+  assign z_T = { 10{ (| fangyuan0_T ) | (|s_T ) }} ;
+  assign fangyuan0_R0 = { 10{ | z_R }} ;
+  assign s_R0 = { 5{ | z_R }} ;
+  assign s_R = ( s_R0 );
+  assign fangyuan0_R = ( fangyuan0_R0 );
+  assign a_R = ( a_R0 ) | ( a_R1 );
+  assign z_R = ( z_R0 );
+ // ground taints for floating regs
+ // ground taints for unused wires
+ // ground taints for unused wire slices
+endmodule

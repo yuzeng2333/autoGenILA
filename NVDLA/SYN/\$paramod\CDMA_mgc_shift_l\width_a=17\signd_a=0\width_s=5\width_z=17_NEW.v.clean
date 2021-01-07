@@ -1,0 +1,6 @@
+module \$paramod\CDMA_mgc_shift_l\width_a=17\signd_a=0\width_s=5\width_z=17 (a, s, z);
+  input [16:0] a;
+  input [4:0] s;
+  output [16:0] z;
+  assign z = a <<< s;
+endmodule

@@ -1,0 +1,189 @@
+module NV_NVDLA_BDMA_STORE_lat_fifo(nvdla_core_clk, nvdla_core_rstn, lat_fifo_wr_prdy, lat_fifo_wr_pvld, lat_fifo_wr_pd, lat_fifo_rd_prdy, lat_fifo_rd_pvld, lat_fifo_rd_pd, pwrbus_ram_pd);
+  wire [7:0] _00_;
+  wire _01_;
+  wire [7:0] _02_;
+  wire [7:0] _03_;
+  wire [7:0] _04_;
+  wire [7:0] _05_;
+  wire [7:0] _06_;
+  wire [7:0] _07_;
+  wire _08_;
+  wire _09_;
+  wire _10_;
+  wire _11_;
+  wire _12_;
+  wire _13_;
+  wire _14_;
+  wire _15_;
+  wire _16_;
+  wire _17_;
+  wire _18_;
+  wire _19_;
+  wire _20_;
+  wire _21_;
+  wire _22_;
+  wire _23_;
+  wire _24_;
+  wire [7:0] _25_;
+  wire [7:0] _26_;
+  reg [7:0] lat_fifo_rd_adr;
+  wire [7:0] lat_fifo_rd_adr_p;
+  reg [7:0] lat_fifo_rd_count_p;
+  output [513:0] lat_fifo_rd_pd;
+  wire [513:0] lat_fifo_rd_pd_p;
+  input lat_fifo_rd_prdy;
+  output lat_fifo_rd_pvld;
+  reg lat_fifo_rd_pvld_int;
+  reg lat_fifo_rd_pvld_p;
+  reg [7:0] lat_fifo_wr_adr;
+  reg lat_fifo_wr_busy_int;
+  wire lat_fifo_wr_busy_next;
+  reg [7:0] lat_fifo_wr_count;
+  input [513:0] lat_fifo_wr_pd;
+  output lat_fifo_wr_prdy;
+  input lat_fifo_wr_pvld;
+  input nvdla_core_clk;
+  wire nvdla_core_clk_mgated;
+  wire nvdla_core_clk_mgated_enable;
+  input nvdla_core_rstn;
+  wire ore;
+  input [31:0] pwrbus_ram_pd;
+  wire [7:0] rd_adr_next;
+  wire [7:0] rd_count_p_next;
+  wire [7:0] rd_count_p_next_no_rd_popping;
+  wire rd_count_p_next_no_rd_popping_not_0;
+  wire rd_count_p_next_not_0;
+  wire [7:0] rd_count_p_next_rd_popping;
+  wire rd_count_p_next_rd_popping_not_0;
+  wire rd_enable;
+  wire rd_popping;
+  reg rd_pushing;
+  wire rd_req_next;
+  wire [7:0] wr_adr_next;
+  wire [7:0] wr_count_next;
+  wire wr_count_next_is_245;
+  wire [7:0] wr_count_next_no_wr_popping;
+  wire wr_count_next_no_wr_popping_is_245;
+  wire [7:0] wr_count_next_wr_popping;
+  wire [7:0] wr_limit_muxed;
+  wire [7:0] wr_limit_reg;
+  reg wr_popping;
+  wire wr_pushing;
+  wire wr_reserving;
+  assign _04_ = lat_fifo_wr_count + 1'b1;
+  assign _05_ = lat_fifo_wr_adr + 1'b1;
+  assign _06_ = lat_fifo_rd_adr + 1'b1;
+  assign _07_ = lat_fifo_rd_count_p + 1'b1;
+  assign wr_count_next_no_wr_popping_is_245 = wr_count_next_no_wr_popping == 8'b11110101;
+  assign _08_ = lat_fifo_wr_adr == 8'b11110100;
+  assign _09_ = lat_fifo_rd_adr == 8'b11110100;
+  assign wr_pushing = lat_fifo_wr_pvld && lat_fifo_wr_prdy;
+  assign _10_ = lat_fifo_rd_pvld_int && _12_;
+  assign ore = lat_fifo_rd_pvld_p && _13_;
+  assign rd_enable = rd_count_p_next_not_0 && _14_;
+  assign _11_ = lat_fifo_rd_pvld_int && lat_fifo_rd_prdy;
+  assign lat_fifo_wr_prdy = ! lat_fifo_wr_busy_int;
+  assign _12_ = ! lat_fifo_rd_prdy;
+  assign _13_ = ! _10_;
+  assign _14_ = _23_ || ore;
+  assign _15_ = rd_pushing || ore;
+  assign rd_req_next = lat_fifo_rd_pvld_p || _10_;
+  assign _16_ = wr_pushing || ore;
+  assign _17_ = _16_ || wr_popping;
+  assign _18_ = _17_ || wr_pushing;
+  assign _19_ = _18_ || _22_;
+  assign _20_ = _15_ || _11_;
+  assign _21_ = _20_ || wr_pushing;
+  assign nvdla_core_clk_mgated_enable = _19_ || _21_;
+  assign rd_count_p_next_rd_popping_not_0 = | rd_count_p_next_rd_popping;
+  assign rd_count_p_next_no_rd_popping_not_0 = | rd_count_p_next_no_rd_popping;
+  assign _22_ = lat_fifo_wr_busy_int != lat_fifo_wr_busy_next;
+  assign _23_ = ~ lat_fifo_rd_pvld_p;
+  always @(posedge nvdla_core_clk_mgated or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lat_fifo_rd_pvld_int <= 1'b0;
+    else
+      lat_fifo_rd_pvld_int <= rd_req_next;
+  always @(posedge nvdla_core_clk_mgated or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lat_fifo_rd_pvld_p <= 1'b0;
+    else
+      lat_fifo_rd_pvld_p <= _01_;
+  always @(posedge nvdla_core_clk_mgated or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lat_fifo_rd_count_p <= 8'b00000000;
+    else
+      lat_fifo_rd_count_p <= _00_;
+  always @(posedge nvdla_core_clk_mgated or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      rd_pushing <= 1'b0;
+    else
+      rd_pushing <= wr_pushing;
+  always @(posedge nvdla_core_clk_mgated or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      wr_popping <= 1'b0;
+    else
+      wr_popping <= ore;
+  always @(posedge nvdla_core_clk_mgated or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lat_fifo_rd_adr <= 8'b00000000;
+    else
+      lat_fifo_rd_adr <= lat_fifo_rd_adr_p;
+  always @(posedge nvdla_core_clk_mgated or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lat_fifo_wr_adr <= 8'b00000000;
+    else
+      lat_fifo_wr_adr <= _02_;
+  always @(posedge nvdla_core_clk_mgated or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lat_fifo_wr_busy_int <= 1'b0;
+    else
+      lat_fifo_wr_busy_int <= lat_fifo_wr_busy_next;
+  always @(posedge nvdla_core_clk_mgated or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lat_fifo_wr_count <= 8'b00000000;
+    else
+      lat_fifo_wr_count <= _03_;
+  assign _00_ = _15_ ? rd_count_p_next : lat_fifo_rd_count_p;
+  assign _01_ = _15_ ? rd_count_p_next_not_0 : lat_fifo_rd_pvld_p;
+  assign lat_fifo_rd_adr_p = ore ? rd_adr_next : lat_fifo_rd_adr;
+  assign _02_ = wr_pushing ? wr_adr_next : lat_fifo_wr_adr;
+  assign _03_ = _24_ ? wr_count_next : lat_fifo_wr_count;
+  assign _25_ = lat_fifo_wr_count - 1'b1;
+  assign _26_ = lat_fifo_rd_count_p - 1'b1;
+  assign wr_count_next_wr_popping = wr_pushing ? lat_fifo_wr_count : _25_;
+  assign wr_count_next_no_wr_popping = wr_pushing ? _04_ : lat_fifo_wr_count;
+  assign wr_count_next = wr_popping ? wr_count_next_wr_popping : wr_count_next_no_wr_popping;
+  assign lat_fifo_wr_busy_next = wr_popping ? 1'b0 : wr_count_next_no_wr_popping_is_245;
+  assign wr_adr_next = _08_ ? 8'b00000000 : _05_;
+  assign rd_adr_next = _09_ ? 8'b00000000 : _06_;
+  assign rd_count_p_next_rd_popping = rd_pushing ? lat_fifo_rd_count_p : _26_;
+  assign rd_count_p_next_no_rd_popping = rd_pushing ? _07_ : lat_fifo_rd_count_p;
+  assign rd_count_p_next = ore ? rd_count_p_next_rd_popping : rd_count_p_next_no_rd_popping;
+  assign rd_count_p_next_not_0 = ore ? rd_count_p_next_rd_popping_not_0 : rd_count_p_next_no_rd_popping_not_0;
+  assign _24_ = wr_pushing ^ wr_popping;
+  NV_CLK_gate_power nvdla_core_clk_mgate (
+    .clk(nvdla_core_clk),
+    .clk_en(nvdla_core_clk_mgated_enable),
+    .clk_gated(nvdla_core_clk_mgated),
+    .reset_(nvdla_core_rstn)
+  );
+  \$paramod\nv_ram_rwsp_245x514\FORCE_CONTENTION_ASSERTION_RESET_ACTIVE=1'1 ram (
+    .clk(nvdla_core_clk),
+    .di(lat_fifo_wr_pd),
+    .dout(lat_fifo_rd_pd_p),
+    .ore(ore),
+    .pwrbus_ram_pd(pwrbus_ram_pd),
+    .ra(lat_fifo_rd_adr_p),
+    .re(rd_enable),
+    .wa(lat_fifo_wr_adr),
+    .we(wr_pushing)
+  );
+  assign lat_fifo_rd_pd = lat_fifo_rd_pd_p;
+  assign lat_fifo_rd_pvld = lat_fifo_rd_pvld_int;
+  assign rd_popping = ore;
+  assign wr_count_next_is_245 = lat_fifo_wr_busy_next;
+  assign wr_limit_muxed = 8'b00000000;
+  assign wr_limit_reg = 8'b00000000;
+  assign wr_reserving = wr_pushing;
+endmodule

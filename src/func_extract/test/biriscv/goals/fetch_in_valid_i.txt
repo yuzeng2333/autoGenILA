@@ -1,0 +1,18 @@
+#1#\u_frontend.u_decode.fetch_in_valid_i#0
+(goals
+(goal
+  (let ((a!1 (not (= (concat ((_ extract 31 3)
+                               |\\u_frontend.u_decode.u_fifo.pc_q[0]___#0|)
+                             #b0)
+                     ((_ extract 31 2) |\\u_issue.pc_x_q___#0|))))
+        (a!2 (not (= (concat ((_ extract 31 3)
+                               |\\u_frontend.u_decode.u_fifo.pc_q[0]___#0|)
+                             #b1)
+                     ((_ extract 31 2) |\\u_issue.pc_x_q___#0|)))))
+  (let ((a!3 (or (= |\\u_frontend.u_decode.u_fifo.count_q___#0| #b00)
+                 (not (or (= |\\u_frontend.u_decode.u_fifo.count_q___#0| #b00)
+                          a!1))
+                 (not (or (= |\\u_frontend.u_decode.u_fifo.count_q___#0| #b00)
+                          a!2)))))
+    (= |\\u_frontend.u_decode.fetch_in_valid_i___#1000| (ite a!3 #b1 #b0)))))
+)

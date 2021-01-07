@@ -1,0 +1,109 @@
+  input clk;
+  input clk_T ;
+  input [13:0] clk_S ;
+  output clk_R ;
+  output clk_X ;
+  output clk_C ;
+  input clr_;
+  input clr__T ;
+  input [13:0] clr__S ;
+  output clr__R ;
+  output clr__X ;
+  output clr__C ;
+  input d;
+  input d_T ;
+  input [13:0] d_S ;
+  output d_R ;
+  output d_X ;
+  output d_C ;
+  logic d0;
+  logic  d0_T ;
+  logic  d0_PREV_VAL1 ;
+  logic  d0_PREV_VAL2 ;
+  logic  d0_R ;
+  logic  d0_X ;
+  logic  d0_C ;
+  logic [13:0] d0_S ;
+  logic d0_t_flag ;
+  logic d0_r_flag ;
+  assign d0_S = 13 ;
+  output q;
+  logic q ;
+  output q_T ;
+  logic q_T ;
+  logic q_R ;
+  logic q_C ;
+  logic q_X ;
+  logic [13:0] q_S ;
+  input q_R0 ;
+  input q_C0 ;
+  input q_X0 ;
+  output [13:0] q_S ;
+  logic q;
+  logic  q_T ;
+  logic  q_PREV_VAL1 ;
+  logic  q_PREV_VAL2 ;
+  logic q_t_flag ;
+  logic q_r_flag ;
+  assign q_S = 14 ;
+  always @(posedge clk or negedge clr_)
+    if (!clr_)
+      q <= 1'b0;
+    else
+      q <= d0;
+  logic [0:0] d0_X0 ;
+  logic [0:0] d0_R0 ;
+  logic [0:0] d0_C0 ;
+  assign d0_X0 = { 1{ q_S != d0_S }} ;
+  assign d0_R0 = 0 ;
+  assign d0_C0 = 0 ;
+  always @( posedge clk )
+      q_T 		<= rst_zy ? 0 : ( d0_T & d0_X0 );
+  always @( posedge clk )
+      q_t_flag 	<= rst_zy ? 0 : q_t_flag ? 1 : | d0_T & ( | d0_X0 );
+  always @( posedge clk )
+      q_r_flag 	<= rst_zy ? 0 : q_r_flag ? 1 : q_t_flag ? 0 : ( | q_R ) ;
+  always @(posedge clk or negedge clr_)
+    if (!clr_)
+      d0 <= 1'b0;
+    else
+      d0 <= d;
+  logic [0:0] d_X0 ;
+  logic [0:0] d_R0 ;
+  logic [0:0] d_C0 ;
+  assign d_X0 = { 1{ d0_S != d_S }} ;
+  assign d_R0 = 0 ;
+  assign d_C0 = 0 ;
+  always @( posedge clk )
+      d0_T 		<= rst_zy ? 0 : ( d_T & d_X0 );
+  always @( posedge clk )
+      d0_t_flag 	<= rst_zy ? 0 : d0_t_flag ? 1 : | d_T & ( | d_X0 );
+  always @( posedge clk )
+      d0_r_flag 	<= rst_zy ? 0 : d0_r_flag ? 1 : d0_t_flag ? 0 : ( | d0_R ) ;
+  assign d_C = ( d_C0 );
+  assign d0_C = ( d0_C0 );
+  assign q_C = ( q_C0 );
+  assign d_X = ( d_X0 );
+  assign d0_X = ( d0_X0 );
+  assign q_X = ( q_X0 );
+  assign d_R = ( d_X0 & d_R0 );
+  assign d0_R = ( d0_X0 & d0_R0 );
+  assign q_R = ( q_X0 & q_R0 );
+ // ground taints for floating regs
+ // ground taints for unused wires
+  always @( posedge clk ) begin
+    if( rst_zy ) q_PREV_VAL1 <= 0 ;
+    if( rst_zy ) q_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) q_PREV_VAL1 <= q ;
+    if( INSTR_IN_ZY ) q_PREV_VAL2 <= q_PREV_VAL1 ;
+  end
+  always @( posedge clk ) begin
+    if( rst_zy ) d0_PREV_VAL1 <= 0 ;
+    if( rst_zy ) d0_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) d0_PREV_VAL1 <= d0 ;
+    if( INSTR_IN_ZY ) d0_PREV_VAL2 <= d0_PREV_VAL1 ;
+  end
+ // ground taints for unused wire slices
+  assert property( d0_r_flag == 0 || d0_PREV_VAL1 == d0_PREV_VAL2 );
+  assert property( q_r_flag == 0 || q_PREV_VAL1 == q_PREV_VAL2 );
+endmodule

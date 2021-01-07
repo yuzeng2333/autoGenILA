@@ -1,0 +1,5 @@
+#1#\u_issue.u_pipe_ctrl.alu_result_e1_i#1
+(goals
+(goal
+  (= |\\u_issue.u_pipe_ctrl.alu_result_e1_i| #x80000068))
+)

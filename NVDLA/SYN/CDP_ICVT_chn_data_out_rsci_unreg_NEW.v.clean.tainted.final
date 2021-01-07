@@ -1,0 +1,41 @@
+module CDP_ICVT_chn_data_out_rsci_unreg ( in_0 , INSTR_IN_ZY , rst_zy , in_0_T , in_0_S , outsig_R0 , outsig_C0 , outsig_X0 , outsig , in_0_R , in_0_X , in_0_C , outsig_T , outsig_S );
+  input rst_zy;
+  integer i;
+  input INSTR_IN_ZY;
+  input in_0;
+  input in_0_T ;
+  input [13:0] in_0_S ;
+  output in_0_R ;
+  output in_0_X ;
+  output in_0_C ;
+  output outsig;
+  logic outsig ;
+  output outsig_T ;
+  logic outsig_T ;
+  logic outsig_R ;
+  logic outsig_C ;
+  logic outsig_X ;
+  logic [13:0] outsig_S ;
+  input outsig_R0 ;
+  input outsig_C0 ;
+  input outsig_X0 ;
+  output [13:0] outsig_S ;
+  assign outsig = in_0;
+  logic [0:0] in_0_C0 ;
+  logic [0:0] in_0_R0 ;
+  logic [0:0] in_0_X0 ;
+  assign outsig_T = in_0_T ;
+  assign in_0_C0 = outsig_C ;
+  assign in_0_R0 = outsig_R ;
+  assign in_0_X0 = outsig_X ;
+  assign outsig_S = in_0_S ;
+  assign in_0_C = ( in_0_C0 );
+  assign outsig_C = ( outsig_C0 );
+  assign in_0_X = ( in_0_X0 );
+  assign outsig_X = ( outsig_X0 );
+  assign in_0_R = ( in_0_X0 & in_0_R0 );
+  assign outsig_R = ( outsig_X0 & outsig_R0 );
+ // ground taints for floating regs
+ // ground taints for unused wires
+ // ground taints for unused wire slices
+endmodule

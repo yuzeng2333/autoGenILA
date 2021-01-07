@@ -1,7 +1,7 @@
-(define-fun INV ((|word| (_ BitVec 9))) (_ BitVec 9)
-   (bvadd (concat #x00 ((_ extract 2 2) |word|))
-          (concat #x00 ((_ extract 1 1) |word|))
-          (concat #x00 ((_ extract 0 0) |word|))))
+(define-fun INV ((|word[2:0]| (_ BitVec 9))) (_ BitVec 9)
+   (bvadd (concat #x00 ((_ extract 2 2) |word[2:0]|))
+          (concat #x00 ((_ extract 1 1) |word[2:0]|))
+          (concat #x00 ((_ extract 0 0) |word[2:0]|))))
 
           
           

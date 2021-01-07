@@ -1,0 +1,110 @@
+  input CP;
+  input CP_T ;
+  input [13:0] CP_S ;
+  output CP_R ;
+  output CP_X ;
+  output CP_C ;
+  input D;
+  input D_T ;
+  input [13:0] D_S ;
+  output D_R ;
+  output D_X ;
+  output D_C ;
+  output Q;
+  logic Q ;
+  output Q_T ;
+  logic Q_T ;
+  logic Q_R ;
+  logic Q_C ;
+  logic Q_X ;
+  logic [13:0] Q_S ;
+  input Q_R0 ;
+  input Q_C0 ;
+  input Q_X0 ;
+  output [13:0] Q_S ;
+  logic Q;
+  logic  Q_T ;
+  logic  Q_PREV_VAL1 ;
+  logic  Q_PREV_VAL2 ;
+  logic Q_t_flag ;
+  logic Q_r_flag ;
+  assign Q_S = 11 ;
+  input SE;
+  input SE_T ;
+  input [13:0] SE_S ;
+  output SE_R ;
+  output SE_X ;
+  output SE_C ;
+  input SI;
+  input SI_T ;
+  input [13:0] SI_S ;
+  output SI_R ;
+  output SI_X ;
+  output SI_C ;
+  logic sel;
+  logic sel_T ;
+  logic sel_R ;
+  logic sel_C ;
+  logic sel_X ;
+  logic [13:0] sel_S ;
+  always @(posedge CP)
+      Q <= sel;
+  logic [0:0] sel_X0 ;
+  logic [0:0] sel_R0 ;
+  logic [0:0] sel_C0 ;
+  assign sel_X0 = { 1{ Q_S != sel_S }} ;
+  assign sel_R0 = 0 ;
+  assign sel_C0 = 0 ;
+  always @( posedge CP )
+      Q_T 		<= rst_zy ? 0 : ( sel_T & sel_X0 );
+  always @( posedge CP )
+      Q_t_flag 	<= rst_zy ? 0 : Q_t_flag ? 1 : | sel_T & ( | sel_X0 );
+  always @( posedge CP )
+      Q_r_flag 	<= rst_zy ? 0 : Q_r_flag ? 1 : Q_t_flag ? 0 : ( | Q_R ) ;
+  assign sel = SE ? SI : D;
+  logic [0:0] SE_C0 ;
+  logic [0:0] SE_R0 ;
+  logic [0:0] SE_X0 ;
+  assign SE_C0 = | sel_C ;
+  assign SE_X0 = | sel_X ;
+  assign sel_T = SE ? ( { 1{ SE_T  }} | SI_T ) : ( { 1{ SE_T  }} | D_T );
+  assign sel_S = SE ? SI_S : D_S ;
+  assign SE_R0 = ( | (sel_R | ( sel_C & ( { 1{ SE }} & SI_T | { 1{ !SE }} & D_T )))) && SI != D ;
+  logic [0:0] SI_C0 ;
+  logic [0:0] SI_R0 ;
+  logic [0:0] SI_X0 ;
+  assign SI_C0 = { 1{ SE }} ;
+  assign SI_R0 = { 1{ SE }} & ( sel_R | ( { 1{ SE_T  }} & sel_C ));
+  assign SI_X0 = { 1{ SE }} & sel_X ;
+  logic [0:0] D_C0 ;
+  logic [0:0] D_R0 ;
+  logic [0:0] D_X0 ;
+  assign D_C0 = { 1{ !SE }} ;
+  assign D_R0 = { 1{ !SE }} & ( sel_R | ( { 1{ SE_T  }} & sel_C ));
+  assign D_X0 = { 1{ !SE }} & sel_X ;
+  assign D_C = ( D_C0 );
+  assign SI_C = ( SI_C0 );
+  assign SE_C = ( SE_C0 );
+  assign sel_C = ( sel_C0 );
+  assign Q_C = ( Q_C0 );
+  assign D_X = ( D_X0 );
+  assign SI_X = ( SI_X0 );
+  assign SE_X = ( SE_X0 );
+  assign sel_X = ( sel_X0 );
+  assign Q_X = ( Q_X0 );
+  assign D_R = ( D_X0 & D_R0 );
+  assign SI_R = ( SI_X0 & SI_R0 );
+  assign SE_R = ( SE_X0 & SE_R0 );
+  assign sel_R = ( sel_X0 & sel_R0 );
+  assign Q_R = ( Q_X0 & Q_R0 );
+ // ground taints for floating regs
+ // ground taints for unused wires
+  always @( posedge CP ) begin
+    if( rst_zy ) Q_PREV_VAL1 <= 0 ;
+    if( rst_zy ) Q_PREV_VAL2 <= 0 ;
+    if( INSTR_IN_ZY ) Q_PREV_VAL1 <= Q ;
+    if( INSTR_IN_ZY ) Q_PREV_VAL2 <= Q_PREV_VAL1 ;
+  end
+ // ground taints for unused wire slices
+  assert property( Q_r_flag == 0 || Q_PREV_VAL1 == Q_PREV_VAL2 );
+endmodule
