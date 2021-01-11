@@ -1,0 +1,2 @@
+1. The main program in this folder tries to achieve this: given two goals, and a map file, try to prove if they are equivalent using Z3.
+
