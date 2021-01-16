@@ -31,10 +31,12 @@ std::unordered_map<std::string, expr*> g_existedExpr;
 // remaining variables to be built goal for
 std::queue<std::pair<std::string, uint32_t>> g_goalVars;
 std::string g_rootNode;
+std::string g_currentModuleName;
 struct instrInfo g_currInstrInfo;
 uint32_t g_destWidth;
 bool g_skipCheck;
 bool g_ignoreSubModules=false;
+bool g_seeInputs;
 uint32_t g_maxDelay = 0;
 
 // assume g_ssaTable and g_nbTable have been filled
@@ -53,12 +55,13 @@ void check_all_regs() {
     for(auto pair: instrInfo.writeASV) {
       uint32_t cycleCnt = pair.first;
       std::string oneWriteAsv = pair.second;
-      if(instrInfo.skipWriteASV.find(oneWriteAsv) == instrInfo.skipWriteASV.end())
+      if(instrInfo.skipWriteASV.find(oneWriteAsv) == instrInfo.skipWriteASV.end()) {
         if(g_reg2Slices.find(oneWriteAsv) == g_reg2Slices.end())
           check_single_reg_and_slice(oneWriteAsv, cycleCnt-1, i-1);
         else
           for(std::string regAndSlice: g_reg2Slices[oneWriteAsv])
             check_single_reg_and_slice(regAndSlice, cycleCnt-1, i-1);
+      }
       else {// if SAT solving of writeASV is to be skipped
         simplify_goal(oneWriteAsv, cycleCnt-1, i-1);
         //simplify_goal_without_submodules(oneWriteAsv, cycleCnt-1, i-1);
@@ -93,7 +96,8 @@ void simplify_goal(std::string destAndSlice, uint32_t bound, uint32_t instrIdx) 
     toCout("Error: the key does not exist in the map: |"+destAndSlice+"|");
     abort();
   } 
-  expr destNextExpr = add_constraint(g_varNode[destAndSlice], 0, c, s, g, bound, /*isSolve=*/false);
+  expr destNextExpr = add_constraint(g_varNode[destAndSlice], 
+                                     0, c, s, g, bound, /*isSolve=*/false);
   expr destExpr_g = var_expr(destAndSlice, 1000+bound, c, false);
   g.add( destExpr_g == destNextExpr ); 
   //add_all_clean_constraints(c, s, g, bound, /*isSolve=*/false);
@@ -109,7 +113,9 @@ void simplify_goal(std::string destAndSlice, uint32_t bound, uint32_t instrIdx) 
 
 
 // submodules are treated as another module, communicated with ports
-void simplify_goal_without_submodules(std::string destAndSlice, uint32_t bound, uint32_t instrIdx) {
+void simplify_goal_without_submodules(std::string destAndSlice, 
+                                      uint32_t bound, 
+                                      uint32_t instrIdx) {
   g_skipCheck = true;
   g_ignoreSubModules = true;
   clean_data();
@@ -126,11 +132,13 @@ void simplify_goal_without_submodules(std::string destAndSlice, uint32_t bound, 
     remove_two_end_space(var);
     uint32_t timeIdx = varPair.second;
     g_regWithFunc.insert(var);
-    if(g_varNode.find(var) == g_varNode.end() && g_varNode.find("\\"+var) == g_varNode.end() ) {
+    if(g_varNode.find(var) == g_varNode.end()
+        && g_varNode.find("\\"+var) == g_varNode.end() ) {
       toCout("Error: the key does not exist in the map: |"+var+"|");
       abort();
     } 
-    expr destNextExpr = add_constraint(g_varNode[var], timeIdx, c, s, g, bound, /*isSolve=*/false);
+    expr destNextExpr = add_constraint(g_varNode[var], 
+                                       timeIdx, c, s, g, bound, /*isSolve=*/false);
     expr destExpr_g = var_expr(var, timeIdx+100, c, false);
     g.add( destExpr_g == destNextExpr ); 
     //add_all_clean_constraints(c, s, g, bound, /*isSolve=*/false);
@@ -154,7 +162,9 @@ void simplify_goal_without_submodules(std::string destAndSlice, uint32_t bound, 
 // However, constructions for the two are quite different. AST tree is
 // constructed only one. But the SMT equation may need to be constructed
 // multiple times, until a solution is obtained or a bound is reached.
-void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint32_t instrIdx) {
+void check_single_reg_and_slice(std::string destAndSlice, 
+                                uint32_t boundIn, 
+                                uint32_t instrIdx) {
   g_skipCheck = false;  
   std::ofstream goalFile;
   goalFile.open(g_path+"/goal.txt");
@@ -172,21 +182,9 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint
   p.set("unsat_core", true);
   s.set(p);
 
-  // *********************
-  //expr wack_time2 = var_expr("wack", 2, c, false);
-  //s.add( wack_time2 == 0 );
-  // *********************
-
-  //std::string rst1 = "rst___#1";
-  //expr rst = c.bv_const(rst1.c_str(), 1);
-  // FIXME: valid reset value should come from file
-  //s.add( rst == c.bv_val(0, 1) );
-  //if(g_print_solver)
-  //  toCout("Add-Solver: rst___#1 == 0");
 
   std::set<std::string> varToExpand{destAndSlice};
   expr destExpr_t = var_expr(destAndSlice, 0, c, true);      
-  //s.add( destExpr_t == 0 );
   s.push();
   bool lastHasSolution = false;
   bool curHasSolution = false;
@@ -194,6 +192,7 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint
   // expr wih timeIdx = bound exist in solutions.
   // But those expr are only inputs.
   uint32_t topTimeIdx = 0;
+  g_seeInputs = false;
   while(bound < bound_limit) {
     curHasSolution = false;
     s.pop();
@@ -205,10 +204,6 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint
     toCoutVerb("### Begin bound: "+ toStr(bound));
     goal g(c);
     for(std::string rootReg: varToExpand) {
-      if(g_varNode.find(pure(rootReg)) == g_varNode.end()) {
-        toCout("Error: root does not have its node: " + rootReg);
-        abort();
-      }
       if(g_varNode.find(pure(rootReg)) == g_varNode.end() ) {
         toCout("Error: the key does not exist in the map: |"+pure(rootReg)+"|");
         abort();
@@ -240,8 +235,10 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint
       model m = s.get_model();
       uint32_t j = 0;
       // only block values for varriables in CLEAN_QUEUE
-      toCout("+++++++ Solution found for "+destAndSlice+", bound: "+toStr(int(bound))+" +++++++++");
-      g_outFile << "+++++++ Solution found for "+destAndSlice+", bound: "+toStr(int(bound))+" +++++++++" << std::endl;
+      toCout("+++++++ Solution found for "+destAndSlice
+             +", bound: "+toStr(int(bound))+" +++++++++");
+      g_outFile << "+++++++ Solution found for "+destAndSlice
+                   +", bound: "+toStr(int(bound))+" +++++++++" << std::endl;
 
       std::vector<std::pair<std::string, uint32_t>> varIdxPairVec;
       for (uint32_t i = 0; i < m.size(); i++)
@@ -269,8 +266,10 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint
         }
 
         if(!is_taint(var) && ( isInput(pure(var)) || isAs(pure(var)) )) {
-          std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ " << v.name() << " = " << m.get_const_interp(v) << "\n";
-          g_outFile << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ " << v.name() << " = " << m.get_const_interp(v) << "\n";
+          std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ " 
+                    << v.name() << " = " << m.get_const_interp(v) << "\n";
+          g_outFile << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ " 
+                    << v.name() << " = " << m.get_const_interp(v) << "\n";
           if(isInput(pure(var)) || isAs(pure(var)) ) {
             expr *tmpPnt = new expr(m.get_const_interp(v));
             INPUT_EXPR_VAL.emplace(var, tmpPnt);
@@ -288,7 +287,8 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint
         toCout("Error: the key does not exist in the map: |"+destAndSlice+"|");
         abort();
       } 
-      expr destNextExpr = add_constraint(g_varNode[destAndSlice], 0, c, s, g, bound, /*isSolve=*/false);
+      expr destNextExpr = add_constraint(g_varNode[destAndSlice], 
+                                         0, c, s, g, bound, /*isSolve=*/false);
       expr destExpr_g = var_expr(destAndSlice, 100, c, false);
       g.add( destExpr_g == destNextExpr ); 
       //add_all_clean_constraints(c, s, g, bound, /*isSolve=*/false);
@@ -299,40 +299,6 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint
       g_outFile << r << std::endl;
       goalFile << "#"+toStr(instrIdx)+"#"+destAndSlice+"#"+toStr(bound) << std::endl;
       goalFile << r << std::endl;
-      // if two goals are the same, then check the two solutions. If any
-      // varriable is different in the two solutions, fix it.
-      //changedVal.clear();
-      //if(!last_input_expr_val.empty()) {
-      //  for(auto it = INPUT_EXPR_VAL.begin(); it != INPUT_EXPR_VAL.end(); it++) {
-      //    if(rootNode.compare(pure(it->first)) == 0)
-      //      continue;
-      //    if(last_input_expr_val.find(it->first) == last_input_expr_val.end()) {
-      //      toCout("Error: not found in last_input_expr_val: "+it->first);
-      //      abort();
-      //    }
-      //    //if(*(it->second) != *last_input_expr_val[it->first]) {
-      //    //  changedVal.insert(it->first);
-      //    //}
-      //  }
-      //}
-      
-      // fix values for variables in changedVal
-      //for(auto timedVar: changedVal) {
-      //  std::string pureVar = pure(timedVar);
-      //  uint32_t localWidth = get_var_slice_width_simp(pureVar);
-      //  expr localExpr = c.bv_const(timedVar.c_str(), localWidth);
-      //  s.add( localExpr == *INPUT_EXPR_VAL[timedVar] );
-      //  toCout("######## Fix "+timedVar );
-      //}
-
-      // update last_input_expr_val
-      //last_input_expr_val.clear();
-      //last_input_expr_val.insert( INPUT_EXPR_VAL.begin(), INPUT_EXPR_VAL.end() );
-
-      //for(uint32_t i = 0; i < r.size(); i++) {
-      //  std::cout << r[i] << std::endl;
-      //}
-
 
       // if input's value is x, fix it to x
       // fix value for readASV
@@ -344,7 +310,8 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint
         uint32_t localTimeIdx = get_time(vName);
         if(localTimeIdx >= bound + 2 - encodingSize) {
           uint32_t idx = bound+1-localTimeIdx;
-          if( g_currInstrInfo.instrEncoding.find(pureVName) != g_currInstrInfo.instrEncoding.end() ) {
+          if( g_currInstrInfo.instrEncoding.find(pureVName) 
+                != g_currInstrInfo.instrEncoding.end() ) {
             if(g_currInstrInfo.instrEncoding[pureVName][idx] == "x") {
               toCoutVerb("Fix value for "+vName);
               s.add( v() == m.get_const_interp(v) );
@@ -389,9 +356,12 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint
       z3Res = (s.check() == sat);
     }
     assert(bound <= bound_limit);
-    toCout("------- No more solution found within the bound: "+toStr(bound)+" ----------");
-    g_outFile << "------- No more solution found within the bound: "+toStr(bound)+" ----------" << std::endl;
-    if(lastHasSolution && !curHasSolution) return; // terminate if has solution in lower bound but no solution in current bound
+    toCout("------- No more solution found within the bound: "
+           +toStr(bound)+" ----------");
+    g_outFile << "------- No more solution found within the bound: "
+                 +toStr(bound)+" ----------" << std::endl;
+    // terminate if has solution in lower bound but no solution in current bound
+    if(lastHasSolution && !curHasSolution) return; 
     bound++;
     topTimeIdx = bound; // Attention: bound has already added by 1
     lastHasSolution = curHasSolution;
@@ -404,7 +374,8 @@ void check_single_reg_and_slice(std::string destAndSlice, uint32_t boundIn, uint
 /// return: if node->dest is a slice, which means the slice is directly assigned, 
 //            it just returns expr for the slice. Otherwise, it returns expr for
 //            the whole var.
-expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
+expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, 
+                    goal &g, uint32_t bound, bool isSolve) {
   // Attention: varAndSlice might have a slice, a directly-assigned varAndSlice
   std::string varAndSlice = node->dest;
   if(varAndSlice == "_4131_[35]") {
@@ -451,7 +422,13 @@ expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s
 }
 
 
-expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
+expr add_nb_constraint(astNode* const node, 
+                       uint32_t timeIdx, 
+                       context &c, 
+                       solver &s, 
+                       goal &g, 
+                       uint32_t bound,
+                       bool isSolve) {
   std::string dest = node->dest;
   if(dest.compare("kp") == 0 && timeIdx == bound) {
     toCout("target reg found! time: "+toStr(timeIdx));
@@ -467,7 +444,9 @@ expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
     toCout("Error: first child's dest is empty: "+node->dest);
     abort();
   }
-  //assert(!is_number(node->childVec.front()->dest));
+
+  // why: when inputs havn't been seen, more unrolling is necessary
+  if(!g_seeInputs && timeIdx == bound) bound++;
 
   if(timeIdx < bound) {
     toCoutVerb("Add nb constraint for: " + dest+" ------  time: "+toStr(timeIdx));
@@ -491,7 +470,8 @@ expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
     else
       return destNextExpr;
   }
-  else if(!isSolve && !is_read_asv(dest) && g_resetedReg.find(timed_name(dest, timeIdx)) != g_resetedReg.end()) {
+  else if(!isSolve && !is_read_asv(dest) 
+            && g_resetedReg.find(timed_name(dest, timeIdx)) != g_resetedReg.end()) {
     assert(INPUT_EXPR_VAL.find(timed_name(dest, timeIdx)) != INPUT_EXPR_VAL.end());
     return *INPUT_EXPR_VAL[timed_name(dest, timeIdx)];        
   }
@@ -500,9 +480,6 @@ expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
   }
   else {
     push_dirty_queue(node, timeIdx);
-    if(dest.find("reset_q") != std::string::npos) {
-      toCout("Found reset_q");
-    }
     if(!isSolve) {
       uint32_t localWidth = get_var_slice_width_simp(dest);
       std::string localRstVal;
@@ -522,7 +499,8 @@ expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
       }
       std::string prefix = "";
       if(!is_formed_num(localRstVal)) prefix = toStr(localWidth)+"'b";
-      toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Replaced with "+prefix+localRstVal+": "+timed_name(dest, timeIdx));
+      toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Replaced with "
+             +prefix+localRstVal+": "+timed_name(dest, timeIdx));
       return var_expr(localRstVal, timeIdx, c, false, localWidth); 
     }
   }
@@ -532,7 +510,8 @@ expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver
 }
 
 
-expr add_ssa_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
+expr add_ssa_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, 
+                        goal &g, uint32_t bound, bool isSolve) {
   toCoutVerb("Add ssa constraint for: " + node->dest+" ------  time: "+toStr(timeIdx));
   std::string var = node->dest;
 
@@ -563,7 +542,8 @@ expr add_ssa_constraint(astNode* const node, uint32_t timeIdx, context &c, solve
 }
 
 
-void add_child_constraint(astNode* const parentNode, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
+void add_child_constraint(astNode* const parentNode, uint32_t timeIdx, context &c, 
+                          solver &s, goal &g, uint32_t bound, bool isSolve) {
   abort();
   for( astNode* node: parentNode->childVec ) {
     add_constraint(node, timeIdx, c, s, g, bound, isSolve);
@@ -572,7 +552,8 @@ void add_child_constraint(astNode* const parentNode, uint32_t timeIdx, context &
 
 
 // dest may be: input, AS or num
-void add_clean_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
+void add_clean_constraint(astNode* const node, uint32_t timeIdx, context &c, 
+                          solver &s, goal &g, uint32_t bound, bool isSolve) {
   //toCoutVerb("Add clean constraint for: " + node->dest);
   std::string dest = node->dest;
   // add clean taint
@@ -606,7 +587,8 @@ void push_clean_queue(astNode* node, uint32_t timeIdx) {
 }
 
 
-void add_all_clean_constraints(context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
+void add_all_clean_constraints(context &c, solver &s, goal &g, 
+                               uint32_t bound, bool isSolve) {
   toCout("-------- Begin Add all clean ----------");
   for(auto it = CLEAN_QUEUE.begin(); it != CLEAN_QUEUE.end(); it++) {
     add_clean_constraint(it->first, it->second, c, s, g, bound, isSolve);
@@ -614,8 +596,9 @@ void add_all_clean_constraints(context &c, solver &s, goal &g, uint32_t bound, b
 }
 
 
-void add_dirty_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, uint32_t bound) {
-  toCoutVerb("Add dirty constraint for: " + node->dest+" ------  time: "+toStr(timeIdx));  
+void add_dirty_constraint(astNode* const node, uint32_t timeIdx, 
+                          context &c, solver &s, uint32_t bound) {
+  toCoutVerb("Add dirty constraint for: "+node->dest+" ------  time: "+toStr(timeIdx));  
   std::string destAndSlice = node->dest;
   if(destAndSlice.compare("wack") == 0) {
     //toCoutVerb("Found it!");
@@ -630,16 +613,20 @@ void add_dirty_constraint(astNode* const node, uint32_t timeIdx, context &c, sol
     std::string rstVal = g_rstVal[dest];
     expr rstValExpr = var_expr(rstVal, timeIdx, c, false, destWidth);
     uint32_t allOne = std::pow(2, destWidth)-1;
-    s.add( destExpr_t == ite( destExpr == rstValExpr, c.bv_val(0, destWidth), c.bv_val(uint32_t(allOne), destWidth) ) );
+    s.add( destExpr_t == ite( destExpr == rstValExpr, 
+           c.bv_val(0, destWidth), 
+           c.bv_val(uint32_t(allOne), destWidth) ) );
     if(g_print_solver) {
-      toCout("Add-Solver: "+get_name(destExpr_t)+" == "+toStr(uint32_t(std::pow(2, destWidth)-1)));
+      toCout("Add-Solver: "+get_name(destExpr_t)
+             +" == "+toStr(uint32_t(std::pow(2, destWidth)-1)));
     }
   }
   else {
     uint32_t allOne = std::pow(2, destWidth)-1;
     s.add( destExpr_t == c.bv_val(uint32_t(allOne), destWidth) );
     if(g_print_solver) {
-      toCout("Add-Solver: "+get_name(destExpr_t)+" == "+toStr(uint32_t(std::pow(2, destWidth)-1)));
+      toCout("Add-Solver: "+get_name(destExpr_t)
+             +" == "+toStr(uint32_t(std::pow(2, destWidth)-1)));
     }
   }
 
@@ -675,7 +662,8 @@ void add_input_values(context &c, solver &s, uint32_t bound) {
       uint32_t width = get_var_slice_width_simp(pair.first);
       expr localVal(c);
       if(pair.second[i] == "x")
-        localVal = var_expr("1'd0", bound+1-i, c, false, width);
+        // FIXME
+        localVal = var_expr(toStr(width)+"'d0", bound+1-i, c, false, width);
       else
         localVal = var_expr(pair.second[i], bound+1-i, c, false, width);
       s.add( singleInput == localVal );

@@ -21,6 +21,7 @@ namespace funcExtract {
 
 extern uint32_t bound_limit;
 extern bool g_ignoreSubModules;
+extern bool g_seeInputs;
 extern uint32_t g_maxDelay;
 
 void check_all_regs();

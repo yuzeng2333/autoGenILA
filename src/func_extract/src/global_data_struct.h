@@ -2,9 +2,11 @@
 #define GLOBAL_DATA_STRUCT
 #include "z3++.h"
 #include "ast.h"
+#include "types.h"
 #include <queue>
 
 using namespace z3;
+using namespace taintGen;
 
 namespace funcExtract {
 
@@ -26,16 +28,21 @@ extern std::unordered_map<std::string, std::string> g_nopInstr;
 extern std::map<std::string, std::string> g_rstVal;
 extern std::unordered_map<std::string, std::string> g_nameVarMap;
 extern std::unordered_map<std::string, std::string> g_varRstValMap;
-extern std::unordered_map<std::string, std::unordered_map<std::string, std::string>> g_wire2ModulePort;
+extern std::unordered_map<std::string, 
+                          std::unordered_map<std::string, 
+                                             std::string>> g_wire2ModulePort;
 extern std::unordered_map<std::string, std::string> g_ins2modMap;
 extern std::unordered_map<std::string, uint32_t> g_moduleInportTime;
 extern std::unordered_map<std::string, uint32_t> g_moduleOutportTime;
+extern Str2StrVecMap_t g_moduleInputsMap;
+extern Str2StrVecMap_t g_moduleOutputsMap;
 extern std::queue<std::pair<std::string, uint32_t>> g_goalVars;
 extern std::ofstream g_outFile;
 extern std::string g_pj_path; 
 extern std::string g_mem2acclData;
 extern std::string g_accl2memAddr;
 extern std::string g_accl2memData;
+extern std::string g_currentModuleName;
 extern uint32_t g_instr_len;
 
 } // end of namespace funcExtract

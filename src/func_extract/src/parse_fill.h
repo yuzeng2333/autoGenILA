@@ -1,6 +1,7 @@
 #ifndef PARSE 
 #define PARSE
 
+#include "types.h"
 #include "ast.h"
 #include <string>
 #include <unordered_map>
@@ -15,6 +16,7 @@
 #include "../../taint_method/src/varWidth.h"
 
 namespace funcExtract {
+
 
 struct instrInfo {
   std::unordered_map<std::string, std::vector<std::string>> instrEncoding;
@@ -35,15 +37,19 @@ struct FuncInfo_t {
 struct ModuleInfo_t {
   std::string name;
   // first key is output, second key is input
-  std::unordered_map<std::string, std::unordered_map<std::string, uint32_t>> out2InDelayMp;
+  std::unordered_map<std::string, 
+                     std::unordered_map<std::string, uint32_t>> out2InDelayMp;
 };
 
 extern std::unordered_map<std::string, std::string> g_ssaTable;
-extern std::set<std::string> g_moduleAs;
+extern StrSet_t g_moduleAs;
 extern std::unordered_map<std::string, std::vector<std::string>> g_reg2Slices;
 extern std::unordered_map<std::string, uint32_t> reg2timeIdx;
 extern std::unordered_map<std::string, std::string> g_nbTable;
-extern std::unordered_map<std::string, std::pair<std::string, std::vector<std::pair<std::string, std::string>>>> g_caseTable;
+extern std::unordered_map<std::string, 
+                          std::pair<std::string, 
+                                    std::vector<std::pair<std::string, 
+                                                          std::string>>>> g_caseTable;
 extern std::unordered_map<std::string, FuncInfo_t> g_funcTable;
 extern uint32_t g_new_var;
 extern taintGen::VarWidth g_varWidth;

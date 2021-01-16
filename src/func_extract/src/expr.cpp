@@ -464,7 +464,10 @@ void module_expr(std::string firstLine, std::ifstream &input) {
   }
   std::string moduleName = m.str(2);
   std::string instanceName = m.str(3);
-  g_ins2modMap.emplace(instanceName, moduleName);
+  if(g_ins2modMap.find(instanceName) != g_ins2modMap.end())
+    assert(g_ins2modMap[instanceName] == moduleName);
+  else
+    g_ins2modMap.emplace(instanceName, moduleName);
   if(g_wire2ModulePort.find(instanceName) == g_wire2ModulePort.end())
     g_wire2ModulePort.emplace(instanceName, std::unordered_map<std::string, std::string>{});
   FuncInfo_t funcInfo;

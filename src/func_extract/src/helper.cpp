@@ -265,7 +265,7 @@ std::string get_name(expr expression) {
 
 
 bool is_read_asv(std::string var) {
-  return g_readASV.find(pure(var)) != g_readASV.end();
+  return g_readASV.find(pure(var)) != g_readASV.end() || g_readASV.find(g_currentModuleName+"."+pure(var)) != g_readASV.end();
 }
 
 
@@ -274,7 +274,9 @@ bool has_explicit_value(std::string input) {
   uint32_t encodingSize = g_currInstrInfo.instrEncoding.begin()->second.size();
   if(g_currInstrInfo.instrEncoding.find(input) == g_currInstrInfo.instrEncoding.end())
     return false;
-  for(auto it = g_currInstrInfo.instrEncoding[input].begin(); it != g_currInstrInfo.instrEncoding[input].end(); it++) {
+  for(auto it = g_currInstrInfo.instrEncoding[input].begin(); 
+        it != g_currInstrInfo.instrEncoding[input].end(); 
+        it++) {
     if(*it != "x")
       return true;
   }
@@ -287,7 +289,8 @@ uint32_t expr_len(expr &e) {
 }
 
 
-bool comparePair(const std::pair<std::string, uint32_t> &p1, const std::pair<std::string, uint32_t> &p2 ) {
+bool comparePair(const std::pair<std::string, uint32_t> &p1, 
+                 const std::pair<std::string, uint32_t> &p2 ) {
   return p1.first < p2.first;
 }
 
@@ -443,7 +446,9 @@ bool has_direct_assignment(std::string varAndSlice) {
   if(varSlice.empty()) {
     toCout("Error: expecting slice for input: "+varAndSlice);
   }
-  return withinReg2Slices && std::find(g_reg2Slices[var].begin(), g_reg2Slices[var].end(), varAndSlice) != g_reg2Slices[var].end();
+  return withinReg2Slices 
+         && std::find(g_reg2Slices[var].begin(), g_reg2Slices[var].end(), varAndSlice) 
+            != g_reg2Slices[var].end();
 }
 
 
@@ -532,10 +537,12 @@ void remove_two_end_space(std::string &str) {
   remove_back_space(str);
 }
 
-bool is_written_ASV(std::string reg) {
+bool is_written_ASV(const std::string &reg) {
   // currently does not support multiple instructions
   assert(g_instrInfo.size() == 1);
-  for(auto it = g_instrInfo.back().writeASV.begin(); it != g_instrInfo.back().writeASV.end(); it++) {
+  for(auto it = g_instrInfo.back().writeASV.begin(); 
+      it != g_instrInfo.back().writeASV.end(); 
+      it++) {
     if(it->second == reg)
       return true;
   }
@@ -612,7 +619,8 @@ std::string purify_line(const std::string &line) {
 bool check_input_val(std::string value) {
   std::regex pX("^(\\d+)'[b|h]x$");
   std::smatch m;
-  if(value == "x" || is_number(value) || value != "DIRTY" || std::regex_match(value, m, pX))
+  if(value == "x" || is_number(value) 
+      || value != "DIRTY" || std::regex_match(value, m, pX))
     return true;
   else if(value.find("+") != std::string::npos) {
     uint32_t pos = value.find("+");
@@ -637,5 +645,34 @@ int try_stoi(std::string num) {
 uint32_t get_var_slice_width_simp( std::string varAndSlice) {
   return get_var_slice_width( varAndSlice, g_varWidth);
 }
+
+
+bool is_comment_line(std::string &line) {
+  uint32_t pos = line.find_first_not_of(" ", 0);
+  return line.substr(pos, 2) == "//";
+}
+
+
+StrPair_t split_module_asv(const std::string &writeAsvLine) {
+  std::regex pModuleAs  ("^(\\s*)([a-zA-Z0-9\\\\\\$\\#]+)\\.([a-zA-Z0-9\\\\\\$\\#]+)$");
+  if(writeAsvLine.find(".") == std::string::npos)
+    return std::make_pair(g_topModule, writeAsvLine);
+  
+  uint32_t dotPos = writeAsvLine.find(".");
+  if(writeAsvLine.find(".", dotPos) != std::string::npos) {
+    toCout("Error: unexpected extra dot for write ASV's name: "+writeAsvLine);
+    abort();
+  }
+  std::string moduleName = writeAsvLine.substr(0, dotPos);
+  std::string asvName = writeAsvLine.substr(dotPos+1);
+  return std::make_pair(moduleName, asvName);
+}
+
+
+std::string remove_prefix_module(const std::string &writeAsvLine) {
+  auto pair = split_module_asv(writeAsvLine);
+  return pair.second;
+}
+
 
 } // end of namespace funcExtract

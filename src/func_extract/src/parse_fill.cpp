@@ -1,5 +1,6 @@
 #include "parse_fill.h"
 #include "expr.h"
+#include "types.h"
 #include "helper.h"
 #include "../../taint_method/src/global_data.h"
 
@@ -9,14 +10,17 @@ using namespace syntaxPatterns;
 namespace funcExtract {
 
 // global variables
-std::set<std::string> g_moduleAs;
+StrSet_t g_moduleAs;
 std::set<std::string> moduleWriteAs;
 std::unordered_map<std::string, std::vector<std::string>> g_reg2Slices;
 std::unordered_map<std::string, uint32_t> reg2timeIdx;
 std::unordered_map<std::string, std::string> g_ssaTable;
 // non-blocking assignment table
 std::unordered_map<std::string, std::string> g_nbTable;
-std::unordered_map<std::string, std::pair<std::string, std::vector<std::pair<std::string, std::string>>>> g_caseTable;
+std::unordered_map<std::string, 
+                   std::pair<std::string, 
+                             std::vector<std::pair<std::string,
+                                                   std::string>>>> g_caseTable;
 std::unordered_map<std::string, FuncInfo_t> g_funcTable;
 uint32_t g_new_var;
 uint32_t g_instr_len;
@@ -29,18 +33,22 @@ std::unordered_map<std::string, std::string> g_nopInstr;
 std::map<std::string, std::string> g_rstVal;
 std::unordered_map<std::string, ModuleInfo_t> g_allModuleInfo;
 // first key is instance name, second key is wire name
-std::unordered_map<std::string, std::unordered_map<std::string, std::string>> g_wire2ModulePort;
+std::unordered_map<std::string, 
+                   std::unordered_map<std::string, 
+                                      std::string>> g_wire2ModulePort;
 std::unordered_map<std::string, std::string> g_ins2modMap;
 std::unordered_map<std::string, uint32_t> g_moduleOutportTime;
 std::unordered_map<std::string, uint32_t> g_moduleInportTime;
+Str2StrVecMap_t g_moduleInputsMap;
+Str2StrVecMap_t g_moduleOutputsMap;
 VarWidth g_varWidth;
 
 std::string g_mem2acclData;
 std::string g_accl2memAddr;
 std::string g_accl2memData;
 
-std::regex pSingleLine (to_re("^(\\s*)assign (NAME) = (.*);$"));
-std::regex pNbLine (to_re("^(\\s*)(NAME) <= (.*);$"));
+std::regex pSingleLine  (to_re("^(\\s*)assign (NAME) = (.*);$"));
+std::regex pNbLine      (to_re("^(\\s*)(NAME) <= (.*);$"));
 
 
 void clear_global_vars() {
@@ -256,7 +264,10 @@ void read_in_instructions(std::string fileName) {
               abort();
             }
             if(firstWord) {
-              struct instrInfo info = { {{signalName, std::vector<std::string>{encoding}}}, std::set<std::string>{}, std::set<std::pair<uint32_t, std::string>>{}, std::set<std::string>{} };
+              struct instrInfo info = { {{signalName, std::vector<std::string>{encoding}}}, 
+                                        std::set<std::string>{}, 
+                                        std::set<std::pair<uint32_t, std::string>>{}, 
+                                        std::set<std::string>{} };
               //info.instrEncoding.emplace(signalName, encoding);
               g_instrInfo.push_back(info);
             }
@@ -276,13 +287,15 @@ void read_in_instructions(std::string fileName) {
               abort();
             }
             if(firstWord)
-              g_instrInfo.back().instrEncoding.emplace(signalName, std::vector<std::string>{encoding});
+              g_instrInfo.back().instrEncoding.emplace(signalName, 
+                                                       std::vector<std::string>{encoding});
             else
               g_instrInfo.back().instrEncoding[signalName].push_back(encoding);
           }
           break;
         case WriteASV:
           {
+            // if space exists, solve process is skipped and delay for writing ASV is specified
             if(line.find(" ") == std::string::npos) {
               g_instrInfo.back().writeASV.insert(std::make_pair(0, line));
               g_moduleAs.insert(line);
@@ -305,7 +318,8 @@ void read_in_instructions(std::string fileName) {
                 asName = line.substr(0, pos-6);
                 g_instrInfo.back().skipWriteASV.insert(asName);                
               }
-              g_instrInfo.back().writeASV.insert(std::make_pair(uint32_t(std::stoi(cycleCnt)), asName));
+              g_instrInfo.back().writeASV.insert(std::make_pair(uint32_t(std::stoi(cycleCnt)), 
+                                                                asName));
               g_moduleAs.insert(asName);
             }
           }
@@ -372,6 +386,8 @@ void read_module_info() {
   std::string outVar;  
   std::unordered_map<std::string, uint32_t> inputDelayMap;
   while(std::getline(input, line)) {
+    if(is_comment_line(line))
+      continue;
     if(is_module_line(line, moduleName)) {
       // store info of last module
       if(!moduleInfo.name.empty()) {
@@ -380,7 +396,8 @@ void read_module_info() {
       moduleInfo.name = moduleName;
       moduleInfo.out2InDelayMp.clear();
     }
-    else if(line.find(":") == std::string::npos && line.find("}") == std::string::npos) { // output name
+    else if(line.find(":") == std::string::npos 
+              && line.find("}") == std::string::npos) { // output name
       if(line.find("{") != std::string::npos)
         outVar = line.substr(0, line.find("{"));
       else

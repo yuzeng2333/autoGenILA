@@ -137,6 +137,7 @@ expr bool_expr(std::string var, uint32_t timeIdx, context &c, bool isTaint) {
 
 
 expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
+  g_seeInputs = true;
   std::string dest = node->dest;
   expr destExpr_t(c);
   expr destExpr(c);
@@ -969,7 +970,9 @@ expr func_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
   uint32_t width = get_var_slice_width_simp(destAndSlice);
   std::string instanceName = node->op;
   std::string moduleName = g_ins2modMap[instanceName];
-  ModuleInfo_t moduleInfo = g_allModuleInfo[moduleName];
+  ModuleInfo_t moduleInfo;
+  if(g_allModuleInfo.find(moduleName) != g_allModuleInfo.end())
+    moduleInfo = g_allModuleInfo[moduleName];
   if(g_wire2ModulePort[instanceName].find(destAndSlice) == g_wire2ModulePort[instanceName].end()) {
     toCout("Error: this key does not exist in g_wire2ModulePort: |"+destAndSlice+"|");
     abort();

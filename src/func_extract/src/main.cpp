@@ -16,6 +16,7 @@
 
 #include "../../taint_method/src/global_data.h"
 #include "../../taint_method/src/helper.h"
+#include "../../taint_method/src/taint_gen.h"
 
 
 namespace funcExtract {
@@ -69,6 +70,22 @@ int main(int argc, char *argv[]) {
   clean_verilog(g_path+"/design.v.clean");
   vcd_parser(g_path+"/rst.vcd");
   inv_gen();
+  
+  // get update function hierarchically
+  std::vector<std::string> modules;  
+  std::map<std::string, std::vector<std::string>> childModules;
+  uint32_t _dummyRegCnt;
+  std::unordered_map<std::string, Str2StrUmap_t> _dummyMap;
+  /*
+  g_topModule = separate_modules(g_path+"/design.v.clean", 
+                                 modules, 
+                                 childModules, 
+                                 _dummyRegCnt, 
+                                 _dummyMap,
+                                 true,
+                                 g_moduleInputsMap,
+                                 g_moduleOutputsMap);
+                                 */
   build_ast_tree();
   check_all_regs();
   print_time();  
@@ -79,9 +96,45 @@ int main(int argc, char *argv[]) {
   pseudo_vlg_gen();
   clean_file(g_path+"/design.v", true);
   print_time();
-  //time_t my_time2 = time(NULL);
-  //std::string time2(ctime(&my_time2));
-  //g_outFile << "End time: "+time2 << std::endl;
   g_outFile.close();
   return 0;
 }
+
+
+/*
+void extract_update_func_bottom_up(std::string path, 
+                                   std::string module,
+                                   std::vector<std::string>> &childModules,
+                                   std::string g_topModule) {
+  if( g_allModuleInfo.find(module) != g_allModuleInfo.end() )
+    return;
+  if( childModules.find(module) == childModules.end() ) {
+    get_update_func(path, module);
+  }
+  else {
+    for(auto oneChildModule: childModules[module]) {
+      extract_update_func_bottom_up(path, 
+                                    oneChildModule, 
+                                    childModules,
+                                    g_topModule);
+    }
+    // all child modules should be ready now
+    get_update_func(path, module);
+  }
+}
+
+
+void get_sub_module_update_func(std::string g_path, 
+                     std::string modulename) {
+  if(g_allmoduleinfo.find(modulename) != g_allmoduleinfo.end()) return;
+
+  toCout("------ Begin extracting update functions for module: "+moduleName);
+  g_currentModuleName = moduleName;
+  moduleInputs = g_moduleInputsMap[moduleName];
+  moduleOutputs = g_moduleOutputsMap[moduleName];
+  for(std::string output: g_moduleOutputsMap[moduleName]) {
+    toCout("--------- Begin output: "+output);
+
+  }
+}
+*/

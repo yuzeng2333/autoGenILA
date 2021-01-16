@@ -45,7 +45,10 @@ void build_tree_for_single_as(std::string regAndSlice) {
 
 // Attention: If different slices of var are assigned in different expressions, they should have different nodes
 // Summary: for each varAndSlice, add a node for it. If varAndSlice is separately assigned(not part of assignment to var), then this function directly add a node for varAndSlice. Otherwise, add a node to var.
-void add_node(std::string varAndSlice, uint32_t timeIdx, astNode* const node, bool varIsDest) {
+void add_node(std::string varAndSlice, 
+              uint32_t timeIdx, 
+              astNode* const node, 
+              bool varIsDest) {
   //toCout("Add node for: "+varAndSlice);
   if(varAndSlice.find("aes_reg_key0_i.reg_out") != std::string::npos) {
     toCout("Found it!");
@@ -60,7 +63,9 @@ void add_node(std::string varAndSlice, uint32_t timeIdx, astNode* const node, bo
   if(g_reg2Slices.find(var) == g_reg2Slices.end()) {
     varToAdd = var;
   }
-  else if(std::find(g_reg2Slices[var].begin(), g_reg2Slices[var].end(), varAndSlice) != g_reg2Slices[var].end()) {
+  else if(std::find(g_reg2Slices[var].begin(), 
+                    g_reg2Slices[var].end(), 
+                    varAndSlice) != g_reg2Slices[var].end()) {
     // the varAndSlice is separately assigned
     varToAdd = varAndSlice;
   }
@@ -99,7 +104,9 @@ void add_node(std::string varAndSlice, uint32_t timeIdx, astNode* const node, bo
 
 // varAndSlice is the child variable, when the func is called, varAndSlice is directly from RHS of the expression. So it may/may not have slice, may/not have direct assignment.
 // parentNode is the node of its parent
-void add_child_node(std::string varAndSlice, uint32_t timeIdx, astNode* const parentNode) {
+void add_child_node(std::string varAndSlice, 
+                    uint32_t timeIdx, 
+                    astNode* const parentNode) {
   toCoutVerb("!! Add child "+varAndSlice+" to "+parentNode->dest);
   if(varAndSlice == "state_0") {
     toCout("Found state_0!");
@@ -129,7 +136,9 @@ void add_child_node(std::string varAndSlice, uint32_t timeIdx, astNode* const pa
 // attention: the slices in g_reg2Slices may not be complete
 // summary: for var whose slices are assigned differently, first add node for whole var,
 //   and then add node to slices that are separately assigned
-void add_sliced_node(std::string varAndSlice, uint32_t timeIdx, astNode* const node) {
+void add_sliced_node(std::string varAndSlice, 
+                     uint32_t timeIdx, 
+                     astNode* const node) {
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
   assert(varSlice.empty());
@@ -576,7 +585,12 @@ void add_func_node(std::string var, uint32_t timeIdx, astNode* const node) {
 }
 
 
-bool check_two_op(std::string line, std::string &op, std::string &dest, std::string &op1, std::string &op2, bool &isReduceOp) {
+bool check_two_op(std::string line, 
+                  std::string &op, 
+                  std::string &dest, 
+                  std::string &op1, 
+                  std::string &op2, 
+                  bool &isReduceOp) {
   line = remove_signed(line);
   isReduceOp = false;
   std::smatch m;
@@ -688,7 +702,12 @@ bool check_two_op(std::string line, std::string &op, std::string &dest, std::str
 }
 
 
-bool check_sel_op(std::string line, std::string &op, std::string &dest, std::string &op1, std::string &op2, std::string &integer) {
+bool check_sel_op(std::string line, 
+                  std::string &op, 
+                  std::string &dest, 
+                  std::string &op1,
+                  std::string &op2, 
+                  std::string &integer) {
   std::smatch m;
   if ( std::regex_match(line, m, pSel1)) {
     op = "sel1";
@@ -716,7 +735,10 @@ bool check_sel_op(std::string line, std::string &op, std::string &dest, std::str
 }
 
 
-bool check_one_op(std::string line, std::string &op, std::string &dest, std::string &op1) {
+bool check_one_op(std::string line, 
+                  std::string &op, 
+                  std::string &dest,
+                  std::string &op1) {
   std::smatch m;
   if ( std::regex_match(line, m, pNone)) {
     op = "";
@@ -741,7 +763,10 @@ bool check_one_op(std::string line, std::string &op, std::string &dest, std::str
 }
 
 
-bool check_reduce_one_op(std::string line, std::string &op, std::string &dest, std::string &op1) {
+bool check_reduce_one_op(std::string line, 
+                         std::string &op, 
+                         std::string &dest, 
+                         std::string &op1) {
   std::smatch m;
   if ( std::regex_match(line, m, pNot)) {
     op = "!";

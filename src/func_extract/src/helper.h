@@ -6,9 +6,11 @@
 #include "../../taint_method/src/global_data.h"
 #include "../../taint_method/src/helper.h"
 #include "z3++.h"
+#include "types.h"
 #include <cctype>
 
 using namespace z3;
+using namespace taintGen;
 
 namespace funcExtract {
 
@@ -92,7 +94,7 @@ void remove_back_space(std::string &str);
 
 void remove_two_end_space(std::string &str);
 
-bool is_written_ASV(std::string reg);
+bool is_written_ASV(const std::string &reg);
 
 bool is_all_x(std::string);
 
@@ -119,6 +121,12 @@ int try_stoi(std::string num);
 std::string get_pure_num(std::string formedNum);
 
 uint32_t get_var_slice_width_simp( std::string varAndSlice);
+
+bool is_comment_line(std::string &line);
+
+StrPair_t split_module_asv(const std::string &writeAsvLine);
+
+std::string remove_prefix_module(const std::string &writeAsvLine);
 } // end of namespace funcExtract
 
 #endif

@@ -65,11 +65,12 @@ void auxiliary_files_gen(const std::string &path, uint32_t delay) {
     }
   }
 
-  for(auto as = g_moduleAs.begin(); as != g_moduleAs.end(); as++) {
+  // FIXME
+  for(auto it = g_moduleAs.begin(); it != g_moduleAs.end(); it++) {
     // make mapping for submodule's inputs. They should be checked
-    if(addedVar.find(*as) == addedVar.end()) {    
-      addedVar.insert(*as);
-      std::string asVar = *as;
+    if(addedVar.find(*it) == addedVar.end()) {    
+      addedVar.insert(*it);
+      std::string asVar = *it;
       asVar = purify_var_name(asVar);
       vmapFile << "      \""+asVar+"\": \""+asVar+"\"," << el;
     }
@@ -127,10 +128,10 @@ void auxiliary_files_gen(const std::string &path, uint32_t delay) {
     infoFile << var+"__:__"+toStr(width)+", YES" << std::endl;
   }
 
-  for(auto as = g_moduleAs.begin(); as != g_moduleAs.end(); as++) {
-    uint32_t width = get_var_slice_width_simp(*as);
-    if(g_regWithFunc.find(*as) == g_regWithFunc.end()) {
-      std::string var = purify_var_name(*as);
+  for(auto it = g_moduleAs.begin(); it != g_moduleAs.end(); it++) {
+    uint32_t width = get_var_slice_width_simp(*it);
+    if(g_regWithFunc.find(*it) == g_regWithFunc.end()) {
+      std::string var = purify_var_name(*it);
       infoFile << var+"__:__"+toStr(width) << std::endl;
     }
   }
