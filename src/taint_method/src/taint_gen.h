@@ -7,6 +7,7 @@
 #include "op_taint_gen.h"
 #include "global_data.h"
 #include "varWidth.h"
+#include "types.h"
 
 namespace taintGen {
 
@@ -94,6 +95,23 @@ void collect_case_dest(const std::string &line);
 void assert_reg_map_gen();
 
 void map_gen(std::string moduleName, std::string instanceName, std::ofstream &output);
+
+std::string separate_modules(std::string fileName, 
+                             std::vector<std::string> &modules,
+                             std::map<std::string, std::vector<std::string>> &childModules,
+                             uint32_t &totalRegCnt,
+                             std::unordered_map<std::string,
+                                                Str2StrUmap_t>& instance2moduleMap,
+                             bool getIO,
+                             Str2StrUmap_t &moduleInputsMap,
+                             Str2StrUmap_t &moduleOutputsMap);
+
+std::string separate_modules(std::string fileName, 
+                             std::vector<std::string> &modules, 
+                             std::map<std::string, std::vector<std::string>> &childModules, 
+                             uint32_t &totalRegCnt, 
+                             std::unordered_map<std::string, 
+                                                Str2StrUmap_t>& instance2moduleMap);
 
 int taint_gen(std::string fileName, uint32_t stage, bool isTopIn, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap, std::map<std::string, std::vector<std::string>> &moduleRFlagsMap, uint32_t totalRegCnt, uint32_t &nextSig, bool doProcessPathInfo);
 

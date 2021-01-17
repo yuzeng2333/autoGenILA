@@ -11,6 +11,7 @@
 #include <set>
 #include <map>
 #include <bitset>
+#include <stack>
 #include "taint_gen.h"
 //#include "pass_info.h"
 #include <cmath>
@@ -89,16 +90,26 @@ bool g_use_value_change = false;
 bool g_split_long_num = true;
 // if true, add (reg_PREV_VAL == rst_val) into assertion
 bool g_use_vcd_parser = false;
-bool g_write_assert = false; // for find written ASV
-bool g_double_assert = false; // to enable having PREV_VAL in assert
-bool g_use_taint_rst = false; // used when start from arbitraty state, only reset taints
-bool g_use_end_sig = true; // used to end verification after a certain time of instruction begins, TODO: enable it for 8051
-bool g_wt_keeped = false; // INSTR_IN_ZY needs to be defined, TODO: enable it for 8051
-bool g_special_equal_taint = false; // TODO: enable it for biRISCV
+// for find written ASV
+bool g_write_assert = false; 
+// to enable having PREV_VAL in assert
+bool g_double_assert = false;
+// used when start from arbitraty state, only reset taints
+bool g_use_taint_rst = false;
+// used to end verification after a certain time of instruction begins, TODO: enable it for 8051
+bool g_use_end_sig = true;
+// INSTR_IN_ZY needs to be defined, TODO: enable it for 8051
+bool g_wt_keeped = false; 
+// TODO: enable it for biRISCV
+bool g_special_equal_taint = false; 
 // set the read flag only if reg's value is not reset value
 bool g_set_rflag_if_not_rst_val = false;  // TODO: usually enable it 
-bool g_set_rflag_if_not_norm_val = false; // TODO: enable it for biRISCV
-bool g_use_does_keep = true;  // TODO: consider enable it
+// TODO: enable it for biRISCV
+bool g_set_rflag_if_not_norm_val = false; 
+// TODO: seems problematic, be careful when considering enable it
+bool g_use_does_keep = true;  
+// enable this to only check if reg's value is invariant when instruction finished
+bool g_check_invariance = true;
 std::string _t="_T";
 std::string _r="_R";
 std::string _x="_X";
@@ -974,7 +985,11 @@ void read_in_clkrst(std::string filePath, std::string fileName) {
 }
 
 
-void add_file_taints(std::string fileName, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap, std::map<std::string, std::vector<std::string>> &moduleRFlagsMap) {
+void add_file_taints(std::string fileName, 
+                     std::map<std::string, 
+                     std::vector<std::string>> &moduleInputsMap, 
+                     std::map<std::string, std::vector<std::string>> &moduleOutputsMap, 
+                     std::map<std::string, std::vector<std::string>> &moduleRFlagsMap) {
   // read pre-defined clk and rst
   if(g_moduleClk.find(moduleName) != g_moduleClk.end()) {
     g_hasClk = true;
@@ -999,7 +1014,8 @@ void add_file_taints(std::string fileName, std::map<std::string, std::vector<std
   // Reserve first line for module declaration
   while( std::getline(input, line) ) {
     toCout(line);
-    if(moduleName.compare("HLS_cdp_icvt_core") == 0 && line.find("IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl") != std::string::npos)
+    if(moduleName.compare("HLS_cdp_icvt_core") == 0 
+       && line.find("IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl") != std::string::npos)
       //toCout(line);
     lineNo++;
     if ( std::regex_match(line, match, pAlwaysComb) ) {
@@ -1222,7 +1238,11 @@ void merge_taints(std::string fileName) {
 }
 
 
-void add_module_name(std::string fileName, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap, std::map<std::string, std::vector<std::string>> &moduleRFlagsMap, bool isTopIn) {
+void add_module_name(std::string fileName, 
+                     std::map<std::string, std::vector<std::string>> &moduleInputsMap,
+                     std::map<std::string, std::vector<std::string>> &moduleOutputsMap,
+                     std::map<std::string, std::vector<std::string>> &moduleRFlagsMap, 
+                     bool isTopIn) {
   std::ifstream in(fileName);
   std::ofstream out(fileName + ".final");
   std::string line;
@@ -1264,7 +1284,11 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
     out << "  logic INSTR_IN_ZY;" << std::endl;
     out << "  assign INSTR_IN_ZY = ";
     for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) {
-      if((*it).compare(g_recentClk) == 0 || (*it).compare(g_recentRst) == 0 || (*it).compare("rst_zy") == 0 || (*it).compare(TAINT_RST) == 0 || (*it).compare(END_SIG) == 0)
+      if((*it).compare(g_recentClk) == 0 
+          || (*it).compare(g_recentRst) == 0 
+          || (*it).compare("rst_zy") == 0 
+          || (*it).compare(TAINT_RST) == 0 
+          || (*it).compare(END_SIG) == 0)
         continue;
       out << *it + _t + " > 0 || ";
     }
@@ -1634,10 +1658,12 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
       uint32_t pos = localPair.first.find("1", bPos);
       uint32_t idx = localPair.first.length() - pos - 1;
       output << blank + "    " + localPair.first + " :" << std::endl;
-      output << blank + "      " + dest+_t+destSlice + " = " + rhs + _t + rhsSlice + " | " + extend(s+_t+"["+toStr(idx)+"]", destWidthNum) + ";" << std::endl;
+      output << blank + "      " + dest+_t+destSlice + " = " + rhs + _t + rhsSlice 
+                                                             + " | " + extend(s+_t+"["+toStr(idx)+"]", destWidthNum) + ";" << std::endl;
     }
     output << blank + "    default :" << std::endl;
-    output << blank + "      " + dest+_t+destSlice + " = " + a + _t + aSlice + " | " + extend("| "+s+_t+sSlice, destWidthNum) + ";" << std::endl;
+    output << blank + "      " + dest+_t+destSlice + " = " + a + _t + aSlice 
+                                                           + " | " + extend("| "+s+_t+sSlice, destWidthNum) + ";" << std::endl;
     output << blank + "  endcase" << std::endl;
     output << blank + "end" << std::endl;
 
@@ -2067,7 +2093,11 @@ void add_func_taints_call_limited(std::string line, std::ofstream &output) {
 }
 
 
-void extend_module_instantiation(std::ifstream &input, std::ofstream &output, std::string moduleFirstLine, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap) {
+void extend_module_instantiation(std::ifstream &input, 
+                                 std::ofstream &output, 
+                                 std::string moduleFirstLine, 
+                                 std::map<std::string, std::vector<std::string>> &moduleInputsMap, 
+                                 std::map<std::string, std::vector<std::string>> &moduleOutputsMap) {
   std::smatch m;
   if(!std::regex_match(moduleFirstLine, m, pModuleBegin)) {
     toCout("Error in matching module definition!");
@@ -2108,7 +2138,11 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
   std::unordered_map<std::string, std::vector<bool>> inputSignalIsNewMap;
   
   for(std::string input: moduleInputsMap[localModuleName]) {
-    if(input.compare(g_recentClk) == 0 || input.compare("rst_zy") == 0 || input.compare("INSTR_IN_ZY") == 0 || input.compare(TAINT_RST) == 0 || input.compare(END_SIG) == 0)
+    if(input.compare(g_recentClk) == 0 
+       || input.compare("rst_zy") == 0 
+       || input.compare("INSTR_IN_ZY") == 0 
+       || input.compare(TAINT_RST) == 0 
+       || input.compare(END_SIG) == 0)
       continue;
     if( port2SignalMap.find(input) == port2SignalMap.end() ) {
       toCout("Error: the module input has not been seen before: "+input);
@@ -2300,7 +2334,12 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
 /* if a basic operator contains concatenated input, 
  * declare a new variable representing the concatenated input*/
 // if a long number(>32bit) is found, split it if g_split_long_num is true
-bool extract_concat(std::string line, std::ofstream &output, std::string &returnedStmt, std::string &fangyuanDeclaration, std::string &fangyuanAssign, bool isFuncCall) {
+bool extract_concat(std::string line, 
+                    std::ofstream &output, 
+                    std::string &returnedStmt, 
+                    std::string &fangyuanDeclaration, 
+                    std::string &fangyuanAssign, 
+                    bool isFuncCall) {
   if(line.find("alu_out") != std::string::npos) {
     toCout("find it");
   }
@@ -2437,16 +2476,22 @@ void gen_assert_property(std::ofstream &output) {
         //checkCond(std::regex_match(var, match, pRFlag), "Error: pRFlag is not matched: "+m.str(1));
         std::string rstVal; 
         if(g_use_vcd_parser)
-          rstVal = g_rstValMap[moduleName][m.str(1)];
+          rstVal = g_rstValMap[moduleName][var];
         if(rstVal.empty()) rstVal = "0";
-        if(!isMem(m.str(1)) && g_double_assert) {
+        if(g_check_invariance) {
+          output << "  assert property( !INSTR_IN_ZY || " + var + " == " + rstVal + " );" << std::endl;
+        }
+        else if(!isMem(var) && g_double_assert) {
           if(g_use_vcd_parser)
-            output << "  assert property( " + out + " == 0 || " + m.str(1) + "_PREV_VAL1 == " + rstVal + " );" << std::endl;
+            output << "  assert property( " + out + " == 0 || " 
+                      + var + "_PREV_VAL1 == " + rstVal + " );" << std::endl;
+
           else if(g_set_rflag_if_not_rst_val)
           //else if(true)
             output << "  assert property( " + out + " == 0 );" << std::endl;
           else
-            output << "  assert property( " + out + " == 0 || " + m.str(1) + "_PREV_VAL1 == " + m.str(1) + "_PREV_VAL2 );" << std::endl;
+            output << "  assert property( " + out + " == 0 || " 
+                      + var + "_PREV_VAL1 == " + var + "_PREV_VAL2 );" << std::endl;
         }
         else if(g_use_end_sig)
           output << "  assert property( " + out + " == 0 || " + END_SIG + DOES_KEEP + ");" << std::endl;          
@@ -2532,7 +2577,181 @@ void map_gen(std::string moduleName, std::string instanceName, std::ofstream &ou
 }
 
 
-int taint_gen(std::string fileName, uint32_t stage, bool isTopIn, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap, std::map<std::string, std::vector<std::string>> &moduleRFlagsMap, uint32_t totalRegCnt, uint32_t &nextSig, bool doProcessPathInfo) {
+// 1. separate the original file into multiple files, each containing one module
+// 2. analyze for each module, which sub-modules it uses
+// Return name of top module
+std::string separate_modules(std::string fileName, 
+                             std::vector<std::string> &modules,
+                             std::map<std::string, std::vector<std::string>> &childModules,
+                             uint32_t &totalRegCnt,
+                             std::unordered_map<std::string,
+                                                Str2StrUmap_t>& instance2moduleMap,
+                             bool getIO,
+                             Str2StrVecMap_t &moduleInputsMap,
+                             Str2StrVecMap_t &moduleOutputsMap) {
+  toCout("... Begin separating modules!");
+  totalRegCnt = 0;
+  std::ifstream input(fileName);
+  std::string line;
+  std::smatch m;
+  std::ofstream output;
+  std::string topModule;
+  std::string moduleName;
+  std::string path = extract_path(fileName);
+  std::set<std::string> regSet;
+  std::stack<std::string> moduleNameStk;
+  bool inModule = false;
+
+  if(getIO) {
+    assert(moduleInputsMap.empty());
+    assert(moduleOutputsMap.empty());
+  }
+
+
+  while(std::getline(input, line)) {
+    //toCout(line);
+    if(std::regex_match(line, m, pNonblock)
+        || std::regex_match(line, m, pNonblockConcat)
+        || std::regex_match(line, m, pNonblockIf) ) {
+      std::string regAndSlice = m.str(2);
+      std::string reg, regSlice;
+      split_slice(regAndSlice, reg, regSlice);
+      if(regSet.find(reg) == regSet.end()) {
+        regSet.insert(reg);
+        totalRegCnt++;
+      }
+    }
+
+    if(line.find("module") != std::string::npos) {
+      if(std::regex_match(line, m, pModule)) {
+        // assume the first module encountered are top module
+        inModule = true;
+        moduleName = m.str(2);
+        moduleNameStk.push(moduleName);
+        if(moduleInputsMap.find(moduleName) == moduleInputsMap.end())
+          moduleInputsMap.emplace(moduleName, std::vector<std::string>{});
+        if(moduleOutputsMap.find(moduleName) == moduleOutputsMap.end())
+          moduleOutputsMap.emplace(moduleName, std::vector<std::string>{});
+        modules.push_back(moduleName);
+        assert(!output.is_open());
+        output.open(path+"/"+moduleName+"_NEW.v");
+      }
+      else {
+        toCout("Error: module name not matched: "+line);
+        abort();
+      }
+    }
+
+    if(std::regex_match(line, m, pEndmodule)) {
+      output << line << std::endl;
+      if(!inModule) {
+        toCout("Error: found endmodule when not in module definition, last module name: "+moduleName);
+        abort();
+      }
+      moduleNameStk.pop();
+      inModule = false;
+      output.close();
+    }
+
+
+    // get IO for each module
+    if(getIO) {
+      std::smatch m;
+      if(std::regex_match(line, m, pInput)) {
+        std::string inputName = m.str(3);
+        moduleInputsMap[moduleNameStk.top()].push_back(inputName);
+      }
+      else if(std::regex_match(line, m, pOutput)) {
+        std::string outputName = m.str(3);
+        moduleInputsMap[moduleNameStk.top()].push_back(outputName);
+      }
+    }
+
+
+    // analyze module dependency
+    if(inModule && std::regex_match(line, m, pModuleBegin)) {
+      std::string localModuleName = m.str(2);
+      std::string instanceName = m.str(3);
+      if(instance2moduleMap.find(moduleName) == instance2moduleMap.end()) {
+        instance2moduleMap.emplace(moduleName, 
+                                     std::unordered_map<std::string, 
+                                                        std::string>{{instanceName, localModuleName}});
+      }
+      else {
+        if(instance2moduleMap[moduleName].find(instanceName) != instance2moduleMap[moduleName].end()) {
+          if(instance2moduleMap[moduleName][instanceName] != localModuleName) {
+            toCout("Error: instance: "+instanceName+" matches multiple modules:"+localModuleName+", "+instance2moduleMap[moduleName][instanceName]);
+            abort();
+          }
+        }
+        else
+          instance2moduleMap[moduleName].emplace(instanceName, localModuleName);
+      }
+
+      if(childModules.find(moduleName) == childModules.end())
+        childModules.emplace(moduleName, std::vector<std::string>{m.str(2)});
+      else
+        childModules[moduleName].push_back(m.str(2));
+    }
+
+    if(!inModule) continue;
+    else {
+      output << line << std::endl;
+    }
+  } // end of getline while loop
+
+  // find out the top module
+  std::unordered_set<std::string> childSet;
+  for(auto it = childModules.begin(); it != childModules.end(); ++it) {
+    for(std::string singleChildModule: it->second) {
+      childSet.emplace(singleChildModule);
+    }
+  }
+  for(std::string singleModule: modules) {
+    if(childSet.find(singleModule) == childSet.end()) {
+      if(!topModule.empty()) {
+        toCout("Two top modules found: "+topModule+" & "+singleModule);
+        abort();
+      }
+      else {
+        topModule = singleModule;
+      }
+    }
+  }
+
+  toCout("... Finished separating modules!");  
+  return topModule;
+}
+
+
+std::string separate_modules(std::string fileName, 
+                             std::vector<std::string> &modules,
+                             std::map<std::string, std::vector<std::string>> &childModules,
+                             uint32_t &totalRegCnt,
+                             std::unordered_map<std::string,
+                                                Str2StrUmap_t>& instance2moduleMap) {
+  Str2StrVecMap_t _dummy_map1;
+  Str2StrVecMap_t _dummy_map2;
+  return separate_modules(fileName, 
+                   modules,
+                   childModules,
+                   totalRegCnt,
+                   instance2moduleMap,
+                   false,
+                   _dummy_map1,
+                   _dummy_map2);
+}
+
+
+int taint_gen(std::string fileName, 
+              uint32_t stage, 
+              bool isTopIn, 
+              std::map<std::string, std::vector<std::string>> &moduleInputsMap, 
+              std::map<std::string, std::vector<std::string>> &moduleOutputsMap, 
+              std::map<std::string, std::vector<std::string>> &moduleRFlagsMap, 
+              uint32_t totalRegCnt, 
+              uint32_t &nextSig, 
+              bool doProcessPathInfo) {
   toCout("*** Begin add taint for module: "+fileName);  
   if (stage <= 0) {
     toCout("Clear Global data!");
