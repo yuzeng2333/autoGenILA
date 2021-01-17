@@ -148,11 +148,10 @@ void reg_taint_gen(std::string line, std::ofstream &output) {
   moduleRegs.push_back(var);
   output << blank << "logic " + slice + " " + var + _t + " ;" << std::endl;
 
-  if(g_double_assert) {
+  if(g_one_prev)
     output << blank << "logic " + slice + " " + var + "_PREV_VAL1 ;" << std::endl; 
-    if(!g_use_vcd_parser)
-      output << blank << "logic " + slice + " " + var + "_PREV_VAL2 ;" << std::endl; 
-  }
+  if(g_two_prev)
+    output << blank << "logic " + slice + " " + var + "_PREV_VAL2 ;" << std::endl; 
 
   if(g_use_does_keep) output <<  "  logic " + slice + " " +var + "_DOES_KEEP = 0 ;"  << std::endl;
 
@@ -205,11 +204,11 @@ void mem_taint_gen(std::string line, std::ofstream &output) {
   moduleMems.emplace(var, varLen);
   //assert_info(!isTop || !isOutput(var), "mem_taint_gen:var is output, line: "+line);  
   output << blank << "logic " + slice + " " + var + _t + " " + sliceTop + " ;" << std::endl;
-  if(g_double_assert) {
+  if(g_one_prev || g_two_prev) 
     output << blank << "logic " + slice + " " + var + "_PREV_VAL1 " + sliceTop + " ;" << std::endl;
-    if(!g_use_vcd_parser)
+  if(g_two_prev)
       output << blank << "logic " + slice + " " + var + "_PREV_VAL2 " + sliceTop + " ;" << std::endl;
-  }
+
   output << blank << "logic " + sliceTop + " " + var + "_t_flag ;" << std::endl;
   output << blank << "logic " + sliceTop + " " + var + "_r_flag ;" << std::endl;
   //output << blank << "logic " + slice + " " + var + _c + " " + sliceTop + " ;" << std::endl;

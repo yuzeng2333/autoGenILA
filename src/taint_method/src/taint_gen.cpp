@@ -92,8 +92,10 @@ bool g_split_long_num = true;
 bool g_use_vcd_parser = false;
 // for find written ASV
 bool g_write_assert = false; 
-// to enable having PREV_VAL in assert
-bool g_double_assert = false;
+// to enable having two PREV_VAL in assert
+bool g_two_prev = true;
+// to enable having single PREV_VAL in assert
+bool g_one_prev = false;
 // used when start from arbitraty state, only reset taints
 bool g_use_taint_rst = false;
 // used to end verification after a certain time of instruction begins, TODO: enable it for 8051
@@ -109,7 +111,7 @@ bool g_set_rflag_if_not_norm_val = false;
 // TODO: seems problematic, be careful when considering enable it
 bool g_use_does_keep = true;  
 // enable this to only check if reg's value is invariant when instruction finished
-bool g_check_invariance = true;
+bool g_check_invariance = false;
 std::string _t="_T";
 std::string _r="_R";
 std::string _x="_X";
@@ -214,6 +216,12 @@ void clean_file(std::string fileName, bool useLogic) {
     g_recentRst = g_moduleRst[moduleName].first;
     g_recentRst_positive = g_moduleRst[moduleName].second;
   }
+
+  // check assert options
+  assert(!g_two_prev || !g_one_prev);
+  assert(!g_one_prev || g_use_vcd_parser);
+  assert(!g_set_rflag_if_not_rst_val || (!g_two_prev && !g_one_prev));
+
   while( std::getline(cleanFileInput, line) ) {
     toCoutVerb(line);
     if(line.find("tmp_div") != std::string::npos) {
@@ -2464,39 +2472,53 @@ bool extract_concat(std::string line,
 void gen_assert_property(std::ofstream &output) {
   std::regex pRFlag("(\\S*)_r_flag");
   std::smatch m;
-  std::smatch match;
   g_mod2assertMap.emplace(moduleName, std::vector<std::string>{});
   std::string DOES_KEEP = "";
+  std::string PREV_VAL_COMP = "";
+  std::string USE_END_SIG = "";
   if(!g_write_assert) {
     for(std::string out: flagOutputs) {
       if(std::regex_search(out, m, pRFlag)) {
         std::string var = m.str(1);        
-        if(g_use_does_keep) DOES_KEEP = " || " + var + "_DOES_KEEP == 0";
+        if(var == "cpu_state") {
+          toCout("Find it!");
+        }
         g_mod2assertMap[moduleName].push_back(var);
-        //checkCond(std::regex_match(var, match, pRFlag), "Error: pRFlag is not matched: "+m.str(1));
+
         std::string rstVal; 
         if(g_use_vcd_parser)
           rstVal = g_rstValMap[moduleName][var];
         if(rstVal.empty()) rstVal = "0";
+
+        if(g_use_does_keep) DOES_KEEP = " || " + var + "_DOES_KEEP == 0";
+        if(g_use_end_sig) USE_END_SIG = " || " + END_SIG;
+        if(g_two_prev) PREV_VAL_COMP = " || " + var + "_PREV_VAL1 == " + var + "_PREV_VAL2";
+        if(g_one_prev) PREV_VAL_COMP = " || " + var + "_PREV_VAL1 == " + rstVal;
+
         if(g_check_invariance) {
           output << "  assert property( !INSTR_IN_ZY || " + var + " == " + rstVal + " );" << std::endl;
         }
-        else if(!isMem(var) && g_double_assert) {
-          if(g_use_vcd_parser)
-            output << "  assert property( " + out + " == 0 || " 
-                      + var + "_PREV_VAL1 == " + rstVal + " );" << std::endl;
-
-          else if(g_set_rflag_if_not_rst_val)
-          //else if(true)
-            output << "  assert property( " + out + " == 0 );" << std::endl;
-          else
-            output << "  assert property( " + out + " == 0 || " 
-                      + var + "_PREV_VAL1 == " + var + "_PREV_VAL2 );" << std::endl;
-        }
-        else if(g_use_end_sig)
-          output << "  assert property( " + out + " == 0 || " + END_SIG + DOES_KEEP + ");" << std::endl;          
+        else if(!isMem(var)) 
+          output << "  assert property( " + out + " == 0 " + PREV_VAL_COMP + USE_END_SIG + DOES_KEEP + " );" << std::endl;
         else
-          output << "  assert property( " + out + " == 0" + DOES_KEEP + ");" << std::endl;
+          output << "  assert property( " + out + " == 0 " + USE_END_SIG + DOES_KEEP + " );" << std::endl;
+
+        //else if(!isMem(var) && g_double_assert) {
+        //  if(g_use_vcd_parser)
+        //    output << "  assert property( " + out + " == 0 || " 
+        //              + var + "_PREV_VAL1 == " + rstVal + " );" << std::endl;
+
+        //  else if(g_set_rflag_if_not_rst_val)
+        //  //else if(true)
+        //    output << "  assert property( " + out + " == 0 );" << std::endl;
+        //  else
+        //    output << "  assert property( " + out + " == 0 || " 
+        //              + var + "_PREV_VAL1 == " + var + "_PREV_VAL2 );" << std::endl;
+        //}
+        //else if(g_use_end_sig)
+        //  output << "  assert property( " + out + " == 0 || " + END_SIG + DOES_KEEP + ");" << std::endl;          
+        //else
+        //  output << "  assert property( " + out + " == 0" + DOES_KEEP + ");" << std::endl;
       }
     }
   }
