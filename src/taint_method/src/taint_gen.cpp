@@ -2622,7 +2622,7 @@ std::string separate_modules(std::string fileName,
       }
     }
 
-    if(line.find("module") != std::string::npos) {
+    if(line.find("module") != std::string::npos && line != "endmodule") {
       if(std::regex_match(line, m, pModule)) {
         // assume the first module encountered are top module
         inModule = true;
