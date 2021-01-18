@@ -1770,6 +1770,7 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
   // _dest is clear either write taint arrives or the value for dest is changed.
   if(g_use_reset_taint) {
     output << blank.substr(0, blank.length()-4) + "always @( posedge " + g_recentClk + " )" << std::endl;    
+    // FIXME: replace get_recent_rst() with rst_zy?    
     if (g_hasRst)
       output << blank + dest + "_reset \t<= " + get_recent_rst() + " ? 1 : " + destAndSlice+" != "+op1AndSlice + " ? 0 : " + dest + "_reset ;" << std::endl;
     else
@@ -1935,6 +1936,7 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
     else {
       nonConstAssign.push_back(line);
       uint32_t localWidthNum = get_var_slice_width(srcAndSlice);
+      // FIXME: replace get_recent_rst() with rst_zy?
       output << blank + "if (" + get_recent_rst() + taintRst + ") " + dest + _t + " " + destSlice + " <= 0 ;" << std::endl;
       if(g_use_value_change) {
         output << blank + "if (" + condAndSlice + ") " + dest + _t + " " + destSlice + " <= ( " + src + _t+" " + srcSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + destAndSlice + " != " + srcAndSlice + " );" << std::endl;
@@ -2031,6 +2033,7 @@ void nonblockif2_taint_gen(std::string line, std::string always_line, std::ifstr
 
     nonConstAssign.push_back(line);
     uint32_t localWidthNum = get_var_slice_width(srcAndSlice);
+    // FIXME: replace get_recent_rst() with rst_zy?    
     output << blank + "if (" + get_recent_rst() + taintRst + ") " + dest + _t + " <= 0 ;" << std::endl;
     // for mem always use value change
     output << blank + "if (" + condAndSlice + ") " + dest + _t + " " + destSlice + " <= ( " + src + _t + " " + srcSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " | " + extend(idxVar+_t, localWidthNum) + " ) & ( " + dest + destSlice + " != " + srcAndSlice + " );" << std::endl;

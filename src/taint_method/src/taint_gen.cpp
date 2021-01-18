@@ -109,6 +109,7 @@ bool g_set_rflag_if_not_rst_val = false;  // TODO: usually enable it
 // TODO: enable it for biRISCV
 bool g_set_rflag_if_not_norm_val = false; 
 // TODO: seems problematic, be careful when considering enable it
+// Disable for 8051
 bool g_use_does_keep = true;  
 // enable this to only check if reg's value is invariant when instruction finished
 bool g_check_invariance = false;
@@ -1184,9 +1185,9 @@ void merge_taints(std::string fileName) {
       if(rstVal.empty()) rstVal = "0";
       output << "  always @( posedge " + g_recentClk + " ) begin" << std::endl;
       if(g_hasRst) {
-        output << "    if( " + get_recent_rst() + " ) " + var + "_PREV_VAL1 <= " + rstVal + " ;" << std::endl;
+        output << "    if( rst_zy ) " + var + "_PREV_VAL1 <= " + rstVal + " ;" << std::endl;
         if(g_two_prev)
-          output << "    if( " + get_recent_rst() + " ) " + var + "_PREV_VAL2 <= " + rstVal + " ;" << std::endl;
+          output << "    if( rst_zy ) " + var + "_PREV_VAL2 <= " + rstVal + " ;" << std::endl;
       }
       else {
         output << "    if( rst_zy ) " + var + "_PREV_VAL1 <= " + rstVal + " ;" << std::endl;
