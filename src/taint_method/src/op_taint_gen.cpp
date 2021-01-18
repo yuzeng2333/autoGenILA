@@ -148,7 +148,7 @@ void reg_taint_gen(std::string line, std::ofstream &output) {
   moduleRegs.push_back(var);
   output << blank << "logic " + slice + " " + var + _t + " ;" << std::endl;
 
-  if(g_one_prev)
+  if(g_one_prev || g_two_prev)
     output << blank << "logic " + slice + " " + var + "_PREV_VAL1 ;" << std::endl; 
   if(g_two_prev)
     output << blank << "logic " + slice + " " + var + "_PREV_VAL2 ;" << std::endl; 
