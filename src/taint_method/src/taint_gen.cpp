@@ -88,8 +88,8 @@ bool g_use_value_change = false;
 // TODO: set this configurations!
 // // for func_extract, split long bitVec into multiple short ones
 bool g_split_long_num = true;
-// if true, add (reg_PREV_VAL == rst_val) into assertion
-bool g_use_vcd_parser = false;
+// if true, rst.vcd file is parsed and rst values are used
+bool g_use_vcd_parser = true;
 // for find written ASV
 bool g_write_assert = false; 
 // to enable having two PREV_VAL in assert
@@ -110,7 +110,7 @@ bool g_set_rflag_if_not_rst_val = false;  // TODO: usually enable it
 bool g_set_rflag_if_not_norm_val = false; 
 // TODO: seems problematic, be careful when considering enable it
 // Disable for 8051
-bool g_use_does_keep = true;  
+bool g_use_does_keep = false;  
 // enable this to only check if reg's value is invariant when instruction finished
 bool g_check_invariance = false;
 std::string _t="_T";
@@ -220,7 +220,6 @@ void clean_file(std::string fileName, bool useLogic) {
 
   // check assert options
   assert(!g_two_prev || !g_one_prev);
-  assert(!g_one_prev || g_use_vcd_parser);
   assert(!g_set_rflag_if_not_rst_val || (!g_two_prev && !g_one_prev));
 
   while( std::getline(cleanFileInput, line) ) {
