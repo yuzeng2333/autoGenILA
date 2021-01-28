@@ -81,8 +81,6 @@ extern bool g_remove_adff;
 extern bool g_use_vcd_parser;
 extern bool g_split_long_num;
 extern bool g_write_assert;
-extern bool g_two_prev;
-extern bool g_one_prev;
 extern bool g_use_value_change;
 extern bool g_set_rflag_if_not_rst_val;
 extern bool g_set_rflag_if_not_norm_val;
@@ -90,6 +88,7 @@ extern bool g_use_taint_rst;
 extern bool g_wt_keeped;
 extern bool g_special_equal_taint;
 extern bool g_use_does_keep;
+extern bool g_enable_taint;
 extern std::string _t;
 extern std::string _r;
 extern std::string _x;
@@ -110,6 +109,8 @@ extern std::string CONSTANT_SIG;
 extern std::string RESET_SIG;
 extern std::string orderFileName;
 
+enum CheckInvarType {None, CheckRst, CheckOneVal, CheckTwoVal};
+extern CheckInvarType g_check_invariance;
 } // end of namespace taintGen 
 
 #endif

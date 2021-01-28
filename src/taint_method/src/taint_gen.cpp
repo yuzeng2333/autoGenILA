@@ -92,10 +92,6 @@ bool g_split_long_num = true;
 bool g_use_vcd_parser = true;
 // for find written ASV
 bool g_write_assert = false; 
-// to enable having two PREV_VAL in assert
-bool g_two_prev = true;
-// to enable having single PREV_VAL in assert
-bool g_one_prev = false;
 // used when start from arbitraty state, only reset taints
 bool g_use_taint_rst = false;
 // used to end verification after a certain time of instruction begins, TODO: enable it for 8051
@@ -112,7 +108,9 @@ bool g_set_rflag_if_not_norm_val = false;
 // Disable for 8051
 bool g_use_does_keep = false;  
 // enable this to only check if reg's value is invariant when instruction finished
-bool g_check_invariance = false;
+CheckInvarType g_check_invariance = CheckOneVal;
+// TODO: g_enable_taint set to false when only checking invariance
+bool g_enable_taint = false;
 std::string _t="_T";
 std::string _r="_R";
 std::string _x="_X";
@@ -219,8 +217,8 @@ void clean_file(std::string fileName, bool useLogic) {
   }
 
   // check assert options
-  assert(!g_two_prev || !g_one_prev);
-  assert(!g_set_rflag_if_not_rst_val || (!g_two_prev && !g_one_prev));
+  //assert(!g_two_prev || !g_one_prev);
+  assert(!g_set_rflag_if_not_rst_val || g_check_invariance == None);
 
   while( std::getline(cleanFileInput, line) ) {
     toCoutVerb(line);
@@ -1173,7 +1171,7 @@ void merge_taints(std::string fileName) {
   //  }
   //  idxedModuleName = moduleName + "_1";
   //}
-  if(g_one_prev || g_two_prev) {
+  if(g_check_invariance == CheckOneVal || g_check_invariance == CheckTwoVal) {
     for(std::string var: moduleTrueRegs) {
       uint32_t width = get_var_slice_width(var);
       if(isMem(var))
@@ -1185,16 +1183,16 @@ void merge_taints(std::string fileName) {
       output << "  always @( posedge " + g_recentClk + " ) begin" << std::endl;
       if(g_hasRst) {
         output << "    if( rst_zy ) " + var + "_PREV_VAL1 <= " + rstVal + " ;" << std::endl;
-        if(g_two_prev)
+        if(g_check_invariance == CheckTwoVal)
           output << "    if( rst_zy ) " + var + "_PREV_VAL2 <= " + rstVal + " ;" << std::endl;
       }
       else {
         output << "    if( rst_zy ) " + var + "_PREV_VAL1 <= " + rstVal + " ;" << std::endl;
-        if(g_two_prev)  
+        if(g_check_invariance == CheckTwoVal)  
           output << "    if( rst_zy ) " + var + "_PREV_VAL2 <= " + rstVal + " ;" << std::endl;
       }
       output << "    if( INSTR_IN_ZY ) " + var + "_PREV_VAL1 <= " + var + " ;"<< std::endl;
-      if(g_two_prev)
+      if(g_check_invariance == CheckTwoVal)
         output << "    if( INSTR_IN_ZY ) " + var + "_PREV_VAL2 <= " + var + "_PREV_VAL1 ;" << std::endl;
       output << "  end" << std::endl;
     }
@@ -2492,11 +2490,14 @@ void gen_assert_property(std::ofstream &output) {
 
         if(g_use_does_keep) DOES_KEEP = " || " + var + "_DOES_KEEP == 0";
         if(g_use_end_sig) USE_END_SIG = " || " + END_SIG;
-        if(g_two_prev) PREV_VAL_COMP = " || " + var + "_PREV_VAL1 == " + var + "_PREV_VAL2";
-        if(g_one_prev) PREV_VAL_COMP = " || " + var + "_PREV_VAL1 == " + rstVal;
+        if(g_check_invariance == CheckTwoVal) PREV_VAL_COMP = " || " + var + "_PREV_VAL1 == " + var + "_PREV_VAL2";
+        if(g_check_invariance == CheckOneVal) PREV_VAL_COMP = " || " + var + "_PREV_VAL1 == " + rstVal;
 
-        if(g_check_invariance) {
+        if(!g_enable_taint && g_check_invariance == CheckRst) {
           output << "  assert property( !INSTR_IN_ZY || " + var + " == " + rstVal + " );" << std::endl;
+        }
+        else if (!g_enable_taint && g_check_invariance != None) {
+          output << "  assert property( !INSTR_IN_ZY " + PREV_VAL_COMP + " );" << std::endl;
         }
         else if(!isMem(var)) 
           output << "  assert property( " + out + " == 0 " + PREV_VAL_COMP + USE_END_SIG + DOES_KEEP + " );" << std::endl;
@@ -2659,8 +2660,8 @@ std::string separate_modules(std::string fileName,
         output.open(path+"/"+moduleName+"_NEW.v");
       }
       else {
-        toCout("Error: module name not matched: "+line);
-        abort();
+        toCout("Warning: module name not matched: "+line);
+        //abort();
       }
     }
 
