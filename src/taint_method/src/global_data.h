@@ -109,7 +109,7 @@ extern std::string CONSTANT_SIG;
 extern std::string RESET_SIG;
 extern std::string orderFileName;
 
-enum CheckInvarType {None, CheckRst, CheckOneVal, CheckTwoVal};
+enum CheckInvarType {CheckRst, CheckOneVal, CheckTwoVal};
 extern CheckInvarType g_check_invariance;
 } // end of namespace taintGen 
 

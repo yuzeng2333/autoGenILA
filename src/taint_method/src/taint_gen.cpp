@@ -218,7 +218,7 @@ void clean_file(std::string fileName, bool useLogic) {
 
   // check assert options
   //assert(!g_two_prev || !g_one_prev);
-  assert(!g_set_rflag_if_not_rst_val || g_check_invariance == None);
+  assert(!g_set_rflag_if_not_rst_val || g_enable_taint);
 
   while( std::getline(cleanFileInput, line) ) {
     toCoutVerb(line);
@@ -914,6 +914,12 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   else if( std::regex_match(line, m, pModuleBegin) ) {
     return MODULEBEGIN;
   }
+  else if( std::regex_match(line, m, pIf) ) {
+    return IF;
+  }
+  else if( std::regex_match(line, m, pElse) ) {
+    return ELSE;
+  }
   else {
     if(!ignoreWrongOp) {
       std::cout << "!! Unsupported operator:" + line << std::endl;
@@ -1260,22 +1266,21 @@ void add_module_name(std::string fileName,
   if(g_use_end_sig) moduleInputs.push_back(END_SIG);  
   if(!isTop) moduleInputs.push_back("rst_zy");
   out << "module " + moduleName + " ( ";
-  for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) {
+  for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) 
     out << *it + " , ";
-  }
-  for (auto it = extendInputs.begin(); it != extendInputs.end(); ++it) {
+  if(g_enable_taint)
+    for (auto it = extendInputs.begin(); it != extendInputs.end(); ++it)
+      out << *it + " , ";
+  for (auto it = moduleOutputs.begin(); it != moduleOutputs.end(); ++it)
     out << *it + " , ";
-  }
-  for (auto it = moduleOutputs.begin(); it != moduleOutputs.end(); ++it) {
-    out << *it + " , ";
-  }
   //for (auto it = flagOutputs.begin(); it != flagOutputs.end(); ++it) {
   //  out << *it + " , ";
   //}
-  for (auto it = extendOutputs.begin(); it != extendOutputs.end() - 1; ++it) {
-    out << *it + " , ";
+  if(g_enable_taint) {
+    for (auto it = extendOutputs.begin(); it != extendOutputs.end() - 1; ++it)
+      out << *it + " , ";
+    out << extendOutputs.back() + " );" << std::endl;
   }
-  out << extendOutputs.back() + " );" << std::endl;
   // if no reset, add a reset
   if(isTop)
     out << "  logic rst_zy;" << std::endl;
@@ -2496,7 +2501,7 @@ void gen_assert_property(std::ofstream &output) {
         if(!g_enable_taint && g_check_invariance == CheckRst) {
           output << "  assert property( !INSTR_IN_ZY || " + var + " == " + rstVal + " );" << std::endl;
         }
-        else if (!g_enable_taint && g_check_invariance != None) {
+        else if (!g_enable_taint) {
           output << "  assert property( !INSTR_IN_ZY " + PREV_VAL_COMP + " );" << std::endl;
         }
         else if(!isMem(var)) 

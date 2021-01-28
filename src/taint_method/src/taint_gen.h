@@ -36,6 +36,8 @@ namespace taintGen {
 #define ALWAYS_STAR     23
 #define ALWAYS_NEG      24
 #define DEST_CONCAT     25
+#define IF              26
+#define ELSE            27
 #define UNSUPPORT       99
 #define NONE            100
 

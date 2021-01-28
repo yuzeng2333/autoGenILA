@@ -95,8 +95,6 @@ void input_taint_gen(std::string line, std::ofstream &output) {
   if(var != g_recentClk) {
     extendInputs.push_back(var+_t);
     extendOutputs.push_back(var+_r);
-    //extendOutputs.push_back(var+_x);
-    //extendOutputs.push_back(var+_c);
   }
   if(!isTop && !g_use_value_change && var != g_recentClk)
     extendInputs.push_back(var+_sig);
@@ -107,8 +105,6 @@ void input_taint_gen(std::string line, std::ofstream &output) {
     if(var != g_recentClk) { 
       output << blank + "input " + slice + var + _t + " ;" << std::endl;
       output << blank + "output " + slice + var + _r + " ;" << std::endl;
-      //output << blank + "output " + slice + var + _x + " ;" << std::endl;
-      //output << blank + "output " + slice + var + _c + " ;" << std::endl;
     }
     if(!g_use_value_change && isTop && var != g_recentClk)
       output << blank + "wire [" + toStr(g_sig_width-1) + ":0] " + var + _sig + " ;" << std::endl;
@@ -963,7 +959,6 @@ void reduce_one_op_taint_gen(std::string line, std::ofstream &output) {
 
 // src_concat
 void mult_op_taint_gen(std::string line, std::ofstream &output) {
-  if(!g_enable_taint) return;  
   std::smatch m;
   if( !std::regex_match(line, m, pSrcConcat) )
     abort();
@@ -977,16 +972,12 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
   // assume only fangyuan variable can be LHS of src concatenation statement
   //checkCond(dest.find("fangyuan") != std::string::npos, "Var not name fangyuan appeared in src_concat! "+line);
   bool isFangyuan = (dest.find("fangyuan") != std::string::npos);
-  //if(!isFangyuan) { 
-  //  toCout("Var not name fangyuan appeared in src_concat! "+line+", check if it is used in case or if it is splitted later!!");
-  //}
 
   std::vector<std::string> updateVec;
   parse_var_list(updateList, updateVec);
   uint32_t destWidthNum = 0;
   for(auto v : updateVec) {
     assert(!isMem(v));
-    //assert_info(!isTop || !isOutput(v), "mult_op_taint_gen:"+v+" is output, line: "+line);      
     destWidthNum += get_var_slice_width(v);
   }
   if (destWidthNum != get_var_slice_width(destAndSlice)) {
@@ -996,14 +987,13 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
 
   uint32_t destHighIdx = varWidth.get_high_idx(dest, line);
 
-  std::string updateTList = get_rhs_taint_list(updateVec, _t);
-  
   // _t
+  std::string updateTList = get_rhs_taint_list(updateVec, _t);
   std::string destWidth = std::to_string(destWidthNum);
   std::string destT = get_lhs_taint_list(dest, _t, output);
-  output << blank + "assign " + dest + _t + destSlice + " = { " + updateTList + " };" << std::endl;
+  if(g_enable_taint)
+    output << blank + "assign " + dest + _t + destSlice + " = { " + updateTList + " };" << std::endl;
   auto destBoundPair = varWidth.get_idx_pair(dest, line);
-  //ground_wires(destT, destBoundPair, destSlice, blank, output);
 
 
   uint32_t srcVecItemNum = 0;
@@ -1106,13 +1096,14 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
     srcSigList.pop_back();
     srcSigList.pop_back();
     fangyuanItemNum.emplace(dest, srcVecItemNum);
+    
     // _sig
-    if(!g_use_value_change) {
+    if(g_enable_taint && !g_use_value_change) {
       output << blank + "logic [" + toStr(srcVecItemNum*g_sig_width-1) + ":" + "0] " + dest + _sig + " ;" << std::endl;
       output << blank + "assign " + dest + _sig + " = { " + srcSigList + " };" << std::endl;
     }
   }
-  else if(!g_use_value_change) { // if fangyuan var is not used as RHS of case or the variable is not named fangyuanXX
+  else if(!g_use_value_change && g_enable_taint) { // if fangyuan var is not used as RHS of case or the variable is not named fangyuanXX
     // in this scenario, if dest is used in some select expression, we need to be careful with setting sig to 0.
     // First, we assume the above scenario does not happen.
     //if(g_selAssign.find(dest) != g_selAssign.end()) {
@@ -1123,6 +1114,8 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
     // when all the signatures of concatenation elements are 
     output << blank + "assign " + dest + _sig + " = 0 ;" << std::endl;
   }
+
+  if(!g_enable_taint) return;  
 
   // other taints
   uint32_t startIdxNum;
@@ -1961,10 +1954,11 @@ void nonblockif2_taint_gen(std::string line, std::string always_line, std::ifstr
 
 
 void always_fake_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream &output) {
-  if(!g_enable_taint) return;    
   std::string line;
   std::smatch m;
   std::getline(input, line);
+  if(!g_enable_taint) return;    
+  
   assert_info( std::regex_match(line, m, pEnd), "Error: expected end for always_fake" );
   output << line << std::endl;
 }
@@ -1974,13 +1968,16 @@ void always_fake_taint_gen(std::string firstLine, std::ifstream &input, std::ofs
 // Therefore, we do not consider cond_t here. Because cond is gated clock signal, those variables
 // that composing it should not be treated as "read"(FIXME)
 void always_star_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream &output) {
-  if(!g_enable_taint) return;    
-  toCout("Error: gated clock not supported yet: "+firstLine);
-  abort();
+  if(g_enable_taint) {
+    toCout("Error: gated clock not supported yet: "+firstLine);
+    abort();
+  }
   std::string ifLine;
   std::string assignLine;
   std::getline(input, ifLine);
   std::getline(input, assignLine);
+  if(!g_enable_taint) return;    
+  
   std::smatch m;
   // process ifLine
   if(!std::regex_match(ifLine, m, pIf)) {
