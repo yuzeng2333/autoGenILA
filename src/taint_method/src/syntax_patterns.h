@@ -32,6 +32,8 @@ extern std::regex pOr;
 extern std::regex pBitOr;     
 extern std::regex pBitExOr;     
 extern std::regex pBitAnd;     
+extern std::regex pBitXnor1;
+extern std::regex pBitXnor2;
 extern std::regex pSel1;   
 extern std::regex pSel2;     
 extern std::regex pSel3;     

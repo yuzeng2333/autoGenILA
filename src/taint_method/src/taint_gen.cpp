@@ -830,6 +830,8 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
             || std::regex_match(line, m, pBitOr)
             || std::regex_match(line, m, pBitExOr)
             || std::regex_match(line, m, pBitAnd)
+            || std::regex_match(line, m, pBitXnor1)
+            || std::regex_match(line, m, pBitXnor2)
             || std::regex_match(line, m, pLeftShift)
             || std::regex_match(line, m, pRightShift)
             || std::regex_match(line, m, pSignedRightShift)
