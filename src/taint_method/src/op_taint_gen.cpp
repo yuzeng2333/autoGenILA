@@ -11,6 +11,7 @@
 #include <math.h>
 #include <assert.h>
 #include "global_data.h"
+#include "helper.h"
 
 #define toStr(a) std::to_string(a)
 // configurations:
@@ -962,8 +963,10 @@ void reduce_one_op_taint_gen(std::string line, std::ofstream &output) {
 // src_concat
 void mult_op_taint_gen(std::string line, std::ofstream &output) {
   std::smatch m;
-  if( !std::regex_match(line, m, pSrcConcat) )
+  if( !is_srcConcat(line) )
     abort();
+
+  if(!std::regex_match(line, m, pSrcConcat)) abort();
 
   std::string blank = m.str(1);
   std::string destAndSlice = m.str(2);
@@ -1095,8 +1098,10 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
         }
       }
     } // end of for loop
-    srcSigList.pop_back();
-    srcSigList.pop_back();
+    if(!srcSigList.empty()) 
+      srcSigList.pop_back();
+    if(!srcSigList.empty()) 
+      srcSigList.pop_back();
     fangyuanItemNum.emplace(dest, srcVecItemNum);
     
     // _sig

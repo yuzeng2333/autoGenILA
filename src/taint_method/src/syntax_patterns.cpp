@@ -96,10 +96,11 @@ std::regex pIf        (taintGen::to_re("^(\\s*)if \\((.*)\\)$"));
 std::regex pElse      (taintGen::to_re("^(\\s*)else$"));
 /* multiple/un-certain # of ops */
 //std::regex pBitExOrConcat (taintGen::to_re("^(\\s*)assign (NAME) = \\{\\} \\^ (NAME)(\\s*)?;$"));
-std::regex pSrcConcat (taintGen::to_re("^(\\s*)assign (NAME) = \\{ ((?:NAME, )*NAME) \\}\\s?;$"));
+//std::regex pSrcConcat (taintGen::to_re("^(\\s*)assign (NAME) = \\{ ((?:NAME, )*NAME) \\}\\s?;$"));
+std::regex pSrcConcat (taintGen::to_re("^(\\s*)assign (NAME) = \\{ (.+) \\}\\s?;$"));
 // here actually src can be only one var
-std::regex pSrcDestBothConcat(taintGen::to_re("^(\\s*)assign \\{ ((?:NAME(?:\\s)?, )+NAME)\\s*\\} = \\{ ((?:NAME(?:\\s)?, )*NAME) \\}(\\s*)?;$"));
-std::regex pDestConcat(taintGen::to_re("^(\\s*)assign \\{ ((?:NAME(?:\\s)?, )+NAME)\\s*\\} = (NAME)(\\s*)?;$"));
+std::regex pSrcDestBothConcat(taintGen::to_re("^(\\s*)assign \\{ (.+)\\s*\\} = \\{ (.+) \\}(\\s*)?;$"));
+std::regex pDestConcat(taintGen::to_re("^(\\s*)assign \\{ (.+)\\s*\\} = (NAME)(\\s*)?;$"));
 
 /* Milicious */
 /* pVarName also exists in to_re(), and parse_var_list() */

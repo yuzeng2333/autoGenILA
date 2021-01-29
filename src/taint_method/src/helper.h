@@ -140,11 +140,11 @@ std::string extract_path(std::string fullFileName);
 
 uint32_t get_dest_ver(std::string destAndSlice);
 
-bool is_srcConcat(std::string line);
+bool is_srcConcat(const std::string &line);
 
-bool is_destConcat(std::string line);
+bool is_destConcat(const std::string &line);
 
-bool is_srcDestConcat(std::string line);
+bool is_srcDestConcat(const std::string &line);
 
 std::string extract_bin(std::string num, uint32_t highIdx, uint32_t lowIdx);
 
@@ -159,5 +159,14 @@ std::string split_long_hex(std::string var, uint32_t width, std::string num, std
 std::string split_long_bin(std::string var, uint32_t width, std::string num, std::string strToConcat);
 
 void fill_var_width(const std::string &line, VarWidth &varWidth);
+
+void remove_back_space(std::string &str);
+
+void remove_front_space(std::string &str);
+
+void remove_two_end_space(std::string &str);
+
+bool vec_has_only_vars(const std::vector<std::string> &vec);
+
 } // end of namespace taintGen
 #endif

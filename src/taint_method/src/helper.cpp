@@ -13,6 +13,7 @@
 #include "taint_gen.h"
 #include <algorithm>
 #include <math.h>
+#include <boost/algorithm/string.hpp>
 /* help functions */
 
 #define toStr(a) std::to_string(a)
@@ -1333,6 +1334,7 @@ uint32_t get_dest_ver(std::string destAndSlice) {
 
 
 // is_srcConcat is needed because it takes infinite time to match pSrcConcat
+/*
 bool is_srcConcat(std::string line) {
   if(line.find(srcConcatFeature) == std::string::npos)
     return false;
@@ -1348,40 +1350,41 @@ bool is_srcConcat(std::string line) {
   }
   return noOperator;
 }
+*/
 
 
 // is_srcConcat is needed because it takes infinite time to match pDestConcat
-bool is_destConcat(std::string line) {
-  if(line.find("} = ") == std::string::npos)
-    return false;
-  if(line.find(bothConcatFeature) != std::string::npos)
-    return false;
-
-  bool noOperator = true;
-  for(auto it = g_operators.begin(); it != g_operators.end(); it++) {
-    if(line.find(*it) != std::string::npos) {
-      noOperator = false;
-      break;
-    }
-  }
-  return noOperator;
-}
+//bool is_destConcat(std::string line) {
+//  if(line.find("} = ") == std::string::npos)
+//    return false;
+//  if(line.find(bothConcatFeature) != std::string::npos)
+//    return false;
+//
+//  bool noOperator = true;
+//  for(auto it = g_operators.begin(); it != g_operators.end(); it++) {
+//    if(line.find(*it) != std::string::npos) {
+//      noOperator = false;
+//      break;
+//    }
+//  }
+//  return noOperator;
+//}
 
 
 // is_srcConcat is needed because it takes infinite time to match pDestConcat
-bool is_srcDestConcat(std::string line) {
-  if(line.find(bothConcatFeature) == std::string::npos)
-    return false;
-
-  bool noOperator = true;
-  for(auto it = g_operators.begin(); it != g_operators.end(); it++) {
-    if(line.find(*it) != std::string::npos) {
-      noOperator = false;
-      break;
-    }
-  }
-  return noOperator;
-}
+//bool is_srcDestConcat(std::string line) {
+//  if(line.find(bothConcatFeature) == std::string::npos)
+//    return false;
+//
+//  bool noOperator = true;
+//  for(auto it = g_operators.begin(); it != g_operators.end(); it++) {
+//    if(line.find(*it) != std::string::npos) {
+//      noOperator = false;
+//      break;
+//    }
+//  }
+//  return noOperator;
+//}
 
 
 std::string extract_bin(std::string num, uint32_t highIdx, uint32_t lowIdx) {
@@ -1690,6 +1693,74 @@ void fill_var_width(const std::string &line, VarWidth &varWidth) {
     default:
       break;
   }
+}
+
+
+void remove_back_space(std::string &str) {
+  while(str.back() == ' ')
+    str.pop_back();
+}
+
+
+void remove_front_space(std::string &str) {
+  size_t pos = str.find_first_not_of(" ");
+  str = str.substr(pos);
+}
+
+void remove_two_end_space(std::string &str) {
+  remove_front_space(str);
+  remove_back_space(str);
+}
+
+
+bool is_srcConcat(const std::string &line) {
+  std::regex pLocalName("[a-zA-Z0-9_=\\.\\$\\\\'\\[\\]\\(\\)]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?");  
+  std::smatch m;
+  if(!std::regex_match(line, m, pSrcConcat))
+    return false;
+  std::string varList = m.str(3);
+  std::vector<std::string> varVec;
+  boost::split(varVec, varList, boost::is_any_of(","));
+  return vec_has_only_vars(varVec);
+}
+
+
+bool is_destConcat(const std::string &line) {
+  std::regex pLocalName("[a-zA-Z0-9_=\\.\\$\\\\'\\[\\]\\(\\)]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?");  
+  std::smatch m;
+  if(!std::regex_match(line, m, pDestConcat))
+    return false;
+  std::string varList = m.str(2);
+  std::vector<std::string> varVec;
+  boost::split(varVec, varList, boost::is_any_of(","));
+  return vec_has_only_vars(varVec);
+}
+
+
+bool is_srcDestConcat(const std::string &line) {
+  std::regex pLocalName("[a-zA-Z0-9_=\\.\\$\\\\'\\[\\]\\(\\)]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?");  
+  std::smatch m;
+  if(!std::regex_match(line, m, pSrcDestBothConcat))
+    return false;
+  std::string srcList = m.str(2);
+  std::string destList = m.str(3);
+  std::vector<std::string> srcVec;
+  std::vector<std::string> destVec;
+  boost::split(srcVec, srcList, boost::is_any_of(","));
+  boost::split(destVec, destList, boost::is_any_of(","));
+  return vec_has_only_vars(srcVec) && vec_has_only_vars(destVec);
+}
+
+
+bool vec_has_only_vars(const std::vector<std::string> &vec) {
+  std::regex pLocalName("[a-zA-Z0-9_=\\.\\$\\\\'\\[\\]\\(\\)]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?");  
+  std::smatch m;  
+  for(std::string var: vec) {
+    remove_two_end_space(var);
+    if(!std::regex_match(var, m, pLocalName))
+      return false;
+  }
+  return true;
 }
 
 } // end of namespace taintGen

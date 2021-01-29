@@ -221,8 +221,8 @@ void clean_file(std::string fileName, bool useLogic) {
   assert(!g_set_rflag_if_not_rst_val || g_enable_taint);
 
   while( std::getline(cleanFileInput, line) ) {
-    toCoutVerb(line);
-    if(line.find("tmp_div") != std::string::npos) {
+    toCout(line);
+    if(line.find("nvdla_cdp_s_lut_access_cfg_0_out") != std::string::npos) {
       toCout("FIND IT!");
     }
 
@@ -782,6 +782,8 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   std::smatch m;
   if(line.empty())
     return NONE;
+  if(line.find("fangyuan0") != std::string::npos)
+    toCout("Find it!");
   if(line.substr(0, 1) == "X") {
     toCout("begin debug");
     ignoreWrongOp = true;
@@ -922,7 +924,7 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   else if( std::regex_match(line, m, pElse) ) {
     return ELSE;
   }
-  else {
+  else if(line.find("(*") == std::string::npos){
     if(!ignoreWrongOp) {
       std::cout << "!! Unsupported operator:" + line << std::endl;
       abort();
@@ -1028,9 +1030,8 @@ void add_file_taints(std::string fileName,
   // Reserve first line for module declaration
   while( std::getline(input, line) ) {
     toCout(line);
-    if(moduleName.compare("HLS_cdp_icvt_core") == 0 
-       && line.find("IntShiftRight_25U_5U_9U_1_mbits_fixed_mux_nl") != std::string::npos)
-      //toCout(line);
+    if(line.find("_000_") != std::string::npos)
+      toCout("Find it!");
     lineNo++;
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       add_case_taints_limited(input, output, line);
