@@ -5,8 +5,8 @@ namespace syntaxPatterns {
 
 /* declarations */
 std::regex pModule      (taintGen::to_re("^(\\s*)module (NAME)\\(.+\\);$"));
-std::regex pInput       (taintGen::to_re("^(\\s*)input (\\[\\d+\\:0\\] )?(NAME)(\\s*)?;$"));
-std::regex pOutput      (taintGen::to_re("^(\\s*)output (\\[\\d+\\:0\\] )?(NAME)(\\s*)?;$"));
+std::regex pInput       (taintGen::to_re("^(\\s*)input (\\[\\d+\\:\\d+\\] )?(NAME)(\\s*)?;$"));
+std::regex pOutput      (taintGen::to_re("^(\\s*)output (\\[\\d+\\:\\d+\\] )?(NAME)(\\s*)?;$"));
 std::regex pReg         (taintGen::to_re("^(\\s*)reg (\\[\\d+\\:\\d+\\] )?(NAME)(\\s*)?;$"));
 std::regex pRegConst    (taintGen::to_re("^(\\s*)reg (\\[\\d+\\:\\d+\\] )?(NAME)(\\s*)= (NUM)(\\s*)?;$"));
 std::regex pWire        (taintGen::to_re("^(\\s*)wire (\\[\\d+\\:\\d+\\] )?(NAME)(\\s*)?;$"));
