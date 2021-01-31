@@ -16,8 +16,8 @@ std::regex pBin("^(\\d+)'b([01x\\?]+)$");
 
 
 bool isAs(std::string var) {
-  auto it = std::find( g_moduleAs.begin(), g_moduleAs.end(), var );
-  return it != g_moduleAs.end();
+  auto it = std::find( g_curMod->moduleAs.begin(), g_curMod->moduleAs.end(), var );
+  return it != g_curMod->moduleAs.end();
 }
 
 
@@ -310,13 +310,13 @@ uint32_t get_time(std::string var) {
 
 
 bool is_case_dest(std::string var) {
-  return g_caseTable.find(var) != g_caseTable.end();
+  return g_curMod->caseTable.find(var) != g_curMod->caseTable.end();
 }
 
 bool is_func_output(std::string var) {
-  if(g_funcTable.find(var) != g_funcTable.end())
+  if(g_curMod->funcTable.find(var) != g_curMod->funcTable.end())
     return true;
-  if(g_funcTable.find(var+" ") != g_funcTable.end())
+  if(g_curMod->funcTable.find(var+" ") != g_curMod->funcTable.end())
     return true;
   return false;
 }
@@ -442,13 +442,13 @@ bool is_all_digits(const std::string& num) {
 bool has_direct_assignment(std::string varAndSlice) {
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
-  bool withinReg2Slices = g_reg2Slices.find(var) != g_reg2Slices.end();
+  bool withinReg2Slices = g_curMod->reg2Slices.find(var) != g_curMod->reg2Slices.end();
   if(varSlice.empty()) {
     toCout("Error: expecting slice for input: "+varAndSlice);
   }
   return withinReg2Slices 
-         && std::find(g_reg2Slices[var].begin(), g_reg2Slices[var].end(), varAndSlice) 
-            != g_reg2Slices[var].end();
+         && std::find(g_curMod->reg2Slices[var].begin(), g_curMod->reg2Slices[var].end(), varAndSlice) 
+            != g_curMod->reg2Slices[var].end();
 }
 
 
@@ -520,22 +520,6 @@ void vec2str(std::vector<std::string> &vec, std::string &ret) {
   ret.pop_back();
 }
 
-
-void remove_back_space(std::string &str) {
-  while(str.back() == ' ')
-    str.pop_back();
-}
-
-
-void remove_front_space(std::string &str) {
-  size_t pos = str.find_first_not_of(" ");
-  str = str.substr(pos);
-}
-
-void remove_two_end_space(std::string &str) {
-  remove_front_space(str);
-  remove_back_space(str);
-}
 
 bool is_written_ASV(const std::string &reg) {
   // currently does not support multiple instructions

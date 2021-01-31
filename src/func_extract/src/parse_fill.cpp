@@ -10,28 +10,19 @@ using namespace syntaxPatterns;
 namespace funcExtract {
 
 // global variables
-StrSet_t g_moduleAs;
+std::unordered_map<std::string, struct ModuleInfo_t*> g_moduleInfoMap;
+std::stack<std::string> g_instanceStk;
+struct ModuleInfo_t *g_curMod;
 std::set<std::string> moduleWriteAs;
-std::unordered_map<std::string, std::vector<std::string>> g_reg2Slices;
-std::unordered_map<std::string, uint32_t> reg2timeIdx;
-std::unordered_map<std::string, std::string> g_ssaTable;
-// non-blocking assignment table
-std::unordered_map<std::string, std::string> g_nbTable;
-std::unordered_map<std::string, 
-                   std::pair<std::string, 
-                             std::vector<std::pair<std::string,
-                                                   std::string>>>> g_caseTable;
-std::unordered_map<std::string, FuncInfo_t> g_funcTable;
 uint32_t g_new_var;
 uint32_t g_instr_len;
 //std::unordered_map<std::string, astNode*> g_asSliceRoot;
 std::unordered_map<std::string, astNode*> g_varNode;
 // each element is a map from input signal to its value
 // x means the value can be arbitrary
-std::vector<struct instrInfo> g_instrInfo;
+std::vector<struct InstrInfo_t> g_instrInfo;
 std::unordered_map<std::string, std::string> g_nopInstr;
 std::map<std::string, std::string> g_rstVal;
-std::unordered_map<std::string, ModuleInfo_t> g_allModuleInfo;
 // first key is instance name, second key is wire name
 std::unordered_map<std::string, 
                    std::unordered_map<std::string, 
@@ -58,13 +49,8 @@ void clear_global_vars() {
   moduleWires.clear();
   moduleMems.clear();
   memDims.clear();
-  g_ssaTable.clear();
-  g_nbTable.clear();
-  g_caseTable.clear();
   g_varWidth.clear();
-  g_moduleAs.clear();
   moduleWriteAs.clear();
-  g_reg2Slices.clear();
   g_new_var = 0;
 }
 
@@ -94,7 +80,7 @@ void clear_global_vars() {
 //}
 
 
-// parse the verilog lines, and store them into g_ssaTable & g_nbTable
+// parse the verilog lines, and store them into ssaTable & nbTable
 void parse_verilog(std::string fileName) {
   toCout("### Begin parse_verilog");
   std::ifstream input(fileName);
@@ -105,15 +91,11 @@ void parse_verilog(std::string fileName) {
   std::string line;
   std::smatch match;
   while( std::getline(input, line) ) {
+    toCout(line);
     if(line.find("_0699_") != std::string::npos) {
       toCout("Find it!");
     }
     fill_var_width(line, g_varWidth);
-    if( line.find("module") != std::string::npos ) {
-      std::regex_match(line, match, pModule);
-      moduleName = match.str(1);
-      continue;
-    }
     //toCout(line);
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       case_expr(line, input);
@@ -121,6 +103,9 @@ void parse_verilog(std::string fileName) {
     }
     uint32_t choice = parse_verilog_line(line, true);
     switch(choice) {
+    case MODULE:
+      module_expr(line);
+      break;
     case INPUT:
       input_expr(line);
       break;
@@ -167,7 +152,7 @@ void parse_verilog(std::string fileName) {
       nonblockif_expr(line, input);
       break;
     case MODULEBEGIN:
-      module_expr(line, input);
+      submodule_expr(line, input);
       break;
     case FUNCDEF:
       toCout("!! Error: function found in verilog file");
@@ -189,7 +174,6 @@ void parse_verilog(std::string fileName) {
 // parsed result is in g_instrInfo
 void read_in_instructions(std::string fileName) {
   toCout("### Begin read in instr info");
-  g_moduleAs.clear();
   g_instrInfo.clear();
   g_rstVal.clear();
   g_instr_len = 0;
@@ -205,6 +189,7 @@ void read_in_instructions(std::string fileName) {
   bool firstWord = true;
   bool firstSignalSeen = false;
   while(std::getline(input, line)) {
+    toCout(line);
     if(line.empty())
       continue;
     if(line.substr(0, 2) == "//")
@@ -264,7 +249,7 @@ void read_in_instructions(std::string fileName) {
               abort();
             }
             if(firstWord) {
-              struct instrInfo info = { {{signalName, std::vector<std::string>{encoding}}}, 
+              struct InstrInfo_t info = { {{signalName, std::vector<std::string>{encoding}}}, 
                                         std::set<std::string>{}, 
                                         std::set<std::pair<uint32_t, std::string>>{}, 
                                         std::set<std::string>{} };
@@ -298,14 +283,14 @@ void read_in_instructions(std::string fileName) {
             // if space exists, solve process is skipped and delay for writing ASV is specified
             if(line.find(" ") == std::string::npos) {
               g_instrInfo.back().writeASV.insert(std::make_pair(0, line));
-              g_moduleAs.insert(line);
+              g_curMod->moduleAs.insert(line);
             }
             else {
               size_t pos = line.find(" ");
               if(pos == line.length() - 1) {
                 line.pop_back();
                 g_instrInfo.back().writeASV.insert(std::make_pair(0, line));
-                g_moduleAs.insert(line);
+                g_curMod->moduleAs.insert(line);
               }
               std::string cycleCnt = line.substr(pos+1);
               if(!is_number(cycleCnt)) {
@@ -320,13 +305,13 @@ void read_in_instructions(std::string fileName) {
               }
               g_instrInfo.back().writeASV.insert(std::make_pair(uint32_t(std::stoi(cycleCnt)), 
                                                                 asName));
-              g_moduleAs.insert(asName);
+              g_curMod->moduleAs.insert(asName);
             }
           }
           break;
         case ReadASV:
           g_instrInfo.back().readASV.insert(line);
-          g_moduleAs.insert(line);
+          g_curMod->moduleAs.insert(line);
           break;
         case ReadNOP:
           {
@@ -381,7 +366,7 @@ void read_module_info() {
   }
   std::string line;
   std::string moduleName;
-  ModuleInfo_t moduleInfo;
+  ModuleInfo_t *moduleInfo = new ModuleInfo_t;
   bool seeOutput = false;
   std::string outVar;  
   std::unordered_map<std::string, uint32_t> inputDelayMap;
@@ -390,11 +375,8 @@ void read_module_info() {
       continue;
     if(is_module_line(line, moduleName)) {
       // store info of last module
-      if(!moduleInfo.name.empty()) {
-        g_allModuleInfo.emplace(moduleInfo.name, moduleInfo);
-      }
-      moduleInfo.name = moduleName;
-      moduleInfo.out2InDelayMp.clear();
+      moduleInfo->name = moduleName;
+      moduleInfo->out2InDelayMp.clear();
     }
     else if(line.find(":") == std::string::npos 
               && line.find("}") == std::string::npos) { // output name
@@ -417,10 +399,10 @@ void read_module_info() {
     }
     else {
       seeOutput = false;
-      moduleInfo.out2InDelayMp.emplace(outVar, inputDelayMap);
+      moduleInfo->out2InDelayMp.emplace(outVar, inputDelayMap);
     }
   }
-  g_allModuleInfo.emplace(moduleInfo.name, moduleInfo);
+  g_moduleInfoMap.emplace(moduleInfo->name, moduleInfo);
 } 
 
 
@@ -453,5 +435,21 @@ void read_top_module_info() {
     }
   }
 } 
+
+ModuleInfo_t::ModuleInfo_t() {}
+
+
+ModuleInfo_t::~ModuleInfo_t() {
+  name.clear();
+  moduleAs.clear();  
+  ssaTable.clear();
+  reg2Slices.clear();
+  nbTable.clear();
+  caseTable.clear();
+  funcTable.clear();
+  reg2timeIdx.clear();
+  out2InDelayMp.clear();
+}
+
 
 } // end of namespace funcExtract

@@ -14,6 +14,8 @@
 
 namespace funcExtract {
 
+void module_expr(std::string line);
+
 void input_expr(std::string line);
 
 void reg_expr(std::string line);
@@ -42,7 +44,7 @@ void always_if_else_expr(std::string line, std::ifstream &input);
 
 void case_expr(std::string line, std::ifstream &input);
 
-void module_expr(std::string line, std::ifstream &input);
+void submodule_expr(std::string line, std::ifstream &input);
 
 void put_into_reg2Slice(std::string destAndSlice);
 

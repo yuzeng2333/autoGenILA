@@ -32,14 +32,14 @@ std::unordered_map<std::string, expr*> g_existedExpr;
 std::queue<std::pair<std::string, uint32_t>> g_goalVars;
 std::string g_rootNode;
 std::string g_currentModuleName;
-struct instrInfo g_currInstrInfo;
+struct InstrInfo_t g_currInstrInfo;
 uint32_t g_destWidth;
 bool g_skipCheck;
 bool g_ignoreSubModules=false;
 bool g_seeInputs;
 uint32_t g_maxDelay = 0;
 
-// assume g_ssaTable and g_nbTable have been filled
+// assume ssaTable and nbTable have been filled
 void check_all_regs() {
   toCout("### Begin check_all_regs");
   toCoutVerb("###### Begin checking SAT! ");
@@ -56,10 +56,10 @@ void check_all_regs() {
       uint32_t cycleCnt = pair.first;
       std::string oneWriteAsv = pair.second;
       if(instrInfo.skipWriteASV.find(oneWriteAsv) == instrInfo.skipWriteASV.end()) {
-        if(g_reg2Slices.find(oneWriteAsv) == g_reg2Slices.end())
+        if(g_curMod->reg2Slices.find(oneWriteAsv) == g_curMod->reg2Slices.end())
           check_single_reg_and_slice(oneWriteAsv, cycleCnt-1, i-1);
         else
-          for(std::string regAndSlice: g_reg2Slices[oneWriteAsv])
+          for(std::string regAndSlice: g_curMod->reg2Slices[oneWriteAsv])
             check_single_reg_and_slice(regAndSlice, cycleCnt-1, i-1);
       }
       else {// if SAT solving of writeASV is to be skipped
@@ -378,8 +378,8 @@ expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s
                     goal &g, uint32_t bound, bool isSolve) {
   // Attention: varAndSlice might have a slice, a directly-assigned varAndSlice
   std::string varAndSlice = node->dest;
-  if(varAndSlice == "_4131_[35]") {
-    toCout("find _4131_[35]");
+  if(varAndSlice == "_2_") {
+    toCout("find _2_");
   }
   expr destExpr = var_expr(varAndSlice, timeIdx, c, false);  
   expr destExpr_t = var_expr(varAndSlice, timeIdx, c, true);  

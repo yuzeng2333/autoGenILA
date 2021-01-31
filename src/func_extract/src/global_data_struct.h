@@ -16,14 +16,14 @@ extern std::unordered_map<std::string, expr*> INPUT_EXPR_VAL;
 extern std::unordered_map<std::string, expr*> TIMED_VAR2EXPR;
 extern std::set<std::string> INT_EXPR_SET;
 
-extern std::vector<struct instrInfo> g_instrInfo;
+extern std::vector<struct InstrInfo_t> g_instrInfo;
 extern bool g_print_solver;
 extern bool g_skipCheck;
 extern std::set<std::string> g_readASV;
 extern std::set<std::string> g_regWithFunc;
 extern std::unordered_map<std::string, expr*> g_existedExpr;
 extern std::string g_rootNode;
-extern struct instrInfo g_currInstrInfo;
+extern struct InstrInfo_t g_currInstrInfo;
 extern std::unordered_map<std::string, std::string> g_nopInstr;
 extern std::map<std::string, std::string> g_rstVal;
 extern std::unordered_map<std::string, std::string> g_nameVarMap;
@@ -45,5 +45,9 @@ extern std::string g_accl2memData;
 extern std::string g_currentModuleName;
 extern uint32_t g_instr_len;
 
+// for hierarchical store
+extern std::unordered_map<std::string, struct ModuleInfo_t*> g_moduleInfoMap;
+extern std::stack<std::string> g_instanceStk;
+extern struct ModuleInfo_t *g_curMod;
 } // end of namespace funcExtract
 #endif

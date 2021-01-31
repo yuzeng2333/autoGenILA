@@ -18,7 +18,7 @@
 namespace funcExtract {
 
 
-struct instrInfo {
+struct InstrInfo_t {
   std::unordered_map<std::string, std::vector<std::string>> instrEncoding;
   std::set<std::string> readASV;
   std::set<std::pair<uint32_t, std::string>> writeASV;
@@ -35,29 +35,32 @@ struct FuncInfo_t {
 
 
 struct ModuleInfo_t {
+  ModuleInfo_t();
+  ModuleInfo_t(std::string nameIn): name(nameIn) {}
+  ~ModuleInfo_t();
+
   std::string name;
+  StrSet_t moduleAs;  
+  std::unordered_map<std::string, std::string> ssaTable;
+  std::unordered_map<std::string, std::vector<std::string>> reg2Slices;
+  std::unordered_map<std::string, std::string> nbTable;
+  std::unordered_map<std::string, 
+                     std::pair<std::string, 
+                               std::vector<std::pair<std::string, 
+                                                     std::string>>>> caseTable;
+  std::unordered_map<std::string, FuncInfo_t> funcTable;
+  std::unordered_map<std::string, uint32_t> reg2timeIdx;  
   // first key is output, second key is input
   std::unordered_map<std::string, 
                      std::unordered_map<std::string, uint32_t>> out2InDelayMp;
+  // TODO: move moduleInputs and moduleOutputs here
 };
 
-extern std::unordered_map<std::string, std::string> g_ssaTable;
-extern StrSet_t g_moduleAs;
-extern std::unordered_map<std::string, std::vector<std::string>> g_reg2Slices;
-extern std::unordered_map<std::string, uint32_t> reg2timeIdx;
-extern std::unordered_map<std::string, std::string> g_nbTable;
-extern std::unordered_map<std::string, 
-                          std::pair<std::string, 
-                                    std::vector<std::pair<std::string, 
-                                                          std::string>>>> g_caseTable;
-extern std::unordered_map<std::string, FuncInfo_t> g_funcTable;
 extern uint32_t g_new_var;
 extern taintGen::VarWidth g_varWidth;
 extern std::regex pSingleLine;
 extern std::regex pNbLine;
-extern std::unordered_map<std::string, astNode*> g_asSliceRoot;
 extern std::unordered_map<std::string, astNode*> g_varNode;
-extern std::unordered_map<std::string, ModuleInfo_t> g_allModuleInfo;
 
 void clear_global_vars();
 

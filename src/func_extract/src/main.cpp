@@ -13,6 +13,7 @@
 #include <string>
 #include <fstream>
 #include <time.h>
+#include <glog/logging.h>
 
 #include "../../taint_method/src/global_data.h"
 #include "../../taint_method/src/helper.h"
@@ -34,6 +35,8 @@ using namespace taintGen;
 // 1. instr.txt
 // 2. module_info.txt
 int main(int argc, char *argv[]) {
+  google::InitGoogleLogging(argv[0]);
+  FLAGS_log_dir = "/workspace/research/ILA/autoGenILA/src/func_extract/log";
   g_path = argv[1];
   // if argv[3] is 1, clean the file
   std::string doClean = argv[2];
@@ -48,12 +51,9 @@ int main(int argc, char *argv[]) {
   g_remove_adff = true;
   g_split_long_num = true;
   print_time();
-  /// read module_info.txt, result in g_allModuleInfo
+  /// read module_info.txt, result in g_moduleInfoMap
   /// read input-output delay info for sub-modules
   read_module_info();
-  // read instr.txt, result in g_instrInfo
-  // instruction encodings, write/read ASV, NOP
-  read_in_instructions(g_path+"/instr.txt");  
   if(doClean.compare("1") == 0) {
     toCout("### Begin clean_file");
     clean_file(g_path+"/design.v", false);
@@ -70,7 +70,9 @@ int main(int argc, char *argv[]) {
   clean_verilog(g_path+"/design.v.clean");
   vcd_parser(g_path+"/rst.vcd");
   inv_gen();
-  
+  // read instr.txt, result in g_instrInfo
+  // instruction encodings, write/read ASV, NOP
+  read_in_instructions(g_path+"/instr.txt");
   // get update function hierarchically
   std::vector<std::string> modules;  
   std::map<std::string, std::vector<std::string>> childModules;
@@ -106,7 +108,7 @@ void extract_update_func_bottom_up(std::string path,
                                    std::string module,
                                    std::vector<std::string>> &childModules,
                                    std::string g_topModule) {
-  if( g_allModuleInfo.find(module) != g_allModuleInfo.end() )
+  if( g_moduleInfoMap.find(module) != g_moduleInfoMap.end() )
     return;
   if( childModules.find(module) == childModules.end() ) {
     get_update_func(path, module);

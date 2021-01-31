@@ -3,10 +3,12 @@
 #include "check_regs.h"
 #include "helper.h"
 #include "ast.h"
+#include <glog/logging.h>
 
 #define toStr(a) std::to_string(a)
 #define SV std::vector<std::string>
 #define PV std::vector<astNode*>
+#define warn(a) LOG(WARNING) << a
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -26,6 +28,7 @@ using namespace z3;
 using namespace taintGen;
 
 namespace funcExtract {
+
 
 /* this function is used for expanding vars used as ITE conditions */
 //void var_expand(std::string varAndSlice, uint32_t timeIdx, context &c, solver &s) {
@@ -174,6 +177,10 @@ expr input_constraint(astNode* const node, uint32_t timeIdx, context &c, solver 
         abort();
       }
       //uint32_t wordIdx = bound+1-timeIdx;
+      if(timeIdx > bound) {
+        toCout("Error: timeIdx greater than bound, timeIdx: "+toStr(timeIdx)+", bound: "+toStr(bound));
+        abort();
+      }
       uint32_t wordIdx = bound-timeIdx;
       std::string localVal = g_currInstrInfo.instrEncoding[dest][wordIdx];
       uint32_t localWidth = get_var_slice_width_simp(dest);
@@ -967,18 +974,19 @@ expr func_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
   std::string destAndSlice = node->dest;
   g_moduleOutportTime.emplace(destAndSlice, timeIdx);
   toCout("Func constraint for:"+destAndSlice);  
+  LOG(WARNING) << "Func constraint";
   uint32_t width = get_var_slice_width_simp(destAndSlice);
   std::string instanceName = node->op;
   std::string moduleName = g_ins2modMap[instanceName];
-  ModuleInfo_t moduleInfo;
-  if(g_allModuleInfo.find(moduleName) != g_allModuleInfo.end())
-    moduleInfo = g_allModuleInfo[moduleName];
+  ModuleInfo_t *moduleInfo;
+  if(g_moduleInfoMap.find(moduleName) != g_moduleInfoMap.end())
+    moduleInfo = g_moduleInfoMap[moduleName];
   if(g_wire2ModulePort[instanceName].find(destAndSlice) == g_wire2ModulePort[instanceName].end()) {
     toCout("Error: this key does not exist in g_wire2ModulePort: |"+destAndSlice+"|");
     abort();
   }
   std::string outPort = g_wire2ModulePort[instanceName][destAndSlice];
-  std::unordered_map<std::string, uint32_t> inputDelayMap = moduleInfo.out2InDelayMp[outPort];
+  std::unordered_map<std::string, uint32_t> inputDelayMap = moduleInfo->out2InDelayMp[outPort];
   if(!g_ignoreSubModules) {
     sort_vector sorts(c);
     for(std::string &var: node->srcVec) {
@@ -997,9 +1005,10 @@ expr func_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &
     for(std::string &var: node->srcVec) {
       std::string inPort = g_wire2ModulePort[instanceName][var];
       if(inputDelayMap.find(inPort) == inputDelayMap.end()) {
-        toCout("Error: cannot find in inputDelayMap: "+inPort);
+        toCout("Warning: cannot find in inputDelayMap: "+inPort);
         toCout("Check module_info.txt!");
-        abort();
+        warn("Warning: cannot find in inputDelayMap: "+inPort);
+        warn("Check module_info.txt!");
       }
       uint32_t delay = inputDelayMap[inPort]; 
       g_moduleInportTime.emplace(var, timeIdx+delay);

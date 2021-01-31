@@ -16,6 +16,24 @@ using namespace syntaxPatterns;
 
 namespace funcExtract {
 
+void module_expr(std::string line) {
+  std::smatch m;
+  if (!std::regex_match(line, m, pModule))
+    return;
+  g_currentModuleName = m.str(2);
+  std::string portList = m.str(3);
+
+  if(g_moduleInfoMap.find(g_currentModuleName) != g_moduleInfoMap.end())
+    g_curMod = g_moduleInfoMap[g_currentModuleName];
+  else
+    g_curMod = new struct ModuleInfo_t;
+  g_moduleInfoMap.emplace(g_currentModuleName, g_curMod);
+  g_curMod->name = g_currentModuleName;
+  moduleName = g_currentModuleName;
+}
+
+
+
 void input_expr(std::string line) {
   std::smatch m;
   if (!std::regex_match(line, m, pInput))
@@ -154,7 +172,7 @@ void single_line_expr(std::string line) {
   }
   std::string destAndSlice = m.str(2);
   put_into_reg2Slice(destAndSlice);
-  auto ret = g_ssaTable.emplace(destAndSlice, line);
+  auto ret = g_curMod->ssaTable.emplace(destAndSlice, line);
   if(!ret.second) {
     toCout("Error in inserting ssaTable in single_line for key: "+m.str(2));
     toCout("Did you check the design.v/design.v.clean file can only have the top module??");
@@ -201,7 +219,7 @@ void both_concat_expr(std::string line) {
   g_varWidth.var_width_insert("yuzeng"+yuzengIdxStr, startIdx, 0);
   std::string newAssign = "  assign yuzeng"+yuzengIdxStr+" = "+srcList+" ;";
 
-  auto ret = g_ssaTable.emplace("yuzeng"+yuzengIdxStr, line);
+  auto ret = g_curMod->ssaTable.emplace("yuzeng"+yuzengIdxStr, line);
   if(!ret.second)
     toCout("Error in inserting ssaTable in both_concat1 for key: yuzeng"+yuzengIdxStr+", original line:"+line);
   
@@ -217,7 +235,7 @@ void both_concat_expr(std::string line) {
       std::string destLowIdx   = toStr(destIdxPair.second);
 
       std::string destAssign = "  assign "+destAndSlice+" = yuzeng"+yuzengIdxStr+" [" + toStr(startIdx)+" : "+toStr(endIdx)+"] ;";
-      auto ret = g_ssaTable.emplace(destAndSlice, destAssign);
+      auto ret = g_curMod->ssaTable.emplace(destAndSlice, destAssign);
       put_into_reg2Slice(destAndSlice);
       if(!ret.second)
         toCout("Error in inserting ssaTable in both_concat2 for key: "+destAndSlice+", original line:"+line);
@@ -271,7 +289,7 @@ void dest_concat_expr(std::string line) {
       split_slice(destAndSlice, dest, destSlice);
 
       std::string destAssign = "  assign "+destAndSlice+" = "+src+" [" + toStr(startIdx)+" : "+toStr(endIdx)+"];";
-      auto ret = g_ssaTable.emplace(destAndSlice, destAssign);
+      auto ret = g_curMod->ssaTable.emplace(destAndSlice, destAssign);
       put_into_reg2Slice(destAndSlice);
       if(!ret.second)
         toCout("Error in inserting ssaTable in both_concat2 for key: "+destAndSlice+", original line:"+line);
@@ -287,7 +305,7 @@ void nb_expr(std::string line) {
     toCout("Error in matching single line expression: "+line);
     return;
   }
-  auto ret = g_nbTable.emplace(m.str(2), line);
+  auto ret = g_curMod->nbTable.emplace(m.str(2), line);
   std::string dest, destSlice;
   split_slice(m.str(2), dest, destSlice);
   moduleTrueRegs.push_back(dest);
@@ -358,12 +376,12 @@ void nonblockif_expr(std::string line, std::ifstream &input) {
   }
  
   std::string destNextLine = "  assign yuzeng"+yuzengIdx+" = "+condAndSlice+" ? "+srcAndSlice+" : "+destAndSlice+" ;";
-  auto ret = g_ssaTable.emplace("yuzeng"+yuzengIdx, destNextLine);
+  auto ret = g_curMod->ssaTable.emplace("yuzeng"+yuzengIdx, destNextLine);
   if(!ret.second)
     toCout("Error in inserting ssaTable for the line: "+line+", "+destNextLine );
 
   std::string destNbLine = "  "+destAndSlice+" <= yuzeng"+yuzengIdx;
-  ret = g_nbTable.emplace(destAndSlice, destNbLine);
+  ret = g_curMod->nbTable.emplace(destAndSlice, destNbLine);
   if(!ret.second)
     toCout("Error in inserting ssaTable for the line: "+line+", "+destNbLine );
 }
@@ -427,12 +445,12 @@ void always_if_else_expr(std::string line, std::ifstream &input) {
     destNextLine = "  assign yuzeng"+yuzengIdx+" = "+condAndSlice+" ? "+src1AndSlice+" : "+src2AndSlice+";";
   else
     destNextLine = "  assign yuzeng"+yuzengIdx+" = "+condAndSlice.substr(1)+" ? "+src2AndSlice+" : "+src1AndSlice+";";
-  auto ret = g_ssaTable.emplace("yuzeng"+yuzengIdx, destNextLine);
+  auto ret = g_curMod->ssaTable.emplace("yuzeng"+yuzengIdx, destNextLine);
   if(!ret.second)
     toCout("Error in inserting ssaTable for the line: "+line+", "+destNextLine);
 
   std::string destNbLine = "  "+destAndSlice+" <= yuzeng"+yuzengIdx+" ;";
-  ret = g_nbTable.emplace(destAndSlice, destNbLine);
+  ret = g_curMod->nbTable.emplace(destAndSlice, destNbLine);
   if(!ret.second)
     toCout("Error in inserting ssaTable for the line: "+line+", "+destNbLine );
 }
@@ -452,11 +470,11 @@ void case_expr(std::string line, std::ifstream &input) {
   std::vector<std::string> inputSlice;
   std::string destAndSlice = parse_case_statements(caseAssignPairs, input, false);
   put_into_reg2Slice(destAndSlice);
-  g_caseTable.emplace(destAndSlice, std::make_pair(sAndSlice, caseAssignPairs));
+  g_curMod->caseTable.emplace(destAndSlice, std::make_pair(sAndSlice, caseAssignPairs));
 }
 
 // TODO: separate inputs and outputs
-void module_expr(std::string firstLine, std::ifstream &input) {
+void submodule_expr(std::string firstLine, std::ifstream &input) {
   std::smatch m;
   if ( !std::regex_match(firstLine, m, pModuleBegin) ) {
     toCout("Error: does not match pModuleBegin: "+firstLine);
@@ -464,6 +482,10 @@ void module_expr(std::string firstLine, std::ifstream &input) {
   }
   std::string moduleName = m.str(2);
   std::string instanceName = m.str(3);
+  if(g_moduleInfoMap.find(moduleName) == g_moduleInfoMap.end()) {
+    toCout("Error: cannot find moduleInfo for: "+moduleName);
+    abort();
+  }
   if(g_ins2modMap.find(instanceName) != g_ins2modMap.end())
     assert(g_ins2modMap[instanceName] == moduleName);
   else
@@ -479,12 +501,12 @@ void module_expr(std::string firstLine, std::ifstream &input) {
   std::vector<std::string> outputVec;
   while(std::getline(input, line) && !std::regex_match(line, m, pModuleEnd)) {
     if(!std::regex_match(line, m, pModulePort)) {
-      toCout("Error in matching module ports");
+      toCout("Error in matching module ports: "+line);
       abort();
     }
     if(m.str(3) == g_recentClk || m.str(3) == g_recentRst)
       continue;
-    if(g_allModuleInfo[moduleName].out2InDelayMp.find(m.str(2)) == g_allModuleInfo[moduleName].out2InDelayMp.end() )
+    if(g_moduleInfoMap[moduleName]->out2InDelayMp.find(m.str(2)) == g_moduleInfoMap[moduleName]->out2InDelayMp.end() )
       inputVec.push_back(m.str(2)+"_#_"+m.str(3));
     else
       outputVec.push_back(m.str(2)+"_#_"+m.str(3));
@@ -505,7 +527,7 @@ void module_expr(std::string firstLine, std::ifstream &input) {
     std::string wire = out.substr(pos+3);
     remove_two_end_space(port);    
     remove_two_end_space(wire);    
-    g_funcTable.emplace(wire, funcInfo);
+    g_curMod->funcTable.emplace(wire, funcInfo);
     g_wire2ModulePort[instanceName].emplace(wire, port);    
   }
 }
@@ -525,14 +547,14 @@ bool compareSlice(std::string destAndSlice1, std::string destAndSlice2) {
 void put_into_reg2Slice(std::string destAndSlice) {
   std::string dest, destSlice;
   split_slice(destAndSlice, dest, destSlice);
-  // if the destAndSlice has slice, put it into the g_reg2Slices map
+  // if the destAndSlice has slice, put it into the g_curMod->reg2Slices map
   if(!destSlice.empty()) {
-    if(g_reg2Slices.find(dest) == g_reg2Slices.end()) {
-      g_reg2Slices.emplace(dest, std::vector<std::string>{destAndSlice});
+    if(g_curMod->reg2Slices.find(dest) == g_curMod->reg2Slices.end()) {
+      g_curMod->reg2Slices.emplace(dest, std::vector<std::string>{destAndSlice});
     }
     else {
-      g_reg2Slices[dest].push_back(destAndSlice);
-      std::sort(g_reg2Slices[dest].begin(), g_reg2Slices[dest].end(), compareSlice);
+      g_curMod->reg2Slices[dest].push_back(destAndSlice);
+      std::sort(g_curMod->reg2Slices[dest].begin(), g_curMod->reg2Slices[dest].end(), compareSlice);
     }
   }
 }

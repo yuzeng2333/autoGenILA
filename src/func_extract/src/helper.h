@@ -90,10 +90,6 @@ bool replace(std::string& str, const std::string& from, const std::string& to);
 
 void vec2str(std::vector<std::string> &vec, std::string &ret);
 
-void remove_back_space(std::string &str);
-
-void remove_two_end_space(std::string &str);
-
 bool is_written_ASV(const std::string &reg);
 
 bool is_all_x(std::string);
