@@ -790,7 +790,7 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   }
   if ( std::regex_match(line, m, pModule) ) {
     moduleName = m.str(2);
-    return NONE;
+    return MODULE;
   }
   else if (std::regex_match(line, m, pInput)) {
     return INPUT;

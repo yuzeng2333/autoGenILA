@@ -38,6 +38,7 @@ namespace taintGen {
 #define DEST_CONCAT     25
 #define IF              26
 #define ELSE            27
+#define MODULE          28
 #define UNSUPPORT       99
 #define NONE            100
 
