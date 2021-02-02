@@ -15,6 +15,7 @@
 #include "taint_gen.h"
 //#include "pass_info.h"
 #include <cmath>
+#include <glog/logging.h>
 
 #define toStr(a) std::to_string(a)
 
@@ -2159,8 +2160,8 @@ void extend_module_instantiation(std::ifstream &input,
        || input.compare(END_SIG) == 0)
       continue;
     if( port2SignalMap.find(input) == port2SignalMap.end() ) {
-      toCout("Error: the module input has not been seen before: "+input);
-      abort();
+      LOG(INFO) << "input port of "+localModuleName+" is not connected: "+input;      
+      continue;
     }
     std::string signalAndSliceList = port2SignalMap[input];
     if(signalAndSliceList.empty())
@@ -2189,8 +2190,6 @@ void extend_module_instantiation(std::ifstream &input,
       std::string signalLowIdx = toStr(signalIdxPair.second);
       if(isNewVec[i]) {
         output << "  logic [" + signalHighIdx + ":" + signalLowIdx + "] " + signal + _r + toStr(signalVerVec[i++])   + " ;" << std::endl;
-        //output << "  logic [" + signalHighIdx + ":" + signalLowIdx + "] " + signal + _x + toStr(signalVerVec[i])   + " ;" << std::endl;
-        //output << "  logic [" + signalHighIdx + ":" + signalLowIdx + "] " + signal + _c + toStr(signalVerVec[i++]) + " ;" << std::endl;
       }
     }
   }
@@ -2207,7 +2206,7 @@ void extend_module_instantiation(std::ifstream &input,
   std::string newLogic;
   std::vector<std::string> newLogicVec;
   for(std::string inPort: moduleInputsMap[localModuleName]) {
-    if(inPort.compare(g_recentClk) == 0 || g_clk_set.find(inPort) != g_clk_set.end())
+    if(inPort.compare(g_recentClk) == 0 || g_clk_set.find(inPort) != g_clk_set.end() || port2SignalMap.find(inPort) == port2SignalMap.end())
       continue;
     if(inPort.compare("rst_zy") == 0) {
       output << "    .rst_zy(rst_zy)," << std::endl;
@@ -2266,6 +2265,10 @@ void extend_module_instantiation(std::ifstream &input,
     }
   }
   for(std::string outPort: moduleOutputsMap[localModuleName]) {
+    if(port2SignalMap.find(outPort) == port2SignalMap.end()) {
+      LOG(INFO) << "output port of "+localModuleName+" is floating: "+outPort;
+      continue;
+    }
     if( !port2SignalMap[outPort].empty() ) {
       output << "    ." + outPort + _t + " ( " + get_lhs_taint_list(port2SignalMap[outPort], _t, newLogic) + " )," << std::endl;
       newLogicVec.push_back(newLogic);      
