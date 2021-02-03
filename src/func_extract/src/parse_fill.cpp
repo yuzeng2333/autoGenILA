@@ -91,7 +91,7 @@ void parse_verilog(std::string fileName) {
   std::string line;
   std::smatch match;
   while( std::getline(input, line) ) {
-    toCout(line);
+    //toCout(line);
     if(line.find("_0699_") != std::string::npos) {
       toCout("Find it!");
     }
@@ -175,7 +175,6 @@ void parse_verilog(std::string fileName) {
 void read_in_instructions(std::string fileName) {
   toCout("### Begin read in instr info");
   g_instrInfo.clear();
-  g_rstVal.clear();
   g_instr_len = 0;
   std::ifstream input(fileName);
   if(!input.is_open()) {
@@ -189,7 +188,7 @@ void read_in_instructions(std::string fileName) {
   bool firstWord = true;
   bool firstSignalSeen = false;
   while(std::getline(input, line)) {
-    toCout(line);
+    //toCout(line);
     if(line.empty())
       continue;
     if(line.substr(0, 2) == "//")

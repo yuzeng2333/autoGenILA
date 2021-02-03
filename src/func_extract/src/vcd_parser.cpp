@@ -23,10 +23,7 @@ void vcd_parser(std::string fileName) {
   std::smatch m;
   while(std::getline(input, line)) {
     //toCout(line);
-    //if(line.compare("b00000000 n3") == 0) {
-    //  toCout("Find it");
-    //}
-    if(line.find("u_csr.branch_q") != std::string::npos) {
+    if(line.find("4)") != std::string::npos) {
         toCout("Find it");
     }
     if(line.substr(0, 6).compare("$scope") == 0) {
