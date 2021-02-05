@@ -1533,7 +1533,7 @@ std::string remove_signed(std::string &line) {
 
 
 std::string split_long_hex(std::string var, uint32_t width, std::string num, std::string strToConcat) {
-  if(width < 31) {
+  if(width < 32) {
     strToConcat = strToConcat + var + ", ";
     return strToConcat;
   }
