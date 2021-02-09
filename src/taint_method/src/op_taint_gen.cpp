@@ -167,8 +167,8 @@ void reg_taint_gen(std::string line, std::ofstream &output) {
     }
     if(g_use_reset_taint)
       output << blank << "logic " + var + "_reset ;" << std::endl;
-    flagOutputs.push_back(var+"_r_flag");
   }
+  flagOutputs.push_back(var+"_r_flag");  
 
   if (!did_clean_file) {
     bool insertDone;
@@ -222,8 +222,8 @@ void mem_taint_gen(std::string line, std::ofstream &output) {
       output << blank << "assign " + var + _sig + " = " + toStr(g_next_sig++) + " ;" << std::endl;
     }
     //output << blank << "logic " + var + "_reset ;" << std::endl;
-    flagOutputs.push_back(var+"_r_flag_top");
   }
+  flagOutputs.push_back(var+"_r_flag_top");  
 
   if (!did_clean_file) {
     bool insertDone;

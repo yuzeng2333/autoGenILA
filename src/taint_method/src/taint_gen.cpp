@@ -1122,65 +1122,41 @@ void merge_taints(std::string fileName) {
   }
 
   // ground taints for floating regs
-  output << " // ground taints for floating regs" << std::endl;
-  for (auto reg : moduleRegs) {
-    if ( isNum(reg) ) {
-      std::cout << "find num in nextVersion: " + reg << std::endl;
-      continue;
+  if(g_enable_taint) {
+    output << " // ground taints for floating regs" << std::endl;
+    for (auto reg : moduleRegs) {
+      if ( isNum(reg) ) {
+        std::cout << "find num in nextVersion: " + reg << std::endl;
+        continue;
+      }
+      if ( nextVersion.find(reg) == nextVersion.end() ) {
+        output << "  assign " + reg + _r+ " = 0;" << std::endl;  
+      }
     }
-    if ( nextVersion.find(reg) == nextVersion.end() ) {
-      output << "  assign " + reg + _r+ " = 0;" << std::endl;  
-      //output << "  assign " + reg + _c+ " = 0;" << std::endl;  
-      //output << "  assign " + reg + _x+ " = 0;" << std::endl;  
+    // these wires are never used as inputs
+    output << " // ground taints for unused wires" << std::endl;
+    std::string outputStr = "";
+    for (auto wire : moduleWires) {
+      if ( isNum(wire) ) {
+        std::cout << "find num in nextVersion: " + wire << std::endl;
+        continue;
+      }
+      if ( nextVersion.find(wire) == nextVersion.end() ) {
+        outputStr = outputStr + wire + _r+ " , ";
+      }
+    }
+    for (auto input : moduleInputs) {
+      if ( nextVersion.find(input) == nextVersion.end() )   
+        outputStr = outputStr + input + _r+ " , ";
+    }
+    if(outputStr.length() > 2) {
+      outputStr.pop_back();
+      outputStr.pop_back();
+      output << "  assign { " + outputStr + " } = 0;" << std::endl; 
     }
   }
 
-  // these wires are never used as inputs
-  output << " // ground taints for unused wires" << std::endl;
-  std::string outputStr = "";
-  for (auto wire : moduleWires) {
-    if ( isNum(wire) ) {
-      std::cout << "find num in nextVersion: " + wire << std::endl;
-      continue;
-    }
-    if ( nextVersion.find(wire) == nextVersion.end() ) {
-      outputStr = outputStr + wire + _r+ " , ";
-      //outputStr = outputStr + wire + _c+ " , ";
-      //if( g_wire2reg.find(wire) == g_wire2reg.end() )
-      //outputStr = outputStr + wire + _x+ " , ";        
-    }
-  }
-  for (auto input : moduleInputs) {
-    if ( nextVersion.find(input) == nextVersion.end() )   
-      outputStr = outputStr + input + _r+ " , ";
-  }
-  if(outputStr.length() > 2) {
-    outputStr.pop_back();
-    outputStr.pop_back();
-    output << "  assign { " + outputStr + " } = 0;" << std::endl; 
-  }
 
-  // gounded unused inputs
-  //output << " // ground read taints for unused inputs" << std::endl;
-  //outputStr = "";
-  //for (auto input : g_unused_inputs) {
-  //  outputStr = outputStr + input + _r+ " , ";
-  //}
-  //if(outputStr.length() > 2) {
-  //  outputStr.pop_back();
-  //  outputStr.pop_back();
-  //  output << "  assign { " + outputStr + " } = 0;" << std::endl; 
-  //}
-
-
-  //idxedModuleName = moduleName;
-  //if(g_rstValMap.find(moduleName) == g_rstValMap.end()) {
-  //  if(g_rstValMap.find(moduleName+"_1") == g_rstValMap.end()) {
-  //    toCout("Error: module is not in g_rstValMap: "+moduleName);
-  //    abort();
-  //  }
-  //  idxedModuleName = moduleName + "_1";
-  //}
   if(g_check_invariance == CheckOneVal || g_check_invariance == CheckTwoVal) {
     for(std::string var: moduleTrueRegs) {
       uint32_t width = get_var_slice_width(var);
@@ -1283,8 +1259,8 @@ void add_module_name(std::string fileName,
   if(g_enable_taint) {
     for (auto it = extendOutputs.begin(); it != extendOutputs.end() - 1; ++it)
       out << *it + " , ";
-    out << extendOutputs.back() + " );" << std::endl;
   }
+  out << extendOutputs.back() + " );" << std::endl;  
   // if no reset, add a reset
   if(isTop)
     out << "  logic rst_zy;" << std::endl;
