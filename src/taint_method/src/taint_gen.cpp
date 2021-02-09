@@ -1245,6 +1245,8 @@ void add_module_name(std::string fileName,
   if(g_use_taint_rst) moduleInputs.push_back(TAINT_RST);  
   if(g_use_end_sig) moduleInputs.push_back(END_SIG);  
   if(!isTop) moduleInputs.push_back("rst_zy");
+  if(moduleName == "S")
+    toCout("Find it!");
   out << "module " + moduleName + " ( ";
   for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) 
     out << *it + " , ";
@@ -1259,8 +1261,9 @@ void add_module_name(std::string fileName,
   if(g_enable_taint) {
     for (auto it = extendOutputs.begin(); it != extendOutputs.end() - 1; ++it)
       out << *it + " , ";
+    out << extendOutputs.back();
   }
-  out << extendOutputs.back() + " );" << std::endl;  
+  out << " );" << std::endl;  
   // if no reset, add a reset
   if(isTop)
     out << "  logic rst_zy;" << std::endl;
