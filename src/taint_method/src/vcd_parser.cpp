@@ -13,6 +13,15 @@ std::map<std::string, std::unordered_map<std::string, std::string>> g_normValMap
 // second key is instance name. Value is the corresponding module name
 std::unordered_map<std::string, std::unordered_map<std::string, std::string>> g_instance2moduleMap;
 
+
+bool is_end_scope(std::string line) {
+  return line.compare("$upscope $end") == 0;
+}
+
+bool is_func_start(std::string line) {
+  return line.substr(0, 15) == "$scope function";
+}
+
 // Assumption: different instances of same module would 
 // have same reset value for same register.
 void hierarchical_vcd_parser(std::string fileName, std::map<std::string, std::unordered_map<std::string, std::string>>& valMap) {
@@ -31,8 +40,17 @@ void hierarchical_vcd_parser(std::string fileName, std::map<std::string, std::un
   bool passLine = false;
   std::smatch m;
   bool isFirstInstance = true;
+  bool isInFunc = false;
   while(std::getline(input, line)) {
     toCout(line);
+    if(line.find("M9") != std::string::npos) {
+      toCout("Find it!");
+    }
+    if(isInFunc) {
+      if (is_end_scope(line)) isInFunc = false;
+      continue;
+    }
+    if(is_func_start(line)) isInFunc = true;
     if(line.substr(0, 6).compare("$scope") == 0) {
       if(!std::regex_match(line, m, pScope)) {
         continue;
@@ -40,14 +58,17 @@ void hierarchical_vcd_parser(std::string fileName, std::map<std::string, std::un
       std::string curInstance = m.str(1);
       uint32_t idx = 0;
       instanceNameStack.push(curInstance);
+      toCout(" ================== push instn "+curInstance+" , stack depth: "+toStr(instanceNameStack.size()));
       if(isFirstInstance) {
         isFirstInstance = false;
         moduleNameStack.push(curInstance);
+        toCout(" ================== push module "+curInstance+" , stack depth: "+toStr(moduleNameStack.size()));        
       }
       else {
         std::string moduleName = moduleNameStack.top();
         std::string curModule = g_instance2moduleMap[moduleName][curInstance];
         moduleNameStack.push(curModule);
+        toCout(" ================== push module "+curModule+" , stack depth: "+toStr(moduleNameStack.size()));             
       }
       state = readName;
       continue;
@@ -61,6 +82,8 @@ void hierarchical_vcd_parser(std::string fileName, std::map<std::string, std::un
       continue;
     }
     else if(line.substr(0, 8).compare("$upscope") == 0) {
+      toCout(" ================== to pop module "+moduleNameStack.top()+" , stack depth: "+toStr(moduleNameStack.size()));      
+      toCout(" ================== to pop instns "+instanceNameStack.top()+" , stack depth: "+toStr(instanceNameStack.size()));      
       instanceNameStack.pop();
       moduleNameStack.pop();
     }
@@ -77,8 +100,8 @@ void hierarchical_vcd_parser(std::string fileName, std::map<std::string, std::un
       uint32_t blankPos = line.find(" ");       
       std::string name = line.substr(blankPos+1);
       if(nameVarMap.find(name) == nameVarMap.end()) {
-        toCout("Error: "+name+" is not found in map");
-        abort();
+        toCout("Warning: "+name+" is not found in map");
+        continue;
       }
       if(name == "n14") {
         toCoutVerb("Found cpu_state");

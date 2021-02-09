@@ -22,4 +22,7 @@ bool check_rst_value(std::map<std::string, std::unordered_map<std::string, std::
 
 bool is_zero(std::string s);
 
+bool is_end_scope(std::string line);
+
+bool is_func_start(std::string line);
 } // end of namespace taintGen
