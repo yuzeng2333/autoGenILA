@@ -1619,6 +1619,8 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
   std::getline(input, line);
   // print end
   output << line << std::endl;
+  if(!g_enable_taint) return;
+
   std::string dest, destSlice;
   std::string a, aSlice;
   std::string b, bSlice;
