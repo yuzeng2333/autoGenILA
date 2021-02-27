@@ -9,8 +9,8 @@
 #include "../../taint_method/src/taint_gen.h"
 #include "../../taint_method/src/helper.h"
 
-#define AS  101
-#define NUM 102
+#define FE_AS  101
+#define FE_NUM 102
 
 typedef uint32_t type;
 

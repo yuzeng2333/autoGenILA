@@ -12,6 +12,14 @@ namespace funcExtract {
 #define SV std::vector<std::string>
 #define toStr(a) std::to_string(a)
 
+static std::unique_ptr<llvm::LLVMContext> TheContext;
+static std::unique_ptr<llvm::Module> TheModule;
+static std::unique_ptr<llvm::IRBuilder<>> Builder;
+static std::map<std::string, llvm::Value *> NamedValues;
+static std::unique_ptr<llvm::legacy::FunctionPassManager> TheFPM;
+//static std::unique_ptr<KaleidoscopeJIT> TheJIT;
+//static std::map<std::string, std::unique_ptr<llvm::PrototypeAST>> FunctionProtos;
+
 uint32_t bound_limit;
 std::regex pTimed("^(\\S+)___#(\\d+)$");
 std::string CURRENT_VAR;
@@ -39,10 +47,10 @@ bool g_ignoreSubModules=false;
 bool g_seeInputs;
 uint32_t g_maxDelay = 0;
 
+
 // assume ssaTable and nbTable have been filled
 void check_all_regs() {
   toCout("### Begin check_all_regs");
-  toCoutVerb("###### Begin checking SAT! ");
   // clean goal file
   std::ofstream goalFile;
   goalFile.open(g_path+"/goal.txt");
@@ -55,18 +63,9 @@ void check_all_regs() {
     for(auto pair: instrInfo.writeASV) {
       uint32_t cycleCnt = pair.first;
       std::string oneWriteAsv = pair.second;
-      if(instrInfo.skipWriteASV.find(oneWriteAsv) == instrInfo.skipWriteASV.end()) {
-        if(g_curMod->reg2Slices.find(oneWriteAsv) == g_curMod->reg2Slices.end())
-          check_single_reg_and_slice(oneWriteAsv, cycleCnt-1, i-1);
-        else
-          for(std::string regAndSlice: g_curMod->reg2Slices[oneWriteAsv])
-            check_single_reg_and_slice(regAndSlice, cycleCnt-1, i-1);
-      }
-      else {// if SAT solving of writeASV is to be skipped
-        simplify_goal(oneWriteAsv, cycleCnt-1, i-1);
-        //simplify_goal_without_submodules(oneWriteAsv, cycleCnt-1, i-1);
-        g_maxDelay = cycleCnt;
-      }
+      simplify_goal(oneWriteAsv, cycleCnt-1, i-1);
+      //simplify_goal_without_submodules(oneWriteAsv, cycleCnt-1, i-1);
+      g_maxDelay = cycleCnt;
     }
   }
 }
