@@ -49,6 +49,11 @@ extern std::regex pHex;
 extern std::regex pDec;
 extern std::regex pBin;
 
+llvm::IntegerType* llvmWidth(uint32_t width, std::unique_ptr<llvm::LLVMContext> &c);
+
+llvm::Value* llvmInt(uint32_t value, uint32_t width, 
+                     std::unique_ptr<llvm::LLVMContext> &c);
+
 bool isAs(std::string var);
 
 llvm::Value* long_bv_val(std::string formedBinVar, context &c,

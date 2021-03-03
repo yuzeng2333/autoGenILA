@@ -11,6 +11,8 @@ namespace funcExtract {
 #define SV std::vector<std::string>
 #define toStr(a) std::to_string(a)
 #define context std::unique_ptr<llvm::LLVMContext>
+#define llvmWidth(a, c) llvm::IntegerType::get(*c, a)
+#define llvmInt(val, width, c) llvm::ConstantInt::get(llvmWidth(width, c), val, false);
 
 //static std::unique_ptr<KaleidoscopeJIT> TheJIT;
 //static std::map<std::string, std::unique_ptr<llvm::PrototypeAST>> FunctionProtos;
@@ -89,7 +91,7 @@ void print_llvm_ir(std::string destAndSlice,
   // declaration for llvm
   TheContext = llvm::make_unique<llvm::LLVMContext>();
   // FIXME: change the following model name
-  TheModule = llvm::make_unique<llvm::Module>("mod", *TheContext);
+  TheModule = llvm::make_unique<llvm::Module>("mod_;;_"+destAndSlice, *TheContext);
   Builder = llvm::make_unique<llvm::IRBuilder<>>(*TheContext);
 
   /// declare function
@@ -129,7 +131,7 @@ void print_llvm_ir(std::string destAndSlice,
   }
 
   // basic block
-  llvm::BasicBlock *BB = llvm::BasicBlock::Create(*TheContext, "entry", TheFunction);
+  llvm::BasicBlock *BB = llvm::BasicBlock::Create(*TheContext, "bb_;;_"+destAndSlice, TheFunction);
   Builder->SetInsertPoint(BB);
 
   g_ignoreSubModules = false;

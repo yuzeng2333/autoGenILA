@@ -59,7 +59,7 @@ llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low, std::unique_
   
   auto Int1Ty = llvm::IntegerType::get(*c, 1);
   uint32_t len = high - low + 1;
-  auto IntTy = llvm::IntegerType::get(*c, high+1);
+  auto IntTy = llvm::IntegerType::get(*c, high+2);
   auto s1 = b->CreateShl(llvm::ConstantInt::get(IntTy, 1, false), len);
   llvm::errs() << "s1: ";
   s1->print(llvm::errs());
@@ -116,13 +116,13 @@ int main() {
   auto Int6Ty = llvm::IntegerType::get(*TheContext, 6);  
   auto Int8Ty = llvm::IntegerType::get(*TheContext, 8);
   auto v14 = llvm::ConstantInt::get(Int8Ty, 14, false);  
-  auto Int14Ty = llvm::IntegerType::get(*TheContext, dyn_cast<uint32_t>(v14));
+  auto Int14Ty = llvm::IntegerType::get(*TheContext, 14);
 
   std::vector<llvm::Type *> Ints;
   Ints.push_back(llvm::IntegerType::get(*TheContext, 8));
   Ints.push_back(Int4Ty);
-  Ints.push_back(Int4Ty);
-  Ints.push_back(Int4Ty);
+  Ints.push_back(Int6Ty);
+  Ints.push_back(Int14Ty);
 
   llvm::FunctionType *FT =
     llvm::FunctionType::get(Int4Ty, Ints, false);
@@ -149,7 +149,7 @@ int main() {
   llvm::Value *var = llvm::ConstantInt::get(Int8Ty, 78, false);
   //TheModule->getGlobalList().push_back(var);
   //llvm::Value* ret = bit_mask(a, 4, 1, TheContext, Builder);
-  //llvm::Value* ret = Builder->CreateAdd(a, b, "finalRet");
+  llvm::Value* ret = Builder->CreateAdd(b, a, "finalRet");
 
   auto v1 = llvm::ConstantInt::get(Int8Ty, 7, false);
   auto v2 = llvm::ConstantInt::get(Int6Ty, 1, false);
@@ -157,8 +157,8 @@ int main() {
   //llvm::Value* ret = concat_value(v1, v2, TheContext, Builder);
   //ret->mutateType(Int14Ty);
   //v1->mutateType(Int14Ty);
-  llvm::Value* v3 = Builder->CreateZExtOrBitCast(v1, Int14Ty);
-  llvm::Value* ret = Builder->CreateShl(v1, v2);
+  //llvm::Value* v3 = Builder->CreateZExtOrBitCast(v1, Int14Ty);
+  //llvm::Value* ret = Builder->CreateShl(v1, v2);
 
   //llvm::Value* ret = Builder->CreateAnd(v3, v2);
 

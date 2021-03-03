@@ -9,8 +9,8 @@
 #define SV std::vector<std::string>
 #define PV std::vector<astNode*>
 #define warn(a) LOG(WARNING) << a
-#define llvmWidth(a, c) llvm::IntegerType::get(*c, a)
-#define llvmInt(val, width, c) llvm::ConstantInt::get(llvmWidth(width, c), val, false);
+//#define llvmWidth(a, c) llvm::IntegerType::get(*c, a)
+//#define llvmInt(val, width, c) llvm::ConstantInt::get(llvmWidth(width, c), val, false);
 #define context std::unique_ptr<llvm::LLVMContext>
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -380,7 +380,8 @@ llvm::Value* two_op_constraint(astNode* const node, uint32_t timeIdx, context &c
 }
 
 
-//expr one_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
+//llvm::Value* one_op_constraint(astNode* const node, uint32_t timeIdx, context &c, 
+//                               std::unique_ptr<llvm::IRBuilder<>> &b, uint32_t bound) {
 //  toCoutVerb("One op constraint for :"+node->dest);
 // 
 //  assert(node->srcVec.size() == 1);
@@ -396,22 +397,17 @@ llvm::Value* two_op_constraint(astNode* const node, uint32_t timeIdx, context &c
 //  uint32_t op1Hi = get_lgc_hi(op1AndSlice);
 //  uint32_t op1Lo = get_lgc_lo(op1AndSlice);
 //
-//  expr destExpr = var_expr(destAndSlice, timeIdx, c, false);
-//  expr op1Expr(c);
+//  llvm::Value* op1Expr;
+//  llvm::Value* tmpExpr = add_constraint(node->childVec[0], timeIdx, c, b, bound);
 //  if(op1Slice.empty() || has_direct_assignment(op1AndSlice))
-//    op1Expr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve);
+//    op1Expr = tmpExpr;
 //  else
-//    op1Expr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve).extract(op1Hi, op1Lo);
+//    op1Expr = bit_mask(tmpExpr, op1Hi, op1Lo, c, b);
 //
-//  if(isSolve) {
-//    expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
-//    expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true);
-//    s.add( destExpr_t == op1Expr_t );
-//  }
-//  return make_z3_expr(s, g, c, node->op, destExpr, op1Expr, isSolve);
+//  return make_z3_expr(b, c, node->op, op1Expr);
 //}
-//
-//
+
+
 //expr reduce_one_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
 //  toCoutVerb("Reduce one op constraint for: "+node->dest);
 //
@@ -995,149 +991,52 @@ llvm::Value* make_llvm_instr(std::unique_ptr<llvm::IRBuilder<>> &b,
                              llvm::Value* op1Expr, llvm::Value* op2Expr, 
                              uint32_t destWidth, uint32_t op1Width, uint32_t op2Width) {
   uint32_t opWidth = std::max(op1Width, op2Width);
-  //if(op == "&") {
-  //  expr retExpr = ( zext(op1Expr, destWidth-op1Width) & zext(op2Expr, destWidth-op2Width) );
-  //  if(isSolve)  {
-  //    s.add( destExpr == retExpr );
-  //    if(g_print_solver) {      
-  //      toCout("Add-Solver: "+get_name(destExpr)+" == ( "+get_name(op1Expr)+" & "+get_name(op2Expr)+" )" );
-  //    }
-  //  }
-  //  return retExpr;
-  //}
+  if(op == "&") {
+    return b->CreateAnd(op1Expr, op2Expr);
+  }
   //else if(op == "&&") {
-  //  expr retExpr = ( ite(ugt(op1Expr, 0), c.bv_val(1, 1), c.bv_val(0, 1)) & ite(ugt(op2Expr, 0), c.bv_val(1, 1), c.bv_val(0, 1)) );
-  //  if(isSolve)  {
-  //    s.add( destExpr == retExpr );
-  //    if(g_print_solver) {      
-  //      toCout("Add-Solver: "+get_name(destExpr)+" == ( "+get_name(op1Expr)+" & "+get_name(op2Expr)+" )" );
-  //    }
-  //  }
-  //  return retExpr;
+  //  return b->CreateAnd( b->CreateICmpNE(op1Expr, llvmInt(0, op1Width, c)), b->CreateICmpNE(op2Expr, llvmInt(0, op2Width, c)) );
   //}
-  //else if(op == "||" || op == "|") {
-  //  expr retExpr = ( zext(op1Expr, destWidth-op1Width) | zext(op2Expr, destWidth-op2Width) );
-  //  if(isSolve)  {
-  //    s.add( destExpr == retExpr );      
-  //    if(g_print_solver) {
-  //      toCout("Add-Solver: "+get_name(destExpr)+" == ( "+get_name(op1Expr)+" | "+get_name(op2Expr)+" )" );
-  //    }
-  //  }
-  //  return retExpr;    
-  //}
-  //else if(op == "^") {
-  //  expr retExpr = ( zext(op1Expr, destWidth-op1Width) ^ zext(op2Expr, destWidth-op2Width) );
-  //  if(isSolve)  {
-  //    s.add( destExpr == retExpr );      
-  //    if(g_print_solver) {      
-  //      toCout("Add-Solver: "+get_name(destExpr)+" == ( "+get_name(op1Expr)+" ^ "+get_name(op2Expr)+" )" );
-  //    }
-  //  }
-  //  return retExpr;
-  //}
-  //else if (op == "==") {
-  //  expr retExpr = ite(zext(op1Expr, opWidth-op1Width) == zext(op2Expr, opWidth-op2Width), c.bv_val(1, 1), c.bv_val(0, 1));
-  //  if(isSolve) {
-  //    s.add( destExpr == retExpr );
-  //    if(g_print_solver) {      
-  //      toCout("Add-Solver: "+get_name(destExpr)+" == ite( "+get_name(op1Expr)+" == "+get_name(op2Expr)+", 1'b1, 1'b0 )" );
-  //    }
-  //  }
-  //  return retExpr;
-  //}
-  //else if (op == "!=") {
-  //  expr retExpr = ite(zext(op1Expr, opWidth-op1Width) != zext(op2Expr, opWidth-op2Width), c.bv_val(1, 1), c.bv_val(0, 1));
-  //  if(isSolve) {
-  //    s.add( destExpr == retExpr );
-  //    if(g_print_solver) {      
-  //      toCout("Add-Solver: "+get_name(destExpr)+" == ite( "+get_name(op1Expr)+" != "+get_name(op2Expr)+", 1'b1, 1'b0 )" );
-  //    }
-  //  }
-  //  return retExpr;
-  //}
-  //else if (op == ">") {
-  //  expr retExpr = ite( ugt(zext(op1Expr, opWidth-op1Width), zext(op2Expr, opWidth-op2Width)), c.bv_val(1, 1), c.bv_val(0, 1) );
-  //  if(isSolve) {
-  //    s.add( destExpr == retExpr );      
-  //    if(g_print_solver) {      
-  //      toCout("Add-Solver: "+get_name(destExpr)+" == ite( "+get_name(op1Expr)+" > "+get_name(op2Expr)+", 1'b1, 1'b0 )" );
-  //    }
-  //  }
-  //  return retExpr;
-  //}
-  //else if (op == "$>") {
-  //  expr retExpr = ite(zext(op1Expr, opWidth-op1Width) > zext(op2Expr, opWidth-op2Width), c.bv_val(1, 1), c.bv_val(0, 1));
-  //  if(isSolve) {
-  //    s.add( destExpr == retExpr );      
-  //    if(g_print_solver) {      
-  //      toCout("Add-Solver: "+get_name(destExpr)+" == ite( "+get_name(op1Expr)+" $> "+get_name(op2Expr)+", 1'b1, 1'b0 )" );
-  //    }
-  //  }
-  //  return retExpr;
-  //}
-  //else if (op == ">=") {
-  //  expr retExpr = ite( uge(zext(op1Expr, opWidth-op1Width), zext(op2Expr, opWidth-op2Width)), c.bv_val(1, 1), c.bv_val(0, 1));
-  //  if(isSolve) {
-  //    s.add( destExpr == retExpr );      
-  //    if(g_print_solver) {      
-  //      toCout("Add-Solver: "+get_name(destExpr)+" == ite( "+get_name(op1Expr)+" >= "+get_name(op2Expr)+", 1'b1, 1'b0 )" );
-  //    }
-  //  }
-  //  return retExpr;
-  //}
-  //else if (op == "$>=") {
-  //  expr retExpr = ite(zext(op1Expr, opWidth-op1Width) >= zext(op2Expr, opWidth-op2Width), c.bv_val(1, 1), c.bv_val(0, 1));
-  //  if(isSolve) {
-  //    s.add( destExpr == retExpr );      
-  //    if(g_print_solver) {      
-  //      toCout("Add-Solver: "+get_name(destExpr)+" == ite( "+get_name(op1Expr)+" $>= "+get_name(op2Expr)+", 1'b1, 1'b0 )" );
-  //    }
-  //  }
-  //  return retExpr;
-  //}
-  //else if (op == "<") {
-  //  //expr retExpr = ite(zext(op1Expr, opWidth-op1Width) < zext(op2Expr, opWidth-op2Width), c.bv_val(1, 1), c.bv_val(0, 1));
-  //  expr retExpr = ite( ult(zext(op1Expr, opWidth-op1Width), zext(op2Expr, opWidth-op2Width)), c.bv_val(1, 1), c.bv_val(0, 1));
-  //  if(isSolve) {
-  //    s.add( destExpr == retExpr );
-  //    if(g_print_solver) {      
-  //      toCout("Add-Solver: "+get_name(destExpr)+" == ite( "+get_name(op1Expr)+" < "+get_name(op2Expr)+", 1'b1, 1'b0 )" );
-  //    }
-  //  }
-  //  return retExpr;
-  //}
-  //else if (op == "$<") {
-  //  expr retExpr = ite(zext(op1Expr, opWidth-op1Width) < zext(op2Expr, opWidth-op2Width), c.bv_val(1, 1), c.bv_val(0, 1));
-  //  if(isSolve) {
-  //    s.add( destExpr == retExpr );
-  //    if(g_print_solver) {      
-  //      toCout("Add-Solver: "+get_name(destExpr)+" == ite( "+get_name(op1Expr)+" $< "+get_name(op2Expr)+", 1'b1, 1'b0 )" );
-  //    }
-  //  }
-  //  return retExpr;
-  //}
-  //else if (op == "<=") {
-  //  expr retExpr = ite( ule(zext(op1Expr, opWidth-op1Width), zext(op2Expr, opWidth-op2Width)), c.bv_val(1, 1), c.bv_val(0, 1));
-  //  if(isSolve) {
-  //    s.add( destExpr == retExpr );
-  //    if(g_print_solver) {      
-  //      toCout("Add-Solver: "+get_name(destExpr)+" == ite( "+get_name(op1Expr)+" <= "+get_name(op2Expr)+", 1'b1, 1'b0 )" );
-  //    }
-  //  }
-  //  return retExpr;
-  //}
-  //  else if (op == "$<=") {
-  //  expr retExpr = ite(zext(op1Expr, opWidth-op1Width) <= zext(op2Expr, opWidth-op2Width), c.bv_val(1, 1), c.bv_val(0, 1));
-  //  if(isSolve) {
-  //    s.add( destExpr == retExpr );
-  //    if(g_print_solver) {      
-  //      toCout("Add-Solver: "+get_name(destExpr)+" == ite( "+get_name(op1Expr)+" $<= "+get_name(op2Expr)+", 1'b1, 1'b0 )" );
-  //    }
-  //  }
-  //  return retExpr;
-  //}
-  //else if(op == "+") {
-  if(op == "+") {
+  else if(op == "|") {
+    return b->CreateOr(op1Expr, op2Expr);
+  }
+  else if(op == "||") {
+    return b->CreateOr( b->CreateAndReduce(op1Expr), b->CreateAndReduce(op2Expr) );    
+  }
+  else if(op == "^") {
+    return b->CreateXor(op1Expr, op2Expr);
+  }
+  else if (op == "==") {
+    return b->CreateICmpEQ(op1Expr, op2Expr);
+  }
+  else if (op == "!=") {
+    return b->CreateICmpNE(op1Expr, op2Expr);
+  }
+  else if (op == ">") {
+    return b->CreateICmpUGT(op1Expr, op2Expr);
+  }
+  else if (op == "$>") { // signed great than?
+    return b->CreateICmpSGT(op1Expr, op2Expr);
+  }
+  else if (op == ">=") {
+    return b->CreateICmpUGE(op1Expr, op2Expr);
+  }
+  else if (op == "$>=") {
+    return b->CreateICmpSGE(op1Expr, op2Expr);
+  }
+  else if (op == "<") {
+    return b->CreateICmpULT(op1Expr, op2Expr);
+  }
+  else if (op == "$<") {
+    return b->CreateICmpSLT(op1Expr, op2Expr);
+  }
+  else if (op == "<=") {
+    return b->CreateICmpULE(op1Expr, op2Expr);
+  }
+  else if (op == "$<=") {
+    return b->CreateICmpSLE(op1Expr, op2Expr);
+  }
+  else if(op == "+") {
     return b->CreateAdd(op1Expr, op2Expr);
   }
   else if(op == "-") {
@@ -1163,41 +1062,14 @@ llvm::Value* make_llvm_instr(std::unique_ptr<llvm::IRBuilder<>> &b,
   //  return retExpr;
   //}
   else if(op == "<<") {
-    int op2Val;
-    if (llvm::ConstantInt* CI = llvm::dyn_cast<llvm::ConstantInt>(op2Expr)) {
-      if (CI->getBitWidth() <= 32) {
-        op2Val = CI->getSExtValue();
-      }
-    }
-    auto newIntTy = llvm::IntegerType::get(*c, op1Width+op2Val);
-    llvm::Value* longOp1 = b->CreateZExtOrBitCast(op1Expr, newIntTy);  
-    return b->CreateShl(longOp1, op2Expr);
+    return b->CreateShl(op1Expr, op2Expr);
   }
-  //else if(op == ">>") {
-  //  expr retExpr = lshr( zext(op1Expr, destWidth-op1Width), zext(op2Expr, destWidth-op2Width) );
-  //  if(isSolve)  {
-  //    s.add( destExpr == retExpr );
-  //    if(g_print_solver) {      
-  //      toCout("Add-Solver: "+get_name(destExpr)+" == ( "+get_name(op1Expr)+" >> "+get_name(op2Expr)+" )" );
-  //    }
-  //  }
-  //  return retExpr;
-  //}
-  //else if(op == ">>>") {
-  //  expr retExpr(c);
-  //  if(destWidth >= op1Width)
-  //    retExpr = ashr( zext(op1Expr, destWidth-op1Width), zext(op2Expr, destWidth-op2Width) );
-  //  else
-  //    retExpr = ashr( op1Expr, zext(op2Expr, op1Width-op2Width) ).extract(destWidth-1, 0);
-
-  //  if(isSolve)  {
-  //    s.add( destExpr == retExpr );
-  //    if(g_print_solver) {      
-  //      toCout("Add-Solver: "+get_name(destExpr)+" == ( "+get_name(op1Expr)+" >>> "+get_name(op2Expr)+" )" );
-  //    }
-  //  }
-  //  return retExpr;
-  //}
+  else if(op == ">>") {
+    return b->CreateLShr(op1Expr, op2Expr);
+  }
+  else if(op == ">>>") {
+    return b->CreateAShr(op1Expr, op2Expr);
+  }
   else {
     toCout("Not supported 2-op in make_z3_expr!!");
     abort();
