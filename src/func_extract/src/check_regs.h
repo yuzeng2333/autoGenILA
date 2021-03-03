@@ -5,7 +5,7 @@
 #include "../../taint_method/src/taint_gen.h"
 #include "../../taint_method/src/global_data.h"
 #include "../../taint_method/src/helper.h"
-#include "z3++.h"
+#include "global_data_struct.h"
 #include "ast.h"
 #include <string>
 #include <queue>
@@ -14,6 +14,9 @@
 #include <utility>
 #include <fstream>
 #include <time.h>
+#include "z3++.h"
+#define context std::unique_ptr<llvm::LLVMContext>
+
 
 using namespace z3;
 
@@ -28,17 +31,23 @@ void check_all_regs();
 
 void clean_data();
 
-void simplify_goal(std::string destAndSlice, uint32_t bound, uint32_t instrIdx);
+void print_llvm_ir(std::string destAndSlice, uint32_t bound, uint32_t instrIdx);
 
-void simplify_goal_without_submodules(std::string destAndSlice, uint32_t bound, uint32_t instrIdx);
+void print_llvm_ir_without_submodules(std::string destAndSlice, uint32_t bound, uint32_t instrIdx);
 
 void check_single_reg_and_slice(std::string regAndSlice, uint32_t cycleCnt, uint32_t instrIdx);
 
-expr add_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve);
+llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
+                            std::unique_ptr<llvm::IRBuilder<>> &b,
+                            uint32_t bound);
 
-expr add_nb_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve);
+llvm::Value* add_nb_constraint(astNode* const node, 
+                               uint32_t timeIdx, context &c, 
+                               std::unique_ptr<llvm::IRBuilder<>> &b,
+                               uint32_t bound);
 
-expr add_ssa_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve);
+llvm::Value* add_ssa_constraint(astNode* const node, uint32_t timeIdx, context &c,  
+                                std::unique_ptr<llvm::IRBuilder<>> &b, uint32_t bound);
 
 void add_child_constraint(astNode* const parentNode, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve);
 

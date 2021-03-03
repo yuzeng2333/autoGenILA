@@ -8,6 +8,37 @@
 #include "z3++.h"
 #include "types.h"
 #include <cctype>
+#include "llvm/ADT/APFloat.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/CFG.h"
+#include "llvm/IR/Constants.h"
+#include "llvm/IR/DebugInfo.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/IRBuilder.h"
+#include "llvm/IR/IntrinsicInst.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/LegacyPassManager.h"
+#include "llvm/IR/Metadata.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Verifier.h"
+#include "llvm/Support/TargetSelect.h"
+#include "llvm/Target/TargetMachine.h"
+#include "llvm/Transforms/InstCombine/InstCombine.h"
+#include "llvm/Transforms/Scalar.h"
+#include "llvm/Transforms/Scalar/GVN.h"
+#include "llvm/Transforms/Utils/BasicBlockUtils.h"
+#include "llvm/Transforms/Utils/Cloning.h"
+#include "llvm/Transforms/Utils/Local.h"
+#include "llvm/Transforms/Utils/ValueMapper.h"
+#include "llvm/Analysis/MemorySSAUpdater.h"
+#include "llvm/Analysis/ConstantFolding.h"
+#include "llvm/Analysis/DomTreeUpdater.h"
+#include "llvm/Analysis/InstructionSimplify.h"
+#include "llvm/Analysis/LoopInfo.h"
 
 using namespace z3;
 using namespace taintGen;
@@ -20,7 +51,8 @@ extern std::regex pBin;
 
 bool isAs(std::string var);
 
-expr long_bv_val(std::string var, context &c);
+llvm::Value* long_bv_val(std::string formedBinVar, context &c,
+                         std::unique_ptr<llvm::IRBuilder<>> &b );
 
 bool is_formed_num(std::string num);
 
@@ -56,7 +88,8 @@ bool has_explicit_value(std::string input);
 
 uint32_t expr_len(expr &e);
 
-bool comparePair(const std::pair<std::string, uint32_t> &p1, const std::pair<std::string, uint32_t> &p2 );
+bool comparePair(const std::pair<std::string, uint32_t> &p1, 
+                 const std::pair<std::string, uint32_t> &p2 );
 
 uint32_t get_time(std::string var);
 
@@ -123,6 +156,16 @@ bool is_comment_line(std::string &line);
 StrPair_t split_module_asv(const std::string &writeAsvLine);
 
 std::string remove_prefix_module(const std::string &writeAsvLine);
+
+llvm::Value* get_arg(std::string regName);
+
+llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low, 
+                      std::unique_ptr<llvm::LLVMContext> &c, 
+                      std::unique_ptr<llvm::IRBuilder<>> &b);
+
+llvm::Value* concat_value(llvm::Value* val1, llvm::Value* val2, 
+                          std::unique_ptr<llvm::LLVMContext> &c,
+                          std::unique_ptr<llvm::IRBuilder<>> &b);
 } // end of namespace funcExtract
 
 #endif

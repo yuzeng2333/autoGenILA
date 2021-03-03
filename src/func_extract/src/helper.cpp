@@ -3,7 +3,11 @@
 #include "global_data_struct.h"
 #include <ctype.h>
 
+#define context std::unique_ptr<llvm::LLVMContext>
 #define toStr(a) std::to_string(a)
+//#define llvmWidth(a, c) llvm::IntegerType::get(c, a)
+//#define llvmInt(b, a, c) llvm::ConstantInt::get(llvmWidth(a, c), b, false)
+
 
 using namespace z3;
 using namespace taintGen;
@@ -14,6 +18,16 @@ std::regex pHex("^(\\d+)'h([\\dabcdefx\\?]+)$");
 std::regex pDec("^(\\d+)'d([\\dx\\?]+)$");
 std::regex pBin("^(\\d+)'b([01x\\?]+)$");
 
+llvm::IntegerType* llvmWidth(uint32_t width, std::unique_ptr<llvm::LLVMContext> &c) {
+  return llvm::IntegerType::get(*c, width);
+}
+
+
+llvm::Value* llvmInt(uint32_t value, uint32_t width, 
+                     std::unique_ptr<llvm::LLVMContext> &c) {
+  return llvm::ConstantInt::get(llvm::IntegerType::get(*c, width), value, false);
+}
+
 
 bool isAs(std::string var) {
   auto it = std::find( g_curMod->moduleAs.begin(), g_curMod->moduleAs.end(), var );
@@ -21,7 +35,8 @@ bool isAs(std::string var) {
 }
 
 
-expr long_bv_val(std::string formedBinVar, context &c) {
+llvm::Value* long_bv_val(std::string formedBinVar, context &c,
+                         std::unique_ptr<llvm::IRBuilder<>> &b ) {
   assert(is_number(formedBinVar));
   if(!is_formed_num(formedBinVar)) {
     toCout("Error: input to long_bv_val is not well-formed number: "+formedBinVar);
@@ -29,27 +44,27 @@ expr long_bv_val(std::string formedBinVar, context &c) {
   }
   uint32_t width = get_num_len(formedBinVar);
   if(width <= 32) 
-    return c.bv_val(hdb2int(formedBinVar), width);
+    return llvm::ConstantInt::get(llvmWidth(width, c), hdb2int(formedBinVar), false);
 
   if(is_hex(formedBinVar)) formedBinVar = formedHex2bin(formedBinVar);
   formedBinVar = zero_extend_num(formedBinVar);
   std::string pureNum = get_pure_num(formedBinVar);
 
-  expr ret = c.bv_val(bin2int(pureNum.substr(0, 32)), 32);
+  llvm::Value* ret = llvm::ConstantInt::get(llvmWidth(32, c), bin2int(pureNum.substr(0, 32)), false);
   width -= 32;
   size_t pos = 32;  
   while(width > 32) {
     std::string subVar = pureNum.substr(pos, 32);
     pos += 32;
     width -= 32;
-    expr nextNum = c.bv_val(bin2int(subVar), 32);
-    ret = concat(ret, nextNum);
+    llvm::Value* nextNum = llvm::ConstantInt::get(llvmWidth(32, c), bin2int(subVar), false);
+    ret = b->CreateAdd( b->CreateShl(ret, llvmInt(32, 32, c)), nextNum );
   }
 
   // deal with the remaining bits
   std::string subVar = pureNum.substr(pos);
-  expr nextNum = c.bv_val(bin2int(subVar), width);
-  ret = concat(ret, nextNum);
+  llvm::Value* nextNum = llvmInt(bin2int(subVar), width, c);
+  ret = b->CreateAdd( b->CreateShl(ret, llvmInt(32, 32, c)), nextNum );
   return ret;
 }
 
@@ -201,7 +216,7 @@ uint32_t bin2int(std::string num) {
 
 
 std::string timed_name(std::string name, uint32_t timeIdx) {
-  return name + "___#" + toStr(timeIdx);
+  return name + DELIM + toStr(timeIdx);
 }
 
 
@@ -296,11 +311,11 @@ bool comparePair(const std::pair<std::string, uint32_t> &p1,
 
 
 uint32_t get_time(std::string var) {
-  if(var.find("___#") == std::string::npos) {
+  if(var.find(DELIM) == std::string::npos) {
     toCout("Error: the var's Name has no time: "+var);
     abort();
   }
-  uint32_t pos = var.find("___#");
+  uint32_t pos = var.find(DELIM);
   uint32_t len = var.length();
   if(var.back() == 'T')
     return try_stoi(var.substr(pos+4, len-2));
@@ -626,6 +641,8 @@ int try_stoi(std::string num) {
 }
 
 
+// ATTENTION: for func_extract, you can only use get_var_slice_width_simp
+// get_var_slice_width cannot be used!!
 uint32_t get_var_slice_width_simp( std::string varAndSlice) {
   return get_var_slice_width( varAndSlice, g_varWidth);
 }
@@ -658,5 +675,41 @@ std::string remove_prefix_module(const std::string &writeAsvLine) {
   return pair.second;
 }
 
+
+
+llvm::Value* get_arg(std::string regName) {
+  for(auto it = TheFunction->arg_begin(); it != TheFunction->arg_end(); it++) {
+    if(it->getName() == regName) return it;
+  }
+  toCout("Error: input is not found: "+regName);
+  abort();
+}
+
+
+llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low, 
+                      std::unique_ptr<llvm::LLVMContext> &c, 
+                      std::unique_ptr<llvm::IRBuilder<>> &b) {
+
+  
+  auto Int1Ty = llvm::IntegerType::get(*c, 1);
+  uint32_t len = high - low + 1;
+  auto IntTy = llvm::IntegerType::get(*c, high+1);
+  auto s1 = b->CreateShl(llvm::ConstantInt::get(IntTy, 1, false), len);
+  auto s2 = b->CreateSub( s1, 
+                          llvm::ConstantInt::get(IntTy, 1, false) );
+  llvm::Value* mask = b->CreateShl(s2, low);
+  return b->CreateAnd(in, mask);
+}
+
+
+llvm::Value* concat_value(llvm::Value* val1, llvm::Value* val2, 
+                          std::unique_ptr<llvm::LLVMContext> &c,
+                          std::unique_ptr<llvm::IRBuilder<>> &b) {
+  uint32_t val1Width = llvm::dyn_cast<llvm::IntegerType>(val1->getType())->getBitWidth();
+  uint32_t val2Width = llvm::dyn_cast<llvm::IntegerType>(val2->getType())->getBitWidth();
+  auto newIntTy = llvm::IntegerType::get(*c, val1Width+val2Width);
+  llvm::Value* val3 = b->CreateZExtOrBitCast(val1, newIntTy);
+  return b->CreateAdd(b->CreateShl(val1, val2Width), val2);
+}
 
 } // end of namespace funcExtract

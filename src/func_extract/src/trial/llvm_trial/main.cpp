@@ -94,21 +94,17 @@ int main() {
   for (auto &Arg : TheFunction->args())
     NamedValues[std::string(Arg.getName())] = &Arg;
   
-  // function body
-  // inputs and registers should come from function arguments
-
-  //llvm::Type Int4Ty = llvm::IntegerType::IntegerType(*TheContext, 4);
-
-  //llvm::Value *a = llvm::ConstantFP::get(*TheContext, llvm::APFloat(1.1));
-  //llvm::Value *b = llvm::ConstantFP::get(*TheContext, llvm::APFloat(2.3));
-
   auto a = TheFunction->args().begin();
   auto b = TheFunction->args().begin()+1;
   auto c = TheFunction->args().begin()+2;
   auto d = TheFunction->args().begin()+3;
 
   // constant integer
-  auto leaf = llvm::ConstantInt::get(Int4Ty, 0, false);
+  llvm::Value *leaf = llvm::ConstantInt::get(Int4Ty, 0, false);
+  int i = 0;
+  while(i++ < 3) {
+    leaf = Builder->CreateAdd(leaf, llvm::ConstantInt::get(Int4Ty, 0, false));
+  }
 
   llvm::Value *func_in_a = Builder->CreateAdd(a, leaf, "ins1_;;_mod.in1");
   llvm::Value *func_in_b = Builder->CreateAdd(b, leaf, "ins1_;;_mod.in2");
@@ -117,26 +113,18 @@ int main() {
 
   llvm::Value *ret;
   llvm::Value *ab = Builder->CreateAdd(func_in_a, func_in_b, "ins1_;;_mod.sum");
-  //toCout("opcode for ab: "+toStr(instr(ab)->getOpcode()));
   auto cd = llvm::dyn_cast<llvm::Instruction>(ab)->clone();
   cd->setName("ins2_;;_mod.sum");
   cd->setOperand(0, func_in_c);
   cd->setOperand(1, func_in_d);
-  //toCout("opcode for cd: "+toStr(cd->getOpcode()));
   BB->getInstList().push_back(cd);
-  //llvm::Value *cd = Builder->CreateAdd(c, d, "ins2_;;_mod.sum");
   llvm::Value* ret1 = Builder->CreateAdd(ab, cd, "top_sum");
-
-  //llvm::ValueToValueMapTy VMap;
-  //llvm::Function* clonedFunc = llvm::CloneFunction(TheFunction, VMap);
 
   std::vector<llvm::Value*> inputVec;
   inputVec.push_back(a);
   inputVec.push_back(b);
   inputVec.push_back(c);
   inputVec.push_back(d);
-  //llvm::Value* ret3 = Builder->CreateCall(clonedFunc, inputVec);
-  //TheModule->getFunctionList().push_back(clonedFunc);
 
   llvm::Value* ret2 = llvm::ConstantInt::get(Int4Ty, 0, false);
   ret = Builder->CreateAdd(ret1, ret2, "top_top_sum");
@@ -165,8 +153,6 @@ int main() {
   //clonedFuncRetInstr->insertBefore(dyn_cast<Instruction>(ret2));  
   //clonedFuncRetInstr->insertAfter(dyn_cast<Instruction>(ret2));  
   ret2->replaceAllUsesWith(InsideFuncRet);
-
-
 
 
   //std::string Str;
