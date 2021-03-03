@@ -54,6 +54,15 @@ llvm::IntegerType* llvmWidth(uint32_t width, std::unique_ptr<llvm::LLVMContext> 
 llvm::Value* llvmInt(uint32_t value, uint32_t width, 
                      std::unique_ptr<llvm::LLVMContext> &c);
 
+llvm::Value* zext(llvm::Value* v1, uint32_t width,
+                 std::unique_ptr<llvm::LLVMContext> &c,
+                 std::unique_ptr<llvm::IRBuilder<>> &b);
+
+llvm::Value* sext(llvm::Value* v1, uint32_t width,
+                 std::unique_ptr<llvm::LLVMContext> &c,
+                 std::unique_ptr<llvm::IRBuilder<>> &b);
+
+
 bool isAs(std::string var);
 
 llvm::Value* long_bv_val(std::string formedBinVar, context &c,

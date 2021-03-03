@@ -29,6 +29,20 @@ llvm::Value* llvmInt(uint32_t value, uint32_t width,
 }
 
 
+llvm::Value* zext(llvm::Value* v1, uint32_t width,
+                 std::unique_ptr<llvm::LLVMContext> &c,
+                 std::unique_ptr<llvm::IRBuilder<>> &b) {
+  return b->CreateZExtOrTrunc(v1, llvmWidth(width, c));
+}
+
+
+llvm::Value* sext(llvm::Value* v1, uint32_t width,
+                 std::unique_ptr<llvm::LLVMContext> &c,
+                 std::unique_ptr<llvm::IRBuilder<>> &b) {
+  return b->CreateSExtOrTrunc(v1, llvmWidth(width, c));
+}
+
+
 bool isAs(std::string var) {
   auto it = std::find( g_curMod->moduleAs.begin(), g_curMod->moduleAs.end(), var );
   return it != g_curMod->moduleAs.end();

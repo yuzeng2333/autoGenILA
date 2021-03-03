@@ -998,49 +998,49 @@ llvm::Value* make_llvm_instr(std::unique_ptr<llvm::IRBuilder<>> &b,
   //  return b->CreateAnd( b->CreateICmpNE(op1Expr, llvmInt(0, op1Width, c)), b->CreateICmpNE(op2Expr, llvmInt(0, op2Width, c)) );
   //}
   else if(op == "|") {
-    return b->CreateOr(op1Expr, op2Expr);
+    return b->CreateOr(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b));
   }
   else if(op == "||") {
     return b->CreateOr( b->CreateAndReduce(op1Expr), b->CreateAndReduce(op2Expr) );    
   }
   else if(op == "^") {
-    return b->CreateXor(op1Expr, op2Expr);
+    return b->CreateXor(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b));
   }
   else if (op == "==") {
-    return b->CreateICmpEQ(op1Expr, op2Expr);
+    return b->CreateICmpEQ(zext(op1Expr, opWidth, c, b), zext(op2Expr, opWidth, c, b));
   }
   else if (op == "!=") {
-    return b->CreateICmpNE(op1Expr, op2Expr);
+    return b->CreateICmpNE(zext(op1Expr, opWidth, c, b), zext(op2Expr, opWidth, c, b));
   }
   else if (op == ">") {
-    return b->CreateICmpUGT(op1Expr, op2Expr);
+    return b->CreateICmpUGT(zext(op1Expr, opWidth, c, b), zext(op2Expr, opWidth, c, b));
   }
   else if (op == "$>") { // signed great than?
-    return b->CreateICmpSGT(op1Expr, op2Expr);
+    return b->CreateICmpSGT(sext(op1Expr, opWidth, c, b), sext(op2Expr, opWidth, c, b));
   }
   else if (op == ">=") {
-    return b->CreateICmpUGE(op1Expr, op2Expr);
+    return b->CreateICmpUGE(zext(op1Expr, opWidth, c, b), zext(op2Expr, opWidth, c, b));
   }
   else if (op == "$>=") {
-    return b->CreateICmpSGE(op1Expr, op2Expr);
+    return b->CreateICmpSGE(sext(op1Expr, opWidth, c, b), sext(op2Expr, opWidth, c, b));
   }
   else if (op == "<") {
-    return b->CreateICmpULT(op1Expr, op2Expr);
+    return b->CreateICmpULT(zext(op1Expr, opWidth, c, b), zext(op2Expr, opWidth, c, b));
   }
   else if (op == "$<") {
-    return b->CreateICmpSLT(op1Expr, op2Expr);
+    return b->CreateICmpSLT(sext(op1Expr, opWidth, c, b), sext(op2Expr, opWidth, c, b));
   }
   else if (op == "<=") {
-    return b->CreateICmpULE(op1Expr, op2Expr);
+    return b->CreateICmpULE(zext(op1Expr, opWidth, c, b), zext(op2Expr, opWidth, c, b));
   }
   else if (op == "$<=") {
-    return b->CreateICmpSLE(op1Expr, op2Expr);
+    return b->CreateICmpSLE(sext(op1Expr, opWidth, c, b), sext(op2Expr, opWidth, c, b));
   }
   else if(op == "+") {
-    return b->CreateAdd(op1Expr, op2Expr);
+    return b->CreateAdd(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b));
   }
   else if(op == "-") {
-    return b->CreateSub(op1Expr, op2Expr);;
+    return b->CreateSub(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b));
   }
   //else if(op == "*") {
   //  expr retExpr(c);
@@ -1062,13 +1062,16 @@ llvm::Value* make_llvm_instr(std::unique_ptr<llvm::IRBuilder<>> &b,
   //  return retExpr;
   //}
   else if(op == "<<") {
-    return b->CreateShl(op1Expr, op2Expr);
+    return b->CreateShl(zext(op1Expr, destWidth, c, b), op2Expr);
   }
   else if(op == ">>") {
-    return b->CreateLShr(op1Expr, op2Expr);
+    return b->CreateLShr(zext(op1Expr, destWidth, c, b), op2Expr);
   }
   else if(op == ">>>") {
-    return b->CreateAShr(op1Expr, op2Expr);
+    if(destWidth >= op1Width)
+      return b->CreateAShr(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b));
+    else
+      return bit_mask(b->CreateAShr(op1Expr, op2Expr), destWidth-1, 0, c, b);
   }
   else {
     toCout("Not supported 2-op in make_z3_expr!!");
