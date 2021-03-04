@@ -406,34 +406,34 @@ llvm::Value* one_op_constraint(astNode* const node, uint32_t timeIdx,
 }
 
 
-//llvm::Value* reduce_one_op_constraint(astNode* const node, uint32_t timeIdx, context &c, builder &b, uint32_t bound, bool isSolve) {
-//  toCoutVerb("Reduce one op constraint for: "+node->dest);
-//
-//  assert(node->srcVec.size() == 1);
-//  std::string dest, destSlice;
-//  std::string op1, op1Slice;
-//  std::string destAndSlice = node->dest;
-//  std::string op1AndSlice = node->srcVec.front();
-//  split_slice(destAndSlice, dest, destSlice);
-//  split_slice(op1AndSlice, op1, op1Slice);
-//  uint32_t op1Hi = get_lgc_hi(op1AndSlice);
-//  uint32_t op1Lo = get_lgc_lo(op1AndSlice);
-//
-//  if(destAndSlice.compare("_0062_") == 0) {
-//    //toCoutVerb("Found it!");
-//  }
-//
-//  llvm::Value* destExpr = var_expr(destAndSlice, timeIdx, c, false);
-//  llvm::Value* op1Expr;
-//  if(op1Slice.empty() || has_direct_assignment(op1AndSlice))
-//    op1Expr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve);
-//  else
-//    op1Expr = extract(add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve), op1Hi, op1Lo, c, b);
-//
-//  return make_llvm_instr(b, c, node->op, op1Expr);  
-//}
-//
-//
+llvm::Value* reduce_one_op_constraint(astNode* const node, uint32_t timeIdx, 
+                                      context &c, builder &b, uint32_t bound) {
+  toCoutVerb("Reduce one op constraint for: "+node->dest);
+
+  assert(node->srcVec.size() == 1);
+  std::string dest, destSlice;
+  std::string op1, op1Slice;
+  std::string destAndSlice = node->dest;
+  std::string op1AndSlice = node->srcVec.front();
+  split_slice(destAndSlice, dest, destSlice);
+  split_slice(op1AndSlice, op1, op1Slice);
+  uint32_t op1Hi = get_lgc_hi(op1AndSlice);
+  uint32_t op1Lo = get_lgc_lo(op1AndSlice);
+  uint32_t op1WidthNum = get_var_slice_width_simp(op1AndSlice);
+  if(destAndSlice.compare("_0062_") == 0) {
+    //toCoutVerb("Found it!");
+  }
+
+  llvm::Value* op1Expr;
+  if(op1Slice.empty() || has_direct_assignment(op1AndSlice))
+    op1Expr = add_constraint(node->childVec[0], timeIdx, c, b, bound);
+  else
+    op1Expr = extract(add_constraint(node->childVec[0], timeIdx, c, b, bound), op1Hi, op1Lo, c, b);
+
+  return make_llvm_instr(b, c, node->op, op1Expr, op1WidthNum);  
+}
+
+
 llvm::Value* sel5_op_constraint(astNode* const node, uint32_t timeIdx, 
                                 context &c, builder &b, uint32_t bound  ) {
   std::smatch m;  
@@ -452,7 +452,8 @@ llvm::Value* sel5_op_constraint(astNode* const node, uint32_t timeIdx,
 }
 
 
-llvm::Value* sel_op_constraint(astNode* const node, uint32_t timeIdx, context &c, builder &b, uint32_t bound ) {
+llvm::Value* sel_op_constraint(astNode* const node, uint32_t timeIdx, 
+                               context &c, builder &b, uint32_t bound ) {
   toCoutVerb("Sel op constraint for :"+node->dest);
   if(node->op == "sel5")
     return sel5_op_constraint(node, timeIdx, c, b, bound);
