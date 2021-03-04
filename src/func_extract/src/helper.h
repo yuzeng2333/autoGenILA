@@ -177,6 +177,10 @@ llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low,
                       std::unique_ptr<llvm::LLVMContext> &c, 
                       std::unique_ptr<llvm::IRBuilder<>> &b);
 
+llvm::Value* extract(llvm::Value* in, uint32_t high, uint32_t low, 
+                      std::unique_ptr<llvm::LLVMContext> &c, 
+                      std::unique_ptr<llvm::IRBuilder<>> &b);
+
 llvm::Value* concat_value(llvm::Value* val1, llvm::Value* val2, 
                           std::unique_ptr<llvm::LLVMContext> &c,
                           std::unique_ptr<llvm::IRBuilder<>> &b);

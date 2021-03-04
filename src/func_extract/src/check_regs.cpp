@@ -504,9 +504,9 @@ llvm::Value* add_ssa_constraint(astNode* const node, uint32_t timeIdx, context &
     case TWO_OP:
       return two_op_constraint(node, timeIdx, c, b, bound);
       break;
-    //case ONE_OP:
-    //  return one_op_constraint(node, timeIdx, c, s, g, bound, isSolve);
-    //  break;
+    case ONE_OP:
+      return one_op_constraint(node, timeIdx, c, b, bound);
+      break;
     //case REDUCE1:
     //  return reduce_one_op_constraint(node, timeIdx, c, s, g, bound, isSolve);
     //  break;
