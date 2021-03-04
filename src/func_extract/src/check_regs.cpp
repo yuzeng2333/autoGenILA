@@ -516,9 +516,9 @@ llvm::Value* add_ssa_constraint(astNode* const node, uint32_t timeIdx, context &
     //case SRC_CONCAT:
     //  return src_concat_op_constraint(node, timeIdx, c, s, g, bound, isSolve);
     //  break;
-    //case ITE:
-    //  return ite_op_constraint(node, timeIdx, c, s, g, bound, isSolve);
-    //  break;
+    case ITE:
+      return ite_op_constraint(node, timeIdx, c, b, bound);
+      break;
     default:
       toCout("Error in add_ssa_constraint for: "+var);
       abort();

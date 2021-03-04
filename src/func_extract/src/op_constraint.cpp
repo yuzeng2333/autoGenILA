@@ -12,6 +12,7 @@
 //#define llvmWidth(a, c) llvm::IntegerType::get(*c, a)
 //#define llvmInt(val, width, c) llvm::ConstantInt::get(llvmWidth(width, c), val, false);
 #define context std::unique_ptr<llvm::LLVMContext>
+#define builder std::unique_ptr<llvm::IRBuilder<>>
 ///////////////////////////////////////////////////////////////////////////////
 //
 //  The main principle of making expr/constraints
@@ -53,8 +54,7 @@ namespace funcExtract {
 
 // returned _t is 0 for number, returned var is its value for int
 llvm::Value* var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, 
-                      std::unique_ptr<llvm::IRBuilder<>> &b, 
-                      bool isTaint, uint32_t width) {
+                      builder &b, bool isTaint, uint32_t width) {
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
   std::string varTimed;
@@ -148,8 +148,7 @@ llvm::Value* bv_val(std::string var, context &c) {
 
 
 llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx, context &c, 
-                              std::unique_ptr<llvm::IRBuilder<>> &b, 
-                              uint32_t bound) {
+                              builder &b, uint32_t bound) {
   g_seeInputs = true;
   std::string dest = node->dest;
   //llvm::Value* destExpr = 
@@ -250,8 +249,7 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx, context &c,
 // the input must be of the form: 3'hx+5'h7+...
 // idx is the start index of slice
 llvm::Value* mixed_value_expr(std::string value, context &c, std::string varName, 
-                              uint32_t timeIdx, uint32_t idx,
-                              std::unique_ptr<llvm::IRBuilder<>> &b ) {
+                              uint32_t timeIdx, uint32_t idx, builder &b ) {
   if(value.find("+") == std::string::npos) {
     return single_expr(value, c, varName, timeIdx, idx, b);
   }
@@ -267,8 +265,7 @@ llvm::Value* mixed_value_expr(std::string value, context &c, std::string varName
 
 
 llvm::Value* single_expr(std::string value, context &c, std::string varName, 
-                         uint32_t timeIdx, uint32_t idx,
-                         std::unique_ptr<llvm::IRBuilder<>> &b ) {
+                         uint32_t timeIdx, uint32_t idx, builder &b ) {
   std::regex pX("^(\\d+)'[hb]x$");
   std::smatch m;
   if(std::regex_match(value, m, pX)) {
@@ -294,8 +291,8 @@ llvm::Value* single_expr(std::string value, context &c, std::string varName,
 
 
 // only need to make _t being 0
-llvm::Value* num_constraint(astNode* const node, uint32_t timeIdx, context &c, 
-                            std::unique_ptr<llvm::IRBuilder<>> &b) {
+llvm::Value* num_constraint(astNode* const node, uint32_t timeIdx, 
+                            context &c, builder &b) {
   std::string dest = node->dest;
   llvm::Value* destExpr = var_expr(dest, timeIdx, c, b, false);
 
@@ -304,7 +301,7 @@ llvm::Value* num_constraint(astNode* const node, uint32_t timeIdx, context &c,
 
 
 llvm::Value* two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, 
-                               std::unique_ptr<llvm::IRBuilder<>> &b, uint32_t bound) {
+                               builder &b, uint32_t bound) {
   toCoutVerb("Two op constraint for :"+node->dest);
   std::smatch m;  
   bool isReduceOp = node->isReduceOp;
@@ -663,132 +660,130 @@ llvm::Value* two_op_constraint(astNode* const node, uint32_t timeIdx, context &c
 //}
 //
 //
-//expr ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve ) {
-//  toCoutVerb("Ite op constraint for :"+node->dest);
-//  assert(node->type == ITE);
-//  assert(node->srcVec.size() == 3);
-//
-//  std::string destAndSlice = node->dest;
-//  std::string condAndSlice = node->srcVec[0];
-//  std::string op1AndSlice = node->srcVec[1];
-//  std::string op2AndSlice = node->srcVec[2];
-//  std::string dest, destSlice;
-//  std::string cond, condSlice;
-//  std::string op1, op1Slice;
-//  std::string op2, op2Slice;
-//
-//  if(destAndSlice.find("u_issue.u_pipe_ctrl.mem_result_e2_i") != std::string::npos) {
-//    toCoutVerb("Found it!");
-//  }
-//
-//  if(destAndSlice.find("u_lsu.u_lsu_request.data_out_o") != std::string::npos) {
-//    toCoutVerb("Found it!");
-//  }
-//
-//  split_slice(destAndSlice, dest, destSlice);
-//  split_slice(condAndSlice, cond, condSlice);
-//  split_slice(op1AndSlice , op1, op1Slice);
-//  split_slice(op2AndSlice , op2, op2Slice);
-//
-//  uint32_t condHi;
-//  uint32_t condLo;
-//  uint32_t op1Hi; 
-//  uint32_t op1Lo; 
-//  uint32_t op2Hi; 
-//  uint32_t op2Lo; 
-//
-//  if(!condSlice.empty()) {
-//    condHi = get_lgc_hi(condAndSlice);
-//    condLo = get_lgc_lo(condAndSlice);
-//  }
-//
-//  if(!op1Slice.empty()) {
-//    op1Hi = get_lgc_hi(op1AndSlice);
-//    op1Lo = get_lgc_lo(op1AndSlice);
-//  }
-//
-//  if(!op2Slice.empty()) {
-//    op2Hi = get_lgc_hi(op2AndSlice);
-//    op2Lo = get_lgc_lo(op2AndSlice);
-//  }
-//
-//  assert(!isMem(op1));    
-//  assert(!isMem(op2));    
-//
-//  uint32_t destWidthNum;
-//  uint32_t op1WidthNum;
-//  uint32_t op2WidthNum;
-//  std::string destWidth;
-//  destWidthNum = get_var_slice_width_simp(destAndSlice);
-//  op1WidthNum = get_var_slice_width_simp(op1AndSlice);
-//  op2WidthNum = get_var_slice_width_simp(op2AndSlice);
-//  uint32_t condWidth = get_var_slice_width_simp(condAndSlice);
-//  destWidth = std::to_string(destWidthNum);
-//
-//  bool op1IsReadRoot = is_root(op1AndSlice) && is_read_asv(op1AndSlice);
-//  bool op2IsReadRoot = is_root(op2AndSlice) && is_read_asv(op2AndSlice);
-//
-//  bool op1IsNum = is_number(op1);
-//  bool op2IsNum = is_number(op2);
-// 
-//  expr destExpr = var_expr(destAndSlice, timeIdx, c, false);
-//  expr condExpr(c);
-//  
-//  if(condSlice.empty() || has_direct_assignment(condAndSlice))
-//    condExpr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve);
-//  else
-//    condExpr = add_constraint(node->childVec[0], timeIdx, c, s, g, bound, isSolve).extract(condHi, condLo);
-//
-//  expr destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
-//  expr condExpr_t = var_expr(condAndSlice, timeIdx, c, true);
-//
-//  expr op1Expr(c);
-//  expr op2Expr(c);
-//
-//  if(!op1Slice.empty()) 
-//    op1Expr = add_constraint(node->childVec[1], timeIdx, c, s, g, bound, isSolve).extract(op1Hi, op1Lo);
-//  else
-//    op1Expr = add_constraint(node->childVec[1], timeIdx, c, s, g, bound, isSolve);
-//  if(!op2Slice.empty()) 
-//    op2Expr = add_constraint(node->childVec[2], timeIdx, c, s, g, bound, isSolve).extract(op2Hi, op2Lo);
-//  else
-//    op2Expr = add_constraint(node->childVec[2], timeIdx, c, s, g, bound, isSolve);
-//
-//  if(isSolve) {
-//    s.add( destExpr == ite( condExpr == c.bv_val(1, 1), zext(op1Expr, destWidthNum-op1WidthNum), zext(op2Expr, destWidthNum-op2WidthNum) ) );
-//    if(g_print_solver)
-//       toCout("Add-Solver: "+get_name(destExpr)+" == ite("+get_name(condExpr)+" == 1'b1, "+get_name(op1Expr)+", "+get_name(op2Expr)+" )" );
-//
-//    expr op1Expr_t = var_expr(op1AndSlice, timeIdx, c, true, op1WidthNum);
-//    expr op2Expr_t = var_expr(op2AndSlice, timeIdx, c, true, op2WidthNum);
-//
-//    //if(!op1IsReadRoot && !op2IsReadRoot) {
-//    s.add( destExpr_t == ite( condExpr == c.bv_val(1, 1), zext(op1Expr_t, destWidthNum-op1WidthNum) | sext(condExpr_t, destWidthNum-1), zext(op2Expr_t, destWidthNum-op2WidthNum) | sext(condExpr_t, destWidthNum-1) ) );
-//    if(g_print_solver)
-//      toCout("Add-Solver: "+get_name(destExpr_t)+" == ite("+get_name(condExpr)+" == 1'b1, "+get_name(op1Expr_t)+" | "+get_name(condExpr_t)+", "+get_name(op2Expr_t)+" | "+get_name(condExpr_t)+" )" );
-//    //}
-//    //else if(!op1IsReadRoot && op2IsReadRoot) {
-//    //  s.add( destExpr_t == ite( condExpr == c.bv_val(1, 1), zext(op1Expr_t, destWidthNum-op1WidthNum) | zext(condExpr_t, destWidthNum-1), zext(condExpr_t, destWidthNum-1) ) );
-//    //  if(g_print_solver)
-//    //    toCout("Add-Solver: "+get_name(destExpr_t)+" == ite("+get_name(condExpr)+" == 1'b1, "+get_name(op1Expr_t)+" | "+get_name(condExpr_t)+", "+get_name(op2Expr_t)+" | "+get_name(condExpr_t)+" )" );
-//    //}
-//    //else if() {
-//
-//    //}
-//    //else {
-//
-//    //}
-//    return destExpr;
-//  }
-//  else {
-//    expr iteCond = condExpr == c.bv_val(1, 1);
-//    expr iteOp1 = zext(op1Expr, destWidthNum-op1WidthNum);
-//    expr iteOp2 = zext(op2Expr, destWidthNum-op2WidthNum);
-//    return ite( iteCond, iteOp1, iteOp2 );
-//  }
-//}
-//
-//
+llvm::Value* ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, 
+                               builder &b, uint32_t bound ) {
+  toCoutVerb("Ite op constraint for :"+node->dest);
+  assert(node->type == ITE);
+  assert(node->srcVec.size() == 3);
+
+  std::string destAndSlice = node->dest;
+  std::string condAndSlice = node->srcVec[0];
+  std::string op1AndSlice = node->srcVec[1];
+  std::string op2AndSlice = node->srcVec[2];
+  std::string dest, destSlice;
+  std::string cond, condSlice;
+  std::string op1, op1Slice;
+  std::string op2, op2Slice;
+
+  if(destAndSlice.find("u_issue.u_pipe_ctrl.mem_result_e2_i") != std::string::npos) {
+    toCoutVerb("Found it!");
+  }
+
+  if(destAndSlice.find("u_lsu.u_lsu_request.data_out_o") != std::string::npos) {
+    toCoutVerb("Found it!");
+  }
+
+  split_slice(destAndSlice, dest, destSlice);
+  split_slice(condAndSlice, cond, condSlice);
+  split_slice(op1AndSlice , op1, op1Slice);
+  split_slice(op2AndSlice , op2, op2Slice);
+
+  uint32_t condHi;
+  uint32_t condLo;
+  uint32_t op1Hi; 
+  uint32_t op1Lo; 
+  uint32_t op2Hi; 
+  uint32_t op2Lo; 
+
+  if(!condSlice.empty()) {
+    condHi = get_lgc_hi(condAndSlice);
+    condLo = get_lgc_lo(condAndSlice);
+  }
+
+  if(!op1Slice.empty()) {
+    op1Hi = get_lgc_hi(op1AndSlice);
+    op1Lo = get_lgc_lo(op1AndSlice);
+  }
+
+  if(!op2Slice.empty()) {
+    op2Hi = get_lgc_hi(op2AndSlice);
+    op2Lo = get_lgc_lo(op2AndSlice);
+  }
+
+  assert(!isMem(op1));    
+  assert(!isMem(op2));    
+
+  uint32_t destWidthNum;
+  uint32_t op1WidthNum;
+  uint32_t op2WidthNum;
+  std::string destWidth;
+  destWidthNum = get_var_slice_width_simp(destAndSlice);
+  op1WidthNum = get_var_slice_width_simp(op1AndSlice);
+  op2WidthNum = get_var_slice_width_simp(op2AndSlice);
+  uint32_t condWidth = get_var_slice_width_simp(condAndSlice);
+  destWidth = std::to_string(destWidthNum);
+
+  bool op1IsReadRoot = is_root(op1AndSlice) && is_read_asv(op1AndSlice);
+  bool op2IsReadRoot = is_root(op2AndSlice) && is_read_asv(op2AndSlice);
+
+  bool op1IsNum = is_number(op1);
+  bool op2IsNum = is_number(op2);
+ 
+  llvm::Value* destExpr;
+  llvm::Value* condExpr;
+  
+  llvm::Value* tmpExpr = add_constraint(node->childVec[0], timeIdx, c, b, bound);
+  if(condSlice.empty() || has_direct_assignment(condAndSlice))
+    condExpr = tmpExpr;
+  else
+    condExpr = bit_mask(tmpExpr, condHi, condLo, c, b);
+
+  llvm::Value* iteCond = b->CreateICmpEQ(condExpr, llvmInt(1, 1, c));
+
+  std::string destTimed = timed_name(destAndSlice, timeIdx);
+  llvm::BasicBlock *ThenBB = llvm::BasicBlock::Create(*TheContext, destTimed+"_;;_then", TheFunction);
+  llvm::BasicBlock *ElseBB = llvm::BasicBlock::Create(*TheContext, destTimed+"_;;_else");
+  llvm::BasicBlock *MergeBB = llvm::BasicBlock::Create(*TheContext, destTimed+"_;;_if");
+
+  b->CreateCondBr(iteCond, ThenBB, ElseBB);
+
+  b->SetInsertPoint(ThenBB);
+
+  // code gen for then block
+  llvm::Value* op1Expr;
+  if(!op1Slice.empty()) 
+    op1Expr = bit_mask(add_constraint(node->childVec[1], timeIdx, c, b, bound), op1Hi, op1Lo, c, b);
+  else
+    op1Expr = add_constraint(node->childVec[1], timeIdx, c, b, bound);
+
+  b->CreateBr(MergeBB);
+
+  ThenBB = b->GetInsertBlock();
+
+  TheFunction->getBasicBlockList().push_back(ElseBB);
+
+  b->SetInsertPoint(ElseBB);
+
+  // codegen for else block
+  llvm::Value* op2Expr;
+  if(!op2Slice.empty()) 
+    op2Expr = bit_mask(add_constraint(node->childVec[2], timeIdx, c, b, bound), op2Hi, op2Lo, c, b);
+  else
+    op2Expr = add_constraint(node->childVec[2], timeIdx, c, b, bound);
+
+  b->CreateBr(MergeBB);
+  ElseBB = b->GetInsertBlock();
+  TheFunction->getBasicBlockList().push_back(MergeBB);
+  b->SetInsertPoint(MergeBB);
+  llvm::PHINode *PN = b->CreatePHI(llvmWidth(destWidthNum ,c), 2, "iftmp");
+
+  PN->addIncoming(op1Expr, ThenBB);
+  PN->addIncoming(op2Expr, ElseBB);
+
+  return PN;
+}
+
+
 //expr case_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
 //  toCoutVerb("Case op constraint for :"+node->dest);  
 //  assert(node->type == CASE);
