@@ -51,15 +51,17 @@ llvm::Value* one_op_constraint(astNode* const node, uint32_t timeIdx,
 llvm::Value* reduce_one_op_constraint(astNode* const node, uint32_t timeIdx, 
                                       context &c, builder &b, uint32_t bound);
 
-expr sel_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve);
-
 llvm::Value* sel5_op_constraint(astNode* const node, uint32_t timeIdx, 
                                 context &c, builder &b, uint32_t bound );
 
 llvm::Value* sel_op_constraint(astNode* const node, uint32_t timeIdx, 
                                context &c, builder &b, uint32_t bound );
 
-expr add_one_concat_expr(astNode* const node, uint32_t nxtIdx, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve, bool isTaint);
+llvm::Value* src_concat_op_constraint(astNode* const node, uint32_t timeIdx, 
+                                      context &c, builder &b, uint32_t bound );
+
+llvm::Value* add_one_concat_expr(astNode* const node, uint32_t nxtIdx, uint32_t timeIdx, 
+                                 context &c, builder &b, uint32_t bound );
 
 llvm::Value* ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, 
                                builder &b, uint32_t bound );

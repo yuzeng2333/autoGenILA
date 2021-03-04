@@ -525,85 +525,63 @@ llvm::Value* sel_op_constraint(astNode* const node, uint32_t timeIdx,
 }
 //
 //
-///// Attention: the RHS might be just slices of dest(same variable). 
-/////             In such cases, slices are directly & separately assigned
-//llvm::Value* src_concat_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve ) {
-//  toCoutVerb("Src concat op constraint for: "+node->dest);
-//
-//  std::string destAndSlice = node->dest;
-//  std::string dest, destSlice;
-//  split_slice(destAndSlice, dest, destSlice);
-//  uint32_t destHi = get_lgc_hi(destAndSlice);
-//  uint32_t destLo = get_lgc_lo(destAndSlice);
-//  llvm::Value* destExpr = var_expr(destAndSlice, timeIdx, c, false);
-//  llvm::Value* destExpr_t = var_expr(destAndSlice, timeIdx, c, true);
-//
-//  // analyze index of srcVec
-//  uint32_t srcHi = get_lgc_hi(node->srcVec[0]);
-//  uint32_t srcLo = get_lgc_lo(node->srcVec.back());
-//  llvm::Value* restConcatExpr = add_one_concat_llvm::Value*(node, 0, timeIdx, c, s, g, bound, isSolve, false);  
-//  llvm::Value* restConcatExpr_t(c);
-//  if(isSolve) {
-//    restConcatExpr_t = add_one_concat_llvm::Value*(node, 0, timeIdx, c, s, g, bound, isSolve, true);
-//    s.add( destExpr == restConcatExpr );
-//    s.add( destExpr_t == restConcatExpr_t );
-//    //s.add( destExpr_t == concat(firstSrcExpr_t, restConcatExpr_t) );
-//  }
-//
-//  //if(destHi == srcHi && destLo == srcLo)
-//  //  return restConcatExpr;
-//  //else if(destHi > srcHi && destLo == srcLo)
-//  //  return concat(c.bv_val(0, destHi - srcHi), restConcatExpr);
-//  //else if(destHi == srcHi && destLo < srcLo)
-//  //  return concat(restConcatExpr, c.bv_val(0, srcLo - destLo));
-//  //else if(destHi > srcHi && destLo < srcLo)
-//  //  return concat(c.bv_val(0, destHi - srcHi), concat(restConcatExpr, c.bv_val(0, srcLo - destLo)));
-//  //else {
-//  //  toCout("Error: src index range is out of dest index range!");
-//  //  abort();
-//  //}
-//  return restConcatExpr;  
-//}
-//
-//
-//llvm::Value* add_one_concat_llvm::Value*(astNode* const node, uint32_t nxtIdx, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve, bool isTaint ) {
-//  llvm::Value* firstSrcExpr(c);
-//  llvm::Value* retExpr(c);
-//  std::string varAndSlice = node->srcVec[nxtIdx];
-//  std::string var, varSlice;
-//  split_slice(varAndSlice, var, varSlice);
-//  uint32_t hi = get_lgc_hi(varAndSlice);
-//  uint32_t lo = get_lgc_lo(varAndSlice);
-//  //auto it = std::find(node->srcVec.begin(), node->srcVec.end(), childVar);
-//  //assert(it != node->srcVec.end());
-//  if(node->childVec.size() != node->srcVec.size()) {
-//    toCout("Error: srcVec and childVec have different sizes for: "+node->dest);
-//    abort();
-//  }
-//  if(!isTaint)
-//    if(varSlice.empty() || has_direct_assignment(varAndSlice))
-//      firstSrcExpr = add_constraint(node->childVec[nxtIdx], timeIdx, c, s, g, bound, isSolve);
-//    else
-//      firstSrcExpr = add_constraint(node->childVec[nxtIdx], timeIdx, c, s, g, bound, isSolve).extract(hi, lo);
-//  else
-//    firstSrcExpr = var_expr(node->srcVec[nxtIdx], timeIdx, c, true);
-//
-//  if(nxtIdx == node->childVec.size() - 1)
-//    retExpr = firstSrcExpr;
-//  else {
-//    llvm::Value* restConcatExpr = add_one_concat_llvm::Value*(node, nxtIdx+1, timeIdx, c, s, g, bound, isSolve, isTaint);
-//    retExpr = concat(firstSrcExpr, restConcatExpr);
-//  }
-//  toCoutVerb("Finished idx: "+toStr(nxtIdx)+" for: "+node->dest);
-//  if(node->dest == "fangyuan27" && nxtIdx == 1) {
-//    toCoutVerb("Found it!");
-//  }
-//  toCoutVerb("blank1");
-//  toCoutVerb("blank2");
-//  return retExpr;
-//}
-//
-//
+/// Attention: the RHS might be just slices of dest(same variable). 
+///             In such cases, slices are directly & separately assigned
+llvm::Value* src_concat_op_constraint(astNode* const node, uint32_t timeIdx, 
+                                      context &c, builder &b, uint32_t bound ) {
+  toCoutVerb("Src concat op constraint for: "+node->dest);
+
+  std::string destAndSlice = node->dest;
+  std::string dest, destSlice;
+  split_slice(destAndSlice, dest, destSlice);
+  uint32_t destHi = get_lgc_hi(destAndSlice);
+  uint32_t destLo = get_lgc_lo(destAndSlice);
+  llvm::Value* destExpr = var_expr(destAndSlice, timeIdx, c, b, false);
+
+  // analyze index of srcVec
+  uint32_t srcHi = get_lgc_hi(node->srcVec[0]);
+  uint32_t srcLo = get_lgc_lo(node->srcVec.back());
+  llvm::Value* restConcatExpr = add_one_concat_expr(node, 0, timeIdx, c, b, bound);  
+
+  return restConcatExpr;  
+}
+
+
+llvm::Value* add_one_concat_expr(astNode* const node, uint32_t nxtIdx, uint32_t timeIdx, 
+                                 context &c, builder &b, uint32_t bound ) {
+  llvm::Value* firstSrcExpr;
+  llvm::Value* retExpr;
+  std::string varAndSlice = node->srcVec[nxtIdx];
+  std::string var, varSlice;
+  split_slice(varAndSlice, var, varSlice);
+  uint32_t hi = get_lgc_hi(varAndSlice);
+  uint32_t lo = get_lgc_lo(varAndSlice);
+
+  if(node->childVec.size() != node->srcVec.size()) {
+    toCout("Error: srcVec and childVec have different sizes for: "+node->dest);
+    abort();
+  }
+  if(varSlice.empty() || has_direct_assignment(varAndSlice))
+    firstSrcExpr = add_constraint(node->childVec[nxtIdx], timeIdx, c, b, bound);
+  else
+    firstSrcExpr = extract(add_constraint(node->childVec[nxtIdx], timeIdx, c, b, bound), hi, lo, c, b);
+
+  if(nxtIdx == node->childVec.size() - 1)
+    retExpr = firstSrcExpr;
+  else {
+    llvm::Value* restConcatExpr = add_one_concat_expr(node, nxtIdx+1, timeIdx, c, b, bound);
+    retExpr = concat_value(firstSrcExpr, restConcatExpr, c, b);
+  }
+  toCoutVerb("Finished idx: "+toStr(nxtIdx)+" for: "+node->dest);
+  if(node->dest == "fangyuan27" && nxtIdx == 1) {
+    toCoutVerb("Found it!");
+  }
+  toCoutVerb("blank1");
+  toCoutVerb("blank2");
+  return retExpr;
+}
+
+
 llvm::Value* ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, 
                                builder &b, uint32_t bound ) {
   toCoutVerb("Ite op constraint for :"+node->dest);
