@@ -707,14 +707,14 @@ llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low,
   uint32_t len = high - low + 1;
   auto IntTy = llvm::IntegerType::get(*c, high+2);
   auto constOne = llvm::ConstantInt::get(IntTy, 1, false);
-  constOne->print(llvm::errs());
+  //constOne->print(llvm::errs());
   auto s1 = b->CreateShl(constOne, len);
-  s1->print(llvm::errs());
+  //s1->print(llvm::errs());
   auto s2 = b->CreateSub( s1, 
                           constOne );
-  s2->print(llvm::errs());
+  //s2->print(llvm::errs());
   llvm::Value* mask = b->CreateShl(s2, low);
-  mask->print(llvm::errs());
+  //mask->print(llvm::errs());
   return b->CreateAnd(in, mask);
 }
 

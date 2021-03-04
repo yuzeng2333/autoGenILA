@@ -377,32 +377,33 @@ llvm::Value* two_op_constraint(astNode* const node, uint32_t timeIdx, context &c
 }
 
 
-//llvm::Value* one_op_constraint(astNode* const node, uint32_t timeIdx, context &c, 
-//                               std::unique_ptr<llvm::IRBuilder<>> &b, uint32_t bound) {
-//  toCoutVerb("One op constraint for :"+node->dest);
-// 
-//  assert(node->srcVec.size() == 1);
-//  std::string dest, destSlice;
-//  std::string op1, op1Slice;
-//  std::string destAndSlice = node->dest;
-//  std::string op1AndSlice = node->srcVec.front();
-//  split_slice(destAndSlice, dest, destSlice);
-//  split_slice(op1AndSlice, op1, op1Slice);
-//  if(destAndSlice.compare("fangyuan1") == 0) {
-//    toCoutVerb("Found it!");
-//  }
-//  uint32_t op1Hi = get_lgc_hi(op1AndSlice);
-//  uint32_t op1Lo = get_lgc_lo(op1AndSlice);
-//
-//  llvm::Value* op1Expr;
-//  llvm::Value* tmpExpr = add_constraint(node->childVec[0], timeIdx, c, b, bound);
-//  if(op1Slice.empty() || has_direct_assignment(op1AndSlice))
-//    op1Expr = tmpExpr;
-//  else
-//    op1Expr = bit_mask(tmpExpr, op1Hi, op1Lo, c, b);
-//
-//  return make_z3_expr(b, c, node->op, op1Expr);
-//}
+llvm::Value* one_op_constraint(astNode* const node, uint32_t timeIdx, 
+                               context &c, builder &b, uint32_t bound) {
+  toCoutVerb("One op constraint for :"+node->dest);
+ 
+  assert(node->srcVec.size() == 1);
+  std::string dest, destSlice;
+  std::string op1, op1Slice;
+  std::string destAndSlice = node->dest;
+  std::string op1AndSlice = node->srcVec.front();
+  split_slice(destAndSlice, dest, destSlice);
+  split_slice(op1AndSlice, op1, op1Slice);
+  if(destAndSlice.compare("fangyuan1") == 0) {
+    toCoutVerb("Found it!");
+  }
+  uint32_t op1WidthNum = get_var_slice_width_simp(op1AndSlice);
+  uint32_t op1Hi = get_lgc_hi(op1AndSlice);
+  uint32_t op1Lo = get_lgc_lo(op1AndSlice);
+
+  llvm::Value* op1Expr;
+  llvm::Value* tmpExpr = add_constraint(node->childVec[0], timeIdx, c, b, bound);
+  if(op1Slice.empty() || has_direct_assignment(op1AndSlice))
+    op1Expr = tmpExpr;
+  else
+    op1Expr = bit_mask(tmpExpr, op1Hi, op1Lo, c, b);
+
+  return make_llvm_instr(b, c, node->op, op1Expr, op1WidthNum);
+}
 
 
 //expr reduce_one_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
@@ -1076,46 +1077,31 @@ llvm::Value* make_llvm_instr(std::unique_ptr<llvm::IRBuilder<>> &b,
 
 
 // for one operator
-//expr make_z3_expr(solver &s, goal &g, context &c, std::string op, expr& destExpr, expr& op1Expr, bool isSolve) {
-//  if(op.empty()) {
-//    if(isSolve) 
-//      s.add( destExpr == op1Expr );
-//    return op1Expr;
-//  }
-//  else if(op == "~") {
-//    if(isSolve) 
-//      s.add( destExpr == ~op1Expr );
-//    return ~op1Expr;
-//  }
-//  else if(op == "!") {
-//    expr retExpr = ite(op1Expr == 0, c.bv_val(1, 1), c.bv_val(0, 1));
-//    if(isSolve) 
-//      s.add( destExpr == retExpr );
-//    return retExpr;
-//  }
-//  else if(op == "|") {
-//    expr retExpr = ite(op1Expr != 0, c.bv_val(1, 1), c.bv_val(0, 1));
-//    if(isSolve) 
-//      s.add( destExpr == retExpr );
-//    return retExpr;
-//  }
-//  else if(op == "&") {
-//    expr retExpr = ite(~op1Expr == 0, c.bv_val(1, 1), c.bv_val(0, 1));
-//    if(isSolve) 
-//      s.add( destExpr == retExpr );
-//    return retExpr;
-//  }
-//  else if(op == "-") {
-//    expr retExpr = - op1Expr;
-//    if(isSolve) 
-//      s.add( destExpr == retExpr );
-//    return retExpr;
-//  }
-//  else {
-//    toCout("Not supported 1-op in make_z3_expr, op is: "+op);
-//    abort();
-//  }
-//}
+llvm::Value* make_llvm_instr(builder &b, context &c, std::string op, 
+                             llvm::Value* op1Expr, uint32_t op1WidthNum) {
+  if(op.empty()) {
+    return op1Expr;
+  }
+  else if(op == "~") {
+    return b->CreateNot(op1Expr);
+  }
+  else if(op == "!") {
+    return b->CreateICmpEQ(op1Expr, llvmInt(0, op1WidthNum, c));
+  }
+  else if(op == "|") {
+    return b->CreateICmpNE(op1Expr, llvmInt(0, op1WidthNum, c));
+  }
+  else if(op == "&") {
+    return b->CreateICmpEQ(b->CreateNot(op1Expr), llvmInt(0, op1WidthNum, c));
+  }
+  else if(op == "-") {
+    toCout("Error: not supported operator: unary -");
+  }
+  else {
+    toCout("Not supported 1-op in make_z3_expr, op is: "+op);
+    abort();
+  }
+}
 
 
 bool is_bool_op(std::string op) {

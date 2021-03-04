@@ -45,7 +45,8 @@ llvm::Value* num_constraint(astNode* const node, uint32_t timeIdx, context &c,
 llvm::Value* two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, 
                                std::unique_ptr<llvm::IRBuilder<>> &b, uint32_t bound);
 
-expr one_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve);
+llvm::Value* one_op_constraint(astNode* const node, uint32_t timeIdx, 
+                               context &c, builder &b, uint32_t bound);
 
 expr reduce_one_op_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve);
 
@@ -71,7 +72,8 @@ llvm::Value* make_llvm_instr(std::unique_ptr<llvm::IRBuilder<>> &b,
                              llvm::Value* op1Expr, llvm::Value* op2Expr, 
                              uint32_t destWidth, uint32_t op1Width, uint32_t op2Width);
 
-expr make_z3_expr(solver &s, goal &g, context &c, std::string op, expr& destExpr, expr& op1Expr, bool isSolve);
+llvm::Value* make_llvm_instr(builder &b, context &c, std::string op, 
+                             llvm::Value* op1Expr, uint32_t op1WidthNum);
 
 bool is_bool_op(std::string op);
 
