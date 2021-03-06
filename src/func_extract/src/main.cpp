@@ -66,6 +66,7 @@ int main(int argc, char *argv[]) {
     toCout("### Begin parse_verilog");
     parse_verilog(g_path+"/design.v.clean");
   }
+  read_all_regs(g_path+"/regs.txt");  
   //read_in_architectural_states(asFile);
   clean_verilog(g_path+"/design.v.clean");
   vcd_parser(g_path+"/rst.vcd");

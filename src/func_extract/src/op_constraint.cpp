@@ -536,7 +536,6 @@ llvm::Value* src_concat_op_constraint(astNode* const node, uint32_t timeIdx,
   split_slice(destAndSlice, dest, destSlice);
   uint32_t destHi = get_lgc_hi(destAndSlice);
   uint32_t destLo = get_lgc_lo(destAndSlice);
-  llvm::Value* destExpr = var_expr(destAndSlice, timeIdx, c, b, false);
 
   // analyze index of srcVec
   uint32_t srcHi = get_lgc_hi(node->srcVec[0]);

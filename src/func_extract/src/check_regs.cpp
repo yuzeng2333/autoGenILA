@@ -105,7 +105,7 @@ void print_llvm_ir(std::string destAndSlice,
       argTy.push_back(llvm::IntegerType::get(*TheContext, width));
   }
   // push regs
-  for(auto it = g_allRegs.begin(); it != g_allRegs.end(); it++) {
+  for(auto it = moduleTrueRegs.begin(); it != moduleTrueRegs.end(); it++) {
     uint32_t width = get_var_slice_width_simp(*it);
     argTy.push_back(llvm::IntegerType::get(*TheContext, width));
   }
@@ -126,7 +126,7 @@ void print_llvm_ir(std::string destAndSlice,
         (TheFunction->args().begin()+idx++)->setName(*it+DELIM+toStr(i));
     }
 
-  for(auto it = g_allRegs.begin(); it != g_allRegs.end(); it++) {
+  for(auto it = moduleTrueRegs.begin(); it != moduleTrueRegs.end(); it++) {
     (TheFunction->args().begin()+idx++)->setName(*it);
   }
 
@@ -434,7 +434,7 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
     retExpr = num_constraint(node, timeIdx, c, b);
   }
   else if( is_case_dest(varAndSlice) ) {
-    retExpr = case_constraint(node, timeIdx, c, s, g, bound, isSolve);
+    retExpr = case_constraint(node, timeIdx, c, b, bound);
   }
   //else if( is_func_output(varAndSlice) ) {
   //  retExpr = func_constraint(node, timeIdx, c, s, g, bound, isSolve);

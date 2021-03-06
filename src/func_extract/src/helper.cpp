@@ -695,7 +695,7 @@ llvm::Value* get_arg(std::string regName) {
   for(auto it = TheFunction->arg_begin(); it != TheFunction->arg_end(); it++) {
     if(it->getName() == regName) return it;
   }
-  toCout("Error: input is not found: "+regName);
+  toCout("Error: function input is not found: "+regName);
   abort();
 }
 

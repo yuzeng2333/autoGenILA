@@ -52,6 +52,7 @@ extern std::vector<struct InstrInfo_t> g_instrInfo;
 extern bool g_print_solver;
 extern bool g_skipCheck;
 extern std::set<std::string> g_readASV;
+extern std::set<std::string> g_allRegs;
 extern std::set<std::string> g_regWithFunc;
 extern std::unordered_map<std::string, llvm::Value*> g_existedExpr;
 extern std::string g_rootNode;

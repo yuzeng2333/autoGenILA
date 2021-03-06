@@ -2,6 +2,7 @@
 #include "expr.h"
 #include "types.h"
 #include "helper.h"
+#include "global_data_struct.h"
 #include "../../taint_method/src/global_data.h"
 
 using namespace taintGen;
@@ -448,6 +449,15 @@ ModuleInfo_t::~ModuleInfo_t() {
   funcTable.clear();
   reg2timeIdx.clear();
   out2InDelayMp.clear();
+}
+
+
+void read_all_regs(std::string fileName) {
+  std::ifstream input(fileName);
+  std::string line;
+  while(std::getline(input, line)) {
+    g_allRegs.insert(line);
+  }
 }
 
 

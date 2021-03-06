@@ -66,11 +66,10 @@ llvm::Value* add_one_concat_expr(astNode* const node, uint32_t nxtIdx, uint32_t 
 llvm::Value* ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, 
                                builder &b, uint32_t bound );
 
-expr case_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve);
+llvm::Value* case_constraint(astNode* const node, uint32_t timeIdx, 
+                             context &c, builder &b, uint32_t bound);
 
 expr func_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve);
-
-expr add_one_case_branch_expr(astNode* const node, expr &caseExpr, uint32_t idx, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve);
 
 llvm::Value* make_llvm_instr(std::unique_ptr<llvm::IRBuilder<>> &b, 
                              context &c, std::string op, 
