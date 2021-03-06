@@ -119,10 +119,10 @@ int main() {
   auto Int14Ty = llvm::IntegerType::get(*TheContext, 14);
 
   std::vector<llvm::Type *> Ints;
-  Ints.push_back(llvm::IntegerType::get(*TheContext, 8));
   Ints.push_back(Int4Ty);
-  Ints.push_back(Int6Ty);
-  Ints.push_back(Int14Ty);
+  Ints.push_back(Int4Ty);
+  Ints.push_back(Int4Ty);
+  Ints.push_back(Int4Ty);
 
   llvm::FunctionType *FT =
     llvm::FunctionType::get(Int4Ty, Ints, false);
@@ -149,10 +149,50 @@ int main() {
   llvm::Value *var = llvm::ConstantInt::get(Int8Ty, 78, false);
   //TheModule->getGlobalList().push_back(var);
   //llvm::Value* ret = bit_mask(a, 4, 1, TheContext, Builder);
-  llvm::Value* ret = Builder->CreateAdd(b, a, "finalRet");
+  //llvm::Value* ret = Builder->CreateAdd(b, a, "finalRet");
+  llvm::Value* ret;
+  llvm::Value* caseRet1;
+  llvm::Value* caseRet2;
+  llvm::Value* caseRet3;
+  auto v1 = llvm::ConstantInt::get(Int4Ty, 1, false);
+  auto v2 = llvm::ConstantInt::get(Int4Ty, 2, false);
 
-  auto v1 = llvm::ConstantInt::get(Int8Ty, 7, false);
-  auto v2 = llvm::ConstantInt::get(Int6Ty, 1, false);
+  // for "case statement" trial
+  llvm::BasicBlock *defaultBB = llvm::BasicBlock::Create(*TheContext, "default", TheFunction);
+  llvm::BasicBlock *case1BB = llvm::BasicBlock::Create(*TheContext, "case1", TheFunction);
+  llvm::BasicBlock *case2BB = llvm::BasicBlock::Create(*TheContext, "case2", TheFunction);
+  llvm::BasicBlock *mergeBB = llvm::BasicBlock::Create(*TheContext, "merge", TheFunction);
+  //auto switchInstr = llvm::SwitchInst::Create(a, defaultBB, 2);
+  auto switchInstr = Builder->CreateSwitch(a, defaultBB, 2);
+  switchInstr->addCase(v1, case1BB);
+  switchInstr->addCase(v2, case2BB);
+   
+  // set block contents
+  TheFunction->getBasicBlockList().push_back(case1BB);
+  Builder->SetInsertPoint(case1BB);
+  caseRet1 = Builder->CreateAdd(a, b);
+  Builder->CreateBr(mergeBB);
+  case1BB = Builder->GetInsertBlock();
+  
+  TheFunction->getBasicBlockList().push_back(case2BB);
+  Builder->SetInsertPoint(case2BB);
+  caseRet2 = Builder->CreateAdd(b, c);
+  Builder->CreateBr(mergeBB);
+  case2BB = Builder->GetInsertBlock();
+
+  Builder->SetInsertPoint(defaultBB);
+  caseRet3 = Builder->CreateAdd(a, c);
+  Builder->CreateBr(mergeBB);
+  defaultBB = Builder->GetInsertBlock();
+
+  TheFunction->getBasicBlockList().push_back(mergeBB);  
+  Builder->SetInsertPoint(mergeBB);
+
+  llvm::PHINode *PN = Builder->CreatePHI(Int4Ty, 3, "caseYZ");
+  PN->addIncoming(caseRet1, case1BB);
+  PN->addIncoming(caseRet2, case2BB);
+  PN->addIncoming(caseRet3, defaultBB);
+
 
   //llvm::Value* ret = concat_value(v1, v2, TheContext, Builder);
   //ret->mutateType(Int14Ty);
@@ -163,8 +203,7 @@ int main() {
   //llvm::Value* ret = Builder->CreateAnd(v3, v2);
 
   /// end of code segment
-
-  Builder->CreateRet(ret);
+  Builder->CreateRet(PN);
   llvm::verifyFunction(*TheFunction);
   llvm::verifyModule(*TheModule);
   llvm::errs() << *TheModule;
@@ -198,4 +237,6 @@ int main() {
 //    v3 = it;
 //}
 
+
+// case statements
 

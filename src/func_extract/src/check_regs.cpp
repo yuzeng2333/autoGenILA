@@ -433,9 +433,9 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
   else if( is_number(varAndSlice) ) { // num_t is always 0
     retExpr = num_constraint(node, timeIdx, c, b);
   }
-  //else if( is_case_dest(varAndSlice) ) {
-  //  retExpr = case_constraint(node, timeIdx, c, s, g, bound, isSolve);
-  //}
+  else if( is_case_dest(varAndSlice) ) {
+    retExpr = case_constraint(node, timeIdx, c, s, g, bound, isSolve);
+  }
   //else if( is_func_output(varAndSlice) ) {
   //  retExpr = func_constraint(node, timeIdx, c, s, g, bound, isSolve);
   //}
@@ -513,9 +513,9 @@ llvm::Value* add_ssa_constraint(astNode* const node, uint32_t timeIdx, context &
     case SEL:
       return sel_op_constraint(node, timeIdx, c, b, bound);
       break;
-    //case SRC_CONCAT:
-    //  return src_concat_op_constraint(node, timeIdx, c, s, g, bound, isSolve);
-    //  break;
+    case SRC_CONCAT:
+      return src_concat_op_constraint(node, timeIdx, c, b, bound);
+      break;
     case ITE:
       return ite_op_constraint(node, timeIdx, c, b, bound);
       break;
