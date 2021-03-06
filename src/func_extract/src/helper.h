@@ -184,6 +184,11 @@ llvm::Value* extract(llvm::Value* in, uint32_t high, uint32_t low,
 llvm::Value* concat_value(llvm::Value* val1, llvm::Value* val2, 
                           std::unique_ptr<llvm::LLVMContext> &c,
                           std::unique_ptr<llvm::IRBuilder<>> &b);
+
+bool is_x(std::string var);
+
+
 } // end of namespace funcExtract
+
 
 #endif

@@ -739,4 +739,10 @@ llvm::Value* concat_value(llvm::Value* val1, llvm::Value* val2,
   return b->CreateAdd(b->CreateShl(val1, val2Width), val2);
 }
 
+
+bool is_x(std::string var) {
+  size_t quotePos = var.find("'");
+  return quotePos != std::string::npos && var.substr(quotePos+2, 1) == "x";
+}
+
 } // end of namespace funcExtract

@@ -79,7 +79,11 @@ llvm::Value* var_expr(std::string varAndSlice, uint32_t timeIdx, context &c,
   uint32_t varWidthNum;
   if(width == 0) varWidthNum = get_var_slice_width_simp(var);
 
-  if(is_number(var)) {
+  if(is_x(varAndSlice)) {
+    // FIXME: if encounter x value, just give 0 to it
+    return llvmInt(0, localWidth, c);
+  } 
+  else if(is_number(var)) {
     if(isTaint) {
       varTimed = var + DELIM + toStr(timeIdx) + "_" + toStr(localWidth) + "b" + _t;
       return llvm::ConstantInt::get(llvmWidth(localWidth, c), 0, false);
@@ -733,7 +737,7 @@ llvm::Value* case_constraint(astNode* const node, uint32_t timeIdx,
   llvm::Value* caseValue;
   llvm::Value* caseRet;
   llvm::BasicBlock *caseBB;
-  llvm::BasicBlock *mergeBB;
+  llvm::BasicBlock *mergeBB = llvm::BasicBlock::Create(*TheContext, destAndSlice+"_;;_default", TheFunction);;
   astNode *assignNode;
   std::vector<std::pair<llvm::Value*, llvm::BasicBlock*>> casePairs;
 
@@ -777,7 +781,6 @@ llvm::Value* case_constraint(astNode* const node, uint32_t timeIdx,
     casePairs.push_back(std::make_pair(caseRet, caseBB));
   }
   // merge block
-  mergeBB = llvm::BasicBlock::Create(*TheContext, destAndSlice+"_;;_default", TheFunction);
   TheFunction->getBasicBlockList().push_back(mergeBB);
   llvm::PHINode *PN = Builder->CreatePHI(llvmWidth(destWidthNum, c), branchNum, destAndSlice+"_;;_case");
   for(auto &pair: casePairs) {
