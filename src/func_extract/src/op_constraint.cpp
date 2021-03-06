@@ -908,25 +908,9 @@ llvm::Value* make_llvm_instr(std::unique_ptr<llvm::IRBuilder<>> &b,
   else if(op == "-") {
     return b->CreateSub(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b));
   }
-  //else if(op == "*") {
-  //  llvm::Value* retExpr(c);
-  //  if(destWidth >= op1Width && destWidth >= op2Width)
-  //    retExpr = ( zext(op1Expr, destWidth-op1Width) * zext(op2Expr, destWidth-op2Width) );
-  //  else if(destWidth < op1Width && destWidth >= op2Width)
-  //    retExpr = ( op1Expr.extract(destWidth-1, 0) * zext(op2Expr, destWidth-op2Width) );
-  //  else if(destWidth >= op1Width && destWidth < op2Width)
-  //    retExpr = ( zext(op1Expr, destWidth-op1Width) * op2Expr.extract(destWidth-1, 0) );
-  //  else //(destWidth < op1Width && destWidth < op2Width)
-  //    retExpr = ( op1Expr.extract(destWidth-1, 0) * op2Expr.extract(destWidth-1, 0) );
-
-  //  if(isSolve)  {
-  //    s.add( destExpr == retExpr );
-  //    if(g_print_solver) {      
-  //      toCout("Add-Solver: "+get_name(destExpr)+" == ( "+get_name(op1Expr)+" * "+get_name(op2Expr)+" )" );
-  //    }
-  //  }
-  //  return retExpr;
-  //}
+  else if(op == "*") {
+    return b->CreateMul(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b));
+  }
   else if(op == "<<") {
     return b->CreateShl(zext(op1Expr, destWidth, c, b), op2Expr);
   }
@@ -940,7 +924,7 @@ llvm::Value* make_llvm_instr(std::unique_ptr<llvm::IRBuilder<>> &b,
       return extract(b->CreateAShr(op1Expr, op2Expr), destWidth-1, 0, c, b);
   }
   else {
-    toCout("Not supported 2-op in make_z3_llvm::Value*!!");
+    toCout("Not supported 2-op in make_llvm_instr, op is: "+op);
     abort();
   }
 }
@@ -968,7 +952,7 @@ llvm::Value* make_llvm_instr(builder &b, context &c, std::string op,
     toCout("Error: not supported operator: unary -");
   }
   else {
-    toCout("Not supported 1-op in make_z3_llvm::Value*, op is: "+op);
+    toCout("Not supported 1-op in make_llvm_instr, op is: "+op);
     abort();
   }
 }
