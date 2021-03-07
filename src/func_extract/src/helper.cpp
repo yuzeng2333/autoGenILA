@@ -72,13 +72,13 @@ llvm::Value* long_bv_val(std::string formedBinVar, context &c,
     pos += 32;
     width -= 32;
     llvm::Value* nextNum = llvm::ConstantInt::get(llvmWidth(32, c), bin2int(subVar), false);
-    ret = b->CreateAdd( b->CreateShl(ret, llvmInt(32, 32, c)), nextNum );
+    ret = concat_value(ret, nextNum, c, b);
   }
 
   // deal with the remaining bits
   std::string subVar = pureNum.substr(pos);
   llvm::Value* nextNum = llvmInt(bin2int(subVar), width, c);
-  ret = b->CreateAdd( b->CreateShl(ret, llvmInt(32, 32, c)), nextNum );
+  ret = concat_value(ret, nextNum, c, b);
   return ret;
 }
 

@@ -313,8 +313,8 @@ llvm::Value* two_op_constraint(astNode* const node, uint32_t timeIdx, context &c
   bool isReduceOp = node->isReduceOp;
   assert(node->srcVec.size() == 2);
   std::string destAndSlice = node->dest;
-  if(destAndSlice == "_1163_") {
-    toCout("find 1163");
+  if(destAndSlice == "_0113_") {
+    toCout("find 0113");
   }
   std::string op1AndSlice = node->srcVec[0];
   std::string op2AndSlice = node->srcVec[1];
@@ -595,6 +595,9 @@ llvm::Value* ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c
   assert(node->srcVec.size() == 3);
 
   std::string destAndSlice = node->dest;
+  if(destAndSlice == "_0002_") {
+    toCout("find it!");
+  }
   std::string condAndSlice = node->srcVec[0];
   std::string op1AndSlice = node->srcVec[1];
   std::string op2AndSlice = node->srcVec[2];
@@ -703,7 +706,7 @@ llvm::Value* ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c
   ElseBB = b->GetInsertBlock();
   TheFunction->getBasicBlockList().push_back(MergeBB);
   b->SetInsertPoint(MergeBB);
-  llvm::PHINode *PN = b->CreatePHI(llvmWidth(destWidthNum ,c), 2, "iftmp");
+  llvm::PHINode *PN = b->CreatePHI(llvmWidth(destWidthNum ,c), 2, destAndSlice+"_;;_iftmp");
 
   PN->addIncoming(op1Expr, ThenBB);
   PN->addIncoming(op2Expr, ElseBB);
@@ -719,6 +722,8 @@ llvm::Value* case_constraint(astNode* const node, uint32_t timeIdx,
   assert(node->srcVec.size() % 2 == 1);
 
   std::string destAndSlice = node->dest;
+  if(destAndSlice == "_0458_")
+    toCout("Find it!");
   uint32_t destWidthNum = get_var_slice_width_simp(destAndSlice);
   std::string caseVarAndSlice = node->srcVec[0];
   uint32_t caseHi = get_lgc_hi(caseVarAndSlice);
