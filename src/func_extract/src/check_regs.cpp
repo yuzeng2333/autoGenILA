@@ -101,7 +101,7 @@ void print_llvm_ir(std::string destAndSlice,
   for(auto it = moduleInputs.begin(); it != moduleInputs.end(); it++) {
     uint32_t width = get_var_slice_width_simp(*it);
     // FIXME the start and end index may be wrong
-    for(uint32_t i = 1; i <= bound; i++)
+    for(uint32_t i = 0; i <= bound; i++)
       argTy.push_back(llvm::IntegerType::get(*TheContext, width));
   }
   // push regs
@@ -120,7 +120,7 @@ void print_llvm_ir(std::string destAndSlice,
   // set arg name for the function
   uint32_t idx = 0;
   // FIXME the start and end index may be wrong  
-  for(uint32_t i = 1; i <= bound; i++)  
+  for(uint32_t i = 0; i <= bound; i++)  
     for(auto it = moduleInputs.begin(); it != moduleInputs.end(); it++) {
       uint32_t width = get_var_slice_width_simp(*it);
       toCoutVerb("set func arg: "+*it+DELIM+toStr(i));

@@ -735,8 +735,8 @@ llvm::Value* concat_value(llvm::Value* val1, llvm::Value* val2,
   uint32_t val1Width = llvm::dyn_cast<llvm::IntegerType>(val1->getType())->getBitWidth();
   uint32_t val2Width = llvm::dyn_cast<llvm::IntegerType>(val2->getType())->getBitWidth();
   auto newIntTy = llvm::IntegerType::get(*c, val1Width+val2Width);
-  llvm::Value* val3 = b->CreateZExtOrBitCast(val1, newIntTy);
-  return b->CreateAdd(b->CreateShl(val1, val2Width), val2);
+  llvm::Value* longVal1 = b->CreateZExtOrBitCast(val1, newIntTy);
+  return b->CreateAdd(b->CreateShl(longVal1, val2Width), val2);
 }
 
 

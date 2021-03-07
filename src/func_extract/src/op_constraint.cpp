@@ -736,6 +736,7 @@ llvm::Value* case_constraint(astNode* const node, uint32_t timeIdx,
   // iterate case branches
   llvm::Value* caseValue;
   llvm::Value* caseRet;
+  llvm::Value* tmp;
   llvm::BasicBlock *caseBB;
   llvm::BasicBlock *mergeBB = llvm::BasicBlock::Create(*TheContext, destAndSlice+"_;;_default", TheFunction);;
   astNode *assignNode;
@@ -757,27 +758,42 @@ llvm::Value* case_constraint(astNode* const node, uint32_t timeIdx,
       caseValue = b->CreateICmpEQ(extract(caseExpr, posOfOne, posOfOne, c, b), llvmInt(1, 1, c));
 
       Builder->SetInsertPoint(caseBB);
-      llvm::Value* caseRet;
-      if(isNum(assignVarAndSlice))
+      if(isNum(assignVarAndSlice)) {
         caseRet = var_expr(assignVarAndSlice, timeIdx, c, b, false);
-      else
-        caseRet = extract(add_constraint(assignNode, timeIdx, c, b, bound), hi, lo, c, b);
+        toCout(" 1 Add case ret: "+assignVarAndSlice);
+      }
+      else {
+        tmp = add_constraint(assignNode, timeIdx, c, b, bound);
+        tmp->print(llvm::errs());        
+        caseRet = extract(tmp, hi, lo, c, b);
+        toCout(" 2 Add case ret: "+assignVarAndSlice+", hi: "+toStr(hi)+", lo: "+toStr(lo));
+        caseRet->print(llvm::errs());        
+      }
 
       b->CreateBr(mergeBB);
       caseBB = b->GetInsertBlock();
     }
     else { // this is the default branch
       assignNode = node->childVec[2];
-      llvm::Value* caseRet;
       Builder->SetInsertPoint(caseBB);      
-      if(isNum(assignVarAndSlice))
+      if(isNum(assignVarAndSlice)) {
         caseRet = var_expr(assignVarAndSlice, timeIdx, c, b, false);
+        toCout(" 3 Add case ret: "+assignVarAndSlice);
+        caseRet->print(llvm::errs());        
+      }
       else {
         caseRet = extract(add_constraint(assignNode, timeIdx, c, b, bound), hi, lo, c, b);
+        toCout(" 4 Add case ret: "+assignVarAndSlice+", hi: "+toStr(hi)+", lo: "+toStr(lo));
       }
       b->CreateBr(mergeBB);
       caseBB = b->GetInsertBlock();
     }
+    //llvm::Type* tmp1 = caseRet->getType();
+    //llvm::IntegerType* tmp2 = llvm::dyn_cast<llvm::IntegerType>(tmp1);
+    //uint32_t tmp3 = tmp2->getBitWidth();
+    //uint32_t tmp_width = tmp3;
+    ////uint32_t tmp_width = llvm::dyn_cast<llvm::IntegerType>(caseRet->getType())->getBitWidth();
+    //toCout("push bitWidth: "+toStr(tmp_width));
     casePairs.push_back(std::make_pair(caseRet, caseBB));
   }
   // merge block
@@ -785,6 +801,7 @@ llvm::Value* case_constraint(astNode* const node, uint32_t timeIdx,
   llvm::PHINode *PN = Builder->CreatePHI(llvmWidth(destWidthNum, c), branchNum, destAndSlice+"_;;_case");
   for(auto &pair: casePairs) {
     // TODO:
+    toCout("bitWidth: "+toStr(llvm::dyn_cast<llvm::IntegerType>(pair.first->getType())->getBitWidth()));
     PN->addIncoming(pair.first, pair.second);
   }
   return PN;

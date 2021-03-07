@@ -524,7 +524,7 @@ void add_sel_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
 
 
 void add_src_concat_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
-  toCoutVerb("Process Reduce One op for :"+line); 
+  toCoutVerb("Process concat op for :"+line); 
   std::smatch m;
   if (!std::regex_match(line, m, pSrcConcat)) {
     toCout("Error: does not match srcConcat");
