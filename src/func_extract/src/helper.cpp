@@ -734,6 +734,11 @@ llvm::Value* concat_value(llvm::Value* val1, llvm::Value* val2,
                           std::unique_ptr<llvm::IRBuilder<>> &b) {
   uint32_t val1Width = llvm::dyn_cast<llvm::IntegerType>(val1->getType())->getBitWidth();
   uint32_t val2Width = llvm::dyn_cast<llvm::IntegerType>(val2->getType())->getBitWidth();
+  std::string name1 = val1->getName();
+  std::string name2 = val2->getName();
+  toCout("concat "+name1+", len: "+toStr(val1Width));
+  toCout("and "+name2+", len: "+toStr(val2Width));
+
   auto newIntTy = llvm::IntegerType::get(*c, val1Width+val2Width);
   llvm::Value* longVal1 = b->CreateZExtOrBitCast(val1, newIntTy);
   return b->CreateAdd(b->CreateShl(longVal1, val2Width), val2);

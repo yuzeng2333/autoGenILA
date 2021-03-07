@@ -454,11 +454,8 @@ llvm::Value* add_nb_constraint(astNode* const node,
                                std::unique_ptr<llvm::IRBuilder<>> &b,
                                uint32_t bound ) {
   std::string dest = node->dest;
-  if(dest.compare("kp") == 0 && timeIdx == bound) {
+  if(dest.compare("mem_do_rdata") == 0 && timeIdx == bound) {
     toCout("target reg found! time: "+toStr(timeIdx));
-  }
-  if(dest.find("u_fifo.ram_q") != std::string::npos) {
-    toCout("Find it!");
   }
   llvm::Value* destNextExpr;
   // assuming RHS of nonblocking is not number

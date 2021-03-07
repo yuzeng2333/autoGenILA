@@ -155,7 +155,9 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx, context &c,
                               builder &b, uint32_t bound) {
   g_seeInputs = true;
   std::string dest = node->dest;
-  //llvm::Value* destExpr = 
+  if(dest == "mem_rdata") {
+    toCout("Find it!");
+  }
   toCoutVerb("See input:"+timed_name(dest, timeIdx));
   std::string destTimed = timed_name(dest, timeIdx);
 
@@ -277,7 +279,7 @@ llvm::Value* single_expr(std::string value, context &c, std::string varName,
     uint32_t localWidth = std::stoi(widthStr);
     uint32_t totalWidth = get_var_slice_width_simp(varName);
     std::string varTimed = varName + DELIM + toStr(timeIdx);
-    llvm::Value* val = get_arg(varName);
+    llvm::Value* val = get_arg(varTimed);
     return extract(val, idx, idx-localWidth+1, c, b);
     //return c.bv_const((varTimed).c_str(), totalWidth).extract(idx, idx-localWidth+1);
   }
@@ -531,6 +533,7 @@ llvm::Value* sel_op_constraint(astNode* const node, uint32_t timeIdx,
 //
 /// Attention: the RHS might be just slices of dest(same variable). 
 ///             In such cases, slices are directly & separately assigned
+// TODO: call an explicit concat function in LLVM IR
 llvm::Value* src_concat_op_constraint(astNode* const node, uint32_t timeIdx, 
                                       context &c, builder &b, uint32_t bound ) {
   toCoutVerb("Src concat op constraint for: "+node->dest);
@@ -764,10 +767,10 @@ llvm::Value* case_constraint(astNode* const node, uint32_t timeIdx,
       }
       else {
         tmp = add_constraint(assignNode, timeIdx, c, b, bound);
-        tmp->print(llvm::errs());        
+        //tmp->print(llvm::errs());        
         caseRet = extract(tmp, hi, lo, c, b);
         toCout(" 2 Add case ret: "+assignVarAndSlice+", hi: "+toStr(hi)+", lo: "+toStr(lo));
-        caseRet->print(llvm::errs());        
+        //caseRet->print(llvm::errs());        
       }
 
       b->CreateBr(mergeBB);
@@ -779,7 +782,7 @@ llvm::Value* case_constraint(astNode* const node, uint32_t timeIdx,
       if(isNum(assignVarAndSlice)) {
         caseRet = var_expr(assignVarAndSlice, timeIdx, c, b, false);
         toCout(" 3 Add case ret: "+assignVarAndSlice);
-        caseRet->print(llvm::errs());        
+        //caseRet->print(llvm::errs());        
       }
       else {
         caseRet = extract(add_constraint(assignNode, timeIdx, c, b, bound), hi, lo, c, b);
@@ -887,7 +890,9 @@ llvm::Value* make_llvm_instr(std::unique_ptr<llvm::IRBuilder<>> &b,
     return b->CreateOr(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b));
   }
   else if(op == "||") {
-    return b->CreateOr( b->CreateAndReduce(op1Expr), b->CreateAndReduce(op2Expr) );    
+    assert(op1Width == 1 && op2Width == 1);
+    //return b->CreateOr( b->CreateAndReduce(op1Expr), b->CreateAndReduce(op2Expr) );    
+    return b->CreateOr( op1Expr, op2Expr );    
   }
   else if(op == "^") {
     return b->CreateXor(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b));
