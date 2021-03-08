@@ -52,6 +52,12 @@
 
 using namespace llvm;
 
+llvm::Value* zext(llvm::Value* v1, uint32_t width,
+                 std::unique_ptr<llvm::LLVMContext> &c,
+                 std::unique_ptr<llvm::IRBuilder<>> &b) {
+  return b->CreateZExtOrTrunc(v1, llvmWidth(width, c));
+}
+
 llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low, std::unique_ptr<llvm::LLVMContext> &c, std::unique_ptr<llvm::IRBuilder<>> &b) {
 
   llvm::errs() << "in: ";
@@ -119,7 +125,7 @@ int main() {
   auto Int14Ty = llvm::IntegerType::get(*TheContext, 14);
 
   std::vector<llvm::Type *> Ints;
-  Ints.push_back(Int4Ty);
+  Ints.push_back(Int6Ty);
   Ints.push_back(Int4Ty);
   Ints.push_back(Int4Ty);
   Ints.push_back(Int4Ty);
@@ -158,7 +164,7 @@ int main() {
   auto v2 = llvm::ConstantInt::get(Int4Ty, 0, false);
 
   //ret = Builder->CreateAnd( Builder->CreateICmpNE(a, v1), Builder->CreateICmpNE(b, v2) );
-  ret = Builder->CreateAnd( a, b );
+  ret = Builder->CreateAnd( zext(a, 4, TheContext, Builder), zext(b, 4, TheContext, Builder) );
 
 
   //ret = concat_value(v1, v2, TheContext, Builder);

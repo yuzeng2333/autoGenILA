@@ -886,7 +886,7 @@ llvm::Value* make_llvm_instr(std::unique_ptr<llvm::IRBuilder<>> &b,
                              uint32_t destWidth, uint32_t op1Width, uint32_t op2Width) {
   uint32_t opWidth = std::max(op1Width, op2Width);
   if(op == "&") {
-    return b->CreateAnd(op1Expr, op2Expr);
+    return b->CreateAnd(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b));
   }
   else if(op == "&&") {
     return b->CreateAnd( b->CreateICmpNE(op1Expr, llvmInt(0, op1Width, c)), b->CreateICmpNE(op2Expr, llvmInt(0, op2Width, c)) );

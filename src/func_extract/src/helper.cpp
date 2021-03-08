@@ -739,9 +739,10 @@ llvm::Value* concat_value(llvm::Value* val1, llvm::Value* val2,
   toCout("concat "+name1+", len: "+toStr(val1Width));
   toCout("and "+name2+", len: "+toStr(val2Width));
 
-  auto newIntTy = llvm::IntegerType::get(*c, val1Width+val2Width);
+  uint32_t newLen = val1Width+val2Width;
+  auto newIntTy = llvm::IntegerType::get(*c, newLen);
   llvm::Value* longVal1 = b->CreateZExtOrBitCast(val1, newIntTy);
-  return b->CreateAdd(b->CreateShl(longVal1, val2Width), val2);
+  return b->CreateAdd(b->CreateShl(longVal1, val2Width), zext(val2, newLen, c, b));
 }
 
 
