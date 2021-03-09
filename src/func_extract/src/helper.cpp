@@ -723,6 +723,14 @@ llvm::Value* extract(llvm::Value* in, uint32_t high, uint32_t low,
                       std::unique_ptr<llvm::LLVMContext> &c, 
                       std::unique_ptr<llvm::IRBuilder<>> &b) {
 
+  uint32_t inWidth = llvm::dyn_cast<llvm::IntegerType>(in->getType())->getBitWidth();
+  if(inWidth < high+1) {
+    toCout("Error: input value width for extract is less than high index");
+    toCout("wdith: "+toStr(inWidth)+", high: "+toStr(high));
+    std::string tmpName = in->getName();
+    toCout("Input value name: "+tmpName);
+    abort();
+  }
   uint32_t len = high - low + 1;
   auto s1 = b->CreateLShr(in, low);
   return b->CreateTrunc(s1, llvmWidth(len, c));

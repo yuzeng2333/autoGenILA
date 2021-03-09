@@ -256,6 +256,9 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx, context &c,
 // idx is the start index of slice
 llvm::Value* mixed_value_expr(std::string value, context &c, std::string varName, 
                               uint32_t timeIdx, uint32_t idx, builder &b ) {
+  if(varName == "mem_rdata") {
+    toCout("Find it!");
+  }
   if(value.find("+") == std::string::npos) {
     return single_expr(value, c, varName, timeIdx, idx, b);
   }
