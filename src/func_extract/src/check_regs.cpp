@@ -151,7 +151,13 @@ void print_llvm_ir(std::string destAndSlice,
   Builder->CreateRet(destNextExpr);
   llvm::verifyFunction(*TheFunction);
   llvm::verifyModule(*TheModule);
-  llvm::errs() << *TheModule;
+  std::string fileName = "tmp.ll";
+  std::string Str;
+  llvm::raw_string_ostream OS(Str);
+  OS << *TheModule;
+  OS.flush();
+  std::ofstream output(fileName);
+  output << Str << std::endl;
 }
 
 
