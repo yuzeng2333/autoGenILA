@@ -675,13 +675,6 @@ llvm::Value* ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c
   llvm::Value* iteCond = b->CreateICmpEQ(condExpr, llvmInt(1, 1, c));
 
   std::string destTimed = timed_name(destAndSlice, timeIdx);
-  llvm::BasicBlock *ThenBB = llvm::BasicBlock::Create(*TheContext, destTimed+"_;;_then", TheFunction);
-  llvm::BasicBlock *ElseBB = llvm::BasicBlock::Create(*TheContext, destTimed+"_;;_else");
-  llvm::BasicBlock *MergeBB = llvm::BasicBlock::Create(*TheContext, destTimed+"_;;_if");
-
-  b->CreateCondBr(iteCond, ThenBB, ElseBB);
-
-  b->SetInsertPoint(ThenBB);
 
   // code gen for then block
   llvm::Value* op1Expr;
@@ -690,14 +683,6 @@ llvm::Value* ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c
   else
     op1Expr = add_constraint(node->childVec[1], timeIdx, c, b, bound);
 
-  b->CreateBr(MergeBB);
-
-  ThenBB = b->GetInsertBlock();
-
-  TheFunction->getBasicBlockList().push_back(ElseBB);
-
-  b->SetInsertPoint(ElseBB);
-
   // codegen for else block
   llvm::Value* op2Expr;
   if(!op2Slice.empty()) 
@@ -705,16 +690,7 @@ llvm::Value* ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c
   else
     op2Expr = add_constraint(node->childVec[2], timeIdx, c, b, bound);
 
-  b->CreateBr(MergeBB);
-  ElseBB = b->GetInsertBlock();
-  TheFunction->getBasicBlockList().push_back(MergeBB);
-  b->SetInsertPoint(MergeBB);
-  llvm::PHINode *PN = b->CreatePHI(llvmWidth(destWidthNum ,c), 2, destTimed+"_;;_iftmp");
-
-  PN->addIncoming(op1Expr, ThenBB);
-  PN->addIncoming(op2Expr, ElseBB);
-
-  return PN;
+  return b->CreateSelect(iteCond, op1Expr, op2Expr);
 }
 
 
@@ -1083,16 +1059,16 @@ llvm::Value* make_llvm_instr(std::unique_ptr<llvm::IRBuilder<>> &b,
     return b->CreateMul(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b));
   }
   else if(op == "<<") {
-    return b->CreateShl(zext(op1Expr, destWidth, c, b), op2Expr);
+    return b->CreateShl(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b));
   }
   else if(op == ">>") {
-    return b->CreateLShr(zext(op1Expr, destWidth, c, b), op2Expr);
+    return b->CreateLShr(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b));
   }
   else if(op == ">>>") {
     if(destWidth >= op1Width)
       return b->CreateAShr(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b));
     else
-      return extract(b->CreateAShr(op1Expr, op2Expr), destWidth-1, 0, c, b);
+      return extract(b->CreateAShr(op1Expr, zext(op2Expr, op1Width, c, b)), destWidth-1, 0, c, b);
   }
   else {
     toCout("Not supported 2-op in make_llvm_instr, op is: "+op);

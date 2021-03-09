@@ -163,7 +163,9 @@ int main() {
   auto v1 = llvm::ConstantInt::get(Int4Ty, 0, false);
   auto v2 = llvm::ConstantInt::get(Int4Ty, 0, false);
 
-  ret = Builder->CreateLShr(a, 2);
+  //ret = Builder->CreateLShr(a, 2);
+  auto cond = Builder->CreateICmpEQ(a, b);
+  ret = Builder->CreateSelect(cond, a, b);
 
   /// end of code segment
   Builder->CreateRet(ret);
