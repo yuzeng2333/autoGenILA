@@ -823,12 +823,6 @@ llvm::Value* case_constraint(astNode* const node, uint32_t timeIdx,
 
   // top level ite is constructed here
   std::string destTimed = timed_name(destAndSlice, timeIdx);  
-  llvm::BasicBlock *ThenBB = llvm::BasicBlock::Create(*TheContext, destTimed+"_;;_then", TheFunction);
-  llvm::BasicBlock *ElseBB = llvm::BasicBlock::Create(*TheContext, destTimed+"_;;_else");
-  llvm::BasicBlock *MergeBB = llvm::BasicBlock::Create(*TheContext, destTimed+"_;;_if");
-
-  b->CreateCondBr(iteCond, ThenBB, ElseBB);
-  b->SetInsertPoint(ThenBB);
 
   std::string assignVarAndSlice = node->srcVec[2];
   uint32_t hi = get_lgc_hi(assignVarAndSlice);
@@ -842,36 +836,16 @@ llvm::Value* case_constraint(astNode* const node, uint32_t timeIdx,
     thenRet = extract(tmp, hi, lo, c, b);
   }
 
-  b->CreateBr(MergeBB);
+  llvm::Value* elseRet = add_one_case_branch_expr(node, caseVarExpr, 3, timeIdx, 
+                                                  c, b, bound);
 
-  ThenBB = b->GetInsertBlock();
-
-  TheFunction->getBasicBlockList().push_back(ElseBB);
-
-  b->SetInsertPoint(ElseBB);
-
-  std::vector<std::pair<llvm::Value*, llvm::BasicBlock*>> pairVec;
-
-  llvm::Value* elseRet = add_one_case_branch_expr(node, caseVarExpr, 3, timeIdx, c, b, 
-                                                  bound, MergeBB, pairVec);
-
-  ElseBB = b->GetInsertBlock();
-  TheFunction->getBasicBlockList().push_back(MergeBB);
-  b->SetInsertPoint(MergeBB);
-  // TODO: maybe we can use only one PN node with many incomings
-  llvm::PHINode *PN = b->CreatePHI(llvmWidth(destWidthNum, c), 2+pairVec.size(), destTimed+"_;;_iftmp");
-  
-  PN->addIncoming(thenRet, ThenBB);
-  for(auto &pair: pairVec)
-    PN->addIncoming(pair.first, pair.second);
-  return PN;
+  return b->CreateSelect(iteCond, thenRet, elseRet);
 }
 
 
 llvm::Value* add_one_case_branch_expr(astNode* const node, llvm::Value* &caseVarExpr, 
                                       uint32_t idx, uint32_t timeIdx, context &c, 
-                                      builder &b, uint32_t bound, llvm::BasicBlock *mergeBB,
-                                      std::vector<std::pair<llvm::Value*, llvm::BasicBlock*>>& pairVec) {
+                                      builder &b, uint32_t bound) {
   astNode *assignNode;
   std::string assignVarAndSlice = node->srcVec[idx+1];
   uint32_t hi = get_lgc_hi(assignVarAndSlice);
@@ -882,11 +856,7 @@ llvm::Value* add_one_case_branch_expr(astNode* const node, llvm::Value* &caseVar
   std::string destTimed = timed_name(var, timeIdx);  
 
   if(idx < node->srcVec.size()-2) {
-    llvm::BasicBlock *thenBB = llvm::BasicBlock::Create(*TheContext, 
-                                                        destTimed+"_;;_then"+toStr((idx+1)/2), 
-                                                        TheFunction);
-    llvm::BasicBlock *elseBB = llvm::BasicBlock::Create(*TheContext, 
-                                                        destTimed+"_;;_else"+toStr((idx+1)/2));
+
     assignNode = node->childVec[1];
     std::string caseValueStr = node->srcVec[idx];
     uint32_t posOfOne = get_pos_of_one(caseValueStr);
@@ -894,9 +864,6 @@ llvm::Value* add_one_case_branch_expr(astNode* const node, llvm::Value* &caseVar
     llvm::Value* iteCond = b->CreateICmpEQ(extract(caseVarExpr, posOfOne, posOfOne, c, b), 
                                            llvmInt(1, 1, c));
 
-    b->CreateCondBr(iteCond, thenBB, elseBB);  
-
-    Builder->SetInsertPoint(thenBB);
     llvm::Value* thenRet;
     if(isNum(assignVarAndSlice)) {
       thenRet = var_expr(assignVarAndSlice, timeIdx, c, b, false);
@@ -906,17 +873,9 @@ llvm::Value* add_one_case_branch_expr(astNode* const node, llvm::Value* &caseVar
       thenRet = extract(tmp, hi, lo, c, b);
     }
 
-    b->CreateBr(mergeBB);
-    pairVec.push_back(std::make_pair(thenRet, thenBB));
-    thenBB = b->GetInsertBlock();
-
-    TheFunction->getBasicBlockList().push_back(elseBB);
-    b->SetInsertPoint(elseBB);
-
-    add_one_case_branch_expr(node, caseVarExpr, idx+2, 
-                             timeIdx, c, b, bound, mergeBB, pairVec);
-
-    elseBB = b->GetInsertBlock();
+    llvm::Value* elseRet = add_one_case_branch_expr(node, caseVarExpr, idx+2, 
+                                                    timeIdx, c, b, bound);
+    return b->CreateSelect(iteCond, thenRet, elseRet);
   }
   else {
     assignNode = node->childVec[2];
@@ -927,8 +886,7 @@ llvm::Value* add_one_case_branch_expr(astNode* const node, llvm::Value* &caseVar
     else {
       elseRet = extract(add_constraint(assignNode, timeIdx, c, b, bound), hi, lo, c, b);
     }
-    b->CreateBr(mergeBB);
-    pairVec.push_back(std::make_pair(elseRet, b->GetInsertBlock()));    
+    return elseRet; 
   }
 } 
 
