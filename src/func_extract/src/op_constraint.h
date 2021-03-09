@@ -69,6 +69,11 @@ llvm::Value* ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c
 llvm::Value* case_constraint(astNode* const node, uint32_t timeIdx, 
                              context &c, builder &b, uint32_t bound);
 
+llvm::Value* add_one_case_branch_expr(astNode* const node, llvm::Value* &caseVarExpr, 
+                                      uint32_t idx, uint32_t timeIdx, context &c, 
+                                      builder &b, uint32_t bound, llvm::BasicBlock *mergeBB,
+                                      std::vector<std::pair<llvm::Value*, llvm::BasicBlock*>>& pairVec);
+
 expr func_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve);
 
 llvm::Value* make_llvm_instr(std::unique_ptr<llvm::IRBuilder<>> &b, 
