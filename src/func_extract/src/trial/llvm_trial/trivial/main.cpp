@@ -133,7 +133,7 @@ int main() {
   llvm::FunctionType *FT =
     llvm::FunctionType::get(Int4Ty, Ints, false);
   llvm::Function *TheFunction = 
-    llvm::Function::Create(FT, llvm::Function::ExternalLinkage, "func_zy", TheModule.get());
+    llvm::Function::Create(FT, llvm::Function::InternalLinkage, "func_zy", TheModule.get());
   TheFunction->args().begin()->setName("a");
   (TheFunction->args().begin()+1)->setName("b");
   (TheFunction->args().begin()+2)->setName("c");
