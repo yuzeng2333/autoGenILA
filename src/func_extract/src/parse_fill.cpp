@@ -15,6 +15,7 @@ std::unordered_map<std::string, struct ModuleInfo_t*> g_moduleInfoMap;
 std::stack<std::string> g_instanceStk;
 struct ModuleInfo_t *g_curMod;
 std::set<std::string> moduleWriteAs;
+std::set<std::string> g_invarRegs;
 uint32_t g_new_var;
 uint32_t g_instr_len;
 //std::unordered_map<std::string, astNode*> g_asSliceRoot;
@@ -184,7 +185,7 @@ void read_in_instructions(std::string fileName) {
   }
   std::string line;
   std::smatch m;
-  enum State {FirstSignal, OtherSignal, WriteASV, ReadASV, ReadNOP, ResetVal};
+  enum State {FirstSignal, OtherSignal, WriteASV, ReadASV, ReadNOP, ResetVal, InvarRegs};
   enum State state;
   bool firstWord = true;
   bool firstSignalSeen = false;
@@ -233,6 +234,9 @@ void read_in_instructions(std::string fileName) {
     }
     else if(line == "*RESET:") {
       state = ResetVal;
+    }
+    else if(line == "$INVAR:") {
+      state = InvarRegs;
     }
     else { // still the old instruction
       switch(state) {
@@ -337,6 +341,12 @@ void read_in_instructions(std::string fileName) {
             }
             g_rstVal.emplace(signalName, encoding);         
           }
+          break;
+        case InvarRegs:
+          {
+            g_invarRegs.insert(line);
+          }
+          break;
       }
     }
   }

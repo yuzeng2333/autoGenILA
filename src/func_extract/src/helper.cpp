@@ -744,8 +744,8 @@ llvm::Value* concat_value(llvm::Value* val1, llvm::Value* val2,
   uint32_t val2Width = llvm::dyn_cast<llvm::IntegerType>(val2->getType())->getBitWidth();
   std::string name1 = val1->getName();
   std::string name2 = val2->getName();
-  toCout("concat "+name1+", len: "+toStr(val1Width));
-  toCout("and "+name2+", len: "+toStr(val2Width));
+  toCoutVerb("concat "+name1+", len: "+toStr(val1Width));
+  toCoutVerb("and "+name2+", len: "+toStr(val2Width));
 
   uint32_t newLen = val1Width+val2Width;
   auto newIntTy = llvm::IntegerType::get(*c, newLen);
