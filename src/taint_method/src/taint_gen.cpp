@@ -1071,52 +1071,54 @@ void merge_taints(std::string fileName) {
   //}
 
   // _r
-  for ( auto it = nextVersion.begin(); it != nextVersion.end(); ++it ) {
-    if(isMem(it->first)) {
-      auto slicePair = memDims[it->first];
-      std::string sliceTop = slicePair.second;
-      std::string highIdx = toStr(get_end(sliceTop));
-      output << "  always @(*) begin" << std::endl;
-      output << "    for(i = 0; i < "+highIdx+"; i = i + 1) begin" << std::endl;
-      output << "      "+it->first+_r+" [i] = (";
-      for (uint32_t i = 0; i < it->second - 1; i++) {
-        if(g_has_read_taint) {
-          //output << it->first + _x + std::to_string(i) + " [i] & ";
-          output << it->first + _r + std::to_string(i) + " [i] ) | ( ";
+  if(g_enable_taint) {
+    for ( auto it = nextVersion.begin(); it != nextVersion.end(); ++it ) {
+      if(isMem(it->first)) {
+        auto slicePair = memDims[it->first];
+        std::string sliceTop = slicePair.second;
+        std::string highIdx = toStr(get_end(sliceTop));
+        output << "  always @(*) begin" << std::endl;
+        output << "    for(i = 0; i < "+highIdx+"; i = i + 1) begin" << std::endl;
+        output << "      "+it->first+_r+" [i] = (";
+        for (uint32_t i = 0; i < it->second - 1; i++) {
+          if(g_has_read_taint) {
+            //output << it->first + _x + std::to_string(i) + " [i] & ";
+            output << it->first + _r + std::to_string(i) + " [i] ) | ( ";
+          }
+          else { // if do not want read taint
+            //output << it->first + _x + std::to_string(i) + " [i] ) | ( ";
+          }
         }
-        else { // if do not want read taint
-          //output << it->first + _x + std::to_string(i) + " [i] ) | ( ";
-        }
-      }
-      if(g_has_read_taint) {
-        //output << it->first + _x + std::to_string(it->second - 1) + " [i] & ";
-        output << it->first + _r + std::to_string(it->second - 1) + " [i] );" << std::endl;
-      }
-      else {
-        //output << it->first + _x + std::to_string(it->second - 1) + " [i] );" << std::endl;
-      }
-      output << "    end" << std::endl;
-      output << "  end" << std::endl;
-    }
-    else {
-      output << "  assign " + it->first + _r+" = ( ";
-      for (uint32_t i = 0; i < it->second - 1; i++) {
         if(g_has_read_taint) {
-          //output << it->first + _x + std::to_string(i) + " & ";
-          //output << it->first + _c + std::to_string(i) + " & ";
-          output << it->first + _r + std::to_string(i) + " ) | ( ";
+          //output << it->first + _x + std::to_string(it->second - 1) + " [i] & ";
+          output << it->first + _r + std::to_string(it->second - 1) + " [i] );" << std::endl;
         }
         else {
-          //output << it->first + _x + std::to_string(i) + " ) | ( ";
+          //output << it->first + _x + std::to_string(it->second - 1) + " [i] );" << std::endl;
         }
-      }
-      if(g_has_read_taint) {      
-        //output << it->first + _x + std::to_string(it->second - 1) + " & ";
-        //output << it->first + _c + std::to_string(it->second - 1) + " & ";
-        output << it->first + _r + std::to_string(it->second - 1) + " );" << std::endl;
+        output << "    end" << std::endl;
+        output << "  end" << std::endl;
       }
       else {
-        //output << it->first + _x + std::to_string(it->second - 1) + " );" << std::endl;
+        output << "  assign " + it->first + _r+" = ( ";
+        for (uint32_t i = 0; i < it->second - 1; i++) {
+          if(g_has_read_taint) {
+            //output << it->first + _x + std::to_string(i) + " & ";
+            //output << it->first + _c + std::to_string(i) + " & ";
+            output << it->first + _r + std::to_string(i) + " ) | ( ";
+          }
+          else {
+            //output << it->first + _x + std::to_string(i) + " ) | ( ";
+          }
+        }
+        if(g_has_read_taint) {      
+          //output << it->first + _x + std::to_string(it->second - 1) + " & ";
+          //output << it->first + _c + std::to_string(it->second - 1) + " & ";
+          output << it->first + _r + std::to_string(it->second - 1) + " );" << std::endl;
+        }
+        else {
+          //output << it->first + _x + std::to_string(it->second - 1) + " );" << std::endl;
+        }
       }
     }
   }
@@ -1186,27 +1188,29 @@ void merge_taints(std::string fileName) {
 
   // some bits of taints are still floating
   //output << "// ground floating taints" << std::endl;
-  output << " // ground taints for unused wire slices" << std::endl;  
-  for(auto it = nxtVerBits.begin(); it != nxtVerBits.end(); ++it) {
-    uint32_t verNum = nextVersion[it->first];
-    std::vector<std::string> freeBitsVec;
-    free_bits(it->first, freeBitsVec);
-    if(freeBitsVec.size() > 0) {
-      output << "  assign " + add_taint(freeBitsVec, _r+toStr(verNum-1)) + " = 0;" << std::endl;
-      //output << "  assign " + add_taint(freeBitsVec, _x+toStr(verNum-1)) + " = 0;" << std::endl;
-      //output << "  assign " + add_taint(freeBitsVec, _c+toStr(verNum-1)) + " = 0;" << std::endl;
+  output << " // ground taints for unused wire slices" << std::endl;
+  if(g_enable_taint) {
+    for(auto it = nxtVerBits.begin(); it != nxtVerBits.end(); ++it) {
+      uint32_t verNum = nextVersion[it->first];
+      std::vector<std::string> freeBitsVec;
+      free_bits(it->first, freeBitsVec);
+      if(freeBitsVec.size() > 0) {
+        output << "  assign " + add_taint(freeBitsVec, _r+toStr(verNum-1)) + " = 0;" << std::endl;
+        //output << "  assign " + add_taint(freeBitsVec, _x+toStr(verNum-1)) + " = 0;" << std::endl;
+        //output << "  assign " + add_taint(freeBitsVec, _c+toStr(verNum-1)) + " = 0;" << std::endl;
+      }
     }
-  }
 
-  // _r_flag_top
-  for( auto it = moduleMems.begin(); it != moduleMems.end(); ++it ) {
-    std::string mem = it->first;
-    uint32_t len = it->second;
-    output << "  assign " + mem + "_r_flag_top  = "; 
-    for(uint32_t i = 0; i < len-1; i++) {
-      output << mem + "_r_flag [" + toStr(i) + "] | ";
+    // _r_flag_top
+    for( auto it = moduleMems.begin(); it != moduleMems.end(); ++it ) {
+      std::string mem = it->first;
+      uint32_t len = it->second;
+      output << "  assign " + mem + "_r_flag_top  = "; 
+      for(uint32_t i = 0; i < len-1; i++) {
+        output << mem + "_r_flag [" + toStr(i) + "] | ";
+      }
+      output << mem + "_r_flag [" + toStr(len-1) + "] ;" << std::endl;
     }
-    output << mem + "_r_flag [" + toStr(len-1) + "] ;" << std::endl;
   }
 
   gen_assert_property(output);
