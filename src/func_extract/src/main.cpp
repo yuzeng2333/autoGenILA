@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
   print_time();
   /// read module_info.txt, result in g_moduleInfoMap
   /// read input-output delay info for sub-modules
-  read_module_info();
+  //read_module_info();
   if(doClean.compare("1") == 0) {
     toCout("### Begin clean_file");
     clean_file(g_path+"/design.v", false);

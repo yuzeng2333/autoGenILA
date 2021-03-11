@@ -496,7 +496,7 @@ llvm::Value* add_nb_constraint(astNode* const node,
   // end of if
 
   // if timeIdx = bound, then return function input or rst/norm value
-  if(g_invarRegs.find(dest) == g_invarRegs.end() 
+  if(g_invarRegs.find(dest) == g_invarRegs.end()
       && g_curMod->moduleAs.find(dest) != g_curMod->moduleAs.end())
     return get_arg(timed_name(dest, timeIdx));
   else {
