@@ -109,7 +109,7 @@ bool g_set_rflag_if_not_norm_val = false;
 // Disable for 8051
 bool g_use_does_keep = false;  
 // enable this to only check if reg's value is invariant when instruction finished
-CheckInvarType g_check_invariance = CheckOneVal;
+CheckInvarType g_check_invariance = CheckOneVal; // TODO: check this setting
 // TODO: g_enable_taint set to false when only checking invariance
 bool g_enable_taint = false;
 std::string _t="_T";
@@ -1245,23 +1245,18 @@ void add_module_name(std::string fileName,
   if(g_use_taint_rst) moduleInputs.push_back(TAINT_RST);  
   if(g_use_end_sig) moduleInputs.push_back(END_SIG);  
   if(!isTop) moduleInputs.push_back("rst_zy");
-  if(moduleName == "S")
-    toCout("Find it!");
-  out << "module " + moduleName + " ( ";
-  for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) 
-    out << *it + " , ";
+  out << "module " + moduleName + " ( " + *moduleInputs.begin();  
+  for (auto it = moduleInputs.begin()+1; it != moduleInputs.end(); ++it) 
+    out << " , " + *it ;
   if(g_enable_taint)
     for (auto it = extendInputs.begin(); it != extendInputs.end(); ++it)
-      out << *it + " , ";
+      out << " , " + *it ;
   for (auto it = moduleOutputs.begin(); it != moduleOutputs.end(); ++it)
-    out << *it + " , ";
-  //for (auto it = flagOutputs.begin(); it != flagOutputs.end(); ++it) {
-  //  out << *it + " , ";
-  //}
-  if(g_enable_taint) {
-    for (auto it = extendOutputs.begin(); it != extendOutputs.end() - 1; ++it)
-      out << *it + " , ";
-    out << extendOutputs.back();
+    out << " , " + *it ;
+
+  if(g_enable_taint && extendOutputs.size() > 0) {
+    for (auto it = extendOutputs.begin(); it != extendOutputs.end(); ++it)
+      out << " , " + *it ;
   }
   out << " );" << std::endl;  
   // if no reset, add a reset
@@ -2159,20 +2154,21 @@ void extend_module_instantiation(std::ifstream &input,
     inputSignalIsNewMap.emplace(input, isNewVec);
 
     uint32_t i = 0;
-    for(std::string signalAndSlice : signalAndSliceVec) {
-      if(isNum(signalAndSlice)) {
-        i++;
-        continue;
+    if(g_enable_taint)
+      for(std::string signalAndSlice : signalAndSliceVec) {
+        if(isNum(signalAndSlice)) {
+          i++;
+          continue;
+        }
+        std::string signal, signalSlice;
+        split_slice(signalAndSlice, signal, signalSlice);
+        auto signalIdxPair = varWidth.get_idx_pair(signal, "extend_module_instantiation:get_idx_pair");
+        std::string signalHighIdx = toStr(signalIdxPair.first);
+        std::string signalLowIdx = toStr(signalIdxPair.second);
+        if(isNewVec[i]) {
+          output << "  logic [" + signalHighIdx + ":" + signalLowIdx + "] " + signal + _r + toStr(signalVerVec[i++])   + " ;" << std::endl;
+        }
       }
-      std::string signal, signalSlice;
-      split_slice(signalAndSlice, signal, signalSlice);
-      auto signalIdxPair = varWidth.get_idx_pair(signal, "extend_module_instantiation:get_idx_pair");
-      std::string signalHighIdx = toStr(signalIdxPair.first);
-      std::string signalLowIdx = toStr(signalIdxPair.second);
-      if(isNewVec[i]) {
-        output << "  logic [" + signalHighIdx + ":" + signalLowIdx + "] " + signal + _r + toStr(signalVerVec[i++])   + " ;" << std::endl;
-      }
-    }
   }
 
   // declare new logic for _r_flag
@@ -2205,88 +2201,90 @@ void extend_module_instantiation(std::ifstream &input,
       output << "    ."+END_SIG+"("+END_SIG+")," << std::endl;
       continue;
     }
-    if( !port2SignalMap[inPort].empty() ) {
-      std::vector<uint32_t> localVerVec = input2SignalVerMap[inPort];
-      output << "    ." + inPort + _t + " ( " + get_rhs_taint_list(port2SignalMap[inPort], _t) + " )," << std::endl;
-      output << "    ." + inPort + _r + " ( " + get_lhs_ver_taint_list(port2SignalMap[inPort], _r, newLogic, localVerVec) + " )," << std::endl;
-      newLogicVec.push_back(newLogic) ; 
-      //output << "    ." + inPort + _x + " ( " + get_lhs_ver_taint_list(port2SignalMap[inPort], _x, newLogic, localVerVec) + " )," << std::endl;
-      newLogicVec.push_back(newLogic) ;    
-      //output << "    ." + inPort + _c + " ( " + get_lhs_ver_taint_list(port2SignalMap[inPort], _c, newLogic, localVerVec) + " )," << std::endl;
-      newLogicVec.push_back(newLogic);
-      // _sig
-      if(!g_use_value_change) {
-        std::string varAndSlice = port2SignalMap[inPort];
-        std::string varConnect;
-        if(!isNum(varAndSlice)) {
-          std::vector<std::string> varVec;
-          parse_var_list(varAndSlice, varVec);
-          if(varVec.size() > 1)
-            varConnect = "0";
-          else
-            varConnect = get_rhs_taint_list(varAndSlice, _sig, true);
-        }
-        else {
-          if( !std::regex_match(varAndSlice, m, pNum)) {
-            std::cout << "!! Error in matching number !!" << std::endl;
+    if(g_enable_taint) {
+      if( !port2SignalMap[inPort].empty() ) {
+        std::vector<uint32_t> localVerVec = input2SignalVerMap[inPort];
+        output << "    ." + inPort + _t + " ( " + get_rhs_taint_list(port2SignalMap[inPort], _t) + " )," << std::endl;
+        output << "    ." + inPort + _r + " ( " + get_lhs_ver_taint_list(port2SignalMap[inPort], _r, newLogic, localVerVec) + " )," << std::endl;
+        newLogicVec.push_back(newLogic) ; 
+        newLogicVec.push_back(newLogic) ;    
+        newLogicVec.push_back(newLogic);
+        // _sig
+        if(!g_use_value_change) {
+          std::string varAndSlice = port2SignalMap[inPort];
+          std::string varConnect;
+          if(!isNum(varAndSlice)) {
+            std::vector<std::string> varVec;
+            parse_var_list(varAndSlice, varVec);
+            if(varVec.size() > 1)
+              varConnect = "0";
+            else
+              varConnect = get_rhs_taint_list(varAndSlice, _sig, true);
           }
-          std::string numWidth = toStr(g_sig_width);
-          varConnect = numWidth + "'h0";
+          else {
+            if( !std::regex_match(varAndSlice, m, pNum)) {
+              std::cout << "!! Error in matching number !!" << std::endl;
+            }
+            std::string numWidth = toStr(g_sig_width);
+            varConnect = numWidth + "'h0";
+          }
+          output << "    ." + inPort + _sig + " ( " + varConnect + " )," << std::endl;    
         }
-        output << "    ." + inPort + _sig + " ( " + varConnect + " )," << std::endl;    
       }
-    }
-    else {  // if the connected signal is empty
-      output << "    ." + inPort + _t + " (0)," << std::endl; 
-      output << "    ." + inPort + _r + " ()," << std::endl; 
-      //output << "    ." + inPort + _x + " ()," << std::endl; 
-      //output << "    ." + inPort + _c + " ()," << std::endl;
-      if(!g_use_value_change)
-      output << "    ." + inPort + _sig + " (0)," << std::endl;
+      else {  // if the connected signal is empty
+        output << "    ." + inPort + _t + " (0)," << std::endl; 
+        output << "    ." + inPort + _r + " ()," << std::endl; 
+        //output << "    ." + inPort + _x + " ()," << std::endl; 
+        //output << "    ." + inPort + _c + " ()," << std::endl;
+        if(!g_use_value_change)
+        output << "    ." + inPort + _sig + " (0)," << std::endl;
+      }
     }
   }
-  for(std::string outPort: moduleOutputsMap[localModuleName]) {
-    if(port2SignalMap.find(outPort) == port2SignalMap.end()) {
-      LOG(INFO) << "output port of "+localModuleName+" is floating: "+outPort;
-      continue;
-    }
-    if( !port2SignalMap[outPort].empty() ) {
-      output << "    ." + outPort + _t + " ( " + get_lhs_taint_list(port2SignalMap[outPort], _t, newLogic) + " )," << std::endl;
-      newLogicVec.push_back(newLogic);      
-      output << "    ." + outPort + _r + "0 ( " + get_rhs_taint_list(port2SignalMap[outPort], _r) + " )," << std::endl; 
-      //output << "    ." + outPort + _x + "0 ( " + get_rhs_taint_list(port2SignalMap[outPort], _x) + " )," << std::endl; 
-      //output << "    ." + outPort + _c + "0 ( " + get_rhs_taint_list(port2SignalMap[outPort], _c) + " )," << std::endl;
-      // _sig
-      if(!g_use_value_change) {
-        std::string varAndSlice = port2SignalMap[outPort];
-        std::string varConnect;
-        if(!isNum(varAndSlice)) {
-          std::vector<std::string> varVec;
-          parse_var_list(varAndSlice, varVec);
-          if(varVec.size() > 1) {
-            varConnect = "";
-            toAssignZero.push_back(get_rhs_taint_list(varAndSlice, _sig, true));
-          }
-          else
-            varConnect = get_rhs_taint_list(varAndSlice, _sig, true);
-        }
-        else {
-          if( !std::regex_match(varAndSlice, m, pNum )) {
-            std::cout << "!! Error in matching number !!" << std::endl;
-          }
-          std::string numWidth = toStr(g_sig_width);
-          varConnect = numWidth + "'h0";
-        }
-        output << "    ." + outPort + _sig + " ( " + varConnect + " )," << std::endl;
+  if(g_enable_taint) {
+    for(std::string outPort: moduleOutputsMap[localModuleName]) {
+      if(port2SignalMap.find(outPort) == port2SignalMap.end()) {
+        LOG(INFO) << "output port of "+localModuleName+" is floating: "+outPort;
+        continue;
       }
-    }
-    else {
-      output << "    ." + outPort + _t + " ()," << std::endl; 
-      output << "    ." + outPort + _r + "0 (0)," << std::endl; 
-      //output << "    ." + outPort + _x + "0 ()," << std::endl; 
-      //output << "    ." + outPort + _c + "0 ()," << std::endl;
-      if(!g_use_value_change)
-      output << "    ." + outPort + _sig + " ()," << std::endl;
+      if( !port2SignalMap[outPort].empty() ) {
+        output << "    ." + outPort + _t + " ( " + get_lhs_taint_list(port2SignalMap[outPort], _t, newLogic) + " )," << std::endl;
+        newLogicVec.push_back(newLogic);      
+        output << "    ." + outPort + _r + "0 ( " + get_rhs_taint_list(port2SignalMap[outPort], _r) + " )," << std::endl; 
+        //output << "    ." + outPort + _x + "0 ( " + get_rhs_taint_list(port2SignalMap[outPort], _x) + " )," << std::endl; 
+        //output << "    ." + outPort + _c + "0 ( " + get_rhs_taint_list(port2SignalMap[outPort], _c) + " )," << std::endl;
+        // _sig
+        if(!g_use_value_change) {
+          std::string varAndSlice = port2SignalMap[outPort];
+          std::string varConnect;
+          if(!isNum(varAndSlice)) {
+            std::vector<std::string> varVec;
+            parse_var_list(varAndSlice, varVec);
+            if(varVec.size() > 1) {
+              varConnect = "";
+              toAssignZero.push_back(get_rhs_taint_list(varAndSlice, _sig, true));
+            }
+            else
+              varConnect = get_rhs_taint_list(varAndSlice, _sig, true);
+          }
+          else {
+            if( !std::regex_match(varAndSlice, m, pNum )) {
+              std::cout << "!! Error in matching number !!" << std::endl;
+            }
+            std::string numWidth = toStr(g_sig_width);
+            varConnect = numWidth + "'h0";
+          }
+          output << "    ." + outPort + _sig + " ( " + varConnect + " )," << std::endl;
+        }
+      }
+      else {
+        output << "    ." + outPort + _t + " ()," << std::endl; 
+        output << "    ." + outPort + _r + "0 (0)," << std::endl; 
+        //output << "    ." + outPort + _x + "0 ()," << std::endl; 
+        //output << "    ." + outPort + _c + "0 ()," << std::endl;
+        if(!g_use_value_change)
+        output << "    ." + outPort + _sig + " ()," << std::endl;
+      }
     }
   }
   // TODO: we cannot leave these _r_flags in the sub-modules,
