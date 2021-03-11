@@ -1,0 +1,35 @@
+picoRV32:
+
+cpu_state
+mem_state
+
+decoder_pseudo_trigger
+decoder_pseudo_trigger_q
+decoder_trigger_q
+eoi
+instr_add : 48
+instr_and : 50
+instr_beq : 53
+instr_bge 
+instr_bgeu
+instr_blt
+instr_bltu
+instr_bne : 58
+instr_or : 68
+instr_sll : 77
+instr_slt : 79
+instr_sltu : 82
+instr_sra : 83
+instr_srl : 85
+instr_sub : 87
+instr_xor : 88
+latched_branch : 103
+latched_is_lh : 105
+latched_is_lu : 106
+mem_do_prefetch : 111
+mem_do_rdata : 112
+mem_do_rinst : 113
+mem_do_wdata : 114
+mem_valid : 118
+pcpi_valid : 122
+trap : 131
