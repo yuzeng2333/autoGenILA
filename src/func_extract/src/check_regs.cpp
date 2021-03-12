@@ -500,9 +500,13 @@ llvm::Value* add_nb_constraint(astNode* const node,
       && g_curMod->moduleAs.find(dest) != g_curMod->moduleAs.end())
     return get_arg(timed_name(dest, timeIdx));
   else {
-    std::string rstVal = g_rstVal[dest];
+    uint32_t width = get_var_slice_width_simp(dest);    
+    std::string rstVal;
+    if(g_rstVal.find(dest) != g_rstVal.end())
+      rstVal = g_rstVal[dest];
+    else
+      rstVal = toStr(width)+"'b0";
     toCout("Replace "+timed_name(dest, timeIdx)+" with "+rstVal);
-    uint32_t width = get_var_slice_width_simp(dest);
     return var_expr(rstVal, timeIdx, c, b, false, width);    
   }
 }
