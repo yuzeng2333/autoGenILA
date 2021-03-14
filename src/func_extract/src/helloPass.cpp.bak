@@ -57,6 +57,8 @@ PreservedAnalyses helloPass::run(Module &M, ModuleAnalysisManager &MAM) {
   fill_mod_into_map(terminateInstr, initModName);
   toCout("size of name2InstrMap: "+toStr(modInternName2InstrMap.size()));
   toCout("size of name2FreqMap: "+toStr(modInternName2FreqMap.size()));
+  assert(modInternName2InstrMap.size() > 0);
+  assert(modInternName2FreqMap.size() > 0);
   toCout("first key of name2InstrMap: "+modInternName2InstrMap.begin()->first);
   toCout("first value of modInternName2FreqMap: "+toStr(modInternName2FreqMap.begin()->second));
   // free memory
