@@ -473,10 +473,12 @@ void case_expr(std::string line, std::ifstream &input) {
   g_curMod->caseTable.emplace(destAndSlice, std::make_pair(sAndSlice, caseAssignPairs));
 }
 
-// TODO: separate inputs and outputs
+
+/// In this function, do not distinguish input and output ports
+/// store all connections in both two maps: wire2InsPortMp & insPort2wireMp
 void submodule_expr(std::string firstLine, std::ifstream &input) {
   std::smatch m;
-  if ( !std::regex_match(firstLine, m, pModuleBegin) ) {
+  if ( !std::regex_match(firstLine, m, pInstanceBegin) ) {
     toCout("Error: does not match pModuleBegin: "+firstLine);
     abort();
   }
@@ -486,49 +488,34 @@ void submodule_expr(std::string firstLine, std::ifstream &input) {
     toCout("Error: cannot find moduleInfo for: "+moduleName);
     abort();
   }
-  if(g_ins2modMap.find(instanceName) != g_ins2modMap.end())
-    assert(g_ins2modMap[instanceName] == moduleName);
-  else
-    g_ins2modMap.emplace(instanceName, moduleName);
-  if(g_wire2ModulePort.find(instanceName) == g_wire2ModulePort.end())
-    g_wire2ModulePort.emplace(instanceName, std::unordered_map<std::string, std::string>{});
-  FuncInfo_t funcInfo;
+
+  // to be deleted
+  //if(g_wire2ModulePort.find(instanceName) == g_wire2ModulePort.end())
+  //  g_wire2ModulePort.emplace(instanceName, std::unordered_map<std::string, std::string>{});
+
+  g_curMod->ins2modMap.emplace(instanceName, moduleName);
+
+  //FuncInfo_t funcInfo;
   // moduleName is important, instanceName does not matter
-  funcInfo.moduleName = moduleName;
-  funcInfo.instanceName = instanceName;
+  //funcInfo.moduleName = moduleName;
+  //funcInfo.instanceName = instanceName;
   std::string line;
-  std::vector<std::string> inputVec;
-  std::vector<std::string> outputVec;
-  while(std::getline(input, line) && !std::regex_match(line, m, pModuleEnd)) {
-    if(!std::regex_match(line, m, pModulePort)) {
+  std::map<std::string, std::string> wire2PortMp;
+  std::vector<std::string> portVec;
+  while(std::getline(input, line) && !std::regex_match(line, m, pInstanceEnd)) {
+    if(!std::regex_match(line, m, pInstancePort)) {
       toCout("Error in matching module ports: "+line);
       abort();
     }
     if(m.str(3) == g_recentClk || m.str(3) == g_recentRst)
       continue;
-    if(g_moduleInfoMap[moduleName]->out2InDelayMp.find(m.str(2)) == g_moduleInfoMap[moduleName]->out2InDelayMp.end() )
-      inputVec.push_back(m.str(2)+"_#_"+m.str(3));
-    else
-      outputVec.push_back(m.str(2)+"_#_"+m.str(3));
+    wire2PortMp.emplace(m.str(2), m.str(3));
   }
-  std::sort(inputVec.begin(), inputVec.end());
-  for(std::string &in : inputVec) {
-    size_t pos = in.find("_#_");
-    std::string port = in.substr(0, pos);
-    std::string wire = in.substr(pos+3);
-    remove_two_end_space(port);
-    remove_two_end_space(wire);
-    funcInfo.inputs.push_back(wire);
-    g_wire2ModulePort[instanceName].emplace(wire, port);
-  }
-  for(std::string &out: outputVec) {
-    size_t pos = out.find("_#_");
-    std::string port = out.substr(0, pos);    
-    std::string wire = out.substr(pos+3);
-    remove_two_end_space(port);    
-    remove_two_end_space(wire);    
-    g_curMod->funcTable.emplace(wire, funcInfo);
-    g_wire2ModulePort[instanceName].emplace(wire, port);    
+  for(auto pair : wire2PortMp) {
+    std::string port = pair.first;
+    std::string wire = pair.second;
+    g_curMod->wire2InsPortMp.emplace(wire, std::make_pair(instanceName, port));
+    g_curMod->insPort2wireMp.emplace(instanceName, std::make_pair(port, wire));
   }
 }
 

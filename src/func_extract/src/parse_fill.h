@@ -40,7 +40,9 @@ struct ModuleInfo_t {
   ~ModuleInfo_t();
 
   std::string name;
-  StrSet_t moduleAs;  
+  ModuleInfo_t* parentMod;
+  StrSet_t moduleAs;
+  std::set<std::string> invarRegs;  
   std::unordered_map<std::string, std::string> ssaTable;
   std::unordered_map<std::string, std::vector<std::string>> reg2Slices;
   std::unordered_map<std::string, std::string> nbTable;
@@ -48,6 +50,13 @@ struct ModuleInfo_t {
                      std::pair<std::string, 
                                std::vector<std::pair<std::string, 
                                                      std::string>>>> caseTable;
+  /// first key is wire/reg name, first of pair is instance name, 
+  /// second of pair is connected instance output port
+  std::unordered_map<std::string, std::pair<std::string, std::string>> wire2InsPortMp;
+  /// key is instance name, first of pair is input port name, 
+  /// second of pair is connected wire
+  std::unordered_map<std::string, std::pair<std::string, std::string>> insPort2wireMp;
+  std::unordered_map<std::string, std::string> ins2modMap;  
   std::unordered_map<std::string, FuncInfo_t> funcTable;
   std::unordered_map<std::string, uint32_t> reg2timeIdx;  
   // first key is output, second key is input

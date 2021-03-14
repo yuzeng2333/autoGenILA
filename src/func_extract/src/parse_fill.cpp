@@ -15,7 +15,6 @@ std::unordered_map<std::string, struct ModuleInfo_t*> g_moduleInfoMap;
 std::stack<std::string> g_instanceStk;
 struct ModuleInfo_t *g_curMod;
 std::set<std::string> moduleWriteAs;
-std::set<std::string> g_invarRegs;
 uint32_t g_new_var;
 uint32_t g_instr_len;
 //std::unordered_map<std::string, astNode*> g_asSliceRoot;
@@ -74,11 +73,6 @@ void clear_global_vars() {
 //    bool isTop = (g_topModule.compare(module) == 0);
 //    parse_verilog_bottom_up(g_path, module, moduleReady, childModules, g_topModule, moduleInputsMap, moduleOutputsMap, moduleRFlagsMap, totalRegCnt, nextSig, doProcessPathInfo);
 //  }
-//}
-
-
-//void parse_verilog_bottom_up(std::string path, ) {
-//
 //}
 
 
@@ -153,7 +147,7 @@ void parse_verilog(std::string fileName) {
     case NONBLOCKIF:
       nonblockif_expr(line, input);
       break;
-    case MODULEBEGIN:
+    case INSTANCEBEGIN:
       submodule_expr(line, input);
       break;
     case FUNCDEF:

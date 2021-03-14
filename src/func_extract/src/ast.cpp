@@ -600,7 +600,7 @@ void add_func_node(std::string var, uint32_t timeIdx, astNode* const node) {
     abort();
   }
   auto funcInfo = g_curMod->funcTable[var];
-  node->type = MODULEBEGIN;
+  node->type = INSTANCEBEGIN;
   node->dest = var;
   node->op = funcInfo.instanceName;
   node->srcVec = funcInfo.inputs;
