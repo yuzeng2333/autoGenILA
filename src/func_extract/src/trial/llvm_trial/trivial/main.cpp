@@ -165,7 +165,11 @@ int main() {
 
   //ret = Builder->CreateLShr(a, 2);
   auto cond = Builder->CreateICmpEQ(a, b);
+  auto cond2 = Builder->CreateICmpEQ(c, b);
   ret = Builder->CreateSelect(cond, a, b);
+
+  cond->replaceAllUsesWith(cond2);
+  llvm::dyn_cast<llvm::Instruction>(cond)->eraseFromParent();
 
   /// end of code segment
   Builder->CreateRet(ret);

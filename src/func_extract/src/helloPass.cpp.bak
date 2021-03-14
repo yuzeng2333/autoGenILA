@@ -68,7 +68,7 @@ PreservedAnalyses helloPass::run(Module &M, ModuleAnalysisManager &MAM) {
   for(auto it = modInternName2InstrMap.begin();
            it != modInternName2InstrMap.end(); it++) {
     std::string varName = it->first;
-    toCout("See: "+varName);
+    //toCout("See: "+varName);
     // for each instruction, compute its signature
     for(auto instr : it->second) {
       std::string sig;
@@ -123,26 +123,28 @@ PreservedAnalyses helloPass::run(Module &M, ModuleAnalysisManager &MAM) {
         //                       llvm::ConstantInt::get(Int4Ty, 3),
         //                       llvm::ConstantInt::get(Int4Ty, 4)};
         /// end
-        toCout("bp: 1");
+        //toCout("bp: 1");
         Value* clonedFuncRet = Builder->CreateCall(newFunc, inputVec);
-        toCout("bp: 2");
+        //toCout("bp: 2");
         Instruction* clonedFuncRetInstr = dyn_cast<Instruction>(clonedFuncRet);
-        toCout("bp: 3");
-        toCout("bp: 4");
+        //toCout("bp: 3");
+        //toCout("bp: 4");
         //Value* newInstr = llvm::ConstantInt::get(Int4Ty, 1, false);
         rootInstr->replaceAllUsesWith(clonedFuncRet);
-        clonedFuncRetInstr->insertBefore(rootInstr);        
+        clonedFuncRetInstr->insertBefore(rootInstr);
+        /// delete the original root instruction
+        dyn_cast<Instruction>(rootInstr)->eraseFromParent();
         //rootInstr->replaceAllUsesWith(newInstr);
-        toCout("bp: 5");
+        //toCout("bp: 5");
         // TODO: add the new function to module
         //M.getFunctionList().push_back(newFunc2);
-        toCout("bp: 6");
+        //toCout("bp: 6");
         //break;
       }
-      toCout("bp: 7");
+      //toCout("bp: 7");
       //break;
     } // end of loop for sig2InstrMap
-    toCout("bp: 8");
+    //toCout("bp: 8");
     //break;
   } // end of loop for modInternName2InstrMap
   ////Type* rootTy = topInstr->getType();  
@@ -189,10 +191,11 @@ std::string helloPass::to_re(std::string input) {
 }
 
 
+/// fill in modInternName2FreqMap & modInternName2InstrMap
 void helloPass::fill_mod_into_map(Instruction *instr, const std::string &lastMod) {
   if (!instr) return;
   std::string name = instr->getName();
-  toCout("see instruction: "+name);
+  //toCout("see instruction: "+name);
   std::smatch m;
   std::string modInternName;
   std::string curMod;
@@ -222,6 +225,7 @@ void helloPass::fill_mod_into_map(Instruction *instr, const std::string &lastMod
            operand != instr->operands().end(); ++operand) {
     fill_mod_into_map(dyn_cast<Instruction>(operand), curMod);
   }
+  toCout("Finished fill_mod_into_map!");
 }
 
 
@@ -276,8 +280,8 @@ std::string helloPass::get_mod_name(const Instruction *instr) {
 Value* helloPass::make_same_tree(Instruction* instr, Instruction* root, BasicBlock* BB) {
   // if leaf node, return function arg
   std::string varName = instr->getName();
-  toCout( "deal with instr: "+varName );
-  toCout( "leaf number: "+toStr(root2LeafMap[root].size()) );
+  //toCout( "deal with instr: "+varName );
+  //toCout( "leaf number: "+toStr(root2LeafMap[root].size()) );
   auto pos = std::find(root2LeafMap[root].begin(), 
                        root2LeafMap[root].end(), instr);
   if(pos != root2LeafMap[root].end()) {

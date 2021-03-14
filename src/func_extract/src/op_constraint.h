@@ -71,17 +71,20 @@ llvm::Value* case_constraint(astNode* const node, uint32_t timeIdx,
 
 llvm::Value* add_one_case_branch_expr(astNode* const node, llvm::Value* &caseVarExpr, 
                                       uint32_t idx, uint32_t timeIdx, context &c, 
-                                      builder &b, uint32_t bound);
+                                      builder &b, uint32_t bound, 
+                                      const std::string &destTimed);
 
 expr func_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve);
 
 llvm::Value* make_llvm_instr(std::unique_ptr<llvm::IRBuilder<>> &b, 
                              context &c, std::string op, 
                              llvm::Value* op1Expr, llvm::Value* op2Expr, 
-                             uint32_t destWidth, uint32_t op1Width, uint32_t op2Width);
+                             uint32_t destWidth, uint32_t op1Width, uint32_t op2Width,
+                             const llvm::Twine &name);
 
 llvm::Value* make_llvm_instr(builder &b, context &c, std::string op, 
-                             llvm::Value* op1Expr, uint32_t op1WidthNum);
+                             llvm::Value* op1Expr, uint32_t op1WidthNum,
+                             const llvm::Twine &name);
 
 bool is_bool_op(std::string op);
 
