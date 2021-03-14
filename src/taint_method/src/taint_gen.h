@@ -28,7 +28,7 @@ namespace taintGen {
 #define ALWAYS_CLKRST   15
 #define ALWAYS          16
 #define REDUCE1         17
-#define MODULEBEGIN     18
+#define INSTANCEBEGIN   18
 #define MEM             19
 #define ALWAYS_FAKE     20
 #define SEL             21

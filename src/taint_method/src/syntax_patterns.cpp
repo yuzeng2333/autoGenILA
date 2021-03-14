@@ -82,9 +82,9 @@ std::regex pFunctionDef   (taintGen::to_re("^(\\s*)function (\\[\\d+\\:0\\] )?(N
 std::regex pEndfunction   (taintGen::to_re("^(\\s*)endfunction$"));
 std::regex pFunctionCall  (taintGen::to_re("^(\\s*)assign (NAME) = (NAME)\\((.*)\\)(\\s*)?;$"));
 /* module instantiation */
-std::regex pModuleBegin   (taintGen::to_re("^(\\s*)(NAME) (NAME) \\($"));
-std::regex pModulePort    (taintGen::to_re("^(\\s*)\\.(NAME)\\((.*)\\),?$"));
-std::regex pModuleEnd     (taintGen::to_re("^(\\s*)\\);$"));
+std::regex pInstanceBegin   (taintGen::to_re("^(\\s*)(NAME) (NAME) \\($"));
+std::regex pInstancePort  (taintGen::to_re("^(\\s*)\\.(NAME)\\((.*)\\),?$"));
+std::regex pInstanceEnd     (taintGen::to_re("^(\\s*)\\);$"));
 /* control keywords */
 // case
 std::regex pCase      (taintGen::to_re("^(\\s*)case(\\S)? \\((NAME)\\)"));

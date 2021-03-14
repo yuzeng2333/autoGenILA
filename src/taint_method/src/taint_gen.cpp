@@ -699,7 +699,7 @@ void add_line_taints(std::string line, std::ofstream &output, std::ifstream &inp
   // because they are treated separately
   if ( !std::regex_match(line, m, pModule) 
       && !std::regex_match(line, m, pEndmodule)
-      && !std::regex_match(line, m, pModuleBegin))
+      && !std::regex_match(line, m, pInstanceBegin))
     output << printedLine << std::endl;
 
   switch( choice ) {
@@ -916,8 +916,8 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   else if( std::regex_match(line, m, pEndfunction) ) {
     return FUNCEND;
   }
-  else if( std::regex_match(line, m, pModuleBegin) ) {
-    return MODULEBEGIN;
+  else if( std::regex_match(line, m, pInstanceBegin) ) {
+    return INSTANCEBEGIN;
   }
   else if( std::regex_match(line, m, pIf) ) {
     return IF;
@@ -1044,7 +1044,7 @@ void add_file_taints(std::string fileName,
       toCout("!! Error: function found!");
       abort();
     }
-    else if ( std::regex_match(line, match, pModuleBegin) ) {
+    else if ( std::regex_match(line, match, pInstanceBegin) ) {
       extend_module_instantiation(input, output, line, moduleInputsMap, moduleOutputsMap);
     }
     else
@@ -2094,7 +2094,7 @@ void extend_module_instantiation(std::ifstream &input,
                                  std::map<std::string, std::vector<std::string>> &moduleInputsMap, 
                                  std::map<std::string, std::vector<std::string>> &moduleOutputsMap) {
   std::smatch m;
-  if(!std::regex_match(moduleFirstLine, m, pModuleBegin)) {
+  if(!std::regex_match(moduleFirstLine, m, pInstanceBegin)) {
     toCout("Error in matching module definition!");
     abort();
   }
@@ -2117,8 +2117,8 @@ void extend_module_instantiation(std::ifstream &input,
   std::getline(input, line);
   // store the module port and their connected signals in the instantiation
   std::unordered_map<std::string, std::string> port2SignalMap;
-  while(!std::regex_match(line, m, pModuleEnd)) {
-    if(!std::regex_match(line, m, pModulePort)) {
+  while(!std::regex_match(line, m, pInstanceEnd)) {
+    if(!std::regex_match(line, m, pInstancePort)) {
       toCout("Error in matching module ports");
       abort();
     }
@@ -2686,7 +2686,7 @@ std::string separate_modules(std::string fileName,
 
 
     // analyze module dependency
-    if(inModule && std::regex_match(line, m, pModuleBegin)) {
+    if(inModule && std::regex_match(line, m, pInstanceBegin)) {
       std::string localModuleName = m.str(2);
       std::string instanceName = m.str(3);
       if(instance2moduleMap.find(moduleName) == instance2moduleMap.end()) {

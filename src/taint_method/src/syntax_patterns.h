@@ -80,9 +80,9 @@ extern std::regex pFunctionDef;
 extern std::regex pEndfunction;
 extern std::regex pFunctionCall;
 
-extern std::regex pModuleBegin;
-extern std::regex pModulePort;
-extern std::regex pModuleEnd;
+extern std::regex pInstanceBegin;
+extern std::regex pInstancePort;
+extern std::regex pInstanceEnd;
 
 extern std::regex pCase;
 extern std::regex pEndcase;
