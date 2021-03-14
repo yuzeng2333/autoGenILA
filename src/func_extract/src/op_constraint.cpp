@@ -717,7 +717,7 @@ llvm::Value* ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c
 //    caseExpr = extract(add_constraint( node->childVec[0], timeIdx, c, b, bound), caseHi, caseLo, c, b);
 //
 //  uint32_t branchNum = (node->srcVec.size() - 1) / 2; 
-//  llvm::BasicBlock *defaultBB = llvm::BasicBlock::Create(*c, destAndSlice+"_;;_default", TheFunction);  
+//  llvm::BasicBlock *defaultBB = llvm::BasicBlock::Create(*c, destAndSlice+"_;_default", TheFunction);  
 //  auto switchInstr = b->CreateSwitch(caseExpr, defaultBB, branchNum);
 //
 //  
@@ -726,13 +726,13 @@ llvm::Value* ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c
 //  llvm::Value* caseRet;
 //  llvm::Value* tmp;
 //  llvm::BasicBlock *caseBB;
-//  llvm::BasicBlock *mergeBB = llvm::BasicBlock::Create(*TheContext, destAndSlice+"_;;_default", TheFunction);;
+//  llvm::BasicBlock *mergeBB = llvm::BasicBlock::Create(*TheContext, destAndSlice+"_;_default", TheFunction);
 //  astNode *assignNode;
 //  std::vector<std::pair<llvm::Value*, llvm::BasicBlock*>> casePairs;
 //
 //  for(uint32_t idx = 1; idx < node->srcVec.size(); idx += 2) {
 //
-//    caseBB = llvm::BasicBlock::Create(*TheContext, destAndSlice+"_;;_case"+toStr((idx+1)/2), TheFunction);
+//    caseBB = llvm::BasicBlock::Create(*TheContext, destAndSlice+"_;_case"+toStr((idx+1)/2), TheFunction);
 //    TheFunction->getBasicBlockList().push_back(caseBB);
 //    
 //    std::string assignVarAndSlice = node->srcVec[idx+1];
@@ -786,7 +786,7 @@ llvm::Value* ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c
 //  }
 //  // merge block
 //  TheFunction->getBasicBlockList().push_back(mergeBB);
-//  llvm::PHINode *PN = Builder->CreatePHI(llvmWidth(destWidthNum, c), branchNum, destAndSlice+"_;;_case");
+//  llvm::PHINode *PN = Builder->CreatePHI(llvmWidth(destWidthNum, c), branchNum, destAndSlice+"_;_case");
 //  for(auto &pair: casePairs) {
 //    // TODO:
 //    toCout("bitWidth: "+toStr(llvm::dyn_cast<llvm::IntegerType>(pair.first->getType())->getBitWidth()));
@@ -821,7 +821,7 @@ llvm::Value* case_constraint(astNode* const node, uint32_t timeIdx,
   uint32_t posOfOne = get_pos_of_one(caseValueStr);
   llvm::Value* iteCond = b->CreateICmpEQ(extract(caseVarExpr, posOfOne, posOfOne, c, b), 
                                          llvmInt(1, 1, c), 
-                                         llvm::Twine(destAndSliceTimed+"_;;_case"+toStr(posOfOne)));
+                                         llvm::Twine(destAndSliceTimed+"_;_case"+toStr(posOfOne)));
 
   // top level ite is constructed here
   std::string destTimed = timed_name(destAndSlice, timeIdx);  
@@ -835,7 +835,7 @@ llvm::Value* case_constraint(astNode* const node, uint32_t timeIdx,
   }
   else {
     llvm::Value* tmp = add_constraint(node->childVec[1], timeIdx, c, b, bound);
-    thenRet = extract(tmp, hi, lo, c, b, destAndSliceTimed+"_;;_then0");
+    thenRet = extract(tmp, hi, lo, c, b, destAndSliceTimed+"_;_then0");
   }
 
   llvm::Value* elseRet = add_one_case_branch_expr(node, caseVarExpr, 3, timeIdx, 
@@ -866,7 +866,7 @@ llvm::Value* add_one_case_branch_expr(astNode* const node, llvm::Value* &caseVar
     // case value
     llvm::Value* iteCond = b->CreateICmpEQ(extract(caseVarExpr, posOfOne, posOfOne, c, b), 
                                            llvmInt(1, 1, c),
-                                           llvm::Twine(destTimed+"_;;_case"+toStr(posOfOne)));
+                                           llvm::Twine(destTimed+"_;_case"+toStr(posOfOne)));
 
     llvm::Value* thenRet;
     if(isNum(assignVarAndSlice)) {
@@ -874,7 +874,7 @@ llvm::Value* add_one_case_branch_expr(astNode* const node, llvm::Value* &caseVar
     }
     else {
       auto tmp = add_constraint(assignNode, timeIdx, c, b, bound);
-      thenRet = extract(tmp, hi, lo, c, b, destTimed+"_;;_then"+toStr(posOfOne));
+      thenRet = extract(tmp, hi, lo, c, b, destTimed+"_;_then"+toStr(posOfOne));
     }
 
     llvm::Value* elseRet = add_one_case_branch_expr(node, caseVarExpr, idx+2, 
@@ -889,7 +889,7 @@ llvm::Value* add_one_case_branch_expr(astNode* const node, llvm::Value* &caseVar
       elseRet = var_expr(assignVarAndSlice, timeIdx, c, b, false);
     else {
       elseRet = extract(add_constraint(assignNode, timeIdx, c, b, bound),
-                        hi, lo, c, b, destTimed+"_;;_default");
+                        hi, lo, c, b, destTimed+"_;_default");
     }
     return elseRet; 
   }

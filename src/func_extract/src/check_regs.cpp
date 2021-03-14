@@ -91,7 +91,7 @@ void print_llvm_ir(std::string destAndSlice,
   // declaration for llvm
   TheContext = llvm::make_unique<llvm::LLVMContext>();
   // FIXME: change the following model name
-  TheModule = llvm::make_unique<llvm::Module>("mod_;;_"+destAndSlice, *TheContext);
+  TheModule = llvm::make_unique<llvm::Module>("mod_;_"+destAndSlice, *TheContext);
   Builder = llvm::make_unique<llvm::IRBuilder<>>(*TheContext);
 
   /// declare function
@@ -115,7 +115,7 @@ void print_llvm_ir(std::string destAndSlice,
   llvm::FunctionType *FT =
     llvm::FunctionType::get(retTy, argTy, false);
   TheFunction = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
-                                       "func_;;_"+destAndSlice, TheModule.get());
+                                       "func_;_"+destAndSlice, TheModule.get());
 
   // set arg name for the function
   uint32_t idx = 0;
@@ -133,7 +133,7 @@ void print_llvm_ir(std::string destAndSlice,
   }
 
   // basic block
-  llvm::BasicBlock *BB = llvm::BasicBlock::Create(*TheContext, "bb_;;_"+destAndSlice, TheFunction);
+  llvm::BasicBlock *BB = llvm::BasicBlock::Create(*TheContext, "bb_;_"+destAndSlice, TheFunction);
   Builder->SetInsertPoint(BB);
 
   g_ignoreSubModules = false;
