@@ -17,6 +17,7 @@ namespace funcExtract {
 //static std::unique_ptr<KaleidoscopeJIT> TheJIT;
 //static std::map<std::string, std::unique_ptr<llvm::PrototypeAST>> FunctionProtos;
 
+std::stack<std::string> g_instanceStk;
 uint32_t bound_limit;
 std::regex pTimed("^(\\S+)"+DELIM+"(\\d+)$");
 std::string CURRENT_VAR;

@@ -23,8 +23,11 @@ void module_expr(std::string line) {
   g_currentModuleName = m.str(2);
   std::string portList = m.str(3);
 
-  if(g_moduleInfoMap.find(g_currentModuleName) != g_moduleInfoMap.end())
+  if(g_moduleInfoMap.find(g_currentModuleName) != g_moduleInfoMap.end()) {
+    toCout("Error: this module has been seen before: "+g_currentModuleName);
+    abort();
     g_curMod = g_moduleInfoMap[g_currentModuleName];
+  }
   else
     g_curMod = new struct ModuleInfo_t;
   g_moduleInfoMap.emplace(g_currentModuleName, g_curMod);

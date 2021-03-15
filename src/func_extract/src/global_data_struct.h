@@ -82,6 +82,7 @@ extern std::string DELIM;
 
 // for hierarchical store
 extern std::unordered_map<std::string, struct ModuleInfo_t*> g_moduleInfoMap;
+extern std::string g_topModName;
 extern std::stack<std::string> g_instanceStk;
 extern struct ModuleInfo_t *g_curMod;
 
