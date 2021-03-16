@@ -53,13 +53,15 @@ struct FuncInfo_t {
 };
 
 // this structu is filled only during parsing
-// ast building only reads info, except parentMod
+// ast building only reads info, 
+// except parentMod and rootNode
 struct ModuleInfo_t {
   ModuleInfo_t();
   ModuleInfo_t(std::string nameIn): name(nameIn) {}
   ~ModuleInfo_t();
 
   std::string name;
+  std::pair<std::string, uint32_t> rootTime;
   std::shared_ptr<ModuleInfo_t> parentMod;
   StrSet_t moduleAs;
   std::set<std::string> invarRegs;
@@ -67,6 +69,9 @@ struct ModuleInfo_t {
   std::set<std::string> moduleOutputs;
   std::set<std::string> moduleTrueRegs;
   taintGen::VarWidth varWidth;
+  // only sub-modules has the two data below
+  std::map<std::string, astNode*> out2RootNodeMp;
+  std::map<std::string, std::set<astNode*>> out2LeafNodeMp;
   std::map<std::string, std::string> ssaTable;
   std::map<std::string, std::vector<std::string>> reg2Slices;
   std::map<std::string, std::string> nbTable;

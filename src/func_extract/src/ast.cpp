@@ -325,19 +325,18 @@ void add_input_node(std::string input, uint32_t timeIdx, astNode* const node) {
     node->dest = input;
     std::pair<std::string, std::shared_ptr<ModuleInfo_t>> pair = g_instancePairStk.top();
     std::string insName = g_instancePairStk.top().first;
-    std::shared_ptr<ModuleInfo_t> parentMod = g_instancePairStk.top().second;
-    g_instancePairStk.pop();
-    g_visitedNodeStk.pop();
 
-    // switch current module
-    g_curMod = parentMod;
     std::string wireName = g_curMod->insPort2wireMp[insName][input];
     /// the input is in parent-module
     node->op = "";
     node->destTime = timeIdx;
     node->done = false;
     node->srcVec = SV{wireName};
-    add_child_node(wireName, timeIdx, node);  
+    std::string rootName = g_curMod->rootTime.first;
+    if(g_curMod->out2LeafNodeMp.find(rootName) == g_curMod->out2LeafNodeMp.end())
+      g_curMod->out2LeafNodeMp.emplace(rootName, std::set<astNode*>{node});
+    else
+      g_curMod->out2LeafNodeMp[rootName].insert(node);
   }
 }
 
@@ -661,17 +660,43 @@ void add_submod_node(std::string var, uint32_t timeIdx, astNode* const node) {
   std::string insName = g_curMod->wire2InsPortMp[var].first;
   std::string output = g_curMod->wire2InsPortMp[var].second;
   node->op = insName;
-  node->srcVec = std::vector<std::string>{output};
+  node->srcVec = std::vector<std::string>{};
   node->destTime = timeIdx;
   node->isReduceOp = false;
   node->done = false;
   // switch module before adding child node
   std::string modName = g_curMod->ins2modMap[insName];
   g_curMod = g_moduleInfoMap[modName];
-  g_visitedNode = std::make_unique<std::map<std::string, astNode*>>();
-  g_visitedNodeStk.push(g_visitedNode);
-  g_instancePairStk.push(std::make_pair(insName, g_curMod));
-  add_child_node(output, timeIdx, node);
+  // treate differently for new or seen submodule output
+  if(g_curMod->out2RootNodeMp.find(output) == g_curMod->out2RootNodeMp.end()) {
+    g_visitedNode = std::make_unique<std::map<std::string, astNode*>>();
+    g_visitedNodeStk.push(g_visitedNode);
+    g_instancePairStk.push(std::make_pair(insName, g_curMod));
+    g_curMod->rootTime = std::make_pair(output, timeIdx);
+    astNode* nextNode = new astNode;
+    add_node(output, timeIdx, nextNode, false);
+
+    g_instancePairStk.pop();
+    g_visitedNodeStk.pop();
+    g_curMod = g_instancePairStk.top().second;
+    //add_child_node(output, timeIdx, node);
+    // all inputs have been added
+    for(auto leaf: g_curMod->out2LeafNodeMp[output]) {
+      node->srcVec.push_back(leaf->srcVec[0]);
+      add_child_node(leaf->srcVec[0], leaf->destTime, node);
+    }
+  }
+  else {
+    auto subMod = g_curMod;
+    g_curMod = g_instancePairStk.top().second;
+    for(auto leaf: subMod->out2LeafNodeMp[output]) {
+      std::string connectWire = g_curMod->insPort2wireMp[insName][leaf->dest];
+
+      node->srcVec.push_back(connectWire);
+      uint32_t timeDiff = leaf->destTime - subMod->rootTime.second;
+      add_child_node(connectWire, timeIdx+timeDiff, node);
+    }
+  }
 }
 
 
