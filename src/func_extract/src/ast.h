@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <stack>
 #include <cassert>
 #include <regex>
 #include <algorithm>
@@ -71,6 +72,8 @@ void add_src_concat_op_node(std::string line, uint32_t timeIdx, astNode* const n
 void add_case_node(std::string var, uint32_t timeIdx, astNode* const node);
 
 void add_func_node(std::string var, uint32_t timeIdx, astNode* const node);
+
+void add_submod_node(std::string var, uint32_t timeIdx, astNode* const node);
 
 void add_ite_op_node(std::string line, uint32_t timeIdx, astNode* const node);
 

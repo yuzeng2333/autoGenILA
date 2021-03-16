@@ -7,6 +7,7 @@
 #include "../../taint_method/src/helper.h"
 #include "z3++.h"
 #include "types.h"
+#include "global_data_struct.h"
 #include <cctype>
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/STLExtras.h"
@@ -49,24 +50,24 @@ extern std::regex pHex;
 extern std::regex pDec;
 extern std::regex pBin;
 
-llvm::IntegerType* llvmWidth(uint32_t width, std::unique_ptr<llvm::LLVMContext> &c);
+llvm::IntegerType* llvmWidth(uint32_t width, std::shared_ptr<llvm::LLVMContext> &c);
 
 llvm::Value* llvmInt(uint32_t value, uint32_t width, 
-                     std::unique_ptr<llvm::LLVMContext> &c);
+                     std::shared_ptr<llvm::LLVMContext> &c);
 
 llvm::Value* zext(llvm::Value* v1, uint32_t width,
-                 std::unique_ptr<llvm::LLVMContext> &c,
-                 std::unique_ptr<llvm::IRBuilder<>> &b);
+                 std::shared_ptr<llvm::LLVMContext> &c,
+                 std::shared_ptr<llvm::IRBuilder<>> &b);
 
 llvm::Value* sext(llvm::Value* v1, uint32_t width,
-                 std::unique_ptr<llvm::LLVMContext> &c,
-                 std::unique_ptr<llvm::IRBuilder<>> &b);
+                 std::shared_ptr<llvm::LLVMContext> &c,
+                 std::shared_ptr<llvm::IRBuilder<>> &b);
 
 
 bool isAs(std::string var);
 
 llvm::Value* long_bv_val(std::string formedBinVar, context &c,
-                         std::unique_ptr<llvm::IRBuilder<>> &b );
+                         std::shared_ptr<llvm::IRBuilder<>> &b );
 
 bool is_formed_num(std::string num);
 
@@ -174,27 +175,34 @@ std::string remove_prefix_module(const std::string &writeAsvLine);
 llvm::Value* get_arg(std::string regName);
 
 llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low, 
-                      std::unique_ptr<llvm::LLVMContext> &c, 
-                      std::unique_ptr<llvm::IRBuilder<>> &b);
+                      std::shared_ptr<llvm::LLVMContext> &c, 
+                      std::shared_ptr<llvm::IRBuilder<>> &b);
 
 llvm::Value* extract(llvm::Value* in, uint32_t high, uint32_t low, 
-                      std::unique_ptr<llvm::LLVMContext> &c, 
-                      std::unique_ptr<llvm::IRBuilder<>> &b,
+                      std::shared_ptr<llvm::LLVMContext> &c, 
+                      std::shared_ptr<llvm::IRBuilder<>> &b,
                       const llvm::Twine &name="");
 
 
 llvm::Value* extract(llvm::Value* in, uint32_t high, uint32_t low, 
-                      std::unique_ptr<llvm::LLVMContext> &c, 
-                      std::unique_ptr<llvm::IRBuilder<>> &b, 
+                      std::shared_ptr<llvm::LLVMContext> &c, 
+                      std::shared_ptr<llvm::IRBuilder<>> &b, 
                       const std::string &name);
 
 
 llvm::Value* concat_value(llvm::Value* val1, llvm::Value* val2, 
-                          std::unique_ptr<llvm::LLVMContext> &c,
-                          std::unique_ptr<llvm::IRBuilder<>> &b);
+                          std::shared_ptr<llvm::LLVMContext> &c,
+                          std::shared_ptr<llvm::IRBuilder<>> &b);
 
-bool is_x(std::string var);
+bool is_x(const std::string &var);
 
+bool is_input(const std::string &var);
+
+bool is_reg(std::string &var);
+
+bool is_submod_output(const std::string &var);
+
+std::shared_ptr<ModuleInfo_t> get_mod_info(std::string insName);
 
 } // end of namespace funcExtract
 

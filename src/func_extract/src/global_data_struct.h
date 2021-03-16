@@ -4,6 +4,10 @@
 #include "ast.h"
 #include "types.h"
 #include <queue>
+#include <memory>
+#include <map>
+#include <set>
+#include <string>
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/IR/BasicBlock.h"
@@ -40,6 +44,50 @@ using namespace z3;
 using namespace taintGen;
 
 namespace funcExtract {
+
+// one for each sub-module
+struct FuncInfo_t {
+  std::string moduleName;
+  std::string instanceName;
+  std::vector<std::string> inputs;
+};
+
+// this structu is filled only during parsing
+// ast building only reads info, except parentMod
+struct ModuleInfo_t {
+  ModuleInfo_t();
+  ModuleInfo_t(std::string nameIn): name(nameIn) {}
+  ~ModuleInfo_t();
+
+  std::string name;
+  std::shared_ptr<ModuleInfo_t> parentMod;
+  StrSet_t moduleAs;
+  std::set<std::string> invarRegs;
+  std::set<std::string> moduleInputs;
+  std::set<std::string> moduleOutputs;
+  std::set<std::string> moduleTrueRegs;
+  taintGen::VarWidth varWidth;
+  std::map<std::string, std::string> ssaTable;
+  std::map<std::string, std::vector<std::string>> reg2Slices;
+  std::map<std::string, std::string> nbTable;
+  std::map<std::string, 
+           std::pair<std::string, 
+                     std::vector<std::pair<std::string, 
+                                           std::string>>>> caseTable;
+  /// first key is wire/reg name, first of pair is instance name, 
+  /// second of pair is connected instance output port
+  std::map<std::string, std::pair<std::string, std::string>> wire2InsPortMp;
+  /// key is instance name, second key is input port name, 
+  /// value is connected wire
+  std::map<std::string, std::map<std::string, std::string>> insPort2wireMp;
+  std::map<std::string, std::string> ins2modMap;  
+  std::map<std::string, FuncInfo_t> funcTable;
+  std::map<std::string, uint32_t> reg2timeIdx;  
+  // first key is output, second key is input
+  std::map<std::string, 
+           std::map<std::string, uint32_t>> out2InDelayMp;
+};
+
 
 extern std::ofstream g_outFile;
 extern std::unordered_map<astNode*, uint32_t> CLEAN_QUEUE;
@@ -81,16 +129,17 @@ extern uint32_t g_instr_len;
 extern std::string DELIM;
 
 // for hierarchical store
-extern std::unordered_map<std::string, struct ModuleInfo_t*> g_moduleInfoMap;
+extern std::map<std::string, std::shared_ptr<ModuleInfo_t>> g_moduleInfoMap;
 extern std::string g_topModName;
 extern std::stack<std::string> g_instanceStk;
-extern struct ModuleInfo_t *g_curMod;
+extern std::stack<std::pair<std::string, std::shared_ptr<ModuleInfo_t>>> g_instancePairStk;
+extern std::shared_ptr<ModuleInfo_t> g_curMod;
 
 // llvm
-extern std::unique_ptr<llvm::LLVMContext> TheContext;
-extern std::unique_ptr<llvm::Module> TheModule;
+extern std::shared_ptr<llvm::LLVMContext> TheContext;
+extern std::shared_ptr<llvm::Module> TheModule;
 extern llvm::Function *TheFunction;
-extern std::unique_ptr<llvm::IRBuilder<>> Builder;
+extern std::shared_ptr<llvm::IRBuilder<>> Builder;
 
 } // end of namespace funcExtract
 #endif

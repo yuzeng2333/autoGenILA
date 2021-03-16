@@ -29,7 +29,7 @@ void module_expr(std::string line) {
     g_curMod = g_moduleInfoMap[g_currentModuleName];
   }
   else
-    g_curMod = new struct ModuleInfo_t;
+    g_curMod = std::make_unique<ModuleInfo_t>();
   g_moduleInfoMap.emplace(g_currentModuleName, g_curMod);
   g_curMod->name = g_currentModuleName;
   moduleName = g_currentModuleName;
@@ -44,13 +44,13 @@ void input_expr(std::string line) {
   std::string slice = m.str(2);
   std::string var = m.str(3);
 
-  moduleInputs.push_back(var);
+  g_curMod->moduleInputs.insert(var);
 
   bool insertDone;
   if(!slice.empty())
-    insertDone = g_varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+    insertDone = g_curMod->varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
   else
-    insertDone = g_varWidth.var_width_insert(var, 0, 0);
+    insertDone = g_curMod->varWidth.var_width_insert(var, 0, 0);
   //if (!insertDone) {
   //  std::cout << "insert failed in input case:" + line << std::endl;
   //  std::cout << "m.str(2):" + m.str(2) << std::endl;
@@ -76,9 +76,9 @@ void reg_expr(std::string line) {
 
   bool insertDone;
   if(!slice.empty())
-    insertDone = g_varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+    insertDone = g_curMod->varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
   else
-    insertDone = g_varWidth.var_width_insert(var, 0, 0);
+    insertDone = g_curMod->varWidth.var_width_insert(var, 0, 0);
   //if (!insertDone) {
   //  std::cout << "insert failed in reg case:" + line << std::endl;
   //  std::cout << "m.str(2):" + m.str(2) << std::endl;
@@ -98,9 +98,9 @@ void wire_expr(std::string line) {
 
   bool insertDone;
   if(!slice.empty())
-    insertDone = g_varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+    insertDone = g_curMod->varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
   else
-    insertDone = g_varWidth.var_width_insert(var, 0, 0);
+    insertDone = g_curMod->varWidth.var_width_insert(var, 0, 0);
   //if (!insertDone) {
   //  std::cout << "insert failed in wire case:" + line << std::endl;
   //  std::cout << "m.str(2):" + m.str(2) << std::endl;
@@ -125,9 +125,9 @@ void mem_expr(std::string line) {
 
   bool insertDone;
   if(!slice.empty())
-    insertDone = g_varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+    insertDone = g_curMod->varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
   else
-    insertDone = g_varWidth.var_width_insert(var, 0, 0);
+    insertDone = g_curMod->varWidth.var_width_insert(var, 0, 0);
   //if (!insertDone) {
   //  std::cout << "insert failed in mem case:" + line << std::endl;
   //  std::cout << "m.str(2):" + m.str(2) << std::endl;
@@ -156,9 +156,9 @@ void output_expr(std::string line) {
 
   bool insertDone;
   if(!slice.empty())
-    insertDone = g_varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+    insertDone = g_curMod->varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
   else
-    insertDone = g_varWidth.var_width_insert(var, 0, 0);
+    insertDone = g_curMod->varWidth.var_width_insert(var, 0, 0);
   //if (!insertDone) {
   //  std::cout << "insert failed in output case:" + line << std::endl;
   //  std::cout << "m.str(2):" + m.str(2) << std::endl;
@@ -219,7 +219,7 @@ void both_concat_expr(std::string line) {
   uint32_t startIdx = destTotalWidthNum - 1;
   uint32_t endIdx;
   moduleWires.insert("yuzeng"+yuzengIdxStr);
-  g_varWidth.var_width_insert("yuzeng"+yuzengIdxStr, startIdx, 0);
+  g_curMod->varWidth.var_width_insert("yuzeng"+yuzengIdxStr, startIdx, 0);
   std::string newAssign = "  assign yuzeng"+yuzengIdxStr+" = "+srcList+" ;";
 
   auto ret = g_curMod->ssaTable.emplace("yuzeng"+yuzengIdxStr, line);
@@ -233,7 +233,7 @@ void both_concat_expr(std::string line) {
     if(!is_number(destAndSlice)) {
       split_slice(destAndSlice, dest, destSlice);
 
-      auto destIdxPair = g_varWidth.get_idx_pair(dest, line);
+      auto destIdxPair = g_curMod->varWidth.get_idx_pair(dest, line);
       std::string destHighIdx  = toStr(destIdxPair.first);
       std::string destLowIdx   = toStr(destIdxPair.second);
 
@@ -311,7 +311,7 @@ void nb_expr(std::string line) {
   auto ret = g_curMod->nbTable.emplace(m.str(2), line);
   std::string dest, destSlice;
   split_slice(m.str(2), dest, destSlice);
-  moduleTrueRegs.push_back(dest);
+  g_curMod->moduleTrueRegs.insert(dest);
   if(!ret.second)
     toCout("Error in inserting ssaTable in nb for key: "+m.str(2));
 }
@@ -366,14 +366,14 @@ void nonblockif_expr(std::string line, std::ifstream &input) {
   split_slice(destAndSlice, dest, destSlice);
   split_slice(srcAndSlice, src, srcSlice);
   split_slice(condAndSlice, cond, condSlice);
-  moduleTrueRegs.push_back(dest);
+  g_curMod->moduleTrueRegs.insert(dest);
 
   std::string yuzengIdx = toStr(g_new_var++);
   std::string destNext = "yuzeng"+yuzengIdx;
   moduleWires.insert("yuzeng"+yuzengIdx);
   uint32_t localWidth = get_var_slice_width_simp(destAndSlice);
   bool insertDone;
-    insertDone = g_varWidth.var_width_insert(destNext, localWidth-1, 0);
+    insertDone = g_curMod->varWidth.var_width_insert(destNext, localWidth-1, 0);
   if (!insertDone) {
     std::cout << "insert failed: " + line << std::endl;
   }
@@ -418,7 +418,7 @@ void always_if_else_expr(std::string line, std::ifstream &input) {
 
   std::string dest, destSlice;
   split_slice(destAndSlice, dest, destSlice);
-  moduleTrueRegs.push_back(dest);
+  g_curMod->moduleTrueRegs.insert(dest);
 
   std::getline(input, line);
   if ( !std::regex_match(line, m, pElse) ) {
@@ -439,7 +439,7 @@ void always_if_else_expr(std::string line, std::ifstream &input) {
   std::string destNext = "yuzeng"+yuzengIdx;
   moduleWires.insert("yuzeng"+yuzengIdx);
   bool insertDone;
-    insertDone = g_varWidth.var_width_insert(destNext, localWidth-1, 0);
+    insertDone = g_curMod->varWidth.var_width_insert(destNext, localWidth-1, 0);
   if (!insertDone) {
     std::cout << "insert failed: " + line << std::endl;
   }
@@ -514,11 +514,12 @@ void submodule_expr(std::string firstLine, std::ifstream &input) {
       continue;
     wire2PortMp.emplace(m.str(2), m.str(3));
   }
+  g_curMod->insPort2wireMp.emplace(instanceName, std::map<std::string, std::string>{{}});
   for(auto pair : wire2PortMp) {
     std::string port = pair.first;
     std::string wire = pair.second;
     g_curMod->wire2InsPortMp.emplace(wire, std::make_pair(instanceName, port));
-    g_curMod->insPort2wireMp.emplace(instanceName, std::make_pair(port, wire));
+    g_curMod->insPort2wireMp[instanceName].emplace(port, wire);
   }
 }
 

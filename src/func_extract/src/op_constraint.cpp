@@ -11,8 +11,8 @@
 #define warn(a) LOG(WARNING) << a
 //#define llvmWidth(a, c) llvm::IntegerType::get(*c, a)
 //#define llvmInt(val, width, c) llvm::ConstantInt::get(llvmWidth(width, c), val, false);
-#define context std::unique_ptr<llvm::LLVMContext>
-#define builder std::unique_ptr<llvm::IRBuilder<>>
+#define context std::shared_ptr<llvm::LLVMContext>
+#define builder std::shared_ptr<llvm::IRBuilder<>>
 ///////////////////////////////////////////////////////////////////////////////
 //
 //  The main principle of making llvm::Value*/constraints
@@ -960,7 +960,7 @@ llvm::Value* add_one_case_branch_expr(astNode* const node, llvm::Value* &caseVar
 
 
 // for two operators
-llvm::Value* make_llvm_instr(std::unique_ptr<llvm::IRBuilder<>> &b, 
+llvm::Value* make_llvm_instr(std::shared_ptr<llvm::IRBuilder<>> &b, 
                              context &c, std::string op, 
                              llvm::Value* op1Expr, llvm::Value* op2Expr, 
                              uint32_t destWidth, uint32_t op1Width, uint32_t op2Width,

@@ -3,7 +3,7 @@
 #include "global_data_struct.h"
 #include <ctype.h>
 
-#define context std::unique_ptr<llvm::LLVMContext>
+#define context std::shared_ptr<llvm::LLVMContext>
 #define toStr(a) std::to_string(a)
 //#define llvmWidth(a, c) llvm::IntegerType::get(c, a)
 //#define llvmInt(b, a, c) llvm::ConstantInt::get(llvmWidth(a, c), b, false)
@@ -18,27 +18,27 @@ std::regex pHex("^(\\d+)'h([\\dabcdefx\\?]+)$");
 std::regex pDec("^(\\d+)'d([\\dx\\?]+)$");
 std::regex pBin("^(\\d+)'b([01x\\?]+)$");
 
-llvm::IntegerType* llvmWidth(uint32_t width, std::unique_ptr<llvm::LLVMContext> &c) {
+llvm::IntegerType* llvmWidth(uint32_t width, std::shared_ptr<llvm::LLVMContext> &c) {
   return llvm::IntegerType::get(*c, width);
 }
 
 
 llvm::Value* llvmInt(uint32_t value, uint32_t width, 
-                     std::unique_ptr<llvm::LLVMContext> &c) {
+                     std::shared_ptr<llvm::LLVMContext> &c) {
   return llvm::ConstantInt::get(llvm::IntegerType::get(*c, width), value, false);
 }
 
 
 llvm::Value* zext(llvm::Value* v1, uint32_t width,
-                 std::unique_ptr<llvm::LLVMContext> &c,
-                 std::unique_ptr<llvm::IRBuilder<>> &b) {
+                 std::shared_ptr<llvm::LLVMContext> &c,
+                 std::shared_ptr<llvm::IRBuilder<>> &b) {
   return b->CreateZExtOrTrunc(v1, llvmWidth(width, c));
 }
 
 
 llvm::Value* sext(llvm::Value* v1, uint32_t width,
-                 std::unique_ptr<llvm::LLVMContext> &c,
-                 std::unique_ptr<llvm::IRBuilder<>> &b) {
+                 std::shared_ptr<llvm::LLVMContext> &c,
+                 std::shared_ptr<llvm::IRBuilder<>> &b) {
   return b->CreateSExtOrTrunc(v1, llvmWidth(width, c));
 }
 
@@ -50,7 +50,7 @@ bool isAs(std::string var) {
 
 
 llvm::Value* long_bv_val(std::string formedBinVar, context &c,
-                         std::unique_ptr<llvm::IRBuilder<>> &b ) {
+                         std::shared_ptr<llvm::IRBuilder<>> &b ) {
   assert(is_number(formedBinVar));
   if(!is_formed_num(formedBinVar)) {
     toCout("Error: input to long_bv_val is not well-formed number: "+formedBinVar);
@@ -284,7 +284,7 @@ bool is_taint(std::string var) {
 
 
 bool is_clean(std::string var) {
-  return !is_taint(var) && ( isInput(pure(var)) || is_read_asv(pure(var)) );
+  return !is_taint(var) && ( is_input(pure(var)) || is_read_asv(pure(var)) );
 }
 
 
@@ -393,7 +393,7 @@ uint32_t get_lgc_hi(std::string varAndSlice) {
     else
       return get_end(varSlice);
   }
-  auto idxPairs = g_varWidth.get_idx_pair(var, "find_version_num for: "+var);
+  auto idxPairs = g_curMod->varWidth.get_idx_pair(var, "find_version_num for: "+var);
   return idxPairs.first;
 }
 
@@ -414,7 +414,7 @@ uint32_t get_ltr_hi(std::string varAndSlice) {
   split_slice(varAndSlice, var, varSlice);
   if(!varSlice.empty())
     return get_end(varSlice);
-  auto idxPairs = g_varWidth.get_idx_pair(var, "find_version_num for: "+var);
+  auto idxPairs = g_curMod->varWidth.get_idx_pair(var, "find_version_num for: "+var);
   return idxPairs.first;
 }
 
@@ -432,7 +432,7 @@ uint32_t get_lgc_lo(std::string varAndSlice) {
     else
       return get_begin(varSlice);
   }
-  auto idxPairs = g_varWidth.get_idx_pair(var, "find_version_num for: "+var);
+  auto idxPairs = g_curMod->varWidth.get_idx_pair(var, "find_version_num for: "+var);
   return idxPairs.second;
 }
 
@@ -446,7 +446,7 @@ uint32_t get_ltr_lo(std::string varAndSlice) {
 
   if(!varSlice.empty())
     return get_begin(varSlice);
-  auto idxPairs = g_varWidth.get_idx_pair(var, "find_version_num for: "+var);
+  auto idxPairs = g_curMod->varWidth.get_idx_pair(var, "find_version_num for: "+var);
   return idxPairs.second;
 }
 
@@ -658,7 +658,7 @@ int try_stoi(std::string num) {
 // ATTENTION: for func_extract, you can only use get_var_slice_width_simp
 // get_var_slice_width cannot be used!!
 uint32_t get_var_slice_width_simp( std::string varAndSlice) {
-  return get_var_slice_width( varAndSlice, g_varWidth);
+  return get_var_slice_width( varAndSlice, g_curMod->varWidth);
 }
 
 
@@ -701,8 +701,8 @@ llvm::Value* get_arg(std::string regName) {
 
 
 llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low, 
-                      std::unique_ptr<llvm::LLVMContext> &c, 
-                      std::unique_ptr<llvm::IRBuilder<>> &b) {
+                      std::shared_ptr<llvm::LLVMContext> &c, 
+                      std::shared_ptr<llvm::IRBuilder<>> &b) {
 
   uint32_t len = high - low + 1;
   auto IntTy = llvm::IntegerType::get(*c, high+2);
@@ -720,8 +720,8 @@ llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low,
 
 
 llvm::Value* extract(llvm::Value* in, uint32_t high, uint32_t low, 
-                      std::unique_ptr<llvm::LLVMContext> &c, 
-                      std::unique_ptr<llvm::IRBuilder<>> &b, 
+                      std::shared_ptr<llvm::LLVMContext> &c, 
+                      std::shared_ptr<llvm::IRBuilder<>> &b, 
                       const llvm::Twine &name) {
 
   uint32_t inWidth = llvm::dyn_cast<llvm::IntegerType>(in->getType())->getBitWidth();
@@ -745,16 +745,16 @@ llvm::Value* extract(llvm::Value* in, uint32_t high, uint32_t low,
 
 
 llvm::Value* extract(llvm::Value* in, uint32_t high, uint32_t low, 
-                      std::unique_ptr<llvm::LLVMContext> &c, 
-                      std::unique_ptr<llvm::IRBuilder<>> &b, 
+                      std::shared_ptr<llvm::LLVMContext> &c, 
+                      std::shared_ptr<llvm::IRBuilder<>> &b, 
                       const std::string &name) {
 
   return extract(in, high, low, c, b, llvm::Twine(name));
 }
 
 llvm::Value* concat_value(llvm::Value* val1, llvm::Value* val2, 
-                          std::unique_ptr<llvm::LLVMContext> &c,
-                          std::unique_ptr<llvm::IRBuilder<>> &b) {
+                          std::shared_ptr<llvm::LLVMContext> &c,
+                          std::shared_ptr<llvm::IRBuilder<>> &b) {
   uint32_t val1Width = llvm::dyn_cast<llvm::IntegerType>(val1->getType())->getBitWidth();
   uint32_t val2Width = llvm::dyn_cast<llvm::IntegerType>(val2->getType())->getBitWidth();
   std::string name1 = val1->getName();
@@ -769,9 +769,34 @@ llvm::Value* concat_value(llvm::Value* val1, llvm::Value* val2,
 }
 
 
-bool is_x(std::string var) {
+bool is_x(const std::string &var) {
   size_t quotePos = var.find("'");
   return quotePos != std::string::npos && var.substr(quotePos+2, 1) == "x";
+}
+
+
+bool is_input(const std::string &var) {
+  auto it = std::find( g_curMod->moduleInputs.begin(), g_curMod->moduleInputs.end(), var );
+  return it != g_curMod->moduleInputs.end();
+}
+
+
+bool is_reg(std::string &var) {
+  if(var.back() == ' ')
+    var.pop_back();
+  auto it = std::find( moduleTrueRegs.begin(), moduleTrueRegs.end(), var );
+  return it != moduleTrueRegs.end();
+}
+
+
+bool is_submod_output(const std::string &var) {
+  return g_curMod->wire2InsPortMp.find(var) != g_curMod->wire2InsPortMp.end();
+}
+
+
+std::shared_ptr<ModuleInfo_t> get_mod_info(std::string insName) {
+  std::string modName = g_curMod->ins2modMap[insName];
+  return g_moduleInfoMap[modName];
 }
 
 } // end of namespace funcExtract

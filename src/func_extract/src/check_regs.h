@@ -15,7 +15,7 @@
 #include <fstream>
 #include <time.h>
 #include "z3++.h"
-#define context std::unique_ptr<llvm::LLVMContext>
+#define context std::shared_ptr<llvm::LLVMContext>
 
 
 using namespace z3;
@@ -38,16 +38,16 @@ void print_llvm_ir_without_submodules(std::string destAndSlice, uint32_t bound, 
 void check_single_reg_and_slice(std::string regAndSlice, uint32_t cycleCnt, uint32_t instrIdx);
 
 llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
-                            std::unique_ptr<llvm::IRBuilder<>> &b,
+                            std::shared_ptr<llvm::IRBuilder<>> &b,
                             uint32_t bound);
 
 llvm::Value* add_nb_constraint(astNode* const node, 
                                uint32_t timeIdx, context &c, 
-                               std::unique_ptr<llvm::IRBuilder<>> &b,
+                               std::shared_ptr<llvm::IRBuilder<>> &b,
                                uint32_t bound);
 
 llvm::Value* add_ssa_constraint(astNode* const node, uint32_t timeIdx, context &c,  
-                                std::unique_ptr<llvm::IRBuilder<>> &b, uint32_t bound);
+                                std::shared_ptr<llvm::IRBuilder<>> &b, uint32_t bound);
 
 void add_child_constraint(astNode* const parentNode, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve);
 

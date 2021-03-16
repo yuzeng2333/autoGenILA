@@ -10,12 +10,12 @@ namespace funcExtract {
 
 #define SV std::vector<std::string>
 #define toStr(a) std::to_string(a)
-#define context std::unique_ptr<llvm::LLVMContext>
+#define context std::shared_ptr<llvm::LLVMContext>
 #define llvmWidth(a, c) llvm::IntegerType::get(*c, a)
 #define llvmInt(val, width, c) llvm::ConstantInt::get(llvmWidth(width, c), val, false);
 
-//static std::unique_ptr<KaleidoscopeJIT> TheJIT;
-//static std::map<std::string, std::unique_ptr<llvm::PrototypeAST>> FunctionProtos;
+//static std::shared_ptr<KaleidoscopeJIT> TheJIT;
+//static std::map<std::string, std::shared_ptr<llvm::PrototypeAST>> FunctionProtos;
 
 std::stack<std::string> g_instanceStk;
 uint32_t bound_limit;
@@ -47,10 +47,10 @@ bool g_ignoreSubModules=false;
 bool g_seeInputs;
 uint32_t g_maxDelay = 0;
 // for llvm
-std::unique_ptr<llvm::LLVMContext> TheContext;
-std::unique_ptr<llvm::Module> TheModule;
+std::shared_ptr<llvm::LLVMContext> TheContext;
+std::shared_ptr<llvm::Module> TheModule;
 llvm::Function *TheFunction;
-std::unique_ptr<llvm::IRBuilder<>> Builder;
+std::shared_ptr<llvm::IRBuilder<>> Builder;
 
 // assume ssaTable and nbTable have been filled
 void check_all_regs() {
@@ -94,6 +94,7 @@ void print_llvm_ir(std::string destAndSlice,
   // FIXME: change the following model name
   TheModule = llvm::make_unique<llvm::Module>("mod_;_"+destAndSlice, *TheContext);
   Builder = llvm::make_unique<llvm::IRBuilder<>>(*TheContext);
+  g_curMod = g_moduleInfoMap[g_topModule];
 
   /// declare function
   // input types
@@ -106,7 +107,8 @@ void print_llvm_ir(std::string destAndSlice,
       argTy.push_back(llvm::IntegerType::get(*TheContext, width));
     }
   // push regs
-  for(auto it = moduleTrueRegs.begin(); it != moduleTrueRegs.end(); it++) {
+  for(auto it = g_curMod->moduleTrueRegs.begin(); 
+        it != g_curMod->moduleTrueRegs.end(); it++) {
     uint32_t width = get_var_slice_width_simp(*it);
     argTy.push_back(llvm::IntegerType::get(*TheContext, width));
   }
@@ -128,7 +130,7 @@ void print_llvm_ir(std::string destAndSlice,
       (TheFunction->args().begin()+idx++)->setName(*it+DELIM+toStr(i));
     }
 
-  for(auto it = moduleTrueRegs.begin(); it != moduleTrueRegs.end(); it++) {
+  for(auto it = g_curMod->moduleTrueRegs.begin(); it != g_curMod->moduleTrueRegs.end(); it++) {
     toCoutVerb("set func arg: "+*it+DELIM+toStr(bound));
     (TheFunction->args().begin()+idx++)->setName(*it+DELIM+toStr(bound));
   }
@@ -420,7 +422,7 @@ void print_llvm_ir(std::string destAndSlice,
 //            it just returns expr for the slice. Otherwise, it returns expr for
 //            the whole var.
 llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
-                            std::unique_ptr<llvm::IRBuilder<>> &b,
+                            std::shared_ptr<llvm::IRBuilder<>> &b,
                             uint32_t bound ) {
   // Attention: varAndSlice might have a slice, a directly-assigned varAndSlice
   std::string varAndSlice = node->dest;
@@ -433,10 +435,10 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
   }
 
   llvm::Value* retExpr;
-  if ( isInput(varAndSlice) ) { // input_t is always 0
+  if ( is_input(varAndSlice) ) { // input_t is always 0
     retExpr = input_constraint(node, timeIdx, c, b, bound);
   }
-  else if( isReg(varAndSlice) ) { // AS case is moved to add_nb_constraint
+  else if( is_reg(varAndSlice) ) { // AS case is moved to add_nb_constraint
     retExpr = add_nb_constraint(node, timeIdx, c, b, bound);
   }
   else if( is_number(varAndSlice) ) { // num_t is always 0
@@ -458,7 +460,7 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
 
 llvm::Value* add_nb_constraint(astNode* const node, 
                                uint32_t timeIdx, context &c, 
-                               std::unique_ptr<llvm::IRBuilder<>> &b,
+                               std::shared_ptr<llvm::IRBuilder<>> &b,
                                uint32_t bound ) {
   std::string dest = node->dest;
   if(dest.compare("mem_do_rdata") == 0 && timeIdx == bound) {
@@ -514,7 +516,7 @@ llvm::Value* add_nb_constraint(astNode* const node,
 
 
 llvm::Value* add_ssa_constraint(astNode* const node, uint32_t timeIdx, context &c,  
-                                std::unique_ptr<llvm::IRBuilder<>> &b, uint32_t bound) {
+                                std::shared_ptr<llvm::IRBuilder<>> &b, uint32_t bound) {
   toCoutVerb("Add ssa constraint for: " + node->dest+" ------  time: "+toStr(timeIdx));
   std::string var = node->dest;
 
@@ -546,7 +548,7 @@ llvm::Value* add_ssa_constraint(astNode* const node, uint32_t timeIdx, context &
 
 
 void add_child_constraint(astNode* const parentNode, uint32_t timeIdx, context &c, 
-                          std::unique_ptr<llvm::IRBuilder<>> &b, uint32_t bound) {
+                          std::shared_ptr<llvm::IRBuilder<>> &b, uint32_t bound) {
   abort();
   for( astNode* node: parentNode->childVec ) {
     add_constraint(node, timeIdx, c, b, bound);

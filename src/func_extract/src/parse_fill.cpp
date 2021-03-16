@@ -11,14 +11,14 @@ using namespace syntaxPatterns;
 namespace funcExtract {
 
 // global variables
-std::unordered_map<std::string, struct ModuleInfo_t*> g_moduleInfoMap;
+std::map<std::string, std::shared_ptr<ModuleInfo_t>> g_moduleInfoMap;
 std::string g_topModName;
-struct ModuleInfo_t *g_curMod;
+std::shared_ptr<ModuleInfo_t> g_curMod;
 std::set<std::string> moduleWriteAs;
 uint32_t g_new_var;
 uint32_t g_instr_len;
 //std::unordered_map<std::string, astNode*> g_asSliceRoot;
-std::unordered_map<std::string, astNode*> g_varNode;
+std::map<std::string, astNode*> g_varNode;
 // each element is a map from input signal to its value
 // x means the value can be arbitrary
 std::vector<struct InstrInfo_t> g_instrInfo;
@@ -33,7 +33,7 @@ std::unordered_map<std::string, uint32_t> g_moduleOutportTime;
 std::unordered_map<std::string, uint32_t> g_moduleInportTime;
 Str2StrVecMap_t g_moduleInputsMap;
 Str2StrVecMap_t g_moduleOutputsMap;
-VarWidth g_varWidth;
+//VarWidth g_varWidth;
 
 std::string g_mem2acclData;
 std::string g_accl2memAddr;
@@ -50,7 +50,6 @@ void clear_global_vars() {
   moduleWires.clear();
   moduleMems.clear();
   memDims.clear();
-  g_varWidth.clear();
   moduleWriteAs.clear();
   g_new_var = 0;
 }
@@ -86,12 +85,15 @@ void parse_verilog(std::string fileName) {
   }
   std::string line;
   std::smatch match;
+  g_curMod = std::make_unique<ModuleInfo_t>();
+  g_curMod->name = g_topModName;
+  g_moduleInfoMap.emplace(g_topModName, g_curMod);
   while( std::getline(input, line) ) {
     //toCout(line);
     if(line.find("_0699_") != std::string::npos) {
       toCout("Find it!");
     }
-    fill_var_width(line, g_varWidth);
+    fill_var_width(line, g_curMod->varWidth);
     //toCout(line);
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       case_expr(line, input);
@@ -383,7 +385,7 @@ void read_module_info() {
   ModuleInfo_t *moduleInfo = new ModuleInfo_t;
   bool seeOutput = false;
   std::string outVar;  
-  std::unordered_map<std::string, uint32_t> inputDelayMap;
+  std::map<std::string, uint32_t> inputDelayMap;
   while(std::getline(input, line)) {
     if(is_comment_line(line))
       continue;
