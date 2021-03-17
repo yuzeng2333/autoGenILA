@@ -8,6 +8,9 @@ using namespace taintGen;
 
 namespace funcExtract {
 
+//TODO: the largest timeIdx of some function may exceed bound
+//TODO: the largest timeIdx of some function may exceed bound
+
 #define SV std::vector<std::string>
 #define toStr(a) std::to_string(a)
 #define context std::shared_ptr<llvm::LLVMContext>
@@ -101,7 +104,7 @@ void print_llvm_ir(std::string destAndSlice,
   std::vector<llvm::Type *> argTy;
   // push inputs
   for(uint32_t i = 0; i <= bound+1; i++)  
-    for(auto it = moduleInputs.begin(); it != moduleInputs.end(); it++) {
+    for(auto it = g_curMod->moduleInputs.begin(); it != g_curMod->moduleInputs.end(); it++) {
       uint32_t width = get_var_slice_width_simp(*it);
       // FIXME the start and end index may be wrong
       argTy.push_back(llvm::IntegerType::get(*TheContext, width));
@@ -124,7 +127,7 @@ void print_llvm_ir(std::string destAndSlice,
   uint32_t idx = 0;
   // FIXME the start and end index may be wrong  
   for(uint32_t i = 0; i <= bound+1; i++)  
-    for(auto it = moduleInputs.begin(); it != moduleInputs.end(); it++) {
+    for(auto it = g_curMod->moduleInputs.begin(); it != g_curMod->moduleInputs.end(); it++) {
       uint32_t width = get_var_slice_width_simp(*it);
       toCoutVerb("set func arg: "+*it+DELIM+toStr(i));
       (TheFunction->args().begin()+idx++)->setName(*it+DELIM+toStr(i));
@@ -502,7 +505,7 @@ llvm::Value* add_nb_constraint(astNode* const node,
   // end of if
 
   // if timeIdx = bound, then return function input or rst/norm value
-  if(g_invarRegs.find(dest) == g_invarRegs.end()
+  if(g_curMod->invarRegs.find(dest) == g_curMod->invarRegs.end()
       && g_curMod->moduleAs.find(dest) != g_curMod->moduleAs.end())
     return get_arg(timed_name(dest, timeIdx));
   else {

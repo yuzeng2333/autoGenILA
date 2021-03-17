@@ -344,7 +344,7 @@ void read_in_instructions(std::string fileName) {
           break;
         case InvarRegs:
           {
-            g_invarRegs.insert(line);
+            g_curMod->invarRegs.insert(line);
           }
           break;
         case TopMod:
@@ -355,6 +355,10 @@ void read_in_instructions(std::string fileName) {
           break;
       }
     }
+  }
+  if(g_topModName.empty()) {
+    toCout("Error: top module name is not set!");
+    abort();
   }
 }
 

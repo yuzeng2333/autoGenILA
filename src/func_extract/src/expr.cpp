@@ -487,10 +487,6 @@ void submodule_expr(std::string firstLine, std::ifstream &input) {
   }
   std::string moduleName = m.str(2);
   std::string instanceName = m.str(3);
-  if(g_moduleInfoMap.find(moduleName) == g_moduleInfoMap.end()) {
-    toCout("Error: cannot find moduleInfo for: "+moduleName);
-    abort();
-  }
 
   // to be deleted
   //if(g_wire2ModulePort.find(instanceName) == g_wire2ModulePort.end())
