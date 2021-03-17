@@ -147,7 +147,7 @@ void print_llvm_ir(std::string destAndSlice,
   clean_data();
   std::ofstream goalFile;
   goalFile.open(g_path+"/goal.txt", std::ofstream::app);
-  if(g_varNode.find(destAndSlice) == g_varNode.end() ) {
+  if(g_varNode.find(destAndSlice) == g_varNode.end()) {
     toCout("Error: the key does not exist in the map: |"+destAndSlice+"|");
     abort();
   } 

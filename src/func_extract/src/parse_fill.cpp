@@ -12,7 +12,7 @@ namespace funcExtract {
 
 // global variables
 std::map<std::string, std::shared_ptr<ModuleInfo_t>> g_moduleInfoMap;
-std::string g_topModName;
+std::string g_topModule;
 std::shared_ptr<ModuleInfo_t> g_curMod;
 std::set<std::string> moduleWriteAs;
 std::set<std::string> g_invarRegs;
@@ -88,9 +88,9 @@ void parse_verilog(std::string fileName) {
   std::string line;
   std::smatch match;
   //g_curMod = std::make_unique<ModuleInfo_t>();
-  //g_curMod->name = g_topModName;
+  //g_curMod->name = g_topModule;
   //g_curMod->invarRegs = g_invarRegs;
-  //g_moduleInfoMap.emplace(g_topModName, g_curMod);
+  //g_moduleInfoMap.emplace(g_topModule, g_curMod);
   while( std::getline(input, line) ) {
     //toCout(line);
     if(line.find("_0699_") != std::string::npos) {
@@ -353,13 +353,13 @@ void read_in_instructions(std::string fileName) {
         case TopMod:
           {
             remove_two_end_space(line);
-            g_topModName = line;
+            g_topModule = line;
           }
           break;
       }
     }
   }
-  if(g_topModName.empty()) {
+  if(g_topModule.empty()) {
     toCout("Error: top module name is not set!");
     abort();
   }

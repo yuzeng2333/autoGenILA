@@ -61,7 +61,6 @@ struct ModuleInfo_t {
   ~ModuleInfo_t();
 
   std::string name;
-  std::pair<std::string, uint32_t> rootTime;
   std::shared_ptr<ModuleInfo_t> parentMod;
   StrSet_t moduleAs;
   std::set<std::string> invarRegs;
@@ -137,7 +136,7 @@ extern std::string DELIM;
 
 // for hierarchical store
 extern std::map<std::string, std::shared_ptr<ModuleInfo_t>> g_moduleInfoMap;
-extern std::string g_topModName;
+extern std::string g_topModule;
 extern std::stack<std::string> g_instanceStk;
 extern std::stack<std::pair<std::string, std::shared_ptr<ModuleInfo_t>>> g_instancePairStk;
 extern std::shared_ptr<ModuleInfo_t> g_curMod;

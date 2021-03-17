@@ -32,8 +32,10 @@ void module_expr(std::string line) {
     g_curMod = std::make_unique<ModuleInfo_t>();
   g_moduleInfoMap.emplace(g_currentModuleName, g_curMod);
   g_curMod->name = g_currentModuleName;
-  if(g_currentModuleName == g_topModName)
+  if(g_currentModuleName == g_topModule) {
     g_curMod->invarRegs = g_invarRegs;
+    g_curMod->moduleAs = moduleAs;
+  }
 }
 
 
@@ -511,12 +513,14 @@ void submodule_expr(std::string firstLine, std::ifstream &input) {
       continue;
     wire2PortMp.emplace(m.str(2), m.str(3));
   }
-  g_curMod->insPort2wireMp.emplace(instanceName, std::map<std::string, std::string>{{}});
   for(auto pair : wire2PortMp) {
     std::string port = pair.first;
     std::string wire = pair.second;
     g_curMod->wire2InsPortMp.emplace(wire, std::make_pair(instanceName, port));
-    g_curMod->insPort2wireMp[instanceName].emplace(port, wire);
+    if( g_curMod->insPort2wireMp.find(instanceName) == g_curMod->insPort2wireMp.end() )
+      g_curMod->insPort2wireMp.emplace(instanceName, std::map<std::string, std::string>{{port, wire}});
+    else
+      g_curMod->insPort2wireMp[instanceName].emplace(port, wire);
   }
 }
 

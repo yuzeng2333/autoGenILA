@@ -996,8 +996,11 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     subMod->out2FuncMp.emplace(outPort, func);
     // make bb for the function
     llvm::BasicBlock *localBB = llvm::BasicBlock::Create(*c, "bb_;_"+modName+"_$"+outPort, func);
-    b->SetInsertPoint(localBB);    
+    b->SetInsertPoint(localBB);
+    auto parentMod = g_curMod;
+    g_curMod = subMod;
     llvm::Value* ret = add_constraint(subMod->out2RootNodeMp[outPort], 0, c, b, bound);
+    g_curMod = parentMod;
     // TODO: modify input_constraint
     Builder->CreateRet(ret);
     llvm::verifyFunction(*func);
