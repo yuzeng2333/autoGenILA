@@ -74,6 +74,9 @@ llvm::Value* add_one_case_branch_expr(astNode* const node, llvm::Value* &caseVar
                                       builder &b, uint32_t bound, 
                                       const std::string &destTimed);
 
+llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c, 
+                               builder &b, uint32_t bound);
+
 expr func_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve);
 
 llvm::Value* make_llvm_instr(std::shared_ptr<llvm::IRBuilder<>> &b, 

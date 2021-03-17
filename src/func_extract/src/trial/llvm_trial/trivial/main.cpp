@@ -166,13 +166,39 @@ int main() {
   //ret = Builder->CreateLShr(a, 2);
   auto cond = Builder->CreateICmpEQ(a, b);
   auto cond2 = Builder->CreateICmpEQ(c, b);
-  ret = Builder->CreateSelect(cond, a, b);
+
+  // make a new function
+  std::vector<llvm::Type *> IntType;
+  IntType.push_back(Int4Ty);
+  IntType.push_back(Int4Ty);
+
+  llvm::FunctionType *FT2 =
+    llvm::FunctionType::get(Int4Ty, IntType, false);
+  llvm::Function *func = 
+    llvm::Function::Create(FT2, llvm::Function::InternalLinkage, "sub_mod", TheModule.get());
+  llvm::BasicBlock *bb = llvm::BasicBlock::Create(*TheContext, "bb", func);
+  Builder->SetInsertPoint(bb);  
+  auto arg1 = func->args().begin();
+  auto arg2 = func->args().begin()+1;
+  auto funcRet = Builder->CreateAdd(arg1, arg2);
+  Builder->CreateRet(funcRet);
+  // end of basicblock filling
+
+  Builder->SetInsertPoint(BB);  
+  std::vector<llvm::Value*> args;
+  args.push_back(a);
+  args.push_back(b);
+  ret = Builder->CreateCall(FT2, func, args, llvm::Twine("sub_func"));
+
+  //ret = Builder->CreateSelect(cond, a, b);
 
   cond->replaceAllUsesWith(cond2);
   llvm::dyn_cast<llvm::Instruction>(cond)->eraseFromParent();
 
   /// end of code segment
   Builder->CreateRet(ret);
+
+
   llvm::verifyFunction(*TheFunction);
   llvm::verifyModule(*TheModule);
   llvm::errs() << *TheModule;

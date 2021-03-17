@@ -164,7 +164,8 @@ int try_stoi(std::string num);
 
 std::string get_pure_num(std::string formedNum);
 
-uint32_t get_var_slice_width_simp( std::string varAndSlice);
+uint32_t get_var_slice_width_simp(std::string varAndSlice, 
+                                  const std::shared_ptr<ModuleInfo_t> &mod=g_curMod);
 
 bool is_comment_line(std::string &line);
 

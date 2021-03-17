@@ -1,3 +1,4 @@
+
 #include "helper.h"
 #include "parse_fill.h"
 #include "global_data_struct.h"
@@ -657,8 +658,9 @@ int try_stoi(std::string num) {
 
 // ATTENTION: for func_extract, you can only use get_var_slice_width_simp
 // get_var_slice_width cannot be used!!
-uint32_t get_var_slice_width_simp( std::string varAndSlice) {
-  return get_var_slice_width( varAndSlice, g_curMod->varWidth);
+uint32_t get_var_slice_width_simp(std::string varAndSlice, 
+                                  const std::shared_ptr<ModuleInfo_t> &mod) {
+  return get_var_slice_width( varAndSlice, mod->varWidth);
 }
 
 

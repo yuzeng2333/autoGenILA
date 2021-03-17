@@ -51,7 +51,7 @@ std::shared_ptr<llvm::LLVMContext> TheContext;
 std::shared_ptr<llvm::Module> TheModule;
 llvm::Function *TheFunction;
 std::shared_ptr<llvm::IRBuilder<>> Builder;
-
+llvm::BasicBlock *BB;
 // assume ssaTable and nbTable have been filled
 void check_all_regs() {
   toCout("### Begin check_all_regs");
@@ -136,7 +136,7 @@ void print_llvm_ir(std::string destAndSlice,
   }
 
   // basic block
-  llvm::BasicBlock *BB = llvm::BasicBlock::Create(*TheContext, "bb_;_"+destAndSlice, TheFunction);
+  BB = llvm::BasicBlock::Create(*TheContext, "bb_;_"+destAndSlice, TheFunction);
   Builder->SetInsertPoint(BB);
 
   g_ignoreSubModules = false;
@@ -450,6 +450,9 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
   //else if( is_func_output(varAndSlice) ) {
   //  retExpr = func_constraint(node, timeIdx, c, s, g, bound, isSolve);
   //}
+  else if( is_submod_output(varAndSlice) ) {
+    retExpr = submod_constraint(node, timeIdx, c, b, bound);
+  }
   else { // it is wire
     retExpr = add_ssa_constraint(node, timeIdx, c, b, bound);
   }

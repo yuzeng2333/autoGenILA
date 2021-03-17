@@ -334,9 +334,9 @@ void add_input_node(std::string input, uint32_t timeIdx, astNode* const node) {
     node->srcVec = SV{wireName};
     std::string rootName = g_curMod->rootTime.first;
     if(g_curMod->out2LeafNodeMp.find(rootName) == g_curMod->out2LeafNodeMp.end())
-      g_curMod->out2LeafNodeMp.emplace(rootName, std::set<astNode*>{node});
+      g_curMod->out2LeafNodeMp.emplace(rootName, std::vector<astNode*>{node});
     else
-      g_curMod->out2LeafNodeMp[rootName].insert(node);
+      g_curMod->out2LeafNodeMp[rootName].push_back(node);
   }
 }
 

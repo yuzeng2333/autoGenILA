@@ -117,7 +117,7 @@ llvm::Value* var_expr(std::string varAndSlice, uint32_t timeIdx, context &c,
     }
     assert(timeIdx == g_maxDelay + 1);    
     llvm::Value* ret = get_arg(var);
-    return extract(ret, hi, lo, c, Builder, llvm::Twine(varAndSlice));
+    return extract(ret, hi, lo, c, Builder, llvm::Twine(varTimed));
   }
   else {
     if(isTaint)
@@ -283,7 +283,7 @@ llvm::Value* single_expr(std::string value, context &c, std::string varName,
     uint32_t totalWidth = get_var_slice_width_simp(varName);
     std::string varTimed = varName + DELIM + toStr(timeIdx);
     llvm::Value* val = get_arg(varTimed);
-    return extract(val, idx, idx-localWidth+1, c, b, llvm::Twine(varName));
+    return extract(val, idx, idx-localWidth+1, c, b, llvm::Twine(varTimed));
     //return c.bv_const((varTimed).c_str(), totalWidth).extract(idx, idx-localWidth+1);
   }
   else if(is_number(value)) {
@@ -382,7 +382,9 @@ llvm::Value* two_op_constraint(astNode* const node, uint32_t timeIdx, context &c
   //assert(isReduceOp || destWidthNum >= opWidthNum);
 
   // add llvm::Value*ession to s or g
-  return make_llvm_instr(b, c, node->op, op1Expr, op2Expr, destWidthNum, op1WidthNum, op2WidthNum, llvm::Twine(destAndSlice));
+  std::string destTimed = timed_name(destAndSlice, timeIdx);
+  return make_llvm_instr(b, c, node->op, op1Expr, op2Expr, 
+                         destWidthNum, op1WidthNum, op2WidthNum, llvm::Twine(destTimed));
 }
 
 
@@ -411,7 +413,8 @@ llvm::Value* one_op_constraint(astNode* const node, uint32_t timeIdx,
   else
     op1Expr = extract(tmpExpr, op1Hi, op1Lo, c, b, op1AndSlice);
 
-  return make_llvm_instr(b, c, node->op, op1Expr, op1WidthNum, llvm::Twine(destAndSlice));
+  std::string destTimed = timed_name(destAndSlice, timeIdx);
+  return make_llvm_instr(b, c, node->op, op1Expr, op1WidthNum, llvm::Twine(destTimed));
 }
 
 
@@ -439,7 +442,8 @@ llvm::Value* reduce_one_op_constraint(astNode* const node, uint32_t timeIdx,
   else
     op1Expr = extract(add_constraint(node->childVec[0], timeIdx, c, b, bound), op1Hi, op1Lo, c, b, op1AndSlice);
 
-  return make_llvm_instr(b, c, node->op, op1Expr, op1WidthNum, llvm::Twine(destAndSlice));  
+  std::string destTimed = timed_name(destAndSlice, timeIdx);
+  return make_llvm_instr(b, c, node->op, op1Expr, op1WidthNum, llvm::Twine(destTimed));  
 }
 
 
@@ -841,7 +845,7 @@ llvm::Value* case_constraint(astNode* const node, uint32_t timeIdx,
   llvm::Value* elseRet = add_one_case_branch_expr(node, caseVarExpr, 3, timeIdx, 
                                                   c, b, bound, destAndSliceTimed);
 
-  return b->CreateSelect(iteCond, thenRet, elseRet, llvm::Twine(destAndSlice));
+  return b->CreateSelect(iteCond, thenRet, elseRet, llvm::Twine(destTimed));
 }
 
 
@@ -957,6 +961,64 @@ llvm::Value* add_one_case_branch_expr(astNode* const node, llvm::Value* &caseVar
 //    return var_expr(destAndSlice, timeIdx, c, false);
 //  }
 //}
+
+
+llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c, 
+                               builder &b, uint32_t bound) {
+  std::string destAndSlice = node->dest;
+  //std::string dest, destSlice;
+  //split_slice(destAndSlice, dest, destSlice);
+
+  auto pair = g_curMod->wire2InsPortMp[destAndSlice];
+  std::string insName = pair.first;
+  assert(insName == node->op);
+  std::string outPort = pair.second;
+  auto subMod = get_mod_info(insName);
+  std::string modName = subMod->name;
+
+  llvm::FunctionType *FT;
+  llvm::Function *func;
+  if(subMod->out2FuncMp.find(outPort) != subMod->out2FuncMp.end()) {
+    func = subMod->out2FuncMp[outPort];
+    FT = func->getFunctionType();
+  }
+  else {
+    // make the func
+    auto retTy = llvm::IntegerType::get(*c, get_var_slice_width_simp(destAndSlice));
+    std::vector<llvm::Type *> argTy;
+    for(auto leafNode : subMod->out2LeafNodeMp[outPort]) {
+      uint32_t width = get_var_slice_width_simp(leafNode->dest, subMod);
+      argTy.push_back(llvm::IntegerType::get(*c, width));
+    }
+    FT = llvm::FunctionType::get(retTy, argTy, false);
+    func = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
+           "func_;_"+modName+"_$"+outPort, TheModule.get());
+    subMod->out2FuncMp.emplace(outPort, func);
+    // make bb for the function
+    llvm::BasicBlock *localBB = llvm::BasicBlock::Create(*c, "bb_;_"+modName+"_$"+outPort, func);
+    b->SetInsertPoint(localBB);    
+    llvm::Value* ret = add_constraint(subMod->out2RootNodeMp[outPort], 0, c, b, bound);
+    // TODO: modify input_constraint
+    Builder->CreateRet(ret);
+    llvm::verifyFunction(*func);
+    llvm::verifyModule(*TheModule);
+    b->SetInsertPoint(BB);
+  }
+  std::vector<llvm::Value*> args;
+  assert(node->srcVec.size() == node->childVec.size());
+  for(uint32_t i = 0; i < node->srcVec.size(); i++) {
+    std::string varAndSlice = node->srcVec[i];
+    std::string var, varSlice;
+    split_slice(varAndSlice, var, varSlice);
+    uint32_t hi = get_lgc_hi(varAndSlice);
+    uint32_t lo = get_lgc_lo(varAndSlice);
+    astNode *child = node->childVec[i];
+    llvm::Value* srcVal = add_constraint(child, child->destTime, c, b, bound);
+    args.push_back(extract(srcVal, hi, lo, c, b));
+  }
+  std::string destTimed = timed_name(destAndSlice, timeIdx);  
+  return b->CreateCall(FT, func, args, llvm::Twine(destTimed));
+}
 
 
 // for two operators

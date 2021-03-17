@@ -71,7 +71,9 @@ struct ModuleInfo_t {
   taintGen::VarWidth varWidth;
   // only sub-modules has the two data below
   std::map<std::string, astNode*> out2RootNodeMp;
-  std::map<std::string, std::set<astNode*>> out2LeafNodeMp;
+  std::map<std::string, std::vector<astNode*>> out2LeafNodeMp;
+  std::map<std::string, llvm::Function*> out2FuncMp;
+
   std::map<std::string, std::string> ssaTable;
   std::map<std::string, std::vector<std::string>> reg2Slices;
   std::map<std::string, std::string> nbTable;
@@ -145,6 +147,6 @@ extern std::shared_ptr<llvm::LLVMContext> TheContext;
 extern std::shared_ptr<llvm::Module> TheModule;
 extern llvm::Function *TheFunction;
 extern std::shared_ptr<llvm::IRBuilder<>> Builder;
-
+extern llvm::BasicBlock *BB;
 } // end of namespace funcExtract
 #endif
