@@ -32,7 +32,8 @@ void module_expr(std::string line) {
     g_curMod = std::make_unique<ModuleInfo_t>();
   g_moduleInfoMap.emplace(g_currentModuleName, g_curMod);
   g_curMod->name = g_currentModuleName;
-  moduleName = g_currentModuleName;
+  if(g_currentModuleName == g_topModName)
+    g_curMod->invarRegs = g_invarRegs;
 }
 
 

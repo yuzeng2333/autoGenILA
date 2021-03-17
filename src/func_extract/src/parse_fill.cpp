@@ -15,6 +15,8 @@ std::map<std::string, std::shared_ptr<ModuleInfo_t>> g_moduleInfoMap;
 std::string g_topModName;
 std::shared_ptr<ModuleInfo_t> g_curMod;
 std::set<std::string> moduleWriteAs;
+std::set<std::string> g_invarRegs;
+StrSet_t moduleAs;
 uint32_t g_new_var;
 uint32_t g_instr_len;
 //std::unordered_map<std::string, astNode*> g_asSliceRoot;
@@ -85,9 +87,10 @@ void parse_verilog(std::string fileName) {
   }
   std::string line;
   std::smatch match;
-  g_curMod = std::make_unique<ModuleInfo_t>();
-  g_curMod->name = g_topModName;
-  g_moduleInfoMap.emplace(g_topModName, g_curMod);
+  //g_curMod = std::make_unique<ModuleInfo_t>();
+  //g_curMod->name = g_topModName;
+  //g_curMod->invarRegs = g_invarRegs;
+  //g_moduleInfoMap.emplace(g_topModName, g_curMod);
   while( std::getline(input, line) ) {
     //toCout(line);
     if(line.find("_0699_") != std::string::npos) {
@@ -287,14 +290,14 @@ void read_in_instructions(std::string fileName) {
             // if space exists, solve process is skipped and delay for writing ASV is specified
             if(line.find(" ") == std::string::npos) {
               g_instrInfo.back().writeASV.insert(std::make_pair(0, line));
-              g_curMod->moduleAs.insert(line);
+              moduleAs.insert(line);
             }
             else {
               size_t pos = line.find(" ");
               if(pos == line.length() - 1) {
                 line.pop_back();
                 g_instrInfo.back().writeASV.insert(std::make_pair(0, line));
-                g_curMod->moduleAs.insert(line);
+                moduleAs.insert(line);
               }
               std::string cycleCnt = line.substr(pos+1);
               if(!is_number(cycleCnt)) {
@@ -309,13 +312,13 @@ void read_in_instructions(std::string fileName) {
               }
               g_instrInfo.back().writeASV.insert(std::make_pair(uint32_t(std::stoi(cycleCnt)), 
                                                                 asName));
-              g_curMod->moduleAs.insert(asName);
+              moduleAs.insert(asName);
             }
           }
           break;
         case ReadASV:
           g_instrInfo.back().readASV.insert(line);
-          g_curMod->moduleAs.insert(line);
+          moduleAs.insert(line);
           break;
         case ReadNOP:
           {
@@ -344,7 +347,7 @@ void read_in_instructions(std::string fileName) {
           break;
         case InvarRegs:
           {
-            g_curMod->invarRegs.insert(line);
+            g_invarRegs.insert(line);
           }
           break;
         case TopMod:
