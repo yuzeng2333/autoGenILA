@@ -139,12 +139,14 @@ extern std::map<std::string, std::shared_ptr<ModuleInfo_t>> g_moduleInfoMap;
 extern std::string g_topModule;
 extern std::stack<std::string> g_instanceStk;
 extern std::stack<std::pair<std::string, std::shared_ptr<ModuleInfo_t>>> g_instancePairStk;
+extern std::vector<std::pair<std::string, std::shared_ptr<ModuleInfo_t>>> g_instancePairVec;
 extern std::shared_ptr<ModuleInfo_t> g_curMod;
 
 // llvm
 extern std::shared_ptr<llvm::LLVMContext> TheContext;
 extern std::shared_ptr<llvm::Module> TheModule;
 extern llvm::Function *TheFunction;
+extern llvm::Function *g_curFunc;
 extern std::shared_ptr<llvm::IRBuilder<>> Builder;
 extern llvm::BasicBlock *BB;
 } // end of namespace funcExtract

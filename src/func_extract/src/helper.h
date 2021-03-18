@@ -173,7 +173,7 @@ StrPair_t split_module_asv(const std::string &writeAsvLine);
 
 std::string remove_prefix_module(const std::string &writeAsvLine);
 
-llvm::Value* get_arg(std::string regName);
+llvm::Value* get_arg(std::string regName, llvm::Function *func=TheFunction);
 
 llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low, 
                       std::shared_ptr<llvm::LLVMContext> &c, 
@@ -205,6 +205,9 @@ bool is_submod_output(const std::string &var);
 
 std::shared_ptr<ModuleInfo_t> get_mod_info(std::string insName);
 
+std::string get_hier_name();
+
+bool is_top_module();
 } // end of namespace funcExtract
 
 

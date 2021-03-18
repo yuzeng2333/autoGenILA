@@ -33,6 +33,7 @@ std::unordered_map<std::string, expr*> INPUT_EXPR_VAL;
 std::unordered_map<std::string, expr*> TIMED_VAR2EXPR;
 std::set<std::string> g_resetedReg;
 std::set<std::string> g_regWithFunc;
+std::vector<std::pair<std::string, std::shared_ptr<ModuleInfo_t>>> g_instancePairVec;
 //std::unordered_map<std::string, expr*> INT_EXPR_VAL;
 std::set<std::string> INT_EXPR_SET;
 std::set<std::string> g_readASV;
@@ -53,8 +54,11 @@ uint32_t g_maxDelay = 0;
 std::shared_ptr<llvm::LLVMContext> TheContext;
 std::shared_ptr<llvm::Module> TheModule;
 llvm::Function *TheFunction;
+llvm::Function *g_curFunc;
 std::shared_ptr<llvm::IRBuilder<>> Builder;
 llvm::BasicBlock *BB;
+
+
 // assume ssaTable and nbTable have been filled
 void check_all_regs() {
   toCout("### Begin check_all_regs");
@@ -62,6 +66,7 @@ void check_all_regs() {
   std::ofstream goalFile;
   goalFile.open(g_path+"/goal.txt");
   goalFile.close();
+  g_instancePairVec.clear();
   uint32_t i = 1;
   for(auto instrInfo : g_instrInfo) {
     toCout("---  BEGIN INSTRUCTION #"+toStr(i++)+" ---");
@@ -98,6 +103,7 @@ void print_llvm_ir(std::string destAndSlice,
   TheModule = llvm::make_unique<llvm::Module>("mod_;_"+destAndSlice, *TheContext);
   Builder = llvm::make_unique<llvm::IRBuilder<>>(*TheContext);
   g_curMod = g_moduleInfoMap[g_topModule];
+  g_instancePairVec.push_back(std::make_pair(g_topModule, g_curMod));
 
   /// declare function
   // input types
@@ -122,7 +128,7 @@ void print_llvm_ir(std::string destAndSlice,
     llvm::FunctionType::get(retTy, argTy, false);
   TheFunction = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
                                        "func_;_"+destAndSlice, TheModule.get());
-
+  g_curFunc = TheFunction;
   // set arg name for the function
   uint32_t idx = 0;
   // FIXME the start and end index may be wrong  
@@ -507,7 +513,7 @@ llvm::Value* add_nb_constraint(astNode* const node,
   // if timeIdx = bound, then return function input or rst/norm value
   if(g_curMod->invarRegs.find(dest) == g_curMod->invarRegs.end()
       && g_curMod->moduleAs.find(dest) != g_curMod->moduleAs.end())
-    return get_arg(timed_name(dest, timeIdx));
+    return get_arg(timed_name(dest, timeIdx), g_curFunc);
   else {
     uint32_t width = get_var_slice_width_simp(dest);    
     std::string rstVal;

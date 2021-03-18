@@ -162,15 +162,23 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx, context &c,
   std::string destTimed = timed_name(dest, timeIdx);
 
   // if is memory io related signal
-  if(g_mem2acclData == dest) {
-    toCout("unsupported in llvm version");
-    abort();
-    //return destExpr;
-  } 
+  //if(g_mem2acclData == dest) {
+  //  toCout("unsupported in llvm version");
+  //  abort();
+  //  //return destExpr;
+  //} 
+
+  // treate submodule's input separately
+  if(!is_top_module()) {
+    assert(timeIdx <= bound+1);
+    return get_arg(destTimed, g_curFunc);
+  }
+
   // if input instruction should be given to the input ports
   // FIXME: bound+1 or bound+2???
-  else if(timeIdx + g_instr_len >= bound+1) {
-    if(g_currInstrInfo.instrEncoding.find(dest) == g_currInstrInfo.instrEncoding.end()) {
+  if(timeIdx + g_instr_len >= bound+1) {
+    if(is_top_module() 
+        && g_currInstrInfo.instrEncoding.find(dest) == g_currInstrInfo.instrEncoding.end()) {
       toCout("Error: input signal not found for current instruction: "+dest);
       abort();
     }
@@ -965,6 +973,7 @@ llvm::Value* add_one_case_branch_expr(astNode* const node, llvm::Value* &caseVar
 
 llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c, 
                                builder &b, uint32_t bound) {
+  // destAndSlice is the wire, not port
   std::string destAndSlice = node->dest;
   //std::string dest, destSlice;
   //split_slice(destAndSlice, dest, destSlice);
@@ -977,38 +986,77 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
   std::string modName = subMod->name;
 
   llvm::FunctionType *FT;
-  llvm::Function *func;
   if(subMod->out2FuncMp.find(outPort) != subMod->out2FuncMp.end()) {
-    func = subMod->out2FuncMp[outPort];
-    FT = func->getFunctionType();
+    // FIXME:
+    // This many not be true for some designs, since differnet instances may 
+    // need different functions
+    g_curFunc = subMod->out2FuncMp[outPort];
+    FT = g_curFunc->getFunctionType();
   }
   else {
     // make the func
     auto retTy = llvm::IntegerType::get(*c, get_var_slice_width_simp(destAndSlice));
     std::vector<llvm::Type *> argTy;
-    for(auto leafNode : subMod->out2LeafNodeMp[outPort]) {
-      uint32_t width = get_var_slice_width_simp(leafNode->dest, subMod);
-      argTy.push_back(llvm::IntegerType::get(*c, width));
+    
+    // the function args here is redundant. 
+    // Later constraint elaboration will tell which inputs are necessary
+    for(uint32_t i = timeIdx; i <= bound+1; i++) {
+      for(auto it = subMod->moduleInputs.begin(); 
+            it != subMod->moduleInputs.end(); it++) {
+        uint32_t width = get_var_slice_width_simp(*it, subMod);
+        // FIXME the start and end index may be wrong
+        argTy.push_back(llvm::IntegerType::get(*TheContext, width));
+      }
     }
+
+    // for regs in submodules, treat copy for every time as func arg
+    for(uint32_t i = timeIdx; i <= bound+1; i++) {
+      for(auto it = subMod->moduleTrueRegs.begin(); 
+            it != subMod->moduleTrueRegs.end(); it++) {
+        uint32_t width = get_var_slice_width_simp(*it, subMod);
+        argTy.push_back(llvm::IntegerType::get(*TheContext, width));
+      }
+    }
+
+    std::string hierName = get_hier_name();
     FT = llvm::FunctionType::get(retTy, argTy, false);
-    func = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
-           "func_;_"+modName+"_$"+outPort, TheModule.get());
-    subMod->out2FuncMp.emplace(outPort, func);
+    g_curFunc = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
+                  "func_;_"+hierName+"."+modName+"_$"+outPort, TheModule.get());
+    subMod->out2FuncMp.emplace(outPort, g_curFunc);
+
+    // set name for args
+    uint32_t idx = 0;    
+    for(uint32_t i = timeIdx; i <= bound+1; i++) {
+      for(auto it = subMod->moduleInputs.begin(); it != subMod->moduleInputs.end(); it++) {
+        toCoutVerb("set func arg: "+*it+DELIM+toStr(i));
+        (g_curFunc->args().begin()+idx++)->setName(*it+DELIM+toStr(i));
+      }
+    }
+
+    for(uint32_t i = timeIdx; i <= bound+1; i++) {
+      for(auto it = subMod->moduleTrueRegs.begin(); it != subMod->moduleTrueRegs.end(); it++) {
+        toCoutVerb("set func arg: "+*it+DELIM+toStr(bound));
+        (g_curFunc->args().begin()+idx++)->setName(*it+DELIM+toStr(i));
+      }
+    }
+
     // make bb for the function
-    llvm::BasicBlock *localBB = llvm::BasicBlock::Create(*c, "bb_;_"+modName+"_$"+outPort, func);
+    llvm::BasicBlock *localBB = llvm::BasicBlock::Create(*c, "bb_;_"+modName+"_$"+outPort, g_curFunc);
     b->SetInsertPoint(localBB);
     auto parentMod = g_curMod;
     g_curMod = subMod;
+    g_instancePairVec.push_back(std::make_pair(insName, subMod));
     llvm::Value* ret = add_constraint(subMod->out2RootNodeMp[outPort], 0, c, b, bound);
+    g_instancePairVec.pop_back();
     g_curMod = parentMod;
     // TODO: modify input_constraint
     Builder->CreateRet(ret);
-    llvm::verifyFunction(*func);
+    llvm::verifyFunction(*g_curFunc);
     llvm::verifyModule(*TheModule);
     b->SetInsertPoint(BB);
   }
   std::vector<llvm::Value*> args;
-  assert(node->srcVec.size() == node->childVec.size());
+  //assert(node->srcVec.size() == node->childVec.size());
   for(uint32_t i = 0; i < node->srcVec.size(); i++) {
     std::string varAndSlice = node->srcVec[i];
     std::string var, varSlice;
@@ -1020,7 +1068,7 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     args.push_back(extract(srcVal, hi, lo, c, b));
   }
   std::string destTimed = timed_name(destAndSlice, timeIdx);  
-  return b->CreateCall(FT, func, args, llvm::Twine(destTimed));
+  return b->CreateCall(FT, g_curFunc, args, llvm::Twine(destTimed));
 }
 
 

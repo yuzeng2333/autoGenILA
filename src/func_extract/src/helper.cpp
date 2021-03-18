@@ -693,8 +693,8 @@ std::string remove_prefix_module(const std::string &writeAsvLine) {
 
 
 
-llvm::Value* get_arg(std::string regName) {
-  for(auto it = TheFunction->arg_begin(); it != TheFunction->arg_end(); it++) {
+llvm::Value* get_arg(std::string regName, llvm::Function *func) {
+  for(auto it = func->arg_begin(); it != func->arg_end(); it++) {
     if(it->getName() == regName) return it;
   }
   toCout("Error: function input is not found: "+regName);
@@ -754,6 +754,7 @@ llvm::Value* extract(llvm::Value* in, uint32_t high, uint32_t low,
   return extract(in, high, low, c, b, llvm::Twine(name));
 }
 
+
 llvm::Value* concat_value(llvm::Value* val1, llvm::Value* val2, 
                           std::shared_ptr<llvm::LLVMContext> &c,
                           std::shared_ptr<llvm::IRBuilder<>> &b) {
@@ -799,6 +800,21 @@ bool is_submod_output(const std::string &var) {
 std::shared_ptr<ModuleInfo_t> get_mod_info(std::string insName) {
   std::string modName = g_curMod->ins2modMap[insName];
   return g_moduleInfoMap[modName];
+}
+
+
+std::string get_hier_name() {
+  std::string ret;
+  for(auto it = g_instancePairVec.begin(); it != g_instancePairVec.end(); it++) {
+    ret = ret + "." + it->first;
+  }
+  ret = ret.substr(1);
+  return ret;
+}
+
+
+bool is_top_module() {
+  return g_curMod->name == g_topModule;
 }
 
 } // end of namespace funcExtract
