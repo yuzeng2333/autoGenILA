@@ -10,6 +10,7 @@ namespace funcExtract {
 
 //TODO: the largest timeIdx of some function may exceed bound
 //TODO: the largest timeIdx of some function may exceed bound
+//TODO: g_existedExpr 
 
 #define SV std::vector<std::string>
 #define toStr(a) std::to_string(a)
@@ -153,13 +154,20 @@ void print_llvm_ir(std::string destAndSlice,
   clean_data();
   std::ofstream goalFile;
   goalFile.open(g_path+"/goal.txt", std::ofstream::app);
-  if(g_varNode.find(destAndSlice) == g_varNode.end()) {
-    toCout("Error: the key does not exist in the map: |"+destAndSlice+"|");
+  llvm::Value* destNextExpr;
+
+  std::string dest, destSlice;
+  split_slice(destAndSlice, dest, destSlice);
+  assert(destSlice.empty());
+  if(g_curMod->varNode.find(dest) == g_curMod->varNode.end()
+      && g_curMod->reg2Slices.find(dest) == g_curMod->reg2Slices.end()) {
+    toCout("Error: ast node is not found for this var: |"+dest+"|");
     abort();
   } 
   // The return value for the function
-  llvm::Value* destNextExpr = add_constraint(g_varNode[destAndSlice], 
-                                     0, TheContext, Builder, bound);
+  else 
+    destNextExpr = add_constraint(dest, 
+                                  0, TheContext, Builder, bound);
   Builder->CreateRet(destNextExpr);
   llvm::verifyFunction(*TheFunction);
   llvm::verifyModule(*TheModule);
@@ -426,6 +434,38 @@ void print_llvm_ir(std::string destAndSlice,
 //}
 
 
+llvm::Value* add_constraint(std::string varAndSlice, uint32_t timeIdx, context &c,
+                            std::shared_ptr<llvm::IRBuilder<>> &b,
+                            uint32_t bound ) {
+  llvm::Value* ret;
+  bool retIsEmpty = true;
+  std::string var, varSlice;
+  split_slice(varAndSlice, var, varSlice);
+  if(g_curMod->reg2Slices.find(var) == g_curMod->reg2Slices.end()) {
+    if(g_curMod->varNode.find(var) == g_curMod->varNode.end()) {
+      toCout("Error: cannot find node for: "+varAndSlice);
+      abort();
+    }
+    return add_constraint(g_curMod->varNode[var], timeIdx, c, b, bound);
+  }
+  else {
+    for(std::string varSlice : g_curMod->reg2Slices[var]) {
+      if(g_curMod->varNode.find(varSlice) == g_curMod->varNode.end()) {
+        toCout("Error: cannot find node for: "+varSlice);
+      }
+      llvm::Value* tmpSlice = add_constraint(g_curMod->varNode[varSlice], timeIdx, c, b, bound);
+      if(retIsEmpty) {
+        retIsEmpty = false;
+        ret = tmpSlice;
+      }
+      else {
+        ret = concat_value(ret, tmpSlice, c, b);
+      }
+    }
+    return ret;
+  }
+
+}
 
 /// return: if node->dest is a slice, which means the slice is directly assigned, 
 //            it just returns expr for the slice. Otherwise, it returns expr for

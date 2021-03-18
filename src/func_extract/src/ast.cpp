@@ -116,7 +116,7 @@ void add_node(std::string varAndSlice,
   }
 
   g_visitedNode->emplace(varToAdd, node);
-  g_varNode.emplace(varToAdd, node);
+  g_curMod->varNode.emplace(varToAdd, node);
   if( g_curMod->reg2Slices.find(varToAdd) != g_curMod->reg2Slices.end() ) {
     add_sliced_node(varToAdd, timeIdx, node);
   }
@@ -673,7 +673,9 @@ void add_submod_node(std::string var, uint32_t timeIdx, astNode* const node) {
   g_curMod = g_instancePairStk.top().second;
   //add_child_node(output, timeIdx, node);
   for(std::string input : subMod->moduleInputs) {
-    add_child_node(g_curMod->insPort2wireMp[insName][input], timeIdx, node);
+    std::string connectWire = g_curMod->insPort2wireMp[insName][input];
+    node->srcVec.push_back(connectWire);
+    add_child_node(connectWire, timeIdx, node);
   }
 }
 

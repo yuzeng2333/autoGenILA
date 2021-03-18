@@ -491,10 +491,15 @@ void submodule_expr(std::string firstLine, std::ifstream &input) {
   std::string moduleName = m.str(2);
   std::string instanceName = m.str(3);
 
+  if(g_moduleInfoMap.find(moduleName) == g_moduleInfoMap.end()) {
+    toCout("Error: submodule has not been seen before: "+moduleName);
+    abort();
+  }
+  auto subMod = g_moduleInfoMap[moduleName];
+
   // to be deleted
   //if(g_wire2ModulePort.find(instanceName) == g_wire2ModulePort.end())
   //  g_wire2ModulePort.emplace(instanceName, std::unordered_map<std::string, std::string>{});
-
   g_curMod->ins2modMap.emplace(instanceName, moduleName);
 
   //FuncInfo_t funcInfo;
@@ -521,6 +526,10 @@ void submodule_expr(std::string firstLine, std::ifstream &input) {
       g_curMod->insPort2wireMp.emplace(instanceName, std::map<std::string, std::string>{{port, wire}});
     else
       g_curMod->insPort2wireMp[instanceName].emplace(port, wire);
+    // if the connected port is output for sub-module, put the wire into reg2Slices
+    if(subMod->moduleOutputs.find(port) != subMod->moduleOutputs.end()) {
+      put_into_reg2Slice(wire);
+    }
   }
 }
 

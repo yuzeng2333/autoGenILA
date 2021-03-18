@@ -73,6 +73,7 @@ struct ModuleInfo_t {
   std::map<std::string, std::vector<astNode*>> out2LeafNodeMp;
   std::map<std::string, llvm::Function*> out2FuncMp;
 
+  std::map<std::string, astNode*> varNode;  
   std::map<std::string, std::string> ssaTable;
   std::map<std::string, std::vector<std::string>> reg2Slices;
   std::map<std::string, std::string> nbTable;

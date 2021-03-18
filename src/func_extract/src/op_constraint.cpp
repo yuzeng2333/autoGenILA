@@ -1056,7 +1056,7 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     b->SetInsertPoint(BB);
   }
   std::vector<llvm::Value*> args;
-  //assert(node->srcVec.size() == node->childVec.size());
+  assert(node->srcVec.size() == node->childVec.size());
   for(uint32_t i = 0; i < node->srcVec.size(); i++) {
     std::string varAndSlice = node->srcVec[i];
     std::string var, varSlice;
