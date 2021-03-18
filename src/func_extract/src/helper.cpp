@@ -784,11 +784,17 @@ bool is_input(const std::string &var) {
 }
 
 
+bool is_output(const std::string &var) {
+  auto it = std::find( g_curMod->moduleOutputs.begin(), g_curMod->moduleOutputs.end(), var );
+  return it != g_curMod->moduleOutputs.end();
+}
+
+
 bool is_reg(std::string &var) {
   if(var.back() == ' ')
     var.pop_back();
-  auto it = std::find( moduleTrueRegs.begin(), moduleTrueRegs.end(), var );
-  return it != moduleTrueRegs.end();
+  auto it = std::find( g_curMod->moduleTrueRegs.begin(), g_curMod->moduleTrueRegs.end(), var );
+  return it != g_curMod->moduleTrueRegs.end();
 }
 
 

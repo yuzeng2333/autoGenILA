@@ -124,7 +124,7 @@ void mem_expr(std::string line) {
   
   uint32_t varLen = get_end(sliceTop) + 1;
   moduleMems.emplace(var, varLen);
-  assert(!isOutput(var));
+  assert(!is_output(var));
 
   bool insertDone;
   if(!slice.empty())
@@ -151,11 +151,12 @@ void output_expr(std::string line) {
   std::string var = m.str(3);
   std::string blank = m.str(1);
     
-  if(isOutput(var)) {
+  if(is_output(var)) {
     std::cout << "!! Duplicate output find: " + line << std::endl;
+    abort();
   }
   else 
-    moduleOutputs.push_back(var);
+    g_curMod->moduleOutputs.insert(var);
 
   bool insertDone;
   if(!slice.empty())

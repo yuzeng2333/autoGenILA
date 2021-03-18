@@ -199,6 +199,8 @@ bool is_x(const std::string &var);
 
 bool is_input(const std::string &var);
 
+bool is_output(const std::string &var);
+
 bool is_reg(std::string &var);
 
 bool is_submod_output(const std::string &var);
