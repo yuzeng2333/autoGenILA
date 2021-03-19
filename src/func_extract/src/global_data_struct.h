@@ -72,6 +72,7 @@ struct ModuleInfo_t {
   std::map<std::string, astNode*> out2RootNodeMp;
   std::map<std::string, std::vector<astNode*>> out2LeafNodeMp;
   std::map<std::string, llvm::Function*> out2FuncMp;
+  std::unordered_map<std::string, llvm::Value*> existedExpr;
 
   std::map<std::string, astNode*> varNode;  
   std::map<std::string, std::string> ssaTable;
@@ -110,7 +111,6 @@ extern std::set<std::string> g_readASV;
 extern std::set<std::string> g_allRegs;
 extern std::set<std::string> g_regWithFunc;
 extern std::set<std::string> g_invarRegs;
-extern std::unordered_map<std::string, llvm::Value*> g_existedExpr;
 extern std::string g_rootNode;
 extern struct InstrInfo_t g_currInstrInfo;
 extern std::unordered_map<std::string, std::string> g_nopInstr;

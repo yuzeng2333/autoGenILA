@@ -274,6 +274,16 @@ func_extract: CMakeFiles/func_extract.dir/src/parse_fill.cpp.o
 func_extract: CMakeFiles/func_extract.dir/src/pseudo_vlg_gen.cpp.o
 func_extract: CMakeFiles/func_extract.dir/src/vcd_parser.cpp.o
 func_extract: CMakeFiles/func_extract.dir/build.make
+func_extract: /usr/local/lib/libglog.a
+func_extract: /usr/lib/libLLVMSupport.a
+func_extract: /usr/lib/libLLVMCore.a
+func_extract: /usr/lib/libLLVMIRReader.a
+func_extract: /usr/lib/libLLVMAsmParser.a
+func_extract: /usr/lib/libLLVMBitReader.a
+func_extract: /usr/lib/libLLVMCore.a
+func_extract: /usr/lib/libLLVMBinaryFormat.a
+func_extract: /usr/lib/libLLVMSupport.a
+func_extract: /usr/lib/libLLVMDemangle.a
 func_extract: CMakeFiles/func_extract.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/workspace/research/ILA/autoGenILA/src/func_extract/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Linking CXX executable func_extract"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/func_extract.dir/link.txt --verbose=$(VERBOSE)

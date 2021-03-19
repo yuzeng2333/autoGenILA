@@ -10,7 +10,6 @@ namespace funcExtract {
 
 //TODO: the largest timeIdx of some function may exceed bound
 //TODO: the largest timeIdx of some function may exceed bound
-//TODO: g_existedExpr 
 
 #define SV std::vector<std::string>
 #define toStr(a) std::to_string(a)
@@ -39,7 +38,6 @@ std::vector<std::pair<std::string, std::shared_ptr<ModuleInfo_t>>> g_instancePai
 std::set<std::string> INT_EXPR_SET;
 std::set<std::string> g_readASV;
 std::set<std::string> g_allRegs;
-std::unordered_map<std::string, llvm::Value*> g_existedExpr;
 // remaining variables to be built goal for
 std::queue<std::pair<std::string, uint32_t>> g_goalVars;
 std::string g_rootNode;
@@ -88,7 +86,6 @@ void clean_data() {
   CLEAN_QUEUE.clear();
   DIRTY_QUEUE.clear();
   g_resetedReg.clear();
-  g_existedExpr.clear();
 }
 
 
@@ -479,8 +476,9 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
     toCout("find _2_");
   }
 
-  if(g_existedExpr.find(timed_name(varAndSlice, timeIdx)) != g_existedExpr.end() ) {
-    return g_existedExpr[timed_name(varAndSlice, timeIdx)];
+  if(g_curMod->existedExpr.find(timed_name(varAndSlice, timeIdx)) 
+      != g_curMod->existedExpr.end() ) {
+    return g_curMod->existedExpr[timed_name(varAndSlice, timeIdx)];
   }
 
   llvm::Value* retExpr;
@@ -505,7 +503,7 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
   else { // it is wire
     retExpr = add_ssa_constraint(node, timeIdx, c, b, bound);
   }
-  g_existedExpr.emplace(timed_name(varAndSlice, timeIdx), retExpr);
+  g_curMod->existedExpr.emplace(timed_name(varAndSlice, timeIdx), retExpr);
   return retExpr;
 }
 
@@ -562,6 +560,8 @@ llvm::Value* add_nb_constraint(astNode* const node,
     else
       rstVal = toStr(width)+"'b0";
     toCout("Replace "+timed_name(dest, timeIdx)+" with "+rstVal);
+    if(dest == "out" && timeIdx == 1)
+      toCout("Find it!");
     return var_expr(rstVal, timeIdx, c, b, false, width);    
   }
 }

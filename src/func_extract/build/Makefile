@@ -67,17 +67,6 @@ rebuild_cache/fast: rebuild_cache
 
 .PHONY : rebuild_cache/fast
 
-# Special rule for the target edit_cache
-edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
-	/opt/cmake-3.14.4-Linux-x86_64/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : edit_cache
-
-# Special rule for the target edit_cache
-edit_cache/fast: edit_cache
-
-.PHONY : edit_cache/fast
-
 # Special rule for the target test
 test:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
@@ -88,6 +77,17 @@ test:
 test/fast: test
 
 .PHONY : test/fast
+
+# Special rule for the target edit_cache
+edit_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
+	/opt/cmake-3.14.4-Linux-x86_64/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : edit_cache
+
+# Special rule for the target edit_cache
+edit_cache/fast: edit_cache
+
+.PHONY : edit_cache/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -120,6 +120,19 @@ preinstall/fast:
 depend:
 	$(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
+
+#=============================================================================
+# Target rules for targets named intrinsics_gen
+
+# Build rule for target.
+intrinsics_gen: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 intrinsics_gen
+.PHONY : intrinsics_gen
+
+# fast build rule for target.
+intrinsics_gen/fast:
+	$(MAKE) -f CMakeFiles/intrinsics_gen.dir/build.make CMakeFiles/intrinsics_gen.dir/build
+.PHONY : intrinsics_gen/fast
 
 #=============================================================================
 # Target rules for targets named func_extract
@@ -519,9 +532,10 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... rebuild_cache"
-	@echo "... edit_cache"
-	@echo "... func_extract"
 	@echo "... test"
+	@echo "... edit_cache"
+	@echo "... intrinsics_gen"
+	@echo "... func_extract"
 	@echo "... src/ast.o"
 	@echo "... src/ast.i"
 	@echo "... src/ast.s"

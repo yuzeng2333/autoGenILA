@@ -712,8 +712,7 @@ llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low,
   //constOne->print(llvm::errs());
   auto s1 = b->CreateShl(constOne, len);
   //s1->print(llvm::errs());
-  auto s2 = b->CreateSub( s1, 
-                          constOne );
+  auto s2 = b->CreateSub( s1, constOne );
   //s2->print(llvm::errs());
   llvm::Value* mask = b->CreateShl(s2, low);
   //mask->print(llvm::errs());
