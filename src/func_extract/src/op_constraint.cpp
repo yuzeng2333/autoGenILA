@@ -171,6 +171,7 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx, context &c,
   // treate submodule's input separately
   if(!is_top_module()) {
     assert(timeIdx <= bound+1);
+    if(timeIdx > g_curMod->maxInputTimeIdx) g_curMod->maxInputTimeIdx = timeIdx;
     return get_arg(destTimed, g_curFunc);
   }
 
@@ -990,8 +991,16 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     // FIXME:
     // This many not be true for some designs, since differnet instances may 
     // need different functions
-    g_curFunc = subMod->out2FuncMp[outPort];
-    FT = g_curFunc->getFunctionType();
+    auto tmpPair = subMod->out2FuncMp[outPort];
+    g_curFunc = tmpPair.first;
+    auto funcBound = tmpPair.second;
+    // if greater than bound, we need to cut the function
+    if(timeIdx+funcBound > bound) {
+      // TODO
+    }
+    else {
+      FT = g_curFunc->getFunctionType();
+    }
   }
   else {
     // make the func
@@ -1000,7 +1009,7 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     
     // the function args here is redundant. 
     // Later constraint elaboration will tell which inputs are necessary
-    for(uint32_t i = timeIdx; i <= bound+1; i++) {
+    for(uint32_t i = timeIdx; i <= bound; i++) {
       for(auto it = subMod->moduleInputs.begin(); 
             it != subMod->moduleInputs.end(); it++) {
         uint32_t width = get_var_slice_width_simp(*it, subMod);
@@ -1010,34 +1019,31 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     }
 
     // for regs in submodules, treat copy for every time as func arg
-    for(uint32_t i = timeIdx; i <= bound+1; i++) {
-      for(auto it = subMod->moduleTrueRegs.begin(); 
-            it != subMod->moduleTrueRegs.end(); it++) {
-        uint32_t width = get_var_slice_width_simp(*it, subMod);
-        argTy.push_back(llvm::IntegerType::get(*TheContext, width));
-      }
+    for(auto it = subMod->moduleTrueRegs.begin(); 
+          it != subMod->moduleTrueRegs.end(); it++) {
+      uint32_t width = get_var_slice_width_simp(*it, subMod);
+      argTy.push_back(llvm::IntegerType::get(*TheContext, width));
     }
 
     std::string hierName = get_hier_name();
     FT = llvm::FunctionType::get(retTy, argTy, false);
     g_curFunc = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
                   "func_;_"+hierName+"."+modName+"_$"+outPort, TheModule.get());
-    subMod->out2FuncMp.emplace(outPort, g_curFunc);
+    subMod->out2FuncMp.emplace(outPort, std::make_pair(g_curFunc, bound-timeIdx));
 
     // set name for args
     uint32_t idx = 0;    
-    for(uint32_t i = timeIdx; i <= bound+1; i++) {
+    for(uint32_t i = timeIdx; i <= bound; i++) {
       for(auto it = subMod->moduleInputs.begin(); it != subMod->moduleInputs.end(); it++) {
         toCoutVerb("set func arg: "+*it+DELIM+toStr(i));
         (g_curFunc->args().begin()+idx++)->setName(*it+DELIM+toStr(i));
       }
     }
 
-    for(uint32_t i = timeIdx; i <= bound+1; i++) {
-      for(auto it = subMod->moduleTrueRegs.begin(); it != subMod->moduleTrueRegs.end(); it++) {
-        toCoutVerb("set func arg: "+*it+DELIM+toStr(bound));
-        (g_curFunc->args().begin()+idx++)->setName(*it+DELIM+toStr(i));
-      }
+    for(auto it = subMod->moduleTrueRegs.begin(); it != subMod->moduleTrueRegs.end(); it++) {
+      toCoutVerb("set func arg: "+*it+DELIM+toStr(bound));
+      // TODO: change bound to bound
+      (g_curFunc->args().begin()+idx++)->setName(*it+DELIM+toStr(bound));
     }
 
     // make bb for the function
@@ -1046,6 +1052,12 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     auto parentMod = g_curMod;
     g_curMod = subMod;
     g_instancePairVec.push_back(std::make_pair(insName, subMod));
+    // which inputs are valid should be collected in the following operation
+    // the output-inputVec pairs are stored in out2InDelayMp
+    std::string outPortTimed = timed_name(outPort, timeIdx);
+    g_curMod->pendingOutPortTimed = outPortTimed;
+    g_curMod->maxInputTimeIdx = timeIdx;
+    g_curMod->rootTimeIdx = timeIdx;
     llvm::Value* ret = add_constraint(subMod->out2RootNodeMp[outPort], 0, c, b, bound);
     g_instancePairVec.pop_back();
     g_curMod = parentMod;
@@ -1057,16 +1069,40 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
   }
   std::vector<llvm::Value*> args;
   assert(node->srcVec.size() == node->childVec.size());
-  for(uint32_t i = 0; i < node->srcVec.size(); i++) {
-    std::string varAndSlice = node->srcVec[i];
-    std::string var, varSlice;
-    split_slice(varAndSlice, var, varSlice);
-    uint32_t hi = get_lgc_hi(varAndSlice);
-    uint32_t lo = get_lgc_lo(varAndSlice);
-    astNode *child = node->childVec[i];
-    llvm::Value* srcVal = add_constraint(child, child->destTime, c, b, bound);
-    args.push_back(extract(srcVal, hi, lo, c, b));
+
+  std::map<std::string, astNode*> input2AstMp;
+  for(uint32_t i = 0; i < node->srcVec.size(); i++)
+    input2AstMp.emplace(node->srcVec[i], node->childVec[i]);
+
+  // push func input args
+  for(uint32_t i = timeIdx; i <= bound; i++) {
+    for(auto it = subMod->moduleInputs.begin(); it != subMod->moduleInputs.end(); it++) {
+      std::string connectWire = g_curMod->insPort2wireMp[insName][*it];
+      std::string var, varSlice;
+      split_slice(connectWire, var, varSlice);
+      uint32_t hi = get_lgc_hi(connectWire);
+      uint32_t lo = get_lgc_lo(connectWire);
+      astNode *child = input2AstMp[connectWire];
+      // FIXME: child->destTime should not be used since it is wrong
+      llvm::Value* srcVal = add_constraint(child, i, c, b, bound);
+      args.push_back(extract(srcVal, hi, lo, c, b));
+    }
   }
+
+  // push func reg args
+  for(auto it = subMod->moduleTrueRegs.begin(); 
+        it != subMod->moduleTrueRegs.end(); it++) {
+    // find corresponding top func arg 
+    uint32_t width = get_var_slice_width_simp(*it, subMod);
+    std::string regName = *it;
+    std::string completeName = get_hier_name(false)+"."+insName+"."+regName;
+    if(g_topFuncArgMp.find(completeName) == g_topFuncArgMp.end()) {
+      toCout("Error: cannot find top function arg: "+completeName);
+    }
+    auto topFuncArg = llvm::dyn_cast<llvm::Value>(g_topFuncArgMp[completeName]);
+    args.push_back(topFuncArg);
+  }
+
   std::string destTimed = timed_name(destAndSlice, timeIdx);  
   return b->CreateCall(FT, g_curFunc, args, llvm::Twine(destTimed));
 }

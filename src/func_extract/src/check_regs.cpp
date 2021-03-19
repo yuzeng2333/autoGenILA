@@ -31,6 +31,7 @@ std::unordered_map<astNode*, uint32_t> DIRTY_QUEUE;
 
 std::unordered_map<std::string, expr*> INPUT_EXPR_VAL;
 std::unordered_map<std::string, expr*> TIMED_VAR2EXPR;
+std::map<std::string, llvm::Function::arg_iterator> g_topFuncArgMp;
 std::set<std::string> g_resetedReg;
 std::set<std::string> g_regWithFunc;
 std::vector<std::pair<std::string, std::shared_ptr<ModuleInfo_t>>> g_instancePairVec;
@@ -114,9 +115,9 @@ void print_llvm_ir(std::string destAndSlice,
       argTy.push_back(llvm::IntegerType::get(*TheContext, width));
     }
   // push regs
-  for(auto it = g_curMod->moduleTrueRegs.begin(); 
-        it != g_curMod->moduleTrueRegs.end(); it++) {
-    uint32_t width = get_var_slice_width_simp(*it);
+  // TODO: need to add regs from all instances of sub-modules to the args
+  for(auto it = g_regWidth.begin(); it != g_regWidth.end(); it++) {
+    uint32_t width = it->second;
     argTy.push_back(llvm::IntegerType::get(*TheContext, width));
   }
   // return types
@@ -137,9 +138,11 @@ void print_llvm_ir(std::string destAndSlice,
       (TheFunction->args().begin()+idx++)->setName(*it+DELIM+toStr(i));
     }
 
-  for(auto it = g_curMod->moduleTrueRegs.begin(); it != g_curMod->moduleTrueRegs.end(); it++) {
-    toCoutVerb("set func arg: "+*it+DELIM+toStr(bound));
-    (TheFunction->args().begin()+idx++)->setName(*it+DELIM+toStr(bound));
+  for(auto it = g_regWidth.begin(); it != g_regWidth.end(); it++) {
+    std::string regName = it->first;
+    toCoutVerb("set reg-type func arg: "+regName+DELIM+toStr(bound));
+    (TheFunction->args().begin()+idx++)->setName(regName+DELIM+toStr(bound));
+    g_topFuncArgMp.emplace(regName+DELIM+toStr(bound), TheFunction->args().begin()+idx++);
   }
 
   // basic block

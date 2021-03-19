@@ -808,11 +808,16 @@ std::shared_ptr<ModuleInfo_t> get_mod_info(std::string insName) {
 }
 
 
-std::string get_hier_name() {
+std::string get_hier_name(bool includeTopModule) {
   std::string ret;
-  for(auto it = g_instancePairVec.begin(); it != g_instancePairVec.end(); it++) {
-    ret = ret + "." + it->first;
-  }
+  if(includeTopModule)
+    for(auto it = g_instancePairVec.begin(); it != g_instancePairVec.end(); it++) {
+      ret = ret + "." + it->first;
+    }
+  else
+    for(auto it = g_instancePairVec.begin()+1; it != g_instancePairVec.end(); it++) {
+      ret = ret + "." + it->first;
+    }
   ret = ret.substr(1);
   return ret;
 }

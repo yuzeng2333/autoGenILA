@@ -207,7 +207,7 @@ bool is_submod_output(const std::string &var);
 
 std::shared_ptr<ModuleInfo_t> get_mod_info(std::string insName);
 
-std::string get_hier_name();
+std::string get_hier_name(bool includeTopModule=true);
 
 bool is_top_module();
 } // end of namespace funcExtract

@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
   }
   read_all_regs(g_path+"/regs.txt");  
   //read_in_architectural_states(asFile);
-  clean_verilog(g_path+"/design.v.clean");
+  //clean_verilog(g_path+"/design.v.clean");
   vcd_parser(g_path+"/rst.vcd");
   inv_gen();
   // get update function hierarchically

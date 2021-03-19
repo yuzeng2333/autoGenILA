@@ -61,6 +61,9 @@ struct ModuleInfo_t {
   ~ModuleInfo_t();
 
   std::string name;
+  std::string pendingOutPortTimed;
+  uint32_t maxInputTimeIdx;
+  uint32_t rootTimeIdx;
   std::shared_ptr<ModuleInfo_t> parentMod;
   StrSet_t moduleAs;
   std::set<std::string> invarRegs;
@@ -71,15 +74,16 @@ struct ModuleInfo_t {
   // only sub-modules has the two data below
   std::map<std::string, astNode*> out2RootNodeMp;
   std::map<std::string, std::vector<astNode*>> out2LeafNodeMp;
-  std::map<std::string, llvm::Function*> out2FuncMp;
+  std::map<std::string, std::pair<llvm::Function*, uint32_t>> out2FuncMp;
   std::unordered_map<std::string, llvm::Value*> existedExpr;
+  
 
   std::map<std::string, astNode*> varNode;  
   std::map<std::string, std::string> ssaTable;
   std::map<std::string, std::vector<std::string>> reg2Slices;
   std::map<std::string, std::string> nbTable;
   std::map<std::string, 
-           std::pair<std::string, 
+           std::pair<std::string,
                      std::vector<std::pair<std::string, 
                                            std::string>>>> caseTable;
   /// first key is wire/reg name, first of pair is instance name, 
@@ -94,6 +98,8 @@ struct ModuleInfo_t {
   // first key is output, second key is input
   std::map<std::string, 
            std::map<std::string, uint32_t>> out2InDelayMp;
+  /// key is arg name, value is its iterator
+  /// only top module map has this data structur->e
 };
 
 
@@ -107,6 +113,7 @@ extern std::set<std::string> INT_EXPR_SET;
 extern std::vector<struct InstrInfo_t> g_instrInfo;
 extern bool g_print_solver;
 extern bool g_skipCheck;
+extern std::vector<std::pair<std::string, uint32_t>> g_regWidth;
 extern std::set<std::string> g_readASV;
 extern std::set<std::string> g_allRegs;
 extern std::set<std::string> g_regWithFunc;
@@ -123,6 +130,8 @@ extern std::unordered_map<std::string,
 extern std::unordered_map<std::string, std::string> g_ins2modMap;
 extern std::unordered_map<std::string, uint32_t> g_moduleInportTime;
 extern std::unordered_map<std::string, uint32_t> g_moduleOutportTime;
+extern std::map<std::string, llvm::Function::arg_iterator> g_topFuncArgMp;
+
 extern Str2StrVecMap_t g_moduleInputsMap;
 extern Str2StrVecMap_t g_moduleOutputsMap;
 extern std::queue<std::pair<std::string, uint32_t>> g_goalVars;
@@ -139,7 +148,6 @@ extern std::string DELIM;
 extern std::map<std::string, std::shared_ptr<ModuleInfo_t>> g_moduleInfoMap;
 extern std::string g_topModule;
 extern std::stack<std::string> g_instanceStk;
-extern std::stack<std::pair<std::string, std::shared_ptr<ModuleInfo_t>>> g_instancePairStk;
 extern std::vector<std::pair<std::string, std::shared_ptr<ModuleInfo_t>>> g_instancePairVec;
 extern std::shared_ptr<ModuleInfo_t> g_curMod;
 
