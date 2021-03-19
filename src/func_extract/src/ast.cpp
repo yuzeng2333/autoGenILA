@@ -332,7 +332,9 @@ void add_input_node(std::string input, uint32_t timeIdx, astNode* const node) {
 
 
 void add_num_node(std::string num, uint32_t timeIdx, astNode* const node) {
-  toCoutVerb("Process num node: "+num);  
+  toCoutVerb("Process num node: "+num);
+  if(num == "8'b00010110")
+    toCout("Find it!");
   node->type = FE_NUM;
   node->dest = num;
   node->op = "";
@@ -674,6 +676,9 @@ void add_submod_node(std::string var, uint32_t timeIdx, astNode* const node) {
   //add_child_node(output, timeIdx, node);
   for(std::string input : subMod->moduleInputs) {
     std::string connectWire = g_curMod->insPort2wireMp[insName][input];
+    if(input == g_recentClk || connectWire == g_recentClk
+        || input == g_recentRst || connectWire == g_recentRst)
+      continue;
     node->srcVec.push_back(connectWire);
     add_child_node(connectWire, timeIdx, node);
   }
