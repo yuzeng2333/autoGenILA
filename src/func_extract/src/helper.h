@@ -210,6 +210,9 @@ std::shared_ptr<ModuleInfo_t> get_mod_info(std::string insName);
 std::string get_hier_name(bool includeTopModule=true);
 
 bool is_top_module();
+
+void collect_regs(std::shared_ptr<ModuleInfo_t> &curMod, std::string regPrefix);
+
 } // end of namespace funcExtract
 
 

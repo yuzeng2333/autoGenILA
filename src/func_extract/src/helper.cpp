@@ -836,4 +836,21 @@ bool is_top_module() {
   return g_curMod->name == g_topModule;
 }
 
+
+void collect_regs(std::shared_ptr<ModuleInfo_t> &curMod, std::string regPrefix) {
+  if(!regPrefix.empty())
+    regPrefix = regPrefix + ".";
+  for(std::string reg : curMod->moduleTrueRegs) {
+    uint32_t width = get_var_slice_width_simp(reg, curMod);
+    g_regWidth.push_back(std::make_pair(regPrefix+reg, width));
+  }
+
+  for(auto pair : curMod->ins2modMap) {
+    std::string insName = pair.first;
+    std::string modName = pair.second;
+    auto childMod = g_moduleInfoMap[modName];
+    collect_regs(childMod, regPrefix+insName);
+  }
+}
+
 } // end of namespace funcExtract

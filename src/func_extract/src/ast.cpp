@@ -1,7 +1,6 @@
 #include "ast.h"
 #include "parse_fill.h"
 #include "helper.h"
-#include "global_data_struct.h"
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/IR/BasicBlock.h"
@@ -72,6 +71,9 @@ void build_ast_tree() {
       }
     }
   }
+
+  // collect all regs
+  collect_regs(g_curMod, "");
 }
 
 
@@ -256,8 +258,8 @@ void add_nb_node(std::string regAndSlice, uint32_t timeIdx, astNode* const node)
     std::string reg, regSlice;
     split_slice(regAndSlice, reg, regSlice);
     std::string hierName = get_hier_name(false);
+    if(!hierName.empty()) hierName += ".";
     uint32_t width = get_var_slice_width_simp(reg);
-    g_regWidth.push_back(std::make_pair(hierName+"."+reg, width));
   }
   else if(std::regex_match(destAssign, m, pNonblockConcat)) {
   }

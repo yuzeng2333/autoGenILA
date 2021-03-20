@@ -108,17 +108,20 @@ void print_llvm_ir(std::string destAndSlice,
   // input types
   std::vector<llvm::Type *> argTy;
   // push inputs
+  uint32_t argNum = 0;
   for(uint32_t i = 0; i <= bound+1; i++)  
     for(auto it = g_curMod->moduleInputs.begin(); it != g_curMod->moduleInputs.end(); it++) {
       uint32_t width = get_var_slice_width_simp(*it);
       // FIXME the start and end index may be wrong
       argTy.push_back(llvm::IntegerType::get(*TheContext, width));
+      argNum++;
     }
   // push regs
   // TODO: need to add regs from all instances of sub-modules to the args
   for(auto it = g_regWidth.begin(); it != g_regWidth.end(); it++) {
     uint32_t width = it->second;
     argTy.push_back(llvm::IntegerType::get(*TheContext, width));
+    argNum++;
   }
   // return types
   auto retTy = llvm::IntegerType::get(*TheContext, 
@@ -136,12 +139,14 @@ void print_llvm_ir(std::string destAndSlice,
       uint32_t width = get_var_slice_width_simp(*it);
       toCoutVerb("set func arg: "+*it+DELIM+toStr(i));
       (TheFunction->args().begin()+idx++)->setName(*it+DELIM+toStr(i));
+      argNum--;
     }
 
   for(auto it = g_regWidth.begin(); it != g_regWidth.end(); it++) {
     std::string regName = it->first;
     toCoutVerb("set reg-type func arg: "+regName+DELIM+toStr(bound));
     (TheFunction->args().begin()+idx++)->setName(regName+DELIM+toStr(bound));
+    argNum--;
     g_topFuncArgMp.emplace(regName+DELIM+toStr(bound), TheFunction->args().begin()+idx++);
   }
 
