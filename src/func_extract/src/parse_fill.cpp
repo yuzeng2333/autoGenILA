@@ -99,7 +99,7 @@ void parse_verilog(std::string fileName) {
       toCout("Find it!");
     }
     fill_var_width(line, g_curMod->varWidth);
-    toCout(line);
+    //toCout(line);
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       case_expr(line, input);
       continue;

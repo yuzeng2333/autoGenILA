@@ -1101,9 +1101,12 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     // find corresponding top func arg 
     uint32_t width = get_var_slice_width_simp(*it, subMod);
     std::string regName = *it;
-    std::string completeName = get_hier_name(false)+"."+insName+"."+regName;
+    std::string prefix = get_hier_name(false);
+    if(!prefix.empty()) prefix += ".";
+    std::string completeName = prefix+insName+"."+regName+DELIM+toStr(bound);
     if(g_topFuncArgMp.find(completeName) == g_topFuncArgMp.end()) {
       toCout("Error: cannot find top function arg: "+completeName);
+      abort();
     }
     auto topFuncArg = llvm::dyn_cast<llvm::Value>(g_topFuncArgMp[completeName]);
     args.push_back(topFuncArg);
