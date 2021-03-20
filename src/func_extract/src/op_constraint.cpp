@@ -997,6 +997,8 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     // if greater than bound, we need to cut the function
     if(timeIdx+funcBound > bound) {
       // TODO
+      toCout("Error: submod's bound is different");
+      abort();
     }
     else {
       FT = g_curFunc->getFunctionType();

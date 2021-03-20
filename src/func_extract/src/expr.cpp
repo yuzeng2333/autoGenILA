@@ -511,6 +511,8 @@ void submodule_expr(std::string firstLine, std::ifstream &input) {
   std::map<std::string, std::string> wire2PortMp;
   std::vector<std::string> portVec;
   while(std::getline(input, line) && !std::regex_match(line, m, pInstanceEnd)) {
+    if(is_comment_line(line))
+      continue;
     if(!std::regex_match(line, m, pInstancePort)) {
       toCout("Error in matching module ports: "+line);
       abort();

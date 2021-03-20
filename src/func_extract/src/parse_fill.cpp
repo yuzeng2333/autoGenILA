@@ -92,7 +92,8 @@ void parse_verilog(std::string fileName) {
   //g_curMod->invarRegs = g_invarRegs;
   //g_moduleInfoMap.emplace(g_topModule, g_curMod);
   while( std::getline(input, line) ) {
-    //toCout(line);
+    if(is_comment_line(line))
+      continue;
     if(line.find("_0699_") != std::string::npos) {
       toCout("Find it!");
     }

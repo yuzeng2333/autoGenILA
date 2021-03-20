@@ -213,6 +213,7 @@ bool is_top_module();
 
 void collect_regs(std::shared_ptr<ModuleInfo_t> &curMod, std::string regPrefix);
 
+bool is_comment(std::string line);
 } // end of namespace funcExtract
 
 

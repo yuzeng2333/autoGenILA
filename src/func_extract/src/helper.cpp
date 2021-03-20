@@ -853,4 +853,10 @@ void collect_regs(std::shared_ptr<ModuleInfo_t> &curMod, std::string regPrefix) 
   }
 }
 
+
+bool is_comment(std::string line) {
+  size_t pos = line.find_first_not_of(' ');
+  return line.substr(pos, 2) == "//";
+}
+
 } // end of namespace funcExtract
