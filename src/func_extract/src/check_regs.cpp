@@ -133,7 +133,10 @@ void print_llvm_ir(std::string destAndSlice,
   g_curFunc = TheFunction;
   // set arg name for the function
   uint32_t idx = 0;
-  // FIXME the start and end index may be wrong  
+  // FIXME the start and end index may be wrong
+
+  uint32_t argSize = TheFunction->arg_size();
+  toCout("Function arg size is: "+toStr(argSize));
   for(uint32_t i = 0; i <= bound+1; i++)  
     for(auto it = g_curMod->moduleInputs.begin(); it != g_curMod->moduleInputs.end(); it++) {
       uint32_t width = get_var_slice_width_simp(*it);
@@ -145,7 +148,7 @@ void print_llvm_ir(std::string destAndSlice,
   for(auto it = g_regWidth.begin(); it != g_regWidth.end(); it++) {
     std::string regName = it->first;
     toCoutVerb("set reg-type func arg: "+regName+DELIM+toStr(bound));
-    (TheFunction->args().begin()+idx++)->setName(regName+DELIM+toStr(bound));
+    (TheFunction->args().begin()+idx)->setName(regName+DELIM+toStr(bound));
     argNum--;
     g_topFuncArgMp.emplace(regName+DELIM+toStr(bound), TheFunction->args().begin()+idx++);
   }
