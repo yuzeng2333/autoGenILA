@@ -798,7 +798,14 @@ bool is_reg(std::string &var) {
 
 
 bool is_submod_output(const std::string &var) {
-  return g_curMod->wire2InsPortMp.find(var) != g_curMod->wire2InsPortMp.end();
+  if( g_curMod->wire2InsPortMp.find(var) == g_curMod->wire2InsPortMp.end() )
+    return false;
+  auto tmpPair = g_curMod->wire2InsPortMp[var];
+  std::string insName = tmpPair.first;
+  std::string subModName = g_curMod->ins2modMap[insName];
+  auto subMod = g_moduleInfoMap[subModName];
+  std::string port = tmpPair.second;
+  return subMod->moduleOutputs.find(port) != subMod->moduleOutputs.end();
 }
 
 
@@ -814,10 +821,12 @@ std::string get_hier_name(bool includeTopModule) {
     for(auto it = g_instancePairVec.begin(); it != g_instancePairVec.end(); it++) {
       ret = ret + "." + it->first;
     }
-  else
+  else {
+    if(g_instancePairVec.size() == 1) return "";
     for(auto it = g_instancePairVec.begin()+1; it != g_instancePairVec.end(); it++) {
       ret = ret + "." + it->first;
     }
+  }
   ret = ret.substr(1);
   return ret;
 }

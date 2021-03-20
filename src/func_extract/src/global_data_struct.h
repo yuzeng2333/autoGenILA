@@ -76,7 +76,6 @@ struct ModuleInfo_t {
   std::map<std::string, std::vector<astNode*>> out2LeafNodeMp;
   std::map<std::string, std::pair<llvm::Function*, uint32_t>> out2FuncMp;
   std::unordered_map<std::string, llvm::Value*> existedExpr;
-  
 
   std::map<std::string, astNode*> varNode;  
   std::map<std::string, std::string> ssaTable;

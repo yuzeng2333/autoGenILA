@@ -59,7 +59,10 @@ void build_ast_tree() {
   g_topMod = g_curMod;
   g_visitedNode = std::make_unique<std::map<std::string, astNode*>>();
   g_visitedNodeStk.push(g_visitedNode);
-  for(std::string reg: g_curMod->moduleAs) {
+  assert(!g_instrInfo.back().skipWriteASV.empty());
+  //assert(!g_curMod->moduleAs.empty());
+  //for(std::string reg: g_curMod->moduleAs) {
+  for(std::string reg: g_instrInfo.back().skipWriteASV) {
     if(g_curMod->reg2Slices.find(reg) == g_curMod->reg2Slices.end()) {
       build_tree_for_single_as(reg);
     }
@@ -124,6 +127,7 @@ void add_node(std::string varAndSlice,
     add_input_node(varToAdd, timeIdx, node);
   }
   else if ( isAs(varToAdd) && !varIsDest ) {
+    toCout("Error: a reg is labeled as asv: "+varAndSlice);
     abort();
     add_as_node(varToAdd, timeIdx, node);    
   }
@@ -155,7 +159,7 @@ void add_child_node(std::string varAndSlice,
                     uint32_t timeIdx, 
                     astNode* const parentNode) {
   toCoutVerb("!! Add child "+varAndSlice+" to "+parentNode->dest);
-  if(varAndSlice == "state_0") {
+  if(varAndSlice == "word") {
     toCout("Found state_0!");
   }
   std::string var, varSlice;
@@ -687,6 +691,8 @@ void add_submod_node(std::string var, uint32_t timeIdx, astNode* const node) {
         || input == g_recentRst || connectWire == g_recentRst)
       continue;
     node->srcVec.push_back(connectWire);
+    if(connectWire == "word")
+      toCout("Find word!");
     add_child_node(connectWire, timeIdx, node);
   }
 }
