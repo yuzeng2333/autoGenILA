@@ -325,8 +325,8 @@ llvm::Value* two_op_constraint(astNode* const node, uint32_t timeIdx, context &c
   bool isReduceOp = node->isReduceOp;
   assert(node->srcVec.size() == 2);
   std::string destAndSlice = node->dest;
-  if(destAndSlice == "_0113_") {
-    toCout("find 0113");
+  if(destAndSlice == "_05_") {
+    toCout("find 05");
   }
   std::string op1AndSlice = node->srcVec[0];
   std::string op2AndSlice = node->srcVec[1];
@@ -1080,6 +1080,10 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
   for(uint32_t i = timeIdx; i <= bound; i++) {
     for(auto it = subMod->moduleInputs.begin(); it != subMod->moduleInputs.end(); it++) {
       std::string connectWire = g_curMod->insPort2wireMp[insName][*it];
+      if(connectWire.empty()) {
+        toCout("Warning: connect wire is empty, the port may be clk or rst: "+*it);
+        continue;
+      }
       std::string var, varSlice;
       split_slice(connectWire, var, varSlice);
       uint32_t hi = get_lgc_hi(connectWire);
