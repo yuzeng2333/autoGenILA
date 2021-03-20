@@ -92,13 +92,14 @@ void parse_verilog(std::string fileName) {
   //g_curMod->invarRegs = g_invarRegs;
   //g_moduleInfoMap.emplace(g_topModule, g_curMod);
   while( std::getline(input, line) ) {
-    if(is_comment_line(line))
+    if(line.empty() || is_comment_line(line)
+          || line.find_first_not_of(' ') == line.length())
       continue;
     if(line.find("_0699_") != std::string::npos) {
       toCout("Find it!");
     }
     fill_var_width(line, g_curMod->varWidth);
-    //toCout(line);
+    toCout(line);
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       case_expr(line, input);
       continue;
