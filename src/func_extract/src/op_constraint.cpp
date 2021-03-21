@@ -76,11 +76,10 @@ llvm::Value* var_expr(std::string varAndSlice, uint32_t timeIdx, context &c,
   else
     localWidth = width;
 
-  uint32_t varWidthNum;
-  if(width == 0) varWidthNum = get_var_slice_width_simp(var);
-
   if(is_x(varAndSlice)) {
     // FIXME: if encounter x value, just give 0 to it
+    toCout("Error: get a x value");
+    abort();
     return llvmInt(0, localWidth, c);
   } 
   else if(is_number(var)) {
@@ -103,33 +102,37 @@ llvm::Value* var_expr(std::string varAndSlice, uint32_t timeIdx, context &c,
         toCout("Error: var in var_expr is not number: "+var);
     }
   }
-  else if(width == 0) { // if is not num
-    // FIXME: use get_lgc_hi or get_ltr_hi??
-    uint32_t hi = get_ltr_hi(varAndSlice);
-    uint32_t lo = get_ltr_lo(varAndSlice);
-    if(isTaint) {
-      varTimed = var + DELIM + toStr(timeIdx) + _t;
-    }
-    else {
-      varTimed = var + DELIM + toStr(timeIdx);
-      //if(!isSolve && INPUT_EXPR_VAL.find(timed_name(varAndSlice, timeIdx)) != INPUT_EXPR_VAL.end() )
-      //  return *INPUT_EXPR_VAL[varTimed];
-    }
-    assert(timeIdx == g_maxDelay + 1);    
-    llvm::Value* ret = get_arg(var);
-    return extract(ret, hi, lo, c, Builder, llvm::Twine(varTimed));
-  }
   else {
-    if(isTaint)
-      varTimed = var + DELIM + toStr(timeIdx) + _t;
-    else
-      varTimed = var + DELIM + toStr(timeIdx);
-    // only vars are beginning cycles are not expanded
-    assert(timeIdx == g_maxDelay + 1);
-    llvm::Value* ret = get_arg(var);
-    //return c.bv_const(varTimed.c_str(), localWidth);
-    return ret;
+    toCout("Error: input to var_expr is not number: "+varAndSlice);
+    abort();
   }
+  //else if(width == 0) { // if is not num
+  //  // FIXME: use get_lgc_hi or get_ltr_hi??
+  //  uint32_t hi = get_ltr_hi(varAndSlice);
+  //  uint32_t lo = get_ltr_lo(varAndSlice);
+  //  if(isTaint) {
+  //    varTimed = var + DELIM + toStr(timeIdx) + _t;
+  //  }
+  //  else {
+  //    varTimed = var + DELIM + toStr(timeIdx);
+  //    //if(!isSolve && INPUT_EXPR_VAL.find(timed_name(varAndSlice, timeIdx)) != INPUT_EXPR_VAL.end() )
+  //    //  return *INPUT_EXPR_VAL[varTimed];
+  //  }
+  //  assert(timeIdx == g_maxDelay + 1);    
+  //  llvm::Value* ret = get_arg(var);
+  //  return extract(ret, hi, lo, c, Builder, llvm::Twine(varTimed));
+  //}
+  //else {
+  //  if(isTaint)
+  //    varTimed = var + DELIM + toStr(timeIdx) + _t;
+  //  else
+  //    varTimed = var + DELIM + toStr(timeIdx);
+  //  // only vars are beginning cycles are not expanded
+  //  assert(timeIdx == g_maxDelay + 1);
+  //  llvm::Value* ret = get_arg(var);
+  //  //return c.bv_const(varTimed.c_str(), localWidth);
+  //  return ret;
+  //}
 }
 
 
@@ -155,7 +158,7 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx, context &c,
                               builder &b, uint32_t bound) {
   g_seeInputs = true;
   std::string dest = node->dest;
-  if(dest == "mem_rdata") {
+  if(dest == "func") {
     toCout("Find it!");
   }
   toCoutVerb("See input:"+timed_name(dest, timeIdx));
@@ -291,6 +294,7 @@ llvm::Value* single_expr(std::string value, context &c, std::string varName,
     uint32_t localWidth = std::stoi(widthStr);
     uint32_t totalWidth = get_var_slice_width_simp(varName);
     std::string varTimed = varName + DELIM + toStr(timeIdx);
+    assert(is_input(varName));
     llvm::Value* val = get_arg(varTimed);
     return extract(val, idx, idx-localWidth+1, c, b, llvm::Twine(varTimed));
     //return c.bv_const((varTimed).c_str(), totalWidth).extract(idx, idx-localWidth+1);
@@ -611,7 +615,7 @@ llvm::Value* ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c
   assert(node->srcVec.size() == 3);
 
   std::string destAndSlice = node->dest;
-  if(destAndSlice == "_0002_") {
+  if(destAndSlice == "word_next") {
     toCout("find it!");
   }
   std::string condAndSlice = node->srcVec[0];

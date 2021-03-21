@@ -695,6 +695,10 @@ std::string remove_prefix_module(const std::string &writeAsvLine) {
 
 llvm::Value* get_arg(std::string regName, llvm::Function *func) {
   for(auto it = func->arg_begin(); it != func->arg_end(); it++) {
+    std::string funcNane = llvm::dyn_cast<llvm::Value>(func)->getName();
+    std::string argName = it->getName();
+    toCout("func name: "+funcNane);
+    toCout("arg name: "+argName);
     if(it->getName() == regName) return it;
   }
   toCout("Error: function input is not found: "+regName);
@@ -853,10 +857,5 @@ void collect_regs(std::shared_ptr<ModuleInfo_t> &curMod, std::string regPrefix) 
   }
 }
 
-
-bool is_comment(std::string line) {
-  size_t pos = line.find_first_not_of(' ');
-  return line.substr(pos, 2) == "//";
-}
 
 } // end of namespace funcExtract

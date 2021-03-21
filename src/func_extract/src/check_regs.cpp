@@ -525,7 +525,7 @@ llvm::Value* add_nb_constraint(astNode* const node,
                                std::shared_ptr<llvm::IRBuilder<>> &b,
                                uint32_t bound ) {
   std::string dest = node->dest;
-  if(dest.compare("mem_do_rdata") == 0 && timeIdx == bound) {
+  if(dest.compare("counter") == 0 && timeIdx == bound) {
     toCout("target reg found! time: "+toStr(timeIdx));
   }
   llvm::Value* destNextExpr;
@@ -561,9 +561,10 @@ llvm::Value* add_nb_constraint(astNode* const node,
   // end of if
 
   // if timeIdx = bound, then return function input or rst/norm value
-  if(g_curMod->invarRegs.find(dest) == g_curMod->invarRegs.end()
-      && g_curMod->moduleAs.find(dest) != g_curMod->moduleAs.end())
-    return get_arg(timed_name(dest, timeIdx), g_curFunc);
+  // TODO: adjust the following condition for different designs
+  if(g_curMod->invarRegs.find(dest) == g_curMod->invarRegs.end())
+      //&& g_curMod->moduleAs.find(dest) != g_curMod->moduleAs.end())
+    return get_arg(timed_name(dest, timeIdx), TheFunction);
   else {
     uint32_t width = get_var_slice_width_simp(dest);    
     std::string rstVal;
