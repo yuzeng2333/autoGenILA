@@ -43,7 +43,6 @@
 #include <iostream>
 #include <regex>
 
-
 #define toCout(a) std::cout << a << std::endl;
 #define instr(a) llvm::dyn_cast<llvm::Instruction>(a)
 #define toStr(a) std::to_string(a)

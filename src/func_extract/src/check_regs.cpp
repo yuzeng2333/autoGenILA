@@ -107,8 +107,16 @@ void print_llvm_ir(std::string destAndSlice,
   /// declare function
   // input types
   std::vector<llvm::Type *> argTy;
-  // push inputs
+
+  // push regs
+  // add regs from all instances of sub-modules to the args
   uint32_t argNum = 0;
+  for(auto it = g_regWidth.begin(); it != g_regWidth.end(); it++) {
+    uint32_t width = it->second;
+    argTy.push_back(llvm::IntegerType::get(*TheContext, width));
+    argNum++;
+  }
+  // push inputs
   for(uint32_t i = 0; i <= bound+1; i++)  
     for(auto it = g_curMod->moduleInputs.begin(); it != g_curMod->moduleInputs.end(); it++) {
       uint32_t width = get_var_slice_width_simp(*it);
@@ -116,13 +124,6 @@ void print_llvm_ir(std::string destAndSlice,
       argTy.push_back(llvm::IntegerType::get(*TheContext, width));
       argNum++;
     }
-  // push regs
-  // TODO: need to add regs from all instances of sub-modules to the args
-  for(auto it = g_regWidth.begin(); it != g_regWidth.end(); it++) {
-    uint32_t width = it->second;
-    argTy.push_back(llvm::IntegerType::get(*TheContext, width));
-    argNum++;
-  }
   // return types
   auto retTy = llvm::IntegerType::get(*TheContext, 
                                       get_var_slice_width_simp(destAndSlice));
