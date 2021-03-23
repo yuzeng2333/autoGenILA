@@ -484,6 +484,9 @@ llvm::Value* sel_op_constraint(astNode* const node, uint32_t timeIdx,
   if(node->op == "sel5")
     return sel5_op_constraint(node, timeIdx, c, b, bound);
 
+  if(node->dest == "_04_")
+    toCout("Find it!");
+
   std::smatch m;  
   assert(node->srcVec.size() == 3);
   std::string destAndSlice = node->dest;
@@ -615,7 +618,7 @@ llvm::Value* ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c
   assert(node->srcVec.size() == 3);
 
   std::string destAndSlice = node->dest;
-  if(destAndSlice == "word_next") {
+  if(destAndSlice == "word_sum_next") {
     toCout("find it!");
   }
   std::string condAndSlice = node->srcVec[0];
@@ -706,6 +709,15 @@ llvm::Value* ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c
     op2Expr = extract(add_constraint(node->childVec[2], timeIdx, c, b, bound), op2Hi, op2Lo, c, b, op2AndSlice);
   else
     op2Expr = add_constraint(node->childVec[2], timeIdx, c, b, bound);
+
+  //const char *ret = llvm::SelectInst::areInvalidOperands(iteCond, op1Expr, op2Expr);
+  //uint32_t ret = llvm::SelectInst::areInvalidOperands(iteCond, op1Expr, op2Expr);
+  //toCout("ret value is:");
+  //printf("%c", *ret);
+  //assert(llvm::SelectInst::areInvalidOperands(iteCond, op1Expr, op2Expr) == 0);
+  //std::string retStr(ret);
+  //if(ret == 0)
+  //  toCout("ret is 0");
 
   return b->CreateSelect(iteCond, op1Expr, op2Expr);
 }

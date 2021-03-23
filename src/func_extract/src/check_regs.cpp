@@ -136,16 +136,6 @@ void print_llvm_ir(std::string destAndSlice,
   uint32_t idx = 0;
   // FIXME the start and end index may be wrong
 
-  uint32_t argSize = TheFunction->arg_size();
-  toCout("Function arg size is: "+toStr(argSize));
-  for(uint32_t i = 0; i <= bound+1; i++)  
-    for(auto it = g_curMod->moduleInputs.begin(); it != g_curMod->moduleInputs.end(); it++) {
-      uint32_t width = get_var_slice_width_simp(*it);
-      toCout("set func arg: "+*it+DELIM+toStr(i));
-      (TheFunction->args().begin()+idx++)->setName(*it+DELIM+toStr(i));
-      argNum--;
-    }
-
   for(auto it = g_regWidth.begin(); it != g_regWidth.end(); it++) {
     std::string regName = it->first;
     toCout("set reg-type func arg: "+regName+DELIM+toStr(bound));
@@ -153,6 +143,16 @@ void print_llvm_ir(std::string destAndSlice,
     argNum--;
     g_topFuncArgMp.emplace(regName+DELIM+toStr(bound), TheFunction->args().begin()+idx++);
   }
+
+  uint32_t argSize = TheFunction->arg_size();
+  toCout("Function arg size is: "+toStr(argSize));
+  for(uint32_t i = 0; i <= bound; i++)  
+    for(auto it = g_curMod->moduleInputs.begin(); it != g_curMod->moduleInputs.end(); it++) {
+      uint32_t width = get_var_slice_width_simp(*it);
+      toCout("set func arg: "+*it+DELIM+toStr(i));
+      (TheFunction->args().begin()+idx++)->setName(*it+DELIM+toStr(i));
+      argNum--;
+    }
 
   // basic block
   BB = llvm::BasicBlock::Create(*TheContext, "bb_;_"+destAndSlice, TheFunction);
@@ -525,7 +525,7 @@ llvm::Value* add_nb_constraint(astNode* const node,
                                std::shared_ptr<llvm::IRBuilder<>> &b,
                                uint32_t bound ) {
   std::string dest = node->dest;
-  if(dest.compare("counter") == 0 && timeIdx == bound) {
+  if(dest.compare("word") == 0 && timeIdx == bound) {
     toCout("target reg found! time: "+toStr(timeIdx));
   }
   llvm::Value* destNextExpr;
@@ -562,9 +562,13 @@ llvm::Value* add_nb_constraint(astNode* const node,
 
   // if timeIdx = bound, then return function input or rst/norm value
   // TODO: adjust the following condition for different designs
-  if(g_curMod->invarRegs.find(dest) == g_curMod->invarRegs.end())
+
+  if(g_curMod->invarRegs.find(dest) == g_curMod->invarRegs.end()) {
       //&& g_curMod->moduleAs.find(dest) != g_curMod->moduleAs.end())
-    return get_arg(timed_name(dest, timeIdx), TheFunction);
+    std::string prefix = get_hier_name(false);
+    if(!prefix.empty()) prefix += ".";
+    return get_arg(prefix+timed_name(dest, timeIdx), TheFunction);
+  }
   else {
     uint32_t width = get_var_slice_width_simp(dest);    
     std::string rstVal;

@@ -116,7 +116,8 @@ extern std::vector<std::pair<std::string, uint32_t>> g_regWidth;
 extern std::set<std::string> g_readASV;
 extern std::set<std::string> g_allRegs;
 extern std::set<std::string> g_regWithFunc;
-extern std::set<std::string> g_invarRegs;
+// first is module name, second is reg name
+extern std::set<std::pair<std::string, std::string>> g_invarRegs;
 extern std::string g_rootNode;
 extern struct InstrInfo_t g_currInstrInfo;
 extern std::unordered_map<std::string, std::string> g_nopInstr;

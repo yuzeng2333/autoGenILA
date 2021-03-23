@@ -33,8 +33,17 @@ void module_expr(std::string line) {
   g_moduleInfoMap.emplace(g_currentModuleName, g_curMod);
   g_curMod->name = g_currentModuleName;
   if(g_currentModuleName == g_topModule) {
-    g_curMod->invarRegs = g_invarRegs;
+    for(auto pair : g_invarRegs) {
+      if(pair.first.empty())
+        g_curMod->invarRegs.insert(pair.second);
+    }
     g_curMod->moduleAs = moduleAs;
+  }
+  else {
+    for(auto pair : g_invarRegs) {
+      if(pair.first == g_currentModuleName)
+        g_curMod->invarRegs.insert(pair.second);
+    }
   }
 }
 

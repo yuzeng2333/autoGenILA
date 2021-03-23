@@ -15,7 +15,7 @@ std::map<std::string, std::shared_ptr<ModuleInfo_t>> g_moduleInfoMap;
 std::string g_topModule;
 std::shared_ptr<ModuleInfo_t> g_curMod;
 std::set<std::string> moduleWriteAs;
-std::set<std::string> g_invarRegs;
+std::set<std::pair<std::string, std::string>> g_invarRegs;
 StrSet_t moduleAs;
 uint32_t g_new_var;
 uint32_t g_instr_len;
@@ -349,7 +349,13 @@ void read_in_instructions(std::string fileName) {
           break;
         case InvarRegs:
           {
-            g_invarRegs.insert(line);
+            std::string modName, regName;
+            size_t tmpPos = line.find("_$_");
+            if(tmpPos != std::string::npos) {
+              modName = line.substr(0, tmpPos);
+              regName = line.substr(tmpPos+3);
+            }
+            g_invarRegs.insert(std::make_pair(modName, regName));
           }
           break;
         case TopMod:
