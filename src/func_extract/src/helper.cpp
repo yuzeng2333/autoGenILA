@@ -724,7 +724,7 @@ llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low,
 }
 
 
-llvm::Value* extract(llvm::Value* in, uint32_t high, uint32_t low, 
+llvm::Value* extract(llvm::Value* in, uint32_t high, uint32_t low,
                       std::shared_ptr<llvm::LLVMContext> &c, 
                       std::shared_ptr<llvm::IRBuilder<>> &b, 
                       const llvm::Twine &name) {
@@ -739,11 +739,14 @@ llvm::Value* extract(llvm::Value* in, uint32_t high, uint32_t low,
   }
   uint32_t len = high - low + 1;
   auto s1 = b->CreateLShr(in, low);
-  llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c), name);
-  if(name.isTriviallyEmpty())
+  if(name.isTriviallyEmpty()) {
+    llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c));
     return ret;
+  }
   else {
-    ret->setName(name.str());
+    llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c), 
+                          llvm::Twine(name.str()+" ["+toStr(high)+":"+toStr(low)+"]"));
+    ret->setName(name.str()+" ["+toStr(high)+":"+toStr(low)+"]");
     return ret;
   }
 }
