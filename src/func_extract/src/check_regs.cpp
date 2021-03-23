@@ -117,7 +117,7 @@ void print_llvm_ir(std::string destAndSlice,
     argNum++;
   }
   // push inputs
-  for(uint32_t i = 0; i <= bound+1; i++)  
+  for(uint32_t i = 0; i <= bound; i++)  
     for(auto it = g_curMod->moduleInputs.begin(); it != g_curMod->moduleInputs.end(); it++) {
       uint32_t width = get_var_slice_width_simp(*it);
       // FIXME the start and end index may be wrong

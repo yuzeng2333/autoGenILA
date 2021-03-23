@@ -56,7 +56,8 @@ void input_expr(std::string line) {
   std::string slice = m.str(2);
   std::string var = m.str(3);
 
-  g_curMod->moduleInputs.insert(var);
+  if(var != g_recentClk && var != g_recentRst)
+    g_curMod->moduleInputs.insert(var);
 
   bool insertDone;
   if(!slice.empty())

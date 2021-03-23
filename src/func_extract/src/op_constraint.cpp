@@ -1010,6 +1010,7 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     auto tmpPair = subMod->out2FuncMp[outPort];
     g_curFunc = tmpPair.first;
     auto funcBound = tmpPair.second;
+    FT = g_curFunc->getFunctionType();    
     // if greater than bound, we need to cut the function
     if(timeIdx+funcBound > bound) {
       // TODO
@@ -1033,6 +1034,8 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
 
     // the function args here is redundant. 
     // Later constraint elaboration will tell which inputs are necessary
+    // TODO: start from timeIdx is wrong
+    // TODO: start from timeIdx is wrong
     for(uint32_t i = timeIdx; i <= bound; i++) {
       for(auto it = subMod->moduleInputs.begin(); 
             it != subMod->moduleInputs.end(); it++) {
@@ -1108,16 +1111,18 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     args.push_back(topFuncArg);
   }
 
+  uint32_t i;
   // push func input args
   // This is a little tricky: args used here are less than the arg_size of 
   // original function if timeIdx > rootTimeIdx
-  for(uint32_t i = timeIdx; i <= bound; i++) {
+  for(i = timeIdx; i <= bound; i++) {
     for(auto it = subMod->moduleInputs.begin(); it != subMod->moduleInputs.end(); it++) {
       std::string connectWire = g_curMod->insPort2wireMp[insName][*it];
       if(connectWire.empty()) {
-        toCout("Warning: connect wire is empty, the port may be clk or rst: "+*it);
-        continue;
+        toCout("Error: connect wire is empty, the port may be clk or rst: "+*it);
+        abort();
       }
+      toCoutVerb("--- wire: "+connectWire+", timeIdx: "+toStr(i));
       std::string var, varSlice;
       split_slice(connectWire, var, varSlice);
       uint32_t hi = get_lgc_hi(connectWire);
@@ -1129,6 +1134,7 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     }
   }
 
+  toCoutVerb("--- To call function!");
   std::string destTimed = timed_name(destAndSlice, timeIdx);  
   return b->CreateCall(FT, g_curFunc, args, llvm::Twine(destTimed));
 }
