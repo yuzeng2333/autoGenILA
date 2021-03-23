@@ -64,6 +64,7 @@ void check_all_regs() {
   goalFile.open(g_path+"/goal.txt");
   goalFile.close();
   g_instancePairVec.clear();
+  clean_module_inputs();
   uint32_t i = 1;
   for(auto instrInfo : g_instrInfo) {
     toCout("---  BEGIN INSTRUCTION #"+toStr(i++)+" ---");
@@ -811,6 +812,21 @@ void print_time() {
   
   // ctime() used to give the present time 
   printf("%s", ctime(&my_time)); 
+}
+
+
+void clean_module_inputs() {
+  for(auto pair : g_moduleInfoMap) {
+    auto curMod = pair.second;
+    std::string modName = pair.first;
+    for(auto it = curMod->moduleInputs.begin(); 
+        it != curMod->moduleInputs.end(); it++) {
+      if(*it == curMod->clk || *it == curMod->rst) {
+        curMod->moduleInputs.erase(it);
+        toCoutVerb("Erase "+*it+" from "+modName);
+      }
+    }
+  }
 }
 
 } // end of namespace funcExtract

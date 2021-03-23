@@ -1129,8 +1129,7 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
       for(auto it = subMod->moduleInputs.begin(); it != subMod->moduleInputs.end(); it++) {
         std::string connectWire = g_curMod->insPort2wireMp[insName][*it];
         if(connectWire.empty()) {
-          toCout("Error: connect wire is empty, the port may be clk or rst: "+*it);
-          abort();
+          toCout("Warning: connect wire is empty, the port may be clk or rst: "+*it);
         }
         toCoutVerb("--- wire: "+connectWire+", timeIdx: "+toStr(i));
         std::string var, varSlice;

@@ -79,6 +79,8 @@ void add_nop(context &c, solver &s, uint32_t bound);
 
 void print_time(); 
 
+void clean_module_inputs();
+
 } // end of namespace funcExtract
 
 #endif
