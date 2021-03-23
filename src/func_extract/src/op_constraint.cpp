@@ -183,10 +183,6 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx, context &c,
   }
 
   // if input instruction should be given to the input ports
-  // FIXME: bound+1 or bound+2???
-  // TODO
-  // TODO
-  // TODO
   if(timeIdx + g_instr_len >= bound+1) { // input signal is explicitly given
     if(is_top_module() 
         && g_currInstrInfo.instrEncoding.find(dest) == g_currInstrInfo.instrEncoding.end()) {
@@ -242,8 +238,6 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx, context &c,
   else if(!g_nopInstr.empty()){ // give the value in nop instruction
     if(g_nopInstr.find(dest) == g_nopInstr.end()) {
       toCout("!!!!!!!!!! WARNING: var not found for nop instruction: "+dest);
-      // TODO: should return the function input
-      //return destExpr;
       return get_arg(destTimed);
     }
     std::string localVal = g_nopInstr[dest];
@@ -559,8 +553,8 @@ llvm::Value* sel_op_constraint(astNode* const node, uint32_t timeIdx,
   // add llvm::Value*ession to s or g
   return extract(b->CreateLShr(op1Expr, op2Expr), upBound, 0, c, b, destAndSlice);
 }
-//
-//
+
+
 /// Attention: the RHS might be just slices of dest(same variable). 
 ///             In such cases, slices are directly & separately assigned
 // TODO: call an explicit concat function in LLVM IR

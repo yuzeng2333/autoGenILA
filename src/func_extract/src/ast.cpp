@@ -51,6 +51,8 @@ std::vector<std::pair<std::string, uint32_t>> g_regWidth;
 void build_ast_tree() {
   toCout("### Begin build_ast_tree");
   g_curMod = g_moduleInfoMap[g_topModule];
+  g_curMod->clk = g_recentClk;
+  g_curMod->rst = g_recentRst;
   g_instancePairVec.push_back(std::make_pair(g_topModule, g_curMod));
   g_topMod = g_curMod;
   g_visitedNode = std::make_unique<std::map<std::string, astNode*>>();
@@ -671,9 +673,14 @@ void add_submod_node(std::string var, uint32_t timeIdx, astNode* const node) {
   //add_child_node(output, timeIdx, node);
   for(std::string input : subMod->moduleInputs) {
     std::string connectWire = g_curMod->insPort2wireMp[insName][input];
-    if(input == g_recentClk || connectWire == g_recentClk
-        || input == g_recentRst || connectWire == g_recentRst)
+    if(connectWire == g_curMod->clk) {
+      subMod->clk = input;
       continue;
+    }
+    if(connectWire == g_curMod->rst) {
+      subMod->rst = input;
+      continue;
+    }
     node->srcVec.push_back(connectWire);
     if(connectWire == "word")
       toCout("Find word!");

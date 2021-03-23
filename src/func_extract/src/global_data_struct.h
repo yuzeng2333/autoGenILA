@@ -62,6 +62,8 @@ struct ModuleInfo_t {
 
   std::string name;
   std::string pendingOutPortTimed;
+  std::string clk;
+  std::string rst;
   uint32_t minInOutDelay;
   uint32_t rootTimeIdx;
   std::shared_ptr<ModuleInfo_t> parentMod;

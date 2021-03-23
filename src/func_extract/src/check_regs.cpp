@@ -8,9 +8,6 @@ using namespace taintGen;
 
 namespace funcExtract {
 
-//TODO: the largest timeIdx of some function may exceed bound
-//TODO: the largest timeIdx of some function may exceed bound
-
 #define SV std::vector<std::string>
 #define toStr(a) std::to_string(a)
 #define context std::shared_ptr<llvm::LLVMContext>
@@ -705,7 +702,6 @@ void push_clean_queue(astNode* node, uint32_t timeIdx) {
 //    }
 //  }
 //
-//  // TODO: maybe deal with it in a better way?
 //  //s.add( destExpr == 0 );
 //};
 
