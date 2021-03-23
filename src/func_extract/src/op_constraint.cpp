@@ -173,14 +173,17 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx, context &c,
 
   // treate submodule's input separately
   if(!is_top_module()) {
-    assert(timeIdx <= bound+1);
+    assert(timeIdx <= bound);
     if(timeIdx > g_curMod->maxInputTimeIdx) g_curMod->maxInputTimeIdx = timeIdx;
     return get_arg(destTimed, g_curFunc);
   }
 
   // if input instruction should be given to the input ports
   // FIXME: bound+1 or bound+2???
-  if(timeIdx + g_instr_len >= bound+1) {
+  // TODO
+  // TODO
+  // TODO
+  if(timeIdx + g_instr_len >= bound+1) { // input signal is explicitly given
     if(is_top_module() 
         && g_currInstrInfo.instrEncoding.find(dest) == g_currInstrInfo.instrEncoding.end()) {
       toCout("Error: input signal not found for current instruction: "+dest);
@@ -1012,13 +1015,13 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     auto funcBound = tmpPair.second;
     FT = g_curFunc->getFunctionType();    
     // if greater than bound, we need to cut the function
-    if(timeIdx+funcBound > bound) {
-      // TODO
-      
-    }
-    else {
-      FT = g_curFunc->getFunctionType();
-    }
+    //if(timeIdx+funcBound > bound) {
+    //  // TODO
+    //  
+    //}
+    //else {
+    //  FT = g_curFunc->getFunctionType();
+    //}
   }
   else {
     // make the func

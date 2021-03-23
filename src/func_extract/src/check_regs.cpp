@@ -75,7 +75,7 @@ void check_all_regs() {
     for(auto pair: instrInfo.writeASV) {
       uint32_t cycleCnt = pair.first;
       std::string oneWriteAsv = pair.second;
-      print_llvm_ir(oneWriteAsv, cycleCnt-1, i-1);
+      print_llvm_ir(oneWriteAsv, cycleCnt, i-1);
       //print_llvm_ir_without_submodules(oneWriteAsv, cycleCnt-1, i-1);
       g_maxDelay = cycleCnt;
     }
@@ -90,9 +90,8 @@ void clean_data() {
 }
 
 
-// Attention: bound is the number of unroll non-blocking
-// By default, there already exists one non-blocking for every reg
-// so last timeIdx = bound + 1, or in2out delay = bound + 1
+/// bound is the number of regs from input to output
+/// timeIdx start from 0, max value = bound
 void print_llvm_ir(std::string destAndSlice, 
                    uint32_t bound, 
                    uint32_t instrIdx) {
@@ -117,6 +116,7 @@ void print_llvm_ir(std::string destAndSlice,
     argNum++;
   }
   // push inputs
+  // bound = (delay in instr.txt) - 1
   for(uint32_t i = 0; i <= bound; i++)  
     for(auto it = g_curMod->moduleInputs.begin(); it != g_curMod->moduleInputs.end(); it++) {
       uint32_t width = get_var_slice_width_simp(*it);
@@ -138,10 +138,11 @@ void print_llvm_ir(std::string destAndSlice,
 
   for(auto it = g_regWidth.begin(); it != g_regWidth.end(); it++) {
     std::string regName = it->first;
-    toCout("set reg-type func arg: "+regName+DELIM+toStr(bound));
-    (TheFunction->args().begin()+idx)->setName(regName+DELIM+toStr(bound));
+    std::string regNameBound = regName+DELIM+toStr(bound);
+    toCout("set reg-type func arg: "+regNameBound);
+    (TheFunction->args().begin()+idx)->setName(regNameBound);
     argNum--;
-    g_topFuncArgMp.emplace(regName+DELIM+toStr(bound), TheFunction->args().begin()+idx++);
+    g_topFuncArgMp.emplace(regNameBound, TheFunction->args().begin()+idx++);
   }
 
   uint32_t argSize = TheFunction->arg_size();
