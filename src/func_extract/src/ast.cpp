@@ -27,9 +27,6 @@
 #include <cstdlib>
 #include <memory>
 
-// TODO: delete all destTime in ast nodes since they are not valid
-// TODO: delete all destTime in ast nodes since they are not valid
-
 using namespace syntaxPatterns;
 using namespace taintGen;
 
@@ -203,7 +200,6 @@ void add_sliced_node(std::string varAndSlice,
   node->dest = var;
   node->op = "";
   //node->srcVec = g_curMod->reg2Slices[var];
-  node->destTime = timeIdx;
   node->done = false;
 
   auto srcVec = g_curMod->reg2Slices[var];
@@ -251,7 +247,6 @@ void add_nb_node(std::string regAndSlice, uint32_t timeIdx, astNode* const node)
     node->dest = regAndSlice;
     node->op = "<=";
     node->srcVec.push_back(destNext);
-    node->destTime = timeIdx;
     node->done = false;
 
     add_child_node(destNext, timeIdx+1, node);
@@ -329,7 +324,6 @@ void add_input_node(std::string input, uint32_t timeIdx, astNode* const node) {
     node->type = INPUT;
     node->dest = input;
     node->op = "";
-    node->destTime = timeIdx;
     node->done = true;
   }
   else {
@@ -338,7 +332,6 @@ void add_input_node(std::string input, uint32_t timeIdx, astNode* const node) {
     std::pair<std::string, std::shared_ptr<ModuleInfo_t>> pair = g_instancePairVec.back();
     /// the input is in parent-module
     node->op = "";
-    node->destTime = timeIdx;
     node->done = false;
   }
 }
@@ -351,7 +344,6 @@ void add_num_node(std::string num, uint32_t timeIdx, astNode* const node) {
   node->type = FE_NUM;
   node->dest = num;
   node->op = "";
-  node->destTime = timeIdx;
   node->done = true;
 }
 
@@ -361,7 +353,6 @@ void add_as_node(std::string as, uint32_t timeIdx, astNode* const node) {
   node->type = FE_AS;
   node->dest = as;
   node->op = "";
-  node->destTime = timeIdx;
   node->done = true;
 }
 
@@ -402,7 +393,6 @@ void add_two_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   node->dest = destAndSlice;
   node->op = op;
   node->srcVec = SV{op1AndSlice, op2AndSlice};
-  node->destTime = timeIdx;
   node->isReduceOp = isReduceOp;
   node->done = false;
 
@@ -439,7 +429,6 @@ void add_one_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   node->dest = destAndSlice;
   node->op = op;
   node->srcVec = SV{op1AndSlice};
-  node->destTime = timeIdx;
   node->done = false;
 
   add_child_node(op1AndSlice, timeIdx, node);  
@@ -488,7 +477,6 @@ void add_ite_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   node->dest = destAndSlice;
   node->op = "ite";
   node->srcVec = SV{condAndSlice, op1AndSlice, op2AndSlice};
-  node->destTime = timeIdx;
   node->done = false;
 
   add_child_node(condAndSlice, timeIdx, node);  
@@ -518,7 +506,6 @@ void add_reduce_op_node(std::string line, uint32_t timeIdx, astNode* const node)
   node->dest = destAndSlice;
   node->op = op;
   node->srcVec = SV{op1AndSlice};
-  node->destTime = timeIdx;
   node->done = false;
 
   add_child_node(op1AndSlice, timeIdx, node);  
@@ -555,7 +542,6 @@ void add_sel_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   node->dest = destAndSlice;
   node->op = op;
   node->srcVec = SV{op1AndSlice, op2AndSlice, integer};
-  node->destTime = timeIdx;
   node->isReduceOp = false;
   node->done = false;
 
@@ -594,7 +580,6 @@ void add_src_concat_op_node(std::string line, uint32_t timeIdx, astNode* const n
   node->dest = destAndSlice;
   node->op = "";
   node->srcVec = srcVec;
-  node->destTime = timeIdx;
   node->done = false;
 
   for(auto src: srcVec) {
@@ -633,7 +618,6 @@ void add_case_node(std::string var, uint32_t timeIdx, astNode* const node) {
     node->srcVec.push_back(caseAssign.first);
     node->srcVec.push_back(caseAssign.second);
   }
-  node->destTime = timeIdx;
   node->isReduceOp = false;
   node->done = false;
   return;
@@ -653,7 +637,6 @@ void add_func_node(std::string var, uint32_t timeIdx, astNode* const node) {
   for(std::string &input: funcInfo.inputs) {
     add_child_node(input, timeIdx, node);
   }
-  node->destTime = timeIdx;
   node->isReduceOp = false;
   node->done = false;
 }
@@ -666,7 +649,6 @@ void add_submod_node(std::string var, uint32_t timeIdx, astNode* const node) {
   std::string output = g_curMod->wire2InsPortMp[var].second;
   node->op = insName;
   node->srcVec = std::vector<std::string>{};
-  node->destTime = timeIdx;
   node->isReduceOp = false;
   node->done = false;
   // switch module before adding child node

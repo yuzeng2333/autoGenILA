@@ -30,7 +30,6 @@ struct astNode{
   std::string op;
   std::vector<std::string> srcVec;
   std::vector<astNode*> childVec;
-  uint32_t destTime;
   bool isReduceOp;
   bool done;
 };
