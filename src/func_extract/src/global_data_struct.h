@@ -62,7 +62,7 @@ struct ModuleInfo_t {
 
   std::string name;
   std::string pendingOutPortTimed;
-  uint32_t maxInputTimeIdx;
+  uint32_t minInOutDelay;
   uint32_t rootTimeIdx;
   std::shared_ptr<ModuleInfo_t> parentMod;
   StrSet_t moduleAs;
@@ -94,7 +94,7 @@ struct ModuleInfo_t {
   std::map<std::string, std::string> ins2modMap;  
   std::map<std::string, FuncInfo_t> funcTable;
   std::map<std::string, uint32_t> reg2timeIdx;  
-  // first key is output, second key is input
+  // store manually specified info. first key is output, second key is input
   std::map<std::string, 
            std::map<std::string, uint32_t>> out2InDelayMp;
   /// key is arg name, value is its iterator

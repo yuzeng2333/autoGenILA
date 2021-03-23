@@ -4,6 +4,7 @@
 #include "helper.h"
 #include "ast.h"
 #include <glog/logging.h>
+#include <limits>
 
 #define toStr(a) std::to_string(a)
 #define SV std::vector<std::string>
@@ -13,6 +14,7 @@
 //#define llvmInt(val, width, c) llvm::ConstantInt::get(llvmWidth(width, c), val, false);
 #define context std::shared_ptr<llvm::LLVMContext>
 #define builder std::shared_ptr<llvm::IRBuilder<>>
+#define UINT32_MAX  (0xffffffff)
 ///////////////////////////////////////////////////////////////////////////////
 //
 //  The main principle of making llvm::Value*/constraints
@@ -174,7 +176,9 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx, context &c,
   // treate submodule's input separately
   if(!is_top_module()) {
     assert(timeIdx <= bound);
-    if(timeIdx > g_curMod->maxInputTimeIdx) g_curMod->maxInputTimeIdx = timeIdx;
+    uint32_t delay = timeIdx - g_curMod->rootTimeIdx;
+    //if(timeIdx > g_curMod->maxInputTimeIdx) g_curMod->maxInputTimeIdx = timeIdx;
+    if(delay < g_curMod->minInOutDelay) g_curMod->minInOutDelay = delay;
     return get_arg(destTimed, g_curFunc);
   }
 
@@ -1079,8 +1083,8 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     // the output-inputVec pairs are stored in out2InDelayMp
     std::string outPortTimed = timed_name(outPort, timeIdx);
     g_curMod->pendingOutPortTimed = outPortTimed;
-    g_curMod->maxInputTimeIdx = timeIdx;
     g_curMod->rootTimeIdx = timeIdx;
+    g_curMod->minInOutDelay = UINT32_MAX;
     llvm::Value* ret = add_constraint(subMod->out2RootNodeMp[outPort], 0, c, b, bound);
     g_instancePairVec.pop_back();
     g_curMod = parentMod;
@@ -1118,22 +1122,32 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
   // push func input args
   // This is a little tricky: args used here are less than the arg_size of 
   // original function if timeIdx > rootTimeIdx
+  uint32_t minDelay = subMod->minInOutDelay;
   for(i = timeIdx; i <= bound; i++) {
-    for(auto it = subMod->moduleInputs.begin(); it != subMod->moduleInputs.end(); it++) {
-      std::string connectWire = g_curMod->insPort2wireMp[insName][*it];
-      if(connectWire.empty()) {
-        toCout("Error: connect wire is empty, the port may be clk or rst: "+*it);
-        abort();
+    if(i < timeIdx + minDelay) {
+      // these inputs for submod would not be used, so just give 0.
+      for(auto it = subMod->moduleInputs.begin(); it != subMod->moduleInputs.end(); it++) {
+        uint32_t width = get_var_slice_width_simp(*it, subMod);
+        args.push_back(llvmInt(0, width, c));
       }
-      toCoutVerb("--- wire: "+connectWire+", timeIdx: "+toStr(i));
-      std::string var, varSlice;
-      split_slice(connectWire, var, varSlice);
-      uint32_t hi = get_lgc_hi(connectWire);
-      uint32_t lo = get_lgc_lo(connectWire);
-      astNode *child = input2AstMp[connectWire];
-      // FIXME: child->destTime should not be used since it is wrong
-      llvm::Value* srcVal = add_constraint(child, i, c, b, bound);
-      args.push_back(extract(srcVal, hi, lo, c, b));
+    }
+    else {
+      for(auto it = subMod->moduleInputs.begin(); it != subMod->moduleInputs.end(); it++) {
+        std::string connectWire = g_curMod->insPort2wireMp[insName][*it];
+        if(connectWire.empty()) {
+          toCout("Error: connect wire is empty, the port may be clk or rst: "+*it);
+          abort();
+        }
+        toCoutVerb("--- wire: "+connectWire+", timeIdx: "+toStr(i));
+        std::string var, varSlice;
+        split_slice(connectWire, var, varSlice);
+        uint32_t hi = get_lgc_hi(connectWire);
+        uint32_t lo = get_lgc_lo(connectWire);
+        astNode *child = input2AstMp[connectWire];
+        // FIXME: child->destTime should not be used since it is wrong
+        llvm::Value* srcVal = add_constraint(child, i, c, b, bound);
+        args.push_back(extract(srcVal, hi, lo, c, b));
+      }
     }
   }
 
