@@ -95,8 +95,9 @@ void add_node(std::string varAndSlice,
               uint32_t timeIdx, 
               astNode* const node, 
               bool varIsDest) {
+  remove_two_end_space(varAndSlice);
   //toCout("Add node for: "+varAndSlice);
-  if(varAndSlice.find("aes_reg_key0_i.reg_out") != std::string::npos) {
+  if(varAndSlice.find("aes_out") != std::string::npos) {
     toCout("Found it!");
     s_node = node;
   }
@@ -658,7 +659,8 @@ void add_submod_node(std::string var, uint32_t timeIdx, astNode* const node) {
   g_curMod = g_moduleInfoMap[modName];
   auto subMod = g_curMod;
   // treate differently for new or seen submodule output
-  if(g_curMod->out2RootNodeMp.find(output) == g_curMod->out2RootNodeMp.end()) {
+  if( g_blackBoxModSet.find(modName) == g_blackBoxModSet.end()
+      && g_curMod->out2RootNodeMp.find(output) == g_curMod->out2RootNodeMp.end()) {
     g_visitedNode = std::make_unique<std::map<std::string, astNode*>>();
     g_visitedNodeStk.push(g_visitedNode);
     g_instancePairVec.push_back(std::make_pair(insName, g_curMod));

@@ -147,6 +147,7 @@ extern uint32_t g_instr_len;
 extern std::string DELIM;
 
 // for hierarchical store
+extern std::set<std::string> g_blackBoxModSet;
 extern std::map<std::string, std::shared_ptr<ModuleInfo_t>> g_moduleInfoMap;
 extern std::string g_topModule;
 extern std::stack<std::string> g_instanceStk;

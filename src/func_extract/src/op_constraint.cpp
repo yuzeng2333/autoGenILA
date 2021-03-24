@@ -989,6 +989,76 @@ llvm::Value* add_one_case_branch_expr(astNode* const node, llvm::Value* &caseVar
 //}
 
 
+llvm::Value* bbMod_constraint(astNode* const node, uint32_t timeIdx, context &c, 
+                               builder &b, uint32_t bound) {
+  std::string varAndSlice = node->dest;
+  std::string var, varSlice;
+  split_slice(varAndSlice, var, varSlice);
+  auto pair = g_curMod->wire2InsPortMp[varAndSlice];
+  std::string insName = pair.first;
+  auto subMod = get_mod_info(insName);
+  std::string modName = subMod->name;
+  if(g_blackBoxModSet.find(modName) == g_blackBoxModSet.end()) {
+    toCout("Error: no black box info is found for this module: "+modName);
+    abort();
+  }
+  auto retTy = llvm::IntegerType::get(*c, get_var_slice_width_simp(varAndSlice));
+  std::vector<llvm::Type *> argTy;  
+  for(auto it = subMod->out2InDelayMp[var].begin(); 
+        it != subMod->out2InDelayMp[var].end(); it++) {
+    std::string input = it->first;
+    std::string connectWire = g_curMod->insPort2wireMp[insName][input];
+    uint32_t delay = it->second;
+    uint32_t width = get_var_slice_width_simp(connectWire);
+    // FIXME the start and end index may be wrong
+    argTy.push_back(llvm::IntegerType::get(*TheContext, width));
+  }
+ 
+  std::string hierName = get_hier_name();  
+  llvm::FunctionType *FT = llvm::FunctionType::get(retTy, argTy, false);
+  g_curFunc = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
+                "func_;_"+hierName+"."+modName+"_$"+var, TheModule.get());
+  subMod->out2FuncMp.emplace(var, std::make_pair(g_curFunc, bound-timeIdx));
+
+  uint32_t idx = 0;
+  for(auto it = subMod->out2InDelayMp[var].begin(); 
+        it != subMod->out2InDelayMp[var].end(); it++) {
+    std::string input = it->first;
+    uint32_t delay = it->second;    
+    toCoutVerb("set func arg: "+input+DELIM+toStr(delay));
+    (g_curFunc->args().begin()+idx++)->setName(input+DELIM+toStr(delay));
+  }
+
+  // apply args
+  std::map<std::string, astNode*> input2AstMp;
+  for(uint32_t i = 0; i < node->srcVec.size(); i++)
+    input2AstMp.emplace(node->srcVec[i], node->childVec[i]);
+
+  std::vector<llvm::Value*> args;
+  for(auto it = subMod->out2InDelayMp[var].begin(); 
+      it != subMod->out2InDelayMp[var].end(); it++) {
+    std::string input = it->first;
+    uint32_t delay = it->second;
+    std::string connectWire = g_curMod->insPort2wireMp[insName][input];
+    if(connectWire.empty()) {
+      toCout("Warning: connect wire is empty, the port may be clk or rst: "+input);
+    }
+    toCoutVerb("--- wire: "+connectWire+", timeIdx: "+toStr(timeIdx+delay));
+    std::string var, varSlice;
+    split_slice(connectWire, var, varSlice);
+    uint32_t hi = get_lgc_hi(connectWire);
+    uint32_t lo = get_lgc_lo(connectWire);
+    astNode *child = input2AstMp[connectWire];
+    // FIXME: child->destTime should not be used since it is wrong
+    llvm::Value* srcVal = add_constraint(child, timeIdx+delay, c, b, bound);
+    args.push_back(extract(srcVal, hi, lo, c, b));
+  }
+
+  toCoutVerb("--- To call blackbox function!");
+  std::string destTimed = timed_name(varAndSlice, timeIdx);  
+  return b->CreateCall(FT, g_curFunc, args, llvm::Twine(destTimed));
+}
+
 llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c, 
                                builder &b, uint32_t bound) {
   // destAndSlice is the wire, not port

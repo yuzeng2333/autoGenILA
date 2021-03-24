@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
   print_time();
   /// read module_info.txt, result in g_moduleInfoMap
   /// read input-output delay info for sub-modules
-  //read_module_info();
+  read_module_info();
   // read instr.txt, result in g_instrInfo
   // instruction encodings, write/read ASV, NOP
   read_in_instructions(g_path+"/instr.txt");

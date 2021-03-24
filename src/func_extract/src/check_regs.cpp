@@ -487,6 +487,10 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
     toCout("find _2_");
   }
 
+  if(varAndSlice.find("aes_top_0.aes_out") != std::string::npos) {
+    toCout("find aes_top_0.aes_out");
+  }
+
   if(g_curMod->existedExpr.find(timed_name(varAndSlice, timeIdx)) 
       != g_curMod->existedExpr.end() ) {
     return g_curMod->existedExpr[timed_name(varAndSlice, timeIdx)];
@@ -509,7 +513,14 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
   //  retExpr = func_constraint(node, timeIdx, c, s, g, bound, isSolve);
   //}
   else if( is_submod_output(varAndSlice) ) {
-    retExpr = submod_constraint(node, timeIdx, c, b, bound);
+    auto pair = g_curMod->wire2InsPortMp[varAndSlice];
+    std::string insName = pair.first;
+    auto subMod = get_mod_info(insName);
+    std::string modName = subMod->name;
+    if(g_blackBoxModSet.find(modName) != g_blackBoxModSet.end())
+      retExpr = bbMod_constraint(node, timeIdx, c, b, bound);
+    else
+      retExpr = submod_constraint(node, timeIdx, c, b, bound);
   }
   else { // it is wire
     retExpr = add_ssa_constraint(node, timeIdx, c, b, bound);

@@ -24,13 +24,12 @@ void module_expr(std::string line) {
   std::string portList = m.str(3);
 
   if(g_moduleInfoMap.find(g_currentModuleName) != g_moduleInfoMap.end()) {
-    toCout("Error: this module has been seen before: "+g_currentModuleName);
-    abort();
     g_curMod = g_moduleInfoMap[g_currentModuleName];
   }
-  else
+  else {
     g_curMod = std::make_unique<ModuleInfo_t>();
-  g_moduleInfoMap.emplace(g_currentModuleName, g_curMod);
+    g_moduleInfoMap.emplace(g_currentModuleName, g_curMod);
+  }
   g_curMod->name = g_currentModuleName;
   if(g_currentModuleName == g_topModule) {
     for(auto pair : g_invarRegs) {
@@ -534,6 +533,8 @@ void submodule_expr(std::string firstLine, std::ifstream &input) {
   for(auto pair : wire2PortMp) {
     std::string port = pair.first;
     std::string wire = pair.second;
+    remove_two_end_space(port);
+    remove_two_end_space(wire);
     g_curMod->wire2InsPortMp.emplace(wire, std::make_pair(instanceName, port));
     if( g_curMod->insPort2wireMp.find(instanceName) == g_curMod->insPort2wireMp.end() )
       g_curMod->insPort2wireMp.emplace(instanceName, std::map<std::string, std::string>{{port, wire}});

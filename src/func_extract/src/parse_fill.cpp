@@ -16,6 +16,7 @@ std::string g_topModule;
 std::shared_ptr<ModuleInfo_t> g_curMod;
 std::set<std::string> moduleWriteAs;
 std::set<std::pair<std::string, std::string>> g_invarRegs;
+std::set<std::string> g_blackBoxModSet;
 StrSet_t moduleAs;
 uint32_t g_new_var;
 uint32_t g_instr_len;
@@ -394,6 +395,7 @@ void read_module_info() {
   std::ifstream input(fileName);
   if(!input.is_open()) {
     toCout("Warning: cannot open "+g_path + "/module_info.txt");
+    return;
   }
   std::string line;
   std::string moduleName;
@@ -418,6 +420,7 @@ void read_module_info() {
       remove_back_space(outVar);
       inputDelayMap.clear();
       seeOutput = true;
+      moduleInfo->moduleOutputs.insert(outVar);      
     }
     else if(line.find("}") == std::string::npos) { // input and delay
       assert(seeOutput);
@@ -427,6 +430,7 @@ void read_module_info() {
       remove_two_end_space(input);
       remove_two_end_space(delay);
       inputDelayMap.emplace(input, std::stoi(delay));
+      moduleInfo->moduleInputs.insert(input);
     }
     else {
       seeOutput = false;
@@ -434,6 +438,7 @@ void read_module_info() {
     }
   }
   g_moduleInfoMap.emplace(moduleInfo->name, moduleInfo);
+  g_blackBoxModSet.insert(moduleInfo->name);
 } 
 
 
