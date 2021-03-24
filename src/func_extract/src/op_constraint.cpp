@@ -160,7 +160,7 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx, context &c,
                               builder &b, uint32_t bound) {
   g_seeInputs = true;
   std::string dest = node->dest;
-  if(dest == "func") {
+  if(dest == "data_in" && timeIdx == 24) {
     toCout("Find it!");
   }
   toCoutVerb("See input:"+timed_name(dest, timeIdx));
@@ -256,6 +256,10 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx, context &c,
       }
       else
         toCout("Error: unexpected input value: "+localVal);          
+    }
+    else {
+      toCout("Error: NOP instruction has x value: "+dest);
+      abort();
     }
   }
   else {
