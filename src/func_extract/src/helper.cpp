@@ -699,6 +699,8 @@ llvm::Value* get_arg(std::string regName, llvm::Function *func) {
     std::string argName = it->getName();
     toCout("func name: "+funcNane);
     toCout("arg name: "+argName);
+    if(argName.find("ata_fifo.r0___#25") != std::string::npos)
+      toCout("Find it!!");
     if(it->getName() == regName) return it;
   }
   toCout("Error: function input is not found: "+regName);

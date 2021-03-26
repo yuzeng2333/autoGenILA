@@ -623,7 +623,7 @@ llvm::Value* ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c
   assert(node->srcVec.size() == 3);
 
   std::string destAndSlice = node->dest;
-  if(destAndSlice == "word_sum_next") {
+  if(destAndSlice == "_0146_" && timeIdx == 25) {
     toCout("find it!");
   }
   std::string condAndSlice = node->srcVec[0];
@@ -1000,33 +1000,43 @@ llvm::Value* bbMod_constraint(astNode* const node, uint32_t timeIdx, context &c,
   split_slice(varAndSlice, var, varSlice);
   auto pair = g_curMod->wire2InsPortMp[varAndSlice];
   std::string insName = pair.first;
+  std::string outPort = pair.second;  
   auto subMod = get_mod_info(insName);
   std::string modName = subMod->name;
   if(g_blackBoxModSet.find(modName) == g_blackBoxModSet.end()) {
     toCout("Error: no black box info is found for this module: "+modName);
     abort();
   }
-  auto retTy = llvm::IntegerType::get(*c, get_var_slice_width_simp(varAndSlice));
-  std::vector<llvm::Type *> argTy;  
-  for(auto it = subMod->out2InDelayMp[var].begin(); 
-        it != subMod->out2InDelayMp[var].end(); it++) {
-    std::string input = it->first;
-    std::string connectWire = g_curMod->insPort2wireMp[insName][input];
-    uint32_t delay = it->second;
-    uint32_t width = get_var_slice_width_simp(connectWire);
-    // FIXME the start and end index may be wrong
-    argTy.push_back(llvm::IntegerType::get(*TheContext, width));
+
+  llvm::FunctionType *FT;
+  if(subMod->out2FuncMp.find(outPort) != subMod->out2FuncMp.end()) {
+    g_curFunc = subMod->out2FuncMp[outPort].first;
+    FT = g_curFunc->getFunctionType();
   }
+  else {
+    auto retTy = llvm::IntegerType::get(*c, get_var_slice_width_simp(varAndSlice));
+    std::vector<llvm::Type *> argTy;  
+    for(auto it = subMod->out2InDelayMp[outPort].begin(); 
+          it != subMod->out2InDelayMp[outPort].end(); it++) {
+      std::string input = it->first;
+      std::string connectWire = g_curMod->insPort2wireMp[insName][input];
+      uint32_t delay = it->second;
+      uint32_t width = get_var_slice_width_simp(connectWire);
+      // FIXME the start and end index may be wrong
+      argTy.push_back(llvm::IntegerType::get(*TheContext, width));
+    }
  
-  std::string hierName = get_hier_name();  
-  llvm::FunctionType *FT = llvm::FunctionType::get(retTy, argTy, false);
-  g_curFunc = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
-                "func_;_"+hierName+"."+modName+"_$"+var, TheModule.get());
-  subMod->out2FuncMp.emplace(var, std::make_pair(g_curFunc, bound-timeIdx));
+    std::string hierName = get_hier_name();
+    std::string funcNane = "func_;_"+hierName+"."+modName+"_$"+outPort;
+    FT = llvm::FunctionType::get(retTy, argTy, false);
+    g_curFunc = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
+                                        funcNane, TheModule.get());
+    subMod->out2FuncMp.emplace(outPort, std::make_pair(g_curFunc, bound-timeIdx));
+  }
 
   uint32_t idx = 0;
-  for(auto it = subMod->out2InDelayMp[var].begin(); 
-        it != subMod->out2InDelayMp[var].end(); it++) {
+  for(auto it = subMod->out2InDelayMp[outPort].begin(); 
+        it != subMod->out2InDelayMp[outPort].end(); it++) {
     std::string input = it->first;
     uint32_t delay = it->second;    
     toCoutVerb("set func arg: "+input+DELIM+toStr(delay));
@@ -1039,8 +1049,8 @@ llvm::Value* bbMod_constraint(astNode* const node, uint32_t timeIdx, context &c,
     input2AstMp.emplace(node->srcVec[i], node->childVec[i]);
 
   std::vector<llvm::Value*> args;
-  for(auto it = subMod->out2InDelayMp[var].begin(); 
-      it != subMod->out2InDelayMp[var].end(); it++) {
+  for(auto it = subMod->out2InDelayMp[outPort].begin(); 
+      it != subMod->out2InDelayMp[outPort].end(); it++) {
     std::string input = it->first;
     uint32_t delay = it->second;
     std::string connectWire = g_curMod->insPort2wireMp[insName][input];

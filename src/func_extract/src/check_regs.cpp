@@ -491,6 +491,11 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
     toCout("find aes_top_0.aes_out");
   }
 
+  if(timeIdx > bound) {
+    uint32_t width = get_var_slice_width_simp(varAndSlice);
+    return llvmInt(0, width, c);
+  }
+
   if(g_curMod->existedExpr.find(timed_name(varAndSlice, timeIdx)) 
       != g_curMod->existedExpr.end() ) {
     return g_curMod->existedExpr[timed_name(varAndSlice, timeIdx)];
@@ -535,7 +540,7 @@ llvm::Value* add_nb_constraint(astNode* const node,
                                std::shared_ptr<llvm::IRBuilder<>> &b,
                                uint32_t bound ) {
   std::string dest = node->dest;
-  if(dest.compare("word") == 0 && timeIdx == bound) {
+  if(dest.find("ata_fifo.r0") != std::string::npos && timeIdx == 25) {
     toCout("target reg found! time: "+toStr(timeIdx));
   }
   llvm::Value* destNextExpr;
