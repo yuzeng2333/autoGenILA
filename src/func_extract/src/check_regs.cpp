@@ -845,4 +845,18 @@ void clean_module_inputs() {
   }
 }
 
+
+void print_reg_info() {
+  uint32_t totalWidth = 0;
+  std::ofstream output("./reg_info.txt");
+  for(auto it = g_regWidth.begin(); it != g_regWidth.end(); it++) {
+    std::string regName = it->first;
+    uint32_t width = it->second;
+    output << regName + ":" + toStr(width) << std::endl;
+    totalWidth += width;
+  }
+  output << "Total width: "+toStr(totalWidth) << std::endl;
+}
+
+
 } // end of namespace funcExtract

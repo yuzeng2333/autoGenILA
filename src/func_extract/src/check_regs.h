@@ -81,6 +81,8 @@ void print_time();
 
 void clean_module_inputs();
 
+void print_reg_info();
+
 } // end of namespace funcExtract
 
 #endif

@@ -40,6 +40,8 @@ int main(int argc, char *argv[]) {
   g_path = argv[1];
   // if argv[3] is 1, clean the file
   std::string doClean = argv[2];
+  bool printRegInfo = false;
+  if(argc > 3) printRegInfo = argv[3] == "-reg";
   time_t my_time = time(NULL);
   g_outFile.open(g_path+"/result.txt");
   g_outFile << "Begin main!" << std::endl;
@@ -90,6 +92,10 @@ int main(int argc, char *argv[]) {
                                  g_moduleOutputsMap);
                                  */
   build_ast_tree();
+  if(printRegInfo) {
+    print_reg_info();
+    return 0;
+  }
   check_all_regs();
   print_time();  
   clean_goal();
