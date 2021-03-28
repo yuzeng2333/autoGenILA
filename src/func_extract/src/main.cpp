@@ -64,10 +64,12 @@ int main(int argc, char *argv[]) {
     clean_file(g_path+"/design.v", false);
     toCout("### Begin remove_functions");
     remove_functions(g_path+"/design.v");
+    get_io(g_path+"/design.v.clean");
     toCout("### Begin parse_verilog");
     parse_verilog(g_path+"/design.v.clean");
   }
   else {
+    get_io(g_path+"/design.v.clean");
     toCout("### Begin parse_verilog");
     parse_verilog(g_path+"/design.v.clean");
   }

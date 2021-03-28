@@ -149,8 +149,12 @@ void add_node(std::string varAndSlice,
   else if( is_submod_output(varToAdd) ) {
     add_submod_node(varToAdd, timeIdx, node);
   }
-  else { // it is wire
+  else if( g_curMod->ssaTable.find(varAndSlice) != g_curMod->ssaTable.end() ){ // it is wire
     add_ssa_node(varToAdd, timeIdx, node);
+  }
+  else {
+    toCout("Error: cannot find assignment statement for: "+varToAdd);
+    abort();
   }
 }
 

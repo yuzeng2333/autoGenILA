@@ -108,10 +108,19 @@ void parse_verilog(std::string fileName) {
     uint32_t choice = parse_verilog_line(line, true);
     switch(choice) {
     case MODULE:
-      module_expr(line);
-      break;
-    case INPUT:
-      input_expr(line);
+      {
+        std::smatch m;
+        if (!std::regex_match(line, m, pModule))
+          return;
+        g_currentModuleName = m.str(2);
+        if(g_moduleInfoMap.find(g_currentModuleName) != g_moduleInfoMap.end()) {
+          g_curMod = g_moduleInfoMap[g_currentModuleName];
+        }
+        else {
+          toCout("Error: unexpected module: "+g_currentModuleName);
+          abort();
+        }
+      }
       break;
     case REG:
       reg_expr(line);
@@ -121,9 +130,6 @@ void parse_verilog(std::string fileName) {
       break;
     case MEM:
       mem_expr(line);
-      break;
-    case OUTPUT:
-      output_expr(line);
       break;
     case TWO_OP:
     case ONE_OP:
@@ -493,6 +499,38 @@ void read_all_regs(std::string fileName) {
   std::string line;
   while(std::getline(input, line)) {
     g_allRegs.insert(line);
+  }
+}
+
+
+/// this function only gets module name and their 
+void get_io(const std::string &fileName) {
+  toCout("### Begin get IO information");
+  std::ifstream input(fileName);
+  std::string line;
+  std::smatch match;
+  while( std::getline(input, line) ) {
+    if(line.empty() || is_comment_line(line)
+          || line.find_first_not_of(' ') == line.length())
+      continue;
+    fill_var_width(line, g_curMod->varWidth);    
+    if ( std::regex_match(line, match, pAlwaysComb) ) {
+      continue;
+    }
+    uint32_t choice = parse_verilog_line(line, true);
+    switch(choice) {
+    case MODULE:
+      module_expr(line);
+      break;
+    case INPUT:
+      input_expr(line);
+      break;
+    case OUTPUT:
+      output_expr(line);
+      break;
+    default:
+      break;
+    }
   }
 }
 

@@ -49,5 +49,6 @@ void read_top_module_info();
 
 void read_all_regs(std::string fileName);
 
+void get_io(const std::string &fileName);
 } // end of namespace funcExtract
 #endif

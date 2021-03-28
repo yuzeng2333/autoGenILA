@@ -459,7 +459,8 @@ llvm::Value* add_constraint(std::string varAndSlice, uint32_t timeIdx, context &
   else {
     for(std::string varSlice : g_curMod->reg2Slices[var]) {
       if(g_curMod->varNode.find(varSlice) == g_curMod->varNode.end()) {
-        toCout("Error: cannot find node for: "+varSlice);
+        toCout("!!! Error: cannot find node for: "+varSlice);
+        abort();
       }
       llvm::Value* tmpSlice = add_constraint(g_curMod->varNode[varSlice], timeIdx, c, b, bound);
       if(retIsEmpty) {

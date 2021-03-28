@@ -475,6 +475,7 @@ bool has_direct_assignment(std::string varAndSlice) {
   bool withinReg2Slices = g_curMod->reg2Slices.find(var) != g_curMod->reg2Slices.end();
   if(varSlice.empty()) {
     toCout("Error: expecting slice for input: "+varAndSlice);
+    abort();
   }
   return withinReg2Slices 
          && std::find(g_curMod->reg2Slices[var].begin(), g_curMod->reg2Slices[var].end(), varAndSlice) 
