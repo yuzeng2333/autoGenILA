@@ -1774,7 +1774,7 @@ bool is_concat(std::string var) {
 }
 
 
-bool extract_concat(std::string var, std::vector<std::string> &vec) {
+bool split_concat(std::string var, std::vector<std::string> &vec) {
   remove_two_end_space(var);
   if(var.front() != '{' || var.back() != '}') return false;
   size_t pos = 1;
@@ -1782,10 +1782,13 @@ bool extract_concat(std::string var, std::vector<std::string> &vec) {
   do {
     commaPos = var.find_first_of(',' , pos);
     std::string oneVar;
-    if(commaPos != std::string::npos)
+    if(commaPos != std::string::npos) {
       oneVar = var.substr(pos, commaPos-pos);
-    else
+    }
+    else {
       oneVar = var.substr(pos);
+      oneVar.pop_back();
+    }
     remove_two_end_space(oneVar);
     vec.push_back(oneVar);
     pos = commaPos + 1;

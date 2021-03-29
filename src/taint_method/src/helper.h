@@ -171,5 +171,7 @@ bool vec_has_only_vars(const std::vector<std::string> &vec);
 bool is_concat(std::string line);
 
 bool extract_concat(std::string var, std::vector<std::string> &vec);
+
+bool split_concat(std::string var, std::vector<std::string> &vec);
 } // end of namespace taintGen
 #endif

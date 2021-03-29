@@ -2613,7 +2613,7 @@ void clean_submod(std::ifstream &input, std::ofstream &output) {
     std::string port = m.str(2);
     std::string wire = m.str(3);
     std::vector<std::string> varVec;
-    if(extract_concat(wire, varVec)) {
+    if(split_concat(wire, varVec)) {
       // get total width
       uint32_t totalWidth = 0;
       for(std::string var: varVec) totalWidth += get_var_slice_width(var);
