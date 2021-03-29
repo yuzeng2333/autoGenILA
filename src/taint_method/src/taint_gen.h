@@ -102,7 +102,7 @@ void assert_reg_map_gen();
 
 void map_gen(std::string moduleName, std::string instanceName, std::ofstream &output);
 
-void clean_submod(std::ifstream &input, std::ofstream &output);
+void clean_submod(std::ifstream &input, std::ofstream &output, const std::string &firstLine);
 
 std::string separate_modules(std::string fileName, 
                              std::vector<std::string> &modules,

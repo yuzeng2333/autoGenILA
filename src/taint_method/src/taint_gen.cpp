@@ -559,7 +559,7 @@ void remove_functions(std::string fileName) {
       remove_function_wrapper(line, input, output);
     }
     else if(g_clean_submod && choice == INSTANCEBEGIN) {
-      clean_submod(input, output);
+      clean_submod(input, output, line);
     }
     else
       output << line << std::endl;
@@ -2599,7 +2599,7 @@ void map_gen(std::string moduleName, std::string instanceName, std::ofstream &ou
 
 
 // this module prints the cleaned submod instantiation, input is changed to end of submod
-void clean_submod(std::ifstream &input, std::ofstream &output) {
+void clean_submod(std::ifstream &input, std::ofstream &output, const std::string &firstLine) {
   // insBegin is the first line for port/wire connection
   auto insBegin = input.tellg();
   std::string line;
@@ -2623,6 +2623,7 @@ void clean_submod(std::ifstream &input, std::ofstream &output) {
     }
   }
   input.seekg(insBegin);
+  output << firstLine << std::endl;
   while(std::getline(input, line) && !std::regex_match(line, m, pInstanceEnd)) {
     if(!std::regex_match(line, m, pInstancePort)) {
       toCout("Error in matching module ports: "+line);
