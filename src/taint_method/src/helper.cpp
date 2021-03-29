@@ -1763,4 +1763,34 @@ bool vec_has_only_vars(const std::vector<std::string> &vec) {
   return true;
 }
 
+
+bool is_concat(std::string var) {
+  remove_two_end_space(var);
+  if(var.front() != '{' || var.back() != '}') return false;
+  if(var.find(",") == std::string::npos) {
+    toCout("Error: no concatenations in braces: "+var);
+  }
+  return true;
+}
+
+
+bool extract_concat(std::string var, std::vector<std::string> &vec) {
+  remove_two_end_space(var);
+  if(var.front() != '{' || var.back() != '}') return false;
+  size_t pos = 1;
+  size_t commaPos;
+  do {
+    commaPos = var.find_first_of(',' , pos);
+    std::string oneVar;
+    if(commaPos != std::string::npos)
+      oneVar = var.substr(pos, commaPos-pos);
+    else
+      oneVar = var.substr(pos);
+    remove_two_end_space(oneVar);
+    vec.push_back(oneVar);
+    pos = commaPos + 1;
+  } while(commaPos != std::string::npos);
+  return true;
+}
+
 } // end of namespace taintGen

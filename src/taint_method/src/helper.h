@@ -168,5 +168,8 @@ void remove_two_end_space(std::string &str);
 
 bool vec_has_only_vars(const std::vector<std::string> &vec);
 
+bool is_concat(std::string line);
+
+bool extract_concat(std::string var, std::vector<std::string> &vec);
 } // end of namespace taintGen
 #endif

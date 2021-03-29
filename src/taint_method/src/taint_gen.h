@@ -39,6 +39,9 @@ namespace taintGen {
 #define IF              26
 #define ELSE            27
 #define MODULE          28
+#define FUNC            29
+#define SUBMODOUT       30
+#define SUBMODIN        31
 #define UNSUPPORT       99
 #define NONE            100
 
@@ -98,6 +101,8 @@ void collect_case_dest(const std::string &line);
 void assert_reg_map_gen();
 
 void map_gen(std::string moduleName, std::string instanceName, std::ofstream &output);
+
+void clean_submod(std::ifstream &input, std::ofstream &output);
 
 std::string separate_modules(std::string fileName, 
                              std::vector<std::string> &modules,

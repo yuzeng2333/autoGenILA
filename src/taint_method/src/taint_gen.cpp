@@ -86,6 +86,7 @@ bool g_use_zy_count = false;
 bool g_use_reset_sig = false;
 bool g_remove_adff = false;
 bool g_use_value_change = false;
+bool g_clean_submod = false;
 // TODO: set this configurations!
 // // for func_extract, split long bitVec into multiple short ones
 bool g_split_long_num = true;
@@ -556,6 +557,9 @@ void remove_functions(std::string fileName) {
     uint32_t choice = parse_verilog_line(line, true);
     if ( choice == FUNCDEF ) {
       remove_function_wrapper(line, input, output);
+    }
+    else if(g_clean_submod && choice == INSTANCEBEGIN) {
+      clean_submod(input, output);
     }
     else
       output << line << std::endl;
@@ -1487,7 +1491,7 @@ void remove_function_wrapper(std::string firstLine, std::ifstream &input, std::o
     }
   }
 
-  std::string a,b,s; // used in function.
+  std::string a, b, s; // used in function.
   std::string lineForParsing = line;
   if( !std::regex_match(lineForParsing, m, pFunctionCall) ) {
     toCout("Error in parsing function call");
@@ -2592,6 +2596,51 @@ void map_gen(std::string moduleName, std::string instanceName, std::ofstream &ou
     }
   }
 }
+
+
+// this module prints the cleaned submod instantiation, input is changed to end of submod
+void clean_submod(std::ifstream &input, std::ofstream &output) {
+  // insBegin is the first line for port/wire connection
+  auto insBegin = input.tellg();
+  std::string line;
+  std::smatch m;
+  std::map<std::string, std::string> port2FangyuanMp;
+  while(std::getline(input, line) && !std::regex_match(line, m, pInstanceEnd)) {
+    if(!std::regex_match(line, m, pInstancePort)) {
+      toCout("Error in matching module ports: "+line);
+      abort();
+    }
+    std::string port = m.str(2);
+    std::string wire = m.str(3);
+    std::vector<std::string> varVec;
+    if(extract_concat(wire, varVec)) {
+      // get total width
+      uint32_t totalWidth = 0;
+      for(std::string var: varVec) totalWidth += get_var_slice_width(var);
+      std::string localIdx = std::to_string(NEW_FANGYUAN++);
+      output << "  wire ["+toStr(totalWidth-1)+":0] fangyuan"+localIdx+";" << std::endl;
+      port2FangyuanMp.emplace(port, "fangyuan"+localIdx);
+    }
+  }
+  input.seekg(insBegin);
+  while(std::getline(input, line) && !std::regex_match(line, m, pInstanceEnd)) {
+    if(!std::regex_match(line, m, pInstancePort)) {
+      toCout("Error in matching module ports: "+line);
+      abort();
+    }
+    std::string port = m.str(2);
+    std::string wire = m.str(3);
+    if(port2FangyuanMp.find(port) == port2FangyuanMp.end()) output << line << std::endl;
+    else {
+      std::string wire = port2FangyuanMp[port];
+      output << "    ."+port+"("+wire+")," << std::endl;
+    }
+  }
+  // print the last line
+  assert(std::regex_match(line, m, pInstanceEnd));
+  output << line << std::endl;
+}
+
 
 
 // 1. separate the original file into multiple files, each containing one module
