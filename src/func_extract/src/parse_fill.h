@@ -50,5 +50,16 @@ void read_top_module_info();
 void read_all_regs(std::string fileName);
 
 void get_io(const std::string &fileName);
+
+void remove_function_wrapper(std::string firstLine, 
+                             std::ifstream &input, 
+                             std::ofstream &output);
+
+void clean_submod(std::ifstream &input, 
+                  std::ofstream &output, 
+                  const std::string &firstLine);
+
+void remove_functions(std::string fileName);
+
 } // end of namespace funcExtract
 #endif

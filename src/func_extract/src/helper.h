@@ -158,7 +158,7 @@ std::string zero_extend_num(std::string num);
 
 std::string formedHex2bin(std::string num);
 
-bool is_hex(std::string num);
+bool is_hex(std::string num);;
 
 int try_stoi(std::string num);
 
@@ -197,7 +197,7 @@ llvm::Value* concat_value(llvm::Value* val1, llvm::Value* val2,
 
 bool is_x(const std::string &var);
 
-bool is_input(const std::string &var);
+bool is_input(const std::string &var, const std::shared_ptr<ModuleInfo_t> &modInfo=g_curMod);
 
 bool is_output(const std::string &var);
 

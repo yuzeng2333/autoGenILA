@@ -41,7 +41,10 @@ int main(int argc, char *argv[]) {
   // if argv[3] is 1, clean the file
   std::string doClean = argv[2];
   bool printRegInfo = false;
-  if(argc > 3) printRegInfo = argv[3] == "-reg";
+  if(argc > 3) {
+    std::string argv3 = argv[3];    
+    if( argv3 == "-reg") printRegInfo = true ;
+  }
   time_t my_time = time(NULL);
   g_outFile.open(g_path+"/result.txt");
   g_outFile << "Begin main!" << std::endl;
@@ -52,6 +55,7 @@ int main(int argc, char *argv[]) {
   g_print_solver = false;
   g_remove_adff = true;
   g_split_long_num = true;
+  g_clean_submod = true;
   print_time();
   /// read module_info.txt, result in g_moduleInfoMap
   /// read input-output delay info for sub-modules
@@ -60,24 +64,28 @@ int main(int argc, char *argv[]) {
   // instruction encodings, write/read ASV, NOP
   read_in_instructions(g_path+"/instr.txt");
   if(doClean.compare("1") == 0) {
-    toCout("### Begin clean_file");
+    toCout("##### Begin clean_file");
     clean_file(g_path+"/design.v", false);
-    toCout("### Begin remove_functions");
-    remove_functions(g_path+"/design.v");
+
+    toCout("##### Begin getting IO");
     get_io(g_path+"/design.v.clean");
-    toCout("### Begin parse_verilog");
+
+    toCout("##### Begin remove_functions");
+    funcExtract::remove_functions(g_path+"/design.v");
+
+    toCout("##### Begin parse_verilog");
     parse_verilog(g_path+"/design.v.clean");
   }
   else {
     get_io(g_path+"/design.v.clean");
-    toCout("### Begin parse_verilog");
+    toCout("##### Begin parse_verilog");
     parse_verilog(g_path+"/design.v.clean");
   }
   read_all_regs(g_path+"/regs.txt");  
   //read_in_architectural_states(asFile);
   //clean_verilog(g_path+"/design.v.clean");
   vcd_parser(g_path+"/rst.vcd");
-  inv_gen();
+  //inv_gen();
   // get update function hierarchically
   std::vector<std::string> modules;  
   std::map<std::string, std::vector<std::string>> childModules;

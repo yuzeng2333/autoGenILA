@@ -1073,6 +1073,7 @@ llvm::Value* bbMod_constraint(astNode* const node, uint32_t timeIdx, context &c,
   return b->CreateCall(FT, g_curFunc, args, llvm::Twine(destTimed));
 }
 
+
 llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c, 
                                builder &b, uint32_t bound) {
   // destAndSlice is the wire, not port

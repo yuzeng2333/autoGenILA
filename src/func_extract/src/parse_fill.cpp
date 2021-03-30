@@ -5,6 +5,8 @@
 #include "global_data_struct.h"
 #include "../../taint_method/src/global_data.h"
 
+#define toStr(a) std::to_string(a)
+
 using namespace taintGen;
 using namespace syntaxPatterns;
 
@@ -113,6 +115,12 @@ void parse_verilog(std::string fileName) {
         if (!std::regex_match(line, m, pModule))
           return;
         g_currentModuleName = m.str(2);
+
+        if(m.str(3) == "t0" || g_currentModuleName == "table_lookup") {
+          toCout("Find it!!");
+        }
+
+        toCout("=== Begin module: "+m.str(2));
         if(g_moduleInfoMap.find(g_currentModuleName) != g_moduleInfoMap.end()) {
           g_curMod = g_moduleInfoMap[g_currentModuleName];
         }
@@ -121,6 +129,9 @@ void parse_verilog(std::string fileName) {
           abort();
         }
       }
+      break;
+    case INPUT:
+    case OUTPUT:
       break;
     case REG:
       reg_expr(line);
@@ -532,6 +543,83 @@ void get_io(const std::string &fileName) {
       break;
     }
   }
+}
+
+
+void remove_functions(std::string fileName) {
+  std::ifstream input(fileName+".nocomment");
+  std::ofstream output(fileName + ".clean");
+  std::string line;
+  while( std::getline(input, line) ) {
+    uint32_t choice = parse_verilog_line(line, true);
+    if ( choice == FUNCDEF ) {
+      taintGen::remove_function_wrapper(line, input, output);
+    }
+    else if(g_clean_submod && choice == INSTANCEBEGIN) {
+      clean_submod(input, output, line);
+    }
+    else
+      output << line << std::endl;
+  }
+}
+
+
+// this module prints the cleaned submod instantiation, input is changed to end of submod
+void clean_submod(std::ifstream &input, 
+                  std::ofstream &output, 
+                  const std::string &firstLine) {
+  // insBegin is the first line for port/wire connection
+  auto insBegin = input.tellg();
+  std::string line;
+  std::smatch m;
+  if(!std::regex_match(firstLine, m, pInstanceBegin)) {
+    toCout("Error: not a instantiaion begin: "+firstLine);
+    abort();
+  }
+  std::string modName = m.str(2);
+  std::string insName = m.str(3);
+  auto subMod = g_moduleInfoMap[modName];
+  std::map<std::string, std::string> port2FangyuanMp;
+  while(std::getline(input, line) && !std::regex_match(line, m, pInstanceEnd)) {
+    if(!std::regex_match(line, m, pInstancePort)) {
+      toCout("Error in matching module ports: "+line);
+      abort();
+    }
+    std::string port = m.str(2);
+    std::string wire = m.str(3);
+    std::vector<std::string> varVec;
+    if(split_concat(wire, varVec)) {
+      // get total width
+      uint32_t totalWidth = 0;
+      for(std::string var: varVec) totalWidth += get_var_slice_width(var);
+      std::string localIdx = std::to_string(NEW_FANGYUAN++);
+      output << "  wire ["+toStr(totalWidth-1)+":0] fangyuan"+localIdx+";" << std::endl;
+      // if port is input
+      if( is_input(port, subMod) )
+        output << "  assign fangyuan"+localIdx+" = "+wire+";" << std::endl;
+      else
+        output << "  assign "+wire+" = fangyuan"+localIdx+";" << std::endl;
+      port2FangyuanMp.emplace(port, "fangyuan"+localIdx);
+    }
+  }
+  input.seekg(insBegin);
+  output << firstLine << std::endl;
+  while(std::getline(input, line) && !std::regex_match(line, m, pInstanceEnd)) {
+    if(!std::regex_match(line, m, pInstancePort)) {
+      toCout("Error in matching module ports: "+line);
+      abort();
+    }
+    std::string port = m.str(2);
+    std::string wire = m.str(3);
+    if(port2FangyuanMp.find(port) == port2FangyuanMp.end()) output << line << std::endl;
+    else {
+      std::string wire = port2FangyuanMp[port];
+      output << "    ."+port+"("+wire+")," << std::endl;
+    }
+  }
+  // print the last line
+  assert(std::regex_match(line, m, pInstanceEnd));
+  output << line << std::endl;
 }
 
 

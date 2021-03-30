@@ -787,9 +787,9 @@ bool is_x(const std::string &var) {
 }
 
 
-bool is_input(const std::string &var) {
-  auto it = std::find( g_curMod->moduleInputs.begin(), g_curMod->moduleInputs.end(), var );
-  return it != g_curMod->moduleInputs.end();
+bool is_input(const std::string &var, const std::shared_ptr<ModuleInfo_t> &modInfo) {
+  auto it = std::find( modInfo->moduleInputs.begin(), modInfo->moduleInputs.end(), var );
+  return it != modInfo->moduleInputs.end();
 }
 
 
@@ -862,6 +862,7 @@ void collect_regs(std::shared_ptr<ModuleInfo_t> &curMod, std::string regPrefix) 
     collect_regs(childMod, regPrefix+insName);
   }
 }
+
 
 
 } // end of namespace funcExtract
