@@ -14,7 +14,6 @@ namespace funcExtract {
 
 // global variables
 std::map<std::string, std::shared_ptr<ModuleInfo_t>> g_moduleInfoMap;
-std::string g_topModule;
 std::shared_ptr<ModuleInfo_t> g_curMod;
 std::set<std::string> moduleWriteAs;
 std::set<std::pair<std::string, std::string>> g_invarRegs;

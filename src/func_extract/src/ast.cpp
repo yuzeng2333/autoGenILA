@@ -75,9 +75,6 @@ void build_ast_tree() {
       }
     }
   }
-
-  // collect all regs
-  collect_regs(g_curMod, "");
 }
 
 

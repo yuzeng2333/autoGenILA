@@ -149,7 +149,6 @@ extern std::string DELIM;
 // for hierarchical store
 extern std::set<std::string> g_blackBoxModSet;
 extern std::map<std::string, std::shared_ptr<ModuleInfo_t>> g_moduleInfoMap;
-extern std::string g_topModule;
 extern std::stack<std::string> g_instanceStk;
 extern std::vector<std::pair<std::string, std::shared_ptr<ModuleInfo_t>>> g_instancePairVec;
 extern std::shared_ptr<ModuleInfo_t> g_curMod;

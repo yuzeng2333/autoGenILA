@@ -18,7 +18,7 @@
 #include "../../taint_method/src/global_data.h"
 #include "../../taint_method/src/helper.h"
 #include "../../taint_method/src/taint_gen.h"
-
+#include "helper.h"
 
 namespace funcExtract {
 
@@ -101,11 +101,16 @@ int main(int argc, char *argv[]) {
                                  g_moduleInputsMap,
                                  g_moduleOutputsMap);
                                  */
-  build_ast_tree();
-  if(printRegInfo) {
+  if(printRegInfo) {  
+    // collect all regs
+    toCout("#### Gegin collect regs and print info");
+    g_curMod = g_moduleInfoMap[g_topModule];    
+    collect_regs(g_curMod, "");
     print_reg_info();
     return 0;
   }
+
+  build_ast_tree();
   check_all_regs();
   print_time();  
   clean_goal();
