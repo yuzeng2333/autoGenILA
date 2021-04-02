@@ -20,6 +20,13 @@
 #include "../../taint_method/src/taint_gen.h"
 #include "helper.h"
 
+
+/// ========= Needed files
+// 1. design.v
+// 2. rst.vcd (optional)
+// 3. instr.txt
+
+
 namespace funcExtract {
 
 bool g_print_solver;
@@ -81,7 +88,7 @@ int main(int argc, char *argv[]) {
     toCout("##### Begin parse_verilog");
     parse_verilog(g_path+"/design.v.clean");
   }
-  read_all_regs(g_path+"/regs.txt");  
+  //read_all_regs(g_path+"/regs.txt");  
   //read_in_architectural_states(asFile);
   //clean_verilog(g_path+"/design.v.clean");
   vcd_parser(g_path+"/rst.vcd");

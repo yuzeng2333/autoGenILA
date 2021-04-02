@@ -458,6 +458,7 @@ void read_module_info() {
 } 
 
 
+// not used...
 void read_top_module_info() {
   std::string fileName = g_path + "/top_module_info.txt";
   std::ifstream input(fileName);
@@ -504,6 +505,7 @@ ModuleInfo_t::~ModuleInfo_t() {
 }
 
 
+// not used...
 void read_all_regs(std::string fileName) {
   std::ifstream input(fileName);
   std::string line;
@@ -576,6 +578,10 @@ void clean_submod(std::ifstream &input,
     abort();
   }
   std::string modName = m.str(2);
+
+  if(modName == "SRAM2S_1024X16")
+    toCout("Find it!");
+
   std::string insName = m.str(3);
   auto subMod = g_moduleInfoMap[modName];
   std::map<std::string, std::string> port2FangyuanMp;

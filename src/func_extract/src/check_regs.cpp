@@ -96,7 +96,7 @@ void print_llvm_ir(std::string destAndSlice,
   // declaration for llvm
   TheContext = llvm::make_unique<llvm::LLVMContext>();
   // FIXME: change the following model name
-  TheModule = llvm::make_unique<llvm::Module>("mod_;_"+destAndSlice, *TheContext);
+  TheModule = llvm::make_unique<llvm::Module>("mod_;_"+g_topModule+"_;_"+destAndSlice, *TheContext);
   Builder = llvm::make_unique<llvm::IRBuilder<>>(*TheContext);
   g_curMod = g_moduleInfoMap[g_topModule];
   g_instancePairVec.push_back(std::make_pair(g_topModule, g_curMod));
