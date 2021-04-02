@@ -581,9 +581,9 @@ llvm::Value* add_nb_constraint(astNode* const node,
 
   if(g_curMod->invarRegs.find(dest) == g_curMod->invarRegs.end()) {
       //&& g_curMod->moduleAs.find(dest) != g_curMod->moduleAs.end())
-    std::string prefix = get_hier_name(false);
-    if(!prefix.empty()) prefix += ".";
-    return get_arg(prefix+timed_name(dest, timeIdx), TheFunction);
+    //std::string prefix = get_hier_name(false);
+    //if(!prefix.empty()) prefix += ".";
+    return get_arg(timed_name(dest, timeIdx), TheFunction);
   }
   else {
     uint32_t width = get_var_slice_width_simp(dest);    

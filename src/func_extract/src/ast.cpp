@@ -261,16 +261,21 @@ void add_nb_node(std::string regAndSlice, uint32_t timeIdx, astNode* const node)
     add_child_node(destNext, timeIdx+1, node);
     std::string reg, regSlice;
     split_slice(regAndSlice, reg, regSlice);
-    std::string hierName = get_hier_name(false);
-    if(!hierName.empty()) hierName += ".";
-    uint32_t width = get_var_slice_width_simp(reg);
+    //std::string hierName = get_hier_name(false);
+    //if(!hierName.empty()) hierName += ".";
+    //uint32_t width = get_var_slice_width_simp(reg);
   }
   else if(std::regex_match(destAssign, m, pNonblockConcat)) {
+    toCout("Error: pNonblockConcat is not supported yet!!");
+    abort();
   }
   else if(std::regex_match(destAssign, m, pNonblockIf)) {
+    toCout("Error: pNonblockIf is not supported yet!!");
+    abort();
   }
   else {
     toCout("Error in add_nb_constraint: "+destAssign);
+    abort();
   }
 }
 
