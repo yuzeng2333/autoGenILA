@@ -1091,14 +1091,15 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
   llvm::FunctionType *FT;
   llvm::Function *subFunc;  
   llvm::Function *parentFunc;  
-  RegWidthVec_t subModRegWidth;  
+  RegWidthVec_t subModRegWidth;
+  uint32_t funcBound;
   if(subMod->out2FuncMp.find(outPort) != subMod->out2FuncMp.end()) {
     // FIXME:
     // This many not be true for some designs, since differnet instances may 
     // need different functions
     auto tmpPair = subMod->out2FuncMp[outPort];
     subFunc = tmpPair.first;
-    auto funcBound = tmpPair.second;
+    funcBound = tmpPair.second;
     FT = subFunc->getFunctionType();    
     // if greater than bound, we need to cut the function
     //if(timeIdx+funcBound > bound) {
@@ -1141,7 +1142,8 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     subFunc = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
                   //"func_;_"+hierName+"."+modName+"_$"+outPort, TheModule.get());
                   "func_;_"+modName+"_$"+outPort, TheModule.get());
-    subMod->out2FuncMp.emplace(outPort, std::make_pair(subFunc, bound-timeIdx));
+    funcBound = bound-timeIdx;
+    subMod->out2FuncMp.emplace(outPort, std::make_pair(subFunc, funcBound));
 
     // set name for args
     uint32_t idx = 0;
@@ -1228,6 +1230,16 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
         llvm::Value* srcVal = add_constraint(child, i, c, b, bound);
         args.push_back(extract(srcVal, hi, lo, c, b));
       }
+    }
+  }
+
+  uint32_t curBound = bound - timeIdx;
+  // may need to add more 0 value args to meet the arg length requirement
+  for(uint32_t i = 0; i < funcBound - curBound; i++) {
+    for(auto it = subMod->moduleInputs.begin(); it != subMod->moduleInputs.end(); it++) {
+      std::string connectWire = g_curMod->insPort2wireMp[insName][*it];
+      uint32_t width = get_var_slice_width_simp(connectWire);
+      args.push_back(llvmInt(0, width, c));
     }
   }
 
