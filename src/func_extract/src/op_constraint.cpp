@@ -1009,9 +1009,11 @@ llvm::Value* bbMod_constraint(astNode* const node, uint32_t timeIdx, context &c,
   }
 
   llvm::FunctionType *FT;
+  //llvm::Function *parentFunc = g_curFunc;
+  llvm::Function *subFunc;
   if(subMod->out2FuncMp.find(outPort) != subMod->out2FuncMp.end()) {
-    g_curFunc = subMod->out2FuncMp[outPort].first;
-    FT = g_curFunc->getFunctionType();
+    subFunc = subMod->out2FuncMp[outPort].first;
+    FT = subFunc->getFunctionType();
   }
   else {
     auto retTy = llvm::IntegerType::get(*c, get_var_slice_width_simp(varAndSlice));
@@ -1029,9 +1031,9 @@ llvm::Value* bbMod_constraint(astNode* const node, uint32_t timeIdx, context &c,
     std::string hierName = get_hier_name();
     std::string funcNane = "func_;_"+hierName+"."+modName+"_$"+outPort;
     FT = llvm::FunctionType::get(retTy, argTy, false);
-    g_curFunc = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
+    subFunc = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
                                         funcNane, TheModule.get());
-    subMod->out2FuncMp.emplace(outPort, std::make_pair(g_curFunc, bound-timeIdx));
+    subMod->out2FuncMp.emplace(outPort, std::make_pair(subFunc, bound-timeIdx));
   }
 
   uint32_t idx = 0;
@@ -1040,7 +1042,7 @@ llvm::Value* bbMod_constraint(astNode* const node, uint32_t timeIdx, context &c,
     std::string input = it->first;
     uint32_t delay = it->second;    
     toCoutVerb("set func arg: "+input+DELIM+toStr(delay));
-    (g_curFunc->args().begin()+idx++)->setName(input+DELIM+toStr(delay));
+    (subFunc->args().begin()+idx++)->setName(input+DELIM+toStr(delay));
   }
 
   // apply args
@@ -1070,7 +1072,7 @@ llvm::Value* bbMod_constraint(astNode* const node, uint32_t timeIdx, context &c,
 
   toCoutVerb("--- To call blackbox function!");
   std::string destTimed = timed_name(varAndSlice, timeIdx);  
-  return b->CreateCall(FT, g_curFunc, args, llvm::Twine(destTimed));
+  return b->CreateCall(FT, subFunc, args, llvm::Twine(destTimed));
 }
 
 
