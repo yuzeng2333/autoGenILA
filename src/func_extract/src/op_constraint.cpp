@@ -1092,6 +1092,8 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
   llvm::Function *subFunc;  
   llvm::Function *parentFunc;  
   RegWidthVec_t subModRegWidth;
+  // collect all regs in current module and sub-instances
+  collect_regs(subMod, "", subModRegWidth);
   uint32_t funcBound;
   if(subMod->out2FuncMp.find(outPort) != subMod->out2FuncMp.end()) {
     // FIXME:
@@ -1114,9 +1116,6 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     // make the func
     auto retTy = llvm::IntegerType::get(*c, get_var_slice_width_simp(destAndSlice));
     std::vector<llvm::Type *> argTy;
-
-    // collect all regs in current module and sub-instances
-    collect_regs(subMod, "", subModRegWidth);
 
     // push reg type arg first
     for(auto it = subModRegWidth.begin(); it != subModRegWidth.end(); it++) {
