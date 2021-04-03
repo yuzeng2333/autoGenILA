@@ -104,6 +104,7 @@ void print_llvm_ir(std::string destAndSlice,
   /// declare function
   // input types
   std::vector<llvm::Type *> argTy;
+  collect_regs(g_curMod, "", g_regWidth);
 
   // push regs
   // add regs from all instances of sub-modules to the args
@@ -583,7 +584,7 @@ llvm::Value* add_nb_constraint(astNode* const node,
       //&& g_curMod->moduleAs.find(dest) != g_curMod->moduleAs.end())
     //std::string prefix = get_hier_name(false);
     //if(!prefix.empty()) prefix += ".";
-    return get_arg(timed_name(dest, timeIdx), TheFunction);
+    return get_arg(timed_name(dest, timeIdx), g_curFunc);
   }
   else {
     uint32_t width = get_var_slice_width_simp(dest);    

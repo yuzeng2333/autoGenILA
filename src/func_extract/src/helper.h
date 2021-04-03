@@ -211,7 +211,9 @@ std::string get_hier_name(bool includeTopModule=true);
 
 bool is_top_module();
 
-void collect_regs(std::shared_ptr<ModuleInfo_t> &curMod, std::string regPrefix);
+void collect_regs(std::shared_ptr<ModuleInfo_t> &curMod, 
+                  std::string regPrefix,
+                  RegWidthVec_t &regWidth = g_regWidth);
 
 } // end of namespace funcExtract
 

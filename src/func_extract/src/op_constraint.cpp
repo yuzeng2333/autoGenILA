@@ -1089,21 +1089,24 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
   std::string modName = subMod->name;
 
   llvm::FunctionType *FT;
+  llvm::Function *subFunc;  
+  llvm::Function *parentFunc;  
+  RegWidthVec_t subModRegWidth;  
   if(subMod->out2FuncMp.find(outPort) != subMod->out2FuncMp.end()) {
     // FIXME:
     // This many not be true for some designs, since differnet instances may 
     // need different functions
     auto tmpPair = subMod->out2FuncMp[outPort];
-    g_curFunc = tmpPair.first;
+    subFunc = tmpPair.first;
     auto funcBound = tmpPair.second;
-    FT = g_curFunc->getFunctionType();    
+    FT = subFunc->getFunctionType();    
     // if greater than bound, we need to cut the function
     //if(timeIdx+funcBound > bound) {
     //  // TODO
     //  
     //}
     //else {
-    //  FT = g_curFunc->getFunctionType();
+    //  FT = subFunc->getFunctionType();
     //}
   }
   else {
@@ -1111,13 +1114,15 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     auto retTy = llvm::IntegerType::get(*c, get_var_slice_width_simp(destAndSlice));
     std::vector<llvm::Type *> argTy;
 
+    // collect all regs in current module and sub-instances
+    collect_regs(subMod, "", subModRegWidth);
+
     // push reg type arg first
-    for(auto it = subMod->moduleTrueRegs.begin(); 
-          it != subMod->moduleTrueRegs.end(); it++) {
-      uint32_t width = get_var_slice_width_simp(*it, subMod);
+    for(auto it = subModRegWidth.begin(); it != subModRegWidth.end(); it++) {
+      uint32_t width = it->second;
       argTy.push_back(llvm::IntegerType::get(*TheContext, width));
     }
-
+    
     // the function args here is redundant. 
     // Later constraint elaboration will tell which inputs are necessary
     // TODO: start from timeIdx is wrong
@@ -1131,29 +1136,29 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
       }
     }
 
-    std::string hierName = get_hier_name();
+    //std::string hierName = get_hier_name();
     FT = llvm::FunctionType::get(retTy, argTy, false);
-    g_curFunc = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
-                  "func_;_"+hierName+"."+modName+"_$"+outPort, TheModule.get());
-    subMod->out2FuncMp.emplace(outPort, std::make_pair(g_curFunc, bound-timeIdx));
+    subFunc = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
+                  //"func_;_"+hierName+"."+modName+"_$"+outPort, TheModule.get());
+                  "func_;_"+modName+"_$"+outPort, TheModule.get());
+    subMod->out2FuncMp.emplace(outPort, std::make_pair(subFunc, bound-timeIdx));
 
     // set name for args
     uint32_t idx = 0;
-    for(auto it = subMod->moduleTrueRegs.begin(); 
-          it != subMod->moduleTrueRegs.end(); it++) {
-      toCoutVerb("set func arg: "+*it+DELIM+toStr(bound));
+    for(auto it = subModRegWidth.begin(); it != subModRegWidth.end(); it++) {
+      toCoutVerb("set func arg: "+it->first+DELIM+toStr(bound));
       // TODO: change bound to bound
-      (g_curFunc->args().begin()+idx++)->setName(*it+DELIM+toStr(bound));
+      (subFunc->args().begin()+idx++)->setName(it->first+DELIM+toStr(bound));
     }
     for(uint32_t i = timeIdx; i <= bound; i++) {
       for(auto it = subMod->moduleInputs.begin(); it != subMod->moduleInputs.end(); it++) {
         toCoutVerb("set func arg: "+*it+DELIM+toStr(i));
-        (g_curFunc->args().begin()+idx++)->setName(*it+DELIM+toStr(i));
+        (subFunc->args().begin()+idx++)->setName(*it+DELIM+toStr(i));
       }
     }
 
     // make bb for the function
-    llvm::BasicBlock *localBB = llvm::BasicBlock::Create(*c, "bb_;_"+modName+"_$"+outPort, g_curFunc);
+    llvm::BasicBlock *localBB = llvm::BasicBlock::Create(*c, "bb_;_"+modName+"_$"+outPort, subFunc);
     b->SetInsertPoint(localBB);
     auto parentMod = g_curMod;
     g_curMod = subMod;
@@ -1164,15 +1169,21 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     g_curMod->pendingOutPortTimed = outPortTimed;
     g_curMod->rootTimeIdx = timeIdx;
     g_curMod->minInOutDelay = UINT32_MAX;
+
+    // switch func before elaborating
+    parentFunc = g_curFunc;
+    g_curFunc = subFunc;
     llvm::Value* ret = add_constraint(subMod->out2RootNodeMp[outPort], 0, c, b, bound);
     g_instancePairVec.pop_back();
     g_curMod = parentMod;
+    g_curFunc = parentFunc;
     // TODO: modify input_constraint
     Builder->CreateRet(ret);
-    llvm::verifyFunction(*g_curFunc);
+    llvm::verifyFunction(*subFunc);
     llvm::verifyModule(*TheModule);
     b->SetInsertPoint(BB);
   }
+  // args to be used when call functions
   std::vector<llvm::Value*> args;
   assert(node->srcVec.size() == node->childVec.size());
 
@@ -1181,20 +1192,11 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     input2AstMp.emplace(node->srcVec[i], node->childVec[i]);
 
   // push func reg args
-  for(auto it = subMod->moduleTrueRegs.begin(); 
-        it != subMod->moduleTrueRegs.end(); it++) {
+  for(auto it = subModRegWidth.begin(); it != subModRegWidth.end(); it++) {
     // find corresponding top func arg 
-    uint32_t width = get_var_slice_width_simp(*it, subMod);
-    std::string regName = *it;
-    std::string prefix = get_hier_name(false);
-    if(!prefix.empty()) prefix += ".";
-    std::string completeName = prefix+insName+"."+regName+DELIM+toStr(bound);
-    if(g_topFuncArgMp.find(completeName) == g_topFuncArgMp.end()) {
-      toCout("Error: cannot find top function arg: "+completeName);
-      abort();
-    }
-    auto topFuncArg = llvm::dyn_cast<llvm::Value>(g_topFuncArgMp[completeName]);
-    args.push_back(topFuncArg);
+    std::string regName = it->first;
+    auto arg = get_arg(insName+"."+regName+DELIM+toStr(bound), g_curFunc);
+    args.push_back(arg);
   }
 
   uint32_t i;
@@ -1231,7 +1233,7 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
 
   toCoutVerb("--- To call function!");
   std::string destTimed = timed_name(destAndSlice, timeIdx);  
-  return b->CreateCall(FT, g_curFunc, args, llvm::Twine(destTimed));
+  return b->CreateCall(FT, subFunc, args, llvm::Twine(destTimed));
 }
 
 
