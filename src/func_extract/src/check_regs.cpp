@@ -485,7 +485,7 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
                             uint32_t bound ) {
   // Attention: varAndSlice might have a slice, a directly-assigned varAndSlice
   std::string varAndSlice = node->dest;
-  if(varAndSlice == "rst") {
+  if(varAndSlice == "_04_") {
     toCout("find it");
   }
 

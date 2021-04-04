@@ -334,7 +334,7 @@ llvm::Value* two_op_constraint(astNode* const node, uint32_t timeIdx, context &c
   bool isReduceOp = node->isReduceOp;
   assert(node->srcVec.size() == 2);
   std::string destAndSlice = node->dest;
-  if(destAndSlice == "_05_") {
+  if(destAndSlice == "_04_") {
     toCout("find 05");
   }
   std::string op1AndSlice = node->srcVec[0];
@@ -346,6 +346,10 @@ llvm::Value* two_op_constraint(astNode* const node, uint32_t timeIdx, context &c
   split_slice(op1AndSlice, op1, op1Slice);
   split_slice(op2AndSlice, op2, op2Slice);
  
+  if(op2 == "_05_") {
+    toCout("find it!");
+  }
+
   bool op1Extract = !op1Slice.empty() && has_direct_assignment(op1AndSlice);
   bool op2Extract = !op2Slice.empty() && has_direct_assignment(op2AndSlice);
 
@@ -531,12 +535,14 @@ llvm::Value* sel_op_constraint(astNode* const node, uint32_t timeIdx,
   //assert(!op1IsNum);
   bool op2IsNum = is_number(op2);
 
+  uint32_t destWidthNum = get_var_slice_width_simp(destAndSlice);
   uint32_t op1WidthNum = get_var_slice_width_simp(op1AndSlice);
   uint32_t op2WidthNum = get_var_slice_width_simp(op2AndSlice);
   llvm::Value* op1Expr;
   llvm::Value* op2Expr;
   if(!op1IsNum)
-    if(!op1Slice.empty()) op1Expr = extract(add_constraint(node->childVec[0], timeIdx, c, b, bound), op1Hi, op1Lo, c, b, op1AndSlice);
+    if(!op1Slice.empty()) op1Expr = extract(add_constraint(node->childVec[0], timeIdx, c, b, bound), 
+                                            op1Hi, op1Lo, c, b, op1AndSlice);
     else                  op1Expr = add_constraint(node->childVec[0], timeIdx, c, b, bound);
   else
     op1Expr = var_expr(op1AndSlice, timeIdx, c, b, false, op1WidthNum);
@@ -545,7 +551,8 @@ llvm::Value* sel_op_constraint(astNode* const node, uint32_t timeIdx,
     if(op2Slice.empty() || has_direct_assignment(op2AndSlice)) 
       op2Expr = add_constraint(node->childVec[1], timeIdx, c, b, bound);
     else
-      op2Expr = extract(add_constraint(node->childVec[1], timeIdx, c, b, bound), op2Hi, op2Lo, c, b, op2AndSlice);
+      op2Expr = extract(add_constraint(node->childVec[1], timeIdx, c, b, bound), 
+                        op2Hi, op2Lo, c, b, op2AndSlice);
   else
     op2Expr = var_expr(op2AndSlice, timeIdx, c, b, false, op1WidthNum);
   
@@ -555,7 +562,10 @@ llvm::Value* sel_op_constraint(astNode* const node, uint32_t timeIdx,
   llvm::Value* op2AdjustedExpr;
 
   // add llvm::Value*ession to s or g
-  return extract(b->CreateLShr(op1Expr, op2Expr), upBound, 0, c, b, destAndSlice);
+  auto tmp = make_llvm_instr(b, c, ">>", op1Expr, op2Expr,
+                             destWidthNum, op1WidthNum, op2WidthNum, destAndSlice);
+  return extract(tmp, upBound, 0, c, b, destAndSlice);
+  //return extract(b->CreateLShr(op1Expr, op2Expr), upBound, 0, c, b, destAndSlice);
 }
 
 
