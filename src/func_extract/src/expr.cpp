@@ -34,7 +34,7 @@ void module_expr(std::string line) {
   g_curMod->name = g_currentModuleName;
   if(g_currentModuleName == g_topModule) {
     for(auto pair : g_invarRegs) {
-      if(pair.first.empty())
+      if(!pair.first.empty())
         g_curMod->invarRegs.insert(pair.second);
     }
     g_curMod->moduleAs = moduleAs;
