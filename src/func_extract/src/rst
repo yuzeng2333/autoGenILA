@@ -1,0 +1,149 @@
+Binary file ./.helper.cpp.swp matches
+./helper.cpp:48:  auto it = std::find( g_curMod->moduleAs.begin(), g_curMod->moduleAs.end(), var );
+./helper.cpp:49:  return it != g_curMod->moduleAs.end();
+./helper.cpp:343:  return g_curMod->caseTable.find(var) != g_curMod->caseTable.end();
+./helper.cpp:347:  if(g_curMod->funcTable.find(var) != g_curMod->funcTable.end())
+./helper.cpp:349:  if(g_curMod->funcTable.find(var+" ") != g_curMod->funcTable.end())
+./helper.cpp:397:  auto idxPairs = g_curMod->varWidth.get_idx_pair(var, "find_version_num for: "+var);
+./helper.cpp:418:  auto idxPairs = g_curMod->varWidth.get_idx_pair(var, "find_version_num for: "+var);
+./helper.cpp:436:  auto idxPairs = g_curMod->varWidth.get_idx_pair(var, "find_version_num for: "+var);
+./helper.cpp:450:  auto idxPairs = g_curMod->varWidth.get_idx_pair(var, "find_version_num for: "+var);
+./helper.cpp:475:  bool withinReg2Slices = g_curMod->reg2Slices.find(var) != g_curMod->reg2Slices.end();
+./helper.cpp:481:         && std::find(g_curMod->reg2Slices[var].begin(), g_curMod->reg2Slices[var].end(), varAndSlice) 
+./helper.cpp:482:            != g_curMod->reg2Slices[var].end();
+./helper.cpp:799:  auto it = std::find( g_curMod->moduleOutputs.begin(), g_curMod->moduleOutputs.end(), var );
+./helper.cpp:800:  return it != g_curMod->moduleOutputs.end();
+./helper.cpp:807:  auto it = std::find( g_curMod->moduleTrueRegs.begin(), g_curMod->moduleTrueRegs.end(), var );
+./helper.cpp:808:  return it != g_curMod->moduleTrueRegs.end();
+./helper.cpp:813:  if( g_curMod->wire2InsPortMp.find(var) == g_curMod->wire2InsPortMp.end() )
+./helper.cpp:815:  auto tmpPair = g_curMod->wire2InsPortMp[var];
+./helper.cpp:817:  std::string subModName = g_curMod->ins2modMap[insName];
+./helper.cpp:825:  std::string modName = g_curMod->ins2modMap[insName];
+./helper.cpp:848:  return g_curMod->name == g_topModule;
+Binary file ./.expr.cpp.swp matches
+Binary file ./.op_constraint.cpp.swp matches
+./ast.cpp:59:  g_curMod->clk = g_recentClk;
+./ast.cpp:60:  g_curMod->rst = g_recentRst;
+./ast.cpp:66:  //assert(!g_curMod->moduleAs.empty());
+./ast.cpp:67:  //for(std::string reg: g_curMod->moduleAs) {
+./ast.cpp:69:    if(g_curMod->reg2Slices.find(reg) == g_curMod->reg2Slices.end()) {
+./ast.cpp:73:      for(std::string regAndSlice: g_curMod->reg2Slices[reg]) {
+./ast.cpp:112:  if(g_curMod->reg2Slices.find(var) == g_curMod->reg2Slices.end()) {
+./ast.cpp:115:  else if(std::find(g_curMod->reg2Slices[var].begin(), 
+./ast.cpp:116:                    g_curMod->reg2Slices[var].end(), 
+./ast.cpp:117:                    varAndSlice) != g_curMod->reg2Slices[var].end()) {
+./ast.cpp:121:  else { // var is the key to g_curMod->reg2Slices, but varAndSlice is not its value
+./ast.cpp:126:  g_curMod->varNode.emplace(varToAdd, node);
+./ast.cpp:127:  if( g_curMod->reg2Slices.find(varToAdd) != g_curMod->reg2Slices.end() ) {
+./ast.cpp:154:  else if( g_curMod->ssaTable.find(varAndSlice) != g_curMod->ssaTable.end() ){ // it is wire
+./ast.cpp:195:// attention: the slices in g_curMod->reg2Slices may not be complete
+./ast.cpp:211:  //node->srcVec = g_curMod->reg2Slices[var];
+./ast.cpp:214:  auto srcVec = g_curMod->reg2Slices[var];
+./ast.cpp:217:  auto idxPairs = g_curMod->varWidth.get_idx_pair(var, "add_sliced_node for:"+var);
+./ast.cpp:240:  if(g_curMod->nbTable.find(regAndSlice) == g_curMod->nbTable.end()) {
+./ast.cpp:241:    toCout("Error: not in g_curMod->nbTable: "+regAndSlice);
+./ast.cpp:247:  std::string destAssign = g_curMod->nbTable[regAndSlice];
+./ast.cpp:284:// (1) If varAndSlice is in g_curMod->ssaTable, then just build that node
+./ast.cpp:293:  if(g_curMod->ssaTable.find(varAndSlice) != g_curMod->ssaTable.end() )
+./ast.cpp:294:    varAssign = g_curMod->ssaTable[varAndSlice];
+./ast.cpp:295:  else if(g_curMod->ssaTable.find(var) != g_curMod->ssaTable.end())
+./ast.cpp:296:    varAssign = g_curMod->ssaTable[var];
+./ast.cpp:298:    toCout("Error: not in g_curMod->ssaTable:"+varAndSlice);
+./ast.cpp:611:  if(g_curMod->caseTable.find(var) == g_curMod->caseTable.end()) {
+./ast.cpp:612:    toCout("Error: not found in g_curMod->caseTable: "+var);
+./ast.cpp:615:  auto localPair = g_curMod->caseTable[var];
+./ast.cpp:642:  if(g_curMod->funcTable.find(var) == g_curMod->funcTable.end()) {
+./ast.cpp:643:    toCout("Error: not found in g_curMod->caseTable: "+var);
+./ast.cpp:646:  auto funcInfo = g_curMod->funcTable[var];
+./ast.cpp:662:  std::string insName = g_curMod->wire2InsPortMp[var].first;
+./ast.cpp:663:  std::string output = g_curMod->wire2InsPortMp[var].second;
+./ast.cpp:669:  std::string modName = g_curMod->ins2modMap[insName];
+./ast.cpp:674:      && g_curMod->out2RootNodeMp.find(output) == g_curMod->out2RootNodeMp.end()) {
+./ast.cpp:683:    g_curMod->out2RootNodeMp.emplace(output, nextNode);
+./ast.cpp:688:    std::string connectWire = g_curMod->insPort2wireMp[insName][input];
+./ast.cpp:689:    if(connectWire == g_curMod->clk) {
+./ast.cpp:693:    if(connectWire == g_curMod->rst) {
+./parse_fill.cpp:93:  //g_curMod->name = g_topModule;
+./parse_fill.cpp:94:  //g_curMod->invarRegs = g_invarRegs;
+./parse_fill.cpp:103:    fill_var_width(line, g_curMod->varWidth);
+./parse_fill.cpp:528:    fill_var_width(line, g_curMod->varWidth);    
+./auxiliary_files_gen.cpp:56:  for(auto it = g_curMod->funcTable.begin(); it != g_curMod->funcTable.end(); it++) {
+./auxiliary_files_gen.cpp:69:  for(auto it = g_curMod->moduleAs.begin(); it != g_curMod->moduleAs.end(); it++) {
+./auxiliary_files_gen.cpp:78:  std::string lastVar = *g_curMod->moduleAs.rbegin();
+./auxiliary_files_gen.cpp:131:  for(auto it = g_curMod->moduleAs.begin(); it != g_curMod->moduleAs.end(); it++) {
+./check_regs.cpp:120:    for(auto it = g_curMod->moduleInputs.begin(); it != g_curMod->moduleInputs.end(); it++) {
+./check_regs.cpp:150:    for(auto it = g_curMod->moduleInputs.begin(); it != g_curMod->moduleInputs.end(); it++) {
+./check_regs.cpp:171:  if(g_curMod->varNode.find(dest) == g_curMod->varNode.end()
+./check_regs.cpp:172:      && g_curMod->reg2Slices.find(dest) == g_curMod->reg2Slices.end()) {
+./check_regs.cpp:453:  if(g_curMod->reg2Slices.find(var) == g_curMod->reg2Slices.end()) {
+./check_regs.cpp:454:    if(g_curMod->varNode.find(var) == g_curMod->varNode.end()) {
+./check_regs.cpp:458:    return add_constraint(g_curMod->varNode[var], timeIdx, c, b, bound);
+./check_regs.cpp:461:    for(std::string varSlice : g_curMod->reg2Slices[var]) {
+./check_regs.cpp:462:      if(g_curMod->varNode.find(varSlice) == g_curMod->varNode.end()) {
+./check_regs.cpp:466:      llvm::Value* tmpSlice = add_constraint(g_curMod->varNode[varSlice], timeIdx, c, b, bound);
+./check_regs.cpp:501:  if(g_curMod->existedExpr.find(timed_name(varAndSlice, timeIdx)) 
+./check_regs.cpp:502:      != g_curMod->existedExpr.end() ) {
+./check_regs.cpp:503:    return g_curMod->existedExpr[timed_name(varAndSlice, timeIdx)];
+./check_regs.cpp:523:    auto pair = g_curMod->wire2InsPortMp[varAndSlice];
+./check_regs.cpp:535:  g_curMod->existedExpr.emplace(timed_name(varAndSlice, timeIdx), retExpr);
+./check_regs.cpp:583:  if(g_curMod->invarRegs.find(dest) == g_curMod->invarRegs.end()) {
+./check_regs.cpp:584:      //&& g_curMod->moduleAs.find(dest) != g_curMod->moduleAs.end())
+./op_constraint.cpp:179:    uint32_t delay = timeIdx - g_curMod->rootTimeIdx;
+./op_constraint.cpp:180:    //if(timeIdx > g_curMod->maxInputTimeIdx) g_curMod->maxInputTimeIdx = timeIdx;
+./op_constraint.cpp:181:    if(delay < g_curMod->minInOutDelay) g_curMod->minInOutDelay = delay;
+./op_constraint.cpp:1002:  auto pair = g_curMod->wire2InsPortMp[varAndSlice];
+./op_constraint.cpp:1025:      std::string connectWire = g_curMod->insPort2wireMp[insName][input];
+./op_constraint.cpp:1059:    std::string connectWire = g_curMod->insPort2wireMp[insName][input];
+./op_constraint.cpp:1089:  auto pair = g_curMod->wire2InsPortMp[destAndSlice];
+./op_constraint.cpp:1176:    g_curMod->pendingOutPortTimed = outPortTimed;
+./op_constraint.cpp:1177:    g_curMod->rootTimeIdx = timeIdx;
+./op_constraint.cpp:1178:    g_curMod->minInOutDelay = UINT32_MAX;
+./op_constraint.cpp:1224:        std::string connectWire = g_curMod->insPort2wireMp[insName][*it];
+./op_constraint.cpp:1247:      std::string connectWire = g_curMod->insPort2wireMp[insName][*it];
+Binary file ./.parse_fill.cpp.swp matches
+Binary file ./.check_regs.cpp.swp matches
+./expr.cpp:34:  g_curMod->name = g_currentModuleName;
+./expr.cpp:38:        g_curMod->invarRegs.insert(pair.second);
+./expr.cpp:40:    g_curMod->moduleAs = moduleAs;
+./expr.cpp:45:        g_curMod->invarRegs.insert(pair.second);
+./expr.cpp:62:    g_curMod->moduleInputs.insert(var);
+./expr.cpp:66:    insertDone = g_curMod->varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+./expr.cpp:68:    insertDone = g_curMod->varWidth.var_width_insert(var, 0, 0);
+./expr.cpp:94:    insertDone = g_curMod->varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+./expr.cpp:96:    insertDone = g_curMod->varWidth.var_width_insert(var, 0, 0);
+./expr.cpp:116:    insertDone = g_curMod->varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+./expr.cpp:118:    insertDone = g_curMod->varWidth.var_width_insert(var, 0, 0);
+./expr.cpp:143:    insertDone = g_curMod->varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+./expr.cpp:145:    insertDone = g_curMod->varWidth.var_width_insert(var, 0, 0);
+./expr.cpp:168:    toCout("module: "+g_curMod->name);
+./expr.cpp:172:    g_curMod->moduleOutputs.insert(var);
+./expr.cpp:176:    insertDone = g_curMod->varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+./expr.cpp:178:    insertDone = g_curMod->varWidth.var_width_insert(var, 0, 0);
+./expr.cpp:195:  auto ret = g_curMod->ssaTable.emplace(destAndSlice, line);
+./expr.cpp:239:  g_curMod->varWidth.var_width_insert("yuzeng"+yuzengIdxStr, startIdx, 0);
+./expr.cpp:242:  auto ret = g_curMod->ssaTable.emplace("yuzeng"+yuzengIdxStr, line);
+./expr.cpp:253:      auto destIdxPair = g_curMod->varWidth.get_idx_pair(dest, line);
+./expr.cpp:258:      auto ret = g_curMod->ssaTable.emplace(destAndSlice, destAssign);
+./expr.cpp:312:      auto ret = g_curMod->ssaTable.emplace(destAndSlice, destAssign);
+./expr.cpp:328:  auto ret = g_curMod->nbTable.emplace(m.str(2), line);
+./expr.cpp:331:  g_curMod->moduleTrueRegs.insert(dest);
+./expr.cpp:386:  g_curMod->moduleTrueRegs.insert(dest);
+./expr.cpp:393:    insertDone = g_curMod->varWidth.var_width_insert(destNext, localWidth-1, 0);
+./expr.cpp:399:  auto ret = g_curMod->ssaTable.emplace("yuzeng"+yuzengIdx, destNextLine);
+./expr.cpp:404:  ret = g_curMod->nbTable.emplace(destAndSlice, destNbLine);
+./expr.cpp:438:  g_curMod->moduleTrueRegs.insert(dest);
+./expr.cpp:459:    insertDone = g_curMod->varWidth.var_width_insert(destNext, localWidth-1, 0);
+./expr.cpp:468:  auto ret = g_curMod->ssaTable.emplace("yuzeng"+yuzengIdx, destNextLine);
+./expr.cpp:473:  ret = g_curMod->nbTable.emplace(destAndSlice, destNbLine);
+./expr.cpp:493:  g_curMod->caseTable.emplace(destAndSlice, std::make_pair(sAndSlice, caseAssignPairs));
+./expr.cpp:517:  g_curMod->ins2modMap.emplace(instanceName, moduleName);
+./expr.cpp:543:    g_curMod->wire2InsPortMp.emplace(wire, std::make_pair(instanceName, port));
+./expr.cpp:544:    if( g_curMod->insPort2wireMp.find(instanceName) == g_curMod->insPort2wireMp.end() )
+./expr.cpp:545:      g_curMod->insPort2wireMp.emplace(instanceName, std::map<std::string, std::string>{{port, wire}});
+./expr.cpp:547:      g_curMod->insPort2wireMp[instanceName].emplace(port, wire);
+./expr.cpp:570:  // if the destAndSlice has slice, put it into the g_curMod->reg2Slices map
+./expr.cpp:572:    if(g_curMod->reg2Slices.find(dest) == g_curMod->reg2Slices.end()) {
+./expr.cpp:573:      g_curMod->reg2Slices.emplace(dest, std::vector<std::string>{destAndSlice});
+./expr.cpp:576:      g_curMod->reg2Slices[dest].push_back(destAndSlice);
+./expr.cpp:577:      std::sort(g_curMod->reg2Slices[dest].begin(), g_curMod->reg2Slices[dest].end(), compareSlice);
+Binary file ./.ast.cpp.swp matches

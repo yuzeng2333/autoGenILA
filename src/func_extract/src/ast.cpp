@@ -690,10 +690,10 @@ void add_submod_node(std::string var, uint32_t timeIdx, astNode* const node) {
       subMod->clk = input;
       continue;
     }
-    if(connectWire == g_curMod->rst) {
-      subMod->rst = input;
-      continue;
-    }
+    //if(connectWire == g_curMod->rst) {
+    //  subMod->rst = input;
+    //  continue;
+    //}
     node->srcVec.push_back(connectWire);
     if(connectWire == "word")
       toCout("Find word!");

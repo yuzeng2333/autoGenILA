@@ -700,8 +700,8 @@ llvm::Value* get_arg(std::string regName, llvm::Function *func) {
   for(auto it = func->arg_begin(); it != func->arg_end(); it++) {
     std::string funcNane = llvm::dyn_cast<llvm::Value>(func)->getName();
     std::string argName = it->getName();
-    toCout("func name: "+funcNane);
-    toCout("arg name: "+argName);
+    //toCout("func name: "+funcNane);
+    //toCout("arg name: "+argName);
     if(argName.find("ata_fifo.r0___#25") != std::string::npos)
       toCout("Find it!!");
     if(it->getName() == regName) return it;

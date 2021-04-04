@@ -995,6 +995,7 @@ llvm::Value* add_one_case_branch_expr(astNode* const node, llvm::Value* &caseVar
 
 llvm::Value* bbMod_constraint(astNode* const node, uint32_t timeIdx, context &c, 
                                builder &b, uint32_t bound) {
+  toCout("begin bbMod: "+node->dest);
   std::string varAndSlice = node->dest;
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
@@ -1059,6 +1060,8 @@ llvm::Value* bbMod_constraint(astNode* const node, uint32_t timeIdx, context &c,
     if(connectWire.empty()) {
       toCout("Warning: connect wire is empty, the port may be clk or rst: "+input);
     }
+    if(connectWire == "rst")
+      toCout("Find it!");
     toCoutVerb("--- wire: "+connectWire+", timeIdx: "+toStr(timeIdx+delay));
     std::string var, varSlice;
     split_slice(connectWire, var, varSlice);
@@ -1085,6 +1088,7 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
 
   auto pair = g_curMod->wire2InsPortMp[destAndSlice];
   std::string insName = pair.first;
+  toCout("--- Begin submod: "+insName);
   assert(insName == node->op);
   std::string outPort = pair.second;
   auto subMod = get_mod_info(insName);
@@ -1221,6 +1225,8 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
         if(connectWire.empty()) {
           toCout("Warning: connect wire is empty, the port may be clk or rst: "+*it);
         }
+        if(connectWire == "rst")
+          toCout("Find it!");
         toCoutVerb("--- wire: "+connectWire+", timeIdx: "+toStr(i));
         std::string var, varSlice;
         split_slice(connectWire, var, varSlice);
