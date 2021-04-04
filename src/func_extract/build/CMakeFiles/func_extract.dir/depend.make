@@ -220,6 +220,7 @@ CMakeFiles/func_extract.dir/src/main.cpp.o: ../src/clean_goal.h
 CMakeFiles/func_extract.dir/src/main.cpp.o: ../src/clean_verilog.h
 CMakeFiles/func_extract.dir/src/main.cpp.o: ../src/expr.h
 CMakeFiles/func_extract.dir/src/main.cpp.o: ../src/global_data_struct.h
+CMakeFiles/func_extract.dir/src/main.cpp.o: ../src/helper.h
 CMakeFiles/func_extract.dir/src/main.cpp.o: ../src/inv_gen.h
 CMakeFiles/func_extract.dir/src/main.cpp.o: ../src/main.cpp
 CMakeFiles/func_extract.dir/src/main.cpp.o: ../src/make_define_fun.h
