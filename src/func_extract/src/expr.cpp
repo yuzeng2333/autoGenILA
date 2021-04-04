@@ -55,8 +55,10 @@ void input_expr(std::string line) {
     return;
   std::string slice = m.str(2);
   std::string var = m.str(3);
-
-  if(var != g_recentClk && var != g_recentRst)
+  if(var == "rst")
+    toCout("Find it!");
+  
+  if(var != g_recentClk)
     g_curMod->moduleInputs.insert(var);
 
   bool insertDone;
@@ -528,7 +530,7 @@ void submodule_expr(std::string firstLine, std::ifstream &input) {
       toCout("Error in matching module ports: "+line);
       abort();
     }
-    if(m.str(3) == g_recentClk || m.str(3) == g_recentRst)
+    if(m.str(3) == g_recentClk)
       continue;
     wire2PortMp.emplace(m.str(2), m.str(3));
   }

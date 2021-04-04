@@ -485,8 +485,8 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
                             uint32_t bound ) {
   // Attention: varAndSlice might have a slice, a directly-assigned varAndSlice
   std::string varAndSlice = node->dest;
-  if(varAndSlice == "_2_") {
-    toCout("find _2_");
+  if(varAndSlice == "rst") {
+    toCout("find it");
   }
 
   if(varAndSlice.find("aes_top_0.aes_out") != std::string::npos) {
@@ -839,7 +839,7 @@ void clean_module_inputs() {
     std::string modName = pair.first;
     for(auto it = curMod->moduleInputs.begin(); 
         it != curMod->moduleInputs.end(); it++) {
-      if(*it == curMod->clk || *it == curMod->rst) {
+      if(*it == curMod->clk ) {
         curMod->moduleInputs.erase(it);
         toCoutVerb("Erase "+*it+" from "+modName);
       }
