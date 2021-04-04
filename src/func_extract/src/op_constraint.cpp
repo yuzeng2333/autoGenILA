@@ -493,6 +493,11 @@ llvm::Value* sel_op_constraint(astNode* const node, uint32_t timeIdx,
   if(node->op == "sel5")
     return sel5_op_constraint(node, timeIdx, c, b, bound);
 
+  if(node->op == "sel3" || node->op == "sel4") {
+    toCout("Error: sel3 and sel4 not supported yet, dest: "+node->dest);
+    abort();
+  }
+
   if(node->dest == "_04_")
     toCout("Find it!");
 
@@ -562,8 +567,11 @@ llvm::Value* sel_op_constraint(astNode* const node, uint32_t timeIdx,
   llvm::Value* op2AdjustedExpr;
 
   // add llvm::Value*ession to s or g
+  uint32_t minOpWidth = std::min(op1WidthNum, op2WidthNum);
+  uint32_t maxOpWidth = std::max(op1WidthNum, op2WidthNum);
   auto tmp = make_llvm_instr(b, c, ">>", op1Expr, op2Expr,
-                             destWidthNum, op1WidthNum, op2WidthNum, destAndSlice);
+                             maxOpWidth, op1WidthNum, op2WidthNum, 
+                             op1AndSlice+"_lshr_"+op2AndSlice+DELIM+toStr(timeIdx));
   return extract(tmp, upBound, 0, c, b, destAndSlice);
   //return extract(b->CreateLShr(op1Expr, op2Expr), upBound, 0, c, b, destAndSlice);
 }

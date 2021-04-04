@@ -128,7 +128,7 @@ void print_llvm_ir(std::string destAndSlice,
                                       get_var_slice_width_simp(destAndSlice));
   llvm::FunctionType *FT =
     llvm::FunctionType::get(retTy, argTy, false);
-  TheFunction = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
+  TheFunction = llvm::Function::Create(FT, llvm::Function::ExternalLinkage, 
                                        "func_;_"+destAndSlice, TheModule.get());
   g_curFunc = TheFunction;
   // set arg name for the function
