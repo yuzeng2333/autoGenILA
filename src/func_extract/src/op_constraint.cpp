@@ -1198,7 +1198,7 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     // switch func before elaborating
     parentFunc = g_curFunc;
     g_curFunc = subFunc;
-    llvm::Value* ret = add_constraint(subMod->out2RootNodeMp[outPort], 0, c, b, bound);
+    llvm::Value* ret = add_constraint(subMod->out2RootNodeMp[outPort], timeIdx, c, b, bound);
     g_instancePairVec.pop_back();
     g_curMod = parentMod;
     g_curFunc = parentFunc;
