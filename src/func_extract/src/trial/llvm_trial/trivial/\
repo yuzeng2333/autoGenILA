@@ -48,7 +48,6 @@
 #define toStr(a) std::to_string(a)
 #define llvmInt(b, a) llvm::ConstantInt::get(llvmWidth(a), b, false)
 #define llvmWidth(a, c) llvm::IntegerType::get(*c, a)
-#define toErrs(a) llvm::errs() << a;
 #define value(a) llvm::dyn_cast<llvm::Value>(a)
 
 using namespace llvm;
@@ -200,7 +199,7 @@ int main() {
   llvm::dyn_cast<llvm::Instruction>(cond)->eraseFromParent();
 
   /// end of code segment
-  Builder->CreateRet(ret);
+  //Builder->CreateRet(ret);
 
   // split basicblock
 
@@ -209,10 +208,8 @@ int main() {
 
   // replace add1 and add2 with memory
   std::string add1Name = add1->getName();
-  toCout("add1Name: "+add1Name);
-  Builder->SetInsertPoint(instr(add3)->getNextNode());
   AllocaInst* add1_alloca = Builder->CreateAlloca(add1->getType(), nullptr,//addrNum++, 
-                                         Twine(add1Name+"_;_mem"));
+                                         Twine(+"_;_mem"));
 
   //add1_alloca->insertBefore(instr(add1));
 
@@ -222,10 +219,10 @@ int main() {
   //StoreInst* add1_store = Builder->CreateStore(value(add1_ptr), value(add1_alloca));
   StoreInst* add1_store = Builder->CreateStore(add1, value(add1_alloca));
   //add1->replaceAllUsesWith(add1_store);
-  //add1_store->insertAfter(add1_alloca);
+  
 
   /// end of code segment
-  //Builder->CreateRet(ret);
+  Builder->CreateRet(ret);
 
 
   llvm::verifyFunction(*TheFunction);
