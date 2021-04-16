@@ -13,8 +13,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/func_extract.dir/src/parse_fill.cpp.o"
   "CMakeFiles/func_extract.dir/src/pseudo_vlg_gen.cpp.o"
   "CMakeFiles/func_extract.dir/src/vcd_parser.cpp.o"
-  "func_extract.pdb"
   "func_extract"
+  "func_extract.pdb"
 )
 
 # Per-language clean rules from dependency scanning.

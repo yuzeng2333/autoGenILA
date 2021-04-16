@@ -1,4 +1,4 @@
-# Install script for directory: /workspace/research/ILA/autoGenILA/src/func_extract
+# Install script for directory: /home/yuzeng/workspace/research/autoGenILA/src/func_extract
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/workspace/research/ILA/autoGenILA/src/func_extract/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/yuzeng/workspace/research/autoGenILA/src/func_extract/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
