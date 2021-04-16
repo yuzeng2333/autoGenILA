@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/g++-9
 CXX_FLAGS = -O0 -Wall -g   
 
-CXX_DEFINES = 
+CXX_DEFINES = -DGOOGLE_GLOG_DLL_DECL=""
 
 CXX_INCLUDES = 
 

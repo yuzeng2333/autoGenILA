@@ -1,5 +1,0 @@
-module \$paramod\SDP_Y_CORE_mgc_in_wire_v1\rscid=18\width=2 (d, z);
-  output [1:0] d;
-  input [1:0] z;
-  assign d = z;
-endmodule

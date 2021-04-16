@@ -14,3 +14,10 @@ SHA/
 *.swm
 *.a
 riscv/
+NVDLA/
+8051-open/
+biriscv/
+graphics/
+io/
+pairing/
+ultra_riscv/

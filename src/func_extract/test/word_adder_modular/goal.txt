@@ -1,5 +1,0 @@
-#1#result#3
-(goals
-(goal
-  (= |result___#1000| (|adder__result__#0| #b1 |word___#4|)))
-)

@@ -1,0 +1,16 @@
+{
+  "models": { "ILA":"m0", "VERILOG": "m1" },
+  "state mapping": {
+      "in": "in",
+      "out": "out",
+      "out": "out"
+    },
+
+  "interface mapping": {
+      "in":"**KEEP**",
+      "out":"**SO**",
+      "clk":"**CLOCK**"
+  },
+  "mapping control": [
+   ]
+}

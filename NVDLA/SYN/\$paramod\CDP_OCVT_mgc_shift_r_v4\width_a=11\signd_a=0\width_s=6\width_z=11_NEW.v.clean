@@ -1,8 +1,0 @@
-module \$paramod\CDP_OCVT_mgc_shift_r_v4\width_a=11\signd_a=0\width_s=6\width_z=11 (a, s, z);
-  input [10:0] a;
-  input [5:0] s;
-  output [10:0] z;
-  wire [11:0] fangyuan0;
-  assign fangyuan0 = { 1'b0, a };
-  assign z = $signed(fangyuan0) >>> s;
-endmodule

@@ -33,3 +33,6 @@ mem_do_wdata : 114
 mem_valid : 118
 pcpi_valid : 122
 trap : 131
+
+aes:
+aes_reg_state

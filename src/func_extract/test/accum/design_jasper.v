@@ -26,7 +26,7 @@ module accum(clk, rst, data, start, sum, finish, timer);
   logic [2:0] timer_nxt;
   assign _04_ = timer + 1'b1;
   assign finish_nxt = cnt == 1'b1;
-  assign _06_ = cnt != 1'b0;
+  assign _06_ = cnt > 1'b0;
   always @(posedge clk)
       timer <= _03_;
   always @(posedge clk)
@@ -45,5 +45,9 @@ module accum(clk, rst, data, start, sum, finish, timer);
   assign _08_ = _06_ ? res : sum;
   assign sum_nxt = start ? 3'b000 : _08_;
   assign timer_nxt = finish ? timer : _04_;
-  assign res = sum + 3'b1;
+  adder u0 (
+    .clk(clk),
+    .in(sum),
+    .out(res)
+  );
 endmodule

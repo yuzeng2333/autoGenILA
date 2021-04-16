@@ -61,8 +61,8 @@ sha:
 vpipe:
 	./build/taint_gen /workspace/research/ILA/autoGenILA/vpipe/SYN/vpipe_yosys.v
 
-dla:
-	./build/taint_gen /workspace/research/ILA/autoGenILA/NVDLA/SYN/nvdla_yosys.v
+nv:
+	./build/taint_gen /workspace/research/ILA/autoGenILA/NVDLA/nv_small/SYN/nvdla_small_yosys_hier.v
 
 fsm:
 	./build/taint_gen /workspace/research/ILA/autoGenILA/naiveEg/fsm/fsm_yosys.v
@@ -75,3 +75,9 @@ gfx:
 
 bi:
 	./build/taint_gen /workspace/research/ILA/autoGenILA/biriscv/SYN/biriscv_yosys.v
+
+tmp:
+	./build/taint_gen ./experiment/tmp.v
+
+urv:
+	./build/taint_gen /workspace/research/ILA/autoGenILA/ultra_riscv/SYN/riscv_flatten_yosys.v

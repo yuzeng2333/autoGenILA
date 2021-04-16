@@ -1,0 +1,5 @@
+#1#word#1
+(goals
+(goal
+  (= |word| |inWord|))
+)

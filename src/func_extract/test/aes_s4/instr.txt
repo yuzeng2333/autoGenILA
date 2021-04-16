@@ -1,0 +1,9 @@
+#1:
+in = x
+W:
+out(skip) 1
+$NOP:
+in = 8'd0
+*RESET:
+$TOP:
+S4

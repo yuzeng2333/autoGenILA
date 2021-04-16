@@ -1,0 +1,11 @@
+#1:
+ap_rst_n = 1
+// more ports to be specified
+W:
+// to be specified
+$NOP:
+// to be fill
+//*RESET:
+$INVAR:
+$TOP:
+hls_target

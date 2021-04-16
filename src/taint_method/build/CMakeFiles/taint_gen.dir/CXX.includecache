@@ -95,6 +95,8 @@ taint_gen.h
 /workspace/research/ILA/autoGenILA/src/taint_method/src/taint_gen.h
 cmath
 -
+glog/logging.h
+-
 
 /workspace/research/ILA/autoGenILA/src/taint_method/src/taint_gen.h
 string

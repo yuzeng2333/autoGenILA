@@ -1,0 +1,26 @@
+{
+  "const": {
+    "global_clk_ovr_on": 0 ,
+    "tmc2slcg_disable_clock_gating": 0 ,
+    "dla_reset_rstn": 1 ,
+    "direct_reset_": 1 ,
+    "test_mode": 0 ,
+    "nvdla_pwrbus_ram_c_pd": 0 ,
+    "nvdla_pwrbus_ram_ma_pd": 0 ,
+    "nvdla_pwrbus_ram_mb_pd": 0 ,
+    "nvdla_pwrbus_ram_p_pd": 0 ,
+    "nvdla_pwrbus_ram_o_pd": 0 ,
+    "nvdla_pwrbus_ram_a_pd": 0
+  },
+
+  "valid": "csb2nvdla_valid" ,
+
+  "instructions":[
+    {
+      "csb2nvdla_addr": "",
+      "csb2nvdla_wdat": ,
+      "csb2nvdla_write":
+      "END": 
+    }
+  ]
+}

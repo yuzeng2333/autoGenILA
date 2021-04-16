@@ -5,9 +5,7 @@ rst = 1'd0
 func = 2'd2
 inWord = x
 W:
-result(skip) 4
-R:
-word
+result(skip) 6
 $NOP:
 func = 2'd0
 rst = 1'd0
@@ -16,3 +14,7 @@ inWord = 9'd0
 counter = 5'd0
 word = 9'd0
 result = 9'd0
+$INVAR:
+adder_$_counter
+$TOP:
+word_adder

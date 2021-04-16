@@ -1,9 +1,0 @@
-module \$paramod\SDP_C_mgc_shift_r_v4\width_a=24\signd_a=0\width_s=4\width_z=24 (a, s, z);
-  input [23:0] a;
-  input [3:0] s;
-  output [23:0] z;
-  wire [24:0] fangyuan0;
-  assign fangyuan0 = { 1'b0, a };
-
-  assign z = $signed(fangyuan0) >>> s;
-endmodule

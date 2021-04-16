@@ -1,9 +1,0 @@
-module \$paramod\SDP_X_mgc_shift_l_v4\width_a=16\signd_a=1\width_s=6\width_z=79 (a, s, z);
-  input [15:0] a;
-  input [5:0] s;
-  output [78:0] z;
-  wire [78:0] fangyuan0;
-  assign fangyuan0 = { a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a[15], a };
-
-  assign z = fangyuan0 <<< s;
-endmodule

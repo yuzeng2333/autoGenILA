@@ -1,0 +1,5 @@
+adder:
+result0 {
+  enable0: 4 
+  word0: 4
+}

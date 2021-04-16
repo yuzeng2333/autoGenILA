@@ -1,8 +1,0 @@
-module \$paramod\CSC_mgc_shift_r\width_a=11\signd_a=0\width_s=4\width_z=11 (a, s, z);
-  input [10:0] a;
-  input [3:0] s;
-  output [10:0] z;
-  wire [11:0] fangyuan0;
-  assign fangyuan0 = { 1'b0, a };
-  assign z = $signed(fangyuan0) >>> s;
-endmodule

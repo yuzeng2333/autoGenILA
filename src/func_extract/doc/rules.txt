@@ -1,0 +1,10 @@
+#[instruction sequence number]
+[input1] = [value]
+[input2] = [value]
+W:
+[submodule name].[written ASV](skip) [delay latency, min=1]
+R:
+[submodule name].[read ASV]
+$NOP:
+[input1] = [value]
+[input2] = [value]

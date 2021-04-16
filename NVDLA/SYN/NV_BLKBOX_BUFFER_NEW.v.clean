@@ -1,5 +1,0 @@
-module NV_BLKBOX_BUFFER(Y, A);
-  input A;
-  output Y;
-  assign Y = A;
-endmodule

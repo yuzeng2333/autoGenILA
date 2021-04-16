@@ -558,9 +558,6 @@ void remove_functions(std::string fileName) {
     if ( choice == FUNCDEF ) {
       remove_function_wrapper(line, input, output);
     }
-    else if(g_clean_submod && choice == INSTANCEBEGIN) {
-      clean_submod(input, output, line);
-    }
     else
       output << line << std::endl;
   }
@@ -2596,52 +2593,6 @@ void map_gen(std::string moduleName, std::string instanceName, std::ofstream &ou
     }
   }
 }
-
-
-// this module prints the cleaned submod instantiation, input is changed to end of submod
-void clean_submod(std::ifstream &input, std::ofstream &output, const std::string &firstLine) {
-  // insBegin is the first line for port/wire connection
-  auto insBegin = input.tellg();
-  std::string line;
-  std::smatch m;
-  std::map<std::string, std::string> port2FangyuanMp;
-  while(std::getline(input, line) && !std::regex_match(line, m, pInstanceEnd)) {
-    if(!std::regex_match(line, m, pInstancePort)) {
-      toCout("Error in matching module ports: "+line);
-      abort();
-    }
-    std::string port = m.str(2);
-    std::string wire = m.str(3);
-    std::vector<std::string> varVec;
-    if(split_concat(wire, varVec)) {
-      // get total width
-      uint32_t totalWidth = 0;
-      for(std::string var: varVec) totalWidth += get_var_slice_width(var);
-      std::string localIdx = std::to_string(NEW_FANGYUAN++);
-      output << "  wire ["+toStr(totalWidth-1)+":0] fangyuan"+localIdx+";" << std::endl;
-      port2FangyuanMp.emplace(port, "fangyuan"+localIdx);
-    }
-  }
-  input.seekg(insBegin);
-  output << firstLine << std::endl;
-  while(std::getline(input, line) && !std::regex_match(line, m, pInstanceEnd)) {
-    if(!std::regex_match(line, m, pInstancePort)) {
-      toCout("Error in matching module ports: "+line);
-      abort();
-    }
-    std::string port = m.str(2);
-    std::string wire = m.str(3);
-    if(port2FangyuanMp.find(port) == port2FangyuanMp.end()) output << line << std::endl;
-    else {
-      std::string wire = port2FangyuanMp[port];
-      output << "    ."+port+"("+wire+")," << std::endl;
-    }
-  }
-  // print the last line
-  assert(std::regex_match(line, m, pInstanceEnd));
-  output << line << std::endl;
-}
-
 
 
 // 1. separate the original file into multiple files, each containing one module

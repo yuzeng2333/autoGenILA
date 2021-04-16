@@ -1,0 +1,12 @@
+Log file created at: 2021/01/31 17:51:55
+Running on machine: yuzeng-ThinkPad-X250
+Running duration (h:mm:ss): 0:00:00
+Log line format: [IWEF]yyyymmdd hh:mm:ss.uuuuuu threadid file:line] msg
+W20210131 17:51:55.157229 19544 op_constraint.cpp:977] Func constraint
+W20210131 17:51:55.157512 19544 op_constraint.cpp:978] Func constraint
+W20210131 17:51:55.267325 19544 op_constraint.cpp:1011] Warning: cannot find in inputDelayMap: rst
+W20210131 17:51:55.267362 19544 op_constraint.cpp:1012] Check module_info.txt!
+W20210131 17:51:55.335574 19544 op_constraint.cpp:977] Func constraint
+W20210131 17:51:55.335702 19544 op_constraint.cpp:978] Func constraint
+W20210131 17:51:55.440665 19544 op_constraint.cpp:1011] Warning: cannot find in inputDelayMap: rst
+W20210131 17:51:55.440686 19544 op_constraint.cpp:1012] Check module_info.txt!

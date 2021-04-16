@@ -1,32 +1,3 @@
 Begin main!
-Start time: Tue Dec 29 11:32:05 2020
+Start time: Fri Mar 19 11:10:42 2021
 
-+++++++ Solution found for word, bound: 0 +++++++++
-_01____#1 = #b000000000
-_01____#1_T = #b000000000
-_06____#1 = #b1
-_06____#1_T = #b0
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ func___#0 = #b10
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ func___#1 = #b01
-func___#1_T = #b00
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ inWord___#0 = #b000000000
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ inWord___#1 = #b000000000
-inWord___#1_T = #b000000000
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rst___#0 = #b0
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rst___#1 = #b0
-rst___#1_T = #b0
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ word___#0 = #b000000000
-word___#0_T = #b000000000
-word___#1_T = #b000000000
-word_next___#1 = #b000000000
-word_next___#1_T = #b000000000
-input value for rst___#1: bv
-input value for func___#1: bv
-(goals
-(goal
-  (= |word___#100| |inWord___#1|))
-)
-------- No more solution found within the bound: 0 ----------
-------- No more solution found within the bound: 1 ----------
-------- No more solution found within the bound: 3 ----------
-------- No more solution found within the bound: 4 ----------

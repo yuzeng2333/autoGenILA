@@ -1,0 +1,6 @@
+read_verilog -sv design.v
+read_verilog -sv tb.v
+prep -top tb
+
+hierarchy -check
+write_smt2 tb.smt2

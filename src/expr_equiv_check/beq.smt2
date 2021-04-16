@@ -147,7 +147,7 @@
                                ((_ extract 31 31) |mem_rdata|)
                                ((_ extract 31 31) |mem_rdata|)
                                ((_ extract 31 31) |mem_rdata|)
-                               ((_ extract 31 31) |mem_rdata|)
+                               ((_ extract 31 31) |mem_rdata|) 
                                ((_ extract 31 31) |mem_rdata|)
                                ((_ extract 31 31) |mem_rdata|)
                                ((_ extract 31 31) |mem_rdata|)
@@ -525,7 +525,7 @@
 
 
 ; add assumption: pc must be aligned
-;(assert (= ((_ extract 1 0) reg_next_pc) #b00))
+(assert (= ((_ extract 1 0) reg_next_pc) #b00))
 
 ; reg1 != reg2
 ;(assert (not (= reg1 reg2)))

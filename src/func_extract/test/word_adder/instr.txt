@@ -3,13 +3,13 @@ rst = 1'd0
 func = 2'd1
 inWord = x
 W:
-word 1
-#2:
-rst = 1'd0
-func = 2'd2
-inWord = x
-W:
-word_sum 4
+word(skip) 2
+//#2:
+//rst = 1'd0
+//func = 2'd2
+//inWord = x
+//W:
+//word_sum 4
 R:
 word
 word_sum
@@ -21,3 +21,5 @@ inWord = 9'd0
 counter = 5'd0
 word = 9'd0
 word_sum = 9'd0
+$TOP:
+word_adder

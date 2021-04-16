@@ -1,7 +1,7 @@
 #1:
 in = x
 W:
-out 1
+out(skip) 2
 $NOP:
 in = 8'd0
 *RESET:

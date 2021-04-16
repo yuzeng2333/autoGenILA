@@ -1,5 +1,0 @@
-module \$paramod\CDP_ICVT_mgc_in_wire_v1\rscid=4\width=5 (d, z);
-  output [4:0] d;
-  input [4:0] z;
-  assign d = z;
-endmodule

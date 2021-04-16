@@ -200,6 +200,9 @@ CMAKE_STRIP:FILEPATH=/usr/bin/strip
 // Studio IDE projects all commands are done without /nologo.
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
+//The directory containing a CMake configuration file for glog.
+glog_DIR:PATH=/usr/local/lib/cmake/glog
+
 //Value Computed by CMake
 taint-gen_BINARY_DIR:STATIC=/workspace/research/ILA/autoGenILA/src/taint_method/build
 

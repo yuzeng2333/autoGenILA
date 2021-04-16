@@ -1,0 +1,2 @@
+(define-fun INV ( (|aes_out| (_ BitVec 128))  ) (_ BitVec 128)
+  (bvadd #x00000000000000000000000000000000 |aes_out|))

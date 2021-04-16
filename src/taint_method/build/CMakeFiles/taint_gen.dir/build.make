@@ -184,6 +184,7 @@ taint_gen: CMakeFiles/taint_gen.dir/src/varWidth.cpp.o
 taint_gen: CMakeFiles/taint_gen.dir/src/vcd_parser.cpp.o
 taint_gen: CMakeFiles/taint_gen.dir/app/main.cpp.o
 taint_gen: CMakeFiles/taint_gen.dir/build.make
+taint_gen: /usr/local/lib/libglog.a
 taint_gen: CMakeFiles/taint_gen.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/workspace/research/ILA/autoGenILA/src/taint_method/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Linking CXX executable taint_gen"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/taint_gen.dir/link.txt --verbose=$(VERBOSE)

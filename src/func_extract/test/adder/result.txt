@@ -1,0 +1,19 @@
+Begin main!
+Start time: Sun Apr  4 15:53:00 2021
+
+Give 1'd0 to rst___#1
+Give 1'd0 to rst___#2
+Give 1'd0 to enable0___#2
+Give 1'd0 to rst___#3
+Give 1'd0 to enable0___#3
+Give 1'd0 to rst___#4
+Give 1'd0 to enable0___#4
+Give 1'd0 to rst___#5
+Give 1'd0 to enable0___#5
+Give 1'd0 to rst___#6
+Give 1'd1 to enable0___#6
+Give 9'd0 to word0___#5
+Give 9'd0 to word0___#4
+Give 9'd0 to word0___#3
+Give 9'd0 to word0___#2
+Give 9'd0 to word0___#1

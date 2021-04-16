@@ -1,5 +1,0 @@
-module \$paramod\SDP_C_mgc_in_wire_v1\rscid=4\width=6 (d, z);
-  output [5:0] d;
-  input [5:0] z;
-  assign d = z;
-endmodule

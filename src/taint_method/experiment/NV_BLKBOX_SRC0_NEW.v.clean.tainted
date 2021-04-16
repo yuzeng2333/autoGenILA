@@ -1,0 +1,8 @@
+  output Y;
+  logic Y ;
+  assign Y = 1'b0;
+  assign Y = Y ~^ Y;
+ // ground taints for floating regs
+ // ground taints for unused wires
+ // ground taints for unused wire slices
+endmodule

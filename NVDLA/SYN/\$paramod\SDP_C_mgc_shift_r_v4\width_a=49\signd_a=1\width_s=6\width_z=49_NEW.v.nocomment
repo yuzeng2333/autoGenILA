@@ -1,6 +1,0 @@
-module \$paramod\SDP_C_mgc_shift_r_v4\width_a=49\signd_a=1\width_s=6\width_z=49 (a, s, z);
-  input [48:0] a;
-  input [5:0] s;
-  output [48:0] z;
-  assign z = $signed(a) >>> s;
-endmodule

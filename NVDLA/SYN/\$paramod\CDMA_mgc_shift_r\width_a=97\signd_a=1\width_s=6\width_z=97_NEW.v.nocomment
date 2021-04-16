@@ -1,6 +1,0 @@
-module \$paramod\CDMA_mgc_shift_r\width_a=97\signd_a=1\width_s=6\width_z=97 (a, s, z);
-  input [96:0] a;
-  input [5:0] s;
-  output [96:0] z;
-  assign z = $signed(a) >>> s;
-endmodule

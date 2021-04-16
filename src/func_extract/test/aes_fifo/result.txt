@@ -1,0 +1,27 @@
+Begin main!
+Start time: Sat Apr  3 21:19:27 2021
+
+Give 0 to rst___#1
+Give 0 to rst___#2
+Give 0 to rst___#3
+Give 0 to rst___#4
+Give 0 to rst___#5
+Give 0 to rst___#6
+Give 0 to rst___#7
+Give 0 to rst___#8
+Give 0 to rst___#9
+Give 0 to rst___#10
+Give 0 to rst___#11
+Give 0 to rst___#12
+Give 0 to rst___#13
+Give 0 to rst___#14
+Give 0 to rst___#15
+Give 0 to rst___#16
+Give 0 to rst___#17
+Give 0 to rst___#18
+Give 0 to rst___#19
+Give 0 to rst___#20
+Give 0 to rst___#21
+Give 0 to rst___#22
+Give 0 to rst___#23
+Give 0 to rst___#24

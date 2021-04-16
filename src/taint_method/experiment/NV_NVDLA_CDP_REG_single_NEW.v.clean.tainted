@@ -1,0 +1,726 @@
+  logic _000_;
+  logic _001_;
+  logic [5:0] _002_;
+  logic [31:0] _003_;
+  logic _004_;
+  logic [7:0] _005_;
+  logic [7:0] _006_;
+  logic [15:0] _007_;
+  logic [4:0] _008_;
+  logic [15:0] _009_;
+  logic [4:0] _010_;
+  logic [5:0] _011_;
+  logic [31:0] _012_;
+  logic [5:0] _013_;
+  logic [31:0] _014_;
+  logic [7:0] _015_;
+  logic [15:0] _016_;
+  logic [4:0] _017_;
+  logic [15:0] _018_;
+  logic [4:0] _019_;
+  logic [5:0] _020_;
+  logic [31:0] _021_;
+  logic _022_;
+  logic _023_;
+  logic _024_;
+  logic _025_;
+  logic _026_;
+  logic _027_;
+  logic _028_;
+  logic _029_;
+  logic _030_;
+  logic _031_;
+  logic _032_;
+  logic _033_;
+  logic _034_;
+  logic _035_;
+  logic _036_;
+  logic _037_;
+  logic _038_;
+  logic _039_;
+  logic _040_;
+  logic _041_;
+  logic _042_;
+  logic _043_;
+  input consumer;
+  output lut_access_type;
+  logic lut_access_type ;
+  logic lut_access_type;
+  logic  lut_access_type_PREV_VAL1 ;
+  input [9:0] lut_addr;
+  output lut_addr_trigger;
+  logic lut_addr_trigger ;
+  input [15:0] lut_data;
+  output lut_data_trigger;
+  logic lut_data_trigger ;
+  output lut_hybrid_priority;
+  logic lut_hybrid_priority ;
+  logic lut_hybrid_priority;
+  logic  lut_hybrid_priority_PREV_VAL1 ;
+  output [5:0] lut_le_end_high;
+  logic [5:0] lut_le_end_high ;
+  logic [5:0] lut_le_end_high;
+  logic [5:0]  lut_le_end_high_PREV_VAL1 ;
+  output [31:0] lut_le_end_low;
+  logic [31:0] lut_le_end_low ;
+  logic [31:0] lut_le_end_low;
+  logic [31:0]  lut_le_end_low_PREV_VAL1 ;
+  output lut_le_function;
+  logic lut_le_function ;
+  logic lut_le_function;
+  logic  lut_le_function_PREV_VAL1 ;
+  output [7:0] lut_le_index_offset;
+  logic [7:0] lut_le_index_offset ;
+  logic [7:0] lut_le_index_offset;
+  logic [7:0]  lut_le_index_offset_PREV_VAL1 ;
+  output [7:0] lut_le_index_select;
+  logic [7:0] lut_le_index_select ;
+  logic [7:0] lut_le_index_select;
+  logic [7:0]  lut_le_index_select_PREV_VAL1 ;
+  output [15:0] lut_le_slope_oflow_scale;
+  logic [15:0] lut_le_slope_oflow_scale ;
+  logic [15:0] lut_le_slope_oflow_scale;
+  logic [15:0]  lut_le_slope_oflow_scale_PREV_VAL1 ;
+  output [4:0] lut_le_slope_oflow_shift;
+  logic [4:0] lut_le_slope_oflow_shift ;
+  logic [4:0] lut_le_slope_oflow_shift;
+  logic [4:0]  lut_le_slope_oflow_shift_PREV_VAL1 ;
+  output [15:0] lut_le_slope_uflow_scale;
+  logic [15:0] lut_le_slope_uflow_scale ;
+  logic [15:0] lut_le_slope_uflow_scale;
+  logic [15:0]  lut_le_slope_uflow_scale_PREV_VAL1 ;
+  output [4:0] lut_le_slope_uflow_shift;
+  logic [4:0] lut_le_slope_uflow_shift ;
+  logic [4:0] lut_le_slope_uflow_shift;
+  logic [4:0]  lut_le_slope_uflow_shift_PREV_VAL1 ;
+  output [5:0] lut_le_start_high;
+  logic [5:0] lut_le_start_high ;
+  logic [5:0] lut_le_start_high;
+  logic [5:0]  lut_le_start_high_PREV_VAL1 ;
+  output [31:0] lut_le_start_low;
+  logic [31:0] lut_le_start_low ;
+  logic [31:0] lut_le_start_low;
+  logic [31:0]  lut_le_start_low_PREV_VAL1 ;
+  output [5:0] lut_lo_end_high;
+  logic [5:0] lut_lo_end_high ;
+  logic [5:0] lut_lo_end_high;
+  logic [5:0]  lut_lo_end_high_PREV_VAL1 ;
+  output [31:0] lut_lo_end_low;
+  logic [31:0] lut_lo_end_low ;
+  logic [31:0] lut_lo_end_low;
+  logic [31:0]  lut_lo_end_low_PREV_VAL1 ;
+  output [7:0] lut_lo_index_select;
+  logic [7:0] lut_lo_index_select ;
+  logic [7:0] lut_lo_index_select;
+  logic [7:0]  lut_lo_index_select_PREV_VAL1 ;
+  output [15:0] lut_lo_slope_oflow_scale;
+  logic [15:0] lut_lo_slope_oflow_scale ;
+  logic [15:0] lut_lo_slope_oflow_scale;
+  logic [15:0]  lut_lo_slope_oflow_scale_PREV_VAL1 ;
+  output [4:0] lut_lo_slope_oflow_shift;
+  logic [4:0] lut_lo_slope_oflow_shift ;
+  logic [4:0] lut_lo_slope_oflow_shift;
+  logic [4:0]  lut_lo_slope_oflow_shift_PREV_VAL1 ;
+  output [15:0] lut_lo_slope_uflow_scale;
+  logic [15:0] lut_lo_slope_uflow_scale ;
+  logic [15:0] lut_lo_slope_uflow_scale;
+  logic [15:0]  lut_lo_slope_uflow_scale_PREV_VAL1 ;
+  output [4:0] lut_lo_slope_uflow_shift;
+  logic [4:0] lut_lo_slope_uflow_shift ;
+  logic [4:0] lut_lo_slope_uflow_shift;
+  logic [4:0]  lut_lo_slope_uflow_shift_PREV_VAL1 ;
+  output [5:0] lut_lo_start_high;
+  logic [5:0] lut_lo_start_high ;
+  logic [5:0] lut_lo_start_high;
+  logic [5:0]  lut_lo_start_high_PREV_VAL1 ;
+  output [31:0] lut_lo_start_low;
+  logic [31:0] lut_lo_start_low ;
+  logic [31:0] lut_lo_start_low;
+  logic [31:0]  lut_lo_start_low_PREV_VAL1 ;
+  output lut_oflow_priority;
+  logic lut_oflow_priority ;
+  logic lut_oflow_priority;
+  logic  lut_oflow_priority_PREV_VAL1 ;
+  output lut_table_id;
+  logic lut_table_id ;
+  logic lut_table_id;
+  logic  lut_table_id_PREV_VAL1 ;
+  output lut_uflow_priority;
+  logic lut_uflow_priority ;
+  logic lut_uflow_priority;
+  logic  lut_uflow_priority_PREV_VAL1 ;
+  logic [17:0] nvdla_cdp_s_lut_access_cfg_0_out;
+  logic nvdla_cdp_s_lut_access_cfg_0_wren;
+  logic [31:0] nvdla_cdp_s_lut_access_data_0_out;
+  logic nvdla_cdp_s_lut_access_data_0_wren;
+  logic [6:0] nvdla_cdp_s_lut_cfg_0_out;
+  logic nvdla_cdp_s_lut_cfg_0_wren;
+  logic [23:0] nvdla_cdp_s_lut_info_0_out;
+  logic nvdla_cdp_s_lut_info_0_wren;
+  logic [31:0] nvdla_cdp_s_lut_le_end_high_0_out;
+  logic nvdla_cdp_s_lut_le_end_high_0_wren;
+  logic [31:0] nvdla_cdp_s_lut_le_end_low_0_out;
+  logic nvdla_cdp_s_lut_le_end_low_0_wren;
+  logic [31:0] nvdla_cdp_s_lut_le_slope_scale_0_out;
+  logic nvdla_cdp_s_lut_le_slope_scale_0_wren;
+  logic [9:0] nvdla_cdp_s_lut_le_slope_shift_0_out;
+  logic nvdla_cdp_s_lut_le_slope_shift_0_wren;
+  logic [31:0] nvdla_cdp_s_lut_le_start_high_0_out;
+  logic nvdla_cdp_s_lut_le_start_high_0_wren;
+  logic [31:0] nvdla_cdp_s_lut_le_start_low_0_out;
+  logic nvdla_cdp_s_lut_le_start_low_0_wren;
+  logic [31:0] nvdla_cdp_s_lut_lo_end_high_0_out;
+  logic nvdla_cdp_s_lut_lo_end_high_0_wren;
+  logic [31:0] nvdla_cdp_s_lut_lo_end_low_0_out;
+  logic nvdla_cdp_s_lut_lo_end_low_0_wren;
+  logic [31:0] nvdla_cdp_s_lut_lo_slope_scale_0_out;
+  logic nvdla_cdp_s_lut_lo_slope_scale_0_wren;
+  logic [9:0] nvdla_cdp_s_lut_lo_slope_shift_0_out;
+  logic nvdla_cdp_s_lut_lo_slope_shift_0_wren;
+  logic [31:0] nvdla_cdp_s_lut_lo_start_high_0_out;
+  logic nvdla_cdp_s_lut_lo_start_high_0_wren;
+  logic [31:0] nvdla_cdp_s_lut_lo_start_low_0_out;
+  logic nvdla_cdp_s_lut_lo_start_low_0_wren;
+  logic [16:0] nvdla_cdp_s_pointer_0_out;
+  logic nvdla_cdp_s_pointer_0_wren;
+  logic [17:0] nvdla_cdp_s_status_0_out;
+  input nvdla_core_clk;
+  input nvdla_core_rstn;
+  output producer;
+  logic producer ;
+  logic producer;
+  logic  producer_PREV_VAL1 ;
+  input [11:0] reg_offset;
+  logic [11:0] reg_offset_rd_int;
+  logic [31:0] reg_offset_wr;
+  output [31:0] reg_rd_data;
+  logic [31:0] reg_rd_data ;
+  input [31:0] reg_wr_data;
+  input reg_wr_en;
+  input [1:0] status_0;
+  input [1:0] status_1;
+  assign lut_addr_trigger = _026_ & reg_wr_en;
+  assign lut_data_trigger = _027_ & reg_wr_en;
+  assign nvdla_cdp_s_lut_cfg_0_wren = _028_ & reg_wr_en;
+  assign nvdla_cdp_s_lut_info_0_wren = _029_ & reg_wr_en;
+  assign nvdla_cdp_s_lut_le_end_high_0_wren = _030_ & reg_wr_en;
+  assign nvdla_cdp_s_lut_le_end_low_0_wren = _031_ & reg_wr_en;
+  assign nvdla_cdp_s_lut_le_slope_scale_0_wren = _032_ & reg_wr_en;
+  assign nvdla_cdp_s_lut_le_slope_shift_0_wren = _033_ & reg_wr_en;
+  assign nvdla_cdp_s_lut_le_start_high_0_wren = _034_ & reg_wr_en;
+  assign nvdla_cdp_s_lut_le_start_low_0_wren = _035_ & reg_wr_en;
+  assign nvdla_cdp_s_lut_lo_end_high_0_wren = _036_ & reg_wr_en;
+  assign nvdla_cdp_s_lut_lo_end_low_0_wren = _037_ & reg_wr_en;
+  assign nvdla_cdp_s_lut_lo_slope_scale_0_wren = _038_ & reg_wr_en;
+  assign nvdla_cdp_s_lut_lo_slope_shift_0_wren = _039_ & reg_wr_en;
+  assign nvdla_cdp_s_lut_lo_start_high_0_wren = _040_ & reg_wr_en;
+  assign nvdla_cdp_s_lut_lo_start_low_0_wren = _041_ & reg_wr_en;
+  assign nvdla_cdp_s_pointer_0_wren = _042_ & reg_wr_en;
+  assign _026_ = reg_offset == 4'b1000;
+  assign _027_ = reg_offset == 4'b1100;
+  assign _028_ = reg_offset == 5'b10000;
+  assign _029_ = reg_offset == 5'b10100;
+  assign _030_ = reg_offset == 6'b100100;
+  assign _031_ = reg_offset == 6'b100000;
+  assign _032_ = reg_offset == 6'b111000;
+  assign _033_ = reg_offset == 6'b111100;
+  assign _034_ = reg_offset == 5'b11100;
+  assign _035_ = reg_offset == 5'b11000;
+  assign _036_ = reg_offset == 6'b110100;
+  assign _037_ = reg_offset == 6'b110000;
+  assign _038_ = reg_offset == 7'b1000000;
+  assign _039_ = reg_offset == 7'b1000100;
+  assign _040_ = reg_offset == 6'b101100;
+  assign _041_ = reg_offset == 6'b101000;
+  assign _042_ = reg_offset == 3'b100;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lut_access_type <= 1'b0;
+    else
+      lut_access_type <= _000_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lut_table_id <= 1'b0;
+    else
+      lut_table_id <= _023_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lut_hybrid_priority <= 1'b0;
+    else
+      lut_hybrid_priority <= _001_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lut_le_function <= 1'b0;
+    else
+      lut_le_function <= _004_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lut_oflow_priority <= 1'b0;
+    else
+      lut_oflow_priority <= _022_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lut_uflow_priority <= 1'b0;
+    else
+      lut_uflow_priority <= _024_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lut_le_index_offset <= 8'b00000000;
+    else
+      lut_le_index_offset <= _005_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lut_le_index_select <= 8'b00000000;
+    else
+      lut_le_index_select <= _006_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lut_lo_index_select <= 8'b00000000;
+    else
+      lut_lo_index_select <= _015_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lut_le_slope_oflow_scale <= 16'b0000000000000000;
+    else
+      lut_le_slope_oflow_scale <= _007_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lut_le_slope_uflow_scale <= 16'b0000000000000000;
+    else
+      lut_le_slope_uflow_scale <= _009_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lut_le_slope_oflow_shift <= 5'b00000;
+    else
+      lut_le_slope_oflow_shift <= _008_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lut_le_slope_uflow_shift <= 5'b00000;
+    else
+      lut_le_slope_uflow_shift <= _010_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lut_lo_slope_oflow_scale <= 16'b0000000000000000;
+    else
+      lut_lo_slope_oflow_scale <= _016_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lut_lo_slope_uflow_scale <= 16'b0000000000000000;
+    else
+      lut_lo_slope_uflow_scale <= _018_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lut_lo_slope_oflow_shift <= 5'b00000;
+    else
+      lut_lo_slope_oflow_shift <= _017_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lut_lo_slope_uflow_shift <= 5'b00000;
+    else
+      lut_lo_slope_uflow_shift <= _019_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      producer <= 1'b0;
+    else
+      producer <= _025_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lut_le_end_high <= 6'b000000;
+    else
+      lut_le_end_high <= _002_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lut_le_end_low <= 32'd0;
+    else
+      lut_le_end_low <= _003_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lut_le_start_high <= 6'b000000;
+    else
+      lut_le_start_high <= _011_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lut_le_start_low <= 32'd0;
+    else
+      lut_le_start_low <= _012_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lut_lo_end_high <= 6'b000000;
+    else
+      lut_lo_end_high <= _013_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lut_lo_end_low <= 32'd0;
+    else
+      lut_lo_end_low <= _014_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lut_lo_start_high <= 6'b000000;
+    else
+      lut_lo_start_high <= _020_;
+  always @(posedge nvdla_core_clk or negedge nvdla_core_rstn)
+    if (!nvdla_core_rstn)
+      lut_lo_start_low <= 32'd0;
+    else
+      lut_lo_start_low <= _021_;
+  assign _021_ = nvdla_cdp_s_lut_lo_start_low_0_wren ? reg_wr_data : lut_lo_start_low;
+  assign _020_ = nvdla_cdp_s_lut_lo_start_high_0_wren ? reg_wr_data[5:0] : lut_lo_start_high;
+  assign _014_ = nvdla_cdp_s_lut_lo_end_low_0_wren ? reg_wr_data : lut_lo_end_low;
+  assign _013_ = nvdla_cdp_s_lut_lo_end_high_0_wren ? reg_wr_data[5:0] : lut_lo_end_high;
+  assign _012_ = nvdla_cdp_s_lut_le_start_low_0_wren ? reg_wr_data : lut_le_start_low;
+  assign _011_ = nvdla_cdp_s_lut_le_start_high_0_wren ? reg_wr_data[5:0] : lut_le_start_high;
+  assign _003_ = nvdla_cdp_s_lut_le_end_low_0_wren ? reg_wr_data : lut_le_end_low;
+  assign _002_ = nvdla_cdp_s_lut_le_end_high_0_wren ? reg_wr_data[5:0] : lut_le_end_high;
+  assign _025_ = nvdla_cdp_s_pointer_0_wren ? reg_wr_data[0] : producer;
+  assign _019_ = nvdla_cdp_s_lut_lo_slope_shift_0_wren ? reg_wr_data[4:0] : lut_lo_slope_uflow_shift;
+  assign _017_ = nvdla_cdp_s_lut_lo_slope_shift_0_wren ? reg_wr_data[9:5] : lut_lo_slope_oflow_shift;
+  assign _018_ = nvdla_cdp_s_lut_lo_slope_scale_0_wren ? reg_wr_data[15:0] : lut_lo_slope_uflow_scale;
+  assign _016_ = nvdla_cdp_s_lut_lo_slope_scale_0_wren ? reg_wr_data[31:16] : lut_lo_slope_oflow_scale;
+  assign _010_ = nvdla_cdp_s_lut_le_slope_shift_0_wren ? reg_wr_data[4:0] : lut_le_slope_uflow_shift;
+  assign _008_ = nvdla_cdp_s_lut_le_slope_shift_0_wren ? reg_wr_data[9:5] : lut_le_slope_oflow_shift;
+  assign _009_ = nvdla_cdp_s_lut_le_slope_scale_0_wren ? reg_wr_data[15:0] : lut_le_slope_uflow_scale;
+  assign _007_ = nvdla_cdp_s_lut_le_slope_scale_0_wren ? reg_wr_data[31:16] : lut_le_slope_oflow_scale;
+  assign _015_ = nvdla_cdp_s_lut_info_0_wren ? reg_wr_data[23:16] : lut_lo_index_select;
+  assign _006_ = nvdla_cdp_s_lut_info_0_wren ? reg_wr_data[15:8] : lut_le_index_select;
+  assign _005_ = nvdla_cdp_s_lut_info_0_wren ? reg_wr_data[7:0] : lut_le_index_offset;
+  assign _024_ = nvdla_cdp_s_lut_cfg_0_wren ? reg_wr_data[4] : lut_uflow_priority;
+  assign _022_ = nvdla_cdp_s_lut_cfg_0_wren ? reg_wr_data[5] : lut_oflow_priority;
+  assign _004_ = nvdla_cdp_s_lut_cfg_0_wren ? reg_wr_data[0] : lut_le_function;
+  assign _001_ = nvdla_cdp_s_lut_cfg_0_wren ? reg_wr_data[6] : lut_hybrid_priority;
+  assign _023_ = lut_addr_trigger ? reg_wr_data[16] : lut_table_id;
+  assign _000_ = lut_addr_trigger ? reg_wr_data[17] : lut_access_type;
+  logic [575:0] fangyuan0;
+  assign fangyuan0 = { 14'b00000000000000, lut_access_type, lut_table_id, 6'b000000, lut_addr, 16'b0000000000000000, lut_data, 25'b0000000000000000000000000, lut_hybrid_priority, lut_oflow_priority, lut_uflow_priority, 3'b000, lut_le_function, 8'b00000000, lut_lo_index_select, lut_le_index_select, lut_le_index_offset, 26'b00000000000000000000000000, lut_le_end_high, lut_le_end_low, lut_le_slope_oflow_scale, lut_le_slope_uflow_scale, 22'b0000000000000000000000, lut_le_slope_oflow_shift, lut_le_slope_uflow_shift, 26'b00000000000000000000000000, lut_le_start_high, lut_le_start_low, 26'b00000000000000000000000000, lut_lo_end_high, lut_lo_end_low, lut_lo_slope_oflow_scale, lut_lo_slope_uflow_scale, 22'b0000000000000000000000, lut_lo_slope_oflow_shift, lut_lo_slope_uflow_shift, 26'b00000000000000000000000000, lut_lo_start_high, lut_lo_start_low, 15'b000000000000000, consumer, 15'b000000000000000, producer, 14'b00000000000000, status_1, 14'b00000000000000, status_0 };
+  logic [17:0] fangyuan1;
+  assign fangyuan1 = { _026_, _027_, _028_, _029_, _030_, _031_, _032_, _033_, _034_, _035_, _036_, _037_, _038_, _039_, _040_, _041_, _042_, _043_ };
+  always @(32'd0 or fangyuan0 or fangyuan1) begin
+    casez (fangyuan1)
+      18'b?????????????????1 :
+        reg_rd_data = fangyuan0 [31:0] ;
+      18'b????????????????1? :
+        reg_rd_data = fangyuan0 [63:32] ;
+      18'b???????????????1?? :
+        reg_rd_data = fangyuan0 [95:64] ;
+      18'b??????????????1??? :
+        reg_rd_data = fangyuan0 [127:96] ;
+      18'b?????????????1???? :
+        reg_rd_data = fangyuan0 [159:128] ;
+      18'b????????????1????? :
+        reg_rd_data = fangyuan0 [191:160] ;
+      18'b???????????1?????? :
+        reg_rd_data = fangyuan0 [223:192] ;
+      18'b??????????1??????? :
+        reg_rd_data = fangyuan0 [255:224] ;
+      18'b?????????1???????? :
+        reg_rd_data = fangyuan0 [287:256] ;
+      18'b????????1????????? :
+        reg_rd_data = fangyuan0 [319:288] ;
+      18'b???????1?????????? :
+        reg_rd_data = fangyuan0 [351:320] ;
+      18'b??????1??????????? :
+        reg_rd_data = fangyuan0 [383:352] ;
+      18'b?????1???????????? :
+        reg_rd_data = fangyuan0 [415:384] ;
+      18'b????1????????????? :
+        reg_rd_data = fangyuan0 [447:416] ;
+      18'b???1?????????????? :
+        reg_rd_data = fangyuan0 [479:448] ;
+      18'b??1??????????????? :
+        reg_rd_data = fangyuan0 [511:480] ;
+      18'b?1???????????????? :
+        reg_rd_data = fangyuan0 [543:512] ;
+      18'b1????????????????? :
+        reg_rd_data = fangyuan0 [575:544] ;
+      default:
+        reg_rd_data = 32'd0 ;
+    endcase
+  end
+    always @( fangyuan0_T or fangyuan1_T or fangyuan1 ) begin
+      casez (fangyuan1)
+        18'b?????????????????1 :
+          reg_rd_data_T = fangyuan0_T  [31:0] | { 32{ fangyuan1_T[0] }} ;
+        18'b????????????????1? :
+          reg_rd_data_T = fangyuan0_T  [63:32] | { 32{ fangyuan1_T[1] }} ;
+        18'b???????????????1?? :
+          reg_rd_data_T = fangyuan0_T  [95:64] | { 32{ fangyuan1_T[2] }} ;
+        18'b??????????????1??? :
+          reg_rd_data_T = fangyuan0_T  [127:96] | { 32{ fangyuan1_T[3] }} ;
+        18'b?????????????1???? :
+          reg_rd_data_T = fangyuan0_T  [159:128] | { 32{ fangyuan1_T[4] }} ;
+        18'b????????????1????? :
+          reg_rd_data_T = fangyuan0_T  [191:160] | { 32{ fangyuan1_T[5] }} ;
+        18'b???????????1?????? :
+          reg_rd_data_T = fangyuan0_T  [223:192] | { 32{ fangyuan1_T[6] }} ;
+        18'b??????????1??????? :
+          reg_rd_data_T = fangyuan0_T  [255:224] | { 32{ fangyuan1_T[7] }} ;
+        18'b?????????1???????? :
+          reg_rd_data_T = fangyuan0_T  [287:256] | { 32{ fangyuan1_T[8] }} ;
+        18'b????????1????????? :
+          reg_rd_data_T = fangyuan0_T  [319:288] | { 32{ fangyuan1_T[9] }} ;
+        18'b???????1?????????? :
+          reg_rd_data_T = fangyuan0_T  [351:320] | { 32{ fangyuan1_T[10] }} ;
+        18'b??????1??????????? :
+          reg_rd_data_T = fangyuan0_T  [383:352] | { 32{ fangyuan1_T[11] }} ;
+        18'b?????1???????????? :
+          reg_rd_data_T = fangyuan0_T  [415:384] | { 32{ fangyuan1_T[12] }} ;
+        18'b????1????????????? :
+          reg_rd_data_T = fangyuan0_T  [447:416] | { 32{ fangyuan1_T[13] }} ;
+        18'b???1?????????????? :
+          reg_rd_data_T = fangyuan0_T  [479:448] | { 32{ fangyuan1_T[14] }} ;
+        18'b??1??????????????? :
+          reg_rd_data_T = fangyuan0_T  [511:480] | { 32{ fangyuan1_T[15] }} ;
+        18'b?1???????????????? :
+          reg_rd_data_T = fangyuan0_T  [543:512] | { 32{ fangyuan1_T[16] }} ;
+        18'b1????????????????? :
+          reg_rd_data_T = fangyuan0_T  [575:544] | { 32{ fangyuan1_T[17] }} ;
+        default:
+          reg_rd_data_T = { 32{ | fangyuan1_T }} ;
+      endcase
+    end
+    always @( fangyuan0_S or fangyuan1 ) begin
+      casez (fangyuan1)
+        18'b?????????????????1 :
+          reg_rd_data_S = fangyuan0_S [4:0] ;
+        18'b????????????????1? :
+          reg_rd_data_S = fangyuan0_S [9:5] ;
+        18'b???????????????1?? :
+          reg_rd_data_S = fangyuan0_S [14:10] ;
+        18'b??????????????1??? :
+          reg_rd_data_S = fangyuan0_S [19:15] ;
+        18'b?????????????1???? :
+          reg_rd_data_S = fangyuan0_S [24:20] ;
+        18'b????????????1????? :
+          reg_rd_data_S = fangyuan0_S [29:25] ;
+        18'b???????????1?????? :
+          reg_rd_data_S = fangyuan0_S [34:30] ;
+        18'b??????????1??????? :
+          reg_rd_data_S = fangyuan0_S [39:35] ;
+        18'b?????????1???????? :
+          reg_rd_data_S = fangyuan0_S [44:40] ;
+        18'b????????1????????? :
+          reg_rd_data_S = fangyuan0_S [49:45] ;
+        18'b???????1?????????? :
+          reg_rd_data_S = fangyuan0_S [54:50] ;
+        18'b??????1??????????? :
+          reg_rd_data_S = fangyuan0_S [59:55] ;
+        18'b?????1???????????? :
+          reg_rd_data_S = fangyuan0_S [64:60] ;
+        18'b????1????????????? :
+          reg_rd_data_S = fangyuan0_S [69:65] ;
+        18'b???1?????????????? :
+          reg_rd_data_S = fangyuan0_S [74:70] ;
+        18'b??1??????????????? :
+          reg_rd_data_S = fangyuan0_S [79:75] ;
+        18'b?1???????????????? :
+          reg_rd_data_S = fangyuan0_S [84:80] ;
+        18'b1????????????????? :
+          reg_rd_data_S = fangyuan0_S [89:85] ;
+        default:
+          reg_rd_data_S = 5'b1 ;
+      endcase
+    end
+    reg [18-1:0] fangyuan1_R0 ;
+    reg [576-1:0] fangyuan0_R0 ;
+    always @( reg_rd_data_R or fangyuan1 ) begin
+      fangyuan1_R0 = { 18{ | reg_rd_data_R }} ;
+      fangyuan0_R0 = 0 ;
+      casez (fangyuan1)
+        18'b?????????????????1 :
+          fangyuan0_R0 [31:0] = reg_rd_data_R ;
+        18'b????????????????1? :
+          fangyuan0_R0 [63:32] = reg_rd_data_R ;
+        18'b???????????????1?? :
+          fangyuan0_R0 [95:64] = reg_rd_data_R ;
+        18'b??????????????1??? :
+          fangyuan0_R0 [127:96] = reg_rd_data_R ;
+        18'b?????????????1???? :
+          fangyuan0_R0 [159:128] = reg_rd_data_R ;
+        18'b????????????1????? :
+          fangyuan0_R0 [191:160] = reg_rd_data_R ;
+        18'b???????????1?????? :
+          fangyuan0_R0 [223:192] = reg_rd_data_R ;
+        18'b??????????1??????? :
+          fangyuan0_R0 [255:224] = reg_rd_data_R ;
+        18'b?????????1???????? :
+          fangyuan0_R0 [287:256] = reg_rd_data_R ;
+        18'b????????1????????? :
+          fangyuan0_R0 [319:288] = reg_rd_data_R ;
+        18'b???????1?????????? :
+          fangyuan0_R0 [351:320] = reg_rd_data_R ;
+        18'b??????1??????????? :
+          fangyuan0_R0 [383:352] = reg_rd_data_R ;
+        18'b?????1???????????? :
+          fangyuan0_R0 [415:384] = reg_rd_data_R ;
+        18'b????1????????????? :
+          fangyuan0_R0 [447:416] = reg_rd_data_R ;
+        18'b???1?????????????? :
+          fangyuan0_R0 [479:448] = reg_rd_data_R ;
+        18'b??1??????????????? :
+          fangyuan0_R0 [511:480] = reg_rd_data_R ;
+        18'b?1???????????????? :
+          fangyuan0_R0 [543:512] = reg_rd_data_R ;
+        18'b1????????????????? :
+          fangyuan0_R0 [575:544] = reg_rd_data_R ;
+      endcase
+    end
+  assign _043_ = ! reg_offset;
+  assign nvdla_cdp_s_lut_access_cfg_0_out = { lut_access_type, lut_table_id, 6'b000000, lut_addr };
+  assign nvdla_cdp_s_lut_access_cfg_0_wren = lut_addr_trigger;
+  assign nvdla_cdp_s_lut_access_data_0_out = { 16'b0000000000000000, lut_data };
+  assign nvdla_cdp_s_lut_access_data_0_wren = lut_data_trigger;
+  assign nvdla_cdp_s_lut_cfg_0_out = { lut_hybrid_priority, lut_oflow_priority, lut_uflow_priority, 3'b000, lut_le_function };
+  assign nvdla_cdp_s_lut_info_0_out = { lut_lo_index_select, lut_le_index_select, lut_le_index_offset };
+  assign nvdla_cdp_s_lut_le_end_high_0_out = { 26'b00000000000000000000000000, lut_le_end_high };
+  assign nvdla_cdp_s_lut_le_end_low_0_out = lut_le_end_low;
+  assign nvdla_cdp_s_lut_le_slope_scale_0_out = { lut_le_slope_oflow_scale, lut_le_slope_uflow_scale };
+  assign nvdla_cdp_s_lut_le_slope_shift_0_out = { lut_le_slope_oflow_shift, lut_le_slope_uflow_shift };
+  assign nvdla_cdp_s_lut_le_start_high_0_out = { 26'b00000000000000000000000000, lut_le_start_high };
+  assign nvdla_cdp_s_lut_le_start_low_0_out = lut_le_start_low;
+  assign nvdla_cdp_s_lut_lo_end_high_0_out = { 26'b00000000000000000000000000, lut_lo_end_high };
+  assign nvdla_cdp_s_lut_lo_end_low_0_out = lut_lo_end_low;
+  assign nvdla_cdp_s_lut_lo_slope_scale_0_out = { lut_lo_slope_oflow_scale, lut_lo_slope_uflow_scale };
+  assign nvdla_cdp_s_lut_lo_slope_shift_0_out = { lut_lo_slope_oflow_shift, lut_lo_slope_uflow_shift };
+  assign nvdla_cdp_s_lut_lo_start_high_0_out = { 26'b00000000000000000000000000, lut_lo_start_high };
+  assign nvdla_cdp_s_lut_lo_start_low_0_out = lut_lo_start_low;
+  assign nvdla_cdp_s_pointer_0_out = { consumer, 15'b000000000000000, producer };
+  assign nvdla_cdp_s_status_0_out = { status_1, 14'b00000000000000, status_0 };
+  assign reg_offset_rd_int = reg_offset;
+  assign reg_offset_wr = { 20'b00000000000000000000, reg_offset };
+  assign fangyuan0_R = ( fangyuan0_R0 );
+  assign fangyuan1_R = ( fangyuan1_R0 );
+ // ground taints for floating regs
+  assign lut_access_type_R = 0;
+  assign lut_hybrid_priority_R = 0;
+  assign lut_le_end_high_R = 0;
+  assign lut_le_end_low_R = 0;
+  assign lut_le_function_R = 0;
+  assign lut_le_index_offset_R = 0;
+  assign lut_le_index_select_R = 0;
+  assign lut_le_slope_oflow_scale_R = 0;
+  assign lut_le_slope_oflow_shift_R = 0;
+  assign lut_le_slope_uflow_scale_R = 0;
+  assign lut_le_slope_uflow_shift_R = 0;
+  assign lut_le_start_high_R = 0;
+  assign lut_le_start_low_R = 0;
+  assign lut_lo_end_high_R = 0;
+  assign lut_lo_end_low_R = 0;
+  assign lut_lo_index_select_R = 0;
+  assign lut_lo_slope_oflow_scale_R = 0;
+  assign lut_lo_slope_oflow_shift_R = 0;
+  assign lut_lo_slope_uflow_scale_R = 0;
+  assign lut_lo_slope_uflow_shift_R = 0;
+  assign lut_lo_start_high_R = 0;
+  assign lut_lo_start_low_R = 0;
+  assign lut_oflow_priority_R = 0;
+  assign lut_table_id_R = 0;
+  assign lut_uflow_priority_R = 0;
+  assign producer_R = 0;
+ // ground taints for unused wires
+  assign { _000__R , _001__R , _002__R , _003__R , _004__R , _005__R , _006__R , _007__R , _008__R , _009__R , _010__R , _011__R , _012__R , _013__R , _014__R , _015__R , _016__R , _017__R , _018__R , _019__R , _020__R , _021__R , _022__R , _023__R , _024__R , _025__R , _026__R , _027__R , _028__R , _029__R , _030__R , _031__R , _032__R , _033__R , _034__R , _035__R , _036__R , _037__R , _038__R , _039__R , _040__R , _041__R , _042__R , _043__R , nvdla_cdp_s_lut_access_cfg_0_out_R , nvdla_cdp_s_lut_access_cfg_0_wren_R , nvdla_cdp_s_lut_access_data_0_out_R , nvdla_cdp_s_lut_access_data_0_wren_R , nvdla_cdp_s_lut_cfg_0_out_R , nvdla_cdp_s_lut_cfg_0_wren_R , nvdla_cdp_s_lut_info_0_out_R , nvdla_cdp_s_lut_info_0_wren_R , nvdla_cdp_s_lut_le_end_high_0_out_R , nvdla_cdp_s_lut_le_end_high_0_wren_R , nvdla_cdp_s_lut_le_end_low_0_out_R , nvdla_cdp_s_lut_le_end_low_0_wren_R , nvdla_cdp_s_lut_le_slope_scale_0_out_R , nvdla_cdp_s_lut_le_slope_scale_0_wren_R , nvdla_cdp_s_lut_le_slope_shift_0_out_R , nvdla_cdp_s_lut_le_slope_shift_0_wren_R , nvdla_cdp_s_lut_le_start_high_0_out_R , nvdla_cdp_s_lut_le_start_high_0_wren_R , nvdla_cdp_s_lut_le_start_low_0_out_R , nvdla_cdp_s_lut_le_start_low_0_wren_R , nvdla_cdp_s_lut_lo_end_high_0_out_R , nvdla_cdp_s_lut_lo_end_high_0_wren_R , nvdla_cdp_s_lut_lo_end_low_0_out_R , nvdla_cdp_s_lut_lo_end_low_0_wren_R , nvdla_cdp_s_lut_lo_slope_scale_0_out_R , nvdla_cdp_s_lut_lo_slope_scale_0_wren_R , nvdla_cdp_s_lut_lo_slope_shift_0_out_R , nvdla_cdp_s_lut_lo_slope_shift_0_wren_R , nvdla_cdp_s_lut_lo_start_high_0_out_R , nvdla_cdp_s_lut_lo_start_high_0_wren_R , nvdla_cdp_s_lut_lo_start_low_0_out_R , nvdla_cdp_s_lut_lo_start_low_0_wren_R , nvdla_cdp_s_pointer_0_out_R , nvdla_cdp_s_pointer_0_wren_R , nvdla_cdp_s_status_0_out_R , reg_offset_rd_int_R , reg_offset_wr_R , consumer_R , lut_addr_R , lut_data_R , nvdla_core_clk_R , nvdla_core_rstn_R , reg_offset_R , reg_wr_data_R , reg_wr_en_R , status_0_R , status_1_R  } = 0;
+  always @( posedge  ) begin
+    if( rst_zy ) lut_access_type_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) lut_access_type_PREV_VAL1 <= lut_access_type ;
+  end
+  always @( posedge  ) begin
+    if( rst_zy ) lut_table_id_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) lut_table_id_PREV_VAL1 <= lut_table_id ;
+  end
+  always @( posedge  ) begin
+    if( rst_zy ) lut_hybrid_priority_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) lut_hybrid_priority_PREV_VAL1 <= lut_hybrid_priority ;
+  end
+  always @( posedge  ) begin
+    if( rst_zy ) lut_le_function_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) lut_le_function_PREV_VAL1 <= lut_le_function ;
+  end
+  always @( posedge  ) begin
+    if( rst_zy ) lut_oflow_priority_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) lut_oflow_priority_PREV_VAL1 <= lut_oflow_priority ;
+  end
+  always @( posedge  ) begin
+    if( rst_zy ) lut_uflow_priority_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) lut_uflow_priority_PREV_VAL1 <= lut_uflow_priority ;
+  end
+  always @( posedge  ) begin
+    if( rst_zy ) lut_le_index_offset_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) lut_le_index_offset_PREV_VAL1 <= lut_le_index_offset ;
+  end
+  always @( posedge  ) begin
+    if( rst_zy ) lut_le_index_select_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) lut_le_index_select_PREV_VAL1 <= lut_le_index_select ;
+  end
+  always @( posedge  ) begin
+    if( rst_zy ) lut_lo_index_select_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) lut_lo_index_select_PREV_VAL1 <= lut_lo_index_select ;
+  end
+  always @( posedge  ) begin
+    if( rst_zy ) lut_le_slope_oflow_scale_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) lut_le_slope_oflow_scale_PREV_VAL1 <= lut_le_slope_oflow_scale ;
+  end
+  always @( posedge  ) begin
+    if( rst_zy ) lut_le_slope_uflow_scale_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) lut_le_slope_uflow_scale_PREV_VAL1 <= lut_le_slope_uflow_scale ;
+  end
+  always @( posedge  ) begin
+    if( rst_zy ) lut_le_slope_oflow_shift_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) lut_le_slope_oflow_shift_PREV_VAL1 <= lut_le_slope_oflow_shift ;
+  end
+  always @( posedge  ) begin
+    if( rst_zy ) lut_le_slope_uflow_shift_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) lut_le_slope_uflow_shift_PREV_VAL1 <= lut_le_slope_uflow_shift ;
+  end
+  always @( posedge  ) begin
+    if( rst_zy ) lut_lo_slope_oflow_scale_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) lut_lo_slope_oflow_scale_PREV_VAL1 <= lut_lo_slope_oflow_scale ;
+  end
+  always @( posedge  ) begin
+    if( rst_zy ) lut_lo_slope_uflow_scale_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) lut_lo_slope_uflow_scale_PREV_VAL1 <= lut_lo_slope_uflow_scale ;
+  end
+  always @( posedge  ) begin
+    if( rst_zy ) lut_lo_slope_oflow_shift_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) lut_lo_slope_oflow_shift_PREV_VAL1 <= lut_lo_slope_oflow_shift ;
+  end
+  always @( posedge  ) begin
+    if( rst_zy ) lut_lo_slope_uflow_shift_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) lut_lo_slope_uflow_shift_PREV_VAL1 <= lut_lo_slope_uflow_shift ;
+  end
+  always @( posedge  ) begin
+    if( rst_zy ) producer_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) producer_PREV_VAL1 <= producer ;
+  end
+  always @( posedge  ) begin
+    if( rst_zy ) lut_le_end_high_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) lut_le_end_high_PREV_VAL1 <= lut_le_end_high ;
+  end
+  always @( posedge  ) begin
+    if( rst_zy ) lut_le_end_low_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) lut_le_end_low_PREV_VAL1 <= lut_le_end_low ;
+  end
+  always @( posedge  ) begin
+    if( rst_zy ) lut_le_start_high_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) lut_le_start_high_PREV_VAL1 <= lut_le_start_high ;
+  end
+  always @( posedge  ) begin
+    if( rst_zy ) lut_le_start_low_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) lut_le_start_low_PREV_VAL1 <= lut_le_start_low ;
+  end
+  always @( posedge  ) begin
+    if( rst_zy ) lut_lo_end_high_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) lut_lo_end_high_PREV_VAL1 <= lut_lo_end_high ;
+  end
+  always @( posedge  ) begin
+    if( rst_zy ) lut_lo_end_low_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) lut_lo_end_low_PREV_VAL1 <= lut_lo_end_low ;
+  end
+  always @( posedge  ) begin
+    if( rst_zy ) lut_lo_start_high_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) lut_lo_start_high_PREV_VAL1 <= lut_lo_start_high ;
+  end
+  always @( posedge  ) begin
+    if( rst_zy ) lut_lo_start_low_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) lut_lo_start_low_PREV_VAL1 <= lut_lo_start_low ;
+  end
+ // ground taints for unused wire slices
+  assign rst_zy = !nvdla_core_rstn ;
+endmodule

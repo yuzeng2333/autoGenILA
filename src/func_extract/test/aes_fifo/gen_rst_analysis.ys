@@ -1,0 +1,4 @@
+read_verilog aes_partial_flatten.v
+
+prep -top aes_top
+sim -clock clk -reset rst -rstlen 20 -vcd rst.vcd

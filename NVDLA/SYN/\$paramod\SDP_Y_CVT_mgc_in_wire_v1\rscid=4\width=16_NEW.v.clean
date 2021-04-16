@@ -1,5 +1,0 @@
-module \$paramod\SDP_Y_CVT_mgc_in_wire_v1\rscid=4\width=16 (d, z);
-  output [15:0] d;
-  input [15:0] z;
-  assign d = z;
-endmodule

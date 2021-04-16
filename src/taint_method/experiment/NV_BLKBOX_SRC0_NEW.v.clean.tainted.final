@@ -1,0 +1,13 @@
+module NV_BLKBOX_SRC0 ( zy_end_sig , Y ,   logic rst_zy;
+  input zy_end_sig;
+  integer i;
+  logic INSTR_IN_ZY;
+  assign INSTR_IN_ZY = 0 ;
+  output Y;
+  logic Y ;
+  assign Y = 1'b0;
+  assign Y = Y ~^ Y;
+ // ground taints for floating regs
+ // ground taints for unused wires
+ // ground taints for unused wire slices
+endmodule
