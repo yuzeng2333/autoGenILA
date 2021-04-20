@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
   g_path = argv[1];
   // if argv[3] is 1, clean the file
   std::string doClean = argv[2];
-  bool printRegInfo = true;
+  bool printRegInfo = false;
   if(argc > 3) {
     std::string argv3 = argv[3];    
     if( argv3 == "-reg") printRegInfo = true ;
