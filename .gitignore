@@ -21,3 +21,5 @@ graphics/
 io/
 pairing/
 ultra_riscv/
+src/taint_method/build
+src/func_extract/build
