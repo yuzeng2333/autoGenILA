@@ -99,7 +99,7 @@ void add_node(std::string varAndSlice,
               bool varIsDest) {
   remove_two_end_space(varAndSlice);
   //toCout("Add node for: "+varAndSlice);
-  if(varAndSlice.find("aes_out") != std::string::npos) {
+  if(varAndSlice.find("cpuregs_wrdata") != std::string::npos) {
     toCout("Found it!");
     s_node = node;
   }
@@ -130,11 +130,12 @@ void add_node(std::string varAndSlice,
   else if ( is_input(varToAdd) ) {
     add_input_node(varToAdd, timeIdx, node);
   }
-  else if ( isAs(varToAdd) && !varIsDest ) {
-    toCout("Error: a reg is labeled as asv: "+varAndSlice);
-    abort();
-    add_as_node(varToAdd, timeIdx, node);    
-  }
+  // FIXME
+  //else if ( isAs(varToAdd) && !varIsDest ) {
+  //  //toCout("Error: a reg is labeled as asv: "+varAndSlice);
+  //  //abort();
+  //  add_as_node(varToAdd, timeIdx, node);    
+  //}
   else if( is_reg(varToAdd) ) {
     add_nb_node(varToAdd, timeIdx, node);
   }
@@ -612,6 +613,10 @@ void add_case_node(std::string var, uint32_t timeIdx, astNode* const node) {
     toCout("Error: not found in g_curMod->caseTable: "+var);
     abort();
   }
+
+  if(var == "cpuregs_wrdata")
+    toCout("Find it!");
+
   auto localPair = g_curMod->caseTable[var];
   std::string caseVar = localPair.first;
   auto caseAssignPairs = localPair.second;

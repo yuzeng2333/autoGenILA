@@ -557,6 +557,8 @@ llvm::Value* add_nb_constraint(astNode* const node,
 
   if(timeIdx < bound) {
     toCoutVerb("Add nb constraint for: " + dest+" ------  time: "+toStr(timeIdx));
+    if(dest == "decoder_trigger_q" && timeIdx == 3)
+      toCout("Find it!");
     std::string destNext = node->srcVec.front();
 
     destNextExpr = add_constraint(node->childVec.front(), timeIdx+1, c, b, bound);
@@ -580,7 +582,8 @@ llvm::Value* add_nb_constraint(astNode* const node,
   // if timeIdx = bound, then return function input or rst/norm value
   // TODO: adjust the following condition for different designs
 
-  if(g_curMod->invarRegs.find(dest) == g_curMod->invarRegs.end()) {
+  //if(g_curMod->invarRegs.find(dest) == g_curMod->invarRegs.end()) {
+  if(g_readASV.find(dest) != g_readASV.end()) {
       //&& g_curMod->moduleAs.find(dest) != g_curMod->moduleAs.end())
     //std::string prefix = get_hier_name(false);
     //if(!prefix.empty()) prefix += ".";
@@ -594,6 +597,7 @@ llvm::Value* add_nb_constraint(astNode* const node,
     else
       rstVal = toStr(width)+"'b0";
     toCout("Replace "+timed_name(dest, timeIdx)+" with "+rstVal);
+    g_outFile << "Replace "+timed_name(dest, timeIdx)+" with "+rstVal << std::endl;
     if(dest == "out" && timeIdx == 1)
       toCout("Find it!");
     return var_expr(rstVal, timeIdx, c, b, false, width);    

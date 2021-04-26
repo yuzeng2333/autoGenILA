@@ -80,8 +80,8 @@ llvm::Value* var_expr(std::string varAndSlice, uint32_t timeIdx, context &c,
 
   if(is_x(varAndSlice)) {
     // FIXME: if encounter x value, just give 0 to it
-    toCout("Error: get a x value");
-    abort();
+    //toCout("Error: get a x value");
+    //abort();
     return llvmInt(0, localWidth, c);
   } 
   else if(is_number(var)) {
@@ -850,7 +850,9 @@ llvm::Value* ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c
 
 llvm::Value* case_constraint(astNode* const node, uint32_t timeIdx, 
                              context &c, builder &b, uint32_t bound) {
-  toCoutVerb("Case op constraint for :"+node->dest);  
+  toCoutVerb("Case op constraint for :"+node->dest);
+  if(node->dest == "cpuregs_wrdata")
+    toCout("Find it!");
   assert(node->type == CASE);
   assert(node->srcVec.size() % 2 == 1);
 
