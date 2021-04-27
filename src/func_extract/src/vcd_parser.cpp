@@ -40,15 +40,15 @@ void vcd_parser(std::string fileName) {
       }
       std::string name = m.str(2);
       std::string var = m.str(3);
-      if(var.find("branch_q") != std::string::npos) {
+      if(var.find("mem_valid") != std::string::npos) {
         toCout("Find it");
       }
       if(var.find("pc_x_q") != std::string::npos) {
         toCout("Find it");
       }
-      if(isTrueReg(var))
+      if(is_reg(var))
         g_nameVarMap.emplace(name, var);
-      else if(isTrueReg("\\"+var))
+      else if(is_reg("\\"+var))
         g_nameVarMap.emplace(name, "\\"+var);
     }
     else if(state == readValue) {

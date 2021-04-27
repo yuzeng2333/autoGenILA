@@ -801,7 +801,7 @@ bool is_output(const std::string &var) {
 }
 
 
-bool is_reg(std::string &var) {
+bool is_reg(std::string var) {
   if(var.back() == ' ')
     var.pop_back();
   auto it = std::find( g_curMod->moduleTrueRegs.begin(), g_curMod->moduleTrueRegs.end(), var );

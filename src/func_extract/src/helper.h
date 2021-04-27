@@ -201,7 +201,7 @@ bool is_input(const std::string &var, const std::shared_ptr<ModuleInfo_t> &modIn
 
 bool is_output(const std::string &var);
 
-bool is_reg(std::string &var);
+bool is_reg(std::string var);
 
 bool is_submod_output(const std::string &var);
 
