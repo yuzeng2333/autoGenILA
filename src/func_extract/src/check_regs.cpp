@@ -841,11 +841,13 @@ void clean_module_inputs() {
   for(auto pair : g_moduleInfoMap) {
     auto curMod = pair.second;
     std::string modName = pair.first;
+    //std::set<std::string> toErase;
     for(auto it = curMod->moduleInputs.begin(); 
         it != curMod->moduleInputs.end(); it++) {
       if(*it == curMod->clk ) {
         curMod->moduleInputs.erase(it);
         toCoutVerb("Erase "+*it+" from "+modName);
+        return;
       }
     }
   }
