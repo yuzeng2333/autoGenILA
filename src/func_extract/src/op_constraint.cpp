@@ -258,8 +258,8 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx, context &c,
         toCout("Error: unexpected input value: "+localVal);          
     }
     else {
-      toCout("Error: NOP instruction has x value: "+dest);
-      abort();
+      toCout("Warning: NOP instruction has x value: "+dest);
+      return get_arg(destTimed);
     }
   }
   else {

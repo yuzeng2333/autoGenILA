@@ -359,6 +359,10 @@ void always_expr(std::string line, std::ifstream &input) {
 }
 
 
+//always @(posedge clk)
+//  if (cond) var <= data1;
+//  else var <= data2; (optional)
+//  else if(cond2) var <= data2; (optional)
 void nonblockif_expr(std::string line, std::ifstream &input) {
   std::smatch m;
   if ( !std::regex_match(line, m, pNonblockIf) )
@@ -369,7 +373,9 @@ void nonblockif_expr(std::string line, std::ifstream &input) {
   std::string blank;
   std::string condAndSlice;
   std::string destAndSlice;
-  std::string srcAndSlice;
+  std::string destAndSlice2;
+  std::string ifSrcAndSlice;
+  std::string elseSrcAndSlice;
   std::string dest, destSlice;
   std::string src, srcSlice;
   std::string cond, condSlice;
@@ -378,10 +384,10 @@ void nonblockif_expr(std::string line, std::ifstream &input) {
   blank = m.str(1);
   condAndSlice = m.str(2);
   destAndSlice = m.str(3);
-  srcAndSlice = m.str(4);
+  ifSrcAndSlice = m.str(4);
 
   split_slice(destAndSlice, dest, destSlice);
-  split_slice(srcAndSlice, src, srcSlice);
+  split_slice(ifSrcAndSlice, src, srcSlice);
   split_slice(condAndSlice, cond, condSlice);
   g_curMod->moduleTrueRegs.insert(dest);
 
@@ -395,12 +401,27 @@ void nonblockif_expr(std::string line, std::ifstream &input) {
     std::cout << "insert failed: " + line << std::endl;
   }
  
-  std::string destNextLine = "  assign yuzeng"+yuzengIdx+" = "+condAndSlice+" ? "+srcAndSlice+" : "+destAndSlice+" ;";
+  std::string elseValue;
+  // need to check if there is "else" statement
+  auto endOfIf = input.tellg();
+  std::getline(input, line);
+  if ( !std::regex_match(line, m, pNonblockElse) ) {
+    input.seekg(endOfIf);
+    elseValue = destAndSlice;
+  }
+  else {
+    destAndSlice2 = m.str(2);
+    elseSrcAndSlice = m.str(3);
+    assert(destAndSlice == destAndSlice2);
+    elseValue = elseSrcAndSlice;
+  }
+
+  std::string destNextLine = "  assign yuzeng"+yuzengIdx+" = "+condAndSlice+" ? "+ifSrcAndSlice+" : "+elseValue+" ;";
   auto ret = g_curMod->ssaTable.emplace("yuzeng"+yuzengIdx, destNextLine);
   if(!ret.second)
     toCout("Error in inserting ssaTable for the line: "+line+", "+destNextLine );
 
-  std::string destNbLine = "  "+destAndSlice+" <= yuzeng"+yuzengIdx;
+  std::string destNbLine = "  "+destAndSlice+" <= yuzeng"+yuzengIdx+";";
   ret = g_curMod->nbTable.emplace(destAndSlice, destNbLine);
   if(!ret.second)
     toCout("Error in inserting ssaTable for the line: "+line+", "+destNbLine );
