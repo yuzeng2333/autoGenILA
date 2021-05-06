@@ -13,6 +13,9 @@ namespace funcExtract {
 #define context std::shared_ptr<llvm::LLVMContext>
 #define llvmWidth(a, c) llvm::IntegerType::get(*c, a)
 #define llvmInt(val, width, c) llvm::ConstantInt::get(llvmWidth(width, c), val, false);
+#define value(a) llvm::dyn_cast<llvm::Value>(a)
+#define instr(a) llvm::dyn_cast<llvm::Instruction>(a)
+
 
 //static std::shared_ptr<KaleidoscopeJIT> TheJIT;
 //static std::map<std::string, std::shared_ptr<llvm::PrototypeAST>> FunctionProtos;
@@ -31,7 +34,8 @@ std::unordered_map<std::string, expr*> TIMED_VAR2EXPR;
 std::map<std::string, llvm::Function::arg_iterator> g_topFuncArgMp;
 std::set<std::string> g_resetedReg;
 std::set<std::string> g_regWithFunc;
-std::vector<std::pair<std::string, std::shared_ptr<ModuleInfo_t>>> g_instancePairVec;
+std::vector<std::pair<std::string, 
+                      std::shared_ptr<ModuleInfo_t>>> g_instancePairVec;
 //std::unordered_map<std::string, expr*> INT_EXPR_VAL;
 std::set<std::string> INT_EXPR_SET;
 std::set<std::string> g_readASV;
@@ -66,6 +70,7 @@ void check_all_regs() {
   g_instancePairVec.clear();
   clean_module_inputs();
   uint32_t i = 1;
+  DestInfo destInfo;  
   for(auto instrInfo : g_instrInfo) {
     toCout("---  BEGIN INSTRUCTION #"+toStr(i++)+" ---");
     g_readASV = instrInfo.readASV;
@@ -73,10 +78,23 @@ void check_all_regs() {
     for(auto pair: instrInfo.writeASV) {
       uint32_t cycleCnt = pair.first;
       std::string oneWriteAsv = pair.second;
-      print_llvm_ir(oneWriteAsv, cycleCnt, i-1);
+      destInfo.isVector = false;
+      destInfo.set_dest_and_slice(oneWriteAsv);
+      destInfo.set_module_name(g_topModule);
+      print_llvm_ir(destInfo, cycleCnt, i-1);
       //print_llvm_ir_without_submodules(oneWriteAsv, cycleCnt-1, i-1);
       g_maxDelay = cycleCnt;
     }
+    // print ir for reg vector
+    destInfo.isVector = true;
+    destInfo.set_dest_vec(instrInfo.writeASVVec);
+    std::string firstASV = instrInfo.writeASVVec.front();
+    std::string modName = get_mod_name(firstASV);
+    uint32_t cycleCnt = instrInfo.writeASVVecDelay;
+    if(!modName.empty())
+      destInfo.set_module_name(modName);
+    print_llvm_ir(destInfo, cycleCnt, i-1);
+    g_maxDelay = cycleCnt;    
   }
 }
 
@@ -90,13 +108,14 @@ void clean_data() {
 
 /// bound is the number of regs from input to output
 /// timeIdx start from 0, max value = bound
-void print_llvm_ir(std::string destAndSlice, 
+void print_llvm_ir(DestInfo &destInfo, 
                    uint32_t bound, 
                    uint32_t instrIdx) {
   // declaration for llvm
   TheContext = std::make_unique<llvm::LLVMContext>();
   // FIXME: change the following model name
-  TheModule = std::make_unique<llvm::Module>("mod_;_"+g_topModule+"_;_"+destAndSlice, *TheContext);
+  std::string destName = destInfo.get_dest_name();
+  TheModule = std::make_unique<llvm::Module>("mod_;_"+g_topModule+"_;_"+destName, *TheContext);
   Builder = std::make_unique<llvm::IRBuilder<>>(*TheContext);
   g_curMod = g_moduleInfoMap[g_topModule];
   g_instancePairVec.push_back(std::make_pair(g_topModule, g_curMod));
@@ -124,12 +143,11 @@ void print_llvm_ir(std::string destAndSlice,
       argNum++;
     }
   // return types
-  auto retTy = llvm::IntegerType::get(*TheContext, 
-                                      get_var_slice_width_simp(destAndSlice));
+  llvm::Type* retTy = destInfo.get_ret_type();
   llvm::FunctionType *FT =
     llvm::FunctionType::get(retTy, argTy, false);
   TheFunction = llvm::Function::Create(FT, llvm::Function::ExternalLinkage, 
-                                       "func_;_"+destAndSlice, TheModule.get());
+                                       "func_;_"+destName, TheModule.get());
   g_curFunc = TheFunction;
   // set arg name for the function
   uint32_t idx = 0;
@@ -155,7 +173,7 @@ void print_llvm_ir(std::string destAndSlice,
     }
 
   // basic block
-  BB = llvm::BasicBlock::Create(*TheContext, "bb_;_"+destAndSlice, TheFunction);
+  BB = llvm::BasicBlock::Create(*TheContext, "bb_;_"+destName, TheFunction);
   Builder->SetInsertPoint(BB);
 
   g_ignoreSubModules = false;
@@ -165,19 +183,75 @@ void print_llvm_ir(std::string destAndSlice,
   goalFile.open(g_path+"/goal.txt", std::ofstream::app);
   llvm::Value* destNextExpr;
 
-  std::string dest, destSlice;
-  split_slice(destAndSlice, dest, destSlice);
-  assert(destSlice.empty());
-  if(g_curMod->varNode.find(dest) == g_curMod->varNode.end()
-      && g_curMod->reg2Slices.find(dest) == g_curMod->reg2Slices.end()) {
-    toCout("Error: ast node is not found for this var: |"+dest+"|");
-    abort();
-  } 
-  // The return value for the function
-  else 
-    destNextExpr = add_constraint(dest, 
-                                  0, TheContext, Builder, bound);
-  Builder->CreateRet(destNextExpr);
+  std::vector<std::string> destVec = destInfo.get_no_slice_name();
+
+  if(!destInfo.isVector) {
+    // FIXME: currently does not support submodule's single register as writeASV
+    std::string dest = destVec.front();
+    if(g_curMod->varNode.find(dest) == g_curMod->varNode.end()
+        && g_curMod->reg2Slices.find(dest) == g_curMod->reg2Slices.end()) {
+      toCout("Error: ast node is not found for this var: |"+dest+"|");
+      abort();
+    } 
+    // The return value for the function
+    else 
+      destNextExpr = add_constraint(dest, 
+                                    0, TheContext, Builder, bound);
+    Builder->CreateRet(destNextExpr);
+  }
+  else {
+    // if dest is a vector, return an array
+    std::vector<llvm::Value*> retVec;
+    std::string modName = destInfo.get_mod_name();
+    check_mod_name(modName);
+    g_curMod = g_moduleInfoMap[modName];
+    llvm::Value* destNextExpr;
+    for(std::string dest: destVec) {
+      if(g_curMod->varNode.find(dest) == g_curMod->varNode.end()
+          && g_curMod->reg2Slices.find(dest) == g_curMod->reg2Slices.end()) {
+        toCout("Error: ast node is not found for this var: |"+dest+"|");
+        abort();
+      } 
+      else {
+        destNextExpr = add_constraint(dest, 
+                                      0, TheContext, Builder, bound);
+        retVec.push_back(destNextExpr);
+      }
+    }
+    uint32_t size = destVec.size();
+    uint32_t bitNum = log2(size) + 1;
+    llvm::ArrayType* retArrTy = llvm::cast<llvm::ArrayType>(retTy);
+    llvm::AllocaInst* arrayAlloca 
+        = Builder->CreateAlloca(
+            retArrTy,
+            llvm::ConstantInt::get(llvm::IntegerType::get(*TheContext, bitNum), 
+                                                    size, false), // # elements
+            llvm::Twine(destName)
+          );
+    // store values in retVec to memory of array
+    llvm::Value* arrPtr = value(arrayAlloca);
+    uint32_t i = 0;
+    for(llvm::Value* val : retVec) {
+      llvm::GetElementPtrInst* ptr 
+        = llvm::GetElementPtrInst::Create(
+            nullptr,
+            arrPtr,
+            std::vector<llvm::Value*>{ 
+              llvm::ConstantInt::get(
+                llvm::IntegerType::get(*TheContext, bitNum), 
+                0, false),
+              llvm::ConstantInt::get(
+                llvm::IntegerType::get(*TheContext, bitNum), 
+                i++, false) },
+            llvm::Twine(val->getName().str()+"_mem"),
+            BB
+          );
+      Builder->SetInsertPoint(BB);
+      llvm::StoreInst* store = Builder->CreateStore(val, value(ptr));  
+    }
+    Builder->CreateRet(arrPtr);
+  }
+
   llvm::verifyFunction(*TheFunction);
   llvm::verifyModule(*TheModule);
   std::string fileName = "tmp.ll";
@@ -583,7 +657,7 @@ llvm::Value* add_nb_constraint(astNode* const node,
   // TODO: adjust the following condition for different designs
 
   //if(g_curMod->invarRegs.find(dest) == g_curMod->invarRegs.end()) {
-  if(g_readASV.find(dest) != g_readASV.end()) {
+  if(is_read_asv(dest)) {
       //&& g_curMod->moduleAs.find(dest) != g_curMod->moduleAs.end())
     //std::string prefix = get_hier_name(false);
     //if(!prefix.empty()) prefix += ".";
@@ -864,6 +938,75 @@ void print_reg_info() {
     totalWidth += width;
   }
   output << "Total width: "+toStr(totalWidth) << std::endl;
+}
+
+
+std::string DestInfo::get_dest_name() {
+  if(isVector) {
+    assert(!destAndSlice.empty());
+    return destAndSlice;
+  }
+  else {
+    return destVec.front()+"_Arr";
+  }
+}
+
+
+llvm::Type* DestInfo::get_ret_type() {
+  if(isVector) {
+    return llvm::IntegerType::get(*TheContext, 
+                                  get_var_slice_width_simp(destAndSlice));
+  }
+  else {
+    // if is reg vector, return an array type pointer
+    // first, check if every reg is of the same size
+    uint32_t size = get_var_slice_width_cmplx(destVec.front());
+    for(auto dest: destVec) {
+      uint32_t elmtSize = get_var_slice_width_cmplx(dest);
+      assert(size = elmtSize);
+    }
+    llvm::Type* I = llvm::IntegerType::get(*TheContext, size);
+    llvm::ArrayType* arrayType = llvm::ArrayType::get(I, destVec.size());
+    return arrayType;
+  }
+}
+
+
+std::vector<std::string> DestInfo::get_no_slice_name() {
+  if(isVector) {
+    std::string dest, destSlice;
+    split_slice(destAndSlice, dest, destSlice);
+    return std::vector<std::string>{dest};
+  }
+  else {
+    std::string var, varSlice;
+    std::vector<std::string> retVec;
+    for(std::string varAndSlice: destVec) {
+      split_slice(varAndSlice, var, varSlice);
+      retVec.push_back(var);
+    }
+    return retVec;
+  }
+}
+
+
+std::string DestInfo::get_mod_name() {
+  return modName;
+}
+
+
+void DestInfo::set_dest_and_slice(std::string var) {
+  destAndSlice = var;
+}
+
+
+void DestInfo::set_module_name(std::string var) {
+  modName = var;
+}
+
+
+void DestInfo::set_dest_vec(const std::vector<std::string> &vec) {
+  destVec = vec;
 }
 
 

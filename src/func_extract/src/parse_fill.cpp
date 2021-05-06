@@ -278,7 +278,8 @@ void read_in_instructions(std::string fileName) {
               struct InstrInfo_t info = { {{signalName, std::vector<std::string>{encoding}}}, 
                                         std::set<std::string>{}, 
                                         std::set<std::pair<uint32_t, std::string>>{}, 
-                                        std::set<std::string>{} };
+                                        std::set<std::string>{},
+                                        std::vector<std::string>{}, 0};
               //info.instrEncoding.emplace(signalName, encoding);
               g_instrInfo.push_back(info);
             }
@@ -307,37 +308,54 @@ void read_in_instructions(std::string fileName) {
         case WriteASV:
           {
             // if space exists, solve process is skipped and delay for writing ASV is specified
-            if(line.find(" ") == std::string::npos) {
-              g_instrInfo.back().writeASV.insert(std::make_pair(0, line));
-              moduleAs.insert(line);
-            }
-            else {
-              size_t pos = line.find(" ");
-              if(pos == line.length() - 1) {
-                line.pop_back();
+            if(line != "[") { // if is not a vector of reg
+              if(line.find(" ") == std::string::npos) {
                 g_instrInfo.back().writeASV.insert(std::make_pair(0, line));
                 moduleAs.insert(line);
               }
+              else {
+                size_t pos = line.find(" ");
+                if(pos == line.length() - 1) {
+                  line.pop_back();
+                  g_instrInfo.back().writeASV.insert(std::make_pair(0, line));
+                  moduleAs.insert(line);
+                }
+                std::string cycleCnt = line.substr(pos+1);
+                if(!is_number(cycleCnt)) {
+                  toCout("Error: cycle count is not number: "+line);
+                  abort();
+                }
+                std::string asName = line.substr(0, pos);
+                std::string subLine = line.substr(0, pos);
+                if(subLine.find("(skip)") != std::string::npos) {
+                  asName = line.substr(0, pos-6);
+                  g_instrInfo.back().skipWriteASV.insert(asName);                
+                }
+                g_instrInfo.back().writeASV.insert(std::make_pair(uint32_t(std::stoi(cycleCnt)), 
+                                                                  asName));
+                moduleAs.insert(asName);
+              }
+            }
+            else { // if is a vector of regs
+              while(line[0] != ']') {
+                std::getline(input, line);
+                g_instrInfo.back().writeASVVec.push_back(line);
+                g_instrInfo.back().skipWriteASV.insert(line);
+                moduleAs.insert(line);
+              }
+              // line begins with "]"
+              size_t pos = line.find(" ");
               std::string cycleCnt = line.substr(pos+1);
-              if(!is_number(cycleCnt)) {
-                toCout("Error: cycle count is not number: "+line);
-                abort();
-              }
-              std::string asName = line.substr(0, pos);
-              std::string subLine = line.substr(0, pos);
-              if(subLine.find("(skip)") != std::string::npos) {
-                asName = line.substr(0, pos-6);
-                g_instrInfo.back().skipWriteASV.insert(asName);                
-              }
-              g_instrInfo.back().writeASV.insert(std::make_pair(uint32_t(std::stoi(cycleCnt)), 
-                                                                asName));
-              moduleAs.insert(asName);
+              g_instrInfo.back().writeASVVecDelay = std::stoi(cycleCnt);
             }
           }
           break;
         case ReadASV:
-          g_instrInfo.back().readASV.insert(line);
-          moduleAs.insert(line);
+          {
+            size_t pos = line.find(".");
+            g_instrInfo.back().readASV.insert(line);
+            moduleAs.insert(line);
+          }
           break;
         case ReadNOP:
           {

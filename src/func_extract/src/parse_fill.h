@@ -24,6 +24,8 @@ struct InstrInfo_t {
   std::set<std::string> readASV;
   std::set<std::pair<uint32_t, std::string>> writeASV;
   std::set<std::string> skipWriteASV;
+  std::vector<std::string> writeASVVec;
+  uint32_t writeASVVecDelay;
 };
 
 

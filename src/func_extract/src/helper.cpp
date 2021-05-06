@@ -665,6 +665,24 @@ uint32_t get_var_slice_width_simp(std::string varAndSlice,
 }
 
 
+// varAndSlice might have a module name prefix. This function
+// parse the module name and get corresponding module information
+uint32_t get_var_slice_width_cmplx(std::string varAndSlice) {
+  if(varAndSlice.find(".") == std::string::npos)
+    return get_var_slice_width_simp(varAndSlice);
+  else {
+    size_t pos = varAndSlice.find(".");
+    std::string modName = varAndSlice.substr(0, pos);
+    std::string varName = varAndSlice.substr(pos+1);
+    if(g_moduleInfoMap.find(modName) == g_moduleInfoMap.end()) {
+      toCout("this module info cannot be found: "+modName);
+    }
+    auto subMod = g_moduleInfoMap[modName];
+    return get_var_slice_width_simp(varName, subMod);
+  }
+}
+
+
 bool is_comment_line(std::string &line) {
   uint32_t pos = line.find_first_not_of(" ", 0);
   return line.substr(pos, 2) == "//";
@@ -868,5 +886,20 @@ void collect_regs(std::shared_ptr<ModuleInfo_t> &curMod,
 }
 
 
+void check_mod_name(std::string modName) {
+  if(g_moduleInfoMap.find(modName) == g_moduleInfoMap.end()) {
+    toCout("Error: module is not in g_moduleInfoMap: "+modName);
+    abort();
+  }
+}
+
+
+std::string get_mod_name(std::string name) {
+  size_t pos = name.find(".");
+  if(pos == std::string::npos) {
+    return "";
+  }
+  return name.substr(pos+1);
+}
 
 } // end of namespace funcExtract

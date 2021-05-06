@@ -167,6 +167,8 @@ std::string get_pure_num(std::string formedNum);
 uint32_t get_var_slice_width_simp(std::string varAndSlice, 
                                   const std::shared_ptr<ModuleInfo_t> &mod=g_curMod);
 
+uint32_t get_var_slice_width_cmplx(std::string varAndSlice);
+
 bool is_comment_line(std::string &line);
 
 StrPair_t split_module_asv(const std::string &writeAsvLine);
@@ -214,6 +216,10 @@ bool is_top_module();
 void collect_regs(std::shared_ptr<ModuleInfo_t> &curMod, 
                   std::string regPrefix,
                   RegWidthVec_t &regWidth = g_regWidth);
+
+void check_mod_name(std::string modName);
+
+std::string get_mod_name(std::string name);
 
 } // end of namespace funcExtract
 

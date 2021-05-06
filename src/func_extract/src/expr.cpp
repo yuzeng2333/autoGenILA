@@ -24,7 +24,8 @@ void module_expr(std::string line) {
   toCout("=== Begin module: "+g_currentModuleName);
   std::string portList = m.str(3);
 
-  if(g_moduleInfoMap.find(g_currentModuleName) != g_moduleInfoMap.end()) {
+  if(g_moduleInfoMap.find(g_currentModuleName) 
+      != g_moduleInfoMap.end()) {
     g_curMod = g_moduleInfoMap[g_currentModuleName];
   }
   else {
@@ -63,7 +64,8 @@ void input_expr(std::string line) {
 
   bool insertDone;
   if(!slice.empty())
-    insertDone = g_curMod->varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+    insertDone = g_curMod->varWidth.var_width_insert(var, get_end(slice), 
+                                                     get_begin(slice));
   else
     insertDone = g_curMod->varWidth.var_width_insert(var, 0, 0);
   //if (!insertDone) {
@@ -91,7 +93,8 @@ void reg_expr(std::string line) {
 
   bool insertDone;
   if(!slice.empty())
-    insertDone = g_curMod->varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+    insertDone = g_curMod->varWidth.var_width_insert(var, get_end(slice),
+                                                     get_begin(slice));
   else
     insertDone = g_curMod->varWidth.var_width_insert(var, 0, 0);
   //if (!insertDone) {
