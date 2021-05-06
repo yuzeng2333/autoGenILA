@@ -80,6 +80,7 @@ void check_all_regs() {
       std::string oneWriteAsv = pair.second;
       destInfo.isVector = false;
       destInfo.set_dest_and_slice(oneWriteAsv);
+      //FIXME: should be mocal module name
       destInfo.set_module_name(g_topModule);
       print_llvm_ir(destInfo, cycleCnt, i-1);
       //print_llvm_ir_without_submodules(oneWriteAsv, cycleCnt-1, i-1);
@@ -115,10 +116,12 @@ void print_llvm_ir(DestInfo &destInfo,
   TheContext = std::make_unique<llvm::LLVMContext>();
   // FIXME: change the following model name
   std::string destName = destInfo.get_dest_name();
-  TheModule = std::make_unique<llvm::Module>("mod_;_"+g_topModule+"_;_"+destName, *TheContext);
+  std::string curModName = destInfo.get_mod_name();
+  TheModule = std::make_unique<llvm::Module>("mod_;_"+curModName+"_;_"+destName, *TheContext);
   Builder = std::make_unique<llvm::IRBuilder<>>(*TheContext);
-  g_curMod = g_moduleInfoMap[g_topModule];
-  g_instancePairVec.push_back(std::make_pair(g_topModule, g_curMod));
+  g_curMod = g_moduleInfoMap[curModName];
+  g_instancePairVec.clear();
+  g_instancePairVec.push_back(std::make_pair(curModName, g_curMod));
 
   /// declare function
   // input types
@@ -190,7 +193,8 @@ void print_llvm_ir(DestInfo &destInfo,
     std::string dest = destVec.front();
     if(g_curMod->varNode.find(dest) == g_curMod->varNode.end()
         && g_curMod->reg2Slices.find(dest) == g_curMod->reg2Slices.end()) {
-      toCout("Error: ast node is not found for this var: |"+dest+"|");
+      toCout("Error: ast node is not found for this var: |"+dest+"|"
+              +", g_curMod: "+g_curMod->name);
       abort();
     } 
     // The return value for the function
@@ -204,12 +208,13 @@ void print_llvm_ir(DestInfo &destInfo,
     std::vector<llvm::Value*> retVec;
     std::string modName = destInfo.get_mod_name();
     check_mod_name(modName);
-    g_curMod = g_moduleInfoMap[modName];
     llvm::Value* destNextExpr;
     for(std::string dest: destVec) {
+      g_curMod = g_moduleInfoMap[modName];    
       if(g_curMod->varNode.find(dest) == g_curMod->varNode.end()
           && g_curMod->reg2Slices.find(dest) == g_curMod->reg2Slices.end()) {
-        toCout("Error: ast node is not found for this var: |"+dest+"|");
+        toCout("Error: ast node is not found for this var: |"+dest+"|"
+                +", g_curMod: "+g_curMod->name);
         abort();
       } 
       else {
@@ -559,7 +564,7 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
                             uint32_t bound ) {
   // Attention: varAndSlice might have a slice, a directly-assigned varAndSlice
   std::string varAndSlice = node->dest;
-  if(varAndSlice == "_04_") {
+  if(varAndSlice == "buff0") {
     toCout("find it");
   }
 
@@ -615,6 +620,7 @@ llvm::Value* add_nb_constraint(astNode* const node,
                                uint32_t timeIdx, context &c, 
                                std::shared_ptr<llvm::IRBuilder<>> &b,
                                uint32_t bound ) {
+  std::shared_ptr<ModuleInfo_t> thisMod = g_curMod;  
   std::string dest = node->dest;
   if(dest.find("ata_fifo.r0") != std::string::npos && timeIdx == 25) {
     toCout("target reg found! time: "+toStr(timeIdx));
@@ -636,6 +642,7 @@ llvm::Value* add_nb_constraint(astNode* const node,
     std::string destNext = node->srcVec.front();
 
     destNextExpr = add_constraint(node->childVec.front(), timeIdx+1, c, b, bound);
+    g_curMod = thisMod;    
     return destNextExpr;
   }
   //else if(!isSolve && !is_read_asv(dest) 
@@ -942,8 +949,7 @@ void print_reg_info() {
 
 
 std::string DestInfo::get_dest_name() {
-  if(isVector) {
-    assert(!destAndSlice.empty());
+  if(!isVector) {
     return destAndSlice;
   }
   else {
@@ -953,7 +959,7 @@ std::string DestInfo::get_dest_name() {
 
 
 llvm::Type* DestInfo::get_ret_type() {
-  if(isVector) {
+  if(!isVector) {
     return llvm::IntegerType::get(*TheContext, 
                                   get_var_slice_width_simp(destAndSlice));
   }
@@ -973,7 +979,7 @@ llvm::Type* DestInfo::get_ret_type() {
 
 
 std::vector<std::string> DestInfo::get_no_slice_name() {
-  if(isVector) {
+  if(!isVector) {
     std::string dest, destSlice;
     split_slice(destAndSlice, dest, destSlice);
     return std::vector<std::string>{dest};
@@ -982,7 +988,8 @@ std::vector<std::string> DestInfo::get_no_slice_name() {
     std::string var, varSlice;
     std::vector<std::string> retVec;
     for(std::string varAndSlice: destVec) {
-      split_slice(varAndSlice, var, varSlice);
+      std::string pureVar = get_var_name(varAndSlice);   
+      split_slice(pureVar, var, varSlice);
       retVec.push_back(var);
     }
     return retVec;

@@ -337,11 +337,12 @@ void read_in_instructions(std::string fileName) {
               }
             }
             else { // if is a vector of regs
+              std::getline(input, line);              
               while(line[0] != ']') {
-                std::getline(input, line);
                 g_instrInfo.back().writeASVVec.push_back(line);
                 g_instrInfo.back().skipWriteASV.insert(line);
                 moduleAs.insert(line);
+                std::getline(input, line);
               }
               // line begins with "]"
               size_t pos = line.find(" ");
@@ -645,5 +646,37 @@ void clean_submod(std::ifstream &input,
   output << line << std::endl;
 }
 
+
+// before building ast tree, determine rst and clk for
+// each module. This should be done top-down.
+void determine_clk_rst() {
+  g_curMod->clk = g_recentClk;
+  g_curMod->rst = g_recentRst;
+  std::shared_ptr<ModuleInfo_t> topModInfo = g_moduleInfoMap[g_topModule];
+  std::set<std::string> visitedMod;
+  determine_clk_rst_iter(topModInfo, visitedMod);
+}
+
+
+void determine_clk_rst_iter(std::shared_ptr<ModuleInfo_t> &modInfo, 
+                            std::set<std::string> &visitedMod) {
+  for(auto pair: modInfo->ins2modMap) {
+    std::string insName = pair.first;
+    std::string modName = pair.second;
+    std::shared_ptr<ModuleInfo_t> subModInfo = g_moduleInfoMap[modName];
+    if(visitedMod.find(modName) != visitedMod.end())
+      continue;
+    for(auto portWire : modInfo->insPort2wireMp[insName]) {
+      std::string port = portWire.first;
+      std::string wire = portWire.second;
+      if(wire == modInfo->clk)
+        subModInfo->clk = port;
+      else if(wire == modInfo->rst)
+        subModInfo->rst = port;
+      // visit its submodules
+      determine_clk_rst_iter(subModInfo, visitedMod);
+    }
+  }
+}
 
 } // end of namespace funcExtract

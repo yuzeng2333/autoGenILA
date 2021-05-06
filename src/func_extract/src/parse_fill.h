@@ -15,6 +15,7 @@
 #include "../../taint_method/src/taint_gen.h"
 #include "../../taint_method/src/helper.h"
 #include "../../taint_method/src/varWidth.h"
+#include "global_data_struct.h"
 
 namespace funcExtract {
 
@@ -34,7 +35,7 @@ extern uint32_t g_new_var;
 extern std::regex pSingleLine;
 extern std::regex pNbLine;
 extern std::map<std::string, astNode*> g_varNode;
-extern std::shared_ptr<std::map<std::string, astNode*>> g_visitedNode;
+extern std::map<std::string, astNode*> g_visitedNode;
 extern StrSet_t moduleAs;
 
 void clear_global_vars();
@@ -62,6 +63,12 @@ void clean_submod(std::ifstream &input,
                   const std::string &firstLine);
 
 void remove_functions(std::string fileName);
+
+void determine_clk_rst();
+
+void determine_clk_rst_iter(std::shared_ptr<ModuleInfo_t> &modInfo, 
+                            std::set<std::string> &visitedMod);
+
 
 } // end of namespace funcExtract
 #endif

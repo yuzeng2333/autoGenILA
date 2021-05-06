@@ -899,7 +899,39 @@ std::string get_mod_name(std::string name) {
   if(pos == std::string::npos) {
     return "";
   }
+  return name.substr(0, pos);
+}
+
+
+std::string get_var_name(std::string name) {
+  size_t pos = name.find(".");
+  if(pos == std::string::npos) {
+    return "";
+  }
   return name.substr(pos+1);
+}
+
+
+std::pair<std::string, std::string> split_mod_var(std::string var) {
+  size_t pos = var.find(".");
+  if(pos == std::string::npos) {
+    return std::make_pair("", var);
+  }
+  else {
+    std::string modName = var.substr(0, pos);
+    std::string varName = var.substr(pos+1);
+    return std::make_pair(modName, varName);
+  }
+}
+
+
+
+//template <typename T>
+std::vector<std::string> print_map_keys(std::map<std::string, astNode*> &map) {
+  std::vector<std::string> ret;
+  for(auto pair : map)
+    ret.push_back(pair.first);
+  return ret;
 }
 
 } // end of namespace funcExtract

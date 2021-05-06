@@ -221,6 +221,12 @@ void check_mod_name(std::string modName);
 
 std::string get_mod_name(std::string name);
 
+std::string get_var_name(std::string name);
+
+std::pair<std::string, std::string> split_mod_var(std::string var);
+
+//template <typename T>
+std::vector<std::string> print_map_keys(std::map<std::string, astNode*> &map);
 } // end of namespace funcExtract
 
 

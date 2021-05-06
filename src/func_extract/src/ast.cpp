@@ -37,10 +37,10 @@ namespace funcExtract {
 #define toStr(a) std::to_string(a)
 
 
-std::stack<std::shared_ptr<std::map<std::string, astNode*>>> g_visitedNodeStk;
-std::shared_ptr<std::map<std::string, astNode*>> g_visitedNode;
+std::stack<std::map<std::string, astNode*>> g_visitedNodeStk;
+std::map<std::string, astNode*> g_visitedNode;
 astNode* s_node;
-std::shared_ptr<ModuleInfo_t> g_topMod;
+std::shared_ptr<ModuleInfo_t> g_topModInfo;
 /// key is submodule output: module_$output
 /// vector is the inputs. 
 /// This map is filled after the function's ast is constructed
@@ -59,19 +59,40 @@ void build_ast_tree() {
   g_curMod->clk = g_recentClk;
   g_curMod->rst = g_recentRst;
   g_instancePairVec.push_back(std::make_pair(g_topModule, g_curMod));
-  g_topMod = g_curMod;
-  g_visitedNode = std::make_unique<std::map<std::string, astNode*>>();
+  g_topModInfo = g_curMod;
+  g_visitedNode = std::map<std::string, astNode*>();
   g_visitedNodeStk.push(g_visitedNode);
   assert(!g_instrInfo.back().skipWriteASV.empty());
   //assert(!g_curMod->moduleAs.empty());
   //for(std::string reg: g_curMod->moduleAs) {
   for(std::string reg: g_instrInfo.back().skipWriteASV) {
-    if(g_curMod->reg2Slices.find(reg) == g_curMod->reg2Slices.end()) {
-      build_tree_for_single_as(reg);
+    std::string modName = get_mod_name(reg);
+    if(modName.empty()) {
+      if(g_curMod->reg2Slices.find(reg) == g_curMod->reg2Slices.end()) {
+        build_tree_for_single_as(reg);
+      }
+      else { // if different slices are assigned differently
+        for(std::string regAndSlice: g_curMod->reg2Slices[reg]) {
+          build_tree_for_single_as(regAndSlice);
+        }
+      }
     }
-    else { // if different slices are assigned differently
-      for(std::string regAndSlice: g_curMod->reg2Slices[reg]) {
-        build_tree_for_single_as(regAndSlice);
+    else { // if the reg is in sub module
+      auto pair = split_mod_var(reg);
+      std::string regName = pair.second;
+      check_mod_name(modName);
+      g_curMod = g_moduleInfoMap[modName];
+      // FIXME: currently I do not push its parent module, because
+      // it seems that is not necessary. All other code can work properly
+      g_instancePairVec.clear();
+      g_instancePairVec.push_back(std::make_pair(modName, g_curMod));
+      if(g_curMod->reg2Slices.find(regName) == g_curMod->reg2Slices.end()) {
+        build_tree_for_single_as(regName);
+      }
+      else { // if different slices are assigned differently
+        for(std::string regAndSlice: g_curMod->reg2Slices[regName]) {
+          build_tree_for_single_as(regAndSlice);
+        }
       }
     }
   }
@@ -81,12 +102,12 @@ void build_ast_tree() {
 void build_tree_for_single_as(std::string regAndSlice) {
   //g_visitedNode.clear();
   toCoutVerb("### Begin build: "+regAndSlice);
-  uint32_t regWidth = get_var_slice_width_simp(regAndSlice);
+  uint32_t regWidth = get_var_slice_width_cmplx(regAndSlice);
   astNode* root;
-  if(g_visitedNode->find(regAndSlice) == g_visitedNode->end())
+  if(g_visitedNode.find(regAndSlice) == g_visitedNode.end())
     root = new astNode;
   else
-    root = (*g_visitedNode)[regAndSlice];
+    root = g_visitedNode[regAndSlice];
 
   add_node(regAndSlice, 0, root, true);
 }
@@ -99,11 +120,12 @@ void add_node(std::string varAndSlice,
               bool varIsDest) {
   remove_two_end_space(varAndSlice);
   //toCout("Add node for: "+varAndSlice);
-  if(varAndSlice.find("cpuregs_wrdata") != std::string::npos) {
+  if(varAndSlice.find("buff0") != std::string::npos) {
     toCout("Found it!");
     s_node = node;
   }
-  if(g_visitedNode->find(varAndSlice) != g_visitedNode->end() && !varIsDest)
+
+  if(g_visitedNode.find(varAndSlice) != g_visitedNode.end() && !varIsDest)
     return;
 
   std::string var, varSlice;
@@ -122,7 +144,7 @@ void add_node(std::string varAndSlice,
     varToAdd = var;
   }
 
-  g_visitedNode->emplace(varToAdd, node);
+  g_visitedNode.emplace(varToAdd, node);
   g_curMod->varNode.emplace(varToAdd, node);
   if( g_curMod->reg2Slices.find(varToAdd) != g_curMod->reg2Slices.end() ) {
     add_sliced_node(varToAdd, timeIdx, node);
@@ -130,12 +152,6 @@ void add_node(std::string varAndSlice,
   else if ( is_input(varToAdd) ) {
     add_input_node(varToAdd, timeIdx, node);
   }
-  // FIXME
-  //else if ( isAs(varToAdd) && !varIsDest ) {
-  //  //toCout("Error: a reg is labeled as asv: "+varAndSlice);
-  //  //abort();
-  //  add_as_node(varToAdd, timeIdx, node);    
-  //}
   else if( is_reg(varToAdd) ) {
     add_nb_node(varToAdd, timeIdx, node);
   }
@@ -152,17 +168,22 @@ void add_node(std::string varAndSlice,
   else if( is_submod_output(varToAdd) ) {
     add_submod_node(varToAdd, timeIdx, node);
   }
-  else if( g_curMod->ssaTable.find(varAndSlice) != g_curMod->ssaTable.end() ){ // it is wire
+  else if( g_curMod->ssaTable.find(varAndSlice) 
+             != g_curMod->ssaTable.end() ){ 
+    // it is wire
     add_ssa_node(varToAdd, timeIdx, node);
   }
   else {
-    toCout("Error: cannot find assignment statement for: "+varToAdd);
+    toCout("Error: cannot find assignment statement for: "+varToAdd
+           +", g_curMod: "+g_curMod->name);
     abort();
   }
 }
 
 
-// varAndSlice is the child variable, when the func is called, varAndSlice is directly from RHS of the expression. So it may/may not have slice, may/not have direct assignment.
+// varAndSlice is the child variable, when the func is called, 
+// varAndSlice is directly from RHS of the expression. 
+// So it may/may not have slice, may/not have direct assignment.
 // parentNode is the node of its parent
 void add_child_node(std::string varAndSlice, 
                     uint32_t timeIdx, 
@@ -181,13 +202,13 @@ void add_child_node(std::string varAndSlice,
     childName = varAndSlice;
   else
     childName = var;
-  if(g_visitedNode->find(childName) == g_visitedNode->end()) {
+  if(g_visitedNode.find(childName) == g_visitedNode.end()) {
     astNode* nextNode = new astNode;      
     parentNode->childVec.push_back(nextNode);
     add_node(childName, timeIdx, nextNode, false);
   }
   else {
-    astNode* existedNode = (*g_visitedNode)[childName];
+    astNode* existedNode = g_visitedNode[childName];
     parentNode->childVec.push_back(existedNode);
   }
 }
@@ -237,7 +258,7 @@ void add_nb_node(std::string regAndSlice, uint32_t timeIdx, astNode* const node)
     toCout("Found it!");
   }
   toCoutVerb("Add nb node for :" + regAndSlice);
-  g_visitedNode->emplace(regAndSlice, node);
+  g_visitedNode.emplace(regAndSlice, node);
   if(g_curMod->nbTable.find(regAndSlice) == g_curMod->nbTable.end()) {
     toCout("Error: not in g_curMod->nbTable: "+regAndSlice);
     abort();
@@ -262,7 +283,6 @@ void add_nb_node(std::string regAndSlice, uint32_t timeIdx, astNode* const node)
     add_child_node(destNext, timeIdx+1, node);
     std::string reg, regSlice;
     split_slice(regAndSlice, reg, regSlice);
-    //std::string hierName = get_hier_name(false);
     //if(!hierName.empty()) hierName += ".";
     //uint32_t width = get_var_slice_width_simp(reg);
   }
@@ -287,7 +307,7 @@ void add_nb_node(std::string regAndSlice, uint32_t timeIdx, astNode* const node)
 // (3) If no slice, build nodes for the whole variable
 void add_ssa_node(std::string varAndSlice, uint32_t timeIdx, astNode* const node) {
   toCoutVerb("Add ssa node for :" + varAndSlice);
-  g_visitedNode->emplace(varAndSlice, node);
+  g_visitedNode.emplace(varAndSlice, node);
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
   std::string varAssign;
@@ -335,7 +355,7 @@ void add_input_node(std::string input, uint32_t timeIdx, astNode* const node) {
   if(input == "enable0")
     toCout("Find it!");
   toCoutVerb("Process input node: "+input);
-  if(g_curMod == g_topMod) {
+  if(g_curMod == g_topModInfo) { // is top module
     node->type = INPUT;
     node->dest = input;
     node->op = "";
@@ -344,10 +364,34 @@ void add_input_node(std::string input, uint32_t timeIdx, astNode* const node) {
   else {
     node->type = SUBMODIN;
     node->dest = input;
-    std::pair<std::string, std::shared_ptr<ModuleInfo_t>> pair = g_instancePairVec.back();
     /// the input is in parent-module
     node->op = "";
     node->done = false;
+
+    std::shared_ptr<ModuleInfo_t> parentMod = g_curMod->parentMod;
+    auto pair = g_instancePairVec.back();
+    std::string insName;    
+    g_instancePairVec.pop_back();
+    if(g_instancePairVec.empty()) {
+      // if we started from the submodule
+      // first, find the instance name of current submodule
+      for(auto insMod: parentMod->ins2modMap) {
+        if(insMod.second == g_curMod->name) {
+          insName = insMod.first;
+          break;
+        }
+      }
+      // push the parent module into g_instancePairVec
+      g_instancePairVec.push_back(std::make_pair(parentMod->name, parentMod));
+    }
+    else {
+      // if we have seen parent module before
+      insName = pair.first;
+    }
+    std::string parentWire = parentMod->insPort2wireMp[insName][input];
+    g_curMod = parentMod;
+    node->srcVec.push_back(parentWire);
+    add_child_node(parentWire, timeIdx, node);
   }
 }
 
@@ -677,7 +721,7 @@ void add_submod_node(std::string var, uint32_t timeIdx, astNode* const node) {
   // treate differently for new or seen submodule output
   if( g_blackBoxModSet.find(modName) == g_blackBoxModSet.end()
       && g_curMod->out2RootNodeMp.find(output) == g_curMod->out2RootNodeMp.end()) {
-    g_visitedNode = std::make_unique<std::map<std::string, astNode*>>();
+    g_visitedNode = std::map<std::string, astNode*>();
     g_visitedNodeStk.push(g_visitedNode);
     g_instancePairVec.push_back(std::make_pair(insName, g_curMod));
     astNode* nextNode = new astNode;
@@ -920,5 +964,6 @@ bool check_reduce_one_op(std::string line,
   op1 = m.str(3);
   return true;
 }
+
 
 } // end of namespace funcExtract

@@ -98,16 +98,7 @@ int main(int argc, char *argv[]) {
   std::map<std::string, std::vector<std::string>> childModules;
   uint32_t _dummyRegCnt;
   std::unordered_map<std::string, Str2StrUmap_t> _dummyMap;
-  /*
-  g_topModule = separate_modules(g_path+"/design.v.clean", 
-                                 modules, 
-                                 childModules, 
-                                 _dummyRegCnt, 
-                                 _dummyMap,
-                                 true,
-                                 g_moduleInputsMap,
-                                 g_moduleOutputsMap);
-                                 */
+
   if(printRegInfo) {  
     // collect all regs
     toCout("#### Gegin collect regs and print info");
@@ -116,7 +107,7 @@ int main(int argc, char *argv[]) {
     print_reg_info();
     return 0;
   }
-
+  determine_clk_rst();
   build_ast_tree();
   check_all_regs();
   print_time();  

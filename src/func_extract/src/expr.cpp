@@ -534,7 +534,7 @@ void submodule_expr(std::string firstLine, std::ifstream &input) {
     abort();
   }
   auto subMod = g_moduleInfoMap[moduleName];
-
+  subMod->parentMod = g_curMod;
   // to be deleted
   //if(g_wire2ModulePort.find(instanceName) == g_wire2ModulePort.end())
   //  g_wire2ModulePort.emplace(instanceName, std::unordered_map<std::string, std::string>{});

@@ -150,7 +150,12 @@ extern std::string DELIM;
 extern std::set<std::string> g_blackBoxModSet;
 extern std::map<std::string, std::shared_ptr<ModuleInfo_t>> g_moduleInfoMap;
 extern std::stack<std::string> g_instanceStk;
-extern std::vector<std::pair<std::string, std::shared_ptr<ModuleInfo_t>>> g_instancePairVec;
+// first of pair is instance name, however, the first in the vector should be
+// module name, instead of instance name.
+// Currently there is a restriction: the first module in the vector can only
+// have one instance
+extern std::vector<std::pair<std::string, 
+                             std::shared_ptr<ModuleInfo_t>>> g_instancePairVec;
 extern std::shared_ptr<ModuleInfo_t> g_curMod;
 
 // llvm
