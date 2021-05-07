@@ -1153,6 +1153,7 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
   // collect all regs in current module and sub-instances
   collect_regs(subMod, "", subModRegWidth);
   uint32_t funcBound;
+  std::vector<llvm::Type *> argTy;  
   if(subMod->out2FuncMp.find(outPort) != subMod->out2FuncMp.end()) {
     // FIXME:
     // This many not be true for some designs, since differnet instances may 
@@ -1173,7 +1174,6 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
   else {
     // make the func
     auto retTy = llvm::IntegerType::get(*c, get_var_slice_width_simp(destAndSlice));
-    std::vector<llvm::Type *> argTy;
 
     // push reg type arg first
     for(auto it = subModRegWidth.begin(); it != subModRegWidth.end(); it++) {
@@ -1311,7 +1311,8 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
   }
 
   toCoutVerb("--- To call function!");
-  std::string destTimed = timed_name(destAndSlice, timeIdx);  
+  std::string destTimed = timed_name(destAndSlice, timeIdx);
+  assert(argTy.size() == args.size());
   return b->CreateCall(FT, subFunc, args, llvm::Twine(destTimed));
 }
 

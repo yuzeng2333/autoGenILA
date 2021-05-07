@@ -78,24 +78,28 @@ void check_all_regs() {
     for(auto pair: instrInfo.writeASV) {
       uint32_t cycleCnt = pair.first;
       std::string oneWriteAsv = pair.second;
+      auto modVarPair = split_mod_var(oneWriteAsv);
+      std::string modName = modVarPair.first;
+      std::string writeVar = modVarPair.second; 
       destInfo.isVector = false;
-      destInfo.set_dest_and_slice(oneWriteAsv);
-      //FIXME: should be mocal module name
-      destInfo.set_module_name(g_topModule);
+      destInfo.set_dest_and_slice(writeVar);
+      destInfo.set_module_name(modName);
       print_llvm_ir(destInfo, cycleCnt, i-1);
       //print_llvm_ir_without_submodules(oneWriteAsv, cycleCnt-1, i-1);
       g_maxDelay = cycleCnt;
     }
     // print ir for reg vector
-    destInfo.isVector = true;
-    destInfo.set_dest_vec(instrInfo.writeASVVec);
-    std::string firstASV = instrInfo.writeASVVec.front();
-    std::string modName = get_mod_name(firstASV);
-    uint32_t cycleCnt = instrInfo.writeASVVecDelay;
-    if(!modName.empty())
-      destInfo.set_module_name(modName);
-    print_llvm_ir(destInfo, cycleCnt, i-1);
-    g_maxDelay = cycleCnt;    
+    if(!instrInfo.writeASVVec.empty()) {
+      destInfo.isVector = true;
+      destInfo.set_dest_vec(instrInfo.writeASVVec);
+      std::string firstASV = instrInfo.writeASVVec.front();
+      std::string modName = get_mod_name(firstASV);
+      uint32_t cycleCnt = instrInfo.writeASVVecDelay;
+      if(!modName.empty())
+        destInfo.set_module_name(modName);
+      print_llvm_ir(destInfo, cycleCnt, i-1);
+      g_maxDelay = cycleCnt;    
+    }
   }
 }
 
