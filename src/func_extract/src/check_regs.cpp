@@ -225,8 +225,9 @@ void print_llvm_ir(DestInfo &destInfo,
       }
     }
     uint32_t size = destVec.size();
-    uint32_t bitNum = log2(size) + 1;
-    llvm::ArrayType* retArrTy = llvm::cast<llvm::ArrayType>(retTy);
+    uint32_t bitNum = log2(size) + 2;
+
+    llvm::ArrayType* retArrTy = llvm::cast<llvm::ArrayType>(destInfo.get_arr_type());
     llvm::AllocaInst* arrayAlloca 
         = Builder->CreateAlloca(
             retArrTy,
@@ -680,7 +681,7 @@ llvm::Value* add_nb_constraint(astNode* const node,
       rstVal = toStr(width)+"'b0";
     toCout("Replace "+timed_name(dest, timeIdx)+" with "+rstVal);
     g_outFile << "Replace "+timed_name(dest, timeIdx)+" with "+rstVal << std::endl;
-    if(dest == "out" && timeIdx == 1)
+    if(dest == "buff1" && timeIdx == 15)
       toCout("Find it!");
     return var_expr(rstVal, timeIdx, c, b, false, width);    
   }
@@ -974,8 +975,24 @@ llvm::Type* DestInfo::get_ret_type() {
     }
     llvm::Type* I = llvm::IntegerType::get(*TheContext, size);
     llvm::ArrayType* arrayType = llvm::ArrayType::get(I, destVec.size());
-    return arrayType;
+    auto ptrTy = llvm::PointerType::get(arrayType, 0);
+    return ptrTy;
   }
+}
+
+
+llvm::Type* DestInfo::get_arr_type() {
+  assert(isVector);
+  // if is reg vector, return an array type pointer
+  // first, check if every reg is of the same size
+  uint32_t size = get_var_slice_width_cmplx(destVec.front());
+  for(auto dest: destVec) {
+    uint32_t elmtSize = get_var_slice_width_cmplx(dest);
+    assert(size = elmtSize);
+  }
+  llvm::Type* I = llvm::IntegerType::get(*TheContext, size);
+  llvm::ArrayType* arrayType = llvm::ArrayType::get(I, destVec.size());
+  return arrayType;
 }
 
 

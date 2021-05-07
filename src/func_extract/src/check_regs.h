@@ -39,6 +39,7 @@ class DestInfo {
     void set_dest_and_slice(std::string var);
     void set_module_name(std::string var);
     void set_dest_vec(const std::vector<std::string> &vec);
+    llvm::Type* get_arr_type();
 };
 
 
