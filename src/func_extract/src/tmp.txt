@@ -1,0 +1,129 @@
+Warning: cannot open ./test/vecAddBuffer/module_info.txt
+### Begin read in instr info
+Warning: find value X in NOP: in
+### Begin get IO information
+=== Begin module: buffer
+Find it!
+=== Begin module: vecAdd
+Find it!
+Find it!
+Find it!
+Find it!
+Find it!
+Find it!
+Find it!
+=== Begin module: vecAdd_top
+Find it!
+##### Begin parse_verilog
+### Begin parse_verilog
+=== Begin module: buffer
+=== Begin module: vecAdd
+Find it!
+Find it!
+Find it!
+Find it!
+Find it!
+Find it!
+=== Begin module: vecAdd_top
+### Begin vcd_parser
+### Begin build_ast_tree
+### Begin build: buff0
+Found it!
+Add nb node for :buff0
+!! Add child yuzeng14 to buff0
+Add ssa node for :yuzeng14
+process Ite line for:   assign yuzeng14 = rst ? 4'b0000 : in ;
+!! Add child rst to yuzeng14
+Process input node: rst
+!! Add child rst to rst
+!! Add child 4'b0000 to yuzeng14
+Process num node: 4'b0000
+!! Add child in to yuzeng14
+Find it!
+Process input node: in
+!! Add child \interconnect to in
+Add nb node for :out
+!! Add child yuzeng20 to out
+Add ssa node for :yuzeng20
+process Ite line for:   assign yuzeng20 = rst ? 4'b0000 : out_nxt ;
+!! Add child rst to yuzeng20
+Process input node: rst
+!! Add child rst to rst
+!! Add child 4'b0000 to yuzeng20
+Process num node: 4'b0000
+!! Add child out_nxt to yuzeng20
+Add ssa node for :out_nxt
+process Ite line for:   assign out_nxt = running ? _00_ : out;
+!! Add child running to out_nxt
+Add nb node for :running
+!! Add child yuzeng17 to running
+Add ssa node for :yuzeng17
+process Ite line for:   assign yuzeng17 = rst ? 1'b0 : _02_[0] ;
+!! Add child rst to yuzeng17
+!! Add child 1'b0 to yuzeng17
+Process num node: 1'b0
+!! Add child _02_[0] to yuzeng17
+Add ssa node for :_02_[0]
+Process Two op for :  assign _02_[0] = _08_ && _07_;
+!! Add child _08_ to _02_[0]
+Add ssa node for :_08_
+Process Two op for :  assign _08_ = _05_ || running;
+!! Add child _05_ to _08_
+Add ssa node for :_05_
+Process Two op for :  assign _05_ = func == 2'b10;
+!! Add child func to _05_
+Process input node: func
+!! Add child func to func
+!! Add child 2'b10 to _05_
+Process num node: 2'b10
+!! Add child running to _08_
+!! Add child _07_ to _02_[0]
+Add ssa node for :_07_
+Process Two op for :  assign _07_ = len > 1'b1;
+!! Add child len to _07_
+Add nb node for :len
+!! Add child yuzeng19 to len
+Add ssa node for :yuzeng19
+process Ite line for:   assign yuzeng19 = rst ? 4'b0000 : len_nxt ;
+!! Add child rst to yuzeng19
+!! Add child 4'b0000 to yuzeng19
+!! Add child len_nxt to yuzeng19
+Add ssa node for :len_nxt
+process Ite line for:   assign len_nxt = _01_ ? _04_[3:0] : len;
+!! Add child _01_ to len_nxt
+Add ssa node for :_01_
+Find it!
+Process Reduce One op for :  assign _01_ = | fangyuan0;
+!! Add child fangyuan0 to _01_
+Add ssa node for :fangyuan0
+Find it!
+Process concat op for :  assign fangyuan0 = { _06_, running };
+!! Add child _06_ to fangyuan0
+Add ssa node for :_06_
+Process Two op for :  assign _06_ = func == 1'b1;
+!! Add child func to _06_
+!! Add child 1'b1 to _06_
+Process num node: 1'b1
+!! Add child running to fangyuan0
+!! Add child _04_[3:0] to len_nxt
+Add ssa node for :_04_[3:0]
+process Ite line for:   assign _04_[3:0] = _06_ ? in : _03_[3:0];
+!! Add child _06_ to _04_[3:0]
+!! Add child in to _04_[3:0]
+Find it!
+Process input node: in
+!! Add child in to in
+!! Add child _03_[3:0] to _04_[3:0]
+Add ssa node for :_03_[3:0]
+Process Two op for :  assign _03_[3:0] = len - 1'b1;
+!! Add child len to _03_[3:0]
+!! Add child 1'b1 to _03_[3:0]
+!! Add child len to len_nxt
+!! Add child 1'b1 to _07_
+!! Add child _00_ to out_nxt
+Add ssa node for :_00_
+Process Two op for :  assign _00_ = in + 2'b10;
+!! Add child in to _00_
+!! Add child 2'b10 to _00_
+!! Add child out to out_nxt
+

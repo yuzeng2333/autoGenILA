@@ -188,9 +188,10 @@ void add_node(std::string varAndSlice,
 void add_child_node(std::string varAndSlice, 
                     uint32_t timeIdx, 
                     astNode* const parentNode) {
+  std::shared_ptr<ModuleInfo_t> thisMod = g_curMod;  
   toCoutVerb("!! Add child "+varAndSlice+" to "+parentNode->dest);
-  if(varAndSlice == "word") {
-    toCout("Found state_0!");
+  if(varAndSlice == "out") {
+    toCout("Find it!");
   }
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
@@ -211,6 +212,7 @@ void add_child_node(std::string varAndSlice,
     astNode* existedNode = g_visitedNode[childName];
     parentNode->childVec.push_back(existedNode);
   }
+  g_curMod = thisMod;
 }
 
 
@@ -352,7 +354,7 @@ void add_ssa_node(std::string varAndSlice, uint32_t timeIdx, astNode* const node
 
 /// Treat differently for top module and sub module
 void add_input_node(std::string input, uint32_t timeIdx, astNode* const node) {
-  if(input == "enable0")
+  if(input == "in")
     toCout("Find it!");
   toCoutVerb("Process input node: "+input);
   if(g_curMod == g_topModInfo) { // is top module
@@ -392,6 +394,8 @@ void add_input_node(std::string input, uint32_t timeIdx, astNode* const node) {
     g_curMod = parentMod;
     node->srcVec.push_back(parentWire);
     add_child_node(parentWire, timeIdx, node);
+    if(g_instancePairVec.empty()) g_instancePairVec.pop_back();
+    g_instancePairVec.push_back(pair);
   }
 }
 
@@ -495,6 +499,7 @@ void add_one_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
 
 
 void add_ite_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
+
   toCoutVerb("process Ite line for: "+line);
   std::smatch m;
   if ( !std::regex_match(line, m, pIte) ) {
@@ -541,6 +546,7 @@ void add_ite_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   add_child_node(condAndSlice, timeIdx, node);  
   add_child_node(op1AndSlice,  timeIdx, node);  
   add_child_node(op2AndSlice,  timeIdx, node);  
+  
 }
 
 
