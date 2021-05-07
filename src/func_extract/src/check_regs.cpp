@@ -126,7 +126,8 @@ void print_llvm_ir(DestInfo &destInfo,
   /// declare function
   // input types
   std::vector<llvm::Type *> argTy;
-  collect_regs(g_curMod, "", g_regWidth);
+  std::shared_ptr<ModuleInfo_t> topModInfo = g_moduleInfoMap[g_topModule];
+  collect_regs(topModInfo, "", g_regWidth);
 
   // push regs
   // add regs from all instances of sub-modules to the args

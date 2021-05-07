@@ -711,7 +711,6 @@ std::string remove_prefix_module(const std::string &writeAsvLine) {
 }
 
 
-
 llvm::Value* get_arg(std::string regName, llvm::Function *func) {
   if(regName.find("es_top_0.mem_data_buf") != std::string::npos)
     toCout("Find the arg!");
