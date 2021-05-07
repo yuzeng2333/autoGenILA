@@ -141,6 +141,7 @@ void print_llvm_ir(DestInfo &destInfo,
   // bound = (delay in instr.txt) - 1
   for(uint32_t i = 0; i <= bound; i++)  
     for(auto it = g_curMod->moduleInputs.begin(); it != g_curMod->moduleInputs.end(); it++) {
+      if(*it == g_curMod->clk) continue;
       uint32_t width = get_var_slice_width_simp(*it);
       // FIXME the start and end index may be wrong
       argTy.push_back(llvm::IntegerType::get(*TheContext, width));

@@ -1188,6 +1188,7 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     for(uint32_t i = timeIdx; i <= bound; i++) {
       for(auto it = subMod->moduleInputs.begin(); 
             it != subMod->moduleInputs.end(); it++) {
+        if(*it == subMod->clk) continue;
         uint32_t width = get_var_slice_width_simp(*it, subMod);
         // FIXME the start and end index may be wrong
         argTy.push_back(llvm::IntegerType::get(*TheContext, width));
@@ -1211,6 +1212,7 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     }
     for(uint32_t i = timeIdx; i <= bound; i++) {
       for(auto it = subMod->moduleInputs.begin(); it != subMod->moduleInputs.end(); it++) {
+        if(*it == subMod->clk) continue;
         toCoutVerb("set func arg: "+*it+DELIM+toStr(i));
         (subFunc->args().begin()+idx++)->setName(*it+DELIM+toStr(i));
       }
@@ -1268,12 +1270,14 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     if(i < timeIdx + minDelay) {
       // these inputs for submod would not be used, so just give 0.
       for(auto it = subMod->moduleInputs.begin(); it != subMod->moduleInputs.end(); it++) {
+        if(*it == subMod->clk) continue;
         uint32_t width = get_var_slice_width_simp(*it, subMod);
         args.push_back(llvmInt(0, width, c));
       }
     }
     else {
       for(auto it = subMod->moduleInputs.begin(); it != subMod->moduleInputs.end(); it++) {
+        if(*it == subMod->clk) continue;      
         std::string connectWire = g_curMod->insPort2wireMp[insName][*it];
         if(connectWire.empty()) {
           toCout("Warning: connect wire is empty, the port may be clk or rst: "+*it);
@@ -1299,6 +1303,7 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
   // may need to add more 0 value args to meet the arg length requirement
   for(uint32_t i = 0; i < funcBound - curBound; i++) {
     for(auto it = subMod->moduleInputs.begin(); it != subMod->moduleInputs.end(); it++) {
+      if(*it == subMod->clk) continue;    
       std::string connectWire = g_curMod->insPort2wireMp[insName][*it];
       uint32_t width = get_var_slice_width_simp(connectWire);
       args.push_back(llvmInt(0, width, c));
