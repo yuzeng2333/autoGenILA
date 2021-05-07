@@ -374,14 +374,20 @@ void add_input_node(std::string input, uint32_t timeIdx, astNode* const node) {
     auto pair = g_instancePairVec.back();
     std::string insName;    
     g_instancePairVec.pop_back();
+    bool isFirstMod = false;
     if(g_instancePairVec.empty()) {
       // if we started from the submodule
       // first, find the instance name of current submodule
+      isFirstMod = true;
       for(auto insMod: parentMod->ins2modMap) {
         if(insMod.second == g_curMod->name) {
           insName = insMod.first;
           break;
         }
+      }
+      if (insName.empty()) {
+        toCout("Error: cannot find instance for: "+g_curMod->name);
+        abort();
       }
       // push the parent module into g_instancePairVec
       g_instancePairVec.push_back(std::make_pair(parentMod->name, parentMod));
@@ -391,10 +397,14 @@ void add_input_node(std::string input, uint32_t timeIdx, astNode* const node) {
       insName = pair.first;
     }
     std::string parentWire = parentMod->insPort2wireMp[insName][input];
+    if(parentWire.empty()) {
+      toCout("Error: cannot find connect wire for input: "+input);
+      abort();
+    }
     g_curMod = parentMod;
     node->srcVec.push_back(parentWire);
     add_child_node(parentWire, timeIdx, node);
-    if(g_instancePairVec.empty()) g_instancePairVec.pop_back();
+    if(isFirstMod) g_instancePairVec.pop_back();
     g_instancePairVec.push_back(pair);
   }
 }
@@ -740,11 +750,11 @@ void add_submod_node(std::string var, uint32_t timeIdx, astNode* const node) {
   g_curMod = g_instancePairVec.back().second;
   //add_child_node(output, timeIdx, node);
   for(std::string input : subMod->moduleInputs) {
-    std::string connectWire = g_curMod->insPort2wireMp[insName][input];
-    if(connectWire == g_curMod->clk) {
+    if(input == subMod->clk) {
       subMod->clk = input;
       continue;
     }
+    std::string connectWire = g_curMod->insPort2wireMp[insName][input];
     //if(connectWire == g_curMod->rst) {
     //  subMod->rst = input;
     //  continue;

@@ -554,8 +554,8 @@ void submodule_expr(std::string firstLine, std::ifstream &input) {
       toCout("Error in matching module ports: "+line);
       abort();
     }
-    if(m.str(3) == g_recentClk)
-      continue;
+    //if(m.str(3) == g_recentClk)
+    //  continue;
     wire2PortMp.emplace(m.str(2), m.str(3));
   }
   for(auto pair : wire2PortMp) {
