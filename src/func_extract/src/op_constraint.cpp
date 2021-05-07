@@ -1278,6 +1278,7 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
         if(connectWire.empty()) {
           toCout("Warning: connect wire is empty, the port may be clk or rst: "+*it);
         }
+        if(connectWire == g_curMod->clk) continue;
         if(connectWire == "rst")
           toCout("Find it!");
         toCoutVerb("--- wire: "+connectWire+", timeIdx: "+toStr(i));
