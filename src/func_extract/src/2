@@ -102,7 +102,7 @@ void build_tree_for_single_as(std::string regAndSlice) {
   split_slice(regAndSlice, reg, regSlice);
   assert(regSlice.empty());
   std::string myInsName = ask_for_my_ins_name();
-  g_curMod->curTarget = reg;
+  g_curMod->curTarget = myInsName;
   uint32_t regWidth = get_var_slice_width_cmplx(regAndSlice);
   astNode* root;
   if(g_curMod->visitedNode.find(reg) == g_curMod->visitedNode.end())
@@ -213,10 +213,6 @@ void add_child_node(std::string varAndSlice,
     childName = var;
 
   std::string iName = g_curMod->curTarget;  
-  if(varAndSlice.find("yuzeng34") != std::string::npos
-       && timeIdx == 7) {
-    toCout("Found it!");
-  }
   if(g_curMod->visitedNode[iName].find(childName) == g_curMod->visitedNode[iName].end()) {
     astNode* nextNode = new astNode;      
     parentNode->childVec.push_back(nextNode);
@@ -422,14 +418,12 @@ void add_input_node(std::string input, uint32_t timeIdx, astNode* const node) {
     auto thisMod = g_curMod;
     g_curMod = parentMod;
     if(g_curMod->curTarget.empty()) {
-      g_curMod->curTarget = thisMod->curTarget;
+      g_curMod->curTarget = ask_for_my_ins_name();
     }
     node->srcVec.push_back(parentWire);
-    toCoutVerb("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Go from: "+thisMod->name+" to parent: "+g_curMod->name);
     add_child_node(parentWire, timeIdx, node);
     if(isFirstMod) g_instancePairVec.pop_back();
     g_instancePairVec.push_back(pair);
-    toCoutVerb("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Return from parent: "+g_curMod->name+" to: "+thisMod->name);    
     g_curMod = thisMod;
     toCoutVerb("~~~~~~~~~~~~~~~~~~~~~~~~ Back to input: "+input
        +", curMod: "+g_curMod->name);
@@ -761,7 +755,6 @@ void add_submod_node(std::string var, uint32_t timeIdx, astNode* const node) {
   toCoutVerb("~~~~~~~~~~~~~~~~~~~~~~~~ Before enter submod: "+insName
              +", curMod: "+g_curMod->name);
   // switch module before adding child node
-  std::string parentMod = g_curMod->name;
   std::string modName = g_curMod->ins2modMap[insName];
   g_curMod = g_moduleInfoMap[modName];
   g_curMod->curTarget = output;
@@ -772,9 +765,8 @@ void add_submod_node(std::string var, uint32_t timeIdx, astNode* const node) {
     g_curMod->visitedNode.emplace(output, std::map<std::string, astNode*>());
     g_instancePairVec.push_back(std::make_pair(insName, g_curMod));
     astNode* nextNode = new astNode;
-    toCout("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Enter mode: "+modName+", out: "+output);
     add_node(output, timeIdx, nextNode, false);
-    toCout("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Return from: "+modName+", out: "+output+" to: "+parentMod);
+
     g_instancePairVec.pop_back();
     g_curMod->out2RootNodeMp.emplace(output, nextNode);
   }

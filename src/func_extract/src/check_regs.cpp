@@ -197,7 +197,7 @@ void print_llvm_ir(DestInfo &destInfo,
   if(!destInfo.isVector) {
     // FIXME: currently does not support submodule's single register as writeASV
     std::string dest = destVec.front();
-    if(g_curMod->varNode.find(dest) == g_curMod->varNode.end()
+    if(g_curMod->visitedNode[dest].find(dest) == g_curMod->visitedNode[dest].end()
         && g_curMod->reg2Slices.find(dest) == g_curMod->reg2Slices.end()) {
       toCout("Error: ast node is not found for this var: |"+dest+"|"
               +", g_curMod: "+g_curMod->name);
@@ -217,7 +217,7 @@ void print_llvm_ir(DestInfo &destInfo,
     llvm::Value* destNextExpr;
     for(std::string dest: destVec) {
       g_curMod = g_moduleInfoMap[modName];    
-      if(g_curMod->varNode.find(dest) == g_curMod->varNode.end()
+      if(g_curMod->visitedNode[dest].find(dest) == g_curMod->visitedNode[dest].end()
           && g_curMod->reg2Slices.find(dest) == g_curMod->reg2Slices.end()) {
         toCout("Error: ast node is not found for this var: |"+dest+"|"
                 +", g_curMod: "+g_curMod->name);
@@ -296,12 +296,12 @@ void print_llvm_ir(DestInfo &destInfo,
 //    remove_two_end_space(var);
 //    uint32_t timeIdx = varPair.second;
 //    g_regWithFunc.insert(var);
-//    if(g_varNode.find(var) == g_varNode.end()
-//        && g_varNode.find("\\"+var) == g_varNode.end() ) {
+//    if(g_visitedNode.find(var) == g_visitedNode.end()
+//        && g_visitedNode.find("\\"+var) == g_visitedNode.end() ) {
 //      toCout("Error: the key does not exist in the map: |"+var+"|");
 //      abort();
 //    } 
-//    expr destNextExpr = add_constraint(g_varNode[var], 
+//    expr destNextExpr = add_constraint(g_visitedNode[var], 
 //                                       timeIdx, c, s, g, bound, /*isSolve=*/false);
 //    expr destExpr_g = var_expr(var, timeIdx+100, c, false);
 //    g.add( destExpr_g == destNextExpr ); 
@@ -363,11 +363,11 @@ void print_llvm_ir(DestInfo &destInfo,
 //    toCoutVerb("### Begin bound: "+ toStr(bound));
 //    goal g(c);
 //    for(std::string rootReg: varToExpand) {
-//      if(g_varNode.find(pure(rootReg)) == g_varNode.end() ) {
+//      if(g_visitedNode.find(pure(rootReg)) == g_visitedNode.end() ) {
 //        toCout("Error: the key does not exist in the map: |"+pure(rootReg)+"|");
 //        abort();
 //      } 
-//      astNode *root = g_varNode[pure(rootReg)];
+//      astNode *root = g_visitedNode[pure(rootReg)];
 //      if(root) {
 //        add_constraint(root, topTimeIdx, c, s, g, bound, true);
 //      }
@@ -442,11 +442,11 @@ void print_llvm_ir(DestInfo &destInfo,
 //
 //      // after getting one solution, build a goal and simplify it with input values
 //      g_existedExpr.clear();
-//      if(g_varNode.find(destAndSlice) == g_varNode.end() ) {
+//      if(g_visitedNode.find(destAndSlice) == g_visitedNode.end() ) {
 //        toCout("Error: the key does not exist in the map: |"+destAndSlice+"|");
 //        abort();
 //      } 
-//      expr destNextExpr = add_constraint(g_varNode[destAndSlice], 
+//      expr destNextExpr = add_constraint(g_visitedNode[destAndSlice], 
 //                                         0, c, s, g, bound, /*isSolve=*/false);
 //      expr destExpr_g = var_expr(destAndSlice, 100, c, false);
 //      g.add( destExpr_g == destNextExpr ); 
@@ -536,20 +536,22 @@ llvm::Value* add_constraint(std::string varAndSlice, uint32_t timeIdx, context &
   bool retIsEmpty = true;
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
+  std::string curTgt = g_curMod->curTarget;
+  assert(g_curMod->visitedNode.find(curTgt) != g_curMod->visitedNode.end());
   if(g_curMod->reg2Slices.find(var) == g_curMod->reg2Slices.end()) {
-    if(g_curMod->varNode.find(var) == g_curMod->varNode.end()) {
+    if(g_curMod->visitedNode[curTgt].find(var) == g_curMod->visitedNode[curTgt].end()) {
       toCout("Error: cannot find node for: "+varAndSlice);
       abort();
     }
-    return add_constraint(g_curMod->varNode[var], timeIdx, c, b, bound);
+    return add_constraint(g_curMod->visitedNode[curTgt][var], timeIdx, c, b, bound);
   }
   else {
     for(std::string varSlice : g_curMod->reg2Slices[var]) {
-      if(g_curMod->varNode.find(varSlice) == g_curMod->varNode.end()) {
+      if(g_curMod->visitedNode[curTgt].find(varSlice) == g_curMod->visitedNode[curTgt].end()) {
         toCout("!!! Error: cannot find node for: "+varSlice);
         abort();
       }
-      llvm::Value* tmpSlice = add_constraint(g_curMod->varNode[varSlice], timeIdx, c, b, bound);
+      llvm::Value* tmpSlice = add_constraint(g_curMod->visitedNode[curTgt][varSlice], timeIdx, c, b, bound);
       if(retIsEmpty) {
         retIsEmpty = false;
         ret = tmpSlice;
@@ -584,9 +586,13 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
     return llvmInt(0, width, c);
   }
 
-  if(g_curMod->existedExpr.find(timed_name(varAndSlice, timeIdx)) 
-      != g_curMod->existedExpr.end() ) {
-    return g_curMod->existedExpr[timed_name(varAndSlice, timeIdx)];
+  std::string curTgt = g_curMod->curTarget;
+  if(g_curMod->existedExpr.find(curTgt) == g_curMod->existedExpr.end() )
+    g_curMod->existedExpr.emplace(curTgt, std::map<std::string, llvm::Value*>() );
+
+  if(g_curMod->existedExpr[curTgt].find(timed_name(varAndSlice, timeIdx)) 
+      != g_curMod->existedExpr[curTgt].end() ) {
+    return g_curMod->existedExpr[curTgt][timed_name(varAndSlice, timeIdx)];
   }
 
   llvm::Value* retExpr;
@@ -618,7 +624,7 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
   else { // it is wire
     retExpr = add_ssa_constraint(node, timeIdx, c, b, bound);
   }
-  g_curMod->existedExpr.emplace(timed_name(varAndSlice, timeIdx), retExpr);
+  g_curMod->existedExpr[curTgt].emplace(timed_name(varAndSlice, timeIdx), retExpr);
   return retExpr;
 }
 

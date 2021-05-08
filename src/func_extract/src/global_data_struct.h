@@ -61,7 +61,7 @@ struct ModuleInfo_t {
   ~ModuleInfo_t();
 
   std::string name;
-  std::string curInsName;
+  std::string curTarget;
   std::string pendingOutPortTimed;
   std::string clk;
   std::string rst;
@@ -78,8 +78,9 @@ struct ModuleInfo_t {
   std::map<std::string, astNode*> out2RootNodeMp;
   std::map<std::string, std::vector<astNode*>> out2LeafNodeMp;
   std::map<std::string, std::pair<llvm::Function*, uint32_t>> out2FuncMp;
-  std::unordered_map<std::string, llvm::Value*> existedExpr;
-  // first key is instance name, second key is node name
+  // first key is target name
+  std::map<std::string, std::map<std::string, llvm::Value*>> existedExpr;
+  // first key is output name, second key is node name
   std::map<std::string, std::map<std::string, astNode*>> visitedNode;
 
   std::map<std::string, astNode*> varNode;  

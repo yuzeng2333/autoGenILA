@@ -1232,7 +1232,7 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     g_curMod->pendingOutPortTimed = outPortTimed;
     g_curMod->rootTimeIdx = timeIdx;
     g_curMod->minInOutDelay = UINT32_MAX;
-
+    g_curMod->curTarget = outPort;
     // switch func before elaborating
     parentFunc = g_curFunc;
     g_curFunc = subFunc;
@@ -1314,7 +1314,7 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
 
   toCoutVerb("--- To call function!");
   std::string destTimed = timed_name(destAndSlice, timeIdx);
-  assert(argTy.size() == args.size());
+  //assert(argTy.size() == args.size());
   return b->CreateCall(FT, subFunc, args, llvm::Twine(destTimed));
 }
 
