@@ -295,7 +295,7 @@ std::string get_name(expr expression) {
 
 
 bool is_read_asv(std::string var) {
-  return g_readASV.find(pure(var)) != g_readASV.end() || g_readASV.find(g_currentModuleName+"."+pure(var)) != g_readASV.end();
+  return g_readASV.find(pure(var)) != g_readASV.end() || g_readASV.find(g_curMod->name+"."+pure(var)) != g_readASV.end();
 }
 
 
