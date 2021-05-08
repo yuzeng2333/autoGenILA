@@ -216,7 +216,10 @@ void print_llvm_ir(DestInfo &destInfo,
     check_mod_name(modName);
     llvm::Value* destNextExpr;
     for(std::string dest: destVec) {
-      g_curMod = g_moduleInfoMap[modName];    
+      if(dest == "buff10")
+        toCout("Find it!");
+      g_curMod = g_moduleInfoMap[modName];
+      g_curMod->curTarget = dest;
       if(g_curMod->visitedNode[dest].find(dest) == g_curMod->visitedNode[dest].end()
           && g_curMod->reg2Slices.find(dest) == g_curMod->reg2Slices.end()) {
         toCout("Error: ast node is not found for this var: |"+dest+"|"
