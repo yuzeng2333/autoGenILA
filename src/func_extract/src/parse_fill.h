@@ -35,7 +35,6 @@ extern uint32_t g_new_var;
 extern std::regex pSingleLine;
 extern std::regex pNbLine;
 extern std::map<std::string, astNode*> g_varNode;
-extern std::map<std::string, astNode*> g_visitedNode;
 extern StrSet_t moduleAs;
 
 void clear_global_vars();

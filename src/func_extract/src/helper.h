@@ -227,6 +227,8 @@ std::pair<std::string, std::string> split_mod_var(std::string var);
 
 //template <typename T>
 std::vector<std::string> print_map_keys(std::map<std::string, astNode*> &map);
+
+std::string ask_for_my_ins_name();
 } // end of namespace funcExtract
 
 

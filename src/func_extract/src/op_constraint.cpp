@@ -1141,7 +1141,9 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
   auto pair = g_curMod->wire2InsPortMp[destAndSlice];
   std::string insName = pair.first;
   toCout("--- Begin submod: "+insName);
-  assert(insName == node->op);
+  if(insName != node->op) {
+    toCout("Warning: insName: "+insName+", node->op: "+node->op);
+  }
   std::string outPort = pair.second;
   auto subMod = get_mod_info(insName);
   std::string modName = subMod->name;

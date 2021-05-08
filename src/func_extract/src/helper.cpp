@@ -933,4 +933,20 @@ std::vector<std::string> print_map_keys(std::map<std::string, astNode*> &map) {
   return ret;
 }
 
+
+std::string ask_for_my_ins_name() {
+  std::string myModName = g_curMod->name;
+  if(g_curMod->parentMod == nullptr) return myModName;
+  auto parentMod = g_curMod->parentMod;
+  std::string insName;
+  for(auto pair : parentMod->ins2modMap) {
+    if(insName.empty() && pair.second == myModName)
+      insName = pair.first;
+    else if(!insName.empty() && pair.second == myModName) {
+      toCout("Error: more than one instance matches!");
+      abort();
+    }
+  }
+  return insName;
+}
 } // end of namespace funcExtract
