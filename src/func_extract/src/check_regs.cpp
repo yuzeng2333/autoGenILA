@@ -649,7 +649,7 @@ llvm::Value* add_nb_constraint(astNode* const node,
   }
 
   // why: when inputs havn't been seen, more unrolling is necessary
-  if(!g_seeInputs && timeIdx == bound) bound++;
+  //if(!g_seeInputs && timeIdx == bound) bound++;
 
   if(timeIdx < bound) {
     toCoutVerb("Add nb constraint for: " + dest+" ------  time: "+toStr(timeIdx));

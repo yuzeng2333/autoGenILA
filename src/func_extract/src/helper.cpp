@@ -847,12 +847,14 @@ std::shared_ptr<ModuleInfo_t> get_mod_info(std::string insName) {
 std::string get_hier_name(bool includeTopModule) {
   std::string ret;
   if(includeTopModule)
-    for(auto it = g_instancePairVec.begin(); it != g_instancePairVec.end(); it++) {
+    for(auto it = g_instancePairVec.begin(); 
+          it != g_instancePairVec.end(); it++) {
       ret = ret + "." + it->first;
     }
   else {
     if(g_instancePairVec.size() == 1) return "";
-    for(auto it = g_instancePairVec.begin()+1; it != g_instancePairVec.end(); it++) {
+    for(auto it = g_instancePairVec.begin()+1; 
+          it != g_instancePairVec.end(); it++) {
       ret = ret + "." + it->first;
     }
   }
@@ -863,6 +865,11 @@ std::string get_hier_name(bool includeTopModule) {
 
 bool is_top_module() {
   return g_curMod->name == g_topModule;
+}
+
+
+bool is_sub_module() {
+  return g_curMod->isSubMod;
 }
 
 

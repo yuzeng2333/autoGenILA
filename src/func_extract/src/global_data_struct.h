@@ -69,6 +69,7 @@ struct ModuleInfo_t {
   uint32_t rootTimeIdx;
   std::shared_ptr<ModuleInfo_t> parentMod;
   StrSet_t moduleAs;
+  bool isSubMod = false;
   std::set<std::string> invarRegs;
   std::set<std::string> moduleInputs;
   std::set<std::string> moduleOutputs;

@@ -158,37 +158,71 @@ llvm::Value* bv_val(std::string var, context &c) {
 
 llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx, 
                               context &c, builder &b, uint32_t bound) {
-  if(is_top_module) g_seeInputs = true;
+  if(!is_sub_module) g_seeInputs = true;
   std::string dest = node->dest;
-  if(dest == "in" ) {
+  if(dest == "func" ) {
     toCout("Find it!");
   }
   toCoutVerb("See input:"+timed_name(dest, timeIdx));
   std::string destTimed = timed_name(dest, timeIdx);
 
-  // if is memory io related signal
-  //if(g_mem2acclData == dest) {
-  //  toCout("unsupported in llvm version");
-  //  abort();
-  //  //return destExpr;
-  //} 
 
   // treate submodule's input separately
-  if(!is_top_module()) {
+  if(is_sub_module()) {
     assert(timeIdx <= bound);
     uint32_t delay = timeIdx - g_curMod->rootTimeIdx;
     if(delay < g_curMod->minInOutDelay) g_curMod->minInOutDelay = delay;
     
-    // should continue in parent module
+    // ====== design consideration: ================================
+    // *** the 3 lines below are wrong, because
+    // *** we are generating a general sub-module function, which
+    // *** should work well for all instances. So we should stop at
+    // *** the sub-module inputs, and do not proceed into parent modules
+    //// should continue in parent module
+    //std::shared_ptr<ModuleInfo_t> parentMod = g_curMod->parentMod;
+    //g_curMod = parentMod;
+    //return add_constraint(node->childVec[0], timeIdx, c, b, bound);
+    // ================================================================
+
+
+    // ======== How to deal with inputs for sub-modules =============
+    // 1. If the input is connected to a top-level input, analyze if it
+    // is time-invariant: its value is unchanged for current instr and NOP.
+    // (1) If so and it is a constant, replace it with the constant. 
+    // Otherwise, keep it symbolically
+
+    std::shared_ptr<ModuleInfo_t> parentMod = g_curMod->parentMod;
+    assert(node->srcVec.size() == 1);
+    std::string srcAndSlice = node->srcVec[0];
+    std::string src, srcSlice;
+    split_slice(srcAndSlice, src, srcSlice);
+    uint32_t localWidth = get_var_slice_width_simp(srcAndSlice);
+    if(parentMod->moduleInputs.find(srcAndSlice) 
+         != parentMod->moduleInputs.end()) {
+      auto encodings = g_currInstrInfo.instrEncoding[src];
+      std::string nopVal = g_nopInstr[src];
+      bool onlyOneVal = true;
+      for(std::string v: encodings) {
+        if(v != nopVal) onlyOneVal = false;
+      }
+      if(onlyOneVal)
+        return llvmInt(hdb2int(nopVal), localWidth, c);
+      else
+        return get_arg(destTimed);        
+    }
+    else { // if not connected to top-level inputs, remain symbolic
+      return get_arg(destTimed);
+    }
+  }
+  else if(!is_top_module()) { // must be the start module
     std::shared_ptr<ModuleInfo_t> parentMod = g_curMod->parentMod;
     g_curMod = parentMod;
     return add_constraint(node->childVec[0], timeIdx, c, b, bound);
-
   }
 
   // if input instruction should be given to the input ports
   if(timeIdx + g_instr_len >= bound+1) { // input signal is explicitly given
-    if(is_top_module() 
+    if(!is_sub_module() 
        && g_currInstrInfo.instrEncoding.find(dest) 
           == g_currInstrInfo.instrEncoding.end()) {
       toCout("Error: input signal not found for current instruction: "+dest);
@@ -208,10 +242,9 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx,
         toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%B Give "+localVal+" to "+timed_name(dest, timeIdx));
         g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
         return llvmInt(hdb2int(localVal), localWidth, c);
-        //return c.bv_val(hdb2int(localVal), localWidth);
       }
       else if(localVal.find("+") != std::string::npos) {
-        // if the value is a combination of x and numbers
+        /// if the value is a combination of x and numbers
         toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%B Give "+localVal+" to "+timed_name(dest, timeIdx));
         g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
         return mixed_value_expr(localVal, c, dest, timeIdx, localWidth-1, b);
@@ -220,13 +253,12 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx,
         toCout("Error: unexpected input value: "+localVal);
       }
     }
-    // FIXME: not sure if this is the best way
+    /// FIXME: not sure if this is the best way
     else if(localVal == "DIRTY") {
       if(g_nopInstr.find(dest) == g_nopInstr.end()) {
         toCout("!!!!!!!!!! Error: var not found for nop instruction: "+dest);
         abort();
-        //return destExpr;
-        // return function arg: input
+        /// return function arg: input
         return get_arg(destTimed);
       }
       std::string localVal = g_nopInstr[dest];
@@ -238,7 +270,7 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx,
         return llvmInt(hdb2int(localVal), localWidth, c);
       }
     }
-    // localVal = x
+    /// localVal = x
     else return get_arg(destTimed);
   }
   else if(!g_nopInstr.empty()){ // give the value in nop instruction
@@ -252,7 +284,6 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx,
       if(is_number(localVal)) {
         toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give "+localVal+" to "+timed_name(dest, timeIdx));
         g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
-        //return c.bv_val(hdb2int(localVal), localWidth);
         return llvmInt(hdb2int(localVal), localWidth, c);
       }
       else if(localVal.find("+") != std::string::npos){
@@ -1213,7 +1244,8 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
       (subFunc->args().begin()+idx++)->setName(it->first+DELIM+toStr(bound));
     }
     for(uint32_t i = timeIdx; i <= bound; i++) {
-      for(auto it = subMod->moduleInputs.begin(); it != subMod->moduleInputs.end(); it++) {
+      for(auto it = subMod->moduleInputs.begin(); 
+            it != subMod->moduleInputs.end(); it++) {
         if(*it == subMod->clk) continue;
         toCoutVerb("set func arg: "+*it+DELIM+toStr(i));
         (subFunc->args().begin()+idx++)->setName(*it+DELIM+toStr(i));
@@ -1221,7 +1253,8 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     }
 
     // make bb for the function
-    llvm::BasicBlock *localBB = llvm::BasicBlock::Create(*c, "bb_;_"+modName+"_$"+outPort, subFunc);
+    llvm::BasicBlock *localBB 
+      = llvm::BasicBlock::Create(*c, "bb_;_"+modName+"_$"+outPort, subFunc);
     b->SetInsertPoint(localBB);
     auto parentMod = g_curMod;
     g_curMod = subMod;
@@ -1233,10 +1266,12 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     g_curMod->rootTimeIdx = timeIdx;
     g_curMod->minInOutDelay = UINT32_MAX;
     g_curMod->curTarget = outPort;
+    g_curMod->isSubMod = true;
     // switch func before elaborating
     parentFunc = g_curFunc;
     g_curFunc = subFunc;
-    llvm::Value* ret = add_constraint(subMod->out2RootNodeMp[outPort], timeIdx, c, b, bound);
+    llvm::Value* ret = add_constraint(subMod->out2RootNodeMp[outPort], 
+                                      timeIdx, c, b, bound);
     g_curMod = thisMod;    
     g_instancePairVec.pop_back();
     g_curMod = parentMod;
