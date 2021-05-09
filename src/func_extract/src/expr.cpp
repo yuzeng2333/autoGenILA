@@ -409,7 +409,7 @@ void nonblockif_expr(std::string line, std::ifstream &input) {
   // need to check if there is "else" statement
   auto endOfIf = input.tellg();
   std::getline(input, line);
-  if( !std::regex_match(line, m, pNBElseIF) ) {
+  if( !std::regex_match(line, m, pNBElseIf) ) {
     if ( !std::regex_match(line, m, pNonblockElse) ) {
       input.seekg(endOfIf);
       elseValue = destAndSlice;

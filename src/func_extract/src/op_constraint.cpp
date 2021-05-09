@@ -966,7 +966,7 @@ llvm::Value* add_one_case_branch_expr(astNode* const node, llvm::Value* &caseVar
 
   std::string var, varSlice;
   split_slice(assignVarAndSlice, var, varSlice);
-  std::string caseVarName = caseVarExpr->getName();
+  std::string caseVarName = caseVarExpr->getName().str();
 
   if(idx < node->srcVec.size()-2) {
 

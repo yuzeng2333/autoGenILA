@@ -715,13 +715,13 @@ llvm::Value* get_arg(std::string regName, llvm::Function *func) {
   if(regName.find("es_top_0.mem_data_buf") != std::string::npos)
     toCout("Find the arg!");
   for(auto it = func->arg_begin(); it != func->arg_end(); it++) {
-    std::string funcNane = llvm::dyn_cast<llvm::Value>(func)->getName();
-    std::string argName = it->getName();
+    std::string funcNane = llvm::dyn_cast<llvm::Value>(func)->getName().str();
+    std::string argName = it->getName().str();
     //toCout("func name: "+funcNane);
     //toCout("arg name: "+argName);
     if(argName.find("ata_fifo.r0___#25") != std::string::npos)
       toCout("Find it!!");
-    if(it->getName() == regName) return it;
+    if(it->getName().str() == regName) return it;
   }
   toCout("Error: function input is not found: "+regName);
   abort();
@@ -755,7 +755,7 @@ llvm::Value* extract(llvm::Value* in, uint32_t high, uint32_t low,
   if(inWidth < high+1) {
     toCout("Error: input value width for extract is less than high index");
     toCout("wdith: "+toStr(inWidth)+", high: "+toStr(high));
-    std::string tmpName = in->getName();
+    std::string tmpName = in->getName().str();
     toCout("Input value name: "+tmpName);
     abort();
   }
@@ -788,8 +788,8 @@ llvm::Value* concat_value(llvm::Value* val1, llvm::Value* val2,
                           std::shared_ptr<llvm::IRBuilder<>> &b) {
   uint32_t val1Width = llvm::dyn_cast<llvm::IntegerType>(val1->getType())->getBitWidth();
   uint32_t val2Width = llvm::dyn_cast<llvm::IntegerType>(val2->getType())->getBitWidth();
-  std::string name1 = val1->getName();
-  std::string name2 = val2->getName();
+  std::string name1 = val1->getName().str();
+  std::string name2 = val2->getName().str();
   toCoutVerb("concat "+name1+", len: "+toStr(val1Width));
   toCoutVerb("and "+name2+", len: "+toStr(val2Width));
 
