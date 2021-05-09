@@ -131,6 +131,7 @@ void print_llvm_ir(DestInfo &destInfo,
   // input types
   std::vector<llvm::Type *> argTy;
   std::shared_ptr<ModuleInfo_t> topModInfo = g_moduleInfoMap[g_topModule];
+  g_regWidth.clear();
   collect_regs(topModInfo, "", g_regWidth);
 
   // push regs
@@ -684,6 +685,8 @@ llvm::Value* add_nb_constraint(astNode* const node,
       //&& g_curMod->moduleAs.find(dest) != g_curMod->moduleAs.end())
     //std::string prefix = get_hier_name(false);
     //if(!prefix.empty()) prefix += ".";
+    // TODO: get the path.reg name for dest
+    // TODO: get the path.reg name for dest
     return get_arg(timed_name(dest, timeIdx), g_curFunc);
   }
   else {

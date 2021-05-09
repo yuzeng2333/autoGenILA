@@ -881,6 +881,7 @@ void collect_regs(std::shared_ptr<ModuleInfo_t> &curMod,
   for(std::string reg : curMod->moduleTrueRegs) {
     uint32_t width = get_var_slice_width_simp(reg, curMod);
     regWidth.push_back(std::make_pair(regPrefix+reg, width));
+    toCoutVerb("Collect reg: "+regPrefix+reg);
   }
 
   for(auto pair : curMod->ins2modMap) {

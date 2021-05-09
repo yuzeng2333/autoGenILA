@@ -339,9 +339,11 @@ void read_in_instructions(std::string fileName) {
             else { // if is a vector of regs
               std::getline(input, line);              
               while(line[0] != ']') {
-                g_instrInfo.back().writeASVVec.push_back(line);
-                g_instrInfo.back().skipWriteASV.insert(line);
-                moduleAs.insert(line);
+                if(line.substr(0, 2) != "//") {
+                  g_instrInfo.back().writeASVVec.push_back(line);
+                  g_instrInfo.back().skipWriteASV.insert(line);
+                  moduleAs.insert(line);
+                }
                 std::getline(input, line);
               }
               // line begins with "]"
