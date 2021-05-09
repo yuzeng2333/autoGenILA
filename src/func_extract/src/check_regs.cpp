@@ -86,8 +86,14 @@ void check_all_regs() {
       std::string modName = modVarPair.first;
       std::string writeVar = modVarPair.second; 
       destInfo.isVector = false;
-      destInfo.set_dest_and_slice(writeVar);
-      destInfo.set_module_name(modName);
+      if(!modName.empty()) {
+        destInfo.set_dest_and_slice(writeVar);
+        destInfo.set_module_name(modName);
+      }
+      else {
+        destInfo.set_dest_and_slice(oneWriteAsv);
+        destInfo.set_module_name(g_topModule);
+      }
       print_llvm_ir(destInfo, cycleCnt, i-1);
       //print_llvm_ir_without_submodules(oneWriteAsv, cycleCnt-1, i-1);
       g_maxDelay = cycleCnt;
@@ -101,6 +107,8 @@ void check_all_regs() {
       uint32_t cycleCnt = instrInfo.writeASVVecDelay;
       if(!modName.empty())
         destInfo.set_module_name(modName);
+      else
+        destInfo.set_module_name(g_topModule);
       print_llvm_ir(destInfo, cycleCnt, i-1);
       g_maxDelay = cycleCnt;    
     }
@@ -240,7 +248,6 @@ void print_llvm_ir(DestInfo &destInfo,
     uint32_t size = destVec.size();
     uint32_t bitNum = log2(size) + 2;
 
-    //llvm::ArrayType* allocaTy = llvm::ArrayType::get(retTy, 1);
     llvm::AllocaInst* arrayAlloca 
         = Builder->CreateAlloca(
             //allocaTy,
@@ -251,21 +258,6 @@ void print_llvm_ir(DestInfo &destInfo,
           );
     // store values in retVec to memory of array
     llvm::Value* arrPtr = value(arrayAlloca);
-    //llvm::GetElementPtrInst* arrPtrInst
-    //  = llvm::GetElementPtrInst::Create(
-    //      nullptr,
-    //      value(arrayAlloca),
-    //      std::vector<llvm::Value*>{ 
-    //        llvm::ConstantInt::get(
-    //          llvm::IntegerType::get(*TheContext, bitNum), 
-    //          0, false),
-    //        llvm::ConstantInt::get(
-    //          llvm::IntegerType::get(*TheContext, bitNum), 
-    //          0, false) },
-    //      llvm::Twine(val->getName().str()+"_arr_ptr"),
-    //      BB
-    //    );
-    //llvm::Value* arrPtr = value(arrPtrInst);
     uint32_t i = 0;
     for(llvm::Value* val : retVec) {
       llvm::GetElementPtrInst* ptr 

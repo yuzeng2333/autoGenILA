@@ -675,7 +675,7 @@ uint32_t get_var_slice_width_cmplx(std::string varAndSlice) {
     std::string modName = varAndSlice.substr(0, pos);
     std::string varName = varAndSlice.substr(pos+1);
     if(g_moduleInfoMap.find(modName) == g_moduleInfoMap.end()) {
-      toCout("this module info cannot be found: "+modName);
+      return get_var_slice_width_simp(varAndSlice);
     }
     auto subMod = g_moduleInfoMap[modName];
     return get_var_slice_width_simp(varName, subMod);
@@ -906,16 +906,24 @@ std::string get_mod_name(std::string name) {
   if(pos == std::string::npos) {
     return "";
   }
-  return name.substr(0, pos);
+  std::string modName = name.substr(0, pos);
+  if(g_moduleInfoMap.find(modName) != g_moduleInfoMap.end())
+    return modName;
+  else
+    return "";
 }
 
 
 std::string get_var_name(std::string name) {
   size_t pos = name.find(".");
   if(pos == std::string::npos) {
-    return "";
+    return name;
   }
-  return name.substr(pos+1);
+  std::string modName = name.substr(0, pos);
+  if(g_moduleInfoMap.find(modName) != g_moduleInfoMap.end())
+    return name.substr(pos+1);
+  else
+    return name;
 }
 
 
@@ -927,7 +935,10 @@ std::pair<std::string, std::string> split_mod_var(std::string var) {
   else {
     std::string modName = var.substr(0, pos);
     std::string varName = var.substr(pos+1);
-    return std::make_pair(modName, varName);
+    if(g_moduleInfoMap.find(modName) != g_moduleInfoMap.end())
+      return std::make_pair(modName, varName);
+    else
+      return std::make_pair("", var);
   }
 }
 
