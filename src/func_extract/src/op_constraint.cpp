@@ -158,7 +158,7 @@ llvm::Value* bv_val(std::string var, context &c) {
 
 llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx, 
                               context &c, builder &b, uint32_t bound) {
-  if(!is_sub_module) g_seeInputs = true;
+  if(is_top_module()) g_seeInputs = true;
   std::string dest = node->dest;
   if(dest == "func" ) {
     toCout("Find it!");
@@ -201,7 +201,7 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx,
          != parentMod->moduleInputs.end()) {
       auto encodings = g_currInstrInfo.instrEncoding[src];
       std::string nopVal = g_nopInstr[src];
-      bool onlyOneVal = true;
+      bool onlyOneVal = is_number(nopVal);      
       for(std::string v: encodings) {
         if(v != nopVal) onlyOneVal = false;
       }
