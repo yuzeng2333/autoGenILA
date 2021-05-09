@@ -75,6 +75,7 @@ extern std::regex pNonblock;
 extern std::regex pNonblockConcat;   
 extern std::regex pNonblockIf;
 extern std::regex pNonblockElse;
+extern std::regex pNBElseIf;
 extern std::regex pNonblockIf2;
 
 extern std::regex pFunctionDef;
