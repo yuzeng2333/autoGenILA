@@ -72,6 +72,10 @@ void check_all_regs() {
   uint32_t i = 1;
   DestInfo destInfo;  
   for(auto instrInfo : g_instrInfo) {
+    if(!instrInfo.writeASVVec.empty() && !instrInfo.writeASV.empty()) {
+      toCout("Error: does not support single ASV and vector together");
+      abort();
+    }
     toCout("---  BEGIN INSTRUCTION #"+toStr(i++)+" ---");
     g_readASV = instrInfo.readASV;
     g_currInstrInfo = instrInfo;
@@ -236,16 +240,32 @@ void print_llvm_ir(DestInfo &destInfo,
     uint32_t size = destVec.size();
     uint32_t bitNum = log2(size) + 2;
 
-    llvm::ArrayType* retArrTy = llvm::cast<llvm::ArrayType>(destInfo.get_arr_type());
+    //llvm::ArrayType* allocaTy = llvm::ArrayType::get(retTy, 1);
     llvm::AllocaInst* arrayAlloca 
         = Builder->CreateAlloca(
-            retArrTy,
+            //allocaTy,
+            retTy,
             llvm::ConstantInt::get(llvm::IntegerType::get(*TheContext, bitNum), 
                                                     size, false), // # elements
             llvm::Twine(destName)
           );
     // store values in retVec to memory of array
     llvm::Value* arrPtr = value(arrayAlloca);
+    //llvm::GetElementPtrInst* arrPtrInst
+    //  = llvm::GetElementPtrInst::Create(
+    //      nullptr,
+    //      value(arrayAlloca),
+    //      std::vector<llvm::Value*>{ 
+    //        llvm::ConstantInt::get(
+    //          llvm::IntegerType::get(*TheContext, bitNum), 
+    //          0, false),
+    //        llvm::ConstantInt::get(
+    //          llvm::IntegerType::get(*TheContext, bitNum), 
+    //          0, false) },
+    //      llvm::Twine(val->getName().str()+"_arr_ptr"),
+    //      BB
+    //    );
+    //llvm::Value* arrPtr = value(arrPtrInst);
     uint32_t i = 0;
     for(llvm::Value* val : retVec) {
       llvm::GetElementPtrInst* ptr 
@@ -265,7 +285,9 @@ void print_llvm_ir(DestInfo &destInfo,
       Builder->SetInsertPoint(BB);
       llvm::StoreInst* store = Builder->CreateStore(val, value(ptr));  
     }
-    Builder->CreateRet(arrPtr);
+
+    llvm::LoadInst *retArr = Builder->CreateLoad(retTy, arrPtr, llvm::Twine("retArr"));
+    Builder->CreateRet(value(retArr));
   }
 
   llvm::verifyFunction(*TheFunction);
@@ -992,8 +1014,8 @@ llvm::Type* DestInfo::get_ret_type() {
     }
     llvm::Type* I = llvm::IntegerType::get(*TheContext, size);
     llvm::ArrayType* arrayType = llvm::ArrayType::get(I, destVec.size());
-    auto ptrTy = llvm::PointerType::get(arrayType, 0);
-    return ptrTy;
+    //auto ptrTy = llvm::PointerType::get(arrayType, 0);
+    return arrayType;
   }
 }
 

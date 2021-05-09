@@ -160,7 +160,7 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx,
                               context &c, builder &b, uint32_t bound) {
   if(is_top_module()) g_seeInputs = true;
   std::string dest = node->dest;
-  if(dest == "func" ) {
+  if(dest == "rst" && timeIdx == 1 ) {
     toCout("Find it!");
   }
   toCoutVerb("See input:"+timed_name(dest, timeIdx));
