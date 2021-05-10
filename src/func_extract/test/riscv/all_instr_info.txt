@@ -1,0 +1,163 @@
+// addi
+12'bx+5'bx+3'h0+5'b1+5'h4+2'h3
+\cpuregs[1] 8
+
+// slli
+6'b0+6'bx+5'bx+3'h1+5'b1+5'h4+2'h3
+\cpuregs[1] 8
+
+// slti
+12'bx+5'bx+3'h2+5'b1+5'h4+2'h3
+\cpuregs[1] 8
+
+// sltiu
+12'bx+5'bx+3'h3+5'b1+5'h4+2'h3
+\cpuregs[1] 8
+
+// xori
+12'bx+5'bx+3'h4+5'b1+5'h4+2'h3
+\cpuregs[1] 8
+
+// srli
+6'b0+6'bx+5'bx+3'h5+5'b1+5'h4+2'h3
+\cpuregs[1] 8
+
+// srai
+6'h16+6'bx+5'bx+3'h5+5'b1+5'h4+2'h3
+\cpuregs[1] 8
+
+// ori
+12'bx+5'bx+3'h6+5'b1+5'h4+2'h3
+\cpuregs[1] 8
+
+// andi
+12'bx+5'bx+3'h7+5'b1+5'h4+2'h3
+\cpuregs[1] 8
+
+// lui
+20'bx+5'b1+5'hd+2'h3
+\cpuregs[1] 8
+
+// auipc
+20'bx+5'b1+5'h5+2'h3
+\cpuregs[1] 8
+
+// add
+7'b0+5'bx+5'bx+3'h0+5'b1+5'hc+2'h3
+\cpuregs[1] 8
+
+// sub
+7'b1111111+5'bx+5'bx+3'h0+5'b1+5'hc+2'h3
+\cpuregs[1] 8
+
+// sll
+7'b0+5'bx+5'bx+3'h1+5'b1+5'hc+2'h3
+\cpuregs[1] 8
+
+// slt
+7'b0+5'bx+5'bx+3'h2+5'b1+5'hc+2'h3
+\cpuregs[1] 8
+
+// sltu
+7'b0+5'bx+5'bx+3'h3+5'b1+5'hc+2'h3
+\cpuregs[1] 8
+
+// xor
+7'b0+5'bx+5'bx+3'h4+5'b1+5'hc+2'h3
+\cpuregs[1] 8
+
+// srl
+7'b0+5'bx+5'bx+3'h5+5'b1+5'hc+2'h3
+\cpuregs[1] 8
+
+// sra
+7'b1111111+5'bx+5'bx+3'h5+5'b1+5'hc+2'h3
+\cpuregs[1] 8
+
+// or
+7'b0+5'bx+5'bx+3'h6+5'b1+5'hc+2'h3
+\cpuregs[1] 8
+
+// and
+7'b0+5'bx+5'bx+3'h7+5'b1+5'hc+2'h3
+\cpuregs[1] 8
+
+// nop
+12'b0+5'b0+3'h0+5'b0+5'h4+2'h3
+\cpuregs[1] 8
+
+// jal
+20'bx+5'b1+5'h1b+2'h3
+reg_next_pc 8
+
+// jalr
+12'bx+5'bx+3'b0+5'b1+5'h1b+2'h3
+reg_next_pc 8
+
+// beq
+7'bx+5'bx+5'bx+3'h0+5'bx+5'h18+2'h3
+reg_next_pc 8
+
+// bne
+7'bx+5'bx+5'bx+3'h1+5'bx+5'h18+2'h3
+reg_next_pc 8
+
+// blt
+7'bx+5'bx+5'bx+3'h4+5'bx+5'h18+2'h3
+reg_next_pc 8
+
+// bge
+7'bx+5'bx+5'bx+3'h5+5'bx+5'h18+2'h3
+reg_next_pc 8
+
+// bltu
+7'bx+5'bx+5'bx+3'h6+5'bx+5'h18+2'h3
+reg_next_pc 8
+
+// bgeu
+7'bx+5'bx+5'bx+3'h7+5'bx+5'h18+2'h3
+reg_next_pc 8
+
+// lb
+12'bx+5'bx+3'h0+5'b1+5'h0+2'h3
+\cpuregs[1] 8
+
+// lh
+12'bx+5'bx+3'h1+5'b1+5'h0+2'h3
+\cpuregs[1] 8
+
+// lw
+12'bx+5'bx+3'h2+5'b1+5'h0+2'h3
+\cpuregs[1] 8
+
+// lbu
+12'bx+5'bx+3'h4+5'b1+5'h0+2'h3
+\cpuregs[1] 8
+
+// lhu
+12'bx+5'bx+3'h5+5'b1+5'h0+2'h3
+\cpuregs[1] 8
+
+// sb
+7'bx+5'bx+5'bx+3'h0+5'bx+5'h8+2'h3
+mem_addr 8
+mem_wdata 8
+mem_valid 8
+mem_wstrb 8
+mem_instr 8
+
+// sh
+7'bx+5'bx+5'bx+3'h1+5'bx+5'h8+2'h3
+mem_addr 8
+mem_wdata 8
+mem_valid 8
+mem_wstrb 8
+mem_instr 8
+
+// sw
+7'bx+5'bx+5'bx+3'h2+5'bx+5'h8+2'h3
+mem_addr 8
+mem_wdata 8
+mem_valid 8
+mem_wstrb 8
+mem_instr 8

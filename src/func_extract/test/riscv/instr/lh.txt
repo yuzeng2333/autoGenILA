@@ -1,0 +1,73 @@
+#1:
+(1)
+mem_rdata = 12'bx+5'bx+3'h1+5'b1+5'h0+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(2)
+mem_rdata = 12'bx+5'bx+3'h1+5'b1+5'h0+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(3)
+mem_rdata = 12'bx+5'bx+3'h1+5'b1+5'h0+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+R:
+\cpuregs[0]
+\cpuregs[1]
+\cpuregs[2]
+\cpuregs[3]
+\cpuregs[4]
+\cpuregs[5]
+\cpuregs[6]
+\cpuregs[7]
+\cpuregs[8]
+\cpuregs[9]
+\cpuregs[10]
+\cpuregs[11]
+\cpuregs[12]
+\cpuregs[13]
+\cpuregs[14]
+\cpuregs[15]
+\cpuregs[16]
+\cpuregs[17]
+\cpuregs[18]
+\cpuregs[19]
+\cpuregs[20]
+\cpuregs[21]
+\cpuregs[22]
+\cpuregs[23]
+\cpuregs[24]
+\cpuregs[25]
+\cpuregs[26]
+\cpuregs[27]
+\cpuregs[28]
+\cpuregs[29]
+\cpuregs[30]
+\cpuregs[31]
+reg_next_pc
+W:
+\cpuregs[1] 8 
+$NOP:
+mem_rdata = 25'b0+5'b00100+2'b11
+resetn = 1
+mem_ready = 0
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0

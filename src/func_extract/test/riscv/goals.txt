@@ -1,0 +1,377 @@
+---------------------------- ADD
+#1#\cpuregs[1]#7
+(goals
+(goal
+  (let ((a!1 (or (not (= ((_ extract 7 7) |mem_rdata___#6|) #b1))
+                 (not (= ((_ extract 8 8) |mem_rdata___#6|) #b0))
+                 (not (= ((_ extract 9 9) |mem_rdata___#6|) #b0))
+                 (not (= ((_ extract 10 10) |mem_rdata___#6|) #b0))
+                 (not (= ((_ extract 11 11) |mem_rdata___#6|) #b0))
+                 (= ((_ extract 11 7) |mem_rdata___#6|) #b00000)))
+        (a!2 (ite (= ((_ extract 16 16) |mem_rdata___#6|) #b1)
+                  (ite (= ((_ extract 15 15) |mem_rdata___#6|) #b1)
+                       |\\cpuregs[31]___#8|
+                       |\\cpuregs[30]___#8|)
+                  (ite (= ((_ extract 15 15) |mem_rdata___#6|) #b1)
+                       |\\cpuregs[29]___#8|
+                       |\\cpuregs[28]___#8|)))
+        (a!3 (ite (= ((_ extract 16 16) |mem_rdata___#6|) #b1)
+                  (ite (= ((_ extract 15 15) |mem_rdata___#6|) #b1)
+                       |\\cpuregs[27]___#8|
+                       |\\cpuregs[26]___#8|)
+                  (ite (= ((_ extract 15 15) |mem_rdata___#6|) #b1)
+                       |\\cpuregs[25]___#8|
+                       |\\cpuregs[24]___#8|)))
+        (a!4 (ite (= ((_ extract 16 16) |mem_rdata___#6|) #b1)
+                  (ite (= ((_ extract 15 15) |mem_rdata___#6|) #b1)
+                       |\\cpuregs[23]___#8|
+                       |\\cpuregs[22]___#8|)
+                  (ite (= ((_ extract 15 15) |mem_rdata___#6|) #b1)
+                       |\\cpuregs[21]___#8|
+                       |\\cpuregs[20]___#8|)))
+        (a!5 (ite (= ((_ extract 16 16) |mem_rdata___#6|) #b1)
+                  (ite (= ((_ extract 15 15) |mem_rdata___#6|) #b1)
+                       |\\cpuregs[19]___#8|
+                       |\\cpuregs[18]___#8|)
+                  (ite (= ((_ extract 15 15) |mem_rdata___#6|) #b1)
+                       |\\cpuregs[17]___#8|
+                       |\\cpuregs[16]___#8|)))
+        (a!7 (ite (= ((_ extract 16 16) |mem_rdata___#6|) #b1)
+                  (ite (= ((_ extract 15 15) |mem_rdata___#6|) #b1)
+                       |\\cpuregs[15]___#8|
+                       |\\cpuregs[14]___#8|)
+                  (ite (= ((_ extract 15 15) |mem_rdata___#6|) #b1)
+                       |\\cpuregs[13]___#8|
+                       |\\cpuregs[12]___#8|)))
+        (a!8 (ite (= ((_ extract 16 16) |mem_rdata___#6|) #b1)
+                  (ite (= ((_ extract 15 15) |mem_rdata___#6|) #b1)
+                       |\\cpuregs[11]___#8|
+                       |\\cpuregs[10]___#8|)
+                  (ite (= ((_ extract 15 15) |mem_rdata___#6|) #b1)
+                       |\\cpuregs[9]___#8|
+                       |\\cpuregs[8]___#8|)))
+        (a!9 (ite (= ((_ extract 16 16) |mem_rdata___#6|) #b1)
+                  (ite (= ((_ extract 15 15) |mem_rdata___#6|) #b1)
+                       |\\cpuregs[7]___#8|
+                       |\\cpuregs[6]___#8|)
+                  (ite (= ((_ extract 15 15) |mem_rdata___#6|) #b1)
+                       |\\cpuregs[5]___#8|
+                       |\\cpuregs[4]___#8|)))
+        (a!10 (ite (= ((_ extract 16 16) |mem_rdata___#6|) #b1)
+                   (ite (= ((_ extract 15 15) |mem_rdata___#6|) #b1)
+                        |\\cpuregs[3]___#8|
+                        |\\cpuregs[2]___#8|)
+                   (ite (= ((_ extract 15 15) |mem_rdata___#6|) #b1)
+                        |\\cpuregs[1]___#8|
+                        |\\cpuregs[0]___#8|)))
+        (a!13 (ite (= ((_ extract 21 21) |mem_rdata___#6|) #b1)
+                   (ite (= ((_ extract 20 20) |mem_rdata___#6|) #b1)
+                        |\\cpuregs[31]___#8|
+                        |\\cpuregs[30]___#8|)
+                   (ite (= ((_ extract 20 20) |mem_rdata___#6|) #b1)
+                        |\\cpuregs[29]___#8|
+                        |\\cpuregs[28]___#8|)))
+        (a!14 (ite (= ((_ extract 21 21) |mem_rdata___#6|) #b1)
+                   (ite (= ((_ extract 20 20) |mem_rdata___#6|) #b1)
+                        |\\cpuregs[27]___#8|
+                        |\\cpuregs[26]___#8|)
+                   (ite (= ((_ extract 20 20) |mem_rdata___#6|) #b1)
+                        |\\cpuregs[25]___#8|
+                        |\\cpuregs[24]___#8|)))
+        (a!15 (ite (= ((_ extract 21 21) |mem_rdata___#6|) #b1)
+                   (ite (= ((_ extract 20 20) |mem_rdata___#6|) #b1)
+                        |\\cpuregs[23]___#8|
+                        |\\cpuregs[22]___#8|)
+                   (ite (= ((_ extract 20 20) |mem_rdata___#6|) #b1)
+                        |\\cpuregs[21]___#8|
+                        |\\cpuregs[20]___#8|)))
+        (a!16 (ite (= ((_ extract 21 21) |mem_rdata___#6|) #b1)
+                   (ite (= ((_ extract 20 20) |mem_rdata___#6|) #b1)
+                        |\\cpuregs[19]___#8|
+                        |\\cpuregs[18]___#8|)
+                   (ite (= ((_ extract 20 20) |mem_rdata___#6|) #b1)
+                        |\\cpuregs[17]___#8|
+                        |\\cpuregs[16]___#8|)))
+        (a!18 (ite (= ((_ extract 21 21) |mem_rdata___#6|) #b1)
+                   (ite (= ((_ extract 20 20) |mem_rdata___#6|) #b1)
+                        |\\cpuregs[15]___#8|
+                        |\\cpuregs[14]___#8|)
+                   (ite (= ((_ extract 20 20) |mem_rdata___#6|) #b1)
+                        |\\cpuregs[13]___#8|
+                        |\\cpuregs[12]___#8|)))
+        (a!19 (ite (= ((_ extract 21 21) |mem_rdata___#6|) #b1)
+                   (ite (= ((_ extract 20 20) |mem_rdata___#6|) #b1)
+                        |\\cpuregs[11]___#8|
+                        |\\cpuregs[10]___#8|)
+                   (ite (= ((_ extract 20 20) |mem_rdata___#6|) #b1)
+                        |\\cpuregs[9]___#8|
+                        |\\cpuregs[8]___#8|)))
+        (a!20 (ite (= ((_ extract 21 21) |mem_rdata___#6|) #b1)
+                   (ite (= ((_ extract 20 20) |mem_rdata___#6|) #b1)
+                        |\\cpuregs[7]___#8|
+                        |\\cpuregs[6]___#8|)
+                   (ite (= ((_ extract 20 20) |mem_rdata___#6|) #b1)
+                        |\\cpuregs[5]___#8|
+                        |\\cpuregs[4]___#8|)))
+        (a!21 (ite (= ((_ extract 21 21) |mem_rdata___#6|) #b1)
+                   (ite (= ((_ extract 20 20) |mem_rdata___#6|) #b1)
+                        |\\cpuregs[3]___#8|
+                        |\\cpuregs[2]___#8|)
+                   (ite (= ((_ extract 20 20) |mem_rdata___#6|) #b1)
+                        |\\cpuregs[1]___#8|
+                        |\\cpuregs[0]___#8|))))
+  (let ((a!6 (ite (= ((_ extract 18 18) |mem_rdata___#6|) #b1)
+                  (ite (= ((_ extract 17 17) |mem_rdata___#6|) #b1) a!2 a!3)
+                  (ite (= ((_ extract 17 17) |mem_rdata___#6|) #b1) a!4 a!5)))
+        (a!11 (ite (= ((_ extract 18 18) |mem_rdata___#6|) #b1)
+                   (ite (= ((_ extract 17 17) |mem_rdata___#6|) #b1) a!7 a!8)
+                   (ite (= ((_ extract 17 17) |mem_rdata___#6|) #b1) a!9 a!10)))
+        (a!17 (ite (= ((_ extract 23 23) |mem_rdata___#6|) #b1)
+                   (ite (= ((_ extract 22 22) |mem_rdata___#6|) #b1) a!13 a!14)
+                   (ite (= ((_ extract 22 22) |mem_rdata___#6|) #b1) a!15 a!16)))
+        (a!22 (ite (= ((_ extract 23 23) |mem_rdata___#6|) #b1)
+                   (ite (= ((_ extract 22 22) |mem_rdata___#6|) #b1) a!18 a!19)
+                   (ite (= ((_ extract 22 22) |mem_rdata___#6|) #b1) a!20 a!21))))
+  (let ((a!12 ((_ extract 30 0)
+                (ite (= ((_ extract 19 19) |mem_rdata___#6|) #b1) a!6 a!11)))
+        (a!23 ((_ extract 30 0)
+                (ite (= ((_ extract 24 24) |mem_rdata___#6|) #b1) a!17 a!22))))
+  (let ((a!24 (bvadd (ite (= ((_ extract 19 15) |mem_rdata___#6|) #b00000)
+                          #b0000000000000000000000000000000
+                          a!12)
+                     (ite (= ((_ extract 24 20) |mem_rdata___#6|) #b00000)
+                          #b0000000000000000000000000000000
+                          a!23))))
+    (= |\\cpuregs[1]___#1007| (ite a!1 |\\cpuregs[1]___#8| (concat a!24 #b0))))))))
+)
+
+
+---------------------------- JAL
+
+(goals
+(goal
+  (let ((a!1 (ite (and (= ((_ extract 1 1) |reg_next_pc___#4|) #b0)
+                       (= ((_ extract 0 0) |reg_next_pc___#4|) #b0))
+                  #x40
+                  #x80)))
+  (let ((a!2 (ite (= a!1 #x20)
+                  #x10
+                  (ite (= a!1 #x40) a!1 (ite (= a!1 #x80) a!1 #x40)))))
+  (let ((a!3 (ite (= a!1 #x04)
+                  a!1
+                  (ite (= a!1 #x08) #x40 (ite (= a!1 #x10) #x08 a!2)))))
+  (let ((a!4 (ite (and (= ((_ extract 1 1) |reg_next_pc___#4|) #b0)
+                       (= ((_ extract 0 0) |reg_next_pc___#4|) #b0))
+                  a!3
+                  #x80)))
+  (let ((a!5 (ite (= a!4 #x40)
+                  (bvadd |reg_next_pc___#4|
+                         (concat ((_ extract 31 31) |mem_rdata___#2|)
+                                 ((_ extract 31 31) |mem_rdata___#2|)
+                                 ((_ extract 31 31) |mem_rdata___#2|)
+                                 ((_ extract 31 31) |mem_rdata___#2|)
+                                 ((_ extract 31 31) |mem_rdata___#2|)
+                                 ((_ extract 31 31) |mem_rdata___#2|)
+                                 ((_ extract 31 31) |mem_rdata___#2|)
+                                 ((_ extract 31 31) |mem_rdata___#2|)
+                                 ((_ extract 31 31) |mem_rdata___#2|)
+                                 ((_ extract 31 31) |mem_rdata___#2|)
+                                 ((_ extract 31 31) |mem_rdata___#2|)
+                                 ((_ extract 31 31) |mem_rdata___#2|)
+                                 ((_ extract 19 12) |mem_rdata___#2|)
+                                 ((_ extract 20 20) |mem_rdata___#2|)
+                                 ((_ extract 30 21) |mem_rdata___#2|)
+                                 #b0))
+                  |reg_next_pc___#4|)))
+    (= |reg_next_pc___#1003| a!5)))))))
+)
+
+---------------------------- BEQ(quivalent for aligned pc)
+(goals
+(goal
+  (let ((a!1 (ite (and (= ((_ extract 1 1) |reg_next_pc___#6|) #b0)
+                       (= ((_ extract 0 0) |reg_next_pc___#6|) #b0))
+                  #x40
+                  #x80))
+        (a!2 ((_ extract 31 1)
+               (bvadd |reg_next_pc___#6|
+                      (concat ((_ extract 31 31) |mem_rdata___#6|)
+                              ((_ extract 31 31) |mem_rdata___#6|)
+                              ((_ extract 31 31) |mem_rdata___#6|)
+                              ((_ extract 31 31) |mem_rdata___#6|)
+                              ((_ extract 31 31) |mem_rdata___#6|)
+                              ((_ extract 31 31) |mem_rdata___#6|)
+                              ((_ extract 31 31) |mem_rdata___#6|)
+                              ((_ extract 31 31) |mem_rdata___#6|)
+                              ((_ extract 31 31) |mem_rdata___#6|)
+                              ((_ extract 31 31) |mem_rdata___#6|)
+                              ((_ extract 31 31) |mem_rdata___#6|)
+                              ((_ extract 31 31) |mem_rdata___#6|)
+                              ((_ extract 31 31) |mem_rdata___#6|)
+                              ((_ extract 31 31) |mem_rdata___#6|)
+                              ((_ extract 31 31) |mem_rdata___#6|)
+                              ((_ extract 31 31) |mem_rdata___#6|)
+                              ((_ extract 31 31) |mem_rdata___#6|)
+                              ((_ extract 31 31) |mem_rdata___#6|)
+                              ((_ extract 31 31) |mem_rdata___#6|)
+                              ((_ extract 31 31) |mem_rdata___#6|)
+                              ((_ extract 7 7) |mem_rdata___#6|)
+                              ((_ extract 30 25) |mem_rdata___#6|)
+                              ((_ extract 11 8) |mem_rdata___#6|)
+                              #b0)))))
+  (let ((a!3 (ite (= |\\cpuregs[2]___#6| |\\cpuregs[1]___#6|)
+                  (concat a!2 #b0)
+                  (bvadd #x00000004
+                         (ite (= |\\cpuregs[2]___#6| |\\cpuregs[1]___#6|)
+                              (concat a!2 #b0)
+                              (bvadd #x00000004 |reg_next_pc___#6|))))))
+    (= |reg_next_pc___#1006|
+       (ite (= a!1 #x40) a!3 (bvadd #x00000004 |reg_next_pc___#6|))))))
+)
+
+
+------------------------------------ lb
+(goals
+(goal
+  (let ((a!1 (ite (and (= ((_ extract 1 1) |reg_next_pc___#6|) #b0)
+                       (= ((_ extract 0 0) |reg_next_pc___#6|) #b0))
+                  #x11
+                  #x80)))
+  (let ((a!2 (ite (= a!1 #x10)
+                  #x08
+                  (ite (= a!1 #x20) #x11 (ite (= a!1 #x40) #x20 a!1))))
+        (a!4 (and (not (= a!1 #x80))
+                  (not (= a!1 #x02))
+                  (not (= a!1 #x10))
+                  (not (= a!1 #x08))
+                  (not (= a!1 #x20))
+                  (= a!1 #x40)))
+        (a!6 (and (not (= a!1 #x80))
+                  (not (= a!1 #x08))
+                  (not (= a!1 #x10))
+                  (not (= a!1 #x40))))
+        (a!8 (= (ite (= a!1 #x04)
+                     #b00100
+                     (ite (= a!1 #x10)
+                          ((_ extract 4 0) |\\cpuregs[2]___#6|)
+                          #b01000))
+                #b00000))
+        (a!12 (ite (= a!1 #x08) #b00000 (ite (= a!1 #x40) #b00001 #b00000)))
+        (a!17 (not (and (not (= a!1 #x08)) (= a!1 #x40))))
+        (a!18 (ite (= a!1 #x08)
+                   |reg_next_pc___#6|
+                   (ite (= a!1 #x20)
+                        #x00000000
+                        (concat ((_ extract 7 7) |mem_rdata___#3|)
+                                ((_ extract 7 7) |mem_rdata___#3|)
+                                ((_ extract 7 7) |mem_rdata___#3|)
+                                ((_ extract 7 7) |mem_rdata___#3|)
+                                ((_ extract 7 7) |mem_rdata___#3|)
+                                ((_ extract 7 7) |mem_rdata___#3|)
+                                ((_ extract 7 7) |mem_rdata___#3|)
+                                ((_ extract 7 7) |mem_rdata___#3|)
+                                ((_ extract 7 7) |mem_rdata___#3|)
+                                ((_ extract 7 7) |mem_rdata___#3|)
+                                ((_ extract 7 7) |mem_rdata___#3|)
+                                ((_ extract 7 7) |mem_rdata___#3|)
+                                ((_ extract 7 7) |mem_rdata___#3|)
+                                ((_ extract 7 7) |mem_rdata___#3|)
+                                ((_ extract 7 7) |mem_rdata___#3|)
+                                ((_ extract 7 7) |mem_rdata___#3|)
+                                ((_ extract 7 7) |mem_rdata___#3|)
+                                ((_ extract 7 7) |mem_rdata___#3|)
+                                ((_ extract 7 7) |mem_rdata___#3|)
+                                ((_ extract 7 7) |mem_rdata___#3|)
+                                ((_ extract 7 7) |mem_rdata___#3|)
+                                ((_ extract 7 7) |mem_rdata___#3|)
+                                ((_ extract 7 7) |mem_rdata___#3|)
+                                ((_ extract 7 7) |mem_rdata___#3|)
+                                ((_ extract 7 0) |mem_rdata___#3|))))))
+  (let ((a!3 (ite (= a!1 #x04) a!1 (ite (= a!1 #x08) #x40 a!2)))
+        (a!7 (ite (= a!1 #x04)
+                  #b00
+                  (ite a!6
+                       (ite (= a!1 #x20)
+                            ((_ extract 1 0) |\\cpuregs[2]___#6|)
+                            #b00)
+                       #b00)))
+        (a!19 (ite (and (not (= a!1 #x80))
+                        (not (= a!1 #x02))
+                        (not (= a!1 #x10))
+                        (not (= a!1 #x40)))
+                   (ite (= a!1 #x04) #x00000000 a!18)
+                   #xccc8ccc8))
+        (a!22 (ite (= a!1 #x04)
+                   #x00000000
+                   (ite a!6
+                        (ite (= a!1 #x20) |\\cpuregs[2]___#6| #x00000000)
+                        #x00000000))))
+  (let ((a!5 (ite (and (not (= a!3 #x80)) (not (= a!3 #x02)) (not (= a!3 #x10)))
+                  (and (not (= a!3 #x08)) (ite (= a!3 #x20) a!4 (= a!3 #x40)))
+                  a!4))
+        (a!9 (ite (= a!3 #x40)
+                  a!3
+                  (ite (= a!3 #x80) a!3 (ite (= a!1 #x40) a!3 #x40))))
+        (a!13 (ite (= a!3 #x08) a!12 (ite (= a!3 #x40) #b00001 a!12)))
+        (a!14 (or (= a!3 #x40) (and (not (= a!1 #x08)) (= a!1 #x40))))
+        (a!20 (ite (or a!4 (not (= a!3 #x40)) (= a!12 #b00000) a!17)
+                   |\\cpuregs[1]___#6|
+                   (ite a!4 #xccccccc8 (ite (= a!1 #x08) #x00000000 a!19))))
+        (a!21 (or (= a!3 #x08) (and (not (= a!3 #x40)) (= a!1 #x08))))
+        (a!23 (ite (= a!3 #x08)
+                   (bvadd #x00000002
+                          (ite (= a!1 #x40)
+                               (bvadd #x00000004 |reg_next_pc___#6|)
+                               |reg_next_pc___#6|))
+                   (ite (= a!3 #x20)
+                        #x00000000
+                        (concat ((_ extract 7 7) |mem_rdata___#2|)
+                                ((_ extract 7 7) |mem_rdata___#2|)
+                                ((_ extract 7 7) |mem_rdata___#2|)
+                                ((_ extract 7 7) |mem_rdata___#2|)
+                                ((_ extract 7 7) |mem_rdata___#2|)
+                                ((_ extract 7 7) |mem_rdata___#2|)
+                                ((_ extract 7 7) |mem_rdata___#2|)
+                                ((_ extract 7 7) |mem_rdata___#2|)
+                                ((_ extract 7 7) |mem_rdata___#2|)
+                                ((_ extract 7 7) |mem_rdata___#2|)
+                                ((_ extract 7 7) |mem_rdata___#2|)
+                                ((_ extract 7 7) |mem_rdata___#2|)
+                                ((_ extract 7 7) |mem_rdata___#2|)
+                                ((_ extract 7 7) |mem_rdata___#2|)
+                                ((_ extract 7 7) |mem_rdata___#2|)
+                                ((_ extract 7 7) |mem_rdata___#2|)
+                                ((_ extract 7 7) |mem_rdata___#2|)
+                                ((_ extract 7 7) |mem_rdata___#2|)
+                                ((_ extract 7 7) |mem_rdata___#2|)
+                                ((_ extract 7 7) |mem_rdata___#2|)
+                                ((_ extract 7 7) |mem_rdata___#2|)
+                                ((_ extract 7 7) |mem_rdata___#2|)
+                                ((_ extract 7 7) |mem_rdata___#2|)
+                                ((_ extract 7 7) |mem_rdata___#2|)
+                                ((_ extract 7 0) |mem_rdata___#2|))))))
+  (let ((a!10 (ite (= a!3 #x08)
+                   #x40
+                   (ite (= a!3 #x10) #x08 (ite (= a!3 #x20) #x00 a!9))))
+        (a!15 (ite (= a!3 #x08) (and (not (= a!1 #x08)) (= a!1 #x40)) a!14))
+        (a!24 (ite (and (not (= a!3 #x80))
+                        (not (= a!3 #x02))
+                        (not (= a!3 #x10))
+                        (not (= a!3 #x40)))
+                   (ite (= a!3 #x04) (ite (= a!1 #x02) #x00000000 a!22) a!23)
+                   #xccc8ccc8)))
+  (let ((a!11 (ite (= (ite (= a!1 #x02) #b00 a!7) #b00)
+                   (ite (= a!3 #x04) (ite a!8 #x40 a!3) a!10)
+                   #x80)))
+  (let ((a!16 (or a!5
+                  (not (= a!11 #x40))
+                  (= a!13 #b00000)
+                  (not a!15)
+                  (not (= ((_ extract 1 1) a!13) #b0))
+                  (not (= ((_ extract 2 2) a!13) #b0))
+                  (not (= ((_ extract 3 3) a!13) #b0))
+                  (not (= ((_ extract 4 4) a!13) #b0)))))
+    (= |\\cpuregs[1]___#1006|
+       (ite a!16 a!20 (ite a!5 #xccccccc8 (ite a!21 #xccccccc8 a!24))))))))))))
+)
+

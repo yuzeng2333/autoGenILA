@@ -1,0 +1,1 @@
+1. update functions for load instructions of picoRISCV is hard because instructions and data are from the same input port: mem_rdata. Therefore, when unrolling, the value of mem_rdata depends on values of output ports, which should indicate whether cpu is asking for instructions or data.

@@ -1,0 +1,44 @@
+{
+  "models": { "ILA":"m0", "VERILOG": "m1" },
+  "state mapping": {
+      "cpuregs10": "cpuregs10",
+      "cpuregs11": "cpuregs11",
+      "cpuregs12": "cpuregs12",
+      "cpuregs13": "cpuregs13",
+      "cpuregs14": "cpuregs14",
+      "cpuregs15": "cpuregs15",
+      "cpuregs16": "cpuregs16",
+      "cpuregs17": "cpuregs17",
+      "cpuregs18": "cpuregs18",
+      "cpuregs19": "cpuregs19",
+      "cpuregs1": "cpuregs1",
+      "cpuregs20": "cpuregs20",
+      "cpuregs21": "cpuregs21",
+      "cpuregs22": "cpuregs22",
+      "cpuregs23": "cpuregs23",
+      "cpuregs24": "cpuregs24",
+      "cpuregs25": "cpuregs25",
+      "cpuregs26": "cpuregs26",
+      "cpuregs27": "cpuregs27",
+      "cpuregs28": "cpuregs28",
+      "cpuregs29": "cpuregs29",
+      "cpuregs2": "cpuregs2",
+      "cpuregs30": "cpuregs30",
+      "cpuregs31": "cpuregs31",
+      "cpuregs3": "cpuregs3",
+      "cpuregs4": "cpuregs4",
+      "cpuregs5": "cpuregs5",
+      "cpuregs6": "cpuregs6",
+      "cpuregs7": "cpuregs7",
+      "cpuregs8": "cpuregs8",
+      "cpuregs9": "cpuregs9",
+      "reg_next_pc": "reg_next_pc",
+      "reg_next_pc": "reg_next_pc"
+    },
+
+  "interface mapping": {
+      "clk":"**CLOCK**"
+  },
+  "mapping control": [
+   ]
+}
