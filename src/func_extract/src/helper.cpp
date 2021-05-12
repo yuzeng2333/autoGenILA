@@ -777,18 +777,12 @@ llvm::Value* extract_func(llvm::Value* in, uint32_t high, uint32_t low,
     auto retTy = llvm::IntegerType::get(*c, len);
     std::vector<llvm::Type *> argTy;  
     argTy.push_back(llvm::IntegerType::get(*c, inputWidth));
-    argTy.push_back(llvm::IntegerType::get(*c, inputWidth));
-    argTy.push_back(llvm::IntegerType::get(*c, inputWidth));
     FT = llvm::FunctionType::get(retTy, argTy, false);
     func = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
                                         funcName, TheModule.get());
     func->addFnAttr(llvm::Attribute::NoMerge);
     func->args().begin()->setName("input");
-    (func->args().begin()+1)->setName("high");
-    (func->args().begin()+2)->setName("low");
     llvm::Value* inArg   = value(func->args().begin()  );
-    llvm::Value* highArg = value(func->args().begin()+1);
-    llvm::Value* lowArg  = value(func->args().begin()+2);
 
     llvm::BasicBlock *localBB 
       = llvm::BasicBlock::Create(*c, "entry", func);
@@ -796,17 +790,14 @@ llvm::Value* extract_func(llvm::Value* in, uint32_t high, uint32_t low,
     std::shared_ptr<llvm::IRBuilder<>> builder;
     builder = std::make_unique<llvm::IRBuilder<>>(*c);
     builder->SetInsertPoint(localBB);
-    auto s1 = builder->CreateLShr(inArg, lowArg, llvm::Twine("lshr"));
-    auto length = builder->CreateSub(highArg, lowArg, llvm::Twine("extract_width"));
-    llvm::Value* ret = builder->CreateTrunc(s1, length->getType(), llvm::Twine("trunc"));
+    auto s1 = builder->CreateLShr(inArg, low, llvm::Twine("lshr"));
+    llvm::Value* ret = builder->CreateTrunc(s1, llvmWidth(len, c), llvm::Twine("trunc"));
     builder->CreateRet(ret);
     g_extractFunc.emplace(funcName, func);
   }
   
   std::vector<llvm::Value*> args;
   args.push_back(in);
-  args.push_back(llvmInt(high, inputWidth, c));
-  args.push_back(llvmInt(low, inputWidth, c));
   return b->CreateCall(FT, func, args, 
                        llvm::Twine(name.str()+" ["+toStr(high)+":"+toStr(low)+"]"));
 }
@@ -883,6 +874,10 @@ llvm::Value* concat_func(llvm::Value* val1, llvm::Value* val2,
     func->args().begin()->setName("val1");
     (func->args().begin()+1)->setName("val2");
 
+    llvm::Value* val1Arg = value(func->args().begin()  );
+    llvm::Value* val2Arg = value(func->args().begin()+1); 
+    assert(val1Arg->getType() == val1->getType());
+    assert(val2Arg->getType() == val2->getType());
 
     llvm::BasicBlock *localBB 
       = llvm::BasicBlock::Create(*c, "entry", func);
@@ -892,18 +887,14 @@ llvm::Value* concat_func(llvm::Value* val1, llvm::Value* val2,
     builder->SetInsertPoint(localBB);
 
     auto newIntTy = llvm::IntegerType::get(*c, len);
-    llvm::Value* longVal1 = builder->CreateZExtOrBitCast(val1, newIntTy);
+    llvm::Value* longVal1 = builder->CreateZExtOrBitCast(val1Arg, newIntTy);
 
     llvm::Value* ret = builder->CreateAdd(builder->CreateShl(longVal1, val2Width), 
-                                                       zext(val2, len, c, builder));
+                                                       zext(val2Arg, len, c, builder));
     builder->CreateRet(ret);
     g_concatFunc.emplace(funcName, func);
   }
 
-  llvm::Value* val1Arg = value(func->args().begin()  );
-  llvm::Value* val2Arg = value(func->args().begin()+1); 
-  assert(val1Arg->getType() == val1->getType());
-  assert(val2Arg->getType() == val2->getType());
   std::vector<llvm::Value*> args;
   args.push_back(val1);
   args.push_back(val2);
