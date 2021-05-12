@@ -894,7 +894,7 @@ llvm::Value* concat_func(llvm::Value* val1, llvm::Value* val2,
     auto newIntTy = llvm::IntegerType::get(*c, len);
     llvm::Value* longVal1 = builder->CreateZExtOrBitCast(val1, newIntTy);
 
-    llvm::Value* ret = builder->CreateAdd(b->CreateShl(longVal1, val2Width), 
+    llvm::Value* ret = builder->CreateAdd(builder->CreateShl(longVal1, val2Width), 
                                                        zext(val2, len, c, builder));
     builder->CreateRet(ret);
     g_concatFunc.emplace(funcName, func);
