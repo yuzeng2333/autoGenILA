@@ -181,6 +181,17 @@ llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low,
                       std::shared_ptr<llvm::LLVMContext> &c, 
                       std::shared_ptr<llvm::IRBuilder<>> &b);
 
+llvm::Value* extract_func(llvm::Value* in, uint32_t high, uint32_t low, 
+                      std::shared_ptr<llvm::LLVMContext> &c, 
+                      std::shared_ptr<llvm::IRBuilder<>> &b, 
+                      const std::string &name);
+
+llvm::Value* extract_func(llvm::Value* in, uint32_t high, uint32_t low,
+                      std::shared_ptr<llvm::LLVMContext> &c, 
+                      std::shared_ptr<llvm::IRBuilder<>> &b, 
+                      const llvm::Twine &name="");
+
+
 llvm::Value* extract(llvm::Value* in, uint32_t high, uint32_t low, 
                       std::shared_ptr<llvm::LLVMContext> &c, 
                       std::shared_ptr<llvm::IRBuilder<>> &b,
@@ -196,6 +207,10 @@ llvm::Value* extract(llvm::Value* in, uint32_t high, uint32_t low,
 llvm::Value* concat_value(llvm::Value* val1, llvm::Value* val2, 
                           std::shared_ptr<llvm::LLVMContext> &c,
                           std::shared_ptr<llvm::IRBuilder<>> &b);
+
+llvm::Value* concat_func(llvm::Value* val1, llvm::Value* val2, 
+                         std::shared_ptr<llvm::LLVMContext> &c,
+                         std::shared_ptr<llvm::IRBuilder<>> &b);
 
 bool is_x(const std::string &var);
 

@@ -110,10 +110,10 @@ struct ModuleInfo_t {
 
 
 extern std::ofstream g_outFile;
-extern std::unordered_map<astNode*, uint32_t> CLEAN_QUEUE;
-extern std::unordered_map<astNode*, uint32_t> DIRTY_QUEUE;
-extern std::unordered_map<std::string, expr*> INPUT_EXPR_VAL;
-extern std::unordered_map<std::string, expr*> TIMED_VAR2EXPR;
+extern std::map<astNode*, uint32_t> CLEAN_QUEUE;
+extern std::map<astNode*, uint32_t> DIRTY_QUEUE;
+extern std::map<std::string, expr*> INPUT_EXPR_VAL;
+extern std::map<std::string, expr*> TIMED_VAR2EXPR;
 extern std::set<std::string> INT_EXPR_SET;
 
 extern std::vector<struct InstrInfo_t> g_instrInfo;
@@ -129,15 +129,17 @@ extern std::string g_rootNode;
 extern struct InstrInfo_t g_currInstrInfo;
 extern std::unordered_map<std::string, std::string> g_nopInstr;
 extern std::map<std::string, std::string> g_rstVal;
-extern std::unordered_map<std::string, std::string> g_nameVarMap;
-extern std::unordered_map<std::string, std::string> g_varRstValMap;
-extern std::unordered_map<std::string, 
+extern std::map<std::string, std::string> g_nameVarMap;
+extern std::map<std::string, std::string> g_varRstValMap;
+extern std::map<std::string, 
                           std::unordered_map<std::string, 
                                              std::string>> g_wire2ModulePort;
-extern std::unordered_map<std::string, std::string> g_ins2modMap;
-extern std::unordered_map<std::string, uint32_t> g_moduleInportTime;
-extern std::unordered_map<std::string, uint32_t> g_moduleOutportTime;
+extern std::map<std::string, std::string> g_ins2modMap;
+extern std::map<std::string, uint32_t> g_moduleInportTime;
+extern std::map<std::string, uint32_t> g_moduleOutportTime;
 extern std::map<std::string, llvm::Function::arg_iterator> g_topFuncArgMp;
+extern std::map<std::string, llvm::Function*> g_extractFunc;
+extern std::map<std::string, llvm::Function*> g_concatFunc;
 
 extern Str2StrVecMap_t g_moduleInputsMap;
 extern Str2StrVecMap_t g_moduleOutputsMap;

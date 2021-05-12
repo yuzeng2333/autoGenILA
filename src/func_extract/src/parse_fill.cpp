@@ -29,12 +29,12 @@ std::vector<struct InstrInfo_t> g_instrInfo;
 std::unordered_map<std::string, std::string> g_nopInstr;
 std::map<std::string, std::string> g_rstVal;
 // first key is instance name, second key is wire name
-std::unordered_map<std::string, 
-                   std::unordered_map<std::string, 
-                                      std::string>> g_wire2ModulePort;
-std::unordered_map<std::string, std::string> g_ins2modMap;
-std::unordered_map<std::string, uint32_t> g_moduleOutportTime;
-std::unordered_map<std::string, uint32_t> g_moduleInportTime;
+std::map<std::string, 
+         std::unordered_map<std::string, 
+                            std::string>> g_wire2ModulePort;
+std::map<std::string, std::string> g_ins2modMap;
+std::map<std::string, uint32_t> g_moduleOutportTime;
+std::map<std::string, uint32_t> g_moduleInportTime;
 Str2StrVecMap_t g_moduleInputsMap;
 Str2StrVecMap_t g_moduleOutputsMap;
 //VarWidth g_varWidth;

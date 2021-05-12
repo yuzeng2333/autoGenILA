@@ -25,13 +25,15 @@ uint32_t bound_limit;
 std::regex pTimed("^(\\S+)"+DELIM+"(\\d+)$");
 std::string CURRENT_VAR;
 // CLEAN_QUEUE includes: input, not-current AS and num
-std::unordered_map<astNode*, uint32_t> CLEAN_QUEUE;
-std::unordered_map<astNode*, uint32_t> DIRTY_QUEUE;
+std::map<astNode*, uint32_t> CLEAN_QUEUE;
+std::map<astNode*, uint32_t> DIRTY_QUEUE;
 // DIRTY_QUEUE is mainly not-current AS
 
-std::unordered_map<std::string, expr*> INPUT_EXPR_VAL;
-std::unordered_map<std::string, expr*> TIMED_VAR2EXPR;
+std::map<std::string, expr*> INPUT_EXPR_VAL;
+std::map<std::string, expr*> TIMED_VAR2EXPR;
 std::map<std::string, llvm::Function::arg_iterator> g_topFuncArgMp;
+std::map<std::string, llvm::Function*> g_extractFunc;
+std::map<std::string, llvm::Function*> g_concatFunc;
 std::set<std::string> g_resetedReg;
 std::set<std::string> g_regWithFunc;
 std::vector<std::pair<std::string, 
@@ -575,7 +577,7 @@ llvm::Value* add_constraint(std::string varAndSlice, uint32_t timeIdx, context &
         ret = tmpSlice;
       }
       else {
-        ret = concat_value(ret, tmpSlice, c, b);
+        ret = concat_func(ret, tmpSlice, c, b);
       }
     }
     return ret;

@@ -6,7 +6,7 @@ using namespace taintGen;
 
 namespace funcExtract {
 
-std::unordered_map<std::string, std::string> g_nameVarMap;
+std::map<std::string, std::string> g_nameVarMap;
 
 /// This function does not deal with hierarchial designs(with multiple scopes)
 void vcd_parser(std::string fileName) {

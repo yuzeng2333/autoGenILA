@@ -6,6 +6,8 @@
 
 #define context std::shared_ptr<llvm::LLVMContext>
 #define toStr(a) std::to_string(a)
+#define value(a) llvm::dyn_cast<llvm::Value>(a)
+#define instr(a) llvm::dyn_cast<llvm::Instruction>(a)
 //#define llvmWidth(a, c) llvm::IntegerType::get(c, a)
 //#define llvmInt(b, a, c) llvm::ConstantInt::get(llvmWidth(a, c), b, false)
 
@@ -715,9 +717,9 @@ llvm::Value* get_arg(std::string regName, llvm::Function *func) {
   if(regName.find("es_top_0.mem_data_buf") != std::string::npos)
     toCout("Find the arg!");
   for(auto it = func->arg_begin(); it != func->arg_end(); it++) {
-    std::string funcNane = llvm::dyn_cast<llvm::Value>(func)->getName().str();
+    std::string funcName = llvm::dyn_cast<llvm::Value>(func)->getName().str();
     std::string argName = it->getName().str();
-    //toCout("func name: "+funcNane);
+    //toCout("func name: "+funcName);
     //toCout("arg name: "+argName);
     if(argName.find("ata_fifo.r0___#25") != std::string::npos)
       toCout("Find it!!");
@@ -743,6 +745,70 @@ llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low,
   llvm::Value* mask = b->CreateShl(s2, low);
   //mask->print(llvm::errs());
   return b->CreateAnd(in, mask);
+}
+
+
+llvm::Value* extract_func(llvm::Value* in, uint32_t high, uint32_t low, 
+                      std::shared_ptr<llvm::LLVMContext> &c, 
+                      std::shared_ptr<llvm::IRBuilder<>> &b, 
+                      const std::string &name) {
+
+  return extract_func(in, high, low, c, b, llvm::Twine(name));
+}
+
+
+llvm::Value* extract_func(llvm::Value* in, uint32_t high, uint32_t low,
+                      std::shared_ptr<llvm::LLVMContext> &c, 
+                      std::shared_ptr<llvm::IRBuilder<>> &b, 
+                      const llvm::Twine &name) {
+  std::string destName = in->getName().str();
+  toCoutVerb("extract for: "+destName);  
+  llvm::Type* inputTy = in->getType();
+  uint32_t inputWidth = llvm::dyn_cast<llvm::IntegerType>(inputTy)->getBitWidth();
+  std::string funcName = "extract_"+toStr(inputWidth)+"_"+toStr(high)+"_"+toStr(low);
+  llvm::Function *func;
+  llvm::FunctionType *FT;  
+  uint32_t len = high-low+1;
+  if(g_extractFunc.find(funcName) != g_extractFunc.end()) {
+    func = g_extractFunc[funcName];
+    FT = func->getFunctionType();
+  }
+  else {
+    auto retTy = llvm::IntegerType::get(*c, len);
+    std::vector<llvm::Type *> argTy;  
+    argTy.push_back(llvm::IntegerType::get(*c, inputWidth));
+    argTy.push_back(llvm::IntegerType::get(*c, inputWidth));
+    argTy.push_back(llvm::IntegerType::get(*c, inputWidth));
+    FT = llvm::FunctionType::get(retTy, argTy, false);
+    func = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
+                                        funcName, TheModule.get());
+    func->addFnAttr(llvm::Attribute::NoMerge);
+    func->args().begin()->setName("input");
+    (func->args().begin()+1)->setName("high");
+    (func->args().begin()+2)->setName("low");
+    llvm::Value* inArg   = value(func->args().begin()  );
+    llvm::Value* highArg = value(func->args().begin()+1);
+    llvm::Value* lowArg  = value(func->args().begin()+2);
+
+    llvm::BasicBlock *localBB 
+      = llvm::BasicBlock::Create(*c, "entry", func);
+
+    std::shared_ptr<llvm::IRBuilder<>> builder;
+    builder = std::make_unique<llvm::IRBuilder<>>(*c);
+    builder->SetInsertPoint(localBB);
+    auto s1 = builder->CreateLShr(inArg, lowArg, llvm::Twine("lshr"));
+    auto length = builder->CreateSub(highArg, lowArg, llvm::Twine("extract_width"));
+    llvm::Value* ret = builder->CreateTrunc(s1, length->getType(), llvm::Twine("trunc"));
+    builder->CreateRet(ret);
+    g_extractFunc.emplace(funcName, func);
+  }
+  
+  std::vector<llvm::Value*> args;
+  args.push_back(in);
+  args.push_back(llvmInt(high, inputWidth, c));
+  args.push_back(llvmInt(low, inputWidth, c));
+  return b->CreateCall(FT, func, args, 
+                       llvm::Twine(name.str()+" ["+toStr(high)+":"+toStr(low)+"]"));
 }
 
 
@@ -780,6 +846,68 @@ llvm::Value* extract(llvm::Value* in, uint32_t high, uint32_t low,
                       const std::string &name) {
 
   return extract(in, high, low, c, b, llvm::Twine(name));
+}
+
+
+llvm::Value* concat_func(llvm::Value* val1, llvm::Value* val2, 
+                         std::shared_ptr<llvm::LLVMContext> &c,
+                         std::shared_ptr<llvm::IRBuilder<>> &b) {
+  std::string name1 = val1->getName().str();
+  std::string name2 = val2->getName().str();
+  toCoutVerb("concat with "+name1+" and "+name2);
+  llvm::Type* val1Ty = val1->getType();
+  llvm::Type* val2Ty = val2->getType();
+  uint32_t val1Width = llvm::dyn_cast<llvm::IntegerType>(val1Ty)->getBitWidth();
+  uint32_t val2Width = llvm::dyn_cast<llvm::IntegerType>(val2Ty)->getBitWidth();
+  std::string funcName = "concat_"+toStr(val1Width)+"_"+toStr(val2Width);
+  llvm::Function *func;
+  llvm::FunctionType *FT;  
+  uint32_t len = val1Width + val2Width;
+  if(g_concatFunc.find(funcName) != g_concatFunc.end()) {
+    func = g_concatFunc[funcName];
+    FT = func->getFunctionType();    
+  }
+  else {
+    auto retTy = llvm::IntegerType::get(*c, len);
+    std::vector<llvm::Type*> argTy;
+    llvm::Type* ty1 = llvm::IntegerType::get(*c, val1Width);
+    llvm::Type* ty2 = llvm::IntegerType::get(*c, val2Width);
+    assert(ty1 == val1->getType());
+    assert(ty2 == val2->getType());
+    argTy.push_back(ty1);
+    argTy.push_back(ty2);
+    FT = llvm::FunctionType::get(retTy, argTy, false);
+    func = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
+                                        funcName, TheModule.get());
+    func->addFnAttr(llvm::Attribute::NoMerge);
+    func->args().begin()->setName("val1");
+    (func->args().begin()+1)->setName("val2");
+
+
+    llvm::BasicBlock *localBB 
+      = llvm::BasicBlock::Create(*c, "entry", func);
+
+    std::shared_ptr<llvm::IRBuilder<>> builder;
+    builder = std::make_unique<llvm::IRBuilder<>>(*c);
+    builder->SetInsertPoint(localBB);
+
+    auto newIntTy = llvm::IntegerType::get(*c, len);
+    llvm::Value* longVal1 = builder->CreateZExtOrBitCast(val1, newIntTy);
+
+    llvm::Value* ret = builder->CreateAdd(b->CreateShl(longVal1, val2Width), 
+                                                       zext(val2, len, c, builder));
+    builder->CreateRet(ret);
+    g_concatFunc.emplace(funcName, func);
+  }
+
+  llvm::Value* val1Arg = value(func->args().begin()  );
+  llvm::Value* val2Arg = value(func->args().begin()+1); 
+  assert(val1Arg->getType() == val1->getType());
+  assert(val2Arg->getType() == val2->getType());
+  std::vector<llvm::Value*> args;
+  args.push_back(val1);
+  args.push_back(val2);
+  return b->CreateCall(FT, func, args, llvm::Twine("concat_"+name1+"_"+name2));
 }
 
 

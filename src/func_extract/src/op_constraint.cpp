@@ -20,7 +20,7 @@
 //  The main principle of making llvm::Value*/constraints
 //  1. If destAndSlice is directly assigned, the returned llvm::Value* should just 
 //      correspond to destAndSlice. The other way(which I do not choose) is:
-//      return llvm::Value* for dest, and then use destExpr.extract(hi, lo) as llvm::Value* 
+//      return llvm::Value* for dest, and then use destExpr.extract_func(hi, lo) as llvm::Value* 
 //      for destAndSlice. This is because the former one is easier to implement
 //      with the AST I use
 //  2. If llvm::Value* of dest is to be derived, which dest itself does not have direct
@@ -122,7 +122,7 @@ llvm::Value* var_expr(std::string varAndSlice, uint32_t timeIdx, context &c,
   //  }
   //  assert(timeIdx == g_maxDelay + 1);    
   //  llvm::Value* ret = get_arg(var);
-  //  return extract(ret, hi, lo, c, Builder, llvm::Twine(varTimed));
+  //  return extract_func(ret, hi, lo, c, Builder, llvm::Twine(varTimed));
   //}
   //else {
   //  if(isTaint)
@@ -322,7 +322,7 @@ llvm::Value* mixed_value_expr(std::string value, context &c, std::string varName
     std::string widthStr = value.substr(0, primePos);
     remove_two_end_space(widthStr);
     uint32_t localWidth = std::stoi(widthStr);
-    return concat_value(single_expr(value.substr(0, pos), c, varName, timeIdx, idx, b), 
+    return concat_func(single_expr(value.substr(0, pos), c, varName, timeIdx, idx, b), 
                         mixed_value_expr(value.substr(pos+1), c, varName, timeIdx, idx-localWidth, b), 
                         c, b);
   }
@@ -340,8 +340,8 @@ llvm::Value* single_expr(std::string value, context &c, std::string varName,
     std::string varTimed = varName + DELIM + toStr(timeIdx);
     assert(is_input(varName));
     llvm::Value* val = get_arg(varTimed);
-    return extract(val, idx, idx-localWidth+1, c, b, llvm::Twine(varTimed));
-    //return c.bv_const((varTimed).c_str(), totalWidth).extract(idx, idx-localWidth+1);
+    return extract_func(val, idx, idx-localWidth+1, c, b, llvm::Twine(varTimed));
+    //return c.bv_const((varTimed).c_str(), totalWidth).extract_func(idx, idx-localWidth+1);
   }
   else if(is_number(value)) {
     uint32_t pos = value.find("'");
@@ -420,7 +420,7 @@ llvm::Value* two_op_constraint(astNode* const node, uint32_t timeIdx, context &c
     if(op1Slice.empty() || has_direct_assignment(op1AndSlice))
       op1Expr = tmpExpr;
     else
-      op1Expr = extract(tmpExpr, op1Hi, op1Lo, c, b, op1AndSlice);
+      op1Expr = extract_func(tmpExpr, op1Hi, op1Lo, c, b, op1AndSlice);
   }
   else
     op1Expr = var_expr(op1AndSlice, timeIdx, c, b, false, op1WidthNum);
@@ -431,7 +431,7 @@ llvm::Value* two_op_constraint(astNode* const node, uint32_t timeIdx, context &c
     if(op2Slice.empty() || has_direct_assignment(op2AndSlice))
       op2Expr = tmpExpr;
     else
-      op2Expr = extract(tmpExpr, op2Hi, op2Lo, c, b, op2AndSlice);
+      op2Expr = extract_func(tmpExpr, op2Hi, op2Lo, c, b, op2AndSlice);
   }
   else
     op2Expr = var_expr(op2AndSlice, timeIdx, c, b, false, op2WidthNum);
@@ -475,7 +475,7 @@ llvm::Value* one_op_constraint(astNode* const node, uint32_t timeIdx,
   if(op1Slice.empty() || has_direct_assignment(op1AndSlice))
     op1Expr = tmpExpr;
   else
-    op1Expr = extract(tmpExpr, op1Hi, op1Lo, c, b, op1AndSlice);
+    op1Expr = extract_func(tmpExpr, op1Hi, op1Lo, c, b, op1AndSlice);
 
   std::string destTimed = timed_name(destAndSlice, timeIdx);
   return make_llvm_instr(b, c, node->op, op1Expr, op1WidthNum, llvm::Twine(destTimed));
@@ -504,7 +504,7 @@ llvm::Value* reduce_one_op_constraint(astNode* const node, uint32_t timeIdx,
   if(op1Slice.empty() || has_direct_assignment(op1AndSlice))
     op1Expr = add_constraint(node->childVec[0], timeIdx, c, b, bound);
   else
-    op1Expr = extract(add_constraint(node->childVec[0], timeIdx, c, b, bound), op1Hi, op1Lo, c, b, op1AndSlice);
+    op1Expr = extract_func(add_constraint(node->childVec[0], timeIdx, c, b, bound), op1Hi, op1Lo, c, b, op1AndSlice);
 
   std::string destTimed = timed_name(destAndSlice, timeIdx);
   return make_llvm_instr(b, c, node->op, op1Expr, op1WidthNum, llvm::Twine(destTimed));  
@@ -525,7 +525,7 @@ llvm::Value* sel5_op_constraint(astNode* const node, uint32_t timeIdx,
 
   llvm::Value* opExpr = add_constraint(node->childVec[0], timeIdx, c, b, bound);
 
-  return extract(opExpr, int1, int2, c, b, destAndSlice);
+  return extract_func(opExpr, int1, int2, c, b, destAndSlice);
 }
 
 
@@ -589,7 +589,7 @@ llvm::Value* sel_op_constraint(astNode* const node, uint32_t timeIdx,
   llvm::Value* op1Expr;
   llvm::Value* op2Expr;
   if(!op1IsNum)
-    if(!op1Slice.empty()) op1Expr = extract(add_constraint(node->childVec[0], timeIdx, c, b, bound), 
+    if(!op1Slice.empty()) op1Expr = extract_func(add_constraint(node->childVec[0], timeIdx, c, b, bound), 
                                             op1Hi, op1Lo, c, b, op1AndSlice);
     else                  op1Expr = add_constraint(node->childVec[0], timeIdx, c, b, bound);
   else
@@ -601,7 +601,7 @@ llvm::Value* sel_op_constraint(astNode* const node, uint32_t timeIdx,
     if(op2Slice.empty() || has_direct_assignment(op2AndSlice)) 
       op2Expr = add_constraint(node->childVec[1], timeIdx, c, b, bound);
     else
-      op2Expr = extract(add_constraint(node->childVec[1], timeIdx, c, b, bound), 
+      op2Expr = extract_func(add_constraint(node->childVec[1], timeIdx, c, b, bound), 
                         op2Hi, op2Lo, c, b, op2AndSlice);
   else
     op2Expr = var_expr(op2AndSlice, timeIdx, c, b, false, op1WidthNum);
@@ -619,8 +619,8 @@ llvm::Value* sel_op_constraint(astNode* const node, uint32_t timeIdx,
   auto tmp = make_llvm_instr(b, c, ">>", op1Expr, op2Expr,
                              maxOpWidth, op1WidthNum, op2WidthNum, 
                              op1AndSlice+"_lshr_"+op2AndSlice+DELIM+toStr(timeIdx));
-  return extract(tmp, upBound, 0, c, b, destAndSlice);
-  //return extract(b->CreateLShr(op1Expr, op2Expr), upBound, 0, c, b, destAndSlice);
+  return extract_func(tmp, upBound, 0, c, b, destAndSlice);
+  //return extract_func(b->CreateLShr(op1Expr, op2Expr), upBound, 0, c, b, destAndSlice);
 }
 
 
@@ -632,6 +632,8 @@ llvm::Value* src_concat_op_constraint(astNode* const node, uint32_t timeIdx,
   toCoutVerb("Src concat op constraint for: "+node->dest);
   std::shared_ptr<ModuleInfo_t> thisMod = g_curMod;
   std::string destAndSlice = node->dest;
+  if(destAndSlice == "fangyuan3")
+    toCoutVerb("Find it");
   std::string dest, destSlice;
   split_slice(destAndSlice, dest, destSlice);
   uint32_t destHi = get_lgc_hi(destAndSlice);
@@ -664,7 +666,7 @@ llvm::Value* add_one_concat_expr(astNode* const node, uint32_t nxtIdx, uint32_t 
   if(varSlice.empty() || has_direct_assignment(varAndSlice))
     firstSrcExpr = add_constraint(node->childVec[nxtIdx], timeIdx, c, b, bound);
   else
-    firstSrcExpr = extract(add_constraint(node->childVec[nxtIdx], timeIdx, c, b, bound), hi, lo, c, b, varAndSlice);
+    firstSrcExpr = extract_func(add_constraint(node->childVec[nxtIdx], timeIdx, c, b, bound), hi, lo, c, b, varAndSlice);
 
   g_curMod = thisMod;
 
@@ -672,7 +674,9 @@ llvm::Value* add_one_concat_expr(astNode* const node, uint32_t nxtIdx, uint32_t 
     retExpr = firstSrcExpr;
   else {
     llvm::Value* restConcatExpr = add_one_concat_expr(node, nxtIdx+1, timeIdx, c, b, bound);
-    retExpr = concat_value(firstSrcExpr, restConcatExpr, c, b);
+    auto ty = restConcatExpr->getType();
+    auto width = llvm::dyn_cast<llvm::IntegerType>(ty)->getBitWidth();
+    retExpr = concat_func(firstSrcExpr, restConcatExpr, c, b);
   }
   toCoutVerb("Finished idx: "+toStr(nxtIdx)+" for: "+node->dest);
   if(node->dest == "fangyuan27" && nxtIdx == 1) {
@@ -765,7 +769,7 @@ llvm::Value* ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c
   if(condSlice.empty() || has_direct_assignment(condAndSlice))
     condExpr = tmpExpr;
   else
-    condExpr = extract(tmpExpr, condHi, condLo, c, b, condAndSlice);
+    condExpr = extract_func(tmpExpr, condHi, condLo, c, b, condAndSlice);
 
   llvm::Value* iteCond = b->CreateICmpEQ(condExpr, llvmInt(1, 1, c));
 
@@ -774,7 +778,7 @@ llvm::Value* ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c
   // code gen for then block
   llvm::Value* op1Expr;
   if(!op1Slice.empty()) 
-    op1Expr = extract(add_constraint(node->childVec[1], timeIdx, c, b, bound), op1Hi, op1Lo, c, b, op1AndSlice);
+    op1Expr = extract_func(add_constraint(node->childVec[1], timeIdx, c, b, bound), op1Hi, op1Lo, c, b, op1AndSlice);
   else
     op1Expr = add_constraint(node->childVec[1], timeIdx, c, b, bound);
   g_curMod = thisMod;
@@ -782,7 +786,7 @@ llvm::Value* ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c
   // codegen for else block
   llvm::Value* op2Expr;
   if(!op2Slice.empty()) 
-    op2Expr = extract(add_constraint(node->childVec[2], timeIdx, c, b, bound), op2Hi, op2Lo, c, b, op2AndSlice);
+    op2Expr = extract_func(add_constraint(node->childVec[2], timeIdx, c, b, bound), op2Hi, op2Lo, c, b, op2AndSlice);
   else
     op2Expr = add_constraint(node->childVec[2], timeIdx, c, b, bound);
   g_curMod = thisMod;
@@ -820,7 +824,7 @@ llvm::Value* ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c
 //  if(caseVarSlice.empty() || has_direct_assignment(caseVarAndSlice))
 //    caseExpr = add_constraint( node->childVec[0], timeIdx, c, b, bound);    
 //  else
-//    caseExpr = extract(add_constraint( node->childVec[0], timeIdx, c, b, bound), caseHi, caseLo, c, b);
+//    caseExpr = extract_func(add_constraint( node->childVec[0], timeIdx, c, b, bound), caseHi, caseLo, c, b);
 //
 //  uint32_t branchNum = (node->srcVec.size() - 1) / 2; 
 //  llvm::BasicBlock *defaultBB = llvm::BasicBlock::Create(*c, destAndSlice+"_;_default", TheFunction);  
@@ -849,7 +853,7 @@ llvm::Value* ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c
 //      std::string caseValueStr = node->srcVec[idx];
 //      uint32_t posOfOne = get_pos_of_one(caseValueStr);
 //      // case value
-//      caseValue = b->CreateICmpEQ(extract(caseExpr, posOfOne, posOfOne, c, b), llvmInt(1, 1, c));
+//      caseValue = b->CreateICmpEQ(extract_func(caseExpr, posOfOne, posOfOne, c, b), llvmInt(1, 1, c));
 //
 //      Builder->SetInsertPoint(caseBB);
 //      if(isNum(assignVarAndSlice)) {
@@ -859,7 +863,7 @@ llvm::Value* ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c
 //      else {
 //        tmp = add_constraint(assignNode, timeIdx, c, b, bound);
 //        //tmp->print(llvm::errs());        
-//        caseRet = extract(tmp, hi, lo, c, b);
+//        caseRet = extract_func(tmp, hi, lo, c, b);
 //        toCout(" 2 Add case ret: "+assignVarAndSlice+", hi: "+toStr(hi)+", lo: "+toStr(lo));
 //        //caseRet->print(llvm::errs());        
 //      }
@@ -876,7 +880,7 @@ llvm::Value* ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c
 //        //caseRet->print(llvm::errs());        
 //      }
 //      else {
-//        caseRet = extract(add_constraint(assignNode, timeIdx, c, b, bound), hi, lo, c, b);
+//        caseRet = extract_func(add_constraint(assignNode, timeIdx, c, b, bound), hi, lo, c, b);
 //        toCout(" 4 Add case ret: "+assignVarAndSlice+", hi: "+toStr(hi)+", lo: "+toStr(lo));
 //      }
 //      b->CreateBr(mergeBB);
@@ -922,13 +926,13 @@ llvm::Value* case_constraint(astNode* const node, uint32_t timeIdx,
   if(caseVarSlice.empty() || has_direct_assignment(caseVarAndSlice))
     caseVarExpr = add_constraint( node->childVec[0], timeIdx, c, b, bound);    
   else
-    caseVarExpr = extract(add_constraint( node->childVec[0], timeIdx, c, b, bound), 
+    caseVarExpr = extract_func(add_constraint( node->childVec[0], timeIdx, c, b, bound), 
                                           caseHi, caseLo, c, b);
   g_curMod = thisMod;
 
   std::string caseValueStr = node->srcVec[1];
   uint32_t posOfOne = get_pos_of_one(caseValueStr);
-  llvm::Value* iteCond = b->CreateICmpEQ(extract(caseVarExpr, posOfOne, posOfOne, c, b), 
+  llvm::Value* iteCond = b->CreateICmpEQ(extract_func(caseVarExpr, posOfOne, posOfOne, c, b), 
                                          llvmInt(1, 1, c), 
                                          llvm::Twine( timed_name(destAndSlice+"_;_case"+toStr(posOfOne), timeIdx) ));
 
@@ -944,7 +948,7 @@ llvm::Value* case_constraint(astNode* const node, uint32_t timeIdx,
   }
   else {
     llvm::Value* tmp = add_constraint(node->childVec[1], timeIdx, c, b, bound);
-    thenRet = extract(tmp, hi, lo, c, b, timed_name(destAndSlice+"_;_then0", timeIdx));
+    thenRet = extract_func(tmp, hi, lo, c, b, timed_name(destAndSlice+"_;_then0", timeIdx));
   }
   g_curMod = thisMod;
   llvm::Value* elseRet = add_one_case_branch_expr(node, caseVarExpr, 3, timeIdx, 
@@ -975,7 +979,7 @@ llvm::Value* add_one_case_branch_expr(astNode* const node, llvm::Value* &caseVar
     uint32_t posOfOne = get_pos_of_one(caseValueStr);
     // case value
     llvm::Value* iteCond = b->CreateICmpEQ(
-                             extract(caseVarExpr, posOfOne, posOfOne, c, b), 
+                             extract_func(caseVarExpr, posOfOne, posOfOne, c, b), 
                              llvmInt(1, 1, c),
                              llvm::Twine( timed_name(dest+"_;_case"+toStr(posOfOne), timeIdx) )
                            );
@@ -987,7 +991,7 @@ llvm::Value* add_one_case_branch_expr(astNode* const node, llvm::Value* &caseVar
     else {
       auto tmp = add_constraint(assignNode, timeIdx, c, b, bound);
       g_curMod = thisMod;      
-      thenRet = extract(tmp, hi, lo, c, b, timed_name( dest+"_;_then"+toStr(posOfOne), timeIdx ));
+      thenRet = extract_func(tmp, hi, lo, c, b, timed_name( dest+"_;_then"+toStr(posOfOne), timeIdx ));
     }
 
     llvm::Value* elseRet = add_one_case_branch_expr(node, caseVarExpr, idx+2, 
@@ -1002,7 +1006,7 @@ llvm::Value* add_one_case_branch_expr(astNode* const node, llvm::Value* &caseVar
     if(isNum(assignVarAndSlice))
       elseRet = var_expr(assignVarAndSlice, timeIdx, c, b, false);
     else {
-      elseRet = extract(add_constraint(assignNode, timeIdx, c, b, bound),
+      elseRet = extract_func(add_constraint(assignNode, timeIdx, c, b, bound),
                         hi, lo, c, b, timed_name(dest+"_;_default", timeIdx));
       g_curMod = thisMod;      
     }
@@ -1055,7 +1059,7 @@ llvm::Value* add_one_case_branch_expr(astNode* const node, llvm::Value* &caseVar
 //      g_moduleInportTime.emplace(var, timeIdx+delay);
 //      uint32_t op1Hi = get_lgc_hi(var);
 //      uint32_t op1Lo = get_lgc_lo(var);
-//      llvm::Value* localExpr = add_constraint(node->childVec[i++], timeIdx+delay, c, s, g, bound, isSolve).extract(op1Hi, op1Lo);
+//      llvm::Value* localExpr = add_constraint(node->childVec[i++], timeIdx+delay, c, s, g, bound, isSolve).extract_func(op1Hi, op1Lo);
 //      llvm::Value*Vec.push_back(localExpr);
 //    }
 //    return subModule(llvm::Value*Vec);
@@ -1153,7 +1157,7 @@ llvm::Value* bbMod_constraint(astNode* const node, uint32_t timeIdx, context &c,
     // FIXME: child->destTime should not be used since it is wrong
     llvm::Value* srcVal = add_constraint(child, timeIdx+delay, c, b, bound);
     g_curMod = thisMod;    
-    args.push_back(extract(srcVal, hi, lo, c, b));
+    args.push_back(extract_func(srcVal, hi, lo, c, b));
   }
 
   toCoutVerb("--- To call blackbox function!");
@@ -1331,7 +1335,7 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
         // FIXME: child->destTime should not be used since it is wrong
         llvm::Value* srcVal = add_constraint(child, i, c, b, bound);
         g_curMod = thisMod;        
-        args.push_back(extract(srcVal, hi, lo, c, b));
+        args.push_back(extract_func(srcVal, hi, lo, c, b));
       }
     }
   }
@@ -1427,7 +1431,7 @@ llvm::Value* make_llvm_instr(std::shared_ptr<llvm::IRBuilder<>> &b,
     if(destWidth >= op1Width)
       return b->CreateAShr(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
     else
-      return extract(b->CreateAShr(op1Expr, zext(op2Expr, op1Width, c, b)), destWidth-1, 0, c, b, name);
+      return extract_func(b->CreateAShr(op1Expr, zext(op2Expr, op1Width, c, b)), destWidth-1, 0, c, b, name);
   }
   else {
     toCout("Not supported 2-op in make_llvm_instr, op is: "+op);
