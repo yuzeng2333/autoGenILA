@@ -67,9 +67,14 @@ int main() {
   }
   argValueList.pop_back();
   argValueList.pop_back();
+  output << "@.str = private unnamed_addr constant [13 x i8] c\"value = %d \\0A\\00\", align 1" << std::endl;
+  output << std::endl;
   output << "define i"+retWidth+" @top() {" << std::endl;
   output << "entry:" << std::endl;
-  output << "%0 = call i"+retWidth+" @"+funcName+"("+argValueList+")" << std::endl;
+  output << "  %0 = call i"+retWidth+" @"+funcName+"("+argValueList+")" << std::endl;
+  output << "  %1 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([13 x i8], [13 x  i8]* @.str, i64 0, i64 0), i32 %0)" << std::endl;
+  output << "ret i32 %0" << std::endl;
+  output << "}" << std::endl;
   return 0;
 }
 
