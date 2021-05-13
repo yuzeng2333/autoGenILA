@@ -748,24 +748,35 @@ llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low,
 }
 
 
-llvm::Value* extract_func(llvm::Value* in, uint32_t high, uint32_t low, 
-                      std::shared_ptr<llvm::LLVMContext> &c, 
-                      std::shared_ptr<llvm::IRBuilder<>> &b, 
-                      const std::string &name) {
-
-  return extract_func(in, high, low, c, b, llvm::Twine(name));
-}
+//llvm::Value* extract_func(llvm::Value* in, uint32_t high, uint32_t low, 
+//                      std::shared_ptr<llvm::LLVMContext> &c, 
+//                      std::shared_ptr<llvm::IRBuilder<>> &b, 
+//                      const std::string &name, bool noinline) {
+//
+//  return extract_func(in, high, low, c, b, llvm::Twine(name), noinline);
+//}
 
 
 llvm::Value* extract_func(llvm::Value* in, uint32_t high, uint32_t low,
                       std::shared_ptr<llvm::LLVMContext> &c, 
                       std::shared_ptr<llvm::IRBuilder<>> &b, 
-                      const llvm::Twine &name) {
+                      const llvm::Twine &name, bool noinline) {
   std::string destName = in->getName().str();
+  std::string dest, destSlice;
+  if(destName.find("reg_next_pc") != std::string::npos)
+    toCoutVerb("Find it!");
+  if(!destName.empty()) {
+    split_slice(destName, dest, destSlice);
+    noinline = false;
+  }
+  else if(is_read_asv(dest) || (is_top_module() && is_input(dest))) noinline = true;
+  else noinline = false;
   toCoutVerb("extract for: "+destName);  
   llvm::Type* inputTy = in->getType();
   uint32_t inputWidth = llvm::dyn_cast<llvm::IntegerType>(inputTy)->getBitWidth();
-  std::string funcName = "extract_"+toStr(inputWidth)+"_"+toStr(high)+"_"+toStr(low);
+  std::string app = "";
+  if(!noinline) app = "_in";
+  std::string funcName = "extract_"+toStr(inputWidth)+"_"+toStr(high)+"_"+toStr(low)+app;
   llvm::Function *func;
   llvm::FunctionType *FT;  
   uint32_t len = high-low+1;
@@ -780,9 +791,9 @@ llvm::Value* extract_func(llvm::Value* in, uint32_t high, uint32_t low,
     FT = llvm::FunctionType::get(retTy, argTy, false);
     func = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
                                         funcName, TheModule.get());
-    func->addFnAttr(llvm::Attribute::NoMerge);
+    if(noinline) func->addFnAttr(llvm::Attribute::NoInline);
     func->args().begin()->setName("input");
-    llvm::Value* inArg   = value(func->args().begin()  );
+    llvm::Value* inArg = value(func->args().begin()  );
 
     llvm::BasicBlock *localBB 
       = llvm::BasicBlock::Create(*c, "entry", func);
@@ -842,15 +853,26 @@ llvm::Value* extract(llvm::Value* in, uint32_t high, uint32_t low,
 
 llvm::Value* concat_func(llvm::Value* val1, llvm::Value* val2, 
                          std::shared_ptr<llvm::LLVMContext> &c,
-                         std::shared_ptr<llvm::IRBuilder<>> &b) {
+                         std::shared_ptr<llvm::IRBuilder<>> &b,
+                         bool noinline) {
   std::string name1 = val1->getName().str();
   std::string name2 = val2->getName().str();
+  std::string n1, n1Slice;
+  std::string n2, n2Slice;
+  if(!name1.empty()) split_slice(name1, n1, n1Slice);
+  if(!name2.empty()) split_slice(name2, n2, n2Slice);
   toCoutVerb("concat with "+name1+" and "+name2);
+  if(name1.empty() || name2.empty()) noinline = false;
+  else if( (is_read_asv(n1) || (is_top_module() && is_input(n1)))
+        && (is_read_asv(n2) || (is_top_module() && is_input(n2))) ) noinline = true;
+  else noinline = false;
   llvm::Type* val1Ty = val1->getType();
   llvm::Type* val2Ty = val2->getType();
   uint32_t val1Width = llvm::dyn_cast<llvm::IntegerType>(val1Ty)->getBitWidth();
   uint32_t val2Width = llvm::dyn_cast<llvm::IntegerType>(val2Ty)->getBitWidth();
-  std::string funcName = "concat_"+toStr(val1Width)+"_"+toStr(val2Width);
+  std::string app = "";
+  if(!noinline) app = "_in";
+  std::string funcName = "concat_"+toStr(val1Width)+"_"+toStr(val2Width)+app;
   llvm::Function *func;
   llvm::FunctionType *FT;  
   uint32_t len = val1Width + val2Width;
@@ -870,7 +892,7 @@ llvm::Value* concat_func(llvm::Value* val1, llvm::Value* val2,
     FT = llvm::FunctionType::get(retTy, argTy, false);
     func = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
                                         funcName, TheModule.get());
-    func->addFnAttr(llvm::Attribute::NoMerge);
+    //func->addFnAttr(llvm::Attribute::NoInline);
     func->args().begin()->setName("val1");
     (func->args().begin()+1)->setName("val2");
 
@@ -1087,4 +1109,15 @@ std::string ask_for_my_ins_name() {
   }
   return insName;
 }
+
+
+void check_no_slice(std::string varAndSlice) {
+  if(varAndSlice.empty()) return;
+  std::string var, varSlice;
+  split_slice(varAndSlice, var, varSlice);
+  assert(varSlice.empty());
+}
+
+
+
 } // end of namespace funcExtract

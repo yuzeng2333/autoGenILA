@@ -181,15 +181,15 @@ llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low,
                       std::shared_ptr<llvm::LLVMContext> &c, 
                       std::shared_ptr<llvm::IRBuilder<>> &b);
 
-llvm::Value* extract_func(llvm::Value* in, uint32_t high, uint32_t low, 
-                      std::shared_ptr<llvm::LLVMContext> &c, 
-                      std::shared_ptr<llvm::IRBuilder<>> &b, 
-                      const std::string &name);
+//llvm::Value* extract_func(llvm::Value* in, uint32_t high, uint32_t low, 
+//                      std::shared_ptr<llvm::LLVMContext> &c, 
+//                      std::shared_ptr<llvm::IRBuilder<>> &b, 
+//                      const std::string &name, bool noinline=true);
 
 llvm::Value* extract_func(llvm::Value* in, uint32_t high, uint32_t low,
                       std::shared_ptr<llvm::LLVMContext> &c, 
                       std::shared_ptr<llvm::IRBuilder<>> &b, 
-                      const llvm::Twine &name="");
+                      const llvm::Twine &name="", bool noinline=false);
 
 
 llvm::Value* extract(llvm::Value* in, uint32_t high, uint32_t low, 
@@ -210,7 +210,8 @@ llvm::Value* concat_value(llvm::Value* val1, llvm::Value* val2,
 
 llvm::Value* concat_func(llvm::Value* val1, llvm::Value* val2, 
                          std::shared_ptr<llvm::LLVMContext> &c,
-                         std::shared_ptr<llvm::IRBuilder<>> &b);
+                         std::shared_ptr<llvm::IRBuilder<>> &b,
+                         bool noinline=false);
 
 bool is_x(const std::string &var);
 
@@ -246,6 +247,9 @@ std::pair<std::string, std::string> split_mod_var(std::string var);
 std::vector<std::string> print_map_keys(std::map<std::string, astNode*> &map);
 
 std::string ask_for_my_ins_name();
+
+void check_no_slice(std::string varAndSlice);
+
 } // end of namespace funcExtract
 
 

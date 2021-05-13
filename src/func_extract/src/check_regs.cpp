@@ -132,6 +132,7 @@ void print_llvm_ir(DestInfo &destInfo,
                    uint32_t instrIdx) {
   // declaration for llvm
   TheContext = std::make_unique<llvm::LLVMContext>();
+
   // FIXME: change the following model name
   std::string destName = destInfo.get_dest_name();
   std::string curModName = destInfo.get_mod_name();
@@ -168,20 +169,30 @@ void print_llvm_ir(DestInfo &destInfo,
     }
   // return types
   llvm::Type* retTy = destInfo.get_ret_type();
+
   llvm::FunctionType *FT =
     llvm::FunctionType::get(retTy, argTy, false);
-  TheFunction = llvm::Function::Create(FT, llvm::Function::ExternalLinkage, 
+
+
+  // make a top function
+  llvm::Function *topFunction 
+    = llvm::Function::Create(FT, llvm::Function::ExternalLinkage, 
+                             "top_function", TheModule.get());
+
+
+  TheFunction = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
                                        "func_;_"+destName, TheModule.get());
+  TheFunction->addFnAttr(llvm::Attribute::NoInline);
   g_curFunc = TheFunction;
+
   // set arg name for the function
   uint32_t idx = 0;
-  // FIXME the start and end index may be wrong
-
   for(auto it = g_regWidth.begin(); it != g_regWidth.end(); it++) {
     std::string regName = it->first;
     std::string regNameBound = regName+DELIM+toStr(bound);
     toCout("set reg-type func arg: "+regNameBound);
     (TheFunction->args().begin()+idx)->setName(regNameBound);
+    (topFunction->args().begin()+idx)->setName(regNameBound);
     argNum--;
     g_topFuncArgMp.emplace(regNameBound, TheFunction->args().begin()+idx++);
   }
@@ -192,7 +203,8 @@ void print_llvm_ir(DestInfo &destInfo,
     for(auto it = g_curMod->moduleInputs.begin(); it != g_curMod->moduleInputs.end(); it++) {
       uint32_t width = get_var_slice_width_simp(*it);
       toCout("set func arg: "+*it+DELIM+toStr(i));
-      (TheFunction->args().begin()+idx++)->setName(*it+DELIM+toStr(i));
+      (TheFunction->args().begin()+idx)->setName(*it+DELIM+toStr(i));
+      (topFunction->args().begin()+idx++)->setName(*it+DELIM+toStr(i));
       argNum--;
     }
 
@@ -285,6 +297,19 @@ void print_llvm_ir(DestInfo &destInfo,
   }
 
   llvm::verifyFunction(*TheFunction);
+
+  // call TheFunction in topFunction
+  auto topBB = llvm::BasicBlock::Create(*TheContext, "top_bb", topFunction);
+  Builder->SetInsertPoint(topBB);  
+  std::vector<llvm::Value*> args;
+  idx = 0;
+  while(idx < argSize) {
+    args.push_back(topFunction->args().begin()+idx++);
+  }
+  auto topRet = Builder->CreateCall(FT, TheFunction, args);
+  Builder->CreateRet(value(topRet));
+  llvm::verifyFunction(*topFunction);
+
   llvm::verifyModule(*TheModule);
   std::string fileName = "tmp.ll";
   std::string Str;
