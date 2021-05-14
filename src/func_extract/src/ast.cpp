@@ -776,21 +776,23 @@ void add_submod_node(std::string var, uint32_t timeIdx, astNode* const node) {
   auto parentMod = g_curMod->parentMod;
   std::string parentModName = g_curMod->name;
   std::string modName = g_curMod->ins2modMap[insName];
+  if(modName == "S4")
+    toCout("Find it!");
   g_curMod = g_moduleInfoMap[modName];
   g_curMod->curTarget = output;
   g_curMod->parentMod = thisMod;
   auto subMod = g_curMod;
   // treate differently for new or seen submodule output
   if( g_blackBoxModSet.find(modName) == g_blackBoxModSet.end()
-      && g_curMod->out2RootNodeMp.find(output) == g_curMod->out2RootNodeMp.end()) {
+      && !g_curMod->is_stored_outport_node(output)) {
     g_curMod->visitedNode.emplace(output, std::map<std::string, astNode*>());
     g_instancePairVec.push_back(std::make_pair(insName, g_curMod));
     astNode* nextNode = new astNode;
+    g_curMod->emplace_outport_node(output, nextNode);    
     toCout("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Enter mode: "+modName+", out: "+output);
     add_node(output, timeIdx, nextNode, false);
     toCout("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Return from: "+modName+", out: "+output+" to: "+parentModName);
     g_instancePairVec.pop_back();
-    g_curMod->out2RootNodeMp.emplace(output, nextNode);
   }
   g_curMod = g_instancePairVec.back().second;
   g_curMod->parentMod = parentMod;

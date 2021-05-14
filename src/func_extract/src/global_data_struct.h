@@ -55,11 +55,20 @@ struct FuncInfo_t {
 // this structu is filled only during parsing
 // ast building only reads info, 
 // except parentMod and rootNode
-struct ModuleInfo_t {
+class ModuleInfo_t {
+  private:
+  std::map<std::string, astNode*> out2RootNodeMp;
+
+  public:
+  // methods:
   ModuleInfo_t();
   ModuleInfo_t(std::string nameIn): name(nameIn) {}
   ~ModuleInfo_t();
+  void emplace_outport_node(const std::string &var, astNode* node);
+  bool is_stored_outport_node(const std::string &var);
+  astNode* get_outport_node(const std::string &outPort);
 
+  // data structure
   std::string name;
   std::string curTarget;
   std::string pendingOutPortTimed;
@@ -76,7 +85,6 @@ struct ModuleInfo_t {
   std::set<std::string> moduleTrueRegs;
   taintGen::VarWidth varWidth;
   // only sub-modules has the two data below
-  std::map<std::string, astNode*> out2RootNodeMp;
   std::map<std::string, std::vector<astNode*>> out2LeafNodeMp;
   std::map<std::string, std::pair<llvm::Function*, uint32_t>> out2FuncMp;
   // first key is target name

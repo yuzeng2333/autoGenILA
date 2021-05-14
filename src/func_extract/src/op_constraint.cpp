@@ -1281,7 +1281,11 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     // switch func before elaborating
     parentFunc = g_curFunc;
     g_curFunc = subFunc;
-    llvm::Value* ret = add_constraint(subMod->out2RootNodeMp[outPort], 
+    if(!subMod->is_stored_outport_node(outPort)) {
+      toCout("Error: cannot find node for output port: "+outPort);
+      abort();
+    }
+    llvm::Value* ret = add_constraint(subMod->get_outport_node(outPort), 
                                       timeIdx, c, b, bound);
     g_curMod = thisMod;    
     g_instancePairVec.pop_back();
