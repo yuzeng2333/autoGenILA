@@ -557,6 +557,8 @@ void submodule_expr(std::string firstLine, std::ifstream &input) {
   }
   std::string moduleName = m.str(2);
   std::string instanceName = m.str(3);
+  if(moduleName == "expand_key_128" && instanceName == "a10")
+    toCout("Find it!");
 
   if(g_moduleInfoMap.find(moduleName) == g_moduleInfoMap.end()) {
     toCout("Error: submodule has not been seen before: "+moduleName);
@@ -593,7 +595,6 @@ void submodule_expr(std::string firstLine, std::ifstream &input) {
     std::string wire = pair.second;
     remove_two_end_space(port);
     remove_two_end_space(wire);
-    g_curMod->wire2InsPortMp.emplace(wire, std::make_pair(instanceName, port));
     if( g_curMod->insPort2wireMp.find(instanceName) == g_curMod->insPort2wireMp.end() )
       g_curMod->insPort2wireMp.emplace(instanceName, std::map<std::string, std::string>{{port, wire}});
     else
@@ -601,6 +602,7 @@ void submodule_expr(std::string firstLine, std::ifstream &input) {
     // if the connected port is output for sub-module, put the wire into reg2Slices
     if(subMod->moduleOutputs.find(port) != subMod->moduleOutputs.end()) {
       put_into_reg2Slice(wire);
+      g_curMod->wire2InsPortMp.emplace(wire, std::make_pair(instanceName, port));      
     }
   }
 }

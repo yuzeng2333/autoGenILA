@@ -125,8 +125,8 @@ void add_node(std::string varAndSlice,
               bool varIsDest) {
   remove_two_end_space(varAndSlice);
   //toCout("Add node for: "+varAndSlice);
-  if(varAndSlice.find("yuzeng34") != std::string::npos
-       && timeIdx == 7) {
+  if(varAndSlice.find("k9") != std::string::npos) {
+       //&& timeIdx == 7) {
     toCout("Found it!");
     s_node = node;
   }
