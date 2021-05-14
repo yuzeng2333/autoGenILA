@@ -94,6 +94,7 @@ void parse_verilog(std::string fileName) {
   //g_curMod->invarRegs = g_invarRegs;
   //g_moduleInfoMap.emplace(g_topModule, g_curMod);
   while( std::getline(input, line) ) {
+    toCoutVerb(line);
     if(line.empty() || is_comment_line(line)
           || line.find_first_not_of(' ') == line.length())
       continue;
@@ -573,6 +574,7 @@ void remove_functions(std::string fileName) {
   std::ofstream output(fileName + ".clean");
   std::string line;
   while( std::getline(input, line) ) {
+    toCoutVerb(line);
     uint32_t choice = parse_verilog_line(line, true);
     if ( choice == FUNCDEF ) {
       taintGen::remove_function_wrapper(line, input, output);

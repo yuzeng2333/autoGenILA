@@ -390,8 +390,8 @@ void add_input_node(std::string input, uint32_t timeIdx, astNode* const node) {
 
     std::shared_ptr<ModuleInfo_t> parentMod = g_curMod->parentMod;
     auto pair = g_instancePairVec.back();
+    g_instancePairVec.pop_back();    
     std::string insName;    
-    g_instancePairVec.pop_back();
     bool isFirstMod = false;
     if(g_instancePairVec.empty()) {
       // if we started from the submodule
@@ -414,9 +414,19 @@ void add_input_node(std::string input, uint32_t timeIdx, astNode* const node) {
       // if we have seen parent module before
       insName = pair.first;
     }
+    if(parentMod->insPort2wireMp.find(insName) 
+         == parentMod->insPort2wireMp.end()) {
+      toCout("Error: the instance is not in parent module!");
+      toCout("parent module: "+parentMod->name);
+      toCout("instance name: "+insName);
+      abort();
+    }
     std::string parentWire = parentMod->insPort2wireMp[insName][input];
     if(parentWire.empty()) {
       toCout("Error: cannot find connect wire for input: "+input);
+      toCout("Parent module: "+parentMod->name);
+      toCout("Current module: "+g_curMod->name);
+      toCout("instance name: "+insName);
       abort();
     }
     auto thisMod = g_curMod;
@@ -431,6 +441,7 @@ void add_input_node(std::string input, uint32_t timeIdx, astNode* const node) {
     g_instancePairVec.push_back(pair);
     toCoutVerb("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Return from parent: "+g_curMod->name+" to: "+thisMod->name);    
     g_curMod = thisMod;
+    g_curMod->parentMod = parentMod;
     toCoutVerb("~~~~~~~~~~~~~~~~~~~~~~~~ Back to input: "+input
        +", curMod: "+g_curMod->name);
 
@@ -758,13 +769,16 @@ void add_submod_node(std::string var, uint32_t timeIdx, astNode* const node) {
   node->srcVec = std::vector<std::string>{};
   node->isReduceOp = false;
   node->done = false;
-  toCoutVerb("~~~~~~~~~~~~~~~~~~~~~~~~ Before enter submod: "+insName
+  toCout("~~~~~~~~~~~~~~~~~~~~~~~~ Before enter submod: "+insName
              +", curMod: "+g_curMod->name);
   // switch module before adding child node
-  std::string parentMod = g_curMod->name;
+  auto thisMod = g_curMod;
+  auto parentMod = g_curMod->parentMod;
+  std::string parentModName = g_curMod->name;
   std::string modName = g_curMod->ins2modMap[insName];
   g_curMod = g_moduleInfoMap[modName];
   g_curMod->curTarget = output;
+  g_curMod->parentMod = thisMod;
   auto subMod = g_curMod;
   // treate differently for new or seen submodule output
   if( g_blackBoxModSet.find(modName) == g_blackBoxModSet.end()
@@ -774,11 +788,12 @@ void add_submod_node(std::string var, uint32_t timeIdx, astNode* const node) {
     astNode* nextNode = new astNode;
     toCout("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Enter mode: "+modName+", out: "+output);
     add_node(output, timeIdx, nextNode, false);
-    toCout("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Return from: "+modName+", out: "+output+" to: "+parentMod);
+    toCout("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Return from: "+modName+", out: "+output+" to: "+parentModName);
     g_instancePairVec.pop_back();
     g_curMod->out2RootNodeMp.emplace(output, nextNode);
   }
   g_curMod = g_instancePairVec.back().second;
+  g_curMod->parentMod = parentMod;
   //add_child_node(output, timeIdx, node);
   for(std::string input : subMod->moduleInputs) {
     if(input == subMod->clk) {
