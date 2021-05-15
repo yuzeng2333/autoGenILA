@@ -63,6 +63,21 @@ llvm::Value* sext(llvm::Value* v1, uint32_t width,
                  std::shared_ptr<llvm::LLVMContext> &c,
                  std::shared_ptr<llvm::IRBuilder<>> &b);
 
+std::string get_insName();
+
+std::string get_target();
+
+void set_target(const std::string &tgtIn);
+
+std::shared_ptr<ModuleInfo_t> get_curMod();
+
+std::shared_ptr<ModuleInfo_t> get_parentMod();
+
+llvm::Function* get_func();
+
+uint32_t get_stk_depth();
+
+std::shared_ptr<ModuleInfo_t> get_real_parentMod();
 
 bool isAs(std::string var);
 
@@ -165,7 +180,7 @@ int try_stoi(std::string num);
 std::string get_pure_num(std::string formedNum);
 
 uint32_t get_var_slice_width_simp(std::string varAndSlice, 
-                                  const std::shared_ptr<ModuleInfo_t> &mod=g_curMod);
+                                  const std::shared_ptr<ModuleInfo_t> &mod=get_curMod());
 
 uint32_t get_var_slice_width_cmplx(std::string varAndSlice);
 
@@ -175,7 +190,7 @@ StrPair_t split_module_asv(const std::string &writeAsvLine);
 
 std::string remove_prefix_module(const std::string &writeAsvLine);
 
-llvm::Value* get_arg(std::string regName, llvm::Function *func=g_curFunc);
+llvm::Value* get_arg(std::string regName, llvm::Function *func=get_func());
 
 llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low, 
                       std::shared_ptr<llvm::LLVMContext> &c, 
@@ -215,7 +230,7 @@ llvm::Value* concat_func(llvm::Value* val1, llvm::Value* val2,
 
 bool is_x(const std::string &var);
 
-bool is_input(const std::string &var, const std::shared_ptr<ModuleInfo_t> &modInfo=g_curMod);
+bool is_input(const std::string &var, const std::shared_ptr<ModuleInfo_t> &modInfo=get_curMod());
 
 bool is_output(const std::string &var);
 

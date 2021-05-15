@@ -24,33 +24,39 @@ void module_expr(std::string line) {
   toCout("=== Begin module: "+g_currentModuleName);
   std::string portList = m.str(3);
 
+  std::shared_ptr<ModuleInfo_t> curMod;
   if(g_moduleInfoMap.find(g_currentModuleName) 
       != g_moduleInfoMap.end()) {
-    g_curMod = g_moduleInfoMap[g_currentModuleName];
+    curMod = g_moduleInfoMap[g_currentModuleName];
   }
   else {
-    g_curMod = std::make_shared<ModuleInfo_t>();
-    g_moduleInfoMap.emplace(g_currentModuleName, g_curMod);
+    curMod = std::make_shared<ModuleInfo_t>();
+    g_moduleInfoMap.emplace(g_currentModuleName, curMod);
   }
-  g_curMod->name = g_currentModuleName;
+  curMod->name = g_currentModuleName;
   if(g_currentModuleName == g_topModule) {
     for(auto pair : g_invarRegs) {
       if(!pair.first.empty())
-        g_curMod->invarRegs.insert(pair.second);
+        curMod->invarRegs.insert(pair.second);
     }
-    g_curMod->moduleAs = moduleAs;
+    curMod->moduleAs = moduleAs;
   }
   else {
     for(auto pair : g_invarRegs) {
       if(pair.first == g_currentModuleName)
-        g_curMod->invarRegs.insert(pair.second);
+        curMod->invarRegs.insert(pair.second);
     }
   }
+
+  Context_t insCntxt(curMod->name, "", curMod, nullptr, nullptr);
+  g_insContextStk.clear();
+  g_insContextStk.push_back(insCntxt);
 }
 
 
 
 void input_expr(std::string line) {
+  const auto curMod = get_curMod();
   std::smatch m;
   if (!std::regex_match(line, m, pInput))
     return;
@@ -60,14 +66,14 @@ void input_expr(std::string line) {
     toCout("Find it!");
   
   if(var != g_recentClk)
-    g_curMod->moduleInputs.insert(var);
+    curMod->moduleInputs.insert(var);
 
   bool insertDone;
   if(!slice.empty())
-    insertDone = g_curMod->varWidth.var_width_insert(var, get_end(slice), 
+    insertDone = curMod->varWidth.var_width_insert(var, get_end(slice), 
                                                      get_begin(slice));
   else
-    insertDone = g_curMod->varWidth.var_width_insert(var, 0, 0);
+    insertDone = curMod->varWidth.var_width_insert(var, 0, 0);
   //if (!insertDone) {
   //  std::cout << "insert failed in input case:" + line << std::endl;
   //  std::cout << "m.str(2):" + m.str(2) << std::endl;
@@ -77,6 +83,7 @@ void input_expr(std::string line) {
 
 
 void reg_expr(std::string line) {
+  const auto curMod = get_curMod();
   if(line.find("state_out") != std::string::npos) {
     toCout("Found it");
   }
@@ -93,10 +100,10 @@ void reg_expr(std::string line) {
 
   bool insertDone;
   if(!slice.empty())
-    insertDone = g_curMod->varWidth.var_width_insert(var, get_end(slice),
+    insertDone = curMod->varWidth.var_width_insert(var, get_end(slice),
                                                      get_begin(slice));
   else
-    insertDone = g_curMod->varWidth.var_width_insert(var, 0, 0);
+    insertDone = curMod->varWidth.var_width_insert(var, 0, 0);
   //if (!insertDone) {
   //  std::cout << "insert failed in reg case:" + line << std::endl;
   //  std::cout << "m.str(2):" + m.str(2) << std::endl;
@@ -106,6 +113,7 @@ void reg_expr(std::string line) {
 
 
 void wire_expr(std::string line) {
+  const auto curMod = get_curMod();
   std::smatch m;
   if ( !std::regex_match(line, m, pWire) )
     return;
@@ -116,9 +124,9 @@ void wire_expr(std::string line) {
 
   bool insertDone;
   if(!slice.empty())
-    insertDone = g_curMod->varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+    insertDone = curMod->varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
   else
-    insertDone = g_curMod->varWidth.var_width_insert(var, 0, 0);
+    insertDone = curMod->varWidth.var_width_insert(var, 0, 0);
   //if (!insertDone) {
   //  std::cout << "insert failed in wire case:" + line << std::endl;
   //  std::cout << "m.str(2):" + m.str(2) << std::endl;
@@ -128,6 +136,7 @@ void wire_expr(std::string line) {
 
 
 void mem_expr(std::string line) {
+  const auto curMod = get_curMod();
   std::smatch m;
   if ( !std::regex_match(line, m, pMem )) 
     return;
@@ -143,9 +152,9 @@ void mem_expr(std::string line) {
 
   bool insertDone;
   if(!slice.empty())
-    insertDone = g_curMod->varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+    insertDone = curMod->varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
   else
-    insertDone = g_curMod->varWidth.var_width_insert(var, 0, 0);
+    insertDone = curMod->varWidth.var_width_insert(var, 0, 0);
   //if (!insertDone) {
   //  std::cout << "insert failed in mem case:" + line << std::endl;
   //  std::cout << "m.str(2):" + m.str(2) << std::endl;
@@ -156,6 +165,7 @@ void mem_expr(std::string line) {
 
 // TODO: put output into moduleWires?
 void output_expr(std::string line) {
+  const auto curMod = get_curMod();
   if(line.find("state_out") != std::string::npos) {
     toCout("Found it");
   }
@@ -168,17 +178,17 @@ void output_expr(std::string line) {
     
   if(is_output(var)) {
     std::cout << "!! Duplicate output find: " + line << std::endl;
-    toCout("module: "+g_curMod->name);
+    toCout("module: "+curMod->name);
     abort();
   }
   else 
-    g_curMod->moduleOutputs.insert(var);
+    curMod->moduleOutputs.insert(var);
 
   bool insertDone;
   if(!slice.empty())
-    insertDone = g_curMod->varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+    insertDone = curMod->varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
   else
-    insertDone = g_curMod->varWidth.var_width_insert(var, 0, 0);
+    insertDone = curMod->varWidth.var_width_insert(var, 0, 0);
   //if (!insertDone) {
   //  std::cout << "insert failed in output case:" + line << std::endl;
   //  std::cout << "m.str(2):" + m.str(2) << std::endl;
@@ -188,6 +198,7 @@ void output_expr(std::string line) {
 
 
 void single_line_expr(std::string line) {
+  const auto curMod = get_curMod();
   std::smatch m;
   if( !std::regex_match(line, m, pSingleLine) ) {
     toCout("Error in matching single line expression: "+line);
@@ -195,7 +206,7 @@ void single_line_expr(std::string line) {
   }
   std::string destAndSlice = m.str(2);
   put_into_reg2Slice(destAndSlice);
-  auto ret = g_curMod->ssaTable.emplace(destAndSlice, line);
+  auto ret = curMod->ssaTable.emplace(destAndSlice, line);
   if(!ret.second) {
     toCout("Error in inserting ssaTable in single_line for key: "+m.str(2));
     toCout("Did you check the design.v/design.v.clean file can only have the top module??");
@@ -205,6 +216,7 @@ void single_line_expr(std::string line) {
 
 
 void both_concat_expr(std::string line) {
+  const auto curMod = get_curMod();
   std::smatch m;
   if( !std::regex_match(line, m, pSrcDestBothConcat) ) {
     toCout("Error: Not both_concat!!");
@@ -239,10 +251,10 @@ void both_concat_expr(std::string line) {
   uint32_t startIdx = destTotalWidthNum - 1;
   uint32_t endIdx;
   moduleWires.insert("yuzeng"+yuzengIdxStr);
-  g_curMod->varWidth.var_width_insert("yuzeng"+yuzengIdxStr, startIdx, 0);
+  curMod->varWidth.var_width_insert("yuzeng"+yuzengIdxStr, startIdx, 0);
   std::string newAssign = "  assign yuzeng"+yuzengIdxStr+" = "+srcList+" ;";
 
-  auto ret = g_curMod->ssaTable.emplace("yuzeng"+yuzengIdxStr, line);
+  auto ret = curMod->ssaTable.emplace("yuzeng"+yuzengIdxStr, line);
   if(!ret.second)
     toCout("Error in inserting ssaTable in both_concat1 for key: yuzeng"+yuzengIdxStr+", original line:"+line);
   
@@ -253,12 +265,12 @@ void both_concat_expr(std::string line) {
     if(!is_number(destAndSlice)) {
       split_slice(destAndSlice, dest, destSlice);
 
-      auto destIdxPair = g_curMod->varWidth.get_idx_pair(dest, line);
+      auto destIdxPair = curMod->varWidth.get_idx_pair(dest, line);
       std::string destHighIdx  = toStr(destIdxPair.first);
       std::string destLowIdx   = toStr(destIdxPair.second);
 
       std::string destAssign = "  assign "+destAndSlice+" = yuzeng"+yuzengIdxStr+" [" + toStr(startIdx)+" : "+toStr(endIdx)+"] ;";
-      auto ret = g_curMod->ssaTable.emplace(destAndSlice, destAssign);
+      auto ret = curMod->ssaTable.emplace(destAndSlice, destAssign);
       put_into_reg2Slice(destAndSlice);
       if(!ret.second)
         toCout("Error in inserting ssaTable in both_concat2 for key: "+destAndSlice+", original line:"+line);
@@ -269,6 +281,7 @@ void both_concat_expr(std::string line) {
 
 
 void dest_concat_expr(std::string line) {
+  const auto curMod = get_curMod();
   std::smatch m;
   if( !std::regex_match(line, m, pDestConcat) ) {
     toCout("Error: Not both_concat!!");
@@ -312,7 +325,7 @@ void dest_concat_expr(std::string line) {
       split_slice(destAndSlice, dest, destSlice);
 
       std::string destAssign = "  assign "+destAndSlice+" = "+src+" [" + toStr(startIdx)+" : "+toStr(endIdx)+"];";
-      auto ret = g_curMod->ssaTable.emplace(destAndSlice, destAssign);
+      auto ret = curMod->ssaTable.emplace(destAndSlice, destAssign);
       put_into_reg2Slice(destAndSlice);
       if(!ret.second)
         toCout("Error in inserting ssaTable in both_concat2 for key: "+destAndSlice+", original line:"+line);
@@ -323,15 +336,16 @@ void dest_concat_expr(std::string line) {
 
 
 void nb_expr(std::string line) {
+  const auto curMod = get_curMod();
   std::smatch m;
   if( !std::regex_match(line, m, pNbLine) ) {
     toCout("Error in matching single line expression: "+line);
     return;
   }
-  auto ret = g_curMod->nbTable.emplace(m.str(2), line);
+  auto ret = curMod->nbTable.emplace(m.str(2), line);
   std::string dest, destSlice;
   split_slice(m.str(2), dest, destSlice);
-  g_curMod->moduleTrueRegs.insert(dest);
+  curMod->moduleTrueRegs.insert(dest);
   if(!ret.second)
     toCout("Error in inserting ssaTable in nb for key: "+m.str(2));
 }
@@ -371,6 +385,7 @@ void nonblockif_expr(std::string line, std::ifstream &input) {
   if ( !std::regex_match(line, m, pNonblockIf) )
     return;
 
+  const auto curMod = get_curMod();
   bool hasRst = false;
   std::string rst;
   std::string blank;
@@ -393,14 +408,14 @@ void nonblockif_expr(std::string line, std::ifstream &input) {
   split_slice(destAndSlice, dest, destSlice);
   split_slice(ifSrcAndSlice, src, srcSlice);
   split_slice(condAndSlice, cond, condSlice);
-  g_curMod->moduleTrueRegs.insert(dest);
+  curMod->moduleTrueRegs.insert(dest);
 
   std::string yuzengIdx = toStr(g_new_var++);
   std::string destNext = "yuzeng"+yuzengIdx;
   moduleWires.insert("yuzeng"+yuzengIdx);
   uint32_t localWidth = get_var_slice_width_simp(destAndSlice);
   bool insertDone;
-    insertDone = g_curMod->varWidth.var_width_insert(destNext, localWidth-1, 0);
+    insertDone = curMod->varWidth.var_width_insert(destNext, localWidth-1, 0);
   if (!insertDone) {
     std::cout << "insert failed: " + line << std::endl;
   }
@@ -423,12 +438,12 @@ void nonblockif_expr(std::string line, std::ifstream &input) {
 
     std::string destNextLine = "  assign yuzeng"+yuzengIdx+" = "+condAndSlice+" ? "+ifSrcAndSlice+" : "+elseValue+" ;";
     toCoutVerb(destNextLine);
-    auto ret = g_curMod->ssaTable.emplace("yuzeng"+yuzengIdx, destNextLine);
+    auto ret = curMod->ssaTable.emplace("yuzeng"+yuzengIdx, destNextLine);
     if(!ret.second)
       toCout("Error in inserting ssaTable for the line: "+line+", "+destNextLine );
 
     std::string destNbLine = "  "+destAndSlice+" <= yuzeng"+yuzengIdx+";";
-    ret = g_curMod->nbTable.emplace(destAndSlice, destNbLine);
+    ret = curMod->nbTable.emplace(destAndSlice, destNbLine);
     if(!ret.second)
       toCout("Error in inserting ssaTable for the line: "+line+", "+destNbLine );
   }
@@ -442,18 +457,18 @@ void nonblockif_expr(std::string line, std::ifstream &input) {
     toCoutVerb(fstLine);
     toCoutVerb(sndLine);
     uint32_t destWidth = get_var_slice_width_simp(destAndSlice);
-    g_curMod->varWidth.var_width_insert("yuzeng"+yuzengIdx, destWidth-1, 0);    
-    g_curMod->varWidth.var_width_insert("yuzeng"+yuzengIdx2, destWidth-1, 0);    
-    auto ret = g_curMod->ssaTable.emplace("yuzeng"+yuzengIdx, fstLine);
+    curMod->varWidth.var_width_insert("yuzeng"+yuzengIdx, destWidth-1, 0);    
+    curMod->varWidth.var_width_insert("yuzeng"+yuzengIdx2, destWidth-1, 0);    
+    auto ret = curMod->ssaTable.emplace("yuzeng"+yuzengIdx, fstLine);
     if(!ret.second)
       toCout("Error in inserting ssaTable for the fstLine: "+line+", "+fstLine );
       
-    ret = g_curMod->ssaTable.emplace("yuzeng"+yuzengIdx2, sndLine);
+    ret = curMod->ssaTable.emplace("yuzeng"+yuzengIdx2, sndLine);
     if(!ret.second)
       toCout("Error in inserting ssaTable for the sndLine: "+line+", "+sndLine );
 
     std::string destNbLine = "  "+destAndSlice+" <= yuzeng"+yuzengIdx2+";";
-    ret = g_curMod->nbTable.emplace(destAndSlice, destNbLine);
+    ret = curMod->nbTable.emplace(destAndSlice, destNbLine);
     if(!ret.second)
       toCout("Error in inserting ssaTable for the line: "+line+", "+destNbLine );
   }
@@ -476,6 +491,7 @@ void always_if_else_expr(std::string line, std::ifstream &input) {
   if ( !std::regex_match(line, m, pIf) )
     return;
   std::string condAndSlice = m.str(2);
+  const auto curMod = get_curMod();
 
   std::getline(input, line);
   if ( !std::regex_match(line, m, pNonblock) ) {
@@ -488,7 +504,7 @@ void always_if_else_expr(std::string line, std::ifstream &input) {
 
   std::string dest, destSlice;
   split_slice(destAndSlice, dest, destSlice);
-  g_curMod->moduleTrueRegs.insert(dest);
+  curMod->moduleTrueRegs.insert(dest);
 
   std::getline(input, line);
   if ( !std::regex_match(line, m, pElse) ) {
@@ -509,7 +525,7 @@ void always_if_else_expr(std::string line, std::ifstream &input) {
   std::string destNext = "yuzeng"+yuzengIdx;
   moduleWires.insert("yuzeng"+yuzengIdx);
   bool insertDone;
-    insertDone = g_curMod->varWidth.var_width_insert(destNext, localWidth-1, 0);
+    insertDone = curMod->varWidth.var_width_insert(destNext, localWidth-1, 0);
   if (!insertDone) {
     std::cout << "insert failed: " + line << std::endl;
   }
@@ -518,12 +534,12 @@ void always_if_else_expr(std::string line, std::ifstream &input) {
     destNextLine = "  assign yuzeng"+yuzengIdx+" = "+condAndSlice+" ? "+src1AndSlice+" : "+src2AndSlice+";";
   else
     destNextLine = "  assign yuzeng"+yuzengIdx+" = "+condAndSlice.substr(1)+" ? "+src2AndSlice+" : "+src1AndSlice+";";
-  auto ret = g_curMod->ssaTable.emplace("yuzeng"+yuzengIdx, destNextLine);
+  auto ret = curMod->ssaTable.emplace("yuzeng"+yuzengIdx, destNextLine);
   if(!ret.second)
     toCout("Error in inserting ssaTable for the line: "+line+", "+destNextLine);
 
   std::string destNbLine = "  "+destAndSlice+" <= yuzeng"+yuzengIdx+" ;";
-  ret = g_curMod->nbTable.emplace(destAndSlice, destNbLine);
+  ret = curMod->nbTable.emplace(destAndSlice, destNbLine);
   if(!ret.second)
     toCout("Error in inserting ssaTable for the line: "+line+", "+destNbLine );
 }
@@ -537,19 +553,21 @@ void case_expr(std::string line, std::ifstream &input) {
     toCout("Error: does not match pCase: "+caseFirstLine);
     abort();
   }
+  const auto curMod = get_curMod();  
   std::string blank = m.str(1);
   std::string sAndSlice = m.str(3);
   std::vector<std::pair<std::string, std::string>> caseAssignPairs;
   std::vector<std::string> inputSlice;
   std::string destAndSlice = parse_case_statements(caseAssignPairs, input, false);
   put_into_reg2Slice(destAndSlice);
-  g_curMod->caseTable.emplace(destAndSlice, std::make_pair(sAndSlice, caseAssignPairs));
+  curMod->caseTable.emplace(destAndSlice, std::make_pair(sAndSlice, caseAssignPairs));
 }
 
 
 /// In this function, do not distinguish input and output ports
 /// store all connections in both two maps: wire2InsPortMp & insPort2wireMp
 void submodule_expr(std::string firstLine, std::ifstream &input) {
+  const auto curMod = get_curMod();
   std::smatch m;
   if ( !std::regex_match(firstLine, m, pInstanceBegin) ) {
     toCout("Error: does not match pModuleBegin: "+firstLine);
@@ -565,11 +583,11 @@ void submodule_expr(std::string firstLine, std::ifstream &input) {
     abort();
   }
   auto subMod = g_moduleInfoMap[moduleName];
-  subMod->parentMod = g_curMod;
+  subMod->parentModVec.push_back(curMod);
   // to be deleted
   //if(g_wire2ModulePort.find(instanceName) == g_wire2ModulePort.end())
   //  g_wire2ModulePort.emplace(instanceName, std::unordered_map<std::string, std::string>{});
-  g_curMod->ins2modMap.emplace(instanceName, moduleName);
+  curMod->ins2modMap.emplace(instanceName, moduleName);
 
   //FuncInfo_t funcInfo;
   // moduleName is important, instanceName does not matter
@@ -595,14 +613,14 @@ void submodule_expr(std::string firstLine, std::ifstream &input) {
     std::string wire = pair.second;
     remove_two_end_space(port);
     remove_two_end_space(wire);
-    if( g_curMod->insPort2wireMp.find(instanceName) == g_curMod->insPort2wireMp.end() )
-      g_curMod->insPort2wireMp.emplace(instanceName, std::map<std::string, std::string>{{port, wire}});
+    if( curMod->insPort2wireMp.find(instanceName) == curMod->insPort2wireMp.end() )
+      curMod->insPort2wireMp.emplace(instanceName, std::map<std::string, std::string>{{port, wire}});
     else
-      g_curMod->insPort2wireMp[instanceName].emplace(port, wire);
+      curMod->insPort2wireMp[instanceName].emplace(port, wire);
     // if the connected port is output for sub-module, put the wire into reg2Slices
     if(subMod->moduleOutputs.find(port) != subMod->moduleOutputs.end()) {
       put_into_reg2Slice(wire);
-      g_curMod->wire2InsPortMp.emplace(wire, std::make_pair(instanceName, port));      
+      curMod->wire2InsPortMp.emplace(wire, std::make_pair(instanceName, port));      
     }
   }
 }
@@ -620,16 +638,17 @@ bool compareSlice(std::string destAndSlice1, std::string destAndSlice2) {
 
 
 void put_into_reg2Slice(std::string destAndSlice) {
+  const auto curMod = get_curMod();
   std::string dest, destSlice;
   split_slice(destAndSlice, dest, destSlice);
-  // if the destAndSlice has slice, put it into the g_curMod->reg2Slices map
+  // if the destAndSlice has slice, put it into the curMod->reg2Slices map
   if(!destSlice.empty()) {
-    if(g_curMod->reg2Slices.find(dest) == g_curMod->reg2Slices.end()) {
-      g_curMod->reg2Slices.emplace(dest, std::vector<std::string>{destAndSlice});
+    if(curMod->reg2Slices.find(dest) == curMod->reg2Slices.end()) {
+      curMod->reg2Slices.emplace(dest, std::vector<std::string>{destAndSlice});
     }
     else {
-      g_curMod->reg2Slices[dest].push_back(destAndSlice);
-      std::sort(g_curMod->reg2Slices[dest].begin(), g_curMod->reg2Slices[dest].end(), compareSlice);
+      curMod->reg2Slices[dest].push_back(destAndSlice);
+      std::sort(curMod->reg2Slices[dest].begin(), curMod->reg2Slices[dest].end(), compareSlice);
     }
   }
 }

@@ -36,8 +36,8 @@ std::map<std::string, llvm::Function*> g_extractFunc;
 std::map<std::string, llvm::Function*> g_concatFunc;
 std::set<std::string> g_resetedReg;
 std::set<std::string> g_regWithFunc;
-std::vector<std::pair<std::string, 
-                      std::shared_ptr<ModuleInfo_t>>> g_instancePairVec;
+std::vector<Context_t> g_insContextStk;
+
 //std::unordered_map<std::string, expr*> INT_EXPR_VAL;
 std::set<std::string> INT_EXPR_SET;
 std::set<std::string> g_readASV;
@@ -57,7 +57,6 @@ uint32_t g_maxDelay = 0;
 std::shared_ptr<llvm::LLVMContext> TheContext;
 std::shared_ptr<llvm::Module> TheModule;
 llvm::Function *TheFunction;
-llvm::Function *g_curFunc;
 std::shared_ptr<llvm::IRBuilder<>> Builder;
 llvm::BasicBlock *BB;
 
@@ -69,7 +68,7 @@ void check_all_regs() {
   std::ofstream goalFile;
   goalFile.open(g_path+"/goal.txt");
   goalFile.close();
-  g_instancePairVec.clear();
+  g_insContextStk.clear();
   clean_module_inputs();
   uint32_t i = 1;
   DestInfo destInfo;  
@@ -138,9 +137,10 @@ void print_llvm_ir(DestInfo &destInfo,
   std::string curModName = destInfo.get_mod_name();
   TheModule = std::make_unique<llvm::Module>("mod_;_"+curModName+"_;_"+destName, *TheContext);
   Builder = std::make_unique<llvm::IRBuilder<>>(*TheContext);
-  g_curMod = g_moduleInfoMap[curModName];
-  g_instancePairVec.clear();
-  g_instancePairVec.push_back(std::make_pair(curModName, g_curMod));
+  auto curMod = g_moduleInfoMap[curModName];
+  Context_t insCntxt(curModName, "", curMod, nullptr, nullptr);  
+  g_insContextStk.clear();
+  g_insContextStk.push_back(insCntxt);
 
   /// declare function
   // input types
@@ -160,9 +160,9 @@ void print_llvm_ir(DestInfo &destInfo,
   // push inputs
   // bound = (delay in instr.txt) - 1
   for(uint32_t i = 0; i <= bound; i++)  
-    for(auto it = g_curMod->moduleInputs.begin(); it != g_curMod->moduleInputs.end(); it++) {
-      if(*it == g_curMod->clk) continue;
-      uint32_t width = get_var_slice_width_simp(*it);
+    for(auto it = curMod->moduleInputs.begin(); it != curMod->moduleInputs.end(); it++) {
+      if(*it == curMod->clk) continue;
+      uint32_t width = get_var_slice_width_simp(*it, curMod);
       // FIXME the start and end index may be wrong
       argTy.push_back(llvm::IntegerType::get(*TheContext, width));
       argNum++;
@@ -183,7 +183,10 @@ void print_llvm_ir(DestInfo &destInfo,
   TheFunction = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
                                        "func_;_"+destName, TheModule.get());
   TheFunction->addFnAttr(llvm::Attribute::NoInline);
-  g_curFunc = TheFunction;
+  //g_curFunc = TheFunction;
+
+  g_insContextStk.back().Target = destName;
+  g_insContextStk.back().Func = topFunction;
 
   // set arg name for the function
   uint32_t idx = 0;
@@ -200,8 +203,9 @@ void print_llvm_ir(DestInfo &destInfo,
   uint32_t argSize = TheFunction->arg_size();
   toCout("Function arg size is: "+toStr(argSize));
   for(uint32_t i = 0; i <= bound; i++)  
-    for(auto it = g_curMod->moduleInputs.begin(); it != g_curMod->moduleInputs.end(); it++) {
-      uint32_t width = get_var_slice_width_simp(*it);
+    for(auto it = curMod->moduleInputs.begin(); it != curMod->moduleInputs.end(); it++) {
+      if(*it == curMod->clk) continue;    
+      uint32_t width = get_var_slice_width_simp(*it, curMod);
       toCout("set func arg: "+*it+DELIM+toStr(i));
       (TheFunction->args().begin()+idx)->setName(*it+DELIM+toStr(i));
       (topFunction->args().begin()+idx++)->setName(*it+DELIM+toStr(i));
@@ -224,10 +228,10 @@ void print_llvm_ir(DestInfo &destInfo,
   if(!destInfo.isVector) {
     // FIXME: currently does not support submodule's single register as writeASV
     std::string dest = destVec.front();
-    if(g_curMod->visitedNode[dest].find(dest) == g_curMod->visitedNode[dest].end()
-        && g_curMod->reg2Slices.find(dest) == g_curMod->reg2Slices.end()) {
+    if(curMod->visitedNode[dest].find(dest) == curMod->visitedNode[dest].end()
+        && curMod->reg2Slices.find(dest) == curMod->reg2Slices.end()) {
       toCout("Error: ast node is not found for this var: |"+dest+"|"
-              +", g_curMod: "+g_curMod->name);
+              +", curMod: "+curMod->name);
       abort();
     } 
     // The return value for the function
@@ -245,12 +249,15 @@ void print_llvm_ir(DestInfo &destInfo,
     for(std::string dest: destVec) {
       if(dest == "buff10")
         toCout("Find it!");
-      g_curMod = g_moduleInfoMap[modName];
-      g_curMod->curTarget = dest;
-      if(g_curMod->visitedNode[dest].find(dest) == g_curMod->visitedNode[dest].end()
-          && g_curMod->reg2Slices.find(dest) == g_curMod->reg2Slices.end()) {
+      curMod = g_moduleInfoMap[modName];
+
+      g_insContextStk.clear();
+      Context_t insCntxt(modName, dest, curMod, nullptr, TheFunction);
+      g_insContextStk.push_back(insCntxt);
+      if(curMod->visitedNode[dest].find(dest) == curMod->visitedNode[dest].end()
+          && curMod->reg2Slices.find(dest) == curMod->reg2Slices.end()) {
         toCout("Error: ast node is not found for this var: |"+dest+"|"
-                +", g_curMod: "+g_curMod->name);
+                +", curMod: "+curMod->name);
         abort();
       } 
       else {
@@ -577,26 +584,27 @@ void print_llvm_ir(DestInfo &destInfo,
 llvm::Value* add_constraint(std::string varAndSlice, uint32_t timeIdx, context &c,
                             std::shared_ptr<llvm::IRBuilder<>> &b,
                             uint32_t bound ) {
+  auto curMod = get_curMod();
   llvm::Value* ret;
   bool retIsEmpty = true;
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
-  std::string curTgt = g_curMod->curTarget;
-  assert(g_curMod->visitedNode.find(curTgt) != g_curMod->visitedNode.end());
-  if(g_curMod->reg2Slices.find(var) == g_curMod->reg2Slices.end()) {
-    if(g_curMod->visitedNode[curTgt].find(var) == g_curMod->visitedNode[curTgt].end()) {
+  const std::string curTgt = get_target();
+  assert(curMod->visitedNode.find(curTgt) != curMod->visitedNode.end());
+  if(curMod->reg2Slices.find(var) == curMod->reg2Slices.end()) {
+    if(curMod->visitedNode[curTgt].find(var) == curMod->visitedNode[curTgt].end()) {
       toCout("Error: cannot find node for: "+varAndSlice);
       abort();
     }
-    return add_constraint(g_curMod->visitedNode[curTgt][var], timeIdx, c, b, bound);
+    return add_constraint(curMod->visitedNode[curTgt][var], timeIdx, c, b, bound);
   }
   else {
-    for(std::string varSlice : g_curMod->reg2Slices[var]) {
-      if(g_curMod->visitedNode[curTgt].find(varSlice) == g_curMod->visitedNode[curTgt].end()) {
+    for(std::string varSlice : curMod->reg2Slices[var]) {
+      if(curMod->visitedNode[curTgt].find(varSlice) == curMod->visitedNode[curTgt].end()) {
         toCout("!!! Error: cannot find node for: "+varSlice);
         abort();
       }
-      llvm::Value* tmpSlice = add_constraint(g_curMod->visitedNode[curTgt][varSlice], timeIdx, c, b, bound);
+      llvm::Value* tmpSlice = add_constraint(curMod->visitedNode[curTgt][varSlice], timeIdx, c, b, bound);
       if(retIsEmpty) {
         retIsEmpty = false;
         ret = tmpSlice;
@@ -618,8 +626,9 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
                             uint32_t bound ) {
   // Attention: varAndSlice might have a slice, a directly-assigned varAndSlice
   std::string varAndSlice = node->dest;
+  auto curMod = get_curMod();
   toCoutVerb("add_constraint for: "+varAndSlice);
-  if(varAndSlice == "buff0") {
+  if(varAndSlice == "8'b00000001") {
     toCout("find it");
   }
 
@@ -632,13 +641,13 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
     return llvmInt(0, width, c);
   }
 
-  std::string curTgt = g_curMod->curTarget;
-  if(g_curMod->existedExpr.find(curTgt) == g_curMod->existedExpr.end() )
-    g_curMod->existedExpr.emplace(curTgt, std::map<std::string, llvm::Value*>() );
+  const std::string curTgt = get_target();
+  if(curMod->existedExpr.find(curTgt) == curMod->existedExpr.end() )
+    curMod->existedExpr.emplace(curTgt, std::map<std::string, llvm::Value*>() );
 
-  if(g_curMod->existedExpr[curTgt].find(timed_name(varAndSlice, timeIdx)) 
-      != g_curMod->existedExpr[curTgt].end() ) {
-    return g_curMod->existedExpr[curTgt][timed_name(varAndSlice, timeIdx)];
+  if(curMod->existedExpr[curTgt].find(timed_name(varAndSlice, timeIdx)) 
+      != curMod->existedExpr[curTgt].end() ) {
+    return curMod->existedExpr[curTgt][timed_name(varAndSlice, timeIdx)];
   }
 
   llvm::Value* retExpr;
@@ -658,7 +667,7 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
   //  retExpr = func_constraint(node, timeIdx, c, s, g, bound, isSolve);
   //}
   else if( is_submod_output(varAndSlice) ) {
-    auto pair = g_curMod->wire2InsPortMp[varAndSlice];
+    auto pair = curMod->wire2InsPortMp[varAndSlice];
     std::string insName = pair.first;
     auto subMod = get_mod_info(insName);
     std::string modName = subMod->name;
@@ -670,7 +679,7 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
   else { // it is wire
     retExpr = add_ssa_constraint(node, timeIdx, c, b, bound);
   }
-  g_curMod->existedExpr[curTgt].emplace(timed_name(varAndSlice, timeIdx), retExpr);
+  curMod->existedExpr[curTgt].emplace(timed_name(varAndSlice, timeIdx), retExpr);
   return retExpr;
 }
 
@@ -679,7 +688,8 @@ llvm::Value* add_nb_constraint(astNode* const node,
                                uint32_t timeIdx, context &c, 
                                std::shared_ptr<llvm::IRBuilder<>> &b,
                                uint32_t bound ) {
-  std::shared_ptr<ModuleInfo_t> thisMod = g_curMod;  
+  const auto curFunc = get_func();
+  const auto curMod = get_curMod();
   std::string dest = node->dest;
   if(dest.find("ata_fifo.r0") != std::string::npos && timeIdx == 25) {
     toCout("target reg found! time: "+toStr(timeIdx));
@@ -701,7 +711,6 @@ llvm::Value* add_nb_constraint(astNode* const node,
     std::string destNext = node->srcVec.front();
 
     destNextExpr = add_constraint(node->childVec.front(), timeIdx+1, c, b, bound);
-    g_curMod = thisMod;    
     return destNextExpr;
   }
   //else if(!isSolve && !is_read_asv(dest) 
@@ -722,14 +731,14 @@ llvm::Value* add_nb_constraint(astNode* const node,
   // if timeIdx = bound, then return function input or rst/norm value
   // TODO: adjust the following condition for different designs
 
-  //if(g_curMod->invarRegs.find(dest) == g_curMod->invarRegs.end()) {
+  //if(curMod->invarRegs.find(dest) == curMod->invarRegs.end()) {
   if(is_read_asv(dest)) {
-      //&& g_curMod->moduleAs.find(dest) != g_curMod->moduleAs.end())
+      //&& curMod->moduleAs.find(dest) != curMod->moduleAs.end())
     //std::string prefix = get_hier_name(false);
     //if(!prefix.empty()) prefix += ".";
     // TODO: get the path.reg name for dest
     // TODO: get the path.reg name for dest
-    return get_arg(timed_name(dest, timeIdx), g_curFunc);
+    return get_arg(timed_name(dest, timeIdx), curFunc);
   }
   else {
     uint32_t width = get_var_slice_width_simp(dest);    

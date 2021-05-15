@@ -47,8 +47,9 @@ llvm::Value* sext(llvm::Value* v1, uint32_t width,
 
 
 bool isAs(std::string var) {
-  auto it = std::find( g_curMod->moduleAs.begin(), g_curMod->moduleAs.end(), var );
-  return it != g_curMod->moduleAs.end();
+  auto curMod = get_curMod();
+  auto it = std::find( curMod->moduleAs.begin(), curMod->moduleAs.end(), var );
+  return it != curMod->moduleAs.end();
 }
 
 
@@ -297,7 +298,8 @@ std::string get_name(expr expression) {
 
 
 bool is_read_asv(std::string var) {
-  return g_readASV.find(pure(var)) != g_readASV.end() || g_readASV.find(g_curMod->name+"."+pure(var)) != g_readASV.end();
+  auto curMod = get_curMod();
+  return g_readASV.find(pure(var)) != g_readASV.end() || g_readASV.find(curMod->name+"."+pure(var)) != g_readASV.end();
 }
 
 
@@ -342,13 +344,15 @@ uint32_t get_time(std::string var) {
 
 
 bool is_case_dest(std::string var) {
-  return g_curMod->caseTable.find(var) != g_curMod->caseTable.end();
+  auto curMod = get_curMod();
+  return curMod->caseTable.find(var) != curMod->caseTable.end();
 }
 
 bool is_func_output(std::string var) {
-  if(g_curMod->funcTable.find(var) != g_curMod->funcTable.end())
+  auto curMod = get_curMod();
+  if(curMod->funcTable.find(var) != curMod->funcTable.end())
     return true;
-  if(g_curMod->funcTable.find(var+" ") != g_curMod->funcTable.end())
+  if(curMod->funcTable.find(var+" ") != curMod->funcTable.end())
     return true;
   return false;
 }
@@ -378,6 +382,7 @@ uint32_t get_pos_of_one(std::string value) {
 // This function is a little counter-intuitive
 // get logical hi
 uint32_t get_lgc_hi(std::string varAndSlice) {
+  auto curMod = get_curMod();
   varAndSlice = remove_signed(varAndSlice);
   std::smatch m;
   if(is_number(varAndSlice)) {
@@ -396,13 +401,14 @@ uint32_t get_lgc_hi(std::string varAndSlice) {
     else
       return get_end(varSlice);
   }
-  auto idxPairs = g_curMod->varWidth.get_idx_pair(var, "find_version_num for: "+var);
+  auto idxPairs = curMod->varWidth.get_idx_pair(var, "find_version_num for: "+var);
   return idxPairs.first;
 }
 
 
 // get literal hi
 uint32_t get_ltr_hi(std::string varAndSlice) {
+  auto curMod = get_curMod();
   varAndSlice = remove_signed(varAndSlice);  
   std::smatch m;
   if(is_number(varAndSlice)) {
@@ -417,12 +423,13 @@ uint32_t get_ltr_hi(std::string varAndSlice) {
   split_slice(varAndSlice, var, varSlice);
   if(!varSlice.empty())
     return get_end(varSlice);
-  auto idxPairs = g_curMod->varWidth.get_idx_pair(var, "find_version_num for: "+var);
+  auto idxPairs = curMod->varWidth.get_idx_pair(var, "find_version_num for: "+var);
   return idxPairs.first;
 }
 
 
 uint32_t get_lgc_lo(std::string varAndSlice) {
+  auto curMod = get_curMod();
   varAndSlice = remove_signed(varAndSlice);  
   if(is_number(varAndSlice))
     return 0;
@@ -435,12 +442,13 @@ uint32_t get_lgc_lo(std::string varAndSlice) {
     else
       return get_begin(varSlice);
   }
-  auto idxPairs = g_curMod->varWidth.get_idx_pair(var, "find_version_num for: "+var);
+  auto idxPairs = curMod->varWidth.get_idx_pair(var, "find_version_num for: "+var);
   return idxPairs.second;
 }
 
 
 uint32_t get_ltr_lo(std::string varAndSlice) {
+  auto curMod = get_curMod();
   varAndSlice = remove_signed(varAndSlice);  
   if(is_number(varAndSlice))
     return 0;
@@ -449,7 +457,7 @@ uint32_t get_ltr_lo(std::string varAndSlice) {
 
   if(!varSlice.empty())
     return get_begin(varSlice);
-  auto idxPairs = g_curMod->varWidth.get_idx_pair(var, "find_version_num for: "+var);
+  auto idxPairs = curMod->varWidth.get_idx_pair(var, "find_version_num for: "+var);
   return idxPairs.second;
 }
 
@@ -472,16 +480,17 @@ bool is_all_digits(const std::string& num) {
 // summary: check if a variable's slice is assigned directly
 // input: varAndSlice must have slice
 bool has_direct_assignment(std::string varAndSlice) {
+  auto curMod = get_curMod();
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
-  bool withinReg2Slices = g_curMod->reg2Slices.find(var) != g_curMod->reg2Slices.end();
+  bool withinReg2Slices = curMod->reg2Slices.find(var) != curMod->reg2Slices.end();
   if(varSlice.empty()) {
     toCout("Error: expecting slice for input: "+varAndSlice);
     abort();
   }
   return withinReg2Slices 
-         && std::find(g_curMod->reg2Slices[var].begin(), g_curMod->reg2Slices[var].end(), varAndSlice) 
-            != g_curMod->reg2Slices[var].end();
+         && std::find(curMod->reg2Slices[var].begin(), curMod->reg2Slices[var].end(), varAndSlice) 
+            != curMod->reg2Slices[var].end();
 }
 
 
@@ -954,25 +963,28 @@ bool is_input(const std::string &var, const std::shared_ptr<ModuleInfo_t> &modIn
 
 
 bool is_output(const std::string &var) {
-  auto it = std::find( g_curMod->moduleOutputs.begin(), g_curMod->moduleOutputs.end(), var );
-  return it != g_curMod->moduleOutputs.end();
+  auto curMod = get_curMod();
+  auto it = std::find( curMod->moduleOutputs.begin(), curMod->moduleOutputs.end(), var );
+  return it != curMod->moduleOutputs.end();
 }
 
 
 bool is_reg(std::string var) {
+  auto curMod = get_curMod();
   if(var.back() == ' ')
     var.pop_back();
-  auto it = std::find( g_curMod->moduleTrueRegs.begin(), g_curMod->moduleTrueRegs.end(), var );
-  return it != g_curMod->moduleTrueRegs.end();
+  auto it = std::find( curMod->moduleTrueRegs.begin(), curMod->moduleTrueRegs.end(), var );
+  return it != curMod->moduleTrueRegs.end();
 }
 
 
 bool is_submod_output(const std::string &var) {
-  if( g_curMod->wire2InsPortMp.find(var) == g_curMod->wire2InsPortMp.end() )
+  auto curMod = get_curMod();
+  if( curMod->wire2InsPortMp.find(var) == curMod->wire2InsPortMp.end() )
     return false;
-  auto tmpPair = g_curMod->wire2InsPortMp[var];
+  auto tmpPair = curMod->wire2InsPortMp[var];
   std::string insName = tmpPair.first;
-  std::string subModName = g_curMod->ins2modMap[insName];
+  std::string subModName = curMod->ins2modMap[insName];
   auto subMod = g_moduleInfoMap[subModName];
   std::string port = tmpPair.second;
   return subMod->moduleOutputs.find(port) != subMod->moduleOutputs.end();
@@ -980,7 +992,8 @@ bool is_submod_output(const std::string &var) {
 
 
 std::shared_ptr<ModuleInfo_t> get_mod_info(std::string insName) {
-  std::string modName = g_curMod->ins2modMap[insName];
+  auto curMod = get_curMod();
+  std::string modName = curMod->ins2modMap[insName];
   return g_moduleInfoMap[modName];
 }
 
@@ -988,15 +1001,15 @@ std::shared_ptr<ModuleInfo_t> get_mod_info(std::string insName) {
 std::string get_hier_name(bool includeTopModule) {
   std::string ret;
   if(includeTopModule)
-    for(auto it = g_instancePairVec.begin(); 
-          it != g_instancePairVec.end(); it++) {
-      ret = ret + "." + it->first;
+    for(auto it = g_insContextStk.begin(); 
+          it != g_insContextStk.end(); it++) {
+      ret = ret + "." + it->InsName;
     }
   else {
-    if(g_instancePairVec.size() == 1) return "";
-    for(auto it = g_instancePairVec.begin()+1; 
-          it != g_instancePairVec.end(); it++) {
-      ret = ret + "." + it->first;
+    if(g_insContextStk.size() == 1) return "";
+    for(auto it = g_insContextStk.begin()+1; 
+          it != g_insContextStk.end(); it++) {
+      ret = ret + "." + it->InsName;
     }
   }
   ret = ret.substr(1);
@@ -1005,12 +1018,14 @@ std::string get_hier_name(bool includeTopModule) {
 
 
 bool is_top_module() {
-  return g_curMod->name == g_topModule;
+  auto curMod = get_curMod();
+  return curMod->name == g_topModule;
 }
 
 
 bool is_sub_module() {
-  return g_curMod->isSubMod;
+  //return curMod->isSubMod;
+  return !is_top_module();
 }
 
 
@@ -1095,9 +1110,10 @@ std::vector<std::string> print_map_keys(std::map<std::string, astNode*> &map) {
 
 
 std::string ask_for_my_ins_name() {
-  std::string myModName = g_curMod->name;
-  if(g_curMod->parentMod == nullptr) return myModName;
-  auto parentMod = g_curMod->parentMod;
+  const auto curMod = get_curMod();
+  std::string myModName = curMod->name;
+  if(get_parentMod() == nullptr) return myModName;
+  auto parentMod = get_parentMod();
   std::string insName;
   for(auto pair : parentMod->ins2modMap) {
     if(insName.empty() && pair.second == myModName)
@@ -1116,6 +1132,67 @@ void check_no_slice(std::string varAndSlice) {
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
   assert(varSlice.empty());
+}
+
+
+std::string get_insName() {
+  return g_insContextStk.back().InsName;
+}
+
+
+std::string get_target() {
+  return g_insContextStk.back().Target;
+}
+
+
+void set_target(const std::string &tgtIn) {
+  if(!g_insContextStk.back().Target.empty()) {
+    toCout("Warning: target has already been set: "
+             +g_insContextStk.back().Target);
+  }
+  g_insContextStk.back().Target = tgtIn;
+}
+
+std::shared_ptr<ModuleInfo_t> get_curMod() {
+  if(g_insContextStk.size() == 0) {
+    toCout("Error: g_insContextStk is empty!");
+    abort();
+  }
+  return g_insContextStk.back().ModInfo;
+}
+
+
+std::shared_ptr<ModuleInfo_t> get_parentMod() {
+  auto parentInfo = g_insContextStk.back().ParentModInfo;
+  uint32_t depth = get_stk_depth();
+  if( depth > 1)
+    assert(parentInfo == g_insContextStk[depth-2].ModInfo);
+  return parentInfo;
+}
+
+
+llvm::Function* get_func() {
+  return g_insContextStk.back().Func;
+}
+
+
+uint32_t get_stk_depth() {
+  return g_insContextStk.size();
+}
+
+
+std::shared_ptr<ModuleInfo_t> get_real_parentMod() {
+  auto parentMod = get_parentMod();
+  if(parentMod != nullptr) return parentMod;
+  else {
+    assert(get_stk_depth() == 1);
+    auto curMod = get_curMod();
+    if(curMod->name == g_topModule) return nullptr;
+    else {
+      assert(curMod->parentModVec.size() == 1);
+      return curMod->parentModVec.front();
+    }
+  }
 }
 
 

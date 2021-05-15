@@ -55,6 +55,7 @@ struct FuncInfo_t {
 // this structu is filled only during parsing
 // ast building only reads info, 
 // except parentMod and rootNode
+// all data should be static
 class ModuleInfo_t {
   private:
   std::map<std::string, astNode*> out2RootNodeMp;
@@ -70,13 +71,12 @@ class ModuleInfo_t {
 
   // data structure
   std::string name;
-  std::string curTarget;
-  std::string pendingOutPortTimed;
+  //std::string curTarget;
   std::string clk;
   std::string rst;
   uint32_t minInOutDelay;
   uint32_t rootTimeIdx;
-  std::shared_ptr<ModuleInfo_t> parentMod;
+  std::vector<std::shared_ptr<ModuleInfo_t>> parentModVec;
   StrSet_t moduleAs;
   bool isSubMod = false;
   std::set<std::string> invarRegs;
@@ -114,6 +114,29 @@ class ModuleInfo_t {
            std::map<std::string, uint32_t>> out2InDelayMp;
   /// key is arg name, value is its iterator
   /// only top module map has this data structur->e
+};
+
+
+// this context contains all the information needed for an instance
+struct Context_t {
+  Context_t(std::string InsName, 
+            std::string Target,
+            std::shared_ptr<ModuleInfo_t> ModInfo,
+            std::shared_ptr<ModuleInfo_t> ParentModInfo,
+            llvm::Function* Func                       
+            ): 
+     InsName        (InsName      ),  
+     Target         (Target       ),  
+     ModInfo        (ModInfo      ),  
+     ParentModInfo  (ParentModInfo),  
+     Func           (Func         )
+     {}
+
+  std::string InsName;
+  std::string Target;
+  std::shared_ptr<ModuleInfo_t> ModInfo;
+  std::shared_ptr<ModuleInfo_t> ParentModInfo;
+  llvm::Function* Func;                       
 };
 
 
@@ -169,9 +192,7 @@ extern std::stack<std::string> g_instanceStk;
 // module name, instead of instance name.
 // Currently there is a restriction: the first module in the vector can only
 // have one instance
-extern std::vector<std::pair<std::string, 
-                             std::shared_ptr<ModuleInfo_t>>> g_instancePairVec;
-extern std::shared_ptr<ModuleInfo_t> g_curMod;
+extern std::vector<Context_t> g_insContextStk;
 
 // llvm
 extern std::shared_ptr<llvm::LLVMContext> TheContext;

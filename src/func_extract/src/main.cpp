@@ -102,8 +102,8 @@ int main(int argc, char *argv[]) {
   if(printRegInfo) {  
     // collect all regs
     toCout("#### Gegin collect regs and print info");
-    g_curMod = g_moduleInfoMap[g_topModule];    
-    collect_regs(g_curMod, "");
+    auto curMod = g_moduleInfoMap[g_topModule];    
+    collect_regs(curMod, "");
     print_reg_info();
     return 0;
   }

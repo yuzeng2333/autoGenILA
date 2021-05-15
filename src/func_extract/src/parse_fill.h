@@ -19,6 +19,7 @@
 
 namespace funcExtract {
 
+extern std::shared_ptr<ModuleInfo_t> g_curMod;
 
 struct InstrInfo_t {
   std::map<std::string, std::vector<std::string>> instrEncoding;

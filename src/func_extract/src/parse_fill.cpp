@@ -101,7 +101,7 @@ void parse_verilog(std::string fileName) {
     if(line.find("_0699_") != std::string::npos) {
       toCout("Find it!");
     }
-    fill_var_width(line, g_curMod->varWidth);
+    fill_var_width(line, get_curMod()->varWidth);
     //toCout(line);
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       case_expr(line, input);
@@ -122,7 +122,10 @@ void parse_verilog(std::string fileName) {
 
         toCout("=== Begin module: "+m.str(2));
         if(g_moduleInfoMap.find(g_currentModuleName) != g_moduleInfoMap.end()) {
-          g_curMod = g_moduleInfoMap[g_currentModuleName];
+          auto curMod = g_moduleInfoMap[g_currentModuleName];
+          Context_t insCntxt(curMod->name, "", curMod, nullptr, nullptr);
+          g_insContextStk.clear();
+          g_insContextStk.push_back(insCntxt);
         }
         else {
           toCout("Error: unexpected module: "+g_currentModuleName);
@@ -544,10 +547,12 @@ void get_io(const std::string &fileName) {
   std::string line;
   std::smatch match;
   while( std::getline(input, line) ) {
+    toCoutVerb(line);
     if(line.empty() || is_comment_line(line)
           || line.find_first_not_of(' ') == line.length())
       continue;
-    fill_var_width(line, g_curMod->varWidth);    
+    if(get_stk_depth() > 0)
+      fill_var_width(line, get_curMod()->varWidth);    
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       continue;
     }
@@ -654,8 +659,9 @@ void clean_submod(std::ifstream &input,
 // before building ast tree, determine rst and clk for
 // each module. This should be done top-down.
 void determine_clk_rst() {
-  g_curMod->clk = g_recentClk;
-  g_curMod->rst = g_recentRst;
+  const auto curMod = get_curMod();
+  curMod->clk = g_recentClk;
+  curMod->rst = g_recentRst;
   std::shared_ptr<ModuleInfo_t> topModInfo = g_moduleInfoMap[g_topModule];
   std::set<std::string> visitedMod;
   determine_clk_rst_iter(topModInfo, visitedMod);

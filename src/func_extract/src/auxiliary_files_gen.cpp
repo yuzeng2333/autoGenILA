@@ -53,7 +53,8 @@ void auxiliary_files_gen(const std::string &path, uint32_t delay) {
     vmapFile << "      \""+in+"\": \""+in+"\"," << el;
   }
 
-  for(auto it = g_curMod->funcTable.begin(); it != g_curMod->funcTable.end(); it++) {
+  const auto curMod = g_moduleInfoMap[g_topModule];
+  for(auto it = curMod->funcTable.begin(); it != curMod->funcTable.end(); it++) {
     auto &funcInfo = it->second;
     for(auto in = funcInfo.inputs.begin(); in != funcInfo.inputs.end(); in++) {
       if(addedVar.find(*in) == addedVar.end() && !is_number(*in)) {
@@ -66,7 +67,7 @@ void auxiliary_files_gen(const std::string &path, uint32_t delay) {
   }
 
   // FIXME
-  for(auto it = g_curMod->moduleAs.begin(); it != g_curMod->moduleAs.end(); it++) {
+  for(auto it = curMod->moduleAs.begin(); it != curMod->moduleAs.end(); it++) {
     // make mapping for submodule's inputs. They should be checked
     if(addedVar.find(*it) == addedVar.end()) {    
       addedVar.insert(*it);
@@ -75,7 +76,7 @@ void auxiliary_files_gen(const std::string &path, uint32_t delay) {
       vmapFile << "      \""+asVar+"\": \""+asVar+"\"," << el;
     }
   }
-  std::string lastVar = *g_curMod->moduleAs.rbegin();
+  std::string lastVar = *curMod->moduleAs.rbegin();
   lastVar = purify_var_name(lastVar);
   vmapFile << "      \""+lastVar+"\": \""+lastVar+"\"" << el;
   vmapFile << "    }," << el << el;
@@ -128,7 +129,7 @@ void auxiliary_files_gen(const std::string &path, uint32_t delay) {
     infoFile << var+"__:__"+toStr(width)+", YES" << std::endl;
   }
 
-  for(auto it = g_curMod->moduleAs.begin(); it != g_curMod->moduleAs.end(); it++) {
+  for(auto it = curMod->moduleAs.begin(); it != curMod->moduleAs.end(); it++) {
     uint32_t width = get_var_slice_width_simp(*it);
     if(g_regWithFunc.find(*it) == g_regWithFunc.end()) {
       std::string var = purify_var_name(*it);
