@@ -105,7 +105,7 @@ void build_tree_for_single_as(std::string regAndSlice) {
   const auto curMod = get_curMod();  
   std::string reg, regSlice;
   split_slice(regAndSlice, reg, regSlice);
-  assert(regSlice.empty());
+  //assert(regSlice.empty());
   std::string myInsName = ask_for_my_ins_name();
   set_target(reg);
   uint32_t regWidth = get_var_slice_width_cmplx(regAndSlice);

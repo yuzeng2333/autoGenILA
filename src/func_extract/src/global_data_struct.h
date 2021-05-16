@@ -187,7 +187,6 @@ extern std::string DELIM;
 // for hierarchical store
 extern std::set<std::string> g_blackBoxModSet;
 extern std::map<std::string, std::shared_ptr<ModuleInfo_t>> g_moduleInfoMap;
-extern std::stack<std::string> g_instanceStk;
 // first of pair is instance name, however, the first in the vector should be
 // module name, instead of instance name.
 // Currently there is a restriction: the first module in the vector can only

@@ -20,7 +20,6 @@ namespace funcExtract {
 //static std::shared_ptr<KaleidoscopeJIT> TheJIT;
 //static std::map<std::string, std::shared_ptr<llvm::PrototypeAST>> FunctionProtos;
 
-std::stack<std::string> g_instanceStk;
 uint32_t bound_limit;
 std::regex pTimed("^(\\S+)"+DELIM+"(\\d+)$");
 std::string CURRENT_VAR;
@@ -301,7 +300,7 @@ void print_llvm_ir(DestInfo &destInfo,
 
     llvm::LoadInst *retArr = Builder->CreateLoad(retTy, arrPtr, llvm::Twine("retArr"));
     Builder->CreateRet(value(retArr));
-  }
+  } // end of add vector
 
   llvm::verifyFunction(*TheFunction);
 

@@ -1291,7 +1291,9 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     // make bb for the function
     llvm::BasicBlock *localBB 
       = llvm::BasicBlock::Create(*c, "bb_;_"+modName+"_$"+outPort, subFunc);
-    b->SetInsertPoint(localBB);
+    std::shared_ptr<llvm::IRBuilder<>> localBuilder 
+      = std::make_unique<llvm::IRBuilder<>>(*c);      
+    localBuilder->SetInsertPoint(localBB);
 
     Context_t insCntxt(insName, outPort, subMod, curMod, subFunc);
     g_insContextStk.push_back(insCntxt);
@@ -1309,13 +1311,12 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     // when makin
     toCout("~~~~~~~~~~~~~~~~ Enter via output from :"+curMod->name+" to :"+subMod->name);    
     llvm::Value* ret = add_constraint(subMod->get_outport_node(outPort), 
-                                      0, c, b, bound);
+                                      0, c, localBuilder, bound);
     g_insContextStk.pop_back();
     toCout("~~~~~~~~~~~~~~~~ Return via output from :"+subMod->name+" to :"+curMod->name);        
-    Builder->CreateRet(ret);
+    localBuilder->CreateRet(ret);
     llvm::verifyFunction(*subFunc);
     llvm::verifyModule(*TheModule);
-    b->SetInsertPoint(BB);
   }
   // args to be used when call functions
   std::vector<llvm::Value*> args;
