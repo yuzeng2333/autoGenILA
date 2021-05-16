@@ -680,6 +680,8 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
     retExpr = add_ssa_constraint(node, timeIdx, c, b, bound);
   }
   curMod->existedExpr[curTgt].emplace(timed_name(varAndSlice, timeIdx), retExpr);
+  if(curMod->name == "T" && curTgt == "out" && varAndSlice == "in" && timeIdx == 1)
+    toCout("push into expr!");
   return retExpr;
 }
 
