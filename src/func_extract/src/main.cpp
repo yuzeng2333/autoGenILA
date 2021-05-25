@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
   std::string time(ctime(&my_time));
   g_outFile << "Start time: "+time << std::endl;
   toCout("Begin main!");
-  g_verb = false;
+  g_verb = true;
   g_print_solver = false;
   g_remove_adff = true;
   g_split_long_num = true;
@@ -105,6 +105,9 @@ int main(int argc, char *argv[]) {
     auto curMod = g_moduleInfoMap[g_topModule];    
     collect_regs(curMod, "");
     print_reg_info();
+    std::vector<std::string> mems;
+    collect_mems(curMod, "", mems);
+    print_mem_info(mems);
     return 0;
   }
   determine_clk_rst();

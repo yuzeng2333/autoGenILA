@@ -1,7 +1,7 @@
 #1:
 (1)
-//mem_rdata = 7'b0+5'bx+5'bx+3'h0+5'b1+5'hc+2'h3
-mem_rdata = 7'b0+5'h2+5'h3+3'h0+5'b1+5'hc+2'h3
+// lb
+mem_rdata = 12'h2+5'h2+3'h0+5'h1+5'h0+2'h3
 resetn = 1
 mem_ready = 1
 pcpi_wr = 0
@@ -10,8 +10,7 @@ pcpi_wait = 0
 pcpi_ready = 0
 irq = 0
 (2)
-//mem_rdata = 7'b0+5'bx+5'bx+3'h0+5'b1+5'hc+2'h3
-mem_rdata = 7'b0+5'h2+5'h3+3'h0+5'b1+5'hc+2'h3
+mem_rdata = 12'h2+5'h2+3'h0+5'h1+5'h0+2'h3
 resetn = 1
 mem_ready = 1
 pcpi_wr = 0
@@ -20,8 +19,7 @@ pcpi_wait = 0
 pcpi_ready = 0
 irq = 0
 (3)
-//mem_rdata = 7'b0+5'bx+5'bx+3'h0+5'b1+5'hc+2'h3
-mem_rdata = 7'b0+5'h2+5'h3+3'h0+5'b1+5'hc+2'h3
+mem_rdata = 12'h2+5'h2+3'h0+5'h1+5'h0+2'h3
 resetn = 1
 mem_ready = 1
 pcpi_wr = 0
@@ -30,6 +28,7 @@ pcpi_wait = 0
 pcpi_ready = 0
 irq = 0
 R:
+\cpuregs[0]
 \cpuregs[1]
 \cpuregs[2]
 \cpuregs[3]
@@ -61,63 +60,19 @@ R:
 \cpuregs[29]
 \cpuregs[30]
 \cpuregs[31]
-//instr_xor
-//decoder_pseudo_trigger
-//decoder_trigger
-//mem_rdata_q
 reg_next_pc
 W:
-\cpuregs[1](skip) 8
-//alu_out_q(skip) 7
-//cpuregs_wrdata(skip) 7
-//alu_out(skip) 6
-//is_lui_auipc_jal_jalr_addi_add_sub(skip) 6
-//alu_add_sub(skip) 6
-//cpuregs_rs1(skip) 5
-//instr_add(skip) 3
-//mem_rdata_q(skip) 2
-//mem_rdata(skip) 1
+\cpuregs[1](skip) 7
 $NOP:
-mem_rdata = 25'b0+5'b00100+2'b11
+//mem_rdata = 25'b0+5'b00100+2'b11
+mem_rdata = x
 resetn = 1
-mem_ready = 0
+// The following is special
+mem_ready = 1
 pcpi_wr = 0
 pcpi_rd = 0
 pcpi_wait = 0
 pcpi_ready = 0
 irq = 0
-$INVAR:
-cpu_state
-mem_state
-decoder_pseudo_trigger
-decoder_pseudo_trigger_q
-decoder_trigger_q
-eoi
-instr_add
-instr_and
-instr_beq
-instr_bge
-instr_bgeu
-instr_blt
-instr_bltu
-instr_bne
-instr_or
-instr_sll
-instr_slt
-instr_sltu
-instr_sra
-instr_srl
-instr_sub
-instr_xor
-latched_branch
-latched_is_lh
-latched_is_lu
-mem_do_prefetch
-mem_do_rdata
-mem_do_rinst
-mem_do_wdata
-mem_valid
-pcpi_valid
-trap
 $TOP:
 picorv32

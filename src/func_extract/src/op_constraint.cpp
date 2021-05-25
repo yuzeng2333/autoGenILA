@@ -486,6 +486,10 @@ llvm::Value* two_op_constraint(astNode* const node, uint32_t timeIdx, context &c
 
   // add llvm::Value*ession to s or g
   std::string destTimed = timed_name(destAndSlice, timeIdx);
+  if(node->op == "===") {
+    assert(is_number(op1AndSlice) || is_number(op2AndSlice));
+    assert(!is_x(op1AndSlice) && !is_x(op2AndSlice));
+  }
   return make_llvm_instr(b, c, node->op, op1Expr, op2Expr, 
                          destWidthNum, op1WidthNum, op2WidthNum, llvm::Twine(destTimed));
 }
@@ -670,19 +674,34 @@ llvm::Value* src_concat_op_constraint(astNode* const node, uint32_t timeIdx,
   toCoutVerb("Src concat op constraint for: "+node->dest);
   const auto curMod = get_curMod();  
   std::string destAndSlice = node->dest;
-  if(destAndSlice == "fangyuan3")
+  if(destAndSlice == "fangyuan36")
     toCoutVerb("Find it");
   std::string dest, destSlice;
   split_slice(destAndSlice, dest, destSlice);
   uint32_t destHi = get_lgc_hi(destAndSlice);
   uint32_t destLo = get_lgc_lo(destAndSlice);
+  uint32_t destWidth = destHi - destLo + 1;
 
   // analyze index of srcVec
   uint32_t srcHi = get_lgc_hi(node->srcVec[0]);
   uint32_t srcLo = get_lgc_lo(node->srcVec.back());
   bool noinline;
   if(destAndSlice.find("fangyuan") != std::string::npos) noinline = false;
-  llvm::Value* restConcatExpr = add_one_concat_expr(node, 0, timeIdx, c, b, bound, noinline);  
+  llvm::Value* restConcatExpr = add_one_concat_expr(node, 0, timeIdx, c, b, bound, noinline);
+
+  uint32_t concatWidth = get_value_width(restConcatExpr);
+  if(concatWidth < destWidth) {
+    if(destSlice.empty()) {
+      toCout("Warning: concatnated width is smaller than dest width");
+      curMod->varWidth.force_insert(dest, concatWidth-1, 0);
+    }
+    else {
+      toCout("Error: concatnated width is smaller than dest width");
+      abort();
+    //uint32_t extraZero = destWidth - concatWidth;
+    //restConcatExpr = concat_func(llvmInt(0, extraZero, c), restConcatExpr, c, b, noinline);
+    }
+  }
 
   return restConcatExpr;  
 }
@@ -734,7 +753,7 @@ llvm::Value* ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c
   assert(node->srcVec.size() == 3);
 
   std::string destAndSlice = node->dest;
-  if(destAndSlice == "_0146_" && timeIdx == 25) {
+  if(destAndSlice == "_0_" && timeIdx == 1) {
     toCout("find it!");
   }
   std::string condAndSlice = node->srcVec[0];
@@ -807,6 +826,9 @@ llvm::Value* ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c
     condExpr = tmpExpr;
   else
     condExpr = extract_func(tmpExpr, condHi, condLo, c, b, condAndSlice);
+
+  uint32_t condValueWidth = get_value_width(condExpr);
+  toCoutVerb("Width of cond var: "+toStr(condValueWidth));
 
   llvm::Value* iteCond = b->CreateICmpEQ(condExpr, llvmInt(1, 1, c));
 
@@ -945,7 +967,7 @@ llvm::Value* case_constraint(astNode* const node, uint32_t timeIdx,
                              context &c, builder &b, uint32_t bound) {
   toCoutVerb("Case op constraint for :"+node->dest);
   const auto curMod = get_curMod();  
-  if(node->dest == "cpuregs_wrdata")
+  if(node->dest == "ap_NS_fsm")
     toCout("Find it!");
   assert(node->type == CASE);
   assert(node->srcVec.size() % 2 == 1);
@@ -1031,7 +1053,7 @@ llvm::Value* add_one_case_branch_expr(astNode* const node, llvm::Value* &caseVar
     }
 
     llvm::Value* elseRet = add_one_case_branch_expr(node, caseVarExpr, idx+2, 
-                                                    timeIdx, c, b, bound, timed_name(dest, timeIdx));
+                                                    timeIdx, c, b, bound, dest);
     return b->CreateSelect(iteCond, thenRet, elseRet, 
                            llvm::Twine( timed_name(dest+"_;_case_src"+toStr(idx), timeIdx)));
   }
@@ -1212,6 +1234,10 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
   auto pair = curMod->wire2InsPortMp[destAndSlice];
   std::string insName = pair.first;
   toCout("--- Begin submod: "+insName);
+  if(destAndSlice 
+     == "hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din") {
+    toCout("Find it!");
+  }
   if(insName == "s4") {
     toCout("Find it!");
   }
@@ -1219,18 +1245,32 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     toCout("Warning: insName: "+insName+", node->op: "+node->op);
   }
   std::string outPort = pair.second;
+
   auto subMod = get_mod_info(insName);
   std::string modName = subMod->name;
   if(modName == "xS")
     toCout("Find xS");
 
+  // if sub-module is memory, do not make the submodule
+  // directly return the function arg correspond to the submodule output
+  if( is_mem_module(modName) ) {
+    //std::string prefix = get_hier_name();
+    std::string portName = insName+"."+outPort+DELIM+toStr(bound);
+    return get_arg(portName);
+  }
+  
+  // making or call the sub-function
   llvm::FunctionType *FT;
   llvm::Function *subFunc;  
   RegWidthVec_t subModRegWidth;
+  std::vector<std::pair<std::string, std::string>> subModMemInstances;  
   // collect all regs in current module and sub-instances
   collect_regs(subMod, "", subModRegWidth);
+  collect_mem_ins(subMod, "", subModMemInstances);
+  
   uint32_t funcBound;
-  std::vector<llvm::Type *> argTy;  
+  std::vector<llvm::Type *> argTy;
+  bool subModExist = false;
   if(subMod->out2FuncMp.find(outPort) != subMod->out2FuncMp.end()) {
     // FIXME:
     // This many not be true for some designs, since differnet instances may 
@@ -1238,7 +1278,8 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     auto tmpPair = subMod->out2FuncMp[outPort];
     subFunc = tmpPair.first;
     funcBound = tmpPair.second;
-    FT = subFunc->getFunctionType();    
+    FT = subFunc->getFunctionType();
+    subModExist = true;
   }
   else {
     // make the func
@@ -1249,7 +1290,26 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
       uint32_t width = it->second;
       argTy.push_back(llvm::IntegerType::get(*TheContext, width));
     }
-    
+    if(destAndSlice 
+       == "hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din") {
+      toCout("---------------------------------------------------------------- argTy size 1: "+toStr(argTy.size()));
+    } 
+
+    // push output ports of memory modules
+    for(auto it = subModMemInstances.begin(); it != subModMemInstances.end(); it++) {
+      std::string pathInsName = it->first;
+      std::string modName = it->second;
+      auto memMod = g_moduleInfoMap[modName];
+      for( auto output : memMod->moduleOutputs ) {
+        uint32_t width = get_var_slice_width_simp(output, memMod);
+        argTy.push_back(llvm::IntegerType::get(*TheContext, width));
+      }
+    }
+    if(destAndSlice 
+       == "hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din") {
+      toCout("---------------------------------------------------------------- argTy size 2: "+toStr(argTy.size()));
+    } 
+
     // the function args here is redundant. 
     // Later constraint elaboration will tell which inputs are necessary
     // TODO: start from timeIdx is wrong
@@ -1263,6 +1323,10 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
         argTy.push_back(llvm::IntegerType::get(*TheContext, width));
       }
     }
+    if(destAndSlice 
+       == "hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din") {
+      toCout("---------------------------------------------------------------- argTy size 3: "+toStr(argTy.size()));
+    } 
 
     //std::string hierName = get_hier_name();
     FT = llvm::FunctionType::get(retTy, argTy, false);
@@ -1279,6 +1343,26 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
       // TODO: change bound to bound
       (subFunc->args().begin()+idx++)->setName(it->first+DELIM+toStr(bound));
     }
+    if(destAndSlice 
+       == "hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din") {
+      toCout("---------------------------------------------------------------- idx size 1: "+toStr(idx));       
+    }
+
+    for(auto it = subModMemInstances.begin(); it != subModMemInstances.end(); it++) {
+      std::string pathInsName = it->first;
+      std::string modName = it->second;
+      auto memMod = g_moduleInfoMap[modName];
+      for( auto output : memMod->moduleOutputs ) {
+        std::string portName = pathInsName+"."+output+DELIM+toStr(bound);
+        toCout("set mem ouput func arg, mem: "+pathInsName+", output: "+output);
+        (subFunc->args().begin()+idx++)->setName(portName);
+      }
+    }
+    if(destAndSlice 
+       == "hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din") {
+      toCout("---------------------------------------------------------------- idx size 2: "+toStr(idx));       
+    }
+
     for(uint32_t i = 0; i <= bound; i++) {
       for(auto it = subMod->moduleInputs.begin(); 
             it != subMod->moduleInputs.end(); it++) {
@@ -1286,6 +1370,10 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
         toCoutVerb("set func arg: "+*it+DELIM+toStr(i));
         (subFunc->args().begin()+idx++)->setName(*it+DELIM+toStr(i));
       }
+    }
+    if(destAndSlice 
+       == "hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din") {
+      toCout("---------------------------------------------------------------- idx size 3: "+toStr(idx));       
     }
 
     // make bb for the function
@@ -1333,6 +1421,25 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     auto arg = get_arg(insName+"."+regName+DELIM+toStr(bound), curFunc);
     args.push_back(arg);
   }
+  if(destAndSlice 
+     == "hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din") {
+     toCout("---------------------------------------------------------------- arg size 1: "+toStr(args.size()));     
+  }
+
+  // push output ports of memory modules
+  for(auto it = subModMemInstances.begin(); it != subModMemInstances.end(); it++) {
+    std::string pathInsName = it->first;
+    std::string modName = it->second;
+    auto memMod = g_moduleInfoMap[modName];
+    for( auto output : memMod->moduleOutputs ) {
+      auto arg = get_arg(insName+"."+pathInsName+"."+output+DELIM+toStr(bound), curFunc);
+      args.push_back(arg);
+    }
+  }
+  if(destAndSlice 
+     == "hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din") {
+     toCout("---------------------------------------------------------------- arg size 2: "+toStr(args.size()));     
+  }
 
   uint32_t i;
   // push func input args
@@ -1343,13 +1450,19 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     if(i < timeIdx + minDelay) {
       // these inputs for submod would not be used, so just give 0.
       for(auto it = subMod->moduleInputs.begin(); it != subMod->moduleInputs.end(); it++) {
+        toCout("push input: "+*it+", timeIdx: "+toStr(i));
         if(*it == subMod->clk) continue;
         uint32_t width = get_var_slice_width_simp(*it, subMod);
         args.push_back(llvmInt(0, width, c));
+        if(destAndSlice 
+          == "hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din") {
+          toCout("---------------------------------------------------------------- tmp arg size: "+toStr(args.size()));
+        }
       }
     }
     else {
       for(auto it = subMod->moduleInputs.begin(); it != subMod->moduleInputs.end(); it++) {
+        toCout("push input: "+*it+", timeIdx: "+toStr(i));      
         if(*it == subMod->clk) continue;      
         std::string connectWire = curMod->insPort2wireMp[insName][*it];
         if(connectWire.empty()) {
@@ -1372,23 +1485,40 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
           uint32_t lo = get_lgc_lo(connectWire);
           args.push_back(extract_func(srcVal, hi, lo, c, b));
         }
+        if(destAndSlice 
+          == "hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din") {
+          toCout("---------------------------------------------------------------- tmp arg size: "+toStr(args.size()));
+        }
       }
     }
+  }
+  if(destAndSlice 
+     == "hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din") {
+     toCout("---------------------------------------------------------------- arg size 3: "+toStr(args.size()));     
   }
 
   // may need to add more 0 value args to meet the arg length requirement
   for(uint32_t i = 0; i < timeIdx; i++) {
     for(auto it = subMod->moduleInputs.begin(); it != subMod->moduleInputs.end(); it++) {
+      toCout("push input: "+*it+", timeIdx: "+toStr(i));    
       if(*it == subMod->clk) continue;    
       std::string connectWire = curMod->insPort2wireMp[insName][*it];
       uint32_t width = get_var_slice_width_simp(connectWire);
       args.push_back(llvmInt(0, width, c));
     }
   }
+  if(destAndSlice 
+     == "hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din") {
+    toCout("---------------------------------------------------------------- arg size 4: "+toStr(args.size()));    
+  }
 
-  toCoutVerb("--- To call function!");
+  toCoutVerb("--- To call function for: "+destAndSlice);
   std::string destTimed = timed_name(destAndSlice, timeIdx);
-  //assert(argTy.size() == args.size());
+  if(!subModExist && argTy.size() != args.size()) {
+    toCout("argTy size: "+toStr(argTy.size())
+           +", args size: "+toStr(args.size()));
+    abort();
+  }
   return b->CreateCall(FT, subFunc, args, llvm::Twine(destTimed));
 }
 
@@ -1418,6 +1548,9 @@ llvm::Value* make_llvm_instr(std::shared_ptr<llvm::IRBuilder<>> &b,
     return b->CreateXor(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
   }
   else if (op == "==") {
+    return b->CreateICmpEQ(zext(op1Expr, opWidth, c, b), zext(op2Expr, opWidth, c, b), name);
+  }
+  else if (op == "===") {
     return b->CreateICmpEQ(zext(op1Expr, opWidth, c, b), zext(op2Expr, opWidth, c, b), name);
   }
   else if (op == "!=") {

@@ -37,6 +37,8 @@ extern std::regex pSingleLine;
 extern std::regex pNbLine;
 extern std::map<std::string, astNode*> g_varNode;
 extern StrSet_t moduleAs;
+extern std::set<std::string> g_mem;
+
 
 void clear_global_vars();
 

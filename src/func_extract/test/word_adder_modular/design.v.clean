@@ -38,7 +38,8 @@ module word_adder(clk, rst, func, inWord, result);
   wire enable;
   input [1:0] func;
   input [8:0] inWord;
-  output [8:0] result;
+  wire [17:0] result0;
+  output [17:0] result;
   input rst;
   reg [8:0] word;
   wire [8:0] word_next;
@@ -51,8 +52,11 @@ module word_adder(clk, rst, func, inWord, result);
   adder u0 (
     .clk(clk),
     .enable0(enable),
-    .result0(result),
+    .result0(result0[8:0]),
     .rst(rst),
     .word0(word)
   );
+  assign result0[17:9] = inWord;
+  assign result[1:0] = result0[1:0];
+  assign result[17:2] = result0[17:2];
 endmodule

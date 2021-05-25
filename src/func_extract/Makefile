@@ -44,10 +44,10 @@ ss1:
 	./build/func_extract ./test/aes_short_s 1
 
 1281:
-	./build/func_extract ./test/aes_128 1
+	./build/func_extract ./test/aes_128_hier 1
 
 128:
-	./build/func_extract ./test/aes_128 0
+	./build/func_extract ./test/aes_128_hier 0
 
 aes1:
 	./build/func_extract ./test/aes_fifo 1
@@ -168,3 +168,19 @@ rbmr:
 
 adder:
 	./build/func_extract ./test/adder 0
+
+vec1:
+	./build/func_extract ./test/vecAdd 1
+vec:
+	./build/func_extract ./test/vecAdd 0
+
+vecb1:
+	./build/func_extract ./test/vecAddBuffer 1
+vecb:
+	./build/func_extract ./test/vecAddBuffer 0
+
+vecf1:
+	./build/func_extract ./test/vecAddBufferFlat 1
+vecf:
+	./build/func_extract ./test/vecAddBufferFlat 0
+

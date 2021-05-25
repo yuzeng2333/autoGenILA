@@ -75,3 +75,5 @@ pcpi_rd = 0
 pcpi_wait = 0
 pcpi_ready = 0
 irq = 0
+$TOP:
+picorv32

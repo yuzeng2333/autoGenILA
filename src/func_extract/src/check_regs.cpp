@@ -41,6 +41,7 @@ std::vector<Context_t> g_insContextStk;
 std::set<std::string> INT_EXPR_SET;
 std::set<std::string> g_readASV;
 std::set<std::string> g_allRegs;
+std::vector<std::pair<std::string, std::string>> g_memInstances;
 // remaining variables to be built goal for
 std::queue<std::pair<std::string, uint32_t>> g_goalVars;
 std::string g_rootNode;
@@ -147,6 +148,7 @@ void print_llvm_ir(DestInfo &destInfo,
   std::shared_ptr<ModuleInfo_t> topModInfo = g_moduleInfoMap[g_topModule];
   g_regWidth.clear();
   collect_regs(topModInfo, "", g_regWidth);
+  collect_mem_ins(topModInfo, "", g_memInstances);
 
   // push regs
   // add regs from all instances of sub-modules to the args
@@ -156,10 +158,25 @@ void print_llvm_ir(DestInfo &destInfo,
     argTy.push_back(llvm::IntegerType::get(*TheContext, width));
     argNum++;
   }
+
+  // push output ports of memory modules
+  for(auto it = g_memInstances.begin(); it != g_memInstances.end(); it++) {
+    std::string pathInsName = it->first;
+    std::string modName = it->second;
+    auto memMod = g_moduleInfoMap[modName];
+    for( auto output : memMod->moduleOutputs ) {
+      uint32_t width = get_var_slice_width_simp(output, memMod);
+      argTy.push_back(llvm::IntegerType::get(*TheContext, width));
+      argNum++;
+    }
+  }
+ 
+
   // push inputs
   // bound = (delay in instr.txt) - 1
   for(uint32_t i = 0; i <= bound; i++)  
-    for(auto it = curMod->moduleInputs.begin(); it != curMod->moduleInputs.end(); it++) {
+    for(auto it = curMod->moduleInputs.begin(); 
+             it != curMod->moduleInputs.end(); it++) {
       if(*it == curMod->clk) continue;
       uint32_t width = get_var_slice_width_simp(*it, curMod);
       // FIXME the start and end index may be wrong
@@ -198,6 +215,22 @@ void print_llvm_ir(DestInfo &destInfo,
     argNum--;
     g_topFuncArgMp.emplace(regNameBound, TheFunction->args().begin()+idx++);
   }
+
+
+  for(auto it = g_memInstances.begin(); it != g_memInstances.end(); it++) {
+    std::string pathInsName = it->first;
+    std::string modName = it->second;
+    auto memMod = g_moduleInfoMap[modName];
+    for( auto output : memMod->moduleOutputs ) {
+      std::string portName = pathInsName+"."+output+DELIM+toStr(bound);
+      toCout("set mem ouput func arg, mem: "+pathInsName+", output: "+output);
+      (TheFunction->args().begin()+idx)->setName(portName);
+      (topFunction->args().begin()+idx)->setName(portName);
+      argNum--;
+      g_topFuncArgMp.emplace(portName, TheFunction->args().begin()+idx++);
+    }
+  }
+
 
   uint32_t argSize = TheFunction->arg_size();
   toCout("Function arg size is: "+toStr(argSize));
@@ -1017,6 +1050,16 @@ void print_reg_info() {
   }
   output << "Total width: "+toStr(totalWidth) << std::endl;
 }
+
+
+void print_mem_info(std::vector<std::string> &mems) {
+  std::ofstream output("./mem_info.txt");
+  for(auto it = mems.begin(); it != mems.end(); it++) {
+    std::string memName = *it;
+    output << memName  << std::endl;
+  }
+}
+
 
 
 std::string DestInfo::get_dest_name() {

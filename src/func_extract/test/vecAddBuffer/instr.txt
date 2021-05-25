@@ -1,0 +1,34 @@
+#1:
+rst = 1'd0
+func = 2'b10
+in = x
+R:
+vecAdd.len
+W:
+[
+buffer.buff0
+buffer.buff1
+buffer.buff2
+//buffer.buff3
+//buffer.buff4
+//buffer.buff5
+//buffer.buff6
+//buffer.buff7
+//buffer.buff8
+//buffer.buff9
+//buffer.buff10
+//buffer.buff11
+//buffer.buff12
+//buffer.buff13
+//buffer.buff14
+//buffer.buff15
+//buffer.buff16
+](skip) 5
+//buffer.buff0(skip) 5
+$NOP:
+rst = 1'd0
+func = 2'b00
+in = x
+$TOP:
+vecAdd_top
+

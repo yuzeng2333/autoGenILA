@@ -145,7 +145,9 @@ void mem_expr(std::string line) {
   std::string var = m.str(3);
   std::string sliceTop = m.str(4);
   memDims.emplace(var, std::make_pair(slice, sliceTop));
+  curMod->moduleMems.insert(var);
   
+  toCout("!!!!  Find mem: "+var);
   uint32_t varLen = get_end(sliceTop) + 1;
   moduleMems.emplace(var, varLen);
   assert(!is_output(var));
@@ -342,10 +344,16 @@ void nb_expr(std::string line) {
     toCout("Error in matching single line expression: "+line);
     return;
   }
-  auto ret = curMod->nbTable.emplace(m.str(2), line);
+  std::string destAndSlice = m.str(2);
+  auto ret = curMod->nbTable.emplace(destAndSlice, line);
   std::string dest, destSlice;
-  split_slice(m.str(2), dest, destSlice);
+  split_slice(destAndSlice, dest, destSlice);
   curMod->moduleTrueRegs.insert(dest);
+  remove_two_end_space(destAndSlice);
+  if(destAndSlice.back() == ']') {
+    toCout("!!! Find mem: "+dest);
+    curMod->moduleMems.insert(dest);
+  }
   if(!ret.second)
     toCout("Error in inserting ssaTable in nb for key: "+m.str(2));
 }

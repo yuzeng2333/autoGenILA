@@ -250,6 +250,15 @@ void collect_regs(std::shared_ptr<ModuleInfo_t> &curMod,
                   std::string regPrefix,
                   RegWidthVec_t &regWidth = g_regWidth);
 
+void collect_mems(std::shared_ptr<ModuleInfo_t> &curMod,
+                  std::string regPrefix, 
+                  std::vector<std::string> &mems);
+
+void collect_mem_ins(std::shared_ptr<ModuleInfo_t> &curMod,
+                  std::string regPrefix, 
+                  std::vector<std::pair<std::string, 
+                                        std::string>> &mems);
+
 void check_mod_name(std::string modName);
 
 std::string get_mod_name(std::string name);
@@ -265,6 +274,13 @@ std::string ask_for_my_ins_name();
 
 void check_no_slice(std::string varAndSlice);
 
+std::string remove_paramod(std::string modName);
+
+bool is_mem_module(std::string modName);
+
+uint32_t get_value_width(llvm::Value* in);
+
+void set_clk_rst(std::shared_ptr<ModuleInfo_t> &modInfo);
 } // end of namespace funcExtract
 
 

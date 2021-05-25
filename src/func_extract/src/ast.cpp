@@ -59,6 +59,7 @@ void build_ast_tree() {
   Context_t insCntxt(g_topModule, "", curMod, nullptr, nullptr);
   g_topModInfo = curMod;
   assert(!g_instrInfo.back().skipWriteASV.empty());
+  set_clk_rst(g_topModInfo);
   //assert(!curMod->moduleAs.empty());
   //for(std::string reg: curMod->moduleAs) {
   for(std::string reg: g_instrInfo.back().skipWriteASV) {
@@ -806,18 +807,18 @@ void add_submod_node(std::string var, uint32_t timeIdx, astNode* const node) {
   }
   //add_child_node(output, timeIdx, node);
   for(std::string input : subMod->moduleInputs) {
-    if(input == curMod->clk) {
+    std::string connectWire = curMod->insPort2wireMp[insName][input];  
+    if(connectWire == curMod->clk) {
       subMod->clk = input;
       continue;
     }
-    std::string connectWire = curMod->insPort2wireMp[insName][input];
     //if(connectWire == curMod->rst) {
     //  subMod->rst = input;
     //  continue;
     //}
     node->srcVec.push_back(connectWire);
-    if(connectWire == "word")
-      toCout("Find word!");
+    if(connectWire == "ap_clk")
+      toCout("Find ap_clk!");
     add_child_node(connectWire, timeIdx, node);
   }
   toCoutVerb("~~~~~~~~~~~~~~~~~~~~~~~~ After finish submod: "+insName

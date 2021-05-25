@@ -47,6 +47,7 @@ extern uint32_t bound_limit;
 extern bool g_ignoreSubModules;
 extern bool g_seeInputs;
 extern uint32_t g_maxDelay;
+extern std::vector<std::pair<std::string, std::string>> g_memInstances;
 
 void check_all_regs();
 
@@ -115,6 +116,7 @@ void clean_module_inputs();
 
 void print_reg_info();
 
+void print_mem_info(std::vector<std::string> &mems);
 } // end of namespace funcExtract
 
 #endif

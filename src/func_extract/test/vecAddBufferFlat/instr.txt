@@ -1,0 +1,33 @@
+#1:
+rst = 1'd0
+func = 2'b10
+in = x
+R:
+\u0.len
+W:
+[
+\u1.buff0
+\u1.buff1
+\u1.buff2
+//\u1.buff3
+//\u1.buff4
+//\u1.buff5
+//\u1.buff6
+//\u1.buff7
+//\u1.buff8
+//\u1.buff9
+//\u1.buff10
+//\u1.buff11
+//\u1.buff12
+//\u1.buff13
+//\u1.buff14
+//\u1.buff15
+//\u1.buff16
+](skip) 5
+//\u1.buff0(skip) 5
+$NOP:
+rst = 1'd0
+func = 2'b00
+in = x
+$TOP:
+vecAdd_top

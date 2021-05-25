@@ -1,0 +1,153 @@
+module buffer(clk, rst, valid, in, sum);
+  reg [3:0] buff0;
+  reg [3:0] buff1;
+  reg [3:0] buff10;
+  reg [3:0] buff11;
+  reg [3:0] buff12;
+  reg [3:0] buff13;
+  reg [3:0] buff14;
+  reg [3:0] buff15;
+  reg [3:0] buff16;
+  reg [3:0] buff2;
+  reg [3:0] buff3;
+  reg [3:0] buff4;
+  reg [3:0] buff5;
+  reg [3:0] buff6;
+  reg [3:0] buff7;
+  reg [3:0] buff8;
+  reg [3:0] buff9;
+  input clk;
+  input [3:0] in;
+  input rst;
+  output [3:0] sum;
+  input valid;
+  always @(posedge clk)
+    if (rst) buff16 <= 4'b0000;
+    else if (valid) buff16 <= buff15;
+  always @(posedge clk)
+    if (rst) buff15 <= 4'b0000;
+    else if (valid) buff15 <= buff14;
+  always @(posedge clk)
+    if (rst) buff14 <= 4'b0000;
+    else if (valid) buff14 <= buff13;
+  always @(posedge clk)
+    if (rst) buff13 <= 4'b0000;
+    else if (valid) buff13 <= buff12;
+  always @(posedge clk)
+    if (rst) buff12 <= 4'b0000;
+    else if (valid) buff12 <= buff11;
+  always @(posedge clk)
+    if (rst) buff11 <= 4'b0000;
+    else if (valid) buff11 <= buff10;
+  always @(posedge clk)
+    if (rst) buff10 <= 4'b0000;
+    else if (valid) buff10 <= buff9;
+  always @(posedge clk)
+    if (rst) buff9 <= 4'b0000;
+    else if (valid) buff9 <= buff8;
+  always @(posedge clk)
+    if (rst) buff8 <= 4'b0000;
+    else if (valid) buff8 <= buff7;
+  always @(posedge clk)
+    if (rst) buff7 <= 4'b0000;
+    else if (valid) buff7 <= buff6;
+  always @(posedge clk)
+    if (rst) buff6 <= 4'b0000;
+    else if (valid) buff6 <= buff5;
+  always @(posedge clk)
+    if (rst) buff5 <= 4'b0000;
+    else if (valid) buff5 <= buff4;
+  always @(posedge clk)
+    if (rst) buff4 <= 4'b0000;
+    else if (valid) buff4 <= buff3;
+  always @(posedge clk)
+    if (rst) buff3 <= 4'b0000;
+    else if (valid) buff3 <= buff2;
+  always @(posedge clk)
+    if (rst) buff2 <= 4'b0000;
+    else if (valid) buff2 <= buff1;
+  always @(posedge clk)
+    if (rst) buff1 <= 4'b0000;
+    else if (valid) buff1 <= buff0;
+  always @(posedge clk)
+    if (rst) buff0 <= 4'b0000;
+    else if (valid) buff0 <= in;
+  assign sum = buff16;
+endmodule
+module vecAdd(clk, rst, func, in, out, valid);
+  wire [3:0] _00_;
+  wire _01_;
+  wire [31:0] _02_;
+  wire [31:0] _03_;
+  wire [31:0] _04_;
+  wire _05_;
+  wire _06_;
+  wire _07_;
+  wire _08_;
+  wire _09_;
+  wire _10_;
+  wire _11_;
+  input clk;
+  input [1:0] func;
+  input [3:0] in;
+  reg [1:0] len;
+  output [3:0] out;
+  reg [3:0] out;
+  input rst;
+  reg running;
+  output valid;
+  reg valid;
+  assign _00_ = in + 2'b10;
+  wire [1:0] fangyuan0;
+  assign fangyuan0 = { _11_, _06_ };
+  assign _01_ = | fangyuan0;
+  always @(posedge clk)
+    if (rst) running <= 1'b0;
+    else running <= _02_[0];
+  always @(posedge clk)
+    if (rst) valid <= 1'b0;
+    else valid <= running;
+  always @(posedge clk)
+    if (rst) len <= 2'b00;
+    else if (_01_) len <= _04_[1:0];
+  always @(posedge clk)
+    if (rst) out <= 4'b0000;
+    else if (running) out <= _00_;
+  assign _05_ = func == 2'b10;
+  assign _06_ = func == 1'b1;
+  assign _07_ = len > 1'b0;
+  assign _08_ = len > 1'b1;
+  assign _09_ = _05_ && _07_;
+  assign _10_ = running && _08_;
+  assign _11_ = running && _07_;
+  assign _02_[0] = _09_ || _10_;
+  assign _03_[1:0] = len - 1'b1;
+  assign _04_[1:0] = _06_ ? in[1:0] : _03_[1:0];
+  assign _02_[31:1] = 31'b0000000000000000000000000000000;
+  assign _03_[30:2] = { _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31] };
+  assign _04_[31:2] = 30'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+endmodule
+module vecAdd_top(clk, rst, func, in, sum);
+  input clk;
+  input [1:0] func;
+  input [3:0] in;
+  wire [3:0] \interconnect ;
+  input rst;
+  output [3:0] sum;
+  wire valid;
+  vecAdd u0 (
+    .clk(clk),
+    .func(func),
+    .in(in),
+    .out(\interconnect ),
+    .rst(rst),
+    .valid(valid)
+  );
+  buffer u1 (
+    .clk(clk),
+    .in(\interconnect ),
+    .rst(rst),
+    .sum(sum),
+    .valid(valid)
+  );
+endmodule

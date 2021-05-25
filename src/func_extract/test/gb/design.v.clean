@@ -4175,7 +4175,7 @@ module hls_target_call_Loop_LB2D_shift_proc(ap_clk, ap_rst, ap_start, ap_done, a
   assign _018_ = exitcond_fu_163_p2 ? 3'b001 : 3'b100;
   assign _050_ = ap_CS_fsm == 2'b10;
   assign _017_ = ap_sig_bdd_102 ? 2'b01 : 2'b10;
-  wire [5:0] fangyuan36;
+  wire [3:0] fangyuan36;
   assign fangyuan36 = { 2'b00, _017_ };
   wire [6:0] fangyuan37;
   assign fangyuan37 = { 1'b0, _018_, _019_, 4'b0010 };
@@ -4678,7 +4678,7 @@ module hls_target_linebuffer_Loop_1_proc(ap_clk, ap_rst, ap_start, ap_done, ap_c
   assign _057_ = ap_CS_fsm == 2'b10;
   assign _015_ = _035_ ? 3'b100 : 3'b010;
   assign _012_ = ap_sig_bdd_142 ? 2'b01 : 2'b10;
-  wire [3:0] fangyuan39;
+  wire [2:0] fangyuan39;
   assign fangyuan39 = { 1'b0, _012_ };
   wire [4:0] fangyuan40;
   assign fangyuan40 = { _015_, 3'b001 };

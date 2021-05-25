@@ -19,6 +19,7 @@ std::set<std::string> moduleWriteAs;
 std::set<std::pair<std::string, std::string>> g_invarRegs;
 std::set<std::string> g_blackBoxModSet;
 StrSet_t moduleAs;
+std::set<std::string> g_mem;
 uint32_t g_new_var;
 uint32_t g_instr_len;
 //std::unordered_map<std::string, astNode*> g_asSliceRoot;
@@ -208,7 +209,7 @@ void read_in_instructions(std::string fileName) {
   std::string line;
   std::smatch m;
   enum State {FirstSignal, OtherSignal, WriteASV, ReadASV, 
-              ReadNOP, ResetVal, InvarRegs, TopMod};
+              ReadNOP, ReadMEM, ResetVal, InvarRegs, TopMod};
   enum State state;
   bool firstWord = true;
   bool firstSignalSeen = false;
@@ -263,6 +264,9 @@ void read_in_instructions(std::string fileName) {
     }
     else if(line == "$TOP:") {
       state = TopMod;
+    }
+    else if(line == "$MEM:") {
+      state = ReadMEM;
     }
     else { // still the old instruction
       switch(state) {
@@ -364,6 +368,12 @@ void read_in_instructions(std::string fileName) {
             moduleAs.insert(line);
           }
           break;
+        case ReadMEM:
+          {
+            remove_two_end_space(line);
+            g_mem.insert(line);
+          }
+          break;
         case ReadNOP:
           {
             auto pos = line.find("=");
@@ -408,6 +418,10 @@ void read_in_instructions(std::string fileName) {
           break;
       }
     }
+  }
+  if(g_recentClk.empty()) {
+    toCout("Error: top module clk is not set!");
+    abort();
   }
   if(g_topModule.empty()) {
     toCout("Error: top module name is not set!");

@@ -21,7 +21,7 @@ std::regex pHex("^(\\d+)'h([\\dabcdefx\\?]+)$");
 std::regex pDec("^(\\d+)'d([\\dx\\?]+)$");
 std::regex pBin("^(\\d+)'b([01x\\?]+)$");
 
-llvm::IntegerType* llvmWidth(uint32_t width, std::shared_ptr<llvm::LLVMContext> &c) {
+llvm::IntegerType* llvmWidth(uint32_t width, std::shared_ptr<llvm::LLVMContext> &c) { 
   return llvm::IntegerType::get(*c, width);
 }
 
@@ -766,13 +766,15 @@ llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low,
 //}
 
 
+
+
 llvm::Value* extract_func(llvm::Value* in, uint32_t high, uint32_t low,
                       std::shared_ptr<llvm::LLVMContext> &c, 
                       std::shared_ptr<llvm::IRBuilder<>> &b, 
                       const llvm::Twine &name, bool noinline) {
   std::string destName = in->getName().str();
   std::string dest, destSlice;
-  if(destName.find("reg_next_pc") != std::string::npos)
+  if(destName.find("concat__concat___017____#4") != std::string::npos)
     toCoutVerb("Find it!");
   if(!destName.empty()) {
     split_slice(destName, dest, destSlice);
@@ -785,7 +787,7 @@ llvm::Value* extract_func(llvm::Value* in, uint32_t high, uint32_t low,
   uint32_t inputWidth = llvm::dyn_cast<llvm::IntegerType>(inputTy)->getBitWidth();
   std::string app = "";
   if(!noinline) app = "_in";
-  std::string funcName = "extract_"+toStr(inputWidth)+"_"+toStr(high)+"_"+toStr(low)+app;
+  std::string funcName = "ext_"+toStr(inputWidth)+"_"+toStr(high)+"_"+toStr(low)+app;
   llvm::Function *func;
   llvm::FunctionType *FT;  
   uint32_t len = high-low+1;
@@ -881,7 +883,7 @@ llvm::Value* concat_func(llvm::Value* val1, llvm::Value* val2,
   uint32_t val2Width = llvm::dyn_cast<llvm::IntegerType>(val2Ty)->getBitWidth();
   std::string app = "";
   if(!noinline) app = "_in";
-  std::string funcName = "concat_"+toStr(val1Width)+"_"+toStr(val2Width)+app;
+  std::string funcName = "cct_"+toStr(val1Width)+"_"+toStr(val2Width)+app;
   llvm::Function *func;
   llvm::FunctionType *FT;  
   uint32_t len = val1Width + val2Width;
@@ -1029,6 +1031,7 @@ bool is_sub_module() {
 }
 
 
+// Do not collect regs in mem module
 void collect_regs(std::shared_ptr<ModuleInfo_t> &curMod,
                   std::string regPrefix, 
                   RegWidthVec_t &regWidth ) {
@@ -1043,8 +1046,48 @@ void collect_regs(std::shared_ptr<ModuleInfo_t> &curMod,
   for(auto pair : curMod->ins2modMap) {
     std::string insName = pair.first;
     std::string modName = pair.second;
+    if(is_mem_module(modName)) continue;
     auto childMod = g_moduleInfoMap[modName];
     collect_regs(childMod, regPrefix+insName, regWidth);
+  }
+}
+
+
+void collect_mems(std::shared_ptr<ModuleInfo_t> &curMod,
+                  std::string regPrefix, 
+                  std::vector<std::string> &mems) {
+  if(!regPrefix.empty())
+    regPrefix = regPrefix + ".";
+  for(std::string mem : curMod->moduleMems) {
+    mems.push_back(regPrefix+mem);
+    toCout("Collect mem: "+mem);
+  }
+
+  for(auto pair : curMod->ins2modMap) {
+    std::string insName = pair.first;
+    std::string modName = pair.second;
+    auto childMod = g_moduleInfoMap[modName];
+    collect_mems(childMod, regPrefix+insName, mems);
+  }
+}
+
+
+void collect_mem_ins(std::shared_ptr<ModuleInfo_t> &curMod,
+                     std::string regPrefix, 
+                     // first is path+instance name, second is module name
+                     std::vector<std::pair<std::string, 
+                                        std::string>> &mems) {
+  if(!regPrefix.empty())
+    regPrefix = regPrefix + ".";
+
+  for(auto pair : curMod->ins2modMap) {
+    std::string insName = pair.first;
+    std::string modName = pair.second;
+    if(is_mem_module(modName)) {
+      mems.push_back(std::make_pair(regPrefix+insName, modName));
+    }
+    auto childMod = g_moduleInfoMap[modName];
+    collect_mem_ins(childMod, regPrefix+insName, mems);
   }
 }
 
@@ -1196,5 +1239,71 @@ std::shared_ptr<ModuleInfo_t> get_real_parentMod() {
 }
 
 
+std::string remove_paramod(std::string modName) {
+  remove_two_end_space(modName);
+  std::smatch m;
+  if(modName.find("paramod") != std::string::npos) {
+    std::regex pParamod1("^\\\\\\$paramod\\\\(\\S+)(\\\\(\\S+)=(\\d+))+$");
+    std::regex pParamod2("^\\\\\\$paramod\\$(?:[0-9a-z]+)(\\S+)$");
+    if(std::regex_match(modName, m, pParamod1)
+       || std::regex_match(modName, m, pParamod2) ) {
+      modName = m.str(1);
+    }
+    else {
+      toCout("Error: paramod module name is not matched: "+modName);
+      abort();
+    }
+  }
+  return modName;
+}
+
+
+bool is_mem_module(std::string modName) {
+  modName = remove_paramod(modName);
+  if(g_mem.find(modName) != g_mem.end()) return true;
+  else return false;
+}
+
+
+uint32_t get_value_width(llvm::Value* in) {
+  llvm::Type* inputTy = in->getType();
+  uint32_t inputWidth = llvm::dyn_cast<llvm::IntegerType>(inputTy)->getBitWidth();
+  return inputWidth;
+}
+
+
+void set_clk_rst(std::shared_ptr<ModuleInfo_t> &modInfo) {
+  assert(!modInfo->clk.empty());
+  for(auto pair : modInfo->insPort2wireMp) {
+    std::string insName = pair.first;
+    std::string subModName = modInfo->ins2modMap[insName];
+    auto subModInfo = g_moduleInfoMap[subModName];
+    if(!subModInfo->clk.empty()) continue;
+    for(auto portWire: pair.second) {
+      std::string inPort = portWire.first;
+      std::string wire = portWire.second;
+      if(wire == modInfo->clk) {
+        subModInfo->clk = inPort;
+        set_clk_rst(subModInfo);
+        break;
+      }
+    }
+  }
+}
+
+
+//std::shared_ptr<ModuleInfo_t> 
+//get_mem_module(const std::string &memPathName) {
+//  remove_two_end_space(memPathName);
+//  size_t pos = memPathName.find_last_of(".");
+//  std::string modName;
+//  if(pos == std::string::npos) {
+//    modName = memPathName;
+//  }
+//  else {
+//    modName = memPathName.substr(pos+1);
+//  }
+//
+//}
 
 } // end of namespace funcExtract

@@ -1,0 +1,143 @@
+module vecAdd_top(clk, rst, func, in, sum);
+  wire [3:0] _00_;
+  wire _01_;
+  wire [31:0] _02_;
+  wire [31:0] _03_;
+  wire [31:0] _04_;
+  wire _05_;
+  wire _06_;
+  wire _07_;
+  wire _08_;
+  wire _09_;
+  wire _10_;
+  wire _11_;
+  input clk;
+  input [1:0] func;
+  input [3:0] in;
+  wire [3:0] \interconnect ;
+  input rst;
+  output [3:0] sum;
+  wire \u0.clk ;
+  wire [1:0] \u0.func ;
+  wire [3:0] \u0.in ;
+  reg [1:0] \u0.len ;
+  reg [3:0] \u0.out ;
+  wire \u0.rst ;
+  reg \u0.running ;
+  reg \u0.valid ;
+  reg [3:0] \u1.buff0 ;
+  reg [3:0] \u1.buff1 ;
+  reg [3:0] \u1.buff10 ;
+  reg [3:0] \u1.buff11 ;
+  reg [3:0] \u1.buff12 ;
+  reg [3:0] \u1.buff13 ;
+  reg [3:0] \u1.buff14 ;
+  reg [3:0] \u1.buff15 ;
+  reg [3:0] \u1.buff16 ;
+  reg [3:0] \u1.buff2 ;
+  reg [3:0] \u1.buff3 ;
+  reg [3:0] \u1.buff4 ;
+  reg [3:0] \u1.buff5 ;
+  reg [3:0] \u1.buff6 ;
+  reg [3:0] \u1.buff7 ;
+  reg [3:0] \u1.buff8 ;
+  reg [3:0] \u1.buff9 ;
+  wire \u1.clk ;
+  wire [3:0] \u1.in ;
+  wire \u1.rst ;
+  wire [3:0] \u1.sum ;
+  wire \u1.valid ;
+  wire valid;
+  assign _00_ = in + 2'b10;
+  wire [1:0] fangyuan0;
+  assign fangyuan0 = { _11_, _06_ };
+  assign _01_ = | fangyuan0;
+  always @(posedge clk)
+    if (rst) \u0.running <= 1'b0;
+    else \u0.running <= _02_[0];
+  always @(posedge clk)
+    if (rst) \u0.valid <= 1'b0;
+    else \u0.valid <= \u0.running ;
+  always @(posedge clk)
+    if (rst) \u0.len <= 2'b00;
+    else if (_01_) \u0.len <= _04_[1:0];
+  always @(posedge clk)
+    if (rst) \u0.out <= 4'b0000;
+    else if (\u0.running ) \u0.out <= _00_;
+  assign _05_ = func == 2'b10;
+  assign _06_ = func == 1'b1;
+  assign _07_ = \u0.len > 1'b0;
+  assign _08_ = \u0.len > 1'b1;
+  assign _09_ = _05_ && _07_;
+  assign _10_ = \u0.running && _08_;
+  assign _11_ = \u0.running && _07_;
+  assign _02_[0] = _09_ || _10_;
+  assign _03_[1:0] = \u0.len - 1'b1;
+  assign _04_[1:0] = _06_ ? in[1:0] : _03_[1:0];
+  always @(posedge clk)
+    if (rst) \u1.buff16 <= 4'b0000;
+    else if (\u0.valid ) \u1.buff16 <= \u1.buff15 ;
+  always @(posedge clk)
+    if (rst) \u1.buff15 <= 4'b0000;
+    else if (\u0.valid ) \u1.buff15 <= \u1.buff14 ;
+  always @(posedge clk)
+    if (rst) \u1.buff14 <= 4'b0000;
+    else if (\u0.valid ) \u1.buff14 <= \u1.buff13 ;
+  always @(posedge clk)
+    if (rst) \u1.buff13 <= 4'b0000;
+    else if (\u0.valid ) \u1.buff13 <= \u1.buff12 ;
+  always @(posedge clk)
+    if (rst) \u1.buff12 <= 4'b0000;
+    else if (\u0.valid ) \u1.buff12 <= \u1.buff11 ;
+  always @(posedge clk)
+    if (rst) \u1.buff11 <= 4'b0000;
+    else if (\u0.valid ) \u1.buff11 <= \u1.buff10 ;
+  always @(posedge clk)
+    if (rst) \u1.buff10 <= 4'b0000;
+    else if (\u0.valid ) \u1.buff10 <= \u1.buff9 ;
+  always @(posedge clk)
+    if (rst) \u1.buff9 <= 4'b0000;
+    else if (\u0.valid ) \u1.buff9 <= \u1.buff8 ;
+  always @(posedge clk)
+    if (rst) \u1.buff8 <= 4'b0000;
+    else if (\u0.valid ) \u1.buff8 <= \u1.buff7 ;
+  always @(posedge clk)
+    if (rst) \u1.buff7 <= 4'b0000;
+    else if (\u0.valid ) \u1.buff7 <= \u1.buff6 ;
+  always @(posedge clk)
+    if (rst) \u1.buff6 <= 4'b0000;
+    else if (\u0.valid ) \u1.buff6 <= \u1.buff5 ;
+  always @(posedge clk)
+    if (rst) \u1.buff5 <= 4'b0000;
+    else if (\u0.valid ) \u1.buff5 <= \u1.buff4 ;
+  always @(posedge clk)
+    if (rst) \u1.buff4 <= 4'b0000;
+    else if (\u0.valid ) \u1.buff4 <= \u1.buff3 ;
+  always @(posedge clk)
+    if (rst) \u1.buff3 <= 4'b0000;
+    else if (\u0.valid ) \u1.buff3 <= \u1.buff2 ;
+  always @(posedge clk)
+    if (rst) \u1.buff2 <= 4'b0000;
+    else if (\u0.valid ) \u1.buff2 <= \u1.buff1 ;
+  always @(posedge clk)
+    if (rst) \u1.buff1 <= 4'b0000;
+    else if (\u0.valid ) \u1.buff1 <= \u1.buff0 ;
+  always @(posedge clk)
+    if (rst) \u1.buff0 <= 4'b0000;
+    else if (\u0.valid ) \u1.buff0 <= \u0.out ;
+  assign _02_[31:1] = 31'b0000000000000000000000000000000;
+  assign _03_[30:2] = { _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31], _03_[31] };
+  assign _04_[31:2] = 30'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+  assign \interconnect = \u0.out ;
+  assign sum = \u1.buff16 ;
+  assign \u0.clk = clk;
+  assign \u0.func = func;
+  assign \u0.in = in;
+  assign \u0.rst = rst;
+  assign \u1.clk = clk;
+  assign \u1.in = \u0.out ;
+  assign \u1.rst = rst;
+  assign \u1.sum = \u1.buff16 ;
+  assign \u1.valid = \u0.valid ;
+  assign valid = \u0.valid ;
+endmodule

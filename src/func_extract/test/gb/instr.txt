@@ -1,11 +1,44 @@
 #1:
-ap_rst_n = 1
-// more ports to be specified
+ap_rst_n_inv = 0
+ap_start = 1
+arg_0_TREADY = 1
+arg_1_TVALID = 1
+arg_1_TDATA = x
+arg_1_TLAST = x
 W:
-// to be specified
+arg_0_TVALID(skip) 5
+R:
+hls_target_Loop_1_proc.arg_0_V_last_V_1_data_reg
+hls_target_Loop_1_proc.exitcond_flatten_reg_2790
+hls_target_Loop_1_proc.indvar_flatten_reg_434
+hls_target_Loop_1_proc.p_hw_output_1_x_scan_dim_0_reg_456
+hls_target_Loop_1_proc.p_hw_output_1_y_scan_dim_1_mi_reg_2799
+hls_target_Loop_1_proc.p_hw_output_1_y_scan_dim_1_reg_445
+hls_target_linebuffer_Loop_1_proc.in_axi_stream_V_last_V_0_in_rdy
+hls_target_linebuffer_Loop_1_proc.indvar_flatten_reg_61
+hls_target_call_Loop_LB2D_buf_proc.col_cast_reg_711
+hls_target_call_Loop_LB2D_buf_proc.col_reg_349 xx
+hls_target_call_Loop_LB2D_buf_proc.p_write_idx_1_1_reg_723
+hls_target_call_Loop_LB2D_buf_proc.row_1_reg_693
+hls_target_call_Loop_LB2D_buf_proc.row_reg_327
+hls_target_call_Loop_LB2D_buf_proc.write_idx_1_1_reg_338
+hls_target_call_Loop_LB2D_shift_proc.i_0_i_i_reg_152
+hls_target_call_Loop_LB2D_shift_proc.n1_1_reg_1246
 $NOP:
-// to be fill
+ap_rst_n_inv = 0
+ap_start = 1
+arg_0_TREADY = 1
+arg_1_TVALID = 1
+arg_1_TDATA = x
+arg_1_TLAST = x
 //*RESET:
 $INVAR:
+$MEM:
+FIFO_hls_target_p_p2_in_bounded_stencil_stream_s_shiftReg
+FIFO_hls_target_call_slice_stream_V_value_V_shiftReg
+FIFO_hls_target_linebuffer_1_in_stream_V_value_V_shiftReg
+hls_target_call_Loop_LB2D_buf_proc_buffer_0_value_V_ram
 $TOP:
 hls_target
+#CLK:ap_clk
+#RST:ap_rst_n_inv

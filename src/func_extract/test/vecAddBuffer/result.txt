@@ -1,0 +1,21 @@
+Begin main!
+Start time: Sun May  9 15:40:03 2021
+
+Give 1'd0 to rst___#1
+Replace running___#5 with 1'b0
+Give 2'b00 to func___#2
+Give 1'd0 to rst___#2
+Give 2'b00 to func___#3
+Give 1'd0 to rst___#3
+Give 2'b00 to func___#4
+Give 1'd0 to rst___#4
+Give 2'b10 to func___#5
+Give 1'd0 to rst___#5
+Replace running___#5 with 1'b0
+Replace out___#5 with 4'b0
+Replace buff0___#5 with 4'b0
+Replace buff0___#5 with 4'b0
+Replace buff1___#5 with 4'b0
+Replace buff0___#5 with 4'b0
+Replace buff1___#5 with 4'b0
+Replace buff2___#5 with 4'b0
