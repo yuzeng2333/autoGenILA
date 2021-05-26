@@ -1230,7 +1230,6 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
   //split_slice(destAndSlice, dest, destSlice);
   const auto curMod = get_curMod();
   const auto curFunc = get_func();
-  std::shared_ptr<ModuleInfo_t> thisMod = curMod;
   auto pair = curMod->wire2InsPortMp[destAndSlice];
   std::string insName = pair.first;
   toCout("--- Begin submod: "+insName);

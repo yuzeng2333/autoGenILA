@@ -71,6 +71,7 @@ void determine_clk_rst();
 void determine_clk_rst_iter(std::shared_ptr<ModuleInfo_t> &modInfo, 
                             std::set<std::string> &visitedMod);
 
-
+void print_design_hierarchy(std::string modName, 
+                            std::string insName, uint32_t depth);
 } // end of namespace funcExtract
 #endif
