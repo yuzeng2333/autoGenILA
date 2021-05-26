@@ -1031,8 +1031,16 @@ bool is_sub_module() {
 }
 
 
-// Do not collect regs in mem module
 void collect_regs(std::shared_ptr<ModuleInfo_t> &curMod,
+                  std::string regPrefix, 
+                  RegWidthVec_t &regWidth ) {
+  std::string modName = curMod->name;
+  toCout("Collecting regs for: "+modName);
+  collect_regs_iter(curMod, regPrefix, regWidth);
+}
+
+// Do not collect regs in mem module
+void collect_regs_iter(std::shared_ptr<ModuleInfo_t> &curMod,
                   std::string regPrefix, 
                   RegWidthVec_t &regWidth ) {
   if(!regPrefix.empty())
@@ -1052,7 +1060,7 @@ void collect_regs(std::shared_ptr<ModuleInfo_t> &curMod,
     std::string modName = pair.second;
     if(is_mem_module(modName)) continue;
     auto childMod = g_moduleInfoMap[modName];
-    collect_regs(childMod, regPrefix+insName, regWidth);
+    collect_regs_iter(childMod, regPrefix+insName, regWidth);
   }
 }
 

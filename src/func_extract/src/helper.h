@@ -250,6 +250,10 @@ void collect_regs(std::shared_ptr<ModuleInfo_t> &curMod,
                   std::string regPrefix,
                   RegWidthVec_t &regWidth = g_regWidth);
 
+void collect_regs_iter(std::shared_ptr<ModuleInfo_t> &curMod,
+                  std::string regPrefix, 
+                  RegWidthVec_t &regWidth );
+
 void collect_mems(std::shared_ptr<ModuleInfo_t> &curMod,
                   std::string regPrefix, 
                   std::vector<std::string> &mems);

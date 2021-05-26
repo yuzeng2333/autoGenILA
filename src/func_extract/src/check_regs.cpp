@@ -209,7 +209,7 @@ void print_llvm_ir(DestInfo &destInfo,
   for(auto it = g_regWidth.begin(); it != g_regWidth.end(); it++) {
     std::string regName = it->first;
     std::string regNameBound = regName+DELIM+toStr(bound);
-    toCout("set reg-type func arg: "+regNameBound);
+    toCoutVerb("set reg-type func arg: "+regNameBound);
     (TheFunction->args().begin()+idx)->setName(regNameBound);
     (topFunction->args().begin()+idx)->setName(regNameBound);
     argNum--;
@@ -223,7 +223,7 @@ void print_llvm_ir(DestInfo &destInfo,
     auto memMod = g_moduleInfoMap[modName];
     for( auto output : memMod->moduleOutputs ) {
       std::string portName = pathInsName+"."+output+DELIM+toStr(bound);
-      toCout("set mem ouput func arg, mem: "+pathInsName+", output: "+output);
+      toCoutVerb("set mem ouput func arg, mem: "+pathInsName+", output: "+output);
       (TheFunction->args().begin()+idx)->setName(portName);
       (topFunction->args().begin()+idx)->setName(portName);
       argNum--;
@@ -233,12 +233,12 @@ void print_llvm_ir(DestInfo &destInfo,
 
 
   uint32_t argSize = TheFunction->arg_size();
-  toCout("Function arg size is: "+toStr(argSize));
+  toCoutVerb("Function arg size is: "+toStr(argSize));
   for(uint32_t i = 0; i <= bound; i++)  
     for(auto it = curMod->moduleInputs.begin(); it != curMod->moduleInputs.end(); it++) {
       if(*it == curMod->clk) continue;    
       uint32_t width = get_var_slice_width_simp(*it, curMod);
-      toCout("set func arg: "+*it+DELIM+toStr(i));
+      toCoutVerb("set func arg: "+*it+DELIM+toStr(i));
       (TheFunction->args().begin()+idx)->setName(*it+DELIM+toStr(i));
       (topFunction->args().begin()+idx++)->setName(*it+DELIM+toStr(i));
       argNum--;
@@ -280,7 +280,7 @@ void print_llvm_ir(DestInfo &destInfo,
     llvm::Value* destNextExpr;
     for(std::string dest: destVec) {
       if(dest == "buff10")
-        toCout("Find it!");
+        toCoutVerb("Find it!");
       curMod = g_moduleInfoMap[modName];
 
       g_insContextStk.clear();
@@ -661,11 +661,11 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
   auto curMod = get_curMod();
   toCoutVerb("add_constraint for: "+varAndSlice);
   if(varAndSlice == "8'b00000001") {
-    toCout("find it");
+    toCoutVerb("find it");
   }
 
   if(varAndSlice.find("aes_top_0.aes_out") != std::string::npos) {
-    toCout("find aes_top_0.aes_out");
+    toCoutVerb("find aes_top_0.aes_out");
   }
 
   if(timeIdx > bound) {
@@ -713,7 +713,7 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
   }
   curMod->existedExpr[curTgt].emplace(timed_name(varAndSlice, timeIdx), retExpr);
   if(curMod->name == "T" && curTgt == "out" && varAndSlice == "in" && timeIdx == 1)
-    toCout("push into expr!");
+    toCoutVerb("push into expr!");
   return retExpr;
 }
 
@@ -726,7 +726,7 @@ llvm::Value* add_nb_constraint(astNode* const node,
   const auto curMod = get_curMod();
   std::string dest = node->dest;
   if(dest.find("ata_fifo.r0") != std::string::npos && timeIdx == 25) {
-    toCout("target reg found! time: "+toStr(timeIdx));
+    toCoutVerb("target reg found! time: "+toStr(timeIdx));
   }
   llvm::Value* destNextExpr;
   // assuming RHS of nonblocking is not number
@@ -741,7 +741,7 @@ llvm::Value* add_nb_constraint(astNode* const node,
   if(timeIdx < bound) {
     toCoutVerb("Add nb constraint for: " + dest+" ------  time: "+toStr(timeIdx));
     if(dest == "decoder_trigger_q" && timeIdx == 3)
-      toCout("Find it!");
+      toCoutVerb("Find it!");
     std::string destNext = node->srcVec.front();
 
     destNextExpr = add_constraint(node->childVec.front(), timeIdx+1, c, b, bound);
@@ -784,7 +784,7 @@ llvm::Value* add_nb_constraint(astNode* const node,
     toCout("Replace "+timed_name(dest, timeIdx)+" with "+rstVal);
     g_outFile << "Replace "+timed_name(dest, timeIdx)+" with "+rstVal << std::endl;
     if(dest == "buff1" && timeIdx == 15)
-      toCout("Find it!");
+      toCoutVerb("Find it!");
     return var_expr(rstVal, timeIdx, c, b, false, width);    
   }
 }

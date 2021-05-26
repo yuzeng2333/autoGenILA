@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
   std::string time(ctime(&my_time));
   g_outFile << "Start time: "+time << std::endl;
   toCout("Begin main!");
-  g_verb = true;
+  g_verb = false;
   g_print_solver = false;
   g_remove_adff = true;
   g_split_long_num = true;
@@ -111,6 +111,8 @@ int main(int argc, char *argv[]) {
     return 0;
   }
   determine_clk_rst();
+  //print_design_hierarchy(g_topModule, "", 0);
+  //return 0;
   build_ast_tree();
   check_all_regs();
   print_time();  

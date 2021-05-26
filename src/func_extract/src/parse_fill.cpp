@@ -707,11 +707,12 @@ void determine_clk_rst_iter(std::shared_ptr<ModuleInfo_t> &modInfo,
 void print_design_hierarchy(std::string modName, 
                             std::string insName, uint32_t depth) {
   std::string blank = std::string(2*depth, ' ');
+  check_mod_name(modName);
   auto modInfo = g_moduleInfoMap[modName];
   toCout(blank+modName+"---"+insName);
   for(auto pair : modInfo->ins2modMap) {
-    std::string subModName = pair.first;
-    std::string subInsName = pair.second;
+    std::string subModName = pair.second;
+    std::string subInsName = pair.first;
     print_design_hierarchy(subModName, subInsName, depth+1);
   }
 }
