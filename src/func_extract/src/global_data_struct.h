@@ -75,7 +75,7 @@ class ModuleInfo_t {
   std::string clk;
   std::string rst;
   // the first key is target name
-  std::map<std::string, uint32_t> minInOutDelay;
+  std::map<std::string, std::map<std::string, uint32_t>> minInOutDelay;
   uint32_t rootTimeIdx;
   std::vector<std::shared_ptr<ModuleInfo_t>> parentModVec;
   StrSet_t moduleAs;
