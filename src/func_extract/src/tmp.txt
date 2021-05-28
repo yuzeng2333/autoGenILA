@@ -1,0 +1,5 @@
+\ForEach{register r \in M} {\\
+    $assum \gets assum \vee \text{assumption\_for\_taint\_of\_r}$\\
+    $assert \gets \text{assertions\_for\_outputs\_of\_M}$\\
+    model\_check(M, E, assum, assert);\\
+}\\

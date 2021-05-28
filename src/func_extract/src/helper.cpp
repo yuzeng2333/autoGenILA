@@ -1041,8 +1041,8 @@ void collect_regs(std::shared_ptr<ModuleInfo_t> &curMod,
 
 // Do not collect regs in mem module
 void collect_regs_iter(std::shared_ptr<ModuleInfo_t> &curMod,
-                  std::string regPrefix, 
-                  RegWidthVec_t &regWidth ) {
+                       std::string regPrefix, 
+                       RegWidthVec_t &regWidth ) {
   if(!regPrefix.empty())
     regPrefix = regPrefix + ".";
   for(std::string reg : curMod->moduleTrueRegs) {

@@ -171,12 +171,13 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx,
 
   // treate submodule's input separately
   const auto curMod = get_curMod();
+  const auto curTgt = get_target();
   std::shared_ptr<ModuleInfo_t> parentMod;
   auto thisFunc = get_func();
   if(is_sub_module()) {
     assert(timeIdx <= bound);
     uint32_t delay = timeIdx - curMod->rootTimeIdx;
-    if(delay < curMod->minInOutDelay) curMod->minInOutDelay = delay;
+    if(delay < curMod->minInOutDelay[curTgt]) curMod->minInOutDelay[curTgt] = delay;
     
     // ====== design consideration: ================================
     // *** the 3 lines below are wrong, because
@@ -1237,8 +1238,8 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
      == "hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din") {
     toCoutVerb("Find it!");
   }
-  if(insName == "s4") {
-    toCoutVerb("Find it!");
+  if(insName == "hls_target_Loop_1_proc_U0") {
+    toCout("Find it!");
   }
   if(insName != node->op) {
     toCout("Warning: insName: "+insName+", node->op: "+node->op);
@@ -1388,7 +1389,7 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     // the output-inputVec pairs are stored in out2InDelayMp
     std::string outPortTimed = timed_name(outPort, 0);
     subMod->rootTimeIdx = 0;
-    subMod->minInOutDelay = UINT32_MAX;
+    subMod->minInOutDelay.emplace(outPort, UINT32_MAX);
     subMod->isSubMod = true;
     // switch func before elaborating
     if(!subMod->is_stored_outport_node(outPort)) {
@@ -1444,7 +1445,7 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
   // push func input args
   // This is a little tricky: args used here are less than the arg_size of 
   // original function if timeIdx > rootTimeIdx
-  uint32_t minDelay = subMod->minInOutDelay;
+  uint32_t minDelay = subMod->minInOutDelay[outPort];
   for(i = timeIdx; i <= bound; i++) {
     if(i < timeIdx + minDelay) {
       // these inputs for submod would not be used, so just give 0.
