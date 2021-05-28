@@ -1286,18 +1286,32 @@ uint32_t get_value_width(llvm::Value* in) {
 
 void set_clk_rst(std::shared_ptr<ModuleInfo_t> &modInfo) {
   assert(!modInfo->clk.empty());
+  assert(!modInfo->rst.empty());
   for(auto pair : modInfo->insPort2wireMp) {
     std::string insName = pair.first;
     std::string subModName = modInfo->ins2modMap[insName];
     auto subModInfo = g_moduleInfoMap[subModName];
-    if(!subModInfo->clk.empty()) continue;
+    if(!subModInfo->clk.empty() && !subModInfo->rst.empty()) continue;
+    bool clkSet = false;
+    bool rstSet = false;
     for(auto portWire: pair.second) {
       std::string inPort = portWire.first;
       std::string wire = portWire.second;
       if(wire == modInfo->clk) {
         subModInfo->clk = inPort;
-        set_clk_rst(subModInfo);
-        break;
+        clkSet = true;
+        if(rstSet) {
+          set_clk_rst(subModInfo);
+          break;          
+        }
+      }
+      else if(wire == modInfo->rst){
+        subModInfo->rst = inPort;
+        rstSet = true;
+        if(clkSet) {
+          set_clk_rst(subModInfo);
+          break;          
+        }
       }
     }
   }

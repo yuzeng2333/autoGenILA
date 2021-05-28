@@ -177,8 +177,10 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx,
   if(is_sub_module()) {
     assert(timeIdx <= bound);
     uint32_t delay = timeIdx - curMod->rootTimeIdx;
-    if(delay < curMod->minInOutDelay[curTgt]) curMod->minInOutDelay[curTgt] = delay;
-    
+    if(delay < curMod->minInOutDelay[curTgt]) {
+      curMod->minInOutDelay[curTgt] = delay;
+      toCout("!!!!!!!! change min delay for: "+curMod->name+", target: "+curTgt+", delay: "+toStr(delay)+", input: "+dest );
+    }    
     // ====== design consideration: ================================
     // *** the 3 lines below are wrong, because
     // *** we are generating a general sub-module function, which
@@ -1233,7 +1235,6 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
   const auto curFunc = get_func();
   auto pair = curMod->wire2InsPortMp[destAndSlice];
   std::string insName = pair.first;
-  toCout("--- Begin submod: "+insName);
   if(destAndSlice 
      == "hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din") {
     toCoutVerb("Find it!");
@@ -1250,6 +1251,13 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
   std::string modName = subMod->name;
   if(modName == "xS")
     toCoutVerb("Find xS");
+
+  if(subMod->minInOutDelay.find(outPort) == subMod->minInOutDelay.end()) {
+    toCout("Warning: cannot find minInOutDelay for: "+outPort);
+    subMod->minInOutDelay.emplace(outPort, UINT32_MAX);
+  }
+  toCout("--- Begin submod: "+insName+", port: "+outPort
+  +", time: "+toStr(timeIdx)+", inOutDelay: "+toStr(subMod->minInOutDelay[outPort]));
 
   // if sub-module is memory, do not make the submodule
   // directly return the function arg correspond to the submodule output
