@@ -177,9 +177,18 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx,
   if(is_sub_module()) {
     assert(timeIdx <= bound);
     uint32_t delay = timeIdx - curMod->rootTimeIdx;
+    if(curMod->minInOutDelay[curTgt].find(dest) 
+         == curMod->minInOutDelay[curTgt].end()) {
+      toCout("Error: cannot find minDelay for the pair, out: " +curTgt+", in: "+dest);
+      abort();
+    }
     if(dest != curMod->rst && delay < curMod->minInOutDelay[curTgt][dest]) {
       curMod->minInOutDelay[curTgt][dest] = delay;
-      toCout("!!!!!!!! change min delay for: "+curMod->name+", target: "+curTgt+", delay: "+toStr(delay)+", input: "+dest );
+      toCout("!!!!!!!! change min delay for: "+curMod->name+", target: "
+             +curTgt+", delay: "+toStr(delay)+", input: "+dest );
+      if(dest == "if_din") {
+        toCout("Find it!");
+      }
     }    
     // ====== design consideration: ================================
     // *** the 3 lines below are wrong, because
@@ -1235,8 +1244,8 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
   const auto curFunc = get_func();
   auto pair = curMod->wire2InsPortMp[destAndSlice];
   std::string insName = pair.first;
-  if(destAndSlice 
-     == "hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din") {
+  if(destAndSlice.find("shiftReg_q") 
+     != std::string::npos ) {
     toCoutVerb("Find it!");
   }
   if(insName == "hls_target_Loop_1_proc_U0") {
@@ -1249,8 +1258,9 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
 
   auto subMod = get_mod_info(insName);
   std::string modName = subMod->name;
-  if(modName == "xS")
-    toCoutVerb("Find xS");
+  if(modName.find("FIFO_hls_target_call_slice_stream_V_value_V_shiftReg") 
+     != std::string::npos)
+    toCoutVerb("Find it!");
 
   if(subMod->minInOutDelay.find(outPort) == subMod->minInOutDelay.end()) {
     toCout("Warning: cannot find minInOutDelay for: "+outPort);
@@ -1425,17 +1435,15 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
   // push func input args
   // This is a little tricky: args used here are less than the arg_size of 
   // original function if timeIdx > rootTimeIdx
-  for(auto it = subMod->moduleInputs.begin(); it != subMod->moduleInputs.end(); it++) {
-    uint32_t minDelay = subMod->minInOutDelay[outPort][*it];
-    for(i = timeIdx; i <= bound; i++) {
+  for(i = timeIdx; i <= bound; i++) {
+    for(auto it = subMod->moduleInputs.begin(); it != subMod->moduleInputs.end(); it++) {
+      uint32_t minDelay = subMod->minInOutDelay[outPort][*it];
       if(i < timeIdx + minDelay) {
         // these inputs for submod would not be used, so just give 0.
-        for(auto it = subMod->moduleInputs.begin(); it != subMod->moduleInputs.end(); it++) {
-          toCoutVerb("push input: "+*it+", timeIdx: "+toStr(i));
-          if(*it == subMod->clk) continue;
-          uint32_t width = get_var_slice_width_simp(*it, subMod);
-          args.push_back(llvmInt(0, width, c));
-        }
+        toCoutVerb("push input: "+*it+", timeIdx: "+toStr(i));
+        if(*it == subMod->clk) continue;
+        uint32_t width = get_var_slice_width_simp(*it, subMod);
+        args.push_back(llvmInt(0, width, c));
       }
       else {
         toCoutVerb("push input: "+*it+", timeIdx: "+toStr(i));      
@@ -1468,18 +1476,18 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
   // may need to add more 0 value args to meet the arg length requirement
   for(uint32_t i = 0; i < timeIdx; i++) {
     for(auto it = subMod->moduleInputs.begin(); it != subMod->moduleInputs.end(); it++) {
+      if(*it == subMod->clk) continue;
       toCoutVerb("push input: "+*it+", timeIdx: "+toStr(i));    
-      if(*it == subMod->clk) continue;    
       std::string connectWire = curMod->insPort2wireMp[insName][*it];
       uint32_t width = get_var_slice_width_simp(connectWire);
       args.push_back(llvmInt(0, width, c));
     }
   }
 
-  toCoutVerb("--- To call function for: "+destAndSlice);
+  toCout("--- To call function for: "+destAndSlice);
   std::string destTimed = timed_name(destAndSlice, timeIdx);
   if(!subModExist && argTy.size() != args.size()) {
-    toCoutVerb("argTy size: "+toStr(argTy.size())
+    toCout("argTy size: "+toStr(argTy.size())
            +", args size: "+toStr(args.size()));
     abort();
   }
