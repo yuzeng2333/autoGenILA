@@ -1,4 +1,3 @@
-
 #include "helper.h"
 #include "parse_fill.h"
 #include "global_data_struct.h"
@@ -1025,8 +1024,9 @@ bool is_top_module() {
 
 
 bool is_sub_module() {
+  return curMod->isSubMod;
+  //auto curMod = get_curMod();
   //return curMod->isSubMod;
-  return !is_top_module();
 }
 
 
@@ -1168,7 +1168,14 @@ std::string ask_for_my_ins_name() {
   std::string myModName = curMod->name;
   if(get_parentMod() == nullptr) return myModName;
   auto parentMod = get_parentMod();
-  std::string insName;
+  std::string insName = ask_parent_my_ins_name(myModName, parentMod);
+  return insName;
+}
+
+
+std::string ask_parent_my_ins_name(std::string myModName, 
+                                   std::shared_ptr<ModuleInfo_t> parentMod) {
+  std::string insName = "";
   for(auto pair : parentMod->ins2modMap) {
     if(insName.empty() && pair.second == myModName)
       insName = pair.first;

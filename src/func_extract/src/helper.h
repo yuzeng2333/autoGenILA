@@ -277,6 +277,9 @@ std::vector<std::string> print_map_keys(std::map<std::string, astNode*> &map);
 
 std::string ask_for_my_ins_name();
 
+std::string ask_parent_my_ins_name(std::string myModName, 
+                                   std::shared_ptr<ModuleInfo_t> parentMod);
+
 void check_no_slice(std::string varAndSlice);
 
 std::string remove_paramod(std::string modName);

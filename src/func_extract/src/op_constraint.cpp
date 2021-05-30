@@ -216,51 +216,35 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx,
     std::string src, srcSlice;
     split_slice(srcAndSlice, src, srcSlice);
     uint32_t localWidth = get_var_slice_width_simp(srcAndSlice, parentMod);
-    //if(parentMod->moduleInputs.find(srcAndSlice) 
-    //     != parentMod->moduleInputs.end()) {
-    //  auto encodings = g_currInstrInfo.instrEncoding[src];
-    //  std::string nopVal = g_nopInstr[src];
-    //  bool onlyOneVal = is_number(nopVal);      
-    //  for(std::string v: encodings) {
-    //    if(v != nopVal) onlyOneVal = false;
-    //  }
-    //  if(onlyOneVal)
-    //    return llvmInt(hdb2int(nopVal), localWidth, c);
-    //  else
-        return get_arg(destTimed);        
-    //}
-    //else { // if not connected to top-level inputs, continue in parent module
-    //  parentMod = curMod->parentMod;
-    //  curMod = parentMod;
-    //  auto ret = add_constraint(node->childVec[0], timeIdx, c, b, bound);
-    //  curMod = thisMod;
-    //  curMod->parentMod = parentMod;
-    //  g_curFunc = thisFunc;
-    //  return ret;
-    //}
+    if(curMod->isFunctionedSubMod) {
+      return get_arg(destTimed);    
+    }
+    else { // if the submodule is not modeled with a subFunc
+      // if the stack size is only 1, meaning this is start module and we need to 
+      // add context for its submodule to the stack
+      // if the stack size is larger than 1, we just pop the stack
 
-    // if the stack size is only 1, meaning this is start module and we need to 
-    // add context for its submodule to the stack
-    // if the stack size is larger than 1, we just pop the stack
 
-    //std::string target = get_target();
-    //auto thisCntxt = g_insContextStk.back();
-    //toCout("~~~~~~~~~~~~~~~~ Return via input from :"+curMod->name+" to :"+parentMod->name);
-    //g_insContextStk.pop_back();
-    //if(get_stk_depth() == 0) {
-    //  Context_t insCntxt(parentMod->name, target, parentMod, nullptr, thisFunc);
-    //  g_insContextStk.push_back(insCntxt);
-    //  auto ret = add_constraint(node->childVec[0], timeIdx, c, b, bound);
-    //  g_insContextStk.pop_back();
-    //  g_insContextStk.push_back(thisCntxt);
-    //  toCout("~~~~~~~~~~~~~~~~ Reenter via input from :"+parentMod->name+" to :"+curMod->name);      
-    //  return ret;
-    //}
-    //else {
-    //  auto ret = add_constraint(node->childVec[0], timeIdx, c, b, bound);
-    //  g_insContextStk.push_back(thisCntxt);
-    //  return ret;      
-    //}
+      // TODO: need to re-consider this code
+      std::string target = get_target();
+      auto thisCntxt = g_insContextStk.back();
+      toCout("~~~~~~~~~~~~~~~~ Return via input from :"+curMod->name+" to :"+parentMod->name);
+      g_insContextStk.pop_back();
+      if(get_stk_depth() == 0) {
+        Context_t insCntxt(parentMod->name, target, parentMod, nullptr, thisFunc);
+        g_insContextStk.push_back(insCntxt);
+        auto ret = add_constraint(node->childVec[0], timeIdx, c, b, bound);
+        g_insContextStk.pop_back();
+        g_insContextStk.push_back(thisCntxt);
+        toCout("~~~~~~~~~~~~~~~~ Reenter via input from :"+parentMod->name+" to :"+curMod->name);      
+        return ret;
+      }
+      else {
+        auto ret = add_constraint(node->childVec[0], timeIdx, c, b, bound);
+        g_insContextStk.push_back(thisCntxt);
+        return ret;      
+      }
+    }
   }
   //else if(!is_top_module()) { // must be the start module
   //  parentMod = curMod->parentMod;
@@ -1339,6 +1323,7 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
                   "func_;_"+modName+"_$"+outPort, TheModule.get());
     funcBound = bound-timeIdx;
     subMod->out2FuncMp.emplace(outPort, std::make_pair(subFunc, funcBound));
+    subMod->isSubMod = true;
 
     // set name for args
     uint32_t idx = 0;

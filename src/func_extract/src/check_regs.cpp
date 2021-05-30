@@ -135,12 +135,37 @@ void print_llvm_ir(DestInfo &destInfo,
   // FIXME: change the following model name
   std::string destName = destInfo.get_dest_name();
   std::string curModName = destInfo.get_mod_name();
-  TheModule = std::make_unique<llvm::Module>("mod_;_"+curModName+"_;_"+destName, *TheContext);
-  Builder = std::make_unique<llvm::IRBuilder<>>(*TheContext);
   auto curMod = g_moduleInfoMap[curModName];
   Context_t insCntxt(curModName, "", curMod, nullptr, nullptr);  
   g_insContextStk.clear();
-  g_insContextStk.push_back(insCntxt);
+  if(curModName == g_topModule) {
+    g_insContextStk.push_back(insCntxt);
+  }
+  else {
+    // if starts from a sub-module, the submodule and all its parent modules
+    // are not treated as separate functions, instead, they are just part of
+    // the function of the top module. 
+    // Here all the submodules and the top module are pushed into the stack,
+    // and their isFunctionedSubMod is set to false
+    while(curMod->name != g_topModule) {
+      assert(curMod->parentModVec.size() == 1);
+      auto parentMod = curMod->parentModVec.front();
+      std::string insName = ask_parent_my_ins_name(curMod->name, parentMod);
+      Context_t insCntxt(insName, "", curMod, parentMod, nullptr);  
+      g_insContextStk.push_back(insCntxt);
+      curMod = parentMod;
+    }
+    // curMod is the top module
+    Context_t insCntxt(curMod->name, "", curMod, nullptr, nullptr);  
+    g_insContextStk.push_back(insCntxt);    
+  }
+  // TODO: modify the following two lines of code
+  std::string destPrefix = get_hier_name(false);
+  TheModule = std::make_unique<llvm::Module>(
+    "mod_;_"+curMod->name+"_;_"+destPrefix+"."+destName, 
+    *TheContext
+  );
+  Builder = std::make_unique<llvm::IRBuilder<>>(*TheContext);
 
   /// declare function
   // input types
@@ -170,7 +195,6 @@ void print_llvm_ir(DestInfo &destInfo,
       argNum++;
     }
   }
- 
 
   // push inputs
   // bound = (delay in instr.txt) - 1
@@ -662,7 +686,7 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
   std::string varAndSlice = node->dest;
   auto curMod = get_curMod();
   toCoutVerb("add_constraint for: "+varAndSlice);
-  if(varAndSlice == "8'b00000001") {
+  if(varAndSlice == "indvar_flatten_reg_61") {
     toCoutVerb("find it");
   }
 
