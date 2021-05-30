@@ -147,6 +147,7 @@ void print_llvm_ir(DestInfo &destInfo,
     // the function of the top module. 
     // Here all the submodules and the top module are pushed into the stack,
     // and their isFunctionedSubMod is set to false
+    // Need to fill target and func in the stack later
     while(curMod->name != g_topModule) {
       assert(curMod->parentModVec.size() == 1);
       auto parentMod = curMod->parentModVec.front();
@@ -161,8 +162,9 @@ void print_llvm_ir(DestInfo &destInfo,
   }
   // TODO: modify the following two lines of code
   std::string destPrefix = get_hier_name(false);
+  destName = destPrefix + "." + destName;
   TheModule = std::make_unique<llvm::Module>(
-    "mod_;_"+curMod->name+"_;_"+destPrefix+"."+destName, 
+    "mod_;_"+curMod->name+"_;_"+destName, 
     *TheContext
   );
   Builder = std::make_unique<llvm::IRBuilder<>>(*TheContext);
@@ -219,14 +221,15 @@ void print_llvm_ir(DestInfo &destInfo,
     = llvm::Function::Create(FT, llvm::Function::ExternalLinkage, 
                              "top_function", TheModule.get());
 
-
   TheFunction = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
                                        "func_;_"+destName, TheModule.get());
   TheFunction->addFnAttr(llvm::Attribute::NoInline);
   //g_curFunc = TheFunction;
 
-  g_insContextStk.back().Target = destName;
-  g_insContextStk.back().Func = topFunction;
+  for(auto context : g_insContextStk) {
+    context->Target = destName;
+    context->Func = topFunction;
+  }
 
   // set arg name for the function
   uint32_t idx = 0;
