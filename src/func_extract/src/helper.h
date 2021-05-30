@@ -232,7 +232,8 @@ bool is_x(const std::string &var);
 
 bool is_input(const std::string &var, const std::shared_ptr<ModuleInfo_t> &modInfo=get_curMod());
 
-bool is_output(const std::string &var);
+bool is_output(const std::string &var, 
+               std::shared_ptr<ModuleInfo_t> curMod=get_curMod());
 
 bool is_reg(std::string var);
 
@@ -285,6 +286,9 @@ bool is_mem_module(std::string modName);
 uint32_t get_value_width(llvm::Value* in);
 
 void set_clk_rst(std::shared_ptr<ModuleInfo_t> &modInfo);
+
+void initialize_min_delay(std::shared_ptr<ModuleInfo_t> &modInfo, 
+                          std::string outPort);
 } // end of namespace funcExtract
 
 

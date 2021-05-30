@@ -260,6 +260,7 @@ void print_llvm_ir(DestInfo &destInfo,
   if(!destInfo.isVector) {
     // FIXME: currently does not support submodule's single register as writeASV
     std::string dest = destVec.front();
+    if(is_output(dest, curMod)) initialize_min_delay(curMod, dest);
     if(curMod->visitedNode[dest].find(dest) == curMod->visitedNode[dest].end()
         && curMod->reg2Slices.find(dest) == curMod->reg2Slices.end()) {
       toCout("Error: ast node is not found for this var: |"+dest+"|"
@@ -279,6 +280,7 @@ void print_llvm_ir(DestInfo &destInfo,
     check_mod_name(modName);
     llvm::Value* destNextExpr;
     for(std::string dest: destVec) {
+      if(is_output(dest, curMod)) initialize_min_delay(curMod, dest);      
       if(dest == "buff10")
         toCoutVerb("Find it!");
       curMod = g_moduleInfoMap[modName];

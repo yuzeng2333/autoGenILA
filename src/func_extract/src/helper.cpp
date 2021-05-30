@@ -964,8 +964,7 @@ bool is_input(const std::string &var, const std::shared_ptr<ModuleInfo_t> &modIn
 }
 
 
-bool is_output(const std::string &var) {
-  auto curMod = get_curMod();
+bool is_output(const std::string &var, std::shared_ptr<ModuleInfo_t> curMod) {
   auto it = std::find( curMod->moduleOutputs.begin(), curMod->moduleOutputs.end(), var );
   return it != curMod->moduleOutputs.end();
 }
@@ -1317,6 +1316,17 @@ void set_clk_rst(std::shared_ptr<ModuleInfo_t> &modInfo) {
   }
 }
 
+
+void initialize_min_delay(std::shared_ptr<ModuleInfo_t> &modInfo, 
+                          std::string outPort) {
+  if(modInfo->minInOutDelay.find(outPort) == modInfo->minInOutDelay.end()) {
+    std::map<std::string, uint32_t> toInputDelay;
+    for(std::string input : modInfo->moduleInputs) {
+      toInputDelay.emplace(input, UINT32_MAX);
+    }
+    modInfo->minInOutDelay.emplace(outPort, toInputDelay);
+  }
+}
 
 //std::shared_ptr<ModuleInfo_t> 
 //get_mem_module(const std::string &memPathName) {

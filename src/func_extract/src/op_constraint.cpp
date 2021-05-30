@@ -1262,14 +1262,8 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
      != std::string::npos)
     toCoutVerb("Find it!");
 
-  if(subMod->minInOutDelay.find(outPort) == subMod->minInOutDelay.end()) {
-    toCout("Warning: cannot find minInOutDelay for: "+outPort);
-    std::map<std::string, uint32_t> toInputDelay;
-    for(std::string input : subMod->moduleInputs) {
-      toInputDelay.emplace(input, UINT32_MAX);
-    }
-    subMod->minInOutDelay.emplace(outPort, toInputDelay);
-  }
+  initialize_min_delay(subMod, outPort);
+
   toCout("--- Begin submod: "+insName+", port: "+outPort
   +", time: "+toStr(timeIdx));
 
