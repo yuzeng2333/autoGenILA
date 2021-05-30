@@ -150,15 +150,16 @@ void print_llvm_ir(DestInfo &destInfo,
     // Need to fill target and func in the stack later
     while(curMod->name != g_topModule) {
       assert(curMod->parentModVec.size() == 1);
+      curMod->isFunctionedSubMod = false;
       auto parentMod = curMod->parentModVec.front();
       std::string insName = ask_parent_my_ins_name(curMod->name, parentMod);
       Context_t insCntxt(insName, "", curMod, parentMod, nullptr);  
-      g_insContextStk.push_back(insCntxt);
+      g_insContextStk.insert(g_insContextStk.begin(), insCntxt);
       curMod = parentMod;
     }
     // curMod is the top module
     Context_t insCntxt(curMod->name, "", curMod, nullptr, nullptr);  
-    g_insContextStk.push_back(insCntxt);    
+    g_insContextStk.insert(g_insContextStk.begin(), insCntxt);    
   }
   // TODO: modify the following two lines of code
   std::string destPrefix = get_hier_name(false);
@@ -226,9 +227,11 @@ void print_llvm_ir(DestInfo &destInfo,
   TheFunction->addFnAttr(llvm::Attribute::NoInline);
   //g_curFunc = TheFunction;
 
-  for(auto context : g_insContextStk) {
-    context->Target = destName;
-    context->Func = topFunction;
+  for(auto it = g_insContextStk.begin();
+      it != g_insContextStk.end(); it++) {
+    it->Target = destName;
+    it->Func = topFunction;
+    initialize_min_delay(it->ModInfo, destName);
   }
 
   // set arg name for the function
@@ -284,6 +287,7 @@ void print_llvm_ir(DestInfo &destInfo,
 
   std::vector<std::string> destVec = destInfo.get_no_slice_name();
 
+  curMod = g_moduleInfoMap[curModName];
   if(!destInfo.isVector) {
     // FIXME: currently does not support submodule's single register as writeASV
     std::string dest = destVec.front();

@@ -1024,9 +1024,7 @@ bool is_top_module() {
 
 
 bool is_sub_module() {
-  return curMod->isSubMod;
-  //auto curMod = get_curMod();
-  //return curMod->isSubMod;
+  return !is_top_module();
 }
 
 

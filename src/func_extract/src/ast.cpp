@@ -60,8 +60,7 @@ void build_ast_tree() {
   g_topModInfo = curMod;
   assert(!g_instrInfo.back().skipWriteASV.empty());
   set_clk_rst(g_topModInfo);
-  //assert(!curMod->moduleAs.empty());
-  //for(std::string reg: curMod->moduleAs) {
+
   for(std::string reg: g_instrInfo.back().skipWriteASV) {
     g_insContextStk.clear();
     g_insContextStk.push_back(insCntxt);
@@ -86,8 +85,23 @@ void build_ast_tree() {
       // FIXME: currently I do not push its parent module, because
       // it seems that is not necessary. All other code can work properly
       g_insContextStk.clear();
-      Context_t insCntxt(modName, regName, curMod, nullptr, nullptr);
-      g_insContextStk.push_back(insCntxt);
+      while(curMod->name != g_topModule) {
+        assert(curMod->parentModVec.size() == 1);
+        curMod->isFunctionedSubMod = false;
+        auto parentMod = curMod->parentModVec.front();
+        std::string insName = ask_parent_my_ins_name(curMod->name, parentMod);
+        Context_t insCntxt(insName, "", curMod, parentMod, nullptr);  
+        g_insContextStk.insert(g_insContextStk.begin(), insCntxt);
+        curMod = parentMod;
+      }
+      Context_t insCntxt(curMod->name, "", curMod, nullptr, nullptr);  
+      g_insContextStk.insert(g_insContextStk.begin(), insCntxt); 
+      std::string destPrefix = get_hier_name(false);
+      std::string destName = destPrefix + "." + regName;
+      for(auto it = g_insContextStk.begin();
+        it != g_insContextStk.end(); it++) {
+        it->Target = destName;
+      }
       if(curMod->reg2Slices.find(regName) == curMod->reg2Slices.end()) {
         build_tree_for_single_as(regName);
       }
@@ -108,17 +122,18 @@ void build_tree_for_single_as(std::string regAndSlice) {
   split_slice(regAndSlice, reg, regSlice);
   //assert(regSlice.empty());
   std::string myInsName = ask_for_my_ins_name();
-  set_target(reg);
+  //set_target(reg);
+  std::string curTgt = get_target();
   uint32_t regWidth = get_var_slice_width_cmplx(regAndSlice);
   astNode* root;
-  if(curMod->visitedNode.find(reg) == curMod->visitedNode.end())
-    curMod->visitedNode.emplace(reg, std::map<std::string, astNode*>{});
+  if(curMod->visitedNode.find(curTgt) == curMod->visitedNode.end())
+    curMod->visitedNode.emplace(curTgt, std::map<std::string, astNode*>{});
 
-  if(curMod->visitedNode[reg].find(regAndSlice) 
-       == curMod->visitedNode[reg].end())
+  if(curMod->visitedNode[curTgt].find(regAndSlice) 
+       == curMod->visitedNode[curTgt].end())
     root = new astNode;
   else
-    root = curMod->visitedNode[reg][regAndSlice];
+    root = curMod->visitedNode[curTgt][regAndSlice];
 
   add_node(regAndSlice, 0, root, true);
 }
@@ -138,7 +153,7 @@ void add_node(std::string varAndSlice,
     s_node = node;
   }
 
-  std::string iName = get_target();;
+  std::string iName = get_target();
   if(curMod->visitedNode[iName].find(varAndSlice) != curMod->visitedNode[iName].end() 
        && !varIsDest)
     return;

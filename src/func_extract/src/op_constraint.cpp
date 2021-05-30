@@ -168,7 +168,6 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx,
   toCoutVerb("See input:"+timed_name(dest, timeIdx));
   std::string destTimed = timed_name(dest, timeIdx);
 
-
   // treate submodule's input separately
   const auto curMod = get_curMod();
   const auto curTgt = get_target();
@@ -223,7 +222,6 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx,
       // if the stack size is only 1, meaning this is start module and we need to 
       // add context for its submodule to the stack
       // if the stack size is larger than 1, we just pop the stack
-
 
       // TODO: need to re-consider this code
       std::string target = get_target();
@@ -1323,7 +1321,7 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
                   "func_;_"+modName+"_$"+outPort, TheModule.get());
     funcBound = bound-timeIdx;
     subMod->out2FuncMp.emplace(outPort, std::make_pair(subFunc, funcBound));
-    subMod->isSubMod = true;
+    subMod->isFunctionedSubMod = true;
 
     // set name for args
     uint32_t idx = 0;
@@ -1367,7 +1365,7 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     std::string outPortTimed = timed_name(outPort, 0);
     subMod->rootTimeIdx = 0;
     //subMod->minInOutDelay.emplace(outPort, UINT32_MAX);
-    subMod->isSubMod = true;
+    subMod->isFunctionedSubMod = true;
     // switch func before elaborating
     if(!subMod->is_stored_outport_node(outPort)) {
       toCout("Error: cannot find node for output port: "+outPort);
