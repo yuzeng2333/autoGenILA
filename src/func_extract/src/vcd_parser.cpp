@@ -15,7 +15,7 @@ void vcd_parser(std::string fileName) {
     return;
   }
   toCout("### Begin vcd_parser");
-  std::regex pName("^\\$var reg (\\d+) (\\S+) (\\S+) (\\[[0-9:]+\\] )?\\$end$");
+  std::regex pName("^\\$var (?:(?:reg)|(?:wire)) (\\d+) (\\S+) (\\S+) (\\[[0-9:]+\\] )?\\$end$");
   std::string line;
   std::ifstream input(fileName);
   if(!input.good()) {
@@ -27,7 +27,7 @@ void vcd_parser(std::string fileName) {
   std::smatch m;
   while(std::getline(input, line)) {
     //toCout(line);
-    if(line.find("4)") != std::string::npos) {
+    if(line.find("ap_CS_fsm") != std::string::npos) {
         toCout("Find it");
     }
     if(line.substr(0, 6).compare("$scope") == 0) {
