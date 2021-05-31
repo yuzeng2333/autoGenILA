@@ -290,16 +290,17 @@ void print_llvm_ir(DestInfo &destInfo,
 
   curMod = g_moduleInfoMap[curModName];
   if(!destInfo.isVector) {
+    std::string dest = destVec.front();
     if(is_output(destName, curMod)) initialize_min_delay(curMod, destName);
-    if(curMod->visitedNode[destName].find(destName) == curMod->visitedNode[destName].end()
-        && curMod->reg2Slices.find(destName) == curMod->reg2Slices.end()) {
-      toCout("Error: ast node is not found for this var: |"+destName+"|"
+    if(curMod->visitedNode[destName].find(dest) == curMod->visitedNode[destName].end()
+        && curMod->reg2Slices.find(dest) == curMod->reg2Slices.end()) {
+      toCout("Error: ast node is not found for this var: |"+dest+"|"
               +", curMod: "+curMod->name);
       abort();
     } 
     // The return value for the function
     else 
-      destNextExpr = add_constraint(destName, 
+      destNextExpr = add_constraint(dest, 
                                     0, TheContext, Builder, bound);
     Builder->CreateRet(destNextExpr);
   }
