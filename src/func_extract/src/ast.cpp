@@ -78,6 +78,8 @@ void build_ast_tree() {
       }
     }
     else { // if the reg is in sub module
+      // IMPORTANT: if starts from a submodule, then target name is
+      // prefix+varName
       auto pair = split_mod_var(reg);
       std::string regName = pair.second;
       check_mod_name(modName);
@@ -94,7 +96,8 @@ void build_ast_tree() {
         g_insContextStk.insert(g_insContextStk.begin(), insCntxt);
         curMod = parentMod;
       }
-      Context_t insCntxt(curMod->name, "", curMod, nullptr, nullptr);  
+      Context_t insCntxt(curMod->name, "", curMod, nullptr, nullptr);
+      curMod->isFunctionedSubMod = true;
       g_insContextStk.insert(g_insContextStk.begin(), insCntxt); 
       std::string destPrefix = get_hier_name(false);
       std::string destName = destPrefix + "." + regName;

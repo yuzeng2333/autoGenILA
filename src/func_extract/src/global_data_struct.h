@@ -79,7 +79,7 @@ class ModuleInfo_t {
   uint32_t rootTimeIdx;
   std::vector<std::shared_ptr<ModuleInfo_t>> parentModVec;
   StrSet_t moduleAs;
-  bool isFunctionedSubMod = false;
+  bool isFunctionedSubMod = true;
   std::set<std::string> invarRegs;
   std::set<std::string> moduleInputs;
   std::set<std::string> moduleOutputs;

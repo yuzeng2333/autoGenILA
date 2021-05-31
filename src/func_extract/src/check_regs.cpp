@@ -158,7 +158,8 @@ void print_llvm_ir(DestInfo &destInfo,
       curMod = parentMod;
     }
     // curMod is the top module
-    Context_t insCntxt(curMod->name, "", curMod, nullptr, nullptr);  
+    Context_t insCntxt(curMod->name, "", curMod, nullptr, nullptr);
+    curMod->isFunctionedSubMod = true;
     g_insContextStk.insert(g_insContextStk.begin(), insCntxt);    
   }
   // TODO: modify the following two lines of code
@@ -289,27 +290,26 @@ void print_llvm_ir(DestInfo &destInfo,
 
   curMod = g_moduleInfoMap[curModName];
   if(!destInfo.isVector) {
-    // FIXME: currently does not support submodule's single register as writeASV
-    std::string dest = destVec.front();
-    if(is_output(dest, curMod)) initialize_min_delay(curMod, dest);
-    if(curMod->visitedNode[dest].find(dest) == curMod->visitedNode[dest].end()
-        && curMod->reg2Slices.find(dest) == curMod->reg2Slices.end()) {
-      toCout("Error: ast node is not found for this var: |"+dest+"|"
+    if(is_output(destName, curMod)) initialize_min_delay(curMod, destName);
+    if(curMod->visitedNode[destName].find(destName) == curMod->visitedNode[destName].end()
+        && curMod->reg2Slices.find(destName) == curMod->reg2Slices.end()) {
+      toCout("Error: ast node is not found for this var: |"+destName+"|"
               +", curMod: "+curMod->name);
       abort();
     } 
     // The return value for the function
     else 
-      destNextExpr = add_constraint(dest, 
+      destNextExpr = add_constraint(destName, 
                                     0, TheContext, Builder, bound);
     Builder->CreateRet(destNextExpr);
   }
   else {
-    // if dest is a vector, return an array
+    // if destName is a vector, return an array
     std::vector<llvm::Value*> retVec;
     std::string modName = destInfo.get_mod_name();
     check_mod_name(modName);
     llvm::Value* destNextExpr;
+    //FIXME: currently do not support vector in submodules
     for(std::string dest: destVec) {
       if(is_output(dest, curMod)) initialize_min_delay(curMod, dest);      
       if(dest == "buff10")

@@ -1212,12 +1212,20 @@ void set_target(const std::string &tgtIn) {
   g_insContextStk.back().Target = tgtIn;
 }
 
+
+// find the first module with True isFunctionedSubMod
 std::shared_ptr<ModuleInfo_t> get_curMod() {
   if(g_insContextStk.size() == 0) {
     toCout("Error: g_insContextStk is empty!");
     abort();
   }
   return g_insContextStk.back().ModInfo;
+  //for(auto it = g_insContextStk.rbegin();
+  //    it != g_insContextStk.rend(); it++) {
+  //  if(it->ModInfo->isFunctionedSubMod) return it->ModInfo;
+  //}
+  //assert(g_insContextStk.front().InsName == g_topModule);
+  //return g_insContextStk.front().ModInfo;
 }
 
 
