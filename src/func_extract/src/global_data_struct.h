@@ -154,7 +154,7 @@ extern bool g_print_solver;
 extern bool g_skipCheck;
 extern std::vector<std::pair<std::string, uint32_t>> g_regWidth;
 extern std::set<std::string> g_readASV;
-extern std::set<std::string> g_allRegs;
+extern std::map<std::string, uint32_t> g_allRegs;
 extern std::set<std::string> g_regWithFunc;
 // first is module name, second is reg name
 extern std::set<std::pair<std::string, std::string>> g_invarRegs;

@@ -237,6 +237,8 @@ bool is_output(const std::string &var,
 
 bool is_reg(std::string var);
 
+bool is_reg_in_curMod(std::string var);
+
 bool is_submod_output(const std::string &var);
 
 std::shared_ptr<ModuleInfo_t> get_mod_info(std::string insName);

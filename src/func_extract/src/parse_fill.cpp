@@ -545,13 +545,13 @@ ModuleInfo_t::~ModuleInfo_t() {
 
 
 // not used...
-void read_all_regs(std::string fileName) {
-  std::ifstream input(fileName);
-  std::string line;
-  while(std::getline(input, line)) {
-    g_allRegs.insert(line);
-  }
-}
+//void read_all_regs(std::string fileName) {
+//  std::ifstream input(fileName);
+//  std::string line;
+//  while(std::getline(input, line)) {
+//    g_allRegs.insert(line);
+//  }
+//}
 
 
 /// this function only gets module name and their 

@@ -185,7 +185,7 @@ void add_node(std::string varAndSlice,
   else if ( is_input(varToAdd) ) {
     add_input_node(varToAdd, timeIdx, node);
   }
-  else if( is_reg(varToAdd) ) {
+  else if( is_reg_in_curMod(varToAdd) ) {
     add_nb_node(varToAdd, timeIdx, node);
   }
   else if( is_number(varToAdd) ) {

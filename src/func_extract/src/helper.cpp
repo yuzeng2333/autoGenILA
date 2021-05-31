@@ -970,6 +970,12 @@ bool is_output(const std::string &var, std::shared_ptr<ModuleInfo_t> curMod) {
 
 
 bool is_reg(std::string var) {
+  remove_two_end_space(var);
+  return g_allRegs.find(var) != g_allRegs.end();
+}
+
+
+bool is_reg_in_curMod(std::string var) {
   auto curMod = get_curMod();
   if(var.back() == ' ')
     var.pop_back();

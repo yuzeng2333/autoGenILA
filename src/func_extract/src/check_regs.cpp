@@ -33,6 +33,7 @@ std::map<std::string, expr*> TIMED_VAR2EXPR;
 std::map<std::string, llvm::Function::arg_iterator> g_topFuncArgMp;
 std::map<std::string, llvm::Function*> g_extractFunc;
 std::map<std::string, llvm::Function*> g_concatFunc;
+std::map<std::string, uint32_t> g_allRegs;
 std::set<std::string> g_resetedReg;
 std::set<std::string> g_regWithFunc;
 std::vector<Context_t> g_insContextStk;
@@ -40,7 +41,6 @@ std::vector<Context_t> g_insContextStk;
 //std::unordered_map<std::string, expr*> INT_EXPR_VAL;
 std::set<std::string> INT_EXPR_SET;
 std::set<std::string> g_readASV;
-std::set<std::string> g_allRegs;
 std::vector<std::pair<std::string, std::string>> g_memInstances;
 // remaining variables to be built goal for
 std::queue<std::pair<std::string, uint32_t>> g_goalVars;
@@ -720,7 +720,7 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
   if ( is_input(varAndSlice) ) { // input_t is always 0
     retExpr = input_constraint(node, timeIdx, c, b, bound);
   }
-  else if( is_reg(varAndSlice) ) { // AS case is moved to add_nb_constraint
+  else if( is_reg_in_curMod(varAndSlice) ) { // AS case is moved to add_nb_constraint
     retExpr = add_nb_constraint(node, timeIdx, c, b, bound);
   }
   else if( is_number(varAndSlice) ) { // num_t is always 0

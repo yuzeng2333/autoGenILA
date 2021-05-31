@@ -70,7 +70,7 @@ void vcd_parser(std::string fileName) {
         if(var.find("branch_q") != std::string::npos) {
           toCout("Find it");
         }
-        uint32_t rstValWidth = get_var_slice_width_simp(var);
+        uint32_t rstValWidth = g_allRegs[var];
         rstVal = std::to_string(rstValWidth)+"'b"+rstVal;
         if(var.find("fetch0_pc_i") != std::string::npos) {
           toCout("Found it!");

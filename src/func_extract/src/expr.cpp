@@ -349,6 +349,8 @@ void nb_expr(std::string line) {
   std::string dest, destSlice;
   split_slice(destAndSlice, dest, destSlice);
   curMod->moduleTrueRegs.insert(dest);
+  uint32_t width = get_var_slice_width_simp(dest);
+  g_allRegs.emplace(dest, width);
   remove_two_end_space(destAndSlice);
   if(destAndSlice.back() == ']') {
     toCout("!!! Find mem: "+dest);
@@ -417,6 +419,8 @@ void nonblockif_expr(std::string line, std::ifstream &input) {
   split_slice(ifSrcAndSlice, src, srcSlice);
   split_slice(condAndSlice, cond, condSlice);
   curMod->moduleTrueRegs.insert(dest);
+  uint32_t destWidth = get_var_slice_width_simp(dest);
+  g_allRegs.emplace(dest, destWidth);
 
   std::string yuzengIdx = toStr(g_new_var++);
   std::string destNext = "yuzeng"+yuzengIdx;
@@ -513,6 +517,8 @@ void always_if_else_expr(std::string line, std::ifstream &input) {
   std::string dest, destSlice;
   split_slice(destAndSlice, dest, destSlice);
   curMod->moduleTrueRegs.insert(dest);
+  uint32_t destWidth = get_var_slice_width_simp(dest);
+  g_allRegs.emplace(dest, destWidth);
 
   std::getline(input, line);
   if ( !std::regex_match(line, m, pElse) ) {
