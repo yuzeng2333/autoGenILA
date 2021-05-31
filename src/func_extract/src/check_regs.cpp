@@ -163,7 +163,7 @@ void print_llvm_ir(DestInfo &destInfo,
   }
   // TODO: modify the following two lines of code
   std::string destPrefix = get_hier_name(false);
-  destName = destPrefix + "." + destName;
+  if(!destPrefix.empty()) destName = destPrefix + "." + destName;
   TheModule = std::make_unique<llvm::Module>(
     "mod_;_"+curMod->name+"_;_"+destName, 
     *TheContext
