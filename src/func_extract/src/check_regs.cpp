@@ -799,12 +799,18 @@ llvm::Value* add_nb_constraint(astNode* const node,
   // TODO: adjust the following condition for different designs
 
   //if(curMod->invarRegs.find(dest) == curMod->invarRegs.end()) {
+  if(dest.find("internal_empty_n") != std::string::npos) {
+    toCout("Find it!");
+  }
   if(is_read_asv(dest)) {
       //&& curMod->moduleAs.find(dest) != curMod->moduleAs.end())
     //std::string prefix = get_hier_name(false);
     //if(!prefix.empty()) prefix += ".";
-    // TODO: get the path.reg name for dest
-    // TODO: get the path.reg name for dest
+    if(curMod->isFunctionedSubMod == false) {
+      std::string prefix = get_hier_name(false);
+      if(!prefix.empty()) prefix += ".";
+      dest = prefix + dest;
+    }
     return get_arg(timed_name(dest, timeIdx), curFunc);
   }
   else {

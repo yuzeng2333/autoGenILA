@@ -1390,10 +1390,15 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     input2AstMp.emplace(node->srcVec[i], node->childVec[i]);
 
   // push func reg args
+  std::string prefix = "";
+  if(!curMod->isFunctionedSubMod) {
+    prefix = get_hier_name(false);
+  }
+  if(!prefix.empty()) prefix += ".";
   for(auto it = subModRegWidth.begin(); it != subModRegWidth.end(); it++) {
     // find corresponding top func arg 
     std::string regName = it->first;
-    auto arg = get_arg(insName+"."+regName+DELIM+toStr(bound), curFunc);
+    auto arg = get_arg(prefix+insName+"."+regName+DELIM+toStr(bound), curFunc);
     args.push_back(arg);
   }
 
@@ -1403,7 +1408,7 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     std::string modName = it->second;
     auto memMod = g_moduleInfoMap[modName];
     for( auto output : memMod->moduleOutputs ) {
-      auto arg = get_arg(insName+"."+pathInsName+"."+output+DELIM+toStr(bound), curFunc);
+      auto arg = get_arg(prefix+insName+"."+pathInsName+"."+output+DELIM+toStr(bound), curFunc);
       args.push_back(arg);
     }
   }
