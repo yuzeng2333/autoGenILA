@@ -18,6 +18,10 @@ void vcd_parser(std::string fileName) {
   std::regex pName("^\\$var reg (\\d+) (\\S+) (\\S+) (\\[[0-9:]+\\] )?\\$end$");
   std::string line;
   std::ifstream input(fileName);
+  if(!input.good()) {
+    toCout("Error: rst.vcd does not exist!");
+    abort();
+  }
   enum State {readName, readValue};
   enum State state;
   std::smatch m;
