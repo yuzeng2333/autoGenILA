@@ -110,8 +110,9 @@ bool g_set_rflag_if_not_norm_val = false;
 // Disable for 8051
 bool g_use_does_keep = false;  
 // enable this to only check if reg's value is invariant when instruction finished
-CheckInvarType g_check_invariance = CheckOneVal; // TODO: check this setting
+CheckInvarType g_check_invariance = CheckTwoVal; // TODO: check this setting
 // TODO: g_enable_taint set to false when only checking invariance
+// (Used when checking for invariant registers to replace ASVs)
 bool g_enable_taint = false;
 std::string _t="_T";
 std::string _r="_R";
@@ -120,6 +121,7 @@ std::string _c="_C";
 std::string _sig="_S";
 std::string TAINT_RST="zy_taint_rst";
 std::string END_SIG="zy_end_sig";
+std::string ASSERT_PROTECT="zy_assert_protect";
 std::string srcConcatFeature = " = {";
 std::string bothConcatFeature = "} = {";
 std::string g_gatedClkFileName = "gated_clk.txt";
@@ -1249,6 +1251,7 @@ void add_module_name(std::string fileName,
   }
   if(g_use_taint_rst) moduleInputs.push_back(TAINT_RST);  
   if(g_use_end_sig) moduleInputs.push_back(END_SIG);  
+  if(g_check_invariance == CheckTwoVal) moduleInputs.push_back(ASSERT_PROTECT);  
   if(!isTop) moduleInputs.push_back("rst_zy");
   out << "module " + moduleName + " ( " + *moduleInputs.begin();  
   for (auto it = moduleInputs.begin()+1; it != moduleInputs.end(); ++it) 
@@ -1271,6 +1274,8 @@ void add_module_name(std::string fileName,
     out << "  input rst_zy;" << std::endl;
   if(g_use_taint_rst) out << "  input "+TAINT_RST+";" << std::endl;
   if(g_use_end_sig) out << "  input "+END_SIG+";" << std::endl;
+  if(g_check_invariance == CheckTwoVal) 
+    out << "  input "+ASSERT_PROTECT+";" << std::endl;
   out << "  integer i;" << std::endl;
   if(!isTop)
     out << "  input INSTR_IN_ZY;" << std::endl;
@@ -1282,6 +1287,7 @@ void add_module_name(std::string fileName,
           || (*it).compare(g_recentRst) == 0 
           || (*it).compare("rst_zy") == 0 
           || (*it).compare(TAINT_RST) == 0 
+          || (*it).compare(ASSERT_PROTECT) == 0 
           || (*it).compare(END_SIG) == 0)
         continue;
       out << *it + _t + " > 0 || ";
@@ -2138,6 +2144,7 @@ void extend_module_instantiation(std::ifstream &input,
        || input.compare("rst_zy") == 0 
        || input.compare("INSTR_IN_ZY") == 0 
        || input.compare(TAINT_RST) == 0 
+       || input.compare(ASSERT_PROTECT) == 0 
        || input.compare(END_SIG) == 0)
       continue;
     if( port2SignalMap.find(input) == port2SignalMap.end() ) {
@@ -2188,7 +2195,9 @@ void extend_module_instantiation(std::ifstream &input,
   std::string newLogic;
   std::vector<std::string> newLogicVec;
   for(std::string inPort: moduleInputsMap[localModuleName]) {
-    if(inPort.compare(g_recentClk) == 0 || g_clk_set.find(inPort) != g_clk_set.end() || port2SignalMap.find(inPort) == port2SignalMap.end())
+    if(inPort.compare(g_recentClk) == 0 
+        || g_clk_set.find(inPort) != g_clk_set.end() 
+        || port2SignalMap.find(inPort) == port2SignalMap.end())
       continue;
     if(inPort.compare("rst_zy") == 0) {
       output << "    .rst_zy(rst_zy)," << std::endl;
@@ -2206,11 +2215,18 @@ void extend_module_instantiation(std::ifstream &input,
       output << "    ."+END_SIG+"("+END_SIG+")," << std::endl;
       continue;
     }
+    if(inPort.compare(ASSERT_PROTECT) == 0) {
+      output << "    ."+ASSERT_PROTECT+"("+ASSERT_PROTECT+")," << std::endl;
+      continue;
+    }
     if(g_enable_taint) {
       if( !port2SignalMap[inPort].empty() ) {
         std::vector<uint32_t> localVerVec = input2SignalVerMap[inPort];
-        output << "    ." + inPort + _t + " ( " + get_rhs_taint_list(port2SignalMap[inPort], _t) + " )," << std::endl;
-        output << "    ." + inPort + _r + " ( " + get_lhs_ver_taint_list(port2SignalMap[inPort], _r, newLogic, localVerVec) + " )," << std::endl;
+        output << "    ." + inPort + _t + " ( " 
+                  + get_rhs_taint_list(port2SignalMap[inPort], _t) + " )," << std::endl;
+        output << "    ." + inPort + _r + " ( " 
+                  + get_lhs_ver_taint_list(port2SignalMap[inPort], _r, newLogic, localVerVec) + " )," 
+                  << std::endl;
         newLogicVec.push_back(newLogic) ; 
         newLogicVec.push_back(newLogic) ;    
         newLogicVec.push_back(newLogic);
@@ -2485,7 +2501,8 @@ void gen_assert_property(std::ofstream &output) {
 
         if(g_use_does_keep) DOES_KEEP = " || " + var + "_DOES_KEEP == 0";
         if(g_use_end_sig) USE_END_SIG = " || " + END_SIG;
-        if(g_check_invariance == CheckTwoVal) PREV_VAL_COMP = " || " + var + "_PREV_VAL1 == " + var + "_PREV_VAL2";
+        if(g_check_invariance == CheckTwoVal) 
+          PREV_VAL_COMP = " || " + ASSERT_PROTECT + " || "  + var + "_PREV_VAL1 == " + var + "_PREV_VAL2";
         if(g_check_invariance == CheckOneVal) PREV_VAL_COMP = " || " + var + "_PREV_VAL1 == " + rstVal;
 
         if(!g_enable_taint && g_check_invariance == CheckRst) {

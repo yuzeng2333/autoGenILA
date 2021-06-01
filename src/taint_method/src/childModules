@@ -1,0 +1,1414 @@
+./helper.cpp:2:#include <string>
+./helper.cpp:16:#include <boost/algorithm/string.hpp>
+./helper.cpp:25:bool isNum(std::string name) {
+./helper.cpp:39:    std::string singleVar;
+./helper.cpp:40:    std::regex_token_iterator<std::string::iterator> rend;
+./helper.cpp:41:    std::regex_token_iterator<std::string::iterator> it(name.begin(), name.end(), pVarName, 0);
+./helper.cpp:52:bool isOutput(std::string varAndSlice) {
+./helper.cpp:53:  std::string var, varSlice;
+./helper.cpp:60:bool isInput(std::string var) {
+./helper.cpp:66:bool isReg(std::string var) {
+./helper.cpp:75:bool isOAReg(std::string var) {
+./helper.cpp:81:bool isWire(std::string var) {
+./helper.cpp:87:bool isMem(std::string varAndSlice) {
+./helper.cpp:88:  std::string var, varSlice;
+./helper.cpp:95:std::string to_re(std::string input) {
+./helper.cpp:97:  std::string varNameBraces("([\a\ba-zA-Z0-9_=\\.\\$\\\\'\\[\\]\\(\\)]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?)(?:\\s)?");
+./helper.cpp:101:  std::string varName("[\a\ba-zA-Z0-9_=\\.\\$\\\\'\\[\\]\\(\\)]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?(?:\\s)?");
+./helper.cpp:105:  std::string regexNum("\\d+'(h|b)[\\dabcdef]+");
+./helper.cpp:108:  std::string regexInt("\\d+");
+./helper.cpp:115:std::string remove_bracket(std::string name) {
+./helper.cpp:127:uint32_t cut_pos(std::string name) {
+./helper.cpp:154:bool split_slice(std::string slicedName, std::string &name, std::string &slice) {
+./helper.cpp:185:uint32_t get_width(std::string slice) {
+./helper.cpp:208:uint32_t get_begin(std::string slice) {
+./helper.cpp:218:uint32_t get_end(std::string slice) {
+./helper.cpp:230:uint32_t find_version_num(std::string opAndSlice, bool &isNew, std::ofstream &output, bool forceNewVer) {
+./helper.cpp:232:  std::string op, opSlice;
+./helper.cpp:245:      std::vector<std::string> freeBitsVec;
+./helper.cpp:271:void free_bits(std::string op, std::vector<std::string> &freeBitsVec) {
+./helper.cpp:305:bool check_bits(std::string op, std::string opSlice, const std::vector<bool> &bitVec) {
+./helper.cpp:350:void merge_bits(std::string op, std::string opSlice, std::vector<bool> &bitVec) {
+./helper.cpp:405:void parse_taintBits(std::string taintBits, bool &tExist, bool &rExist, bool &xExist, bool &cExist) {
+./helper.cpp:421:void collapse_bits(std::string varName, uint32_t bound1, uint32_t bound2, std::ofstream &output) {
+./helper.cpp:431:std::string extend(std::string in, uint32_t length) {
+./helper.cpp:436:void debug_line(std::string line) {
+./helper.cpp:442:void ground_wires(std::string wireName, std::pair<uint32_t, uint32_t> idxPair, std::string slice, std::string blank, std::ofstream &output) {
+./helper.cpp:468:void parse_var_list(std::string list, std::vector<std::string> &vec, bool noSlice) {
+./helper.cpp:482:  std::string arg;
+./helper.cpp:484:  while( current != std::string::npos ) {
+./helper.cpp:497:      std::string var, varSlice;
+./helper.cpp:507:std::string get_nth_var_in_list(std::string list, uint32_t idx) {
+./helper.cpp:515:  std::string arg;
+./helper.cpp:518:  while( current != std::string::npos ) {
+./helper.cpp:534:uint32_t get_var_slice_width( std::string varAndSlice, VarWidth &varWidthIn) {
+./helper.cpp:546:  std::string var, varSlice;
+./helper.cpp:574:std::string get_rhs_taint_list(std::vector<std::string> &updateVec, std::string taint, bool noSlice) {
+./helper.cpp:575:  std::vector<std::string> taintVec;
+./helper.cpp:578:  for(std::string singleUpdate : updateVec) {
+./helper.cpp:580:      std::string update, updateSlice;
+./helper.cpp:591:      std::string numWidth = m.str(1);
+./helper.cpp:596:  std::string returnList = " ";
+./helper.cpp:605:std::string get_rhs_taint_list(std::string updateList, std::string taint, bool noSlice) {
+./helper.cpp:606:  std::vector<std::string> updateVec;
+./helper.cpp:616:std::string insert_taint(std::string signalAndSlice, std::string taint, std::string ver) {
+./helper.cpp:617:  std::string signal, signalSlice;
+./helper.cpp:627:std::string get_lhs_ver_taint_list(std::vector<std::string> &updateVec, std::string taint, std::ofstream &output, std::vector<uint32_t> verVec) {
+./helper.cpp:629:  std::vector<std::string> taintVec;
+./helper.cpp:631:  std::string update;
+./helper.cpp:632:  std::string updateSlice;
+./helper.cpp:634:  for(std::string updateAndSlice : updateVec) {
+./helper.cpp:635:    std::string updateTaintSlice;
+./helper.cpp:640:      std::string updateWidth = toStr(updateWidthNum);
+./helper.cpp:641:      std::string localVer = toStr(verVec[i++]);
+./helper.cpp:651:      std::string numWidth = m.str(1);
+./helper.cpp:659:  std::string returnList = " ";
+./helper.cpp:668:std::string get_lhs_ver_taint_list(std::string list, std::string taint, std::ofstream &output, std::vector<uint32_t> localVer) {
+./helper.cpp:669:  std::vector<std::string> vec;
+./helper.cpp:679:std::string get_lhs_ver_taint_list(std::vector<std::string> &updateVec, std::string taint, std::string &newLogic, std::vector<uint32_t> verVec) {
+./helper.cpp:682:  std::vector<std::string> taintVec;
+./helper.cpp:684:  std::string update;
+./helper.cpp:685:  std::string updateSlice;
+./helper.cpp:687:  for(std::string updateAndSlice : updateVec) {
+./helper.cpp:688:    std::string updateTaintSlice;
+./helper.cpp:693:      std::string updateWidth = toStr(updateWidthNum);
+./helper.cpp:694:      std::string localVer = toStr(verVec[i]);
+./helper.cpp:704:      std::string numWidth = m.str(1);
+./helper.cpp:713:  std::string returnList = " ";
+./helper.cpp:722:std::string get_lhs_ver_taint_list(std::string list, std::string taint, std::string &newLogic, std::vector<uint32_t> localVer) {
+./helper.cpp:723:  std::vector<std::string> vec;
+./helper.cpp:732:void get_ver_vec(std::vector<std::string> varVec, std::vector<uint32_t> &verVec, std::ofstream &output) {
+./helper.cpp:735:  for(std::string var : varVec) {
+./helper.cpp:744:void get_ver_vec(std::string list, std::vector<uint32_t> &verVec, std::ofstream &output) {
+./helper.cpp:745:  std::vector<std::string> vec;
+./helper.cpp:751:void get_ver_vec(std::vector<std::string> varVec, std::vector<uint32_t> &verVec, std::vector<bool> &isNewVec, std::ofstream &output) {
+./helper.cpp:755:  for(std::string var : varVec) {
+./helper.cpp:768:std::string get_lhs_taint_list(std::vector<std::string> &destVec, std::string taint, std::ofstream &output) {
+./helper.cpp:769:  std::vector<std::string> taintVec;
+./helper.cpp:771:  for(std::string singleDest : destVec) {
+./helper.cpp:775:      std::string dest, destSlice;
+./helper.cpp:784:      std::string numWidth = m.str(1);
+./helper.cpp:792:  std::string returnList = " ";
+./helper.cpp:801:std::string get_lhs_taint_list(std::string destList, std::string taint, std::ofstream &output) {
+./helper.cpp:802:  std::vector<std::string> destVec;
+./helper.cpp:811:std::string get_lhs_taint_list(std::vector<std::string> &destVec, std::string taint, std::string &newLogic) {
+./helper.cpp:813:  std::vector<std::string> taintVec;
+./helper.cpp:815:  for(std::string singleDest : destVec) {
+./helper.cpp:819:      std::string dest, destSlice;
+./helper.cpp:828:      std::string numWidth = m.str(1);
+./helper.cpp:836:  std::string returnList = " ";
+./helper.cpp:845:std::string get_lhs_taint_list(std::string destList, std::string taint, std::string &newLogic) {
+./helper.cpp:846:  std::vector<std::string> destVec;
+./helper.cpp:856:std::string get_lhs_taint_list_no_slice(std::vector<std::string> &destVec, std::string taint, std::ofstream &output) {
+./helper.cpp:857:  assert(taint.find(_sig) != std::string::npos);
+./helper.cpp:858:  std::vector<std::string> taintVec;
+./helper.cpp:860:  for(std::string singleDest : destVec) {
+./helper.cpp:864:      std::string dest, destSlice;
+./helper.cpp:873:      std::string numWidth = m.str(1);
+./helper.cpp:881:  std::string returnList = " ";
+./helper.cpp:890:std::string get_lhs_taint_list_no_slice(std::string destList, std::string taint, std::ofstream &output) {
+./helper.cpp:891:  std::vector<std::string> destVec;
+./helper.cpp:900:int str2int(std::string str, std::string info) {
+./helper.cpp:917:void toCout(std::string line) {
+./helper.cpp:922:void toCoutVerb(std::string line) {
+./helper.cpp:928:bool isSingleBit(std::string slice) {
+./helper.cpp:938:std::string further_clean_line(std::string line) {
+./helper.cpp:947:  while( cur != std::string::npos ) {
+./helper.cpp:975:std::string get_recent_rst() {
+./helper.cpp:1004:std::string get_rst() {
+./helper.cpp:1012:bool isRFlag(std::string var) {
+./helper.cpp:1023:void parse_func_statements(std::vector<std::pair<std::string, std::string>> &caseAssignPairs, std::vector<std::string> &inputWidth, std::ifstream &input, bool goToEnd) {
+./helper.cpp:1025:  std::string line;
+./helper.cpp:1043:    assert(line.find("endfunction", 0) != std::string::npos);
+./helper.cpp:1049:std::string parse_case_statements(std::vector<std::pair<std::string, std::string>> &caseAssignPairs, std::ifstream &input, bool returnBegin) {
+./helper.cpp:1051:  std::string line;
+./helper.cpp:1053:  std::string firstLine = "";
+./helper.cpp:1056:  std::string pairValue;
+./helper.cpp:1057:  std::string pairAssign;
+./helper.cpp:1058:  std::string returnVar;
+./helper.cpp:1088:  if(line.find("endcase", 0) == std::string::npos){
+./helper.cpp:1097:std::string pairVec2taintString( std::vector<std::pair<std::string, std::string>> &pairVec, std::string notIncluded, std::string taint, std::ofstream &output ) {
+./helper.cpp:1099:  std::vector<std::string> rhsVec;
+./helper.cpp:1105:  std::string res = get_lhs_taint_list(rhsVec, taint, output);
+./helper.cpp:1111:std::string max_num(uint32_t width) {
+./helper.cpp:1112:  std::string res = toStr(width)+"'b";
+./helper.cpp:1120:std::string max_num(std::string widthStr) {
+./helper.cpp:1131:std::string dec2bin(uint32_t inNum) {
+./helper.cpp:1132:  std::string res="";
+./helper.cpp:1144:// input is a string of binary-format number
+./helper.cpp:1145:std::string get_bits(std::string inNum, uint32_t highIdx, uint32_t lowIdx) {
+./helper.cpp:1152:std::string add_taint(std::vector<std::string> &freeBitsVec, std::string taint) {
+./helper.cpp:1153:  std::string res = "{ ";
+./helper.cpp:1154:  for(std::string freeBits: freeBitsVec) {
+./helper.cpp:1164:void assert_info(bool val, std::string info) {
+./helper.cpp:1173:void merge_vec(std::vector<std::string> &srcVec, std::vector<std::string> &destVec) {
+./helper.cpp:1174:  std::string prevVar = "";
+./helper.cpp:1175:  std::string var, varSlice;
+./helper.cpp:1184:  for( std::string varAndSlice : srcVec ) {
+./helper.cpp:1275:bool is_neg_rst(std::string var) {
+./helper.cpp:1291:void printAndAbort(std::string in) {
+./helper.cpp:1297:void checkCond(bool cond, std::string in) {
+./helper.cpp:1304:std::string expand_slice(std::string slice) {
+./helper.cpp:1312:std::string extract_path(std::string fullFileName) {
+./helper.cpp:1314:  if(pos == std::string::npos) {
+./helper.cpp:1322:uint32_t get_dest_ver(std::string destAndSlice) {
+./helper.cpp:1323:  std::string dest, destSlice;
+./helper.cpp:1338:bool is_srcConcat(std::string line) {
+./helper.cpp:1339:  if(line.find(srcConcatFeature) == std::string::npos)
+./helper.cpp:1341:  if(line.find(bothConcatFeature) != std::string::npos)
+./helper.cpp:1346:    if(line.find(*it) != std::string::npos) {
+./helper.cpp:1357://bool is_destConcat(std::string line) {
+./helper.cpp:1358://  if(line.find("} = ") == std::string::npos)
+./helper.cpp:1360://  if(line.find(bothConcatFeature) != std::string::npos)
+./helper.cpp:1365://    if(line.find(*it) != std::string::npos) {
+./helper.cpp:1375://bool is_srcDestConcat(std::string line) {
+./helper.cpp:1376://  if(line.find(bothConcatFeature) == std::string::npos)
+./helper.cpp:1381://    if(line.find(*it) != std::string::npos) {
+./helper.cpp:1390:std::string extract_bin(std::string num, uint32_t highIdx, uint32_t lowIdx) {
+./helper.cpp:1394:    std::string bits = m.str(2);
+./helper.cpp:1403:    std::string bits = m.str(2);
+./helper.cpp:1404:    std::string binBits = hex2bin(bits);
+./helper.cpp:1415:std::string hex2bin(std::string hexNum) {
+./helper.cpp:1416:  std::string res = "";
+./helper.cpp:1459:// input string might contain variables besides bit-vectors
+./helper.cpp:1460:std::string split_long_bit_vec(std::string varList) {
+./helper.cpp:1463:  std::string ret;
+./helper.cpp:1464:  if(varList.find(",") == std::string::npos)
+./helper.cpp:1468:  while(varList.find(", ", lastPos) != std::string::npos) {
+./helper.cpp:1470:    std::string var = varList.substr(lastPos, end-lastPos);
+./helper.cpp:1478:      std::string num = m.str(2);
+./helper.cpp:1483:      std::string num = m.str(2);
+./helper.cpp:1493:  std::string var = varList.substr(lastPos);
+./helper.cpp:1500:    std::string num = m.str(2);
+./helper.cpp:1505:    std::string num = m.str(2);
+./helper.cpp:1524:std::string remove_signed(std::string &line) {
+./helper.cpp:1527:  if(line.find("$signed") != std::string::npos) {
+./helper.cpp:1535:std::string split_long_hex(std::string var, uint32_t width, std::string num, std::string strToConcat) {
+./helper.cpp:1545:    std::string subVar;
+./helper.cpp:1556:std::string split_long_bin(std::string var, uint32_t width, std::string num, std::string strToConcat) {
+./helper.cpp:1565:    std::string subVar = toStr(subWidth)+"'b"+num.substr(pos, subWidth);
+./helper.cpp:1574:void fill_var_width(const std::string &line, VarWidth &varWidth) {
+./helper.cpp:1582:        std::string slice = m.str(2);
+./helper.cpp:1583:        std::string var = m.str(3);
+./helper.cpp:1611:        std::string slice = m.str(2);
+./helper.cpp:1612:        std::string var = m.str(3);
+./helper.cpp:1636:        std::string slice = m.str(2);
+./helper.cpp:1637:        std::string var = m.str(3);
+./helper.cpp:1661:        std::string slice = m.str(2);
+./helper.cpp:1662:        std::string var = m.str(3);
+./helper.cpp:1699:void remove_back_space(std::string &str) {
+./helper.cpp:1705:void remove_front_space(std::string &str) {
+./helper.cpp:1710:void remove_two_end_space(std::string &str) {
+./helper.cpp:1716:bool is_srcConcat(const std::string &line) {
+./helper.cpp:1721:  std::string varList = m.str(3);
+./helper.cpp:1722:  std::vector<std::string> varVec;
+./helper.cpp:1728:bool is_destConcat(const std::string &line) {
+./helper.cpp:1733:  std::string varList = m.str(2);
+./helper.cpp:1734:  std::vector<std::string> varVec;
+./helper.cpp:1740:bool is_srcDestConcat(const std::string &line) {
+./helper.cpp:1745:  std::string srcList = m.str(2);
+./helper.cpp:1746:  std::string destList = m.str(3);
+./helper.cpp:1747:  std::vector<std::string> srcVec;
+./helper.cpp:1748:  std::vector<std::string> destVec;
+./helper.cpp:1755:bool vec_has_only_vars(const std::vector<std::string> &vec) {
+./helper.cpp:1758:  for(std::string var: vec) {
+./helper.cpp:1767:bool is_concat(std::string var) {
+./helper.cpp:1770:  if(var.find(",") == std::string::npos) {
+./helper.cpp:1777:bool split_concat(std::string var, std::vector<std::string> &vec) {
+./helper.cpp:1784:    std::string oneVar;
+./helper.cpp:1785:    if(commaPos != std::string::npos) {
+./helper.cpp:1795:  } while(commaPos != std::string::npos);
+./helper.h:4:#include <string>
+./helper.h:9:bool isNum(std::string name);
+./helper.h:11:bool isOutput(std::string var);
+./helper.h:13:bool isInput(std::string var);
+./helper.h:15:bool isReg(std::string var);
+./helper.h:17:bool isOAReg(std::string var);
+./helper.h:19:bool isWire(std::string var);
+./helper.h:21:bool isMem(std::string var);
+./helper.h:23:std::string to_re(std::string input);
+./helper.h:25:std::string remove_bracket(std::string name);
+./helper.h:27:uint32_t cut_pos(std::string name);
+./helper.h:29:bool split_slice(std::string slicedName, std::string &name, std::string &slice);
+./helper.h:31:uint32_t get_width(std::string slice);
+./helper.h:33:uint32_t get_begin(std::string slice);
+./helper.h:35:uint32_t get_end(std::string slice);
+./helper.h:37:uint32_t find_version_num(std::string opAndSlice, bool &isNew, std::ofstream &output, bool forceNewVer=false);
+./helper.h:39:void free_bits(std::string op, std::vector<std::string> &freeBitsVec);
+./helper.h:41:bool check_bits(std::string op, std::string opSlice, const std::vector<bool> &bitVec);
+./helper.h:43:void merge_bits(std::string op, std::string opSlice, std::vector<bool> &bitVec);
+./helper.h:45:void parse_taintBits(std::string taintBits, bool &tExist, bool &rExist, bool &xExist, bool &cExist);
+./helper.h:47:void collapse_bits(std::string varName, uint32_t bound1, uint32_t bound2, std::ofstream &output);
+./helper.h:49:std::string extend(std::string in, uint32_t length);
+./helper.h:51:void debug_line(std::string line);
+./helper.h:53:void ground_wires(std::string wireName, std::pair<uint32_t, uint32_t> idxPair, std::string slice, std::string blank, std::ofstream &output);
+./helper.h:55:void parse_var_list(std::string list, std::vector<std::string> &vec, bool noSlice = false);
+./helper.h:57:std::string get_nth_var_in_list(std::string list, uint32_t idx);
+./helper.h:59:uint32_t get_var_slice_width( std::string varSlice, VarWidth &varWdithIn = varWidth);
+./helper.h:61:std::string get_rhs_taint_list(std::vector<std::string> &updateVec, std::string taint, bool noSlice=false);
+./helper.h:63:std::string get_rhs_taint_list(std::string updateList, std::string taint, bool noSlice=false);
+./helper.h:65:std::string insert_taint(std::string signalAndSlice, std::string taint, std::string ver="");
+./helper.h:67:std::string get_lhs_ver_taint_list(std::vector<std::string> &updateVec, std::string taint, std::ofstream &output, std::vector<uint32_t> localVer);
+./helper.h:69:std::string get_lhs_ver_taint_list(std::string list, std::string taint, std::ofstream &output, std::vector<uint32_t> localVer);
+./helper.h:71:std::string get_lhs_ver_taint_list(std::vector<std::string> &updateVec, std::string taint, std::string &newLogic, std::vector<uint32_t> verVec);
+./helper.h:73:std::string get_lhs_ver_taint_list(std::string list, std::string taint, std::string &newLogic, std::vector<uint32_t> localVer);
+./helper.h:75:std::string get_lhs_taint_list(std::vector<std::string> &destVec, std::string taint, std::ofstream &output);
+./helper.h:77:std::string get_lhs_taint_list(std::string destList, std::string taint, std::ofstream &output);
+./helper.h:79:std::string get_lhs_taint_list(std::vector<std::string> &destVec, std::string taint, std::string &newLogic);
+./helper.h:81:std::string get_lhs_taint_list(std::string destList, std::string taint, std::string &newLogic);
+./helper.h:83:std::string get_lhs_taint_list_no_slice(std::vector<std::string> &destVec, std::string taint, std::ofstream &output);
+./helper.h:85:std::string get_lhs_taint_list_no_slice(std::string destList, std::string taint, std::ofstream &output);
+./helper.h:87:void get_ver_vec(std::vector<std::string> varVec, std::vector<uint32_t> &verVec, std::ofstream &output);
+./helper.h:89:void get_ver_vec(std::string list, std::vector<uint32_t> &verVec, std::ofstream &output);
+./helper.h:91:void get_ver_vec(std::vector<std::string> varVec, std::vector<uint32_t> &verVec, std::vector<bool> &isNewVec, std::ofstream &output);
+./helper.h:93:int str2int(std::string str, std::string info);
+./helper.h:95:void toCout(std::string line);
+./helper.h:97:void toCoutVerb(std::string line);
+./helper.h:99:bool isSingleBit(std::string slice);
+./helper.h:101:std::string further_clean_line(std::string line);
+./helper.h:103:std::string get_recent_rst();
+./helper.h:105:std::string get_rst();
+./helper.h:107:bool isRFlag(std::string var);
+./helper.h:109:void parse_func_statements(std::vector<std::pair<std::string, std::string>> &caseAssignPairs, std::vector<std::string> &inputWidth, std::ifstream &input, bool goToEnd=false);
+./helper.h:111:std::string parse_case_statements(std::vector<std::pair<std::string, std::string>> &caseAssignPairs, std::ifstream &input, bool returnBegin=false);
+./helper.h:113:std::string pairVec2taintString( std::vector<std::pair<std::string, std::string>> &pairVec, std::string notIncluded, std::string taint, std::ofstream &output );
+./helper.h:115:std::string max_num(uint32_t width);
+./helper.h:117:std::string max_num(std::string widthStr);
+./helper.h:121:std::string dec2bin(uint32_t inNum);
+./helper.h:123:std::string get_bits(std::string inNum, uint32_t highIdx, uint32_t lowIdx);
+./helper.h:125:std::string add_taint(std::vector<std::string> &freeBitsVec, std::string taint);
+./helper.h:127:void assert_info(bool val, std::string info);
+./helper.h:129:void merge_vec(std::vector<std::string> &srcVec, std::vector<std::string> &destVec);
+./helper.h:131:bool is_neg_rst(std::string rst);
+./helper.h:133:void printAndAbort(std::string in);
+./helper.h:135:void checkCond(bool cond, std::string in);
+./helper.h:137:std::string expand_slice(std::string slice);
+./helper.h:139:std::string extract_path(std::string fullFileName);
+./helper.h:141:uint32_t get_dest_ver(std::string destAndSlice);
+./helper.h:143:bool is_srcConcat(const std::string &line);
+./helper.h:145:bool is_destConcat(const std::string &line);
+./helper.h:147:bool is_srcDestConcat(const std::string &line);
+./helper.h:149:std::string extract_bin(std::string num, uint32_t highIdx, uint32_t lowIdx);
+./helper.h:151:std::string hex2bin(std::string hexNum);
+./helper.h:153:std::string split_long_bit_vec(std::string varList);
+./helper.h:155:std::string remove_signed(std::string &line);
+./helper.h:157:std::string split_long_hex(std::string var, uint32_t width, std::string num, std::string strToConcat);
+./helper.h:159:std::string split_long_bin(std::string var, uint32_t width, std::string num, std::string strToConcat);
+./helper.h:161:void fill_var_width(const std::string &line, VarWidth &varWidth);
+./helper.h:163:void remove_back_space(std::string &str);
+./helper.h:165:void remove_front_space(std::string &str);
+./helper.h:167:void remove_two_end_space(std::string &str);
+./helper.h:169:bool vec_has_only_vars(const std::vector<std::string> &vec);
+./helper.h:171:bool is_concat(std::string line);
+./helper.h:173:bool extract_concat(std::string var, std::vector<std::string> &vec);
+./helper.h:175:bool split_concat(std::string var, std::vector<std::string> &vec);
+./op_taint_gen.h:10:void input_taint_gen(std::string line, std::ofstream &output);
+./op_taint_gen.h:12:void reg_taint_gen(std::string line, std::ofstream &output);
+./op_taint_gen.h:14:void mem_taint_gen(std::string line, std::ofstream &output);
+./op_taint_gen.h:16:void wire_taint_gen(std::string line, std::ofstream &output);
+./op_taint_gen.h:18:void output_insert_map(std::string line, std::ofstream &output, std::ifstream &input);
+./op_taint_gen.h:20:void two_op_taint_gen(std::string line, std::ofstream &output);
+./op_taint_gen.h:22:void one_op_taint_gen(std::string line, std::ofstream &output);
+./op_taint_gen.h:24:void sel_op_taint_gen(std::string line, std::ofstream &output);
+./op_taint_gen.h:26:void reduce_one_op_taint_gen(std::string line, std::ofstream &output);
+./op_taint_gen.h:28:void mult_op_taint_gen(std::string line, std::ofstream &output);
+./op_taint_gen.h:30:void both_concat_op_taint_gen(std::string line, std::ofstream &output);
+./op_taint_gen.h:32:void dest_concat_op_taint_gen(std::string line, std::ofstream &output);
+./op_taint_gen.h:34:void ite_taint_gen(std::string line, std::ofstream &output);
+./op_taint_gen.h:36:void nonblock_taint_gen(std::string line, std::ofstream &output);
+./op_taint_gen.h:38:void nonblock_gate_taint_gen(std::string line, std::ofstream &output);
+./op_taint_gen.h:40:void nonblockconcat_taint_gen(std::string line, std::ofstream &output);
+./op_taint_gen.h:42:void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstream &input, std::ofstream &output); 
+./op_taint_gen.h:44:void always_fake_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream &output);
+./op_taint_gen.h:46:void always_star_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream &output);
+./op_taint_gen.h:48:void always_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream &output);
+./op_taint_gen.h:50:void always_neg_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream &output);
+./op_taint_gen.h:52:void always_clkrst_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream &output);
+./op_taint_gen.h:55:void reg_taint_gen_func(std::string line, std::ofstream &output, std::string taintBits);
+./op_taint_gen.h:57:void wire_taint_gen_func(std::string line, std::ofstream &output, std::string taintBits);
+./op_taint_gen.h:59:void two_op_taint_gen_func(std::string line, std::ofstream &output, std::unordered_map<std::string, uint32_t> &versionMap, std::string taintBits);
+./op_taint_gen.h:61:void one_op_taint_gen_func(std::string line, std::ofstream &output, std::unordered_map<std::string, uint32_t> &versionMap, std::string taintBits);
+./op_taint_gen.h:63:void ite_taint_gen_func(std::string line, std::ofstream &output, std::unordered_map<std::string, uint32_t> &versionMap, std::string taintBits);  
+./vcd_parser.cpp:10:std::map<std::string, std::unordered_map<std::string, std::string>> g_rstValMap;
+./vcd_parser.cpp:11:std::map<std::string, std::unordered_map<std::string, std::string>> g_normValMap;
+./vcd_parser.cpp:14:std::unordered_map<std::string, std::unordered_map<std::string, std::string>> g_instance2moduleMap;
+./vcd_parser.cpp:17:bool is_end_scope(std::string line) {
+./vcd_parser.cpp:21:bool is_func_start(std::string line) {
+./vcd_parser.cpp:27:void hierarchical_vcd_parser(std::string fileName, std::map<std::string, std::unordered_map<std::string, std::string>>& valMap) {
+./vcd_parser.cpp:29:  std::unordered_map<std::string, std::pair<std::string, std::string>> nameVarMap;
+./vcd_parser.cpp:30:  std::stack<std::string> instanceNameStack;
+./vcd_parser.cpp:31:  std::stack<std::string> moduleNameStack;
+./vcd_parser.cpp:36:  std::string line;
+./vcd_parser.cpp:46:    if(line.find("M9") != std::string::npos) {
+./vcd_parser.cpp:58:      std::string curInstance = m.str(1);
+./vcd_parser.cpp:68:        std::string moduleName = moduleNameStack.top();
+./vcd_parser.cpp:69:        std::string curModule = g_instance2moduleMap[moduleName][curInstance];
+./vcd_parser.cpp:95:      std::string name = m.str(2);
+./vcd_parser.cpp:96:      std::string var = m.str(3);
+./vcd_parser.cpp:101:      std::string name = line.substr(blankPos+1);
+./vcd_parser.cpp:110:      std::string rstVal = line.substr(1, blankPos-1);
+./vcd_parser.cpp:118:      std::string modName = moduleVarPair.first;
+./vcd_parser.cpp:119:      std::string varName = moduleVarPair.second;
+./vcd_parser.cpp:121:        valMap.emplace(modName, std::unordered_map<std::string, std::string>{{varName, rstVal}});
+./vcd_parser.cpp:137:bool check_rst_value(std::map<std::string, std::unordered_map<std::string, std::string>>& rstValMap) {
+./vcd_parser.cpp:153:bool same_module(const std::string& name1, const std::string& name2) {
+./vcd_parser.cpp:158:  if(dlmtPos2 != std::string::npos) {
+./vcd_parser.cpp:159:    if(dlmtPos1 != std::string::npos) {
+./vcd_parser.cpp:172:  else if(dlmtPos1 != std::string::npos)
+./vcd_parser.cpp:183:    //std::string mod1 = g_instance2moduleMap[name1];
+./vcd_parser.cpp:184:    //std::string mod2 = g_instance2moduleMap[name2];
+./vcd_parser.cpp:191:bool all_are_digits(const std::string& s) {
+./vcd_parser.cpp:192:  std::string::const_iterator it = s.begin();
+./vcd_parser.cpp:198:bool equal_maps( std::unordered_map<std::string, std::string>& mp1, std::unordered_map<std::string, std::string>& mp2 ) {
+./vcd_parser.cpp:211:bool is_zero(std::string s) {
+./vcd_parser.cpp:212:  std::string::const_iterator it = s.begin();
+./assume_gen/assume_gen.h:1:#include <string>
+./assume_gen/assume_gen.h:5:void gen_rst_property(std::string rstName, std::ofstream &output);
+./assume_gen/assume_gen.h:7:uint32_t gen_in_out_property(std::vector<std::pair<std::vector<std::string>, std::vector<std::string>>> inOutPair, std::ofstream &output, uint32_t instrIdx);
+./assume_gen/assume_gen.h:10:std::string in_out_formula(std::pair<std::vector<std::string>, std::vector<std::string>> &singlePair, bool interested);
+./assume_gen/assume_gen.h:12:uint32_t gen_in_taint_property(std::vector<std::pair<std::vector<std::string>, std::vector<std::string>>> &inOutPair, std::ofstream &output, uint32_t instrIdx, uint32_t startPropertyIdx);
+./assume_gen/assume_gen.h:14:std::string in_taint_formula(std::vector<std::string> inputValVec, bool interested);
+./assume_gen/assume_gen.h:16:void gen_legal_instrs(std::vector<std::pair<std::vector<std::string>, std::vector<std::string>>> &inOutPair, std::ofstream &output, uint32_t propertyIdx); 
+./assume_gen/assume_gen.h:18:std::string instr_values(std::vector<std::string> inputValVec, uint32_t instrIdx);
+./assume_gen/assume_gen.h:22:void parse_var_list(std::string list, std::vector<std::string> &vec, bool noSlice);
+./assume_gen/assume_gen.h:24:bool split_slice(std::string slicedName, std::string &name, std::string &slice);
+./assume_gen/assume_gen.h:26:uint32_t cut_pos(std::string name);
+./assume_gen/assume_gen.h:30:std::string max_num(std::string widthStr);
+./assume_gen/assume_gen.h:33://  void operator()(const std::string str) {
+./assume_gen/assume_gen.cpp:3:#include <string>
+./assume_gen/assume_gen.cpp:25:std::vector<std::string> inputDataPorts;
+./assume_gen/assume_gen.cpp:26:std::vector<std::string> inputCtrlPorts;
+./assume_gen/assume_gen.cpp:27:std::vector<std::string> outputReadPorts;
+./assume_gen/assume_gen.cpp:29:std::vector<std::string> inputDataWidth;
+./assume_gen/assume_gen.cpp:30:std::vector<std::string> inputCtrlWidth;
+./assume_gen/assume_gen.cpp:31:std::vector<std::string> outputReadWidth;
+./assume_gen/assume_gen.cpp:35:  std::string fileName = argv[1];
+./assume_gen/assume_gen.cpp:37:  std::string line;
+./assume_gen/assume_gen.cpp:43:  std::string rstName;
+./assume_gen/assume_gen.cpp:74:  std::vector<std::pair<std::vector<std::string>, std::vector<std::string>>> inOutPair;
+./assume_gen/assume_gen.cpp:75:  std::vector<std::vector<std::string>> outRead;
+./assume_gen/assume_gen.cpp:76:  std::vector<std::vector<std::string>> inputComb;
+./assume_gen/assume_gen.cpp:80:    std::string inputs = m.str(1);
+./assume_gen/assume_gen.cpp:81:    std::string taints = m.str(2);
+./assume_gen/assume_gen.cpp:83:      std::vector<std::string> localVec;
+./assume_gen/assume_gen.cpp:88:      std::vector<std::string> localVec;
+./assume_gen/assume_gen.cpp:93:      std::vector<std::string> localInVec;
+./assume_gen/assume_gen.cpp:94:      std::vector<std::string> localOutVec;
+./assume_gen/assume_gen.cpp:123:void gen_rst_property(std::string rstName, std::ofstream &output) {
+./assume_gen/assume_gen.cpp:131:uint32_t gen_in_out_property(std::vector<std::pair<std::vector<std::string>, std::vector<std::string>>> inOutPair, std::ofstream &output, uint32_t instrIdx) {
+./assume_gen/assume_gen.cpp:146:std::string in_out_formula(std::pair<std::vector<std::string>, std::vector<std::string>> &singlePair, bool interested) {
+./assume_gen/assume_gen.cpp:147:  std::string firstPart="";
+./assume_gen/assume_gen.cpp:148:  std::string secondPart="";
+./assume_gen/assume_gen.cpp:149:  //std::vector<std::string> &inVa
+./assume_gen/assume_gen.cpp:159:    std::string maxNum = max_num(outputReadWidth[i]);
+./assume_gen/assume_gen.cpp:166:uint32_t gen_in_taint_property(std::vector<std::pair<std::vector<std::string>, std::vector<std::string>>> &inOutPair, std::ofstream &output, uint32_t instrIdx, uint32_t startPropertyIdx) {
+./assume_gen/assume_gen.cpp:179:std::string in_taint_formula(std::vector<std::string> inputValVec, bool interested) {
+./assume_gen/assume_gen.cpp:180:  std::string firstPart="";
+./assume_gen/assume_gen.cpp:181:  std::string secondPart="";
+./assume_gen/assume_gen.cpp:182:  //std::vector<std::string> &inVa
+./assume_gen/assume_gen.cpp:192:    std::string maxNum = max_num(inputCtrlWidth[i]);
+./assume_gen/assume_gen.cpp:198:    std::string maxNum = max_num(inputCtrlWidth[i]);    
+./assume_gen/assume_gen.cpp:206:void gen_legal_instrs(std::vector<std::pair<std::vector<std::string>, std::vector<std::string>>> &inOutPair, std::ofstream &output, uint32_t propertyIdx) {
+./assume_gen/assume_gen.cpp:217:std::string instr_values(std::vector<std::string> inputValVec, uint32_t instrIdx) {
+./assume_gen/assume_gen.cpp:218:  std::string res = "";
+./assume_gen/assume_gen.cpp:222:  for(std::string input: inputCtrlPorts) {
+./assume_gen/assume_gen.cpp:239:void parse_var_list(std::string list, std::vector<std::string> &vec, bool noSlice) {
+./assume_gen/assume_gen.cpp:249:  std::string arg;
+./assume_gen/assume_gen.cpp:251:  while( current != std::string::npos ) {
+./assume_gen/assume_gen.cpp:264:      std::string var, varSlice;
+./assume_gen/assume_gen.cpp:273:bool split_slice(std::string slicedName, std::string &name, std::string &slice) {
+./assume_gen/assume_gen.cpp:295:uint32_t cut_pos(std::string name) {
+./assume_gen/assume_gen.cpp:328:std::string max_num(std::string widthStr) {
+./assume_gen/assume_gen.cpp:330:  std::string res = widthStr+"'b";
+./varWidth.h:4:#include <string>
+./varWidth.h:12:  std::unordered_map<std::string, std::pair<uint32_t, uint32_t>> internalVarWidth;
+./varWidth.h:17:  bool var_width_insert(std::string var, uint32_t begin, uint32_t end);
+./varWidth.h:18:  uint32_t get_from_var_width(std::string var, std::string line="");
+./varWidth.h:19:  uint32_t get_high_idx(std::string var, std::string line="");
+./varWidth.h:20:  uint32_t get_low_idx(std::string var, std::string line="");
+./varWidth.h:21:  bool force_insert(std::string var, uint32_t begin, uint32_t end);
+./varWidth.h:22:  bool check_key(std::string key, std::string line="");  
+./varWidth.h:23:  std::pair<uint32_t, uint32_t> get_idx_pair(std::string var, std::string line="");
+./vcd_parser.h:1:#include <string>
+./vcd_parser.h:13:void hierarchical_vcd_parser(std::string fileName, std::map<std::string, std::unordered_map<std::string, std::string>>& valMap);
+./vcd_parser.h:15:bool same_module(const std::string& name1, const std::string& name2);
+./vcd_parser.h:17:bool all_are_digits(const std::string& s);
+./vcd_parser.h:19:bool equal_maps( std::unordered_map<std::string, std::string>& mp1, std::unordered_map<std::string, std::string>& mp2 );
+./vcd_parser.h:21:bool check_rst_value(std::map<std::string, std::unordered_map<std::string, std::string>>& rstValMap);
+./vcd_parser.h:23:bool is_zero(std::string s);
+./vcd_parser.h:25:bool is_end_scope(std::string line);
+./vcd_parser.h:27:bool is_func_start(std::string line);
+./taint_gen.h:4:#include <string>
+./taint_gen.h:48:void clean_file(std::string fileName, bool useLogic);
+./taint_gen.h:50:void remove_functions(std::string fileName);
+./taint_gen.h:52:void add_line_taints(std::string line, std::ofstream &output, std::ifstream &input);
+./taint_gen.h:54:void read_in_clkrst(std::string pathFile, std::string fileName);
+./taint_gen.h:56:void add_file_taints(std::string fileName, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap, std::map<std::string, std::vector<std::string>> &moduleRFlagsMap);
+./taint_gen.h:58:void add_module_name(std::string fileName, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap, std::map<std::string, std::vector<std::string>> &moduleRFlagsMap, bool isTopIn);
+./taint_gen.h:60:bool isNum(std::string name);
+./taint_gen.h:62:bool isOutput(std::string var);
+./taint_gen.h:64:bool isReg(std::string var);
+./taint_gen.h:66:std::string to_re(std::string input);
+./taint_gen.h:68:int parse_verilog_line(std::string line, bool ignoreWrongOp=false);
+./taint_gen.h:70:void add_func_taints(std::ifstream &input, std::ofstream &output, std::string funcDefinition);
+./taint_gen.h:73:void add_case_taints(std::ifstream &input, std::ofstream &output, std::string firstLine, std::string taintBits);
+./taint_gen.h:75:void add_func_taints_limited(std::ifstream &input, std::ofstream &output, std::string firstLine);
+./taint_gen.h:77:void add_func_taints_call_limited(std::string line, std::ofstream &output);
+./taint_gen.h:79:void extend_module_instantiation(std::ifstream &input, std::ofstream &output, std::string moduleFirstLine, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap);
+./taint_gen.h:81:void merge_taints(std::string fileName);
+./taint_gen.h:83:bool extract_concat(std::string line, std::ofstream &output, std::string &returnedStmt, std::string &fangyuanDeclaration, std::string &fangyuanAssign, bool isFuncCall);
+./taint_gen.h:87:void gen_reg_output(std::string fileName);
+./taint_gen.h:89:void gen_wire_output(std::string fileName);
+./taint_gen.h:91:void remove_function_wrapper(std::string firstLine, std::ifstream &input, std::ofstream &output);
+./taint_gen.h:93:void analyze_reg_path( std::string fileName );
+./taint_gen.h:95:void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::string caseFirstLine);
+./taint_gen.h:97:void collect_ite_dest(const std::string &line);
+./taint_gen.h:99:void collect_case_dest(const std::string &line);
+./taint_gen.h:103:void map_gen(std::string moduleName, std::string instanceName, std::ofstream &output);
+./taint_gen.h:105:std::string separate_modules(std::string fileName, 
+./taint_gen.h:106:                             std::vector<std::string> &modules,
+./taint_gen.h:107:                             std::map<std::string, std::vector<std::string>> &childModules,
+./taint_gen.h:109:                             std::unordered_map<std::string,
+./taint_gen.h:115:std::string separate_modules(std::string fileName, 
+./taint_gen.h:116:                             std::vector<std::string> &modules, 
+./taint_gen.h:117:                             std::map<std::string, std::vector<std::string>> &childModules, 
+./taint_gen.h:119:                             std::unordered_map<std::string, 
+./taint_gen.h:122:int taint_gen(std::string fileName, uint32_t stage, bool isTopIn, std::map<std::string, std::vector<std::string>> &moduleInputsMap, std::map<std::string, std::vector<std::string>> &moduleOutputsMap, std::map<std::string, std::vector<std::string>> &moduleRFlagsMap, uint32_t totalRegCnt, uint32_t &nextSig, bool doProcessPathInfo);
+./pass_info.cpp:15:std::unordered_map<std::string, std::vector<uint32_t>> g_backwardMap;
+./pass_info.cpp:17:std::unordered_map<std::string, std::vector<uint32_t>> g_forwardMap;
+./pass_info.cpp:19:std::vector<std::string> g_passExprStore;
+./pass_info.cpp:20:std::unordered_map<std::string, uint32_t> g_caseBackwardMap;
+./pass_info.cpp:21:std::unordered_map<std::string, uint32_t> g_caseForwardMap;
+./pass_info.cpp:23:std::unordered_map<std::string, std::vector<struct passInfo>> g_passInfoMap;
+./pass_info.cpp:24:std::map<std::string, std::string> g_regCondMap; // store register(AndSlice) and conditions that make it repeat itself
+./pass_info.cpp:27:void fill_in_pass_relation(std::string destAndSlice, std::string srcAndSlice, std::string line) {
+./pass_info.cpp:30:  std::string src, srcSlice;
+./pass_info.cpp:37:void fill_in_case_relation(std::string dest, std::string longSrc, std::string shortSrc, std::string cond, std::vector<std::pair<std::string, std::string>> &caseAssignPairs) {
+./pass_info.cpp:44:  std::string longSrcName, longSrcSlice;
+./pass_info.cpp:45:  std::string shortSrcName, shortSrcSlice;
+./pass_info.cpp:55:void make_case_val_explicit(std::vector<std::pair<std::string, std::string>> &caseAssignPairs) {
+./pass_info.cpp:56:  std::vector<std::pair<std::string, std::string>>::iterator it = caseAssignPairs.begin();
+./pass_info.cpp:58:    std::string val = it->first;
+./pass_info.cpp:59:    std::string newVal = "";
+./pass_info.cpp:78:void fill_in_src_concat_relation(std::string line) {
+./pass_info.cpp:86:  std::string destAndSlice = m.str(2);
+./pass_info.cpp:87:  std::string srcList = m.str(3);
+./pass_info.cpp:92:  std::vector<std::string> srcVec;
+./pass_info.cpp:94:  for(std::string srcAndSlice: srcVec) {
+./pass_info.cpp:100:void fill_in_dest_concat_relation(std::string line) {
+./pass_info.cpp:109:  std::string destList = m.str(2);
+./pass_info.cpp:110:  std::string srcAndSlice = m.str(3);
+./pass_info.cpp:115:  std::vector<std::string> destVec;
+./pass_info.cpp:117:  for(std::string destAndSlice: destVec) {
+./pass_info.cpp:123:void fill_in_ite_relation(std::string line) {
+./pass_info.cpp:131:  std::string destAndSlice = m.str(2);
+./pass_info.cpp:132:  std::string cond = m.str(3);
+./pass_info.cpp:133:  std::string op1AndSlice = m.str(4);
+./pass_info.cpp:134:  std::string op2AndSlice = m.str(5);
+./pass_info.cpp:142:void fill_in_sel_relation(std::string line) {
+./pass_info.cpp:153:  std::string destAndSlice = m.str(2);
+./pass_info.cpp:154:  std::string op1 = m.str(3);
+./pass_info.cpp:155:  std::string slice = m.str(4);  
+./pass_info.cpp:156:  std::string op2AndSlice = m.str(5);
+./pass_info.cpp:165:void fill_in_both_concat_relation(std::string line) {
+./pass_info.cpp:173:  std::string destList = m.str(2);
+./pass_info.cpp:174:  std::string srcList = m.str(3);
+./pass_info.cpp:176:  std::vector<std::string> destVec;
+./pass_info.cpp:178:  for(std::string destAndSlice: destVec)
+./pass_info.cpp:182:  std::vector<std::string> srcVec;
+./pass_info.cpp:184:  for(std::string srcAndSlice: srcVec) {
+./pass_info.cpp:192:void add_into_backwardMap(std::string destAndSlice, std::string line, uint32_t storeIdx) {
+./pass_info.cpp:193:  std::string dest, destSlice;
+./pass_info.cpp:208:  //    std::string destSliceLine = g_passExprStore[tmpStoreIdx];
+./pass_info.cpp:222:void add_into_forwardMap(std::string srcAndSlice, std::string line, uint32_t storeIdx) {
+./pass_info.cpp:223:  std::string src, srcSlice;
+./pass_info.cpp:235:void process_pass_info(std::string fileName) {
+./pass_info.cpp:237:  std::string line;
+./pass_info.cpp:241:    if(line.find("27'b000000000000000000000000000, of, 32'b00000000000000000000000000000000") != std::string::npos) {
+./pass_info.cpp:250:        std::string destAndSlice = m.str(2);
+./pass_info.cpp:251:        std::string srcList = m.str(3);
+./pass_info.cpp:252:        std::vector<std::pair<std::string, std::string>> frontCondPairVec;
+./pass_info.cpp:253:        std::vector<std::pair<std::string, std::string>> backCondPairVec;
+./pass_info.cpp:254:        std::vector<std::string> srcVec;
+./pass_info.cpp:256:        std::unordered_set<std::string> srcSet(srcVec.begin(), srcVec.end());
+./pass_info.cpp:257:        for(std::string srcAndSlice: srcSet) {
+./pass_info.cpp:262:          std::string forwardStart = get_target_and_slice(srcAndSlice, srcAndSlice, srcList, destAndSlice);
+./pass_info.cpp:275:        std::string destList = m.str(2);
+./pass_info.cpp:276:        std::string srcList = m.str(3);
+./pass_info.cpp:277:        std::vector<std::string> destVec;
+./pass_info.cpp:279:        std::vector<std::string> srcVec;
+./pass_info.cpp:281:        std::unordered_set<std::string> srcSet(srcVec.begin(), srcVec.end());        
+./pass_info.cpp:282:        std::vector<std::pair<std::string, std::string>> frontCondPairVec;
+./pass_info.cpp:283:        std::vector<std::pair<std::string, std::string>> backCondPairVec;
+./pass_info.cpp:284:        for(std::string srcAndSlice: srcSet) {
+./pass_info.cpp:289:          std::string forwardStart = get_target_and_slice(srcAndSlice, srcAndSlice, srcList, destList);
+./pass_info.cpp:304:        std::string destList = m.str(2);
+./pass_info.cpp:305:        std::string srcAndSlice = m.str(3);
+./pass_info.cpp:306:        std::vector<std::pair<std::string, std::string>> frontCondPairVec;
+./pass_info.cpp:307:        std::vector<std::pair<std::string, std::string>> backCondPairVec;
+./pass_info.cpp:308:        std::vector<std::string> destVec;
+./pass_info.cpp:310:        for(std::string destAndSlice: destVec) {
+./pass_info.cpp:315:          std::string backwardStart = get_target_and_slice(destAndSlice, destAndSlice, destList, srcAndSlice);
+./pass_info.cpp:331:      //  std::string destAndSlice = m.str(2);
+./pass_info.cpp:332:      //  std::string op1 = m.str(3);
+./pass_info.cpp:333:      //  std::string slice = m.str(4);
+./pass_info.cpp:334:      //  std::string op2AndSlice = m.str(5);
+./pass_info.cpp:335:      //  std::string lowIdx = m.str(6);
+./pass_info.cpp:336:      //  std::vector<std::pair<std::string, std::string>> frontCondPairVec;
+./pass_info.cpp:337:      //  std::vector<std::pair<std::string, std::string>> backCondPairVec;
+./pass_info.cpp:354:  //std::map<std::string, std::string>::iterator it = g_regCondMap.begin();
+./pass_info.cpp:355:  //std::string oldRegName = "";
+./pass_info.cpp:356:  //std::string reg, regSlice;
+./pass_info.cpp:357:  //std::vector<std::string> sliceVec;
+./pass_info.cpp:361:  //    std::string overallCond = checkAllBits(sliceVec);
+./pass_info.cpp:373:std::string checkAllBits( std::vector<std::string> &sliceVec ) {
+./pass_info.cpp:376:  std::string reg, regSlice;
+./pass_info.cpp:380:  for(std::string regAndSlice: sliceVec) {
+./pass_info.cpp:402:  std::string retCond = "";
+./pass_info.cpp:403:  for(std::string regAndSlice: sliceVec) {
+./pass_info.cpp:404:    std::string localCond = g_regCondMap[regAndSlice];
+./pass_info.cpp:416:bool firstLTsecond(std::pair<std::string, std::string> pair1, std::pair<std::string, std::string> pair2) {
+./pass_info.cpp:422:void merge_both_direction( const std::vector<std::pair<std::string, std::string>> &frontCondPairVec, const std::vector<std::pair<std::string, std::string>> &backCondPairVec ) {
+./pass_info.cpp:425:  //std::sort(frontCondPairVec.begin(), frontCondPairVec.end(), [](const std::pair<std::string, std::string> &pair1, const std::pair<std::string, std::string> &pair2)->bool{
+./pass_info.cpp:428:  //std::sort(backCondPairVec.begin(), backCondPairVec.end(), [](const std::pair<std::string, std::string> &pair1, const std::pair<std::string, std::string> &pair2)->bool{
+./pass_info.cpp:447:  std::map<std::string, std::string> mergedFrontCondMap;
+./pass_info.cpp:448:  std::map<std::string, std::string> mergedBackCondMap;
+./pass_info.cpp:452:  std::map<std::string, std::string>::iterator it = g_regCondMap.begin();
+./pass_info.cpp:465:      std::string regAndSlice = backIt->first;
+./pass_info.cpp:478:        std::string existingCond = g_regCondMap[regAndSlice];
+./pass_info.cpp:500:void merge_reg_cond_pair_vec(const std::vector<std::pair<std::string, std::string>> &pairVec, std::map<std::string, std::string> &mergedMap) {
+./pass_info.cpp:503:  std::string overallCond = ""; // 1
+./pass_info.cpp:512:    std::string reg, regSlice;
+./pass_info.cpp:528:      std::string reg2, reg2Slice;
+./pass_info.cpp:570:void go_forward(std::string startVarAndSlice, std::vector<std::pair<std::string, std::string>> &frontCondPairVec) {
+./pass_info.cpp:576:  std::string startVar, startVarSlice;
+./pass_info.cpp:582:  std::vector<std::pair<std::string, std::string>> localFrontCondPairVec;
+./pass_info.cpp:585:      std::string line = g_passExprStore[storeIdx];
+./pass_info.cpp:587:      //  std::vector<std::string> varAndSliceVec;
+./pass_info.cpp:589:      //  for(std::string varAndSlice: varAndSliceVec) {
+./pass_info.cpp:596:        std::string destAndSlice = m.str(2);
+./pass_info.cpp:597:        std::string condAndSlice = m.str(3);
+./pass_info.cpp:598:        std::string op1AndSlice = m.str(4);
+./pass_info.cpp:599:        std::string op2AndSlice = m.str(5);
+./pass_info.cpp:600:        std::string dest, destSlice;
+./pass_info.cpp:601:        std::string cond, condSlice;
+./pass_info.cpp:602:        std::string op1, op1Slice;
+./pass_info.cpp:603:        std::string op2, op2Slice;
+./pass_info.cpp:609:          std::string newStartVarAndSlice = get_target_and_slice(startVarAndSlice, op1AndSlice, op1AndSlice, destAndSlice);
+./pass_info.cpp:622:          std::string newStartVarAndSlice = get_target_and_slice(startVarAndSlice, op2AndSlice, op2AndSlice, destAndSlice);
+./pass_info.cpp:636:        std::string destAndSlice = m.str(2);
+./pass_info.cpp:637:        std::string updateList = m.str(3);
+./pass_info.cpp:638:        std::vector<std::string> updateVec;
+./pass_info.cpp:640:        std::string update, updateSlice;
+./pass_info.cpp:641:        for(std::string updateAndSlice: updateVec) {
+./pass_info.cpp:645:          std::string newStartVarAndSlice = get_target_and_slice(startVarAndSlice, updateAndSlice, updateList, destAndSlice);
+./pass_info.cpp:659:        std::string destAndSlice = m.str(2);      
+./pass_info.cpp:660:        std::string op1AndSlice = m.str(3);
+./pass_info.cpp:661:        std::string newStartVarAndSlice = get_target_and_slice(startVarAndSlice, op1AndSlice, op1AndSlice, destAndSlice);
+./pass_info.cpp:679:        std::string destList = m.str(2);
+./pass_info.cpp:680:        std::string srcList = m.str(3);
+./pass_info.cpp:681:        std::vector<std::string> destVec;
+./pass_info.cpp:683:        std::vector<std::string> srcVec;
+./pass_info.cpp:685:        std::unordered_set<std::string> srcSet(srcVec.begin(), srcVec.end());        
+./pass_info.cpp:686:        std::string src, srcSlice;
+./pass_info.cpp:687:        for(std::string srcAndSlice: srcSet) {
+./pass_info.cpp:691:          std::string newStartVarAndSlice = get_target_and_slice(startVarAndSlice, srcAndSlice, srcList, destList);
+./pass_info.cpp:709:        std::string destList = m.str(2);
+./pass_info.cpp:710:        std::string srcAndSlice = m.str(3);
+./pass_info.cpp:711:        std::string src, srcSlice;
+./pass_info.cpp:715:        std::string newStartVarAndSlice = get_target_and_slice(startVarAndSlice, srcAndSlice, srcAndSlice, destList);
+./pass_info.cpp:728:        std::string ifCond = m.str(2);
+./pass_info.cpp:729:        std::string destAndSlice = m.str(3);
+./pass_info.cpp:730:        std::string op1AndSlice = m.str(4);
+./pass_info.cpp:731:        std::string newStartVarAndSlice = get_target_and_slice(startVarAndSlice, op1AndSlice, op1AndSlice, destAndSlice);
+./pass_info.cpp:744:        std::string destAndSlice = m.str(2);      
+./pass_info.cpp:745:        std::string op1AndSlice = m.str(3);
+./pass_info.cpp:746:        std::string newStartVarAndSlice = get_target_and_slice(startVarAndSlice, op1AndSlice, op1AndSlice, destAndSlice);
+./pass_info.cpp:771:        std::string blank = m.str(1);
+./pass_info.cpp:772:        std::string destAndSlice = m.str(2);
+./pass_info.cpp:773:        std::string op1 = m.str(3);
+./pass_info.cpp:774:        std::string slice = m.str(4);
+./pass_info.cpp:775:        std::string op2AndSlice = m.str(5);
+./pass_info.cpp:776:        std::string range = m.str(6);
+./pass_info.cpp:777:        std::string dest, destSlice;
+./pass_info.cpp:778:        std::string op2, op2Slice;
+./pass_info.cpp:826:// If returned dest has its boundary crossed, return empty string
+./pass_info.cpp:830:std::string get_target_and_slice(std::string startVarAndSlice, std::string op1AndSlice, std::string srcList, std::string destList) {
+./pass_info.cpp:831:  std::string dest, destSlice;
+./pass_info.cpp:832:  std::string op1, op1Slice;
+./pass_info.cpp:833:  std::string startVar, startVarSlice;
+./pass_info.cpp:836:  std::vector<std::string> destVec;
+./pass_info.cpp:868:      std::vector<std::string> srcVec;
+./pass_info.cpp:871:      for(std::string srcAndSlice: srcVec) {
+./pass_info.cpp:879:    std::string destAndSlice;
+./pass_info.cpp:884:      for(std::string singleDest: destVec ) {
+./pass_info.cpp:912:void make_new_pair_vec( std::vector<std::pair<std::string, std::string>> &oldFrontCondPairVec, std::vector<std::pair<std::string, std::string>> &newFrontCondPairVec, std::string newCond ) {
+./pass_info.cpp:913:  std::string front, condSeries;
+./pass_info.cpp:924:void go_backward(std::string startVarAndSlice, std::vector<std::pair<std::string, std::string>> &backCondPairVec) {
+./pass_info.cpp:926:  std::string startVar, startVarSlice;
+./pass_info.cpp:928:  if( startVar.compare("fangyuan299") == 0 || startVar.find("fangyuan299") != std::string::npos ) {
+./pass_info.cpp:942:    std::string line = g_passExprStore[storeIdx];
+./pass_info.cpp:945:    std::vector<std::pair<std::string, std::string>> localBackCondPairVec;
+./pass_info.cpp:948:      std::string destAndSlice = m.str(2);
+./pass_info.cpp:949:      std::string condAndSlice = m.str(3);
+./pass_info.cpp:950:      std::string op1AndSlice = m.str(4);
+./pass_info.cpp:951:      std::string op2AndSlice = m.str(5);
+./pass_info.cpp:952:      std::string dest, destSlice;
+./pass_info.cpp:953:      std::string cond, condSlice;
+./pass_info.cpp:954:      std::string op1, op1Slice;
+./pass_info.cpp:955:      std::string op2, op2Slice;
+./pass_info.cpp:962:      std::string newStartVarAndSlice = get_target_and_slice(startVarAndSlice, destAndSlice, destAndSlice, op1AndSlice);
+./pass_info.cpp:984:      std::string destAndSlice = m.str(2);
+./pass_info.cpp:985:      std::string updateList = m.str(3);
+./pass_info.cpp:986:      std::string newStartVarAndSlice = get_target_and_slice(startVarAndSlice, destAndSlice, destAndSlice, updateList);
+./pass_info.cpp:999:      std::string destAndSlice = m.str(2);      
+./pass_info.cpp:1000:      std::string op1AndSlice = m.str(3);
+./pass_info.cpp:1001:      std::string newStartVarAndSlice = get_target_and_slice(startVarAndSlice, destAndSlice, destAndSlice, op1AndSlice);
+./pass_info.cpp:1018:      std::string destList = m.str(2);
+./pass_info.cpp:1019:      std::string srcList = m.str(3);
+./pass_info.cpp:1020:      std::vector<std::string> destVec;
+./pass_info.cpp:1022:      std::vector<std::string> srcVec;
+./pass_info.cpp:1025:      std::string dest, destSlice;
+./pass_info.cpp:1026:      for(std::string destAndSlice: destVec) {
+./pass_info.cpp:1030:        std::string newStartVarAndSlice = get_target_and_slice(startVarAndSlice, destAndSlice, destList, srcList);
+./pass_info.cpp:1047:      std::string destList = m.str(2);
+./pass_info.cpp:1048:      std::string srcAndSlice = m.str(3);
+./pass_info.cpp:1049:      std::vector<std::string> destVec;
+./pass_info.cpp:1051:      std::string dest, destSlice;
+./pass_info.cpp:1052:      for(std::string destAndSlice: destVec) {
+./pass_info.cpp:1056:        std::string newStartVarAndSlice = get_target_and_slice(startVarAndSlice, destAndSlice, destList, srcAndSlice);
+./pass_info.cpp:1069:      std::string destAndSlice = m.str(2);      
+./pass_info.cpp:1070:      std::string op1AndSlice = m.str(3);
+./pass_info.cpp:1071:      std::string newStartVarAndSlice = get_target_and_slice(startVarAndSlice, destAndSlice, destAndSlice, op1AndSlice);
+./pass_info.cpp:1087:      std::string blank = m.str(1);
+./pass_info.cpp:1088:      std::string destAndSlice = m.str(2);
+./pass_info.cpp:1089:      std::string op1 = m. str(3);
+./pass_info.cpp:1090:      std::string slice = m.str(4);
+./pass_info.cpp:1091:      std::string op2AndSlice = m.str(5);
+./pass_info.cpp:1092:      std::string lowIdxStr = m.str(6);
+./pass_info.cpp:1093:      std::string dest, destSlice;
+./pass_info.cpp:1094:      std::string op2, op2Slice;
+./pass_info.cpp:1106:      std::string op1Line = g_passExprStore[op1IdxVec.front()];
+./pass_info.cpp:1112:      std::set<std::string> visitedStartVar;
+./pass_info.cpp:1114:        std::vector<std::pair<std::string, std::string>> localBackCondPairVec;
+./pass_info.cpp:1115:        std::string newStartVarAndSlice = get_target_and_slice(startVarAndSlice, destAndSlice, destAndSlice, op1+" ["+toStr(lowIdx*i-1)+":"+toStr(lowIdx*(i-1))+"]");
+./pass_info.cpp:1135:bool isTrueReg(std::string varAndSlice) {
+./pass_info.cpp:1136:  std::string var, varSlice;
+./pass_info.cpp:1145:bool isSliceList(std::string passExprStoreItem) {
+./pass_info.cpp:1147:  if( passExprStoreItem.find(",") != std::string::npos
+Binary file ./.taint_gen.cpp.swp matches
+./pass_info.h:11:#include <string>
+./pass_info.h:17:  std::string dest;
+./pass_info.h:18:  std::string longSrc;
+./pass_info.h:19:  std::string shortSrc;
+./pass_info.h:20:  std::string cond;
+./pass_info.h:21:  std::vector<std::pair<std::string, std::string>> condSrcPairs;
+./pass_info.h:31:  std::vector<std::string> conditions;
+./pass_info.h:35:void fill_in_pass_relation(std::string dest, std::string srcAndSlice, std::string line);
+./pass_info.h:37:void fill_in_case_relation(std::string dest, std::string longSrc, std::string shortSrc, std::string cond, std::vector<std::pair<std::string, std::string>> &caseAssignPairs);
+./pass_info.h:39:void make_case_val_explicit(std::vector<std::pair<std::string, std::string>> &caseAssignPairs);
+./pass_info.h:41:void fill_in_src_concat_relation(std::string line);
+./pass_info.h:43:void fill_in_dest_concat_relation(std::string line);
+./pass_info.h:45:void fill_in_ite_relation(std::string line);
+./pass_info.h:47:void fill_in_sel_relation(std::string line);
+./pass_info.h:49:void fill_in_both_concat_relation(std::string line);
+./pass_info.h:51:void add_into_backwardMap(std::string destAndSlice, std::string line, uint32_t storeIdx);
+./pass_info.h:53:void add_into_forwardMap(std::string srcAndSlice, std::string line, uint32_t storeIdx);
+./pass_info.h:55:void process_pass_info(std::string fileName);
+./pass_info.h:57:std::string checkAllBits( std::vector<std::string> &sliceVec );
+./pass_info.h:59:bool firstLTsecond(std::pair<std::string, std::string> pair1, std::pair<std::string, std::string> pair2);
+./pass_info.h:61:void merge_both_direction( const std::vector<std::pair<std::string, std::string>> &frontCondPairVec, const std::vector<std::pair<std::string, std::string>> &backCondPairVec );
+./pass_info.h:63:void merge_reg_cond_pair_vec(const std::vector<std::pair<std::string, std::string>> &pairVec, std::map<std::string, std::string> &mergedMap);
+./pass_info.h:65:void go_forward(std::string startVarAndSlice, std::vector<std::pair<std::string, std::string>> &frontCondPairVec);
+./pass_info.h:67:std::string get_target_and_slice(std::string startVarAndSlice, std::string op1AndSlice, std::string srcList, std::string destList);
+./pass_info.h:69:void make_new_pair_vec( std::vector<std::pair<std::string, std::string>> &oldFrontCondPairVec, std::vector<std::pair<std::string, std::string>> &newFrontCondPairVec, std::string newCond );
+./pass_info.h:71:void go_backward(std::string startVarAndSlice, std::vector<std::pair<std::string, std::string>> &backCondPairVec);
+./pass_info.h:73:bool isTrueReg(std::string var);
+./pass_info.h:75:bool isSliceList(std::string passExprStoreItem);
+./global_data.h:6:#include <string>
+./global_data.h:15:extern std::string moduleName;
+./global_data.h:16:extern std::vector<std::string> moduleInputs;
+./global_data.h:17:extern std::vector<std::string> moduleOutputs;
+./global_data.h:18:extern std::vector<std::string> extendInputs;
+./global_data.h:19:extern std::vector<std::string> extendOutputs;
+./global_data.h:20:extern std::vector<std::string> flagOutputs;
+./global_data.h:21:extern std::vector<std::string> moduleRegs;
+./global_data.h:22:extern std::vector<std::string> moduleTrueRegs;
+./global_data.h:23:extern std::unordered_map<std::string, uint32_t> moduleMems;
+./global_data.h:24:extern std::set<std::string> moduleWires;
+./global_data.h:25:extern std::set<std::string> g_iteDest;
+./global_data.h:26:extern std::set<std::string> g_wire2reg;
+./global_data.h:27:extern std::set<std::string> g_operators;
+./global_data.h:28:extern std::set<std::string> g_clk_set;
+./global_data.h:29:extern std::string clockName;
+./global_data.h:30:extern std::string resetName;
+./global_data.h:31:extern std::vector<std::string> rTaints;
+./global_data.h:32:extern std::unordered_map<std::string, uint32_t> nextVersion;
+./global_data.h:33:extern std::unordered_map<std::string, std::vector<bool>> nxtVerBits;
+./global_data.h:34:extern std::unordered_map<std::string, std::string> new_next;
+./global_data.h:35:extern std::unordered_map<std::string, std::string> update_reg;
+./global_data.h:36:extern std::unordered_map<std::string, std::pair<std::string, std::string>> memDims;
+./global_data.h:37:extern std::unordered_map<std::string, uint32_t> reg2sig;
+./global_data.h:38:extern std::unordered_map<std::string, uint32_t> fangyuanItemNum; 
+./global_data.h:39:extern std::unordered_map<std::string, uint32_t> fangyuanCaseSliceWidth;
+./global_data.h:40:extern std::unordered_map<std::string, uint32_t> g_destVersion; 
+./global_data.h:41:extern std::unordered_map<std::string, std::unordered_map<std::string, std::string>> g_instance2moduleMap;
+./global_data.h:42:extern std::unordered_map<std::string, std::pair<std::string, bool>> g_moduleRst;
+./global_data.h:43:extern std::unordered_map<std::string, std::string> g_moduleClk;
+./global_data.h:44:extern std::unordered_map<std::string, std::unordered_map<std::string, std::string>> g_mod2instMap;
+./global_data.h:45:extern std::unordered_map<std::string, std::vector<std::string>> g_mod2assertMap;
+./global_data.h:46:extern std::map<std::string, std::unordered_map<std::string, std::string>> g_rstValMap;
+./global_data.h:47:extern std::map<std::string, std::unordered_map<std::string, std::string>> g_normValMap;
+./global_data.h:48:extern std::map<std::string, std::string> g_finalRegCondMap;
+./global_data.h:50:extern std::unordered_map<std::string, std::vector<uint32_t>> g_backwardMap;
+./global_data.h:51:extern std::unordered_map<std::string, std::vector<uint32_t>> g_forwardMap;
+./global_data.h:52:extern std::vector<std::string> g_passExprStore;
+./global_data.h:53:extern std::unordered_map<std::string, uint32_t> g_caseBackwardMap;
+./global_data.h:54:extern std::unordered_map<std::string, uint32_t> g_caseForwardMap;
+./global_data.h:56:extern std::unordered_map<std::string, std::vector<struct passInfo>> g_passInfoMap;
+./global_data.h:57:extern std::map<std::string, std::string> g_regCondMap;
+./global_data.h:65:extern std::string g_recentClk;
+./global_data.h:66:extern std::string g_recentRst;
+./global_data.h:68:extern std::string g_possibleCLK;
+./global_data.h:69:extern std::string g_possibleRST;
+./global_data.h:93:extern std::string _t;
+./global_data.h:94:extern std::string _r;
+./global_data.h:95:extern std::string _x;
+./global_data.h:96:extern std::string _c;
+./global_data.h:97:extern std::string _sig;
+./global_data.h:98:extern std::string TAINT_RST;
+./global_data.h:99:extern std::string srcConcatFeature;
+./global_data.h:100:extern std::string bothConcatFeature;
+./global_data.h:101:extern std::string g_gatedClkFileName;
+./global_data.h:102:extern std::string g_path;
+./global_data.h:103:extern std::string g_topModule;
+./global_data.h:104:extern std::string idxedModuleName;
+./global_data.h:109:extern std::string CONSTANT_SIG;
+./global_data.h:110:extern std::string RESET_SIG;
+./global_data.h:111:extern std::string orderFileName;
+./varWidth.cpp:14:bool VarWidth::var_width_insert(std::string var, uint32_t begin, uint32_t end) {
+./varWidth.cpp:22:  std::string key = m.str(2);
+./varWidth.cpp:28:uint32_t VarWidth::get_from_var_width(std::string var, std::string line) {
+./varWidth.cpp:55:uint32_t VarWidth::get_high_idx(std::string var, std::string line) {
+./varWidth.cpp:85:uint32_t VarWidth::get_low_idx(std::string var, std::string line) {
+./varWidth.cpp:115:std::pair<uint32_t, uint32_t> VarWidth::get_idx_pair(std::string var, std::string line) {
+./varWidth.cpp:143:bool VarWidth::force_insert(std::string var, uint32_t begin, uint32_t end) {
+./varWidth.cpp:158:bool VarWidth::check_key(std::string var, std::string line) {
+./types.h:1:#include <string>
+./types.h:8:  typedef std::map<std::string, std::vector<std::string>> Str2VecMap_t;
+./types.h:10:  typedef std::unordered_map<std::string, std::string> Str2StrUmap_t;
+./types.h:12:  typedef std::map<std::string, std::vector<std::string>> Str2StrVecMap_t; 
+./op_taint_gen.cpp:2:#include <string>
+./op_taint_gen.cpp:23:void input_taint_gen(std::string line, std::ofstream &output) {
+./op_taint_gen.cpp:27:  std::string blank = m.str(1);
+./op_taint_gen.cpp:28:  std::string slice = m.str(2);
+./op_taint_gen.cpp:29:  std::string var = m.str(3);
+./op_taint_gen.cpp:60:    else if(var.find("clk") != std::string::npos
+./op_taint_gen.cpp:61:            || var.find("clock") != std::string::npos 
+./op_taint_gen.cpp:62:            || var.find("CLOCK") != std::string::npos 
+./op_taint_gen.cpp:63:            || var.find("CLK") != std::string::npos && var.find("EN") == std::string::npos ) {
+./op_taint_gen.cpp:69:    else if( var.find("rstn") != std::string::npos
+./op_taint_gen.cpp:70:            || var.find("rst_n") != std::string::npos
+./op_taint_gen.cpp:71:            || var.find("resetn") != std::string::npos
+./op_taint_gen.cpp:72:            || var.find("RSTN") != std::string::npos
+./op_taint_gen.cpp:73:            || var.find("RST_N") != std::string::npos
+./op_taint_gen.cpp:74:            || var.find("RESETN") != std::string::npos
+./op_taint_gen.cpp:75:            || var.find("RESET_N") != std::string::npos
+./op_taint_gen.cpp:76:            || var.find("reset_n") != std::string::npos ) {
+./op_taint_gen.cpp:83:    else if(var.find("rst") != std::string::npos
+./op_taint_gen.cpp:84:            || var.find("reset") != std::string::npos 
+./op_taint_gen.cpp:85:            || var.find("RST") != std::string::npos 
+./op_taint_gen.cpp:86:            || var.find("RESET") != std::string::npos ) {
+./op_taint_gen.cpp:134:void reg_taint_gen(std::string line, std::ofstream &output) {
+./op_taint_gen.cpp:142:  std::string blank = m.str(1);
+./op_taint_gen.cpp:143:  std::string slice = m.str(2);  
+./op_taint_gen.cpp:144:  std::string var = m.str(3);
+./op_taint_gen.cpp:145:  std::string num = m.str(4);
+./op_taint_gen.cpp:194:void mem_taint_gen(std::string line, std::ofstream &output) {
+./op_taint_gen.cpp:199:  std::string blank = m.str(1);
+./op_taint_gen.cpp:200:  std::string slice = m.str(2);  
+./op_taint_gen.cpp:201:  std::string var = m.str(3);
+./op_taint_gen.cpp:202:  std::string sliceTop = m.str(4);
+./op_taint_gen.cpp:249:void wire_taint_gen(std::string line, std::ofstream &output) {
+./op_taint_gen.cpp:253:  std::string slice = m.str(2);  
+./op_taint_gen.cpp:254:  std::string var = m.str(3);
+./op_taint_gen.cpp:255:  std::string blank = m.str(1);
+./op_taint_gen.cpp:263:    if(var.find("fangyuan") == std::string::npos && !g_use_value_change)
+./op_taint_gen.cpp:282:void output_insert_map(std::string line, std::ofstream &output, std::ifstream &input) {
+./op_taint_gen.cpp:286:  std::string slice = m.str(2);  
+./op_taint_gen.cpp:287:  std::string var = m.str(3);
+./op_taint_gen.cpp:288:  std::string blank = m.str(1);
+./op_taint_gen.cpp:299:  std::string nextLine;
+./op_taint_gen.cpp:342:void two_op_taint_gen(std::string line, std::ofstream &output) {
+./op_taint_gen.cpp:401:  std::string blank = m.str(1);
+./op_taint_gen.cpp:402:  std::string dest, destSlice;
+./op_taint_gen.cpp:403:  std::string op1, op1Slice;
+./op_taint_gen.cpp:404:  std::string op2, op2Slice;
+./op_taint_gen.cpp:405:  std::string destAndSlice = m.str(2);
+./op_taint_gen.cpp:406:  std::string op1AndSlice = m.str(3);
+./op_taint_gen.cpp:407:  std::string op2AndSlice = m.str(4);
+./op_taint_gen.cpp:421:  std::string op1HighIdx  = toStr(op1IdxPair.first);
+./op_taint_gen.cpp:422:  std::string op1LowIdx   = toStr(op1IdxPair.second);
+./op_taint_gen.cpp:423:  std::string op2HighIdx  = toStr(op2IdxPair.first);
+./op_taint_gen.cpp:424:  std::string op2LowIdx   = toStr(op2IdxPair.second);
+./op_taint_gen.cpp:447:    std::string sndVer = std::to_string(sndVerNum);
+./op_taint_gen.cpp:448:    std::string thdVer = std::to_string(thdVerNum);
+./op_taint_gen.cpp:534:    std::string sndVer = std::to_string(sndVerNum);
+./op_taint_gen.cpp:572:    std::string thdVer = std::to_string(thdVerNum);
+./op_taint_gen.cpp:618:void one_op_taint_gen(std::string line, std::ofstream &output) {
+./op_taint_gen.cpp:632:  std::string blank = m.str(1);
+./op_taint_gen.cpp:633:  std::string dest, destSlice;
+./op_taint_gen.cpp:634:  std::string op1, op1Slice;
+./op_taint_gen.cpp:635:  std::string op1AndSlice = m.str(3);
+./op_taint_gen.cpp:641:  std::string sndVer;
+./op_taint_gen.cpp:658:    std::string slice = slicePair.first;
+./op_taint_gen.cpp:659:    std::string sliceTop = slicePair.second;
+./op_taint_gen.cpp:660:    std::string highIdx = toStr(get_end(sliceTop));
+./op_taint_gen.cpp:689:  std::string op1HighIdx  = toStr(op1IdxPair.first);
+./op_taint_gen.cpp:690:  std::string op1LowIdx   = toStr(op1IdxPair.second);
+./op_taint_gen.cpp:717:void sel_op_taint_gen(std::string line, std::ofstream &output) {
+./op_taint_gen.cpp:733:  std::string blank = m.str(1);
+./op_taint_gen.cpp:734:  std::string destAndSlice = m.str(2);
+./op_taint_gen.cpp:735:  std::string op1AndSlice = m.str(3);
+./op_taint_gen.cpp:736:  std::string slice = m.str(4);
+./op_taint_gen.cpp:737:  std::string op2AndSlice = m.str(5);
+./op_taint_gen.cpp:738:  std::string lowIdx = m.str(6);
+./op_taint_gen.cpp:739:  std::string dest, destSlice;
+./op_taint_gen.cpp:740:  std::string op1, op1Slice;
+./op_taint_gen.cpp:741:  std::string op2, op2Slice;
+./op_taint_gen.cpp:753:  std::string sndVer;
+./op_taint_gen.cpp:758:    std::string op1HighIdx  = toStr(op1IdxPair.first);
+./op_taint_gen.cpp:759:    std::string op1LowIdx   = toStr(op1IdxPair.second);
+./op_taint_gen.cpp:779:    std::string slice = slicePair.first;
+./op_taint_gen.cpp:780:    std::string sliceTop = slicePair.second;
+./op_taint_gen.cpp:781:    std::string highIdx = toStr(get_end(sliceTop));
+./op_taint_gen.cpp:799:    std::string op2HighIdx  = toStr(op2IdxPair.first);
+./op_taint_gen.cpp:800:    std::string op2LowIdx   = toStr(op2IdxPair.second);
+./op_taint_gen.cpp:804:    std::string thdVer = std::to_string(thdVerNum);
+./op_taint_gen.cpp:853:    std::string op2HighIdx  = toStr(op2IdxPair.first);
+./op_taint_gen.cpp:854:    std::string op2LowIdx   = toStr(op2IdxPair.second);
+./op_taint_gen.cpp:858:    std::string thdVer = std::to_string(thdVerNum);
+./op_taint_gen.cpp:882:void reduce_one_op_taint_gen(std::string line, std::ofstream &output) {
+./op_taint_gen.cpp:905:  std::string blank = m.str(1);
+./op_taint_gen.cpp:906:  std::string dest, destSlice;
+./op_taint_gen.cpp:907:  std::string op1, op1Slice;
+./op_taint_gen.cpp:908:  std::string destAndSlice = m.str(2);
+./op_taint_gen.cpp:909:  std::string op1AndSlice = m.str(3);
+./op_taint_gen.cpp:919:  std::string op1HighIdx  = toStr(op1IdxPair.first);
+./op_taint_gen.cpp:920:  std::string op1LowIdx   = toStr(op1IdxPair.second);
+./op_taint_gen.cpp:924:  std::string sndVer = std::to_string(sndVerNum);
+./op_taint_gen.cpp:964:void mult_op_taint_gen(std::string line, std::ofstream &output) {
+./op_taint_gen.cpp:971:  std::string blank = m.str(1);
+./op_taint_gen.cpp:972:  std::string destAndSlice = m.str(2);
+./op_taint_gen.cpp:973:  std::string dest, destSlice;
+./op_taint_gen.cpp:976:  std::string updateList = m.str(3);
+./op_taint_gen.cpp:978:  //checkCond(dest.find("fangyuan") != std::string::npos, "Var not name fangyuan appeared in src_concat! "+line);
+./op_taint_gen.cpp:979:  bool isFangyuan = (dest.find("fangyuan") != std::string::npos);
+./op_taint_gen.cpp:981:  std::vector<std::string> updateVec;
+./op_taint_gen.cpp:996:  std::string updateTList = get_rhs_taint_list(updateVec, _t);
+./op_taint_gen.cpp:997:  std::string destWidth = std::to_string(destWidthNum);
+./op_taint_gen.cpp:998:  std::string destT = get_lhs_taint_list(dest, _t, output);
+./op_taint_gen.cpp:1005:  std::string srcSigList;
+./op_taint_gen.cpp:1006:  std::string v, vSlice;
+./op_taint_gen.cpp:1012:  std::string currentSig = "";
+./op_taint_gen.cpp:1020:      checkCond(vAndSlice.find("fangyuan") == std::string::npos, "fangyuan found in fangyuan! "+line);
+./op_taint_gen.cpp:1136:  std::vector<std::string> collapsedVec;
+./op_taint_gen.cpp:1138:  for (std::string updateAndSlice: collapsedVec) {
+./op_taint_gen.cpp:1139:    std::string update, updateSlice;
+./op_taint_gen.cpp:1143:    std::string startIdx = toStr(startIdxNum);
+./op_taint_gen.cpp:1144:    std::string endIdx = toStr(startIdxNum - updateSliceWidthNum + 1);
+./op_taint_gen.cpp:1148:      std::string updateHighIdx  = toStr(updateIdxPair.first);
+./op_taint_gen.cpp:1149:      std::string updateLowIdx   = toStr(updateIdxPair.second);
+./op_taint_gen.cpp:1153:      std::string localVer = std::to_string(localVerNum); 
+./op_taint_gen.cpp:1177:void both_concat_op_taint_gen(std::string line, std::ofstream &output) {
+./op_taint_gen.cpp:1185:  std::string blank = m.str(1);
+./op_taint_gen.cpp:1186:  std::string destList = m.str(2);
+./op_taint_gen.cpp:1187:  std::string srcList = m.str(3);
+./op_taint_gen.cpp:1189:  std::vector<std::string> destVec;
+./op_taint_gen.cpp:1191:  std::vector<std::string> srcVec;
+./op_taint_gen.cpp:1193:  for(std::string src: srcVec) { 
+./op_taint_gen.cpp:1198:  //std::string destTList = std::regex_replace(destList, pVarNameGroup, "$1_t$3 ");
+./op_taint_gen.cpp:1199:  std::string destTList = get_lhs_taint_list(destList, _t, output);
+./op_taint_gen.cpp:1200:  std::string srcTList = get_rhs_taint_list(srcVec, _t);
+./op_taint_gen.cpp:1204:    std::string destSigList = get_lhs_taint_list_no_slice(destList, _sig, output);
+./op_taint_gen.cpp:1205:    std::string srcSigList = get_rhs_taint_list(srcVec, _sig);
+./op_taint_gen.cpp:1212:  std::string yuzengIdxStr = toStr(yuzengIdx);
+./op_taint_gen.cpp:1213:  for(std::string destAndSlice: destVec) {
+./op_taint_gen.cpp:1221:  std::string destTotalWidth = toStr(destTotalWidthNum);
+./op_taint_gen.cpp:1226:  std::string destRList = get_rhs_taint_list(destList, _r);
+./op_taint_gen.cpp:1227:  //std::string destXList = get_rhs_taint_list(destList, _x);
+./op_taint_gen.cpp:1228:  //std::string destCList = get_rhs_taint_list(destList, _c);
+./op_taint_gen.cpp:1238:  for (std::string srcAndSlice: srcVec) {
+./op_taint_gen.cpp:1244:  std::string src, srcSlice;
+./op_taint_gen.cpp:1249:    std::string srcRList = get_lhs_ver_taint_list(srcVec, _r, output, verVec);
+./op_taint_gen.cpp:1250:    //std::string srcXList = get_lhs_ver_taint_list(srcVec, _x, output, verVec);
+./op_taint_gen.cpp:1251:    //std::string srcCList = get_lhs_ver_taint_list(srcVec, _c, output, verVec);
+./op_taint_gen.cpp:1252:    std::string srcSList = get_lhs_ver_taint_list(srcVec, _sig, output, verVec);
+./op_taint_gen.cpp:1261:  for (std::string srcAndSlice: srcVec) {
+./op_taint_gen.cpp:1268:      std::string srcHighIdx  = toStr(srcIdxPair.first);
+./op_taint_gen.cpp:1269:      std::string srcLowIdx   = toStr(srcIdxPair.second);
+./op_taint_gen.cpp:1272:      std::string srcVer = toStr(find_version_num(srcAndSlice, srcIsNew, output));
+./op_taint_gen.cpp:1287:void dest_concat_op_taint_gen(std::string line, std::ofstream &output) { 
+./op_taint_gen.cpp:1295:  std::string blank = m.str(1);
+./op_taint_gen.cpp:1296:  std::string destList = m.str(2);
+./op_taint_gen.cpp:1297:  std::string srcAndSlice = m.str(3);
+./op_taint_gen.cpp:1299:  std::vector<std::string> destVec;
+./op_taint_gen.cpp:1301:  std::string src, srcSlice;
+./op_taint_gen.cpp:1305:  //std::string destTList = std::regex_replace(destList, pVarNameGroup, "$1_t$3 ");
+./op_taint_gen.cpp:1306:  std::string destTList = get_lhs_taint_list(destList, _t, output);
+./op_taint_gen.cpp:1309:  std::string destSigList = get_lhs_taint_list_no_slice(destList, _sig, output);
+./op_taint_gen.cpp:1313:  std::string destRList = get_rhs_taint_list(destList, _r);
+./op_taint_gen.cpp:1314:  //std::string destXList = get_rhs_taint_list(destList, _x);
+./op_taint_gen.cpp:1315:  //std::string destCList = get_rhs_taint_list(destList, _c);
+./op_taint_gen.cpp:1318:  std::string srcHighIdx = toStr(srcIdxPair.first);
+./op_taint_gen.cpp:1319:  std::string srcLowIdx  = toStr(srcIdxPair.second);
+./op_taint_gen.cpp:1322:  std::string localVer = std::to_string(localVerNum);
+./op_taint_gen.cpp:1334:void ite_taint_gen(std::string line, std::ofstream &output) {
+./op_taint_gen.cpp:1343:  std::string blank = m.str(1);
+./op_taint_gen.cpp:1344:  std::string destAndSlice = m.str(2);
+./op_taint_gen.cpp:1345:  std::string dest, destSlice;
+./op_taint_gen.cpp:1346:  std::string cond, condSlice;
+./op_taint_gen.cpp:1347:  std::string op1, op1Slice;
+./op_taint_gen.cpp:1348:  std::string op2, op2Slice;
+./op_taint_gen.cpp:1351:  std::string localWidth;
+./op_taint_gen.cpp:1362:  std::string condAndSlice = m.str(3);
+./op_taint_gen.cpp:1363:  std::string op1AndSlice = m.str(4);
+./op_taint_gen.cpp:1364:  std::string op2AndSlice = m.str(5);
+./op_taint_gen.cpp:1379:  std::string destHighIdx = toStr(destIdxPair.first);
+./op_taint_gen.cpp:1380:  std::string destLowIdx  = toStr(destIdxPair.second);
+./op_taint_gen.cpp:1381:  std::string condHighIdx = toStr(condIdxPair.first);
+./op_taint_gen.cpp:1382:  std::string condLowIdx = toStr(condIdxPair.second);
+./op_taint_gen.cpp:1383:  std::string op1HighIdx  = toStr(op1IdxPair.first);
+./op_taint_gen.cpp:1384:  std::string op1LowIdx   = toStr(op1IdxPair.second);
+./op_taint_gen.cpp:1385:  std::string op2HighIdx  = toStr(op2IdxPair.first);
+./op_taint_gen.cpp:1386:  std::string op2LowIdx   = toStr(op2IdxPair.second);
+./op_taint_gen.cpp:1395:  std::string condVer;
+./op_taint_gen.cpp:1431:    std::string thdVer = std::to_string(thdVerNum);        
+./op_taint_gen.cpp:1432:    std::string fthVer = std::to_string(fthVerNum);
+./op_taint_gen.cpp:1458:    std::string thdVer = std::to_string(thdVerNum);
+./op_taint_gen.cpp:1482:    std::string fthVer = std::to_string(fthVerNum);
+./op_taint_gen.cpp:1523:void nonblock_taint_gen(std::string line, std::ofstream &output) {
+./op_taint_gen.cpp:1528:  std::string blank = m.str(1);
+./op_taint_gen.cpp:1529:  std::string op1AndSlice = m.str(3);
+./op_taint_gen.cpp:1530:  std::string destAndSlice = m.str(2);
+./op_taint_gen.cpp:1533:  std::string dest, destSlice;
+./op_taint_gen.cpp:1534:  std::string op1, op1Slice;
+./op_taint_gen.cpp:1559:  std::string localWidth;
+./op_taint_gen.cpp:1564:  std::string op1Ver = toStr(op1VerNum);
+./op_taint_gen.cpp:1571:  std::string repeatCond;
+./op_taint_gen.cpp:1594:  std::string taintRst;
+./op_taint_gen.cpp:1596:  std::string dest_t_Or = "";
+./op_taint_gen.cpp:1624:  std::string neqRst = "";
+./op_taint_gen.cpp:1663:void nonblock_gate_taint_gen(std::string line, std::ofstream &output) {
+./op_taint_gen.cpp:1669:  std::string gate = m.str(2);
+./op_taint_gen.cpp:1670:  std::string gateUpdate = m.str(3);
+./op_taint_gen.cpp:1681:void nonblockconcat_taint_gen(std::string line, std::ofstream &output) {
+./op_taint_gen.cpp:1687:  std::string blank = m.str(1);
+./op_taint_gen.cpp:1688:  std::string updateList = m.str(3);
+./op_taint_gen.cpp:1689:  std::string destAndSlice = m.str(2);
+./op_taint_gen.cpp:1691:  std::string dest, destSlice;
+./op_taint_gen.cpp:1695:  std::vector<std::string> updateVec;
+./op_taint_gen.cpp:1703:  std::string localWidth;
+./op_taint_gen.cpp:1706:  std::string updateRListLeft   = get_lhs_taint_list(updateList, _r, output);
+./op_taint_gen.cpp:1707:  //std::string updateXListLeft   = get_lhs_taint_list(updateList, _x, output);
+./op_taint_gen.cpp:1708:  //std::string updateCListLeft   = get_lhs_taint_list(updateList, _c, output);
+./op_taint_gen.cpp:1709:  std::string updateTList = get_rhs_taint_list(updateList, _t);
+./op_taint_gen.cpp:1722:  std::string sigCheck = "";
+./op_taint_gen.cpp:1723:  std::string taintRst;  
+./op_taint_gen.cpp:1725:  std::string dest_t_Or = "";
+./op_taint_gen.cpp:1739:  std::string neqRst = "";
+./op_taint_gen.cpp:1760:void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstream &input, std::ofstream &output) {
+./op_taint_gen.cpp:1771:  std::string rst;
+./op_taint_gen.cpp:1772:  std::string blank;
+./op_taint_gen.cpp:1773:  std::string condAndSlice;
+./op_taint_gen.cpp:1774:  std::string destAndSlice;
+./op_taint_gen.cpp:1775:  std::string srcAndSlice;
+./op_taint_gen.cpp:1776:  std::string dest, destSlice;
+./op_taint_gen.cpp:1777:  std::string src, srcSlice;
+./op_taint_gen.cpp:1778:  std::string cond, condSlice;
+./op_taint_gen.cpp:1780:  std::vector<std::string> nonConstAssign;
+./op_taint_gen.cpp:1781:  std::string taintRst;  
+./op_taint_gen.cpp:1804:    std::string dest_t_Or = "";
+./op_taint_gen.cpp:1827:      std::string neqRst = "";
+./op_taint_gen.cpp:1843:  for(std::string line: nonConstAssign) {
+./op_taint_gen.cpp:1854:    std::string srcVer = toStr(find_version_num(srcAndSlice, srcIsNew, output));
+./op_taint_gen.cpp:1868:void nonblockif2_taint_gen(std::string line, std::string always_line, std::ifstream &input, std::ofstream &output) {
+./op_taint_gen.cpp:1879:  std::string rst;
+./op_taint_gen.cpp:1880:  std::string blank;
+./op_taint_gen.cpp:1881:  std::string condAndSlice;
+./op_taint_gen.cpp:1882:  std::string dest;
+./op_taint_gen.cpp:1883:  std::string destSlice;
+./op_taint_gen.cpp:1884:  std::string idxVar;
+./op_taint_gen.cpp:1885:  std::string idxVarBit;
+./op_taint_gen.cpp:1886:  std::string cond, condSlice;
+./op_taint_gen.cpp:1887:  std::string srcAndSlice;
+./op_taint_gen.cpp:1888:  std::string src, srcSlice;
+./op_taint_gen.cpp:1890:  std::vector<std::string> nonConstAssign;
+./op_taint_gen.cpp:1891:  std::string taintRst;  
+./op_taint_gen.cpp:1920:    std::string neqRst = "";
+./op_taint_gen.cpp:1935:  for(std::string line: nonConstAssign) {
+./op_taint_gen.cpp:1949:    std::string srcVer = toStr(find_version_num(srcAndSlice, srcIsNew, output));
+./op_taint_gen.cpp:1963:void always_fake_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream &output) {
+./op_taint_gen.cpp:1964:  std::string line;
+./op_taint_gen.cpp:1977:void always_star_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream &output) {
+./op_taint_gen.cpp:1982:  std::string ifLine;
+./op_taint_gen.cpp:1983:  std::string assignLine;
+./op_taint_gen.cpp:1994:  std::string condAndSlice = m.str(2);
+./op_taint_gen.cpp:1995:  std::string cond, condSlice;
+./op_taint_gen.cpp:2000:  std::string condVer = toStr(condVerNum);
+./op_taint_gen.cpp:2002:  std::string condHighIdx  = toStr(condIdxPair.first);
+./op_taint_gen.cpp:2003:  std::string condLowIdx   = toStr(condIdxPair.second);
+./op_taint_gen.cpp:2011:  std::string destAndSlice = m.str(2);
+./op_taint_gen.cpp:2012:  std::string op1AndSlice = m.str(3);
+./op_taint_gen.cpp:2013:  std::string dest, destSlice;
+./op_taint_gen.cpp:2014:  std::string op1, op1Slice;
+./op_taint_gen.cpp:2022:  std::string op1Ver = toStr(op1VerNum);
+./op_taint_gen.cpp:2024:  std::string op1HighIdx  = toStr(op1IdxPair.first);
+./op_taint_gen.cpp:2025:  std::string op1LowIdx   = toStr(op1IdxPair.second);
+./op_taint_gen.cpp:2050:void always_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream &output) {
+./op_taint_gen.cpp:2059:  std::string line;
+./op_taint_gen.cpp:2085:void always_neg_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream &output) {
+./op_taint_gen.cpp:2094:  std::string gatedClk = m.str(2);
+./op_taint_gen.cpp:2099:  std::string line;
+./op_taint_gen.cpp:2114:void always_clkrst_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream &output) {
+./op_taint_gen.cpp:2135:  std::string line;
+./op_taint_gen.cpp:2150:  std::string destName = m.str(2);
+./op_taint_gen.cpp:2151:  std::string src1Name = m.str(3);
+./op_taint_gen.cpp:2168:  std::string sndAssign = line;
+./op_taint_gen.cpp:2174:  std::string dest2Name = m.str(2);
+./op_taint_gen.cpp:2175:  std::string src2Name = m.str(3);
+./taint_gen.cpp:2:#include <string>
+./taint_gen.cpp:33:std::string moduleName;
+./taint_gen.cpp:34:std::vector<std::string> moduleInputs;
+./taint_gen.cpp:35:std::vector<std::string> moduleOutputs;
+./taint_gen.cpp:36:std::vector<std::string> extendInputs;
+./taint_gen.cpp:37:std::vector<std::string> extendOutputs;
+./taint_gen.cpp:38:std::vector<std::string> flagOutputs;
+./taint_gen.cpp:39:std::vector<std::string> moduleRegs;
+./taint_gen.cpp:40:std::vector<std::string> moduleTrueRegs;
+./taint_gen.cpp:41:std::unordered_map<std::string, uint32_t> moduleMems;
+./taint_gen.cpp:42:std::set<std::string> moduleWires;
+./taint_gen.cpp:43:std::set<std::string> g_iteDest;
+./taint_gen.cpp:44:std::set<std::string> g_wire2reg;
+./taint_gen.cpp:45:std::set<std::string> g_operators{"+", "-", "*", "/","%", "&&", "||", "==", "===", "!=", ">", ">=", "<", "<=", "|", "^", "&", "+:", "-:", "<<", ">>", "<<<", ">>>", "~", "!", "&", "~&", "~|", "~^", "^", "?", "<=", "always", "function"};
+./taint_gen.cpp:46:std::set<std::string> g_clk_set;
+./taint_gen.cpp:47:std::string clockName;
+./taint_gen.cpp:48:std::string resetName;
+./taint_gen.cpp:49:std::vector<std::string> rTaints;
+./taint_gen.cpp:50:std::unordered_map<std::string, uint32_t> nextVersion;
+./taint_gen.cpp:51:std::unordered_map<std::string, std::vector<bool>> nxtVerBits;
+./taint_gen.cpp:52:std::unordered_map<std::string, std::string> new_next;
+./taint_gen.cpp:53:std::unordered_map<std::string, std::string> update_reg;
+./taint_gen.cpp:54:std::unordered_map<std::string, std::pair<std::string, std::string>> memDims;
+./taint_gen.cpp:55:std::unordered_map<std::string, uint32_t> reg2sig;
+./taint_gen.cpp:56:std::unordered_map<std::string, uint32_t> fangyuanItemNum; // used to check item number in case statementsrs
+./taint_gen.cpp:57:std::unordered_map<std::string, uint32_t> fangyuanCaseSliceWidth; // width of each slice used in RHS of case
+./taint_gen.cpp:58:std::unordered_map<std::string, uint32_t> g_destVersion;
+./taint_gen.cpp:59:std::unordered_map<std::string, std::pair<std::string, bool>> g_moduleRst;
+./taint_gen.cpp:60:std::unordered_map<std::string, std::string> g_moduleClk;
+./taint_gen.cpp:62:std::unordered_map<std::string, std::unordered_map<std::string, std::string>> g_mod2instMap;
+./taint_gen.cpp:64:std::unordered_map<std::string, std::vector<std::string>> g_mod2assertMap;
+./taint_gen.cpp:71:std::string g_recentClk;
+./taint_gen.cpp:72:std::string g_recentRst;
+./taint_gen.cpp:74:std::string g_possibleCLK;
+./taint_gen.cpp:75:std::string g_possibleRST;
+./taint_gen.cpp:116:std::string _t="_T";
+./taint_gen.cpp:117:std::string _r="_R";
+./taint_gen.cpp:118:std::string _x="_X";
+./taint_gen.cpp:119:std::string _c="_C";
+./taint_gen.cpp:120:std::string _sig="_S";
+./taint_gen.cpp:121:std::string TAINT_RST="zy_taint_rst";
+./taint_gen.cpp:122:std::string END_SIG="zy_end_sig";
+./taint_gen.cpp:123:std::string srcConcatFeature = " = {";
+./taint_gen.cpp:124:std::string bothConcatFeature = "} = {";
+./taint_gen.cpp:125:std::string g_gatedClkFileName = "gated_clk.txt";
+./taint_gen.cpp:126:std::string g_path;
+./taint_gen.cpp:127:std::string idxedModuleName;
+./taint_gen.cpp:128:std::string g_topModule;
+./taint_gen.cpp:129:std::string orderFileName = "order.txt";
+./taint_gen.cpp:134:std::string CONSTANT_SIG; // reserve sig=1 for constants
+./taint_gen.cpp:135:std::string RESET_SIG = "2"; // reserve sig=2 for reset
+./taint_gen.cpp:198:void clean_file(std::string fileName, bool useLogic) {
+./taint_gen.cpp:201:  std::string line;
+./taint_gen.cpp:202:  std::string cleanLine;
+./taint_gen.cpp:209:  std::string rsvdLine; // reserved line, not printed in last iteration
+./taint_gen.cpp:227:    if(line.find("nvdla_cdp_s_lut_access_cfg_0_out") != std::string::npos) {
+./taint_gen.cpp:237:    if(line.find("//") != std::string::npos)
+./taint_gen.cpp:244:    std::string retStr;    
+./taint_gen.cpp:245:    std::string fangyuanDeclaration;
+./taint_gen.cpp:246:    std::string fangyuanAssign;
+./taint_gen.cpp:253:        std::string printedLine = line;        
+./taint_gen.cpp:259:        std::string printedLine = line;
+./taint_gen.cpp:287:          std::string slice = m.str(2);
+./taint_gen.cpp:288:          std::string var = m.str(3);
+./taint_gen.cpp:316:          std::string slice = m.str(2);
+./taint_gen.cpp:317:          std::string var = m.str(3);
+./taint_gen.cpp:341:          std::string slice = m.str(2);
+./taint_gen.cpp:342:          std::string var = m.str(3);
+./taint_gen.cpp:366:          std::string slice = m.str(2);
+./taint_gen.cpp:367:          std::string var = m.str(3);
+./taint_gen.cpp:406:      //    std::string destAndSlice = m.str(2);
+./taint_gen.cpp:407:      //    std::string op1AndSlice = m.str(3);
+./taint_gen.cpp:408:      //    std::string slice = m.str(4);
+./taint_gen.cpp:409:      //    std::string op2AndSlice = m.str(5);
+./taint_gen.cpp:410:      //    std::string op1, op1Slice;
+./taint_gen.cpp:437:      //    std::string dest = m.str(2);
+./taint_gen.cpp:438:      //    std::string src = m.str(3);
+./taint_gen.cpp:453:          std::string blank = m.str(1);
+./taint_gen.cpp:454:          std::string destList = m.str(2);
+./taint_gen.cpp:455:          std::string srcList = m.str(3);
+./taint_gen.cpp:458:          std::vector<std::string> destVec;
+./taint_gen.cpp:459:          std::vector<std::string> srcVec;
+./taint_gen.cpp:466:          std::string outputString;
+./taint_gen.cpp:467:          std::vector<std::string> lhsVec;
+./taint_gen.cpp:468:          for(std::string singleDest: destVec) {
+./taint_gen.cpp:514:          std::string destAndSlice = m.str(2);
+./taint_gen.cpp:515:          std::string dest, destSlice;
+./taint_gen.cpp:552:void remove_functions(std::string fileName) {
+./taint_gen.cpp:555:  std::string line;
+./taint_gen.cpp:567:void analyze_reg_path( std::string fileName ) {
+./taint_gen.cpp:569:  std::string line;
+./taint_gen.cpp:573:    if(line.find("27'b000000000000000000000000000, of, 32'b00000000000000000000000000000000") != std::string::npos) {
+./taint_gen.cpp:582:            std::string destAndSlice = m.str(2);
+./taint_gen.cpp:583:            std::string op1AndSlice = m.str(3);
+./taint_gen.cpp:627:          std::string destAndSlice = m.str(2);
+./taint_gen.cpp:628:          std::string dest, destSlice;
+./taint_gen.cpp:633:          std::string src = m.str(3);
+./taint_gen.cpp:653:          std::string destAndSlice = m.str(3);
+./taint_gen.cpp:654:          std::string dest, destSlice;
+./taint_gen.cpp:656:          std::string srcAndSlice = m.str(4);
+./taint_gen.cpp:672:          std::string nextLine;
+./taint_gen.cpp:685:void add_line_taints(std::string line, std::ofstream &output, std::ifstream &input) 
+./taint_gen.cpp:688:  std::string printedLine = line;
+./taint_gen.cpp:781:int parse_verilog_line(std::string line, bool ignoreWrongOp) {
+./taint_gen.cpp:787:  if(line.find("fangyuan0") != std::string::npos)
+./taint_gen.cpp:896:  else if( line.find("always @*") != std::string::npos || std::regex_match(line, m, pAlwaysStar) ) {
+./taint_gen.cpp:929:  else if(line.find("(*") == std::string::npos){
+./taint_gen.cpp:939:void read_in_clkrst(std::string filePath, std::string fileName) {
+./taint_gen.cpp:944:  std::string signName;
+./taint_gen.cpp:945:  std::string path = extract_path(filePath);
+./taint_gen.cpp:947:  std::string line;
+./taint_gen.cpp:948:  std::string localModName;
+./taint_gen.cpp:1006:void add_file_taints(std::string fileName, 
+./taint_gen.cpp:1007:                     std::map<std::string, 
+./taint_gen.cpp:1008:                     std::vector<std::string>> &moduleInputsMap, 
+./taint_gen.cpp:1009:                     std::map<std::string, std::vector<std::string>> &moduleOutputsMap, 
+./taint_gen.cpp:1010:                     std::map<std::string, std::vector<std::string>> &moduleRFlagsMap) {
+./taint_gen.cpp:1026:  std::string line;
+./taint_gen.cpp:1035:    if(line.find("_000_") != std::string::npos)
+./taint_gen.cpp:1060:void merge_taints(std::string fileName) {
+./taint_gen.cpp:1063:  //std::vector<std::string> appendix{_x};
+./taint_gen.cpp:1064:  //for (std::string app : appendix) {  
+./taint_gen.cpp:1079:        std::string sliceTop = slicePair.second;
+./taint_gen.cpp:1080:        std::string highIdx = toStr(get_end(sliceTop));
+./taint_gen.cpp:1141:    std::string outputStr = "";
+./taint_gen.cpp:1164:    for(std::string var: moduleTrueRegs) {
+./taint_gen.cpp:1168:      std::string rstVal;
+./taint_gen.cpp:1196:      std::vector<std::string> freeBitsVec;
+./taint_gen.cpp:1207:      std::string mem = it->first;
+./taint_gen.cpp:1238:void add_module_name(std::string fileName, 
+./taint_gen.cpp:1239:                     std::map<std::string, std::vector<std::string>> &moduleInputsMap,
+./taint_gen.cpp:1240:                     std::map<std::string, std::vector<std::string>> &moduleOutputsMap,
+./taint_gen.cpp:1241:                     std::map<std::string, std::vector<std::string>> &moduleRFlagsMap, 
+./taint_gen.cpp:1245:  std::string line;
+./taint_gen.cpp:1306:void fill_update(std::string fileName) {
+./taint_gen.cpp:1308:  std::string line;
+./taint_gen.cpp:1310:  std::string reg;
+./taint_gen.cpp:1316:      std::vector<std::string> updateVec;
+./taint_gen.cpp:1318:      for (std::string update: updateVec) {
+./taint_gen.cpp:1328:void add_func_taints_limited(std::ifstream &input, std::ofstream &output, std::string funcDefinition) {
+./taint_gen.cpp:1333:  std::string blank = m.str(1);
+./taint_gen.cpp:1334:  std::string funcSlice = m.str(2);
+./taint_gen.cpp:1335:  std::string funcName = m.str(3);
+./taint_gen.cpp:1339:  std::vector<std::pair<std::string, std::string>> caseAssignPairs;
+./taint_gen.cpp:1340:  std::vector<std::string> inputSlice;
+./taint_gen.cpp:1344:  std::string line;
+./taint_gen.cpp:1352:      std::string slice = m.str(2);
+./taint_gen.cpp:1358:  std::string rhs, rhsSlice;
+./taint_gen.cpp:1388:  std::string taintString = pairVec2taintString(caseAssignPairs, "no_reg_is_excluded_2333", _r, output);
+./taint_gen.cpp:1463:void remove_function_wrapper(std::string firstLine, std::ifstream &input, std::ofstream &output) {
+./taint_gen.cpp:1467:  std::string blank = m.str(1);
+./taint_gen.cpp:1468:  std::string funcSlice = m.str(2);
+./taint_gen.cpp:1469:  std::string funcName = m.str(3);
+./taint_gen.cpp:1472:  std::vector<std::pair<std::string, std::string>> caseAssignPairs;
+./taint_gen.cpp:1473:  std::vector<std::string> inputSlice;
+./taint_gen.cpp:1479:  std::string line;
+./taint_gen.cpp:1491:  std::string a, b, s; // used in function.
+./taint_gen.cpp:1492:  std::string lineForParsing = line;
+./taint_gen.cpp:1497:  std::string result = m.str(2);
+./taint_gen.cpp:1498:  std::string callFuncName = m.str(3);
+./taint_gen.cpp:1499:  std::string arguments = m.str(4);
+./taint_gen.cpp:1500:  std::vector<std::string> argVec;
+./taint_gen.cpp:1515:    std::string rhs, rhsSlice;
+./taint_gen.cpp:1521:      //checkCond(b.find("fangyuan") != std::string::npos, "RHS in case is not fangyuan! "+ b);
+./taint_gen.cpp:1531:    std::string localIdx = std::to_string(NEW_FANGYUAN++);
+./taint_gen.cpp:1550:    std::string rhs, rhsSlice;
+./taint_gen.cpp:1560:      //std::string binNum = dec2bin(selectedBits);
+./taint_gen.cpp:1561:      //std::string binWidth = toStr(binNum.length());
+./taint_gen.cpp:1562:      //std::string rhsNum = (selectedBits == 0) ? "0" : (binWidth + "'b" + binNum);
+./taint_gen.cpp:1563:      std::string rhsBin = extract_bin(b, highIdx, lowIdx);
+./taint_gen.cpp:1564:      //std::string rhsNum = "fangyuan"+localIdx+"["+toStr(highIdx)+":"+toStr(lowIdx)+"]";
+./taint_gen.cpp:1575:void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::string alwaysFirstLine) {
+./taint_gen.cpp:1579:  std::string caseFirstLine;
+./taint_gen.cpp:1584:  std::string blank = m.str(1);
+./taint_gen.cpp:1585:  std::string sAndSlice = m.str(3);
+./taint_gen.cpp:1586:  std::vector<std::pair<std::string, std::string>> caseAssignPairs;
+./taint_gen.cpp:1587:  std::vector<std::string> inputSlice;
+./taint_gen.cpp:1588:  std::string destAndSlice = parse_case_statements(caseAssignPairs, input, true);
+./taint_gen.cpp:1590:  std::string line;
+./taint_gen.cpp:1592:  while(line.find("endcase", 0) == std::string::npos ) {
+./taint_gen.cpp:1603:  std::string dest, destSlice;
+./taint_gen.cpp:1604:  std::string a, aSlice;
+./taint_gen.cpp:1605:  std::string b, bSlice;
+./taint_gen.cpp:1606:  std::string s, sSlice;
+./taint_gen.cpp:1607:  std::string aAndSlice = caseAssignPairs.back().second;
+./taint_gen.cpp:1608:  std::string bAndSlice = caseAssignPairs[0].second;
+./taint_gen.cpp:1618:  std::string sWidth, aWidth, bWidth;
+./taint_gen.cpp:1619:  std::string sVer, aVer, bVer;
+./taint_gen.cpp:1648:    std::string rhs, rhsSlice;
+./taint_gen.cpp:1653:      if(bPos == std::string::npos) abort();
+./taint_gen.cpp:1667:    if(!g_use_value_change && b.find("fangyuan") != std::string::npos) {
+./taint_gen.cpp:1793:    std::string rhs, rhsSlice;
+./taint_gen.cpp:1799:      if(bPos == std::string::npos) abort();
+./taint_gen.cpp:1871:    std::string rhs, rhsSlice;
+./taint_gen.cpp:1876:      if(bPos == std::string::npos) abort();
+./taint_gen.cpp:1891:    if(!g_use_value_change && b.find("fangyuan") != std::string::npos) {
+./taint_gen.cpp:1964:    std::string rhs, rhsSlice;
+./taint_gen.cpp:1970:      if(bPos == std::string::npos) abort();
+./taint_gen.cpp:2010:void add_func_taints_call(std::string line, std::ofstream &output) {
+./taint_gen.cpp:2014:  std::string blank = m.str(1);
+./taint_gen.cpp:2015:  std::string returnValue = m.str(2);
+./taint_gen.cpp:2016:  std::string funcName = m.str(3);
+./taint_gen.cpp:2017:  std::string arguments = m.str(4);
+./taint_gen.cpp:2024:  ////// preprocss the arguments string
+./taint_gen.cpp:2037:  std::vector<std::string> args;
+./taint_gen.cpp:2038:  std::string arg;
+./taint_gen.cpp:2040:  while( current != std::string::npos ) {
+./taint_gen.cpp:2048:  for (std::string arg: args) {
+./taint_gen.cpp:2055:void add_func_taints_call_limited(std::string line, std::ofstream &output) {
+./taint_gen.cpp:2059:  std::string blank = m.str(1);
+./taint_gen.cpp:2060:  std::string returnArg = m.str(2);
+./taint_gen.cpp:2061:  std::string funcName = m.str(3);
+./taint_gen.cpp:2062:  std::string arguments = m.str(4);
+./taint_gen.cpp:2069:  std::string varArgs = m.str(0);
+./taint_gen.cpp:2070:  std::string condArgForFunc = get_nth_var_in_list(varArgs, 3);
+./taint_gen.cpp:2072:  std::string returnArgT = get_lhs_taint_list(returnArg, _t, output);
+./taint_gen.cpp:2073:  std::string returnArgR = get_rhs_taint_list(returnArg, _r);
+./taint_gen.cpp:2074:  //std::string returnArgX = get_rhs_taint_list(returnArg, _x);
+./taint_gen.cpp:2075:  //std::string returnArgC = get_rhs_taint_list(returnArg, _c);
+./taint_gen.cpp:2077:  std::string argTList = get_rhs_taint_list(varArgs, _t);
+./taint_gen.cpp:2081:  std::string argRList = get_lhs_ver_taint_list(varArgs, _r, output, verVec);
+./taint_gen.cpp:2082:  //std::string argXList = get_lhs_ver_taint_list(varArgs, _x, output, verVec);
+./taint_gen.cpp:2083:  //std::string argCList = get_lhs_ver_taint_list(varArgs, _c, output, verVec);
+./taint_gen.cpp:2094:                                 std::string moduleFirstLine, 
+./taint_gen.cpp:2095:                                 std::map<std::string, std::vector<std::string>> &moduleInputsMap, 
+./taint_gen.cpp:2096:                                 std::map<std::string, std::vector<std::string>> &moduleOutputsMap) {
+./taint_gen.cpp:2102:  std::string localModuleName = m.str(2);
+./taint_gen.cpp:2106:  std::string instanceName = m.str(3);
+./taint_gen.cpp:2111:    g_mod2instMap.emplace(moduleName, std::unordered_map<std::string, std::string>{{instanceName, localModuleName}});
+./taint_gen.cpp:2117:  std::string line;
+./taint_gen.cpp:2120:  std::unordered_map<std::string, std::string> port2SignalMap;
+./taint_gen.cpp:2133:  std::unordered_map<std::string, std::vector<uint32_t>> input2SignalVerMap;
+./taint_gen.cpp:2134:  std::unordered_map<std::string, std::vector<bool>> inputSignalIsNewMap;
+./taint_gen.cpp:2136:  for(std::string input: moduleInputsMap[localModuleName]) {
+./taint_gen.cpp:2147:    std::string signalAndSliceList = port2SignalMap[input];
+./taint_gen.cpp:2150:    std::vector<std::string> signalAndSliceVec;
+./taint_gen.cpp:2163:      for(std::string signalAndSlice : signalAndSliceVec) {
+./taint_gen.cpp:2168:        std::string signal, signalSlice;
+./taint_gen.cpp:2171:        std::string signalHighIdx = toStr(signalIdxPair.first);
+./taint_gen.cpp:2172:        std::string signalLowIdx = toStr(signalIdxPair.second);
+./taint_gen.cpp:2180:  //for(std::string reg_r_flag: flagOutputs) {
+./taint_gen.cpp:2185:  std::vector<std::string> toAssignZero;
+./taint_gen.cpp:2188:  std::string newLogic;
+./taint_gen.cpp:2189:  std::vector<std::string> newLogicVec;
+./taint_gen.cpp:2190:  for(std::string inPort: moduleInputsMap[localModuleName]) {
+./taint_gen.cpp:2219:          std::string varAndSlice = port2SignalMap[inPort];
+./taint_gen.cpp:2220:          std::string varConnect;
+./taint_gen.cpp:2222:            std::vector<std::string> varVec;
+./taint_gen.cpp:2233:            std::string numWidth = toStr(g_sig_width);
+./taint_gen.cpp:2250:    for(std::string outPort: moduleOutputsMap[localModuleName]) {
+./taint_gen.cpp:2263:          std::string varAndSlice = port2SignalMap[outPort];
+./taint_gen.cpp:2264:          std::string varConnect;
+./taint_gen.cpp:2266:            std::vector<std::string> varVec;
+./taint_gen.cpp:2279:            std::string numWidth = toStr(g_sig_width);
+./taint_gen.cpp:2296:  //for(std::string reg_r_flag: flagOutputs) {
+./taint_gen.cpp:2301:  std::string lineToPrint;
+./taint_gen.cpp:2312:  for(std::string unwiredSig: toAssignZero)
+./taint_gen.cpp:2315:  for(std::string oneNewLogic: newLogicVec)
+./taint_gen.cpp:2320:    std::string signalList = port2SignalMap[it->first];
+./taint_gen.cpp:2323:    std::vector<std::string> signalVec;
+./taint_gen.cpp:2327:      std::string localSignal, localSignalSlice;
+./taint_gen.cpp:2338:bool extract_concat(std::string line, 
+./taint_gen.cpp:2340:                    std::string &returnedStmt, 
+./taint_gen.cpp:2341:                    std::string &fangyuanDeclaration, 
+./taint_gen.cpp:2342:                    std::string &fangyuanAssign, 
+./taint_gen.cpp:2344:  if(line.find("alu_out") != std::string::npos) {
+./taint_gen.cpp:2347:  std::string retStr = "";
+./taint_gen.cpp:2360:  std::regex_token_iterator<std::string::iterator> rend;
+./taint_gen.cpp:2361:  std::regex_token_iterator<std::string::iterator> it(line.begin(), line.end(), pBraces, 1);
+./taint_gen.cpp:2363:  std::string varList;
+./taint_gen.cpp:2364:  std::string newLine;
+./taint_gen.cpp:2365:  std::vector<std::string> allVarList;
+./taint_gen.cpp:2366:  std::queue<std::string> newVarQueue;
+./taint_gen.cpp:2369:  if ( (line.find("assign") != std::string::npos
+./taint_gen.cpp:2384:      std::string localIdx = std::to_string(localIdxNum);
+./taint_gen.cpp:2386:      std::vector<std::string> varVec;
+./taint_gen.cpp:2388:      for(std::string var: varVec) {
+./taint_gen.cpp:2408:        output << std::string(blankNo, ' ') + "wire [" + toStr(totalWidth-1) + ":0] fangyuan" + localIdx + ";" << std::endl;        
+./taint_gen.cpp:2410:          output << std::string(blankNo, ' ') + "assign { " + varList + " } = fangyuan" + localIdx + ";" << std::endl;
+./taint_gen.cpp:2412:          output << std::string(blankNo, ' ') + "assign fangyuan" + localIdx + " = { " + varList + " };" << std::endl;
+./taint_gen.cpp:2427:    std::string part;
+./taint_gen.cpp:2429:    while( openBracePos != std::string::npos ) {
+./taint_gen.cpp:2468:  g_mod2assertMap.emplace(moduleName, std::vector<std::string>{});
+./taint_gen.cpp:2469:  std::string DOES_KEEP = "";
+./taint_gen.cpp:2470:  std::string PREV_VAL_COMP = "";
+./taint_gen.cpp:2471:  std::string USE_END_SIG = "";
+./taint_gen.cpp:2473:    for(std::string out: flagOutputs) {
+./taint_gen.cpp:2475:        std::string var = m.str(1);        
+./taint_gen.cpp:2481:        std::string rstVal; 
+./taint_gen.cpp:2529:    std::string asv;
+./taint_gen.cpp:2537:void gen_reg_output(std::string fileName) {
+./taint_gen.cpp:2539:  for( std::string out: moduleOutputs ) {
+./taint_gen.cpp:2546:void gen_wire_output(std::string fileName) {
+./taint_gen.cpp:2548:  for( std::string out: moduleOutputs ) {
+./taint_gen.cpp:2555:void collect_ite_dest(const std::string &line) {
+./taint_gen.cpp:2559:  std::string destAndSlice = m.str(2);
+./taint_gen.cpp:2560:  std::string dest, destSlice;
+./taint_gen.cpp:2566:void collect_case_dest(const std::string &line) {
+./taint_gen.cpp:2570:  std::string destAndSlice = m.str(2);
+./taint_gen.cpp:2571:  std::string dest, destSlice;
+./taint_gen.cpp:2583:void map_gen(std::string moduleName, std::string instanceName, std::ofstream &output) {
+./taint_gen.cpp:2601:std::string separate_modules(std::string fileName, 
+./taint_gen.cpp:2602:                             std::vector<std::string> &modules,
+./taint_gen.cpp:2603:                             std::map<std::string, std::vector<std::string>> &childModules,
+./taint_gen.cpp:2605:                             std::unordered_map<std::string,
+./taint_gen.cpp:2613:  std::string line;
+./taint_gen.cpp:2616:  std::string topModule;
+./taint_gen.cpp:2617:  std::string moduleName;
+./taint_gen.cpp:2618:  std::string path = extract_path(fileName);
+./taint_gen.cpp:2619:  std::set<std::string> regSet;
+./taint_gen.cpp:2620:  std::stack<std::string> moduleNameStk;
+./taint_gen.cpp:2634:      std::string regAndSlice = m.str(2);
+./taint_gen.cpp:2635:      std::string reg, regSlice;
+./taint_gen.cpp:2643:    if(line.find("module") != std::string::npos && line != "endmodule") {
+./taint_gen.cpp:2650:          moduleInputsMap.emplace(moduleName, std::vector<std::string>{});
+./taint_gen.cpp:2652:          moduleOutputsMap.emplace(moduleName, std::vector<std::string>{});
+./taint_gen.cpp:2679:        std::string inputName = m.str(3);
+./taint_gen.cpp:2683:        std::string outputName = m.str(3);
+./taint_gen.cpp:2691:      std::string localModuleName = m.str(2);
+./taint_gen.cpp:2692:      std::string instanceName = m.str(3);
+./taint_gen.cpp:2695:                                     std::unordered_map<std::string, 
+./taint_gen.cpp:2696:                                                        std::string>{{instanceName, localModuleName}});
+./taint_gen.cpp:2710:        childModules.emplace(moduleName, std::vector<std::string>{m.str(2)});
+./taint_gen.cpp:2722:  std::unordered_set<std::string> childSet;
+./taint_gen.cpp:2724:    for(std::string singleChildModule: it->second) {
+./taint_gen.cpp:2728:  for(std::string singleModule: modules) {
+./taint_gen.cpp:2745:std::string separate_modules(std::string fileName, 
+./taint_gen.cpp:2746:                             std::vector<std::string> &modules,
+./taint_gen.cpp:2747:                             std::map<std::string, std::vector<std::string>> &childModules,
+./taint_gen.cpp:2749:                             std::unordered_map<std::string,
+./taint_gen.cpp:2764:int taint_gen(std::string fileName, 
+./taint_gen.cpp:2767:              std::map<std::string, std::vector<std::string>> &moduleInputsMap, 
+./taint_gen.cpp:2768:              std::map<std::string, std::vector<std::string>> &moduleOutputsMap, 
+./taint_gen.cpp:2769:              std::map<std::string, std::vector<std::string>> &moduleRFlagsMap, 
+./taint_gen.cpp:2778:    std::string path = extract_path(fileName);
