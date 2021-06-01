@@ -1251,6 +1251,9 @@ void add_module_name(std::string fileName,
   }
   if(g_use_taint_rst) moduleInputs.push_back(TAINT_RST);  
   if(g_use_end_sig) moduleInputs.push_back(END_SIG);  
+  if(moduleName == "hls_target_Loop_1_proc") {
+    toCout("Find it!");
+  }
   if(g_check_invariance == CheckTwoVal) moduleInputs.push_back(ASSERT_PROTECT);  
   if(!isTop) moduleInputs.push_back("rst_zy");
   out << "module " + moduleName + " ( " + *moduleInputs.begin();  
@@ -2106,8 +2109,8 @@ void extend_module_instantiation(std::ifstream &input,
     abort();
   }
   std::string localModuleName = m.str(2);
-  //if(localModuleName.compare("adder_32bit") == 0)
-  //  toCout("find adder_32bit!");
+  if(localModuleName.compare("hls_target_Loop_1_proc") == 0)
+    toCout("find it!");
 
   std::string instanceName = m.str(3);
   if(instanceName.find("buffer") != std::string::npos) {
@@ -2198,10 +2201,6 @@ void extend_module_instantiation(std::ifstream &input,
   std::string newLogic;
   std::vector<std::string> newLogicVec;
   for(std::string inPort: moduleInputsMap[localModuleName]) {
-    if(inPort.compare(g_recentClk) == 0 
-        || g_clk_set.find(inPort) != g_clk_set.end() 
-        || port2SignalMap.find(inPort) == port2SignalMap.end())
-      continue;
     if(inPort.compare("rst_zy") == 0) {
       output << "    .rst_zy(rst_zy)," << std::endl;
       continue;
@@ -2222,6 +2221,10 @@ void extend_module_instantiation(std::ifstream &input,
       output << "    ."+ASSERT_PROTECT+"("+ASSERT_PROTECT+")," << std::endl;
       continue;
     }
+    if(inPort.compare(g_recentClk) == 0 
+        || g_clk_set.find(inPort) != g_clk_set.end() 
+        || port2SignalMap.find(inPort) == port2SignalMap.end())
+      continue;
     if(g_enable_taint) {
       if( !port2SignalMap[inPort].empty() ) {
         std::vector<uint32_t> localVerVec = input2SignalVerMap[inPort];
