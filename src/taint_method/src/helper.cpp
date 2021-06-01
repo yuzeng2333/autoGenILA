@@ -244,7 +244,7 @@ uint32_t find_version_num(std::string opAndSlice, bool &isNew, std::ofstream &ou
       // ground unassigned wires
       std::vector<std::string> freeBitsVec;
       free_bits(op, freeBitsVec);
-      if(freeBitsVec.size() > 0) {
+      if(freeBitsVec.size() > 0 && g_enable_taint) {
         output << "  assign "+add_taint(freeBitsVec, _r+toStr(verNum-1)) + " = 0;" << std::endl;
         //output << "  assign "+add_taint(freeBitsVec, _x+toStr(verNum-1)) + " = 0;" << std::endl;
         //output << "  assign "+add_taint(freeBitsVec, _c+toStr(verNum-1)) + " = 0;" << std::endl;

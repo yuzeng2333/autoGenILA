@@ -2110,6 +2110,9 @@ void extend_module_instantiation(std::ifstream &input,
   //  toCout("find adder_32bit!");
 
   std::string instanceName = m.str(3);
+  if(instanceName.find("buffer") != std::string::npos) {
+    toCout("Find it!");
+  }
   if(g_mod2instMap.find(moduleName) != g_mod2instMap.end()) {
     g_mod2instMap[moduleName].emplace(instanceName, localModuleName);
   }
