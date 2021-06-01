@@ -1279,7 +1279,7 @@ void add_module_name(std::string fileName,
   out << "  integer i;" << std::endl;
   if(!isTop)
     out << "  input INSTR_IN_ZY;" << std::endl;
-  else {
+  else if(g_enable_taint){
     out << "  logic INSTR_IN_ZY;" << std::endl;
     out << "  assign INSTR_IN_ZY = ";
     for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) {
