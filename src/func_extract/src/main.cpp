@@ -30,6 +30,8 @@
 namespace funcExtract {
 
 bool g_print_solver;
+bool g_use_read_ASV;
+bool g_read_rst;
 std::ofstream g_outFile;
 std::string g_pj_path = "/workspace/research/ILA/autoGenILA/src/";
 
@@ -63,6 +65,7 @@ int main(int argc, char *argv[]) {
   g_remove_adff = true;
   g_split_long_num = true;
   g_clean_submod = true;
+  g_use_read_ASV = false;
   print_time();
   /// read module_info.txt, result in g_moduleInfoMap
   /// read input-output delay info for sub-modules
@@ -91,7 +94,8 @@ int main(int argc, char *argv[]) {
   //read_all_regs(g_path+"/regs.txt");  
   //read_in_architectural_states(asFile);
   //clean_verilog(g_path+"/design.v.clean");
-  vcd_parser(g_path+"/rst.vcd");
+  if(g_use_read_ASV) vcd_parser(g_path+"/rst.vcd");
+  else vcd_parser(g_path+"/norm.vcd");
   //inv_gen();
   // get update function hierarchically
   std::vector<std::string> modules;  

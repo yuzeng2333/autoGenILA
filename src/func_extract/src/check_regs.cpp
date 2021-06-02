@@ -803,29 +803,42 @@ llvm::Value* add_nb_constraint(astNode* const node,
   if(dest.find("internal_empty_n") != std::string::npos) {
     toCout("Find it!");
   }
-  if(is_read_asv(dest)) {
-      //&& curMod->moduleAs.find(dest) != curMod->moduleAs.end())
-    //std::string prefix = get_hier_name(false);
-    //if(!prefix.empty()) prefix += ".";
-    if(curMod->isFunctionedSubMod == false) {
-      std::string prefix = get_hier_name(false);
-      if(!prefix.empty()) prefix += ".";
-      dest = prefix + dest;
+  if(g_use_read_ASV) {
+    if(is_read_asv(dest)) {
+        //&& curMod->moduleAs.find(dest) != curMod->moduleAs.end())
+      //std::string prefix = get_hier_name(false);
+      //if(!prefix.empty()) prefix += ".";
+      if(curMod->isFunctionedSubMod == false) {
+        std::string prefix = get_hier_name(false);
+        if(!prefix.empty()) prefix += ".";
+        dest = prefix + dest;
+      }
+      return get_arg(timed_name(dest, timeIdx), curFunc);
     }
-    return get_arg(timed_name(dest, timeIdx), curFunc);
+    else {
+      uint32_t width = get_var_slice_width_simp(dest);    
+      std::string rstVal = get_rst_value(dest, timeIdx);
+      return var_expr(rstVal, timeIdx, c, b, false, width);    
+    }
   }
   else {
-    uint32_t width = get_var_slice_width_simp(dest);    
-    std::string rstVal;
-    if(g_rstVal.find(dest) != g_rstVal.end())
-      rstVal = g_rstVal[dest];
-    else
-      rstVal = toStr(width)+"'b0";
-    toCout("Replace "+timed_name(dest, timeIdx)+" with "+rstVal);
-    g_outFile << "Replace "+timed_name(dest, timeIdx)+" with "+rstVal << std::endl;
-    if(dest == "buff1" && timeIdx == 15)
-      toCoutVerb("Find it!");
-    return var_expr(rstVal, timeIdx, c, b, false, width);    
+    // if do not use read asv, then for invariant registers, return their
+    // normal value(not rst value), and for other registers, set them symbolic
+    std::string modName = curMod->name;
+    if(g_invarRegs.find(modName) == g_invarRegs.end()) {
+      return get_arg(timed_name(dest, timeIdx), curFunc);
+    }
+    else {
+      if(g_invarRegs[modName].find(dest) == g_invarRegs[modName].end())
+        return get_arg(timed_name(dest, timeIdx), curFunc);
+      else {
+        // if is invariant register, then return its norm value, which is
+        // stored in g_rstVal
+        uint32_t width = get_var_slice_width_simp(dest);    
+        std::string rstVal = get_rst_value(dest, timeIdx);
+        return var_expr(rstVal, timeIdx, c, b, false, width);
+      }
+    }
   }
 }
 

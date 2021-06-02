@@ -152,12 +152,13 @@ extern std::set<std::string> INT_EXPR_SET;
 extern std::vector<struct InstrInfo_t> g_instrInfo;
 extern bool g_print_solver;
 extern bool g_skipCheck;
+extern bool g_use_read_ASV;
 extern std::vector<std::pair<std::string, uint32_t>> g_regWidth;
 extern std::set<std::string> g_readASV;
 extern std::map<std::string, uint32_t> g_allRegs;
 extern std::set<std::string> g_regWithFunc;
 // first is module name, second is reg name
-extern std::set<std::pair<std::string, std::string>> g_invarRegs;
+extern std::map<std::string, std::set<std::string>> g_invarRegs;
 extern std::string g_rootNode;
 extern struct InstrInfo_t g_currInstrInfo;
 extern std::unordered_map<std::string, std::string> g_nopInstr;

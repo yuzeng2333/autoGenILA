@@ -294,6 +294,8 @@ void set_clk_rst(std::shared_ptr<ModuleInfo_t> &modInfo);
 
 void initialize_min_delay(std::shared_ptr<ModuleInfo_t> &modInfo, 
                           std::string outPort);
+
+std::string get_rst_value(const std::string &dest, uint32_t timeIdx);
 } // end of namespace funcExtract
 
 

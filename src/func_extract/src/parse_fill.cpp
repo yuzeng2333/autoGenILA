@@ -16,7 +16,8 @@ namespace funcExtract {
 std::map<std::string, std::shared_ptr<ModuleInfo_t>> g_moduleInfoMap;
 std::shared_ptr<ModuleInfo_t> g_curMod;
 std::set<std::string> moduleWriteAs;
-std::set<std::pair<std::string, std::string>> g_invarRegs;
+//std::set<std::pair<std::string, std::string>> g_invarRegs;
+std::map<std::string, std::set<std::string>> g_invarRegs;
 std::set<std::string> g_blackBoxModSet;
 StrSet_t moduleAs;
 std::set<std::string> g_mem;
@@ -407,7 +408,10 @@ void read_in_instructions(std::string fileName) {
               modName = line.substr(0, tmpPos);
               regName = line.substr(tmpPos+3);
             }
-            g_invarRegs.insert(std::make_pair(modName, regName));
+            if(g_invarRegs.find(modName) == g_invarRegs.end())
+              g_invarRegs.emplace(modName, std::set<std::string>{regName});
+            else
+              g_invarRegs[modName].insert(regName);
           }
           break;
         case TopMod:

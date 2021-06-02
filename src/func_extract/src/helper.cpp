@@ -1347,6 +1347,21 @@ void initialize_min_delay(std::shared_ptr<ModuleInfo_t> &modInfo,
   }
 }
 
+
+std::string get_rst_value(const std::string &dest, uint32_t timeIdx) {
+  uint32_t width = get_var_slice_width_simp(dest);    
+  std::string rstVal;
+  if(g_rstVal.find(dest) != g_rstVal.end())
+    rstVal = g_rstVal[dest];
+  else
+    rstVal = toStr(width)+"'b0";
+  toCout("Replace "+timed_name(dest, timeIdx)+" with "+rstVal);
+  g_outFile << "Replace "+timed_name(dest, timeIdx)+" with "+rstVal << std::endl;
+  if(dest == "buff1" && timeIdx == 15)
+    toCoutVerb("Find it!");
+  return rstVal;
+}
+
 //std::shared_ptr<ModuleInfo_t> 
 //get_mem_module(const std::string &memPathName) {
 //  remove_two_end_space(memPathName);

@@ -35,16 +35,14 @@ void module_expr(std::string line) {
   }
   curMod->name = g_currentModuleName;
   if(g_currentModuleName == g_topModule) {
-    for(auto pair : g_invarRegs) {
-      if(!pair.first.empty())
-        curMod->invarRegs.insert(pair.second);
+    for(auto reg : g_invarRegs[g_currentModuleName]) {
+      curMod->invarRegs.insert(reg);
     }
     curMod->moduleAs = moduleAs;
   }
   else {
-    for(auto pair : g_invarRegs) {
-      if(pair.first == g_currentModuleName)
-        curMod->invarRegs.insert(pair.second);
+    for(auto reg : g_invarRegs[g_currentModuleName]) {
+      curMod->invarRegs.insert(reg);
     }
   }
 
