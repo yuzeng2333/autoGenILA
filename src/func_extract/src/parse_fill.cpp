@@ -411,6 +411,10 @@ void read_in_instructions(std::string fileName) {
             else {
               // if no modName is specified, 
               // by default modName is top module name
+              if(g_topModule.empty()) {
+                toCout("Error: top module name should be specified earlier!");
+                abort();
+              }
               modName = g_topModule;
               remove_two_end_space(line);
               regName = line;
