@@ -408,6 +408,13 @@ void read_in_instructions(std::string fileName) {
               modName = line.substr(0, tmpPos);
               regName = line.substr(tmpPos+3);
             }
+            else {
+              // if no modName is specified, 
+              // by default modName is top module name
+              modName = g_topModule;
+              remove_two_end_space(line);
+              regName = line;
+            }
             if(g_invarRegs.find(modName) == g_invarRegs.end())
               g_invarRegs.emplace(modName, std::set<std::string>{regName});
             else
