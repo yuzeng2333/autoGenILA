@@ -28,8 +28,11 @@ void get_all_update() {
       destInfo.set_dest_and_slice(target);
       destInfo.isVector = false;
       print_llvm_ir(destInfo, delayBound, instrIdx++);
-      std::string clean("clean");
-      std::string opto3("opto3");
+      std::string clean("optn --instsimplify --deadargelim 
+                        --instsimplify tmp.ll -S -o=clean.ll");
+      std::string opto3("opt -O3 clean.ll -S -o=tmp.o3.ll; 
+                         opt -passes=deadargelim tmp.o3.ll -S -o=clean.o3.ll; 
+                         rm tmp.o3.ll");
       system(clean.c_str());
       system(opto3.c_str());
       system(("cp clean.o3.ll "+g_path+"/update_"+target+".ll").c_str());
@@ -48,7 +51,7 @@ void read_clean_o3(std::string fileName,
   std::string line;
   std::smatch m;
   bool seeFuncDef = false;
-  std::regex pDef("define internal fastcc i(\\d+) @(\\S+)\\((\\S+)\\) unnamed_addr #1");
+  std::regex pDef("^define internal fastcc i(\\d+) @(\\S+)\\((.+)\\) unnamed_addr #1 \\{$");  
   while(std::getline(input, line)) {
     if(line.substr(0, 6) == "define") {
       if(!seeFuncDef) seeFuncDef = true;
