@@ -61,7 +61,19 @@ void build_ast_tree() {
   assert(!g_instrInfo.back().skipWriteASV.empty());
   set_clk_rst(g_topModInfo);
 
-  for(std::string reg: g_instrInfo.back().skipWriteASV) {
+  std::set<std::string>::iterator beginIt;
+  std::set<std::string>::iterator endIt;
+  if(!g_get_all_update) {
+    beginIt = g_instrInfo.back().skipWriteASV.begin();
+    endIt = g_instrInfo.back().skipWriteASV.end();
+  }
+  else {
+    beginIt = g_moduleInfoMap[g_topModule]->moduleOutputs.begin();
+    endIt = g_moduleInfoMap[g_topModule]->moduleOutputs.end();
+  }
+  for(auto it = beginIt; it != endIt; it++) {
+  //for(std::string reg: g_instrInfo.back().skipWriteASV) {
+    std::string reg = *it;
     g_insContextStk.clear();
     g_insContextStk.push_back(insCntxt);
     std::string modName = get_mod_name(reg);

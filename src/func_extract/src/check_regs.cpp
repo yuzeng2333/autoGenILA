@@ -1181,6 +1181,10 @@ std::vector<std::string> DestInfo::get_no_slice_name() {
 
 
 std::string DestInfo::get_mod_name() {
+  if(modName.empty()) {
+    toCout("Warning: modName is not set");
+    return g_topModule;
+  }
   return modName;
 }
 

@@ -12,6 +12,7 @@ void get_all_update() {
   std::set<std::string> asvSet;
   uint32_t instrIdx = 1;
   for(auto instrInfo : g_instrInfo) {
+    g_currInstrInfo = instrInfo;
     toCout("---  BEGIN INSTRUCTION #"+toStr(instrIdx)+" ---");
     std::set<std::string> workSet;
     uint32_t delayBound = instrInfo.delayBound;
