@@ -7,6 +7,9 @@
 
 namespace funcExtract {
 
+std::map<std::string, std::set<std::string>> dependVarMap;
+
+
 void get_all_update() {
   toCout("### Begin get_all_update ");
   std::set<std::string> asvSet;
@@ -32,20 +35,27 @@ void get_all_update() {
       std::string opto3("opt -O3 clean.ll -S -o=tmp.o3.ll; opt -passes=deadargelim tmp.o3.ll -S -o=clean.o3.ll; rm tmp.o3.ll");
       system(clean.c_str());
       system(opto3.c_str());
-      std::vector<std::pair<std::string, uint32_t>> argWidthVec;
-      read_clean_o3("./clean.o3.ll", argWidthVec);
-      if(argWidthVec.size() > 0)
-        system(("cp clean.o3.ll "+g_path+"/update_"+target+".ll").c_str());      
-      for(auto pair : argWidthVec)
-        workSet.insert(pair.first);
+      std::set<std::string> argVec;
+      read_clean_o3("./clean.o3.ll", argVec);
+      if(argVec.size() > 0) {
+        system(("cp clean.o3.ll "+g_path+"/update_"+target+".ll").c_str());
+        if(dependVarMap.find(target) == dependVarMap.end())
+          dependVarMap.emplace(target, argVec);
+        else {
+          for(std::string arg: argVec)
+            dependVarMap[target].insert(arg);
+        }
+      }
+      for(std::string reg : argVec)
+        workSet.insert(reg);
     }
   }
 }
 
 
-// returned argWidthVec is empty if the update function just returns 0
+// returned argVec is empty if the update function just returns 0
 void read_clean_o3(std::string fileName, 
-                   std::vector<std::pair<std::string, uint32_t>> &argWidthVec) {
+                   std::set<std::string> &argVec) {
   std::ifstream input(fileName);
   std::string line;
   std::smatch m;
@@ -68,7 +78,7 @@ void read_clean_o3(std::string fileName,
         argList = m.str(3);
       }
     }
-    else if(line.substr(2, 3) == "ret") {
+    else if(line.size() > 9 && line.substr(2, 3) == "ret") {
       if(!seeReturn) seeReturn = true;
       else {
         if(std::regex_match(line, m, pRet)) returnZero = true;
@@ -86,7 +96,7 @@ void read_clean_o3(std::string fileName,
       uint32_t width = std::stoi(widthAndArg.substr(1, blankPos-1));
       std::string arg = widthAndArg.substr(blankPos+3);
       arg.pop_back();
-      argWidthVec.push_back(std::make_pair(arg, width));
+      argVec.insert(arg);
       startPos = dotPos + 2;
     }
   }
