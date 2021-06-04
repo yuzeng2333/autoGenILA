@@ -28,16 +28,14 @@ void get_all_update() {
       destInfo.set_dest_and_slice(target);
       destInfo.isVector = false;
       print_llvm_ir(destInfo, delayBound, instrIdx++);
-      std::string clean("optn --instsimplify --deadargelim 
-                        --instsimplify tmp.ll -S -o=clean.ll");
-      std::string opto3("opt -O3 clean.ll -S -o=tmp.o3.ll; 
-                         opt -passes=deadargelim tmp.o3.ll -S -o=clean.o3.ll; 
-                         rm tmp.o3.ll");
+      std::string clean("opt --instsimplify --deadargelim --instsimplify tmp.ll -S -o=clean.ll");
+      std::string opto3("opt -O3 clean.ll -S -o=tmp.o3.ll; opt -passes=deadargelim tmp.o3.ll -S -o=clean.o3.ll; rm tmp.o3.ll");
       system(clean.c_str());
       system(opto3.c_str());
-      system(("cp clean.o3.ll "+g_path+"/update_"+target+".ll").c_str());
       std::vector<std::pair<std::string, uint32_t>> argWidthVec;
       read_clean_o3("./clean.o3.ll", argWidthVec);
+      if(argWidthVec.size() > 0)
+        system(("cp clean.o3.ll "+g_path+"/update_"+target+".ll").c_str());      
       for(auto pair : argWidthVec)
         workSet.insert(pair.first);
     }
@@ -45,13 +43,18 @@ void get_all_update() {
 }
 
 
+// returned argWidthVec is empty if the update function just returns 0
 void read_clean_o3(std::string fileName, 
                    std::vector<std::pair<std::string, uint32_t>> &argWidthVec) {
   std::ifstream input(fileName);
   std::string line;
   std::smatch m;
+  std::string argList;
   bool seeFuncDef = false;
+  bool seeReturn = false;
+  bool returnZero = false;
   std::regex pDef("^define internal fastcc i(\\d+) @(\\S+)\\((.+)\\) unnamed_addr #1 \\{$");  
+  std::regex pRet("^\\s+ret i\\d+ 0$");  
   while(std::getline(input, line)) {
     if(line.substr(0, 6) == "define") {
       if(!seeFuncDef) seeFuncDef = true;
@@ -62,21 +65,29 @@ void read_clean_o3(std::string fileName,
         }
         std::string retWidth = m.str(1);
         std::string funcName = m.str(2);
-        std::string argList = m.str(3);
-        uint32_t pos = 0;
-        uint32_t startPos = 0;
-        while(startPos < argList.size()) {
-          uint32_t dotPos = argList.find(",", startPos);
-          std::string widthAndArg = argList.substr(startPos, dotPos-startPos);
-          uint32_t blankPos = widthAndArg.find(" ");
-          uint32_t width = std::stoi(widthAndArg.substr(1, blankPos-1));
-          std::string arg = widthAndArg.substr(blankPos+3);
-          arg.pop_back();
-          argWidthVec.push_back(std::make_pair(arg, width));
-          startPos = dotPos + 2;
-        }
-        return;
+        argList = m.str(3);
       }
+    }
+    else if(line.substr(2, 3) == "ret") {
+      if(!seeReturn) seeReturn = true;
+      else {
+        if(std::regex_match(line, m, pRet)) returnZero = true;
+        break;
+      }
+    }
+  }
+  if(!returnZero) {
+    uint32_t pos = 0;
+    uint32_t startPos = 0;
+    while(startPos < argList.size()) {
+      uint32_t dotPos = argList.find(",", startPos);
+      std::string widthAndArg = argList.substr(startPos, dotPos-startPos);
+      uint32_t blankPos = widthAndArg.find(" ");
+      uint32_t width = std::stoi(widthAndArg.substr(1, blankPos-1));
+      std::string arg = widthAndArg.substr(blankPos+3);
+      arg.pop_back();
+      argWidthVec.push_back(std::make_pair(arg, width));
+      startPos = dotPos + 2;
     }
   }
 }
