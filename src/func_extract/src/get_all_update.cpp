@@ -79,7 +79,13 @@ void read_clean_o3(std::string fileName,
       }
     }
     else if(line.size() > 9 && line.substr(2, 3) == "ret") {
-      if(!seeReturn) seeReturn = true;
+      if(!seeReturn) {
+        seeReturn = true;
+        if(std::regex_match(line, m, pRet)) {
+          returnZero = true;
+          break;
+        }
+      }
       else {
         if(std::regex_match(line, m, pRet)) returnZero = true;
         break;
