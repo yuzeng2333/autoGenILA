@@ -1355,10 +1355,19 @@ std::string get_rst_value(const std::string &dest, uint32_t timeIdx) {
     rstVal = g_rstVal[dest];
   else
     rstVal = toStr(width)+"'b0";
+
+    // the following is for debug
+  if(dest == "decoder_trigger"
+     || dest == "latched_store"
+     || dest == "latched_stalu" )
+    rstVal = toStr(width)+"'b0";
+
   toCout("Replace "+timed_name(dest, timeIdx)+" with "+rstVal);
   g_outFile << "Replace "+timed_name(dest, timeIdx)+" with "+rstVal << std::endl;
+  g_regValueFile << "Replace "+timed_name(dest, timeIdx)+" with "+rstVal << std::endl;
   if(dest == "buff1" && timeIdx == 15)
     toCoutVerb("Find it!");
+
   return rstVal;
 }
 

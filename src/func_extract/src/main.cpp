@@ -10,6 +10,7 @@
 #include "check_regs.h"
 #include "auxiliary_files_gen.h"
 #include "make_define_fun.h"
+#include "get_all_update.h"
 #include <string>
 #include <fstream>
 #include <time.h>
@@ -27,12 +28,32 @@
 // 3. instr.txt
 
 
+// I am making a new complete pass that 
+// can get the update function for every (instr, asv) pair.
+// In the directory for a hardware, it should have the following files:
+// File 1:
+//    (1) encodings for every instruction 
+//    (2) encoding for NOP
+//    (3) $TOP: top module name
+//    (4) #CLK, #RST
+//    (5) $INVAR: invariant regs
+//
+// Then, this main function should do these:
+// for instr in {instrs}:
+//   work_set <- {regs}
+//   while (reg in work_set):
+//       get ( update(reg), read_regs );
+//       work_set = work_set + read_regs;
+
+
 namespace funcExtract {
 
 bool g_print_solver;
 bool g_use_read_ASV;
 bool g_read_rst;
+bool g_get_all_update;
 std::ofstream g_outFile;
+std::ofstream g_regValueFile;
 std::string g_pj_path = "/workspace/research/ILA/autoGenILA/src/";
 
 }
@@ -56,6 +77,7 @@ int main(int argc, char *argv[]) {
   }
   time_t my_time = time(NULL);
   g_outFile.open(g_path+"/result.txt");
+  g_regValueFile.open(g_path+"/reg_values.txt");
   g_outFile << "Begin main!" << std::endl;
   std::string time(ctime(&my_time));
   g_outFile << "Start time: "+time << std::endl;
@@ -66,6 +88,7 @@ int main(int argc, char *argv[]) {
   g_split_long_num = true;
   g_clean_submod = true;
   g_use_read_ASV = false;
+  g_get_all_update = true;
   print_time();
   /// read module_info.txt, result in g_moduleInfoMap
   /// read input-output delay info for sub-modules
@@ -91,12 +114,10 @@ int main(int argc, char *argv[]) {
     toCout("##### Begin parse_verilog");
     parse_verilog(g_path+"/design.v.clean");
   }
-  //read_all_regs(g_path+"/regs.txt");  
-  //read_in_architectural_states(asFile);
-  //clean_verilog(g_path+"/design.v.clean");
+
   if(g_use_read_ASV) vcd_parser(g_path+"/rst.vcd");
   else vcd_parser(g_path+"/norm.vcd");
-  //inv_gen();
+
   // get update function hierarchically
   std::vector<std::string> modules;  
   std::map<std::string, std::vector<std::string>> childModules;
@@ -115,18 +136,21 @@ int main(int argc, char *argv[]) {
     return 0;
   }
   determine_clk_rst();
-  //print_design_hierarchy(g_topModule, "", 0);
-  //return 0;
   build_ast_tree();
-  check_all_regs();
-  print_time();  
-  clean_goal();
-  make_dirs(g_path);
-  define_fun_gen(g_path+"/clean_sub_goals.txt");  
-  auxiliary_files_gen(g_path, g_maxDelay);
-  pseudo_vlg_gen();
-  clean_file(g_path+"/design.v", true);
-  print_time();
+  if(!g_get_all_update) {
+    check_all_regs();
+  }
+  else {
+    get_all_update();
+  }
+  //print_time();  
+  //clean_goal();
+  //make_dirs(g_path);
+  //define_fun_gen(g_path+"/clean_sub_goals.txt");  
+  //auxiliary_files_gen(g_path, g_maxDelay);
+  //pseudo_vlg_gen();
+  //clean_file(g_path+"/design.v", true);
+  //print_time();
   g_outFile.close();
   return 0;
 }

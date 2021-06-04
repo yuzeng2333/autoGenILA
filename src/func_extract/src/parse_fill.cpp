@@ -210,7 +210,7 @@ void read_in_instructions(std::string fileName) {
   std::string line;
   std::smatch m;
   enum State {FirstSignal, OtherSignal, WriteASV, ReadASV, 
-              ReadNOP, ReadMEM, ResetVal, InvarRegs, TopMod};
+              ReadNOP, ReadMEM, ResetVal, InvarRegs, TopMod, DelayBound};
   enum State state;
   bool firstWord = true;
   bool firstSignalSeen = false;
@@ -230,6 +230,12 @@ void read_in_instructions(std::string fileName) {
       std::string rst = line.substr(5);
       remove_two_end_space(rst);
       g_recentRst = rst;
+      continue;
+    }
+    if(line.substr(0,6) == "#delay") {
+      std::string delay = line.substr(7);
+      remove_two_end_space(delay);
+      g_instrInfo.back().delayBound = std::stoi(delay);
       continue;
     }
     if(line.back() == ' ')

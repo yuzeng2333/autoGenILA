@@ -143,6 +143,7 @@ struct Context_t {
 
 
 extern std::ofstream g_outFile;
+extern std::ofstream g_regValueFile;
 extern std::map<astNode*, uint32_t> CLEAN_QUEUE;
 extern std::map<astNode*, uint32_t> DIRTY_QUEUE;
 extern std::map<std::string, expr*> INPUT_EXPR_VAL;

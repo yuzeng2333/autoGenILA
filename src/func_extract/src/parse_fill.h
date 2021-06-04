@@ -28,6 +28,7 @@ struct InstrInfo_t {
   std::set<std::string> skipWriteASV;
   std::vector<std::string> writeASVVec;
   uint32_t writeASVVecDelay;
+  uint32_t delayBound;
 };
 
 
