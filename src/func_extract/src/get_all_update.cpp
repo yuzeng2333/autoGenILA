@@ -69,6 +69,7 @@ void read_clean_o3(std::string fileName,
   std::regex pDef("^define internal fastcc i(\\d+) @(\\S+)\\((.+)\\) unnamed_addr #1 \\{$");  
   std::regex pRet("^\\s+ret i\\d+ 0$");  
   while(std::getline(input, line)) {
+    toCoutVerb(line);
     if(line.substr(0, 6) == "define") {
       if(!seeFuncDef) seeFuncDef = true;
       else {
@@ -100,6 +101,9 @@ void read_clean_o3(std::string fileName,
     uint32_t startPos = 0;
     while(startPos < argList.size()) {
       uint32_t dotPos = argList.find(",", startPos);
+      if(dotPos == std::string::npos) {
+        dotPos = argList.size();
+      }
       std::string widthAndArg = argList.substr(startPos, dotPos-startPos);
       uint32_t blankPos = widthAndArg.find(" ");
       uint32_t width = std::stoi(widthAndArg.substr(1, blankPos-1));
