@@ -156,6 +156,7 @@ extern bool g_skipCheck;
 extern bool g_use_read_ASV;
 extern bool g_get_all_update;
 extern bool g_use_concat_extract_func;
+extern bool g_use_simple_func_name;
 extern std::vector<std::pair<std::string, uint32_t>> g_regWidth;
 extern std::set<std::string> g_readASV;
 extern std::map<std::string, uint32_t> g_allRegs;
@@ -188,6 +189,8 @@ extern std::string g_accl2memAddr;
 extern std::string g_accl2memData;
 extern std::string g_currentModuleName;
 extern uint32_t g_instr_len;
+extern uint32_t g_cct_cnt;
+extern uint32_t g_ext_cnt;
 extern std::string DELIM;
 
 // for hierarchical store

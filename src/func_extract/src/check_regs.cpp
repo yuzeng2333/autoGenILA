@@ -53,6 +53,8 @@ bool g_skipCheck;
 bool g_ignoreSubModules=false;
 bool g_seeInputs;
 uint32_t g_maxDelay = 0;
+uint32_t g_cct_cnt = 0;
+uint32_t g_ext_cnt = 0;
 // for llvm
 std::shared_ptr<llvm::LLVMContext> TheContext;
 std::shared_ptr<llvm::Module> TheModule;
@@ -138,6 +140,8 @@ void print_llvm_ir(DestInfo &destInfo,
   auto curMod = g_moduleInfoMap[curModName];
   Context_t insCntxt(curModName, "", curMod, nullptr, nullptr);  
   g_insContextStk.clear();
+  g_cct_cnt = 0; 
+  g_ext_cnt = 0;
   if(curModName == g_topModule) {
     g_insContextStk.push_back(insCntxt);
   }
@@ -694,7 +698,7 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
   std::string varAndSlice = node->dest;
   auto curMod = get_curMod();
   toCoutVerb("add_constraint for: "+varAndSlice);
-  if(varAndSlice == "indvar_flatten_reg_61") {
+  if(varAndSlice == "mem_addr") {
     toCoutVerb("find it");
   }
 

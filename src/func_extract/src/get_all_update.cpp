@@ -28,6 +28,8 @@ void get_all_update() {
       std::string target = *targetIt;
       toCout("---  BEGIN Target: "+target+" ---");
       workSet.erase(targetIt);
+      if(target == "eoi")
+        continue;
       DestInfo destInfo;
       destInfo.set_dest_and_slice(target);
       destInfo.isVector = false;

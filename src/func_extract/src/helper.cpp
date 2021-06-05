@@ -791,10 +791,16 @@ llvm::Value* extract_func(llvm::Value* in, uint32_t high, uint32_t low,
   llvm::FunctionType *FT;  
   uint32_t len = high-low+1;
 
+  std::string extValName;
+  if(g_use_simple_func_name)
+    extValName = "ext_"+toStr(g_ext_cnt++);
+  else
+    extValName = destName+" ["+toStr(high)+":"+toStr(low)+"]";
+
   if(!g_use_concat_extract_func) {
     auto s1 = b->CreateLShr(in, low, llvm::Twine(destName+"_lshr"));
     llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c), 
-                        llvm::Twine(destName+" ["+toStr(high)+":"+toStr(low)+"]"));
+                        llvm::Twine(extValName));
     return ret;
   }
 
@@ -828,7 +834,7 @@ llvm::Value* extract_func(llvm::Value* in, uint32_t high, uint32_t low,
   std::vector<llvm::Value*> args;
   args.push_back(in);
   return b->CreateCall(FT, func, args, 
-                       llvm::Twine(name.str()+" ["+toStr(high)+":"+toStr(low)+"]"));
+                       llvm::Twine(extValName));
 }
 
 
@@ -887,11 +893,17 @@ llvm::Value* concat_func(llvm::Value* val1, llvm::Value* val2,
     toCoutVerb("Find it!");
   }
 
+  std::string cctValName;
+  if(g_use_simple_func_name)
+    cctValName = "cct_"+toStr(g_cct_cnt++);
+  else
+    cctValName = "cct_"+name1+"_"+name2;
+
   if(!g_use_concat_extract_func) {
     llvm::Value* longVal1 = b->CreateZExtOrBitCast(val1, newIntTy, llvm::Twine(name1+"_zext"));
     llvm::Value* ret = b->CreateAdd(b->CreateShl(longVal1, val2Width), 
                                     zext(val2, len, c, b), 
-                                    llvm::Twine("cct_"+name1+"_"+name2));
+                                    llvm::Twine(cctValName));
     return ret;
   }
 
@@ -952,7 +964,7 @@ llvm::Value* concat_func(llvm::Value* val1, llvm::Value* val2,
   std::vector<llvm::Value*> args;
   args.push_back(val1);
   args.push_back(val2);
-  return b->CreateCall(FT, func, args, llvm::Twine("cct_"+name1+"_"+name2));
+  return b->CreateCall(FT, func, args, llvm::Twine(cctValName));
 }
 
 
