@@ -23,6 +23,8 @@ void get_all_update() {
     for(std::string out: topModuleInfo->moduleOutputs) {
       workSet.insert(out);
     }
+    // declaration for llvm
+    TheContext = std::make_unique<llvm::LLVMContext>();
     while(!workSet.empty()) {
       auto targetIt = workSet.begin();
       std::string target = *targetIt;

@@ -82,6 +82,8 @@ void check_all_regs() {
     toCout("---  BEGIN INSTRUCTION #"+toStr(i++)+" ---");
     g_readASV = instrInfo.readASV;
     g_currInstrInfo = instrInfo;
+    // declaration for llvm
+    TheContext = std::make_unique<llvm::LLVMContext>();
     for(auto pair: instrInfo.writeASV) {
       uint32_t cycleCnt = pair.first;
       std::string oneWriteAsv = pair.second;
@@ -131,8 +133,6 @@ void clean_data() {
 void print_llvm_ir(DestInfo &destInfo, 
                    uint32_t bound, 
                    uint32_t instrIdx) {
-  // declaration for llvm
-  TheContext = std::make_unique<llvm::LLVMContext>();
 
   // FIXME: change the following model name
   std::string destName = destInfo.get_dest_name();
@@ -698,7 +698,7 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
   // Attention: varAndSlice might have a slice, a directly-assigned varAndSlice
   std::string varAndSlice = node->dest;
   auto curMod = get_curMod();
-  toCoutVerb("add_constraint for: "+varAndSlice);
+  toCoutVerb("add_constraint for: "+varAndSlice+", timeIdx: "+toStr(timeIdx));
   if(varAndSlice == "mem_addr") {
     toCoutVerb("find it");
   }
