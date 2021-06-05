@@ -1405,6 +1405,15 @@ std::string get_rst_value(const std::string &dest, uint32_t timeIdx) {
   return rstVal;
 }
 
+
+void ModuleInfo_t::clean_ir_data() {
+  existedExpr.clear();
+  minInOutDelay.clear();
+  out2FuncMp.clear();
+  out2InDelayMp.clear();
+}
+
+
 //std::shared_ptr<ModuleInfo_t> 
 //get_mem_module(const std::string &memPathName) {
 //  remove_two_end_space(memPathName);

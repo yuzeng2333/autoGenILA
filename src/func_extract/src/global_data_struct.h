@@ -68,14 +68,14 @@ class ModuleInfo_t {
   void emplace_outport_node(const std::string &var, astNode* node);
   bool is_stored_outport_node(const std::string &var);
   astNode* get_outport_node(const std::string &outPort);
+  void clean_ir_data();
 
   // data structure
   std::string name;
   //std::string curTarget;
   std::string clk;
   std::string rst;
-  // the first key is target name
-  std::map<std::string, std::map<std::string, uint32_t>> minInOutDelay;
+
   uint32_t rootTimeIdx;
   std::vector<std::shared_ptr<ModuleInfo_t>> parentModVec;
   StrSet_t moduleAs;
@@ -87,13 +87,9 @@ class ModuleInfo_t {
   std::set<std::string> moduleMems;
   taintGen::VarWidth varWidth;
   // only sub-modules has the two data below
-  std::map<std::string, std::vector<astNode*>> out2LeafNodeMp;
-  std::map<std::string, std::pair<llvm::Function*, uint32_t>> out2FuncMp;
-  // first key is target name
-  std::map<std::string, std::map<std::string, llvm::Value*>> existedExpr;
+  //std::map<std::string, std::vector<astNode*>> out2LeafNodeMp;
   // first key is output name, second key is node name
   std::map<std::string, std::map<std::string, astNode*>> visitedNode;
-
   std::map<std::string, astNode*> varNode;  
   std::map<std::string, std::string> ssaTable;
   std::map<std::string, std::vector<std::string>> reg2Slices;
@@ -111,11 +107,18 @@ class ModuleInfo_t {
   std::map<std::string, std::string> ins2modMap;  
   std::map<std::string, FuncInfo_t> funcTable;
   std::map<std::string, uint32_t> reg2timeIdx;  
-  // store manually specified info. first key is output, second key is input
+
+
+  /// data for making ir
+  /// These data are different for making different irs
+  // first key is target name
+  std::map<std::string, std::map<std::string, llvm::Value*>> existedExpr;
+  // the first key is target name
+  std::map<std::string, std::map<std::string, uint32_t>> minInOutDelay;
+  std::map<std::string, std::pair<llvm::Function*, uint32_t>> out2FuncMp;
+  // first key is output, second key is input
   std::map<std::string, 
-           std::map<std::string, uint32_t>> out2InDelayMp;
-  /// key is arg name, value is its iterator
-  /// only top module map has this data structur->e
+           std::map<std::string, uint32_t>> out2InDelayMp; 
 };
 
 

@@ -140,6 +140,7 @@ void print_llvm_ir(DestInfo &destInfo,
   auto curMod = g_moduleInfoMap[curModName];
   Context_t insCntxt(curModName, "", curMod, nullptr, nullptr);  
   g_insContextStk.clear();
+  curMod->clean_ir_data();
   g_cct_cnt = 0; 
   g_ext_cnt = 0;
   if(curModName == g_topModule) {
