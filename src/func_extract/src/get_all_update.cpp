@@ -28,8 +28,8 @@ void get_all_update() {
       std::string target = *targetIt;
       toCout("---  BEGIN Target: "+target+" ---");
       workSet.erase(targetIt);
-      if(target == "eoi")
-        continue;
+      //if(target == "eoi")
+      //  continue;
       DestInfo destInfo;
       destInfo.set_dest_and_slice(target);
       destInfo.isVector = false;
@@ -101,7 +101,7 @@ void read_clean_o3(std::string fileName,
     uint32_t startPos = 0;
     while(startPos < argList.size()) {
       uint32_t dotPos = argList.find(",", startPos);
-      if(dotPos == std::string::npos) {
+      if(dotPos == std::string::npos || dotPos > argList.size()) {
         dotPos = argList.size();
       }
       std::string widthAndArg = argList.substr(startPos, dotPos-startPos);
@@ -109,8 +109,11 @@ void read_clean_o3(std::string fileName,
       uint32_t width = std::stoi(widthAndArg.substr(1, blankPos-1));
       std::string arg = widthAndArg.substr(blankPos+3);
       arg.pop_back();
-      argVec.insert(arg);
+      uint32_t pos = arg.find(DELIM, 0);
+      std::string var = arg.substr(0, pos);
+      argVec.insert(var);
       startPos = dotPos + 2;
+      if(dotPos == argList.size()) return;
     }
   }
 }
