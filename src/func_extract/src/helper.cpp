@@ -790,6 +790,14 @@ llvm::Value* extract_func(llvm::Value* in, uint32_t high, uint32_t low,
   llvm::Function *func;
   llvm::FunctionType *FT;  
   uint32_t len = high-low+1;
+
+  if(!g_use_concat_extract_func) {
+    auto s1 = b->CreateLShr(in, low, llvm::Twine(destName+"_lshr"));
+    llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c), 
+                        llvm::Twine(destName+" ["+toStr(high)+":"+toStr(low)+"]"));
+    return ret;
+  }
+
   if(g_extractFunc.find(funcName) != g_extractFunc.end()) {
     func = g_extractFunc[funcName];
     FT = func->getFunctionType();
@@ -865,27 +873,42 @@ llvm::Value* concat_func(llvm::Value* val1, llvm::Value* val2,
                          std::shared_ptr<llvm::LLVMContext> &c,
                          std::shared_ptr<llvm::IRBuilder<>> &b,
                          bool noinline) {
-  std::string name1 = val1->getName().str();
-  std::string name2 = val2->getName().str();
-  std::string n1, n1Slice;
-  std::string n2, n2Slice;
-  if(!name1.empty()) split_slice(name1, n1, n1Slice);
-  if(!name2.empty()) split_slice(name2, n2, n2Slice);
-  toCoutVerb("concat with "+name1+" and "+name2);
-  if(name1.empty() || name2.empty()) noinline = false;
-  else if( (is_read_asv(n1) || (is_top_module() && is_input(n1)))
-        && (is_read_asv(n2) || (is_top_module() && is_input(n2))) ) noinline = true;
-  else noinline = false;
+
   llvm::Type* val1Ty = val1->getType();
   llvm::Type* val2Ty = val2->getType();
   uint32_t val1Width = llvm::dyn_cast<llvm::IntegerType>(val1Ty)->getBitWidth();
   uint32_t val2Width = llvm::dyn_cast<llvm::IntegerType>(val2Ty)->getBitWidth();
+  uint32_t len = val1Width + val2Width;
+  auto newIntTy = llvm::IntegerType::get(*c, len);
+  std::string name1 = val1->getName().str();
+  std::string name2 = val2->getName().str();
+  toCoutVerb("concat with "+name1+" and "+name2+", total width: "+toStr(val1Width+val2Width));  
+  if(name2 == "cct_mem_rdata_word[15:0] [15:0]_cct_mem_rdata_word[7] [7:7]_cct_mem_rdata_word[7] [7:7]325_cct_mem_rdata_word[7] [7:7]326_cct_mem_rdata_word[7] [7:7]327_cct_mem_rdata_word[7] [7:7]328_cct_mem_rdata_word[7] [7:7]329_cct_mem_rdata_word[7] [7:7]330_cct_mem_rdata_word[7] [7:7]331_cct_mem_rdata_word[7] [7:7]332_cct_mem_rdata_word[7] [7:7]333_cct_mem_rdata_word[7] [7:7]334_cct_mem_rdata_word[7] [7:7]335_cct_mem_rdata_word[7] [7:7]336_cct_mem_rdata_word[7] [7:7]337_cct_mem_rdata_word[7] [7:7]338_cct_mem_rdata_word[7] [7:7]339_cct_mem_rdata_word[7] [7:7]340_cct_mem_rdata_word[7] [7:7]341_cct_mem_rdata_word[7] [7:7]342_cct_mem_rdata_word[7] [7:7]343_cct_mem_rdata_word[7] [7:7]344_cct_mem_rdata_word[7] [7:7]345_cct_mem_rdata_word[7] [7:7]346_cct_mem_rdata_word[7] [7:7]347_mem_rdata_word[7:0] [7:0]") {
+    toCoutVerb("Find it!");
+  }
+
+  if(!g_use_concat_extract_func) {
+    llvm::Value* longVal1 = b->CreateZExtOrBitCast(val1, newIntTy, llvm::Twine(name1+"_zext"));
+    llvm::Value* ret = b->CreateAdd(b->CreateShl(longVal1, val2Width), 
+                                    zext(val2, len, c, b), 
+                                    llvm::Twine("cct_"+name1+"_"+name2));
+    return ret;
+  }
+
+  std::string n1, n1Slice;
+  std::string n2, n2Slice;
+  if(!name1.empty()) split_slice(name1, n1, n1Slice);
+  if(!name2.empty()) split_slice(name2, n2, n2Slice);
+  if(name1.empty() || name2.empty()) noinline = false;
+  else if( (is_read_asv(n1) || (is_top_module() && is_input(n1)))
+        && (is_read_asv(n2) || (is_top_module() && is_input(n2))) ) noinline = true;
+  else noinline = false;
+
   std::string app = "";
   if(!noinline) app = "_in";
   std::string funcName = "cct_"+toStr(val1Width)+"_"+toStr(val2Width)+app;
   llvm::Function *func;
   llvm::FunctionType *FT;  
-  uint32_t len = val1Width + val2Width;
   if(g_concatFunc.find(funcName) != g_concatFunc.end()) {
     func = g_concatFunc[funcName];
     FT = func->getFunctionType();    
@@ -918,7 +941,6 @@ llvm::Value* concat_func(llvm::Value* val1, llvm::Value* val2,
     builder = std::make_unique<llvm::IRBuilder<>>(*c);
     builder->SetInsertPoint(localBB);
 
-    auto newIntTy = llvm::IntegerType::get(*c, len);
     llvm::Value* longVal1 = builder->CreateZExtOrBitCast(val1Arg, newIntTy);
 
     llvm::Value* ret = builder->CreateAdd(builder->CreateShl(longVal1, val2Width), 
@@ -930,7 +952,7 @@ llvm::Value* concat_func(llvm::Value* val1, llvm::Value* val2,
   std::vector<llvm::Value*> args;
   args.push_back(val1);
   args.push_back(val2);
-  return b->CreateCall(FT, func, args, llvm::Twine("concat_"+name1+"_"+name2));
+  return b->CreateCall(FT, func, args, llvm::Twine("cct_"+name1+"_"+name2));
 }
 
 

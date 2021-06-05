@@ -26,6 +26,7 @@ void get_all_update() {
     while(!workSet.empty()) {
       auto targetIt = workSet.begin();
       std::string target = *targetIt;
+      toCout("---  BEGIN Target: "+target+" ---");
       workSet.erase(targetIt);
       DestInfo destInfo;
       destInfo.set_dest_and_slice(target);

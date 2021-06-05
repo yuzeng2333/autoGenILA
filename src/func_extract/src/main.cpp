@@ -52,6 +52,7 @@ bool g_print_solver;
 bool g_use_read_ASV;
 bool g_read_rst;
 bool g_get_all_update;
+bool g_use_concat_extract_func;
 std::ofstream g_outFile;
 std::ofstream g_regValueFile;
 std::string g_pj_path = "/workspace/research/ILA/autoGenILA/src/";
@@ -89,6 +90,7 @@ int main(int argc, char *argv[]) {
   g_clean_submod = true;
   g_use_read_ASV = false;
   g_get_all_update = true;
+  g_use_concat_extract_func = false;  
   print_time();
   /// read module_info.txt, result in g_moduleInfoMap
   /// read input-output delay info for sub-modules
