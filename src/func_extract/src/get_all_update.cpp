@@ -38,6 +38,7 @@ void get_all_update() {
       toCout("---  BEGIN Target: "+target+" ---");
       if(target.find("puregs[2]") != std::string::npos)
         toCoutVerb("Find it!");
+      //else continue;
       workSet.erase(targetIt);
       if(visitedTgt.find(target) != visitedTgt.end())
         continue;
@@ -124,7 +125,13 @@ void read_clean_o3(std::string fileName,
       std::string arg = widthAndArg.substr(blankPos+3);
       arg.pop_back();
       uint32_t pos = arg.find(DELIM, 0);
-      std::string var = arg.substr(0, pos);
+      if(arg.find("cpuregs[") != std::string::npos)
+        toCoutVerb("Find it!");
+      std::string var;
+      if(arg.substr(0, 2) == "\\")
+        var = arg.substr(1, pos);
+      else
+        var = arg.substr(0, pos);
       argVec.insert(var);
       startPos = dotPos + 2;
       if(dotPos == argList.size()) return;
