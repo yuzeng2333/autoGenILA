@@ -13,10 +13,8 @@ void get_all_update() {
   toCout("### Begin get_all_update ");
   std::set<std::string> asvSet;
   std::set<std::string> visitedTgt;
-  std::set<std::string> skippedOutput;
   std::ifstream visitedTgtInFile(g_path+"/visited_target.txt");
   std::string line;
-  get_skipped_output(skippedOutput);
   while(std::getline(visitedTgtInFile, line)) {
     remove_two_end_space(line);
     visitedTgt.insert(line);
@@ -55,7 +53,7 @@ void get_all_update() {
       //else continue;
       workSet.erase(targetIt);
       if(visitedTgt.find(target) != visitedTgt.end()
-         || skippedOutput.find(target) != skippedOutput.end())
+         || g_skippedOutput.find(target) != g_skippedOutput.end())
         continue;
       DestInfo destInfo;
       destInfo.set_dest_and_slice(target);
@@ -158,12 +156,6 @@ void read_clean_o3(std::string fileName,
 }
 
 
-void get_skipped_output(std::set<std::string> &skippedOutput) {
-  std::ifstream input(g_path+"/skipped_output.txt");
-  std::string line;
-  while(std::getline(input, line)) {
-    skippedOutput.insert(line);
-  }
-}
+
 
 } // end of namespace

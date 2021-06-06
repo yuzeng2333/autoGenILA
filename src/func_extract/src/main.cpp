@@ -57,6 +57,7 @@ bool g_use_simple_func_name;
 std::ofstream g_outFile;
 std::ofstream g_regValueFile;
 std::string g_pj_path = "/workspace/research/ILA/autoGenILA/src/";
+std::set<std::string> g_skippedOutput;
 
 }
 
@@ -115,6 +116,7 @@ int main(int argc, char *argv[]) {
   }
   else {
     get_io(g_path+"/design.v.clean");
+    get_skipped_output(g_skippedOutput);    
     toCout("##### Begin parse_verilog");
     parse_verilog(g_path+"/design.v.clean");
   }

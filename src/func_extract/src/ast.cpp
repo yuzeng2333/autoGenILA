@@ -74,6 +74,8 @@ void build_ast_tree() {
   for(auto it = beginIt; it != endIt; it++) {
   //for(std::string reg: g_instrInfo.back().skipWriteASV) {
     std::string reg = *it;
+    if(g_get_all_update 
+        && g_skippedOutput.find(reg) != g_skippedOutput.end()) continue;
     g_insContextStk.clear();
     g_insContextStk.push_back(insCntxt);
     std::string modName = get_mod_name(reg);

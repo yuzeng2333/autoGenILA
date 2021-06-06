@@ -739,5 +739,11 @@ void print_design_hierarchy(std::string modName,
 }
 
 
-
+void get_skipped_output(std::set<std::string> &skippedOutput) {
+  std::ifstream input(g_path+"/skipped_output.txt");
+  std::string line;
+  while(std::getline(input, line)) {
+    skippedOutput.insert(line);
+  }
+}
 } // end of namespace funcExtract

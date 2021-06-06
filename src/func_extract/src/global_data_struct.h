@@ -164,6 +164,7 @@ extern std::vector<std::pair<std::string, uint32_t>> g_regWidth;
 extern std::set<std::string> g_readASV;
 extern std::map<std::string, uint32_t> g_allRegs;
 extern std::set<std::string> g_regWithFunc;
+extern std::set<std::string> g_skippedOutput;
 // first is module name, second is reg name
 extern std::map<std::string, std::set<std::string>> g_invarRegs;
 extern std::string g_rootNode;
