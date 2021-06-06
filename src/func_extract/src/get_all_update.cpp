@@ -13,17 +13,19 @@ void get_all_update() {
   toCout("### Begin get_all_update ");
   std::set<std::string> asvSet;
   std::set<std::string> visitedTgt;
-  std::ifstream visitedTgtInFile("./visited_target.txt");
+  std::set<std::string> skippedOutput;
+  std::ifstream visitedTgtInFile(g_path+"/visited_target.txt");
   std::string line;
+  get_skipped_output(skippedOutput);
   while(std::getline(visitedTgtInFile, line)) {
     remove_two_end_space(line);
     visitedTgt.insert(line);
   }
   visitedTgtInFile.close();
   std::ofstream visitedTgtFile;
-  visitedTgtFile.open("./visited_target.txt", std::ios_base::app);
+  visitedTgtFile.open(g_path+"/visited_target.txt", std::ios_base::app);
 
-  std::ifstream addedWorkSetInFile("./added_work_set.txt");
+  std::ifstream addedWorkSetInFile(g_path+"/added_work_set.txt");
   auto topModuleInfo = g_moduleInfoMap[g_topModule];
   std::set<std::string> workSet;  
   for(std::string out: topModuleInfo->moduleOutputs) {
@@ -34,7 +36,7 @@ void get_all_update() {
   }
   addedWorkSetInFile.close();
   std::ofstream addedWorkSetFile;
-  addedWorkSetFile.open("./added_work_set.txt", std::ios_base::app);
+  addedWorkSetFile.open(g_path+"/added_work_set.txt", std::ios_base::app);
 
   uint32_t instrIdx = 1;
   for(auto instrInfo : g_instrInfo) {
@@ -52,7 +54,8 @@ void get_all_update() {
         toCoutVerb("Find it!");
       //else continue;
       workSet.erase(targetIt);
-      if(visitedTgt.find(target) != visitedTgt.end())
+      if(visitedTgt.find(target) != visitedTgt.end()
+         || skippedOutput.find(target) != skippedOutput.end())
         continue;
       DestInfo destInfo;
       destInfo.set_dest_and_slice(target);
@@ -155,5 +158,12 @@ void read_clean_o3(std::string fileName,
 }
 
 
+void get_skipped_output(std::set<std::string> &skippedOutput) {
+  std::ifstream input(g_path+"/skipped_output.txt");
+  std::string line;
+  while(std::getline(input, line)) {
+    skippedOutput.insert(line);
+  }
+}
 
 } // end of namespace

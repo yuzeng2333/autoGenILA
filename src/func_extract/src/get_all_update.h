@@ -17,5 +17,6 @@ void get_all_update();
 void read_clean_o3(std::string fileName, 
                    std::set<std::string> &argWidthVec);
 
+void get_skipped_output(std::set<std::string> &skippedOutput);
 } // end of namespace
 #endif
