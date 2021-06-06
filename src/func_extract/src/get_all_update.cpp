@@ -13,23 +13,35 @@ void get_all_update() {
   toCout("### Begin get_all_update ");
   std::set<std::string> asvSet;
   std::set<std::string> visitedTgt;
-  std::fstream visitedTgtFile;
-  visitedTgtFile.open ("./visited_target.txt", std::ios::out | std::ios::in );
+  std::ifstream visitedTgtInFile("./visited_target.txt");
   std::string line;
-  while(std::getline(visitedTgtFile, line)) {
+  while(std::getline(visitedTgtInFile, line)) {
     remove_two_end_space(line);
     visitedTgt.insert(line);
   }
+  visitedTgtInFile.close();
+  std::ofstream visitedTgtFile;
+  visitedTgtFile.open("./visited_target.txt", std::ios_base::app);
+
+  std::ifstream addedWorkSetInFile("./added_work_set.txt");
+  auto topModuleInfo = g_moduleInfoMap[g_topModule];
+  std::set<std::string> workSet;  
+  for(std::string out: topModuleInfo->moduleOutputs) {
+    workSet.insert(out);
+  }
+  while(std::getline(addedWorkSetInFile, line)) {
+    workSet.insert(line);  
+  }
+  addedWorkSetInFile.close();
+  std::ofstream addedWorkSetFile;
+  addedWorkSetFile.open("./added_work_set.txt", std::ios_base::app);
+
   uint32_t instrIdx = 1;
   for(auto instrInfo : g_instrInfo) {
     g_currInstrInfo = instrInfo;
     toCout("---  BEGIN INSTRUCTION #"+toStr(instrIdx)+" ---");
-    std::set<std::string> workSet;
     uint32_t delayBound = instrInfo.delayBound;
-    auto topModuleInfo = g_moduleInfoMap[g_topModule];
-    for(std::string out: topModuleInfo->moduleOutputs) {
-      workSet.insert(out);
-    }
+
     // declaration for llvm
     TheContext = std::make_unique<llvm::LLVMContext>();
     while(!workSet.empty()) {
@@ -63,11 +75,14 @@ void get_all_update() {
             dependVarMap[target].insert(arg);
         }
       }
-      for(std::string reg : argVec)
+      for(std::string reg : argVec) {
         workSet.insert(reg);
+        addedWorkSetFile << reg << std::endl;
+      }
     }
   }
   visitedTgtFile.close();
+  addedWorkSetFile.close();
 }
 
 
@@ -128,8 +143,8 @@ void read_clean_o3(std::string fileName,
       if(arg.find("cpuregs[") != std::string::npos)
         toCoutVerb("Find it!");
       std::string var;
-      if(arg.substr(0, 2) == "\\")
-        var = arg.substr(1, pos);
+      if(arg.substr(0, 2) == "\\\\")
+        var = arg.substr(1, pos-1);
       else
         var = arg.substr(0, pos);
       argVec.insert(var);
