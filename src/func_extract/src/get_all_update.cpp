@@ -9,10 +9,17 @@ namespace funcExtract {
 
 std::map<std::string, std::set<std::string>> dependVarMap;
 
-
 void get_all_update() {
   toCout("### Begin get_all_update ");
   std::set<std::string> asvSet;
+  std::set<std::string> visitedTgt;
+  std::fstream visitedTgtFile;
+  visitedTgtFile.open ("./visited_target.txt", std::ios::out | std::ios::in );
+  std::string line;
+  while(std::getline(visitedTgtFile, line)) {
+    remove_two_end_space(line);
+    visitedTgt.insert(line);
+  }
   uint32_t instrIdx = 1;
   for(auto instrInfo : g_instrInfo) {
     g_currInstrInfo = instrInfo;
@@ -29,9 +36,13 @@ void get_all_update() {
       auto targetIt = workSet.begin();
       std::string target = *targetIt;
       toCout("---  BEGIN Target: "+target+" ---");
+      if(target.find("puregs[2]") != std::string::npos)
+        toCoutVerb("Find it!");
       workSet.erase(targetIt);
-      //if(target == "eoi")
-      //  continue;
+      if(visitedTgt.find(target) != visitedTgt.end())
+        continue;
+      else
+        visitedTgtFile << target << std::endl;
       DestInfo destInfo;
       destInfo.set_dest_and_slice(target);
       destInfo.isVector = false;
@@ -55,6 +66,7 @@ void get_all_update() {
         workSet.insert(reg);
     }
   }
+  visitedTgtFile.close();
 }
 
 
@@ -71,7 +83,7 @@ void read_clean_o3(std::string fileName,
   std::regex pDef("^define internal fastcc i(\\d+) @(\\S+)\\((.*)\\) unnamed_addr #1 \\{$");  
   std::regex pRetZero("^\\s+ret i\\d+ 0$");  
   while(std::getline(input, line)) {
-    toCoutVerb(line);
+    //toCoutVerb(line);
     if(line.substr(0, 6) == "define") {
       if(!seeFuncDef) seeFuncDef = true;
       else {
@@ -119,5 +131,7 @@ void read_clean_o3(std::string fileName,
     }
   }
 }
+
+
 
 } // end of namespace

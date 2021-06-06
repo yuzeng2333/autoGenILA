@@ -82,7 +82,7 @@ void input_expr(std::string line) {
 
 void reg_expr(std::string line) {
   const auto curMod = get_curMod();
-  if(line.find("state_out") != std::string::npos) {
+  if(line.find("puregs[2]") != std::string::npos) {
     toCout("Found it");
   }
   std::smatch m;
