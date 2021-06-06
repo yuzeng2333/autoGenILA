@@ -89,7 +89,8 @@ class ModuleInfo_t {
   // only sub-modules has the two data below
   //std::map<std::string, std::vector<astNode*>> out2LeafNodeMp;
   // first key is output name, second key is node name
-  std::map<std::string, std::map<std::string, astNode*>> visitedNode;
+  //std::map<std::string, std::map<std::string, astNode*>> visitedNode;
+  std::map<std::string, astNode*> visitedNode;
   std::map<std::string, astNode*> varNode;  
   std::map<std::string, std::string> ssaTable;
   std::map<std::string, std::vector<std::string>> reg2Slices;

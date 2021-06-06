@@ -297,7 +297,7 @@ void print_llvm_ir(DestInfo &destInfo,
   if(!destInfo.isVector) {
     std::string dest = destVec.front();
     if(is_output(destName, curMod)) initialize_min_delay(curMod, destName);
-    if(curMod->visitedNode[destName].find(dest) == curMod->visitedNode[destName].end()
+    if(curMod->visitedNode.find(dest) == curMod->visitedNode.end()
         && curMod->reg2Slices.find(dest) == curMod->reg2Slices.end()) {
       toCout("Error: ast node is not found for this var: |"+dest+"|"
               +", curMod: "+curMod->name);
@@ -325,7 +325,7 @@ void print_llvm_ir(DestInfo &destInfo,
       g_insContextStk.clear();
       Context_t insCntxt(modName, dest, curMod, nullptr, TheFunction);
       g_insContextStk.push_back(insCntxt);
-      if(curMod->visitedNode[dest].find(dest) == curMod->visitedNode[dest].end()
+      if(curMod->visitedNode.find(dest) == curMod->visitedNode.end()
           && curMod->reg2Slices.find(dest) == curMod->reg2Slices.end()) {
         toCout("Error: ast node is not found for this var: |"+dest+"|"
                 +", curMod: "+curMod->name);
@@ -661,21 +661,21 @@ llvm::Value* add_constraint(std::string varAndSlice, uint32_t timeIdx, context &
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
   const std::string curTgt = get_target();
-  assert(curMod->visitedNode.find(curTgt) != curMod->visitedNode.end());
+  //assert(curMod->visitedNode.find(curTgt) != curMod->visitedNode.end());
   if(curMod->reg2Slices.find(var) == curMod->reg2Slices.end()) {
-    if(curMod->visitedNode[curTgt].find(var) == curMod->visitedNode[curTgt].end()) {
+    if(curMod->visitedNode.find(var) == curMod->visitedNode.end()) {
       toCout("Error: cannot find node for: "+varAndSlice);
       abort();
     }
-    return add_constraint(curMod->visitedNode[curTgt][var], timeIdx, c, b, bound);
+    return add_constraint(curMod->visitedNode[var], timeIdx, c, b, bound);
   }
   else {
     for(std::string varSlice : curMod->reg2Slices[var]) {
-      if(curMod->visitedNode[curTgt].find(varSlice) == curMod->visitedNode[curTgt].end()) {
+      if(curMod->visitedNode.find(varSlice) == curMod->visitedNode.end()) {
         toCout("!!! Error: cannot find node for: "+varSlice);
         abort();
       }
-      llvm::Value* tmpSlice = add_constraint(curMod->visitedNode[curTgt][varSlice], timeIdx, c, b, bound);
+      llvm::Value* tmpSlice = add_constraint(curMod->visitedNode[varSlice], timeIdx, c, b, bound);
       if(retIsEmpty) {
         retIsEmpty = false;
         ret = tmpSlice;
