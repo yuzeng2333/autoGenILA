@@ -54,8 +54,6 @@ void get_all_update() {
       workSet.erase(targetIt);
       if(visitedTgt.find(target) != visitedTgt.end())
         continue;
-      else
-        visitedTgtFile << target << std::endl;
       DestInfo destInfo;
       destInfo.set_dest_and_slice(target);
       destInfo.isVector = false;
@@ -79,6 +77,8 @@ void get_all_update() {
         workSet.insert(reg);
         addedWorkSetFile << reg << std::endl;
       }
+      visitedTgt.insert(target);
+      visitedTgtFile << target << std::endl;
     }
   }
   visitedTgtFile.close();
