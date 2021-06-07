@@ -58,7 +58,7 @@ void build_ast_tree() {
   curMod->rst = g_recentRst;
   Context_t insCntxt(g_topModule, "", curMod, nullptr, nullptr);
   g_topModInfo = curMod;
-  assert(!g_instrInfo.back().skipWriteASV.empty());
+  //assert(!g_instrInfo.back().skipWriteASV.empty());
   set_clk_rst(g_topModInfo);
 
   std::set<std::string>::iterator beginIt;

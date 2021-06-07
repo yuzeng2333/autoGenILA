@@ -249,6 +249,7 @@ void read_in_instructions(std::string fileName) {
         abort();
       }
       state = FirstSignal;
+      firstSignalSeen = false;
     }
     else if(line.front() == '(') { // (n) is used to express instr word in cycle n
       if(!is_number(line.substr(1, line.length()-2))) {
