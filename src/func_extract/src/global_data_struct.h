@@ -184,6 +184,7 @@ extern std::map<std::string, uint32_t> g_moduleOutportTime;
 extern std::map<std::string, llvm::Function::arg_iterator> g_topFuncArgMp;
 extern std::map<std::string, llvm::Function*> g_extractFunc;
 extern std::map<std::string, llvm::Function*> g_concatFunc;
+extern std::map<std::string, std::string> g_fifoIns;
 
 extern Str2StrVecMap_t g_moduleInputsMap;
 extern Str2StrVecMap_t g_moduleOutputsMap;

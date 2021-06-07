@@ -18,6 +18,8 @@ std::shared_ptr<ModuleInfo_t> g_curMod;
 std::set<std::string> moduleWriteAs;
 //std::set<std::pair<std::string, std::string>> g_invarRegs;
 std::map<std::string, std::set<std::string>> g_invarRegs;
+// key is instance name, value is module name
+std::map<std::string, std::string> g_fifoIns;
 std::set<std::string> g_blackBoxModSet;
 StrSet_t moduleAs;
 std::set<std::string> g_mem;

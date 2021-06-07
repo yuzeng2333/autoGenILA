@@ -220,7 +220,7 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx,
     }
     else { // if the submodule is not modeled with a subFunc
       // if the stack size is only 1, meaning this is start module and we need to 
-      // add context for its submodule to the stack
+      // add context for its parent module to the stack
       // if the stack size is larger than 1, we just pop the stack
 
       // TODO: need to re-consider this code

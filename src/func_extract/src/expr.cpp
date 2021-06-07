@@ -587,6 +587,9 @@ void submodule_expr(std::string firstLine, std::ifstream &input) {
   }
   std::string moduleName = m.str(2);
   std::string instanceName = m.str(3);
+  if(is_fifo_module(moduleName)) {
+    g_fifoIns.emplace(instanceName, moduleName);
+  }
   if(moduleName == "expand_key_128" && instanceName == "a10")
     toCout("Find it!");
 

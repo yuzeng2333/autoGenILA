@@ -2,6 +2,7 @@
 #include "parse_fill.h"
 #include "check_regs.h"
 #include "global_data_struct.h"
+#include "helper.h"
 #define toStr(a) std::to_string(a)
 #define toCout(a) std::cout << a << std::endl
 
@@ -27,10 +28,20 @@ void get_all_update() {
   auto topModuleInfo = g_moduleInfoMap[g_topModule];
   std::set<std::string> workSet;  
   for(std::string out: topModuleInfo->moduleOutputs) {
+    if(is_fifo_output(out)) continue;
     workSet.insert(out);
   }
   while(std::getline(addedWorkSetInFile, line)) {
     workSet.insert(line);  
+  }
+  // insert regs in fifos
+  for(auto pair: g_fifoIns) {
+    std::string insName = pair.first;
+    std::string modName = pair.second;
+    assert(g_fifo.find(modName) != g_fifo.end());
+    uint32_t bound = g_fifo[modName];
+    for(uint32_t i = 0; i < bound; i++)
+      workSet.insert(insName+".r"+toStr(i));
   }
   addedWorkSetInFile.close();
   std::ofstream addedWorkSetFile;
@@ -51,7 +62,25 @@ void get_all_update() {
        || g_skippedOutput.find(target) != g_skippedOutput.end())
       continue;
     DestInfo destInfo;
-    destInfo.set_dest_and_slice(target);
+    if(target.find(".") == std::string::npos)
+      destInfo.set_dest_and_slice(target);
+    else {
+      auto pair = split_module_asv(target);
+      std::string prefix = pair.first;
+      std::string var = pair.second;
+      if(g_moduleInfoMap.find(prefix) != g_moduleInfoMap.end()) {
+        destInfo.set_module_name(prefix);
+        destInfo.set_dest_and_slice(var);
+      }
+      else {
+        assert(topModuleInfo->ins2modMap.find(prefix) 
+               != topModuleInfo->ins2modMap.end());
+        std::string modName = topModuleInfo->ins2modMap[prefix];
+        destInfo.set_module_name(modName);
+        destInfo.set_instance_name(prefix);
+        destInfo.set_dest_and_slice(var);
+      }
+    }
     destInfo.isVector = false;
  
     uint32_t instrIdx = 0;

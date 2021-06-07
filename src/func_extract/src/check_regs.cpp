@@ -137,8 +137,10 @@ void print_llvm_ir(DestInfo &destInfo,
   // FIXME: change the following model name
   std::string destName = destInfo.get_dest_name();
   std::string curModName = destInfo.get_mod_name();
+  std::string curInsName = destInfo.get_ins_name();
   auto curMod = g_moduleInfoMap[curModName];
-  Context_t insCntxt(curModName, "", curMod, nullptr, nullptr);  
+  std::string insName = curInsName.empty() ? curModName : curInsName;
+  Context_t insCntxt(insName, "", curMod, nullptr, nullptr);  
   g_insContextStk.clear();
   clean_all_mod_dynamic_info();
   g_cct_cnt = 0; 
@@ -1194,6 +1196,15 @@ std::string DestInfo::get_mod_name() {
 }
 
 
+std::string DestInfo::get_ins_name() {
+  if(insName.empty()) {
+    toCout("Warning: insName is not set");
+    return "";
+  }
+  return insName;
+}
+
+
 void DestInfo::set_dest_and_slice(std::string var) {
   destAndSlice = var;
 }
@@ -1201,6 +1212,11 @@ void DestInfo::set_dest_and_slice(std::string var) {
 
 void DestInfo::set_module_name(std::string var) {
   modName = var;
+}
+
+
+void DestInfo::set_instance_name(std::string var) {
+  insName = var;
 }
 
 

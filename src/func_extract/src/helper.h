@@ -296,6 +296,11 @@ void initialize_min_delay(std::shared_ptr<ModuleInfo_t> &modInfo,
                           std::string outPort);
 
 std::string get_rst_value(const std::string &dest, uint32_t timeIdx);
+
+bool is_fifo_output(std::string wire);
+
+bool is_fifo_module(std::string modName);
+
 } // end of namespace funcExtract
 
 

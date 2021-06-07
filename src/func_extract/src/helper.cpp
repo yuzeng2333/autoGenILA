@@ -1414,6 +1414,28 @@ void ModuleInfo_t::clean_ir_data() {
 }
 
 
+bool is_fifo_output(std::string wire) {
+  auto topMod = g_moduleInfoMap[g_topModule];
+  if(topMod->wire2InsPortMp.find(wire) == topMod->wire2InsPortMp.end())
+    return false;
+  auto pair = topMod->wire2InsPortMp[wire];
+  std::string insName = pair.first;
+  std::string port = pair.second;
+  std::string modName = topMod->ins2modMap[insName];
+  if(is_fifo_module(modName) 
+    && is_output(port, g_moduleInfoMap[modName]))
+    return true;
+  else return false;
+}
+
+
+bool is_fifo_module(std::string modName) {
+  if(g_fifo.find(modName) != g_fifo.end()) return true;
+  if(modName.find("\\$paramod\\mem_fifo\\WIDTH=") != std::string::npos)
+    return true;
+  return false;
+}
+
 //std::shared_ptr<ModuleInfo_t> 
 //get_mem_module(const std::string &memPathName) {
 //  remove_two_end_space(memPathName);
