@@ -163,8 +163,8 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx,
   if(dest == "state_in" && timeIdx == 2 ) {
     toCoutVerb("Find it!");
   }
-  if(dest == "in")
-    toCoutVerb("Find in!");
+  if(dest == "resetn" && timeIdx == 3)
+    toCoutVerb("Find it!");
   toCoutVerb("See input:"+timed_name(dest, timeIdx));
   std::string destTimed = timed_name(dest, timeIdx);
 
@@ -256,7 +256,7 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx,
 
   // the module is top module
   // if input instruction should be given to the input ports
-  if(timeIdx + g_instr_len >= bound+1) { // input signal is explicitly given
+  if(timeIdx + g_currInstrInfo.instrLen >= bound+1) { // input signal is explicitly given
     if(!is_sub_module() 
        && g_currInstrInfo.instrEncoding.find(dest) 
           == g_currInstrInfo.instrEncoding.end()) {

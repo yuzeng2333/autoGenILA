@@ -193,7 +193,6 @@ extern std::string g_mem2acclData;
 extern std::string g_accl2memAddr;
 extern std::string g_accl2memData;
 extern std::string g_currentModuleName;
-extern uint32_t g_instr_len;
 extern uint32_t g_cct_cnt;
 extern uint32_t g_ext_cnt;
 extern std::string DELIM;

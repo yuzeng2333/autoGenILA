@@ -22,7 +22,6 @@ std::set<std::string> g_blackBoxModSet;
 StrSet_t moduleAs;
 std::set<std::string> g_mem;
 uint32_t g_new_var;
-uint32_t g_instr_len;
 //std::unordered_map<std::string, astNode*> g_asSliceRoot;
 std::map<std::string, astNode*> g_varNode;
 // each element is a map from input signal to its value
@@ -201,7 +200,6 @@ void parse_verilog(std::string fileName) {
 void read_in_instructions(std::string fileName) {
   toCout("### Begin read in instr info");
   g_instrInfo.clear();
-  g_instr_len = 0;
   std::ifstream input(fileName);
   if(!input.is_open()) {
     toCout("Error: cannot open file: "+fileName);
@@ -250,6 +248,7 @@ void read_in_instructions(std::string fileName) {
       }
       state = FirstSignal;
       firstSignalSeen = false;
+      firstWord = true;
     }
     else if(line.front() == '(') { // (n) is used to express instr word in cycle n
       if(!is_number(line.substr(1, line.length()-2))) {
@@ -283,7 +282,6 @@ void read_in_instructions(std::string fileName) {
       switch(state) {
         case FirstSignal:
           {
-            g_instr_len++;
             if(firstSignalSeen)
               firstWord = false;
             auto pos = line.find("=");
@@ -298,12 +296,14 @@ void read_in_instructions(std::string fileName) {
                                         std::set<std::string>{}, 
                                         std::set<std::pair<uint32_t, std::string>>{}, 
                                         std::set<std::string>{},
-                                        std::vector<std::string>{}, 0};
+                                        std::vector<std::string>{}, 0, 0, 1};
               //info.instrEncoding.emplace(signalName, encoding);
               g_instrInfo.push_back(info);
             }
-            else
+            else {
               g_instrInfo.back().instrEncoding[signalName].push_back(encoding);
+              g_instrInfo.back().instrLen++;
+            }
             state = OtherSignal;
             firstSignalSeen = true;
           }
