@@ -163,6 +163,7 @@ extern bool g_use_concat_extract_func;
 extern bool g_use_simple_func_name;
 extern std::vector<std::pair<std::string, uint32_t>> g_regWidth;
 extern std::set<std::string> g_readASV;
+extern std::map<std::string, uint32_t> g_fifo;
 extern std::map<std::string, uint32_t> g_allRegs;
 extern std::set<std::string> g_regWithFunc;
 extern std::set<std::string> g_skippedOutput;

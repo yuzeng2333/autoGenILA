@@ -21,6 +21,7 @@ std::map<std::string, std::set<std::string>> g_invarRegs;
 std::set<std::string> g_blackBoxModSet;
 StrSet_t moduleAs;
 std::set<std::string> g_mem;
+std::map<std::string, uint32_t> g_fifo;
 uint32_t g_new_var;
 //std::unordered_map<std::string, astNode*> g_asSliceRoot;
 std::map<std::string, astNode*> g_varNode;
@@ -209,7 +210,8 @@ void read_in_instructions(std::string fileName) {
   std::smatch m;
   std::regex pIdx("^#\\d+:$");
   enum State {FirstSignal, OtherSignal, WriteASV, ReadASV, 
-              ReadNOP, ReadMEM, ResetVal, InvarRegs, TopMod, DelayBound};
+              ReadNOP, ReadMEM, ResetVal, InvarRegs, TopMod, 
+              DelayBound, ReadFIFO};
   enum State state;
   bool firstWord = true;
   bool firstSignalSeen = false;
@@ -277,6 +279,9 @@ void read_in_instructions(std::string fileName) {
     }
     else if(line == "$MEM:") {
       state = ReadMEM;
+    }
+    else if(line == "$FIFO:") {
+      state = ReadFIFO;
     }
     else { // still the old instruction
       switch(state) {
@@ -383,6 +388,15 @@ void read_in_instructions(std::string fileName) {
           {
             remove_two_end_space(line);
             g_mem.insert(line);
+          }
+          break;
+        case ReadFIFO:
+          {
+            remove_two_end_space(line);
+            uint32_t colonPos = line.find(":");
+            std::string fifoName = line.substr(0, colonPos);
+            std::string bound = line.substr(colonPos+1);
+            g_fifo.emplace(fifoName, std::stoi(bound));
           }
           break;
         case ReadNOP:

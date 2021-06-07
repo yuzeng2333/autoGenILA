@@ -1072,7 +1072,7 @@ void collect_regs(std::shared_ptr<ModuleInfo_t> &curMod,
                   std::string regPrefix, 
                   RegWidthVec_t &regWidth ) {
   std::string modName = curMod->name;
-  toCout("Collecting regs for: "+modName);
+  toCoutVerb("Collecting regs for: "+modName);
   collect_regs_iter(curMod, regPrefix, regWidth);
 }
 
