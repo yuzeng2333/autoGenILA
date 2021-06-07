@@ -274,18 +274,19 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx,
     uint32_t localWidth = get_var_slice_width_simp(dest);
     if(localVal != "x" && localVal != "DIRTY") {
       if(is_number(localVal)) {
-        toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%B Give "+localVal+" to "+timed_name(dest, timeIdx));
+        toCoutVerb("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%B Give "+localVal+" to "+timed_name(dest, timeIdx));
         g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
         return llvmInt(hdb2int(localVal), localWidth, c);
       }
       else if(localVal.find("+") != std::string::npos) {
         /// if the value is a combination of x and numbers
-        toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%B Give "+localVal+" to "+timed_name(dest, timeIdx));
+        toCoutVerb("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%B Give "+localVal+" to "+timed_name(dest, timeIdx));
         g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
         return mixed_value_expr(localVal, c, dest, timeIdx, localWidth-1, b);
       }
       else {
         toCout("Error: unexpected input value: "+localVal);
+        abort();
       }
     }
     /// FIXME: not sure if this is the best way
@@ -300,7 +301,7 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx,
       uint32_t localWidth = get_var_slice_width_simp(dest);
       if(localVal != "x") {
         assert(is_number(localVal));
-        toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give "+localVal+" to "+timed_name(dest, timeIdx));
+        toCoutVerb("%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give "+localVal+" to "+timed_name(dest, timeIdx));
         g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
         return llvmInt(hdb2int(localVal), localWidth, c);
       }
@@ -317,17 +318,19 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx,
     uint32_t localWidth = get_var_slice_width_simp(dest);
     if(localVal != "x") {
       if(is_number(localVal)) {
-        toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give "+localVal+" to "+timed_name(dest, timeIdx));
+        toCoutVerb("%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give "+localVal+" to "+timed_name(dest, timeIdx));
         g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
         return llvmInt(hdb2int(localVal), localWidth, c);
       }
       else if(localVal.find("+") != std::string::npos){
-        toCout("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%B Give "+localVal+" to "+timed_name(dest, timeIdx));
+        toCoutVerb("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%B Give "+localVal+" to "+timed_name(dest, timeIdx));
         g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
         return mixed_value_expr(localVal, c, dest, timeIdx, localWidth-1, b);
       }
-      else
-        toCout("Error: unexpected input value: "+localVal);          
+      else {
+        toCout("Error: unexpected input value : "+localVal);
+        abort();
+      }
     }
     else {
       toCout("Warning: NOP instruction has x value: "+dest);
@@ -1330,6 +1333,7 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
       // TODO: change bound to bound
       (subFunc->args().begin()+idx++)->setName(it->first+DELIM+toStr(bound));
     }
+    toCoutVerb("************* set arg name, reg-type arg number: "+toStr(idx-1));
 
     for(auto it = subModMemInstances.begin(); it != subModMemInstances.end(); it++) {
       std::string pathInsName = it->first;
@@ -1341,6 +1345,7 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
         (subFunc->args().begin()+idx++)->setName(portName);
       }
     }
+    toCoutVerb("************* set arg name, mem-type arg number: "+toStr(idx-1));    
 
     for(uint32_t i = 0; i <= bound; i++) {
       for(auto it = subMod->moduleInputs.begin(); 
@@ -1350,6 +1355,7 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
         (subFunc->args().begin()+idx++)->setName(*it+DELIM+toStr(i));
       }
     }
+    toCoutVerb("************* set arg name, input-type arg number: "+toStr(idx-1));    
 
     // make bb for the function
     llvm::BasicBlock *localBB 
@@ -1401,6 +1407,8 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
     auto arg = get_arg(prefix+insName+"."+regName+DELIM+toStr(bound), curFunc);
     args.push_back(arg);
   }
+  toCoutVerb("************* finish push reg, arg number: "+toStr(args.size()));
+
 
   // push output ports of memory modules
   for(auto it = subModMemInstances.begin(); it != subModMemInstances.end(); it++) {
@@ -1412,6 +1420,7 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
       args.push_back(arg);
     }
   }
+  toCoutVerb("************* finish push mem-output, arg number: "+toStr(args.size()));
 
   uint32_t i;
   // push func input args
@@ -1465,6 +1474,7 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
       args.push_back(llvmInt(0, width, c));
     }
   }
+  toCoutVerb("************* finish push input, arg number: "+toStr(args.size()));
 
   toCout("--- To call function for: "+destAndSlice);
   std::string destTimed = timed_name(destAndSlice, timeIdx);

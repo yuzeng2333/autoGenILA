@@ -1396,7 +1396,7 @@ std::string get_rst_value(const std::string &dest, uint32_t timeIdx) {
      || dest == "latched_stalu" )
     rstVal = toStr(width)+"'b0";
 
-  toCout("Replace "+timed_name(dest, timeIdx)+" with "+rstVal);
+  toCoutVerb("Replace "+timed_name(dest, timeIdx)+" with "+rstVal);
   g_outFile << "Replace "+timed_name(dest, timeIdx)+" with "+rstVal << std::endl;
   g_regValueFile << "Replace "+timed_name(dest, timeIdx)+" with "+rstVal << std::endl;
   if(dest == "buff1" && timeIdx == 15)

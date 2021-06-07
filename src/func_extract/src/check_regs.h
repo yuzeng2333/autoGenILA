@@ -117,6 +117,8 @@ void clean_module_inputs();
 void print_reg_info();
 
 void print_mem_info(std::vector<std::string> &mems);
+
+void clean_all_mod_dynamic_info();
 } // end of namespace funcExtract
 
 #endif

@@ -140,7 +140,7 @@ void print_llvm_ir(DestInfo &destInfo,
   auto curMod = g_moduleInfoMap[curModName];
   Context_t insCntxt(curModName, "", curMod, nullptr, nullptr);  
   g_insContextStk.clear();
-  curMod->clean_ir_data();
+  clean_all_mod_dynamic_info();
   g_cct_cnt = 0; 
   g_ext_cnt = 0;
   if(curModName == g_topModule) {
@@ -1208,5 +1208,11 @@ void DestInfo::set_dest_vec(const std::vector<std::string> &vec) {
   destVec = vec;
 }
 
+
+void clean_all_mod_dynamic_info() {
+  for(auto pair : g_moduleInfoMap) {
+    pair.second->clean_ir_data();
+  }
+}
 
 } // end of namespace funcExtract
