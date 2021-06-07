@@ -36,28 +36,30 @@ void get_all_update() {
   std::ofstream addedWorkSetFile;
   addedWorkSetFile.open(g_path+"/added_work_set.txt", std::ios_base::app);
 
-  uint32_t instrIdx = 1;
-  for(auto instrInfo : g_instrInfo) {
-    g_currInstrInfo = instrInfo;
-    toCout("---  BEGIN INSTRUCTION #"+toStr(instrIdx)+" ---");
-    uint32_t delayBound = instrInfo.delayBound;
 
-    // declaration for llvm
-    TheContext = std::make_unique<llvm::LLVMContext>();
-    while(!workSet.empty()) {
-      auto targetIt = workSet.begin();
-      std::string target = *targetIt;
-      toCout("---  BEGIN Target: "+target+" ---");
-      if(target.find("puregs[2]") != std::string::npos)
-        toCoutVerb("Find it!");
-      //else continue;
-      workSet.erase(targetIt);
-      if(visitedTgt.find(target) != visitedTgt.end()
-         || g_skippedOutput.find(target) != g_skippedOutput.end())
-        continue;
-      DestInfo destInfo;
-      destInfo.set_dest_and_slice(target);
-      destInfo.isVector = false;
+  // declaration for llvm
+  TheContext = std::make_unique<llvm::LLVMContext>();
+  while(!workSet.empty()) {
+    auto targetIt = workSet.begin();
+    std::string target = *targetIt;
+    toCout("---  BEGIN Target: "+target+" ---");
+    if(target.find("puregs[2]") != std::string::npos)
+      toCoutVerb("Find it!");
+    //else continue;
+    workSet.erase(targetIt);
+    if(visitedTgt.find(target) != visitedTgt.end()
+       || g_skippedOutput.find(target) != g_skippedOutput.end())
+      continue;
+    DestInfo destInfo;
+    destInfo.set_dest_and_slice(target);
+    destInfo.isVector = false;
+ 
+    uint32_t instrIdx = 1; 
+    for(auto instrInfo : g_instrInfo) {
+      g_currInstrInfo = instrInfo;
+      toCout("---  BEGIN INSTRUCTION #"+toStr(instrIdx)+" ---");
+      uint32_t delayBound = instrInfo.delayBound;
+
       print_llvm_ir(destInfo, delayBound, instrIdx++);
       std::string clean("opt --instsimplify --deadargelim --instsimplify tmp.ll -S -o=clean.ll");
       std::string opto3("opt -O3 clean.ll -S -o=tmp.o3.ll; opt -passes=deadargelim tmp.o3.ll -S -o=clean.o3.ll; rm tmp.o3.ll");
@@ -66,7 +68,7 @@ void get_all_update() {
       std::set<std::string> argVec;
       read_clean_o3("./clean.o3.ll", argVec);
       if(argVec.size() > 0) {
-        system(("cp clean.o3.ll "+g_path+"/update_"+target+".ll").c_str());
+        system(("cp clean.o3.ll "+g_path+"/update"+toStr(instrIdx)+"_"+target+".ll").c_str());
         if(dependVarMap.find(target) == dependVarMap.end())
           dependVarMap.emplace(target, argVec);
         else {
@@ -78,9 +80,9 @@ void get_all_update() {
         workSet.insert(reg);
         addedWorkSetFile << reg << std::endl;
       }
-      visitedTgt.insert(target);
-      visitedTgtFile << target << std::endl;
     }
+    visitedTgt.insert(target);
+    visitedTgtFile << target << std::endl;
   }
   visitedTgtFile.close();
   addedWorkSetFile.close();

@@ -209,6 +209,7 @@ void read_in_instructions(std::string fileName) {
   }
   std::string line;
   std::smatch m;
+  std::regex pIdx("^#\\d+:$");
   enum State {FirstSignal, OtherSignal, WriteASV, ReadASV, 
               ReadNOP, ReadMEM, ResetVal, InvarRegs, TopMod, DelayBound};
   enum State state;
@@ -241,6 +242,8 @@ void read_in_instructions(std::string fileName) {
     if(line.back() == ' ')
       line.pop_back();
     if(line.front() == '#') { // a new instr begins
+      std::smatch m;
+      assert(std::regex_match(line, m, pIdx));
       if(!is_number(line.substr(1, line.length()-2))) {
         toCout("Error: parse instr.txt failed! # is not followed by intruction ID: "+line);
         abort();
