@@ -77,7 +77,7 @@ class ModuleInfo_t {
   std::string rst;
 
   uint32_t rootTimeIdx;
-  std::vector<std::shared_ptr<ModuleInfo_t>> parentModVec;
+  std::set<std::shared_ptr<ModuleInfo_t>> parentModVec;
   StrSet_t moduleAs;
   bool isFunctionedSubMod = true;
   std::set<std::string> invarRegs;

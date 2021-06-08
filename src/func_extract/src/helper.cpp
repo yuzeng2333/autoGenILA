@@ -705,7 +705,7 @@ StrPair_t split_module_asv(const std::string &writeAsvLine) {
     return std::make_pair(g_topModule, writeAsvLine);
   
   uint32_t dotPos = writeAsvLine.find(".");
-  if(writeAsvLine.find(".", dotPos) != std::string::npos) {
+  if(writeAsvLine.find(".", dotPos+1) != std::string::npos) {
     toCout("Error: unexpected extra dot for write ASV's name: "+writeAsvLine);
     abort();
   }
@@ -1297,7 +1297,7 @@ std::shared_ptr<ModuleInfo_t> get_real_parentMod() {
     if(curMod->name == g_topModule) return nullptr;
     else {
       assert(curMod->parentModVec.size() == 1);
-      return curMod->parentModVec.front();
+      return *(curMod->parentModVec.begin());
     }
   }
 }

@@ -156,10 +156,15 @@ void print_llvm_ir(DestInfo &destInfo,
     // and their isFunctionedSubMod is set to false
     // Need to fill target and func in the stack later
     while(curMod->name != g_topModule) {
-      assert(curMod->parentModVec.size() == 1);
+      if(curMod->parentModVec.size() > 1) {
+        toCout("Error: module: "+curMod->name+" has multiple parents:");
+        for(auto parentMod: curMod->parentModVec)
+          toCout(parentMod->name);
+      }
       curMod->isFunctionedSubMod = false;
-      auto parentMod = curMod->parentModVec.front();
-      std::string insName = ask_parent_my_ins_name(curMod->name, parentMod);
+      auto parentMod = *(curMod->parentModVec.begin());
+      if(insName.empty())
+        insName = ask_parent_my_ins_name(curMod->name, parentMod);
       Context_t insCntxt(insName, "", curMod, parentMod, nullptr);  
       g_insContextStk.insert(g_insContextStk.begin(), insCntxt);
       curMod = parentMod;
@@ -701,7 +706,7 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
   std::string varAndSlice = node->dest;
   auto curMod = get_curMod();
   toCoutVerb("add_constraint for: "+varAndSlice+", timeIdx: "+toStr(timeIdx));
-  if(varAndSlice == "mem_addr") {
+  if(varAndSlice == "r0" && timeIdx == 8) {
     toCoutVerb("find it");
   }
 
@@ -836,8 +841,19 @@ llvm::Value* add_nb_constraint(astNode* const node,
       return get_arg(timed_name(dest, timeIdx), curFunc);
     }
     else {
-      if(g_invarRegs[modName].find(dest) == g_invarRegs[modName].end())
-        return get_arg(timed_name(dest, timeIdx), curFunc);
+      if(g_invarRegs[modName].find(dest) == g_invarRegs[modName].end()) {
+        if(is_top_module())
+          return get_arg(timed_name(dest, timeIdx), curFunc);
+        else {
+          if(curMod->isFunctionedSubMod)
+            return get_arg(timed_name(dest, timeIdx), curFunc);
+          else {
+            std::string prefix = get_hier_name(false);
+            dest = prefix + "." + dest;
+            return get_arg(timed_name(dest, timeIdx), curFunc);
+          }
+        }
+      }
       else {
         // if is invariant register, then return its norm value, which is
         // stored in g_rstVal

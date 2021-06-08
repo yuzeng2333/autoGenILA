@@ -104,7 +104,7 @@ void build_ast_tree() {
       while(curMod->name != g_topModule) {
         assert(curMod->parentModVec.size() == 1);
         curMod->isFunctionedSubMod = false;
-        auto parentMod = curMod->parentModVec.front();
+        auto parentMod = *(curMod->parentModVec.begin());
         std::string insName = ask_parent_my_ins_name(curMod->name, parentMod);
         Context_t insCntxt(insName, "", curMod, parentMod, nullptr);  
         g_insContextStk.insert(g_insContextStk.begin(), insCntxt);
@@ -434,7 +434,7 @@ void add_input_node(std::string input, uint32_t timeIdx, astNode* const node) {
       parentMod = get_parentMod();
     else {
       assert(curMod->parentModVec.size() == 1);
-      parentMod = curMod->parentModVec.front();
+      parentMod = *(curMod->parentModVec.begin());
     }
     auto insCntxt = g_insContextStk.back();
     g_insContextStk.pop_back();    
