@@ -56,7 +56,6 @@ void build_ast_tree() {
   auto curMod = g_moduleInfoMap[g_topModule];
   curMod->clk = g_recentClk;
   curMod->rst = g_recentRst;
-  Context_t insCntxt(g_topModule, "", curMod, nullptr, nullptr);
   g_topModInfo = curMod;
   //assert(!g_instrInfo.back().skipWriteASV.empty());
   set_clk_rst(g_topModInfo);
@@ -64,22 +63,51 @@ void build_ast_tree() {
   std::set<std::string>::iterator beginIt;
   std::set<std::string>::iterator endIt;
   if(!g_get_all_update) {
-    beginIt = g_instrInfo.back().skipWriteASV.begin();
-    endIt = g_instrInfo.back().skipWriteASV.end();
+    beginIt = g_instrInfo.front().skipWriteASV.begin();
+    endIt = g_instrInfo.front().skipWriteASV.end();
   }
   else {
     beginIt = g_moduleInfoMap[g_topModule]->moduleOutputs.begin();
     endIt = g_moduleInfoMap[g_topModule]->moduleOutputs.end();
   }
+
+  std::string curModName;
+  std::string curInsName;
+  std::string reg;
   for(auto it = beginIt; it != endIt; it++) {
-  //for(std::string reg: g_instrInfo.back().skipWriteASV) {
-    std::string reg = *it;
+
+    // prepare context info
+    std::string writeASV = *it;
+    auto prefixVarPair = split_prefix_var(writeASV);
+    std::string prefix = prefixVarPair.first;
+    std::string writeVar = prefixVarPair.second; 
+    if(prefix.empty()) {
+      reg = writeVar;
+      curModName = g_topModule;
+      curInsName = g_topModule;
+    }
+    else if(g_moduleInfoMap.find(prefix) != g_moduleInfoMap.end()) {
+      reg = writeVar;
+      curModName = prefix;
+      curInsName = prefix;
+    }
+    else {
+      curInsName = prefix;
+      curMod = get_mod_info(prefix, g_moduleInfoMap[g_topModule]);
+      curModName = curMod->name;
+      reg = writeVar;
+    }
+    
+    curMod = g_moduleInfoMap[curModName];
+    Context_t insCntxt(curInsName, "", curMod, nullptr, nullptr);
+
     if(g_get_all_update 
         && g_skippedOutput.find(reg) != g_skippedOutput.end()) continue;
     g_insContextStk.clear();
     g_insContextStk.push_back(insCntxt);
-    std::string modName = get_mod_name(reg);
-    if(modName.empty()) {
+    //std::string modName = get_mod_name(reg);
+
+    if(prefix.empty()) {
       if(curMod->reg2Slices.find(reg) == curMod->reg2Slices.end()) {
         g_insContextStk.back().Target = reg;
         build_tree_for_single_as(reg);
@@ -94,10 +122,6 @@ void build_ast_tree() {
     else { // if the reg is in sub module
       // IMPORTANT: if starts from a submodule, then target name is
       // prefix+varName
-      auto pair = split_prefix_var(reg);
-      std::string regName = pair.second;
-      check_mod_name(modName);
-      curMod = g_moduleInfoMap[modName];
       // FIXME: currently I do not push its parent module, because
       // it seems that is not necessary. All other code can work properly
       g_insContextStk.clear();
@@ -114,16 +138,16 @@ void build_ast_tree() {
       curMod->isFunctionedSubMod = true;
       g_insContextStk.insert(g_insContextStk.begin(), insCntxt); 
       std::string destPrefix = get_hier_name(false);
-      std::string destName = destPrefix + "." + regName;
+      std::string destName = destPrefix + "." + reg;
       for(auto it = g_insContextStk.begin();
         it != g_insContextStk.end(); it++) {
         it->Target = destName;
       }
-      if(curMod->reg2Slices.find(regName) == curMod->reg2Slices.end()) {
-        build_tree_for_single_as(regName);
+      if(curMod->reg2Slices.find(reg) == curMod->reg2Slices.end()) {
+        build_tree_for_single_as(reg);
       }
       else { // if different slices are assigned differently
-        for(std::string regAndSlice: curMod->reg2Slices[regName]) {
+        for(std::string regAndSlice: curMod->reg2Slices[reg]) {
           build_tree_for_single_as(regAndSlice);
         }
       }

@@ -1203,11 +1203,13 @@ std::vector<std::string> print_map_keys(std::map<std::string, astNode*> &map) {
 
 
 std::string ask_for_my_ins_name() {
+  std::string insName = get_insName();
+  if(!insName.empty()) return insName;
   const auto curMod = get_curMod();
   std::string myModName = curMod->name;
   if(get_parentMod() == nullptr) return myModName;
   auto parentMod = get_parentMod();
-  std::string insName = ask_parent_my_ins_name(myModName, parentMod);
+  insName = ask_parent_my_ins_name(myModName, parentMod);
   return insName;
 }
 
