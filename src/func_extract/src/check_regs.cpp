@@ -117,6 +117,9 @@ void check_all_regs() {
       print_llvm_ir(destInfo, cycleCnt, i-1);
       g_maxDelay = cycleCnt;    
     }
+
+    // if g_get_all_update=true, only do the first instruction
+    if(g_get_all_update) break;
   }
 }
 
