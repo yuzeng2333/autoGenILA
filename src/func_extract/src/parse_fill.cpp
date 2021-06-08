@@ -248,10 +248,6 @@ void read_in_instructions(std::string fileName) {
       std::smatch m;
       assert(std::regex_match(line, m, pIdx));
       g_instrName = m.str(1); 
-      if(!is_number(line.substr(1, line.length()-2))) {
-        toCout("Error: parse instr.txt failed! # is not followed by intruction ID: "+line);
-        abort();
-      }
       state = FirstSignal;
       firstSignalSeen = false;
       firstWord = true;

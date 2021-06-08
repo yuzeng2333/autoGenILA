@@ -94,7 +94,7 @@ void build_ast_tree() {
     else { // if the reg is in sub module
       // IMPORTANT: if starts from a submodule, then target name is
       // prefix+varName
-      auto pair = split_mod_var(reg);
+      auto pair = split_prefix_var(reg);
       std::string regName = pair.second;
       check_mod_name(modName);
       curMod = g_moduleInfoMap[modName];

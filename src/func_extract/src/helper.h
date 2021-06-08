@@ -241,7 +241,8 @@ bool is_reg_in_curMod(std::string var);
 
 bool is_submod_output(const std::string &var);
 
-std::shared_ptr<ModuleInfo_t> get_mod_info(std::string insName);
+std::shared_ptr<ModuleInfo_t> get_mod_info(std::string insName,
+                                           std::shared_ptr<ModuleInfo_t> curMod=get_curMod());
 
 std::string get_hier_name(bool includeTopModule=true);
 
@@ -272,7 +273,7 @@ std::string get_mod_name(std::string name);
 
 std::string get_var_name(std::string name);
 
-std::pair<std::string, std::string> split_mod_var(std::string var);
+std::pair<std::string, std::string> split_prefix_var(std::string var);
 
 //template <typename T>
 std::vector<std::string> print_map_keys(std::map<std::string, astNode*> &map);

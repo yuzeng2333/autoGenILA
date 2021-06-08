@@ -87,17 +87,23 @@ void check_all_regs() {
     for(auto pair: instrInfo.writeASV) {
       uint32_t cycleCnt = pair.first;
       std::string oneWriteAsv = pair.second;
-      auto modVarPair = split_mod_var(oneWriteAsv);
-      std::string modName = modVarPair.first;
-      std::string writeVar = modVarPair.second; 
+      auto prefixVarPair = split_prefix_var(oneWriteAsv);
+      std::string prefix = prefixVarPair.first;
+      std::string writeVar = prefixVarPair.second; 
       destInfo.isVector = false;
-      if(!modName.empty()) {
+      if(prefix.empty()) {
         destInfo.set_dest_and_slice(writeVar);
-        destInfo.set_module_name(modName);
+        destInfo.set_module_name(g_topModule);
+      }
+      else if(g_moduleInfoMap.find(prefix) != g_moduleInfoMap.end()) {
+        destInfo.set_dest_and_slice(writeVar);
+        destInfo.set_module_name(prefix);
       }
       else {
-        destInfo.set_dest_and_slice(oneWriteAsv);
-        destInfo.set_module_name(g_topModule);
+        destInfo.set_instance_name(prefix);
+        auto subMod = get_mod_info(prefix, g_moduleInfoMap[g_topModule]);
+        destInfo.set_dest_and_slice(writeVar);
+        destInfo.set_module_name(subMod->name);
       }
       print_llvm_ir(destInfo, cycleCnt, i-1);
       //print_llvm_ir_without_submodules(oneWriteAsv, cycleCnt-1, i-1);
@@ -324,6 +330,8 @@ void print_llvm_ir(DestInfo &destInfo,
     // if destName is a vector, return an array
     std::vector<llvm::Value*> retVec;
     std::string modName = destInfo.get_mod_name();
+    std::string insName = destInfo.get_ins_name();
+    if(insName.empty()) insName = modName;
     check_mod_name(modName);
     llvm::Value* destNextExpr;
     //FIXME: currently do not support vector in submodules
@@ -333,8 +341,10 @@ void print_llvm_ir(DestInfo &destInfo,
         toCoutVerb("Find it!");
       curMod = g_moduleInfoMap[modName];
 
+      toCout("Error: re-think and check the g_insContextStk");
+      abort();
       g_insContextStk.clear();
-      Context_t insCntxt(modName, dest, curMod, nullptr, TheFunction);
+      Context_t insCntxt(insName, dest, curMod, nullptr, TheFunction);
       g_insContextStk.push_back(insCntxt);
       if(curMod->visitedNode.find(dest) == curMod->visitedNode.end()
           && curMod->reg2Slices.find(dest) == curMod->reg2Slices.end()) {

@@ -1031,8 +1031,12 @@ bool is_submod_output(const std::string &var) {
 }
 
 
-std::shared_ptr<ModuleInfo_t> get_mod_info(std::string insName) {
-  auto curMod = get_curMod();
+std::shared_ptr<ModuleInfo_t> get_mod_info(std::string insName, 
+                                           std::shared_ptr<ModuleInfo_t> curMod) {
+  if(curMod->ins2modMap.find(insName) == curMod->ins2modMap.end()) {
+    toCout("Error: cannot find submod instance: "+insName+" for module: "+curMod->name);
+    abort();
+  }
   std::string modName = curMod->ins2modMap[insName];
   return g_moduleInfoMap[modName];
 }
@@ -1175,7 +1179,7 @@ std::string get_var_name(std::string name) {
 }
 
 
-std::pair<std::string, std::string> split_mod_var(std::string var) {
+std::pair<std::string, std::string> split_prefix_var(std::string var) {
   size_t pos = var.find(".");
   if(pos == std::string::npos) {
     return std::make_pair("", var);
@@ -1183,10 +1187,7 @@ std::pair<std::string, std::string> split_mod_var(std::string var) {
   else {
     std::string modName = var.substr(0, pos);
     std::string varName = var.substr(pos+1);
-    if(g_moduleInfoMap.find(modName) != g_moduleInfoMap.end())
-      return std::make_pair(modName, varName);
-    else
-      return std::make_pair("", var);
+    return std::make_pair(modName, varName);
   }
 }
 
