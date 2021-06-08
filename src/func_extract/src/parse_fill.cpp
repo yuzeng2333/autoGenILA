@@ -46,6 +46,7 @@ Str2StrVecMap_t g_moduleOutputsMap;
 std::string g_mem2acclData;
 std::string g_accl2memAddr;
 std::string g_accl2memData;
+std::string g_instrName;
 
 std::regex pSingleLine  (to_re("^(\\s*)assign (NAME) = (.*);$"));
 std::regex pNbLine      (to_re("^(\\s*)(NAME) <= (.*);$"));
@@ -210,7 +211,7 @@ void read_in_instructions(std::string fileName) {
   }
   std::string line;
   std::smatch m;
-  std::regex pIdx("^#\\d+:$");
+  std::regex pIdx("^#\\d+:([a-z0-9A-Z_]*)$");
   enum State {FirstSignal, OtherSignal, WriteASV, ReadASV, 
               ReadNOP, ReadMEM, ResetVal, InvarRegs, TopMod, 
               DelayBound, ReadFIFO};
@@ -246,6 +247,7 @@ void read_in_instructions(std::string fileName) {
     if(line.front() == '#') { // a new instr begins
       std::smatch m;
       assert(std::regex_match(line, m, pIdx));
+      g_instrName = m.str(1); 
       if(!is_number(line.substr(1, line.length()-2))) {
         toCout("Error: parse instr.txt failed! # is not followed by intruction ID: "+line);
         abort();
@@ -303,7 +305,7 @@ void read_in_instructions(std::string fileName) {
                                         std::set<std::string>{}, 
                                         std::set<std::pair<uint32_t, std::string>>{}, 
                                         std::set<std::string>{},
-                                        std::vector<std::string>{}, 0, 0, 1};
+                                        std::vector<std::string>{}, 0, 0, 1, g_instrName};
               //info.instrEncoding.emplace(signalName, encoding);
               g_instrInfo.push_back(info);
             }

@@ -238,8 +238,9 @@ void print_llvm_ir(DestInfo &destInfo,
     = llvm::Function::Create(FT, llvm::Function::ExternalLinkage, 
                              "top_function", TheModule.get());
 
-  TheFunction = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
-                                       "func_;_"+destName, TheModule.get());
+  TheFunction = llvm::Function::Create(
+    FT, llvm::Function::InternalLinkage, 
+    "func_;_"+g_currInstrInfo.name+"_"+destName, TheModule.get());
   TheFunction->addFnAttr(llvm::Attribute::NoInline);
   //g_curFunc = TheFunction;
 

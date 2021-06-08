@@ -30,6 +30,7 @@ struct InstrInfo_t {
   uint32_t writeASVVecDelay;
   uint32_t delayBound;
   uint32_t instrLen = 0;
+  std::string name;
 };
 
 
@@ -40,6 +41,7 @@ extern std::regex pNbLine;
 extern std::map<std::string, astNode*> g_varNode;
 extern StrSet_t moduleAs;
 extern std::set<std::string> g_mem;
+extern std::string g_instrName;
 
 
 void clear_global_vars();
