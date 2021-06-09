@@ -1,0 +1,541 @@
+
+// sw
+#12:sw
+(1)
+//mem_rdata = 7'hx+5'bx+5'bx+3'h2+5'bx+5'h8+2'b11
+mem_rdata = 7'h4+5'b1+5'h2+3'h2+5'b4+5'h8+2'b11
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(2)
+//mem_rdata = 7'hx+5'bx+5'bx+3'h2+5'bx+5'h8+2'b11
+mem_rdata = 7'h4+5'b1+5'h2+3'h2+5'b4+5'h8+2'b11
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(3)
+//mem_rdata = 7'hx+5'bx+5'bx+3'h2+5'bx+5'h8+2'b11
+mem_rdata = 7'h4+5'b1+5'h2+3'h2+5'b4+5'h8+2'b11
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+
+#delay:8
+
+W:
+picorv32.mem_wdata(skip) 8
+//picorv32.cpu_state(skip) 1
+//fifo_valid.r0(skip) 8
+//fifo_valid.r1(skip) 8
+//fifo_valid.r2(skip) 8
+
+
+
+// add
+#1:add
+(1)
+//mem_rdata = 7'b0+5'bx+5'bx+3'h0+5'bx+5'hc+2'h3
+mem_rdata = 7'b0+5'h2+5'h3+3'h0+5'b1+5'hc+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(2)
+//mem_rdata = 7'b0+5'bx+5'bx+3'h0+5'bx+5'hc+2'h3
+mem_rdata = 7'b0+5'h2+5'h3+3'h0+5'b1+5'hc+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(3)
+//mem_rdata = 7'b0+5'bx+5'bx+3'h0+5'bx+5'hc+2'h3
+mem_rdata = 7'b0+5'h2+5'h3+3'h0+5'b1+5'hc+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+
+#delay:8
+
+
+// beq
+#2:beq
+(1)
+// for brevity
+mem_rdata = 7'hx+5'hx+5'hx+3'h0+5'hx+5'h18+2'h3
+//mem_rdata = 7'hx+5'h1+5'h2+3'h0+5'hx+5'h18+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(2)
+mem_rdata = 7'hx+5'hx+5'hx+3'h0+5'hx+5'h18+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(3)
+mem_rdata = 7'hx+5'hx+5'hx+3'h0+5'hx+5'h18+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+
+#delay:7
+
+
+// jal
+#3:jal
+(1)
+mem_rdata = 20'bx+5'bx+5'h1b+2'h3
+//mem_rdata = 20'bx+5'b1+5'h1b+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(2)
+mem_rdata = 20'bx+5'bx+5'h1b+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(3)
+mem_rdata = 20'bx+5'bx+5'h1b+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+
+#delay: 4
+
+// lb
+#4:lb
+(1)
+//mem_rdata = 12'h2+5'h2+3'h0+5'h1+5'h0+2'h3
+mem_rdata = 12'hx+5'hx+3'hx+5'hx+5'h0+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(2)
+mem_rdata = 12'hx+5'hx+3'hx+5'hx+5'h0+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(3)
+mem_rdata = 12'hx+5'hx+3'hx+5'hx+5'h0+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+
+#delay:8
+
+
+// bne
+#5:bne
+(1)
+// for brevity
+mem_rdata = 7'hx+5'hx+5'hx+3'h1+5'hx+5'h18+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(2)
+mem_rdata = 7'hx+5'hx+5'hx+3'h1+5'hx+5'h18+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(3)
+mem_rdata = 7'hx+5'hx+5'hx+3'h1+5'hx+5'h18+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+
+#delay:8
+
+
+// blt
+#6:blt
+(1)
+// for brevity
+mem_rdata = 7'hx+5'hx+5'hx+3'h4+5'hx+5'h18+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(2)
+mem_rdata = 7'hx+5'hx+5'hx+3'h4+5'hx+5'h18+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(3)
+mem_rdata = 7'hx+5'hx+5'hx+3'h4+5'hx+5'h18+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+
+#delay:8
+
+
+// bge
+#7:bge
+(1)
+// for brevity
+mem_rdata = 7'hx+5'hx+5'hx+3'h5+5'hx+5'h18+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(2)
+mem_rdata = 7'hx+5'hx+5'hx+3'h5+5'hx+5'h18+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(3)
+mem_rdata = 7'hx+5'hx+5'hx+3'h5+5'hx+5'h18+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+
+#delay:8
+
+
+// bltu
+#8:bltu
+(1)
+// for brevity
+mem_rdata = 7'hx+5'hx+5'hx+3'h6+5'hx+5'h18+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(2)
+mem_rdata = 7'hx+5'hx+5'hx+3'h6+5'hx+5'h18+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(3)
+mem_rdata = 7'hx+5'hx+5'hx+3'h6+5'hx+5'h18+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+
+#delay:8
+
+
+// bgeu
+#9:bgeu
+(1)
+// for brevity
+mem_rdata = 7'hx+5'hx+5'hx+3'h7+5'hx+5'h18+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(2)
+mem_rdata = 7'hx+5'hx+5'hx+3'h7+5'hx+5'h18+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(3)
+mem_rdata = 7'hx+5'hx+5'hx+3'h7+5'hx+5'h18+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+
+#delay:8
+
+
+
+// jalr
+#10:jalr
+(1)
+mem_rdata = 20'bx+5'bx+5'h1b+2'h3
+//mem_rdata = 20'bx+5'b1+5'h1b+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(2)
+mem_rdata = 20'bx+5'bx+5'h1b+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(3)
+mem_rdata = 20'bx+5'bx+5'h1b+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+
+#delay: 4
+
+
+// sb
+#11:sb
+(1)
+//mem_rdata = 12'h2+5'h2+3'h0+5'h1+5'h0+2'h3
+mem_rdata = 7'hx+5'bx+5'bx+3'h0+5'bx+5'h8+2'b11
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(2)
+mem_rdata = 7'hx+5'bx+5'bx+3'h0+5'bx+5'h8+2'b11
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(3)
+mem_rdata = 7'hx+5'bx+5'bx+3'h0+5'bx+5'h8+2'b11
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+
+#delay:8
+
+
+// sw
+#12:sw
+(1)
+mem_rdata = 7'hx+5'bx+5'bx+3'h2+5'bx+5'h8+2'b11
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(2)
+mem_rdata = 7'hx+5'bx+5'bx+3'h2+5'bx+5'h8+2'b11
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(3)
+mem_rdata = 7'hx+5'bx+5'bx+3'h2+5'bx+5'h8+2'b11
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+
+#delay:8
+
+
+// universal information
+
+$FIFO:
+\$paramod\mem_fifo\WIDTH=1:2
+\$paramod\mem_fifo\WIDTH=32:2
+\$paramod\mem_fifo\WIDTH=4:2
+
+
+$TOP:
+top
+
+$INVAR:
+picorv32.pcpi_valid
+picorv32.decoder_pseudo_trigger
+picorv32.decoder_pseudo_trigger_q
+picorv32.decoder_trigger
+picorv32.eoi
+picorv32.latched_is_lh
+picorv32.latched_stalu
+picorv32.trap
+picorv32.compressed_instr
+picorv32.cpu_state
+picorv32.\cpuregs[0]
+picorv32.decoder_trigger_q
+picorv32.instr_add
+picorv32.instr_and
+picorv32.instr_beq
+picorv32.instr_bgeu
+picorv32.instr_blt
+picorv32.instr_bne
+picorv32.instr_ecall_ebreak
+picorv32.instr_jal
+picorv32.instr_jalr
+picorv32.instr_lb
+picorv32.instr_lbu
+picorv32.instr_lhu
+picorv32.instr_lw
+picorv32.instr_rdcycle
+picorv32.instr_rdcycleh
+picorv32.instr_rdinstr
+picorv32.instr_rdinstrh
+picorv32.instr_retirq
+picorv32.instr_sh
+picorv32.instr_sll
+picorv32.instr_slt
+picorv32.instr_sltu
+picorv32.instr_sra
+picorv32.instr_srl
+picorv32.instr_sub
+picorv32.instr_xor
+picorv32.is_alu_reg_reg
+picorv32.is_beq_bne_blt_bge_bltu_bgeu
+picorv32.is_lb_lh_lw_lbu_lhu
+picorv32.is_lbu_lhu_lw
+picorv32.is_sb_sh_sw
+picorv32.latched_branch
+picorv32.latched_compr
+picorv32.latched_is_lu
+picorv32.latched_store
+picorv32.mem_do_rdata
+picorv32.mem_do_rinst
+picorv32.mem_do_wdata
+picorv32.mem_instr
+picorv32.mem_state
+picorv32.mem_valid
+picorv32.mem_wstrb
+picorv32.mem_do_prefetch
+picorv32.mem_wordsize
+picorv32.instr_bge
+picorv32.instr_bltu
+picorv32.instr_lh
+picorv32.instr_or
+picorv32.instr_sb
+
+$NOP:
+mem_rdata = 25'b0+5'b00100+2'b11
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+
+#CLK:clk
+#RST:resetn

@@ -1,0 +1,3996 @@
+module \$paramod\mem_fifo\WIDTH=1 (clk, rst, in, wr, out);
+  wire _000_;
+  wire _001_;
+  wire _002_;
+  wire _003_;
+  wire _004_;
+  wire _005_;
+  wire _006_;
+  wire _007_;
+  wire _008_;
+  wire _009_;
+  wire _010_;
+  wire _011_;
+  wire _012_;
+  wire _013_;
+  wire _014_;
+  wire _015_;
+  wire _016_;
+  wire _017_;
+  wire _018_;
+  wire _019_;
+  wire _020_;
+  wire _021_;
+  wire _022_;
+  wire _023_;
+  wire _024_;
+  wire _025_;
+  wire _026_;
+  wire _027_;
+  wire _028_;
+  wire _029_;
+  wire _030_;
+  wire _031_;
+  wire _032_;
+  wire _033_;
+  wire _034_;
+  wire _035_;
+  wire _036_;
+  wire _037_;
+  wire _038_;
+  wire _039_;
+  wire _040_;
+  wire _041_;
+  wire _042_;
+  wire _043_;
+  wire _044_;
+  wire _045_;
+  wire _046_;
+  wire _047_;
+  wire _048_;
+  wire _049_;
+  wire _050_;
+  wire _051_;
+  wire _052_;
+  wire _053_;
+  wire _054_;
+  wire _055_;
+  wire _056_;
+  wire _057_;
+  wire _058_;
+  wire _059_;
+  wire _060_;
+  wire _061_;
+  wire _062_;
+  wire _063_;
+  wire _064_;
+  wire _065_;
+  wire _066_;
+  wire _067_;
+  wire _068_;
+  wire _069_;
+  wire _070_;
+  wire _071_;
+  wire _072_;
+  wire _073_;
+  wire _074_;
+  wire _075_;
+  wire _076_;
+  wire _077_;
+  wire _078_;
+  wire _079_;
+  wire _080_;
+  wire _081_;
+  wire _082_;
+  wire _083_;
+  wire _084_;
+  wire _085_;
+  wire _086_;
+  wire _087_;
+  wire _088_;
+  wire _089_;
+  wire _090_;
+  wire _091_;
+  wire _092_;
+  wire _093_;
+  wire _094_;
+  wire _095_;
+  wire _096_;
+  wire _097_;
+  wire _098_;
+  wire _099_;
+  wire _100_;
+  wire _101_;
+  wire _102_;
+  wire _103_;
+  wire _104_;
+  wire _105_;
+  wire _106_;
+  wire _107_;
+  wire _108_;
+  wire _109_;
+  wire _110_;
+  wire _111_;
+  wire _112_;
+  wire _113_;
+  wire _114_;
+  wire _115_;
+  wire _116_;
+  wire _117_;
+  wire _118_;
+  wire _119_;
+  wire _120_;
+  wire _121_;
+  wire _122_;
+  wire _123_;
+  wire _124_;
+  wire _125_;
+  wire _126_;
+  wire _127_;
+  wire _128_;
+  wire _129_;
+  wire _130_;
+  wire _131_;
+  wire _132_;
+  wire _133_;
+  wire _134_;
+  wire _135_;
+  wire _136_;
+  wire _137_;
+  wire _138_;
+  wire _139_;
+  input clk;
+  input in;
+  output out;
+  reg r0;
+  reg r1;
+  reg r10;
+  reg r11;
+  reg r12;
+  reg r13;
+  reg r14;
+  reg r15;
+  reg r16;
+  reg r17;
+  reg r18;
+  reg r19;
+  reg r2;
+  reg r20;
+  reg r21;
+  reg r22;
+  reg r23;
+  reg r24;
+  reg r25;
+  reg r26;
+  reg r27;
+  reg r28;
+  reg r29;
+  reg r3;
+  reg r30;
+  reg r31;
+  reg r32;
+  reg r33;
+  reg r34;
+  reg r35;
+  reg r36;
+  reg r37;
+  reg r38;
+  reg r39;
+  reg r4;
+  reg r40;
+  reg r41;
+  reg r42;
+  reg r43;
+  reg r44;
+  reg r45;
+  reg r46;
+  reg r47;
+  reg r48;
+  reg r49;
+  reg r5;
+  reg r50;
+  reg r51;
+  reg r52;
+  reg r53;
+  reg r54;
+  reg r55;
+  reg r56;
+  reg r57;
+  reg r58;
+  reg r59;
+  reg r6;
+  reg r60;
+  reg r61;
+  reg r62;
+  reg r63;
+  reg r64;
+  reg r65;
+  reg r66;
+  reg r67;
+  reg r68;
+  reg r69;
+  reg r7;
+  reg r8;
+  reg r9;
+  input rst;
+  input wr;
+  always @(posedge clk)
+    r0 <= _000_;
+  always @(posedge clk)
+    r1 <= _011_;
+  always @(posedge clk)
+    r2 <= _022_;
+  always @(posedge clk)
+    r3 <= _033_;
+  always @(posedge clk)
+    r4 <= _044_;
+  always @(posedge clk)
+    r5 <= _055_;
+  always @(posedge clk)
+    r6 <= _066_;
+  always @(posedge clk)
+    r7 <= _067_;
+  always @(posedge clk)
+    r8 <= _068_;
+  always @(posedge clk)
+    r9 <= _069_;
+  always @(posedge clk)
+    r10 <= _001_;
+  always @(posedge clk)
+    r11 <= _002_;
+  always @(posedge clk)
+    r12 <= _003_;
+  always @(posedge clk)
+    r13 <= _004_;
+  always @(posedge clk)
+    r14 <= _005_;
+  always @(posedge clk)
+    r15 <= _006_;
+  always @(posedge clk)
+    r16 <= _007_;
+  always @(posedge clk)
+    r17 <= _008_;
+  always @(posedge clk)
+    r18 <= _009_;
+  always @(posedge clk)
+    r19 <= _010_;
+  always @(posedge clk)
+    r20 <= _012_;
+  always @(posedge clk)
+    r21 <= _013_;
+  always @(posedge clk)
+    r22 <= _014_;
+  always @(posedge clk)
+    r23 <= _015_;
+  always @(posedge clk)
+    r24 <= _016_;
+  always @(posedge clk)
+    r25 <= _017_;
+  always @(posedge clk)
+    r26 <= _018_;
+  always @(posedge clk)
+    r27 <= _019_;
+  always @(posedge clk)
+    r28 <= _020_;
+  always @(posedge clk)
+    r29 <= _021_;
+  always @(posedge clk)
+    r30 <= _023_;
+  always @(posedge clk)
+    r31 <= _024_;
+  always @(posedge clk)
+    r32 <= _025_;
+  always @(posedge clk)
+    r33 <= _026_;
+  always @(posedge clk)
+    r34 <= _027_;
+  always @(posedge clk)
+    r35 <= _028_;
+  always @(posedge clk)
+    r36 <= _029_;
+  always @(posedge clk)
+    r37 <= _030_;
+  always @(posedge clk)
+    r38 <= _031_;
+  always @(posedge clk)
+    r39 <= _032_;
+  always @(posedge clk)
+    r40 <= _034_;
+  always @(posedge clk)
+    r41 <= _035_;
+  always @(posedge clk)
+    r42 <= _036_;
+  always @(posedge clk)
+    r43 <= _037_;
+  always @(posedge clk)
+    r44 <= _038_;
+  always @(posedge clk)
+    r45 <= _039_;
+  always @(posedge clk)
+    r46 <= _040_;
+  always @(posedge clk)
+    r47 <= _041_;
+  always @(posedge clk)
+    r48 <= _042_;
+  always @(posedge clk)
+    r49 <= _043_;
+  always @(posedge clk)
+    r50 <= _045_;
+  always @(posedge clk)
+    r51 <= _046_;
+  always @(posedge clk)
+    r52 <= _047_;
+  always @(posedge clk)
+    r53 <= _048_;
+  always @(posedge clk)
+    r54 <= _049_;
+  always @(posedge clk)
+    r55 <= _050_;
+  always @(posedge clk)
+    r56 <= _051_;
+  always @(posedge clk)
+    r57 <= _052_;
+  always @(posedge clk)
+    r58 <= _053_;
+  always @(posedge clk)
+    r59 <= _054_;
+  always @(posedge clk)
+    r60 <= _056_;
+  always @(posedge clk)
+    r61 <= _057_;
+  always @(posedge clk)
+    r62 <= _058_;
+  always @(posedge clk)
+    r63 <= _059_;
+  always @(posedge clk)
+    r64 <= _060_;
+  always @(posedge clk)
+    r65 <= _061_;
+  always @(posedge clk)
+    r66 <= _062_;
+  always @(posedge clk)
+    r67 <= _063_;
+  always @(posedge clk)
+    r68 <= _064_;
+  always @(posedge clk)
+    r69 <= _065_;
+  assign _070_ = wr ? r68 : r69;
+  assign _065_ = rst ? 1'h0 : _070_;
+  assign _071_ = wr ? r67 : r68;
+  assign _064_ = rst ? 1'h0 : _071_;
+  assign _072_ = wr ? r66 : r67;
+  assign _063_ = rst ? 1'h0 : _072_;
+  assign _073_ = wr ? r65 : r66;
+  assign _062_ = rst ? 1'h0 : _073_;
+  assign _074_ = wr ? r64 : r65;
+  assign _061_ = rst ? 1'h0 : _074_;
+  assign _075_ = wr ? r63 : r64;
+  assign _060_ = rst ? 1'h0 : _075_;
+  assign _076_ = wr ? r62 : r63;
+  assign _059_ = rst ? 1'h0 : _076_;
+  assign _077_ = wr ? r61 : r62;
+  assign _058_ = rst ? 1'h0 : _077_;
+  assign _078_ = wr ? r60 : r61;
+  assign _057_ = rst ? 1'h0 : _078_;
+  assign _079_ = wr ? r59 : r60;
+  assign _056_ = rst ? 1'h0 : _079_;
+  assign _080_ = wr ? r58 : r59;
+  assign _054_ = rst ? 1'h0 : _080_;
+  assign _081_ = wr ? r57 : r58;
+  assign _053_ = rst ? 1'h0 : _081_;
+  assign _082_ = wr ? r56 : r57;
+  assign _052_ = rst ? 1'h0 : _082_;
+  assign _083_ = wr ? r55 : r56;
+  assign _051_ = rst ? 1'h0 : _083_;
+  assign _084_ = wr ? r54 : r55;
+  assign _050_ = rst ? 1'h0 : _084_;
+  assign _085_ = wr ? r53 : r54;
+  assign _049_ = rst ? 1'h0 : _085_;
+  assign _086_ = wr ? r52 : r53;
+  assign _048_ = rst ? 1'h0 : _086_;
+  assign _087_ = wr ? r51 : r52;
+  assign _047_ = rst ? 1'h0 : _087_;
+  assign _088_ = wr ? r50 : r51;
+  assign _046_ = rst ? 1'h0 : _088_;
+  assign _089_ = wr ? r49 : r50;
+  assign _045_ = rst ? 1'h0 : _089_;
+  assign _090_ = wr ? r48 : r49;
+  assign _043_ = rst ? 1'h0 : _090_;
+  assign _091_ = wr ? r47 : r48;
+  assign _042_ = rst ? 1'h0 : _091_;
+  assign _092_ = wr ? r46 : r47;
+  assign _041_ = rst ? 1'h0 : _092_;
+  assign _093_ = wr ? r45 : r46;
+  assign _040_ = rst ? 1'h0 : _093_;
+  assign _094_ = wr ? r44 : r45;
+  assign _039_ = rst ? 1'h0 : _094_;
+  assign _095_ = wr ? r43 : r44;
+  assign _038_ = rst ? 1'h0 : _095_;
+  assign _096_ = wr ? r42 : r43;
+  assign _037_ = rst ? 1'h0 : _096_;
+  assign _097_ = wr ? r41 : r42;
+  assign _036_ = rst ? 1'h0 : _097_;
+  assign _098_ = wr ? r40 : r41;
+  assign _035_ = rst ? 1'h0 : _098_;
+  assign _099_ = wr ? r39 : r40;
+  assign _034_ = rst ? 1'h0 : _099_;
+  assign _100_ = wr ? r38 : r39;
+  assign _032_ = rst ? 1'h0 : _100_;
+  assign _101_ = wr ? r37 : r38;
+  assign _031_ = rst ? 1'h0 : _101_;
+  assign _102_ = wr ? r36 : r37;
+  assign _030_ = rst ? 1'h0 : _102_;
+  assign _103_ = wr ? r35 : r36;
+  assign _029_ = rst ? 1'h0 : _103_;
+  assign _104_ = wr ? r34 : r35;
+  assign _028_ = rst ? 1'h0 : _104_;
+  assign _105_ = wr ? r33 : r34;
+  assign _027_ = rst ? 1'h0 : _105_;
+  assign _106_ = wr ? r32 : r33;
+  assign _026_ = rst ? 1'h0 : _106_;
+  assign _107_ = wr ? r31 : r32;
+  assign _025_ = rst ? 1'h0 : _107_;
+  assign _108_ = wr ? r30 : r31;
+  assign _024_ = rst ? 1'h0 : _108_;
+  assign _109_ = wr ? r29 : r30;
+  assign _023_ = rst ? 1'h0 : _109_;
+  assign _110_ = wr ? r28 : r29;
+  assign _021_ = rst ? 1'h0 : _110_;
+  assign _111_ = wr ? r27 : r28;
+  assign _020_ = rst ? 1'h0 : _111_;
+  assign _112_ = wr ? r26 : r27;
+  assign _019_ = rst ? 1'h0 : _112_;
+  assign _113_ = wr ? r25 : r26;
+  assign _018_ = rst ? 1'h0 : _113_;
+  assign _114_ = wr ? r24 : r25;
+  assign _017_ = rst ? 1'h0 : _114_;
+  assign _115_ = wr ? r23 : r24;
+  assign _016_ = rst ? 1'h0 : _115_;
+  assign _116_ = wr ? r22 : r23;
+  assign _015_ = rst ? 1'h0 : _116_;
+  assign _117_ = wr ? r21 : r22;
+  assign _014_ = rst ? 1'h0 : _117_;
+  assign _118_ = wr ? r20 : r21;
+  assign _013_ = rst ? 1'h0 : _118_;
+  assign _119_ = wr ? r19 : r20;
+  assign _012_ = rst ? 1'h0 : _119_;
+  assign _120_ = wr ? r18 : r19;
+  assign _010_ = rst ? 1'h0 : _120_;
+  assign _121_ = wr ? r17 : r18;
+  assign _009_ = rst ? 1'h0 : _121_;
+  assign _122_ = wr ? r16 : r17;
+  assign _008_ = rst ? 1'h0 : _122_;
+  assign _123_ = wr ? r15 : r16;
+  assign _007_ = rst ? 1'h0 : _123_;
+  assign _124_ = wr ? r14 : r15;
+  assign _006_ = rst ? 1'h0 : _124_;
+  assign _125_ = wr ? r13 : r14;
+  assign _005_ = rst ? 1'h0 : _125_;
+  assign _126_ = wr ? r12 : r13;
+  assign _004_ = rst ? 1'h0 : _126_;
+  assign _127_ = wr ? r11 : r12;
+  assign _003_ = rst ? 1'h0 : _127_;
+  assign _128_ = wr ? r10 : r11;
+  assign _002_ = rst ? 1'h0 : _128_;
+  assign _129_ = wr ? r9 : r10;
+  assign _001_ = rst ? 1'h0 : _129_;
+  assign _130_ = wr ? r8 : r9;
+  assign _069_ = rst ? 1'h0 : _130_;
+  assign _131_ = wr ? r7 : r8;
+  assign _068_ = rst ? 1'h0 : _131_;
+  assign _132_ = wr ? r6 : r7;
+  assign _067_ = rst ? 1'h0 : _132_;
+  assign _133_ = wr ? r5 : r6;
+  assign _066_ = rst ? 1'h0 : _133_;
+  assign _134_ = wr ? r4 : r5;
+  assign _055_ = rst ? 1'h0 : _134_;
+  assign _135_ = wr ? r3 : r4;
+  assign _044_ = rst ? 1'h0 : _135_;
+  assign _136_ = wr ? r2 : r3;
+  assign _033_ = rst ? 1'h0 : _136_;
+  assign _137_ = wr ? r1 : r2;
+  assign _022_ = rst ? 1'h0 : _137_;
+  assign _138_ = wr ? r0 : r1;
+  assign _011_ = rst ? 1'h0 : _138_;
+  assign _139_ = wr ? in : r0;
+  assign _000_ = rst ? 1'h0 : _139_;
+  assign out = r69;
+endmodule
+module \$paramod\mem_fifo\WIDTH=32 (clk, rst, in, wr, out);
+  wire [31:0] _000_;
+  wire [31:0] _001_;
+  wire [31:0] _002_;
+  wire [31:0] _003_;
+  wire [31:0] _004_;
+  wire [31:0] _005_;
+  wire [31:0] _006_;
+  wire [31:0] _007_;
+  wire [31:0] _008_;
+  wire [31:0] _009_;
+  wire [31:0] _010_;
+  wire [31:0] _011_;
+  wire [31:0] _012_;
+  wire [31:0] _013_;
+  wire [31:0] _014_;
+  wire [31:0] _015_;
+  wire [31:0] _016_;
+  wire [31:0] _017_;
+  wire [31:0] _018_;
+  wire [31:0] _019_;
+  wire [31:0] _020_;
+  wire [31:0] _021_;
+  wire [31:0] _022_;
+  wire [31:0] _023_;
+  wire [31:0] _024_;
+  wire [31:0] _025_;
+  wire [31:0] _026_;
+  wire [31:0] _027_;
+  wire [31:0] _028_;
+  wire [31:0] _029_;
+  wire [31:0] _030_;
+  wire [31:0] _031_;
+  wire [31:0] _032_;
+  wire [31:0] _033_;
+  wire [31:0] _034_;
+  wire [31:0] _035_;
+  wire [31:0] _036_;
+  wire [31:0] _037_;
+  wire [31:0] _038_;
+  wire [31:0] _039_;
+  wire [31:0] _040_;
+  wire [31:0] _041_;
+  wire [31:0] _042_;
+  wire [31:0] _043_;
+  wire [31:0] _044_;
+  wire [31:0] _045_;
+  wire [31:0] _046_;
+  wire [31:0] _047_;
+  wire [31:0] _048_;
+  wire [31:0] _049_;
+  wire [31:0] _050_;
+  wire [31:0] _051_;
+  wire [31:0] _052_;
+  wire [31:0] _053_;
+  wire [31:0] _054_;
+  wire [31:0] _055_;
+  wire [31:0] _056_;
+  wire [31:0] _057_;
+  wire [31:0] _058_;
+  wire [31:0] _059_;
+  wire [31:0] _060_;
+  wire [31:0] _061_;
+  wire [31:0] _062_;
+  wire [31:0] _063_;
+  wire [31:0] _064_;
+  wire [31:0] _065_;
+  wire [31:0] _066_;
+  wire [31:0] _067_;
+  wire [31:0] _068_;
+  wire [31:0] _069_;
+  wire [31:0] _070_;
+  wire [31:0] _071_;
+  wire [31:0] _072_;
+  wire [31:0] _073_;
+  wire [31:0] _074_;
+  wire [31:0] _075_;
+  wire [31:0] _076_;
+  wire [31:0] _077_;
+  wire [31:0] _078_;
+  wire [31:0] _079_;
+  wire [31:0] _080_;
+  wire [31:0] _081_;
+  wire [31:0] _082_;
+  wire [31:0] _083_;
+  wire [31:0] _084_;
+  wire [31:0] _085_;
+  wire [31:0] _086_;
+  wire [31:0] _087_;
+  wire [31:0] _088_;
+  wire [31:0] _089_;
+  wire [31:0] _090_;
+  wire [31:0] _091_;
+  wire [31:0] _092_;
+  wire [31:0] _093_;
+  wire [31:0] _094_;
+  wire [31:0] _095_;
+  wire [31:0] _096_;
+  wire [31:0] _097_;
+  wire [31:0] _098_;
+  wire [31:0] _099_;
+  wire [31:0] _100_;
+  wire [31:0] _101_;
+  wire [31:0] _102_;
+  wire [31:0] _103_;
+  wire [31:0] _104_;
+  wire [31:0] _105_;
+  wire [31:0] _106_;
+  wire [31:0] _107_;
+  wire [31:0] _108_;
+  wire [31:0] _109_;
+  wire [31:0] _110_;
+  wire [31:0] _111_;
+  wire [31:0] _112_;
+  wire [31:0] _113_;
+  wire [31:0] _114_;
+  wire [31:0] _115_;
+  wire [31:0] _116_;
+  wire [31:0] _117_;
+  wire [31:0] _118_;
+  wire [31:0] _119_;
+  wire [31:0] _120_;
+  wire [31:0] _121_;
+  wire [31:0] _122_;
+  wire [31:0] _123_;
+  wire [31:0] _124_;
+  wire [31:0] _125_;
+  wire [31:0] _126_;
+  wire [31:0] _127_;
+  wire [31:0] _128_;
+  wire [31:0] _129_;
+  wire [31:0] _130_;
+  wire [31:0] _131_;
+  wire [31:0] _132_;
+  wire [31:0] _133_;
+  wire [31:0] _134_;
+  wire [31:0] _135_;
+  wire [31:0] _136_;
+  wire [31:0] _137_;
+  wire [31:0] _138_;
+  wire [31:0] _139_;
+  input clk;
+  input [31:0] in;
+  output [31:0] out;
+  reg [31:0] r0;
+  reg [31:0] r1;
+  reg [31:0] r10;
+  reg [31:0] r11;
+  reg [31:0] r12;
+  reg [31:0] r13;
+  reg [31:0] r14;
+  reg [31:0] r15;
+  reg [31:0] r16;
+  reg [31:0] r17;
+  reg [31:0] r18;
+  reg [31:0] r19;
+  reg [31:0] r2;
+  reg [31:0] r20;
+  reg [31:0] r21;
+  reg [31:0] r22;
+  reg [31:0] r23;
+  reg [31:0] r24;
+  reg [31:0] r25;
+  reg [31:0] r26;
+  reg [31:0] r27;
+  reg [31:0] r28;
+  reg [31:0] r29;
+  reg [31:0] r3;
+  reg [31:0] r30;
+  reg [31:0] r31;
+  reg [31:0] r32;
+  reg [31:0] r33;
+  reg [31:0] r34;
+  reg [31:0] r35;
+  reg [31:0] r36;
+  reg [31:0] r37;
+  reg [31:0] r38;
+  reg [31:0] r39;
+  reg [31:0] r4;
+  reg [31:0] r40;
+  reg [31:0] r41;
+  reg [31:0] r42;
+  reg [31:0] r43;
+  reg [31:0] r44;
+  reg [31:0] r45;
+  reg [31:0] r46;
+  reg [31:0] r47;
+  reg [31:0] r48;
+  reg [31:0] r49;
+  reg [31:0] r5;
+  reg [31:0] r50;
+  reg [31:0] r51;
+  reg [31:0] r52;
+  reg [31:0] r53;
+  reg [31:0] r54;
+  reg [31:0] r55;
+  reg [31:0] r56;
+  reg [31:0] r57;
+  reg [31:0] r58;
+  reg [31:0] r59;
+  reg [31:0] r6;
+  reg [31:0] r60;
+  reg [31:0] r61;
+  reg [31:0] r62;
+  reg [31:0] r63;
+  reg [31:0] r64;
+  reg [31:0] r65;
+  reg [31:0] r66;
+  reg [31:0] r67;
+  reg [31:0] r68;
+  reg [31:0] r69;
+  reg [31:0] r7;
+  reg [31:0] r8;
+  reg [31:0] r9;
+  input rst;
+  input wr;
+  always @(posedge clk)
+    r0 <= _000_;
+  always @(posedge clk)
+    r1 <= _011_;
+  always @(posedge clk)
+    r2 <= _022_;
+  always @(posedge clk)
+    r3 <= _033_;
+  always @(posedge clk)
+    r4 <= _044_;
+  always @(posedge clk)
+    r5 <= _055_;
+  always @(posedge clk)
+    r6 <= _066_;
+  always @(posedge clk)
+    r7 <= _067_;
+  always @(posedge clk)
+    r8 <= _068_;
+  always @(posedge clk)
+    r9 <= _069_;
+  always @(posedge clk)
+    r10 <= _001_;
+  always @(posedge clk)
+    r11 <= _002_;
+  always @(posedge clk)
+    r12 <= _003_;
+  always @(posedge clk)
+    r13 <= _004_;
+  always @(posedge clk)
+    r14 <= _005_;
+  always @(posedge clk)
+    r15 <= _006_;
+  always @(posedge clk)
+    r16 <= _007_;
+  always @(posedge clk)
+    r17 <= _008_;
+  always @(posedge clk)
+    r18 <= _009_;
+  always @(posedge clk)
+    r19 <= _010_;
+  always @(posedge clk)
+    r20 <= _012_;
+  always @(posedge clk)
+    r21 <= _013_;
+  always @(posedge clk)
+    r22 <= _014_;
+  always @(posedge clk)
+    r23 <= _015_;
+  always @(posedge clk)
+    r24 <= _016_;
+  always @(posedge clk)
+    r25 <= _017_;
+  always @(posedge clk)
+    r26 <= _018_;
+  always @(posedge clk)
+    r27 <= _019_;
+  always @(posedge clk)
+    r28 <= _020_;
+  always @(posedge clk)
+    r29 <= _021_;
+  always @(posedge clk)
+    r30 <= _023_;
+  always @(posedge clk)
+    r31 <= _024_;
+  always @(posedge clk)
+    r32 <= _025_;
+  always @(posedge clk)
+    r33 <= _026_;
+  always @(posedge clk)
+    r34 <= _027_;
+  always @(posedge clk)
+    r35 <= _028_;
+  always @(posedge clk)
+    r36 <= _029_;
+  always @(posedge clk)
+    r37 <= _030_;
+  always @(posedge clk)
+    r38 <= _031_;
+  always @(posedge clk)
+    r39 <= _032_;
+  always @(posedge clk)
+    r40 <= _034_;
+  always @(posedge clk)
+    r41 <= _035_;
+  always @(posedge clk)
+    r42 <= _036_;
+  always @(posedge clk)
+    r43 <= _037_;
+  always @(posedge clk)
+    r44 <= _038_;
+  always @(posedge clk)
+    r45 <= _039_;
+  always @(posedge clk)
+    r46 <= _040_;
+  always @(posedge clk)
+    r47 <= _041_;
+  always @(posedge clk)
+    r48 <= _042_;
+  always @(posedge clk)
+    r49 <= _043_;
+  always @(posedge clk)
+    r50 <= _045_;
+  always @(posedge clk)
+    r51 <= _046_;
+  always @(posedge clk)
+    r52 <= _047_;
+  always @(posedge clk)
+    r53 <= _048_;
+  always @(posedge clk)
+    r54 <= _049_;
+  always @(posedge clk)
+    r55 <= _050_;
+  always @(posedge clk)
+    r56 <= _051_;
+  always @(posedge clk)
+    r57 <= _052_;
+  always @(posedge clk)
+    r58 <= _053_;
+  always @(posedge clk)
+    r59 <= _054_;
+  always @(posedge clk)
+    r60 <= _056_;
+  always @(posedge clk)
+    r61 <= _057_;
+  always @(posedge clk)
+    r62 <= _058_;
+  always @(posedge clk)
+    r63 <= _059_;
+  always @(posedge clk)
+    r64 <= _060_;
+  always @(posedge clk)
+    r65 <= _061_;
+  always @(posedge clk)
+    r66 <= _062_;
+  always @(posedge clk)
+    r67 <= _063_;
+  always @(posedge clk)
+    r68 <= _064_;
+  always @(posedge clk)
+    r69 <= _065_;
+  assign _070_ = wr ? r68 : r69;
+  assign _065_ = rst ? 32'h00000000 : _070_;
+  assign _071_ = wr ? r67 : r68;
+  assign _064_ = rst ? 32'h00000000 : _071_;
+  assign _072_ = wr ? r66 : r67;
+  assign _063_ = rst ? 32'h00000000 : _072_;
+  assign _073_ = wr ? r65 : r66;
+  assign _062_ = rst ? 32'h00000000 : _073_;
+  assign _074_ = wr ? r64 : r65;
+  assign _061_ = rst ? 32'h00000000 : _074_;
+  assign _075_ = wr ? r63 : r64;
+  assign _060_ = rst ? 32'h00000000 : _075_;
+  assign _076_ = wr ? r62 : r63;
+  assign _059_ = rst ? 32'h00000000 : _076_;
+  assign _077_ = wr ? r61 : r62;
+  assign _058_ = rst ? 32'h00000000 : _077_;
+  assign _078_ = wr ? r60 : r61;
+  assign _057_ = rst ? 32'h00000000 : _078_;
+  assign _079_ = wr ? r59 : r60;
+  assign _056_ = rst ? 32'h00000000 : _079_;
+  assign _080_ = wr ? r58 : r59;
+  assign _054_ = rst ? 32'h00000000 : _080_;
+  assign _081_ = wr ? r57 : r58;
+  assign _053_ = rst ? 32'h00000000 : _081_;
+  assign _082_ = wr ? r56 : r57;
+  assign _052_ = rst ? 32'h00000000 : _082_;
+  assign _083_ = wr ? r55 : r56;
+  assign _051_ = rst ? 32'h00000000 : _083_;
+  assign _084_ = wr ? r54 : r55;
+  assign _050_ = rst ? 32'h00000000 : _084_;
+  assign _085_ = wr ? r53 : r54;
+  assign _049_ = rst ? 32'h00000000 : _085_;
+  assign _086_ = wr ? r52 : r53;
+  assign _048_ = rst ? 32'h00000000 : _086_;
+  assign _087_ = wr ? r51 : r52;
+  assign _047_ = rst ? 32'h00000000 : _087_;
+  assign _088_ = wr ? r50 : r51;
+  assign _046_ = rst ? 32'h00000000 : _088_;
+  assign _089_ = wr ? r49 : r50;
+  assign _045_ = rst ? 32'h00000000 : _089_;
+  assign _090_ = wr ? r48 : r49;
+  assign _043_ = rst ? 32'h00000000 : _090_;
+  assign _091_ = wr ? r47 : r48;
+  assign _042_ = rst ? 32'h00000000 : _091_;
+  assign _092_ = wr ? r46 : r47;
+  assign _041_ = rst ? 32'h00000000 : _092_;
+  assign _093_ = wr ? r45 : r46;
+  assign _040_ = rst ? 32'h00000000 : _093_;
+  assign _094_ = wr ? r44 : r45;
+  assign _039_ = rst ? 32'h00000000 : _094_;
+  assign _095_ = wr ? r43 : r44;
+  assign _038_ = rst ? 32'h00000000 : _095_;
+  assign _096_ = wr ? r42 : r43;
+  assign _037_ = rst ? 32'h00000000 : _096_;
+  assign _097_ = wr ? r41 : r42;
+  assign _036_ = rst ? 32'h00000000 : _097_;
+  assign _098_ = wr ? r40 : r41;
+  assign _035_ = rst ? 32'h00000000 : _098_;
+  assign _099_ = wr ? r39 : r40;
+  assign _034_ = rst ? 32'h00000000 : _099_;
+  assign _100_ = wr ? r38 : r39;
+  assign _032_ = rst ? 32'h00000000 : _100_;
+  assign _101_ = wr ? r37 : r38;
+  assign _031_ = rst ? 32'h00000000 : _101_;
+  assign _102_ = wr ? r36 : r37;
+  assign _030_ = rst ? 32'h00000000 : _102_;
+  assign _103_ = wr ? r35 : r36;
+  assign _029_ = rst ? 32'h00000000 : _103_;
+  assign _104_ = wr ? r34 : r35;
+  assign _028_ = rst ? 32'h00000000 : _104_;
+  assign _105_ = wr ? r33 : r34;
+  assign _027_ = rst ? 32'h00000000 : _105_;
+  assign _106_ = wr ? r32 : r33;
+  assign _026_ = rst ? 32'h00000000 : _106_;
+  assign _107_ = wr ? r31 : r32;
+  assign _025_ = rst ? 32'h00000000 : _107_;
+  assign _108_ = wr ? r30 : r31;
+  assign _024_ = rst ? 32'h00000000 : _108_;
+  assign _109_ = wr ? r29 : r30;
+  assign _023_ = rst ? 32'h00000000 : _109_;
+  assign _110_ = wr ? r28 : r29;
+  assign _021_ = rst ? 32'h00000000 : _110_;
+  assign _111_ = wr ? r27 : r28;
+  assign _020_ = rst ? 32'h00000000 : _111_;
+  assign _112_ = wr ? r26 : r27;
+  assign _019_ = rst ? 32'h00000000 : _112_;
+  assign _113_ = wr ? r25 : r26;
+  assign _018_ = rst ? 32'h00000000 : _113_;
+  assign _114_ = wr ? r24 : r25;
+  assign _017_ = rst ? 32'h00000000 : _114_;
+  assign _115_ = wr ? r23 : r24;
+  assign _016_ = rst ? 32'h00000000 : _115_;
+  assign _116_ = wr ? r22 : r23;
+  assign _015_ = rst ? 32'h00000000 : _116_;
+  assign _117_ = wr ? r21 : r22;
+  assign _014_ = rst ? 32'h00000000 : _117_;
+  assign _118_ = wr ? r20 : r21;
+  assign _013_ = rst ? 32'h00000000 : _118_;
+  assign _119_ = wr ? r19 : r20;
+  assign _012_ = rst ? 32'h00000000 : _119_;
+  assign _120_ = wr ? r18 : r19;
+  assign _010_ = rst ? 32'h00000000 : _120_;
+  assign _121_ = wr ? r17 : r18;
+  assign _009_ = rst ? 32'h00000000 : _121_;
+  assign _122_ = wr ? r16 : r17;
+  assign _008_ = rst ? 32'h00000000 : _122_;
+  assign _123_ = wr ? r15 : r16;
+  assign _007_ = rst ? 32'h00000000 : _123_;
+  assign _124_ = wr ? r14 : r15;
+  assign _006_ = rst ? 32'h00000000 : _124_;
+  assign _125_ = wr ? r13 : r14;
+  assign _005_ = rst ? 32'h00000000 : _125_;
+  assign _126_ = wr ? r12 : r13;
+  assign _004_ = rst ? 32'h00000000 : _126_;
+  assign _127_ = wr ? r11 : r12;
+  assign _003_ = rst ? 32'h00000000 : _127_;
+  assign _128_ = wr ? r10 : r11;
+  assign _002_ = rst ? 32'h00000000 : _128_;
+  assign _129_ = wr ? r9 : r10;
+  assign _001_ = rst ? 32'h00000000 : _129_;
+  assign _130_ = wr ? r8 : r9;
+  assign _069_ = rst ? 32'h00000000 : _130_;
+  assign _131_ = wr ? r7 : r8;
+  assign _068_ = rst ? 32'h00000000 : _131_;
+  assign _132_ = wr ? r6 : r7;
+  assign _067_ = rst ? 32'h00000000 : _132_;
+  assign _133_ = wr ? r5 : r6;
+  assign _066_ = rst ? 32'h00000000 : _133_;
+  assign _134_ = wr ? r4 : r5;
+  assign _055_ = rst ? 32'h00000000 : _134_;
+  assign _135_ = wr ? r3 : r4;
+  assign _044_ = rst ? 32'h00000000 : _135_;
+  assign _136_ = wr ? r2 : r3;
+  assign _033_ = rst ? 32'h00000000 : _136_;
+  assign _137_ = wr ? r1 : r2;
+  assign _022_ = rst ? 32'h00000000 : _137_;
+  assign _138_ = wr ? r0 : r1;
+  assign _011_ = rst ? 32'h00000000 : _138_;
+  assign _139_ = wr ? in : r0;
+  assign _000_ = rst ? 32'h00000000 : _139_;
+  assign out = r69;
+endmodule
+module \$paramod\mem_fifo\WIDTH=4 (clk, rst, in, wr, out);
+  wire [3:0] _000_;
+  wire [3:0] _001_;
+  wire [3:0] _002_;
+  wire [3:0] _003_;
+  wire [3:0] _004_;
+  wire [3:0] _005_;
+  wire [3:0] _006_;
+  wire [3:0] _007_;
+  wire [3:0] _008_;
+  wire [3:0] _009_;
+  wire [3:0] _010_;
+  wire [3:0] _011_;
+  wire [3:0] _012_;
+  wire [3:0] _013_;
+  wire [3:0] _014_;
+  wire [3:0] _015_;
+  wire [3:0] _016_;
+  wire [3:0] _017_;
+  wire [3:0] _018_;
+  wire [3:0] _019_;
+  wire [3:0] _020_;
+  wire [3:0] _021_;
+  wire [3:0] _022_;
+  wire [3:0] _023_;
+  wire [3:0] _024_;
+  wire [3:0] _025_;
+  wire [3:0] _026_;
+  wire [3:0] _027_;
+  wire [3:0] _028_;
+  wire [3:0] _029_;
+  wire [3:0] _030_;
+  wire [3:0] _031_;
+  wire [3:0] _032_;
+  wire [3:0] _033_;
+  wire [3:0] _034_;
+  wire [3:0] _035_;
+  wire [3:0] _036_;
+  wire [3:0] _037_;
+  wire [3:0] _038_;
+  wire [3:0] _039_;
+  wire [3:0] _040_;
+  wire [3:0] _041_;
+  wire [3:0] _042_;
+  wire [3:0] _043_;
+  wire [3:0] _044_;
+  wire [3:0] _045_;
+  wire [3:0] _046_;
+  wire [3:0] _047_;
+  wire [3:0] _048_;
+  wire [3:0] _049_;
+  wire [3:0] _050_;
+  wire [3:0] _051_;
+  wire [3:0] _052_;
+  wire [3:0] _053_;
+  wire [3:0] _054_;
+  wire [3:0] _055_;
+  wire [3:0] _056_;
+  wire [3:0] _057_;
+  wire [3:0] _058_;
+  wire [3:0] _059_;
+  wire [3:0] _060_;
+  wire [3:0] _061_;
+  wire [3:0] _062_;
+  wire [3:0] _063_;
+  wire [3:0] _064_;
+  wire [3:0] _065_;
+  wire [3:0] _066_;
+  wire [3:0] _067_;
+  wire [3:0] _068_;
+  wire [3:0] _069_;
+  wire [3:0] _070_;
+  wire [3:0] _071_;
+  wire [3:0] _072_;
+  wire [3:0] _073_;
+  wire [3:0] _074_;
+  wire [3:0] _075_;
+  wire [3:0] _076_;
+  wire [3:0] _077_;
+  wire [3:0] _078_;
+  wire [3:0] _079_;
+  wire [3:0] _080_;
+  wire [3:0] _081_;
+  wire [3:0] _082_;
+  wire [3:0] _083_;
+  wire [3:0] _084_;
+  wire [3:0] _085_;
+  wire [3:0] _086_;
+  wire [3:0] _087_;
+  wire [3:0] _088_;
+  wire [3:0] _089_;
+  wire [3:0] _090_;
+  wire [3:0] _091_;
+  wire [3:0] _092_;
+  wire [3:0] _093_;
+  wire [3:0] _094_;
+  wire [3:0] _095_;
+  wire [3:0] _096_;
+  wire [3:0] _097_;
+  wire [3:0] _098_;
+  wire [3:0] _099_;
+  wire [3:0] _100_;
+  wire [3:0] _101_;
+  wire [3:0] _102_;
+  wire [3:0] _103_;
+  wire [3:0] _104_;
+  wire [3:0] _105_;
+  wire [3:0] _106_;
+  wire [3:0] _107_;
+  wire [3:0] _108_;
+  wire [3:0] _109_;
+  wire [3:0] _110_;
+  wire [3:0] _111_;
+  wire [3:0] _112_;
+  wire [3:0] _113_;
+  wire [3:0] _114_;
+  wire [3:0] _115_;
+  wire [3:0] _116_;
+  wire [3:0] _117_;
+  wire [3:0] _118_;
+  wire [3:0] _119_;
+  wire [3:0] _120_;
+  wire [3:0] _121_;
+  wire [3:0] _122_;
+  wire [3:0] _123_;
+  wire [3:0] _124_;
+  wire [3:0] _125_;
+  wire [3:0] _126_;
+  wire [3:0] _127_;
+  wire [3:0] _128_;
+  wire [3:0] _129_;
+  wire [3:0] _130_;
+  wire [3:0] _131_;
+  wire [3:0] _132_;
+  wire [3:0] _133_;
+  wire [3:0] _134_;
+  wire [3:0] _135_;
+  wire [3:0] _136_;
+  wire [3:0] _137_;
+  wire [3:0] _138_;
+  wire [3:0] _139_;
+  input clk;
+  input [3:0] in;
+  output [3:0] out;
+  reg [3:0] r0;
+  reg [3:0] r1;
+  reg [3:0] r10;
+  reg [3:0] r11;
+  reg [3:0] r12;
+  reg [3:0] r13;
+  reg [3:0] r14;
+  reg [3:0] r15;
+  reg [3:0] r16;
+  reg [3:0] r17;
+  reg [3:0] r18;
+  reg [3:0] r19;
+  reg [3:0] r2;
+  reg [3:0] r20;
+  reg [3:0] r21;
+  reg [3:0] r22;
+  reg [3:0] r23;
+  reg [3:0] r24;
+  reg [3:0] r25;
+  reg [3:0] r26;
+  reg [3:0] r27;
+  reg [3:0] r28;
+  reg [3:0] r29;
+  reg [3:0] r3;
+  reg [3:0] r30;
+  reg [3:0] r31;
+  reg [3:0] r32;
+  reg [3:0] r33;
+  reg [3:0] r34;
+  reg [3:0] r35;
+  reg [3:0] r36;
+  reg [3:0] r37;
+  reg [3:0] r38;
+  reg [3:0] r39;
+  reg [3:0] r4;
+  reg [3:0] r40;
+  reg [3:0] r41;
+  reg [3:0] r42;
+  reg [3:0] r43;
+  reg [3:0] r44;
+  reg [3:0] r45;
+  reg [3:0] r46;
+  reg [3:0] r47;
+  reg [3:0] r48;
+  reg [3:0] r49;
+  reg [3:0] r5;
+  reg [3:0] r50;
+  reg [3:0] r51;
+  reg [3:0] r52;
+  reg [3:0] r53;
+  reg [3:0] r54;
+  reg [3:0] r55;
+  reg [3:0] r56;
+  reg [3:0] r57;
+  reg [3:0] r58;
+  reg [3:0] r59;
+  reg [3:0] r6;
+  reg [3:0] r60;
+  reg [3:0] r61;
+  reg [3:0] r62;
+  reg [3:0] r63;
+  reg [3:0] r64;
+  reg [3:0] r65;
+  reg [3:0] r66;
+  reg [3:0] r67;
+  reg [3:0] r68;
+  reg [3:0] r69;
+  reg [3:0] r7;
+  reg [3:0] r8;
+  reg [3:0] r9;
+  input rst;
+  input wr;
+  always @(posedge clk)
+    r0 <= _000_;
+  always @(posedge clk)
+    r1 <= _011_;
+  always @(posedge clk)
+    r2 <= _022_;
+  always @(posedge clk)
+    r3 <= _033_;
+  always @(posedge clk)
+    r4 <= _044_;
+  always @(posedge clk)
+    r5 <= _055_;
+  always @(posedge clk)
+    r6 <= _066_;
+  always @(posedge clk)
+    r7 <= _067_;
+  always @(posedge clk)
+    r8 <= _068_;
+  always @(posedge clk)
+    r9 <= _069_;
+  always @(posedge clk)
+    r10 <= _001_;
+  always @(posedge clk)
+    r11 <= _002_;
+  always @(posedge clk)
+    r12 <= _003_;
+  always @(posedge clk)
+    r13 <= _004_;
+  always @(posedge clk)
+    r14 <= _005_;
+  always @(posedge clk)
+    r15 <= _006_;
+  always @(posedge clk)
+    r16 <= _007_;
+  always @(posedge clk)
+    r17 <= _008_;
+  always @(posedge clk)
+    r18 <= _009_;
+  always @(posedge clk)
+    r19 <= _010_;
+  always @(posedge clk)
+    r20 <= _012_;
+  always @(posedge clk)
+    r21 <= _013_;
+  always @(posedge clk)
+    r22 <= _014_;
+  always @(posedge clk)
+    r23 <= _015_;
+  always @(posedge clk)
+    r24 <= _016_;
+  always @(posedge clk)
+    r25 <= _017_;
+  always @(posedge clk)
+    r26 <= _018_;
+  always @(posedge clk)
+    r27 <= _019_;
+  always @(posedge clk)
+    r28 <= _020_;
+  always @(posedge clk)
+    r29 <= _021_;
+  always @(posedge clk)
+    r30 <= _023_;
+  always @(posedge clk)
+    r31 <= _024_;
+  always @(posedge clk)
+    r32 <= _025_;
+  always @(posedge clk)
+    r33 <= _026_;
+  always @(posedge clk)
+    r34 <= _027_;
+  always @(posedge clk)
+    r35 <= _028_;
+  always @(posedge clk)
+    r36 <= _029_;
+  always @(posedge clk)
+    r37 <= _030_;
+  always @(posedge clk)
+    r38 <= _031_;
+  always @(posedge clk)
+    r39 <= _032_;
+  always @(posedge clk)
+    r40 <= _034_;
+  always @(posedge clk)
+    r41 <= _035_;
+  always @(posedge clk)
+    r42 <= _036_;
+  always @(posedge clk)
+    r43 <= _037_;
+  always @(posedge clk)
+    r44 <= _038_;
+  always @(posedge clk)
+    r45 <= _039_;
+  always @(posedge clk)
+    r46 <= _040_;
+  always @(posedge clk)
+    r47 <= _041_;
+  always @(posedge clk)
+    r48 <= _042_;
+  always @(posedge clk)
+    r49 <= _043_;
+  always @(posedge clk)
+    r50 <= _045_;
+  always @(posedge clk)
+    r51 <= _046_;
+  always @(posedge clk)
+    r52 <= _047_;
+  always @(posedge clk)
+    r53 <= _048_;
+  always @(posedge clk)
+    r54 <= _049_;
+  always @(posedge clk)
+    r55 <= _050_;
+  always @(posedge clk)
+    r56 <= _051_;
+  always @(posedge clk)
+    r57 <= _052_;
+  always @(posedge clk)
+    r58 <= _053_;
+  always @(posedge clk)
+    r59 <= _054_;
+  always @(posedge clk)
+    r60 <= _056_;
+  always @(posedge clk)
+    r61 <= _057_;
+  always @(posedge clk)
+    r62 <= _058_;
+  always @(posedge clk)
+    r63 <= _059_;
+  always @(posedge clk)
+    r64 <= _060_;
+  always @(posedge clk)
+    r65 <= _061_;
+  always @(posedge clk)
+    r66 <= _062_;
+  always @(posedge clk)
+    r67 <= _063_;
+  always @(posedge clk)
+    r68 <= _064_;
+  always @(posedge clk)
+    r69 <= _065_;
+  assign _069_ = rst ? 4'h0 : _139_;
+  assign _070_ = wr ? r7 : r8;
+  assign _068_ = rst ? 4'h0 : _070_;
+  assign _071_ = wr ? r6 : r7;
+  assign _067_ = rst ? 4'h0 : _071_;
+  assign _072_ = wr ? r5 : r6;
+  assign _066_ = rst ? 4'h0 : _072_;
+  assign _073_ = wr ? r4 : r5;
+  assign _055_ = rst ? 4'h0 : _073_;
+  assign _074_ = wr ? r3 : r4;
+  assign _044_ = rst ? 4'h0 : _074_;
+  assign _075_ = wr ? r2 : r3;
+  assign _033_ = rst ? 4'h0 : _075_;
+  assign _076_ = wr ? r1 : r2;
+  assign _022_ = rst ? 4'h0 : _076_;
+  assign _077_ = wr ? r0 : r1;
+  assign _011_ = rst ? 4'h0 : _077_;
+  assign _078_ = wr ? in : r0;
+  assign _000_ = rst ? 4'h0 : _078_;
+  assign _079_ = wr ? r68 : r69;
+  assign _065_ = rst ? 4'h0 : _079_;
+  assign _080_ = wr ? r67 : r68;
+  assign _064_ = rst ? 4'h0 : _080_;
+  assign _081_ = wr ? r66 : r67;
+  assign _063_ = rst ? 4'h0 : _081_;
+  assign _082_ = wr ? r65 : r66;
+  assign _062_ = rst ? 4'h0 : _082_;
+  assign _083_ = wr ? r64 : r65;
+  assign _061_ = rst ? 4'h0 : _083_;
+  assign _084_ = wr ? r63 : r64;
+  assign _060_ = rst ? 4'h0 : _084_;
+  assign _085_ = wr ? r62 : r63;
+  assign _059_ = rst ? 4'h0 : _085_;
+  assign _086_ = wr ? r61 : r62;
+  assign _058_ = rst ? 4'h0 : _086_;
+  assign _087_ = wr ? r60 : r61;
+  assign _057_ = rst ? 4'h0 : _087_;
+  assign _088_ = wr ? r59 : r60;
+  assign _056_ = rst ? 4'h0 : _088_;
+  assign _089_ = wr ? r58 : r59;
+  assign _054_ = rst ? 4'h0 : _089_;
+  assign _090_ = wr ? r57 : r58;
+  assign _053_ = rst ? 4'h0 : _090_;
+  assign _091_ = wr ? r56 : r57;
+  assign _052_ = rst ? 4'h0 : _091_;
+  assign _092_ = wr ? r55 : r56;
+  assign _051_ = rst ? 4'h0 : _092_;
+  assign _093_ = wr ? r54 : r55;
+  assign _050_ = rst ? 4'h0 : _093_;
+  assign _094_ = wr ? r53 : r54;
+  assign _049_ = rst ? 4'h0 : _094_;
+  assign _095_ = wr ? r52 : r53;
+  assign _048_ = rst ? 4'h0 : _095_;
+  assign _096_ = wr ? r51 : r52;
+  assign _047_ = rst ? 4'h0 : _096_;
+  assign _097_ = wr ? r50 : r51;
+  assign _046_ = rst ? 4'h0 : _097_;
+  assign _098_ = wr ? r49 : r50;
+  assign _045_ = rst ? 4'h0 : _098_;
+  assign _099_ = wr ? r48 : r49;
+  assign _043_ = rst ? 4'h0 : _099_;
+  assign _100_ = wr ? r47 : r48;
+  assign _042_ = rst ? 4'h0 : _100_;
+  assign _101_ = wr ? r46 : r47;
+  assign _041_ = rst ? 4'h0 : _101_;
+  assign _102_ = wr ? r45 : r46;
+  assign _040_ = rst ? 4'h0 : _102_;
+  assign _103_ = wr ? r44 : r45;
+  assign _039_ = rst ? 4'h0 : _103_;
+  assign _104_ = wr ? r43 : r44;
+  assign _038_ = rst ? 4'h0 : _104_;
+  assign _105_ = wr ? r42 : r43;
+  assign _037_ = rst ? 4'h0 : _105_;
+  assign _106_ = wr ? r41 : r42;
+  assign _036_ = rst ? 4'h0 : _106_;
+  assign _107_ = wr ? r40 : r41;
+  assign _035_ = rst ? 4'h0 : _107_;
+  assign _108_ = wr ? r39 : r40;
+  assign _034_ = rst ? 4'h0 : _108_;
+  assign _109_ = wr ? r38 : r39;
+  assign _032_ = rst ? 4'h0 : _109_;
+  assign _110_ = wr ? r37 : r38;
+  assign _031_ = rst ? 4'h0 : _110_;
+  assign _111_ = wr ? r36 : r37;
+  assign _030_ = rst ? 4'h0 : _111_;
+  assign _112_ = wr ? r35 : r36;
+  assign _029_ = rst ? 4'h0 : _112_;
+  assign _113_ = wr ? r34 : r35;
+  assign _028_ = rst ? 4'h0 : _113_;
+  assign _114_ = wr ? r33 : r34;
+  assign _027_ = rst ? 4'h0 : _114_;
+  assign _115_ = wr ? r32 : r33;
+  assign _026_ = rst ? 4'h0 : _115_;
+  assign _116_ = wr ? r31 : r32;
+  assign _025_ = rst ? 4'h0 : _116_;
+  assign _117_ = wr ? r30 : r31;
+  assign _024_ = rst ? 4'h0 : _117_;
+  assign _118_ = wr ? r29 : r30;
+  assign _023_ = rst ? 4'h0 : _118_;
+  assign _119_ = wr ? r28 : r29;
+  assign _021_ = rst ? 4'h0 : _119_;
+  assign _120_ = wr ? r27 : r28;
+  assign _020_ = rst ? 4'h0 : _120_;
+  assign _121_ = wr ? r26 : r27;
+  assign _019_ = rst ? 4'h0 : _121_;
+  assign _122_ = wr ? r25 : r26;
+  assign _018_ = rst ? 4'h0 : _122_;
+  assign _123_ = wr ? r24 : r25;
+  assign _017_ = rst ? 4'h0 : _123_;
+  assign _124_ = wr ? r23 : r24;
+  assign _016_ = rst ? 4'h0 : _124_;
+  assign _125_ = wr ? r22 : r23;
+  assign _015_ = rst ? 4'h0 : _125_;
+  assign _126_ = wr ? r21 : r22;
+  assign _014_ = rst ? 4'h0 : _126_;
+  assign _127_ = wr ? r20 : r21;
+  assign _013_ = rst ? 4'h0 : _127_;
+  assign _128_ = wr ? r19 : r20;
+  assign _012_ = rst ? 4'h0 : _128_;
+  assign _129_ = wr ? r18 : r19;
+  assign _010_ = rst ? 4'h0 : _129_;
+  assign _130_ = wr ? r17 : r18;
+  assign _009_ = rst ? 4'h0 : _130_;
+  assign _131_ = wr ? r16 : r17;
+  assign _008_ = rst ? 4'h0 : _131_;
+  assign _132_ = wr ? r15 : r16;
+  assign _007_ = rst ? 4'h0 : _132_;
+  assign _133_ = wr ? r14 : r15;
+  assign _006_ = rst ? 4'h0 : _133_;
+  assign _134_ = wr ? r13 : r14;
+  assign _005_ = rst ? 4'h0 : _134_;
+  assign _135_ = wr ? r12 : r13;
+  assign _004_ = rst ? 4'h0 : _135_;
+  assign _136_ = wr ? r11 : r12;
+  assign _003_ = rst ? 4'h0 : _136_;
+  assign _137_ = wr ? r10 : r11;
+  assign _002_ = rst ? 4'h0 : _137_;
+  assign _138_ = wr ? r9 : r10;
+  assign _001_ = rst ? 4'h0 : _138_;
+  assign _139_ = wr ? r8 : r9;
+  assign out = r69;
+endmodule
+module picorv32(clk, resetn, trap, mem_valid, mem_instr, mem_ready, mem_addr, mem_wdata, mem_wstrb, mem_rdata, mem_la_read, mem_la_write, mem_la_addr, mem_la_wdata, mem_la_wstrb, pcpi_valid, pcpi_insn, pcpi_rs1, pcpi_rs2, pcpi_wr, pcpi_rd, pcpi_wait, pcpi_ready, irq, eoi, trace_valid, trace_data);
+  wire [4:0] _0000_;
+  wire [31:0] _0001_;
+  wire [31:0] _0002_;
+  wire _0003_;
+  wire [63:0] _0004_;
+  wire [63:0] _0005_;
+  wire [7:0] _0006_;
+  wire [31:0] _0007_;
+  wire [31:0] _0008_;
+  wire [4:0] _0009_;
+  wire [4:0] _0010_;
+  wire [4:0] _0011_;
+  wire _0012_;
+  wire _0013_;
+  wire [31:0] _0014_;
+  wire _0015_;
+  wire _0016_;
+  wire _0017_;
+  wire _0018_;
+  wire _0019_;
+  wire _0020_;
+  wire _0021_;
+  wire _0022_;
+  wire _0023_;
+  wire _0024_;
+  wire _0025_;
+  wire _0026_;
+  wire _0027_;
+  wire _0028_;
+  wire _0029_;
+  wire _0030_;
+  wire _0031_;
+  wire _0032_;
+  wire _0033_;
+  wire _0034_;
+  wire _0035_;
+  wire _0036_;
+  wire _0037_;
+  wire _0038_;
+  wire _0039_;
+  wire _0040_;
+  wire _0041_;
+  wire _0042_;
+  wire _0043_;
+  wire _0044_;
+  wire _0045_;
+  wire _0046_;
+  wire _0047_;
+  wire _0048_;
+  wire _0049_;
+  wire _0050_;
+  wire _0051_;
+  wire _0052_;
+  wire _0053_;
+  wire _0054_;
+  wire _0055_;
+  wire _0056_;
+  wire _0057_;
+  wire _0058_;
+  wire _0059_;
+  wire _0060_;
+  wire _0061_;
+  wire _0062_;
+  wire _0063_;
+  wire _0064_;
+  wire _0065_;
+  wire _0066_;
+  wire _0067_;
+  wire _0068_;
+  wire _0069_;
+  wire _0070_;
+  wire _0071_;
+  wire _0072_;
+  wire _0073_;
+  wire _0074_;
+  wire _0075_;
+  wire [4:0] _0076_;
+  wire _0077_;
+  wire _0078_;
+  wire [31:0] _0079_;
+  wire _0080_;
+  wire _0081_;
+  wire _0082_;
+  wire _0083_;
+  wire _0084_;
+  wire [31:0] _0085_;
+  wire [1:0] _0086_;
+  wire _0087_;
+  wire [31:0] _0088_;
+  wire [1:0] _0089_;
+  wire [3:0] _0090_;
+  wire [31:0] _0091_;
+  wire _0092_;
+  wire [31:0] _0093_;
+  wire [31:0] _0094_;
+  wire [31:0] _0095_;
+  wire [31:0] _0096_;
+  wire [31:0] _0097_;
+  wire [4:0] _0098_;
+  wire _0099_;
+  wire _0100_;
+  wire _0101_;
+  wire _0102_;
+  wire [31:0] _0103_;
+  wire _0104_;
+  wire [31:0] _0105_;
+  wire _0106_;
+  wire _0107_;
+  wire _0108_;
+  wire [31:0] _0109_;
+  wire [31:0] _0110_;
+  wire _0111_;
+  wire _0112_;
+  wire _0113_;
+  wire _0114_;
+  wire _0115_;
+  wire _0116_;
+  wire [31:0] _0117_;
+  wire [31:0] _0118_;
+  wire [63:0] _0119_;
+  wire [31:0] _0120_;
+  wire [63:0] _0121_;
+  wire [31:0] _0122_;
+  wire [31:0] _0123_;
+  wire [31:0] _0124_;
+  wire [29:0] _0125_;
+  wire [31:0] _0126_;
+  wire [31:0] _0127_;
+  wire [31:0] _0128_;
+  wire [3:0] _0129_;
+  wire _0130_;
+  wire _0131_;
+  wire _0132_;
+  wire _0133_;
+  wire _0134_;
+  wire _0135_;
+  wire _0136_;
+  wire _0137_;
+  wire _0138_;
+  wire _0139_;
+  wire _0140_;
+  wire _0141_;
+  wire _0142_;
+  wire _0143_;
+  wire _0144_;
+  wire _0145_;
+  wire _0146_;
+  wire _0147_;
+  wire _0148_;
+  wire _0149_;
+  wire _0150_;
+  wire _0151_;
+  wire _0152_;
+  wire _0153_;
+  wire _0154_;
+  wire _0155_;
+  wire _0156_;
+  wire _0157_;
+  wire _0158_;
+  wire _0159_;
+  wire _0160_;
+  wire _0161_;
+  wire _0162_;
+  wire _0163_;
+  wire _0164_;
+  wire _0165_;
+  wire _0166_;
+  wire _0167_;
+  wire _0168_;
+  wire _0169_;
+  wire _0170_;
+  wire _0171_;
+  wire _0172_;
+  wire _0173_;
+  wire _0174_;
+  wire _0175_;
+  wire _0176_;
+  wire _0177_;
+  wire _0178_;
+  wire _0179_;
+  wire _0180_;
+  wire _0181_;
+  wire _0182_;
+  wire _0183_;
+  wire _0184_;
+  wire _0185_;
+  wire _0186_;
+  wire _0187_;
+  wire _0188_;
+  wire _0189_;
+  wire _0190_;
+  wire _0191_;
+  wire _0192_;
+  wire _0193_;
+  wire _0194_;
+  wire _0195_;
+  wire [7:0] _0196_;
+  wire [7:0] _0197_;
+  wire [31:0] _0198_;
+  wire [31:0] _0199_;
+  wire [31:0] _0200_;
+  wire _0201_;
+  wire _0202_;
+  wire _0203_;
+  wire _0204_;
+  wire _0205_;
+  wire _0206_;
+  wire _0207_;
+  wire _0208_;
+  wire _0209_;
+  wire _0210_;
+  wire _0211_;
+  wire _0212_;
+  wire _0213_;
+  wire _0214_;
+  wire _0215_;
+  wire _0216_;
+  wire _0217_;
+  wire _0218_;
+  wire _0219_;
+  wire _0220_;
+  wire _0221_;
+  wire _0222_;
+  wire _0223_;
+  wire _0224_;
+  wire _0225_;
+  wire _0226_;
+  wire _0227_;
+  wire _0228_;
+  wire _0229_;
+  wire _0230_;
+  wire _0231_;
+  wire _0232_;
+  wire _0233_;
+  wire _0234_;
+  wire _0235_;
+  wire _0236_;
+  wire _0237_;
+  wire _0238_;
+  wire _0239_;
+  wire _0240_;
+  wire _0241_;
+  wire _0242_;
+  wire _0243_;
+  wire _0244_;
+  wire _0245_;
+  wire _0246_;
+  wire _0247_;
+  wire _0248_;
+  wire _0249_;
+  wire _0250_;
+  wire _0251_;
+  wire _0252_;
+  wire _0253_;
+  wire _0254_;
+  wire _0255_;
+  wire _0256_;
+  wire _0257_;
+  wire _0258_;
+  wire _0259_;
+  wire _0260_;
+  wire _0261_;
+  wire _0262_;
+  wire _0263_;
+  wire _0264_;
+  wire _0265_;
+  wire _0266_;
+  wire _0267_;
+  wire _0268_;
+  wire _0269_;
+  wire _0270_;
+  wire _0271_;
+  wire _0272_;
+  wire _0273_;
+  wire _0274_;
+  wire _0275_;
+  wire _0276_;
+  wire _0277_;
+  wire _0278_;
+  wire _0279_;
+  wire _0280_;
+  wire _0281_;
+  wire _0282_;
+  wire _0283_;
+  wire _0284_;
+  wire _0285_;
+  wire _0286_;
+  wire _0287_;
+  wire _0288_;
+  wire _0289_;
+  wire _0290_;
+  wire _0291_;
+  wire _0292_;
+  wire _0293_;
+  wire _0294_;
+  wire _0295_;
+  wire _0296_;
+  wire _0297_;
+  wire _0298_;
+  wire _0299_;
+  wire _0300_;
+  wire _0301_;
+  wire _0302_;
+  wire _0303_;
+  wire _0304_;
+  wire _0305_;
+  wire _0306_;
+  wire _0307_;
+  wire _0308_;
+  wire _0309_;
+  wire _0310_;
+  wire _0311_;
+  wire _0312_;
+  wire _0313_;
+  wire _0314_;
+  wire _0315_;
+  wire _0316_;
+  wire _0317_;
+  wire _0318_;
+  wire _0319_;
+  wire _0320_;
+  wire _0321_;
+  wire _0322_;
+  wire _0323_;
+  wire _0324_;
+  wire _0325_;
+  wire _0326_;
+  wire _0327_;
+  wire _0328_;
+  wire _0329_;
+  wire _0330_;
+  wire _0331_;
+  wire _0332_;
+  wire _0333_;
+  wire _0334_;
+  wire _0335_;
+  wire _0336_;
+  wire _0337_;
+  wire _0338_;
+  wire _0339_;
+  wire _0340_;
+  wire [31:0] _0341_;
+  wire [31:0] _0342_;
+  wire [31:0] _0343_;
+  wire [31:0] _0344_;
+  wire [31:0] _0345_;
+  wire [31:0] _0346_;
+  wire [31:0] _0347_;
+  wire [31:0] _0348_;
+  wire [31:0] _0349_;
+  wire [31:0] _0350_;
+  wire [31:0] _0351_;
+  wire [31:0] _0352_;
+  wire [31:0] _0353_;
+  wire [31:0] _0354_;
+  wire [31:0] _0355_;
+  wire [31:0] _0356_;
+  wire [31:0] _0357_;
+  wire [31:0] _0358_;
+  wire [31:0] _0359_;
+  wire [31:0] _0360_;
+  wire [31:0] _0361_;
+  wire [31:0] _0362_;
+  wire [31:0] _0363_;
+  wire [31:0] _0364_;
+  wire [31:0] _0365_;
+  wire [31:0] _0366_;
+  wire [31:0] _0367_;
+  wire [31:0] _0368_;
+  wire [31:0] _0369_;
+  wire [31:0] _0370_;
+  wire _0371_;
+  wire _0372_;
+  wire _0373_;
+  wire _0374_;
+  wire _0375_;
+  wire _0376_;
+  wire _0377_;
+  wire _0378_;
+  wire _0379_;
+  wire _0380_;
+  wire _0381_;
+  wire _0382_;
+  wire _0383_;
+  wire _0384_;
+  wire _0385_;
+  wire _0386_;
+  wire _0387_;
+  wire _0388_;
+  wire _0389_;
+  wire _0390_;
+  wire _0391_;
+  wire _0392_;
+  wire _0393_;
+  wire _0394_;
+  wire _0395_;
+  wire _0396_;
+  wire _0397_;
+  wire _0398_;
+  wire _0399_;
+  wire _0400_;
+  wire _0401_;
+  wire _0402_;
+  wire [31:0] _0403_;
+  wire [31:0] _0404_;
+  wire [31:0] _0405_;
+  wire [31:0] _0406_;
+  wire [31:0] _0407_;
+  wire [31:0] _0408_;
+  wire [31:0] _0409_;
+  wire [31:0] _0410_;
+  wire [31:0] _0411_;
+  wire [31:0] _0412_;
+  wire [31:0] _0413_;
+  wire [31:0] _0414_;
+  wire [31:0] _0415_;
+  wire [31:0] _0416_;
+  wire [31:0] _0417_;
+  wire [31:0] _0418_;
+  wire [31:0] _0419_;
+  wire [31:0] _0420_;
+  wire [31:0] _0421_;
+  wire [31:0] _0422_;
+  wire [31:0] _0423_;
+  wire [31:0] _0424_;
+  wire [31:0] _0425_;
+  wire [31:0] _0426_;
+  wire [31:0] _0427_;
+  wire [31:0] _0428_;
+  wire [31:0] _0429_;
+  wire [31:0] _0430_;
+  wire [31:0] _0431_;
+  wire [31:0] _0432_;
+  wire [31:0] _0433_;
+  wire [31:0] _0434_;
+  wire [31:0] _0435_;
+  wire [31:0] _0436_;
+  wire [29:0] _0437_;
+  wire [29:0] _0438_;
+  wire [29:0] _0439_;
+  wire _0440_;
+  wire _0441_;
+  wire _0442_;
+  wire _0443_;
+  wire _0444_;
+  wire _0445_;
+  wire [31:0] _0446_;
+  wire [31:0] _0447_;
+  wire _0448_;
+  wire _0449_;
+  wire _0450_;
+  wire _0451_;
+  wire _0452_;
+  wire _0453_;
+  wire _0454_;
+  wire _0455_;
+  wire [31:0] _0456_;
+  wire [31:0] _0457_;
+  wire [31:0] _0458_;
+  wire [31:0] _0459_;
+  wire [31:0] _0460_;
+  wire [31:0] _0461_;
+  wire [31:0] _0462_;
+  wire [4:0] _0463_;
+  wire [4:0] _0464_;
+  wire [4:0] _0465_;
+  wire _0466_;
+  wire [4:0] _0467_;
+  wire [4:0] _0468_;
+  wire _0469_;
+  wire _0470_;
+  wire _0471_;
+  wire _0472_;
+  wire _0473_;
+  wire _0474_;
+  wire _0475_;
+  wire _0476_;
+  wire _0477_;
+  wire _0478_;
+  wire _0479_;
+  wire _0480_;
+  wire _0481_;
+  wire _0482_;
+  wire _0483_;
+  wire _0484_;
+  wire _0485_;
+  wire _0486_;
+  wire _0487_;
+  wire [7:0] _0488_;
+  wire [7:0] _0489_;
+  wire [7:0] _0490_;
+  wire [7:0] _0491_;
+  wire [7:0] _0492_;
+  wire [7:0] _0493_;
+  wire _0494_;
+  wire [7:0] _0495_;
+  wire [7:0] _0496_;
+  wire [7:0] _0497_;
+  wire _0498_;
+  wire _0499_;
+  wire _0500_;
+  wire _0501_;
+  wire _0502_;
+  wire _0503_;
+  wire _0504_;
+  wire _0505_;
+  wire _0506_;
+  wire _0507_;
+  wire _0508_;
+  wire _0509_;
+  wire _0510_;
+  wire [1:0] _0511_;
+  wire [1:0] _0512_;
+  wire [1:0] _0513_;
+  wire [1:0] _0514_;
+  wire [1:0] _0515_;
+  wire [1:0] _0516_;
+  wire [1:0] _0517_;
+  wire [31:0] _0518_;
+  wire [31:0] _0519_;
+  wire [31:0] _0520_;
+  wire [31:0] _0521_;
+  wire [31:0] _0522_;
+  wire [31:0] _0523_;
+  wire [31:0] _0524_;
+  wire [31:0] _0525_;
+  wire [31:0] _0526_;
+  wire [31:0] _0527_;
+  wire [31:0] _0528_;
+  wire [31:0] _0529_;
+  wire [29:0] _0530_;
+  wire [63:0] _0531_;
+  wire [63:0] _0532_;
+  wire _0533_;
+  wire _0534_;
+  wire [31:0] _0535_;
+  wire _0536_;
+  wire _0537_;
+  wire _0538_;
+  wire _0539_;
+  wire _0540_;
+  wire _0541_;
+  wire _0542_;
+  wire _0543_;
+  wire _0544_;
+  wire _0545_;
+  wire _0546_;
+  wire _0547_;
+  wire _0548_;
+  wire _0549_;
+  wire _0550_;
+  wire _0551_;
+  wire _0552_;
+  wire _0553_;
+  wire _0554_;
+  wire _0555_;
+  wire _0556_;
+  wire _0557_;
+  wire _0558_;
+  wire _0559_;
+  wire [1:0] _0560_;
+  wire [1:0] _0561_;
+  wire _0562_;
+  wire [1:0] _0563_;
+  wire _0564_;
+  wire [1:0] _0565_;
+  wire [1:0] _0566_;
+  wire _0567_;
+  wire [1:0] _0568_;
+  wire [1:0] _0569_;
+  wire [1:0] _0570_;
+  wire [3:0] _0571_;
+  wire [3:0] _0572_;
+  wire [3:0] _0573_;
+  wire [31:0] _0574_;
+  wire [31:0] _0575_;
+  wire _0576_;
+  wire _0577_;
+  wire _0578_;
+  wire _0579_;
+  wire _0580_;
+  wire _0581_;
+  wire _0582_;
+  wire _0583_;
+  wire _0584_;
+  wire _0585_;
+  wire _0586_;
+  wire _0587_;
+  wire _0588_;
+  wire _0589_;
+  wire _0590_;
+  wire _0591_;
+  wire _0592_;
+  wire _0593_;
+  wire _0594_;
+  wire _0595_;
+  wire _0596_;
+  wire _0597_;
+  wire _0598_;
+  wire [3:0] _0599_;
+  wire [31:0] _0600_;
+  wire [31:0] _0601_;
+  wire _0602_;
+  wire [31:0] _0603_;
+  wire [31:0] _0604_;
+  wire [31:0] _0605_;
+  wire [31:0] _0606_;
+  wire [3:0] _0607_;
+  wire [31:0] _0608_;
+  wire [31:0] alu_add_sub;
+  wire alu_eq;
+  wire alu_lts;
+  wire alu_ltu;
+  wire [31:0] alu_out;
+  wire alu_out_0;
+  reg [31:0] alu_out_q;
+  wire [31:0] alu_shl;
+  wire [31:0] alu_shr;
+  input clk;
+  reg compressed_instr;
+  reg [63:0] count_cycle;
+  reg [63:0] count_instr;
+  reg [7:0] cpu_state;
+  reg [31:0] \cpuregs[0] ;
+  reg [31:0] \cpuregs[10] ;
+  reg [31:0] \cpuregs[11] ;
+  reg [31:0] \cpuregs[12] ;
+  reg [31:0] \cpuregs[13] ;
+  reg [31:0] \cpuregs[14] ;
+  reg [31:0] \cpuregs[15] ;
+  reg [31:0] \cpuregs[16] ;
+  reg [31:0] \cpuregs[17] ;
+  reg [31:0] \cpuregs[18] ;
+  reg [31:0] \cpuregs[19] ;
+  reg [31:0] \cpuregs[1] ;
+  reg [31:0] \cpuregs[20] ;
+  reg [31:0] \cpuregs[21] ;
+  reg [31:0] \cpuregs[22] ;
+  reg [31:0] \cpuregs[23] ;
+  reg [31:0] \cpuregs[24] ;
+  reg [31:0] \cpuregs[25] ;
+  reg [31:0] \cpuregs[26] ;
+  reg [31:0] \cpuregs[27] ;
+  reg [31:0] \cpuregs[28] ;
+  reg [31:0] \cpuregs[29] ;
+  reg [31:0] \cpuregs[2] ;
+  reg [31:0] \cpuregs[30] ;
+  reg [31:0] \cpuregs[31] ;
+  reg [31:0] \cpuregs[3] ;
+  reg [31:0] \cpuregs[4] ;
+  reg [31:0] \cpuregs[5] ;
+  reg [31:0] \cpuregs[6] ;
+  reg [31:0] \cpuregs[7] ;
+  reg [31:0] \cpuregs[8] ;
+  reg [31:0] \cpuregs[9] ;
+  wire [31:0] cpuregs_rs1;
+  wire [31:0] cpuregs_rs2;
+  wire [31:0] cpuregs_wrdata;
+  wire cpuregs_write;
+  wire [31:0] dbg_mem_addr;
+  wire dbg_mem_instr;
+  wire [31:0] dbg_mem_rdata;
+  wire dbg_mem_ready;
+  wire dbg_mem_valid;
+  wire [31:0] dbg_mem_wdata;
+  wire [3:0] dbg_mem_wstrb;
+  reg [31:0] decoded_imm;
+  reg [31:0] decoded_imm_j;
+  reg [4:0] decoded_rd;
+  wire [4:0] decoded_rs;
+  reg [4:0] decoded_rs1;
+  reg [4:0] decoded_rs2;
+  reg decoder_pseudo_trigger;
+  reg decoder_pseudo_trigger_q;
+  reg decoder_trigger;
+  reg decoder_trigger_q;
+  wire do_waitirq;
+  output [31:0] eoi;
+  reg [31:0] eoi;
+  reg instr_add;
+  reg instr_addi;
+  reg instr_and;
+  reg instr_andi;
+  reg instr_auipc;
+  reg instr_beq;
+  reg instr_bge;
+  reg instr_bgeu;
+  reg instr_blt;
+  reg instr_bltu;
+  reg instr_bne;
+  reg instr_ecall_ebreak;
+  reg instr_jal;
+  reg instr_jalr;
+  reg instr_lb;
+  reg instr_lbu;
+  reg instr_lh;
+  reg instr_lhu;
+  reg instr_lui;
+  reg instr_lw;
+  reg instr_or;
+  reg instr_ori;
+  reg instr_rdcycle;
+  reg instr_rdcycleh;
+  reg instr_rdinstr;
+  reg instr_rdinstrh;
+  reg instr_retirq;
+  reg instr_sb;
+  reg instr_sh;
+  reg instr_sll;
+  reg instr_slli;
+  reg instr_slt;
+  reg instr_slti;
+  reg instr_sltiu;
+  reg instr_sltu;
+  reg instr_sra;
+  reg instr_srai;
+  reg instr_srl;
+  reg instr_srli;
+  reg instr_sub;
+  reg instr_sw;
+  wire instr_trap;
+  reg instr_xor;
+  reg instr_xori;
+  input [31:0] irq;
+  reg is_alu_reg_imm;
+  reg is_alu_reg_reg;
+  reg is_beq_bne_blt_bge_bltu_bgeu;
+  reg is_compare;
+  reg is_jalr_addi_slti_sltiu_xori_ori_andi;
+  reg is_lb_lh_lw_lbu_lhu;
+  reg is_lbu_lhu_lw;
+  reg is_lui_auipc_jal;
+  reg is_lui_auipc_jal_jalr_addi_add_sub;
+  wire is_rdcycle_rdcycleh_rdinstr_rdinstrh;
+  reg is_sb_sh_sw;
+  reg is_slli_srli_srai;
+  reg is_slti_blt_slt;
+  reg is_sltiu_bltu_sltu;
+  reg latched_branch;
+  reg latched_compr;
+  reg latched_is_lb;
+  reg latched_is_lh;
+  reg latched_is_lu;
+  reg [4:0] latched_rd;
+  reg latched_stalu;
+  reg latched_store;
+  output [31:0] mem_addr;
+  reg [31:0] mem_addr;
+  reg mem_do_prefetch;
+  reg mem_do_rdata;
+  reg mem_do_rinst;
+  reg mem_do_wdata;
+  wire mem_done;
+  output mem_instr;
+  reg mem_instr;
+  output [31:0] mem_la_addr;
+  wire mem_la_firstword;
+  wire mem_la_firstword_xfer;
+  output mem_la_read;
+  wire mem_la_use_prefetched_high_word;
+  output [31:0] mem_la_wdata;
+  output mem_la_write;
+  output [3:0] mem_la_wstrb;
+  input [31:0] mem_rdata;
+  wire [31:0] mem_rdata_latched;
+  wire [31:0] mem_rdata_latched_noshuffle;
+  reg [31:0] mem_rdata_q;
+  wire [31:0] mem_rdata_word;
+  input mem_ready;
+  reg [1:0] mem_state;
+  output mem_valid;
+  reg mem_valid;
+  output [31:0] mem_wdata;
+  reg [31:0] mem_wdata;
+  reg [1:0] mem_wordsize;
+  output [3:0] mem_wstrb;
+  reg [3:0] mem_wstrb;
+  wire mem_xfer;
+  wire [31:0] next_pc;
+  wire [31:0] pcpi_div_rd;
+  wire pcpi_div_ready;
+  wire pcpi_div_wait;
+  wire pcpi_div_wr;
+  output [31:0] pcpi_insn;
+  reg [31:0] pcpi_insn;
+  wire pcpi_int_ready;
+  wire pcpi_int_wait;
+  wire [31:0] pcpi_mul_rd;
+  wire pcpi_mul_ready;
+  wire pcpi_mul_wait;
+  wire pcpi_mul_wr;
+  input [31:0] pcpi_rd;
+  input pcpi_ready;
+  output [31:0] pcpi_rs1;
+  output [31:0] pcpi_rs2;
+  output pcpi_valid;
+  reg pcpi_valid;
+  input pcpi_wait;
+  input pcpi_wr;
+  reg [31:0] reg_next_pc;
+  reg [31:0] reg_op1;
+  reg [31:0] reg_op2;
+  reg [31:0] reg_out;
+  reg [31:0] reg_pc;
+  reg [4:0] reg_sh;
+  input resetn;
+  output [35:0] trace_data;
+  output trace_valid;
+  output trap;
+  reg trap;
+  assign _0117_ = reg_op1 + reg_op2;
+  assign _0118_ = reg_pc + _0199_[2:0];
+  assign _0119_ = count_cycle + 1'h1;
+  assign _0120_ = _0109_ + _0200_[2:0];
+  assign _0121_ = count_instr + 1'h1;
+  assign _0122_ = _0109_ + decoded_imm_j;
+  assign _0123_ = reg_pc + decoded_imm;
+  assign _0124_ = reg_op1 + decoded_imm;
+  assign _0125_ = next_pc[31:2] + 1'h0;
+  assign _0126_ = reg_out & 32'hfffffffe;
+  assign _0127_ = reg_op1 & reg_op2;
+  assign _0128_ = _0603_ & 32'hfffffffe;
+  wire [3:0] fangyuan0;
+  assign fangyuan0 = { mem_la_write, mem_la_write, mem_la_write, mem_la_write };
+  assign _0129_ = mem_la_wstrb & fangyuan0;
+  assign _0186_ = _0000_[0] == 1'h0;
+  assign _0187_ = _0000_[1] == 1'h0;
+  assign _0188_ = _0000_[2] == 1'h0;
+  assign _0189_ = _0000_[3] == 1'h0;
+  assign _0190_ = _0000_[4] == 1'h0;
+  assign _0191_ = _0000_[0] == 1'h1;
+  assign _0192_ = _0000_[1] == 1'h1;
+  assign _0193_ = _0000_[2] == 1'h1;
+  assign _0194_ = _0000_[3] == 1'h1;
+  assign _0195_ = _0000_[4] == 1'h1;
+  assign _0138_ = _0186_ & _0187_;
+  assign _0139_ = _0189_ & _0190_;
+  assign _0140_ = _0188_ & _0139_;
+  assign _0141_ = _0138_ & _0140_;
+  assign _0142_ = _0191_ & _0187_;
+  assign _0143_ = _0142_ & _0140_;
+  assign _0144_ = _0186_ & _0192_;
+  assign _0145_ = _0144_ & _0140_;
+  assign _0146_ = _0191_ & _0192_;
+  assign _0147_ = _0146_ & _0140_;
+  assign _0148_ = _0193_ & _0139_;
+  assign _0149_ = _0138_ & _0148_;
+  assign _0150_ = _0142_ & _0148_;
+  assign _0151_ = _0144_ & _0148_;
+  assign _0152_ = _0146_ & _0148_;
+  assign _0153_ = _0194_ & _0190_;
+  assign _0154_ = _0188_ & _0153_;
+  assign _0155_ = _0138_ & _0154_;
+  assign _0156_ = _0142_ & _0154_;
+  assign _0157_ = _0144_ & _0154_;
+  assign _0158_ = _0146_ & _0154_;
+  assign _0159_ = _0193_ & _0153_;
+  assign _0160_ = _0138_ & _0159_;
+  assign _0161_ = _0142_ & _0159_;
+  assign _0162_ = _0144_ & _0159_;
+  assign _0163_ = _0146_ & _0159_;
+  assign _0164_ = _0189_ & _0195_;
+  assign _0165_ = _0188_ & _0164_;
+  assign _0166_ = _0138_ & _0165_;
+  assign _0167_ = _0142_ & _0165_;
+  assign _0168_ = _0144_ & _0165_;
+  assign _0169_ = _0146_ & _0165_;
+  assign _0170_ = _0193_ & _0164_;
+  assign _0171_ = _0138_ & _0170_;
+  assign _0172_ = _0142_ & _0170_;
+  assign _0173_ = _0144_ & _0170_;
+  assign _0174_ = _0146_ & _0170_;
+  assign _0175_ = _0194_ & _0195_;
+  assign _0176_ = _0188_ & _0175_;
+  assign _0177_ = _0138_ & _0176_;
+  assign _0178_ = _0142_ & _0176_;
+  assign _0179_ = _0144_ & _0176_;
+  assign _0180_ = _0146_ & _0176_;
+  assign _0181_ = _0193_ & _0175_;
+  assign _0182_ = _0138_ & _0181_;
+  assign _0183_ = _0142_ & _0181_;
+  assign _0184_ = _0144_ & _0181_;
+  assign _0185_ = _0146_ & _0181_;
+  wire [6:0] fangyuan1;
+  assign fangyuan1 = { _0445_, _0444_, _0443_, _0441_, _0440_, _0219_, _0218_ };
+  assign _0130_ = | fangyuan1;
+  wire [6:0] fangyuan2;
+  assign fangyuan2 = { _0445_, _0444_, _0443_, _0442_, _0441_, _0219_, _0218_ };
+  assign _0131_ = | fangyuan2;
+  wire [6:0] fangyuan3;
+  assign fangyuan3 = { _0445_, _0443_, _0442_, _0441_, _0440_, _0219_, _0218_ };
+  assign _0132_ = | fangyuan3;
+  wire [1:0] fangyuan4;
+  assign fangyuan4 = { _0443_, _0440_ };
+  assign _0133_ = | fangyuan4;
+  wire [2:0] fangyuan5;
+  assign fangyuan5 = { is_jalr_addi_slti_sltiu_xori_ori_andi, is_slli_srli_srai, is_lui_auipc_jal };
+  assign _0134_ = | fangyuan5;
+  wire [1:0] fangyuan6;
+  assign fangyuan6 = { _0294_, latched_branch };
+  assign _0135_ = | fangyuan6;
+  wire [1:0] fangyuan7;
+  assign fangyuan7 = { _0442_, _0440_ };
+  assign _0136_ = | fangyuan7;
+  wire [1:0] fangyuan8;
+  assign fangyuan8 = { _0567_, _0564_ };
+  assign _0137_ = | fangyuan8;
+  assign _0201_ = ! mem_rdata_q[14:12];
+  assign _0202_ = mem_rdata_q[14:12] == 1'h1;
+  assign _0203_ = mem_rdata_q[14:12] == 3'h4;
+  assign _0204_ = mem_rdata_q[14:12] == 3'h5;
+  assign _0205_ = mem_rdata_q[14:12] == 3'h6;
+  assign _0206_ = mem_rdata_q[14:12] == 3'h7;
+  assign _0207_ = mem_rdata_q[14:12] == 2'h2;
+  assign _0208_ = mem_rdata_q[14:12] == 2'h3;
+  assign _0209_ = ! mem_rdata_q[31:25];
+  assign _0210_ = mem_rdata_q[31:25] == 6'h20;
+  assign _0211_ = mem_rdata_q[6:0] == 7'h73;
+  assign _0212_ = mem_rdata_q[31:12] == 20'hc0002;
+  assign _0213_ = mem_rdata_q[31:12] == 20'hc0102;
+  assign _0214_ = mem_rdata_q[31:12] == 20'hc8002;
+  assign _0215_ = mem_rdata_q[31:12] == 20'hc8102;
+  assign _0216_ = mem_rdata_q[31:12] == 20'hc0202;
+  assign _0217_ = mem_rdata_q[31:12] == 20'hc8202;
+  assign alu_eq = reg_op1 == reg_op2;
+  assign _0218_ = cpu_state == 7'h40;
+  assign _0219_ = cpu_state == 5'h10;
+  assign _0220_ = ! reg_sh;
+  assign _0221_ = mem_rdata_latched[6:0] == 6'h37;
+  assign _0222_ = mem_rdata_latched[6:0] == 5'h17;
+  assign _0223_ = mem_rdata_latched[6:0] == 7'h6f;
+  assign _0224_ = mem_rdata_latched[6:0] == 7'h67;
+  assign _0225_ = ! mem_rdata_latched[14:12];
+  assign _0226_ = mem_rdata_latched[6:0] == 7'h63;
+  assign _0227_ = mem_rdata_latched[6:0] == 2'h3;
+  assign _0228_ = mem_rdata_latched[6:0] == 6'h23;
+  assign _0229_ = mem_rdata_latched[6:0] == 5'h13;
+  assign _0230_ = mem_rdata_latched[6:0] == 6'h33;
+  assign _0231_ = reg_sh >= 3'h4;
+  assign _0232_ = decoder_trigger && _0310_;
+  assign _0233_ = is_beq_bne_blt_bge_bltu_bgeu && _0201_;
+  assign _0234_ = is_beq_bne_blt_bge_bltu_bgeu && _0202_;
+  assign _0235_ = is_beq_bne_blt_bge_bltu_bgeu && _0203_;
+  assign _0236_ = is_beq_bne_blt_bge_bltu_bgeu && _0204_;
+  assign _0237_ = is_beq_bne_blt_bge_bltu_bgeu && _0205_;
+  assign _0238_ = is_beq_bne_blt_bge_bltu_bgeu && _0206_;
+  assign _0239_ = is_lb_lh_lw_lbu_lhu && _0201_;
+  assign _0240_ = is_lb_lh_lw_lbu_lhu && _0202_;
+  assign _0241_ = is_lb_lh_lw_lbu_lhu && _0207_;
+  assign _0242_ = is_lb_lh_lw_lbu_lhu && _0203_;
+  assign _0243_ = is_lb_lh_lw_lbu_lhu && _0204_;
+  assign _0244_ = is_sb_sh_sw && _0201_;
+  assign _0245_ = is_sb_sh_sw && _0202_;
+  assign _0246_ = is_sb_sh_sw && _0207_;
+  assign _0247_ = is_alu_reg_imm && _0201_;
+  assign _0248_ = is_alu_reg_imm && _0207_;
+  assign _0249_ = is_alu_reg_imm && _0208_;
+  assign _0250_ = is_alu_reg_imm && _0203_;
+  assign _0251_ = is_alu_reg_imm && _0205_;
+  assign _0252_ = is_alu_reg_imm && _0206_;
+  assign _0253_ = is_alu_reg_imm && _0202_;
+  assign _0254_ = _0253_ && _0209_;
+  assign _0255_ = is_alu_reg_imm && _0204_;
+  assign _0256_ = _0255_ && _0209_;
+  assign _0257_ = _0255_ && _0210_;
+  assign _0258_ = is_alu_reg_reg && _0201_;
+  assign _0259_ = _0258_ && _0209_;
+  assign _0260_ = _0258_ && _0210_;
+  assign _0261_ = is_alu_reg_reg && _0202_;
+  assign _0262_ = _0261_ && _0209_;
+  assign _0263_ = is_alu_reg_reg && _0207_;
+  assign _0264_ = _0263_ && _0209_;
+  assign _0265_ = is_alu_reg_reg && _0208_;
+  assign _0266_ = _0265_ && _0209_;
+  assign _0267_ = is_alu_reg_reg && _0203_;
+  assign _0268_ = _0267_ && _0209_;
+  assign _0269_ = is_alu_reg_reg && _0204_;
+  assign _0270_ = _0269_ && _0209_;
+  assign _0271_ = _0269_ && _0210_;
+  assign _0272_ = is_alu_reg_reg && _0205_;
+  assign _0273_ = _0272_ && _0209_;
+  assign _0274_ = is_alu_reg_reg && _0206_;
+  assign _0275_ = _0274_ && _0209_;
+  assign _0276_ = _0211_ && _0212_;
+  assign _0278_ = _0211_ && _0213_;
+  assign _0279_ = _0211_ && _0214_;
+  assign _0281_ = _0211_ && _0215_;
+  assign _0282_ = _0211_ && _0216_;
+  assign _0283_ = _0211_ && _0217_;
+  assign _0284_ = _0211_ && _0311_;
+  assign _0285_ = _0284_ && _0312_;
+  assign _0286_ = is_alu_reg_imm && _0594_;
+  assign _0287_ = _0202_ && _0209_;
+  assign _0288_ = _0204_ && _0209_;
+  assign _0289_ = _0204_ && _0210_;
+  assign _0290_ = is_alu_reg_imm && _0595_;
+  assign _0291_ = latched_store && latched_branch;
+  assign _0294_ = latched_store && _0316_;
+  assign _0295_ = resetn && cpuregs_write;
+  assign _0296_ = _0295_ && latched_rd;
+  assign _0297_ = mem_do_rinst && mem_done;
+  assign _0299_ = _0317_ && _0318_;
+  assign _0300_ = _0319_ && mem_done;
+  assign _0301_ = decoder_trigger_q && _0320_;
+  assign _0302_ = _0301_ && instr_ecall_ebreak;
+  assign mem_xfer = mem_valid && mem_ready;
+  assign _0303_ = mem_xfer && _0596_;
+  assign _0304_ = _0303_ && _0334_;
+  assign _0305_ = _0592_ && mem_do_rinst;
+  assign mem_done = resetn && _0335_;
+  assign _0306_ = resetn && _0307_;
+  assign mem_la_write = _0306_ && mem_do_wdata;
+  assign _0308_ = _0307_ && _0337_;
+  assign mem_la_read = resetn && _0308_;
+  assign _0309_ = _0224_ && _0225_;
+  assign _0310_ = ! decoder_pseudo_trigger;
+  assign _0311_ = ! mem_rdata_q[31:21];
+  assign _0312_ = ! mem_rdata_q[19:7];
+  assign _0313_ = ! alu_eq;
+  assign _0314_ = ! alu_lts;
+  assign _0315_ = ! alu_ltu;
+  assign _0316_ = ! latched_branch;
+  assign _0298_ = ! decoder_trigger;
+  assign _0317_ = ! instr_jalr;
+  assign _0318_ = ! instr_retirq;
+  assign _0319_ = ! mem_do_prefetch;
+  assign _0320_ = ! decoder_pseudo_trigger_q;
+  assign _0321_ = ! resetn;
+  assign _0307_ = ! mem_state;
+  assign _0277_ = _0276_ || _0278_;
+  assign _0280_ = _0279_ || _0281_;
+  assign _0322_ = instr_jalr || _0290_;
+  assign _0323_ = instr_sra || instr_srai;
+  assign _0324_ = instr_xori || instr_xor;
+  assign _0325_ = instr_ori || instr_or;
+  assign _0326_ = instr_andi || instr_and;
+  assign _0292_ = instr_sll || instr_slli;
+  assign _0327_ = instr_srl || instr_srli;
+  assign _0328_ = _0327_ || instr_sra;
+  assign _0293_ = _0328_ || instr_srai;
+  assign _0329_ = _0319_ || mem_done;
+  assign _0330_ = instr_lb || instr_lbu;
+  assign _0331_ = instr_lh || instr_lhu;
+  assign _0332_ = _0321_ || mem_done;
+  assign _0333_ = mem_do_rinst || mem_do_rdata;
+  assign _0334_ = _0333_ || mem_do_wdata;
+  assign _0335_ = _0304_ || _0305_;
+  assign _0336_ = mem_do_rinst || mem_do_prefetch;
+  assign _0337_ = _0336_ || mem_do_rdata;
+  assign _0338_ = _0321_ || trap;
+  assign _0339_ = _0321_ || mem_ready;
+  assign _0340_ = mem_la_read || mem_la_write;
+  assign alu_lts = $signed(reg_op1) < $signed(reg_op2);
+  assign alu_ltu = reg_op1 < reg_op2;
+  assign _0435_ = decoded_rs[4] ? _0342_ : _0341_;
+  assign _0341_ = decoded_rs[3] ? _0344_ : _0343_;
+  assign _0342_ = decoded_rs[3] ? _0346_ : _0345_;
+  assign _0343_ = decoded_rs[2] ? _0348_ : _0347_;
+  assign _0344_ = decoded_rs[2] ? _0350_ : _0349_;
+  assign _0345_ = decoded_rs[2] ? _0352_ : _0351_;
+  assign _0346_ = decoded_rs[2] ? _0354_ : _0353_;
+  assign _0347_ = decoded_rs[1] ? _0356_ : _0355_;
+  assign _0348_ = decoded_rs[1] ? _0358_ : _0357_;
+  assign _0349_ = decoded_rs[1] ? _0360_ : _0359_;
+  assign _0350_ = decoded_rs[1] ? _0362_ : _0361_;
+  assign _0351_ = decoded_rs[1] ? _0364_ : _0363_;
+  assign _0352_ = decoded_rs[1] ? _0366_ : _0365_;
+  assign _0353_ = decoded_rs[1] ? _0368_ : _0367_;
+  assign _0354_ = decoded_rs[1] ? _0370_ : _0369_;
+  assign _0355_ = decoded_rs[0] ? \cpuregs[1] : \cpuregs[0] ;
+  assign _0365_ = decoded_rs[0] ? \cpuregs[21] : \cpuregs[20] ;
+  assign _0366_ = decoded_rs[0] ? \cpuregs[23] : \cpuregs[22] ;
+  assign _0367_ = decoded_rs[0] ? \cpuregs[25] : \cpuregs[24] ;
+  assign _0368_ = decoded_rs[0] ? \cpuregs[27] : \cpuregs[26] ;
+  assign _0369_ = decoded_rs[0] ? \cpuregs[29] : \cpuregs[28] ;
+  assign _0370_ = decoded_rs[0] ? \cpuregs[31] : \cpuregs[30] ;
+  assign _0356_ = decoded_rs[0] ? \cpuregs[3] : \cpuregs[2] ;
+  assign _0357_ = decoded_rs[0] ? \cpuregs[5] : \cpuregs[4] ;
+  assign _0358_ = decoded_rs[0] ? \cpuregs[7] : \cpuregs[6] ;
+  assign _0359_ = decoded_rs[0] ? \cpuregs[9] : \cpuregs[8] ;
+  assign _0360_ = decoded_rs[0] ? \cpuregs[11] : \cpuregs[10] ;
+  assign _0361_ = decoded_rs[0] ? \cpuregs[13] : \cpuregs[12] ;
+  assign _0362_ = decoded_rs[0] ? \cpuregs[15] : \cpuregs[14] ;
+  assign _0363_ = decoded_rs[0] ? \cpuregs[17] : \cpuregs[16] ;
+  assign _0364_ = decoded_rs[0] ? \cpuregs[19] : \cpuregs[18] ;
+  assign _0371_ = _0141_ & _0002_[31];
+  assign _0372_ = _0157_ & _0002_[31];
+  assign _0373_ = _0158_ & _0002_[31];
+  assign _0374_ = _0160_ & _0002_[31];
+  assign _0375_ = _0161_ & _0002_[31];
+  assign _0376_ = _0162_ & _0002_[31];
+  assign _0377_ = _0163_ & _0002_[31];
+  assign _0378_ = _0166_ & _0002_[31];
+  assign _0379_ = _0167_ & _0002_[31];
+  assign _0380_ = _0168_ & _0002_[31];
+  assign _0381_ = _0169_ & _0002_[31];
+  assign _0382_ = _0143_ & _0002_[31];
+  assign _0383_ = _0171_ & _0002_[31];
+  assign _0384_ = _0172_ & _0002_[31];
+  assign _0385_ = _0173_ & _0002_[31];
+  assign _0386_ = _0174_ & _0002_[31];
+  assign _0387_ = _0177_ & _0002_[31];
+  assign _0388_ = _0178_ & _0002_[31];
+  assign _0389_ = _0179_ & _0002_[31];
+  assign _0390_ = _0180_ & _0002_[31];
+  assign _0391_ = _0182_ & _0002_[31];
+  assign _0392_ = _0183_ & _0002_[31];
+  assign _0393_ = _0145_ & _0002_[31];
+  assign _0394_ = _0184_ & _0002_[31];
+  assign _0395_ = _0185_ & _0002_[31];
+  assign _0396_ = _0147_ & _0002_[31];
+  assign _0397_ = _0149_ & _0002_[31];
+  assign _0398_ = _0150_ & _0002_[31];
+  assign _0399_ = _0151_ & _0002_[31];
+  assign _0400_ = _0152_ & _0002_[31];
+  assign _0401_ = _0155_ & _0002_[31];
+  assign _0402_ = _0156_ & _0002_[31];
+  assign _0403_ = _0371_ ? _0001_ : \cpuregs[0] ;
+  assign _0404_ = _0372_ ? _0001_ : \cpuregs[10] ;
+  assign _0405_ = _0373_ ? _0001_ : \cpuregs[11] ;
+  assign _0406_ = _0374_ ? _0001_ : \cpuregs[12] ;
+  assign _0407_ = _0375_ ? _0001_ : \cpuregs[13] ;
+  assign _0408_ = _0376_ ? _0001_ : \cpuregs[14] ;
+  assign _0409_ = _0377_ ? _0001_ : \cpuregs[15] ;
+  assign _0410_ = _0378_ ? _0001_ : \cpuregs[16] ;
+  assign _0411_ = _0379_ ? _0001_ : \cpuregs[17] ;
+  assign _0412_ = _0380_ ? _0001_ : \cpuregs[18] ;
+  assign _0413_ = _0381_ ? _0001_ : \cpuregs[19] ;
+  assign _0414_ = _0382_ ? _0001_ : \cpuregs[1] ;
+  assign _0415_ = _0383_ ? _0001_ : \cpuregs[20] ;
+  assign _0416_ = _0384_ ? _0001_ : \cpuregs[21] ;
+  assign _0417_ = _0385_ ? _0001_ : \cpuregs[22] ;
+  assign _0418_ = _0386_ ? _0001_ : \cpuregs[23] ;
+  assign _0419_ = _0387_ ? _0001_ : \cpuregs[24] ;
+  assign _0420_ = _0388_ ? _0001_ : \cpuregs[25] ;
+  assign _0421_ = _0389_ ? _0001_ : \cpuregs[26] ;
+  assign _0422_ = _0390_ ? _0001_ : \cpuregs[27] ;
+  assign _0423_ = _0391_ ? _0001_ : \cpuregs[28] ;
+  assign _0424_ = _0392_ ? _0001_ : \cpuregs[29] ;
+  assign _0425_ = _0393_ ? _0001_ : \cpuregs[2] ;
+  assign _0426_ = _0394_ ? _0001_ : \cpuregs[30] ;
+  assign _0427_ = _0395_ ? _0001_ : \cpuregs[31] ;
+  assign _0428_ = _0396_ ? _0001_ : \cpuregs[3] ;
+  assign _0429_ = _0397_ ? _0001_ : \cpuregs[4] ;
+  assign _0430_ = _0398_ ? _0001_ : \cpuregs[5] ;
+  assign _0431_ = _0399_ ? _0001_ : \cpuregs[6] ;
+  assign _0432_ = _0400_ ? _0001_ : \cpuregs[7] ;
+  assign _0433_ = _0401_ ? _0001_ : \cpuregs[8] ;
+  assign _0434_ = _0402_ ? _0001_ : \cpuregs[9] ;
+  always @(posedge clk)
+    \cpuregs[0] <= _0403_;
+  always @(posedge clk)
+    \cpuregs[10] <= _0404_;
+  always @(posedge clk)
+    \cpuregs[11] <= _0405_;
+  always @(posedge clk)
+    \cpuregs[12] <= _0406_;
+  always @(posedge clk)
+    \cpuregs[13] <= _0407_;
+  always @(posedge clk)
+    \cpuregs[14] <= _0408_;
+  always @(posedge clk)
+    \cpuregs[15] <= _0409_;
+  always @(posedge clk)
+    \cpuregs[16] <= _0410_;
+  always @(posedge clk)
+    \cpuregs[17] <= _0411_;
+  always @(posedge clk)
+    \cpuregs[18] <= _0412_;
+  always @(posedge clk)
+    \cpuregs[19] <= _0413_;
+  always @(posedge clk)
+    \cpuregs[1] <= _0414_;
+  always @(posedge clk)
+    \cpuregs[20] <= _0415_;
+  always @(posedge clk)
+    \cpuregs[21] <= _0416_;
+  always @(posedge clk)
+    \cpuregs[22] <= _0417_;
+  always @(posedge clk)
+    \cpuregs[23] <= _0418_;
+  always @(posedge clk)
+    \cpuregs[24] <= _0419_;
+  always @(posedge clk)
+    \cpuregs[25] <= _0420_;
+  always @(posedge clk)
+    \cpuregs[26] <= _0421_;
+  always @(posedge clk)
+    \cpuregs[27] <= _0422_;
+  always @(posedge clk)
+    \cpuregs[28] <= _0423_;
+  always @(posedge clk)
+    \cpuregs[29] <= _0424_;
+  always @(posedge clk)
+    \cpuregs[2] <= _0425_;
+  always @(posedge clk)
+    \cpuregs[30] <= _0426_;
+  always @(posedge clk)
+    \cpuregs[31] <= _0427_;
+  always @(posedge clk)
+    \cpuregs[3] <= _0428_;
+  always @(posedge clk)
+    \cpuregs[4] <= _0429_;
+  always @(posedge clk)
+    \cpuregs[5] <= _0430_;
+  always @(posedge clk)
+    \cpuregs[6] <= _0431_;
+  always @(posedge clk)
+    \cpuregs[7] <= _0432_;
+  always @(posedge clk)
+    \cpuregs[8] <= _0433_;
+  always @(posedge clk)
+    \cpuregs[9] <= _0434_;
+  assign _0436_ = reg_op1 | reg_op2;
+  always @(posedge clk)
+    trap <= _0102_;
+  always @(posedge clk)
+    pcpi_valid <= _0092_;
+  always @(posedge clk)
+    eoi <= _0014_;
+  reg \trace_data_reg[0] ;
+  always @(posedge clk)
+    \trace_data_reg[0] <= 1'hx;
+  assign trace_data[0] = \trace_data_reg[0] ;
+  always @(posedge clk)
+    count_cycle <= _0004_;
+  always @(posedge clk)
+    count_instr <= _0005_;
+  always @(posedge clk)
+    reg_pc <= fangyuan9;
+  wire [31:0] fangyuan9;
+  assign fangyuan9 = { _0097_[31:2], 2'h0 };
+  always @(posedge clk)
+    reg_next_pc <= fangyuan10;
+  wire [31:0] fangyuan10;
+  assign fangyuan10 = { _0093_[31:2], 2'h0 };
+  always @(posedge clk)
+    reg_op1 <= _0094_;
+  always @(posedge clk)
+    reg_op2 <= _0095_;
+  always @(posedge clk)
+    reg_out <= _0096_;
+  always @(posedge clk)
+    reg_sh <= _0098_;
+  always @(posedge clk)
+    mem_wordsize <= _0089_;
+  always @(posedge clk)
+    mem_do_prefetch <= _0080_;
+  always @(posedge clk)
+    mem_do_rinst <= _0082_;
+  always @(posedge clk)
+    mem_do_rdata <= _0081_;
+  always @(posedge clk)
+    mem_do_wdata <= _0083_;
+  always @(posedge clk)
+    decoder_trigger <= _0013_;
+  always @(posedge clk)
+    decoder_trigger_q <= decoder_trigger;
+  always @(posedge clk)
+    decoder_pseudo_trigger <= _0012_;
+  always @(posedge clk)
+    decoder_pseudo_trigger_q <= decoder_pseudo_trigger;
+  always @(posedge clk)
+    cpu_state <= _0006_;
+  always @(posedge clk)
+    latched_store <= _0078_;
+  always @(posedge clk)
+    latched_stalu <= _0077_;
+  always @(posedge clk)
+    latched_branch <= _0071_;
+  always @(posedge clk)
+    latched_compr <= _0072_;
+  always @(posedge clk)
+    latched_is_lu <= _0075_;
+  always @(posedge clk)
+    latched_is_lh <= _0074_;
+  always @(posedge clk)
+    latched_is_lb <= _0073_;
+  always @(posedge clk)
+    latched_rd <= _0076_;
+  always @(posedge clk)
+    alu_out_q <= alu_out;
+  always @(posedge clk)
+    pcpi_insn <= _0091_;
+  always @(posedge clk)
+    instr_lui <= _0033_;
+  always @(posedge clk)
+    instr_auipc <= _0019_;
+  always @(posedge clk)
+    instr_jal <= _0027_;
+  always @(posedge clk)
+    instr_jalr <= _0028_;
+  always @(posedge clk)
+    instr_beq <= _0020_;
+  always @(posedge clk)
+    instr_bne <= _0025_;
+  always @(posedge clk)
+    instr_blt <= _0023_;
+  always @(posedge clk)
+    instr_bge <= _0021_;
+  always @(posedge clk)
+    instr_bltu <= _0024_;
+  always @(posedge clk)
+    instr_bgeu <= _0022_;
+  always @(posedge clk)
+    instr_lb <= _0029_;
+  always @(posedge clk)
+    instr_lh <= _0031_;
+  always @(posedge clk)
+    instr_lw <= _0034_;
+  always @(posedge clk)
+    instr_lbu <= _0030_;
+  always @(posedge clk)
+    instr_lhu <= _0032_;
+  always @(posedge clk)
+    instr_sb <= _0042_;
+  always @(posedge clk)
+    instr_sh <= _0043_;
+  always @(posedge clk)
+    instr_sw <= _0055_;
+  always @(posedge clk)
+    instr_addi <= _0016_;
+  always @(posedge clk)
+    instr_slti <= _0047_;
+  always @(posedge clk)
+    instr_sltiu <= _0048_;
+  always @(posedge clk)
+    instr_xori <= _0057_;
+  always @(posedge clk)
+    instr_ori <= _0036_;
+  always @(posedge clk)
+    instr_andi <= _0018_;
+  always @(posedge clk)
+    instr_slli <= _0045_;
+  always @(posedge clk)
+    instr_srli <= _0053_;
+  always @(posedge clk)
+    instr_srai <= _0051_;
+  always @(posedge clk)
+    instr_add <= _0015_;
+  always @(posedge clk)
+    instr_sub <= _0054_;
+  always @(posedge clk)
+    instr_sll <= _0044_;
+  always @(posedge clk)
+    instr_slt <= _0046_;
+  always @(posedge clk)
+    instr_sltu <= _0049_;
+  always @(posedge clk)
+    instr_xor <= _0056_;
+  always @(posedge clk)
+    instr_srl <= _0052_;
+  always @(posedge clk)
+    instr_sra <= _0050_;
+  always @(posedge clk)
+    instr_or <= _0035_;
+  always @(posedge clk)
+    instr_and <= _0017_;
+  always @(posedge clk)
+    instr_rdcycle <= _0037_;
+  always @(posedge clk)
+    instr_rdcycleh <= _0038_;
+  always @(posedge clk)
+    instr_rdinstr <= _0039_;
+  always @(posedge clk)
+    instr_rdinstrh <= _0040_;
+  always @(posedge clk)
+    instr_ecall_ebreak <= _0026_;
+  always @(posedge clk)
+    instr_retirq <= _0041_;
+  always @(posedge clk)
+    decoded_rd <= _0009_;
+  always @(posedge clk)
+    decoded_rs1 <= _0010_;
+  always @(posedge clk)
+    decoded_rs2 <= _0011_;
+  always @(posedge clk)
+    decoded_imm <= _0007_;
+  always @(posedge clk)
+    decoded_imm_j <= _0008_;
+  always @(posedge clk)
+    compressed_instr <= _0003_;
+  always @(posedge clk)
+    is_lui_auipc_jal <= _0065_;
+  always @(posedge clk)
+    is_lb_lh_lw_lbu_lhu <= _0063_;
+  always @(posedge clk)
+    is_slli_srli_srai <= _0068_;
+  always @(posedge clk)
+    is_jalr_addi_slti_sltiu_xori_ori_andi <= _0062_;
+  always @(posedge clk)
+    is_sb_sh_sw <= _0067_;
+  always @(posedge clk)
+    is_lui_auipc_jal_jalr_addi_add_sub <= _0066_;
+  always @(posedge clk)
+    is_slti_blt_slt <= _0069_;
+  always @(posedge clk)
+    is_sltiu_bltu_sltu <= _0070_;
+  always @(posedge clk)
+    is_beq_bne_blt_bge_bltu_bgeu <= _0060_;
+  always @(posedge clk)
+    is_lbu_lhu_lw <= _0064_;
+  always @(posedge clk)
+    is_alu_reg_imm <= _0058_;
+  always @(posedge clk)
+    is_alu_reg_reg <= _0059_;
+  always @(posedge clk)
+    is_compare <= _0061_;
+  always @(posedge clk)
+    mem_valid <= _0087_;
+  always @(posedge clk)
+    mem_instr <= _0084_;
+  always @(posedge clk)
+    mem_addr <= _0079_;
+  always @(posedge clk)
+    mem_wdata <= _0088_;
+  always @(posedge clk)
+    mem_wstrb <= _0090_;
+  always @(posedge clk)
+    mem_state <= _0086_;
+  always @(posedge clk)
+    mem_rdata_q <= _0085_;
+  assign _0437_ = instr_jal ? _0122_[31:2] : _0120_[31:2];
+  assign _0438_ = decoder_trigger ? _0437_ : _0109_[31:2];
+  assign _0439_ = _0218_ ? _0438_ : reg_next_pc[31:2];
+  assign _0093_[31:2] = resetn ? _0439_ : 30'h00000000;
+  assign _0111_ = _0329_ ? _0114_ : 1'h0;
+  assign _0440_ = cpu_state == 1'h1;
+  assign _0441_ = cpu_state == 6'h20;
+  assign _0113_ = _0329_ ? _0115_ : 1'h0;
+  assign _0442_ = cpu_state == 2'h2;
+  assign _0443_ = cpu_state == 3'h4;
+  assign _0444_ = cpu_state == 4'h8;
+  assign _0445_ = cpu_state == 8'h80;
+  assign _0112_ = is_beq_bne_blt_bge_bltu_bgeu ? _0116_ : 1'h0;
+  assign _0115_ = mem_do_wdata ? 1'h0 : 1'h1;
+  assign _0114_ = mem_do_rdata ? 1'h0 : 1'h1;
+  assign _0116_ = alu_out_0 ? 1'h1 : 1'h0;
+  assign _0446_ = latched_branch ? _0604_ : reg_next_pc;
+  assign _0447_ = _0218_ ? _0446_ : 32'hxxxxxxxx;
+  assign _0109_ = resetn ? _0447_ : 32'hxxxxxxxx;
+  wire [1:0] fangyuan11;
+  assign fangyuan11 = { _0113_, 1'h0 };
+  wire [1:0] fangyuan12;
+  assign fangyuan12 = { _0442_, _0130_ };
+  always @(1'hx or fangyuan11 or fangyuan12) begin
+    casez (fangyuan12)
+      2'b?1 :
+        _0108_ = fangyuan11 [0:0] ;
+      2'b1? :
+        _0108_ = fangyuan11 [1:1] ;
+      default:
+        _0108_ = 1'hx ;
+    endcase
+  end
+  wire [1:0] fangyuan13;
+  assign fangyuan13 = { 1'h0, _0111_ };
+  wire [1:0] fangyuan14;
+  assign fangyuan14 = { _0131_, _0440_ };
+  always @(1'hx or fangyuan13 or fangyuan14) begin
+    casez (fangyuan14)
+      2'b?1 :
+        _0106_ = fangyuan13 [0:0] ;
+      2'b1? :
+        _0106_ = fangyuan13 [1:1] ;
+      default:
+        _0106_ = 1'hx ;
+    endcase
+  end
+  wire [1:0] fangyuan15;
+  assign fangyuan15 = { _0112_, 1'h0 };
+  wire [1:0] fangyuan16;
+  assign fangyuan16 = { _0444_, _0132_ };
+  always @(1'hx or fangyuan15 or fangyuan16) begin
+    casez (fangyuan16)
+      2'b?1 :
+        _0107_ = fangyuan15 [0:0] ;
+      2'b1? :
+        _0107_ = fangyuan15 [1:1] ;
+      default:
+        _0107_ = 1'hx ;
+    endcase
+  end
+  assign _0101_ = resetn ? _0108_ : 1'h0;
+  assign _0099_ = resetn ? _0106_ : 1'h0;
+  assign _0100_ = resetn ? _0107_ : 1'h0;
+  assign _0448_ = _0300_ ? 1'h1 : 1'h0;
+  assign _0449_ = _0329_ ? _0448_ : 1'h0;
+  assign _0450_ = _0136_ ? _0449_ : 1'h0;
+  assign _0012_ = resetn ? _0450_ : 1'h0;
+  assign _0451_ = _0300_ ? 1'h1 : _0297_;
+  assign _0452_ = _0329_ ? _0451_ : _0297_;
+  wire [1:0] fangyuan17;
+  assign fangyuan17 = { _0455_, _0452_ };
+  wire [1:0] fangyuan18;
+  assign fangyuan18 = { _0444_, _0136_ };
+  always @(_0297_ or fangyuan17 or fangyuan18) begin
+    casez (fangyuan18)
+      2'b?1 :
+        _0453_ = fangyuan17 [0:0] ;
+      2'b1? :
+        _0453_ = fangyuan17 [1:1] ;
+      default:
+        _0453_ = _0297_ ;
+    endcase
+  end
+  assign _0454_ = alu_out_0 ? 1'h0 : _0297_;
+  assign _0455_ = is_beq_bne_blt_bge_bltu_bgeu ? _0454_ : _0297_;
+  assign _0013_ = resetn ? _0453_ : _0297_;
+  wire [95:0] fangyuan19;
+  assign fangyuan19 = { mem_rdata_word, mem_rdata_word[15], mem_rdata_word[15], mem_rdata_word[15], mem_rdata_word[15], mem_rdata_word[15], mem_rdata_word[15], mem_rdata_word[15], mem_rdata_word[15], mem_rdata_word[15], mem_rdata_word[15], mem_rdata_word[15], mem_rdata_word[15], mem_rdata_word[15], mem_rdata_word[15], mem_rdata_word[15], mem_rdata_word[15], mem_rdata_word[15:0], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7:0] };
+  wire [2:0] fangyuan20;
+  assign fangyuan20 = { latched_is_lu, latched_is_lh, latched_is_lb };
+  always @(32'hxxxxxxxx or fangyuan19 or fangyuan20) begin
+    casez (fangyuan20)
+      3'b??1 :
+        _0456_ = fangyuan19 [31:0] ;
+      3'b?1? :
+        _0456_ = fangyuan19 [63:32] ;
+      3'b1?? :
+        _0456_ = fangyuan19 [95:64] ;
+      default:
+        _0456_ = 32'hxxxxxxxx ;
+    endcase
+  end
+  assign _0457_ = _0300_ ? _0456_ : 32'hxxxxxxxx;
+  assign _0458_ = _0329_ ? _0457_ : 32'hxxxxxxxx;
+  wire [127:0] fangyuan21;
+  assign fangyuan21 = { _0461_, _0123_, _0460_, _0458_ };
+  wire [3:0] fangyuan22;
+  assign fangyuan22 = { _0441_, _0444_, _0443_, _0440_ };
+  always @(32'hxxxxxxxx or fangyuan21 or fangyuan22) begin
+    casez (fangyuan22)
+      4'b???1 :
+        _0459_ = fangyuan21 [31:0] ;
+      4'b??1? :
+        _0459_ = fangyuan21 [63:32] ;
+      4'b?1?? :
+        _0459_ = fangyuan21 [95:64] ;
+      4'b1??? :
+        _0459_ = fangyuan21 [127:96] ;
+      default:
+        _0459_ = 32'hxxxxxxxx ;
+    endcase
+  end
+  assign _0460_ = _0220_ ? reg_op1 : 32'hxxxxxxxx;
+  assign _0461_ = is_rdcycle_rdcycleh_rdinstr_rdinstrh ? _0462_ : 32'hxxxxxxxx;
+  wire [127:0] fangyuan23;
+  assign fangyuan23 = { count_cycle[31:0], count_cycle[63:32], count_instr[31:0], count_instr[63:32] };
+  wire [3:0] fangyuan24;
+  assign fangyuan24 = { instr_rdcycle, instr_rdcycleh, instr_rdinstr, instr_rdinstrh };
+  always @(32'hxxxxxxxx or fangyuan23 or fangyuan24) begin
+    casez (fangyuan24)
+      4'b???1 :
+        _0462_ = fangyuan23 [31:0] ;
+      4'b??1? :
+        _0462_ = fangyuan23 [63:32] ;
+      4'b?1?? :
+        _0462_ = fangyuan23 [95:64] ;
+      4'b1??? :
+        _0462_ = fangyuan23 [127:96] ;
+      default:
+        _0462_ = 32'hxxxxxxxx ;
+    endcase
+  end
+  assign _0096_ = resetn ? _0459_ : 32'hxxxxxxxx;
+  assign _0463_ = _0231_ ? _0198_[4:0] : _0601_[4:0];
+  assign _0464_ = _0220_ ? 5'hxx : _0463_;
+  wire [9:0] fangyuan25;
+  assign fangyuan25 = { cpuregs_rs1[4:0], _0464_ };
+  wire [1:0] fangyuan26;
+  assign fangyuan26 = { _0219_, _0443_ };
+  always @(5'hxx or fangyuan25 or fangyuan26) begin
+    casez (fangyuan26)
+      2'b?1 :
+        _0465_ = fangyuan25 [4:0] ;
+      2'b1? :
+        _0465_ = fangyuan25 [9:5] ;
+      default:
+        _0465_ = 5'hxx ;
+    endcase
+  end
+  assign _0098_ = resetn ? _0465_ : 5'hxx;
+  assign _0466_ = _0445_ ? 1'h1 : 1'h0;
+  assign _0102_ = resetn ? _0466_ : 1'h0;
+  assign _0467_ = is_beq_bne_blt_bge_bltu_bgeu ? 5'h00 : latched_rd;
+  wire [9:0] fangyuan27;
+  assign fangyuan27 = { decoded_rd, _0467_ };
+  wire [1:0] fangyuan28;
+  assign fangyuan28 = { _0218_, _0444_ };
+  always @(latched_rd or fangyuan27 or fangyuan28) begin
+    casez (fangyuan28)
+      2'b?1 :
+        _0468_ = fangyuan27 [4:0] ;
+      2'b1? :
+        _0468_ = fangyuan27 [9:5] ;
+      default:
+        _0468_ = latched_rd ;
+    endcase
+  end
+  assign _0076_ = resetn ? _0468_ : latched_rd;
+  assign _0469_ = mem_do_rdata ? latched_is_lb : instr_lb;
+  assign _0470_ = _0329_ ? _0469_ : latched_is_lb;
+  wire [1:0] fangyuan29;
+  assign fangyuan29 = { 1'h0, _0470_ };
+  wire [1:0] fangyuan30;
+  assign fangyuan30 = { _0218_, _0440_ };
+  always @(latched_is_lb or fangyuan29 or fangyuan30) begin
+    casez (fangyuan30)
+      2'b?1 :
+        _0471_ = fangyuan29 [0:0] ;
+      2'b1? :
+        _0471_ = fangyuan29 [1:1] ;
+      default:
+        _0471_ = latched_is_lb ;
+    endcase
+  end
+  assign _0073_ = resetn ? _0471_ : 1'h0;
+  assign _0472_ = mem_do_rdata ? latched_is_lh : instr_lh;
+  assign _0473_ = _0329_ ? _0472_ : latched_is_lh;
+  wire [1:0] fangyuan31;
+  assign fangyuan31 = { 1'h0, _0473_ };
+  wire [1:0] fangyuan32;
+  assign fangyuan32 = { _0218_, _0440_ };
+  always @(latched_is_lh or fangyuan31 or fangyuan32) begin
+    casez (fangyuan32)
+      2'b?1 :
+        _0474_ = fangyuan31 [0:0] ;
+      2'b1? :
+        _0474_ = fangyuan31 [1:1] ;
+      default:
+        _0474_ = latched_is_lh ;
+    endcase
+  end
+  assign _0074_ = resetn ? _0474_ : 1'h0;
+  assign _0475_ = mem_do_rdata ? latched_is_lu : is_lbu_lhu_lw;
+  assign _0476_ = _0329_ ? _0475_ : latched_is_lu;
+  wire [1:0] fangyuan33;
+  assign fangyuan33 = { 1'h0, _0476_ };
+  wire [1:0] fangyuan34;
+  assign fangyuan34 = { _0218_, _0440_ };
+  always @(latched_is_lu or fangyuan33 or fangyuan34) begin
+    casez (fangyuan34)
+      2'b?1 :
+        _0477_ = fangyuan33 [0:0] ;
+      2'b1? :
+        _0477_ = fangyuan33 [1:1] ;
+      default:
+        _0477_ = latched_is_lu ;
+    endcase
+  end
+  assign _0075_ = resetn ? _0477_ : 1'h0;
+  assign _0478_ = _0218_ ? compressed_instr : latched_compr;
+  assign _0072_ = resetn ? _0478_ : latched_compr;
+  assign _0479_ = is_beq_bne_blt_bge_bltu_bgeu ? alu_out_0 : instr_jalr;
+  wire [1:0] fangyuan35;
+  assign fangyuan35 = { _0482_, _0479_ };
+  wire [1:0] fangyuan36;
+  assign fangyuan36 = { _0218_, _0444_ };
+  always @(latched_branch or fangyuan35 or fangyuan36) begin
+    casez (fangyuan36)
+      2'b?1 :
+        _0480_ = fangyuan35 [0:0] ;
+      2'b1? :
+        _0480_ = fangyuan35 [1:1] ;
+      default:
+        _0480_ = latched_branch ;
+    endcase
+  end
+  assign _0481_ = instr_jal ? 1'h1 : 1'h0;
+  assign _0482_ = decoder_trigger ? _0481_ : 1'h0;
+  assign _0071_ = resetn ? _0480_ : 1'h0;
+  assign _0483_ = is_beq_bne_blt_bge_bltu_bgeu ? latched_stalu : 1'h1;
+  wire [1:0] fangyuan37;
+  assign fangyuan37 = { 1'h0, _0483_ };
+  wire [1:0] fangyuan38;
+  assign fangyuan38 = { _0218_, _0444_ };
+  always @(latched_stalu or fangyuan37 or fangyuan38) begin
+    casez (fangyuan38)
+      2'b?1 :
+        _0484_ = fangyuan37 [0:0] ;
+      2'b1? :
+        _0484_ = fangyuan37 [1:1] ;
+      default:
+        _0484_ = latched_stalu ;
+    endcase
+  end
+  assign _0077_ = resetn ? _0484_ : 1'h0;
+  wire [3:0] fangyuan39;
+  assign fangyuan39 = { 1'h0, _0487_, _0486_, 1'h1 };
+  wire [3:0] fangyuan40;
+  assign fangyuan40 = { _0218_, _0441_, _0444_, _0133_ };
+  always @(latched_store or fangyuan39 or fangyuan40) begin
+    casez (fangyuan40)
+      4'b???1 :
+        _0485_ = fangyuan39 [0:0] ;
+      4'b??1? :
+        _0485_ = fangyuan39 [1:1] ;
+      4'b?1?? :
+        _0485_ = fangyuan39 [2:2] ;
+      4'b1??? :
+        _0485_ = fangyuan39 [3:3] ;
+      default:
+        _0485_ = latched_store ;
+    endcase
+  end
+  assign _0486_ = is_beq_bne_blt_bge_bltu_bgeu ? alu_out_0 : 1'h1;
+  assign _0487_ = is_rdcycle_rdcycleh_rdinstr_rdinstrh ? 1'h1 : latched_store;
+  assign _0078_ = resetn ? _0485_ : 1'h0;
+  assign _0488_ = _0300_ ? 8'h40 : cpu_state;
+  assign _0489_ = _0329_ ? _0488_ : cpu_state;
+  wire [47:0] fangyuan41;
+  assign fangyuan41 = { _0496_, 1'h0, _0197_[6:0], 4'h0, _0196_[3:0], _0493_, _0491_, _0489_ };
+  wire [5:0] fangyuan42;
+  assign fangyuan42 = { _0218_, _0441_, _0219_, _0444_, _0443_, _0136_ };
+  always @(cpu_state or fangyuan41 or fangyuan42) begin
+    casez (fangyuan42)
+      6'b?????1 :
+        _0490_ = fangyuan41 [7:0] ;
+      6'b????1? :
+        _0490_ = fangyuan41 [15:8] ;
+      6'b???1?? :
+        _0490_ = fangyuan41 [23:16] ;
+      6'b??1??? :
+        _0490_ = fangyuan41 [31:24] ;
+      6'b?1???? :
+        _0490_ = fangyuan41 [39:32] ;
+      6'b1????? :
+        _0490_ = fangyuan41 [47:40] ;
+      default:
+        _0490_ = cpu_state ;
+    endcase
+  end
+  assign _0491_ = _0220_ ? 8'h40 : cpu_state;
+  assign _0492_ = mem_done ? 8'h40 : cpu_state;
+  assign _0493_ = is_beq_bne_blt_bge_bltu_bgeu ? _0492_ : 8'h40;
+  assign _0196_[3:0] = is_sb_sh_sw ? 4'h2 : 4'h8;
+  wire [2:0] fangyuan43;
+  assign fangyuan43 = { is_rdcycle_rdcycleh_rdinstr_rdinstrh, is_lb_lh_lw_lbu_lhu, _0134_ };
+  always @(7'h10 or fangyuan43) begin
+    casez (fangyuan43)
+      3'b??1 :
+        _0197_[6:0] = 7'b0001000 ;
+      3'b?1? :
+        _0197_[6:0] = 7'b0000001 ;
+      3'b1?? :
+        _0197_[6:0] = 7'b1000000 ;
+      default:
+        _0197_[6:0] = 7'h10 ;
+    endcase
+  end
+  wire [1:0] fangyuan44;
+  assign fangyuan44 = { is_jalr_addi_slti_sltiu_xori_ori_andi, is_slli_srli_srai };
+  assign _0494_ = | fangyuan44;
+  assign _0495_ = instr_jal ? cpu_state : 8'h20;
+  assign _0496_ = decoder_trigger ? _0495_ : cpu_state;
+  assign _0497_ = resetn ? _0490_ : 8'h40;
+  assign _0006_ = _0302_ ? 8'h80 : _0497_;
+  assign _0498_ = _0332_ ? 1'h0 : mem_do_wdata;
+  assign _0083_ = _0101_ ? 1'h1 : _0498_;
+  assign _0499_ = _0332_ ? 1'h0 : mem_do_rdata;
+  assign _0081_ = _0099_ ? 1'h1 : _0499_;
+  assign _0500_ = _0220_ ? mem_do_prefetch : mem_do_rinst;
+  wire [3:0] fangyuan45;
+  assign fangyuan45 = { _0504_, _0503_, _0502_, _0500_ };
+  wire [3:0] fangyuan46;
+  assign fangyuan46 = { _0218_, _0441_, _0219_, _0443_ };
+  always @(mem_do_rinst or fangyuan45 or fangyuan46) begin
+    casez (fangyuan46)
+      4'b???1 :
+        _0501_ = fangyuan45 [0:0] ;
+      4'b??1? :
+        _0501_ = fangyuan45 [1:1] ;
+      4'b?1?? :
+        _0501_ = fangyuan45 [2:2] ;
+      4'b1??? :
+        _0501_ = fangyuan45 [3:3] ;
+      default:
+        _0501_ = mem_do_rinst ;
+    endcase
+  end
+  assign _0502_ = is_sb_sh_sw ? 1'h1 : mem_do_prefetch;
+  wire [1:0] fangyuan47;
+  assign fangyuan47 = { 1'h1, mem_do_prefetch };
+  wire [1:0] fangyuan48;
+  assign fangyuan48 = { is_lb_lh_lw_lbu_lhu, _0134_ };
+  always @(mem_do_rinst or fangyuan47 or fangyuan48) begin
+    casez (fangyuan48)
+      2'b?1 :
+        _0503_ = fangyuan47 [0:0] ;
+      2'b1? :
+        _0503_ = fangyuan47 [1:1] ;
+      default:
+        _0503_ = mem_do_rinst ;
+    endcase
+  end
+  assign _0504_ = decoder_trigger ? _0481_ : _0298_;
+  assign _0505_ = resetn ? _0501_ : mem_do_rinst;
+  assign _0506_ = _0332_ ? 1'h0 : _0505_;
+  assign _0082_ = _0100_ ? 1'h1 : _0506_;
+  assign _0507_ = instr_jal ? mem_do_prefetch : _0299_;
+  assign _0508_ = decoder_trigger ? _0507_ : mem_do_prefetch;
+  assign _0509_ = _0218_ ? _0508_ : mem_do_prefetch;
+  assign _0510_ = resetn ? _0509_ : mem_do_prefetch;
+  assign _0080_ = _0332_ ? 1'h0 : _0510_;
+  wire [2:0] fangyuan49;
+  assign fangyuan49 = { _0330_, _0331_, instr_lw };
+  always @(2'hx or fangyuan49) begin
+    casez (fangyuan49)
+      3'b??1 :
+        _0511_ = 2'b00 ;
+      3'b?1? :
+        _0511_ = 2'b01 ;
+      3'b1?? :
+        _0511_ = 2'b10 ;
+      default:
+        _0511_ = 2'hx ;
+    endcase
+  end
+  assign _0512_ = mem_do_rdata ? mem_wordsize : _0511_;
+  assign _0513_ = _0329_ ? _0512_ : mem_wordsize;
+  wire [5:0] fangyuan50;
+  assign fangyuan50 = { 2'h0, _0517_, _0513_ };
+  wire [2:0] fangyuan51;
+  assign fangyuan51 = { _0218_, _0442_, _0440_ };
+  always @(mem_wordsize or fangyuan50 or fangyuan51) begin
+    casez (fangyuan51)
+      3'b??1 :
+        _0514_ = fangyuan50 [1:0] ;
+      3'b?1? :
+        _0514_ = fangyuan50 [3:2] ;
+      3'b1?? :
+        _0514_ = fangyuan50 [5:4] ;
+      default:
+        _0514_ = mem_wordsize ;
+    endcase
+  end
+  wire [2:0] fangyuan52;
+  assign fangyuan52 = { instr_sb, instr_sh, instr_sw };
+  always @(2'hx or fangyuan52) begin
+    casez (fangyuan52)
+      3'b??1 :
+        _0515_ = 2'b00 ;
+      3'b?1? :
+        _0515_ = 2'b01 ;
+      3'b1?? :
+        _0515_ = 2'b10 ;
+      default:
+        _0515_ = 2'hx ;
+    endcase
+  end
+  assign _0516_ = mem_do_wdata ? mem_wordsize : _0515_;
+  assign _0517_ = _0329_ ? _0516_ : mem_wordsize;
+  assign _0089_ = resetn ? _0514_ : mem_wordsize;
+  wire [63:0] fangyuan53;
+  assign fangyuan53 = { _0519_, cpuregs_rs1 };
+  wire [1:0] fangyuan54;
+  assign fangyuan54 = { _0441_, _0219_ };
+  always @(reg_op2 or fangyuan53 or fangyuan54) begin
+    casez (fangyuan54)
+      2'b?1 :
+        _0518_ = fangyuan53 [31:0] ;
+      2'b1? :
+        _0518_ = fangyuan53 [63:32] ;
+      default:
+        _0518_ = reg_op2 ;
+    endcase
+  end
+  wire [63:0] fangyuan55;
+  assign fangyuan55 = { decoded_imm, _0606_ };
+  wire [1:0] fangyuan56;
+  assign fangyuan56 = { is_lui_auipc_jal, _0494_ };
+  always @(32'hxxxxxxxx or fangyuan55 or fangyuan56) begin
+    casez (fangyuan56)
+      2'b?1 :
+        _0519_ = fangyuan55 [31:0] ;
+      2'b1? :
+        _0519_ = fangyuan55 [63:32] ;
+      default:
+        _0519_ = 32'hxxxxxxxx ;
+    endcase
+  end
+  assign _0095_ = resetn ? _0518_ : reg_op2;
+  assign _0520_ = mem_do_rdata ? reg_op1 : _0124_;
+  assign _0521_ = _0329_ ? _0520_ : reg_op1;
+  wire [127:0] fangyuan57;
+  assign fangyuan57 = { _0529_, _0528_, _0524_, _0521_ };
+  wire [3:0] fangyuan58;
+  assign fangyuan58 = { _0441_, _0443_, _0442_, _0440_ };
+  always @(reg_op1 or fangyuan57 or fangyuan58) begin
+    casez (fangyuan58)
+      4'b???1 :
+        _0522_ = fangyuan57 [31:0] ;
+      4'b??1? :
+        _0522_ = fangyuan57 [63:32] ;
+      4'b?1?? :
+        _0522_ = fangyuan57 [95:64] ;
+      4'b1??? :
+        _0522_ = fangyuan57 [127:96] ;
+      default:
+        _0522_ = reg_op1 ;
+    endcase
+  end
+  assign _0523_ = mem_do_wdata ? reg_op1 : _0124_;
+  assign _0524_ = _0329_ ? _0523_ : reg_op1;
+  wire [95:0] fangyuan59;
+  assign fangyuan59 = { reg_op1[30:0], 2'h0, reg_op1[31:1], reg_op1[31], reg_op1[31:1] };
+  wire [2:0] fangyuan60;
+  assign fangyuan60 = { _0292_, _0327_, _0323_ };
+  always @(32'hxxxxxxxx or fangyuan59 or fangyuan60) begin
+    casez (fangyuan60)
+      3'b??1 :
+        _0525_ = fangyuan59 [31:0] ;
+      3'b?1? :
+        _0525_ = fangyuan59 [63:32] ;
+      3'b1?? :
+        _0525_ = fangyuan59 [95:64] ;
+      default:
+        _0525_ = 32'hxxxxxxxx ;
+    endcase
+  end
+  wire [95:0] fangyuan61;
+  assign fangyuan61 = { reg_op1[27:0], 8'h00, reg_op1[31:4], reg_op1[31], reg_op1[31], reg_op1[31], reg_op1[31], reg_op1[31:4] };
+  wire [2:0] fangyuan62;
+  assign fangyuan62 = { _0292_, _0327_, _0323_ };
+  always @(32'hxxxxxxxx or fangyuan61 or fangyuan62) begin
+    casez (fangyuan62)
+      3'b??1 :
+        _0526_ = fangyuan61 [31:0] ;
+      3'b?1? :
+        _0526_ = fangyuan61 [63:32] ;
+      3'b1?? :
+        _0526_ = fangyuan61 [95:64] ;
+      default:
+        _0526_ = 32'hxxxxxxxx ;
+    endcase
+  end
+  assign _0527_ = _0231_ ? _0526_ : _0525_;
+  assign _0528_ = _0220_ ? reg_op1 : _0527_;
+  wire [63:0] fangyuan63;
+  assign fangyuan63 = { 16'hxxxx, 16'hxxxx, _0605_ };
+  wire [1:0] fangyuan64;
+  assign fangyuan64 = { is_rdcycle_rdcycleh_rdinstr_rdinstrh, is_lui_auipc_jal };
+  always @(cpuregs_rs1 or fangyuan63 or fangyuan64) begin
+    casez (fangyuan64)
+      2'b?1 :
+        _0529_ = fangyuan63 [31:0] ;
+      2'b1? :
+        _0529_ = fangyuan63 [63:32] ;
+      default:
+        _0529_ = cpuregs_rs1 ;
+    endcase
+  end
+  assign _0094_ = resetn ? _0522_ : reg_op1;
+  assign _0530_ = _0218_ ? _0109_[31:2] : reg_pc[31:2];
+  assign _0097_[31:2] = resetn ? _0530_ : 30'h00000000;
+  assign _0531_ = decoder_trigger ? _0121_ : count_instr;
+  assign _0532_ = _0218_ ? _0531_ : count_instr;
+  assign _0005_ = resetn ? _0532_ : 64'h0000000000000000;
+  assign _0014_ = resetn ? eoi : 32'h00000000;
+  assign _0092_ = resetn ? pcpi_valid : 1'h0;
+  assign _0002_[31] = _0296_ ? 1'h1 : 1'h0;
+  assign _0001_ = _0296_ ? cpuregs_wrdata : 32'hxxxxxxxx;
+  assign _0000_ = _0296_ ? latched_rd : 5'hxx;
+  assign _0104_ = _0135_ ? 1'h1 : 1'h0;
+  wire [63:0] fangyuan65;
+  assign fangyuan65 = { _0118_, _0603_ };
+  wire [1:0] fangyuan66;
+  assign fangyuan66 = { latched_branch, _0294_ };
+  always @(32'hxxxxxxxx or fangyuan65 or fangyuan66) begin
+    casez (fangyuan66)
+      2'b?1 :
+        _0103_ = fangyuan65 [31:0] ;
+      2'b1? :
+        _0103_ = fangyuan65 [63:32] ;
+      default:
+        _0103_ = 32'hxxxxxxxx ;
+    endcase
+  end
+  assign cpuregs_wrdata = _0218_ ? _0103_ : 32'hxxxxxxxx;
+  assign cpuregs_write = _0218_ ? _0104_ : 1'h0;
+  wire [223:0] fangyuan67;
+  assign fangyuan67 = { alu_add_sub, 31'h00000000, alu_out_0, _0608_, _0436_, _0127_, alu_shl, alu_shr };
+  wire [6:0] fangyuan68;
+  assign fangyuan68 = { is_lui_auipc_jal_jalr_addi_add_sub, is_compare, _0324_, _0325_, _0326_, _0292_, _0293_ };
+  always @(32'hxxxxxxxx or fangyuan67 or fangyuan68) begin
+    casez (fangyuan68)
+      7'b??????1 :
+        alu_out = fangyuan67 [31:0] ;
+      7'b?????1? :
+        alu_out = fangyuan67 [63:32] ;
+      7'b????1?? :
+        alu_out = fangyuan67 [95:64] ;
+      7'b???1??? :
+        alu_out = fangyuan67 [127:96] ;
+      7'b??1???? :
+        alu_out = fangyuan67 [159:128] ;
+      7'b?1????? :
+        alu_out = fangyuan67 [191:160] ;
+      7'b1?????? :
+        alu_out = fangyuan67 [223:192] ;
+      default:
+        alu_out = 32'hxxxxxxxx ;
+    endcase
+  end
+  wire [5:0] fangyuan69;
+  assign fangyuan69 = { alu_eq, _0313_, _0314_, _0315_, alu_lts, alu_ltu };
+  wire [5:0] fangyuan70;
+  assign fangyuan70 = { instr_beq, instr_bne, instr_bge, instr_bgeu, is_slti_blt_slt, is_sltiu_bltu_sltu };
+  always @(1'hx or fangyuan69 or fangyuan70) begin
+    casez (fangyuan70)
+      6'b?????1 :
+        alu_out_0 = fangyuan69 [0:0] ;
+      6'b????1? :
+        alu_out_0 = fangyuan69 [1:1] ;
+      6'b???1?? :
+        alu_out_0 = fangyuan69 [2:2] ;
+      6'b??1??? :
+        alu_out_0 = fangyuan69 [3:3] ;
+      6'b?1???? :
+        alu_out_0 = fangyuan69 [4:4] ;
+      6'b1????? :
+        alu_out_0 = fangyuan69 [5:5] ;
+      default:
+        alu_out_0 = 1'hx ;
+    endcase
+  end
+  assign _0010_[4] = _0297_ ? mem_rdata_latched[19] : decoded_rs1[4];
+  assign _0008_[10] = _0297_ ? mem_rdata_latched[30] : decoded_imm_j[10];
+  assign _0008_[7] = _0297_ ? mem_rdata_latched[27] : decoded_imm_j[7];
+  assign _0008_[6] = _0297_ ? mem_rdata_latched[26] : decoded_imm_j[6];
+  assign _0008_[3:1] = _0297_ ? mem_rdata_latched[23:21] : decoded_imm_j[3:1];
+  assign _0008_[5] = _0297_ ? mem_rdata_latched[25] : decoded_imm_j[5];
+  assign _0008_[9:8] = _0297_ ? mem_rdata_latched[29:28] : decoded_imm_j[9:8];
+  wire [11:0] fangyuan71;
+  assign fangyuan71 = { mem_rdata_latched[31], mem_rdata_latched[31], mem_rdata_latched[31], mem_rdata_latched[31], mem_rdata_latched[31], mem_rdata_latched[31], mem_rdata_latched[31], mem_rdata_latched[31], mem_rdata_latched[31], mem_rdata_latched[31], mem_rdata_latched[31], mem_rdata_latched[31] };
+  assign _0008_[31:20] = _0297_ ? fangyuan71 : decoded_imm_j[31:20];
+  assign _0008_[4] = _0297_ ? mem_rdata_latched[24] : decoded_imm_j[4];
+  assign _0008_[11] = _0297_ ? mem_rdata_latched[20] : decoded_imm_j[11];
+  assign _0008_[0] = _0297_ ? 1'h0 : decoded_imm_j[0];
+  assign _0010_[3:0] = _0297_ ? mem_rdata_latched[18:15] : decoded_rs1[3:0];
+  assign _0066_ = _0232_ ? 1'h0 : _0597_;
+  assign _0059_ = _0297_ ? _0230_ : is_alu_reg_reg;
+  assign _0058_ = _0297_ ? _0229_ : is_alu_reg_imm;
+  assign _0533_ = _0297_ ? _0226_ : is_beq_bne_blt_bge_bltu_bgeu;
+  assign _0060_ = resetn ? _0533_ : 1'h0;
+  assign _0067_ = _0297_ ? _0228_ : is_sb_sh_sw;
+  assign _0062_ = _0232_ ? _0322_ : is_jalr_addi_slti_sltiu_xori_ori_andi;
+  assign _0068_ = _0232_ ? _0286_ : is_slli_srli_srai;
+  assign _0063_ = _0297_ ? _0227_ : is_lb_lh_lw_lbu_lhu;
+  assign _0003_ = _0297_ ? 1'h0 : compressed_instr;
+  assign _0534_ = _0232_ ? 1'h0 : _0598_;
+  assign _0061_ = resetn ? _0534_ : 1'h0;
+  wire [159:0] fangyuan72;
+  assign fangyuan72 = { decoded_imm_j, mem_rdata_q[31:12], 12'h000, mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31:20], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[7], mem_rdata_q[30:25], mem_rdata_q[11:8], 1'h0, mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31:25], mem_rdata_q[11:7] };
+  wire [4:0] fangyuan73;
+  assign fangyuan73 = { instr_jal, _0537_, _0536_, is_beq_bne_blt_bge_bltu_bgeu, is_sb_sh_sw };
+  always @(32'b0000000000000000000000000000000x or fangyuan72 or fangyuan73) begin
+    casez (fangyuan73)
+      5'b????1 :
+        _0535_ = fangyuan72 [31:0] ;
+      5'b???1? :
+        _0535_ = fangyuan72 [63:32] ;
+      5'b??1?? :
+        _0535_ = fangyuan72 [95:64] ;
+      5'b?1??? :
+        _0535_ = fangyuan72 [127:96] ;
+      5'b1???? :
+        _0535_ = fangyuan72 [159:128] ;
+      default:
+        _0535_ = 32'b0000000000000000000000000000000x ;
+    endcase
+  end
+  assign _0007_ = _0232_ ? _0535_ : decoded_imm;
+  assign _0011_ = _0297_ ? mem_rdata_latched[24:20] : decoded_rs2;
+  assign _0008_[19:12] = _0297_ ? mem_rdata_latched[19:12] : decoded_imm_j[19:12];
+  assign _0009_ = _0297_ ? mem_rdata_latched[11:7] : decoded_rd;
+  assign _0041_ = _0297_ ? 1'h0 : instr_retirq;
+  assign _0026_ = _0232_ ? _0285_ : instr_ecall_ebreak;
+  assign _0040_ = _0232_ ? _0283_ : instr_rdinstrh;
+  assign _0039_ = _0232_ ? _0282_ : instr_rdinstr;
+  assign _0038_ = _0232_ ? _0280_ : instr_rdcycleh;
+  assign _0037_ = _0232_ ? _0277_ : instr_rdcycle;
+  assign _0538_ = _0232_ ? _0275_ : instr_and;
+  assign _0017_ = resetn ? _0538_ : 1'h0;
+  assign _0539_ = _0232_ ? _0273_ : instr_or;
+  assign _0035_ = resetn ? _0539_ : 1'h0;
+  assign _0540_ = _0232_ ? _0271_ : instr_sra;
+  assign _0050_ = resetn ? _0540_ : 1'h0;
+  assign _0541_ = _0232_ ? _0270_ : instr_srl;
+  assign _0052_ = resetn ? _0541_ : 1'h0;
+  assign _0542_ = _0232_ ? _0268_ : instr_xor;
+  assign _0056_ = resetn ? _0542_ : 1'h0;
+  assign _0543_ = _0232_ ? _0266_ : instr_sltu;
+  assign _0049_ = resetn ? _0543_ : 1'h0;
+  assign _0544_ = _0232_ ? _0264_ : instr_slt;
+  assign _0046_ = resetn ? _0544_ : 1'h0;
+  assign _0545_ = _0232_ ? _0262_ : instr_sll;
+  assign _0044_ = resetn ? _0545_ : 1'h0;
+  assign _0546_ = _0232_ ? _0260_ : instr_sub;
+  assign _0054_ = resetn ? _0546_ : 1'h0;
+  assign _0547_ = _0232_ ? _0259_ : instr_add;
+  assign _0015_ = resetn ? _0547_ : 1'h0;
+  assign _0051_ = _0232_ ? _0257_ : instr_srai;
+  assign _0053_ = _0232_ ? _0256_ : instr_srli;
+  assign _0045_ = _0232_ ? _0254_ : instr_slli;
+  assign _0548_ = _0232_ ? _0252_ : instr_andi;
+  assign _0018_ = resetn ? _0548_ : 1'h0;
+  assign _0549_ = _0232_ ? _0251_ : instr_ori;
+  assign _0036_ = resetn ? _0549_ : 1'h0;
+  assign _0550_ = _0232_ ? _0250_ : instr_xori;
+  assign _0057_ = resetn ? _0550_ : 1'h0;
+  assign _0551_ = _0232_ ? _0249_ : instr_sltiu;
+  assign _0048_ = resetn ? _0551_ : 1'h0;
+  assign _0552_ = _0232_ ? _0248_ : instr_slti;
+  assign _0047_ = resetn ? _0552_ : 1'h0;
+  assign _0553_ = _0232_ ? _0247_ : instr_addi;
+  assign _0016_ = resetn ? _0553_ : 1'h0;
+  assign _0055_ = _0232_ ? _0246_ : instr_sw;
+  assign _0043_ = _0232_ ? _0245_ : instr_sh;
+  assign _0042_ = _0232_ ? _0244_ : instr_sb;
+  assign _0032_ = _0232_ ? _0243_ : instr_lhu;
+  assign _0030_ = _0232_ ? _0242_ : instr_lbu;
+  assign _0034_ = _0232_ ? _0241_ : instr_lw;
+  assign _0031_ = _0232_ ? _0240_ : instr_lh;
+  assign _0029_ = _0232_ ? _0239_ : instr_lb;
+  assign _0554_ = _0232_ ? _0238_ : instr_bgeu;
+  assign _0022_ = resetn ? _0554_ : 1'h0;
+  assign _0555_ = _0232_ ? _0237_ : instr_bltu;
+  assign _0024_ = resetn ? _0555_ : 1'h0;
+  assign _0556_ = _0232_ ? _0236_ : instr_bge;
+  assign _0021_ = resetn ? _0556_ : 1'h0;
+  assign _0557_ = _0232_ ? _0235_ : instr_blt;
+  assign _0023_ = resetn ? _0557_ : 1'h0;
+  assign _0558_ = _0232_ ? _0234_ : instr_bne;
+  assign _0025_ = resetn ? _0558_ : 1'h0;
+  assign _0559_ = _0232_ ? _0233_ : instr_beq;
+  assign _0020_ = resetn ? _0559_ : 1'h0;
+  assign _0028_ = _0297_ ? _0309_ : instr_jalr;
+  assign _0027_ = _0297_ ? _0223_ : instr_jal;
+  assign _0019_ = _0297_ ? _0222_ : instr_auipc;
+  assign _0033_ = _0297_ ? _0221_ : instr_lui;
+  assign _0091_ = _0232_ ? 32'hxxxxxxxx : pcpi_insn;
+  assign _0560_ = mem_do_rinst ? 2'h0 : mem_state;
+  wire [7:0] fangyuan74;
+  assign fangyuan74 = { _0569_, _0566_, _0563_, _0560_ };
+  wire [3:0] fangyuan75;
+  assign fangyuan75 = { _0307_, _0567_, _0564_, _0562_ };
+  always @(mem_state or fangyuan74 or fangyuan75) begin
+    casez (fangyuan75)
+      4'b???1 :
+        _0561_ = fangyuan74 [1:0] ;
+      4'b??1? :
+        _0561_ = fangyuan74 [3:2] ;
+      4'b?1?? :
+        _0561_ = fangyuan74 [5:4] ;
+      4'b1??? :
+        _0561_ = fangyuan74 [7:6] ;
+      default:
+        _0561_ = mem_state ;
+    endcase
+  end
+  assign _0562_ = mem_state == 2'h3;
+  assign _0563_ = mem_xfer ? 2'h0 : mem_state;
+  assign _0564_ = mem_state == 2'h2;
+  assign _0566_ = mem_xfer ? _0565_ : mem_state;
+  assign _0567_ = mem_state == 1'h1;
+  assign _0568_ = _0337_ ? 2'h1 : mem_state;
+  assign _0569_ = mem_do_wdata ? 2'h2 : _0568_;
+  assign _0570_ = resetn ? mem_state : 2'h0;
+  assign _0086_ = _0338_ ? _0570_ : _0561_;
+  assign _0571_ = _0340_ ? _0129_ : mem_wstrb;
+  assign _0572_ = _0337_ ? 4'h0 : _0571_;
+  assign _0573_ = _0307_ ? _0572_ : _0571_;
+  assign _0090_ = _0338_ ? mem_wstrb : _0573_;
+  assign _0574_ = mem_la_write ? mem_la_wdata : mem_wdata;
+  assign _0088_ = _0338_ ? mem_wdata : _0574_;
+  assign _0575_ = _0340_ ? mem_la_addr : mem_addr;
+  assign _0079_ = _0338_ ? mem_addr : _0575_;
+  assign _0576_ = _0337_ ? _0336_ : mem_instr;
+  assign _0577_ = mem_do_wdata ? 1'h0 : _0576_;
+  assign _0578_ = _0307_ ? _0577_ : mem_instr;
+  assign _0084_ = _0338_ ? mem_instr : _0578_;
+  assign _0579_ = mem_xfer ? 1'h0 : mem_valid;
+  wire [1:0] fangyuan76;
+  assign fangyuan76 = { _0582_, _0579_ };
+  wire [1:0] fangyuan77;
+  assign fangyuan77 = { _0307_, _0137_ };
+  always @(mem_valid or fangyuan76 or fangyuan77) begin
+    casez (fangyuan77)
+      2'b?1 :
+        _0580_ = fangyuan76 [0:0] ;
+      2'b1? :
+        _0580_ = fangyuan76 [1:1] ;
+      default:
+        _0580_ = mem_valid ;
+    endcase
+  end
+  assign _0581_ = _0337_ ? 1'h1 : mem_valid;
+  assign _0582_ = mem_do_wdata ? 1'h1 : _0581_;
+  assign _0583_ = _0339_ ? 1'h0 : mem_valid;
+  assign _0087_ = _0338_ ? _0583_ : _0580_;
+  assign _0085_[31] = mem_xfer ? mem_rdata[31] : mem_rdata_q[31];
+  assign _0085_[7] = mem_xfer ? mem_rdata[7] : mem_rdata_q[7];
+  assign _0085_[24:20] = mem_xfer ? mem_rdata[24:20] : mem_rdata_q[24:20];
+  assign _0085_[19:15] = mem_xfer ? mem_rdata[19:15] : mem_rdata_q[19:15];
+  assign _0085_[6:0] = mem_xfer ? mem_rdata[6:0] : mem_rdata_q[6:0];
+  assign _0085_[14:12] = mem_xfer ? mem_rdata[14:12] : mem_rdata_q[14:12];
+  assign _0085_[11:8] = mem_xfer ? mem_rdata[11:8] : mem_rdata_q[11:8];
+  assign _0085_[30:25] = mem_xfer ? mem_rdata[30:25] : mem_rdata_q[30:25];
+  wire [127:0] fangyuan78;
+  assign fangyuan78 = { 24'h000000, mem_rdata[7:0], 24'h000000, mem_rdata[15:8], 24'h000000, mem_rdata[23:16], 24'h000000, mem_rdata[31:24] };
+  wire [3:0] fangyuan79;
+  assign fangyuan79 = { _0587_, _0586_, _0585_, _0584_ };
+  always @(32'hxxxxxxxx or fangyuan78 or fangyuan79) begin
+    casez (fangyuan79)
+      4'b???1 :
+        _0110_ = fangyuan78 [31:0] ;
+      4'b??1? :
+        _0110_ = fangyuan78 [63:32] ;
+      4'b?1?? :
+        _0110_ = fangyuan78 [95:64] ;
+      4'b1??? :
+        _0110_ = fangyuan78 [127:96] ;
+      default:
+        _0110_ = 32'hxxxxxxxx ;
+    endcase
+  end
+  assign _0584_ = reg_op1[1:0] == 2'h3;
+  assign _0585_ = reg_op1[1:0] == 2'h2;
+  assign _0586_ = reg_op1[1:0] == 1'h1;
+  assign _0587_ = ! reg_op1[1:0];
+  assign _0588_ = mem_wordsize == 2'h2;
+  wire [63:0] fangyuan80;
+  assign fangyuan80 = { 16'h0000, mem_rdata[15:0], 16'h0000, mem_rdata[31:16] };
+  wire [1:0] fangyuan81;
+  assign fangyuan81 = { _0589_, reg_op1[1] };
+  always @(32'hxxxxxxxx or fangyuan80 or fangyuan81) begin
+    casez (fangyuan81)
+      2'b?1 :
+        _0105_ = fangyuan80 [31:0] ;
+      2'b1? :
+        _0105_ = fangyuan80 [63:32] ;
+      default:
+        _0105_ = 32'hxxxxxxxx ;
+    endcase
+  end
+  assign _0589_ = ~ reg_op1[1];
+  assign _0590_ = mem_wordsize == 1'h1;
+  wire [95:0] fangyuan82;
+  assign fangyuan82 = { mem_rdata, _0105_, _0110_ };
+  wire [2:0] fangyuan83;
+  assign fangyuan83 = { _0591_, _0590_, _0588_ };
+  always @(32'hxxxxxxxx or fangyuan82 or fangyuan83) begin
+    casez (fangyuan83)
+      3'b??1 :
+        mem_rdata_word = fangyuan82 [31:0] ;
+      3'b?1? :
+        mem_rdata_word = fangyuan82 [63:32] ;
+      3'b1?? :
+        mem_rdata_word = fangyuan82 [95:64] ;
+      default:
+        mem_rdata_word = 32'hxxxxxxxx ;
+    endcase
+  end
+  assign _0591_ = ! mem_wordsize;
+  wire [11:0] fangyuan84;
+  assign fangyuan84 = { 4'hf, _0607_, _0599_ };
+  wire [2:0] fangyuan85;
+  assign fangyuan85 = { _0591_, _0590_, _0588_ };
+  always @(4'hx or fangyuan84 or fangyuan85) begin
+    casez (fangyuan85)
+      3'b??1 :
+        mem_la_wstrb = fangyuan84 [3:0] ;
+      3'b?1? :
+        mem_la_wstrb = fangyuan84 [7:4] ;
+      3'b1?? :
+        mem_la_wstrb = fangyuan84 [11:8] ;
+      default:
+        mem_la_wstrb = 4'hx ;
+    endcase
+  end
+  wire [95:0] fangyuan86;
+  assign fangyuan86 = { reg_op2, reg_op2[15:0], reg_op2[15:0], reg_op2[7:0], reg_op2[7:0], reg_op2[7:0], reg_op2[7:0] };
+  wire [2:0] fangyuan87;
+  assign fangyuan87 = { _0591_, _0590_, _0588_ };
+  always @(32'hxxxxxxxx or fangyuan86 or fangyuan87) begin
+    casez (fangyuan87)
+      3'b??1 :
+        mem_la_wdata = fangyuan86 [31:0] ;
+      3'b?1? :
+        mem_la_wdata = fangyuan86 [63:32] ;
+      3'b1?? :
+        mem_la_wdata = fangyuan86 [95:64] ;
+      default:
+        mem_la_wdata = 32'hxxxxxxxx ;
+    endcase
+  end
+  assign _0592_ = & mem_state;
+  assign _0593_ = | decoded_rs;
+  wire [2:0] fangyuan88;
+  assign fangyuan88 = { _0287_, _0288_, _0289_ };
+  assign _0594_ = | fangyuan88;
+  wire [5:0] fangyuan89;
+  assign fangyuan89 = { _0208_, _0207_, _0206_, _0205_, _0203_, _0201_ };
+  assign _0595_ = | fangyuan89;
+  wire [1:0] fangyuan90;
+  assign fangyuan90 = { instr_auipc, instr_lui };
+  assign _0537_ = | fangyuan90;
+  wire [2:0] fangyuan91;
+  assign fangyuan91 = { is_alu_reg_imm, is_lb_lh_lw_lbu_lhu, instr_jalr };
+  assign _0536_ = | fangyuan91;
+  assign _0596_ = | mem_state;
+  wire [3:0] fangyuan92;
+  assign fangyuan92 = { instr_rdinstrh, instr_rdinstr, instr_rdcycleh, instr_rdcycle };
+  assign is_rdcycle_rdcycleh_rdinstr_rdinstrh = | fangyuan92;
+  wire [2:0] fangyuan93;
+  assign fangyuan93 = { instr_jal, instr_auipc, instr_lui };
+  assign _0065_ = | fangyuan93;
+  wire [6:0] fangyuan94;
+  assign fangyuan94 = { instr_sub, instr_add, instr_addi, instr_jalr, instr_jal, instr_auipc, instr_lui };
+  assign _0597_ = | fangyuan94;
+  wire [2:0] fangyuan95;
+  assign fangyuan95 = { instr_slt, instr_slti, instr_blt };
+  assign _0069_ = | fangyuan95;
+  wire [2:0] fangyuan96;
+  assign fangyuan96 = { instr_sltu, instr_sltiu, instr_bltu };
+  assign _0070_ = | fangyuan96;
+  wire [2:0] fangyuan97;
+  assign fangyuan97 = { instr_lhu, instr_lbu, instr_lw };
+  assign _0064_ = | fangyuan97;
+  wire [4:0] fangyuan98;
+  assign fangyuan98 = { is_beq_bne_blt_bge_bltu_bgeu, instr_sltu, instr_slt, instr_sltiu, instr_slti };
+  assign _0598_ = | fangyuan98;
+  assign alu_shl = reg_op1 << reg_op2[4:0];
+  assign _0599_ = 1'h1 << reg_op1[1:0];
+  wire [32:0] fangyuan99;
+  assign fangyuan99 = { _0602_, reg_op1 };
+  assign alu_shr = $signed(fangyuan99) >>> reg_op2[4:0];
+  assign _0600_ = reg_op1 - reg_op2;
+  assign _0198_[4:0] = reg_sh - 3'h4;
+  assign _0601_[4:0] = reg_sh - 1'h1;
+  assign next_pc = _0291_ ? _0126_ : reg_next_pc;
+  assign alu_add_sub = instr_sub ? _0600_ : _0117_;
+  assign _0602_ = _0323_ ? reg_op1[31] : 1'h0;
+  assign _0199_[2:0] = latched_compr ? 3'h2 : 3'h4;
+  assign _0603_ = latched_stalu ? alu_out_q : reg_out;
+  assign decoded_rs = _0219_ ? decoded_rs2 : decoded_rs1;
+  assign cpuregs_rs1 = _0593_ ? _0435_ : 32'h00000000;
+  assign _0004_ = resetn ? _0119_ : 64'h0000000000000000;
+  assign _0604_ = latched_store ? _0128_ : reg_next_pc;
+  assign _0200_[2:0] = compressed_instr ? 3'h2 : 3'h4;
+  assign _0605_ = instr_lui ? 32'h00000000 : reg_pc;
+  wire [31:0] fangyuan100;
+  assign fangyuan100 = { 27'h0000000, decoded_rs2 };
+  assign _0606_ = is_slli_srli_srai ? fangyuan100 : decoded_imm;
+  wire [31:0] fangyuan101;
+  assign fangyuan101 = { _0125_, 2'h0 };
+  wire [31:0] fangyuan102;
+  assign fangyuan102 = { reg_op1[31:2], 2'h0 };
+  assign mem_la_addr = _0336_ ? fangyuan101 : fangyuan102;
+  assign mem_rdata_latched = mem_xfer ? mem_rdata : mem_rdata_q;
+  assign _0607_ = reg_op1[1] ? 4'hc : 4'h3;
+  assign _0565_ = _0333_ ? 2'h0 : 2'h3;
+  assign _0608_ = reg_op1 ^ reg_op2;
+  assign _0002_[30:0] = { _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31] };
+  assign _0093_[1:0] = 2'h0;
+  assign _0097_[1:0] = 2'h0;
+  assign _0196_[7:4] = 4'h0;
+  assign _0197_[7] = 1'h0;
+  assign _0199_[31:3] = 29'h00000000;
+  assign _0200_[31:3] = 29'h00000000;
+  assign cpuregs_rs2 = cpuregs_rs1;
+  assign dbg_mem_addr = mem_addr;
+  assign dbg_mem_instr = mem_instr;
+  assign dbg_mem_rdata = mem_rdata;
+  assign dbg_mem_ready = mem_ready;
+  assign dbg_mem_valid = mem_valid;
+  assign dbg_mem_wdata = mem_wdata;
+  assign dbg_mem_wstrb = mem_wstrb;
+  assign do_waitirq = 1'h0;
+  assign instr_trap = 1'h0;
+  assign mem_la_firstword = 1'h0;
+  assign mem_la_firstword_xfer = 1'h0;
+  assign mem_la_use_prefetched_high_word = 1'h0;
+  assign mem_rdata_latched_noshuffle = mem_rdata_latched;
+  assign pcpi_div_rd = 32'hxxxxxxxx;
+  assign pcpi_div_ready = 1'h0;
+  assign pcpi_div_wait = 1'h0;
+  assign pcpi_div_wr = 1'h0;
+  assign pcpi_int_ready = 1'h0;
+  assign pcpi_int_wait = 1'h0;
+  assign pcpi_mul_rd = 32'hxxxxxxxx;
+  assign pcpi_mul_ready = 1'h0;
+  assign pcpi_mul_wait = 1'h0;
+  assign pcpi_mul_wr = 1'h0;
+  assign pcpi_rs1 = reg_op1;
+  assign pcpi_rs2 = reg_op2;
+  assign trace_data[35:1] = { trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0] };
+  assign trace_valid = 1'h0;
+endmodule
+module top(clk, resetn, trap, mem_valid_fifo, mem_instr_fifo, mem_ready, mem_addr_fifo, mem_wdata_fifo, mem_wstrb_fifo, mem_rdata, irq, eoi, mem_la_read, mem_la_write, mem_la_addr, mem_la_wdata, mem_la_wstrb, pcpi_valid, pcpi_insn, pcpi_rs1, pcpi_rs2, pcpi_wr, pcpi_rd, pcpi_wait, pcpi_ready, trace_valid, trace_data);
+  wire _0_;
+  input clk;
+  output [31:0] eoi;
+  input [31:0] irq;
+  wire [31:0] mem_addr;
+  output [31:0] mem_addr_fifo;
+  wire mem_instr;
+  output mem_instr_fifo;
+  output [31:0] mem_la_addr;
+  output mem_la_read;
+  output [31:0] mem_la_wdata;
+  output mem_la_write;
+  output [3:0] mem_la_wstrb;
+  input [31:0] mem_rdata;
+  input mem_ready;
+  wire mem_valid;
+  output mem_valid_fifo;
+  wire [31:0] mem_wdata;
+  output [31:0] mem_wdata_fifo;
+  wire [3:0] mem_wstrb;
+  output [3:0] mem_wstrb_fifo;
+  output [31:0] pcpi_insn;
+  input [31:0] pcpi_rd;
+  input pcpi_ready;
+  output [31:0] pcpi_rs1;
+  output [31:0] pcpi_rs2;
+  output pcpi_valid;
+  input pcpi_wait;
+  input pcpi_wr;
+  input resetn;
+  output [35:0] trace_data;
+  output trace_valid;
+  output trap;
+  assign _0_ = ! resetn;
+  \$paramod\mem_fifo\WIDTH=32 fifo_addr (
+    .clk(clk),
+    .in(mem_addr),
+    .out(mem_addr_fifo),
+    .rst(_0_),
+    .wr(mem_valid)
+  );
+  \$paramod\mem_fifo\WIDTH=1 fifo_instr (
+    .clk(clk),
+    .in(mem_instr),
+    .out(mem_instr_fifo),
+    .rst(_0_),
+    .wr(mem_valid)
+  );
+  \$paramod\mem_fifo\WIDTH=1 fifo_valid (
+    .clk(clk),
+    .in(mem_valid),
+    .out(mem_valid_fifo),
+    .rst(_0_),
+    .wr(mem_valid)
+  );
+  \$paramod\mem_fifo\WIDTH=32 fifo_wdata (
+    .clk(clk),
+    .in(mem_wdata),
+    .out(mem_wdata_fifo),
+    .rst(_0_),
+    .wr(mem_valid)
+  );
+  \$paramod\mem_fifo\WIDTH=4 fifo_wstrb (
+    .clk(clk),
+    .in(mem_wstrb),
+    .out(mem_wstrb_fifo),
+    .rst(_0_),
+    .wr(mem_valid)
+  );
+  picorv32 u0 (
+    .clk(clk),
+    .eoi(eoi),
+    .irq(irq),
+    .mem_addr(mem_addr),
+    .mem_instr(mem_instr),
+    .mem_la_addr(mem_la_addr),
+    .mem_la_read(mem_la_read),
+    .mem_la_wdata(mem_la_wdata),
+    .mem_la_write(mem_la_write),
+    .mem_la_wstrb(mem_la_wstrb),
+    .mem_rdata(mem_rdata),
+    .mem_ready(mem_ready),
+    .mem_valid(mem_valid),
+    .mem_wdata(mem_wdata),
+    .mem_wstrb(mem_wstrb),
+    .pcpi_insn(pcpi_insn),
+    .pcpi_rd(pcpi_rd),
+    .pcpi_ready(pcpi_ready),
+    .pcpi_rs1(pcpi_rs1),
+    .pcpi_rs2(pcpi_rs2),
+    .pcpi_valid(pcpi_valid),
+    .pcpi_wait(pcpi_wait),
+    .pcpi_wr(pcpi_wr),
+    .resetn(resetn),
+    .trace_data(trace_data),
+    .trace_valid(trace_valid),
+    .trap(trap)
+  );
+endmodule
