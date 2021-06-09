@@ -89,7 +89,10 @@ void build_ast_tree() {
     else if(g_moduleInfoMap.find(prefix) != g_moduleInfoMap.end()) {
       reg = writeVar;
       curModName = prefix;
-      curInsName = prefix;
+      curInsName = ask_parent_my_ins_name(
+                     prefix, 
+                     *(g_moduleInfoMap[prefix]->parentModVec.begin())
+                   );
     }
     else {
       curInsName = prefix;
@@ -129,8 +132,10 @@ void build_ast_tree() {
         assert(curMod->parentModVec.size() == 1);
         curMod->isFunctionedSubMod = false;
         auto parentMod = *(curMod->parentModVec.begin());
-        std::string insName = ask_parent_my_ins_name(curMod->name, parentMod);
-        Context_t insCntxt(insName, "", curMod, parentMod, nullptr);  
+        if(curInsName.empty())
+          curInsName = ask_parent_my_ins_name(curMod->name, parentMod);
+        Context_t insCntxt(curInsName, "", curMod, parentMod, nullptr);
+        curInsName.clear();
         g_insContextStk.insert(g_insContextStk.begin(), insCntxt);
         curMod = parentMod;
       }

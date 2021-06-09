@@ -89,7 +89,8 @@ void check_all_regs() {
       std::string oneWriteAsv = pair.second;
       auto prefixVarPair = split_prefix_var(oneWriteAsv);
       std::string prefix = prefixVarPair.first;
-      std::string writeVar = prefixVarPair.second; 
+      std::string writeVar = prefixVarPair.second;
+      std::string insName;
       destInfo.isVector = false;
       if(prefix.empty()) {
         destInfo.set_dest_and_slice(writeVar);
@@ -98,6 +99,11 @@ void check_all_regs() {
       else if(g_moduleInfoMap.find(prefix) != g_moduleInfoMap.end()) {
         destInfo.set_dest_and_slice(writeVar);
         destInfo.set_module_name(prefix);
+        insName = ask_parent_my_ins_name(
+                    prefix,
+                    *(g_moduleInfoMap[prefix]->parentModVec.begin())                    
+                  );
+        destInfo.set_instance_name(insName);
       }
       else {
         destInfo.set_instance_name(prefix);
@@ -125,7 +131,7 @@ void check_all_regs() {
     }
 
     // if g_get_all_update=true, only do the first instruction
-    if(g_get_all_update) break;
+    if(g_get_all_update) return;
   }
 }
 
@@ -417,6 +423,7 @@ void print_llvm_ir(DestInfo &destInfo,
   OS.flush();
   std::ofstream output(fileName);
   output << Str << std::endl;
+  toCout("** Finish update function for: "+destName);
 }
 
 
