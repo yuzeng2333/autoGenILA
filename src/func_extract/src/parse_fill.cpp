@@ -426,11 +426,15 @@ void read_in_instructions(std::string fileName) {
           break;
         case InvarRegs:
           {
+            if(line.find("_$_") != std::string::npos) {
+              toCout("Error: the format for invariant regs are no longer supported!");
+              abort();
+            }
             std::string modName, regName;
-            size_t tmpPos = line.find("_$_");
+            size_t tmpPos = line.find(".");
             if(tmpPos != std::string::npos) {
               modName = line.substr(0, tmpPos);
-              regName = line.substr(tmpPos+3);
+              regName = line.substr(tmpPos+1);
             }
             else {
               // if no modName is specified, 
