@@ -30,6 +30,7 @@ class DestInfo {
     std::vector<std::string> destVec;
     std::string modName;
     std::string insName;
+    std::string instrName;
 
   public:
     bool isVector;
@@ -38,8 +39,10 @@ class DestInfo {
     std::vector<std::string> get_no_slice_name();
     std::string get_mod_name();
     std::string get_ins_name();
+    std::string get_instr_name();
     void set_dest_and_slice(std::string var);
     void set_module_name(std::string var);
+    void set_instr_name(std::string var);
     void set_instance_name(std::string var);
     void set_dest_vec(const std::vector<std::string> &vec);
     llvm::Type* get_arr_type();

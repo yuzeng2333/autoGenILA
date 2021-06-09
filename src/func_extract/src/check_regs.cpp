@@ -80,6 +80,7 @@ void check_all_regs() {
       abort();
     }
     toCout("---  BEGIN INSTRUCTION #"+toStr(i++)+" ---");
+    destInfo.set_instr_name(instrInfo.name);
     g_readASV = instrInfo.readASV;
     g_currInstrInfo = instrInfo;
     // declaration for llvm
@@ -416,7 +417,8 @@ void print_llvm_ir(DestInfo &destInfo,
   llvm::verifyFunction(*topFunction);
 
   llvm::verifyModule(*TheModule);
-  std::string fileName = "tmp.ll";
+  std::string fileName = g_path+"/"+destInfo.get_instr_name()+"_"
+                         +destName+"_"+toStr(bound)+"_tmp.ll";
   std::string Str;
   llvm::raw_string_ostream OS(Str);
   OS << *TheModule;
@@ -1242,6 +1244,15 @@ std::string DestInfo::get_ins_name() {
 }
 
 
+std::string DestInfo::get_instr_name() {
+  if(instrName.empty()) {
+    toCout("Warning: instrName is not set");
+    return "";
+  }
+  return instrName;
+}
+
+
 void DestInfo::set_dest_and_slice(std::string var) {
   destAndSlice = var;
 }
@@ -1249,6 +1260,11 @@ void DestInfo::set_dest_and_slice(std::string var) {
 
 void DestInfo::set_module_name(std::string var) {
   modName = var;
+}
+
+
+void DestInfo::set_instr_name(std::string var) {
+  instrName = var;
 }
 
 
