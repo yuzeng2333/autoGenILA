@@ -74,6 +74,7 @@ void check_all_regs() {
   clean_module_inputs();
   uint32_t i = 1;
   DestInfo destInfo;  
+  TheContext = std::make_unique<llvm::LLVMContext>();  
   for(auto instrInfo : g_instrInfo) {
     if(!instrInfo.writeASVVec.empty() && !instrInfo.writeASV.empty()) {
       toCout("Error: does not support single ASV and vector together");
@@ -84,7 +85,6 @@ void check_all_regs() {
     g_readASV = instrInfo.readASV;
     g_currInstrInfo = instrInfo;
     // declaration for llvm
-    TheContext = std::make_unique<llvm::LLVMContext>();
     for(auto pair: instrInfo.writeASV) {
       uint32_t cycleCnt = pair.first;
       std::string oneWriteAsv = pair.second;
@@ -425,6 +425,12 @@ void print_llvm_ir(DestInfo &destInfo,
   OS.flush();
   std::ofstream output(fileName);
   output << Str << std::endl;
+  output.close();
+  if(true) {
+    std::ofstream output("./tmp.ll");
+    output << Str << std::endl;
+    output.close();    
+  }
   toCout("** Finish update function for: "+destName);
 }
 
