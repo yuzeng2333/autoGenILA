@@ -132,7 +132,7 @@ void check_all_regs() {
     }
 
     // if g_get_all_update=true, only do the first instruction
-    if(g_get_all_update) return;
+    if(i-1 >= g_do_instr_num) return;
   }
 }
 
@@ -418,7 +418,7 @@ void print_llvm_ir(DestInfo &destInfo,
 
   llvm::verifyModule(*TheModule);
   std::string fileName = g_path+"/"+destInfo.get_instr_name()+"_"
-                         +destName+"_"+toStr(bound)+"_tmp.ll";
+                         +destInfo.get_dest_name()+"_"+toStr(bound)+"_tmp.ll";
   std::string Str;
   llvm::raw_string_ostream OS(Str);
   OS << *TheModule;

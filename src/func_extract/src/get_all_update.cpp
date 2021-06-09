@@ -89,16 +89,18 @@ void get_all_update() {
       g_currInstrInfo = instrInfo;
       toCout("---  BEGIN INSTRUCTION #"+toStr(instrIdx)+" ---");
       uint32_t delayBound = instrInfo.delayBound;
-
+      std::string fileName = g_path+"/"+destInfo.get_instr_name()+"_"
+                             +destInfo.get_dest_name()+"_"+toStr(delayBound)+"_tmp.ll";
       print_llvm_ir(destInfo, delayBound, instrIdx);
-      std::string clean("opt --instsimplify --deadargelim --instsimplify tmp.ll -S -o=clean.ll");
-      std::string opto3("opt -O3 clean.ll -S -o=tmp.o3.ll; opt -passes=deadargelim tmp.o3.ll -S -o=clean.o3.ll; rm tmp.o3.ll");
+      std::string clean("opt --instsimplify --deadargelim --instsimplify "+fileName+" -S -o="+g_path+"/clean.ll");
+      std::string opto3("opt -O3 "+g_path+"/clean.ll -S -o=tmp.o3.ll; opt -passes=deadargelim tmp.o3.ll -S -o="+g_path+"/clean.o3.ll; rm tmp.o3.ll");
       system(clean.c_str());
       system(opto3.c_str());
       std::set<std::string> argVec;
-      read_clean_o3("./clean.o3.ll", argVec);
+      read_clean_o3(g_path+"/clean.o3.ll", argVec);
       if(argVec.size() > 0) {
-        system(("cp clean.o3.ll "+g_path+"/update"+toStr(instrIdx)+"_"+target+".ll").c_str());
+        system(("mv "+g_path+"/clean.o3.ll "+g_path+"/"+destInfo.get_instr_name()+"_"
+                +destInfo.get_dest_name()+"_"+toStr(delayBound)+".ll").c_str());
         toCout("----- For instr "+toStr(instrIdx)+", "+target+" is affected");
         if(dependVarMap.find(target) == dependVarMap.end())
           dependVarMap.emplace(target, argVec);

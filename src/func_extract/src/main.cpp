@@ -54,6 +54,7 @@ bool g_read_rst;
 bool g_get_all_update;
 bool g_use_concat_extract_func;
 bool g_use_simple_func_name;
+uint32_t g_do_instr_num;
 std::ofstream g_outFile;
 std::ofstream g_regValueFile;
 std::string g_pj_path = "/workspace/research/ILA/autoGenILA/src/";
@@ -85,7 +86,7 @@ int main(int argc, char *argv[]) {
   std::string time(ctime(&my_time));
   g_outFile << "Start time: "+time << std::endl;
   toCout("Begin main!");
-  g_verb = true;
+  g_verb = false;
   g_print_solver = false;
   g_remove_adff = true;
   g_split_long_num = true;
@@ -94,6 +95,7 @@ int main(int argc, char *argv[]) {
   g_get_all_update = false;
   g_use_concat_extract_func = false;
   g_use_simple_func_name = true;
+  g_do_instr_num = 4;
   print_time();
   /// read module_info.txt, result in g_moduleInfoMap
   /// read input-output delay info for sub-modules
