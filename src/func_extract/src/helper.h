@@ -159,6 +159,8 @@ bool is_all_x(std::string);
 
 void add_front_backslash(std::string &line);
 
+void remove_front_backslash(std::string &line);
+
 std::string purify_var_name(std::string name);
 
 bool isLetter(const char &c);

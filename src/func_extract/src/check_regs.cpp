@@ -417,8 +417,10 @@ void print_llvm_ir(DestInfo &destInfo,
   llvm::verifyFunction(*topFunction);
 
   llvm::verifyModule(*TheModule);
+  std::string destNameSimp = destInfo.get_dest_name();
+  remove_front_backslash(destNameSimp);
   std::string fileName = g_path+"/"+destInfo.get_instr_name()+"_"
-                         +destInfo.get_dest_name()+"_"+toStr(bound)+"_tmp.ll";
+                         +destNameSimp+"_"+toStr(bound)+"_tmp.ll";
   std::string Str;
   llvm::raw_string_ostream OS(Str);
   OS << *TheModule;
@@ -1252,8 +1254,9 @@ std::string DestInfo::get_ins_name() {
 
 std::string DestInfo::get_instr_name() {
   if(instrName.empty()) {
-    toCout("Warning: instrName is not set");
-    return "";
+    toCout("Error: instrName is not set");
+    abort();
+    //return "";
   }
   return instrName;
 }

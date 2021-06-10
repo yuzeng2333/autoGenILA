@@ -87,10 +87,14 @@ void get_all_update() {
     for(auto instrInfo : g_instrInfo) {
       instrIdx++;
       g_currInstrInfo = instrInfo;
+      destInfo.set_instr_name(instrInfo.name);      
+      assert(!instrInfo.name.empty());
       toCout("---  BEGIN INSTRUCTION #"+toStr(instrIdx)+" ---");
       uint32_t delayBound = instrInfo.delayBound;
-      std::string fileName = g_path+"/"+destInfo.get_instr_name()+"_"
-                             +destInfo.get_dest_name()+"_"+toStr(delayBound)+"_tmp.ll";
+      std::string destNameSimp = destInfo.get_dest_name();
+      remove_front_backslash(destNameSimp);
+      std::string fileName = g_path+"/"+instrInfo.name+"_"
+                             +destNameSimp+"_"+toStr(delayBound)+"_tmp.ll";
       print_llvm_ir(destInfo, delayBound, instrIdx);
       std::string clean("opt --instsimplify --deadargelim --instsimplify "+fileName+" -S -o="+g_path+"/clean.ll");
       std::string opto3("opt -O3 "+g_path+"/clean.ll -S -o=tmp.o3.ll; opt -passes=deadargelim tmp.o3.ll -S -o="+g_path+"/clean.o3.ll; rm tmp.o3.ll");
@@ -99,9 +103,9 @@ void get_all_update() {
       std::set<std::string> argVec;
       read_clean_o3(g_path+"/clean.o3.ll", argVec);
       if(argVec.size() > 0) {
-        system(("mv "+g_path+"/clean.o3.ll "+g_path+"/"+destInfo.get_instr_name()+"_"
+        system(("mv "+g_path+"/clean.o3.ll "+g_path+"/"+instrInfo.name+"_"
                 +destInfo.get_dest_name()+"_"+toStr(delayBound)+".ll").c_str());
-        toCout("----- For instr "+toStr(instrIdx)+", "+target+" is affected");
+        toCout("----- For instr "+instrInfo.name+", "+target+" is affected");
         if(dependVarMap.find(target) == dependVarMap.end())
           dependVarMap.emplace(target, argVec);
         else {
@@ -110,8 +114,37 @@ void get_all_update() {
         }
       }
       else       
-        toCout("---- For instr "+toStr(instrIdx)+", "+target+" is NOT affected");
+        toCout("---- For instr "+instrInfo.name+", "+target+" is NOT affected");
       for(std::string reg : argVec) {
+        if(reg.find("cpuregs[3]") != std::string::npos
+           || reg.find("cpuregs[4]") != std::string::npos
+           || reg.find("cpuregs[5]") != std::string::npos
+           || reg.find("cpuregs[6]") != std::string::npos
+           || reg.find("cpuregs[7]") != std::string::npos
+           || reg.find("cpuregs[8]") != std::string::npos
+           || reg.find("cpuregs[9]") != std::string::npos
+           || reg.find("cpuregs[10]") != std::string::npos
+           || reg.find("cpuregs[11]") != std::string::npos
+           || reg.find("cpuregs[12]") != std::string::npos
+           || reg.find("cpuregs[13]") != std::string::npos
+           || reg.find("cpuregs[14]") != std::string::npos
+           || reg.find("cpuregs[15]") != std::string::npos
+           || reg.find("cpuregs[16]") != std::string::npos
+           || reg.find("cpuregs[17]") != std::string::npos
+           || reg.find("cpuregs[18]") != std::string::npos
+           || reg.find("cpuregs[19]") != std::string::npos
+           || reg.find("cpuregs[20]") != std::string::npos
+           || reg.find("cpuregs[21]") != std::string::npos
+           || reg.find("cpuregs[22]") != std::string::npos
+           || reg.find("cpuregs[23]") != std::string::npos
+           || reg.find("cpuregs[24]") != std::string::npos
+           || reg.find("cpuregs[25]") != std::string::npos
+           || reg.find("cpuregs[26]") != std::string::npos
+           || reg.find("cpuregs[27]") != std::string::npos
+           || reg.find("cpuregs[28]") != std::string::npos
+           || reg.find("cpuregs[29]") != std::string::npos
+           || reg.find("cpuregs[30]") != std::string::npos)
+            continue;
         workSet.insert(reg);
         addedWorkSetFile << reg << std::endl;
       }

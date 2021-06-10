@@ -66,7 +66,9 @@ void build_ast_tree() {
   std::string curModName;
   std::string curInsName;
   std::string reg;
+  uint32_t idx = 1;
   for(auto instrInfo : g_instrInfo) {
+    if(idx++ > g_do_instr_num) break;
     if(!g_get_all_update) {
       beginIt = instrInfo.skipWriteASV.begin();
       endIt = instrInfo.skipWriteASV.end();

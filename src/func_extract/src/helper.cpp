@@ -583,11 +583,20 @@ bool is_all_x(std::string strIn) {
   return true;
 }
 
+
 void add_front_backslash(std::string &line) {
   if(line.substr(0, 1) == "\\" && line.substr(0, 2) != "\\\\") {
     line = "\\"+line;
   }
 }
+
+
+void remove_front_backslash(std::string &line) {
+  while(line.substr(0, 1) == "\\" ) {
+    line = line.substr(1);
+  }
+}
+
 
 
 std::string purify_var_name(std::string name) {
