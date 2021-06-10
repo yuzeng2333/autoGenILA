@@ -92,7 +92,7 @@ int main(int argc, char *argv[]) {
   g_split_long_num = true;
   g_clean_submod = true;
   g_use_read_ASV = false;
-  g_get_all_update = true;
+  g_get_all_update = false;
   g_use_concat_extract_func = false;
   g_use_simple_func_name = true;
   g_do_instr_num = 1;

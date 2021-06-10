@@ -1190,7 +1190,7 @@ std::string get_var_name(std::string name) {
 
 std::pair<std::string, std::string> split_prefix_var(std::string var) {
   size_t pos = var.find(".");
-  if(pos == std::string::npos) {
+  if(var.substr(0, 1) == "\\" || pos == std::string::npos) {
     return std::make_pair("", var);
   }
   else {
