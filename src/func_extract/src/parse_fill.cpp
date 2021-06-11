@@ -430,23 +430,11 @@ void read_in_instructions(std::string fileName) {
               toCout("Error: the format for invariant regs are no longer supported!");
               abort();
             }
+            auto pair = split_prefix_var(line);
             std::string modName, regName;
-            size_t tmpPos = line.find(".");
-            if(tmpPos != std::string::npos) {
-              modName = line.substr(0, tmpPos);
-              regName = line.substr(tmpPos+1);
-            }
-            else {
-              // if no modName is specified, 
-              // by default modName is top module name
-              if(g_topModule.empty()) {
-                toCout("Error: top module name should be specified earlier!");
-                abort();
-              }
-              modName = g_topModule;
-              remove_two_end_space(line);
-              regName = line;
-            }
+            modName = pair.first;
+            regName = pair.second;
+            if(modName.empty()) modName = g_topModule;
             if(g_invarRegs.find(modName) == g_invarRegs.end())
               g_invarRegs.emplace(modName, std::set<std::string>{regName});
             else

@@ -802,8 +802,9 @@ llvm::Value* add_nb_constraint(astNode* const node,
   const auto curFunc = get_func();
   const auto curMod = get_curMod();
   std::string dest = node->dest;
-  if(dest.find("ata_fifo.r0") != std::string::npos && timeIdx == 25) {
-    toCoutVerb("target reg found! time: "+toStr(timeIdx));
+  if(dest.find("cpu_state") != std::string::npos && timeIdx == 8) {
+    //toCoutVerb("target reg found! time: "+toStr(timeIdx));
+    toCout("Find it");
   }
   llvm::Value* destNextExpr;
   // assuming RHS of nonblocking is not number
@@ -1292,5 +1293,12 @@ void clean_all_mod_dynamic_info() {
     pair.second->clean_ir_data();
   }
 }
+
+
+//void check_invar_regs() {
+//  for(std::string reg : g_invarRegs) {
+//    
+//  }
+//}
 
 } // end of namespace funcExtract

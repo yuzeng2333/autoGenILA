@@ -47,7 +47,7 @@ void vcd_parser(std::string fileName) {
       if(var.find("mem_valid") != std::string::npos) {
         toCout("Find it");
       }
-      if(var.find("pc_x_q") != std::string::npos) {
+      if(var.find("u0.cpu_state") != std::string::npos) {
         toCout("Find it");
       }
       if(is_reg(var))
