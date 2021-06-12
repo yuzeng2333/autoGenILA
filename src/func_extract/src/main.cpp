@@ -1,3 +1,4 @@
+#include "parse_execute.h"
 #include "parse_fill.h"
 #include "expr.h"
 #include "vcd_parser.h"
@@ -86,7 +87,7 @@ int main(int argc, char *argv[]) {
   std::string time(ctime(&my_time));
   g_outFile << "Start time: "+time << std::endl;
   toCout("Begin main!");
-  g_verb = false;
+  g_verb = true;
   g_print_solver = false;
   g_remove_adff = true;
   g_split_long_num = true;

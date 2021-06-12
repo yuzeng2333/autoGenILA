@@ -1592,7 +1592,7 @@ llvm::Value* make_llvm_instr(builder &b, context &c, std::string op,
     return b->CreateICmpEQ(b->CreateNot(op1Expr), llvmInt(0, op1WidthNum, c), name);
   }
   else if(op == "-") {
-    toCout("Error: not supported operator: unary -");
+    return b->CreateSub(llvmInt(0, op1WidthNum, c), op1Expr, name);
   }
   else {
     toCout("Not supported 1-op in make_llvm_instr, op is: "+op);
