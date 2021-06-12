@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/tmp/src/main.cpp
+iostream
+-
+string
+-
+llvm/IR/Module.h
+-
+llvm/IRReader/IRReader.h
+-
+llvm/Support/SourceMgr.h
+-
+llvm/ExecutionEngine/ExecutionEngine.h
+-
+llvm/ExecutionEngine/GenericValue.h
+-
+

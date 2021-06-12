@@ -1,0 +1,21 @@
+/usr/bin/cmake -S/home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/tmp -B/home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/tmp/build --check-build-system CMakeFiles/Makefile.cmake 0
+/usr/bin/cmake -E cmake_progress_start /home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/tmp/build/CMakeFiles /home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/tmp/build/CMakeFiles/progress.marks
+make -f CMakeFiles/Makefile2 all
+make[1]: Entering directory '/home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/tmp/build'
+make -f CMakeFiles/llvm_exec.dir/build.make CMakeFiles/llvm_exec.dir/depend
+make[2]: Entering directory '/home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/tmp/build'
+cd /home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/tmp/build && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/tmp /home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/tmp /home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/tmp/build /home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/tmp/build /home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/tmp/build/CMakeFiles/llvm_exec.dir/DependInfo.cmake --color=
+make[2]: Leaving directory '/home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/tmp/build'
+make -f CMakeFiles/llvm_exec.dir/build.make CMakeFiles/llvm_exec.dir/build
+make[2]: Entering directory '/home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/tmp/build'
+[ 50%] Linking CXX executable llvm_exec
+/usr/bin/cmake -E cmake_link_script CMakeFiles/llvm_exec.dir/link.txt --verbose=1
+/usr/bin/c++  -O0 -Wall -g   -rdynamic CMakeFiles/llvm_exec.dir/src/main.cpp.o  -o llvm_exec  /usr/local/lib/libLLVMSupport.a /usr/local/lib/libLLVMCore.a /usr/local/lib/libLLVMIRReader.a /usr/local/lib/libLLVMExecutionEngine.a /usr/local/lib/libLLVMJITLink.a /usr/local/lib/libLLVMMCJIT.a /usr/local/lib/libLLVMOrcJIT.a -lLLVMjit /usr/local/lib/libLLVMX86CodeGen.a /usr/local/lib/libLLVMX86AsmParser.a /usr/local/lib/libLLVMX86Desc.a /usr/local/lib/libLLVMX86Disassembler.a /usr/local/lib/libLLVMX86Info.a /usr/local/lib/libLLVMExecutionEngine.a /usr/local/lib/libLLVMJITLink.a /usr/local/lib/libLLVMRuntimeDyld.a /usr/local/lib/libLLVMOrcTargetProcess.a /usr/local/lib/libLLVMPasses.a /usr/local/lib/libLLVMCoroutines.a /usr/local/lib/libLLVMipo.a /usr/local/lib/libLLVMIRReader.a /usr/local/lib/libLLVMAsmParser.a /usr/local/lib/libLLVMFrontendOpenMP.a /usr/local/lib/libLLVMLinker.a /usr/local/lib/libLLVMObjCARCOpts.a /usr/local/lib/libLLVMVectorize.a /usr/local/lib/libLLVMInstrumentation.a /usr/local/lib/libLLVMOrcShared.a /usr/local/lib/libLLVMAsmPrinter.a /usr/local/lib/libLLVMDebugInfoDWARF.a /usr/local/lib/libLLVMGlobalISel.a /usr/local/lib/libLLVMSelectionDAG.a /usr/local/lib/libLLVMCodeGen.a /usr/local/lib/libLLVMTarget.a /usr/local/lib/libLLVMBitWriter.a /usr/local/lib/libLLVMScalarOpts.a /usr/local/lib/libLLVMAggressiveInstCombine.a /usr/local/lib/libLLVMInstCombine.a /usr/local/lib/libLLVMTransformUtils.a /usr/local/lib/libLLVMAnalysis.a /usr/local/lib/libLLVMObject.a /usr/local/lib/libLLVMBitReader.a /usr/local/lib/libLLVMTextAPI.a /usr/local/lib/libLLVMProfileData.a /usr/local/lib/libLLVMCFGuard.a /usr/local/lib/libLLVMCore.a /usr/local/lib/libLLVMRemarks.a /usr/local/lib/libLLVMBitstreamReader.a /usr/local/lib/libLLVMMCParser.a /usr/local/lib/libLLVMMCDisassembler.a /usr/local/lib/libLLVMMC.a /usr/local/lib/libLLVMBinaryFormat.a /usr/local/lib/libLLVMDebugInfoCodeView.a /usr/local/lib/libLLVMDebugInfoMSF.a /usr/local/lib/libLLVMSupport.a -lrt -ldl -lpthread -lm /usr/lib/x86_64-linux-gnu/libz.so -ltinfo /usr/local/lib/libLLVMDemangle.a 
+/usr/bin/ld: cannot find -lLLVMjit
+collect2: error: ld returned 1 exit status
+make[2]: *** [CMakeFiles/llvm_exec.dir/build.make:141: llvm_exec] Error 1
+make[2]: Leaving directory '/home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/tmp/build'
+make[1]: *** [CMakeFiles/Makefile2:79: CMakeFiles/llvm_exec.dir/all] Error 2
+make[1]: Leaving directory '/home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/tmp/build'
+make: *** [Makefile:95: all] Error 2
+
