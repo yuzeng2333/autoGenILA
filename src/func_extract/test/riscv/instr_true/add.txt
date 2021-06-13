@@ -1,6 +1,7 @@
 #1:
 (1)
-mem_rdata = 7'b0+5'bx+5'bx+3'h0+5'b1+5'hc+2'h3
+//mem_rdata = 7'b0+5'bx+5'bx+3'h0+5'b1+5'hc+2'h3
+mem_rdata = 7'b0+5'h2+5'h3+3'h0+5'b1+5'hc+2'h3
 resetn = 1
 mem_ready = 1
 pcpi_wr = 0
@@ -9,7 +10,8 @@ pcpi_wait = 0
 pcpi_ready = 0
 irq = 0
 (2)
-mem_rdata = 7'b0+5'bx+5'bx+3'h0+5'b1+5'hc+2'h3
+//mem_rdata = 7'b0+5'bx+5'bx+3'h0+5'b1+5'hc+2'h3
+mem_rdata = 7'b0+5'h2+5'h3+3'h0+5'b1+5'hc+2'h3
 resetn = 1
 mem_ready = 1
 pcpi_wr = 0
@@ -18,7 +20,8 @@ pcpi_wait = 0
 pcpi_ready = 0
 irq = 0
 (3)
-mem_rdata = 7'b0+5'bx+5'bx+3'h0+5'b1+5'hc+2'h3
+//mem_rdata = 7'b0+5'bx+5'bx+3'h0+5'b1+5'hc+2'h3
+mem_rdata = 7'b0+5'h2+5'h3+3'h0+5'b1+5'hc+2'h3
 resetn = 1
 mem_ready = 1
 pcpi_wr = 0
@@ -59,9 +62,115 @@ R:
 \cpuregs[29]
 \cpuregs[30]
 \cpuregs[31]
+instr_srli
+instr_xori
+is_alu_reg_imm
+is_compare
+is_jalr_addi_slti_sltiu_xori_ori_andi
+is_lui_auipc_jal
+is_lui_auipc_jal_jalr_addi_add_sub
+is_slli_srli_srai
+is_slti_blt_slt
+is_sltiu_bltu_sltu
+latched_rd
+mem_rdata_q
+reg_op2
+reg_sh
+trace_data
+trace_valid
+alu_out_q
+count_cycle
+count_instr
+decoded_imm
+decoded_imm_j
+decoded_rd
+decoded_rs1
+decoded_rs2
+instr_addi
+instr_andi
+instr_auipc
+instr_lui
+instr_ori
+instr_slli
+instr_slti
+instr_sltiu
+instr_srai
+mem_addr
+mem_wdata
+reg_next_pc
+reg_op1
+reg_pc
 //reg_next_pc
+
 W:
 \cpuregs[1](skip) 8 
+
+$TOP:
+picorv32
+
+$INVAR:
+pcpi_valid
+decoder_pseudo_trigger
+decoder_pseudo_trigger_q
+decoder_trigger
+eoi
+latched_is_lh
+latched_stalu
+trap
+compressed_instr
+cpu_state
+\cpuregs[0]
+decoder_trigger_q
+instr_add
+instr_and
+instr_beq
+instr_bgeu
+instr_blt
+instr_bne
+instr_ecall_ebreak
+instr_jal
+instr_jalr
+instr_lb
+instr_lbu
+instr_lhu
+instr_lw
+instr_rdcycle
+instr_rdcycleh
+instr_rdinstr
+instr_rdinstrh
+instr_retirq
+instr_sh
+instr_sll
+instr_slt
+instr_sltu
+instr_sra
+instr_srl
+instr_sub
+instr_xor
+is_alu_reg_reg
+is_beq_bne_blt_bge_bltu_bgeu
+is_lb_lh_lw_lbu_lhu
+is_lbu_lhu_lw
+is_sb_sh_sw
+latched_branch
+latched_compr
+latched_is_lu
+latched_store
+mem_do_rdata
+mem_do_rinst
+mem_do_wdata
+mem_instr
+mem_state
+mem_valid
+mem_wstrb
+mem_do_prefetch
+mem_wordsize
+instr_bge
+instr_bltu
+instr_lh
+instr_or
+instr_sb
+
 $NOP:
 mem_rdata = 25'b0+5'b00100+2'b11
 resetn = 1
@@ -71,3 +180,6 @@ pcpi_rd = 0
 pcpi_wait = 0
 pcpi_ready = 0
 irq = 0
+
+#CLK:clk
+#RST:resetn

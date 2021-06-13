@@ -1,9 +1,8 @@
-
-// sw
-#12:sw
+// LW
+#11:Lw
 (1)
-//mem_rdata = 7'hx+5'bx+5'bx+3'h2+5'bx+5'h8+2'b11
-mem_rdata = 7'h4+5'b1+5'h2+3'h2+5'b4+5'h8+2'b11
+//mem_rdata = 12'h2+5'h2+3'h0+5'h1+5'h0+2'h3
+mem_rdata = 12'h7+5'h2+3'h2+5'b1+5'h0+2'b11
 resetn = 1
 mem_ready = 1
 pcpi_wr = 0
@@ -12,8 +11,7 @@ pcpi_wait = 0
 pcpi_ready = 0
 irq = 0
 (2)
-//mem_rdata = 7'hx+5'bx+5'bx+3'h2+5'bx+5'h8+2'b11
-mem_rdata = 7'h4+5'b1+5'h2+3'h2+5'b4+5'h8+2'b11
+mem_rdata = 12'h7+5'h2+3'h2+5'b1+5'h0+2'b11
 resetn = 1
 mem_ready = 1
 pcpi_wr = 0
@@ -22,8 +20,7 @@ pcpi_wait = 0
 pcpi_ready = 0
 irq = 0
 (3)
-//mem_rdata = 7'hx+5'bx+5'bx+3'h2+5'bx+5'h8+2'b11
-mem_rdata = 7'h4+5'b1+5'h2+3'h2+5'b4+5'h8+2'b11
+mem_rdata = 12'h7+5'h2+3'h2+5'b1+5'h0+2'b11
 resetn = 1
 mem_ready = 1
 pcpi_wr = 0
@@ -32,16 +29,25 @@ pcpi_wait = 0
 pcpi_ready = 0
 irq = 0
 
-#delay:8
+#delay:9
 
 W:
-picorv32.mem_wdata(skip) 8
-//picorv32.cpu_state(skip) 1
-//fifo_valid.r0(skip) 8
-//fifo_valid.r1(skip) 8
-//fifo_valid.r2(skip) 8
-
-
+//picorv32.\cpuregs[1](skip) 8 -wrong: ret i32 %"u0.\\cpuregs[1]___#8"
+//picorv32.cpu_state(skip) 5  -correct
+//picorv32.mem_addr(skip) 6 add i32 %"u0.reg_next_pc___#6", 4
+//picorv32.mem_addr(skip) 7 --correct
+//picorv32.\cpuregs[1](skip) 9 -- correct
+//\u0.mem_valid(skip) 5
+//\u0.mem_valid(skip) 4
+//\u0.mem_valid(skip) 3
+//\u0.mem_valid(skip) 2
+//\u0.mem_valid(skip) 1
+//\u0.mem_valid(skip) 0
+//\u0.mem_valid(skip) 6
+//\u0.mem_valid(skip) 7
+//\u0.mem_valid(skip) 8
+\fifo_addr.r0(skip) 9
+\fifo_wdata.r0(skip) 9
 
 // add
 #1:add
@@ -465,70 +471,70 @@ $TOP:
 top
 
 $INVAR:
-picorv32.pcpi_valid
-picorv32.decoder_pseudo_trigger
-picorv32.decoder_pseudo_trigger_q
-picorv32.decoder_trigger
-picorv32.eoi
-picorv32.latched_is_lh
-picorv32.latched_stalu
-picorv32.trap
-picorv32.compressed_instr
-picorv32.cpu_state
-picorv32.\cpuregs[0]
-picorv32.decoder_trigger_q
-picorv32.instr_add
-picorv32.instr_and
-picorv32.instr_beq
-picorv32.instr_bgeu
-picorv32.instr_blt
-picorv32.instr_bne
-picorv32.instr_ecall_ebreak
-picorv32.instr_jal
-picorv32.instr_jalr
-picorv32.instr_lb
-picorv32.instr_lbu
-picorv32.instr_lhu
-picorv32.instr_lw
-picorv32.instr_rdcycle
-picorv32.instr_rdcycleh
-picorv32.instr_rdinstr
-picorv32.instr_rdinstrh
-picorv32.instr_retirq
-picorv32.instr_sh
-picorv32.instr_sll
-picorv32.instr_slt
-picorv32.instr_sltu
-picorv32.instr_sra
-picorv32.instr_srl
-picorv32.instr_sub
-picorv32.instr_xor
-picorv32.is_alu_reg_reg
-picorv32.is_beq_bne_blt_bge_bltu_bgeu
-picorv32.is_lb_lh_lw_lbu_lhu
-picorv32.is_lbu_lhu_lw
-picorv32.is_sb_sh_sw
-picorv32.latched_branch
-picorv32.latched_compr
-picorv32.latched_is_lu
-picorv32.latched_store
-picorv32.mem_do_rdata
-picorv32.mem_do_rinst
-picorv32.mem_do_wdata
-picorv32.mem_instr
-picorv32.mem_state
-picorv32.mem_valid
-picorv32.mem_wstrb
-picorv32.mem_do_prefetch
-picorv32.mem_wordsize
-picorv32.instr_bge
-picorv32.instr_bltu
-picorv32.instr_lh
-picorv32.instr_or
-picorv32.instr_sb
+\u0.pcpi_valid
+\u0.decoder_pseudo_trigger
+\u0.decoder_pseudo_trigger_q
+\u0.decoder_trigger
+\u0.eoi
+\u0.latched_is_lh
+\u0.latched_stalu
+\u0.trap
+\u0.compressed_instr
+\u0.cpu_state
+\u0.\cpuregs[0]
+\u0.decoder_trigger_q
+\u0.instr_add
+\u0.instr_and
+\u0.instr_beq
+\u0.instr_bgeu
+\u0.instr_blt
+\u0.instr_bne
+\u0.instr_ecall_ebreak
+\u0.instr_jal
+\u0.instr_jalr
+\u0.instr_lb
+\u0.instr_lbu
+\u0.instr_lhu
+\u0.instr_lw
+\u0.instr_rdcycle
+\u0.instr_rdcycleh
+\u0.instr_rdinstr
+\u0.instr_rdinstrh
+\u0.instr_retirq
+\u0.instr_sh
+\u0.instr_sll
+\u0.instr_slt
+\u0.instr_sltu
+\u0.instr_sra
+\u0.instr_srl
+\u0.instr_sub
+\u0.instr_xor
+\u0.is_alu_reg_reg
+\u0.is_beq_bne_blt_bge_bltu_bgeu
+\u0.is_lb_lh_lw_lbu_lhu
+\u0.is_lbu_lhu_lw
+\u0.is_sb_sh_sw
+\u0.latched_branch
+\u0.latched_compr
+\u0.latched_is_lu
+\u0.latched_store
+\u0.mem_do_rdata
+\u0.mem_do_rinst
+\u0.mem_do_wdata
+\u0.mem_instr
+\u0.mem_state
+\u0.mem_valid
+\u0.mem_wstrb
+\u0.mem_do_prefetch
+\u0.mem_wordsize
+\u0.instr_bge
+\u0.instr_bltu
+\u0.instr_lh
+\u0.instr_or
+\u0.instr_sb
 
 $NOP:
-mem_rdata = 25'b0+5'b00100+2'b11
+mem_rdata = x
 resetn = 1
 mem_ready = 1
 pcpi_wr = 0

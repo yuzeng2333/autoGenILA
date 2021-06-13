@@ -3,7 +3,7 @@
   "instructions": [
     {
       "instruction": "i1",
-      "ready bound": 5
+      "ready bound": 1
     }
   ]
 }

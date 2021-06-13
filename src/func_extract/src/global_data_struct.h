@@ -75,6 +75,7 @@ class ModuleInfo_t {
   //std::string curTarget;
   std::string clk;
   std::string rst;
+  std::string inputValid;
 
   uint32_t rootTimeIdx;
   std::set<std::shared_ptr<ModuleInfo_t>> parentModVec;
@@ -196,6 +197,7 @@ extern std::string g_mem2acclData;
 extern std::string g_accl2memAddr;
 extern std::string g_accl2memData;
 extern std::string g_currentModuleName;
+extern std::string g_inputValid;
 extern uint32_t g_cct_cnt;
 extern uint32_t g_ext_cnt;
 extern std::string DELIM;

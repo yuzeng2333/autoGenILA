@@ -47,6 +47,7 @@ std::string g_mem2acclData;
 std::string g_accl2memAddr;
 std::string g_accl2memData;
 std::string g_instrName;
+std::string g_inputValid;
 
 std::regex pSingleLine  (to_re("^(\\s*)assign (NAME) = (.*);$"));
 std::regex pNbLine      (to_re("^(\\s*)(NAME) <= (.*);$"));
@@ -196,6 +197,7 @@ void parse_verilog(std::string fileName) {
       break;
     }
   }
+  g_moduleInfoMap[g_topModule]->inputValid = g_inputValid;
 }
 
 
@@ -234,6 +236,12 @@ void read_in_instructions(std::string fileName) {
       std::string rst = line.substr(5);
       remove_two_end_space(rst);
       g_recentRst = rst;
+      continue;
+    }
+    if(line.substr(0, 4) == "#valid") {
+      std::string var = line.substr(5);
+      remove_two_end_space(var);
+      g_inputValid = var;
       continue;
     }
     if(line.substr(0,6) == "#delay") {

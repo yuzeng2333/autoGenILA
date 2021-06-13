@@ -1,1 +1,8 @@
 1. update functions for load instructions of picoRISCV is hard because instructions and data are from the same input port: mem_rdata. Therefore, when unrolling, the value of mem_rdata depends on values of output ports, which should indicate whether cpu is asking for instructions or data.
+
+2. For pico, rst.vcd and norm.vcd are exactly the same. See work_log.txt (date: 06/03) for the reason.
+
+3. For LW, the delay bound should be 9, because the cpuregs[] is not updated until 9 cycles later. On the other hand, other signals like mem_addr, mem_valid is valid before 9 cycles. Therefore, output buffers need to be connected to the output ports. And the buffer and pico-riscv should be flattened together!
+
+4. Regarding the NOP instruction: it turns out, mem_ready must be 1 because for instructions like sw, lw, multiple cpu-to-mem communication happens, and mem_ready need to be 1 to proceed. 
+mem_rdata_actually can be x, because its value really does not affect how the cpu proceed execution.

@@ -461,21 +461,6 @@ uint32_t get_ltr_lo(std::string varAndSlice) {
 }
 
 
-bool is_number(const std::string& s) {
-  std::string num = s;
-  num = remove_signed(num);
-  if(isNum(num)) return true; 
-  return is_all_digits(num);
-}
-
-
-bool is_all_digits(const std::string& num) {
-  std::string::const_iterator it = num.begin();
-  while (it != num.end() && std::isdigit(*it)) ++it;
-  return !num.empty() && it == num.end();
-}
-
-
 // summary: check if a variable's slice is assigned directly
 // input: varAndSlice must have slice
 bool has_direct_assignment(std::string varAndSlice) {
@@ -647,21 +632,6 @@ std::string purify_line(const std::string &line) {
   var = purify_var_name(var);
   lastPart = purify_line(lastPart);
   return firstPart + "|" + var + "|" + lastPart;
-}
-
-
-bool check_input_val(std::string value) {
-  std::regex pX("^(\\d+)'[b|h]x$");
-  std::smatch m;
-  if(value == "x" || is_number(value) 
-      || value != "DIRTY" || std::regex_match(value, m, pX))
-    return true;
-  else if(value.find("+") != std::string::npos) {
-    uint32_t pos = value.find("+");
-    return check_input_val(value.substr(0, pos)) && check_input_val(value.substr(pos+1));
-  }
-  else
-    return false;
 }
 
 

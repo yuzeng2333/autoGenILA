@@ -6,7 +6,18 @@ arg_1_TVALID = 1
 arg_1_TDATA = x
 arg_1_TLAST = x
 W:
-arg_0_TVALID(skip) 5
+//arg_0_TVALID(skip) 5
+//hls_target_linebuffer_1_U0_out_stream_V_value_V_write(skip) 1
+//hls_target_linebuffer_Loop_1_proc.in_stream_V_value_V_write(skip) 0 - false
+//hls_target_linebuffer_1.hls_target_linebuffer_Loop_1_proc_U0_arg_1_TVALID(skip) 0 -true
+//hls_target_linebuffer_Loop_1_proc.ap_sig_bdd_114(skip) 0 - correct
+//hls_target_linebuffer_Loop_1_proc.ap_sig_cseq_ST_pp0_stg0_fsm_1(skip) 0 -- false; wrong
+//hls_target_linebuffer_Loop_1_proc.ap_CS_fsm(skip) 0  -- 3'b000, wrong, should be 3'b010
+////hls_target_linebuffer_Loop_1_proc.ap_sig_bdd_114(skip) 0 --correct
+////hls_target_linebuffer_Loop_1_proc.exitcond_flatten_reg_88(skip) 0 -- false, correct
+//hls_target_linebuffer_Loop_1_proc.ap_reg_ppiten_pp0_it1(skip) 0 -- false, wrong, this is the problem
+hls_target_linebuffer_Loop_1_proc.ap_reg_ppiten_pp0_it1(skip) 1
+//hls_target_linebuffer_Loop_1_proc.exitcond_flatten_fu_72_p2(skip) 0
 R:
 hls_target_Loop_1_proc.arg_0_V_last_V_1_data_reg
 hls_target_Loop_1_proc.exitcond_flatten_reg_2790
@@ -24,6 +35,13 @@ hls_target_call_Loop_LB2D_buf_proc.row_reg_327
 hls_target_call_Loop_LB2D_buf_proc.write_idx_1_1_reg_338
 hls_target_call_Loop_LB2D_shift_proc.i_0_i_i_reg_152
 hls_target_call_Loop_LB2D_shift_proc.n1_1_reg_1246
+hls_target_linebuffer_Loop_1_proc.ap_CS_fsm
+hls_target_call_Loop_LB2D_shift_proc.ap_CS_fsm
+hls_target_call_Loop_LB2D_buf_proc.ap_CS_fsm
+hls_target_Loop_1_proc.ap_CS_fsm
+// ap_CS_fsm should be ASV, because they are initially 001, and becomes 
+// 010 only after valid data has been received. So they are persistent
+// across instructions
 $NOP:
 ap_rst_n_inv = 0
 ap_start = 1

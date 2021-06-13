@@ -111,6 +111,13 @@ riscvr:
 	./build/func_extract ./test/riscv 0 -reg
 
 
+rvfifo1:
+	./build/func_extract ./test/riscv_fifo 1
+
+rvfifo:
+	./build/func_extract ./test/riscv_fifo 0
+
+
 bi1:
 	./build/func_extract ./test/biriscv 1
 

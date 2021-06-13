@@ -1,11 +1,11 @@
-#1:
+#1:add
 (1)
 //mem_i_inst_i = 24'b0+8'h13+32'h000010b7 LUI
 // ADD
-//mem_i_inst_i = 7'b0+5'h2+5'h3+3'b0+5'h1+5'hc+2'b11
+mem_i_inst_i = 7'b0+5'h2+5'h3+3'b0+5'h1+5'hc+2'b11
 // JAL
 //               31-12 11-7 6-2   1-0
-mem_i_inst_i = 20'hx+5'h1+5'h1b+2'b11
+//mem_i_inst_i = 20'hx+5'h1+5'h1b+2'b11
 // BEQ
 //mem_i_inst_i = 7'hx+5'h1+5'h2+3'h0+5'hx+5'h18+2'h3
 // lb
@@ -24,6 +24,36 @@ mem_d_accept_i = 1
 mem_d_ack_i = 1
 mem_d_error_i = 0
 mem_d_resp_tag_i = x
+
+#delay:5
+
+#2:jal
+(1)
+// JAL
+//             31-12 11-7 6-2   1-0
+mem_i_inst_i = 20'hx+5'h1+5'h1b+2'b11
+rst_i = 0
+mem_i_accept_i = 1
+mem_i_valid_i = 1
+mem_i_error_i = 0
+intr_i = 0
+reset_vector_i = 32'h80000000
+cpu_id_i = 0
+mem_d_data_rd_i = x
+mem_d_accept_i = 1
+// The following is special
+mem_d_ack_i = 1
+mem_d_error_i = 0
+mem_d_resp_tag_i = x
+
+
+
+
+
+$TOP:
+riscv_core
+
+
 R:
 \u_fetch.pc_f_q
 \u_fetch.pc_d_q
@@ -58,6 +88,8 @@ R:
 \u_issue.u_regfile.REGFILE.reg_r7_q 
 \u_issue.u_regfile.REGFILE.reg_r8_q 
 \u_issue.u_regfile.REGFILE.reg_r9_q 
+
+
 W:
 //jal: \u_decode.fetch_in_instr_i(skip) 1
 //jal: \u_issue.issue_ra_idx_w(skip) 1
@@ -75,7 +107,7 @@ W:
 
 //\u_exec.u_alu.alu_op_i(skip) 1
 //\u_fetch.branch_pc_w(skip) 2
-\u_fetch.pc_f_q(skip) 4
+//\u_fetch.pc_f_q(skip) 4
 //\u_exec.result_q(skip) 2
 //\u_exec.alu_p_w(skip) 1
 //\u_exec.u_alu.alu_b_i(skip) 1
@@ -91,6 +123,11 @@ W:
 //\u_frontend.u_decode.u_fifo.ram_q[0](skip) 1
 //\u_frontend.u_decode.u_fifo.ram_q[0](skip) 2
 //\u_exec0.jimm20_r(skip) 2
+
+
+\u_issue.u_regfile.REGFILE.reg_r1_q(skip) 5
+
+
 $NOP:
 mem_i_inst_i = 25'b0+5'b00100+2'b11
 rst_i = 0
@@ -106,3 +143,7 @@ mem_d_accept_i = 1
 mem_d_ack_i = 1
 mem_d_error_i = 0
 mem_d_resp_tag_i = x
+
+
+#CLK:clk_i
+#RST:rst_i

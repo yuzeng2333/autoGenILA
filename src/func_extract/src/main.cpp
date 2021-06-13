@@ -1,4 +1,3 @@
-#include "parse_execute.h"
 #include "parse_fill.h"
 #include "expr.h"
 #include "vcd_parser.h"
@@ -92,7 +91,7 @@ int main(int argc, char *argv[]) {
   g_remove_adff = true;
   g_split_long_num = true;
   g_clean_submod = true;
-  g_use_read_ASV = false;
+  g_use_read_ASV = true;
   g_get_all_update = false;
   g_use_concat_extract_func = false;
   g_use_simple_func_name = true;
