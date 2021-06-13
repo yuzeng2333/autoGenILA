@@ -22,6 +22,10 @@
 using namespace funcExtract;
 using namespace taintGen;
 
+uint32_t cycleLen = 10;
+uint32_t protectedInstrNum = 3;
+uint32_t simulatedInstrNum = 20;
+
 int main(int argc, char *argv[]) {
   g_path = argv[1];
   read_in_instructions(g_path+"/instr.txt");
@@ -44,7 +48,7 @@ int main(int argc, char *argv[]) {
     print_wire(width, output);
   }
 
-  toCout("  always #5 "+clk+" = ~"+clk+" ;");
+  toCout("  always #"+toStr(cycleLen/2)+" "+clk+" = ~"+clk+" ;");
 
   // module instantiation
   toCout("  "+topModInfo->name+" u0 (");
@@ -69,10 +73,20 @@ int main(int argc, char *argv[]) {
     if(pair.first != clk && pair.first != rst)
       assign_value(pair.first, pair.second);
   }
+  assign_value("INSTR_IN_ZY", 0);
+  assign_value("zy_assert_protect", 1);
   wait_time(100);
   assign_value(rst, 0);
 
+  toCout(" // begin protected instruction");
+  for(uint32_t i = 0; i < protectedInstrNum; i++)
+    assign_random_instr();
 
+  toCout(" // begin simulated instruction");
+  for(uint32_t i = 0; i < simulatedInstrNum; i++)
+    assign_random_instr();
+
+  toCout("    $finish;");
   toCout("  end");
 
 }
@@ -96,4 +110,30 @@ void assign_value(std::string var, std::string value) {
 
 void wait_time(uint32_t time) {
   toCout("    #"+toStr(time));
+}
+
+
+void assign_random_sparse_instr() {
+  toCout("");
+  uint32_t instrIdx = rand() % g_instrInfo.size();
+  toCout("    // random instruction: "+toStr(instrIdx));  
+  auto instrInfo = g_instrInfo[instrIdx];
+
+  // first assign instruction encodings
+  uint32_t instrLen = instrInfo.instrEncoding.begin()->second.size();
+  uint32_t waitTime = 0;
+  for(uint32_t i = 0; i < instrLen; i++) {
+    for(auto pair: instrInfo.instrEncoding) {
+      assign_value(pair.first, pair.second[i]);
+    }
+    wait_time(waitTime);    
+  }
+
+  // then assign nop instruction
+  uint32_t nopLen = instrInfo->delayBound - instrLen;
+  uint32_t i = 0;
+  for(auto pair : g_nopInstr) {
+    assign_value(pair.first, pair.second);
+  }
+  wait_time(nopLen);
 }
