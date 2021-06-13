@@ -46,6 +46,10 @@ extern std::unordered_map<std::string, std::vector<std::string>> g_mod2assertMap
 extern std::map<std::string, std::unordered_map<std::string, std::string>> g_rstValMap;
 extern std::map<std::string, std::unordered_map<std::string, std::string>> g_normValMap;
 extern std::map<std::string, std::string> g_finalRegCondMap;
+extern std::vector<struct InstrInfo_t> g_instrInfo;
+extern std::string g_instrName;
+extern std::map<std::string, std::string> g_nopInstr;
+
 // pass_info
 extern std::unordered_map<std::string, std::vector<uint32_t>> g_backwardMap;
 extern std::unordered_map<std::string, std::vector<uint32_t>> g_forwardMap;
@@ -90,6 +94,10 @@ extern bool g_wt_keeped;
 extern bool g_special_equal_taint;
 extern bool g_use_does_keep;
 extern bool g_enable_taint;
+extern bool g_use_jasper;
+extern uint32_t g_assert_num;
+extern std::vector<std::string> g_assertNames;
+
 extern std::string _t;
 extern std::string _r;
 extern std::string _x;

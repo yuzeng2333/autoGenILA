@@ -49,6 +49,21 @@ bool isNum(std::string name) {
 }
 
 
+bool is_number(const std::string& s) {
+  std::string num = s;
+  num = remove_signed(num);
+  if(isNum(num)) return true; 
+  return is_all_digits(num);
+}
+
+
+bool is_all_digits(const std::string& num) {
+  std::string::const_iterator it = num.begin();
+  while (it != num.end() && std::isdigit(*it)) ++it;
+  return !num.empty() && it == num.end();
+}
+
+
 bool isOutput(std::string varAndSlice) {
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
@@ -1794,6 +1809,21 @@ bool split_concat(std::string var, std::vector<std::string> &vec) {
     pos = commaPos + 1;
   } while(commaPos != std::string::npos);
   return true;
+}
+
+
+bool check_input_val(std::string value) {
+  std::regex pX("^(\\d+)'[b|h]x$");
+  std::smatch m;
+  if(value == "x" || is_number(value) 
+      || value != "DIRTY" || std::regex_match(value, m, pX))
+    return true;
+  else if(value.find("+") != std::string::npos) {
+    uint32_t pos = value.find("+");
+    return check_input_val(value.substr(0, pos)) && check_input_val(value.substr(pos+1));
+  }
+  else
+    return false;
 }
 
 } // end of namespace taintGen

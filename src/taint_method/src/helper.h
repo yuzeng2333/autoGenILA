@@ -8,6 +8,10 @@ namespace taintGen {
 
 bool isNum(std::string name);
 
+bool is_number(const std::string& s);
+
+bool is_all_digits(const std::string& num);
+
 bool isOutput(std::string var);
 
 bool isInput(std::string var);
@@ -173,5 +177,7 @@ bool is_concat(std::string line);
 bool extract_concat(std::string var, std::vector<std::string> &vec);
 
 bool split_concat(std::string var, std::vector<std::string> &vec);
+
+bool check_input_val(std::string value);
 } // end of namespace taintGen
 #endif
