@@ -38,7 +38,7 @@ uint32_t VarWidth::get_from_var_width(std::string var, std::string line) {
     std::regex pName("(\\s*)?(\\S+)(\\s*)?");
     std::smatch m;
     if(!std::regex_match(var, m, pName)) {
-      std::cout << "Not a valid key for read:" + var << std::endl;
+      std::cout << "Not a valid key for read: |" + var + "|" << std::endl;
       std::cout << "The line is: " + line << std::endl;      
       return 0;
     }

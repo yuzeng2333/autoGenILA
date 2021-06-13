@@ -114,6 +114,12 @@ CheckInvarType g_check_invariance = CheckTwoVal; // TODO: check this setting
 // TODO: g_enable_taint set to false when only checking invariance
 // (Used when checking for invariant registers to replace ASVs)
 bool g_enable_taint = false;
+// if is true, "assert()" will be generated for jaspergold to check
+// otherwise, a verilog assert module will be generated for simulation-based check
+bool g_use_jasper = false;
+uint32_t g_assert_num = 0;
+std::vector<std::string> g_assertNames;
+
 std::string _t="_T";
 std::string _r="_R";
 std::string _x="_X";
@@ -2511,16 +2517,30 @@ void gen_assert_property(std::ofstream &output) {
           PREV_VAL_COMP = " || " + ASSERT_PROTECT + " || "  + var + "_PREV_VAL1 == " + var + "_PREV_VAL2";
         if(g_check_invariance == CheckOneVal) PREV_VAL_COMP = " || " + var + "_PREV_VAL1 == " + rstVal;
 
+        std::string assertion;
+
         if(!g_enable_taint && g_check_invariance == CheckRst) {
-          output << "  assert property( !INSTR_IN_ZY || " + var + " == " + rstVal + " );" << std::endl;
+          assertion = "!INSTR_IN_ZY || " + var + " == " + rstVal;
         }
         else if (!g_enable_taint) {
-          output << "  assert property( !INSTR_IN_ZY " + PREV_VAL_COMP + " );" << std::endl;
+          assertion = "!INSTR_IN_ZY " + PREV_VAL_COMP;
         }
         else if(!isMem(var)) 
-          output << "  assert property( " + out + " == 0 " + PREV_VAL_COMP + USE_END_SIG + DOES_KEEP + " );" << std::endl;
+          assertion = out + " == 0 " + PREV_VAL_COMP + USE_END_SIG + DOES_KEEP;
         else
-          output << "  assert property( " + out + " == 0 " + USE_END_SIG + DOES_KEEP + " );" << std::endl;
+          assertion = out + " == 0 " + USE_END_SIG + DOES_KEEP;
+
+        if(g_use_jasper) {
+          output << "  assert property( " + assertion + " );" << std::endl;
+        }
+        else {
+          output << "  wire zy_assert"+toStr(g_assert_num) + " = " + assertion + " ;" << std::endl;
+          output << "  assert var (" << std::endl;
+          output << "    .clk( " + g_recentClk + " )," << std::endl;
+          output << "    .test( zy_assert"+toStr(g_assert_num++) + " )" << std::endl;
+          output << "  );" << std::endl;
+        }
+
 
         //else if(!isMem(var) && g_double_assert) {
         //  if(g_use_vcd_parser)
