@@ -1,4 +1,3 @@
-#include "../src/parse_execute.h"
 #include "../src/helper.h"
 #include "../src/parse_fill.h"
 #include "../src/expr.h"
@@ -14,6 +13,7 @@
 #include "../src/make_define_fun.h"
 #include "../src/get_all_update.h"
 #include "../../taint_method/src/global_data.h"
+#include "tb_gen.h"
 
 #define toCout(a) std::cout << a << std::endl
 #define toStr(a) std::to_string(a)
@@ -80,11 +80,12 @@ int main(int argc, char *argv[]) {
 
   toCout(" // begin protected instruction");
   for(uint32_t i = 0; i < protectedInstrNum; i++)
-    assign_random_instr();
+    assign_random_sparse_instr();
+  assign_value("zy_assert_protect", 0);
 
   toCout(" // begin simulated instruction");
   for(uint32_t i = 0; i < simulatedInstrNum; i++)
-    assign_random_instr();
+    assign_random_sparse_instr();
 
   toCout("    $finish;");
   toCout("  end");
@@ -96,17 +97,21 @@ void print_reg(uint32_t width, std::string regName) {
   toCout( "  reg ["+toStr(width-1)+":0] "+regName+" ;" );
 }
 
+
 void print_wire(uint32_t width, std::string wireName) {
   toCout( "  wire ["+toStr(width-1)+":0] "+wireName+" ;" );
 }
+
 
 void assign_value(std::string var, uint32_t value) {
   assign_value(var, toStr(value));
 }
 
+
 void assign_value(std::string var, std::string value) {
   toCout("    "+var+" = "+value+" ;");
 }
+
 
 void wait_time(uint32_t time) {
   toCout("    #"+toStr(time));
@@ -122,15 +127,17 @@ void assign_random_sparse_instr() {
   // first assign instruction encodings
   uint32_t instrLen = instrInfo.instrEncoding.begin()->second.size();
   uint32_t waitTime = 0;
+  assign_value("INSTR_IN_ZY", 1);
   for(uint32_t i = 0; i < instrLen; i++) {
     for(auto pair: instrInfo.instrEncoding) {
       assign_value(pair.first, pair.second[i]);
     }
     wait_time(waitTime);    
   }
+  assign_value("INSTR_IN_ZY", 0);  
 
   // then assign nop instruction
-  uint32_t nopLen = instrInfo->delayBound - instrLen;
+  uint32_t nopLen = instrInfo.delayBound - instrLen;
   uint32_t i = 0;
   for(auto pair : g_nopInstr) {
     assign_value(pair.first, pair.second);

@@ -53,6 +53,18 @@ std::regex pSingleLine  (to_re("^(\\s*)assign (NAME) = (.*);$"));
 std::regex pNbLine      (to_re("^(\\s*)(NAME) <= (.*);$"));
 
 
+// global variables used in main function
+bool g_use_read_ASV;
+bool g_get_all_update;
+bool g_use_concat_extract_func;
+bool g_use_simple_func_name;
+uint32_t g_do_instr_num;
+std::ofstream g_outFile;
+std::ofstream g_regValueFile;
+std::string g_pj_path = "/workspace/research/ILA/autoGenILA/src/";
+std::set<std::string> g_skippedOutput;
+
+
 void clear_global_vars() {
   moduleInputs.clear();
   moduleOutputs.clear();

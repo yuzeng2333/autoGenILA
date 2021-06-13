@@ -1,16 +1,18 @@
-#include "parse_fill.h"
-#include "expr.h"
-#include "vcd_parser.h"
-#include "check_regs.h"
-#include "op_constraint.h"
-#include "clean_goal.h"
-#include "clean_verilog.h"
-#include "inv_gen.h"
-#include "pseudo_vlg_gen.h"
-#include "check_regs.h"
-#include "auxiliary_files_gen.h"
-#include "make_define_fun.h"
-#include "get_all_update.h"
+#include "../src/parse_fill.h"
+#include "../src/expr.h"
+#include "../src/vcd_parser.h"
+#include "../src/check_regs.h"
+#include "../src/op_constraint.h"
+#include "../src/clean_goal.h"
+#include "../src/clean_verilog.h"
+#include "../src/inv_gen.h"
+#include "../src/pseudo_vlg_gen.h"
+#include "../src/check_regs.h"
+#include "../src/auxiliary_files_gen.h"
+#include "../src/make_define_fun.h"
+#include "../src/get_all_update.h"
+#include "../src/helper.h"
+
 #include <string>
 #include <fstream>
 #include <time.h>
@@ -19,7 +21,6 @@
 #include "../../taint_method/src/global_data.h"
 #include "../../taint_method/src/helper.h"
 #include "../../taint_method/src/taint_gen.h"
-#include "helper.h"
 
 
 /// ========= Needed files
@@ -49,16 +50,6 @@
 namespace funcExtract {
 
 bool g_print_solver;
-bool g_use_read_ASV;
-bool g_read_rst;
-bool g_get_all_update;
-bool g_use_concat_extract_func;
-bool g_use_simple_func_name;
-uint32_t g_do_instr_num;
-std::ofstream g_outFile;
-std::ofstream g_regValueFile;
-std::string g_pj_path = "/workspace/research/ILA/autoGenILA/src/";
-std::set<std::string> g_skippedOutput;
 
 }
 
