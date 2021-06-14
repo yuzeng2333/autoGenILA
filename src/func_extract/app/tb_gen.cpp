@@ -16,6 +16,7 @@
 #include "tb_gen.h"
 
 #define toCout(a) std::cout << a << std::endl
+#define toFile(a) output << a << std::endl
 #define toStr(a) std::to_string(a)
 // this main function is used to generate testbench for verilog
 
@@ -28,11 +29,14 @@ uint32_t simulatedInstrNum = 20;
 
 int main(int argc, char *argv[]) {
   g_path = argv[1];
+  g_verb = true;
   read_in_instructions(g_path+"/instr.txt");
+  get_io(g_path+"/design.v.clean");
   parse_verilog(g_path+"/design.v.clean");  
+  determine_clk_rst();  
   std::ofstream output(g_path+"/tb_vlg.v");
-  toCout("`include ./design.v.clean");
-  toCout("module tb;");
+  toFile("`include \"./design.v.clean\"");
+  toFile("module tb;");
 
   // input/output
   auto topModInfo = g_moduleInfoMap[g_topModule];
@@ -43,28 +47,32 @@ int main(int argc, char *argv[]) {
     print_reg(width, input);
   }
 
-  for(auto output : topModInfo->moduleOutputs) {
-    uint32_t width = get_var_slice_width_simp(output, topModInfo);
-    print_wire(width, output);
+  for(auto out : topModInfo->moduleOutputs) {
+    uint32_t width = get_var_slice_width_simp(out, topModInfo);
+    print_wire(width, out);
   }
 
-  toCout("  always #"+toStr(cycleLen/2)+" "+clk+" = ~"+clk+" ;");
+  toFile("  always #"+toStr(cycleLen/2)+" "+clk+" = ~"+clk+" ;");
 
   // module instantiation
-  toCout("  "+topModInfo->name+" u0 (");
+  toFile("  "+topModInfo->name+" u0 (");
   bool isFirst = true;
   for(auto input : topModInfo->moduleInputs) {
-    if(isFirst) toCout("   ."+input+"("+input+")");
-    else toCout("  ,."+input+"("+input+")");
+    if(isFirst) {
+      toFile("   ."+input+"("+input+")");
+      isFirst = false;
+    }
+    else toFile("  ,."+input+"("+input+")");
   }
 
-  for(auto output : topModInfo->moduleOutputs) {
-    toCout("  ,."+output+"("+output+")");
+  for(auto out : topModInfo->moduleOutputs) {
+    toFile("  ,."+out+"("+out+")");
   }
+  toFile("  );");
 
   // generate signals
-  toCout("  initial begin");
-  toCout("    $dumpvars();");
+  toFile("  initial begin");
+  toFile("    $dumpvars();");
 
   // reset values
   assign_value(clk, 0);
@@ -78,28 +86,28 @@ int main(int argc, char *argv[]) {
   wait_time(100);
   assign_value(rst, 0);
 
-  toCout(" // begin protected instruction");
+  toFile("    // begin protected instruction");
   for(uint32_t i = 0; i < protectedInstrNum; i++)
     assign_random_sparse_instr();
   assign_value("zy_assert_protect", 0);
 
-  toCout(" // begin simulated instruction");
+  toFile("    // begin simulated instruction");
   for(uint32_t i = 0; i < simulatedInstrNum; i++)
     assign_random_sparse_instr();
 
-  toCout("    $finish;");
-  toCout("  end");
+  toFile("    $finish;");
+  toFile("  end");
 
 }
 
 
 void print_reg(uint32_t width, std::string regName) {
-  toCout( "  reg ["+toStr(width-1)+":0] "+regName+" ;" );
+  toFile( "  reg ["+toStr(width-1)+":0] "+regName+" ;" );
 }
 
 
 void print_wire(uint32_t width, std::string wireName) {
-  toCout( "  wire ["+toStr(width-1)+":0] "+wireName+" ;" );
+  toFile( "  wire ["+toStr(width-1)+":0] "+wireName+" ;" );
 }
 
 
@@ -109,19 +117,19 @@ void assign_value(std::string var, uint32_t value) {
 
 
 void assign_value(std::string var, std::string value) {
-  toCout("    "+var+" = "+value+" ;");
+  toFile("    "+var+" = "+value+" ;");
 }
 
 
 void wait_time(uint32_t time) {
-  toCout("    #"+toStr(time));
+  toFile("    #"+toStr(time));
 }
 
 
 void assign_random_sparse_instr() {
-  toCout("");
+  toFile("");
   uint32_t instrIdx = rand() % g_instrInfo.size();
-  toCout("    // random instruction: "+toStr(instrIdx));  
+  toFile("    // random instruction: "+toStr(instrIdx));  
   auto instrInfo = g_instrInfo[instrIdx];
 
   // first assign instruction encodings
