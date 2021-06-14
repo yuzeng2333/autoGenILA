@@ -77,7 +77,7 @@ bool g_possibleSign;
 bool isTop = false;
 bool g_hasRst;
 bool g_hasClk;
-bool g_verb;
+bool g_verb = false;
 bool g_has_read_taint;  // if false, read taint is replaced with x taint
 bool g_rst_pos;
 bool g_clkrst_exist = false;
@@ -938,7 +938,7 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   else if(line.find("(*") == std::string::npos){
     if(!ignoreWrongOp) {
       std::cout << "!! Unsupported operator:" + line << std::endl;
-      abort();
+      if(g_use_jasper) abort();
     }
     return UNSUPPORT;
   }
@@ -1040,15 +1040,18 @@ void add_file_taints(std::string fileName,
   CONSTANT_SIG = toStr(g_sig_width) + "'b1";
   // Reserve first line for module declaration
   while( std::getline(input, line) ) {
-    toCout(line);
-    if(!g_use_jasper) continue;
+    toCoutVerb(line);
     if(line.find("_000_") != std::string::npos)
       toCout("Find it!");
     lineNo++;
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       add_case_taints_limited(input, output, line);
     }
-    else if ( std::regex_match(line, match, pFunctionCall) 
+    else if( !g_use_jasper && std::regex_match(line, match, pFunctionDef)) {
+      print_function_lines(input, output, line);
+    }
+    else if (   g_use_jasper
+                && std::regex_match(line, match, pFunctionCall) 
         // TODO: remove this if statement
                 && match.str(3).compare("$signed") != 0 ) {
       //add_func_taints_call_limited(line, output);

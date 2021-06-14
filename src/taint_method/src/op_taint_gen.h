@@ -62,6 +62,8 @@ void one_op_taint_gen_func(std::string line, std::ofstream &output, std::unorder
 
 void ite_taint_gen_func(std::string line, std::ofstream &output, std::unordered_map<std::string, uint32_t> &versionMap, std::string taintBits);  
 
+void print_function_lines(std::ifstream &input, std::ofstream &output, std::string firstLine);
+
 } // end of namespace taintGen
 
 #endif

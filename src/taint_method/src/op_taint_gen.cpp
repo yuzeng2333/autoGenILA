@@ -2181,4 +2181,16 @@ void always_clkrst_taint_gen(std::string firstLine, std::ifstream &input, std::o
   nonblock_taint_gen(sndAssign, output);
 }
 
+
+void print_function_lines(std::ifstream &input, std::ofstream &output, std::string firstLine) {
+  output << firstLine << std::endl;
+  std::string line;
+  std::getline(input, line);
+  while(line.find("endfunction") != std::string::npos) {
+    output << line << std::endl;
+    std::getline(input, line);
+  }
+  output << line << std::endl;
+}
+
 } // end of namespace taintGen
