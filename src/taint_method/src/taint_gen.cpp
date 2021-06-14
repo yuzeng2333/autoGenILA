@@ -1239,6 +1239,20 @@ void merge_taints(std::string fileName) {
   //output << " ;" << std::endl;
 
   output << "endmodule" << std::endl;
+  output << std::endl;
+
+  if(!g_use_jasper) {
+    output << "module assert(input clk, input test);" << std::endl;
+    output << "    always @(posedge clk)" << std::endl;
+    output << "    begin" << std::endl;
+    output << "        if (test !== 1)" << std::endl;
+    output << "        begin" << std::endl;
+    output << "            $display(\"ASSERTION FAILED in %m\");" << std::endl;
+    output << "        end" << std::endl;
+    output << "    end" << std::endl;
+    output << "endmodule" << std::endl;
+  }
+
   output.close();
 }
 
