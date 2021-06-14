@@ -118,6 +118,7 @@ bool g_enable_taint = false;
 // otherwise, a verilog assert module will be generated for simulation-based check
 bool g_use_jasper = false;
 uint32_t g_assert_num = 0;
+uint32_t g_case_reg_num = 0;
 std::vector<std::string> g_assertNames;
 
 std::string _t="_T";
@@ -260,13 +261,13 @@ void clean_file(std::string fileName, bool useLogic) {
       else if(useLogic && std::regex_match(line, match, pReg)) {
         std::string printedLine = line;        
         int pos = printedLine.find("reg", 0);
-        printedLine.replace(pos, 3, "logic");
+        if(g_use_jasper) printedLine.replace(pos, 3, "logic");
         output << printedLine << std::endl;
       }
       else if(useLogic && std::regex_match(line, match, pWire)) {
         std::string printedLine = line;
         int pos = printedLine.find("wire", 0);
-        printedLine.replace(pos, 4, "logic");
+        if(g_use_jasper) printedLine.replace(pos, 4, "logic");
         output << printedLine << std::endl;
       }
       else if (noConcat) {
@@ -697,11 +698,11 @@ void add_line_taints(std::string line, std::ofstream &output, std::ifstream &inp
   int choice = parse_verilog_line(line);
   if(choice == REG) {
     int pos = printedLine.find("reg", 0);
-    printedLine.replace(pos, 3, "logic");
+    if(g_use_jasper) printedLine.replace(pos, 3, "logic");
   }
   else if (choice == WIRE) {
     int pos = printedLine.find("wire", 0);
-    printedLine.replace(pos, 4, "logic");
+    if(g_use_jasper) printedLine.replace(pos, 4, "logic");
   }
   std::smatch m;
   // Do not print lines matching these patterns
@@ -1292,8 +1293,10 @@ void add_module_name(std::string fileName,
   }
   out << " );" << std::endl;  
   // if no reset, add a reset
-  if(isTop)
+  if(isTop && g_use_jasper )
     out << "  logic rst_zy;" << std::endl;
+  else if(isTop)
+    out << "  wire rst_zy;" << std::endl;    
   else
     out << "  input rst_zy;" << std::endl;
   if(g_use_taint_rst) out << "  input "+TAINT_RST+";" << std::endl;
@@ -1303,8 +1306,10 @@ void add_module_name(std::string fileName,
   out << "  integer i;" << std::endl;
   if(!isTop)
     out << "  input INSTR_IN_ZY;" << std::endl;
+  else if(! g_use_jasper)
+    out << "  wire INSTR_IN_ZY;" << std::endl;
   else if(g_enable_taint){
-    out << "  logic INSTR_IN_ZY;" << std::endl;
+    out << "  wire INSTR_IN_ZY;" << std::endl;
     out << "  assign INSTR_IN_ZY = ";
     for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) {
       if((*it).compare(g_recentClk) == 0 
@@ -1659,6 +1664,15 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
   sWidth = toStr(sWidthNum);
   sVer = toStr(find_version_num(sAndSlice, sIsNew, output));
 
+  std::string caseDest;
+  if(g_use_jasper)
+    caseDest = dest;
+  else {
+    caseDest = "zy_case_dest"+toStr(g_case_reg_num);
+    output << blank + "reg ["+toStr(destWidthNum-1)+":0] zy_case_dest"+toStr(g_case_reg_num++)+" ;" << std::endl;
+    output << blank + "assign "+dest+" = "+caseDest+" ;" << std::endl;
+  }
+
   if(!aIsNum && !bIsNum) {
     aWidthNum = get_var_slice_width(a);
     bWidthNum = get_var_slice_width(b);
@@ -1684,11 +1698,11 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
       uint32_t pos = localPair.first.find("1", bPos);
       uint32_t idx = localPair.first.length() - pos - 1;
       output << blank + "    " + localPair.first + " :" << std::endl;
-      output << blank + "      " + dest+_t+destSlice + " = " + rhs + _t + rhsSlice 
+      output << blank + "      " + caseDest+_t+destSlice + " = " + rhs + _t + rhsSlice 
                                                              + " | " + extend(s+_t+"["+toStr(idx)+"]", destWidthNum) + ";" << std::endl;
     }
     output << blank + "    default :" << std::endl;
-    output << blank + "      " + dest+_t+destSlice + " = " + a + _t + aSlice 
+    output << blank + "      " + caseDest+_t+destSlice + " = " + a + _t + aSlice 
                                                            + " | " + extend("| "+s+_t+sSlice, destWidthNum) + ";" << std::endl;
     output << blank + "  endcase" << std::endl;
     output << blank + "end" << std::endl;
@@ -1702,16 +1716,16 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
         caseNum++;
         split_slice(localPair.second, rhs, rhsSlice);
         output << blank + "    " + localPair.first + " :" << std::endl;
-        output << blank + "      " + dest + _sig + " = " + rhs + _sig + " [" + toStr(caseNum*g_sig_width-1) + ":" + toStr(g_sig_width*(caseNum-1)) + "] == " + CONSTANT_SIG + " ? " + s + _sig + " : " + rhs + _sig + " [" + toStr(caseNum*g_sig_width-1) + ":" + toStr(g_sig_width*(caseNum-1)) + "] ;" << std::endl;
+        output << blank + "      " + caseDest + _sig + " = " + rhs + _sig + " [" + toStr(caseNum*g_sig_width-1) + ":" + toStr(g_sig_width*(caseNum-1)) + "] == " + CONSTANT_SIG + " ? " + s + _sig + " : " + rhs + _sig + " [" + toStr(caseNum*g_sig_width-1) + ":" + toStr(g_sig_width*(caseNum-1)) + "] ;" << std::endl;
       }
       output << blank + "    default :" << std::endl;
-      output << blank + "      " + dest + _sig + " = " + a + _sig + " == " + CONSTANT_SIG + " ? " + s + _sig + " : " + a + _sig + " ;" << std::endl;
+      output << blank + "      " + caseDest + _sig + " = " + a + _sig + " == " + CONSTANT_SIG + " ? " + s + _sig + " : " + a + _sig + " ;" << std::endl;
       output << blank + "  endcase" << std::endl;
       output << blank + "end" << std::endl;
       checkCond(caseNum == fangyuanItemNum[rhs], "case number does not equal fangyuan item number!, var: "+rhs+" , caseNum:"+toStr(caseNum)+" , itemNum:"+toStr(fangyuanItemNum[rhs]));
     }
     else if(!g_use_value_change)
-      output << "  assign " + dest + _sig + " = 0 ;" << std::endl;
+      output << "  assign " + caseDest + _sig + " = 0 ;" << std::endl;
 
     // print _r function
     if(sIsNew) {
@@ -1727,23 +1741,23 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     //output << blank + "logic [" + bWidth + "-1:0] " + b + _x + bVer + " ;" << std::endl;
     //output << blank + "logic [" + bWidth + "-1:0] " + b + _c + bVer + " ;" << std::endl;
 
-    output << blank + "always @( "+dest+_r+destSlice+" or "+s+_t+sSlice+" or "+s+" ) begin" << std::endl;
-    //output << blank + "  "+s+_r+sVer+" "+sSlice+" = " + extend("| "+dest+_r+destSlice, sWidthNum) + " ;" << std::endl;
+    output << blank + "always @( "+caseDest+_r+destSlice+" or "+s+_t+sSlice+" or "+s+" ) begin" << std::endl;
+    //output << blank + "  "+s+_r+sVer+" "+sSlice+" = " + extend("| "+caseDest+_r+destSlice, sWidthNum) + " ;" << std::endl;
     output << blank + "  "+b+_r+bVer+" = 0 ;" << std::endl;
     output << blank + "  "+a+_r+aVer+" = 0 ;" << std::endl;
     output << blank + "  casez ("+sAndSlice+")" << std::endl;
     for(auto localPair: caseAssignPairs) {
       split_slice(localPair.second, rhs, rhsSlice);
       output << blank + "    " + localPair.first + " :" << std::endl;
-      output << blank + "      " + rhs + _r + bVer + rhsSlice + " = " + dest + _r + destSlice + " ;" << std::endl;
+      output << blank + "      " + rhs + _r + bVer + rhsSlice + " = " + caseDest + _r + destSlice + " ;" << std::endl;
     }
     output << blank + "    default :" << std::endl;
-    output << blank + "      " + a + _r + aVer + aSlice + " = " + dest + _r + destSlice + " ;" << std::endl;
+    output << blank + "      " + a + _r + aVer + aSlice + " = " + caseDest + _r + destSlice + " ;" << std::endl;
     output << blank + "  endcase" << std::endl;
     output << blank + "end" << std::endl;  
 
     // _r for conditions
-    output << blank + "always @( "+dest+_r+destSlice+" or "+s+" ) begin" << std::endl;
+    output << blank + "always @( "+caseDest+_r+destSlice+" or "+s+" ) begin" << std::endl;
     output << blank + "  "+s+_r+sVer+" "+sSlice+" = 0 ;" << std::endl;
     output << blank + "  casez ("+sAndSlice+")" << std::endl;
     uint32_t i = 0;
@@ -1751,61 +1765,12 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     for(auto localPair: caseAssignPairs) {
       split_slice(localPair.second, rhs, rhsSlice);
       output << blank + "    " + localPair.first + " :" << std::endl;
-      output << blank + "      " + s+_r+sVer+" "+sSlice+"["+toStr(i++)+"]" + " = | " + dest + _r + destSlice + " ;" << std::endl;
+      output << blank + "      " + s+_r+sVer+" "+sSlice+"["+toStr(i++)+"]" + " = | " + caseDest + _r + destSlice + " ;" << std::endl;
     }
     //output << blank + "    default :" << std::endl;
-    //output << blank + "      " + a + _r + aVer + aSlice + " = " + dest + _r + destSlice + " ;" << std::endl;
+    //output << blank + "      " + a + _r + aVer + aSlice + " = " + caseDest + _r + destSlice + " ;" << std::endl;
     output << blank + "  endcase" << std::endl;
     output << blank + "end" << std::endl;  
-
-
-    // print _x function
-    //output << blank + "always @( "+dest+_x+destSlice+" or "+s+" ) begin" << std::endl;  
-    ////output << blank + "  "+s+_x+sVer+sSlice+" = " + extend("| "+dest+_x+destSlice, sWidthNum) + " ;" << std::endl;
-    //output << blank + "  "+b+_x+bVer+" = 0 ;" << std::endl;
-    //output << blank + "  "+a+_x+aVer+" = 0 ;" << std::endl;
-    //output << blank + "  casez ("+sAndSlice+")" << std::endl;
-    //for(auto localPair: caseAssignPairs) {
-    //  split_slice(localPair.second, rhs, rhsSlice);
-    //  output << blank + "    " + localPair.first + " :" << std::endl;
-    //  output << blank + "      " + rhs + _x + bVer + rhsSlice + " = " + dest + _x + destSlice + " ;" << std::endl;
-    //}
-    //output << blank + "    default :" << std::endl;
-    //output << blank + "      " + a + _x + aVer + aSlice + " = " + dest + _x + destSlice + " ;" << std::endl;
-    //output << blank + "  endcase" << std::endl;
-    //output << blank + "end" << std::endl;
-
-    //// _x for conditions
-    //output << blank + "always @( "+dest+_x+destSlice+" or "+s+" ) begin" << std::endl;
-    //output << blank + "  "+s+_x+sVer+" "+sSlice+" = 0 ;" << std::endl;
-    //output << blank + "  casez ("+sAndSlice+")" << std::endl;
-    //i = 0;
-    //checkCond(sSlice.empty(), "Condition in case has slice: "+sAndSlice);
-    //for(auto localPair: caseAssignPairs) {
-    //  split_slice(localPair.second, rhs, rhsSlice);
-    //  output << blank + "    " + localPair.first + " :" << std::endl;
-    //  output << blank + "      " + s+_x+sVer+" "+sSlice+"["+toStr(i++)+"]" + " = | " + dest + _x + destSlice + " ;" << std::endl;
-    //}
-    ////output << blank + "    default :" << std::endl;
-    ////output << blank + "      " + a + _x + aVer + aSlice + " = " + dest + _x + destSlice + " ;" << std::endl;
-    //output << blank + "  endcase" << std::endl;
-    //output << blank + "end" << std::endl;  
-
-    // print _c function
-    //output << blank + "always @( "+dest+_c+destSlice+" or "+s+" ) begin" << std::endl;  
-    //output << blank + "  "+s+_c+sVer+sSlice+" = " + extend("| "+dest+_c+destSlice, sWidthNum) + " ;" << std::endl;
-    //output << blank + "  "+b+_c+bVer+" = 0 ;" << std::endl;
-    //output << blank + "  "+a+_c+aVer+" = 0 ;" << std::endl;
-    //output << blank + "  casez ("+sAndSlice+")" << std::endl;
-    //for(auto localPair: caseAssignPairs) {
-    //  split_slice(localPair.second, rhs, rhsSlice);
-    //  output << blank + "    " + localPair.first + " :" << std::endl;
-    //  output << blank + "      " + rhs + _c + bVer + rhsSlice + " = " + extend("1'b1", destWidthNum) + " ;" << std::endl;
-    //}
-    //output << blank + "    default :" << std::endl;
-    //output << blank + "      " + a + _c + aVer + aSlice + " = " + extend("1'b1", destWidthNum) + " ;" << std::endl;
-    //output << blank + "  endcase" << std::endl;
-    //output << blank + "end" << std::endl;
 
     // ground other wires of s
     auto sBoundPair = varWidth.get_idx_pair(s, alwaysFirstLine);
@@ -1830,14 +1795,14 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
       uint32_t pos = localPair.first.find("1", bPos);
       uint32_t idx = localPair.first.length() - pos - 1;
       output << blank + "    " + localPair.first + " :" << std::endl;
-      output << blank + "      " + dest+_t+destSlice+" = " + extend(s+_t+"["+toStr(idx)+"]", destWidthNum) + " ;" << std::endl;
+      output << blank + "      " + caseDest+_t+destSlice+" = " + extend(s+_t+"["+toStr(idx)+"]", destWidthNum) + " ;" << std::endl;
     }
     output << blank + "    default:" << std::endl;
-    output << blank + "      " +  dest+_t+destSlice+" = " + a + _t+ " " + aSlice + " | " + extend("| "+s+_t+sSlice, destWidthNum) + " ;" << std::endl;
+    output << blank + "      " +  caseDest+_t+destSlice+" = " + a + _t+ " " + aSlice + " | " + extend("| "+s+_t+sSlice, destWidthNum) + " ;" << std::endl;
     output << blank + "  endcase" << std::endl;
     output << blank + "end" << std::endl;
-    //auto destBoundPair = varWidth.get_idx_pair(dest, line);
-    //ground(dest+_t, destBoundPair, destSlice, blank, output);
+    //auto destBoundPair = varWidth.get_idx_pair(caseDest, line);
+    //ground(caseDest+_t, destBoundPair, destSlice, blank, output);
 
     // _sig
     if(!g_use_value_change) {
@@ -1846,45 +1811,25 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
       // only the last one matters
       for(auto localPair: caseAssignPairs) {
         output << blank + "    " + localPair.first + " :" << std::endl;
-        output << blank + "      " + dest+_sig+destSlice+" = "+CONSTANT_SIG+" ;" << std::endl;
+        output << blank + "      " + caseDest+_sig+destSlice+" = "+CONSTANT_SIG+" ;" << std::endl;
       }
       output << blank + "    default:" << std::endl;
-      output << blank + "      " +  dest+_sig+destSlice+" = " + a + _sig+ " ;" << std::endl;
+      output << blank + "      " +  caseDest+_sig+destSlice+" = " + a + _sig+ " ;" << std::endl;
       output << blank + "  endcase" << std::endl;
       output << blank + "end" << std::endl;
     }
 
     // print _r function
     output << blank + "reg [" + sWidth + "-1:0] " + s + _r + sVer + " ;" << std::endl;
-    //output << blank + "reg [" + sWidth + "-1:0] " + s + _x + sVer + " ;" << std::endl;
-    //output << blank + "reg [" + sWidth + "-1:0] " + s + _c + sVer + " ;" << std::endl;
 
     output << blank + "reg [" + aWidth + "-1:0] " + a + _r + aVer + " ;" << std::endl;
-    //output << blank + "reg [" + aWidth + "-1:0] " + a + _x + aVer + " ;" << std::endl;
-    //output << blank + "reg [" + aWidth + "-1:0] " + a + _c + aVer + " ;" << std::endl;
 
-    output << blank + "always @( "+dest+_r+destSlice+" or "+s+" ) begin" << std::endl;
-    output << blank + "  "+s+_r+sVer+sSlice+" = " + extend("| "+dest+_r+destSlice, sWidthNum) + " ;" << std::endl;
+    output << blank + "always @( "+caseDest+_r+destSlice+" or "+s+" ) begin" << std::endl;
+    output << blank + "  "+s+_r+sVer+sSlice+" = " + extend("| "+caseDest+_r+destSlice, sWidthNum) + " ;" << std::endl;
     output << blank + "  "+a+_r+aVer+" = 0 ;" << std::endl;
     output << blank + "  if (" + sAndSlice + " == 0 )" << std::endl;
-    output << blank + "    "+a+_r+aVer+" = "+dest+_r+destSlice+" ;" << std::endl;
+    output << blank + "    "+a+_r+aVer+" = "+caseDest+_r+destSlice+" ;" << std::endl;
     output << blank + "end" << std::endl;  
-
-    // print _x function
-    //output << blank + "always @( "+dest+_x+destSlice+" or "+s+" ) begin" << std::endl;  
-    //output << blank + "  "+s+_x+sVer+sSlice+" = " + extend("| "+dest+_x+destSlice, sWidthNum) + " ;" << std::endl;
-    //output << blank + "  "+a+_x+aVer+" = 0 ;" << std::endl;
-    //output << blank + "  if (" + sAndSlice + " == 0 )" << std::endl;
-    //output << blank + "    "+a+_x+aVer+" = "+dest+_x+destSlice+" ;" << std::endl;
-    //output << blank + "end" << std::endl;
-
-    // print _c function
-    //output << blank + "always @( "+dest+_c+destSlice+" or "+s+" ) begin" << std::endl;
-    //output << blank + "  "+s+_c+sVer+sSlice+" = " + extend("| "+dest+_c+destSlice, sWidthNum) + " ;" << std::endl;
-    //output << blank + "  "+a+_c+aVer+" = 0 ;" << std::endl;
-    //output << blank + "  if (" + sAndSlice + " == 0 )" << std::endl;
-    //output << blank + "    "+a+_c+aVer+" = "+extend("1'b1", destWidthNum)+" ;" << std::endl;
-    //output << blank + "end" << std::endl;
 
     // ground other wires of s
     auto sBoundPair = varWidth.get_idx_pair(s, alwaysFirstLine);
@@ -1907,14 +1852,12 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
       uint32_t pos = localPair.first.find("1", bPos);
       uint32_t idx = localPair.first.length() - pos - 1;
       output << blank + "    " + localPair.first + " :" << std::endl;
-      output << blank + "      " + dest+_t+destSlice+" = " + rhs + _t+" " + rhsSlice + " | " + extend(s+_t+"["+toStr(idx)+"]", destWidthNum) + " ;" << std::endl;
+      output << blank + "      " + caseDest+_t+destSlice+" = " + rhs + _t+" " + rhsSlice + " | " + extend(s+_t+"["+toStr(idx)+"]", destWidthNum) + " ;" << std::endl;
     }
     output << blank + "    default:" << std::endl;
-    output << blank + "      "+dest+_t+destSlice+" = "+ extend("| "+s+_t+sSlice, destWidthNum) + " ;" << std::endl;
+    output << blank + "      "+caseDest+_t+destSlice+" = "+ extend("| "+s+_t+sSlice, destWidthNum) + " ;" << std::endl;
     output << blank + "  endcase" << std::endl;
     output << blank + "end" << std::endl;
-    //auto destBoundPair = varWidth.get_idx_pair(dest, line);
-    //ground(dest+_t, destBoundPair, destSlice, blank, output);
 
 
     // _sig
@@ -1926,62 +1869,32 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
         caseNum++;
         split_slice(localPair.second, rhs, rhsSlice);
         output << blank + "    " + localPair.first + " :" << std::endl;
-        output << blank + "      " + dest+_sig+" = " + rhs + _sig + " [" + toStr(caseNum*g_sig_width-1) + ":" + toStr(g_sig_width*(caseNum-1)) + "] ;" << std::endl;      
+        output << blank + "      " + caseDest+_sig+" = " + rhs + _sig + " [" + toStr(caseNum*g_sig_width-1) + ":" + toStr(g_sig_width*(caseNum-1)) + "] ;" << std::endl;      
       }
       output << blank + "    default:" << std::endl;
-      output << blank + "      " + dest+_sig+" = "+CONSTANT_SIG+" ;" << std::endl;
+      output << blank + "      " + caseDest+_sig+" = "+CONSTANT_SIG+" ;" << std::endl;
       output << blank + "  endcase" << std::endl;
       output << blank + "end" << std::endl;
     }
     else if(!g_use_value_change)
-      output << "  assign " + dest + _sig + " = 0 ;" << std::endl;
+      output << "  assign " + caseDest + _sig + " = 0 ;" << std::endl;
 
     // print _r function
     output << blank + "reg [" + sWidth + "-1:0] " + s + _r + sVer + " ;" << std::endl;
-    //output << blank + "reg [" + sWidth + "-1:0] " + s + _x + sVer + " ;" << std::endl;
-    //output << blank + "reg [" + sWidth + "-1:0] " + s + _c + sVer + " ;" << std::endl;
 
     output << blank + "reg [" + bWidth + "-1:0] " + b + _r + bVer + " ;" << std::endl;
-    //output << blank + "reg [" + bWidth + "-1:0] " + b + _x + bVer + " ;" << std::endl;
-    //output << blank + "reg [" + bWidth + "-1:0] " + b + _c + bVer + " ;" << std::endl;
 
-    output << blank + "always @( "+dest+_r+destSlice+" or "+s+" ) begin" << std::endl;
-    output << blank + "  "+s+_r+sVer+sSlice+" = " + extend("| "+dest+_r+destSlice, sWidthNum) + " ;" << std::endl;
+    output << blank + "always @( "+caseDest+_r+destSlice+" or "+s+" ) begin" << std::endl;
+    output << blank + "  "+s+_r+sVer+sSlice+" = " + extend("| "+caseDest+_r+destSlice, sWidthNum) + " ;" << std::endl;
     output << blank + "  "+b+_r+bVer+" = 0 ;" << std::endl;
     output << blank + "  casez ("+sAndSlice+")" << std::endl;
     for(auto localPair: caseAssignPairs) {
       split_slice(localPair.second, rhs, rhsSlice);
       output << blank + "    " + localPair.first + " :" << std::endl;
-      output << blank + "      " + rhs + _r + bVer + rhsSlice + " = " + dest + _r + destSlice + " ;" << std::endl;
+      output << blank + "      " + rhs + _r + bVer + rhsSlice + " = " + caseDest + _r + destSlice + " ;" << std::endl;
     }
     output << blank + "  endcase" << std::endl;
     output << blank + "end" << std::endl;  
-
-    // print _x function
-    //output << blank + "always @( "+dest+_x+destSlice+" or "+s+" ) begin" << std::endl;  
-    //output << blank + "  "+s+_x+sVer+sSlice+" = " + extend("| "+dest+_x+destSlice, sWidthNum) + " ;" << std::endl;
-    //output << blank + "  "+b+_x+bVer+" = 0 ;" << std::endl;
-    //output << blank + "  casez ("+sAndSlice+")" << std::endl;
-    //for(auto localPair: caseAssignPairs) {
-    //  split_slice(localPair.second, rhs, rhsSlice);
-    //  output << blank + "    " + localPair.first + " :" << std::endl;
-    //  output << blank + "      " + rhs + _x + bVer + rhsSlice + " = "+dest+_x+destSlice+" ;" << std::endl;
-    //}
-    //output << blank + "  endcase" << std::endl;
-    //output << blank + "end" << std::endl;
-
-    // print _c function
-    //output << blank + "always @( "+dest+_c+destSlice+" or "+s+" ) begin" << std::endl;
-    //output << blank + "  "+s+_c+sVer+sSlice+" = " + extend("| "+dest+_c+destSlice, sWidthNum) + " ;" << std::endl;
-    //output << blank + "  "+b+_c+bVer+" = 0 ;" << std::endl;
-    //output << blank + "  casez ("+sAndSlice+")" << std::endl;
-    //for(auto localPair: caseAssignPairs) {
-    //  split_slice(localPair.second, rhs, rhsSlice);
-    //  output << blank + "    " + localPair.first + " :" << std::endl;
-    //  output << blank + "      " + rhs + _c + bVer + rhsSlice + " = " + extend("1'b1", destWidthNum) + " ;" << std::endl;
-    //}
-    //output << blank + "  endcase" << std::endl;
-    //output << blank + "end" << std::endl;
 
     // ground other wires of s
     auto sBoundPair = varWidth.get_idx_pair(s, alwaysFirstLine);
@@ -2001,37 +1914,24 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
       uint32_t pos = localPair.first.find("1", bPos);
       uint32_t idx = localPair.first.length() - pos - 1;
       output << blank + "    " + localPair.first + " :" << std::endl;
-      output << blank + "      " + dest+_t+destSlice+" = " + extend(s+_t+"["+toStr(idx)+"]", destWidthNum) + " ;" << std::endl;
+      output << blank + "      " + caseDest+_t+destSlice+" = " + extend(s+_t+"["+toStr(idx)+"]", destWidthNum) + " ;" << std::endl;
     }
     output << blank + "    default:" << std::endl;
-    output << blank + "      " + dest+_t+destSlice+" = " + extend("| "+s+_t+sSlice, destWidthNum) + " ;" << std::endl;
+    output << blank + "      " + caseDest+_t+destSlice+" = " + extend("| "+s+_t+sSlice, destWidthNum) + " ;" << std::endl;
     output << blank + "  endcase" << std::endl;
     output << blank + "end" << std::endl;
-    //auto destBoundPair = varWidth.get_idx_pair(dest, line);
-    //ground(dest+_t, destBoundPair, destSlice, blank, output);
 
     // print _sig function
     if(!g_use_value_change)
-      output << blank + "assign " + dest + _sig + " = "+CONSTANT_SIG+" ;" << std::endl;
+      output << blank + "assign " + caseDest + _sig + " = "+CONSTANT_SIG+" ;" << std::endl;
 
     // print _r function
     output << blank + "reg [" + sWidth + "-1:0] " + s + _r + sVer + " ;" << std::endl;
-    //output << blank + "reg [" + sWidth + "-1:0] " + s + _x + sVer + " ;" << std::endl;
-    //output << blank + "reg [" + sWidth + "-1:0] " + s + _c + sVer + " ;" << std::endl;
 
-    output << blank + "always @( "+dest+_r+destSlice+" or "+s+" ) begin" << std::endl;
-    output << blank + "  "+s+_r+sVer+sSlice+" = " + extend("| "+dest+_r+destSlice, sWidthNum) + " ;" << std::endl;
+    output << blank + "always @( "+caseDest+_r+destSlice+" or "+s+" ) begin" << std::endl;
+    output << blank + "  "+s+_r+sVer+sSlice+" = " + extend("| "+caseDest+_r+destSlice, sWidthNum) + " ;" << std::endl;
     output << blank + "end" << std::endl;  
 
-    // print _x function
-    //output << blank + "always @( "+dest+_x+destSlice+" or "+s+" ) begin" << std::endl;  
-    //output << blank + "  "+s+_x+sVer+sSlice+" = " + extend("| "+dest+_x+destSlice, sWidthNum) + " ;" << std::endl;
-    //output << blank + "end" << std::endl;
-
-    // print _c function
-    //output << blank + "always @( "+dest+_c+destSlice+" or "+s+" ) begin" << std::endl;  
-    //output << blank + "  "+s+_c+sVer+sSlice+" = " + extend("| "+dest+_c+destSlice, sWidthNum) + " ;" << std::endl;    
-    //output << blank + "end" << std::endl;
   }
 }
 
@@ -2551,7 +2451,7 @@ void gen_assert_property(std::ofstream &output) {
         }
         else {
           output << "  wire zy_assert"+toStr(g_assert_num) + " = " + assertion + " ;" << std::endl;
-          output << "  assert var (" << std::endl;
+          output << "  assert "+var+"_asst (" << std::endl;
           output << "    .clk( " + g_recentClk + " )," << std::endl;
           output << "    .test( zy_assert"+toStr(g_assert_num++) + " )" << std::endl;
           output << "  );" << std::endl;

@@ -184,9 +184,9 @@ void reg_taint_gen(std::string line, std::ofstream &output) {
   }
 
   if(g_check_invariance == CheckOneVal || g_check_invariance == CheckTwoVal)
-    output << blank << "logic " + slice + " " + var + "_PREV_VAL1 ;" << std::endl; 
+    output << blank << "reg " + slice + " " + var + "_PREV_VAL1 ;" << std::endl; 
   if(g_check_invariance == CheckTwoVal)
-    output << blank << "logic " + slice + " " + var + "_PREV_VAL2 ;" << std::endl; 
+    output << blank << "reg " + slice + " " + var + "_PREV_VAL2 ;" << std::endl; 
 }
 
 
@@ -239,9 +239,9 @@ void mem_taint_gen(std::string line, std::ofstream &output) {
   }
 
   if(g_check_invariance == CheckOneVal || g_check_invariance == CheckTwoVal)
-    output << blank << "logic " + slice + " " + var + "_PREV_VAL1 " + sliceTop + " ;" << std::endl;
+    output << blank << "reg " + slice + " " + var + "_PREV_VAL1 " + sliceTop + " ;" << std::endl;
   if(g_check_invariance == CheckTwoVal)
-    output << blank << "logic " + slice + " " + var + "_PREV_VAL2 " + sliceTop + " ;" << std::endl;
+    output << blank << "reg " + slice + " " + var + "_PREV_VAL2 " + sliceTop + " ;" << std::endl;
 
 }
 
@@ -293,7 +293,7 @@ void output_insert_map(std::string line, std::ofstream &output, std::ifstream &i
   else 
     moduleOutputs.push_back(var);
  
-  output << blank << "logic " + slice + var + " ;" << std::endl;  
+  //output << blank << "logic " + slice + var + " ;" << std::endl;  
 
   auto currentPos = input.tellg();
   std::string nextLine;
