@@ -179,5 +179,9 @@ bool extract_concat(std::string var, std::vector<std::string> &vec);
 bool split_concat(std::string var, std::vector<std::string> &vec);
 
 bool check_input_val(std::string value);
+
+void split_by(std::string str, std::string separator, std::vector<std::string> &vec);
+
+std::string merge_with(const std::vector<std::string> &vec, std::string connector);
 } // end of namespace taintGen
 #endif

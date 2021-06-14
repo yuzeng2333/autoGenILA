@@ -1826,4 +1826,34 @@ bool check_input_val(std::string value) {
     return false;
 }
 
+
+void split_by(std::string str, std::string separator, std::vector<std::string> &vec) {
+  assert(vec.empty());
+  if(str.find(separator) == std::string::npos) {
+    vec.push_back(str);
+    return;
+  }
+  remove_two_end_space(str);
+  size_t pos = 0;
+  while(str.find(separator, pos) != std::string::npos) {
+    size_t endPos = str.find(separator, pos);
+    std::string singleVal = str.substr(pos, endPos-pos);
+    pos = endPos + 1;
+    remove_two_end_space(singleVal);
+    vec.push_back(singleVal);
+  }
+  std::string singleVal = str.substr(pos);
+  remove_two_end_space(singleVal);
+  vec.push_back(singleVal);
+}
+
+
+std::string merge_with(const std::vector<std::string> &vec, std::string connector) {
+  std::string ret = vec.front();
+  for(uint32_t i = 1; i < vec.size(); i++) {
+    ret = ret + connector + vec[i];
+  }
+  return ret;
+}
+
 } // end of namespace taintGen

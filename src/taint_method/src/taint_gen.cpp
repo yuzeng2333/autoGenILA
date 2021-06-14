@@ -1255,7 +1255,8 @@ void add_module_name(std::string fileName,
   if(!isTop) {
     moduleInputs.push_back("INSTR_IN_ZY");    
   }
-  if(g_use_taint_rst) moduleInputs.push_back(TAINT_RST);  
+  if(g_use_taint_rst) moduleInputs.push_back(TAINT_RST);
+  g_use_end_sig = g_use_end_sig && !g_use_jasper;
   if(g_use_end_sig) moduleInputs.push_back(END_SIG);  
   if(moduleName == "hls_target_Loop_1_proc") {
     toCout("Find it!");
@@ -2512,6 +2513,7 @@ void gen_assert_property(std::ofstream &output) {
         if(rstVal.empty()) rstVal = "0";
 
         if(g_use_does_keep) DOES_KEEP = " || " + var + "_DOES_KEEP == 0";
+        g_use_end_sig = g_use_end_sig && !g_use_jasper;
         if(g_use_end_sig) USE_END_SIG = " || " + END_SIG;
         if(g_check_invariance == CheckTwoVal) 
           PREV_VAL_COMP = " || " + ASSERT_PROTECT + " || "  + var + "_PREV_VAL1 == " + var + "_PREV_VAL2";

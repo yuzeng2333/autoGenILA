@@ -46,9 +46,9 @@ extern std::unordered_map<std::string, std::vector<std::string>> g_mod2assertMap
 extern std::map<std::string, std::unordered_map<std::string, std::string>> g_rstValMap;
 extern std::map<std::string, std::unordered_map<std::string, std::string>> g_normValMap;
 extern std::map<std::string, std::string> g_finalRegCondMap;
-extern std::vector<struct InstrInfo_t> g_instrInfo;
-extern std::string g_instrName;
-extern std::map<std::string, std::string> g_nopInstr;
+//extern std::vector<struct InstrInfo_t> g_instrInfo;
+//extern std::string g_instrName;
+//extern std::map<std::string, std::string> g_nopInstr;
 
 // pass_info
 extern std::unordered_map<std::string, std::vector<uint32_t>> g_backwardMap;
