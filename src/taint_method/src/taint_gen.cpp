@@ -1271,7 +1271,7 @@ void add_module_name(std::string fileName,
   std::ofstream out(fileName + ".final");
   std::string line;
   std::smatch match;
-  if(!isTop) {
+  if(!isTop || !g_use_jasper) {
     moduleInputs.push_back("INSTR_IN_ZY");    
   }
   if(g_use_taint_rst) moduleInputs.push_back(TAINT_RST);
@@ -1308,10 +1308,8 @@ void add_module_name(std::string fileName,
   if(g_check_invariance == CheckTwoVal) 
     out << "  input "+ASSERT_PROTECT+";" << std::endl;
   out << "  integer i;" << std::endl;
-  if(!isTop)
+  if(!isTop || !g_use_jasper)
     out << "  input INSTR_IN_ZY;" << std::endl;
-  else if(! g_use_jasper)
-    out << "  wire INSTR_IN_ZY;" << std::endl;
   else if(g_enable_taint){
     out << "  wire INSTR_IN_ZY;" << std::endl;
     out << "  assign INSTR_IN_ZY = ";

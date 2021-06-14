@@ -2186,7 +2186,7 @@ void print_function_lines(std::ifstream &input, std::ofstream &output, std::stri
   output << firstLine << std::endl;
   std::string line;
   std::getline(input, line);
-  while(line.find("endfunction") != std::string::npos) {
+  while(line.find("endfunction") == std::string::npos) {
     output << line << std::endl;
     std::getline(input, line);
   }
