@@ -119,7 +119,8 @@ void parse_verilog(std::string fileName) {
     if(line.find("_0699_") != std::string::npos) {
       toCout("Find it!");
     }
-    fill_var_width(line, get_curMod()->varWidth);
+    if(!g_insContextStk.empty())
+      fill_var_width(line, get_curMod()->varWidth);
     //toCout(line);
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       case_expr(line, input);
