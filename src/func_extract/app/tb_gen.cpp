@@ -16,7 +16,6 @@
 #include "tb_gen.h"
 
 #define toCout(a) std::cout << a << std::endl
-#define toFile(a) output << a << std::endl
 #define toStr(a) std::to_string(a)
 // this main function is used to generate testbench for verilog
 
@@ -26,6 +25,7 @@ using namespace taintGen;
 uint32_t cycleLen = 10;
 uint32_t protectedInstrNum = 3;
 uint32_t simulatedInstrNum = 20;
+std::ofstream output;
 
 int main(int argc, char *argv[]) {
   g_path = argv[1];
@@ -34,45 +34,51 @@ int main(int argc, char *argv[]) {
   get_io(g_path+"/design.v.clean");
   parse_verilog(g_path+"/design.v.clean");  
   determine_clk_rst();  
-  std::ofstream output(g_path+"/tb_vlg.v");
-  toFile("`include \"./design.v.clean\"");
-  toFile("module tb;");
+  output.open(g_path+"/tb_vlg.v", std::ios::out);
+  to_file("`include \"./design.v.clean\"");
+  to_file("module tb;");
 
   // input/output
   auto topModInfo = g_moduleInfoMap[g_topModule];
   std::string clk = topModInfo->clk;
-  std::string rst = topModInfo->rst;
+  std::string modRst = topModInfo->rst;
+  std::string rst = "reset";
+  bool positiveRst = true;
+  if(modRst == "rstn" || modRst == "resetn") positiveRst = false;
   for(auto input : topModInfo->moduleInputs) {
     uint32_t width = get_var_slice_width_simp(input, topModInfo);
     print_reg(width, input);
   }
+  print_reg(1, "zy_assert_protect");
 
   for(auto out : topModInfo->moduleOutputs) {
     uint32_t width = get_var_slice_width_simp(out, topModInfo);
     print_wire(width, out);
   }
+  
 
-  toFile("  always #"+toStr(cycleLen/2)+" "+clk+" = ~"+clk+" ;");
+  to_file("  always #"+toStr(cycleLen/2)+" "+clk+" = ~"+clk+" ;");
 
   // module instantiation
-  toFile("  "+topModInfo->name+" u0 (");
-  bool isFirst = true;
+  to_file("  "+topModInfo->name+" u0 (");
+  to_file("    ."+clk+"("+clk+")");
+  if(positiveRst)
+    to_file("   ,."+modRst+"("+rst+")");
+  else
+    to_file("   ,."+modRst+"(~"+rst+")");
+  to_file("   ,.zy_assert_protect(zy_assert_protect)");
   for(auto input : topModInfo->moduleInputs) {
-    if(isFirst) {
-      toFile("   ."+input+"("+input+")");
-      isFirst = false;
-    }
-    else toFile("  ,."+input+"("+input+")");
+    to_file("  ,."+input+"("+input+")");
   }
 
   for(auto out : topModInfo->moduleOutputs) {
-    toFile("  ,."+out+"("+out+")");
+    to_file("  ,."+out+"("+out+")");
   }
-  toFile("  );");
+  to_file("  );");
 
   // generate signals
-  toFile("  initial begin");
-  toFile("    $dumpvars();");
+  to_file("  initial begin");
+  to_file("    $dumpvars();");
 
   // reset values
   assign_value(clk, 0);
@@ -86,28 +92,29 @@ int main(int argc, char *argv[]) {
   wait_time(100);
   assign_value(rst, 0);
 
-  toFile("    // begin protected instruction");
+  to_file("    // begin protected instruction");
   for(uint32_t i = 0; i < protectedInstrNum; i++)
     assign_random_sparse_instr();
   assign_value("zy_assert_protect", 0);
 
-  toFile("    // begin simulated instruction");
+  to_file("    // begin simulated instruction");
   for(uint32_t i = 0; i < simulatedInstrNum; i++)
     assign_random_sparse_instr();
 
-  toFile("    $finish;");
-  toFile("  end");
-
+  to_file("    $finish;");
+  to_file("  end");
+  to_file("endmodule");
+  toCout("*** Check reset input!!!");
 }
 
 
 void print_reg(uint32_t width, std::string regName) {
-  toFile( "  reg ["+toStr(width-1)+":0] "+regName+" ;" );
+  to_file( "  reg ["+toStr(width-1)+":0] "+regName+" ;" );
 }
 
 
 void print_wire(uint32_t width, std::string wireName) {
-  toFile( "  wire ["+toStr(width-1)+":0] "+wireName+" ;" );
+  to_file( "  wire ["+toStr(width-1)+":0] "+wireName+" ;" );
 }
 
 
@@ -117,30 +124,53 @@ void assign_value(std::string var, uint32_t value) {
 
 
 void assign_value(std::string var, std::string value) {
-  toFile("    "+var+" = "+value+" ;");
+  value = value_format_convert(value);
+  to_file("    "+var+" = "+value+" ;");
+}
+
+
+// convert 4'h1+4'h2 to { 4'h1, 4'h2 }
+std::string value_format_convert(std::string val) {
+  std::regex pX("(\\d+)'[b|h][x|X]$");
+  if(val.find("+") == std::string::npos) return val;
+  remove_two_end_space(val);
+  std::string ret = " { ";
+  std::vector<std::string> vec;
+  split_by(val, "+", vec);
+  // replace x with number value
+  std::smatch m;
+  for(auto it = vec.begin(); it != vec.end(); it++) {
+    if(!std::regex_match(*it, m, pX)) continue;
+    uint32_t width = std::stoi(m.str(1));
+    uint32_t base = exp2(width);
+    uint32_t newVal = rand() %  base;
+    std::string hexVal = dec2hex(std::to_string(newVal));
+    *it = toStr(width)+"'h"+hexVal;
+  }
+  ret = merge_with(vec, ", ");
+  return " { "+ret+" } ";
 }
 
 
 void wait_time(uint32_t time) {
-  toFile("    #"+toStr(time));
+  to_file("    #"+toStr(time));
 }
 
 
 void assign_random_sparse_instr() {
-  toFile("");
+  to_file("");
   uint32_t instrIdx = rand() % g_instrInfo.size();
-  toFile("    // random instruction: "+toStr(instrIdx));  
+  to_file("    // random instruction: "+toStr(instrIdx));  
   auto instrInfo = g_instrInfo[instrIdx];
 
   // first assign instruction encodings
   uint32_t instrLen = instrInfo.instrEncoding.begin()->second.size();
-  uint32_t waitTime = 0;
   assign_value("INSTR_IN_ZY", 1);
   for(uint32_t i = 0; i < instrLen; i++) {
     for(auto pair: instrInfo.instrEncoding) {
       assign_value(pair.first, pair.second[i]);
     }
-    wait_time(waitTime);    
+    wait_time(cycleLen);    
   }
   assign_value("INSTR_IN_ZY", 0);  
 
@@ -150,5 +180,10 @@ void assign_random_sparse_instr() {
   for(auto pair : g_nopInstr) {
     assign_value(pair.first, pair.second);
   }
-  wait_time(nopLen);
+  wait_time(nopLen*cycleLen);
+}
+
+
+void to_file(std::string line) {
+  output << line << std::endl;
 }
