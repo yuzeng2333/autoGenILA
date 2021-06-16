@@ -73,6 +73,7 @@ int main(int argc, char *argv[]) {
   else
     to_file("   ,."+modRst+"(~"+rst+")");
   to_file("   ,.zy_assert_protect(zy_assert_protect)");
+  to_file("   ,.INSTR_IN_ZY(INSTR_IN_ZY)");
   for(auto input : topModInfo->moduleInputs) {
     if(input == modRst) continue;    
     to_file("  ,."+input+"("+input+")");
@@ -86,14 +87,15 @@ int main(int argc, char *argv[]) {
   // generate signals
   to_file("  initial begin");
   to_file("    $dumpvars();");
+  to_file("");
 
   // initialize regs
   if(reset_regs) {
     for(std::string reg : topModInfo->moduleTrueRegs) {
-      assign_value(reg, 0);
+      assign_value("u0."+reg, 0);
     }
   }
-
+  to_file("");
 
   // reset values
   assign_value(clk, 0);
@@ -120,6 +122,8 @@ int main(int argc, char *argv[]) {
   to_file("  end");
   to_file("endmodule");
   toCout("*** Check reset input!!!");
+
+  print_reg_info();
 }
 
 
