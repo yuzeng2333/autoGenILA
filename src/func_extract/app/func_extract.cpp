@@ -77,16 +77,18 @@ int main(int argc, char *argv[]) {
   std::string time(ctime(&my_time));
   g_outFile << "Start time: "+time << std::endl;
   toCout("Begin main!");
-  g_verb = true;
+  g_verb = false;
   g_print_solver = false;
   g_remove_adff = true;
   g_split_long_num = true;
   g_clean_submod = true;
-  g_use_read_ASV = true;
-  g_get_all_update = false;
   g_use_concat_extract_func = false;
   g_use_simple_func_name = true;
-  g_do_instr_num = 1;
+
+  // Needs to be changed!
+  g_use_read_ASV = false;
+  g_get_all_update = true;
+  g_do_instr_num = 2;
   print_time();
   /// read module_info.txt, result in g_moduleInfoMap
   /// read input-output delay info for sub-modules

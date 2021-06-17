@@ -6,3 +6,5 @@
 
 4. Regarding the NOP instruction: it turns out, mem_ready must be 1 because for instructions like sw, lw, multiple cpu-to-mem communication happens, and mem_ready need to be 1 to proceed. 
 mem_rdata_actually can be x, because its value really does not affect how the cpu proceed execution.
+
+5. g_use_read_ASV must be false for PicoRISCV
