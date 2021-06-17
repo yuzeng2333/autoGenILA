@@ -21,6 +21,12 @@ namespace funcExtract {
 
 extern std::shared_ptr<ModuleInfo_t> g_curMod;
 
+struct FuncTy_t {
+  uint32_t retTy;
+  std::vector<std::pair<uint32_t, std::string>> argTy;
+};
+
+
 struct InstrInfo_t {
   std::map<std::string, std::vector<std::string>> instrEncoding;
   std::set<std::string> readASV;
@@ -31,6 +37,8 @@ struct InstrInfo_t {
   uint32_t delayBound;
   uint32_t instrLen = 0;
   std::string name;
+  // key is writeASV. Each instruction might update multiple ASVs
+  std::map<std::string, FuncTy_t> funcTypes;
 };
 
 

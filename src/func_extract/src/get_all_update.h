@@ -15,7 +15,10 @@ namespace funcExtract {
 void get_all_update();
 
 void read_clean_o3(std::string fileName, 
-                   std::set<std::string> &argWidthVec);
+                   std::vector<std::pair<std::string, uint32_t>> &argVec);
 
+void print_func_info(std::ofstream &output);
+
+void print_asv_info(std::ofstream &output);
 } // end of namespace
 #endif

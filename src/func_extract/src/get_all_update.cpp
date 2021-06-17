@@ -8,11 +8,16 @@
 
 namespace funcExtract {
 
-std::map<std::string, std::set<std::string>> dependVarMap;
+// the first key is instr name, the second key is target name
+std::map<std::string, std::map<std::string, std::vector<std::pair<std::string, uint32_t>>>> dependVarMap;
+std::map<std::string, uint32_t> asvSet;
 
+// A file should be generated, including:
+// 1. all the asvs and their bit numbers
+// 2. For each instruction, what ASVs they write, and 
+// for each of it update function, what are the arguments
 void get_all_update() {
   toCout("### Begin get_all_update ");
-  std::set<std::string> asvSet;
   std::set<std::string> visitedTgt;
   std::ifstream visitedTgtInFile(g_path+"/visited_target.txt");
   std::string line;
@@ -26,13 +31,15 @@ void get_all_update() {
 
   std::ifstream addedWorkSetInFile(g_path+"/added_work_set.txt");
   auto topModuleInfo = g_moduleInfoMap[g_topModule];
-  std::set<std::string> workSet;  
+  std::set<std::string> workSet;
   for(std::string out: topModuleInfo->moduleOutputs) {
     if(is_fifo_output(out)) continue;
     workSet.insert(out);
+    uint32_t width = get_var_slice_width_simp(out, topModuleInfo);
+    asvSet.emplace(out, width);
   }
   while(std::getline(addedWorkSetInFile, line)) {
-    workSet.insert(line);  
+    workSet.insert(line);
   }
   // insert regs in fifos
   for(auto pair: g_fifoIns) {
@@ -50,6 +57,8 @@ void get_all_update() {
 
   // declaration for llvm
   TheContext = std::make_unique<llvm::LLVMContext>();
+  std::ofstream funcInfo(g_path+"/func_info.txt");
+  std::ofstream asvInfo(g_path+"/asv_info.txt");
   while(!workSet.empty()) {
     auto targetIt = workSet.begin();
     std::string target = *targetIt;
@@ -85,6 +94,9 @@ void get_all_update() {
  
     uint32_t instrIdx = 0;
     for(auto instrInfo : g_instrInfo) {
+      std::string instrName = instrInfo.name;
+      if(dependVarMap.find(instrName) == dependVarMap.end())
+        dependVarMap.emplace( instrName, std::map<std::string, std::vector<std::pair<std::string, uint32_t>>>{} );
       instrIdx++;
       g_currInstrInfo = instrInfo;
       destInfo.set_instr_name(instrInfo.name);      
@@ -100,22 +112,23 @@ void get_all_update() {
       std::string opto3("opt -O3 "+g_path+"/clean.ll -S -o=tmp.o3.ll; opt -passes=deadargelim tmp.o3.ll -S -o="+g_path+"/clean.o3.ll; rm tmp.o3.ll");
       system(clean.c_str());
       system(opto3.c_str());
-      std::set<std::string> argVec;
+      std::vector<std::pair<std::string, uint32_t>> argVec;
       read_clean_o3(g_path+"/clean.o3.ll", argVec);
       if(argVec.size() > 0) {
         system(("mv "+g_path+"/clean.o3.ll "+g_path+"/"+instrInfo.name+"_"
                 +destInfo.get_dest_name()+"_"+toStr(delayBound)+".ll").c_str());
         toCout("----- For instr "+instrInfo.name+", "+target+" is affected");
-        if(dependVarMap.find(target) == dependVarMap.end())
-          dependVarMap.emplace(target, argVec);
+        if(dependVarMap[instrName].find(target) == dependVarMap[instrName].end())
+          dependVarMap[instrName].emplace(target, argVec);
         else {
-          for(std::string arg: argVec)
-            dependVarMap[target].insert(arg);
+          toCout("Error: for instruction "+instrInfo.name+", target: "+target+" is seen before");
+          abort();
         }
       }
       else       
         toCout("---- For instr "+instrInfo.name+", "+target+" is NOT affected");
-      for(std::string reg : argVec) {
+      for(auto pair : argVec) {
+        std::string reg = pair.first;
         if(reg.find("cpuregs[3]") != std::string::npos
            || reg.find("cpuregs[4]") != std::string::npos
            || reg.find("cpuregs[5]") != std::string::npos
@@ -146,12 +159,15 @@ void get_all_update() {
            || reg.find("cpuregs[30]") != std::string::npos)
             continue;
         workSet.insert(reg);
+        // TODO:
+        asvSet.emplace(reg, pair.second);
         addedWorkSetFile << reg << std::endl;
       }
     }
     visitedTgt.insert(target);
     visitedTgtFile << target << std::endl;
-  }
+  } // end of while loop
+  print_func_info(funcInfo);
   visitedTgtFile.close();
   addedWorkSetFile.close();
 }
@@ -159,7 +175,7 @@ void get_all_update() {
 
 // returned argVec is empty if the update function just returns 0
 void read_clean_o3(std::string fileName, 
-                   std::set<std::string> &argVec) {
+                   std::vector<std::pair<std::string, uint32_t>> &argVec) {
   std::ifstream input(fileName);
   std::string line;
   std::smatch m;
@@ -218,7 +234,7 @@ void read_clean_o3(std::string fileName,
         var = arg.substr(1, pos-1);
       else
         var = arg.substr(0, pos);
-      argVec.insert(var);
+      argVec.push_back(std::make_pair(var, width));
       startPos = dotPos + 2;
       if(dotPos == argList.size()) return;
     }
@@ -226,6 +242,24 @@ void read_clean_o3(std::string fileName,
 }
 
 
+void print_func_info(std::ofstream &output) {
+  for(auto pair1 : dependVarMap) {
+    output << "Instr:"+pair1.first << std::endl;
+    for(auto pair2 : pair1.second) {
+      output << "Target:"+pair2.first << std::endl;
+      for(auto pair3 : pair2.second) {
+        output << pair3.first+":"+toStr(pair3.second) << std::endl;
+      }
+      output << std::endl;
+    }
+    output << std::endl;
+  }
+}
 
+
+void print_asv_info(std::ofstream &output) {
+  for(auto pair: asvSet)
+    output << pair.first+":"+toStr(pair.second) << std::endl;
+}
 
 } // end of namespace
