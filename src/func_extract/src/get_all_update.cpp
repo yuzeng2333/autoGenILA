@@ -9,7 +9,10 @@
 namespace funcExtract {
 
 // the first key is instr name, the second key is target name
-std::map<std::string, std::map<std::string, std::vector<std::pair<std::string, uint32_t>>>> dependVarMap;
+std::map<std::string, 
+         std::map<std::string, 
+                  std::vector<std::pair<std::string, 
+                                        uint32_t>>>> dependVarMap;
 std::map<std::string, uint32_t> asvSet;
 
 // A file should be generated, including:
@@ -96,7 +99,10 @@ void get_all_update() {
     for(auto instrInfo : g_instrInfo) {
       std::string instrName = instrInfo.name;
       if(dependVarMap.find(instrName) == dependVarMap.end())
-        dependVarMap.emplace( instrName, std::map<std::string, std::vector<std::pair<std::string, uint32_t>>>{} );
+        dependVarMap.emplace( instrName, 
+                              std::map<std::string, 
+                                       std::vector<std::pair<std::string, 
+                                                             uint32_t>>>{} );
       instrIdx++;
       g_currInstrInfo = instrInfo;
       destInfo.set_instr_name(instrInfo.name);      
@@ -114,19 +120,16 @@ void get_all_update() {
       system(opto3.c_str());
       std::vector<std::pair<std::string, uint32_t>> argVec;
       read_clean_o3(g_path+"/clean.o3.ll", argVec);
-      if(argVec.size() > 0) {
-        system(("mv "+g_path+"/clean.o3.ll "+g_path+"/"+instrInfo.name+"_"
-                +destInfo.get_dest_name()+"_"+toStr(delayBound)+".ll").c_str());
-        toCout("----- For instr "+instrInfo.name+", "+target+" is affected");
-        if(dependVarMap[instrName].find(target) == dependVarMap[instrName].end())
-          dependVarMap[instrName].emplace(target, argVec);
-        else {
-          toCout("Error: for instruction "+instrInfo.name+", target: "+target+" is seen before");
-          abort();
-        }
+
+      system(("mv "+g_path+"/clean.o3.ll "+g_path+"/"+instrInfo.name+"_"
+              +destInfo.get_dest_name()+"_"+toStr(delayBound)+".ll").c_str());
+      toCout("----- For instr "+instrInfo.name+", "+target+" is finished");
+      if(dependVarMap[instrName].find(target) == dependVarMap[instrName].end())
+        dependVarMap[instrName].emplace(target, argVec);
+      else {
+        toCout("Error: for instruction "+instrInfo.name+", target: "+target+" is seen before");
+        abort();
       }
-      else       
-        toCout("---- For instr "+instrInfo.name+", "+target+" is NOT affected");
       for(auto pair : argVec) {
         std::string reg = pair.first;
         if(reg.find("cpuregs[3]") != std::string::npos
@@ -168,6 +171,7 @@ void get_all_update() {
     visitedTgtFile << target << std::endl;
   } // end of while loop
   print_func_info(funcInfo);
+  print_asv_info(asvInfo);
   visitedTgtFile.close();
   addedWorkSetFile.close();
 }
