@@ -1,6 +1,7 @@
 #include "sim_gen.h"
 #include "../src/parse_fill.h"
 #include "../src/helper.h"
+#include "../src/vcd_parser.h"
 #include "../src/global_data_struct.h"
 #define toCout(a) std::cout << a << std::endl
 #define toStr(a) std::to_string(a)
@@ -31,13 +32,14 @@ int main(int argc, char *argv[]) {
   read_to_do_instr(g_path+"/tb.txt", toDoList);
 
   std::ofstream header(g_path+"/ila.h");
-  std::ofstream cpp(g_path+"/ila.cpp");
+  std::ofstream cpp(g_path+"/ila.c");
 
   // fill cpp file
   cpp << "#include <stdio.h>" << std::endl;
   cpp << "#include \"cpp.h\"" << std::endl;
   cpp << "int main() {" << std::endl;
 
+  vcd_parser(g_path+"/rst.vcd");
   // asv declarations
   for(auto pair : g_asv) {
     std::string asv = pair.first;
@@ -48,7 +50,13 @@ int main(int argc, char *argv[]) {
       abort();
     }
     g_asvTy.emplace(asv, asvTy);
-    std::string ret = "  "+asvTy+" "+asv+";";
+    if(g_rstVal.find(asv) == g_rstVal.end()) {
+      toCout("Error: cannot find rst value for: "+asv);
+      abort();
+    }
+    std::string rstVal = g_rstVal[asv];
+    rstVal = hdb2int(rstVal);
+    std::string ret = "  "+asvTy+" "+asv+" = "+rstVal+";";
     cpp << ret << std::endl;
   }
   cpp << std::endl;
@@ -63,7 +71,7 @@ int main(int argc, char *argv[]) {
       std::string funcName = instrInfo.name + CNCT + writeASV;
       std::string funcCall = func_call(writeASV, funcName, pair.second.argTy);
       cpp << funcCall << std::endl;
-      cpp << "  printf( \""+writeASV+": %ld\", "+writeASV+" );" << std::endl;
+      cpp << "  printf( \""+writeASV+": %ld\", "+writeASV+"\n );" << std::endl;
       cpp << std::endl;
     }
     cpp << std::endl;
