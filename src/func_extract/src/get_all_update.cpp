@@ -62,6 +62,7 @@ void get_all_update() {
   TheContext = std::make_unique<llvm::LLVMContext>();
   std::ofstream funcInfo(g_path+"/func_info.txt");
   std::ofstream asvInfo(g_path+"/asv_info.txt");
+  std::vector<std::string> fileNameVec;  
   while(!workSet.empty()) {
     auto targetIt = workSet.begin();
     std::string target = *targetIt;
@@ -121,8 +122,10 @@ void get_all_update() {
       std::vector<std::pair<std::string, uint32_t>> argVec;
       bool usefulFunc = read_clean_o3(g_path+"/clean.o3.ll", argVec, g_path+"/clean.simp.ll");
 
-      system(("mv "+g_path+"/clean.simp.ll "+g_path+"/"+instrInfo.name+"_"
-              +destInfo.get_dest_name()+"_"+toStr(delayBound)+".ll").c_str());
+      std::string llvmFileName = instrInfo.name+"_"+destInfo.get_dest_name()
+                                 +"_"+toStr(delayBound)+".ll";
+      system(("mv "+g_path+"/clean.simp.ll "+g_path+"/"+llvmFileName).c_str());
+      fileNameVec.push_back(llvmFileName);
       if(usefulFunc) {
         toCout("----- For instr "+instrInfo.name+", "+target+" is affected!");
         if(dependVarMap[instrName].find(target) == dependVarMap[instrName].end())
@@ -175,6 +178,7 @@ void get_all_update() {
     visitedTgt.insert(target);
     visitedTgtFile << target << std::endl;
   } // end of while loop
+  print_llvm_script(fileNameVec, g_path+"/link.sh");
   print_func_info(funcInfo);
   print_asv_info(asvInfo);
   visitedTgtFile.close();
@@ -233,7 +237,7 @@ bool read_clean_o3(std::string fileName,
     }
     output << line << std::endl;    
   }
-  output.close()
+  output.close();
   if(internalExist) {
     uint32_t pos = 0;
     uint32_t startPos = 0;
@@ -283,5 +287,20 @@ void print_asv_info(std::ofstream &output) {
   for(auto pair: asvSet)
     output << pair.first+":"+toStr(pair.second) << std::endl;
 }
+
+
+void print_llvm_script(const std::vector<std::string> &fileNameVec,
+                       std::string fileName) {
+  std::ofstream output(fileName);
+  output << "clang ila.c -emit-llvm -S -o main.ll" << std::endl;
+  std::string line = "llvm-link -v main.ll ";
+  for(std::string file : fileNameVec)
+    line = line + file + " ";
+  line = line + "-S -o linked.ll";
+  output << line << std::endl;
+  output << "clang linked.ll" << std::endl;
+  output.close();
+}
+
 
 } // end of namespace

@@ -21,5 +21,8 @@ bool read_clean_o3(std::string fileName,
 void print_func_info(std::ofstream &output);
 
 void print_asv_info(std::ofstream &output);
+
+void print_llvm_script(const std::vector<std::string> &fileNameVec,
+                       std::string fileName);
 } // end of namespace
 #endif
