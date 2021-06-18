@@ -14,7 +14,7 @@ namespace funcExtract {
 
 void get_all_update();
 
-void read_clean_o3(std::string fileName, 
+bool read_clean_o3(std::string fileName, 
                    std::vector<std::pair<std::string, uint32_t>> &argVec,
                    std::string outFileName);                   
 

@@ -119,16 +119,21 @@ void get_all_update() {
       system(clean.c_str());
       system(opto3.c_str());
       std::vector<std::pair<std::string, uint32_t>> argVec;
-      read_clean_o3(g_path+"/clean.o3.ll", argVec, g_path+"/clean.simp.ll");
+      bool usefulFunc = read_clean_o3(g_path+"/clean.o3.ll", argVec, g_path+"/clean.simp.ll");
 
       system(("mv "+g_path+"/clean.simp.ll "+g_path+"/"+instrInfo.name+"_"
               +destInfo.get_dest_name()+"_"+toStr(delayBound)+".ll").c_str());
-      toCout("----- For instr "+instrInfo.name+", "+target+" is finished");
-      if(dependVarMap[instrName].find(target) == dependVarMap[instrName].end())
-        dependVarMap[instrName].emplace(target, argVec);
+      if(usefulFunc) {
+        toCout("----- For instr "+instrInfo.name+", "+target+" is affected!");
+        if(dependVarMap[instrName].find(target) == dependVarMap[instrName].end())
+          dependVarMap[instrName].emplace(target, argVec);
+        else {
+          toCout("Error: for instruction "+instrInfo.name+", target: "+target+" is seen before");
+          abort();
+        }
+      }
       else {
-        toCout("Error: for instruction "+instrInfo.name+", target: "+target+" is seen before");
-        abort();
+        toCout("----- For instr "+instrInfo.name+", "+target+" is NOT affected!");
       }
       for(auto pair : argVec) {
         std::string reg = pair.first;
@@ -179,7 +184,8 @@ void get_all_update() {
 
 // returned argVec is empty if the update function just returns 0
 // generate a new file
-void read_clean_o3(std::string fileName, 
+// Assune: if no internal function is found, then this function is discarded
+bool read_clean_o3(std::string fileName, 
                    std::vector<std::pair<std::string, uint32_t>> &argVec,
                    std::string outFileName) {
   std::ifstream input(fileName);
@@ -191,7 +197,8 @@ void read_clean_o3(std::string fileName,
   bool seeReturn = false;
   bool returnConst = false;
   std::regex pDef("^define internal fastcc i(\\d+) @(\\S+)\\((.*)\\) unnamed_addr #1 \\{$");  
-  std::regex pRetZero("^\\s+ret i\\d+ 0$");  
+  std::regex pRetZero("^\\s+ret i\\d+ 0$");
+  bool internalExist = false;
   while(std::getline(input, line)) {
     if(line.substr(0, 6) == "define") {
       if(!seeFuncDef) {
@@ -200,6 +207,7 @@ void read_clean_o3(std::string fileName,
         continue;
       }
       else {
+        internalExist = true;
         if(!std::regex_match(line, m, pDef)) {
           toCout("Error: pDef is not matched!");
           abort();
@@ -226,7 +234,7 @@ void read_clean_o3(std::string fileName,
     output << line << std::endl;    
   }
   output.close()
-  if(!returnConst) {
+  if(internalExist) {
     uint32_t pos = 0;
     uint32_t startPos = 0;
     while(startPos < argList.size()) {
@@ -249,9 +257,10 @@ void read_clean_o3(std::string fileName,
         var = arg.substr(0, pos);
       argVec.push_back(std::make_pair(var, width));
       startPos = dotPos + 2;
-      if(dotPos == argList.size()) return;
+      if(dotPos == argList.size()) break;
     }
   }
+  return internalExist;
 }
 
 
