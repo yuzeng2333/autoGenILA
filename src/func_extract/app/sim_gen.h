@@ -4,6 +4,9 @@
 #include <vector>
 #include "../src/parse_fill.h"
 
+using namespace funcExtract;
+using namespace taintGen;
+
 
 std::string asv_type(uint32_t width);
 
@@ -19,6 +22,6 @@ void read_func_info(std::string fileName);
 void read_to_do_instr(std::string fileName, 
                       std::vector<uint32_t> &toDoList);
 
-std::string var_name_convert(std::string varName);
-
-bool is_letter(char c);
+void print_func_declare(struct FuncTy_t funcTy, 
+                        std::string funcName, 
+                        std::ofstream &header);

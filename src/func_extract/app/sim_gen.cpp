@@ -57,10 +57,10 @@ int main(int argc, char *argv[]) {
   // update asvs according to instructions
   for(auto idx : toDoList) {
     cpp << "  // instr: "+toStr(idx) << std::endl;
-    auto instr = g_instrInfo[idx];
-    for(auto pair : instr.funcTypes) {
+    auto instrInfo = g_instrInfo[idx];
+    for(auto pair : instrInfo.funcTypes) {
       std::string writeASV = pair.first;
-      std::string funcName = instr.name + CNCT + writeASV;
+      std::string funcName = instrInfo.name + CNCT + writeASV;
       std::string funcCall = func_call(writeASV, funcName, pair.second.argTy);
       cpp << funcCall << std::endl;
       cpp << "  printf( \""+writeASV+": %ld\", "+writeASV+" );" << std::endl;
@@ -70,6 +70,19 @@ int main(int argc, char *argv[]) {
   }
 
   cpp << "}" << std::endl;
+
+
+  // generate header file for update functions
+  for(auto instrInfo : g_instrInfo) {
+    for(auto pair : instrInfo.funcTypes) {
+      std::string writeASV = pair.first;
+      std::string funcName = instrInfo.name + CNCT + writeASV;
+      print_func_declare(pair.second, funcName, header);
+    }
+  }
+
+  cpp.close();
+  header.close();
   return 0;
 }
 
@@ -148,7 +161,8 @@ void read_func_info(std::string fileName) {
         toCout("Error: target: "+target+" already existed!");
         abort();
       }
-      g_instrInfo[idx].funcTypes.emplace(target, FuncTy_t{targetWidth});
+      struct FuncTy_t tmp = { targetWidth, std::vector<std::pair<uint32_t, std::string>>{} };
+      g_instrInfo[idx].funcTypes.emplace(target, tmp);
     }
     else if(line.find(":") != std::string::npos) {
       size_t pos = line.find(":");
@@ -184,25 +198,21 @@ void read_to_do_instr(std::string fileName,
 }
 
 
-std::string var_name_convert(std::string varName) {
-  std::string ret;
-  for(char c : varName) {
-    if(std::isdigit(c)
-       || is_letter(c))
-       ret += c;
-    else {
-      // if is special character
-      ret += '_';
-    }
+void print_func_declare(struct funcExtract::FuncTy_t funcTy, 
+                        std::string funcName, 
+                        std::ofstream &header) {
+  std::string ret = asv_type(funcTy.retTy) + " " + funcName + " ( ";
+  for(auto pair : funcTy.argTy) {
+    uint32_t width = pair.first;
+    std::string argType = asv_type(width);
+    std::string argName = pair.second;
+    ret = ret + argType + " " + argName + ", ";
   }
-  return ret;
+  if(funcTy.argTy.size() > 0) {
+    ret.pop_back();
+    ret.pop_back();
+  }
+  ret = ret + " );";
+  header << ret << std::endl;
 }
 
-
-bool is_letter(char c) {
-  if(c <= 'z' && c >= 'a'
-     || c <= 'Z' && c >= 'A'
-     || c == '_')
-     return true;
-  else return false;
-}
