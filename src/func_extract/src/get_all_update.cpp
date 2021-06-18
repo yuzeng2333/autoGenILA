@@ -119,9 +119,9 @@ void get_all_update() {
       system(clean.c_str());
       system(opto3.c_str());
       std::vector<std::pair<std::string, uint32_t>> argVec;
-      read_clean_o3(g_path+"/clean.o3.ll", argVec);
+      read_clean_o3(g_path+"/clean.o3.ll", argVec, g_path+"/clean.simp.ll");
 
-      system(("mv "+g_path+"/clean.o3.ll "+g_path+"/"+instrInfo.name+"_"
+      system(("mv "+g_path+"/clean.simp.ll "+g_path+"/"+instrInfo.name+"_"
               +destInfo.get_dest_name()+"_"+toStr(delayBound)+".ll").c_str());
       toCout("----- For instr "+instrInfo.name+", "+target+" is finished");
       if(dependVarMap[instrName].find(target) == dependVarMap[instrName].end())
@@ -178,9 +178,12 @@ void get_all_update() {
 
 
 // returned argVec is empty if the update function just returns 0
+// generate a new file
 void read_clean_o3(std::string fileName, 
-                   std::vector<std::pair<std::string, uint32_t>> &argVec) {
+                   std::vector<std::pair<std::string, uint32_t>> &argVec,
+                   std::string outFileName) {
   std::ifstream input(fileName);
+  std::ofstream output(outFileName);
   std::string line;
   std::smatch m;
   std::string argList;
@@ -190,9 +193,12 @@ void read_clean_o3(std::string fileName,
   std::regex pDef("^define internal fastcc i(\\d+) @(\\S+)\\((.*)\\) unnamed_addr #1 \\{$");  
   std::regex pRetZero("^\\s+ret i\\d+ 0$");  
   while(std::getline(input, line)) {
-    //toCoutVerb(line);
     if(line.substr(0, 6) == "define") {
-      if(!seeFuncDef) seeFuncDef = true;
+      if(!seeFuncDef) {
+        seeFuncDef = true;
+        while(line != "}") std::getline(input, line);
+        continue;
+      }
       else {
         if(!std::regex_match(line, m, pDef)) {
           toCout("Error: pDef is not matched!");
@@ -201,6 +207,7 @@ void read_clean_o3(std::string fileName,
         std::string retWidth = m.str(1);
         std::string funcName = m.str(2);
         argList = m.str(3);
+        line = "define "+line.substr(16);
       }
     }
     else if(line.size() > 9 && line.substr(2, 3) == "ret") {
@@ -216,7 +223,9 @@ void read_clean_o3(std::string fileName,
         break;
       }
     }
+    output << line << std::endl;    
   }
+  output.close()
   if(!returnConst) {
     uint32_t pos = 0;
     uint32_t startPos = 0;
