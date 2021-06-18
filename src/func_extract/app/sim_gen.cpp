@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
 
   // fill cpp file
   cpp << "#include <stdio.h>" << std::endl;
-  cpp << "#include \"cpp.h\"" << std::endl;
+  cpp << "#include \"ila.h\"" << std::endl;
   cpp << "int main() {" << std::endl;
 
   vcd_parser(g_path+"/rst.vcd");
@@ -51,14 +51,17 @@ int main(int argc, char *argv[]) {
       abort();
     }
     g_asvTy.emplace(asvSimp, asvTy);
+    std::string rstVal;
     std::string noSlash = asv;
     if(asv.substr(0, 1) == "\\") noSlash = asv.substr(1);
     if(g_rstVal.find(noSlash) == g_rstVal.end()) {
-      toCout("Error: cannot find rst value for: "+noSlash);
-      abort();
+      toCout("Warning: cannot find rst value for: "+noSlash);
+      rstVal = "0";
     }
-    std::string rstVal = g_rstVal[noSlash];
-    rstVal = hdb2int(rstVal);
+    else {
+      rstVal = g_rstVal[noSlash];
+    }
+    rstVal = toStr(hdb2int(rstVal));
     std::string ret = "  "+asvTy+" "+asvSimp+" = "+rstVal+";";
     cpp << ret << std::endl;
   }
@@ -75,7 +78,7 @@ int main(int argc, char *argv[]) {
       std::string funcName = instrInfo.name + CNCT + writeASV;
       std::string funcCall = func_call(writeASV, funcName, pair.second.argTy);
       cpp << funcCall << std::endl;
-      cpp << "  printf( \""+writeASV+": %ld\", "+writeASV+"\n );" << std::endl;
+      cpp << "  printf( \""+writeASV+": %ld\\n\", "+writeASV+" );" << std::endl;
       cpp << std::endl;
     }
     cpp << std::endl;
@@ -193,18 +196,6 @@ uint32_t get_instr_by_name(std::string instrName) {
   }
   toCout("Error: cannot find instrInfo for: "+instrName);
   abort();
-}
-
-
-void read_to_do_instr(std::string fileName, 
-                      std::vector<uint32_t> &toDoList) {
-  // each line is an instruction idx
-  std::ifstream input(fileName);
-  std::string line;
-  while(std::getline(input, line)) {
-    uint32_t idx = std::stoi(line);
-    toDoList.push_back(idx);
-  }
 }
 
 

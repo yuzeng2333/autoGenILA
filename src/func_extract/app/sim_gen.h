@@ -19,9 +19,6 @@ void read_asv_info(std::string fileName);
 
 void read_func_info(std::string fileName);
 
-void read_to_do_instr(std::string fileName, 
-                      std::vector<uint32_t> &toDoList);
-
 void print_func_declare(struct FuncTy_t funcTy, 
                         std::string funcName, 
                         std::ofstream &header);

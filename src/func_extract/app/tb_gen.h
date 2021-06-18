@@ -15,6 +15,8 @@ void wait_time(uint32_t time);
 
 void assign_random_sparse_instr();
 
+void assign_instr(uint32_t instrIdx);
+
 void to_file(std::string line);
 
 //void assign_random_dense_instr();

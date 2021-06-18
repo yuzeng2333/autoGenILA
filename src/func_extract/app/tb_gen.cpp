@@ -22,6 +22,7 @@
 using namespace funcExtract;
 using namespace taintGen;
 
+bool g_rand_sim = false;
 uint32_t cycleLen = 10;
 uint32_t protectedInstrNum = 3;
 uint32_t simulatedInstrNum = 20;
@@ -34,7 +35,9 @@ int main(int argc, char *argv[]) {
   read_in_instructions(g_path+"/instr.txt");
   get_io(g_path+"/design.v.clean");
   parse_verilog(g_path+"/design.v.clean");  
-  determine_clk_rst();  
+  determine_clk_rst();
+  std::vector<uint32_t> toDoList;  
+  if(!g_rand_sim) read_to_do_instr(g_path+"/tb.txt", toDoList);
   output.open(g_path+"/tb_vlg.v", std::ios::out);
   to_file("`include \"./design.v.clean\"");
   to_file("module tb;");
@@ -115,8 +118,15 @@ int main(int argc, char *argv[]) {
   assign_value("zy_assert_protect", 0);
 
   to_file("    // begin simulated instruction");
-  for(uint32_t i = 0; i < simulatedInstrNum; i++)
-    assign_random_sparse_instr();
+  if(g_rand_sim) {
+    for(uint32_t i = 0; i < simulatedInstrNum; i++)
+      assign_random_sparse_instr();
+  }
+  else {
+    for(auto idx : toDoList) {
+      assign_instr(idx);
+    }
+  }
 
   to_file("    $finish;");
   to_file("  end");
@@ -180,6 +190,11 @@ void assign_random_sparse_instr() {
   to_file("");
   uint32_t instrIdx = rand() % g_instrInfo.size();
   to_file("    // random instruction: "+toStr(instrIdx));  
+  assign_instr(instrIdx);
+}
+
+
+void assign_instr(uint32_t instrIdx) {
   auto instrInfo = g_instrInfo[instrIdx];
 
   // first assign instruction encodings
