@@ -53,11 +53,11 @@ int main(int argc, char *argv[]) {
     g_asvTy.emplace(asvSimp, asvTy);
     std::string noSlash = asv;
     if(asv.substr(0, 1) == "\\") noSlash = asv.substr(1);
-    if(g_rstVal.find(noSlash) == g_rstVal.end()) {
-      toCout("Error: cannot find rst value for: "+noSlash);
+    if(g_rstVal.find(asv) == g_rstVal.end()) {
+      toCout("Error: cannot find rst value for: "+asv);
       abort();
     }
-    std::string rstVal = g_rstVal[noSlash];
+    std::string rstVal = g_rstVal[asv];
     rstVal = hdb2int(rstVal);
     std::string ret = "  "+asvTy+" "+asvSimp+" = "+rstVal+";";
     cpp << ret << std::endl;
