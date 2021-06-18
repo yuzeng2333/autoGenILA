@@ -245,6 +245,7 @@ void print_llvm_ir(DestInfo &destInfo,
     }
   // return types
   llvm::Type* retTy = destInfo.get_ret_type();
+  std::string destSimpleName = var_name_convert(destName);
 
   llvm::FunctionType *FT =
     llvm::FunctionType::get(retTy, argTy, false);
@@ -257,7 +258,7 @@ void print_llvm_ir(DestInfo &destInfo,
 
   TheFunction = llvm::Function::Create(
     FT, llvm::Function::InternalLinkage, 
-    "func_;_"+g_currInstrInfo.name+"_"+destName, TheModule.get());
+    g_currInstrInfo.name+"_"+destSimpleName, TheModule.get());
   TheFunction->addFnAttr(llvm::Attribute::NoInline);
   //g_curFunc = TheFunction;
 

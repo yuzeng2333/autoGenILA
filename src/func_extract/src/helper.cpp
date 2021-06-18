@@ -1418,18 +1418,28 @@ bool is_fifo_module(std::string modName) {
   return false;
 }
 
-//std::shared_ptr<ModuleInfo_t> 
-//get_mem_module(const std::string &memPathName) {
-//  remove_two_end_space(memPathName);
-//  size_t pos = memPathName.find_last_of(".");
-//  std::string modName;
-//  if(pos == std::string::npos) {
-//    modName = memPathName;
-//  }
-//  else {
-//    modName = memPathName.substr(pos+1);
-//  }
-//
-//}
+
+std::string var_name_convert(std::string varName) {
+  std::string ret;
+  for(char c : varName) {
+    if(std::isdigit(c)
+       || is_letter(c))
+       ret += c;
+    else {
+      // if is special character
+      ret += '_';
+    }
+  }
+  return ret;
+}
+
+
+bool is_letter(char c) {
+  if(c <= 'z' && c >= 'a'
+     || c <= 'Z' && c >= 'A'
+     || c == '_')
+     return true;
+  else return false;
+}
 
 } // end of namespace funcExtract
