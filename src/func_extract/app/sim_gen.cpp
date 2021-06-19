@@ -17,6 +17,7 @@ using namespace taintGen;
 /// These data is to be filled by reading a previously generated file
 // key is the asv name, value is its bit number
 std::vector<uint32_t> toDoList;
+std::map<std::string, std::string> rstVals;
 
 
 // key is the asv name, value is its c data type name
@@ -63,7 +64,12 @@ int main(int argc, char *argv[]) {
     }
     rstVal = toStr(hdb2int(rstVal));
     std::string ret = "  "+asvTy+" "+asvSimp+" = "+rstVal+";";
+    rstVals.emplace(asv, rstVals);
     cpp << ret << std::endl;
+  }
+  cpp << std::endl;
+  for(auto pair : rstVals) {
+    cpp << "  printf( \""+pair.first+": "+pair.second+"\" )" << std::endl;
   }
   cpp << std::endl;
 
@@ -72,6 +78,7 @@ int main(int argc, char *argv[]) {
   for(auto idx : toDoList) {
     auto instrInfo = g_instrInfo[idx];    
     cpp << "  // instr"+toStr(idx)+": "+instrInfo.name << std::endl;
+    cpp << "  printf( \"// instr"+toStr(idx)+": "+instrInfo.name+" \");" << std::endl;
     cpp << "  printf( // \""+instrInfo.name+"\" );" << std::endl;
     for(auto pair : instrInfo.funcTypes) {
       std::string writeASV = pair.first;
@@ -143,9 +150,6 @@ std::string func_call(std::string writeASV, std::string funcName,
 }
 
 
-
-
-
 void print_func_declare(struct funcExtract::FuncTy_t funcTy, 
                         std::string funcName, 
                         std::ofstream &header) {
@@ -164,3 +168,7 @@ void print_func_declare(struct funcExtract::FuncTy_t funcTy,
   header << ret << std::endl;
 }
 
+
+void print_rst_values() {
+
+}
