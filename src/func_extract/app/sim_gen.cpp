@@ -1,6 +1,7 @@
 #include "sim_gen.h"
 #include "../src/parse_fill.h"
 #include "../src/helper.h"
+#include "../src/util.h"
 #include "../src/vcd_parser.h"
 #include "../src/global_data_struct.h"
 #define toCout(a) std::cout << a << std::endl

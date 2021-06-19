@@ -1,4 +1,5 @@
 #include "../src/helper.h"
+#include "../src/util.h"
 #include "../src/parse_fill.h"
 #include "../src/expr.h"
 #include "../src/vcd_parser.h"
@@ -94,6 +95,7 @@ int main(int argc, char *argv[]) {
   to_file("");
 
   // initialize regs
+  to_file("    $display( \"// initialization \" );");
   if(reset_regs) {
     std::string rstVal;
     uint32_t value;
@@ -118,6 +120,8 @@ int main(int argc, char *argv[]) {
         }
       }
       assign_value("u0."+reg, value);
+      // print reset values
+      to_file("    $display( \""+reg+": %d\", u0."+value+" );");
     }
   }
   to_file("");
