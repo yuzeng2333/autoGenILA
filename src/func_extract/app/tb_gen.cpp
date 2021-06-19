@@ -31,7 +31,7 @@ bool reset_regs = true;
 
 int main(int argc, char *argv[]) {
   g_path = argv[1];
-  g_verb = true;
+  g_verb = false;
   read_in_instructions(g_path+"/instr.txt");
   get_io(g_path+"/design.v.clean");
   parse_verilog(g_path+"/design.v.clean");  
@@ -39,6 +39,7 @@ int main(int argc, char *argv[]) {
   std::vector<uint32_t> toDoList;  
   if(!g_rand_sim) read_to_do_instr(g_path+"/tb.txt", toDoList);
   read_asv_info(g_path+"/asv_info.txt");
+  vcd_parser(g_path+"/rst.vcd");  
   output.open(g_path+"/tb_vlg.v", std::ios::out);
   to_file("`include \"./design.v.clean\"");
   to_file("module tb;");
@@ -57,6 +58,7 @@ int main(int argc, char *argv[]) {
     print_reg(width, input);
   }
   print_reg(1, "zy_assert_protect");
+  print_reg(1, "INSTR_IN_ZY");
   print_reg(1, clk);
   print_reg(1, rst);
 
@@ -96,7 +98,14 @@ int main(int argc, char *argv[]) {
   // initialize regs
   if(reset_regs) {
     for(std::string reg : topModInfo->moduleTrueRegs) {
-      assign_value("u0."+reg, 0);
+      if(reg.substr(0, 1) == "\\") reg = reg.substr(1);
+      if(g_rstVal.find(reg) == g_rstVal.end()) {
+        toCout("Error: cannot find reset value for: "+reg);
+        abort();
+      }
+      std::string rstVal = g_rstVal[reg];
+      uint32_t value = std::stoi(rstVal);
+      assign_value("u0."+reg, value);
     }
   }
   to_file("");
@@ -218,13 +227,13 @@ void assign_instr(uint32_t instrIdx) {
   wait_time(nopLen*cycleLen);
   // display all asv values
 
-  to_file("    $display(\"// "+instrInfo.name+"\")");
+  to_file("    $display( \"// "+instrInfo.name+"\" );");
   for(auto pair : g_asv) {
     std::string asv = pair.first;
     uint32_t width = pair.second;
-    to_file("    $display(\""+asv+": %d\", "+asv+");");
+    to_file("    $display( \""+asv+": %d\", u0."+asv+" );");
   }
-  to_file("    $display(\"\n\")");
+  to_file("    $display(\"\\n\");");
 }
 
 

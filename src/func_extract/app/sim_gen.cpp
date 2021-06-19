@@ -15,7 +15,6 @@ using namespace taintGen;
 
 /// These data is to be filled by reading a previously generated file
 // key is the asv name, value is its bit number
-std::map<std::string, uint32_t> g_asv;
 std::vector<uint32_t> toDoList;
 
 
@@ -143,15 +142,7 @@ std::string func_call(std::string writeASV, std::string funcName,
 }
 
 
-uint32_t get_instr_by_name(std::string instrName) {
-  uint32_t idx = 0;
-  for(auto instrInfo : g_instrInfo) {
-    if(instrInfo.name == instrName) return idx;
-    idx++;
-  }
-  toCout("Error: cannot find instrInfo for: "+instrName);
-  abort();
-}
+
 
 
 void print_func_declare(struct funcExtract::FuncTy_t funcTy, 
