@@ -28,6 +28,7 @@ uint32_t protectedInstrNum = 3;
 uint32_t simulatedInstrNum = 20;
 std::ofstream output;
 bool reset_regs = true;
+bool use_protect_signal = false;
 
 int main(int argc, char *argv[]) {
   g_path = argv[1];
@@ -74,10 +75,7 @@ int main(int argc, char *argv[]) {
   // module instantiation
   to_file("  "+topModInfo->name+" u0 (");
   to_file("    ."+clk+"("+clk+")");
-  if(positiveRst)
-    to_file("   ,."+modRst+"("+rst+")");
-  else
-    to_file("   ,."+modRst+"(~"+rst+")");
+  to_file("   ,."+modRst+"("+rst+")");
   to_file("   ,.zy_assert_protect(zy_assert_protect)");
   to_file("   ,.INSTR_IN_ZY(INSTR_IN_ZY)");
   for(auto input : topModInfo->moduleInputs) {
@@ -97,14 +95,28 @@ int main(int argc, char *argv[]) {
 
   // initialize regs
   if(reset_regs) {
+    std::string rstVal;
+    uint32_t value;
     for(std::string reg : topModInfo->moduleTrueRegs) {
-      if(reg.substr(0, 1) == "\\") reg = reg.substr(1);
-      if(g_rstVal.find(reg) == g_rstVal.end()) {
-        toCout("Error: cannot find reset value for: "+reg);
-        abort();
+      if(reg.find("cpuregs") == std::string::npos) {
+        //toCout("Find it!");
       }
-      std::string rstVal = g_rstVal[reg];
-      uint32_t value = std::stoi(rstVal);
+      std::string regRst = reg;
+      if(reg.substr(0, 1) == "\\") regRst = reg.substr(1);
+      if(g_rstVal.find(regRst) == g_rstVal.end()) {
+        toCout("Warning: cannot find reset value for: "+regRst);
+        rstVal = "0";
+        value = 0;
+      }
+      else {
+        rstVal = g_rstVal[regRst];        
+        if(is_x) {
+          value = 0;
+        }
+        else {
+          value = std::stoi(rstVal);
+        }
+      }
       assign_value("u0."+reg, value);
     }
   }
@@ -122,9 +134,11 @@ int main(int argc, char *argv[]) {
   wait_time(100);
   assign_value(rst, 1-rstVal);
 
-  to_file("    // begin protected instruction");
-  for(uint32_t i = 0; i < protectedInstrNum; i++)
-    assign_random_sparse_instr();
+  if(use_protect_signal) {
+    to_file("    // begin protected instruction");
+    for(uint32_t i = 0; i < protectedInstrNum; i++)
+      assign_random_sparse_instr();
+  }
   assign_value("zy_assert_protect", 0);
 
   to_file("    // begin simulated instruction");
