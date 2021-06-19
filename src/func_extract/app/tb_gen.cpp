@@ -38,6 +38,7 @@ int main(int argc, char *argv[]) {
   determine_clk_rst();
   std::vector<uint32_t> toDoList;  
   if(!g_rand_sim) read_to_do_instr(g_path+"/tb.txt", toDoList);
+  read_asv_info(g_path+"/asv_info.txt");
   output.open(g_path+"/tb_vlg.v", std::ios::out);
   to_file("`include \"./design.v.clean\"");
   to_file("module tb;");
@@ -215,6 +216,15 @@ void assign_instr(uint32_t instrIdx) {
     assign_value(pair.first, pair.second);
   }
   wait_time(nopLen*cycleLen);
+  // display all asv values
+
+  to_file("    $display(\"// "+instrInfo.name+"\")");
+  for(auto pair : g_asv) {
+    std::string asv = pair.first;
+    uint32_t width = pair.second;
+    to_file("    $display(\""+asv+": %d\", "+asv+");");
+  }
+  to_file("    $display(\"\n\")");
 }
 
 
