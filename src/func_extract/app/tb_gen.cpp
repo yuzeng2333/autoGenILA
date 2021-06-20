@@ -38,7 +38,8 @@ int main(int argc, char *argv[]) {
   get_io(g_path+"/design.v.clean");
   parse_verilog(g_path+"/design.v.clean");  
   determine_clk_rst();
-  std::vector<uint32_t> toDoList;  
+  std::vector<std::map<std::string, 
+                       std::vector<std::string>>> toDoList
   if(!g_rand_sim) read_to_do_instr(g_path+"/tb.txt", toDoList);
   read_asv_info(g_path+"/asv_info.txt");
   vcd_parser(g_path+"/rst.vcd");  
@@ -121,7 +122,7 @@ int main(int argc, char *argv[]) {
       }
       assign_value("u0."+reg, value);
       // print reset values
-      to_file("    $display( \""+reg+": %d\", u0."+value+" );");
+      to_file("    $display( \""+reg+": %d\", u0."+toStr(value)+" );");
     }
   }
   to_file("");
@@ -151,8 +152,8 @@ int main(int argc, char *argv[]) {
       assign_random_sparse_instr();
   }
   else {
-    for(auto idx : toDoList) {
-      assign_instr(idx);
+    for(auto instr : toDoList) {
+      assign_instr(instr);
     }
   }
 

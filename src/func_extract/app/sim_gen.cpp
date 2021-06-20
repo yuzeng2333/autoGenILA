@@ -17,7 +17,7 @@ using namespace taintGen;
 /// These data is to be filled by reading a previously generated file
 // key is the asv name, value is its bit number
 std::vector<uint32_t> toDoList;
-std::map<std::string, std::string> rstVals;
+std::map<std::string, std::string> rstValMap;
 
 
 // key is the asv name, value is its c data type name
@@ -41,6 +41,7 @@ int main(int argc, char *argv[]) {
   cpp << "int main() {" << std::endl;
 
   vcd_parser(g_path+"/rst.vcd");
+
   // asv declarations
   for(auto pair : g_asv) {
     std::string asv = pair.first;
@@ -64,27 +65,32 @@ int main(int argc, char *argv[]) {
     }
     rstVal = toStr(hdb2int(rstVal));
     std::string ret = "  "+asvTy+" "+asvSimp+" = "+rstVal+";";
-    rstVals.emplace(asv, rstVals);
+    rstValMap.emplace(asv, rstVal);
     cpp << ret << std::endl;
   }
   cpp << std::endl;
-  for(auto pair : rstVals) {
-    cpp << "  printf( \""+pair.first+": "+pair.second+"\" )" << std::endl;
+  cpp << "  printf( \" // Initialization \\n\" );" << std::endl;
+  for(auto pair : rstValMap) {
+    std::string reg = var_name_convert(pair.first);
+    cpp << "  printf( \""+reg+": "+pair.second+"\\n\" );" << std::endl;
   }
   cpp << std::endl;
 
 
   // update asvs according to instructions
-  for(auto idx : toDoList) {
+  for(auto encoding : toDoList) {
+    std::string instrName = decode(encoding);
+    uint32_t idx = get_instr_by_name(instrName);
     auto instrInfo = g_instrInfo[idx];    
     cpp << "  // instr"+toStr(idx)+": "+instrInfo.name << std::endl;
-    cpp << "  printf( \"// instr"+toStr(idx)+": "+instrInfo.name+" \");" << std::endl;
-    cpp << "  printf( // \""+instrInfo.name+"\" );" << std::endl;
+    cpp << "  printf( \"// instr"+toStr(idx)+": "+instrInfo.name+"\\n \");" << std::endl;
     for(auto pair : instrInfo.funcTypes) {
       std::string writeASV = pair.first;
       writeASV = var_name_convert(writeASV);
       std::string funcName = instrInfo.name + CNCT + writeASV;
-      std::string funcCall = func_call(writeASV, funcName, pair.second.argTy);
+      // should replace the input-type arg in the function call with explicit values 
+      // in the instruction
+      std::string funcCall = func_call(writeASV, funcName, pair.second.argTy, encoding);
       cpp << funcCall << std::endl;
       cpp << "  printf( \""+writeASV+": %ld\\n\", "+writeASV+" );" << std::endl;
       cpp << std::endl;
@@ -134,12 +140,26 @@ std::string asv_type(uint32_t width) {
 }
 
 
+// currently only support one-cycle inputInstr
 std::string func_call(std::string writeASV, std::string funcName, 
-                      const std::vector<std::pair<uint32_t, std::string>> &argTy) {
+                      const std::vector<std::pair<uint32_t, std::string>> &argTy,
+                      const std::map<std::string, std::vector<std::string>> &inputInstr) {
   std::string ret = "  "+writeASV+" = "+funcName+"( ";
   for(auto pair: argTy) {
-    std::string arg = var_name_convert(pair.second);
-    ret += arg +", ";
+    std::string arg = pair.second;
+    std::string argValue;
+    if(inputInstr.find(arg) != inputInstr.end()) {
+      if(inputInstr[arg].size() > 1) {
+        toCout("Warning: instruction spans mulitple cycles!");
+      }
+      argValue = inputInstr[arg].front();
+      uint32_t intValue = hdb2int(argValue);
+      argValue = toStr(intValue);
+    }
+    else {
+      argValue = var_name_convert(pair.second);
+    }
+    ret += argValue +", ";
   }
   if(argTy.size() > 0) {
     ret.pop_back();
