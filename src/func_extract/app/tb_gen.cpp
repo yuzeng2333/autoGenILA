@@ -223,14 +223,16 @@ void assign_random_sparse_instr() {
 }
 
 
-void assign_instr(uint32_t instrIdx) {
+void assign_instr(const std::map<std::string, std::vector<std::string>> &inputInstr) {
+  std::string instrName = decode(inputInstr);
+  uint32_t instrIdx = get_instr_by_name(instrName);
   auto instrInfo = g_instrInfo[instrIdx];
 
   // first assign instruction encodings
   uint32_t instrLen = instrInfo.instrEncoding.begin()->second.size();
   assign_value("INSTR_IN_ZY", 1);
   for(uint32_t i = 0; i < instrLen; i++) {
-    for(auto pair: instrInfo.instrEncoding) {
+    for(auto pair: inputInstr) {
       assign_value(pair.first, pair.second[i]);
     }
     wait_time(cycleLen);    
