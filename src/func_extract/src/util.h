@@ -11,7 +11,8 @@
 namespace funcExtract {
 
 void read_to_do_instr(std::string fileName, 
-                      std::vector<std::string> &toDoList);
+                      std::vector<std::map<std::string, 
+                                           std::vector<std::string>>> &toDoList);
 
 void read_asv_info(std::string fileName);
 

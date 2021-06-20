@@ -10,13 +10,37 @@ using namespace syntaxPatterns;
 
 namespace funcExtract {
 
+
+// all instructions must begin with a "#" line
 void read_to_do_instr(std::string fileName, 
-                      std::vector<std::string> &toDoList) {
+                      std::vector<std::map<std::string, 
+                                           std::vector<std::string>>> &toDoList) {
   // each line is an instruction idx
   std::ifstream input(fileName);
   std::string line;
   while(std::getline(input, line)) {
-    toDoList.push_back(line);
+    if(line.substr(0, 1) == "#") {
+      // to start a new instruction
+      toDoList.push_back(std::map<std::string, 
+                                  std::vector<std::string>>{});
+    }
+    else if(line.substr(0, 1) == "(") {
+      // TODO
+    }
+    else if(line.find("=") != std::string::npos) {
+      // variable and values are separated with '='
+      size_t pos = line.find("=");
+      std::string varName = line.substr(0, pos);
+      remove_two_end_space(varName);
+      std::string value = line.substr(pos+1);
+      remove_two_end_space(value);
+      if(toDoList.back().find(varName) == toDoList.back().end()) {
+        toDoList.back().emplace(varName, std::vector<std::string>{value});
+      }
+      else {
+        toDoList.back()[varName].push_back(value);
+      }
+    }
   }
 }
 
