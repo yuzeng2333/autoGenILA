@@ -1419,12 +1419,23 @@ bool is_fifo_module(std::string modName) {
 }
 
 
+void print_all_regs(const std::vector<std::pair<std::string, uint32_t>> &regWidth) {
+  std::ofstream output(g_path+"/all_regs.txt");
+  for(auto pair : regWidth) {
+    output << pair.first+":"+toStr(pair.second) << std::endl;
+  }
+  output.close();
+}
+
 std::string var_name_convert(std::string varName) {
   std::string ret;
   for(char c : varName) {
     if(std::isdigit(c)
        || is_letter(c))
        ret += c;
+    else if(c == '\\') {
+      continue;
+    }
     else {
       // if is special character
       ret += '_';
@@ -1441,5 +1452,4 @@ bool is_letter(char c) {
      return true;
   else return false;
 }
-
 } // end of namespace funcExtract

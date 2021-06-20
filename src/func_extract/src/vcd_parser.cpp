@@ -28,7 +28,7 @@ void vcd_parser(std::string fileName) {
   while(std::getline(input, line)) {
     //toCout(line);
     if(line.find("ap_CS_fsm") != std::string::npos) {
-        toCout("Find it");
+      toCout("Find it");
     }
     if(line.substr(0, 6).compare("$scope") == 0) {
       state = readName;

@@ -39,6 +39,7 @@ std::map<std::string,
 std::map<std::string, std::string> g_ins2modMap;
 std::map<std::string, uint32_t> g_moduleOutportTime;
 std::map<std::string, uint32_t> g_moduleInportTime;
+std::map<std::string, uint32_t> g_asv;
 Str2StrVecMap_t g_moduleInputsMap;
 Str2StrVecMap_t g_moduleOutputsMap;
 //VarWidth g_varWidth;

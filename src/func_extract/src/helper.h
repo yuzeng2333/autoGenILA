@@ -298,10 +298,11 @@ bool is_fifo_output(std::string wire);
 
 bool is_fifo_module(std::string modName);
 
+void print_all_regs(const std::vector<std::pair<std::string, uint32_t>> &regWidth);
+
 std::string var_name_convert(std::string varName);
 
 bool is_letter(char c);
-
 } // end of namespace funcExtract
 
 

@@ -209,6 +209,8 @@ void print_llvm_ir(DestInfo &destInfo,
   std::shared_ptr<ModuleInfo_t> topModInfo = g_moduleInfoMap[g_topModule];
   g_regWidth.clear();
   collect_regs(topModInfo, "", g_regWidth);
+  print_all_regs(g_regWidth);
+
   collect_mem_ins(topModInfo, "", g_memInstances);
 
   // push regs

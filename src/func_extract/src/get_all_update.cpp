@@ -227,12 +227,10 @@ bool read_clean_o3(std::string fileName,
         seeReturn = true;
         if(std::regex_match(line, m, pRetZero)) {
           returnConst = true;
-          break;
         }
       }
       else {
         if(std::regex_match(line, m, pRetZero)) returnConst = true;
-        break;
       }
     }
     output << line << std::endl;    
