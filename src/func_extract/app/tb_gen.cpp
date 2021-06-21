@@ -24,10 +24,8 @@ using namespace funcExtract;
 using namespace taintGen;
 
 bool g_rand_sim = false;
-uint32_t cycleLen = 10;
 uint32_t protectedInstrNum = 3;
 uint32_t simulatedInstrNum = 20;
-std::ofstream output;
 bool reset_regs = true;
 bool use_protect_signal = false;
 
@@ -43,7 +41,7 @@ int main(int argc, char *argv[]) {
   if(!g_rand_sim) read_to_do_instr(g_path+"/tb.txt", toDoList);
   read_asv_info(g_path+"/asv_info.txt");
   vcd_parser(g_path+"/rst.vcd");  
-  output.open(g_path+"/tb_vlg.v", std::ios::out);
+  g_output.open(g_path+"/tb_vlg.v", std::ios::out);
   to_file("`include \"./design.v.clean\"");
   to_file("module tb;");
 
@@ -72,7 +70,7 @@ int main(int argc, char *argv[]) {
   }
   
 
-  to_file("  \nalways #"+toStr(cycleLen/2)+" "+clk+" = ~"+clk+" ;\n");
+  to_file("  \nalways #"+toStr(g_cycleLen/2)+" "+clk+" = ~"+clk+" ;\n");
 
   // module instantiation
   to_file("  "+topModInfo->name+" u0 (");
@@ -176,46 +174,6 @@ void print_wire(uint32_t width, std::string wireName) {
 }
 
 
-void assign_value(std::string var, uint32_t value) {
-  assign_value(var, toStr(value));
-}
-
-
-void assign_value(std::string var, std::string value, bool rand) {
-  value = value_format_convert(value, rand);
-  to_file("    "+var+" = "+value+" ;");
-}
-
-
-// convert 4'h1+4'h2 to { 4'h1, 4'h2 }
-std::string value_format_convert(std::string val, bool isRand) {
-  std::regex pX("(\\d+)'[b|h][x|X]$");
-  if(val.find("+") == std::string::npos) return val;
-  remove_two_end_space(val);
-  std::string ret = " { ";
-  std::vector<std::string> vec;
-  vec.clear();
-  split_by(val, "+", vec);
-  // replace x with number value
-  std::smatch m;
-  for(auto it = vec.begin(); it != vec.end(); it++) {
-    if(!std::regex_match(*it, m, pX)) continue;
-    uint32_t width = std::stoi(m.str(1));
-    uint32_t base = exp2(width);
-    uint32_t newVal = rand() % base;
-    std::string hexVal = dec2hex(std::to_string(newVal));
-    *it = toStr(width)+"'h"+hexVal;
-  }
-  ret = merge_with(vec, ", ");
-  return " { "+ret+" } ";
-}
-
-
-void wait_time(uint32_t time) {
-  to_file("    #"+toStr(time));
-}
-
-
 void assign_random_sparse_instr() {
   to_file("");
   uint32_t instrIdx = rand() % g_instrInfo.size();
@@ -223,75 +181,3 @@ void assign_random_sparse_instr() {
   assign_instr(instrIdx);
 }
 
-
-void assign_instr(uint32_t instrIdx) {
-  auto instrInfo = g_instrInfo[instrIdx];
-
-  // first assign instruction encodings
-  uint32_t instrLen = instrInfo.instrEncoding.begin()->second.size();
-  assign_value("INSTR_IN_ZY", 1);
-  for(uint32_t i = 0; i < instrLen; i++) {
-    for(auto pair: instrInfo.instrEncoding) {
-      assign_value(pair.first, pair.second[i], true);
-    }
-    wait_time(cycleLen);    
-  }
-  assign_value("INSTR_IN_ZY", 0);  
-
-  // then assign nop instruction
-  uint32_t nopLen = instrInfo.delayBound - instrLen;
-  uint32_t i = 0;
-  for(auto pair : g_nopInstr) {
-    assign_value(pair.first, pair.second);
-  }
-  wait_time(nopLen*cycleLen);
-  // display all asv values
-
-  to_file("    $display( \"// "+instrInfo.name+"\" );");
-  for(auto pair : g_asv) {
-    std::string asv = pair.first;
-    uint32_t width = pair.second;
-    to_file("    $display( \""+asv+": %d\", u0."+asv+" );");
-  }
-  to_file("    $display(\"\\n\");");
-}
-
-
-void assign_instr(const std::map<std::string, std::vector<std::string>> &inputInstr) {
-  std::string instrName = decode(inputInstr);
-  uint32_t instrIdx = get_instr_by_name(instrName);
-  auto instrInfo = g_instrInfo[instrIdx];
-
-  // first assign instruction encodings
-  uint32_t instrLen = instrInfo.instrEncoding.begin()->second.size();
-  assign_value("INSTR_IN_ZY", 1);
-  for(uint32_t i = 0; i < instrLen; i++) {
-    for(auto pair: inputInstr) {
-      assign_value(pair.first, pair.second[i]);
-    }
-    wait_time(cycleLen);    
-  }
-  assign_value("INSTR_IN_ZY", 0);  
-
-  // then assign nop instruction
-  uint32_t nopLen = instrInfo.delayBound - instrLen;
-  uint32_t i = 0;
-  for(auto pair : g_nopInstr) {
-    assign_value(pair.first, pair.second);
-  }
-  wait_time(nopLen*cycleLen);
-  // display all asv values
-
-  to_file("    $display( \"// "+instrInfo.name+"\" );");
-  for(auto pair : g_asv) {
-    std::string asv = pair.first;
-    uint32_t width = pair.second;
-    to_file("    $display( \""+asv+": %d\", u0."+asv+" );");
-  }
-  to_file("    $display(\"\\n\");");
-}
-
-
-void to_file(std::string line) {
-  output << line << std::endl;
-}
