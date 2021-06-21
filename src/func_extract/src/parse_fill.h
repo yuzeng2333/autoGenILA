@@ -35,6 +35,7 @@ struct InstrInfo_t {
   std::vector<std::string> writeASVVec;
   uint32_t writeASVVecDelay;
   uint32_t delayBound;
+  uint32_t extraDelay;
   uint32_t instrLen = 0;
   std::string name;
   // key is writeASV. Each instruction might update multiple ASVs

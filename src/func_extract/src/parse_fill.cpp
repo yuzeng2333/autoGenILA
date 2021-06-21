@@ -264,6 +264,12 @@ void read_in_instructions(std::string fileName) {
       g_instrInfo.back().delayBound = std::stoi(delay);
       continue;
     }
+    if(line.substr(0,6) == "#extraDelay") {
+      std::string delay = line.substr(12);
+      remove_two_end_space(delay);
+      g_instrInfo.back().extraDelay = std::stoi(delay);
+      continue;
+    }
     if(line.back() == ' ')
       line.pop_back();
     if(line.front() == '#') { // a new instr begins
