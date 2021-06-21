@@ -16,9 +16,10 @@ using namespace taintGen;
 
 /// These data is to be filled by reading a previously generated file
 // key is the asv name, value is its bit number
-std::vector<uint32_t> toDoList;
-std::map<std::string, std::string> rstValMap;
 
+std::map<std::string, std::string> rstValMap;
+std::vector<std::map<std::string, 
+                     std::vector<std::string>>> toDoList;
 
 // key is the asv name, value is its c data type name
 std::map<std::string, std::string> g_asvTy;
@@ -45,7 +46,7 @@ int main(int argc, char *argv[]) {
   // asv declarations
   for(auto pair : g_asv) {
     std::string asv = pair.first;
-    std::string asvSimp = var_name_convert(asv);
+    std::string asvSimp = var_name_convert(asv, true);
     uint32_t width = pair.second;   
     std::string asvTy = asv_type(width);
     if(asvTy.empty()) {
@@ -71,7 +72,7 @@ int main(int argc, char *argv[]) {
   cpp << std::endl;
   cpp << "  printf( \" // Initialization \\n\" );" << std::endl;
   for(auto pair : rstValMap) {
-    std::string reg = var_name_convert(pair.first);
+    std::string reg = var_name_convert(pair.first, true);
     cpp << "  printf( \""+reg+": "+pair.second+"\\n\" );" << std::endl;
   }
   cpp << std::endl;
@@ -86,7 +87,7 @@ int main(int argc, char *argv[]) {
     cpp << "  printf( \"// instr"+toStr(idx)+": "+instrInfo.name+"\\n \");" << std::endl;
     for(auto pair : instrInfo.funcTypes) {
       std::string writeASV = pair.first;
-      writeASV = var_name_convert(writeASV);
+      writeASV = var_name_convert(writeASV, true);
       std::string funcName = instrInfo.name + CNCT + writeASV;
       // should replace the input-type arg in the function call with explicit values 
       // in the instruction
@@ -143,21 +144,21 @@ std::string asv_type(uint32_t width) {
 // currently only support one-cycle inputInstr
 std::string func_call(std::string writeASV, std::string funcName, 
                       const std::vector<std::pair<uint32_t, std::string>> &argTy,
-                      const std::map<std::string, std::vector<std::string>> &inputInstr) {
+                      std::map<std::string, std::vector<std::string>> &inputInstr) {
   std::string ret = "  "+writeASV+" = "+funcName+"( ";
   for(auto pair: argTy) {
     std::string arg = pair.second;
     std::string argValue;
     if(inputInstr.find(arg) != inputInstr.end()) {
-      if(inputInstr[arg].size() > 1) {
+      if((inputInstr.at(arg)).size() > 1) {
         toCout("Warning: instruction spans mulitple cycles!");
       }
-      argValue = inputInstr[arg].front();
-      uint32_t intValue = hdb2int(argValue);
+      argValue = (inputInstr[arg]).front();
+      uint32_t intValue = convert_to_single_num(argValue);
       argValue = toStr(intValue);
     }
     else {
-      argValue = var_name_convert(pair.second);
+      argValue = var_name_convert(pair.second, true);
     }
     ret += argValue +", ";
   }
@@ -189,6 +190,24 @@ void print_func_declare(struct funcExtract::FuncTy_t funcTy,
 }
 
 
-void print_rst_values() {
-
+uint32_t convert_to_single_num(std::string numIn) {
+  std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");
+  if(numIn.find("+") == std::string::npos)
+    return hdb2int(numIn);
+  else {
+    std::vector<std::string> vec;
+    split_by(numIn, "+", vec);
+    uint32_t ret = 0;
+    for(std::string num : vec) {
+      std::smatch m;
+      if(!std::regex_match(num, m, pNum)) {
+        toCout("Error: does not match pNum: "+num);
+        abort();
+      }
+      std::string width = m.str(1);
+      uint32_t localVal = hdb2int(num);
+      ret = ret << width + localVal;
+    }
+    return ret;
+  }
 }

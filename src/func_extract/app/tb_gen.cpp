@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
   parse_verilog(g_path+"/design.v.clean");  
   determine_clk_rst();
   std::vector<std::map<std::string, 
-                       std::vector<std::string>>> toDoList
+                       std::vector<std::string>>> toDoList;
   if(!g_rand_sim) read_to_do_instr(g_path+"/tb.txt", toDoList);
   read_asv_info(g_path+"/asv_info.txt");
   vcd_parser(g_path+"/rst.vcd");  
@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
       }
       assign_value("u0."+reg, value);
       // print reset values
-      to_file("    $display( \""+reg+": %d\", u0."+toStr(value)+" );");
+      to_file("    $display( \""+reg+": %d\", "+toStr(value)+" );");
     }
   }
   to_file("");
@@ -152,8 +152,8 @@ int main(int argc, char *argv[]) {
       assign_random_sparse_instr();
   }
   else {
-    for(auto instr : toDoList) {
-      assign_instr(instr);
+    for(auto instrEncoding : toDoList) {
+      assign_instr(instrEncoding);
     }
   }
 
@@ -181,19 +181,20 @@ void assign_value(std::string var, uint32_t value) {
 }
 
 
-void assign_value(std::string var, std::string value) {
-  value = value_format_convert(value);
+void assign_value(std::string var, std::string value, bool rand) {
+  value = value_format_convert(value, rand);
   to_file("    "+var+" = "+value+" ;");
 }
 
 
 // convert 4'h1+4'h2 to { 4'h1, 4'h2 }
-std::string value_format_convert(std::string val) {
+std::string value_format_convert(std::string val, bool isRand) {
   std::regex pX("(\\d+)'[b|h][x|X]$");
   if(val.find("+") == std::string::npos) return val;
   remove_two_end_space(val);
   std::string ret = " { ";
   std::vector<std::string> vec;
+  vec.clear();
   split_by(val, "+", vec);
   // replace x with number value
   std::smatch m;
@@ -201,7 +202,7 @@ std::string value_format_convert(std::string val) {
     if(!std::regex_match(*it, m, pX)) continue;
     uint32_t width = std::stoi(m.str(1));
     uint32_t base = exp2(width);
-    uint32_t newVal = rand() %  base;
+    uint32_t newVal = rand() % base;
     std::string hexVal = dec2hex(std::to_string(newVal));
     *it = toStr(width)+"'h"+hexVal;
   }
@@ -220,6 +221,39 @@ void assign_random_sparse_instr() {
   uint32_t instrIdx = rand() % g_instrInfo.size();
   to_file("    // random instruction: "+toStr(instrIdx));  
   assign_instr(instrIdx);
+}
+
+
+void assign_instr(uint32_t instrIdx) {
+  auto instrInfo = g_instrInfo[instrIdx];
+
+  // first assign instruction encodings
+  uint32_t instrLen = instrInfo.instrEncoding.begin()->second.size();
+  assign_value("INSTR_IN_ZY", 1);
+  for(uint32_t i = 0; i < instrLen; i++) {
+    for(auto pair: instrInfo.instrEncoding) {
+      assign_value(pair.first, pair.second[i], true);
+    }
+    wait_time(cycleLen);    
+  }
+  assign_value("INSTR_IN_ZY", 0);  
+
+  // then assign nop instruction
+  uint32_t nopLen = instrInfo.delayBound - instrLen;
+  uint32_t i = 0;
+  for(auto pair : g_nopInstr) {
+    assign_value(pair.first, pair.second);
+  }
+  wait_time(nopLen*cycleLen);
+  // display all asv values
+
+  to_file("    $display( \"// "+instrInfo.name+"\" );");
+  for(auto pair : g_asv) {
+    std::string asv = pair.first;
+    uint32_t width = pair.second;
+    to_file("    $display( \""+asv+": %d\", u0."+asv+" );");
+  }
+  to_file("    $display(\"\\n\");");
 }
 
 
