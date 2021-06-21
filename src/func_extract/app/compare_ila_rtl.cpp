@@ -28,6 +28,7 @@ void read_rtl_values(std::string fileName) {
   std::ifstream input(fileName);
   std::string line;
   while(std::getline(input, line)) {
+    //toCout(line);
     if(line.find(":") != std::string::npos) {
       size_t pos = line.find(":");
       std::string regName = line.substr(0, pos);
@@ -53,7 +54,7 @@ void read_ila_values(std::string fileName) {
   std::ifstream input(fileName);
   std::string line;
   while(std::getline(input, line)) {
-    toCout(line);
+    //toCout(line);
     if(line.find("// instr") != std::string::npos) {
       // if see the start of an instruction.
       // check if all the vecs in the map has the same length
@@ -103,7 +104,7 @@ void compare_results() {
       uint32_t ilaVal = ilaValues[pair.first][idx];
       if(rtlVal != ilaVal) {
         toCout("Error: values differ for: "+pair.first+" in cycle: "+toStr(idx));
-        toCout("rst value: "+toStr(rtlVal));
+        toCout("rtl value: "+toStr(rtlVal));
         toCout("ila value: "+toStr(ilaVal));
       }
     }
@@ -119,5 +120,5 @@ uint32_t to_int(std::string value) {
     toCout("Error: see a non-number value: "+value);
     abort();
   }
-  else return std::stoi(value);
+  else return std::stol(value);
 }

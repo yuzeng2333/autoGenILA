@@ -6,6 +6,7 @@
 #include <math.h>
 #include <iostream>
 #include <fstream>
+#include <map>
 #define toStr(a) std::to_string(a)
 
 using namespace funcExtract;
@@ -13,6 +14,7 @@ using namespace taintGen;
 
 int InstrNum = 10;
 std::regex pX("(\\d+)'[b|h][x|X]$");
+std::map<std::string, std::string> regValueMap;
 
 std::string materialize_num(std::string val) {
   assert(val.find("+") == std::string::npos);
@@ -59,19 +61,29 @@ std::string replace_x(std::string val) {
 void assign_instr_value(std::string var, std::string value, bool rand) {
   value = replace_x(value);
   to_file(""+var+" = "+value);
+  if(regValueMap.find(var) == regValueMap.end()) {
+    regValueMap.emplace(var, value);
+  }
+  else {
+    regValueMap[var] = value;
+  }
 }
 
 
 void make_instr(uint32_t instrIdx) {
   auto instrInfo = g_instrInfo[instrIdx];
 
+  // FIXME: currently assume 
   // first assign instruction encodings
   to_file("// instr: "+instrInfo.name);
   uint32_t instrLen = instrInfo.instrEncoding.begin()->second.size();
   for(uint32_t i = 0; i < instrLen; i++) {
     to_file("("+toStr(i)+")");
     for(auto pair: instrInfo.instrEncoding) {
-      assign_instr_value(pair.first, pair.second[i], true);
+      if(i == 0)
+        assign_instr_value(pair.first, pair.second[i], true);
+      else
+        assign_instr_value(pair.first, regValueMap[pair.first], true);
     }
   }
 }
