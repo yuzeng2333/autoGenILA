@@ -18,4 +18,4 @@ void print_func_declare(struct FuncTy_t funcTy,
                         std::string funcName, 
                         std::ofstream &header);
 
-uint32_t conert_to_single_num(std::string numIn);
+uint32_t convert_to_single_num(std::string numIn);

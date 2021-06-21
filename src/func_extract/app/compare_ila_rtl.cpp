@@ -1,5 +1,6 @@
 #include "../../taint_method/src/global_data.h"
 #include "../src/helper.h"
+#include "../src/util.h"
 #include "compare_ila_rtl.h"
 #define toStr(a) std::to_string(a)
 // This files is used to parse the results from ila simulation
@@ -15,7 +16,7 @@ uint32_t rtlValueLen = 0;
 
 int main(int argc, char *argv[]) {
   g_path = argv[1];
-
+  read_asv_info(g_path+"/asv_info.txt");
   read_rtl_values(g_path+"/rtl_results.txt");
   read_ila_values(g_path+"/ila_results.txt");
 
@@ -30,6 +31,7 @@ void read_rtl_values(std::string fileName) {
     if(line.find(":") != std::string::npos) {
       size_t pos = line.find(":");
       std::string regName = line.substr(0, pos);
+      if(g_asv.find(regName) == g_asv.end()) continue;
       regName = var_name_convert(regName);
       std::string value = line.substr(pos+1);
       remove_two_end_space(value);
@@ -94,6 +96,10 @@ void compare_results() {
   while(idx < rtlValueLen) {
     for(auto pair : rtlValues) {
       uint32_t rtlVal = pair.second[idx];
+      if(ilaValues.find(pair.first) == ilaValues.end()) {
+        toCout("Error: cannot find in ilaValues: "+pair.first);
+        abort();
+      }
       uint32_t ilaVal = ilaValues[pair.first][idx];
       if(rtlVal != ilaVal) {
         toCout("Error: values differ for: "+pair.first+" in cycle: "+toStr(idx));
@@ -103,7 +109,7 @@ void compare_results() {
     }
     idx++;
   }
-  toCout("All simulation results are the same!!!");
+  toCout("All simulation results are the same!!! number of comparison: "+toStr(idx));
 }
 
 

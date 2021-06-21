@@ -130,9 +130,13 @@ bool is_compatible(const std::vector<std::string> &multiCycleValue1,
                    const std::vector<std::string> &multiCycleValue2) {
   std::vector<std::string> valueVec1;
   std::vector<std::string> valueVec2;
+  valueVec1.clear();
+  valueVec2.clear();
   assert(multiCycleValue1.size() == multiCycleValue2.size());
   uint32_t size = multiCycleValue1.size();
   for(uint32_t i = 0; i < size; i++) {
+    valueVec1.clear();
+    valueVec2.clear();
     std::string singleValue1 = multiCycleValue1[i];
     std::string singleValue2 = multiCycleValue2[i];
     split_by(singleValue1, "+", valueVec1);
@@ -151,9 +155,10 @@ bool is_compatible(const std::vector<std::string> &multiCycleValue1,
 
 bool same_value(std::string val1, std::string val2) {
   std::smatch m;
+  std::regex pX("(\\d+)'(d|h|b)x");
+  std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");
   if(is_x(val1)) {
-    std::regex pX("(\\d+)'([dhb])x");
-    std::regex pNum("(\\d+)'([dhb])([0-9a-fA-Fx]+)");
+
     if(!std::regex_match(val1, m, pX)) {
       toCout("Error: val1 does not match x pattern: "+val1);
       abort();
@@ -168,27 +173,33 @@ bool same_value(std::string val1, std::string val2) {
     else return false;
   }
 
-  std::regex pNum("(\\d+)'([dhb])([0-9a-fA-F]+)");
-  if(std::regex_match(val1, m, pNum)) {
-    toCout("Error: val1 is not of correct format: "+val1);
-    abort();
-  }
-  std::string width1 = m.str(1);
-  std::string format1 = m.str(2);
-  std::string num1 = m.str(3);
+  //bool isZero = false;
+  //if(!std::regex_match(val1, m, pNum)) {
+  //  if(val1 == "0") {
+  //    isZero = true;
+  //  }
+  //  else {
+  //    toCout("Error: val1 is not of correct format: "+val1);
+  //    abort();
+  //  }
+  //}
+  //std::string width1 = m.str(1);
+  //std::string format1 = m.str(2);
+  //std::string num1 = m.str(3);
 
-  if(std::regex_match(val2, m, pNum)) {
-    toCout("Error: val2 is not of correct format: "+val2);
-    abort();
-  }
-  std::string width2 = m.str(1);
-  std::string format2 = m.str(2);
-  std::string num2 = m.str(3);
+  //if(!std::regex_match(val2, m, pNum)) {
+  //  if(val1 == "0") {
+  //    isZero = true;
+  //  }
+  //  else {
+  //    toCout("Error: val2 is not of correct format: "+val2);
+  //    abort();
+  //  }
+  //}
+  //std::string width2 = m.str(1);
+  //std::string format2 = m.str(2);
+  //std::string num2 = m.str(3);
 
-  if(width1 != width2) {
-    toCout("Error: two width are not the same: "+val1+", "+val2);
-    abort();
-  }
   uint32_t v1 = hdb2int(val1);
   uint32_t v2 = hdb2int(val2);
   return v1 == v2;

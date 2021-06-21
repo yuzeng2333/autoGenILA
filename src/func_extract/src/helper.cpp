@@ -1427,14 +1427,15 @@ void print_all_regs(const std::vector<std::pair<std::string, uint32_t>> &regWidt
   output.close();
 }
 
-std::string var_name_convert(std::string varName) {
+std::string var_name_convert(std::string varName, bool replaceSlash) {
   std::string ret;
   for(char c : varName) {
     if(std::isdigit(c)
        || is_letter(c))
        ret += c;
     else if(c == '\\') {
-      continue;
+      if(replaceSlash) ret += '_';
+      else continue;
     }
     else {
       // if is special character

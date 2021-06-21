@@ -204,9 +204,9 @@ uint32_t convert_to_single_num(std::string numIn) {
         toCout("Error: does not match pNum: "+num);
         abort();
       }
-      std::string width = m.str(1);
+      uint32_t width = std::stoi(m.str(1));
       uint32_t localVal = hdb2int(num);
-      ret = ret << width + localVal;
+      ret = (ret << width) + localVal;
     }
     return ret;
   }
