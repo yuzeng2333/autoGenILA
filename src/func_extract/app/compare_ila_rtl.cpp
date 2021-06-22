@@ -93,8 +93,8 @@ void read_ila_values(std::string fileName) {
 
 void compare_results() {
   uint32_t idx = 0;
-  assert(rtlValueLen == ilaValueLen);
-  while(idx < rtlValueLen) {
+  uint32_t len = std::min(rtlValueLen, ilaValueLen);
+  while(idx < len) {
     for(auto pair : rtlValues) {
       uint32_t rtlVal = pair.second[idx];
       if(ilaValues.find(pair.first) == ilaValues.end()) {
@@ -110,7 +110,12 @@ void compare_results() {
     }
     idx++;
   }
-  toCout("All simulation results are the same!!! number of comparison: "+toStr(idx));
+  if(rtlValueLen > len)
+    toCout("rtl results has longer length: "+toStr(rtlValueLen));
+  else if(ilaValueLen > len)
+    toCout("ila results has longer length: "+toStr(ilaValueLen));
+
+  toCout("Number of comparison: "+toStr(idx));
 }
 
 

@@ -251,7 +251,7 @@ void assign_instr(const std::map<std::string, std::vector<std::string>> &inputIn
  
   // if there are extraDelay, then continue wait with NOP
   if(instrInfo.extraDelay > 0)
-    wait_time(nopLen*instrInfo.extraDelay);
+    wait_time(g_cycleLen*instrInfo.extraDelay);
 
   to_file("    $display(\"\\n\");");
 }

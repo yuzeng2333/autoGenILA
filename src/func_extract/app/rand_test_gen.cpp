@@ -12,9 +12,15 @@
 using namespace funcExtract;
 using namespace taintGen;
 
+std::ofstream g_output;
 int InstrNum = 10;
 std::regex pX("(\\d+)'[b|h][x|X]$");
 std::map<std::string, std::string> regValueMap;
+
+
+void to_file(std::string line) {
+  g_output << line << std::endl;
+}
 
 std::string materialize_num(std::string val) {
   assert(val.find("+") == std::string::npos);
