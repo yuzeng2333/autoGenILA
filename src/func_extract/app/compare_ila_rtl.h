@@ -10,4 +10,6 @@ void read_rtl_values(std::string fileName);
 
 void read_ila_values(std::string fileName);
 
+void align_map_size(std::map<std::string, std::vector<uint32_t>> &ilaValues);
+
 void compare_results();

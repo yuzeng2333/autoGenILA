@@ -58,19 +58,7 @@ void read_ila_values(std::string fileName) {
     if(line.find("// instr") != std::string::npos) {
       // if see the start of an instruction.
       // check if all the vecs in the map has the same length
-      uint32_t maxSize = 0;
-      for(auto it = ilaValues.begin(); it != ilaValues.end(); it++) {
-        if(it->second.size() > maxSize) maxSize = it->second.size();
-      }
-      for(auto it = ilaValues.begin(); it != ilaValues.end(); it++) {
-        uint32_t size = it->second.size();
-        if(size < maxSize) {
-          if(size + 1 != maxSize) {
-            
-          }
-          it->second.push_back(it->second.back());
-        }
-      }
+      align_map_size(ilaValues);
     }
     else if(line.find(":") != std::string::npos) {
       size_t pos = line.find(":");
@@ -88,6 +76,24 @@ void read_ila_values(std::string fileName) {
       ilaValueLen = std::max(ilaValueLen, uint32_t(ilaValues[regName].size()) );
     }
   }
+  align_map_size(ilaValues);
+}
+
+
+void align_map_size(std::map<std::string, std::vector<uint32_t>> &ilaValues) {
+  uint32_t maxSize = 0;
+  for(auto it = ilaValues.begin(); it != ilaValues.end(); it++) {
+    if(it->second.size() > maxSize) maxSize = it->second.size();
+  }
+  for(auto it = ilaValues.begin(); it != ilaValues.end(); it++) {
+    uint32_t size = it->second.size();
+    if(size < maxSize) {
+      if(size + 1 != maxSize) {
+        toCout("Error: sizes are missed by more than 1");
+      }
+      it->second.push_back(it->second.back());
+    }
+  }
 }
 
 
@@ -96,6 +102,8 @@ void compare_results() {
   uint32_t len = std::min(rtlValueLen, ilaValueLen);
   while(idx < len) {
     for(auto pair : rtlValues) {
+      if(idx == 10 && pair.first == "mem_wdata")
+        toCout("Find it!");
       uint32_t rtlVal = pair.second[idx];
       if(ilaValues.find(pair.first) == ilaValues.end()) {
         toCout("Error: cannot find in ilaValues: "+pair.first);

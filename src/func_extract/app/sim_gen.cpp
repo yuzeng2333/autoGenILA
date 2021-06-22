@@ -154,6 +154,7 @@ std::string func_call(std::string writeASV, std::string funcName,
         toCout("Warning: instruction spans mulitple cycles!");
       }
       argValue = (inputInstr[arg]).front();
+      //argValue = "7'h4+5'h7+5'h13+3'h2+5'h12+5'h8+2'b11";
       uint32_t intValue = convert_to_single_num(argValue);
       argValue = toStr(intValue);
     }
