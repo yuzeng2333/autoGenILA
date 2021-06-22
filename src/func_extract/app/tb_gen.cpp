@@ -23,6 +23,7 @@
 using namespace funcExtract;
 using namespace taintGen;
 
+bool g_use_event_driven = true;
 std::ofstream g_output;
 uint32_t g_cycleLen = 10;
 bool g_rand_sim = false;
@@ -224,6 +225,7 @@ void assign_instr(const std::map<std::string, std::vector<std::string>> &inputIn
 
   // first assign instruction encodings
   uint32_t instrLen = instrInfo.instrEncoding.begin()->second.size();
+  if(g_use_event_driven) to_file("    @(posedge issue_instr)");
   assign_value("INSTR_IN_ZY", 1);
   for(uint32_t i = 0; i < instrLen; i++) {
     for(auto pair: inputInstr) {
@@ -233,27 +235,29 @@ void assign_instr(const std::map<std::string, std::vector<std::string>> &inputIn
   }
   assign_value("INSTR_IN_ZY", 0);  
 
-  // then assign nop instruction
-  uint32_t nopLen = instrInfo.delayBound - instrLen;
-  uint32_t i = 0;
-  for(auto pair : g_nopInstr) {
-    assign_value(pair.first, pair.second);
-  }
-  wait_time(nopLen*g_cycleLen);
-  // display all asv values
+  if(!g_use_event_driven) {
+    // then assign nop instruction
+    uint32_t nopLen = instrInfo.delayBound - instrLen;
+    uint32_t i = 0;
+    for(auto pair : g_nopInstr) {
+      assign_value(pair.first, pair.second);
+    }
+    wait_time(nopLen*g_cycleLen);
+    // display all asv values
 
-  to_file("    $display( \"// "+instrInfo.name+"\" );");
-  for(auto pair : g_asv) {
-    std::string asv = pair.first;
-    uint32_t width = pair.second;
-    to_file("    $display( \""+asv+": %d\", u0."+asv+" );");
-  }
+    to_file("    $display( \"// "+instrInfo.name+"\" );");
+    for(auto pair : g_asv) {
+      std::string asv = pair.first;
+      uint32_t width = pair.second;
+      to_file("    $display( \""+asv+": %d\", u0."+asv+" );");
+    }
  
-  // if there are extraDelay, then continue wait with NOP
-  if(instrInfo.extraDelay > 0)
-    wait_time(g_cycleLen*instrInfo.extraDelay);
+    // if there are extraDelay, then continue wait with NOP
+    if(instrInfo.extraDelay > 0)
+      wait_time(g_cycleLen*instrInfo.extraDelay);
 
-  to_file("    $display(\"\\n\");");
+    to_file("    $display(\"\\n\");");
+  }
 }
 
 
