@@ -175,12 +175,14 @@ std::string func_call(std::string writeASV, std::string funcName,
 void print_func_declare(struct funcExtract::FuncTy_t funcTy, 
                         std::string funcName, 
                         std::ofstream &header) {
-  std::string ret = asv_type(funcTy.retTy) + " " + funcName + " ( ";
+  std::string funcNameSimp = var_name_convert(funcName, true);
+  std::string ret = asv_type(funcTy.retTy) + " " + funcNameSimp + " ( ";
   for(auto pair : funcTy.argTy) {
     uint32_t width = pair.first;
     std::string argType = asv_type(width);
     std::string argName = pair.second;
-    ret = ret + argType + " " + argName + ", ";
+    std::string argNameSimp = var_name_convert(argName, true);
+    ret = ret + argType + " " + argNameSimp + ", ";
   }
   if(funcTy.argTy.size() > 0) {
     ret.pop_back();

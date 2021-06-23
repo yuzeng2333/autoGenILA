@@ -15,7 +15,34 @@ using namespace taintGen;
 std::ofstream g_output;
 int InstrNum = 10;
 std::regex pX("(\\d+)'[b|h][x|X]$");
+std::regex pHex("(\\d+)'h([0-9a-fA-F]+)$");
 std::map<std::string, std::string> regValueMap;
+
+
+//std::string correct_hex(std::string hexValue) {
+//  std::smatch m;
+//  if(!std::regex_match(hexVal, m, pHex)) {
+//    toCout("Error: input number does not match pHex");
+//    abort();
+//  }
+//  uint32_t width = std::stoi(m.str(1));
+//  std::string num = m.str(2);
+//  if(width <= 4) assert(num.size() == 1);
+//  else if(width == 5) {
+//    if(num.substr(0, 1) != "1") 
+//      num = "1"+num.substr(1);
+//  }
+//  else if(width == 6) {
+//    uint32_t msb = std::stoi(num.substr(0, 1));
+//    if(msb > 3) 
+//      num = "3"+num.substr(1);
+//  }
+//  else if(width == 7) {
+//    uint32_t msb = std::stoi(num.substr(0, 1));
+//    if(msb > 3) 
+//      num = "3"+num.substr(1);
+//  }
+//}
 
 
 void to_file(std::string line) {
@@ -33,7 +60,7 @@ std::string materialize_num(std::string val) {
     }
     uint32_t width = std::stoi(m.str(1));
     uint32_t randVal = rand() % (2 << width);
-    std::string hexVal = dec2hex(std::to_string(randVal));
+    std::string hexVal = dec2hex(randVal);
     return toStr(width)+"'h"+hexVal;
   }
 }
@@ -55,7 +82,7 @@ std::string replace_x(std::string val) {
       uint32_t width = std::stoi(m.str(1));
       uint32_t base = exp2(width);
       uint32_t newVal = rand() % base;
-      std::string hexVal = dec2hex(std::to_string(newVal));
+      std::string hexVal = dec2hex(newVal);
       *it = toStr(width)+"'h"+hexVal;
     }
     ret = merge_with(vec, "+");
