@@ -264,7 +264,7 @@ void read_in_instructions(std::string fileName) {
       g_instrInfo.back().delayBound = std::stoi(delay);
       continue;
     }
-    if(line.substr(0,6) == "#extraDelay") {
+    if(line.substr(0,11) == "#extraDelay") {
       std::string delay = line.substr(12);
       remove_two_end_space(delay);
       g_instrInfo.back().extraDelay = std::stoi(delay);
@@ -329,7 +329,7 @@ void read_in_instructions(std::string fileName) {
                                         std::set<std::string>{}, 
                                         std::set<std::pair<uint32_t, std::string>>{}, 
                                         std::set<std::string>{},
-                                        std::vector<std::string>{}, 0, 0, 1, g_instrName};
+                                        std::vector<std::string>{}, 0, 0, 0, 1, g_instrName};
               //info.instrEncoding.emplace(signalName, encoding);
               g_instrInfo.push_back(info);
             }

@@ -291,9 +291,9 @@ void print_llvm_script(const std::vector<std::string> &fileNameVec,
                        std::string fileName) {
   std::ofstream output(fileName);
   output << "clang ila.c -emit-llvm -S -o main.ll" << std::endl;
-  std::string line = "llvm-link -v main.ll ";
+  std::string line = "llvm-link -v main.ll \\";
   for(std::string file : fileNameVec)
-    line = line + file + " ";
+    line = line + file + " \\";
   line = line + "-S -o linked.ll";
   output << line << std::endl;
   output << "clang linked.ll" << std::endl;

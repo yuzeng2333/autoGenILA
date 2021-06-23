@@ -247,7 +247,7 @@ void print_llvm_ir(DestInfo &destInfo,
     }
   // return types
   llvm::Type* retTy = destInfo.get_ret_type();
-  std::string destSimpleName = var_name_convert(destName);
+  std::string destSimpleName = var_name_convert(destName, true);
 
   llvm::FunctionType *FT =
     llvm::FunctionType::get(retTy, argTy, false);
