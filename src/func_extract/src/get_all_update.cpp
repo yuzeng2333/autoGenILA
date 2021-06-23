@@ -125,8 +125,8 @@ void get_all_update() {
       std::string llvmFileName = instrInfo.name+"_"+destInfo.get_dest_name()
                                  +"_"+toStr(delayBound)+".ll";
       system(("mv "+g_path+"/clean.simp.ll "+g_path+"/"+llvmFileName).c_str());
-      fileNameVec.push_back(llvmFileName);
       if(usefulFunc) {
+        fileNameVec.push_back(llvmFileName);        
         toCout("----- For instr "+instrInfo.name+", "+target+" is affected!");
         if(dependVarMap[instrName].find(target) == dependVarMap[instrName].end())
           dependVarMap[instrName].emplace(target, argVec);
