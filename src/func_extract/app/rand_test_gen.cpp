@@ -4,6 +4,8 @@
 #include "../../taint_method/src/global_data.h"
 #include "../src/global_data_struct.h"
 #include <math.h>
+#include <time.h>
+#include <stdlib.h>
 #include <iostream>
 #include <fstream>
 #include <map>
@@ -127,7 +129,8 @@ int main(int argc, char *argv[]) {
   g_verb = false;
   read_in_instructions(g_path+"/instr.txt");
   g_output.open(g_path+"/tb.txt", std::ios::out);
-  
+  srand(time(NULL));
+
   uint32_t idx = 0;
   while(idx++ < InstrNum) {
     uint32_t instrIdx = rand() % g_instrInfo.size();
