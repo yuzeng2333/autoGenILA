@@ -25,3 +25,5 @@ void print_instr_calls(std::map<std::string,
                                 std::vector<std::string>> &encoding,
                        std::string prefix,
                        std::ofstream &cpp);
+
+void update_asvs(std::ofstream &cpp, std::string prefix);
