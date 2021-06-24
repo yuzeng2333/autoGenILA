@@ -1,6 +1,7 @@
 #include <set>
 #include <string>
 #include <map>
+#include <cmath>
 #include <vector>
 #include "../src/parse_fill.h"
 
@@ -19,3 +20,7 @@ void print_func_declare(struct FuncTy_t funcTy,
                         std::ofstream &header);
 
 uint32_t convert_to_single_num(std::string numIn);
+
+void print_instr_calls(std::map<std::string, 
+                                std::vector<std::string>> &encoding,
+                       std::ofstream &cpp);

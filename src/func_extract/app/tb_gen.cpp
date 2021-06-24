@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
     uint32_t width = get_var_slice_width_simp(out, topModInfo);
     print_wire(width, out);
   }
-  to_file("  string instr_name;"); 
+  //to_file("  string instr_name;"); 
 
   to_file("  \nalways #"+toStr(g_cycleLen/2)+" "+clk+" = ~"+clk+" ;\n");
 
@@ -227,7 +227,7 @@ void assign_instr(const std::map<std::string, std::vector<std::string>> &inputIn
   uint32_t instrLen = instrInfo.instrEncoding.begin()->second.size();
   if(g_use_event_driven) to_file("    @(posedge issue_instr)");
   assign_value("INSTR_IN_ZY", 1);
-  to_file("    instr_name = \""+instrInfo.name+"\" ;");
+  //to_file("    instr_name = \""+instrInfo.name+"\" ;");
   for(uint32_t i = 0; i < instrLen; i++) {
     for(auto pair: inputInstr) {
       assign_value(pair.first, pair.second[i]);
@@ -247,7 +247,7 @@ void assign_instr(const std::map<std::string, std::vector<std::string>> &inputIn
     // display all asv values
 
     to_file("    $display( \"// "+instrInfo.name+"\" );");
-    to_file("    instr_name = "+instrInfo.name+" ;");
+    //to_file("    instr_name = "+instrInfo.name+" ;");
     for(auto pair : g_asv) {
       std::string asv = pair.first;
       uint32_t width = pair.second;

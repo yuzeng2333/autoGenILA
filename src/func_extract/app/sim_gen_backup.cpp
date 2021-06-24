@@ -17,9 +17,6 @@ using namespace taintGen;
 /// These data is to be filled by reading a previously generated file
 // key is the asv name, value is its bit number
 
-bool g_use_mem = true;
-std::string g_instrValueVar = "mem_rdata";
-std::string g_memAddrVar = "mem_addr";
 std::map<std::string, std::string> rstValMap;
 std::vector<std::map<std::string, 
                      std::vector<std::string>>> toDoList;
@@ -73,8 +70,6 @@ int main(int argc, char *argv[]) {
     cpp << ret << std::endl;
   }
   cpp << std::endl;
-
-  // initialization of regs
   cpp << "  printf( \" // Initialization \\n\" );" << std::endl;
   for(auto pair : rstValMap) {
     std::string reg = var_name_convert(pair.first, true);
@@ -83,43 +78,30 @@ int main(int argc, char *argv[]) {
   cpp << std::endl;
 
 
-  if(g_use_mem) {
-    // declare memories
-    uint32_t instrNum = toDoList.size();
-    uint32_t instrNumBits = ceil(log2(instrNum));
-    cpp << "  int mem["+toStr(instrNum)+"];" << std::endl;
-    uint32_t idx = 0;
-    for(auto encoding: toDoList) {
-      uint32_t intValue = convert_to_single_num(encoding[g_instrValueVar].front());    
-      cpp << "  mem["+toStr(idx++)+"] = "+toStr(intValue)+" ;" << std::endl;
+  // update asvs according to instructions
+  for(auto encoding : toDoList) {
+    std::string instrName = decode(encoding);
+    uint32_t idx = get_instr_by_name(instrName);
+    auto instrInfo = g_instrInfo[idx];    
+    cpp << "  // instr"+toStr(idx)+": "+instrInfo.name << std::endl;
+    cpp << "  printf( \"// instr"+toStr(idx)+": "+instrInfo.name+"\\n \");" << std::endl;
+    for(auto pair : instrInfo.funcTypes) {
+      std::string writeASV = pair.first;
+      writeASV = var_name_convert(writeASV, true);
+      std::string funcName = instrInfo.name + CNCT + writeASV;
+      // should replace the input-type arg in the function call with explicit values 
+      // in the instruction
+      std::string funcCall = func_call(writeASV, funcName, pair.second.argTy, encoding);
+      cpp << funcCall << std::endl;
+      cpp << "  printf( \""+writeASV+": %ld\\n\", "+writeASV+" );" << std::endl;
+      cpp << std::endl;
     }
+    cpp << "  printf( \"\\n\" );" << std::endl;
     cpp << std::endl;
-
-    // by default, execute number of 'instrNum' instructions
-    cpp << "  int addr ;" << std::endl;
-    cpp << "  int mem_rdata;" << std::endl;
-    cpp << std::endl;
-    cpp << "  for(int i = 0; i < "+toStr(instrNum)+"; i++) {" << std::endl;
-    cpp << "    addr = "+g_memAddrVar+" % "+toStr(instrNum)+";" << std::endl;
-    cpp << "    mem_rdata = mem[addr];" << std::endl;
-    cpp << "    switch(addr) {" <<std::endl;
-    idx = 0;
-    for(auto encoding: toDoList) {
-    cpp << "      case "+toStr(idx++)+" :" << std::endl;
-    print_instr_calls(encoding, cpp);
-    cpp << "        break;" << std::endl;
-    }
-    cpp << "    }" <<std::endl;    
-    cpp << "  }" << std::endl;
-  }
-  else {
-    // update asvs according to instructions
-    for(auto encoding : toDoList) {
-      print_instr_calls(encoding, cpp);
-    }
   }
 
-  cpp << "}" << std::endl; // end of main function
+  cpp << "}" << std::endl;
+
 
   // generate header file for update functions
   for(auto instrInfo : g_instrInfo) {
@@ -133,30 +115,6 @@ int main(int argc, char *argv[]) {
   cpp.close();
   header.close();
   return 0;
-}
-
-
-void print_instr_calls(std::map<std::string, 
-                                std::vector<std::string>> &encoding,
-                       std::ofstream &cpp) {
-  std::string instrName = decode(encoding);
-  uint32_t idx = get_instr_by_name(instrName);
-  auto instrInfo = g_instrInfo[idx];    
-  cpp << "  // instr"+toStr(idx)+": "+instrInfo.name << std::endl;
-  cpp << "  printf( \"// instr"+toStr(idx)+": "+instrInfo.name+"\\n \");" << std::endl;
-  for(auto pair : instrInfo.funcTypes) {
-    std::string writeASV = pair.first;
-    writeASV = var_name_convert(writeASV, true);
-    std::string funcName = instrInfo.name + CNCT + writeASV;
-    // should replace the input-type arg in the function call with explicit values 
-    // in the instruction
-    std::string funcCall = func_call(writeASV, funcName, pair.second.argTy, encoding);
-    cpp << funcCall << std::endl;
-    cpp << "  printf( \""+writeASV+": %ld\\n\", "+writeASV+" );" << std::endl;
-    cpp << std::endl;
-  }
-  cpp << "  printf( \"\\n\" );" << std::endl;
-  cpp << std::endl;
 }
 
 
