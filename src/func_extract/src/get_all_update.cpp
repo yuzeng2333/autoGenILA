@@ -8,6 +8,8 @@
 
 namespace funcExtract {
 
+// TODO: choose these options!
+bool g_push_new_target = false;
 // the first key is instr name, the second key is target name
 std::map<std::string, 
          std::map<std::string, 
@@ -70,7 +72,7 @@ void get_all_update() {
 
   // declaration for llvm
   TheContext = std::make_unique<llvm::LLVMContext>();
-  std::ofstream funcInfo(g_path+"/func_info.txt");
+  std::ofstream funcInfo(g_path+"/func_info.txt", std::ios::app);
   std::ofstream asvInfo(g_path+"/asv_info.txt");
   std::vector<std::string> fileNameVec;  
   while(!workSet.empty()) {
@@ -85,7 +87,8 @@ void get_all_update() {
        || g_skippedOutput.find(target) != g_skippedOutput.end())
       continue;
     DestInfo destInfo;
-    if(target.find(".") == std::string::npos)
+    if(target.find(".") == std::string::npos 
+       || target.substr(0, 1) == "\\")
       destInfo.set_dest_and_slice(target);
     else {
       auto pair = split_module_asv(target);
@@ -179,7 +182,7 @@ void get_all_update() {
            || reg.find("cpuregs[29]") != std::string::npos
            || reg.find("cpuregs[30]") != std::string::npos)
             continue;
-        workSet.insert(reg);
+        if(g_push_new_target) workSet.insert(reg);
         // TODO:
         asvSet.emplace(reg, pair.second);
         addedWorkSetFile << reg << std::endl;
@@ -302,9 +305,12 @@ void print_llvm_script(const std::vector<std::string> &fileNameVec,
   std::ofstream output(fileName);
   output << "clang ila.c -emit-llvm -S -o main.ll" << std::endl;
   std::string line = "llvm-link -v main.ll \\";
-  for(std::string file : fileNameVec)
-    line = line + file + " \\";
-  line = line + "-S -o linked.ll";
+  output << line << std::endl;
+  for(std::string file : fileNameVec) {
+    line = file + " \\";
+    output << line << std::endl;
+  }
+  line = "-S -o linked.ll";
   output << line << std::endl;
   output << "clang linked.ll" << std::endl;
   output.close();

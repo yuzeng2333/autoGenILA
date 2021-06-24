@@ -73,6 +73,10 @@ void read_func_info(std::string fileName) {
     }
     else if(line.substr(0, 7) == "Target:") {
       target = line.substr(7);
+      if(g_asv.find(target) == g_asv.end()) {
+        toCout("Error: cannot find in g_asv: "+target);
+        abort();
+      }
       uint32_t targetWidth = g_asv[target];
       if(g_instrInfo[idx].funcTypes.find(target) 
            != g_instrInfo[idx].funcTypes.end()) {

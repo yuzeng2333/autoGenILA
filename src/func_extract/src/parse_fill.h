@@ -40,6 +40,7 @@ struct InstrInfo_t {
   std::string name;
   // key is writeASV. Each instruction might update multiple ASVs
   std::map<std::string, FuncTy_t> funcTypes;
+  std::string memAddr;
 };
 
 

@@ -270,6 +270,12 @@ void read_in_instructions(std::string fileName) {
       g_instrInfo.back().extraDelay = std::stoi(delay);
       continue;
     }
+    if(line.substr(0, 8) == "#memAddr") {
+      std::string memAddr = line.substr(9);
+      remove_two_end_space(delay);
+      g_instrInfo.back().memAddr = memAddr;
+      continue;
+    }
     if(line.back() == ' ')
       line.pop_back();
     if(line.front() == '#') { // a new instr begins
