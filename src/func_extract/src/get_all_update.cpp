@@ -32,6 +32,14 @@ void get_all_update() {
   std::ofstream visitedTgtFile;
   visitedTgtFile.open(g_path+"/visited_target.txt", std::ios_base::app);
 
+  std::set<std::string> allowedTgt;
+  std::ifstream allowedTgtInFile(g_path+"/allowed_target.txt");
+  while(std::getline(allowedTgtInFile, line)) {
+    remove_two_end_space(line);
+    allowedTgt.insert(line);
+  }
+  allowedTgtInFile.close();
+
   std::ifstream addedWorkSetInFile(g_path+"/added_work_set.txt");
   auto topModuleInfo = g_moduleInfoMap[g_topModule];
   std::set<std::string> workSet;
@@ -57,6 +65,8 @@ void get_all_update() {
   std::ofstream addedWorkSetFile;
   addedWorkSetFile.open(g_path+"/added_work_set.txt", std::ios_base::app);
 
+  if(!allowedTgt.empty())
+    workSet = allowedTgt;
 
   // declaration for llvm
   TheContext = std::make_unique<llvm::LLVMContext>();

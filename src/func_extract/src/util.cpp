@@ -120,6 +120,9 @@ std::string decode(const std::map<std::string, std::vector<std::string>> &inputI
     if(isCompatible) return instr.name;
   }
   toCout("Error: input instruction cannot be decoded!");
+  for(auto pair : inputInstr) {
+    toCout(pair.first+": "+pair.second.front());
+  }
   abort();
 }
 
