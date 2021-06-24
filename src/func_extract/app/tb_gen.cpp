@@ -73,7 +73,8 @@ int main(int argc, char *argv[]) {
   }
   //to_file("  string instr_name;"); 
 
-  to_file("  \nalways #"+toStr(g_cycleLen/2)+" "+clk+" = ~"+clk+" ;\n");
+  to_file("\n");
+  to_file("  always #"+toStr(g_cycleLen/2)+" "+clk+" = ~"+clk+" ;\n");
 
   // module instantiation
   to_file("  "+topModInfo->name+" u0 (");

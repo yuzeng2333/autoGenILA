@@ -25,7 +25,7 @@ using namespace taintGen;
 
 bool g_use_mem = true;
 std::string g_instrValueVar = "mem_rdata";
-std::string g_memAddrVar = "mem_addr";
+std::string g_memAddrVar = "zy_mem_addr";
 std::string nxt = "_nxt";
 std::map<std::string, std::string> rstValMap;
 std::vector<std::map<std::string, 
@@ -35,6 +35,8 @@ std::vector<std::map<std::string,
 std::map<std::string, std::string> g_asvTy;
 std::string CNCT = "_";
 
+
+// the second argument is the number of instructions
 int main(int argc, char *argv[]) {
   g_path = argv[1];
   g_verb = false;
@@ -42,6 +44,11 @@ int main(int argc, char *argv[]) {
   read_asv_info(g_path+"/asv_info.txt");
   read_func_info(g_path+"/func_info.txt");
   read_to_do_instr(g_path+"/tb.txt", toDoList);
+  uint32_t instrNum;
+  if(argc < 2) 
+    instrNum = toDoList.size();
+  else
+    instrNum = std::stoi(argv[2]);
 
   std::ofstream header(g_path+"/ila.h");
   std::ofstream cpp(g_path+"/ila.c");
@@ -56,6 +63,7 @@ int main(int argc, char *argv[]) {
   // asv declarations
   for(auto pair : g_asv) {
     std::string asv = pair.first;
+    toCout(asv);
     std::string asvSimp = var_name_convert(asv, true);
     uint32_t width = pair.second;   
     std::string asvTy = asv_type(width);
@@ -94,8 +102,9 @@ int main(int argc, char *argv[]) {
 
   if(g_use_mem) {
     // declare memories
-    uint32_t instrNum = toDoList.size();
     uint32_t instrNumBits = ceil(log2(instrNum));
+    // actually the declaration and initialization of mem is not necessarily
+    // but for convenience of reference, I keep thse code
     cpp << "  int mem["+toStr(instrNum)+"];" << std::endl;
     uint32_t idx = 0;
     for(auto encoding: toDoList) {
@@ -109,7 +118,7 @@ int main(int argc, char *argv[]) {
     cpp << std::endl;
     cpp << "  for(int i = 0; i < "+toStr(instrNum)+"; i++) {" << std::endl;
     cpp << "    addr = "+g_memAddrVar+" % "+toStr(instrNum)+";" << std::endl;
-    cpp << "    mem_rdata = mem[addr];" << std::endl;
+    //cpp << "    mem_rdata = mem[addr];" << std::endl;
     cpp << "    switch(addr) {" <<std::endl;
     idx = 0;
     for(auto encoding: toDoList) {
@@ -159,6 +168,7 @@ void print_instr_calls(std::map<std::string,
   auto instrInfo = g_instrInfo[idx];    
   cpp << prefix+"  // instr"+toStr(idx)+": "+instrInfo.name << std::endl;
   cpp << prefix+"  printf( \"// instr"+toStr(idx)+": "+instrInfo.name+"\\n \");" << std::endl;
+  std::string  memAddr = instrInfo.memAddr;
   for(auto pair : instrInfo.funcTypes) {
     std::string writeASV = pair.first;
     writeASV = var_name_convert(writeASV, true);
@@ -169,6 +179,12 @@ void print_instr_calls(std::map<std::string,
     cpp << prefix+funcCall << std::endl;
     cpp << prefix+"  printf( \""+writeASV+": %ld\\n\", "+writeASV+" );" << std::endl;
     cpp << std::endl;
+    if(writeASV == memAddr) {
+      funcCall = func_call(memAddr, funcName, pair.second.argTy, encoding);
+      cpp << prefix+funcCall << std::endl;
+      cpp << prefix+"  printf( \""+memAddr+": %ld\\n\", "+memAddr+" );" << std::endl;
+      cpp << std::endl;
+    }
   }
   cpp << prefix+"  printf( \"\\n\" );" << std::endl;
   cpp << std::endl;
