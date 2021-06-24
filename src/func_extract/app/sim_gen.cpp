@@ -45,10 +45,7 @@ int main(int argc, char *argv[]) {
   read_func_info(g_path+"/func_info.txt");
   read_to_do_instr(g_path+"/tb.txt", toDoList);
   uint32_t instrNum;
-  if(argc < 2) 
-    instrNum = toDoList.size();
-  else
-    instrNum = std::stoi(argv[2]);
+  instrNum = toDoList.size();
 
   std::ofstream header(g_path+"/ila.h");
   std::ofstream cpp(g_path+"/ila.c");
@@ -89,6 +86,7 @@ int main(int argc, char *argv[]) {
     ret = "  "+asvTy+" "+asvSimp+nxt+" = "+rstVal+";";
     cpp << ret << std::endl;
   }
+  cpp << "  int "+g_memAddrVar+" ;" << std::endl;
   cpp << std::endl;
 
   // initialization of regs
@@ -168,21 +166,21 @@ void print_instr_calls(std::map<std::string,
   auto instrInfo = g_instrInfo[idx];    
   cpp << prefix+"  // instr"+toStr(idx)+": "+instrInfo.name << std::endl;
   cpp << prefix+"  printf( \"// instr"+toStr(idx)+": "+instrInfo.name+"\\n \");" << std::endl;
-  std::string  memAddr = instrInfo.memAddr;
+  std::string  memAddr = var_name_convert(instrInfo.memAddr, true);
   for(auto pair : instrInfo.funcTypes) {
     std::string writeASV = pair.first;
     writeASV = var_name_convert(writeASV, true);
     std::string funcName = instrInfo.name + CNCT + writeASV;
     // should replace the input-type arg in the function call with explicit values 
     // in the instruction
-    std::string funcCall = func_call(writeASV, funcName, pair.second.argTy, encoding);
+    std::string funcCall = func_call(writeASV+nxt, funcName, pair.second.argTy, encoding);
     cpp << prefix+funcCall << std::endl;
     cpp << prefix+"  printf( \""+writeASV+": %ld\\n\", "+writeASV+" );" << std::endl;
     cpp << std::endl;
     if(writeASV == memAddr) {
-      funcCall = func_call(memAddr, funcName, pair.second.argTy, encoding);
+      funcCall = func_call(g_memAddrVar, funcName, pair.second.argTy, encoding);
       cpp << prefix+funcCall << std::endl;
-      cpp << prefix+"  printf( \""+memAddr+": %ld\\n\", "+memAddr+" );" << std::endl;
+      cpp << prefix+"  printf( \""+g_memAddrVar+": %ld\\n\", "+g_memAddrVar+" );" << std::endl;
       cpp << std::endl;
     }
   }
@@ -218,7 +216,7 @@ std::string asv_type(uint32_t width) {
 std::string func_call(std::string writeASV, std::string funcName, 
                       const std::vector<std::pair<uint32_t, std::string>> &argTy,
                       std::map<std::string, std::vector<std::string>> &inputInstr) {
-  std::string ret = "  "+writeASV+nxt+" = "+funcName+"( ";
+  std::string ret = "  "+writeASV+" = "+funcName+"( ";
   for(auto pair: argTy) {
     std::string arg = pair.second;
     std::string argValue;

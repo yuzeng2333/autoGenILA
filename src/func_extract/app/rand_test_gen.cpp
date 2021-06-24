@@ -126,6 +126,11 @@ void make_instr(uint32_t instrIdx) {
 
 int main(int argc, char *argv[]) {
   g_path = argv[1];
+  if(argc < 2) {
+    toCout("Error: number of instructions is not set!");
+    abort();
+  }
+  InstrNum = std::stoi(argv[2]);
   g_verb = false;
   read_in_instructions(g_path+"/instr.txt");
   g_output.open(g_path+"/tb.txt", std::ios::out);
