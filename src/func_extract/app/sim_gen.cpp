@@ -106,7 +106,7 @@ int main(int argc, char *argv[]) {
     idx = 0;
     for(auto encoding: toDoList) {
     cpp << "      case "+toStr(idx++)+" :" << std::endl;
-    print_instr_calls(encoding, cpp);
+    print_instr_calls(encoding, "      ", cpp);
     cpp << "        break;" << std::endl;
     }
     cpp << "    }" <<std::endl;    
@@ -115,7 +115,7 @@ int main(int argc, char *argv[]) {
   else {
     // update asvs according to instructions
     for(auto encoding : toDoList) {
-      print_instr_calls(encoding, cpp);
+      print_instr_calls(encoding, "", cpp);
     }
   }
 
@@ -138,12 +138,13 @@ int main(int argc, char *argv[]) {
 
 void print_instr_calls(std::map<std::string, 
                                 std::vector<std::string>> &encoding,
+                       std::string prefix,
                        std::ofstream &cpp) {
   std::string instrName = decode(encoding);
   uint32_t idx = get_instr_by_name(instrName);
   auto instrInfo = g_instrInfo[idx];    
-  cpp << "  // instr"+toStr(idx)+": "+instrInfo.name << std::endl;
-  cpp << "  printf( \"// instr"+toStr(idx)+": "+instrInfo.name+"\\n \");" << std::endl;
+  cpp << prefix+"  // instr"+toStr(idx)+": "+instrInfo.name << std::endl;
+  cpp << prefix+"  printf( \"// instr"+toStr(idx)+": "+instrInfo.name+"\\n \");" << std::endl;
   for(auto pair : instrInfo.funcTypes) {
     std::string writeASV = pair.first;
     writeASV = var_name_convert(writeASV, true);
@@ -151,11 +152,11 @@ void print_instr_calls(std::map<std::string,
     // should replace the input-type arg in the function call with explicit values 
     // in the instruction
     std::string funcCall = func_call(writeASV, funcName, pair.second.argTy, encoding);
-    cpp << funcCall << std::endl;
-    cpp << "  printf( \""+writeASV+": %ld\\n\", "+writeASV+" );" << std::endl;
+    cpp << prefix+funcCall << std::endl;
+    cpp << prefix+"  printf( \""+writeASV+": %ld\\n\", "+writeASV+" );" << std::endl;
     cpp << std::endl;
   }
-  cpp << "  printf( \"\\n\" );" << std::endl;
+  cpp << prefix+"  printf( \"\\n\" );" << std::endl;
   cpp << std::endl;
 }
 
