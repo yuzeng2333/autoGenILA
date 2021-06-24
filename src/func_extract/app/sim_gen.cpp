@@ -11,6 +11,12 @@ using namespace funcExtract;
 using namespace taintGen;
 
 
+// TODO: declare two sets of variables: new var and old var
+// TODO: declare two sets of variables: new var and old var
+// TODO: declare two sets of variables: new var and old var
+// TODO: declare two sets of variables: new var and old var
+// TODO: declare two sets of variables: new var and old var
+
 // This function will generate a c++ simulation file
 // for a series of instructions. 
 
@@ -20,6 +26,7 @@ using namespace taintGen;
 bool g_use_mem = true;
 std::string g_instrValueVar = "mem_rdata";
 std::string g_memAddrVar = "mem_addr";
+std::string nxt = "_nxt";
 std::map<std::string, std::string> rstValMap;
 std::vector<std::map<std::string, 
                      std::vector<std::string>>> toDoList;
@@ -68,8 +75,10 @@ int main(int argc, char *argv[]) {
       rstVal = g_rstVal[noSlash];
     }
     rstVal = toStr(hdb2int(rstVal));
+    rstValMap.emplace(asv, rstVal);    
     std::string ret = "  "+asvTy+" "+asvSimp+" = "+rstVal+";";
-    rstValMap.emplace(asv, rstVal);
+    cpp << ret << std::endl;    
+    ret = "  "+asvTy+" "+asvSimp+nxt+" = "+rstVal+";";
     cpp << ret << std::endl;
   }
   cpp << std::endl;
@@ -108,15 +117,21 @@ int main(int argc, char *argv[]) {
     print_instr_calls(encoding, "      ", cpp);
     cpp << "        break;" << std::endl;
     }
-    cpp << "    }" <<std::endl;    
+    cpp << "    }" <<std::endl;
+    update_asvs(cpp, "    ");
     cpp << "  }" << std::endl;
   }
   else {
     // update asvs according to instructions
     for(auto encoding : toDoList) {
-      print_instr_calls(encoding, "", cpp);
+      print_instr_calls(encoding, "  ", cpp);
+      update_asvs(cpp, "  ");
     }
   }
+  cpp << std::endl;
+
+
+
 
   cpp << "}" << std::endl; // end of main function
 
@@ -187,7 +202,7 @@ std::string asv_type(uint32_t width) {
 std::string func_call(std::string writeASV, std::string funcName, 
                       const std::vector<std::pair<uint32_t, std::string>> &argTy,
                       std::map<std::string, std::vector<std::string>> &inputInstr) {
-  std::string ret = "  "+writeASV+" = "+funcName+"( ";
+  std::string ret = "  "+writeASV+nxt+" = "+funcName+"( ";
   for(auto pair: argTy) {
     std::string arg = pair.second;
     std::string argValue;
@@ -254,5 +269,15 @@ uint32_t convert_to_single_num(std::string numIn) {
       ret = (ret << width) + localVal;
     }
     return ret;
+  }
+}
+
+
+void update_asvs(std::ofstream &cpp, std::string prefix) {
+  // update asvs with their nxt counterparts
+  for(auto pair : g_asv) {
+    std::string asv = pair.first;
+    std::string asvSimp = var_name_convert(asv, true);
+    cpp << prefix+asvSimp +" = "+asvSimp+nxt+" ;" << std::endl;
   }
 }
