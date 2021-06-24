@@ -97,7 +97,6 @@ int main(int argc, char *argv[]) {
 
     // by default, execute number of 'instrNum' instructions
     cpp << "  int addr ;" << std::endl;
-    cpp << "  int mem_rdata;" << std::endl;
     cpp << std::endl;
     cpp << "  for(int i = 0; i < "+toStr(instrNum)+"; i++) {" << std::endl;
     cpp << "    addr = "+g_memAddrVar+" % "+toStr(instrNum)+";" << std::endl;
