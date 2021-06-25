@@ -24,7 +24,8 @@ uint32_t convert_to_single_num(std::string numIn);
 void print_instr_calls(std::map<std::string, 
                                 std::vector<std::string>> &encoding,
                        std::string prefix,
-                       std::ofstream &cpp);
+                       std::ofstream &cpp,
+                       uint32_t instrAddr);
 
 void update_asvs(std::ofstream &cpp, std::string prefix);
 

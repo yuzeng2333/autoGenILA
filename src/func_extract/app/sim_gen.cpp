@@ -125,7 +125,7 @@ int main(int argc, char *argv[]) {
     idx = 0;
     for(auto encoding: toDoList) {
     cpp << "      case "+toStr(idx++)+" :" << std::endl;
-    print_instr_calls(encoding, "      ", cpp);
+    print_instr_calls(encoding, "      ", cpp, idx-1);
     cpp << "        break;" << std::endl;
     }
     cpp << "    }" <<std::endl;
@@ -135,7 +135,7 @@ int main(int argc, char *argv[]) {
   else {
     // update asvs according to instructions
     for(auto encoding : toDoList) {
-      print_instr_calls(encoding, "  ", cpp);
+      print_instr_calls(encoding, "  ", cpp, 0);
       update_asvs(cpp, "  ");
     }
   }
@@ -164,11 +164,12 @@ int main(int argc, char *argv[]) {
 void print_instr_calls(std::map<std::string, 
                                 std::vector<std::string>> &encoding,
                        std::string prefix,
-                       std::ofstream &cpp) {
+                       std::ofstream &cpp,
+                       uint32_t instrAddr) {
   std::string instrName = decode(encoding);
   uint32_t idx = get_instr_by_name(instrName);
   auto instrInfo = g_instrInfo[idx];    
-  cpp << prefix+"  // instr"+toStr(idx)+": "+instrInfo.name << std::endl;
+  cpp << prefix+"  // instr"+toStr(idx)+": "+instrInfo.name+", memAddr: "+toStr(instrAddr) << std::endl;
   cpp << prefix+"  printf( \"// instr"+toStr(idx)+": "+instrInfo.name+"\\n \");" << std::endl;
   std::string  memAddr = var_name_convert(instrInfo.memAddr, true);
   for(auto pair : instrInfo.funcTypes) {
