@@ -182,7 +182,9 @@ void print_instr_calls(std::map<std::string,
     std::string printName = writeASV;
     if(g_refineMap[instrName].find(writeASV) != g_refineMap[instrName].end())
       printName = g_refineMap[instrName][writeASV];
-    cpp << prefix+"  printf( \""+printName+": %ld\\n\", "+writeASV+nxt+" );" << std::endl;
+    std::string printValueName = writeASV+nxt;
+    if(writeASV == g_memAddrVar) printValueName = writeASV;
+    cpp << prefix+"  printf( \""+printName+": %ld\\n\", "+printValueName+" );" << std::endl;
     cpp << std::endl;
     if(writeASV == memAddr) {
       funcCall = func_call(g_memAddrVar, funcName, pair.second.argTy, encoding);
