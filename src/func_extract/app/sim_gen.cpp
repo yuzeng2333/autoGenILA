@@ -30,6 +30,9 @@ std::string nxt = "_nxt";
 std::map<std::string, std::string> rstValMap;
 std::vector<std::map<std::string, 
                      std::vector<std::string>>> toDoList;
+std::map<std::string, std::map<std::string, 
+                               std::string>> g_refineMap;
+
 
 // key is the asv name, value is its c data type name
 std::map<std::string, std::string> g_asvTy;
@@ -44,6 +47,7 @@ int main(int argc, char *argv[]) {
   read_asv_info(g_path+"/asv_info.txt");
   read_func_info(g_path+"/func_info.txt");
   read_to_do_instr(g_path+"/tb.txt", toDoList);
+  read_refinement(g_path+"/refinement.txt");
   uint32_t instrNum;
   instrNum = toDoList.size();
 
@@ -175,12 +179,15 @@ void print_instr_calls(std::map<std::string,
     // in the instruction
     std::string funcCall = func_call(writeASV+nxt, funcName, pair.second.argTy, encoding);
     cpp << prefix+funcCall << std::endl;
-    cpp << prefix+"  printf( \""+writeASV+": %ld\\n\", "+writeASV+" );" << std::endl;
+    std::string printName = writeASV;
+    if(g_refineMap[instrName].find(writeASV) != g_refineMap[instrName].end())
+      printName = g_refineMap[instrName][writeASV];
+    cpp << prefix+"  printf( \""+printName+": %ld\\n\", "+writeASV+nxt+" );" << std::endl;
     cpp << std::endl;
     if(writeASV == memAddr) {
       funcCall = func_call(g_memAddrVar, funcName, pair.second.argTy, encoding);
       cpp << prefix+funcCall << std::endl;
-      cpp << prefix+"  printf( \""+g_memAddrVar+": %ld\\n\", "+g_memAddrVar+" );" << std::endl;
+      cpp << prefix+"  printf( \""+g_memAddrVar+": %ld\\n\", "+g_memAddrVar+nxt+" );" << std::endl;
       cpp << std::endl;
     }
   }
@@ -293,5 +300,30 @@ void update_asvs(std::ofstream &cpp, std::string prefix) {
     std::string asv = pair.first;
     std::string asvSimp = var_name_convert(asv, true);
     cpp << prefix+asvSimp +" = "+asvSimp+nxt+" ;" << std::endl;
+  }
+}
+
+
+void read_refinement(std::string fileName) {
+  std::ifstream input(fileName);
+  std::string line;
+  std::string instrName;
+  while(std::getline(input, line)) {
+    if(line.substr(0, 1) == "$") {
+      instrName = line.substr(1);
+      if(g_refineMap.find(instrName) != g_refineMap.end()) {
+        toCout("Error: mapping for the instruction has been seen before: "+instrName);
+        abort();
+      }
+      g_refineMap.emplace(instrName, std::map<std::string, std::string>{});
+    }
+    else if(line.find(":") != std::string::npos) {
+      size_t pos = line.find(":");
+      std::string ilaVar = line.substr(0, pos);
+      std::string rtlVar = line.substr(pos+1);
+      remove_two_end_space(ilaVar);
+      remove_two_end_space(rtlVar);
+      g_refineMap[instrName].emplace(ilaVar, rtlVar);
+    }
   }
 }
