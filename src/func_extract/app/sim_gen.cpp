@@ -119,7 +119,7 @@ int main(int argc, char *argv[]) {
     cpp << "  int addr ;" << std::endl;
     cpp << std::endl;
     cpp << "  for(int i = 0; i < "+toStr(instrNum)+"; i++) {" << std::endl;
-    cpp << "    addr = "+g_memAddrVar+" % "+toStr(instrNum)+";" << std::endl;
+    cpp << "    addr = ("+g_memAddrVar+" >> 2) % "+toStr(instrNum)+";" << std::endl;
     //cpp << "    mem_rdata = mem[addr];" << std::endl;
     cpp << "    switch(addr) {" <<std::endl;
     idx = 0;
@@ -182,14 +182,12 @@ void print_instr_calls(std::map<std::string,
     std::string printName = writeASV;
     if(g_refineMap[instrName].find(writeASV) != g_refineMap[instrName].end())
       printName = g_refineMap[instrName][writeASV];
-    std::string printValueName = writeASV+nxt;
-    if(writeASV == g_memAddrVar) printValueName = writeASV;
-    cpp << prefix+"  printf( \""+printName+": %ld\\n\", "+printValueName+" );" << std::endl;
+    cpp << prefix+"  printf( \""+printName+": %ld\\n\", "+writeASV+nxt+" );" << std::endl;
     cpp << std::endl;
     if(writeASV == memAddr) {
       funcCall = func_call(g_memAddrVar, funcName, pair.second.argTy, encoding);
       cpp << prefix+funcCall << std::endl;
-      cpp << prefix+"  printf( \""+g_memAddrVar+": %ld\\n\", "+g_memAddrVar+nxt+" );" << std::endl;
+      cpp << prefix+"  printf( \""+g_memAddrVar+": %ld\\n\", "+g_memAddrVar+" );" << std::endl;
       cpp << std::endl;
     }
   }
