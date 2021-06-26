@@ -45,13 +45,14 @@ void read_to_do_instr(std::string fileName,
 }
 
 
-void read_asv_info(std::string fileName) {
+void read_asv_info(std::string fileName, bool convertName) {
   std::ifstream input(fileName);
   std::string line;
   while(std::getline(input, line)) {
     if(line.find(":") == std::string::npos) continue;
     size_t pos = line.find(":");
     std::string asv = line.substr(0, pos);
+    if(convertName) asv = var_name_convert(asv);
     uint32_t width = std::stoi(line.substr(pos+1));
     if(width == 0) {
       toCout("Warning: asv width is 0: "+asv);

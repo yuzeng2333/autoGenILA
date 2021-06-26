@@ -9,7 +9,7 @@
 namespace funcExtract {
 
 // TODO: choose these options!
-bool g_push_new_target = true;
+bool g_push_new_target = false;
 // the first key is instr name, the second key is target name
 std::map<std::string, 
          std::map<std::string, 

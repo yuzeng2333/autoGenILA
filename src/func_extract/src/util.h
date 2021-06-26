@@ -14,7 +14,7 @@ void read_to_do_instr(std::string fileName,
                       std::vector<std::map<std::string, 
                                            std::vector<std::string>>> &toDoList);
 
-void read_asv_info(std::string fileName);
+void read_asv_info(std::string fileName, bool convertName=false);
 
 void read_func_info(std::string fileName);
 

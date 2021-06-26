@@ -657,7 +657,8 @@ uint32_t get_var_slice_width_simp(std::string varAndSlice,
 // varAndSlice might have a module name prefix. This function
 // parse the module name and get corresponding module information
 uint32_t get_var_slice_width_cmplx(std::string varAndSlice) {
-  if(varAndSlice.find(".") == std::string::npos)
+  if(varAndSlice.find(".") == std::string::npos 
+     || varAndSlice.substr(0, 1) == "\\")
     return get_var_slice_width_simp(varAndSlice);
   else {
     size_t pos = varAndSlice.find(".");
