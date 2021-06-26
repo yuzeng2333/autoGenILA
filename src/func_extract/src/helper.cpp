@@ -1420,7 +1420,7 @@ bool is_fifo_module(std::string modName) {
 
 
 void print_all_regs(const std::vector<std::pair<std::string, uint32_t>> &regWidth) {
-  std::ofstream output(g_path+"/all_regs.txt");
+  std::ofstream output(g_path+"/all_regs.txt", std::ios::app);
   for(auto pair : regWidth) {
     output << pair.first+":"+toStr(pair.second) << std::endl;
   }

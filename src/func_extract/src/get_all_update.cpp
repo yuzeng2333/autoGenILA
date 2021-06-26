@@ -9,7 +9,7 @@
 namespace funcExtract {
 
 // TODO: choose these options!
-bool g_push_new_target = false;
+bool g_push_new_target = true;
 // the first key is instr name, the second key is target name
 std::map<std::string, 
          std::map<std::string, 
@@ -73,7 +73,7 @@ void get_all_update() {
   // declaration for llvm
   TheContext = std::make_unique<llvm::LLVMContext>();
   std::ofstream funcInfo(g_path+"/func_info.txt", std::ios::app);
-  std::ofstream asvInfo(g_path+"/asv_info.txt");
+  std::ofstream asvInfo(g_path+"/asv_info.txt", std::ios::app);
   std::vector<std::string> fileNameVec;  
   while(!workSet.empty()) {
     auto targetIt = workSet.begin();
@@ -302,7 +302,7 @@ void print_asv_info(std::ofstream &output) {
 
 void print_llvm_script(const std::vector<std::string> &fileNameVec,
                        std::string fileName) {
-  std::ofstream output(fileName);
+  std::ofstream output(fileName, std::ios::app);
   output << "clang ila.c -emit-llvm -S -o main.ll" << std::endl;
   std::string line = "llvm-link -v main.ll \\";
   output << line << std::endl;

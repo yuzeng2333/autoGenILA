@@ -272,7 +272,7 @@ void read_in_instructions(std::string fileName) {
     }
     if(line.substr(0, 8) == "#memAddr") {
       std::string memAddr = line.substr(9);
-      remove_two_end_space(delay);
+      remove_two_end_space(memAddr);
       g_instrInfo.back().memAddr = memAddr;
       continue;
     }
