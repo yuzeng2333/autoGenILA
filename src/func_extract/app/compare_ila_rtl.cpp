@@ -16,7 +16,7 @@ uint32_t rtlValueLen = 0;
 
 int main(int argc, char *argv[]) {
   g_path = argv[1];
-  read_asv_info(g_path+"/asv_info.txt");
+  read_asv_info(g_path+"/asv_info.txt", true);
   read_rtl_values(g_path+"/rtl_results.txt");
   read_ila_values(g_path+"/ila_results.txt");
 

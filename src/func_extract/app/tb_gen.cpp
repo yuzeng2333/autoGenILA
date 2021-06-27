@@ -34,6 +34,10 @@ bool use_protect_signal = false;
 
 int main(int argc, char *argv[]) {
   g_path = argv[1];
+  if(argc < 3) {
+    toCout("Error: did not specify the number of instructions!");
+    abort();
+  }
   g_verb = false;
   read_in_instructions(g_path+"/instr.txt");
   get_io(g_path+"/design.v.clean");
@@ -124,7 +128,7 @@ int main(int argc, char *argv[]) {
       }
       assign_value("u0."+reg, value);
       // print reset values
-      to_file("    $display( \""+reg+": %d\", "+toStr(value)+" );");
+      //to_file("    $display( \""+reg+": %d\", "+toStr(value)+" );");
     }
   }
   to_file("");

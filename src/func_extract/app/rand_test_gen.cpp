@@ -126,7 +126,7 @@ void make_instr(uint32_t instrIdx) {
 
 int main(int argc, char *argv[]) {
   g_path = argv[1];
-  if(argc < 2) {
+  if(argc < 3) {
     toCout("Error: number of instructions is not set!");
     abort();
   }

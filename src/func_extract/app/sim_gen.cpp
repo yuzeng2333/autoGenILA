@@ -42,6 +42,10 @@ std::string CNCT = "_";
 // the second argument is the number of instructions
 int main(int argc, char *argv[]) {
   g_path = argv[1];
+  if(argc < 3) {
+    toCout("Error: did not specify the number of instructions!");
+    abort();
+  }
   g_verb = false;
   read_in_instructions(g_path+"/instr.txt");
   read_asv_info(g_path+"/asv_info.txt");
@@ -49,7 +53,7 @@ int main(int argc, char *argv[]) {
   read_to_do_instr(g_path+"/tb.txt", toDoList);
   read_refinement(g_path+"/refinement.txt");
   uint32_t instrNum;
-  instrNum = toDoList.size();
+  instrNum = std::stoi(argv[2]);
 
   std::ofstream header(g_path+"/ila.h");
   std::ofstream cpp(g_path+"/ila.c");
@@ -90,7 +94,7 @@ int main(int argc, char *argv[]) {
     ret = "  "+asvTy+" "+asvSimp+nxt+" = "+rstVal+";";
     cpp << ret << std::endl;
   }
-  cpp << "  int "+g_memAddrVar+" ;" << std::endl;
+  cpp << "  unsigned int "+g_memAddrVar+" ;" << std::endl;
   cpp << std::endl;
 
   // initialization of regs
@@ -169,8 +173,12 @@ void print_instr_calls(std::map<std::string,
   std::string instrName = decode(encoding);
   uint32_t idx = get_instr_by_name(instrName);
   auto instrInfo = g_instrInfo[idx];    
-  cpp << prefix+"  // instr"+toStr(idx)+": "+instrInfo.name+", memAddr: "+toStr(instrAddr) << std::endl;
-  cpp << prefix+"  printf( \"// instr"+toStr(idx)+": "+instrInfo.name+"\\n \");" << std::endl;
+  cpp << prefix+"  // instr"+toStr(idx)+": "+instrInfo.name << std::endl;
+  cpp << prefix+"  printf( \"// instr"+toStr(idx)+": "+instrInfo.name+", memAddr: "+toStr(instrAddr)+" \\n \");" << std::endl;
+  if(instrInfo.memAddr.empty()) {
+    toCout(" Error: memAddr is not specified for: "+instrInfo.name);
+    abort();
+  }
   std::string  memAddr = var_name_convert(instrInfo.memAddr, true);
   for(auto pair : instrInfo.funcTypes) {
     std::string writeASV = pair.first;
