@@ -87,8 +87,8 @@ int main(int argc, char *argv[]) {
 
   // Needs to be changed!
   g_use_read_ASV = false;
-  g_get_all_update = true;
-  g_do_instr_num = 3;
+  g_get_all_update = false;
+  g_do_instr_num = 1;
   print_time();
   /// read module_info.txt, result in g_moduleInfoMap
   /// read input-output delay info for sub-modules
