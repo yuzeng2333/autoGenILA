@@ -259,10 +259,27 @@ void read_in_instructions(std::string fileName) {
       continue;
     }
     if(line.substr(0,6) == "#delay") {
-      std::string delay = line.substr(7);
-      remove_two_end_space(delay);
-      g_instrInfo.back().delayBound = std::stoi(delay);
-      continue;
+      if(line.find("(") == std::string::npos) {
+        std::string delay = line.substr(7);
+        remove_two_end_space(delay);
+        g_instrInfo.back().delayBound = std::stoi(delay);
+        continue;
+      }
+      else {
+        std::string delayPart = line.substr(7);
+        size_t openBracePos = delayPart.find("(");
+        std::string delay = delayPart.substr(0, openBracePos);
+        remove_two_end_space(delay);
+        g_instrInfo.back().delayBound = std::stoi(delay);
+        std::string bracePart = delayPart.substr(openBracePos+1);
+        bracePart.pop_back();
+        size_t colonPos = bracePart.find(":");
+        std::string exceptionVar = bracePart.substr(0, colonPos);
+        uint32_t exceptionDelay = std::stoi(bracePart.substr(colonPos+1));
+        // FIXME: currently only support one exception
+        g_instrInfo.back().delayExceptions.emplace(exceptionVar, exceptionDelay);
+        continue;
+      }
     }
     if(line.substr(0,11) == "#extraDelay") {
       std::string delay = line.substr(12);

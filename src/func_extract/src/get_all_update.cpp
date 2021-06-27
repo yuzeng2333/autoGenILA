@@ -124,12 +124,15 @@ void get_all_update() {
       toCout("---  BEGIN INSTRUCTION #"+toStr(instrIdx)+" ---");
       uint32_t delayBound = instrInfo.delayBound;
       std::string destNameSimp = destInfo.get_dest_name();
+      if(instrInfo.delayExceptions.find(destNameSimp) != instrInfo.delayExceptions.end() ) {
+        delayBound = instrInfo.delayExceptions[destNameSimp];
+      }
       remove_front_backslash(destNameSimp);
       std::string fileName = g_path+"/"+instrInfo.name+"_"
                              +destNameSimp+"_"+toStr(delayBound)+"_tmp.ll";
       print_llvm_ir(destInfo, delayBound, instrIdx);
       std::string clean("opt --instsimplify --deadargelim --instsimplify "+fileName+" -S -o="+g_path+"/clean.ll");
-      std::string opto3("opt -O3 "+g_path+"/clean.ll -S -o=tmp.o3.ll; opt -passes=deadargelim tmp.o3.ll -S -o="+g_path+"/clean.o3.ll; rm tmp.o3.ll");
+      std::string opto3("opt -O1 "+g_path+"/clean.ll -S -o=tmp.o3.ll; opt -passes=deadargelim tmp.o3.ll -S -o="+g_path+"/clean.o3.ll; rm tmp.o3.ll");
       system(clean.c_str());
       system(opto3.c_str());
       std::vector<std::pair<std::string, uint32_t>> argVec;
