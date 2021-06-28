@@ -86,9 +86,11 @@ int main(int argc, char *argv[]) {
   g_use_simple_func_name = true;
 
   // Needs to be changed!
-  g_use_read_ASV = false;
-  g_get_all_update = true;
-  g_do_instr_num = 1;
+  // Set these in config.txt
+  //g_use_read_ASV = false;
+  //g_get_all_update = true;
+  //g_do_instr_num = 1;
+  
   print_time();
   /// read module_info.txt, result in g_moduleInfoMap
   /// read input-output delay info for sub-modules

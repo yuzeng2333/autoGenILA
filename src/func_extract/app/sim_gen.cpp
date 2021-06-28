@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
     ret = "  "+asvTy+" "+asvSimp+nxt+" = "+rstVal+";";
     cpp << ret << std::endl;
   }
-  cpp << "  unsigned int "+g_memAddrVar+" ;" << std::endl;
+  cpp << "  unsigned int "+g_memAddrVar+" = 0;" << std::endl;
   cpp << std::endl;
 
   // initialization of regs
