@@ -58,15 +58,24 @@ void get_all_update() {
     std::string modName = pair.second;
     assert(g_fifo.find(modName) != g_fifo.end());
     uint32_t bound = g_fifo[modName];
-    for(uint32_t i = 0; i < bound; i++)
-      workSet.insert(insName+".r"+toStr(i));
+    for(uint32_t i = 0; i < bound; i++) {
+      std::string reg = insName+".r"+toStr(i);
+      workSet.insert(reg);
+      uint32_t width = get_var_slice_width_simp(reg, topModuleInfo);
+      asvSet.emplace(reg, width);
+    }
   }
   addedWorkSetInFile.close();
   std::ofstream addedWorkSetFile;
   addedWorkSetFile.open(g_path+"/added_work_set.txt", std::ios_base::app);
 
-  if(!allowedTgt.empty())
+  if(!allowedTgt.empty()) {
     workSet = allowedTgt;
+    for(std::string tgt: allowedTgt) {
+      uint32_t width = get_var_slice_width_cmplx(tgt);
+      asvSet.emplace(tgt, width);
+    }
+  }
 
   // declaration for llvm
   TheContext = std::make_unique<llvm::LLVMContext>();

@@ -59,6 +59,7 @@ bool g_use_read_ASV;
 bool g_get_all_update;
 bool g_use_concat_extract_func;
 bool g_use_simple_func_name;
+bool g_push_new_target;
 uint32_t g_do_instr_num;
 std::ofstream g_outFile;
 std::ofstream g_regValueFile;
