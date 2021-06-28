@@ -432,7 +432,7 @@ void read_in_instructions(std::string fileName) {
         case ReadASV:
           {
             size_t pos = line.find(".");
-            g_instrInfo.back().readASV.insert(line);
+            g_readASV.insert(line);
             moduleAs.insert(line);
           }
           break;

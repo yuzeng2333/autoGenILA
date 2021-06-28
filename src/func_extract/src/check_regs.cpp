@@ -82,7 +82,7 @@ void check_all_regs() {
     }
     toCout("---  BEGIN INSTRUCTION #"+toStr(i++)+" ---");
     destInfo.set_instr_name(instrInfo.name);
-    g_readASV = instrInfo.readASV;
+    //g_readASV = instrInfo.readASV;
     if(g_use_read_ASV && g_readASV.empty()) {
       toCout("Error: read asv is not specified in the instr file!");
       abort();

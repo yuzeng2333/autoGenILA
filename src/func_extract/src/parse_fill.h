@@ -29,7 +29,7 @@ struct FuncTy_t {
 
 struct InstrInfo_t {
   std::map<std::string, std::vector<std::string>> instrEncoding;
-  std::set<std::string> readASV;
+  //std::set<std::string> readASV;
   std::set<std::pair<uint32_t, std::string>> writeASV;
   std::set<std::string> skipWriteASV;
   std::vector<std::string> writeASVVec;

@@ -81,7 +81,7 @@ void read_func_info(std::string fileName) {
       uint32_t targetWidth = g_asv[target];
       if(g_instrInfo[idx].funcTypes.find(target) 
            != g_instrInfo[idx].funcTypes.end()) {
-        toCout("Error: target: "+target+" already existed!");
+        toCout("Error: target: "+target+" already existed for: "+g_instrInfo[idx].name);
         abort();
       }
       struct FuncTy_t tmp = { targetWidth, std::vector<std::pair<uint32_t, std::string>>{} };
