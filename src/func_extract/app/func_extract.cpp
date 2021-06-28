@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
 
   // Needs to be changed!
   g_use_read_ASV = false;
-  g_get_all_update = false;
+  g_get_all_update = true;
   g_do_instr_num = 1;
   print_time();
   /// read module_info.txt, result in g_moduleInfoMap
@@ -95,6 +95,7 @@ int main(int argc, char *argv[]) {
   read_module_info();
   // read instr.txt, result in g_instrInfo
   // instruction encodings, write/read ASV, NOP
+  read_config(g_path+"/config.txt");
   read_in_instructions(g_path+"/instr.txt");
   if(doClean.compare("1") == 0) {
     toCout("##### Begin clean_file");

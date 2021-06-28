@@ -807,4 +807,41 @@ void get_skipped_output(std::set<std::string> &skippedOutput) {
     skippedOutput.insert(line);
   }
 }
+
+
+void read_config(std::string fileName) {
+  std::ifstream input(fileName);
+  std::string line;
+  uint32_t configNum = 0;
+  while(std::getline(input, line)) {
+    if(line.find("=") != std::string::npos) {
+      size_t pos = line.find("=");
+      std::string config = line.substr(0, pos);
+      remove_two_end_space(config);
+      std::string value = line.substr(pos+1);
+      remove_two_end_space(value);
+      if(config == "g_use_read_ASV") {
+        g_use_read_ASV = (value == "true");
+        configNum++;
+      }
+      else if(config == "g_get_all_update") {
+        g_get_all_update = (value == "true");
+        configNum++;
+      }
+      else if(config == "g_do_instr_num") {
+        g_do_instr_num = std::stoi(value);
+        configNum++;
+      }
+      else if(config == "g_push_new_target") {
+        g_push_new_target = (value == "true");
+        configNum++;
+      }
+    }
+  }
+  if(configNum < 4) {
+    toCout("Error: not enough configurations!");
+    abort();
+  }
+}
+
 } // end of namespace funcExtract

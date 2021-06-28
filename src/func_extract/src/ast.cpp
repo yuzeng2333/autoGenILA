@@ -163,6 +163,17 @@ void build_ast_tree() {
       }
     }
   }
+  std::set<std::string> allowedTgt;
+  std::string line;
+  std::ifstream allowedTgtInFile(g_path+"/allowed_target.txt");
+  while(std::getline(allowedTgtInFile, line)) {
+    remove_two_end_space(line);
+    allowedTgt.insert(line);
+  }
+  allowedTgtInFile.close();
+  for(std::string tgt: allowedTgt) {
+    build_tree_for_single_as(tgt);
+  }
 }
 
 
