@@ -68,6 +68,7 @@ void read_func_info(std::string fileName) {
   std::string line;
   uint32_t idx;
   while(std::getline(input, line)) {
+    if(line.substr(0, 2) == "\\\\") continue;
     if(line.substr(0, 6) == "Instr:") {
       instrName = line.substr(6);
       idx = get_instr_by_name(instrName);

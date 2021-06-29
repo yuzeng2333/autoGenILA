@@ -350,7 +350,7 @@ void read_in_instructions(std::string fileName) {
             }
             if(firstWord) {
               struct InstrInfo_t info = { {{signalName, std::vector<std::string>{encoding}}}, 
-                                        std::set<std::string>{}, 
+                                        //std::set<std::string>{}, 
                                         std::set<std::pair<uint32_t, std::string>>{}, 
                                         std::set<std::string>{},
                                         std::vector<std::string>{}, 0, 0, 0, 1, g_instrName};
