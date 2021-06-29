@@ -11,6 +11,7 @@ using namespace taintGen;
 
 std::map<std::string, std::vector<uint32_t>> ilaValues;
 std::map<std::string, std::vector<uint32_t>> rtlValues;
+std::set<std::string> ignoredASV;
 uint32_t ilaValueLen = 0;
 uint32_t rtlValueLen = 0;
 
@@ -100,11 +101,13 @@ void align_map_size(std::map<std::string, std::vector<uint32_t>> &ilaValues) {
 void compare_results() {
   uint32_t idx = 0;
   uint32_t len = std::min(rtlValueLen, ilaValueLen);
+  read_ignored_asv(g_path+"/ignore_asv.txt");
   while(idx < len) {
     for(auto pair : rtlValues) {
       if(idx == 10 && pair.first == "mem_wdata")
         toCout("Find it!");
       uint32_t rtlVal = pair.second[idx];
+      if(ignoredASV.find(pair.first) != ignoredASV.end()) continue;
       if(ilaValues.find(pair.first) == ilaValues.end()) {
         toCout("Error: cannot find in ilaValues: "+pair.first);
         abort();
@@ -134,4 +137,14 @@ uint32_t to_int(std::string value) {
     abort();
   }
   else return std::stol(value);
+}
+
+
+void read_ignored_asv(std::string fileName) {
+  std::ifstream input(fileName);
+  std::string line;
+  while(std::getline(input, line)) {
+    remove_two_end_space(line);
+    ignoredASV.insert(line);
+  }
 }
