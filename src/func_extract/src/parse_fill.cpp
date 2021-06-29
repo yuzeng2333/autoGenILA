@@ -60,6 +60,7 @@ bool g_get_all_update;
 bool g_use_concat_extract_func;
 bool g_use_simple_func_name;
 bool g_push_new_target;
+bool g_read_rst_vcd;
 uint32_t g_do_instr_num;
 std::ofstream g_outFile;
 std::ofstream g_regValueFile;
@@ -837,9 +838,13 @@ void read_config(std::string fileName) {
         g_push_new_target = (value == "true");
         configNum++;
       }
+      else if(config == "g_read_rst_vcd") {
+        g_read_rst_vcd = (value == "true");
+        configNum++;
+      }
     }
   }
-  if(configNum < 4) {
+  if(configNum < 5) {
     toCout("Error: not enough configurations!");
     abort();
   }

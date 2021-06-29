@@ -50,7 +50,6 @@
 namespace funcExtract {
 
 bool g_print_solver;
-
 }
 
 using namespace funcExtract;
@@ -119,7 +118,7 @@ int main(int argc, char *argv[]) {
     parse_verilog(g_path+"/design.v.clean");
   }
 
-  if(g_use_read_ASV) vcd_parser(g_path+"/rst.vcd");
+  if(g_read_rst_vcd) vcd_parser(g_path+"/rst.vcd");
   else vcd_parser(g_path+"/norm.vcd");
 
   // get update function hierarchically

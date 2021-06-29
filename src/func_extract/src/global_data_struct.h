@@ -161,6 +161,7 @@ extern bool g_skipCheck;
 extern bool g_use_read_ASV;
 extern bool g_get_all_update;
 extern bool g_push_new_target;
+extern bool g_read_rst_vcd;
 extern bool g_use_concat_extract_func;
 extern bool g_use_simple_func_name;
 extern uint32_t g_do_instr_num;
