@@ -2,6 +2,9 @@
 #define HELPER
 
 #include <string>
+#include <sstream>
+#include <bitset>
+#include <iostream>
 #include "global_data.h"
 
 namespace taintGen {
@@ -183,5 +186,9 @@ bool check_input_val(std::string value);
 void split_by(std::string str, std::string separator, std::vector<std::string> &vec);
 
 std::string merge_with(const std::vector<std::string> &vec, std::string connector);
+
+std::string dec2hex(std::string decimalValue);
+
+std::string dec2hex(uint32_t decimalValue);
 } // end of namespace taintGen
 #endif

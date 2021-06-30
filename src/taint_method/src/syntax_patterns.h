@@ -9,6 +9,7 @@ extern std::regex pOutput;
 extern std::regex pReg;
 extern std::regex pRegConst;
 extern std::regex pWire;
+extern std::regex pWireAssign;
 extern std::regex pMem;
 /* 2 operators */
 extern std::regex pAdd;

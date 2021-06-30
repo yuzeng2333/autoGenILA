@@ -113,7 +113,7 @@ std::string to_re(std::string input) {
   auto res = std::regex_replace(input, pNameBraces, varNameBraces);
 
   std::regex pName("NAME");
-  std::string varName("[\a\ba-zA-Z0-9_=\\.\\$\\\\'\\[\\]\\(\\)]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?(?:\\s)?");
+  std::string varName("[\a\ba-zA-Z0-9_=\\.\\$\\\\'\\[\\]\\(\\)\\/\\:]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?(?:\\s)?");
   res = std::regex_replace(res, pName, varName);
 
   std::regex pNUM("NUM");
@@ -1855,5 +1855,20 @@ std::string merge_with(const std::vector<std::string> &vec, std::string connecto
   }
   return ret;
 }
+
+
+std::string dec2hex(std::string decimalValue) {
+  uint32_t val = std::stoi(decimalValue);
+  return dec2hex(val);
+}
+
+
+std::string dec2hex(uint32_t decimalValue) {
+  std::stringstream ss;
+  ss << std::hex << decimalValue; // int decimal_value
+  std::string res ( ss.str() );
+  return res;
+}
+
 
 } // end of namespace taintGen

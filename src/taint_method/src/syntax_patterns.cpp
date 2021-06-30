@@ -10,6 +10,7 @@ std::regex pOutput      (taintGen::to_re("^(\\s*)output (\\[\\d+\\:\\d+\\] )?(NA
 std::regex pReg         (taintGen::to_re("^(\\s*)reg (\\[\\d+\\:\\d+\\] )?(NAME)(\\s*)?;$"));
 std::regex pRegConst    (taintGen::to_re("^(\\s*)reg (\\[\\d+\\:\\d+\\] )?(NAME)(\\s*)= (NUM)(\\s*)?;$"));
 std::regex pWire        (taintGen::to_re("^(\\s*)wire (\\[\\d+\\:\\d+\\] )?(NAME)(\\s*)?;$"));
+std::regex pWireAssign  (taintGen::to_re("^(\\s*)wire (\\[\\d+\\:\\d+\\] )?(NAME) = (NAME)(\\s*)?;$"));
 std::regex pMem         (taintGen::to_re("^(\\s*)reg (\\[\\d+\\:\\d+\\]) (NAME) (\\[\\d+\\:\\d+\\]);$"));
 /* 2 operators */
 std::regex pAdd         (taintGen::to_re("^(\\s*)assign (NAME) = (NAME) \\+ (NAME)(\\s*)?;$"));

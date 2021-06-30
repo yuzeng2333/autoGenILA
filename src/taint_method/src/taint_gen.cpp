@@ -270,6 +270,20 @@ void clean_file(std::string fileName, bool useLogic) {
         if(g_use_jasper) printedLine.replace(pos, 4, "logic");
         output << printedLine << std::endl;
       }
+      else if(useLogic && std::regex_match(line, match, pWireAssign)) {
+        size_t pos = line.find("=");
+        if(pos == std::string::npos) {
+          toCout("Error: cannot find equal sign in wire-asign: "+line);
+          abort();
+        }
+        std::string printedLine = line.substr(0, pos)+";";
+        pos = printedLine.find("wire", 0);
+        if(g_use_jasper) printedLine.replace(pos, 4, "logic");
+        output << printedLine << std::endl;
+        std::string varName = m.str(3);
+        std::string assignName = m.str(4);
+        output << "  assign "+varName+" = "+assignName+";" << std::endl;
+      }
       else if (noConcat) {
         if(!rsvdLine.empty()) output << rsvdLine << std::endl;
         output << cleanLine << std::endl;
