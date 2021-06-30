@@ -1,0 +1,10 @@
+\u0.cpuregs[1]
+\u0.cpuregs[2]
+\u0.cpuregs[31]
+\u0.reg_next_pc
+\fifo_pc.r0
+\fifo_addr.r0
+\fifo_instr.r0
+\fifo_valid.r0
+\fifo_wdata.r0
+\fifo_wstrb.r0

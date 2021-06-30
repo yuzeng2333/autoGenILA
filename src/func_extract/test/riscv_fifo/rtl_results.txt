@@ -1,0 +1,189 @@
+VCD info: dumpfile dump.vcd opened for output.
+WARNING: tb_vlg.v:150: $readmemh: The behaviour for reg[...] mem[N:0]; $readmemh("...", mem); changed in the 1364-2005 standard. To avoid ambiguity, use mem[0:N] or explicit range parameters $readmemh("...", mem, start, stop);. Defaulting to 1364-2005 behavior.
+
+
+// display  0
+_u0_mem_addr:          0
+_fifo_addr_r0:          0
+_fifo_valid_r0: 1
+_fifo_wstrb_r0:  0
+_fifo_wdata_r0:          0
+_fifo_instr_r0: 1
+_u0_reg_next_pc:          0
+_u0_cpuregs_1_:          0
+
+
+// display  1
+_u0_mem_addr:          4
+_fifo_addr_r0:          4
+_fifo_valid_r0: 1
+_fifo_wstrb_r0:  0
+_fifo_wdata_r0:          0
+_fifo_instr_r0: 1
+_u0_reg_next_pc:          4
+_u0_cpuregs_1_:          0
+
+
+// display  2
+_u0_mem_addr:          8
+_fifo_addr_r0:          8
+_fifo_valid_r0: 1
+_fifo_wstrb_r0:  0
+_fifo_wdata_r0:          0
+_fifo_instr_r0: 1
+_u0_reg_next_pc:          8
+_u0_cpuregs_1_:          0
+
+
+// display  3
+_u0_mem_addr:         12
+_fifo_addr_r0:         12
+_fifo_valid_r0: 1
+_fifo_wstrb_r0:  0
+_fifo_wdata_r0:          0
+_fifo_instr_r0: 1
+_u0_reg_next_pc:         12
+_u0_cpuregs_1_:          0
+
+
+// display  4
+_u0_mem_addr:         16
+_fifo_addr_r0:         16
+_fifo_valid_r0: 1
+_fifo_wstrb_r0:  0
+_fifo_wdata_r0:          0
+_fifo_instr_r0: 1
+_u0_reg_next_pc:         16
+_u0_cpuregs_1_:          0
+
+
+// display  5
+_u0_mem_addr:         20
+_fifo_addr_r0:         20
+_fifo_valid_r0: 1
+_fifo_wstrb_r0:  0
+_fifo_wdata_r0:          0
+_fifo_instr_r0: 1
+_u0_reg_next_pc:         20
+_u0_cpuregs_1_:          0
+
+
+// display 12
+_u0_mem_addr: 4294965872
+_fifo_addr_r0: 4294965872
+_fifo_valid_r0: 1
+_fifo_wstrb_r0:  0
+_fifo_wdata_r0:          0
+_fifo_instr_r0: 1
+_u0_reg_next_pc: 4294965872
+_u0_cpuregs_1_:          0
+
+
+// display 13
+_u0_mem_addr: 4294965876
+_fifo_addr_r0: 4294965876
+_fifo_valid_r0: 1
+_fifo_wstrb_r0:  0
+_fifo_wdata_r0:          0
+_fifo_instr_r0: 1
+_u0_reg_next_pc: 4294965876
+_u0_cpuregs_1_:          0
+
+
+// display 14
+_u0_mem_addr_sw:        376
+_fifo_addr_r0:        376
+_fifo_valid_r0: 1
+_fifo_wstrb_r0:  3
+_fifo_wdata_r0:          0
+_fifo_instr_r0: 0
+_u0_reg_next_pc: 4294965880
+_u0_cpuregs_1_:          0
+
+
+// display 15
+_u0_mem_addr: 4294965884
+_fifo_addr_r0: 4294965884
+_fifo_valid_r0: 1
+_fifo_wstrb_r0:  0
+_fifo_wdata_r0:          0
+_fifo_instr_r0: 1
+_u0_reg_next_pc: 4294965884
+_u0_cpuregs_1_:          0
+
+
+// display  0
+_u0_mem_addr: 4294965888
+_fifo_addr_r0: 4294965888
+_fifo_valid_r0: 1
+_fifo_wstrb_r0:  0
+_fifo_wdata_r0:          0
+_fifo_instr_r0: 1
+_u0_reg_next_pc: 4294965888
+_u0_cpuregs_1_:          0
+
+
+// display  1
+_u0_mem_addr: 4294965892
+_fifo_addr_r0: 4294965892
+_fifo_valid_r0: 1
+_fifo_wstrb_r0:  0
+_fifo_wdata_r0:          0
+_fifo_instr_r0: 1
+_u0_reg_next_pc: 4294965892
+_u0_cpuregs_1_:          0
+
+
+// display  2
+_u0_mem_addr: 4294965896
+_fifo_addr_r0: 4294965896
+_fifo_valid_r0: 1
+_fifo_wstrb_r0:  0
+_fifo_wdata_r0:          0
+_fifo_instr_r0: 1
+_u0_reg_next_pc: 4294965896
+_u0_cpuregs_1_:          0
+
+
+// display  3
+_u0_mem_addr: 4294965900
+_fifo_addr_r0: 4294965900
+_fifo_valid_r0: 1
+_fifo_wstrb_r0:  0
+_fifo_wdata_r0:          0
+_fifo_instr_r0: 1
+_u0_reg_next_pc: 4294965900
+_u0_cpuregs_1_:          0
+
+
+// display  4
+_u0_mem_addr: 4294965904
+_fifo_addr_r0: 4294965904
+_fifo_valid_r0: 1
+_fifo_wstrb_r0:  0
+_fifo_wdata_r0:          0
+_fifo_instr_r0: 1
+_u0_reg_next_pc: 4294965904
+_u0_cpuregs_1_:          0
+
+
+// display  5
+_u0_mem_addr: 4294965908
+_fifo_addr_r0: 4294965908
+_fifo_valid_r0: 1
+_fifo_wstrb_r0:  0
+_fifo_wdata_r0:          0
+_fifo_instr_r0: 1
+_u0_reg_next_pc: 4294965908
+_u0_cpuregs_1_:          0
+
+
+// display 12
+_u0_mem_addr: 4294964464
+_fifo_addr_r0: 4294964464
+_fifo_valid_r0: 1
+_fifo_wstrb_r0:  0
+_fifo_wdata_r0:          0
+_fifo_instr_r0: 1
+_u0_reg_next_pc: 4294964464
+tb_vlg.v:308: $finish called at 760 (1s)

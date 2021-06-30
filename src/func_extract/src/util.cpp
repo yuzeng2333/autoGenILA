@@ -214,4 +214,62 @@ bool same_value(std::string val1, std::string val2) {
   return v1 == v2;
 }
 
+
+void print_reg_info() {
+  uint32_t totalWidth = 0;
+  std::ofstream output("./reg_info.txt");
+  for(auto it = g_regWidth.begin(); it != g_regWidth.end(); it++) {
+    std::string regName = it->first;
+    uint32_t width = it->second;
+    output << regName + ":" + toStr(width) << std::endl;
+    totalWidth += width;
+  }
+  output << "Total width: "+toStr(totalWidth) << std::endl;
+}
+
+
+void read_config(std::string fileName) {
+  std::ifstream input(fileName);
+  std::string line;
+  uint32_t configNum = 0;
+  while(std::getline(input, line)) {
+    if(line.find("=") != std::string::npos) {
+      size_t pos = line.find("=");
+      std::string config = line.substr(0, pos);
+      remove_two_end_space(config);
+      std::string value = line.substr(pos+1);
+      remove_two_end_space(value);
+      if(config == "g_use_read_ASV") {
+        g_use_read_ASV = (value == "true");
+        configNum++;
+        toCout("read g_use_read_ASV: "+config);
+      }
+      else if(config == "g_get_all_update") {
+        g_get_all_update = (value == "true");
+        configNum++;
+        toCout("read g_get_all_update: "+config);
+      }
+      else if(config == "g_do_instr_num") {
+        g_do_instr_num = std::stoi(value);
+        configNum++;
+        toCout("read g_do_instr_num: "+config);
+      }
+      else if(config == "g_push_new_target") {
+        g_push_new_target = (value == "true");
+        configNum++;
+        toCout("read g_push_new_target: "+config);
+      }
+      else if(config == "g_read_rst_vcd") {
+        g_read_rst_vcd = (value == "true");
+        configNum++;
+        toCout("read g_read_rst_vcd: "+config);
+      }
+    }
+  }
+  if(configNum < 5) {
+    toCout("Error: not enough configurations!");
+    abort();
+  }
+}
+
 }

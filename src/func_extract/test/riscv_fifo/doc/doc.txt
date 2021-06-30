@@ -1,0 +1,1 @@
+1. for branch instruction, the delay for getting reg_next_pc is different based on whether branch is taken or not. Therefore, it is impossible to get the correct update function by specifyng a specific delay. I think the only solution is to connect another mem_fifo to the reg_next_pc.

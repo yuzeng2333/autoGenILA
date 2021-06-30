@@ -1,0 +1,448 @@
+// instr: auipc
+(0)
+irq = 0
+mem_rdata = 20'haec85+5'h1+5'h5+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(1)
+irq = 0
+mem_rdata = 20'haec85+5'h1+5'h5+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(2)
+irq = 0
+mem_rdata = 20'haec85+5'h1+5'h5+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+// instr: addi
+(0)
+irq = 0
+mem_rdata = 12'hb02+5'h3+3'h0+5'h1+5'h4+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(1)
+irq = 0
+mem_rdata = 12'hb02+5'h3+3'h0+5'h1+5'h4+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(2)
+irq = 0
+mem_rdata = 12'hb02+5'h3+3'h0+5'h1+5'h4+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+// instr: auipc
+(0)
+irq = 0
+mem_rdata = 20'he8bfa+5'h1+5'h5+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(1)
+irq = 0
+mem_rdata = 20'he8bfa+5'h1+5'h5+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(2)
+irq = 0
+mem_rdata = 20'he8bfa+5'h1+5'h5+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+// instr: lui
+(0)
+irq = 0
+mem_rdata = 20'h6f48a+5'h1+5'hd+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(1)
+irq = 0
+mem_rdata = 20'h6f48a+5'h1+5'hd+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(2)
+irq = 0
+mem_rdata = 20'h6f48a+5'h1+5'hd+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+// instr: addi
+(0)
+irq = 0
+mem_rdata = 12'h5c3+5'h19+3'h0+5'h1+5'h4+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(1)
+irq = 0
+mem_rdata = 12'h5c3+5'h19+3'h0+5'h1+5'h4+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(2)
+irq = 0
+mem_rdata = 12'h5c3+5'h19+3'h0+5'h1+5'h4+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+// instr: lui
+(0)
+irq = 0
+mem_rdata = 20'h991f2+5'h1+5'hd+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(1)
+irq = 0
+mem_rdata = 20'h991f2+5'h1+5'hd+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(2)
+irq = 0
+mem_rdata = 20'h991f2+5'h1+5'hd+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+// instr: auipc
+(0)
+irq = 0
+mem_rdata = 20'h13ce4+5'h1+5'h5+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(1)
+irq = 0
+mem_rdata = 20'h13ce4+5'h1+5'h5+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(2)
+irq = 0
+mem_rdata = 20'h13ce4+5'h1+5'h5+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+// instr: auipc
+(0)
+irq = 0
+mem_rdata = 20'hd50e0+5'h1+5'h5+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(1)
+irq = 0
+mem_rdata = 20'hd50e0+5'h1+5'h5+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(2)
+irq = 0
+mem_rdata = 20'hd50e0+5'h1+5'h5+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+// instr: lui
+(0)
+irq = 0
+mem_rdata = 20'h7d1fa+5'h1+5'hd+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(1)
+irq = 0
+mem_rdata = 20'h7d1fa+5'h1+5'hd+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(2)
+irq = 0
+mem_rdata = 20'h7d1fa+5'h1+5'hd+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+// instr: auipc
+(0)
+irq = 0
+mem_rdata = 20'hc3362+5'h1+5'h5+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(1)
+irq = 0
+mem_rdata = 20'hc3362+5'h1+5'h5+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(2)
+irq = 0
+mem_rdata = 20'hc3362+5'h1+5'h5+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+// instr: lui
+(0)
+irq = 0
+mem_rdata = 20'h377d0+5'h1+5'hd+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(1)
+irq = 0
+mem_rdata = 20'h377d0+5'h1+5'hd+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(2)
+irq = 0
+mem_rdata = 20'h377d0+5'h1+5'hd+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+// instr: addi
+(0)
+irq = 0
+mem_rdata = 12'hdaa+5'h19+3'h0+5'h1+5'h4+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(1)
+irq = 0
+mem_rdata = 12'hdaa+5'h19+3'h0+5'h1+5'h4+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(2)
+irq = 0
+mem_rdata = 12'hdaa+5'h19+3'h0+5'h1+5'h4+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+// instr: auipc
+(0)
+irq = 0
+mem_rdata = 20'hff8e7+5'h1+5'h5+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(1)
+irq = 0
+mem_rdata = 20'hff8e7+5'h1+5'h5+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(2)
+irq = 0
+mem_rdata = 20'hff8e7+5'h1+5'h5+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+// instr: auipc
+(0)
+irq = 0
+mem_rdata = 20'h8dcfa+5'h1+5'h5+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(1)
+irq = 0
+mem_rdata = 20'h8dcfa+5'h1+5'h5+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(2)
+irq = 0
+mem_rdata = 20'h8dcfa+5'h1+5'h5+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+// instr: auipc
+(0)
+irq = 0
+mem_rdata = 20'h666eb+5'h1+5'h5+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(1)
+irq = 0
+mem_rdata = 20'h666eb+5'h1+5'h5+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(2)
+irq = 0
+mem_rdata = 20'h666eb+5'h1+5'h5+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+// instr: lui
+(0)
+irq = 0
+mem_rdata = 20'h52d3c+5'h1+5'hd+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(1)
+irq = 0
+mem_rdata = 20'h52d3c+5'h1+5'hd+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1
+(2)
+irq = 0
+mem_rdata = 20'h52d3c+5'h1+5'hd+2'b11
+mem_ready = 1
+pcpi_rd = 0
+pcpi_ready = 0
+pcpi_wait = 0
+pcpi_wr = 0
+resetn = 1

@@ -31,11 +31,132 @@ pcpi_wait = 0
 pcpi_ready = 0
 irq = 0
 
+#delay:7
+
+W:
+//\cpuregs[1](skip) 8
+// this delay must be 7 because add instruction takes 4 cycles.
+// if delay is 8, then the reg_next_pc is 9 cycles later, and 
+// it will be added by 8 instead of 4
+reg_next_pc(skip) 7
+
+
+
+// jal
+#10:jal
+(1)
+mem_rdata = 20'bx+5'bx+5'h1b+2'h3
+//mem_rdata = 20'bx+5'b1+5'h1b+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(2)
+mem_rdata = 20'bx+5'bx+5'h1b+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(3)
+mem_rdata = 20'bx+5'bx+5'h1b+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+
+#delay: 5
+
+W:
+\cpuregs[10](skip) 5
+reg_next_pc(skip) 5
+mem_addr(skip) 5
+
+
+
+// beq
+#2:beq
+(1)
+// for brevity
+mem_rdata = 7'hx+5'hx+5'hx+3'h0+5'hx+5'h18+2'h3
+//mem_rdata = 7'hx+5'h1+5'h2+3'h0+5'hx+5'h18+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(2)
+mem_rdata = 7'hx+5'hx+5'hx+3'h0+5'hx+5'h18+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+(3)
+mem_rdata = 7'hx+5'hx+5'hx+3'h0+5'hx+5'h18+2'h3
+resetn = 1
+mem_ready = 1
+pcpi_wr = 0
+pcpi_rd = 0
+pcpi_wait = 0
+pcpi_ready = 0
+irq = 0
+
 #delay:8
 
 W:
-\cpuregs[1](skip) 8
+reg_next_pc(skip) 8 
 
+
+
+//// jal
+//#3:jal
+//(1)
+//mem_rdata = 20'bx+5'bx+5'h1b+2'h3
+////mem_rdata = 20'bx+5'b1+5'h1b+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(2)
+//mem_rdata = 20'bx+5'bx+5'h1b+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(3)
+//mem_rdata = 20'bx+5'bx+5'h1b+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//
+//#delay: 8
+//
+//W:
+//reg_next_pc(skip) 8 
+//reg_next_pc(skip) 4 
 
 
 // sw
@@ -69,6 +190,8 @@ pcpi_ready = 0
 irq = 0
 
 #delay:8
+// insert additional NOPs
+#extraDelay:3
 
 W:
 mem_wdata(skip) 8
@@ -154,3 +277,11 @@ irq = 0
 
 #CLK:clk
 #RST:resetn
+
+//$issue:
+//mem_valid = 1
+//mem_instr = 1
+//
+//$display:
+//cpu_state = 8'h40
+//decoder_trigger = 1

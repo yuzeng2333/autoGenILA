@@ -1,8 +1,1045 @@
-// LW
-#11:Lw
+//// beq
+//#2:beq
+//(1)
+//// for brevity
+//mem_rdata = 7'hx+5'hx+5'hx+3'h0+5'hx+5'h18+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(2)
+//mem_rdata = 7'hx+5'hx+5'hx+3'h0+5'hx+5'h18+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(3)
+//mem_rdata = 7'hx+5'hx+5'hx+3'h0+5'hx+5'h18+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//
+//#memAddr:\fifo_addr_r0
+//#delay:9(\u0.reg_next_pc:8)
+//
+//W:
+//\u0.reg_next_pc(skip) 8 
+
+
+//// bne
+//#2:bne
+//(1)
+//mem_rdata = 7'hx+5'hx+5'hx+3'h1+5'hx+5'h18+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(2)
+//mem_rdata = 7'hx+5'hx+5'hx+3'h1+5'hx+5'h18+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(3)
+//mem_rdata = 7'hx+5'hx+5'hx+3'h1+5'hx+5'h18+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//
+//#memAddr:\fifo_addr_r0
+//#delay:9(\u0.reg_next_pc:7)
+//
+//
+//// blt
+//#2:blt
+//(1)
+//mem_rdata = 7'hx+5'hx+5'hx+3'h4+5'hx+5'h18+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(2)
+//mem_rdata = 7'hx+5'hx+5'hx+3'h4+5'hx+5'h18+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(3)
+//mem_rdata = 7'hx+5'hx+5'hx+3'h4+5'hx+5'h18+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//
+//#memAddr:\fifo_addr_r0
+//#delay:9(\u0.reg_next_pc:7)
+//
+//
+//// bge
+//#2:bge
+//(1)
+//// for brevity
+//mem_rdata = 7'hx+5'hx+5'hx+3'h5+5'hx+5'h18+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(2)
+//mem_rdata = 7'hx+5'hx+5'hx+3'h5+5'hx+5'h18+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(3)
+//mem_rdata = 7'hx+5'hx+5'hx+3'h5+5'hx+5'h18+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//
+//#memAddr:\fifo_addr_r0
+//#delay:9(\u0.reg_next_pc:7)
+//
+//
+//// bltu
+//#2:bltu
+//(1)
+//mem_rdata = 7'hx+5'hx+5'hx+3'h6+5'hx+5'h18+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(2)
+//mem_rdata = 7'hx+5'hx+5'hx+3'h6+5'hx+5'h18+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(3)
+//mem_rdata = 7'hx+5'hx+5'hx+3'h6+5'hx+5'h18+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//
+//#memAddr:\fifo_addr_r0
+//#delay:9(\u0.reg_next_pc:7)
+//
+//
+//
+//// bgeu
+//#2:bgeu
+//(1)
+//mem_rdata = 7'hx+5'hx+5'hx+3'h7+5'hx+5'h18+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(2)
+//mem_rdata = 7'hx+5'hx+5'hx+3'h7+5'hx+5'h18+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(3)
+//mem_rdata = 7'hx+5'hx+5'hx+3'h7+5'hx+5'h18+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//
+//#memAddr:\fifo_addr_r0
+//#delay:9(\u0.reg_next_pc:7)
+
+
+
+//// sw
+//#12:sw
+//(1)
+//mem_rdata = 7'hx+5'bx+5'bx+3'h2+5'bx+5'h8+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(2)
+//mem_rdata = 7'hx+5'bx+5'bx+3'h2+5'bx+5'h8+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(3)
+//mem_rdata = 7'hx+5'bx+5'bx+3'h2+5'bx+5'h8+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//
+//#memAddr:\fifo_addr.r1
+//#delay:9
+//// insert additional NOPs
+////#extraDelay:3
+//
+//W:
+////\u0.mem_wdata(skip) 8
+//\fifo_addr.r0(skip) 9
+//
+//// sb
+//#12:sb
+//(1)
+//mem_rdata = 7'hx+5'bx+5'bx+3'h0+5'bx+5'h8+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(2)
+//mem_rdata = 7'hx+5'bx+5'bx+3'h0+5'bx+5'h8+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(3)
+//mem_rdata = 7'hx+5'bx+5'bx+3'h0+5'bx+5'h8+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//
+//#memAddr:\fifo_addr.r1
+//#delay:9
+//
+//
+//// sh
+//#12:sh
+//(1)
+//mem_rdata = 7'hx+5'bx+5'bx+3'h1+5'bx+5'h8+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(2)
+//mem_rdata = 7'hx+5'bx+5'bx+3'h1+5'bx+5'h8+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(3)
+//mem_rdata = 7'hx+5'bx+5'bx+3'h1+5'bx+5'h8+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//
+//#memAddr:\fifo_addr.r1
+//#delay:9
+//
+//
+//// lui
+//#13:lui
+//(1)
+//mem_rdata = 20'hx+5'h1+5'hd+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(2)
+//mem_rdata = 20'hx+5'h1+5'hd+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(3)
+//mem_rdata = 20'hx+5'h1+5'hd+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//
+//#delay:7(\u0.reg_next_pc:6)
+//#memAddr:\fifo_addr.r0
+//
+//W:
+////\u0.cpuregs[1](skip) 7
+//\u0.reg_next_pc(skip) 6
+//
+//
+//// auipc
+//#14:auipc
+//(1)
+//mem_rdata = 20'hx+5'h1+5'h5+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(2)
+//mem_rdata = 20'hx+5'h1+5'h5+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(3)
+//mem_rdata = 20'hx+5'h1+5'h5+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//
+//#delay:7(\u0.reg_next_pc:6)
+//#memAddr:\fifo_addr.r0
+//
+//W:
+//\u0.cpuregs[1](skip) 7
+//\u0.reg_next_pc(skip) 6
+//
+//
+//
+//// addi
+//#15:addi
+//(1)
+//mem_rdata = 12'hx+5'hx+3'h0+5'hx+5'h4+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(2)
+//mem_rdata = 12'hx+5'hx+3'h0+5'hx+5'h4+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(3)
+//mem_rdata = 12'hx+5'hx+3'h0+5'hx+5'h4+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//
+//#delay:8(\u0.reg_next_pc:6)
+//// if using u0.mem_addr, delay is 7 not 8. 
+//// So here use fifo_addr.r0
+//#memAddr:\fifo_addr_r0
+//
+//W:
+////\u0.reg_next_pc(skip) 6
+////\u0.cpuregs[1](skip) 7
+////\u0.mem_valid(skip) 7
+////\u0.mem_addr(skip) 7
+//\fifo_addr.r0(skip) 8
+//
+//
+//
+//// slti
+//#15:slti
+//(1)
+//mem_rdata = 12'hx+5'hx+3'h2+5'hx+5'h4+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(2)
+//mem_rdata = 12'hx+5'hx+3'h2+5'hx+5'h4+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(3)
+//mem_rdata = 12'hx+5'hx+3'h2+5'hx+5'h4+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//
+//#delay:8(\u0.reg_next_pc:6)
+//#memAddr:\fifo_addr_r0
+//
+//
+//// sltiu
+//#15:sltiu
+//(1)
+//mem_rdata = 12'hx+5'hx+3'h3+5'hx+5'h4+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(2)
+//mem_rdata = 12'hx+5'hx+3'h3+5'hx+5'h4+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(3)
+//mem_rdata = 12'hx+5'hx+3'h3+5'hx+5'h4+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//
+//#delay:8(\u0.reg_next_pc:6)
+//#memAddr:\fifo_addr_r0
+//
+//
+//// xori
+//#15:xori
+//(1)
+//mem_rdata = 12'hx+5'hx+3'h4+5'hx+5'h4+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(2)
+//mem_rdata = 12'hx+5'hx+3'h4+5'hx+5'h4+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(3)
+//mem_rdata = 12'hx+5'hx+3'h4+5'hx+5'h4+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//
+//#delay:8(\u0.reg_next_pc:6)
+//#memAddr:\fifo_addr_r0
+//
+//
+//// ori
+//#15:ori
+//(1)
+//mem_rdata = 12'hx+5'hx+3'h6+5'hx+5'h4+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(2)
+//mem_rdata = 12'hx+5'hx+3'h6+5'hx+5'h4+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(3)
+//mem_rdata = 12'hx+5'hx+3'h6+5'hx+5'h4+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//
+//#delay:8(\u0.reg_next_pc:6)
+//#memAddr:\fifo_addr_r0
+//
+//
+//// andi
+//#15:andi
+//(1)
+//mem_rdata = 12'hx+5'hx+3'h7+5'hx+5'h4+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(2)
+//mem_rdata = 12'hx+5'hx+3'h7+5'hx+5'h4+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(3)
+//mem_rdata = 12'hx+5'hx+3'h7+5'hx+5'h4+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//
+//#delay:8(\u0.reg_next_pc:6)
+//#memAddr:\fifo_addr_r0
+//
+//
+//
+//// add
+//#1:add
+//(1)
+//mem_rdata = 7'b0+5'bx+5'bx+3'h0+5'bx+5'hc+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(2)
+//mem_rdata = 7'b0+5'bx+5'bx+3'h0+5'bx+5'hc+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(3)
+//mem_rdata = 7'b0+5'bx+5'bx+3'h0+5'bx+5'hc+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//
+//#memAddr:\fifo_addr_r0
+//#delay:8(\u0.reg_next_pc:7)
+//
+//W:
+//\u0.cpuregs[0](skip) 8
+//\u0.cpuregs[1](skip) 8
+//\u0.cpuregs[2](skip) 8
+//\u0.cpuregs[31](skip) 8
+//\u0.mem_addr(skip) 8
+//\u0.mem_valid(skip) 8
+//\fifo_addr.r0(skip) 8
+//
+//// this delay must be 7 because add instruction takes 4 cycles.
+//// if delay is 8, then the reg_next_pc is 9 cycles later, and 
+//// it will be added by 8 instead of 4
+////\u0.reg_next_pc(skip) 7
+//
+//
+//// sub
+//#1:sub
+//(1)
+//mem_rdata = 7'h7f+5'bx+5'bx+3'h0+5'bx+5'hc+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(2)
+//mem_rdata = 7'h7f+5'bx+5'bx+3'h0+5'bx+5'hc+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(3)
+//mem_rdata = 7'h7f+5'bx+5'bx+3'h0+5'bx+5'hc+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//
+//#memAddr:\fifo_addr_r0
+//#delay:8(\u0.reg_next_pc:7)
+//
+//
+//// sll
+//#1:sll
+//(1)
+//mem_rdata = 7'b0+5'bx+5'bx+3'h1+5'bx+5'hc+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(2)
+//mem_rdata = 7'b0+5'bx+5'bx+3'h1+5'bx+5'hc+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(3)
+//mem_rdata = 7'b0+5'bx+5'bx+3'h1+5'bx+5'hc+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//
+//#memAddr:\fifo_addr_r0
+//#delay:8(\u0.reg_next_pc:7)
+//
+//
+//// slt
+//#1:slt
+//(1)
+//mem_rdata = 7'b0+5'bx+5'bx+3'h2+5'bx+5'hc+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(2)
+//mem_rdata = 7'b0+5'bx+5'bx+3'h2+5'bx+5'hc+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(3)
+//mem_rdata = 7'b0+5'bx+5'bx+3'h2+5'bx+5'hc+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//
+//#memAddr:\fifo_addr_r0
+//#delay:8(\u0.reg_next_pc:7)
+//
+//
+//// sltu
+//#1:sltu
+//(1)
+//mem_rdata = 7'b0+5'bx+5'bx+3'h3+5'bx+5'hc+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(2)
+//mem_rdata = 7'b0+5'bx+5'bx+3'h3+5'bx+5'hc+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(3)
+//mem_rdata = 7'b0+5'bx+5'bx+3'h3+5'bx+5'hc+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//
+//#memAddr:\fifo_addr_r0
+//#delay:8(\u0.reg_next_pc:7)
+//
+//
+//// xor
+//#1:xor
+//(1)
+//mem_rdata = 7'b0+5'bx+5'bx+3'h4+5'bx+5'hc+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(2)
+//mem_rdata = 7'b0+5'bx+5'bx+3'h4+5'bx+5'hc+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(3)
+//mem_rdata = 7'b0+5'bx+5'bx+3'h4+5'bx+5'hc+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//
+//#memAddr:\fifo_addr_r0
+//#delay:8(\u0.reg_next_pc:7)
+//
+//
+//// srl
+//#1:srl
+//(1)
+//mem_rdata = 7'b0+5'bx+5'bx+3'h5+5'bx+5'hc+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(2)
+//mem_rdata = 7'b0+5'bx+5'bx+3'h5+5'bx+5'hc+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(3)
+//mem_rdata = 7'b0+5'bx+5'bx+3'h5+5'bx+5'hc+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//
+//#memAddr:\fifo_addr_r0
+//#delay:8(\u0.reg_next_pc:7)
+//
+//
+//// sra
+//#1:sra
+//(1)
+//mem_rdata = 7'h7f+5'bx+5'bx+3'h5+5'bx+5'hc+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(2)
+//mem_rdata = 7'h7f+5'bx+5'bx+3'h5+5'bx+5'hc+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(3)
+//mem_rdata = 7'h7f+5'bx+5'bx+3'h5+5'bx+5'hc+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//
+//#memAddr:\fifo_addr_r0
+//#delay:8(\u0.reg_next_pc:7)
+//
+//
+//// or 
+//#1:or
+//(1)
+//mem_rdata = 7'b0+5'bx+5'bx+3'h6+5'bx+5'hc+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(2)
+//mem_rdata = 7'b0+5'bx+5'bx+3'h6+5'bx+5'hc+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(3)
+//mem_rdata = 7'b0+5'bx+5'bx+3'h6+5'bx+5'hc+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//
+//#memAddr:\fifo_addr_r0
+//#delay:8(\u0.reg_next_pc:7)
+//
+//
+//// and
+//#1:and
+//(1)
+//mem_rdata = 7'b0+5'bx+5'bx+3'h7+5'bx+5'hc+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(2)
+//mem_rdata = 7'b0+5'bx+5'bx+3'h7+5'bx+5'hc+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(3)
+//mem_rdata = 7'b0+5'bx+5'bx+3'h7+5'bx+5'hc+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//
+//#memAddr:\fifo_addr_r0
+//#delay:8(\u0.reg_next_pc:7)
+//
+//
+//// jal
+//#10:jal
+//(1)
+//mem_rdata = 20'bx+5'bx+5'h1b+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(2)
+//mem_rdata = 20'bx+5'bx+5'h1b+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(3)
+//mem_rdata = 20'bx+5'bx+5'h1b+2'h3
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//
+//#memAddr:\fifo_addr_r0
+//#delay: 5
+//
+//W:
+//\u0.cpuregs[10](skip) 5
+//\u0.reg_next_pc(skip) 5
+//\u0.mem_addr(skip) 5
+//
+//
+//// jalr
+//#10:jalr
+//(1)
+//mem_rdata = 12'hx+5'hx+3'h0+5'hx+5'h19+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(2)
+//mem_rdata = 12'hx+5'hx+3'h0+5'hx+5'h19+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//(3)
+//mem_rdata = 12'hx+5'hx+3'h0+5'hx+5'h19+2'b11
+//resetn = 1
+//mem_ready = 1
+//pcpi_wr = 0
+//pcpi_rd = 0
+//pcpi_wait = 0
+//pcpi_ready = 0
+//irq = 0
+//
+//#memAddr:\fifo_addr_r0
+//// FIXME: the delay may be wrong
+//#delay: 6
+
+
+// lw
+#11:lw
 (1)
-//mem_rdata = 12'h2+5'h2+3'h0+5'h1+5'h0+2'h3
-mem_rdata = 12'h7+5'h2+3'h2+5'b1+5'h0+2'b11
+mem_rdata = 12'hx+5'hx+3'h2+5'hx+5'h0+2'b11
 resetn = 1
 mem_ready = 1
 pcpi_wr = 0
@@ -11,7 +1048,7 @@ pcpi_wait = 0
 pcpi_ready = 0
 irq = 0
 (2)
-mem_rdata = 12'h7+5'h2+3'h2+5'b1+5'h0+2'b11
+mem_rdata = 12'hx+5'hx+3'h2+5'hx+5'h0+2'b11
 resetn = 1
 mem_ready = 1
 pcpi_wr = 0
@@ -20,7 +1057,7 @@ pcpi_wait = 0
 pcpi_ready = 0
 irq = 0
 (3)
-mem_rdata = 12'h7+5'h2+3'h2+5'b1+5'h0+2'b11
+mem_rdata = 12'hx+5'hx+3'h2+5'hx+5'h0+2'b11
 resetn = 1
 mem_ready = 1
 pcpi_wr = 0
@@ -29,135 +1066,14 @@ pcpi_wait = 0
 pcpi_ready = 0
 irq = 0
 
+#memAddr:\fifo_addr.r0
 #delay:9
 
-W:
-//picorv32.\cpuregs[1](skip) 8 -wrong: ret i32 %"u0.\\cpuregs[1]___#8"
-//picorv32.cpu_state(skip) 5  -correct
-//picorv32.mem_addr(skip) 6 add i32 %"u0.reg_next_pc___#6", 4
-//picorv32.mem_addr(skip) 7 --correct
-//picorv32.\cpuregs[1](skip) 9 -- correct
-//\u0.mem_valid(skip) 5
-//\u0.mem_valid(skip) 4
-//\u0.mem_valid(skip) 3
-//\u0.mem_valid(skip) 2
-//\u0.mem_valid(skip) 1
-//\u0.mem_valid(skip) 0
-//\u0.mem_valid(skip) 6
-//\u0.mem_valid(skip) 7
-//\u0.mem_valid(skip) 8
-\fifo_addr.r0(skip) 9
-\fifo_wdata.r0(skip) 9
-
-// add
-#1:add
-(1)
-//mem_rdata = 7'b0+5'bx+5'bx+3'h0+5'bx+5'hc+2'h3
-mem_rdata = 7'b0+5'h2+5'h3+3'h0+5'b1+5'hc+2'h3
-resetn = 1
-mem_ready = 1
-pcpi_wr = 0
-pcpi_rd = 0
-pcpi_wait = 0
-pcpi_ready = 0
-irq = 0
-(2)
-//mem_rdata = 7'b0+5'bx+5'bx+3'h0+5'bx+5'hc+2'h3
-mem_rdata = 7'b0+5'h2+5'h3+3'h0+5'b1+5'hc+2'h3
-resetn = 1
-mem_ready = 1
-pcpi_wr = 0
-pcpi_rd = 0
-pcpi_wait = 0
-pcpi_ready = 0
-irq = 0
-(3)
-//mem_rdata = 7'b0+5'bx+5'bx+3'h0+5'bx+5'hc+2'h3
-mem_rdata = 7'b0+5'h2+5'h3+3'h0+5'b1+5'hc+2'h3
-resetn = 1
-mem_ready = 1
-pcpi_wr = 0
-pcpi_rd = 0
-pcpi_wait = 0
-pcpi_ready = 0
-irq = 0
-
-#delay:8
-
-
-// beq
-#2:beq
-(1)
-// for brevity
-mem_rdata = 7'hx+5'hx+5'hx+3'h0+5'hx+5'h18+2'h3
-//mem_rdata = 7'hx+5'h1+5'h2+3'h0+5'hx+5'h18+2'h3
-resetn = 1
-mem_ready = 1
-pcpi_wr = 0
-pcpi_rd = 0
-pcpi_wait = 0
-pcpi_ready = 0
-irq = 0
-(2)
-mem_rdata = 7'hx+5'hx+5'hx+3'h0+5'hx+5'h18+2'h3
-resetn = 1
-mem_ready = 1
-pcpi_wr = 0
-pcpi_rd = 0
-pcpi_wait = 0
-pcpi_ready = 0
-irq = 0
-(3)
-mem_rdata = 7'hx+5'hx+5'hx+3'h0+5'hx+5'h18+2'h3
-resetn = 1
-mem_ready = 1
-pcpi_wr = 0
-pcpi_rd = 0
-pcpi_wait = 0
-pcpi_ready = 0
-irq = 0
-
-#delay:7
-
-
-// jal
-#3:jal
-(1)
-mem_rdata = 20'bx+5'bx+5'h1b+2'h3
-//mem_rdata = 20'bx+5'b1+5'h1b+2'h3
-resetn = 1
-mem_ready = 1
-pcpi_wr = 0
-pcpi_rd = 0
-pcpi_wait = 0
-pcpi_ready = 0
-irq = 0
-(2)
-mem_rdata = 20'bx+5'bx+5'h1b+2'h3
-resetn = 1
-mem_ready = 1
-pcpi_wr = 0
-pcpi_rd = 0
-pcpi_wait = 0
-pcpi_ready = 0
-irq = 0
-(3)
-mem_rdata = 20'bx+5'bx+5'h1b+2'h3
-resetn = 1
-mem_ready = 1
-pcpi_wr = 0
-pcpi_rd = 0
-pcpi_wait = 0
-pcpi_ready = 0
-irq = 0
-
-#delay: 4
 
 // lb
-#4:lb
+#11:lb
 (1)
-//mem_rdata = 12'h2+5'h2+3'h0+5'h1+5'h0+2'h3
-mem_rdata = 12'hx+5'hx+3'hx+5'hx+5'h0+2'h3
+mem_rdata = 12'hx+5'hx+3'h0+5'hx+5'h0+2'b11
 resetn = 1
 mem_ready = 1
 pcpi_wr = 0
@@ -166,7 +1082,7 @@ pcpi_wait = 0
 pcpi_ready = 0
 irq = 0
 (2)
-mem_rdata = 12'hx+5'hx+3'hx+5'hx+5'h0+2'h3
+mem_rdata = 12'hx+5'hx+3'h0+5'hx+5'h0+2'b11
 resetn = 1
 mem_ready = 1
 pcpi_wr = 0
@@ -175,7 +1091,7 @@ pcpi_wait = 0
 pcpi_ready = 0
 irq = 0
 (3)
-mem_rdata = 12'hx+5'hx+3'hx+5'hx+5'h0+2'h3
+mem_rdata = 12'hx+5'hx+3'h0+5'hx+5'h0+2'b11
 resetn = 1
 mem_ready = 1
 pcpi_wr = 0
@@ -184,14 +1100,14 @@ pcpi_wait = 0
 pcpi_ready = 0
 irq = 0
 
-#delay:8
+#memAddr:\fifo_addr.r0
+#delay:9
 
 
-// bne
-#5:bne
+// lh
+#11:lh
 (1)
-// for brevity
-mem_rdata = 7'hx+5'hx+5'hx+3'h1+5'hx+5'h18+2'h3
+mem_rdata = 12'hx+5'hx+3'h1+5'hx+5'h0+2'b11
 resetn = 1
 mem_ready = 1
 pcpi_wr = 0
@@ -200,7 +1116,7 @@ pcpi_wait = 0
 pcpi_ready = 0
 irq = 0
 (2)
-mem_rdata = 7'hx+5'hx+5'hx+3'h1+5'hx+5'h18+2'h3
+mem_rdata = 12'hx+5'hx+3'h1+5'hx+5'h0+2'b11
 resetn = 1
 mem_ready = 1
 pcpi_wr = 0
@@ -209,7 +1125,7 @@ pcpi_wait = 0
 pcpi_ready = 0
 irq = 0
 (3)
-mem_rdata = 7'hx+5'hx+5'hx+3'h1+5'hx+5'h18+2'h3
+mem_rdata = 12'hx+5'hx+3'h1+5'hx+5'h0+2'b11
 resetn = 1
 mem_ready = 1
 pcpi_wr = 0
@@ -218,14 +1134,14 @@ pcpi_wait = 0
 pcpi_ready = 0
 irq = 0
 
-#delay:8
+#memAddr:\fifo_addr.r0
+#delay:9
 
 
-// blt
-#6:blt
+// lbu
+#11:lbu
 (1)
-// for brevity
-mem_rdata = 7'hx+5'hx+5'hx+3'h4+5'hx+5'h18+2'h3
+mem_rdata = 12'hx+5'hx+3'h4+5'hx+5'h0+2'b11
 resetn = 1
 mem_ready = 1
 pcpi_wr = 0
@@ -234,7 +1150,7 @@ pcpi_wait = 0
 pcpi_ready = 0
 irq = 0
 (2)
-mem_rdata = 7'hx+5'hx+5'hx+3'h4+5'hx+5'h18+2'h3
+mem_rdata = 12'hx+5'hx+3'h4+5'hx+5'h0+2'b11
 resetn = 1
 mem_ready = 1
 pcpi_wr = 0
@@ -243,7 +1159,7 @@ pcpi_wait = 0
 pcpi_ready = 0
 irq = 0
 (3)
-mem_rdata = 7'hx+5'hx+5'hx+3'h4+5'hx+5'h18+2'h3
+mem_rdata = 12'hx+5'hx+3'h4+5'hx+5'h0+2'b11
 resetn = 1
 mem_ready = 1
 pcpi_wr = 0
@@ -252,14 +1168,14 @@ pcpi_wait = 0
 pcpi_ready = 0
 irq = 0
 
-#delay:8
+#memAddr:\fifo_addr.r0
+#delay:9
 
 
-// bge
-#7:bge
+// lhu
+#11:lhu
 (1)
-// for brevity
-mem_rdata = 7'hx+5'hx+5'hx+3'h5+5'hx+5'h18+2'h3
+mem_rdata = 12'hx+5'hx+3'h5+5'hx+5'h0+2'b11
 resetn = 1
 mem_ready = 1
 pcpi_wr = 0
@@ -268,7 +1184,7 @@ pcpi_wait = 0
 pcpi_ready = 0
 irq = 0
 (2)
-mem_rdata = 7'hx+5'hx+5'hx+3'h5+5'hx+5'h18+2'h3
+mem_rdata = 12'hx+5'hx+3'h5+5'hx+5'h0+2'b11
 resetn = 1
 mem_ready = 1
 pcpi_wr = 0
@@ -277,7 +1193,7 @@ pcpi_wait = 0
 pcpi_ready = 0
 irq = 0
 (3)
-mem_rdata = 7'hx+5'hx+5'hx+3'h5+5'hx+5'h18+2'h3
+mem_rdata = 12'hx+5'hx+3'h5+5'hx+5'h0+2'b11
 resetn = 1
 mem_ready = 1
 pcpi_wr = 0
@@ -286,185 +1202,18 @@ pcpi_wait = 0
 pcpi_ready = 0
 irq = 0
 
-#delay:8
+#memAddr:\fifo_addr.r0
+#delay:9
 
 
-// bltu
-#8:bltu
-(1)
-// for brevity
-mem_rdata = 7'hx+5'hx+5'hx+3'h6+5'hx+5'h18+2'h3
-resetn = 1
-mem_ready = 1
-pcpi_wr = 0
-pcpi_rd = 0
-pcpi_wait = 0
-pcpi_ready = 0
-irq = 0
-(2)
-mem_rdata = 7'hx+5'hx+5'hx+3'h6+5'hx+5'h18+2'h3
-resetn = 1
-mem_ready = 1
-pcpi_wr = 0
-pcpi_rd = 0
-pcpi_wait = 0
-pcpi_ready = 0
-irq = 0
-(3)
-mem_rdata = 7'hx+5'hx+5'hx+3'h6+5'hx+5'h18+2'h3
-resetn = 1
-mem_ready = 1
-pcpi_wr = 0
-pcpi_rd = 0
-pcpi_wait = 0
-pcpi_ready = 0
-irq = 0
-
-#delay:8
-
-
-// bgeu
-#9:bgeu
-(1)
-// for brevity
-mem_rdata = 7'hx+5'hx+5'hx+3'h7+5'hx+5'h18+2'h3
-resetn = 1
-mem_ready = 1
-pcpi_wr = 0
-pcpi_rd = 0
-pcpi_wait = 0
-pcpi_ready = 0
-irq = 0
-(2)
-mem_rdata = 7'hx+5'hx+5'hx+3'h7+5'hx+5'h18+2'h3
-resetn = 1
-mem_ready = 1
-pcpi_wr = 0
-pcpi_rd = 0
-pcpi_wait = 0
-pcpi_ready = 0
-irq = 0
-(3)
-mem_rdata = 7'hx+5'hx+5'hx+3'h7+5'hx+5'h18+2'h3
-resetn = 1
-mem_ready = 1
-pcpi_wr = 0
-pcpi_rd = 0
-pcpi_wait = 0
-pcpi_ready = 0
-irq = 0
-
-#delay:8
-
-
-
-// jalr
-#10:jalr
-(1)
-mem_rdata = 20'bx+5'bx+5'h1b+2'h3
-//mem_rdata = 20'bx+5'b1+5'h1b+2'h3
-resetn = 1
-mem_ready = 1
-pcpi_wr = 0
-pcpi_rd = 0
-pcpi_wait = 0
-pcpi_ready = 0
-irq = 0
-(2)
-mem_rdata = 20'bx+5'bx+5'h1b+2'h3
-resetn = 1
-mem_ready = 1
-pcpi_wr = 0
-pcpi_rd = 0
-pcpi_wait = 0
-pcpi_ready = 0
-irq = 0
-(3)
-mem_rdata = 20'bx+5'bx+5'h1b+2'h3
-resetn = 1
-mem_ready = 1
-pcpi_wr = 0
-pcpi_rd = 0
-pcpi_wait = 0
-pcpi_ready = 0
-irq = 0
-
-#delay: 4
-
-
-// sb
-#11:sb
-(1)
-//mem_rdata = 12'h2+5'h2+3'h0+5'h1+5'h0+2'h3
-mem_rdata = 7'hx+5'bx+5'bx+3'h0+5'bx+5'h8+2'b11
-resetn = 1
-mem_ready = 1
-pcpi_wr = 0
-pcpi_rd = 0
-pcpi_wait = 0
-pcpi_ready = 0
-irq = 0
-(2)
-mem_rdata = 7'hx+5'bx+5'bx+3'h0+5'bx+5'h8+2'b11
-resetn = 1
-mem_ready = 1
-pcpi_wr = 0
-pcpi_rd = 0
-pcpi_wait = 0
-pcpi_ready = 0
-irq = 0
-(3)
-mem_rdata = 7'hx+5'bx+5'bx+3'h0+5'bx+5'h8+2'b11
-resetn = 1
-mem_ready = 1
-pcpi_wr = 0
-pcpi_rd = 0
-pcpi_wait = 0
-pcpi_ready = 0
-irq = 0
-
-#delay:8
-
-
-// sw
-#12:sw
-(1)
-mem_rdata = 7'hx+5'bx+5'bx+3'h2+5'bx+5'h8+2'b11
-resetn = 1
-mem_ready = 1
-pcpi_wr = 0
-pcpi_rd = 0
-pcpi_wait = 0
-pcpi_ready = 0
-irq = 0
-(2)
-mem_rdata = 7'hx+5'bx+5'bx+3'h2+5'bx+5'h8+2'b11
-resetn = 1
-mem_ready = 1
-pcpi_wr = 0
-pcpi_rd = 0
-pcpi_wait = 0
-pcpi_ready = 0
-irq = 0
-(3)
-mem_rdata = 7'hx+5'bx+5'bx+3'h2+5'bx+5'h8+2'b11
-resetn = 1
-mem_ready = 1
-pcpi_wr = 0
-pcpi_rd = 0
-pcpi_wait = 0
-pcpi_ready = 0
-irq = 0
-
-#delay:8
 
 
 // universal information
 
 $FIFO:
-\$paramod\mem_fifo\WIDTH=1:2
-\$paramod\mem_fifo\WIDTH=32:2
-\$paramod\mem_fifo\WIDTH=4:2
+\$paramod\mem_fifo\WIDTH=1:1
+\$paramod\mem_fifo\WIDTH=32:1
+\$paramod\mem_fifo\WIDTH=4:1
 
 
 $TOP:
@@ -481,7 +1230,7 @@ $INVAR:
 \u0.trap
 \u0.compressed_instr
 \u0.cpu_state
-\u0.\cpuregs[0]
+\u0.cpuregs[0]
 \u0.decoder_trigger_q
 \u0.instr_add
 \u0.instr_and
@@ -534,7 +1283,7 @@ $INVAR:
 \u0.instr_sb
 
 $NOP:
-mem_rdata = x
+mem_rdata = 32'hx
 resetn = 1
 mem_ready = 1
 pcpi_wr = 0
@@ -545,3 +1294,11 @@ irq = 0
 
 #CLK:clk
 #RST:resetn
+
+//$issue:
+//mem_valid = 1
+//mem_instr = 1
+//
+//$display:
+//cpu_state = 8'h40
+//decoder_trigger = 1

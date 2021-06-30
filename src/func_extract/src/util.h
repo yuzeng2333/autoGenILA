@@ -27,6 +27,9 @@ bool is_compatible(const std::vector<std::string> &multiCycleValue1,
 
 bool same_value(std::string val1, std::string val2);
 
+void print_reg_info();
+
+void read_config(std::string fileName);
 
 }
 #endif

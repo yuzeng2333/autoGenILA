@@ -1,0 +1,169 @@
+ // Initialization 
+_fifo_addr_r0: 0
+_u0_cpuregs_0_: 0
+_u0_cpuregs_10_: 0
+_u0_cpuregs_11_: 0
+_u0_cpuregs_12_: 0
+_u0_cpuregs_13_: 0
+_u0_cpuregs_14_: 0
+_u0_cpuregs_15_: 0
+_u0_cpuregs_16_: 0
+_u0_cpuregs_17_: 0
+_u0_cpuregs_18_: 0
+_u0_cpuregs_19_: 0
+_u0_cpuregs_1_: 0
+_u0_cpuregs_20_: 0
+_u0_cpuregs_21_: 0
+_u0_cpuregs_22_: 0
+_u0_cpuregs_23_: 0
+_u0_cpuregs_24_: 0
+_u0_cpuregs_25_: 0
+_u0_cpuregs_26_: 0
+_u0_cpuregs_27_: 0
+_u0_cpuregs_28_: 0
+_u0_cpuregs_29_: 0
+_u0_cpuregs_2_: 0
+_u0_cpuregs_30_: 0
+_u0_cpuregs_31_: 0
+_u0_cpuregs_3_: 0
+_u0_cpuregs_4_: 0
+_u0_cpuregs_5_: 0
+_u0_cpuregs_6_: 0
+_u0_cpuregs_7_: 0
+_u0_cpuregs_8_: 0
+_u0_cpuregs_9_: 0
+_u0_mem_addr: 0
+_u0_mem_valid: 0
+_u0_mem_wdata: 0
+_u0_reg_next_pc: 0
+eoi: 0
+mem_addr_fifo: 0
+mem_instr_fifo: 0
+mem_la_addr: 0
+mem_la_read: 0
+mem_la_wdata: 0
+mem_la_write: 0
+mem_la_wstrb: 0
+mem_rdata: 0
+mem_valid_fifo: 0
+mem_wdata_fifo: 0
+mem_wstrb_fifo: 0
+pcpi_insn: 0
+pcpi_rs1: 0
+pcpi_rs2: 0
+pcpi_valid: 0
+trace_data: 0
+trace_valid: 0
+trap: 0
+// instr1: auipc, memAddr: 0 
+ _u0_cpuregs_1_: 2932363264
+_u0_mem_addr: 4
+zy_mem_addr: 4
+_u0_mem_valid: 0
+_u0_reg_next_pc: 4
+
+// instr2: addi, memAddr: 1 
+ _u0_cpuregs_1_: 4294966018
+_u0_mem_addr: 8
+zy_mem_addr: 8
+_u0_mem_valid: 0
+_u0_reg_next_pc: 8
+
+// instr1: auipc, memAddr: 2 
+ _u0_cpuregs_1_: 3904872456
+_u0_mem_addr: 12
+zy_mem_addr: 12
+_u0_mem_valid: 0
+_u0_reg_next_pc: 12
+
+// instr0: lui, memAddr: 3 
+ _u0_cpuregs_1_: 1867030528
+_u0_mem_addr: 16
+zy_mem_addr: 16
+_u0_mem_valid: 0
+_u0_reg_next_pc: 16
+
+// instr2: addi, memAddr: 4 
+ _u0_cpuregs_1_: 1475
+_u0_mem_addr: 20
+zy_mem_addr: 20
+_u0_mem_valid: 0
+_u0_reg_next_pc: 20
+
+// instr0: lui, memAddr: 5 
+ _u0_cpuregs_1_: 2568953856
+_u0_mem_addr: 24
+zy_mem_addr: 24
+_u0_mem_valid: 0
+_u0_reg_next_pc: 24
+
+// instr1: auipc, memAddr: 6 
+ _u0_cpuregs_1_: 332283928
+_u0_mem_addr: 28
+zy_mem_addr: 28
+_u0_mem_valid: 0
+_u0_reg_next_pc: 28
+
+// instr1: auipc, memAddr: 7 
+ _u0_cpuregs_1_: 3574464540
+_u0_mem_addr: 32
+zy_mem_addr: 32
+_u0_mem_valid: 0
+_u0_reg_next_pc: 32
+
+// instr0: lui, memAddr: 8 
+ _u0_cpuregs_1_: 2099224576
+_u0_mem_addr: 36
+zy_mem_addr: 36
+_u0_mem_valid: 0
+_u0_reg_next_pc: 36
+
+// instr1: auipc, memAddr: 9 
+ _u0_cpuregs_1_: 3275104292
+_u0_mem_addr: 40
+zy_mem_addr: 40
+_u0_mem_valid: 0
+_u0_reg_next_pc: 40
+
+// instr0: lui, memAddr: 10 
+ _u0_cpuregs_1_: 930938880
+_u0_mem_addr: 44
+zy_mem_addr: 44
+_u0_mem_valid: 0
+_u0_reg_next_pc: 44
+
+// instr2: addi, memAddr: 11 
+ _u0_cpuregs_1_: 4294966698
+_u0_mem_addr: 48
+zy_mem_addr: 48
+_u0_mem_valid: 0
+_u0_reg_next_pc: 48
+
+// instr1: auipc, memAddr: 12 
+ _u0_cpuregs_1_: 4287524912
+_u0_mem_addr: 52
+zy_mem_addr: 52
+_u0_mem_valid: 0
+_u0_reg_next_pc: 52
+
+// instr1: auipc, memAddr: 13 
+ _u0_cpuregs_1_: 2379194420
+_u0_mem_addr: 56
+zy_mem_addr: 56
+_u0_mem_valid: 0
+_u0_reg_next_pc: 56
+
+// instr1: auipc, memAddr: 14 
+ _u0_cpuregs_1_: 1718530104
+_u0_mem_addr: 60
+zy_mem_addr: 60
+_u0_mem_valid: 0
+_u0_reg_next_pc: 60
+
+// instr0: lui, memAddr: 15 
+ _u0_cpuregs_1_: 1389608960
+_u0_mem_addr: 64
+zy_mem_addr: 64
+_u0_mem_valid: 0
+_u0_reg_next_pc: 64
+

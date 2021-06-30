@@ -1,0 +1,30 @@
+Here are the steps for generating ILA update functions and simulation files
+
+1. prepare the instr.txt in the test directory. If there is fifo, must make $FIFO
+   prepare the necessary visited_target.txt file to skip target, and allowed_target.txt.
+   prepare the rst.vcd or norm.vcd file
+   
+
+2. run ./build/func_extract, multiple will be generated:
+    *.ll and *_tmp.ll
+    all_regs.txt
+    asv_info.txt (some "asvs" may need to be deleted for simplicity)
+    func_info.txt: target and dependent registers for each function -- used to generate function declare and call
+    link.sh: script for compile and link llvm ir files)
+
+    All these files are appended, so need manual check (!!! So need to remove legacy txt in the above files)
+
+3.  move *.ll and link.sh into ILA_SIM folder
+
+4. run ./build/instr_gen (with arg: instrNum), it takes the instr.txt file and
+   generate tb.txt file, which includes instructions to be 
+   used in rtl and ila simulations.
+
+5. run ./build/sim_gen (with arg: instrNum), generate ila.cpp and ila.h file
+   may need to modify the mem_rdata and mem_addr in ila.cpp
+   !!! specify the mem_addr for each instruction
+
+6. copy ila.cpp and ila.h to ILA_SIM folder
+
+7. (1) option1: run ./build/tb_gen (with arg: instrNum) to generate rtl testbench
+   (2) option2: update the memd.txt file by ila.c, and generate mem.txt with ./rtl_sim/util.a.out

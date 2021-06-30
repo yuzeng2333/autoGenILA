@@ -9,3 +9,7 @@ pcpi_rs1
 pcpi_rs2
 trace_valid
 trace_data
+eoi
+mem_addr_fifo
+mem_wdata_fifo
+mem_wstrb_fifo

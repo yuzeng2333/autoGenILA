@@ -45,6 +45,31 @@ using namespace taintGen;
 
 namespace funcExtract {
 
+
+struct FuncTy_t {
+  uint32_t retTy;
+  std::vector<std::pair<uint32_t, std::string>> argTy;
+};
+
+
+struct InstrInfo_t {
+  std::map<std::string, std::vector<std::string>> instrEncoding;
+  //std::set<std::string> readASV;
+  std::set<std::pair<uint32_t, std::string>> writeASV;
+  std::set<std::string> skipWriteASV;
+  std::vector<std::string> writeASVVec;
+  uint32_t writeASVVecDelay;
+  uint32_t delayBound;
+  uint32_t extraDelay;
+  uint32_t instrLen = 0;
+  std::string name;
+  // key is writeASV. Each instruction might update multiple ASVs
+  std::map<std::string, FuncTy_t> funcTypes;
+  std::string memAddr;
+  std::map<std::string, uint32_t> delayExceptions;
+};
+
+
 // one for each sub-module
 struct FuncInfo_t {
   std::string moduleName;
@@ -146,6 +171,16 @@ struct Context_t {
   llvm::Function* Func;                       
 };
 
+extern std::shared_ptr<ModuleInfo_t> g_curMod;
+extern uint32_t g_new_var;
+//extern taintGen::VarWidth g_varWidth;
+extern std::regex pSingleLine;
+extern std::regex pNbLine;
+extern std::map<std::string, astNode*> g_varNode;
+extern StrSet_t moduleAs;
+extern std::set<std::string> g_mem;
+extern std::string g_instrName;
+
 
 extern std::ofstream g_outFile;
 extern std::ofstream g_regValueFile;
@@ -208,6 +243,7 @@ extern std::string DELIM;
 // for hierarchical store
 extern std::set<std::string> g_blackBoxModSet;
 extern std::map<std::string, std::shared_ptr<ModuleInfo_t>> g_moduleInfoMap;
+extern std::set<std::string> moduleWriteAs;
 // first of pair is instance name, however, the first in the vector should be
 // module name, instead of instance name.
 // Currently there is a restriction: the first module in the vector can only

@@ -1,0 +1,6 @@
+\fifo_addr.r1
+\fifo_instr.r1
+\fifo_pc.r1
+\fifo_valid.r1
+\fifo_wdata.r1
+\fifo_wstrb.r1
