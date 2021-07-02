@@ -174,11 +174,11 @@ void print_instr_calls(std::map<std::string,
   auto instrInfo = g_instrInfo[idx];    
   cpp << prefix+"  // instr"+toStr(idx)+": "+instrInfo.name << std::endl;
   cpp << prefix+"  printf( \"// instr"+toStr(idx)+": "+instrInfo.name+", memAddr: "+toStr(instrAddr)+" \\n \");" << std::endl;
-  if(instrInfo.memAddr.empty()) {
-    toCout(" Error: memAddr is not specified for: "+instrInfo.name);
+  if(instrInfo.instrAddr.empty()) {
+    toCout(" Error: instrAddr is not specified for: "+instrInfo.name);
     abort();
   }
-  std::string  memAddr = var_name_convert(instrInfo.memAddr, true);
+  std::string  memAddr = var_name_convert(instrInfo.instrAddr, true);
   for(auto pair : instrInfo.funcTypes) {
     std::string writeASV = pair.first;
     writeASV = var_name_convert(writeASV, true);

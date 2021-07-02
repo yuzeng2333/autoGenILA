@@ -1,1 +1,9 @@
 1. for branch instruction, the delay for getting reg_next_pc is different based on whether branch is taken or not. Therefore, it is impossible to get the correct update function by specifyng a specific delay. I think the only solution is to connect another mem_fifo to the reg_next_pc.
+
+2. for load and store instructions, the mem_addr first outputs the address to store/load data, and then output the address for the next instruction.
+
+3. for jal instruction, cpu_state will stay in 40(decode) state, until mem_addr is updated and a new instruction is read in. So the instruction after jal will not be skipped.
+
+4. for branch, if the branch is not taken, then everything is normal. If the branch is taken, the next 40 state will last for 3 cycles, as a result, the next instruction is skipped, and the one after it is read in.
+
+
