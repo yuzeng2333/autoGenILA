@@ -1,7 +1,7 @@
-#include "../src/parse_fill.h"
+#include "../src/read_instr.h"
 #include "../src/helper.h"
 #include "../src/util.h"
-#include "../../taint_method/src/global_data.h"
+//#include "../../../taint_method/src/global_data.h"
 #include "../src/global_data_struct.h"
 #include <math.h>
 #include <time.h>
@@ -14,37 +14,12 @@
 using namespace funcExtract;
 using namespace taintGen;
 
+
 std::ofstream g_output;
-int InstrNum = 10;
+uint32_t InstrNum = 10;
 std::regex pX("(\\d+)'[b|h][x|X]$");
-std::regex pHex("(\\d+)'h([0-9a-fA-F]+)$");
 std::map<std::string, std::string> regValueMap;
 
-
-//std::string correct_hex(std::string hexValue) {
-//  std::smatch m;
-//  if(!std::regex_match(hexVal, m, pHex)) {
-//    toCout("Error: input number does not match pHex");
-//    abort();
-//  }
-//  uint32_t width = std::stoi(m.str(1));
-//  std::string num = m.str(2);
-//  if(width <= 4) assert(num.size() == 1);
-//  else if(width == 5) {
-//    if(num.substr(0, 1) != "1") 
-//      num = "1"+num.substr(1);
-//  }
-//  else if(width == 6) {
-//    uint32_t msb = std::stoi(num.substr(0, 1));
-//    if(msb > 3) 
-//      num = "3"+num.substr(1);
-//  }
-//  else if(width == 7) {
-//    uint32_t msb = std::stoi(num.substr(0, 1));
-//    if(msb > 3) 
-//      num = "3"+num.substr(1);
-//  }
-//}
 
 
 void to_file(std::string line) {
@@ -142,3 +117,9 @@ int main(int argc, char *argv[]) {
     make_instr(instrIdx);
   }
 }
+
+//int main(int argc, char *argv[]) {
+//  std::cout << "yes!!!" << std::endl;
+//  return 0;
+//}
+

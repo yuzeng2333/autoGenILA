@@ -303,6 +303,8 @@ void print_all_regs(const std::vector<std::pair<std::string, uint32_t>> &regWidt
 std::string var_name_convert(std::string varName, bool replaceSlash=false);
 
 bool is_letter(char c);
+
+void print_reg_info();
 } // end of namespace funcExtract
 
 

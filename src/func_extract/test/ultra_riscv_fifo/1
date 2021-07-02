@@ -1,0 +1,9 @@
+\u0.u_issue.u_regfile.REGFILE.reg_r1_q
+\fifo_d_addr.r0
+\fifo_d_data_wr.r0
+\fifo_d_rd.r0
+\fifo_d_wr.r0
+\fifo_i_pc.r0
+\fifo_i_rd.r0
+\fifo_pc_out.r0
+\fifo_pc_out.r1

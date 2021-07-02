@@ -2865,9 +2865,9 @@ module riscv_core(clk_i, rst_i, mem_d_data_rd_i, mem_d_accept_i, mem_d_ack_i, me
   assign _0478_ = \u_div.div_busy_q ? fangyuan23 : \u_div.divisor_q ;
   assign _0479_ = \u_div.div_complete_w ? \u_div.divisor_q : _0478_;
   wire [62:0] fangyuan24;
-  assign fangyuan24 = { _0462_, 16'h0000, 15'h0000 };
+  assign fangyuan24 = { _0462_, 31'h00000000 };
   wire [62:0] fangyuan25;
-  assign fangyuan25 = { \u_div.opcode_rb_operand_i , 16'h0000, 15'h0000 };
+  assign fangyuan25 = { \u_div.opcode_rb_operand_i , 31'h00000000 };
   assign _0480_ = _0453_ ? fangyuan24 : fangyuan25;
   assign _0481_ = \u_div.div_start_w ? _0480_ : _0479_;
   assign _0440_ = rst_i ? 63'h0000000000000000 : _0481_;
@@ -3101,7 +3101,7 @@ module riscv_core(clk_i, rst_i, mem_d_data_rd_i, mem_d_accept_i, mem_d_ack_i, me
   assign fangyuan54 = { \u_exec.alu_input_a_r [30:0], 1'h0 };
   assign _0620_ = \u_exec.alu_input_b_r [0] ? fangyuan54 : \u_exec.alu_input_a_r ;
   wire [287:0] fangyuan55;
-  assign fangyuan55 = { _0619_, _0629_, _0631_, \u_exec.u_alu.sub_res_w , _0632_, _0639_, _0651_, 16'h0000, 15'h0000, _0634_[0], 16'h0000, 15'h0000, _0630_ };
+  assign fangyuan55 = { _0619_, _0629_, _0631_, \u_exec.u_alu.sub_res_w , _0632_, _0639_, _0651_, 31'h00000000, _0634_[0], 31'h00000000, _0630_ };
   wire [8:0] fangyuan56;
   assign fangyuan56 = { _0642_, _0641_, _0648_, _0647_, _0646_, _0645_, _0644_, _0643_, _0640_ };
   always @(\u_exec.alu_input_a_r or fangyuan55 or fangyuan56) begin

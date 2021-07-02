@@ -1,0 +1,5 @@
+g_use_read_ASV = true
+g_get_all_update = true 
+g_do_instr_num = 6
+g_push_new_target = false
+g_read_rst_vcd = false

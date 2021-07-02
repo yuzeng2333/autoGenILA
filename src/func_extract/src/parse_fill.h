@@ -56,5 +56,7 @@ void print_design_hierarchy(std::string modName,
 
 void get_skipped_output(std::set<std::string> &skippedOutput);
 
+void read_config(std::string fileName);
+
 } // end of namespace funcExtract
 #endif

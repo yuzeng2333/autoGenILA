@@ -3,6 +3,7 @@ Here are the steps for generating ILA update functions and simulation files
 1. prepare the instr.txt in the test directory. If there is fifo, must make $FIFO
    prepare the necessary visited_target.txt file to skip target, and allowed_target.txt.
    prepare the rst.vcd or norm.vcd file
+   prepare the config.txt file
    
 
 2. run ./build/func_extract, multiple will be generated:

@@ -500,3 +500,7 @@ lbu_\fifo_wstrb.r1_9.ll \
 lhu_\fifo_wstrb.r1_9.ll \
 -S -o linked.ll
 clang linked.ll
+clang ila.c -emit-llvm -S -o main.ll
+llvm-link -v main.ll \
+-S -o linked.ll
+clang linked.ll

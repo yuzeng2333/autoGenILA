@@ -130,6 +130,14 @@ urv1:
 urv:
 	./build/func_extract ./test/ultra_riscv 0
 
+
+urvff1:
+	./build/func_extract ./test/ultra_riscv_fifo 1
+
+urvff:
+	./build/func_extract ./test/ultra_riscv_fifo 0
+
+
 naive:
 	./build/func_extract ./test/naive 0
 

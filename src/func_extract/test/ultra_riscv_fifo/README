@@ -1,0 +1,2 @@
+1. currently all the generated update functions seem good. The only concern is that all the update functions to fifo_i_rd is none. This needs more study.
+2. 

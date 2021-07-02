@@ -1,5 +1,5 @@
 Begin main!
-Start time: Tue Jun 29 17:10:11 2021
+Start time: Wed Jun 30 11:29:11 2021
 
 Give 0 to rst_i___#1
 Give 0 to rst_i___#2
@@ -53,8 +53,8 @@ Replace \u_lsu.mem_xb_q___#5 with 0
 Replace \u_lsu.mem_load_q___#5 with 0
 Give 0 to mem_d_error_i___#4
 Replace \u_csr.exception_e1_q___#5 with 6'b0
-Give 0 to mem_i_valid_i___#3
-Give 0 to mem_i_valid_i___#4
+Give 1 to mem_i_valid_i___#3
+Give 1 to mem_i_valid_i___#4
 Replace \u_exec.result_q___#5 with 32'b0
 Replace \u_issue.u_pipe_ctrl.opcode_e2_q___#5 with 32'b10011
 Replace \u_mul.result_e2_q___#5 with 32'b0
@@ -110,7 +110,7 @@ Give 0 to cpu_id_i___#5
 Give 1 to mem_d_ack_i___#2
 Give 0 to mem_d_error_i___#2
 Give 1 to mem_d_accept_i___#2
-Give 0 to mem_i_valid_i___#2
+Give 1 to mem_i_valid_i___#2
 Give 1 to mem_i_accept_i___#3
 Replace \u_div.divisor_q___#5 with 63'b0
 Replace \u_issue.u_pipe_ctrl.pc_wb_q___#5 with 32'b10000000000000000000000001011000
@@ -120,7 +120,7 @@ Replace \u_issue.u_pipe_ctrl.csr_wdata_e2_q___#5 with 32'b0
 Replace \u_csr.u_csrfile.csr_mip_upd_q___#5 with 0
 Give 0 to intr_i___#4
 Give 1 to mem_i_accept_i___#2
-Give 0 to mem_i_valid_i___#1
+Give 1 to mem_i_valid_i___#1
 Give 1 to mem_d_ack_i___#1
 Give 0 to mem_d_error_i___#1
 Give 1 to mem_d_accept_i___#1

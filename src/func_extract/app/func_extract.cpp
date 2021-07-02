@@ -102,11 +102,11 @@ int main(int argc, char *argv[]) {
     toCout("##### Begin clean_file");
     clean_file(g_path+"/design.v", false);
 
-    toCout("##### Begin getting IO");
-    get_io(g_path+"/design.v.clean");
-
     toCout("##### Begin remove_functions");
     funcExtract::remove_functions(g_path+"/design.v");
+
+    toCout("##### Begin getting IO");
+    get_io(g_path+"/design.v.clean");
 
     toCout("##### Begin parse_verilog");
     parse_verilog(g_path+"/design.v.clean");
