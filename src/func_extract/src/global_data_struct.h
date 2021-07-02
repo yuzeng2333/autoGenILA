@@ -65,7 +65,9 @@ struct InstrInfo_t {
   std::string name;
   // key is writeASV. Each instruction might update multiple ASVs
   std::map<std::string, FuncTy_t> funcTypes;
-  std::string memAddr;
+  std::string instrAddr;
+  // only load instruction has dataAddr: to get data from dmem
+  std::string dataAddr;
   std::map<std::string, uint32_t> delayExceptions;
 };
 

@@ -80,13 +80,14 @@ void read_func_info(std::string fileName) {
         abort();
       }
       uint32_t targetWidth = g_asv[target];
+      struct FuncTy_t tmp = { targetWidth, std::vector<std::pair<uint32_t, std::string>>{} };      
       if(g_instrInfo[idx].funcTypes.find(target) 
            != g_instrInfo[idx].funcTypes.end()) {
-        toCout("Error: target: "+target+" already existed for: "+g_instrInfo[idx].name);
-        abort();
+        toCout("Warning: target: "+target+" already existed for: "+g_instrInfo[idx].name);
+        g_instrInfo[idx].funcTypes[target] = tmp;
       }
-      struct FuncTy_t tmp = { targetWidth, std::vector<std::pair<uint32_t, std::string>>{} };
-      g_instrInfo[idx].funcTypes.emplace(target, tmp);
+      else
+        g_instrInfo[idx].funcTypes.emplace(target, tmp);
     }
     else if(line.find(":") != std::string::npos) {
       size_t pos = line.find(":");
