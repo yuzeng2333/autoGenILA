@@ -160,7 +160,7 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx,
                               context &c, builder &b, uint32_t bound) {
   if(is_top_module()) g_seeInputs = true;
   std::string dest = node->dest;
-  if(dest == "state_in" && timeIdx == 2 ) {
+  if(dest == "mem_rdata" ) {
     toCoutVerb("Find it!");
   }
   if(dest == "resetn" && timeIdx == 3)
@@ -317,7 +317,10 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx,
     std::string localVal = g_nopInstr[dest];
     uint32_t localWidth = get_var_slice_width_simp(dest);
     if(localVal != "x") {
-      if(is_number(localVal)) {
+      if(is_x(localVal)) {
+        return get_arg(destTimed);
+      }
+      else if(is_number(localVal)) {
         toCoutVerb("%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give "+localVal+" to "+timed_name(dest, timeIdx));
         g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
         return llvmInt(hdb2int(localVal), localWidth, c);

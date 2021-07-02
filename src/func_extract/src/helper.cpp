@@ -96,6 +96,10 @@ bool is_formed_num(std::string num) {
 
 // convert a string number, in hex|decimal|binary form, into uint32_t
 uint32_t hdb2int(std::string num) {
+  if(num.find("x") != std::string::npos) {
+    toCout("Error: find x in num for hdb2int: "+num);
+    abort();
+  }
   num = remove_signed(num);
   std::smatch m;
   if(std::regex_match(num, m, pDec)) {
