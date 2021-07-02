@@ -774,6 +774,10 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
     retExpr = add_nb_constraint(node, timeIdx, c, b, bound);
   }
   else if( is_number(varAndSlice) ) { // num_t is always 0
+    if(varAndSlice.find(x) != std::string::npos) {
+      toCout("Error: number in add_constraint should not have x: "+varAndSlice);
+      abort();
+    }
     retExpr = num_constraint(node, timeIdx, c, b);
   }
   else if( is_case_dest(varAndSlice) ) {

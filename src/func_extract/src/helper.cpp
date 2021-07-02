@@ -97,8 +97,7 @@ bool is_formed_num(std::string num) {
 // convert a string number, in hex|decimal|binary form, into uint32_t
 uint32_t hdb2int(std::string num) {
   if(num.find("x") != std::string::npos) {
-    toCout("Error: find x in num for hdb2int: "+num);
-    abort();
+    replace_with(num, "x", "0");
   }
   num = remove_signed(num);
   std::smatch m;
@@ -1471,4 +1470,22 @@ void print_reg_info() {
   }
   output << "Total width: "+toStr(totalWidth) << std::endl;
 }
+
+
+void replace_with(std::string str, std::string subStr, std::string newSubStr) {
+  size_t index = 0;
+  uint32_t len = subStr.size();
+  while (true) {
+    /* Locate the substring to replace. */
+    index = str.find(subStr, index);
+    if (index == std::string::npos) break;
+  
+    /* Make the replacement. */
+    str.replace(index, len, newSubStr);
+  
+    /* Advance index forward so the next iteration doesn't pick it up as well. */
+    index += len;
+  }
+}
+
 } // end of namespace funcExtract

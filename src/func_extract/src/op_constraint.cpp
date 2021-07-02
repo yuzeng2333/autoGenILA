@@ -78,13 +78,13 @@ llvm::Value* var_expr(std::string varAndSlice, uint32_t timeIdx, context &c,
   else
     localWidth = width;
 
-  if(is_x(varAndSlice)) {
+  if(is_x(varAndSlice) || varAndSlice.find("x") != std::string::npos) {
     // FIXME: if encounter x value, just give 0 to it
-    //toCout("Error: get a x value");
-    //abort();
-    return llvmInt(0, localWidth, c);
+    toCout("Error: get a x value: "+varAndSlice);
+    abort();
+    //return llvmInt(0, localWidth, c);
   } 
-  else if(is_number(var)) {
+  else if(is_pure_num(var)) {
     if(isTaint) {
       varTimed = var + DELIM + toStr(timeIdx) + "_" + toStr(localWidth) + "b" + _t;
       return llvm::ConstantInt::get(llvmWidth(localWidth, c), 0, false);
@@ -139,7 +139,7 @@ llvm::Value* var_expr(std::string varAndSlice, uint32_t timeIdx, context &c,
 
 
 llvm::Value* bv_val(std::string var, context &c) {
-  assert(is_number(var));
+  assert(is_pure_num(var));
   return llvmInt(hdb2int(var), get_var_slice_width_simp(var), c);
   //return c.bv_val(hdb2int(var), get_var_slice_width_simp(var));
 }
@@ -273,7 +273,7 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx,
     std::string localVal = g_currInstrInfo.instrEncoding[dest][wordIdx];
     uint32_t localWidth = get_var_slice_width_simp(dest);
     if(localVal != "x" && localVal != "DIRTY") {
-      if(is_number(localVal)) {
+      if(is_pure_number(localVal)) {
         toCoutVerb("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%B Give "+localVal+" to "+timed_name(dest, timeIdx));
         g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
         return llvmInt(hdb2int(localVal), localWidth, c);
@@ -320,7 +320,7 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx,
       if(is_x(localVal)) {
         return get_arg(destTimed);
       }
-      else if(is_number(localVal)) {
+      else if(is_pure_number(localVal)) {
         toCoutVerb("%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give "+localVal+" to "+timed_name(dest, timeIdx));
         g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
         return llvmInt(hdb2int(localVal), localWidth, c);
@@ -384,7 +384,7 @@ llvm::Value* single_expr(std::string value, context &c, std::string varName,
     return extract_func(val, idx, idx-localWidth+1, c, b, llvm::Twine(varTimed), true);
     //return c.bv_const((varTimed).c_str(), totalWidth).extract_func(idx, idx-localWidth+1);
   }
-  else if(is_number(value)) {
+  else if(is_pure_num(value)) {
     uint32_t pos = value.find("'");
     std::string widthStr = value.substr(0, pos);
     uint32_t width = std::stoi(widthStr);
