@@ -80,9 +80,9 @@ llvm::Value* var_expr(std::string varAndSlice, uint32_t timeIdx, context &c,
 
   if(is_x(varAndSlice) || varAndSlice.find("x") != std::string::npos) {
     // FIXME: if encounter x value, just give 0 to it
-    toCout("Error: get a x value: "+varAndSlice);
-    abort();
-    //return llvmInt(0, localWidth, c);
+    //toCout("Error: get a x value: "+varAndSlice);
+    //abort();
+    return llvmInt(0, localWidth, c);
   } 
   else if(is_pure_num(var)) {
     if(isTaint) {
@@ -273,7 +273,7 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx,
     std::string localVal = g_currInstrInfo.instrEncoding[dest][wordIdx];
     uint32_t localWidth = get_var_slice_width_simp(dest);
     if(localVal != "x" && localVal != "DIRTY") {
-      if(is_pure_number(localVal)) {
+      if(is_pure_num(localVal)) {
         toCoutVerb("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%B Give "+localVal+" to "+timed_name(dest, timeIdx));
         g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
         return llvmInt(hdb2int(localVal), localWidth, c);
@@ -320,7 +320,7 @@ llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx,
       if(is_x(localVal)) {
         return get_arg(destTimed);
       }
-      else if(is_pure_number(localVal)) {
+      else if(is_pure_num(localVal)) {
         toCoutVerb("%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give "+localVal+" to "+timed_name(dest, timeIdx));
         g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
         return llvmInt(hdb2int(localVal), localWidth, c);

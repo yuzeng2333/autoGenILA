@@ -269,6 +269,23 @@ void read_in_instructions(std::string fileName) {
             g_rstVal.emplace(signalName, encoding);         
           }
           break;
+        case InvarRegs:
+          {
+            if(line.find("_$_") != std::string::npos) {
+              toCout("Error: the format for invariant regs are no longer supported!");
+              abort();
+            }
+            auto pair = split_prefix_var(line);
+            std::string modName, regName;
+            modName = pair.first;
+            regName = pair.second;
+            if(modName.empty()) modName = g_topModule;
+            if(g_invarRegs.find(modName) == g_invarRegs.end())
+              g_invarRegs.emplace(modName, std::set<std::string>{regName});
+            else
+              g_invarRegs[modName].insert(regName);
+          }
+          break;
         case TopMod:
           {
             remove_two_end_space(line);

@@ -1472,6 +1472,14 @@ void print_reg_info() {
 }
 
 
+// return if var is purely number -- no x
+bool is_pure_num(std::string var) {
+  if(!is_number(var)) return false;
+  if(var.find("x") == std::string::npos) return true;
+  else return false;
+}
+
+
 void replace_with(std::string str, std::string subStr, std::string newSubStr) {
   size_t index = 0;
   uint32_t len = subStr.size();

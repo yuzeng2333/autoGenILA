@@ -305,6 +305,10 @@ std::string var_name_convert(std::string varName, bool replaceSlash=false);
 bool is_letter(char c);
 
 void print_reg_info();
+
+bool is_pure_num(std::string var);
+
+void replace_with(std::string str, std::string subStr, std::string newSubStr);
 } // end of namespace funcExtract
 
 
