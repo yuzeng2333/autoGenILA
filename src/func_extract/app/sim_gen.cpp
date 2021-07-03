@@ -26,8 +26,12 @@ bool g_use_mem = true;
 std::string g_instrValueVar = "mem_rdata";
 std::string g_instrAddrVar = "zy_instr_addr";
 std::string g_dataAddrVar = "zy_data_addr";
+std::string g_dataIn = "zy_data_in";
 std::string nxt = "_nxt";
 std::map<std::string, std::string> rstValMap;
+// key of map is var name, the value vector is the
+// vector of values for multiple cycles, since an
+// instruction might span numtiple cycles
 std::vector<std::map<std::string, 
                      std::vector<std::string>>> toDoList;
 std::map<std::string, std::map<std::string, 
@@ -204,7 +208,12 @@ void print_instr_calls(std::map<std::string,
     }
     else if(writeASV == dataAddr) {
       funcCall = func_call(g_dataAddrVar, funcName, pair.second.argTy, encoding);
-      
+      cpp << prefix+funcCall << std::endl;
+      cpp << prefix+"  printf( \""+g_dataAddrVar+": %ld\\n\", "+g_dataAddrVar+" );" << std::endl;
+      cpp << std::endl;
+      cpp << prefix+"  unsigned int data_byte_addr = "+g_dataAddrVar+" >> 2;" << std::endl;
+      cpp << prefix+"  "+g_dataIn+" = mem[data_byte_addr] ;" << std::endl;
+      cpp << prefix+"  printf( \"load data addr : %d\\n\", data_byte_addr );" << std::endl;      
     }
   }
   cpp << prefix+"  printf( \"\\n\" );" << std::endl;
@@ -243,7 +252,11 @@ std::string func_call(std::string writeASV, std::string funcName,
   for(auto pair: argTy) {
     std::string arg = pair.second;
     std::string argValue;
-    if(inputInstr.find(arg) != inputInstr.end()) {
+    if(arg.substr(0, 9) == "FROM_MEM_") {
+      assert(inputInstr[arg].front() == "FROM_MEM");
+      argValue = g_dataIn;
+    }
+    else if(inputInstr.find(arg) != inputInstr.end()) {
       if((inputInstr.at(arg)).size() > 1) {
         toCout("Warning: instruction spans mulitple cycles!");
       }

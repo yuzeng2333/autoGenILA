@@ -96,7 +96,8 @@ void make_instr(uint32_t instrIdx) {
         varIdxMap.emplace(var, 0);
       else
         (varIdxMap[var])++;
-      if(var == instrInfo.dataIn.first 
+      if( !instrInfo.dataIn.first.empty()
+           && var == instrInfo.dataIn.first 
            && varIdxMap[var] == instrInfo.dataIn.second-1 ) {
         to_file(""+var+" = FROM_MEM");
       }
