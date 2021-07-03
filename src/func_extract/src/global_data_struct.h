@@ -45,6 +45,13 @@ using namespace taintGen;
 
 namespace funcExtract {
 
+//struct LoadDataInfo_t {
+//    // only load instruction has dataAddr: to get data from dmem
+//  std::string dataAddr;
+//  // first is arg name, second is the index of the arg
+//  std::pair<std::string, uint32_t> dataIn;
+//};
+
 
 struct FuncTy_t {
   uint32_t retTy;
@@ -66,10 +73,9 @@ struct InstrInfo_t {
   // key is writeASV. Each instruction might update multiple ASVs
   std::map<std::string, FuncTy_t> funcTypes;
   std::string instrAddr;
-  // only load instruction has dataAddr: to get data from dmem
-  std::string dataAddr;
-  // first is arg name, second is the index of the arg
-  std::pair<std::string, uint32_t> dataIn;
+  std::string dataAddr;  
+  // key is the name of target
+  std::map<std::string, std::pair<std::string, uint32_t>> loadDataInfo;
   std::map<std::string, uint32_t> delayExceptions;
 };
 

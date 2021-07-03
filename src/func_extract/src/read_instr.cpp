@@ -86,25 +86,44 @@ void read_in_instructions(std::string fileName) {
       std::string dataAddr = line.substr(10);
       remove_two_end_space(dataAddr);
       g_instrInfo.back().dataAddr = dataAddr;
-      continue;
     }
-    if(line.substr(0, 7) == "#dataIn") {
-      std::string dataIn = line.substr(8);
-      size_t pos = dataIn.find("(");
-      std::string idx;
-      if(pos != std::string::npos) {
-        idx = dataIn.substr(pos+1);      
-        dataIn = dataIn.substr(0, pos);
-        remove_two_end_space(idx);
-        idx.pop_back();
-        remove_two_end_space(idx);
+    if(line.substr(0, 12) == "#needDataTgt") {
+      std::string varName = line.substr(13);
+      size_t pos = varName.find("{");
+      varName = varName.substr(0, pos);
+      remove_two_end_space(varName);
+      if(g_instrInfo.back().loadDataInfo.find(varName) 
+           != g_instrInfo.back().loadDataInfo.end()) {
+        toCout("Error: target is already in loadDataInfo: "+varName);
+        abort();
       }
-      remove_two_end_space(dataIn);
-      uint32_t idxNum;
-      if(idx.empty()) idxNum = 0;
-      else idxNum = std::stoi(idx);
-      g_instrInfo.back().dataIn = std::make_pair(dataIn, idxNum);
-      continue;
+      g_instrInfo.back().loadDataInfo.emplace(varName, std::make_pair("", 0));
+      std::string newLine;
+      while(newLine != "}") {
+        std::getline(input, newLine);
+        if(newLine.substr(0, 2) == "//") continue;
+        else if(newLine.substr(0, 7) == "#dataIn") {
+          std::string dataIn = newLine.substr(8);
+          size_t pos = dataIn.find("(");
+          std::string idx;
+          if(pos != std::string::npos) {
+            idx = dataIn.substr(pos+1);      
+            dataIn = dataIn.substr(0, pos);
+            remove_two_end_space(idx);
+            idx.pop_back();
+            remove_two_end_space(idx);
+          }
+          remove_two_end_space(dataIn);
+          uint32_t idxNum;
+          if(idx.empty()) idxNum = 0;
+          else idxNum = std::stoi(idx);
+          g_instrInfo.back().loadDataInfo[varName] = std::make_pair(dataIn, idxNum);
+        }
+        else {
+          toCout("Unexpected line: "+newLine);
+          abort();
+        }
+      }
     }
     if(line.back() == ' ')
       line.pop_back();

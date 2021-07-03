@@ -119,6 +119,8 @@ uint32_t get_instr_by_name(std::string instrName) {
 std::string decode(const std::map<std::string, std::vector<std::string>> &inputInstr) {
   bool isCompatible;
   for(auto instr: g_instrInfo) {
+    if(instr.name == "lh")
+      toCout("Find it!");
     isCompatible = true;
     for(auto pair : inputInstr) {
       std::string varName = pair.first;
@@ -160,6 +162,10 @@ bool is_compatible(const std::vector<std::string> &multiCycleValue1,
     uint32_t num = valueVec1.size();
     for(uint32_t j = 0; j < num; j++) {
       if(!same_value(valueVec1[j], valueVec2[j])) {
+        //toCout("valueVec1: "+toStr(j));
+        //for(auto val: valueVec1) toCout(val);
+        //for(auto val: valueVec2) toCout(val);
+        //toCout("\n");
         return false;
       }
     }
@@ -169,6 +175,8 @@ bool is_compatible(const std::vector<std::string> &multiCycleValue1,
 
 
 bool same_value(std::string val1, std::string val2) {
+  if(val1 == "5'hx" && val2 == "5'ha")
+    toCout("Find it!");
   std::smatch m;
   std::regex pX("(\\d+)'(d|h|b)x");
   std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");
