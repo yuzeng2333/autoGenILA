@@ -147,7 +147,7 @@ bool is_compatible(const std::vector<std::string> &multiCycleValue1,
   std::vector<std::string> valueVec2;
   valueVec1.clear();
   valueVec2.clear();
-  assert(multiCycleValue1.size() == multiCycleValue2.size());
+  if(multiCycleValue1.size() != multiCycleValue2.size()) return false;
   uint32_t size = multiCycleValue1.size();
   for(uint32_t i = 0; i < size; i++) {
     valueVec1.clear();
