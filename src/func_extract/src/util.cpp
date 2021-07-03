@@ -34,11 +34,16 @@ void read_to_do_instr(std::string fileName,
       remove_two_end_space(varName);
       std::string value = line.substr(pos+1);
       remove_two_end_space(value);
-      if(toDoList.back().find(varName) == toDoList.back().end()) {
-        toDoList.back().emplace(varName, std::vector<std::string>{value});
+      if(value == "FROM_MEM") {
+        toDoList.back().emplace("FROM_MEM_"+varName, std::vector<std::string>{"FROM_MEM"});
       }
       else {
-        toDoList.back()[varName].push_back(value);
+        if(toDoList.back().find(varName) == toDoList.back().end()) {
+          toDoList.back().emplace(varName, std::vector<std::string>{value});
+        }
+        else {
+          toDoList.back()[varName].push_back(value);
+        }
       }
     }
   }
@@ -214,6 +219,5 @@ bool same_value(std::string val1, std::string val2) {
   uint32_t v2 = hdb2int(val2);
   return v1 == v2;
 }
-
 
 }

@@ -93,15 +93,15 @@ void read_in_instructions(std::string fileName) {
       size_t pos = dataIn.find("(");
       std::string idx;
       if(pos != std::string::npos) {
+        idx = dataIn.substr(pos+1);      
         dataIn = dataIn.substr(0, pos);
-        idx = dataIn.substr(pos+1);
         remove_two_end_space(idx);
         idx.pop_back();
         remove_two_end_space(idx);
       }
       remove_two_end_space(dataIn);
       uint32_t idxNum;
-      if(idx.emplace()) idxNum = 0;
+      if(idx.empty()) idxNum = 0;
       else idxNum = std::stoi(idx);
       g_instrInfo.back().dataIn = std::make_pair(dataIn, idxNum);
       continue;
