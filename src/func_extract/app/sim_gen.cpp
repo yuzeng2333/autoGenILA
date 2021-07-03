@@ -187,7 +187,19 @@ void print_instr_calls(std::map<std::string,
   }
   std::string instrAddr = var_name_convert(instrInfo.instrAddr, true);
   std::string dataAddr = var_name_convert(instrInfo.dataAddr, true);
-  for(auto pair : instrInfo.funcTypes) {
+  // reorder the funcTypes, which also reorder the sequence of calling update functions
+  // put call for dataAddr at the first
+  std::vector<std::pair<std::string, FuncTy_t>> tmpFuncTypes;
+  for(pair: instrInfo.funcTypes) {
+    if(pair.first == instrInfo.dataAddr) {
+      tmpFuncTypes.insert(tmpFuncTypes.begin(), std::make_pair(pair.first, pair.second));
+    }
+    else {
+      tmpFuncTypes.push_back(std::make_pair(pair.first, pair.second));
+    }
+  }
+
+  for(auto pair : tmpFuncTypes) {
     std::string writeASV = pair.first;
     writeASV = var_name_convert(writeASV, true);
     std::string funcName = instrInfo.name + CNCT + writeASV;
