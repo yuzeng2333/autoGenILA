@@ -35,6 +35,7 @@ void get_all_update() {
   std::set<std::string> allowedTgt;
   std::ifstream allowedTgtInFile(g_path+"/allowed_target.txt");
   while(std::getline(allowedTgtInFile, line)) {
+    if(line.substr(0, 2) == "//")  continue;
     remove_two_end_space(line);
     allowedTgt.insert(line);
   }

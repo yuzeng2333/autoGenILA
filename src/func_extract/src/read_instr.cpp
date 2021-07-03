@@ -1,4 +1,5 @@
 #include "read_instr.h"
+#include "helper.h"
 #include "global_data_struct.h"
 
 namespace funcExtract {
