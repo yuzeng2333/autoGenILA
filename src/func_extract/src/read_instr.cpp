@@ -86,6 +86,7 @@ void read_in_instructions(std::string fileName) {
       std::string dataAddr = line.substr(10);
       remove_two_end_space(dataAddr);
       g_instrInfo.back().dataAddr = dataAddr;
+      continue;
     }
     if(line.substr(0, 12) == "#needDataTgt") {
       std::string varName = line.substr(13);
@@ -99,9 +100,10 @@ void read_in_instructions(std::string fileName) {
       }
       g_instrInfo.back().loadDataInfo.emplace(varName, std::make_pair("", 0));
       std::string newLine;
+      std::getline(input, newLine);      
       while(newLine != "}") {
-        std::getline(input, newLine);
-        if(newLine.substr(0, 2) == "//") continue;
+        remove_two_end_space(newLine);
+        if(newLine.substr(0, 2) == "//") {}
         else if(newLine.substr(0, 7) == "#dataIn") {
           std::string dataIn = newLine.substr(8);
           size_t pos = dataIn.find("(");
@@ -123,13 +125,18 @@ void read_in_instructions(std::string fileName) {
           toCout("Unexpected line: "+newLine);
           abort();
         }
+        std::getline(input, newLine);
       }
+      continue;
     }
     if(line.back() == ' ')
       line.pop_back();
     if(line.front() == '#') { // a new instr begins
       std::smatch m;
-      assert(std::regex_match(line, m, pIdx));
+      if(!std::regex_match(line, m, pIdx)) {
+        toCout("Error: does not match pIdx: "+line);
+        abort();
+      }
       g_instrName = m.str(1); 
       state = FirstSignal;
       firstSignalSeen = false;
