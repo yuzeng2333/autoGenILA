@@ -89,11 +89,23 @@ void make_instr(uint32_t instrIdx) {
   uint32_t instrLen = instrInfo.instrEncoding.begin()->second.size();
   for(uint32_t i = 0; i < instrLen; i++) {
     to_file("("+toStr(i)+")");
+    std::map<std::string, uint32_t> varIdxMap; 
     for(auto pair: instrInfo.instrEncoding) {
-      if(i == 0)
-        assign_instr_value(pair.first, pair.second[i], true);
+      std::string var = pair.first;
+      if(varIdxMap.find(var) == varIdxMap.end())
+        varIdxMap.emplace(var, 0);
       else
-        assign_instr_value(pair.first, regValueMap[pair.first], true);
+        (varIdxMap[var])++;
+      if(var == instrInfo.dataIn.first 
+           && varIdxMap[var] == instrInfo.dataIn.second-1 ) {
+        to_file(""+var+" = FROM_MEM");
+      }
+      else {
+        if(i == 0)
+          assign_instr_value(var, pair.second[i], true);
+        else
+          assign_instr_value(var, regValueMap[pair.first], true);
+      }
     }
   }
 }

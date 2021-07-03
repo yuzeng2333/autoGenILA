@@ -24,7 +24,8 @@ using namespace taintGen;
 
 bool g_use_mem = true;
 std::string g_instrValueVar = "mem_rdata";
-std::string g_memAddrVar = "zy_mem_addr";
+std::string g_instrAddrVar = "zy_instr_addr";
+std::string g_dataAddrVar = "zy_data_addr";
 std::string nxt = "_nxt";
 std::map<std::string, std::string> rstValMap;
 std::vector<std::map<std::string, 
@@ -48,6 +49,7 @@ int main(int argc, char *argv[]) {
   g_verb = false;
   read_in_instructions(g_path+"/instr.txt");
   read_asv_info(g_path+"/asv_info.txt");
+  // fill the funcTypes in g_instrInfo
   read_func_info(g_path+"/func_info.txt");
   read_to_do_instr(g_path+"/tb.txt", toDoList);
   read_refinement(g_path+"/refinement.txt");
@@ -93,7 +95,8 @@ int main(int argc, char *argv[]) {
     ret = "  "+asvTy+" "+asvSimp+nxt+" = "+rstVal+";";
     cpp << ret << std::endl;
   }
-  cpp << "  unsigned int "+g_memAddrVar+" = 0;" << std::endl;
+  cpp << "  unsigned int "+g_instrAddrVar+" = 0;" << std::endl;
+  cpp << "  unsigned int "+g_dataAddrVar+" = 0;" << std::endl;
   cpp << std::endl;
 
   // initialization of regs
@@ -122,7 +125,7 @@ int main(int argc, char *argv[]) {
     cpp << "  int addr ;" << std::endl;
     cpp << std::endl;
     cpp << "  for(int i = 0; i < "+toStr(instrNum)+"; i++) {" << std::endl;
-    cpp << "    addr = ("+g_memAddrVar+" >> 2) % "+toStr(instrNum)+";" << std::endl;
+    cpp << "    addr = ("+g_instrAddrVar+" >> 2) % "+toStr(instrNum)+";" << std::endl;
     //cpp << "    mem_rdata = mem[addr];" << std::endl;
     cpp << "    switch(addr) {" <<std::endl;
     idx = 0;
@@ -178,7 +181,8 @@ void print_instr_calls(std::map<std::string,
     toCout(" Error: instrAddr is not specified for: "+instrInfo.name);
     abort();
   }
-  std::string  memAddr = var_name_convert(instrInfo.instrAddr, true);
+  std::string instrAddr = var_name_convert(instrInfo.instrAddr, true);
+  std::string dataAddr = var_name_convert(instrInfo.dataAddr, true);
   for(auto pair : instrInfo.funcTypes) {
     std::string writeASV = pair.first;
     writeASV = var_name_convert(writeASV, true);
@@ -192,11 +196,15 @@ void print_instr_calls(std::map<std::string,
       printName = g_refineMap[instrName][writeASV];
     cpp << prefix+"  printf( \""+printName+": %ld\\n\", "+writeASV+nxt+" );" << std::endl;
     cpp << std::endl;
-    if(writeASV == memAddr) {
-      funcCall = func_call(g_memAddrVar, funcName, pair.second.argTy, encoding);
+    if(writeASV == instrAddr) {
+      funcCall = func_call(g_instrAddrVar, funcName, pair.second.argTy, encoding);
       cpp << prefix+funcCall << std::endl;
-      cpp << prefix+"  printf( \""+g_memAddrVar+": %ld\\n\", "+g_memAddrVar+" );" << std::endl;
+      cpp << prefix+"  printf( \""+g_instrAddrVar+": %ld\\n\", "+g_instrAddrVar+" );" << std::endl;
       cpp << std::endl;
+    }
+    else if(writeASV == dataAddr) {
+      funcCall = func_call(g_dataAddrVar, funcName, pair.second.argTy, encoding);
+      
     }
   }
   cpp << prefix+"  printf( \"\\n\" );" << std::endl;
