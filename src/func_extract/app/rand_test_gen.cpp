@@ -26,6 +26,7 @@ void to_file(std::string line) {
   g_output << line << std::endl;
 }
 
+
 std::string materialize_num(std::string val) {
   assert(val.find("+") == std::string::npos);
   std::smatch m;
@@ -89,24 +90,19 @@ void make_instr(uint32_t instrIdx) {
   uint32_t instrLen = instrInfo.instrEncoding.begin()->second.size();
   for(uint32_t i = 0; i < instrLen; i++) {
     to_file("("+toStr(i)+")");
-    std::map<std::string, uint32_t> varIdxMap; 
     for(auto pair: instrInfo.instrEncoding) {
       std::string var = pair.first;
-      if(varIdxMap.find(var) == varIdxMap.end())
-        varIdxMap.emplace(var, 0);
+      //if( !instrInfo.dataIn.first.empty()
+      //     && var == instrInfo.dataIn.first 
+      //     && varIdxMap[var] == instrInfo.dataIn.second-1 ) {
+      //  to_file(""+var+" = FROM_MEM");
+      //}
+      //else {
+      if(i == 0)
+        assign_instr_value(var, pair.second[i], true);
       else
-        (varIdxMap[var])++;
-      if( !instrInfo.dataIn.first.empty()
-           && var == instrInfo.dataIn.first 
-           && varIdxMap[var] == instrInfo.dataIn.second-1 ) {
-        to_file(""+var+" = FROM_MEM");
-      }
-      else {
-        if(i == 0)
-          assign_instr_value(var, pair.second[i], true);
-        else
-          assign_instr_value(var, regValueMap[pair.first], true);
-      }
+        assign_instr_value(var, regValueMap[pair.first], true);
+      //}
     }
   }
 }
@@ -123,6 +119,7 @@ int main(int argc, char *argv[]) {
   read_in_instructions(g_path+"/instr.txt");
   g_output.open(g_path+"/tb.txt", std::ios::out);
   srand(time(NULL));
+  //srand(1);
 
   uint32_t idx = 0;
   while(idx++ < InstrNum) {

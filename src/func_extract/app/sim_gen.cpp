@@ -10,12 +10,6 @@ using namespace funcExtract;
 using namespace taintGen;
 
 
-// TODO: declare two sets of variables: new var and old var
-// TODO: declare two sets of variables: new var and old var
-// TODO: declare two sets of variables: new var and old var
-// TODO: declare two sets of variables: new var and old var
-// TODO: declare two sets of variables: new var and old var
-
 // This function will generate a c++ simulation file
 // for a series of instructions. 
 
@@ -175,12 +169,12 @@ void print_instr_calls(std::map<std::string,
                                 std::vector<std::string>> &encoding,
                        std::string prefix,
                        std::ofstream &cpp,
-                       uint32_t instrAddr) {
+                       uint32_t memAddr) {
   std::string instrName = decode(encoding);
   uint32_t idx = get_instr_by_name(instrName);
   auto instrInfo = g_instrInfo[idx];    
   cpp << prefix+"  // instr"+toStr(idx)+": "+instrInfo.name << std::endl;
-  cpp << prefix+"  printf( \"// instr"+toStr(idx)+": "+instrInfo.name+", memAddr: "+toStr(instrAddr)+" \\n \");" << std::endl;
+  cpp << prefix+"  printf( \"// instr"+toStr(idx)+": "+instrInfo.name+", memAddr: "+toStr(memAddr)+" \\n \");" << std::endl;
   if(instrInfo.instrAddr.empty()) {
     toCout(" Error: instrAddr is not specified for: "+instrInfo.name);
     abort();
@@ -190,7 +184,7 @@ void print_instr_calls(std::map<std::string,
   // reorder the funcTypes, which also reorder the sequence of calling update functions
   // put call for dataAddr at the first
   std::vector<std::pair<std::string, FuncTy_t>> tmpFuncTypes;
-  for(pair: instrInfo.funcTypes) {
+  for(auto pair: instrInfo.funcTypes) {
     if(pair.first == instrInfo.dataAddr) {
       tmpFuncTypes.insert(tmpFuncTypes.begin(), std::make_pair(pair.first, pair.second));
     }
@@ -205,7 +199,8 @@ void print_instr_calls(std::map<std::string,
     std::string funcName = instrInfo.name + CNCT + writeASV;
     // should replace the input-type arg in the function call with explicit values 
     // in the instruction
-    std::string funcCall = func_call(writeASV+nxt, funcName, pair.second.argTy, encoding);
+    std::string funcCall = func_call(writeASV+nxt, funcName, pair.second.argTy, 
+                                     encoding, instrInfo.dataIn);
     cpp << prefix+funcCall << std::endl;
     std::string printName = writeASV;
     if(g_refineMap[instrName].find(writeASV) != g_refineMap[instrName].end())
@@ -213,13 +208,13 @@ void print_instr_calls(std::map<std::string,
     cpp << prefix+"  printf( \""+printName+": %ld\\n\", "+writeASV+nxt+" );" << std::endl;
     cpp << std::endl;
     if(writeASV == instrAddr) {
-      funcCall = func_call(g_instrAddrVar, funcName, pair.second.argTy, encoding);
+      funcCall = func_call(g_instrAddrVar, funcName, pair.second.argTy, encoding, instrInfo.dataIn);
       cpp << prefix+funcCall << std::endl;
       cpp << prefix+"  printf( \""+g_instrAddrVar+": %ld\\n\", "+g_instrAddrVar+" );" << std::endl;
       cpp << std::endl;
     }
     else if(writeASV == dataAddr) {
-      funcCall = func_call(g_dataAddrVar, funcName, pair.second.argTy, encoding);
+      funcCall = func_call(g_dataAddrVar, funcName, pair.second.argTy, encoding, instrInfo.dataIn);
       cpp << prefix+funcCall << std::endl;
       cpp << prefix+"  printf( \""+g_dataAddrVar+": %ld\\n\", "+g_dataAddrVar+" );" << std::endl;
       cpp << std::endl;
@@ -259,14 +254,21 @@ std::string asv_type(uint32_t width) {
 // currently only support one-cycle inputInstr
 std::string func_call(std::string writeASV, std::string funcName, 
                       const std::vector<std::pair<uint32_t, std::string>> &argTy,
-                      std::map<std::string, std::vector<std::string>> &inputInstr) {
+                      std::map<std::string, std::vector<std::string>> &inputInstr,
+                      std::pair<std::string, uint32_t> dataIn) {
   std::string ret = "  "+writeASV+" = "+funcName+"( ";
+  std::map<std::string, uint32_t> varIdxMap; 
   for(auto pair: argTy) {
     std::string arg = pair.second;
+    if(varIdxMap.find(arg) == varIdxMap.end())
+      varIdxMap.emplace(arg, 0);
+    else
+      (varIdxMap[arg])++;
     std::string argValue;
-    if(arg.substr(0, 9) == "FROM_MEM_") {
-      assert(inputInstr[arg].front() == "FROM_MEM");
-      argValue = g_dataIn;
+    if( !dataIn.first.empty()
+         && arg == dataIn.first 
+         && varIdxMap[arg] == dataIn.second-1 ) {
+      argValue = g_dataIn;      
     }
     else if(inputInstr.find(arg) != inputInstr.end()) {
       if((inputInstr.at(arg)).size() > 1) {

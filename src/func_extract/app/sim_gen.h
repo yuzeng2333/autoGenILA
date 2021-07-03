@@ -13,7 +13,8 @@ std::string asv_type(uint32_t width);
 
 std::string func_call(std::string writeASV, std::string funcName, 
                       const std::vector<std::pair<uint32_t, std::string>> &argTy,
-                      std::map<std::string, std::vector<std::string>> &inputInstr);                      
+                      std::map<std::string, std::vector<std::string>> &inputInstr,
+                      std::pair<std::string, uint32_t> dataIn);                      
 
 void print_func_declare(struct FuncTy_t funcTy, 
                         std::string funcName, 
