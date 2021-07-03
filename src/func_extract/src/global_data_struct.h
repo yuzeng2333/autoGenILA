@@ -68,6 +68,8 @@ struct InstrInfo_t {
   std::string instrAddr;
   // only load instruction has dataAddr: to get data from dmem
   std::string dataAddr;
+  // first is arg name, second is the index of the arg
+  std::pair<std::string, uint32_t> dataIn;
   std::map<std::string, uint32_t> delayExceptions;
 };
 
@@ -230,6 +232,7 @@ extern std::map<std::string, uint32_t> g_asv;
 
 extern Str2StrVecMap_t g_moduleInputsMap;
 extern Str2StrVecMap_t g_moduleOutputsMap;
+extern std::set<std::string> g_allowedTgt;
 extern std::queue<std::pair<std::string, uint32_t>> g_goalVars;
 extern std::ofstream g_outFil;
 extern std::string g_pj_path; 

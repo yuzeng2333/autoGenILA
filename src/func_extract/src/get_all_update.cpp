@@ -32,15 +32,6 @@ void get_all_update() {
   std::ofstream visitedTgtFile;
   visitedTgtFile.open(g_path+"/visited_target.txt", std::ios_base::app);
 
-  std::set<std::string> allowedTgt;
-  std::ifstream allowedTgtInFile(g_path+"/allowed_target.txt");
-  while(std::getline(allowedTgtInFile, line)) {
-    if(line.substr(0, 2) == "//")  continue;
-    remove_two_end_space(line);
-    allowedTgt.insert(line);
-  }
-  allowedTgtInFile.close();
-
   std::ifstream addedWorkSetInFile(g_path+"/added_work_set.txt");
   auto topModuleInfo = g_moduleInfoMap[g_topModule];
   std::set<std::string> workSet;
@@ -70,9 +61,9 @@ void get_all_update() {
   std::ofstream addedWorkSetFile;
   addedWorkSetFile.open(g_path+"/added_work_set.txt", std::ios_base::app);
 
-  if(!allowedTgt.empty()) {
-    workSet = allowedTgt;
-    for(std::string tgt: allowedTgt) {
+  if(!g_allowedTgt.empty()) {
+    workSet = g_allowedTgt;
+    for(std::string tgt: g_allowedTgt) {
       uint32_t width = get_var_slice_width_cmplx(tgt);
       asvSet.emplace(tgt, width);
     }
