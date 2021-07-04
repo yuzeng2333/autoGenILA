@@ -209,14 +209,14 @@ void print_instr_calls(std::map<std::string,
 
     std::string funcCall;
     if(instrInfo.funcTgtMap.find(origWriteASV) != instrInfo.funcTgtMap.end()) {
-      for(std::string mappedVar : instrInfo.funcTgtMap[origWriteASV]) {
-        mappedVar = var_name_convert(mappedVar, true);
+      for(std::string origMappedVar : instrInfo.funcTgtMap[origWriteASV]) {
+        std::string mappedVar = var_name_convert(origMappedVar, true);
         funcCall = func_call(mappedVar+nxt, funcName, pair.second.argTy, 
                              encoding, instrInfo.loadDataInfo[origWriteASV]);
         cpp << prefix+funcCall << std::endl;
         cpp << prefix+"  printf( \""+mappedVar+": %ld\\n\", "+mappedVar+nxt+" );" << std::endl;
         cpp << std::endl;
-        remappedVar.insert(origWriteASV);
+        remappedVar.insert(origMappedVar);
       }
     }
     else {
