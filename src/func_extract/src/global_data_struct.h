@@ -77,6 +77,8 @@ struct InstrInfo_t {
   // key is the name of target
   std::map<std::string, std::pair<std::string, uint32_t>> loadDataInfo;
   std::map<std::string, uint32_t> delayExceptions;
+  // map update function to new target var(s)
+  std::map<std::string, std::set<std::string>> funcTgtMap;
 };
 
 

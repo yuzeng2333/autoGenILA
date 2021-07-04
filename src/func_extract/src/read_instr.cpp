@@ -129,6 +129,38 @@ void read_in_instructions(std::string fileName) {
       }
       continue;
     }
+  
+
+    if(line.substr(0, 7) == "#VarMap") {
+      std::string newLine;
+      std::getline(input, newLine);      
+      while(newLine != "}") {
+        remove_two_end_space(newLine);
+        if(newLine.substr(0, 2) == "//") {}
+        else if(newLine.find(":") != std::string::npos) {
+
+          size_t pos = newLine.find(":");
+          std::string mappedVar = newLine.substr(0, pos);
+          remove_two_end_space(mappedVar);
+          std::string srcVar = newLine.substr(pos+1);
+          remove_two_end_space(srcVar);
+          if(g_instrInfo.back().funcTgtMap.find(srcVar)
+               == g_instrInfo.back().funcTgtMap.end()) {
+            g_instrInfo.back().funcTgtMap.emplace(srcVar,
+                                                  std::set<std::string>{mappedVar});
+          }
+          else {
+            g_instrInfo.back().funcTgtMap[srcVar].insert(mappedVar);
+          }
+        }
+        else {
+          toCout("Unexpected line: "+newLine);
+          abort();
+        }
+        std::getline(input, newLine);
+      }
+      continue;
+    }
     if(line.back() == ' ')
       line.pop_back();
     if(line.front() == '#') { // a new instr begins
