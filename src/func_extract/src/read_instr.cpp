@@ -129,8 +129,6 @@ void read_in_instructions(std::string fileName) {
       }
       continue;
     }
-  
-
     if(line.substr(0, 7) == "#VarMap") {
       std::string newLine;
       std::getline(input, newLine);      
