@@ -1,4 +1,5 @@
-#include "sim_gen.h"
+
+// #include "sim_gen.h"
 #include "../src/helper.h"
 #include "../src/util.h"
 #include "../src/vcd_parser.h"
@@ -254,14 +255,14 @@ void print_instr_calls(std::map<std::string,
 std::string asv_type(uint32_t width) {
   std::string ret;
   switch (width) {
-    case 1 ... 8:
-      ret = "unsigned char";
-      break;
-    case 9 ... 16:
+    //case 1 ... 8:
+    //  ret = "unsigned char";
+    //  break;
+    case 1 ... 16:
       ret = "unsigned short";
       break;
     case 17 ... 32:
-      ret = "int";
+      ret = "unsigned int";
       break;
     case 33 ... 64:
       ret = "long int";
