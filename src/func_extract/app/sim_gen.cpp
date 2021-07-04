@@ -100,10 +100,21 @@ int main(int argc, char *argv[]) {
   cpp << std::endl;
 
   // initialization of regs
+  std::set<std::string> initializedReg;
   cpp << "  printf( \" // Initialization \\n\" );" << std::endl;
   for(auto pair : rstValMap) {
     std::string reg = var_name_convert(pair.first, true);
+    initializedReg.insert(reg);
     cpp << "  printf( \""+reg+": "+pair.second+"\\n\" );" << std::endl;
+  }
+  // initialized rtlVars in the refinement map
+  for(auto pair1 : g_refineMap) {
+    for(auto pair2 : pair1.second) {
+      std::string rtlVar = pair2.second;
+      if(initializedReg.find(rtlVar) != initializedReg.end()) continue;
+      else initializedReg.insert(rtlVar);
+      cpp << "  printf( \""+rtlVar+": 0\\n\" );" << std::endl;
+    }
   }
   cpp << std::endl;
 

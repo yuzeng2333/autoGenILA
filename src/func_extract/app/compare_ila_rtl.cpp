@@ -148,6 +148,7 @@ void read_ignored_asv(std::string fileName) {
   std::string line;
   while(std::getline(input, line)) {
     remove_two_end_space(line);
+    line = var_name_convert(line, true);
     ignoredASV.insert(line);
   }
 }
