@@ -53,6 +53,7 @@ int main(int argc, char *argv[]) {
   read_refinement(g_path+"/refinement.txt");
   uint32_t instrNum;
   instrNum = std::stoi(argv[2]);
+  uint32_t memSize = toDoList.size();
 
   std::ofstream header(g_path+"/ila.h");
   std::ofstream cpp(g_path+"/ila.c");
@@ -112,7 +113,7 @@ int main(int argc, char *argv[]) {
     uint32_t instrNumBits = ceil(log2(instrNum));
     // actually the declaration and initialization of mem is not necessarily
     // but for convenience of reference, I keep thse code
-    cpp << "  unsigned int mem["+toStr(instrNum)+"];" << std::endl;
+    cpp << "  unsigned int mem["+toStr(memSize)+"];" << std::endl;
     uint32_t idx = 0;
     for(auto encoding: toDoList) {
       uint32_t intValue = convert_to_single_num(encoding[g_instrValueVar].front());    
@@ -124,7 +125,7 @@ int main(int argc, char *argv[]) {
     cpp << "  int addr ;" << std::endl;
     cpp << std::endl;
     cpp << "  for(int i = 0; i < "+toStr(instrNum)+"; i++) {" << std::endl;
-    cpp << "    addr = ("+g_instrAddrVar+" >> 2) % "+toStr(instrNum)+";" << std::endl;
+    cpp << "    addr = ("+g_instrAddrVar+" >> 2) % "+toStr(memSize)+";" << std::endl;
     //cpp << "    mem_rdata = mem[addr];" << std::endl;
     cpp << "    switch(addr) {" <<std::endl;
     idx = 0;

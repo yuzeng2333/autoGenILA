@@ -133,8 +133,9 @@ void compare_results() {
 uint32_t to_int(std::string value) {
   if(is_x(value)) return 0;
   else if(!is_number(value)) {
-    toCout("Error: see a non-number value: "+value);
-    abort();
+    toCout("Warning: see a non-number value: "+value);
+    //abort();
+    return value[0] - '0';
   }
   else return std::stol(value);
 }
