@@ -99,7 +99,9 @@ void align_map_size(std::map<std::string, std::vector<uint32_t>> &ilaValues) {
 
 
 void compare_results() {
-  uint32_t idx = 0;
+  // skip the first item in both results since it is 
+  // before any instruction being executed
+  uint32_t idx = 1;
   uint32_t len = std::min(rtlValueLen, ilaValueLen);
   read_ignored_asv(g_path+"/ignore_asv.txt");
   while(idx < len) {
