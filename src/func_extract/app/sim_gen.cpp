@@ -203,14 +203,28 @@ void print_instr_calls(std::map<std::string,
     std::string funcName = instrInfo.name + CNCT + writeASV;
     // should replace the input-type arg in the function call with explicit values 
     // in the instruction
-    std::string funcCall = func_call(writeASV+nxt, funcName, pair.second.argTy, 
-                                     encoding, instrInfo.loadDataInfo[origWriteASV]);
-    cpp << prefix+funcCall << std::endl;
-    std::string printName = writeASV;
-    if(g_refineMap[instrName].find(writeASV) != g_refineMap[instrName].end())
-      printName = g_refineMap[instrName][writeASV];
-    cpp << prefix+"  printf( \""+printName+": %ld\\n\", "+writeASV+nxt+" );" << std::endl;
-    cpp << std::endl;
+
+    std::string funcCall;
+    if(instrInfo.funcTgtMap.find(origWriteASV) != instrInfo.funcTgtMap.end()) {
+      for(std::string mappedVar : instrInfo.funcTgtMap[origWriteASV]) {
+        mappedVar = var_name_convert(mappedVar, true);
+        funcCall = func_call(mappedVar+nxt, funcName, pair.second.argTy, 
+                             encoding, instrInfo.loadDataInfo[origWriteASV]);
+        cpp << prefix+funcCall << std::endl;
+        cpp << prefix+"  printf( \""+mappedVar+": %ld\\n\", "+mappedVar+nxt+" );" << std::endl;
+        cpp << std::endl;        
+      }
+    }
+    else {
+      funcCall = func_call(writeASV+nxt, funcName, pair.second.argTy, 
+                           encoding, instrInfo.loadDataInfo[origWriteASV]);
+      cpp << prefix+funcCall << std::endl;
+      std::string printName = writeASV;
+      if(g_refineMap[instrName].find(writeASV) != g_refineMap[instrName].end())
+        printName = g_refineMap[instrName][writeASV];
+      cpp << prefix+"  printf( \""+printName+": %ld\\n\", "+writeASV+nxt+" );" << std::endl;
+      cpp << std::endl;
+    }
     if(writeASV == instrAddr) {
       funcCall = func_call(g_instrAddrVar, funcName, pair.second.argTy, encoding, std::pair<std::string, uint32_t>{});
       cpp << prefix+funcCall << std::endl;
@@ -225,15 +239,6 @@ void print_instr_calls(std::map<std::string,
       cpp << prefix+"  unsigned int data_byte_addr = "+g_dataAddrVar+" >> 2;" << std::endl;
       cpp << prefix+"  "+g_dataIn+" = mem[data_byte_addr] ;" << std::endl;
       cpp << prefix+"  printf( \"load data addr : %d\\n\", data_byte_addr );" << std::endl;      
-    }
-    else if(instrInfo.funcTgtMap.find(origWriteASV) != instrInfo.funcTgtMap.end()) {
-      for(std::string mappedVar : instrInfo.funcTgtMap[origWriteASV]) {
-        mappedVar = var_name_convert(mappedVar, true);
-        funcCall = func_call(mappedVar+nxt, funcName, pair.second.argTy, 
-                             encoding, instrInfo.loadDataInfo[origWriteASV]);
-        cpp << prefix+"  printf( \""+mappedVar+": %ld\\n\", "+mappedVar+nxt+" );" << std::endl;
-        cpp << std::endl;        
-      }
     }
   }
   cpp << prefix+"  printf( \"\\n\" );" << std::endl;
