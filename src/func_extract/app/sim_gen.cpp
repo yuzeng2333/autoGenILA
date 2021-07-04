@@ -193,8 +193,11 @@ void print_instr_calls(std::map<std::string,
     }
   }
 
+  // use to collect mapped var, its original update functions are skipped
+  std::set<std::string> remappedVar;
   for(auto pair : tmpFuncTypes) {
     std::string origWriteASV = pair.first;
+    if(remappedVar.find(origWriteASV) != remappedVar.end()) continue;
     bool needData = (instrInfo.loadDataInfo.find(origWriteASV) != instrInfo.loadDataInfo.end()) ;
     std::string dataAddr = var_name_convert(instrInfo.dataAddr, true);    
     std::string writeASV = var_name_convert(origWriteASV, true);
@@ -212,7 +215,8 @@ void print_instr_calls(std::map<std::string,
                              encoding, instrInfo.loadDataInfo[origWriteASV]);
         cpp << prefix+funcCall << std::endl;
         cpp << prefix+"  printf( \""+mappedVar+": %ld\\n\", "+mappedVar+nxt+" );" << std::endl;
-        cpp << std::endl;        
+        cpp << std::endl;
+        remappedVar.insert(origWriteASV);
       }
     }
     else {
