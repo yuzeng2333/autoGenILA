@@ -97,15 +97,16 @@ int main(int argc, char *argv[]) {
   cpp << "  unsigned int "+g_instrAddrVar+" = 0;" << std::endl;
   cpp << "  unsigned int "+g_dataAddrVar+" = 0;" << std::endl;
   cpp << "  unsigned int "+g_dataIn+" = 0;" << std::endl;
+  cpp << "  int PRINT_ALL = 1;" << std::endl;
   cpp << std::endl;
 
   // initialization of regs
   std::set<std::string> initializedReg;
-  cpp << "  printf( \" // Initialization \\n\" );" << std::endl;
+  cpp << "  if(PRINT_ALL) printf( \" // Initialization \\n\" );" << std::endl;
   for(auto pair : rstValMap) {
     std::string reg = var_name_convert(pair.first, true);
     initializedReg.insert(reg);
-    cpp << "  printf( \""+reg+": "+pair.second+"\\n\" );" << std::endl;
+    cpp << "  if(PRINT_ALL) printf( \""+reg+": "+pair.second+"\\n\" );" << std::endl;
   }
   // initialized rtlVars in the refinement map
   for(auto pair1 : g_refineMap) {
@@ -113,7 +114,7 @@ int main(int argc, char *argv[]) {
       std::string rtlVar = pair2.second;
       if(initializedReg.find(rtlVar) != initializedReg.end()) continue;
       else initializedReg.insert(rtlVar);
-      cpp << "  printf( \""+rtlVar+": 0\\n\" );" << std::endl;
+      cpp << "  if(PRINT_ALL) printf( \""+rtlVar+": 0\\n\" );" << std::endl;
     }
   }
   cpp << std::endl;
@@ -157,10 +158,9 @@ int main(int argc, char *argv[]) {
     }
   }
   cpp << std::endl;
-
-
-
-
+  cpp << "  }" << std::endl;
+  cpp << std::endl;
+  print_final_results(cpp);
   cpp << "}" << std::endl; // end of main function
 
   // generate header file for update functions
@@ -187,7 +187,7 @@ void print_instr_calls(std::map<std::string,
   uint32_t idx = get_instr_by_name(instrName);
   auto instrInfo = g_instrInfo[idx];    
   cpp << prefix+"  // instr"+toStr(idx)+": "+instrInfo.name << std::endl;
-  cpp << prefix+"  printf( \"// instr"+toStr(idx)+": "+instrInfo.name+", memAddr: "+toStr(memAddr)+" \\n \");" << std::endl;
+  cpp << prefix+"  if(PRINT_ALL) printf( \"// instr"+toStr(idx)+": "+instrInfo.name+", memAddr: "+toStr(memAddr)+" \\n \");" << std::endl;
   if(instrInfo.instrAddr.empty()) {
     toCout(" Error: instrAddr is not specified for: "+instrInfo.name);
     abort();
@@ -226,7 +226,7 @@ void print_instr_calls(std::map<std::string,
         funcCall = func_call(mappedVar+nxt, funcName, pair.second.argTy, 
                              encoding, instrInfo.loadDataInfo[origWriteASV]);
         cpp << prefix+funcCall << std::endl;
-        cpp << prefix+"  printf( \""+mappedVar+": %ld\\n\", "+mappedVar+nxt+" );" << std::endl;
+        cpp << prefix+"  if(PRINT_ALL) printf( \""+mappedVar+": %ld\\n\", "+mappedVar+nxt+" );" << std::endl;
         cpp << std::endl;
         remappedVar.insert(origMappedVar);
       }
@@ -238,26 +238,26 @@ void print_instr_calls(std::map<std::string,
       std::string printName = writeASV;
       if(g_refineMap[instrName].find(writeASV) != g_refineMap[instrName].end())
         printName = g_refineMap[instrName][writeASV];
-      cpp << prefix+"  printf( \""+printName+": %ld\\n\", "+writeASV+nxt+" );" << std::endl;
+      cpp << prefix+"  if(PRINT_ALL) printf( \""+printName+": %ld\\n\", "+writeASV+nxt+" );" << std::endl;
       cpp << std::endl;
     }
     if(writeASV == instrAddr) {
       funcCall = func_call(g_instrAddrVar, funcName, pair.second.argTy, encoding, std::pair<std::string, uint32_t>{});
       cpp << prefix+funcCall << std::endl;
-      cpp << prefix+"  printf( \""+g_instrAddrVar+": %ld\\n\", "+g_instrAddrVar+" );" << std::endl;
+      cpp << prefix+"  if(PRINT_ALL) printf( \""+g_instrAddrVar+": %ld\\n\", "+g_instrAddrVar+" );" << std::endl;
       cpp << std::endl;
     }
     else if(writeASV == dataAddr) {
       funcCall = func_call(g_dataAddrVar, funcName, pair.second.argTy, encoding, instrInfo.loadDataInfo[origWriteASV]);
       cpp << prefix+funcCall << std::endl;
-      cpp << prefix+"  printf( \""+g_dataAddrVar+": %ld\\n\", "+g_dataAddrVar+" );" << std::endl;
+      cpp << prefix+"  if(PRINT_ALL) printf( \""+g_dataAddrVar+": %ld\\n\", "+g_dataAddrVar+" );" << std::endl;
       cpp << std::endl;
       cpp << prefix+"  unsigned int data_byte_addr = "+g_dataAddrVar+" >> 2;" << std::endl;
       cpp << prefix+"  "+g_dataIn+" = mem[data_byte_addr] ;" << std::endl;
-      cpp << prefix+"  printf( \"load data addr : %d\\n\", data_byte_addr );" << std::endl;      
+      cpp << prefix+"  if(PRINT_ALL) printf( \"load data addr : %d\\n\", data_byte_addr );" << std::endl;      
     }
   }
-  cpp << prefix+"  printf( \"\\n\" );" << std::endl;
+  cpp << prefix+"  if(PRINT_ALL) printf( \"\\n\" );" << std::endl;
   cpp << std::endl;
 }
 
@@ -411,4 +411,23 @@ void read_refinement(std::string fileName) {
       g_refineMap[instrName].emplace(ilaVar, rtlVar);
     }
   }
+}
+
+
+void print_final_results(std::ofstream &cpp) {
+  // if not PRINT_ALL, then print values only at the end
+  cpp << "  if(!PRINT_ALL) {" << std::endl;
+  cpp << "    printf(\"//// the final results:\");" << std::endl;
+  for(auto pair : g_asv) {
+    std::string reg = var_name_convert(pair.first, true);
+    cpp << "    printf( \""+reg+": %ld\\n\", "+reg+" );" << std::endl;
+  }
+  // initialized rtlVars in the refinement map
+  for(auto pair1 : g_refineMap) {
+    for(auto pair2 : pair1.second) {
+      std::string rtlVar = pair2.second;
+      cpp << "    printf( \""+rtlVar+": %ld\\n\", "+rtlVar+" );" << std::endl;
+    }
+  }
+  cpp << "  }" << std::endl
 }

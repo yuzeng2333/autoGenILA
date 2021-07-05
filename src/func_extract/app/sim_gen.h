@@ -31,3 +31,5 @@ void print_instr_calls(std::map<std::string,
 void update_asvs(std::ofstream &cpp, std::string prefix);
 
 void read_refinement(std::string fileName);
+
+void print_final_results(std::ofstream &cpp);
