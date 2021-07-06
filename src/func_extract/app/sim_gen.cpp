@@ -97,6 +97,7 @@ int main(int argc, char *argv[]) {
   cpp << "  unsigned int "+g_instrAddrVar+" = 0;" << std::endl;
   cpp << "  unsigned int "+g_dataAddrVar+" = 0;" << std::endl;
   cpp << "  unsigned int "+g_dataIn+" = 0;" << std::endl;
+  cpp << "  unsigned int data_byte_addr = 0; " << std::endl;  
   cpp << "  int PRINT_ALL = 1;" << std::endl;
   cpp << std::endl;
 
@@ -158,10 +159,9 @@ int main(int argc, char *argv[]) {
     }
   }
   cpp << std::endl;
-  cpp << "  }" << std::endl;
-  cpp << std::endl;
   print_final_results(cpp);
   cpp << "}" << std::endl; // end of main function
+  cpp.close();  
 
   // generate header file for update functions
   for(auto instrInfo : g_instrInfo) {
@@ -172,7 +172,6 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  cpp.close();
   header.close();
   return 0;
 }
@@ -196,6 +195,10 @@ void print_instr_calls(std::map<std::string,
   // reorder the funcTypes, which also reorder the sequence of calling update functions
   // put call for dataAddr at the first
   std::vector<std::pair<std::string, FuncTy_t>> tmpFuncTypes;
+  if(instrInfo.funcTypes.empty()) {
+    toCout("Error: no func_info found for instruction: "+instrInfo.name());
+    abort();
+  }
   for(auto pair: instrInfo.funcTypes) {
     if(pair.first == instrInfo.dataAddr) {
       tmpFuncTypes.insert(tmpFuncTypes.begin(), std::make_pair(pair.first, pair.second));
@@ -252,7 +255,7 @@ void print_instr_calls(std::map<std::string,
       cpp << prefix+funcCall << std::endl;
       cpp << prefix+"  if(PRINT_ALL) printf( \""+g_dataAddrVar+": %ld\\n\", "+g_dataAddrVar+" );" << std::endl;
       cpp << std::endl;
-      cpp << prefix+"  unsigned int data_byte_addr = "+g_dataAddrVar+" >> 2;" << std::endl;
+      cpp << prefix+"  data_byte_addr = "+g_dataAddrVar+" >> 2;" << std::endl;
       cpp << prefix+"  "+g_dataIn+" = mem[data_byte_addr] ;" << std::endl;
       cpp << prefix+"  if(PRINT_ALL) printf( \"load data addr : %d\\n\", data_byte_addr );" << std::endl;      
     }
@@ -429,5 +432,5 @@ void print_final_results(std::ofstream &cpp) {
       cpp << "    printf( \""+rtlVar+": %ld\\n\", "+rtlVar+" );" << std::endl;
     }
   }
-  cpp << "  }" << std::endl
+  cpp << "  }" << std::endl;
 }
