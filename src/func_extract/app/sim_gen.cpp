@@ -30,7 +30,7 @@ std::vector<std::map<std::string,
                      std::vector<std::string>>> toDoList;
 std::map<std::string, std::map<std::string, 
                                std::string>> g_refineMap;
-
+uint32_t memSize;
 
 // key is the asv name, value is its c data type name
 std::map<std::string, std::string> g_asvTy;
@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
   read_refinement(g_path+"/refinement.txt");
   uint32_t instrNum;
   instrNum = std::stoi(argv[2]);
-  uint32_t memSize = toDoList.size();
+  memSize = toDoList.size();
 
   std::ofstream header(g_path+"/ila.h");
   std::ofstream cpp(g_path+"/ila.c");
@@ -196,7 +196,7 @@ void print_instr_calls(std::map<std::string,
   // put call for dataAddr at the first
   std::vector<std::pair<std::string, FuncTy_t>> tmpFuncTypes;
   if(instrInfo.funcTypes.empty()) {
-    toCout("Error: no func_info found for instruction: "+instrInfo.name());
+    toCout("Error: no func_info found for instruction: "+instrInfo.name);
     abort();
   }
   for(auto pair: instrInfo.funcTypes) {
@@ -255,7 +255,7 @@ void print_instr_calls(std::map<std::string,
       cpp << prefix+funcCall << std::endl;
       cpp << prefix+"  if(PRINT_ALL) printf( \""+g_dataAddrVar+": %ld\\n\", "+g_dataAddrVar+" );" << std::endl;
       cpp << std::endl;
-      cpp << prefix+"  data_byte_addr = "+g_dataAddrVar+" >> 2;" << std::endl;
+      cpp << prefix+"  data_byte_addr = ("+g_dataAddrVar+" >> 2) % "+toStr(memSize)+";" << std::endl;
       cpp << prefix+"  "+g_dataIn+" = mem[data_byte_addr] ;" << std::endl;
       cpp << prefix+"  if(PRINT_ALL) printf( \"load data addr : %d\\n\", data_byte_addr );" << std::endl;      
     }
