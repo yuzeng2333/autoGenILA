@@ -58,9 +58,29 @@ std::string replace_x(std::string val) {
     for(auto it = vec.begin(); it != vec.end(); it++) {
       if(!std::regex_match(*it, m, pX)) continue;
       uint32_t width = std::stoi(m.str(1));
-      uint32_t base = exp2(width);
-      uint32_t newVal = rand() % base;
-      std::string hexVal = dec2hex(newVal);
+      std::string hexVal;
+      if(width != 5) {
+        uint32_t base = exp2(width);
+        uint32_t newVal = rand() % base;
+        hexVal = dec2hex(newVal);
+      }
+      else {
+        uint32_t newVal = rand() % 4;
+        switch(newVal) {
+          case 0:
+            hexVal = "0";
+            break;
+          case 1:
+            hexVal = "1";
+            break;
+          case 2:
+            hexVal = "2";
+            break;
+          case 3:
+            hexVal = "1f";
+            break;
+        }
+      }
       *it = toStr(width)+"'h"+hexVal;
     }
     ret = merge_with(vec, "+");
