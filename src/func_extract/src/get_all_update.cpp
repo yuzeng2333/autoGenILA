@@ -35,6 +35,7 @@ void get_all_update() {
   std::ifstream addedWorkSetInFile(g_path+"/added_work_set.txt");
   auto topModuleInfo = g_moduleInfoMap[g_topModule];
   std::set<std::string> workSet;
+  std::vector<std::string> vecWorkSet;
   for(std::string out: topModuleInfo->moduleOutputs) {
     if(is_fifo_output(out)) continue;
     workSet.insert(out);
@@ -68,45 +69,74 @@ void get_all_update() {
       asvSet.emplace(tgt, width);
     }
   }
+  vecWorkSet = g_allowedTgtVec;
 
   // declaration for llvm
   TheContext = std::make_unique<llvm::LLVMContext>();
   std::ofstream funcInfo(g_path+"/func_info.txt", std::ios::app);
   std::ofstream asvInfo(g_path+"/asv_info.txt", std::ios::app);
   std::vector<std::string> fileNameVec;  
-  while(!workSet.empty()) {
-    auto targetIt = workSet.begin();
-    std::string target = *targetIt;
-    toCout("---  BEGIN Target: "+target+" ---");
-    if(target.find("puregs[2]") != std::string::npos)
-      toCoutVerb("Find it!");
-    //else continue;
-    workSet.erase(targetIt);
-    if(visitedTgt.find(target) != visitedTgt.end()
-       || g_skippedOutput.find(target) != g_skippedOutput.end())
-      continue;
-    DestInfo destInfo;
-    if(target.find(".") == std::string::npos 
-       || target.substr(0, 1) == "\\")
-      destInfo.set_dest_and_slice(target);
-    else {
-      auto pair = split_module_asv(target);
-      std::string prefix = pair.first;
-      std::string var = pair.second;
-      if(g_moduleInfoMap.find(prefix) != g_moduleInfoMap.end()) {
-        destInfo.set_module_name(prefix);
-        destInfo.set_dest_and_slice(var);
-      }
+  while(!workSet.empty() || !vecWorkSet.empty()) {
+    // work on workSet first
+    if(!workSet.empty()) {
+      auto targetIt = workSet.begin();
+      std::string target = *targetIt;
+      toCout("---  BEGIN Target: "+target+" ---");
+      if(target.find("puregs[2]") != std::string::npos)
+        toCoutVerb("Find it!");
+      //else continue;
+      workSet.erase(targetIt);
+      if(visitedTgt.find(target) != visitedTgt.end()
+         || g_skippedOutput.find(target) != g_skippedOutput.end())
+        continue;
+      DestInfo destInfo;
+      if(target.find(".") == std::string::npos 
+         || target.substr(0, 1) == "\\")
+        destInfo.set_dest_and_slice(target);
       else {
-        assert(topModuleInfo->ins2modMap.find(prefix) 
-               != topModuleInfo->ins2modMap.end());
-        std::string modName = topModuleInfo->ins2modMap[prefix];
-        destInfo.set_module_name(modName);
-        destInfo.set_instance_name(prefix);
-        destInfo.set_dest_and_slice(var);
+        auto pair = split_module_asv(target);
+        std::string prefix = pair.first;
+        std::string var = pair.second;
+        if(g_moduleInfoMap.find(prefix) != g_moduleInfoMap.end()) {
+          destInfo.set_module_name(prefix);
+          destInfo.set_dest_and_slice(var);
+        }
+        else {
+          assert(topModuleInfo->ins2modMap.find(prefix) 
+                 != topModuleInfo->ins2modMap.end());
+          std::string modName = topModuleInfo->ins2modMap[prefix];
+          destInfo.set_module_name(modName);
+          destInfo.set_instance_name(prefix);
+          destInfo.set_dest_and_slice(var);
+        }
       }
+      destInfo.isVector = false;
     }
-    destInfo.isVector = false;
+    else {
+      // when workSet is done, work on the vector of target registers
+      destInfo.isVector = true;
+      destInfo.set_dest_vec(vecWorkSet);
+      std::string firstASV = vecWorkSet.front();
+      if(firstASV.find(".") != std::string::npos 
+         && firstASV.substr(0, 1) != "\\") {
+        auto pair = split_module_asv(target);
+        std::string prefix = pair.first;
+        std::string var = pair.second;
+        if(g_moduleInfoMap.find(prefix) != g_moduleInfoMap.end()) {
+          destInfo.set_module_name(prefix);
+          destInfo.set_dest_and_slice(var);
+        }
+        else {
+          assert(topModuleInfo->ins2modMap.find(prefix)
+                 != topModuleInfo->ins2modMap.end());
+          std::string modName = topModuleInfo->ins2modMap[prefix];
+          destInfo.set_module_name(modName);
+          destInfo.set_instance_name(prefix);
+          destInfo.set_dest_and_slice(var);
+        }
+      }
+      else  destInfo.set_module_name(g_topModule);
+    }
  
     uint32_t instrIdx = 0;
     for(auto instrInfo : g_instrInfo) {
