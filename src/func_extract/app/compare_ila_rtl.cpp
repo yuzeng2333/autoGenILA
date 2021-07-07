@@ -14,9 +14,15 @@ std::map<std::string, std::vector<uint32_t>> rtlValues;
 std::set<std::string> ignoredASV;
 uint32_t ilaValueLen = 0;
 uint32_t rtlValueLen = 0;
+bool compareAll = true;
+uint32_t cmpNum = 0;
 
 int main(int argc, char *argv[]) {
   g_path = argv[1];
+  if(argc > 2) {
+    compareAll = false;
+    cmpNum = std::stoi(argv[2]);
+  }
   read_asv_info(g_path+"/asv_info.txt", true);
   read_rtl_values(g_path+"/rtl_results.txt");
   read_ila_values(g_path+"/ila_results.txt");
@@ -103,6 +109,7 @@ void compare_results() {
   // before any instruction being executed
   uint32_t idx = 1;
   uint32_t len = std::min(rtlValueLen, ilaValueLen);
+  if(!compareAll) len = cmpNum;
   read_ignored_asv(g_path+"/ignore_asv.txt");
   while(idx < len) {
     for(auto pair : rtlValues) {
