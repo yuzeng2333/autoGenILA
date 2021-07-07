@@ -78,9 +78,11 @@ void get_all_update() {
   std::vector<std::string> fileNameVec;  
   while(!workSet.empty() || !vecWorkSet.empty()) {
     // work on workSet first
+    DestInfo destInfo;
+    std::string target;
     if(!workSet.empty()) {
       auto targetIt = workSet.begin();
-      std::string target = *targetIt;
+      target = *targetIt;
       toCout("---  BEGIN Target: "+target+" ---");
       if(target.find("puregs[2]") != std::string::npos)
         toCoutVerb("Find it!");
@@ -89,7 +91,6 @@ void get_all_update() {
       if(visitedTgt.find(target) != visitedTgt.end()
          || g_skippedOutput.find(target) != g_skippedOutput.end())
         continue;
-      DestInfo destInfo;
       if(target.find(".") == std::string::npos 
          || target.substr(0, 1) == "\\")
         destInfo.set_dest_and_slice(target);
@@ -115,11 +116,14 @@ void get_all_update() {
     else {
       // when workSet is done, work on the vector of target registers
       destInfo.isVector = true;
+      target = "{ ";
+      for(std::string tgt: vecWorkSet) target = target + tgt + ", ";
+      target += "}";
       destInfo.set_dest_vec(vecWorkSet);
       std::string firstASV = vecWorkSet.front();
       if(firstASV.find(".") != std::string::npos 
          && firstASV.substr(0, 1) != "\\") {
-        auto pair = split_module_asv(target);
+        auto pair = split_module_asv(firstASV);
         std::string prefix = pair.first;
         std::string var = pair.second;
         if(g_moduleInfoMap.find(prefix) != g_moduleInfoMap.end()) {

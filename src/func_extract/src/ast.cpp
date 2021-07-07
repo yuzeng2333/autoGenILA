@@ -179,7 +179,7 @@ void build_ast_tree() {
           g_allowedTgtVec.push_back(line);
           moduleAs.insert(line);
         }
-        std::getline(input, line);
+        std::getline(allowedTgtInFile, line);
       }
     }
   }
