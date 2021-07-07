@@ -166,12 +166,28 @@ void build_ast_tree() {
   std::string line;
   std::ifstream allowedTgtInFile(g_path+"/allowed_target.txt");
   while(std::getline(allowedTgtInFile, line)) {
-    if(line.substr(0, 2) == "//")  continue;  
-    remove_two_end_space(line);
-    g_allowedTgt.insert(line);
+    if(line.substr(0, 2) == "//")  continue;
+    if(line != "[") {
+      remove_two_end_space(line);
+      g_allowedTgt.insert(line);
+    }
+    // collecting vector of target registers
+    else {
+      std::getline(allowedTgtInFile, line);
+      while(line[0] != ']') {
+        if(line.substr(0, 2) != "//") {
+          g_allowedTgtVec.push_back(line);
+          moduleAs.insert(line);
+        }
+        std::getline(input, line);
+      }
+    }
   }
   allowedTgtInFile.close();
   for(std::string tgt: g_allowedTgt) {
+    build_tree_for_single_as(tgt);
+  }
+  for(std::string tgt: g_allowedTgtVec) {
     build_tree_for_single_as(tgt);
   }
 }
