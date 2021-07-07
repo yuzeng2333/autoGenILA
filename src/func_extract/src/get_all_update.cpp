@@ -69,6 +69,9 @@ void get_all_update() {
       asvSet.emplace(tgt, width);
     }
   }
+  else if(!g_allowedTgtVec.empty()) {
+    workSet.clear();
+  }
   vecWorkSet = g_allowedTgtVec;
 
   // declaration for llvm
