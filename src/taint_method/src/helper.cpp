@@ -1871,6 +1871,16 @@ std::string dec2hex(uint32_t decimalValue) {
 }
 
 
+void print_reg_list(std::string moduleName) {
+  std::ofstream output;
+  output.open(g_path+"/reg_list.txt", std::ios::app);
+  output << "module:"+moduleName << std::endl;
+  for(std::string reg: moduleTrueRegs) {
+    output << reg << std::endl;
+  }
+  output << std::endl;
+  output.close();
+}
 
 
 } // end of namespace taintGen
