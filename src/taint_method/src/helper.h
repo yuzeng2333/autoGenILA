@@ -190,5 +190,6 @@ std::string merge_with(const std::vector<std::string> &vec, std::string connecto
 std::string dec2hex(std::string decimalValue);
 
 std::string dec2hex(uint32_t decimalValue);
+
 } // end of namespace taintGen
 #endif
