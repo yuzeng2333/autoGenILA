@@ -2443,10 +2443,10 @@ void gen_assert_property(std::ofstream &output) {
         std::string assertion;
 
         if(!g_enable_taint && g_check_invariance == CheckRst) {
-          assertion = "!INSTR_IN_ZY || " + var + " == " + rstVal;
+          assertion = "(!INSTR_IN_ZY) || " + var + " == " + rstVal;
         }
         else if (!g_enable_taint) {
-          assertion = "!INSTR_IN_ZY " + PREV_VAL_COMP;
+          assertion = "(!INSTR_IN_ZY) " + PREV_VAL_COMP;
         }
         else if(!isMem(var)) 
           assertion = "( " + out + " == 0 ) " + PREV_VAL_COMP + USE_END_SIG + DOES_KEEP;
@@ -2779,6 +2779,7 @@ int taint_gen(std::string fileName,
     gen_wire_output(fileName + ".wire_output");
   }
   nextSig = g_next_sig;
+  print_reg_list();
   toCout("*** Finish add taint for module: "+fileName);  
   return 0;
 }

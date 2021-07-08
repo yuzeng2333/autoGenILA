@@ -191,5 +191,6 @@ std::string dec2hex(std::string decimalValue);
 
 std::string dec2hex(uint32_t decimalValue);
 
+void print_reg_list(std::string moduleName);
 } // end of namespace taintGen
 #endif
