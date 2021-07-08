@@ -1723,10 +1723,10 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
         caseNum++;
         split_slice(localPair.second, rhs, rhsSlice);
         output << blank + "    " + localPair.first + " :" << std::endl;
-        output << blank + "      " + dest + _sig + " = " + rhs + _sig + " [" + toStr(caseNum*g_sig_width-1) + ":" + toStr(g_sig_width*(caseNum-1)) + "] == " + CONSTANT_SIG + " ? " + s + _sig + " : " + rhs + _sig + " [" + toStr(caseNum*g_sig_width-1) + ":" + toStr(g_sig_width*(caseNum-1)) + "] ;" << std::endl;
+        output << blank + "      " + dest + _sig + " = " + rhs + _sig + " [" + toStr(caseNum*g_sig_width-1) + ": (" + toStr(g_sig_width*(caseNum-1)) + "] == " + CONSTANT_SIG + " ) ? " + s + _sig + " : " + rhs + _sig + " [" + toStr(caseNum*g_sig_width-1) + ":" + toStr(g_sig_width*(caseNum-1)) + "] ;" << std::endl;
       }
       output << blank + "    default :" << std::endl;
-      output << blank + "      " + dest + _sig + " = " + a + _sig + " == " + CONSTANT_SIG + " ? " + s + _sig + " : " + a + _sig + " ;" << std::endl;
+      output << blank + "      " + dest + _sig + " = ( " + a + _sig + " == " + CONSTANT_SIG + " ) ? " + s + _sig + " : " + a + _sig + " ;" << std::endl;
       output << blank + "  endcase" << std::endl;
       output << blank + "end" << std::endl;
       checkCond(caseNum == fangyuanItemNum[rhs], "case number does not equal fangyuan item number!, var: "+rhs+" , caseNum:"+toStr(caseNum)+" , itemNum:"+toStr(fangyuanItemNum[rhs]));
@@ -2433,12 +2433,12 @@ void gen_assert_property(std::ofstream &output) {
           rstVal = g_rstValMap[moduleName][var];
         if(rstVal.empty()) rstVal = "0";
 
-        if(g_use_does_keep) DOES_KEEP = " || " + var + "_DOES_KEEP == 0";
+        if(g_use_does_keep) DOES_KEEP = " || ( " + var + "_DOES_KEEP == 0 )";
         g_use_end_sig = g_use_end_sig && !g_use_jasper;
         if(g_use_end_sig) USE_END_SIG = " || " + END_SIG;
         if(g_check_invariance == CheckTwoVal) 
-          PREV_VAL_COMP = " || " + ASSERT_PROTECT + " || "  + var + "_PREV_VAL1 == " + var + "_PREV_VAL2";
-        if(g_check_invariance == CheckOneVal) PREV_VAL_COMP = " || " + var + "_PREV_VAL1 == " + rstVal;
+          PREV_VAL_COMP = " || " + ASSERT_PROTECT + " || ( "  + var + "_PREV_VAL1 == " + var + "_PREV_VAL2 )";
+        if(g_check_invariance == CheckOneVal) PREV_VAL_COMP = " || ( " + var + "_PREV_VAL1 == " + rstVal + " )";
 
         std::string assertion;
 
@@ -2449,9 +2449,9 @@ void gen_assert_property(std::ofstream &output) {
           assertion = "!INSTR_IN_ZY " + PREV_VAL_COMP;
         }
         else if(!isMem(var)) 
-          assertion = out + " == 0 " + PREV_VAL_COMP + USE_END_SIG + DOES_KEEP;
+          assertion = "( " + out + " == 0 ) " + PREV_VAL_COMP + USE_END_SIG + DOES_KEEP;
         else
-          assertion = out + " == 0 " + USE_END_SIG + DOES_KEEP;
+          assertion = "( " + out + " == 0 )" + USE_END_SIG + DOES_KEEP;
 
         if(g_use_jasper) {
           output << "  assert property( " + assertion + " );" << std::endl;
