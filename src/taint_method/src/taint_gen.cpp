@@ -2456,7 +2456,7 @@ void gen_assert_property(std::ofstream &output) {
         else
           assertion = "( " + out + " == 0 )" + USE_END_SIG + DOES_KEEP;
 
-        if(g_use_jasper) {
+        if(g_use_jasper && g_modChangedRegs[moduleName].find(var) == g_modChangedRegs[moduleName].end()) {
           output << "  assert property( " + assertion + " );" << std::endl;
         }
         else {
@@ -2598,6 +2598,8 @@ void determine_regs_to_check() {
     std::reverse(pathVec.begin(), pathVec.end());
     find_reg(g_topModule, pathVec);
   }
+  if(!g_modChangedRegs.empty())
+    toCout("Get changed regs!!");
 }
 
 
