@@ -1,5 +1,6 @@
 #ifndef GLOBAL
 #define GLOBAL
+#include "types.h"
 #include "varWidth.h"
 #include "pass_info.h"
 #include <vector>
@@ -20,7 +21,7 @@ extern std::vector<std::string> extendOutputs;
 extern std::vector<std::string> flagOutputs;
 extern std::vector<std::string> moduleRegs;
 extern std::vector<std::string> moduleTrueRegs;
-extern StrVec_t g_changedRegVec;
+extern StrSet_t g_changedRegVec;
 extern std::unordered_map<std::string, uint32_t> moduleMems;
 extern std::set<std::string> moduleWires;
 extern std::set<std::string> g_iteDest;

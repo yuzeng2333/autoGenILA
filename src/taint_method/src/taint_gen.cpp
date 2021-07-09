@@ -48,7 +48,7 @@ std::set<std::string> g_clk_set;
 std::string clockName;
 std::string resetName;
 std::vector<std::string> rTaints;
-StrVec_t g_changedRegVec;
+StrSet_t g_changedRegVec;
 std::unordered_map<std::string, uint32_t> nextVersion;
 std::unordered_map<std::string, std::vector<bool>> nxtVerBits;
 std::unordered_map<std::string, std::string> new_next;
@@ -65,6 +65,8 @@ std::unordered_map<std::string, std::unordered_map<std::string, std::string>> g_
 // key is module name, value is vector of asserted regs in this module
 std::unordered_map<std::string, std::vector<std::string>> g_mod2assertMap;
 std::map<std::string, std::set<std::string>> g_modChangedRegs;
+std::unordered_map<std::string, Str2StrUmap_t> g_instance2moduleMap;
+
 VarWidth varWidth;
 VarWidth funcVarWidth;
 unsigned long int NEW_VAR = 0;
@@ -119,7 +121,7 @@ CheckInvarType g_check_invariance = CheckTwoVal; // TODO: check this setting
 bool g_enable_taint = false;
 // if is true, "assert()" will be generated for jaspergold to check
 // otherwise, a verilog assert module will be generated for simulation-based check
-bool g_use_jasper = false;
+bool g_use_jasper = true;
 uint32_t g_assert_num = 0;
 uint32_t g_case_reg_num = 0;
 std::vector<std::string> g_assertNames;
@@ -2567,7 +2569,7 @@ void map_gen(std::string moduleName, std::string instanceName, std::ofstream &ou
 
 
 void read_changed_regs(std::string fileName, 
-                       StrVec_t & changedRegVec) {
+                       StrSet_t & changedRegSet) {
   std::string modName;
   std::string line;
   std::ifstream input(fileName);
@@ -2580,7 +2582,7 @@ void read_changed_regs(std::string fileName,
       std::string changedReg = line.substr(26);
       uint32_t size = changedReg.size();
       changedReg = changedReg.substr(0, size-5);
-      changedRegVec.insert(changedReg);
+      changedRegSet.insert(changedReg);
     }
   }
 }
@@ -2625,7 +2627,7 @@ void find_reg(std::string parentModName, StrVec_t &path2Reg) {
 // check if g_modChangedRegs is a subset of moduleTrueRegs
 void check_changed_regs(std::string modName) {
   for(std::string reg: g_modChangedRegs[modName]) {
-    if(moduleTrueRegs.find(reg) == moduleTrueRegs.end()) {
+    if(std::find(moduleTrueRegs.begin(), moduleTrueRegs.end(), reg) == moduleTrueRegs.end()) {
       toCout("Error: changed reg is not truely reg, reg: "+reg+", module: "+modName);
       abort();
     }
