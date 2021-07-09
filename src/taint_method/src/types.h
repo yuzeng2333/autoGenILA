@@ -3,6 +3,7 @@
 #include <map>
 #include <unordered_map>
 #include <set>
+#include <vector>
 
 namespace taintGen {
   typedef std::map<std::string, std::vector<std::string>> Str2VecMap_t;
@@ -10,4 +11,8 @@ namespace taintGen {
   typedef std::unordered_map<std::string, std::string> Str2StrUmap_t;
 
   typedef std::map<std::string, std::vector<std::string>> Str2StrVecMap_t; 
+
+  typedef std::vector<std::string> StrVec_t;
+
+  typedef std::set<std::string> StrSet_t;
 }

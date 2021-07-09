@@ -12,6 +12,7 @@
 #include <map>
 #include <bitset>
 #include <stack>
+#include <algorithm>
 #include "taint_gen.h"
 //#include "pass_info.h"
 #include <cmath>
@@ -47,6 +48,7 @@ std::set<std::string> g_clk_set;
 std::string clockName;
 std::string resetName;
 std::vector<std::string> rTaints;
+StrVec_t g_changedRegVec;
 std::unordered_map<std::string, uint32_t> nextVersion;
 std::unordered_map<std::string, std::vector<bool>> nxtVerBits;
 std::unordered_map<std::string, std::string> new_next;
@@ -62,6 +64,7 @@ std::unordered_map<std::string, std::string> g_moduleClk;
 std::unordered_map<std::string, std::unordered_map<std::string, std::string>> g_mod2instMap;
 // key is module name, value is vector of asserted regs in this module
 std::unordered_map<std::string, std::vector<std::string>> g_mod2assertMap;
+std::map<std::string, std::set<std::string>> g_modChangedRegs;
 VarWidth varWidth;
 VarWidth funcVarWidth;
 unsigned long int NEW_VAR = 0;
@@ -2549,13 +2552,80 @@ void assert_reg_map_gen() {
 void map_gen(std::string moduleName, std::string instanceName, std::ofstream &output) {
   uint32_t i = 1;
   if(g_mod2assertMap.find(moduleName) != g_mod2assertMap.end()) {
-    for(auto it = g_mod2assertMap[moduleName].begin(); it != g_mod2assertMap[moduleName].end(); it++) {
+    for(auto it = g_mod2assertMap[moduleName].begin(); 
+          it != g_mod2assertMap[moduleName].end(); it++) {
       output << instanceName+"._assert_"+toStr(i++)+" : "+*it << std::endl;
     }
   }
   if(g_mod2instMap.find(moduleName) != g_mod2instMap.end()) {
-    for(auto it = g_mod2instMap[moduleName].begin(); it != g_mod2instMap[moduleName].end(); it++) {
+    for(auto it = g_mod2instMap[moduleName].begin(); 
+          it != g_mod2instMap[moduleName].end(); it++) {
       map_gen(it->second, instanceName+"."+it->first, output);
+    }
+  }
+}
+
+
+void read_changed_regs(std::string fileName, 
+                       StrVec_t & changedRegVec) {
+  std::string modName;
+  std::string line;
+  std::ifstream input(fileName);
+  while(std::getline(input, line)) {
+    if(line.empty() || line.substr(0, 9) != "ASSERTION") continue;
+    else if(line.find(".") == std::string::npos) continue;
+    else {
+      size_t pos = line.find_last_of(".");
+      // cutting the beginning 26 chars "ASSERTION FAILED in tb.u0."
+      std::string changedReg = line.substr(26);
+      uint32_t size = changedReg.size();
+      changedReg = changedReg.substr(0, size-5);
+      changedRegVec.insert(changedReg);
+    }
+  }
+}
+
+
+// according to g_instance2moduleMap and g_mod2ChangedRegMap,
+// determine for each module which regs need to be checked
+// by jaspergold
+// result is stored in g_modChangedRegs
+void determine_regs_to_check() {
+  for(std::string path2Reg : g_changedRegVec) {
+    assert(path2Reg.substr(0, 2) != "//");
+    StrVec_t pathVec;
+    split_by(path2Reg, ".", pathVec);
+    std::reverse(pathVec.begin(), pathVec.end());
+    find_reg(g_topModule, pathVec);
+  }
+}
+
+
+void find_reg(std::string parentModName, StrVec_t &path2Reg) {
+  if(path2Reg.size() == 1) {
+    if(g_modChangedRegs.find(parentModName) == g_modChangedRegs.end()) {
+      g_modChangedRegs.emplace(parentModName, StrSet_t{path2Reg.back()});
+    }
+    else
+      g_modChangedRegs[parentModName].insert(path2Reg.back());
+  }
+  else {
+    std::string insName = path2Reg.back();
+    assert(g_mod2instMap[parentModName].find(insName) 
+             != g_mod2instMap[parentModName].end() );
+    std::string childModName = g_mod2instMap[parentModName][insName];
+    path2Reg.pop_back();
+    find_reg(childModName, path2Reg);
+  }
+}
+
+
+// check if g_modChangedRegs is a subset of moduleTrueRegs
+void check_changed_regs(std::string modName) {
+  for(std::string reg: g_modChangedRegs[modName]) {
+    if(moduleTrueRegs.find(reg) == moduleTrueRegs.end()) {
+      toCout("Error: changed reg is not truely reg, reg: "+reg+", module: "+modName);
+      abort();
     }
   }
 }
@@ -2779,7 +2849,8 @@ int taint_gen(std::string fileName,
     gen_wire_output(fileName + ".wire_output");
   }
   nextSig = g_next_sig;
-  print_reg_list();
+  check_changed_regs(moduleName);
+  print_reg_list(moduleName);
   toCout("*** Finish add taint for module: "+fileName);  
   return 0;
 }
