@@ -20,6 +20,7 @@ extern std::vector<std::string> extendOutputs;
 extern std::vector<std::string> flagOutputs;
 extern std::vector<std::string> moduleRegs;
 extern std::vector<std::string> moduleTrueRegs;
+extern StrVec_t g_changedRegVec;
 extern std::unordered_map<std::string, uint32_t> moduleMems;
 extern std::set<std::string> moduleWires;
 extern std::set<std::string> g_iteDest;
@@ -43,6 +44,7 @@ extern std::unordered_map<std::string, std::pair<std::string, bool>> g_moduleRst
 extern std::unordered_map<std::string, std::string> g_moduleClk;
 extern std::unordered_map<std::string, std::unordered_map<std::string, std::string>> g_mod2instMap;
 extern std::unordered_map<std::string, std::vector<std::string>> g_mod2assertMap;
+extern std::map<std::string, std::set<std::string>> g_modChangedRegs;
 extern std::map<std::string, std::unordered_map<std::string, std::string>> g_rstValMap;
 extern std::map<std::string, std::unordered_map<std::string, std::string>> g_normValMap;
 extern std::map<std::string, std::string> g_finalRegCondMap;

@@ -102,6 +102,13 @@ void assert_reg_map_gen();
 
 void map_gen(std::string moduleName, std::string instanceName, std::ofstream &output);
 
+void read_changed_regs(std::string fileName, 
+                       StrVec_t & changedRegVec);
+
+void find_reg(std::string parentModName, StrVec_t &path2Reg);
+
+void check_changed_regs(std::string modName);
+
 std::string separate_modules(std::string fileName, 
                              std::vector<std::string> &modules,
                              std::map<std::string, std::vector<std::string>> &childModules,
