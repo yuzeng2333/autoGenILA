@@ -65,6 +65,8 @@ std::unordered_map<std::string, std::unordered_map<std::string, std::string>> g_
 // key is module name, value is vector of asserted regs in this module
 std::unordered_map<std::string, std::vector<std::string>> g_mod2assertMap;
 std::map<std::string, std::set<std::string>> g_modChangedRegs;
+// first key is module name: which module the instance is within
+// second key is instance name. Value is the corresponding module name
 std::unordered_map<std::string, Str2StrUmap_t> g_instance2moduleMap;
 
 VarWidth varWidth;
@@ -237,7 +239,7 @@ void clean_file(std::string fileName, bool useLogic) {
   assert(!g_set_rflag_if_not_rst_val || g_enable_taint);
 
   while( std::getline(cleanFileInput, line) ) {
-    toCout(line);
+    //toCout(line);
     if(line.find("nvdla_cdp_s_lut_access_cfg_0_out") != std::string::npos) {
       toCout("FIND IT!");
     }
@@ -2458,8 +2460,9 @@ void gen_assert_property(std::ofstream &output) {
         else
           assertion = "( " + out + " == 0 )" + USE_END_SIG + DOES_KEEP;
 
-        if(g_use_jasper && g_modChangedRegs[moduleName].find(var) == g_modChangedRegs[moduleName].end()) {
-          output << "  assert property( " + assertion + " );" << std::endl;
+        if(g_use_jasper) {
+          if(g_modChangedRegs[moduleName].find(var) == g_modChangedRegs[moduleName].end())
+            output << "  assert property( " + assertion + " );" << std::endl;
         }
         else {
           output << "  wire zy_assert"+toStr(g_assert_num) + " = " + assertion + " ;" << std::endl;
@@ -2556,7 +2559,10 @@ void map_gen(std::string moduleName, std::string instanceName, std::ofstream &ou
   if(g_mod2assertMap.find(moduleName) != g_mod2assertMap.end()) {
     for(auto it = g_mod2assertMap[moduleName].begin(); 
           it != g_mod2assertMap[moduleName].end(); it++) {
-      output << instanceName+"._assert_"+toStr(i++)+" : "+*it << std::endl;
+      std::string reg = *it;
+      if(g_modChangedRegs[moduleName].find(reg) != g_modChangedRegs.end())
+        continue;
+      output << instanceName+"._assert_"+toStr(i++)+" : "+reg << std::endl;
     }
   }
   if(g_mod2instMap.find(moduleName) != g_mod2instMap.end()) {
@@ -2594,7 +2600,7 @@ void read_changed_regs(std::string fileName,
 // result is stored in g_modChangedRegs
 void determine_regs_to_check() {
   for(std::string path2Reg : g_changedRegVec) {
-    assert(path2Reg.substr(0, 2) != "//");
+    assert(path2Reg.substr(0, 2) != "\\");
     StrVec_t pathVec;
     split_by(path2Reg, ".", pathVec);
     std::reverse(pathVec.begin(), pathVec.end());
@@ -2615,9 +2621,9 @@ void find_reg(std::string parentModName, StrVec_t &path2Reg) {
   }
   else {
     std::string insName = path2Reg.back();
-    assert(g_mod2instMap[parentModName].find(insName) 
-             != g_mod2instMap[parentModName].end() );
-    std::string childModName = g_mod2instMap[parentModName][insName];
+    assert(g_instance2moduleMap[parentModName].find(insName) 
+             != g_instance2moduleMap[parentModName].end() );
+    std::string childModName = g_instance2moduleMap[parentModName][insName];
     path2Reg.pop_back();
     find_reg(childModName, path2Reg);
   }
@@ -2627,8 +2633,10 @@ void find_reg(std::string parentModName, StrVec_t &path2Reg) {
 // check if g_modChangedRegs is a subset of moduleTrueRegs
 void check_changed_regs(std::string modName) {
   for(std::string reg: g_modChangedRegs[modName]) {
-    if(std::find(moduleTrueRegs.begin(), moduleTrueRegs.end(), reg) == moduleTrueRegs.end()) {
-      toCout("Error: changed reg is not truely reg, reg: "+reg+", module: "+modName);
+    if(std::find(moduleTrueRegs.begin(), moduleTrueRegs.end(), reg) == moduleTrueRegs.end()
+       && moduleMems.find(reg) == moduleMems.end()
+       && std::find(moduleTrueRegs.begin(), moduleTrueRegs.end(), "\\"+reg) == moduleTrueRegs.end() ) {
+      toCout("Error: changed reg is not truely reg or mem, reg: "+reg+", module: "+modName);
       abort();
     }
   }

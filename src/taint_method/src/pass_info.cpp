@@ -237,7 +237,7 @@ void process_pass_info(std::string fileName) {
   std::string line;
   std::smatch m;
   while(std::getline(input, line)) {
-    toCout(line);
+    //toCout(line);
     if(line.find("27'b000000000000000000000000000, of, 32'b00000000000000000000000000000000") != std::string::npos) {
       toCout("FIND IT!");
     }
