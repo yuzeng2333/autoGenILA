@@ -343,6 +343,7 @@ void nb_expr(std::string line) {
     return;
   }
   std::string destAndSlice = m.str(2);
+  put_into_reg2Slice(destAndSlice);
   auto ret = curMod->nbTable.emplace(destAndSlice, line);
   std::string dest, destSlice;
   split_slice(destAndSlice, dest, destSlice);
@@ -557,6 +558,7 @@ void always_if_else_expr(std::string line, std::ifstream &input) {
 
   std::string destNbLine = "  "+destAndSlice+" <= yuzeng"+yuzengIdx+" ;";
   ret = curMod->nbTable.emplace(destAndSlice, destNbLine);
+  put_into_reg2Slice(destAndSlice);
   if(!ret.second)
     toCout("Error in inserting ssaTable for the line: "+line+", "+destNbLine );
 }
