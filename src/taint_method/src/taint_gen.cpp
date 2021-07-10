@@ -2560,7 +2560,7 @@ void map_gen(std::string moduleName, std::string instanceName, std::ofstream &ou
     for(auto it = g_mod2assertMap[moduleName].begin(); 
           it != g_mod2assertMap[moduleName].end(); it++) {
       std::string reg = *it;
-      if(g_modChangedRegs[moduleName].find(reg) != g_modChangedRegs.end())
+      if(g_modChangedRegs[moduleName].find(reg) != g_modChangedRegs[moduleName].end())
         continue;
       output << instanceName+"._assert_"+toStr(i++)+" : "+reg << std::endl;
     }
