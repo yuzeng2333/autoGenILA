@@ -355,8 +355,8 @@ void print_llvm_ir(DestInfo &destInfo,
         toCoutVerb("Find it!");
       curMod = g_moduleInfoMap[modName];
 
-      toCout("Error: re-think and check the g_insContextStk");
-      abort();
+      //toCout("Error: re-think and check the g_insContextStk");
+      assert(modName == g_topModule);
       g_insContextStk.clear();
       Context_t insCntxt(insName, dest, curMod, nullptr, TheFunction);
       g_insContextStk.push_back(insCntxt);

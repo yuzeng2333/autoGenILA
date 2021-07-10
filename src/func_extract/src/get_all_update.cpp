@@ -253,6 +253,7 @@ bool read_clean_o3(std::string fileName,
   bool seeReturn = false;
   bool returnConst = false;
   std::regex pDef("^define internal fastcc i(\\d+) @(\\S+)\\((.*)\\) unnamed_addr #1 \\{$");  
+  std::regex pVecDef("^define internal fastcc [(\\d+) x i(\\d+)] @(\\S+)\\((.*)\\) unnamed_addr #1 \\{$");  
   std::regex pRetZero("^\\s+ret i\\d+ 0$");
   bool internalExist = false;
   while(std::getline(input, line)) {
@@ -262,10 +263,22 @@ bool read_clean_o3(std::string fileName,
         while(line != "}") std::getline(input, line);
         continue;
       }
+      else if( line.substr(0, 24) == "define internal fastcc [" ) {
+        internalExist = true;
+        if(!std::regex_match(line, m, pVecDef)) {
+          toCout("Error: pVecDef is not matched: "+line);
+          abort();
+        }
+        std::string arrLen = m.str(1);
+        std::string retWidth = m.str(2);
+        std::string funcName = m.str(3);
+        argList = m.str(4);
+        line = "define "+line.substr(16);
+      }
       else {
         internalExist = true;
         if(!std::regex_match(line, m, pDef)) {
-          toCout("Error: pDef is not matched!");
+          toCout("Error: pDef is not matched: "+line);
           abort();
         }
         std::string retWidth = m.str(1);
