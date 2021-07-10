@@ -992,7 +992,9 @@ bool is_reg(std::string var) {
 }
 
 
-bool is_reg_in_curMod(std::string var) {
+bool is_reg_in_curMod(std::string varAndSlice) {
+  std::string var, varSlice;
+  split_slice(varAndSlice, var, varSlice);
   auto curMod = get_curMod();
   if(var.back() == ' ')
     var.pop_back();
