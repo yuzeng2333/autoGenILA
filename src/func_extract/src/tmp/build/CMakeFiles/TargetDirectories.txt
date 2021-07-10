@@ -1,7 +1,0 @@
-/home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/tmp/build/CMakeFiles/rebuild_cache.dir
-/home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/tmp/build/CMakeFiles/llvm_exec.dir
-/home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/tmp/build/CMakeFiles/acc_gen.dir
-/home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/tmp/build/CMakeFiles/edit_cache.dir
-/home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/tmp/build/CMakeFiles/test.dir
-/home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/tmp/build/CMakeFiles/omp_gen.dir
-/home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/tmp/build/CMakeFiles/intrinsics_gen.dir
