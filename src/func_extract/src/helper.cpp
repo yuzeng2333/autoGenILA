@@ -13,6 +13,7 @@
 
 using namespace z3;
 using namespace taintGen;
+using namespace syntaxPatterns;
 
 namespace funcExtract {
 
@@ -1380,7 +1381,7 @@ std::string get_rst_value(const std::string &destAndSlice, uint32_t timeIdx) {
     if(!destSlice.empty()) {
       uint32_t hi = get_end(destSlice);
       uint32_t lo = get_begin(destSlice);
-      std::smatch n;
+      std::smatch m;
       if(!std::regex_match(rstVal, m, pBinX)) {
         toCout("Error: rstVal does not match pBinX: "+rstVal);
         abort();

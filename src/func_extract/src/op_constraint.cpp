@@ -1405,8 +1405,12 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
   assert(node->srcVec.size() == node->childVec.size());
 
   std::map<std::string, astNode*> input2AstMp;
-  for(uint32_t i = 0; i < node->srcVec.size(); i++)
+  for(uint32_t i = 0; i < node->srcVec.size(); i++) {
+    if(node->srcVec[i].find("aes_reg_key0_i.reg_out")
+         != std::string::npos)
+       toCout("Find it!");
     input2AstMp.emplace(node->srcVec[i], node->childVec[i]);
+  }
 
   // push func reg args
   std::string prefix = "";

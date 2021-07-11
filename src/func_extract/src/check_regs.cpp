@@ -744,12 +744,13 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
   std::string varAndSlice = node->dest;
   auto curMod = get_curMod();
   toCoutVerb("add_constraint for: "+varAndSlice+", timeIdx: "+toStr(timeIdx));
-  if(varAndSlice == "r0" && timeIdx == 8) {
+  if(varAndSlice == "" && timeIdx == 8) {
     toCoutVerb("find it");
   }
 
-  if(varAndSlice.find("aes_top_0.aes_out") != std::string::npos) {
-    toCoutVerb("find aes_top_0.aes_out");
+  if(varAndSlice.find("aes_reg_key0_i.reg_out [127:120]") != std::string::npos
+       && timeIdx == 25) {
+    toCoutVerb("Find it!");
   }
 
   if(timeIdx > bound) {
@@ -770,7 +771,8 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
   if ( is_input(varAndSlice) ) { // input_t is always 0
     retExpr = input_constraint(node, timeIdx, c, b, bound);
   }
-  else if( is_reg_in_curMod(varAndSlice) ) { // AS case is moved to add_nb_constraint
+  else if( is_reg_in_curMod(varAndSlice) && node->type != SRC_CONCAT ) { 
+    // AS case is moved to add_nb_constraint
     retExpr = add_nb_constraint(node, timeIdx, c, b, bound);
   }
   else if( is_number(varAndSlice) ) { // num_t is always 0
