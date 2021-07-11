@@ -490,6 +490,7 @@ llvm::Value* two_op_constraint(astNode* const node, uint32_t timeIdx, context &c
     assert(is_number(op1AndSlice) || is_number(op2AndSlice));
     assert(!is_x(op1AndSlice) && !is_x(op2AndSlice));
   }
+  toCoutVerb("go to make_llvm_instr from two-op: "+op1AndSlice+", "+op2AndSlice);
   return make_llvm_instr(b, c, node->op, op1Expr, op2Expr, 
                          destWidthNum, op1WidthNum, op2WidthNum, llvm::Twine(destTimed));
 }
@@ -521,6 +522,7 @@ llvm::Value* one_op_constraint(astNode* const node, uint32_t timeIdx,
     op1Expr = extract_func(tmpExpr, op1Hi, op1Lo, c, b, op1AndSlice);
 
   std::string destTimed = timed_name(destAndSlice, timeIdx);
+  toCoutVerb("go to make_llvm_instr from one-op: "+op1AndSlice+", dest: "+destAndSlice);
   return make_llvm_instr(b, c, node->op, op1Expr, op1WidthNum, llvm::Twine(destTimed));
 }
 
@@ -553,6 +555,7 @@ llvm::Value* reduce_one_op_constraint(astNode* const node, uint32_t timeIdx,
   auto Ty = llvm::dyn_cast<llvm::IntegerType>(op1Expr->getType());
   uint32_t op1W = Ty->getBitWidth();
   std::string destTimed = timed_name(destAndSlice, timeIdx);
+  toCoutVerb("go to make_llvm_instr from reduce-op: "+op1AndSlice+", dest: "+destAndSlice);  
   return make_llvm_instr(b, c, node->op, op1Expr, op1WidthNum, llvm::Twine(destTimed));  
 }
 
@@ -658,6 +661,7 @@ llvm::Value* sel_op_constraint(astNode* const node, uint32_t timeIdx,
   // add llvm::Value*ession to s or g
   uint32_t minOpWidth = std::min(op1WidthNum, op2WidthNum);
   uint32_t maxOpWidth = std::max(op1WidthNum, op2WidthNum);
+  toCoutVerb("go to make_llvm_instr from sel-op: "+op1AndSlice+", "+op2AndSlice+", dest: "+destAndSlice);  
   auto tmp = make_llvm_instr(b, c, ">>", op1Expr, op2Expr,
                              maxOpWidth, op1WidthNum, op2WidthNum, 
                              op1AndSlice+"_lshr_"+op2AndSlice+DELIM+toStr(timeIdx));

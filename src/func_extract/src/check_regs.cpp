@@ -812,8 +812,10 @@ llvm::Value* add_nb_constraint(astNode* const node,
                                uint32_t bound ) {
   const auto curFunc = get_func();
   const auto curMod = get_curMod();
-  std::string dest = node->dest;
-  if(dest.find("cpu_state") != std::string::npos && timeIdx == 8) {
+  std::string destAndSlice = node->dest;
+  std::string dest, destSlice;
+  split_slice(destAndSlice, dest, destSlice);
+  if(destAndSlice.find("cpu_state") != std::string::npos && timeIdx == 8) {
     //toCoutVerb("target reg found! time: "+toStr(timeIdx));
     toCout("Find it");
   }
@@ -828,21 +830,14 @@ llvm::Value* add_nb_constraint(astNode* const node,
   //if(!g_seeInputs && timeIdx == bound) bound++;
 
   if(timeIdx < bound) {
-    toCoutVerb("Add nb constraint for: " + dest+" ------  time: "+toStr(timeIdx));
-    if(dest == "decoder_trigger_q" && timeIdx == 3)
+    toCoutVerb("Add nb constraint for: " + destAndSlice+" ------  time: "+toStr(timeIdx));
+    if(destAndSlice == "decoder_trigger_q" && timeIdx == 3)
       toCoutVerb("Find it!");
     std::string destNext = node->srcVec.front();
 
     destNextExpr = add_constraint(node->childVec.front(), timeIdx+1, c, b, bound);
     return destNextExpr;
   }
-  //else if(!isSolve && !is_read_asv(dest) 
-  //          && g_resetedReg.find(timed_name(dest, timeIdx)) != g_resetedReg.end()) {
-  //  toCout("Error: unexpected condition!");
-  //  abort();
-  //  //assert(INPUT_EXPR_VAL.find(timed_name(dest, timeIdx)) != INPUT_EXPR_VAL.end());
-  //  //return *INPUT_EXPR_VAL[timed_name(dest, timeIdx)];        
-  //}
   else if ( is_clean(dest) ){ // the bound has been reached, do not expand its assignment
     push_clean_queue(node, timeIdx);
   }
@@ -868,11 +863,20 @@ llvm::Value* add_nb_constraint(astNode* const node,
         if(!prefix.empty()) prefix += ".";
         dest = prefix + dest;
       }
-      return get_arg(timed_name(dest, timeIdx), curFunc);
+      std::string destTimed = timed_name(dest, timeIdx);
+      auto destExpr = get_arg(destTimed, curFunc);
+      if(destSlice.empty())
+        return destExpr;
+      else {
+        uint32_t hi = get_end(destSlice);
+        uint32_t lo = get_begin(destSlice);
+        return extract_func(destExpr, hi, lo, 
+                            c, b, llvm::Twine(destTimed), true);
+      }
     }
     else {
-      uint32_t width = get_var_slice_width_simp(dest);    
-      std::string rstVal = get_rst_value(dest, timeIdx);
+      uint32_t width = get_var_slice_width_simp(destAndSlice);    
+      std::string rstVal = get_rst_value(destAndSlice, timeIdx);
       return var_expr(rstVal, timeIdx, c, b, false, width);    
     }
   }
