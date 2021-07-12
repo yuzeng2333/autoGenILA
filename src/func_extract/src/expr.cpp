@@ -21,7 +21,7 @@ void module_expr(std::string line) {
   if (!std::regex_match(line, m, pModule))
     return;
   g_currentModuleName = m.str(2);
-  toCout("=== Begin module: "+g_currentModuleName);
+  toCout("=== Begin module2 : "+g_currentModuleName);
   std::string portList = m.str(3);
 
   std::shared_ptr<ModuleInfo_t> curMod;
@@ -343,6 +343,7 @@ void nb_expr(std::string line) {
     return;
   }
   std::string destAndSlice = m.str(2);
+  put_into_reg2Slice(destAndSlice);
   auto ret = curMod->nbTable.emplace(destAndSlice, line);
   std::string dest, destSlice;
   split_slice(destAndSlice, dest, destSlice);
@@ -412,7 +413,12 @@ void nonblockif_expr(std::string line, std::ifstream &input) {
   condAndSlice = m.str(2);
   destAndSlice = m.str(3);
   ifSrcAndSlice = m.str(4);
+  put_into_reg2Slice(destAndSlice);
 
+  if(destAndSlice.find("aes_reg_oplen_i.reg_out") != std::string::npos) {
+    toCout("Find it!");
+  }
+ 
   split_slice(destAndSlice, dest, destSlice);
   split_slice(ifSrcAndSlice, src, srcSlice);
   split_slice(condAndSlice, cond, condSlice);
@@ -552,6 +558,7 @@ void always_if_else_expr(std::string line, std::ifstream &input) {
 
   std::string destNbLine = "  "+destAndSlice+" <= yuzeng"+yuzengIdx+" ;";
   ret = curMod->nbTable.emplace(destAndSlice, destNbLine);
+  put_into_reg2Slice(destAndSlice);
   if(!ret.second)
     toCout("Error in inserting ssaTable for the line: "+line+", "+destNbLine );
 }

@@ -9,9 +9,6 @@ namespace taintGen {
 // the first key is module name, the second key is variable name
 std::map<std::string, std::unordered_map<std::string, std::string>> g_rstValMap;
 std::map<std::string, std::unordered_map<std::string, std::string>> g_normValMap;
-// first key is module name: which module the instance is within
-// second key is instance name. Value is the corresponding module name
-std::unordered_map<std::string, std::unordered_map<std::string, std::string>> g_instance2moduleMap;
 
 
 bool is_end_scope(std::string line) {

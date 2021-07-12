@@ -355,8 +355,8 @@ void print_llvm_ir(DestInfo &destInfo,
         toCoutVerb("Find it!");
       curMod = g_moduleInfoMap[modName];
 
-      toCout("Error: re-think and check the g_insContextStk");
-      abort();
+      //toCout("Error: re-think and check the g_insContextStk");
+      assert(modName == g_topModule);
       g_insContextStk.clear();
       Context_t insCntxt(insName, dest, curMod, nullptr, TheFunction);
       g_insContextStk.push_back(insCntxt);
@@ -744,12 +744,13 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
   std::string varAndSlice = node->dest;
   auto curMod = get_curMod();
   toCoutVerb("add_constraint for: "+varAndSlice+", timeIdx: "+toStr(timeIdx));
-  if(varAndSlice == "r0" && timeIdx == 8) {
+  if(varAndSlice == "" && timeIdx == 8) {
     toCoutVerb("find it");
   }
 
-  if(varAndSlice.find("aes_top_0.aes_out") != std::string::npos) {
-    toCoutVerb("find aes_top_0.aes_out");
+  if(varAndSlice.find("aes_reg_key0_i.reg_out") != std::string::npos) {
+    //   && timeIdx == 25) {
+    toCoutVerb("Find it!");
   }
 
   if(timeIdx > bound) {
@@ -770,7 +771,8 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
   if ( is_input(varAndSlice) ) { // input_t is always 0
     retExpr = input_constraint(node, timeIdx, c, b, bound);
   }
-  else if( is_reg_in_curMod(varAndSlice) ) { // AS case is moved to add_nb_constraint
+  else if( is_reg_in_curMod(varAndSlice) && node->type != SRC_CONCAT ) { 
+    // AS case is moved to add_nb_constraint
     retExpr = add_nb_constraint(node, timeIdx, c, b, bound);
   }
   else if( is_number(varAndSlice) ) { // num_t is always 0
@@ -812,8 +814,10 @@ llvm::Value* add_nb_constraint(astNode* const node,
                                uint32_t bound ) {
   const auto curFunc = get_func();
   const auto curMod = get_curMod();
-  std::string dest = node->dest;
-  if(dest.find("cpu_state") != std::string::npos && timeIdx == 8) {
+  std::string destAndSlice = node->dest;
+  std::string dest, destSlice;
+  split_slice(destAndSlice, dest, destSlice);
+  if(destAndSlice.find("cpu_state") != std::string::npos && timeIdx == 8) {
     //toCoutVerb("target reg found! time: "+toStr(timeIdx));
     toCout("Find it");
   }
@@ -828,21 +832,14 @@ llvm::Value* add_nb_constraint(astNode* const node,
   //if(!g_seeInputs && timeIdx == bound) bound++;
 
   if(timeIdx < bound) {
-    toCoutVerb("Add nb constraint for: " + dest+" ------  time: "+toStr(timeIdx));
-    if(dest == "decoder_trigger_q" && timeIdx == 3)
+    toCoutVerb("Add nb constraint for: " + destAndSlice+" ------  time: "+toStr(timeIdx));
+    if(destAndSlice == "decoder_trigger_q" && timeIdx == 3)
       toCoutVerb("Find it!");
     std::string destNext = node->srcVec.front();
 
     destNextExpr = add_constraint(node->childVec.front(), timeIdx+1, c, b, bound);
     return destNextExpr;
   }
-  //else if(!isSolve && !is_read_asv(dest) 
-  //          && g_resetedReg.find(timed_name(dest, timeIdx)) != g_resetedReg.end()) {
-  //  toCout("Error: unexpected condition!");
-  //  abort();
-  //  //assert(INPUT_EXPR_VAL.find(timed_name(dest, timeIdx)) != INPUT_EXPR_VAL.end());
-  //  //return *INPUT_EXPR_VAL[timed_name(dest, timeIdx)];        
-  //}
   else if ( is_clean(dest) ){ // the bound has been reached, do not expand its assignment
     push_clean_queue(node, timeIdx);
   }
@@ -868,11 +865,20 @@ llvm::Value* add_nb_constraint(astNode* const node,
         if(!prefix.empty()) prefix += ".";
         dest = prefix + dest;
       }
-      return get_arg(timed_name(dest, timeIdx), curFunc);
+      std::string destTimed = timed_name(dest, timeIdx);
+      auto destExpr = get_arg(destTimed, curFunc);
+      if(destSlice.empty())
+        return destExpr;
+      else {
+        uint32_t hi = get_end(destSlice);
+        uint32_t lo = get_begin(destSlice);
+        return extract_func(destExpr, hi, lo, 
+                            c, b, llvm::Twine(destTimed), true);
+      }
     }
     else {
-      uint32_t width = get_var_slice_width_simp(dest);    
-      std::string rstVal = get_rst_value(dest, timeIdx);
+      uint32_t width = get_var_slice_width_simp(destAndSlice);    
+      std::string rstVal = get_rst_value(destAndSlice, timeIdx);
       return var_expr(rstVal, timeIdx, c, b, false, width);    
     }
   }

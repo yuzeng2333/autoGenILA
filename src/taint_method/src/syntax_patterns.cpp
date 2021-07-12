@@ -113,6 +113,7 @@ std::regex pVarNameGroup("([\aa-zA-Z0-9_\\.\\$\\\\'\\[\\]]+)(?:(\\s*)(\\[\\d+(\\
 std::regex pNum("^(\\d+)'(h|d|b)[\\dabcdefx\\?]+$");
 std::regex pNumExist("(\\d+)'(h|d|b)[\\dabcdef\\?]+");
 std::regex pBin("(\\d+)'b([01]+)");
+std::regex pBinX("(\\d+)'b([01x]+)");
 std::regex pHex("(\\d+)'h([\\dabcdefx\\?]+)");
 } // end of namespace syntaxPatterns
 

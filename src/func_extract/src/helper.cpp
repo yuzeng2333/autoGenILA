@@ -13,6 +13,7 @@
 
 using namespace z3;
 using namespace taintGen;
+using namespace syntaxPatterns;
 
 namespace funcExtract {
 
@@ -992,7 +993,9 @@ bool is_reg(std::string var) {
 }
 
 
-bool is_reg_in_curMod(std::string var) {
+bool is_reg_in_curMod(std::string varAndSlice) {
+  std::string var, varSlice;
+  split_slice(varAndSlice, var, varSlice);
   auto curMod = get_curMod();
   if(var.back() == ' ')
     var.pop_back();
@@ -1368,11 +1371,26 @@ void initialize_min_delay(std::shared_ptr<ModuleInfo_t> &modInfo,
 }
 
 
-std::string get_rst_value(const std::string &dest, uint32_t timeIdx) {
-  uint32_t width = get_var_slice_width_simp(dest);    
+std::string get_rst_value(const std::string &destAndSlice, uint32_t timeIdx) {
+  uint32_t width = get_var_slice_width_simp(destAndSlice);
+  std::string dest, destSlice;
+  split_slice(destAndSlice, dest, destSlice);
   std::string rstVal;
-  if(g_rstVal.find(dest) != g_rstVal.end())
-    rstVal = g_rstVal[dest];
+  if(g_rstVal.find(dest) != g_rstVal.end()) {
+    rstVal = g_rstVal[dest];  
+    if(!destSlice.empty()) {
+      uint32_t hi = get_end(destSlice);
+      uint32_t lo = get_begin(destSlice);
+      std::smatch m;
+      if(!std::regex_match(rstVal, m, pBinX)) {
+        toCout("Error: rstVal does not match pBinX: "+rstVal);
+        abort();
+      }
+      rstVal = m.str(2);
+      rstVal = get_bits(rstVal, hi, lo);
+      rstVal = toStr(width)+"'b"+rstVal;
+    }
+  }
   else
     rstVal = toStr(width)+"'b0";
 

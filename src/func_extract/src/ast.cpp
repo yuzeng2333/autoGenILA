@@ -223,8 +223,8 @@ void add_node(std::string varAndSlice,
   const auto curMod = get_curMod();  
   remove_two_end_space(varAndSlice);
   //toCout("Add node for: "+varAndSlice);
-  if(varAndSlice.find("k9") != std::string::npos) {
-       //&& timeIdx == 7) {
+  if(varAndSlice.find("aes_reg_key0_i.reg_out") != std::string::npos//) {
+       && timeIdx == 25) {
     toCout("Found it!");
     s_node = node;
   }

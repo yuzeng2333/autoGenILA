@@ -1488,7 +1488,7 @@ std::string split_long_bit_vec(std::string varList) {
       ret = ret + var + ", ";
       continue;
     }
-    if(std::regex_match(var, m, pBin)) {
+    if(std::regex_match(var, m, pBinX)) {
       uint32_t width = std::stoi(m.str(1));
       std::string num = m.str(2);
       ret = split_long_bin(var, width, num, ret);

@@ -490,6 +490,7 @@ llvm::Value* two_op_constraint(astNode* const node, uint32_t timeIdx, context &c
     assert(is_number(op1AndSlice) || is_number(op2AndSlice));
     assert(!is_x(op1AndSlice) && !is_x(op2AndSlice));
   }
+  toCoutVerb("go to make_llvm_instr from two-op: "+op1AndSlice+", "+op2AndSlice);
   return make_llvm_instr(b, c, node->op, op1Expr, op2Expr, 
                          destWidthNum, op1WidthNum, op2WidthNum, llvm::Twine(destTimed));
 }
@@ -521,6 +522,7 @@ llvm::Value* one_op_constraint(astNode* const node, uint32_t timeIdx,
     op1Expr = extract_func(tmpExpr, op1Hi, op1Lo, c, b, op1AndSlice);
 
   std::string destTimed = timed_name(destAndSlice, timeIdx);
+  toCoutVerb("go to make_llvm_instr from one-op: "+op1AndSlice+", dest: "+destAndSlice);
   return make_llvm_instr(b, c, node->op, op1Expr, op1WidthNum, llvm::Twine(destTimed));
 }
 
@@ -553,6 +555,7 @@ llvm::Value* reduce_one_op_constraint(astNode* const node, uint32_t timeIdx,
   auto Ty = llvm::dyn_cast<llvm::IntegerType>(op1Expr->getType());
   uint32_t op1W = Ty->getBitWidth();
   std::string destTimed = timed_name(destAndSlice, timeIdx);
+  toCoutVerb("go to make_llvm_instr from reduce-op: "+op1AndSlice+", dest: "+destAndSlice);  
   return make_llvm_instr(b, c, node->op, op1Expr, op1WidthNum, llvm::Twine(destTimed));  
 }
 
@@ -658,6 +661,7 @@ llvm::Value* sel_op_constraint(astNode* const node, uint32_t timeIdx,
   // add llvm::Value*ession to s or g
   uint32_t minOpWidth = std::min(op1WidthNum, op2WidthNum);
   uint32_t maxOpWidth = std::max(op1WidthNum, op2WidthNum);
+  toCoutVerb("go to make_llvm_instr from sel-op: "+op1AndSlice+", "+op2AndSlice+", dest: "+destAndSlice);  
   auto tmp = make_llvm_instr(b, c, ">>", op1Expr, op2Expr,
                              maxOpWidth, op1WidthNum, op2WidthNum, 
                              op1AndSlice+"_lshr_"+op2AndSlice+DELIM+toStr(timeIdx));
@@ -989,6 +993,9 @@ llvm::Value* case_constraint(astNode* const node, uint32_t timeIdx,
 
   std::string caseValueStr = node->srcVec[1];
   uint32_t posOfOne = get_pos_of_one(caseValueStr);
+  std::string name1 = caseVarExpr->getName().str();
+  std::string name2 = "1";
+  toCoutVerb("compare4: "+name1+", "+name2);
   llvm::Value* iteCond = b->CreateICmpEQ(extract_func(caseVarExpr, posOfOne, posOfOne, c, b, "_", condNoinline), 
                                          llvmInt(1, 1, c), 
                                          llvm::Twine( timed_name(destAndSlice+"_;_case"+toStr(posOfOne), timeIdx) ));
@@ -1036,6 +1043,9 @@ llvm::Value* add_one_case_branch_expr(astNode* const node, llvm::Value* &caseVar
     std::string caseValueStr = node->srcVec[idx];
     uint32_t posOfOne = get_pos_of_one(caseValueStr);
     // case value
+    std::string name1 = caseVarExpr->getName().str();
+    std::string name2 = "1";
+    toCoutVerb("compare3: "+name1+", "+name2);    
     llvm::Value* iteCond = b->CreateICmpEQ(
                              extract_func(caseVarExpr, posOfOne, posOfOne, c, b, "_", condNoinline), 
                              llvmInt(1, 1, c),
@@ -1395,8 +1405,12 @@ llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c
   assert(node->srcVec.size() == node->childVec.size());
 
   std::map<std::string, astNode*> input2AstMp;
-  for(uint32_t i = 0; i < node->srcVec.size(); i++)
+  for(uint32_t i = 0; i < node->srcVec.size(); i++) {
+    if(node->srcVec[i].find("aes_reg_key0_i.reg_out")
+         != std::string::npos)
+       toCout("Find it!");
     input2AstMp.emplace(node->srcVec[i], node->childVec[i]);
+  }
 
   // push func reg args
   std::string prefix = "";
@@ -1515,9 +1529,15 @@ llvm::Value* make_llvm_instr(std::shared_ptr<llvm::IRBuilder<>> &b,
     return b->CreateXor(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
   }
   else if (op == "==") {
+    std::string name1 = op1Expr->getName().str();
+    std::string name2 = op2Expr->getName().str();
+    toCoutVerb("compare1: "+name1+", "+name2);    
     return b->CreateICmpEQ(zext(op1Expr, opWidth, c, b), zext(op2Expr, opWidth, c, b), name);
   }
   else if (op == "===") {
+    std::string name1 = op1Expr->getName().str();
+    std::string name2 = op2Expr->getName().str();
+    toCoutVerb("compare2: "+name1+", "+name2);    
     return b->CreateICmpEQ(zext(op1Expr, opWidth, c, b), zext(op2Expr, opWidth, c, b), name);
   }
   else if (op == "!=") {
@@ -1579,6 +1599,9 @@ llvm::Value* make_llvm_instr(std::shared_ptr<llvm::IRBuilder<>> &b,
 llvm::Value* make_llvm_instr(builder &b, context &c, std::string op, 
                              llvm::Value* op1Expr, uint32_t op1WidthNum,
                              const llvm::Twine &name) {
+  // FIXME: the input op1WidthNum might be wrong(in the case of !),
+  // needs to figure out the reason later
+  uint32_t width = llvm::dyn_cast<llvm::IntegerType>(op1Expr->getType())->getBitWidth();
   if(op.empty()) {
     return op1Expr;
   }
@@ -1586,16 +1609,22 @@ llvm::Value* make_llvm_instr(builder &b, context &c, std::string op,
     return b->CreateNot(op1Expr, name);
   }
   else if(op == "!") {
-    return b->CreateICmpEQ(op1Expr, llvmInt(0, op1WidthNum, c), name);
+    std::string name1 = op1Expr->getName().str();
+    std::string name2 = "0";
+    toCoutVerb("compare7: "+name1+", "+name2);
+    return b->CreateICmpEQ(op1Expr, llvmInt(0, width, c), name);
   }
   else if(op == "|") {
-    return b->CreateICmpNE(op1Expr, llvmInt(0, op1WidthNum, c), name);
+    return b->CreateICmpNE(op1Expr, llvmInt(0, width, c), name);
   }
   else if(op == "&") {
-    return b->CreateICmpEQ(b->CreateNot(op1Expr), llvmInt(0, op1WidthNum, c), name);
+    std::string name1 = op1Expr->getName().str();
+    std::string name2 = "0";
+    toCoutVerb("compare8: "+name1+", "+name2);
+    return b->CreateICmpEQ(b->CreateNot(op1Expr), llvmInt(0, width, c), name);
   }
   else if(op == "-") {
-    return b->CreateSub(llvmInt(0, op1WidthNum, c), op1Expr, name);
+    return b->CreateSub(llvmInt(0, width, c), op1Expr, name);
   }
   else {
     toCout("Not supported 1-op in make_llvm_instr, op is: "+op);
