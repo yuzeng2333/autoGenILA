@@ -257,7 +257,7 @@ bool read_clean_o3(std::string fileName,
   std::regex pRetZero("^\\s+ret i\\d+ 0$");
   bool internalExist = false;
   while(std::getline(input, line)) {
-    if(line.substr(0, 6) == "define") {
+    if(line.substr(0, 6) == "define" && !internalExist) {
       if(!seeFuncDef) {
         seeFuncDef = true;
         while(line != "}") std::getline(input, line);
@@ -287,17 +287,17 @@ bool read_clean_o3(std::string fileName,
         line = "define "+line.substr(16);
       }
     }
-    else if(line.size() > 9 && line.substr(2, 3) == "ret") {
-      if(!seeReturn) {
-        seeReturn = true;
-        if(std::regex_match(line, m, pRetZero)) {
-          returnConst = true;
-        }
-      }
-      else {
-        if(std::regex_match(line, m, pRetZero)) returnConst = true;
-      }
-    }
+    //else if(line.size() > 9 && line.substr(2, 3) == "ret") {
+    //  if(!seeReturn) {
+    //    seeReturn = true;
+    //    if(std::regex_match(line, m, pRetZero)) {
+    //      returnConst = true;
+    //    }
+    //  }
+    //  else {
+    //    if(std::regex_match(line, m, pRetZero)) returnConst = true;
+    //  }
+    //}
     output << line << std::endl;    
   }
   output.close();

@@ -748,8 +748,8 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
     toCoutVerb("find it");
   }
 
-  if(varAndSlice.find("aes_reg_key0_i.reg_out [127:120]") != std::string::npos
-       && timeIdx == 25) {
+  if(varAndSlice.find("aes_reg_key0_i.reg_out") != std::string::npos) {
+    //   && timeIdx == 25) {
     toCoutVerb("Find it!");
   }
 
