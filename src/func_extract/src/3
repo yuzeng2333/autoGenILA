@@ -8,17 +8,12 @@
 
 namespace funcExtract {
 
-std::mutex g_dependVarMapMtx;
 // the first key is instr name, the second key is target name
 std::map<std::string, 
          std::map<std::string, 
                   std::vector<std::pair<std::string, 
                                         uint32_t>>>> g_dependVarMap;
-struct ThreadSafeMap_t g_asvSet;
-struct RunningThreadCnt_t g_threadCnt;
-struct WorkSet_t g_workSet;
-struct ThreadSafeVector_t g_fileNameVec;
-std::shared_ptr<ModuleInfo_t> g_topModuleInfo;
+std::map<std::string, uint32_t> g_asvSet;
 
 // A file should be generated, including:
 // 1. all the asvs and their bit numbers
@@ -38,16 +33,17 @@ void get_all_update() {
   visitedTgtFile.open(g_path+"/visited_target.txt", std::ios_base::app);
 
   std::ifstream addedWorkSetInFile(g_path+"/added_work_set.txt");
-  g_topModuleInfo = g_moduleInfoMap[g_topModule];
+  auto topModuleInfo = g_moduleInfoMap[g_topModule];
+  struct WorkSet_t workSet;
   std::vector<std::string> vecWorkSet;
-  for(std::string out: g_topModuleInfo->moduleOutputs) {
+  for(std::string out: topModuleInfo->moduleOutputs) {
     if(is_fifo_output(out)) continue;
-    g_workSet.mtxInsert(out);
-    uint32_t width = get_var_slice_width_simp(out, g_topModuleInfo);
+    workSet.mtxInsert(out);
+    uint32_t width = get_var_slice_width_simp(out, topModuleInfo);
     g_asvSet.emplace(out, width);
   }
   while(std::getline(addedWorkSetInFile, line)) {
-    g_workSet.mtxInsert(line);
+    workSet.mtxInsert(line);
   }
   // insert regs in fifos
   for(auto pair: g_fifoIns) {
@@ -57,8 +53,8 @@ void get_all_update() {
     uint32_t bound = g_fifo[modName];
     for(uint32_t i = 0; i < bound; i++) {
       std::string reg = insName+".r"+toStr(i);
-      g_workSet.mtxInsert(reg);
-      uint32_t width = get_var_slice_width_simp(reg, g_topModuleInfo);
+      workSet.mtxInsert(reg);
+      uint32_t width = get_var_slice_width_simp(reg, topModuleInfo);
       g_asvSet.emplace(reg, width);
     }
   }
@@ -67,14 +63,14 @@ void get_all_update() {
   addedWorkSetFile.open(g_path+"/added_work_set.txt", std::ios_base::app);
 
   if(!g_allowedTgt.empty()) {
-    g_workSet.mtxAssign(g_allowedTgt);
+    workSet.mtxAssign(g_allowedTgt);
     for(std::string tgt: g_allowedTgt) {
       uint32_t width = get_var_slice_width_cmplx(tgt);
       g_asvSet.emplace(tgt, width);
     }
   }
   else if(!g_allowedTgtVec.empty()) {
-    g_workSet.mtxClear();
+    workSet.mtxClear();
   }
   vecWorkSet = g_allowedTgtVec;
 
@@ -82,56 +78,41 @@ void get_all_update() {
   TheContext = std::make_unique<llvm::LLVMContext>();
   std::ofstream funcInfo(g_path+"/func_info.txt", std::ios::app);
   std::ofstream asvInfo(g_path+"/asv_info.txt", std::ios::app);
-  //std::vector<std::string> g_fileNameVec;
-  struct ThreadSafeVector_t g_fileNameVec;
+  std::vector<std::string> fileNameVec;
   std::vector<std::thread> threads;
-  while(!g_workSet.empty() || !vecWorkSet.empty() || g_threadCnt.get() > 0) {
+  struct RunningThreadCnt_t threadCnt;
+  while(!workSet.empty() || !vecWorkSet.empty() || threadCnt.get() > 0) {
   
     bool isVec;
-    bool doSingleTgt = false;
-    bool doVecTgt = false;
-    std::string target;
-    if(!g_workSet.empty()) {
+    if(!workSet.empty()) {
       isVec = false;
-      doSingleTgt = true;
-      auto targetIt = g_workSet.begin();
+      auto targetIt = workSet.begin();
       target = *targetIt;
-      g_workSet.mtxErase(targetIt);
+      workSet.mtxErase(targetIt);
       if(visitedTgt.find(target) != visitedTgt.end()
          || g_skippedOutput.find(target) != g_skippedOutput.end())
         continue;
     }
-    else if(!vecWorkSet.empty()){
-      doVecTgt = true;
+    else {
       isVec = true;
     }
-    if(!doSingleTgt && !doVecTgt) continue;
+
     // code for separate instructions
 
     uint32_t instrIdx = 0;
     for(auto instrInfo : g_instrInfo) {
       instrIdx++;
-      std::thread th(get_update_function, target, vecWorkSet, isVec,
-                     instrInfo, instrIdx);
-                     //addedWorkSetFile,
-                     //g_topModuleInfo);
-      g_threadCnt.increase();
-      //threads.push_back(std::move(th));
+      thread th(get_update_function, target, vecWorkSet, isVec,
+                instrInfo, instrIdx, g_dependVarMap, g_asvSet, 
+                addedWorkSetFile);
+      threadCnt.increase();
+      threads.push_back(std::move(th));
     }
-    if(isVec) {
-      for(auto reg: vecWorkSet) {
-        visitedTgt.insert(reg);
-        visitedTgtFile << target << std::endl;
-      }
-      vecWorkSet.clear();
-    }
-    else {
-      visitedTgt.insert(target);
-      visitedTgtFile << target << std::endl;
-    }
+    visitedTgt.insert(target);
+    visitedTgtFile << target << std::endl;
   } // end of while loop
 
-  print_llvm_script(g_path+"/link.sh");
+  print_llvm_script(fileNameVec, g_path+"/link.sh");
   print_func_info(funcInfo);
   print_asv_info(asvInfo);
   visitedTgtFile.close();
@@ -143,25 +124,25 @@ void get_update_function(std::string target,
                          std::vector<std::string> vecWorkSet,
                          bool isVec,
                          InstrInfo_t instrInfo,
-                         uint32_t instrIdx) {
-                         //std::map<std::string,
-                         //         std::map<std::string,
-                         //                  std::vector<std::pair<std::string,
-                         //                                        uint32_t>>>> &dependVarMap,
-                         //std::map<std::string, uint32_t> &asvSet,
-                         //std::ofstream addedWorkSetFile, 
-                         //struct WorkSet_t &g_workSet,
-                         //std::shared_ptr<ModuleInfo_t> g_topModuleInfo) {
-                         //struct ThreadSafeVector_t &g_fileNameVec) {
+                         uint32_t instrIdx,
+                         std::map<std::string,
+                                  std::map<std::string,
+                                           std::vector<std::pair<std::string,
+                                                                 uint32_t>>>> dependVarMap,
+                         std::map<std::string, uint32_t> asvSet,
+                         std::ofstream addedWorkSetFile, 
+                         struct WorkSet_t &workSet,
+                         struct RunningThreadCnt_t threadCnt) {
 
   // set the destInfo according to the target
   DestInfo destInfo;
+  std::string target;
   if(!isVec) {
     toCout("---  BEGIN Target: "+target+" ---");
     if(target.find("puregs[2]") != std::string::npos)
       toCoutVerb("Find it!");
     ///else continue;
-    ///g_workSet.erase(targetIt);
+    ///workSet.erase(targetIt);
     ///if(visitedTgt.find(target) != visitedTgt.end()
     ///   || g_skippedOutput.find(target) != g_skippedOutput.end())
     ///  continue;
@@ -177,9 +158,9 @@ void get_update_function(std::string target,
         destInfo.set_dest_and_slice(var);
       }
       else {
-        assert(g_topModuleInfo->ins2modMap.find(prefix) 
-               != g_topModuleInfo->ins2modMap.end());
-        std::string modName = g_topModuleInfo->ins2modMap[prefix];
+        assert(topModuleInfo->ins2modMap.find(prefix) 
+               != topModuleInfo->ins2modMap.end());
+        std::string modName = topModuleInfo->ins2modMap[prefix];
         destInfo.set_module_name(modName);
         destInfo.set_instance_name(prefix);
         destInfo.set_dest_and_slice(var);
@@ -188,7 +169,7 @@ void get_update_function(std::string target,
     destInfo.isVector = false;
   }
   else {
-    // when g_workSet is done, work on the vector of target registers
+    // when workSet is done, work on the vector of target registers
     destInfo.isVector = true;
     target = "{ ";
     for(std::string tgt: vecWorkSet) target = target + tgt + ", ";
@@ -205,9 +186,9 @@ void get_update_function(std::string target,
         destInfo.set_dest_and_slice(var);
       }
       else {
-        assert(g_topModuleInfo->ins2modMap.find(prefix)
-               != g_topModuleInfo->ins2modMap.end());
-        std::string modName = g_topModuleInfo->ins2modMap[prefix];
+        assert(topModuleInfo->ins2modMap.find(prefix)
+               != topModuleInfo->ins2modMap.end());
+        std::string modName = topModuleInfo->ins2modMap[prefix];
         destInfo.set_module_name(modName);
         destInfo.set_instance_name(prefix);
         destInfo.set_dest_and_slice(var);
@@ -218,13 +199,11 @@ void get_update_function(std::string target,
 
 
   std::string instrName = instrInfo.name;
-  g_dependVarMapMtx.lock();
-  if(g_dependVarMap.find(instrName) == g_dependVarMap.end())
-    g_dependVarMap.emplace( instrName, 
-                            std::map<std::string, 
-                                     std::vector<std::pair<std::string, 
-                                                           uint32_t>>>{} );
-  g_dependVarMapMtx.unlock();
+  if(dependVarMap.find(instrName) == dependVarMap.end())
+    dependVarMap.emplace( instrName, 
+                          std::map<std::string, 
+                                   std::vector<std::pair<std::string, 
+                                                         uint32_t>>>{} );
   ///instrIdx++;
   g_currInstrInfo = instrInfo;
   destInfo.set_instr_name(instrInfo.name);      
@@ -250,16 +229,14 @@ void get_update_function(std::string target,
                              +"_"+toStr(delayBound)+".ll";
   system(("mv "+fileName+"_clean.simp.ll "+g_path+"/"+llvmFileName).c_str());
   if(usefulFunc) {
-    g_fileNameVec.push_back(llvmFileName);        
+    fileNameVec.push_back(llvmFileName);        
     toCout("----- For instr "+instrInfo.name+", "+target+" is affected!");
-    g_dependVarMapMtx.lock();
-    if(g_dependVarMap[instrName].find(target) == g_dependVarMap[instrName].end())
-      g_dependVarMap[instrName].emplace(target, argVec);
+    if(dependVarMap[instrName].find(target) == dependVarMap[instrName].end())
+      dependVarMap[instrName].emplace(target, argVec);
     else {
       toCout("Error: for instruction "+instrInfo.name+", target: "+target+" is seen before");
       abort();
     }
-    g_dependVarMapMtx.unlock();
   }
   else {
     toCout("----- For instr "+instrInfo.name+", "+target+" is NOT affected!");
@@ -295,12 +272,12 @@ void get_update_function(std::string target,
        || reg.find("cpuregs[29]") != std::string::npos
        || reg.find("cpuregs[30]") != std::string::npos)
         continue;
-    if(g_push_new_target) g_workSet.mtxInsert(reg);
+    if(g_push_new_target) workSet.mtxInsert(reg);
     // TODO:
-    g_asvSet.emplace(reg, pair.second);
-    //addedWorkSetFile << reg << std::endl;
+    asvSet.emplace(reg, pair.second);
+    addedWorkSetFile << reg << std::endl;
   }
-  g_threadCnt.decrease();  
+  threadCnt.decrease();  
 }
 
 
@@ -400,8 +377,7 @@ bool read_clean_o3(std::string fileName,
 
 
 void print_func_info(std::ofstream &output) {
-  g_dependVarMapMtx.lock();
-  for(auto pair1 : g_dependVarMap) {
+  for(auto pair1 : dependVarMap) {
     output << "Instr:"+pair1.first << std::endl;
     for(auto pair2 : pair1.second) {
       output << "Target:"+pair2.first << std::endl;
@@ -412,23 +388,23 @@ void print_func_info(std::ofstream &output) {
     }
     output << std::endl;
   }
-  g_dependVarMapMtx.unlock();  
 }
 
 
 void print_asv_info(std::ofstream &output) {
-  for(auto it = g_asvSet.begin(); it != g_asvSet.end(); it++)
-    output << it->first+":"+toStr(it->second) << std::endl;
+  for(auto pair: g_asvSet)
+    output << pair.first+":"+toStr(pair.second) << std::endl;
 }
 
 
-void print_llvm_script( std::string fileName) {
+void print_llvm_script(const std::vector<std::string> &fileNameVec,
+                       std::string fileName) {
   std::ofstream output(fileName, std::ios::app);
   output << "clang ila.c -emit-llvm -S -o main.ll" << std::endl;
   std::string line = "llvm-link -v main.ll \\";
   output << line << std::endl;
-  for(auto it = g_fileNameVec.begin(); it != g_fileNameVec.end(); it++) {
-    line = *it + " \\";
+  for(std::string file : fileNameVec) {
+    line = file + " \\";
     output << line << std::endl;
   }
   line = "-S -o linked.ll";
@@ -490,48 +466,13 @@ void RunningThreadCnt_t::decrease() {
 }
 
 
-uint32_t RunningThreadCnt_t::get() {
+void RunningThreadCnt_t::get() {
   uint32_t ret;
   mtx.lock();
   ret = cnt;
   mtx.unlock();
   return ret;
 }
-
-
-void ThreadSafeVector_t::push_back(std::string var) {
-  mtx.lock();
-  vec.push_back(var);
-  mtx.unlock();
-}
-
-
-std::vector<std::string>::iterator ThreadSafeVector_t::begin() {
-  return vec.begin();
-}
-
-
-std::vector<std::string>::iterator ThreadSafeVector_t::end() {
-  return vec.end();
-}
-
-
-void ThreadSafeMap_t::emplace(std::string var, uint32_t width) {
-  mtx.lock();
-  mp.emplace(var, width);
-  mtx.unlock();
-}
-
-
-std::map<std::string, uint32_t>::iterator ThreadSafeMap_t::begin() {
-  return mp.begin();
-}
-
-
-std::map<std::string, uint32_t>::iterator ThreadSafeMap_t::end() {
-  return mp.end();
-}
-
 
 
 
