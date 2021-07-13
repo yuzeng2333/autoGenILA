@@ -129,10 +129,11 @@ int main(int argc, char *argv[]) {
 
   if(printRegInfo) {  
     // collect all regs
-    toCout("#### Gegin collect regs and print info");
+    toCout("#### Begin collect regs and print info");
     auto curMod = g_moduleInfoMap[g_topModule];    
-    collect_regs(curMod, "");
-    print_reg_info();
+    RegWidthVec_t regWidth;
+    collect_regs(curMod, "", regWidth);
+    print_reg_info(regWidth);
     std::vector<std::string> mems;
     collect_mems(curMod, "", mems);
     print_mem_info(mems);

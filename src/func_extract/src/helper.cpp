@@ -53,40 +53,6 @@ bool isAs(std::string var) {
 }
 
 
-llvm::Value* long_bv_val(std::string formedBinVar, context &c,
-                         std::shared_ptr<llvm::IRBuilder<>> &b ) {
-  assert(is_number(formedBinVar));
-  if(!is_formed_num(formedBinVar)) {
-    toCout("Error: input to long_bv_val is not well-formed number: "+formedBinVar);
-    abort();
-  }
-  uint32_t width = get_num_len(formedBinVar);
-  if(width <= 32) 
-    return llvm::ConstantInt::get(llvmWidth(width, c), hdb2int(formedBinVar), false);
-
-  if(is_hex(formedBinVar)) formedBinVar = formedHex2bin(formedBinVar);
-  formedBinVar = zero_extend_num(formedBinVar);
-  std::string pureNum = get_pure_num(formedBinVar);
-
-  llvm::Value* ret = llvm::ConstantInt::get(llvmWidth(32, c), bin2int(pureNum.substr(0, 32)), false);
-  width -= 32;
-  size_t pos = 32;  
-  while(width > 32) {
-    std::string subVar = pureNum.substr(pos, 32);
-    pos += 32;
-    width -= 32;
-    llvm::Value* nextNum = llvm::ConstantInt::get(llvmWidth(32, c), bin2int(subVar), false);
-    ret = concat_value(ret, nextNum, c, b);
-  }
-
-  // deal with the remaining bits
-  std::string subVar = pureNum.substr(pos);
-  llvm::Value* nextNum = llvmInt(bin2int(subVar), width, c);
-  ret = concat_value(ret, nextNum, c, b);
-  return ret;
-}
-
-
 bool is_formed_num(std::string num) {
   std::smatch m;
   return std::regex_match(num, m, pHex)
@@ -751,222 +717,6 @@ llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low,
 
 
 
-llvm::Value* extract_func(llvm::Value* in, uint32_t high, uint32_t low,
-                      std::shared_ptr<llvm::LLVMContext> &c, 
-                      std::shared_ptr<llvm::IRBuilder<>> &b, 
-                      const llvm::Twine &name, bool noinline) {
-  std::string destName = in->getName().str();
-  std::string dest, destSlice;
-  if(destName.find("concat__concat___017____#4") != std::string::npos)
-    toCoutVerb("Find it!");
-  if(!destName.empty()) {
-    split_slice(destName, dest, destSlice);
-    noinline = false;
-  }
-  else if(is_read_asv(dest) || (is_top_module() && is_input(dest))) noinline = true;
-  else noinline = false;
-  toCoutVerb("extract for: "+destName);  
-  llvm::Type* inputTy = in->getType();
-  uint32_t inputWidth = llvm::dyn_cast<llvm::IntegerType>(inputTy)->getBitWidth();
-  std::string app = "";
-  if(!noinline) app = "_in";
-  std::string funcName = "ext_"+toStr(inputWidth)+"_"+toStr(high)+"_"+toStr(low)+app;
-  llvm::Function *func;
-  llvm::FunctionType *FT;  
-  uint32_t len = high-low+1;
-
-  std::string extValName;
-  if(g_use_simple_func_name)
-    extValName = "ext_"+toStr(g_ext_cnt++);
-  else
-    extValName = destName+" ["+toStr(high)+":"+toStr(low)+"]";
-
-  if(!g_use_concat_extract_func) {
-    auto s1 = b->CreateLShr(in, low, llvm::Twine(destName+"_lshr"));
-    llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c), 
-                        llvm::Twine(extValName));
-    return ret;
-  }
-
-  if(g_extractFunc.find(funcName) != g_extractFunc.end()) {
-    func = g_extractFunc[funcName];
-    FT = func->getFunctionType();
-  }
-  else {
-    auto retTy = llvm::IntegerType::get(*c, len);
-    std::vector<llvm::Type *> argTy;  
-    argTy.push_back(llvm::IntegerType::get(*c, inputWidth));
-    FT = llvm::FunctionType::get(retTy, argTy, false);
-    func = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
-                                        funcName, TheModule.get());
-    if(noinline) func->addFnAttr(llvm::Attribute::NoInline);
-    func->args().begin()->setName("input");
-    llvm::Value* inArg = value(func->args().begin()  );
-
-    llvm::BasicBlock *localBB 
-      = llvm::BasicBlock::Create(*c, "entry", func);
-
-    std::shared_ptr<llvm::IRBuilder<>> builder;
-    builder = std::make_unique<llvm::IRBuilder<>>(*c);
-    builder->SetInsertPoint(localBB);
-    auto s1 = builder->CreateLShr(inArg, low, llvm::Twine("lshr"));
-    llvm::Value* ret = builder->CreateTrunc(s1, llvmWidth(len, c), llvm::Twine("trunc"));
-    builder->CreateRet(ret);
-    g_extractFunc.emplace(funcName, func);
-  }
-  
-  std::vector<llvm::Value*> args;
-  args.push_back(in);
-  return b->CreateCall(FT, func, args, 
-                       llvm::Twine(extValName));
-}
-
-
-llvm::Value* extract(llvm::Value* in, uint32_t high, uint32_t low,
-                      std::shared_ptr<llvm::LLVMContext> &c, 
-                      std::shared_ptr<llvm::IRBuilder<>> &b, 
-                      const llvm::Twine &name) {
-
-  uint32_t inWidth = llvm::dyn_cast<llvm::IntegerType>(in->getType())->getBitWidth();
-  if(inWidth < high+1) {
-    toCout("Error: input value width for extract is less than high index");
-    toCout("wdith: "+toStr(inWidth)+", high: "+toStr(high));
-    std::string tmpName = in->getName().str();
-    toCout("Input value name: "+tmpName);
-    abort();
-  }
-  uint32_t len = high - low + 1;
-  auto s1 = b->CreateLShr(in, low);
-  if(name.isTriviallyEmpty()) {
-    llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c));
-    return ret;
-  }
-  else {
-    llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c), 
-                          llvm::Twine(name.str()+" ["+toStr(high)+":"+toStr(low)+"]"));
-    ret->setName(name.str()+" ["+toStr(high)+":"+toStr(low)+"]");
-    return ret;
-  }
-}
-
-
-llvm::Value* extract(llvm::Value* in, uint32_t high, uint32_t low, 
-                      std::shared_ptr<llvm::LLVMContext> &c, 
-                      std::shared_ptr<llvm::IRBuilder<>> &b, 
-                      const std::string &name) {
-
-  return extract(in, high, low, c, b, llvm::Twine(name));
-}
-
-
-llvm::Value* concat_func(llvm::Value* val1, llvm::Value* val2, 
-                         std::shared_ptr<llvm::LLVMContext> &c,
-                         std::shared_ptr<llvm::IRBuilder<>> &b,
-                         bool noinline) {
-
-  llvm::Type* val1Ty = val1->getType();
-  llvm::Type* val2Ty = val2->getType();
-  uint32_t val1Width = llvm::dyn_cast<llvm::IntegerType>(val1Ty)->getBitWidth();
-  uint32_t val2Width = llvm::dyn_cast<llvm::IntegerType>(val2Ty)->getBitWidth();
-  uint32_t len = val1Width + val2Width;
-  auto newIntTy = llvm::IntegerType::get(*c, len);
-  std::string name1 = val1->getName().str();
-  std::string name2 = val2->getName().str();
-  toCoutVerb("concat with "+name1+" and "+name2+", total width: "+toStr(val1Width+val2Width));  
-  if(name2 == "cct_mem_rdata_word[15:0] [15:0]_cct_mem_rdata_word[7] [7:7]_cct_mem_rdata_word[7] [7:7]325_cct_mem_rdata_word[7] [7:7]326_cct_mem_rdata_word[7] [7:7]327_cct_mem_rdata_word[7] [7:7]328_cct_mem_rdata_word[7] [7:7]329_cct_mem_rdata_word[7] [7:7]330_cct_mem_rdata_word[7] [7:7]331_cct_mem_rdata_word[7] [7:7]332_cct_mem_rdata_word[7] [7:7]333_cct_mem_rdata_word[7] [7:7]334_cct_mem_rdata_word[7] [7:7]335_cct_mem_rdata_word[7] [7:7]336_cct_mem_rdata_word[7] [7:7]337_cct_mem_rdata_word[7] [7:7]338_cct_mem_rdata_word[7] [7:7]339_cct_mem_rdata_word[7] [7:7]340_cct_mem_rdata_word[7] [7:7]341_cct_mem_rdata_word[7] [7:7]342_cct_mem_rdata_word[7] [7:7]343_cct_mem_rdata_word[7] [7:7]344_cct_mem_rdata_word[7] [7:7]345_cct_mem_rdata_word[7] [7:7]346_cct_mem_rdata_word[7] [7:7]347_mem_rdata_word[7:0] [7:0]") {
-    toCoutVerb("Find it!");
-  }
-
-  std::string cctValName;
-  if(g_use_simple_func_name)
-    cctValName = "cct_"+toStr(g_cct_cnt++);
-  else
-    cctValName = "cct_"+name1+"_"+name2;
-
-  if(!g_use_concat_extract_func) {
-    llvm::Value* longVal1 = b->CreateZExtOrBitCast(val1, newIntTy, llvm::Twine(name1+"_zext"));
-    llvm::Value* ret = b->CreateAdd(b->CreateShl(longVal1, val2Width), 
-                                    zext(val2, len, c, b), 
-                                    llvm::Twine(cctValName));
-    return ret;
-  }
-
-  std::string n1, n1Slice;
-  std::string n2, n2Slice;
-  if(!name1.empty()) split_slice(name1, n1, n1Slice);
-  if(!name2.empty()) split_slice(name2, n2, n2Slice);
-  if(name1.empty() || name2.empty()) noinline = false;
-  else if( (is_read_asv(n1) || (is_top_module() && is_input(n1)))
-        && (is_read_asv(n2) || (is_top_module() && is_input(n2))) ) noinline = true;
-  else noinline = false;
-
-  std::string app = "";
-  if(!noinline) app = "_in";
-  std::string funcName = "cct_"+toStr(val1Width)+"_"+toStr(val2Width)+app;
-  llvm::Function *func;
-  llvm::FunctionType *FT;  
-  if(g_concatFunc.find(funcName) != g_concatFunc.end()) {
-    func = g_concatFunc[funcName];
-    FT = func->getFunctionType();    
-  }
-  else {
-    auto retTy = llvm::IntegerType::get(*c, len);
-    std::vector<llvm::Type*> argTy;
-    llvm::Type* ty1 = llvm::IntegerType::get(*c, val1Width);
-    llvm::Type* ty2 = llvm::IntegerType::get(*c, val2Width);
-    assert(ty1 == val1->getType());
-    assert(ty2 == val2->getType());
-    argTy.push_back(ty1);
-    argTy.push_back(ty2);
-    FT = llvm::FunctionType::get(retTy, argTy, false);
-    func = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
-                                        funcName, TheModule.get());
-    //func->addFnAttr(llvm::Attribute::NoInline);
-    func->args().begin()->setName("val1");
-    (func->args().begin()+1)->setName("val2");
-
-    llvm::Value* val1Arg = value(func->args().begin()  );
-    llvm::Value* val2Arg = value(func->args().begin()+1); 
-    assert(val1Arg->getType() == val1->getType());
-    assert(val2Arg->getType() == val2->getType());
-
-    llvm::BasicBlock *localBB 
-      = llvm::BasicBlock::Create(*c, "entry", func);
-
-    std::shared_ptr<llvm::IRBuilder<>> builder;
-    builder = std::make_unique<llvm::IRBuilder<>>(*c);
-    builder->SetInsertPoint(localBB);
-
-    llvm::Value* longVal1 = builder->CreateZExtOrBitCast(val1Arg, newIntTy);
-
-    llvm::Value* ret = builder->CreateAdd(builder->CreateShl(longVal1, val2Width), 
-                                                       zext(val2Arg, len, c, builder));
-    builder->CreateRet(ret);
-    g_concatFunc.emplace(funcName, func);
-  }
-
-  std::vector<llvm::Value*> args;
-  args.push_back(val1);
-  args.push_back(val2);
-  return b->CreateCall(FT, func, args, llvm::Twine(cctValName));
-}
-
-
-llvm::Value* concat_value(llvm::Value* val1, llvm::Value* val2, 
-                          std::shared_ptr<llvm::LLVMContext> &c,
-                          std::shared_ptr<llvm::IRBuilder<>> &b) {
-  uint32_t val1Width = llvm::dyn_cast<llvm::IntegerType>(val1->getType())->getBitWidth();
-  uint32_t val2Width = llvm::dyn_cast<llvm::IntegerType>(val2->getType())->getBitWidth();
-  std::string name1 = val1->getName().str();
-  std::string name2 = val2->getName().str();
-  toCoutVerb("concat "+name1+", len: "+toStr(val1Width));
-  toCoutVerb("and "+name2+", len: "+toStr(val2Width));
-
-  uint32_t newLen = val1Width+val2Width;
-  auto newIntTy = llvm::IntegerType::get(*c, newLen);
-  llvm::Value* longVal1 = b->CreateZExtOrBitCast(val1, newIntTy);
-  return b->CreateAdd(b->CreateShl(longVal1, val2Width), zext(val2, newLen, c, b));
-}
 
 
 bool is_x(const std::string &var) {
@@ -1028,17 +778,18 @@ std::shared_ptr<ModuleInfo_t> get_mod_info(std::string insName,
 }
 
 
-std::string get_hier_name(bool includeTopModule) {
+std::string get_hier_name(std::vector<Context_t> &insContextStk,
+                          bool includeTopModule) {
   std::string ret;
   if(includeTopModule)
-    for(auto it = g_insContextStk.begin(); 
-          it != g_insContextStk.end(); it++) {
+    for(auto it = insContextStk.begin(); 
+          it != insContextStk.end(); it++) {
       ret = ret + "." + it->InsName;
     }
   else {
-    if(g_insContextStk.size() == 1) return "";
-    for(auto it = g_insContextStk.begin()+1; 
-          it != g_insContextStk.end(); it++) {
+    if(insContextStk.size() == 1) return "";
+    for(auto it = insContextStk.begin()+1; 
+          it != insContextStk.end(); it++) {
       ret = ret + "." + it->InsName;
     }
   }
@@ -1359,17 +1110,6 @@ void set_clk_rst(std::shared_ptr<ModuleInfo_t> &modInfo) {
 }
 
 
-void initialize_min_delay(std::shared_ptr<ModuleInfo_t> &modInfo, 
-                          std::string outPort) {
-  if(modInfo->minInOutDelay.find(outPort) == modInfo->minInOutDelay.end()) {
-    std::map<std::string, uint32_t> toInputDelay;
-    for(std::string input : modInfo->moduleInputs) {
-      toInputDelay.emplace(input, UINT32_MAX);
-    }
-    modInfo->minInOutDelay.emplace(outPort, toInputDelay);
-  }
-}
-
 
 std::string get_rst_value(const std::string &destAndSlice, uint32_t timeIdx) {
   uint32_t width = get_var_slice_width_simp(destAndSlice);
@@ -1407,14 +1147,6 @@ std::string get_rst_value(const std::string &destAndSlice, uint32_t timeIdx) {
     toCoutVerb("Find it!");
 
   return rstVal;
-}
-
-
-void ModuleInfo_t::clean_ir_data() {
-  existedExpr.clear();
-  minInOutDelay.clear();
-  out2FuncMp.clear();
-  out2InDelayMp.clear();
 }
 
 
@@ -1477,10 +1209,10 @@ bool is_letter(char c) {
 }
 
 
-void print_reg_info() {
+void print_reg_info(RegWidthVec_t &regWidth) {
   uint32_t totalWidth = 0;
   std::ofstream output("./reg_info.txt");
-  for(auto it = g_regWidth.begin(); it != g_regWidth.end(); it++) {
+  for(auto it = regWidth.begin(); it != regWidth.end(); it++) {
     std::string regName = it->first;
     uint32_t width = it->second;
     output << regName + ":" + toStr(width) << std::endl;

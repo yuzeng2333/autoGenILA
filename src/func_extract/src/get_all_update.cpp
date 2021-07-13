@@ -79,7 +79,6 @@ void get_all_update() {
   vecWorkSet = g_allowedTgtVec;
 
   // declaration for llvm
-  TheContext = std::make_unique<llvm::LLVMContext>();
   std::ofstream funcInfo(g_path+"/func_info.txt", std::ios::app);
   std::ofstream asvInfo(g_path+"/asv_info.txt", std::ios::app);
   //std::vector<std::string> g_fileNameVec;
@@ -115,6 +114,7 @@ void get_all_update() {
                      instrInfo, instrIdx);
                      //addedWorkSetFile,
                      //g_topModuleInfo);
+      th.join();
       g_threadCnt.increase();
       //threads.push_back(std::move(th));
     }
@@ -238,7 +238,9 @@ void get_update_function(std::string target,
   remove_front_backslash(destNameSimp);
   std::string fileName = g_path+"/"+instrInfo.name+"_"
                          +destNameSimp+"_"+toStr(delayBound);
-  print_llvm_ir(destInfo, delayBound, instrIdx);
+  UpdateFunctionGen UFGen;  
+  UFGen.TheContext = std::make_unique<llvm::LLVMContext>();
+  UFGen.print_llvm_ir(destInfo, delayBound, instrIdx);
   std::string clean("opt --instsimplify --deadargelim --instsimplify "+fileName+"_tmp.ll -S -o="+fileName+"_clean.ll");
   std::string opto3("opt -O1 "+fileName+"_clean.ll -S -o="+fileName+"_tmp.o3.ll; opt -passes=deadargelim "+fileName+"_tmp.o3.ll -S -o="+fileName+"_clean.o3.ll; rm "+fileName+"_tmp.o3.ll");
   system(clean.c_str());

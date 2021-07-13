@@ -157,7 +157,7 @@ int main(int argc, char *argv[]) {
   to_file("endmodule");
   toCout("*** Check reset input!!!");
 
-  print_reg_info();
+  //print_reg_info();
 }
 
 

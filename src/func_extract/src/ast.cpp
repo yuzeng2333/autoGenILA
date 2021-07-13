@@ -146,7 +146,7 @@ void build_ast_tree() {
         Context_t insCntxt(curMod->name, "", curMod, nullptr, nullptr);
         curMod->isFunctionedSubMod = true;
         g_insContextStk.insert(g_insContextStk.begin(), insCntxt); 
-        std::string destPrefix = get_hier_name(false);
+        std::string destPrefix = get_hier_name(g_insContextStk, false);
         std::string destName = destPrefix + "." + reg;
         for(auto it = g_insContextStk.begin();
           it != g_insContextStk.end(); it++) {

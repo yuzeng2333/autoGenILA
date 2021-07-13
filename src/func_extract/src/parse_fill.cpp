@@ -198,7 +198,7 @@ void read_module_info() {
     if(is_module_line(line, moduleName)) {
       // store info of last module
       moduleInfo->name = moduleName;
-      moduleInfo->out2InDelayMp.clear();
+      //moduleInfo->out2InDelayMp.clear();
     }
     else if(line.find(":") == std::string::npos 
               && line.find("}") == std::string::npos) { // output name
@@ -223,7 +223,8 @@ void read_module_info() {
     }
     else {
       seeOutput = false;
-      moduleInfo->out2InDelayMp.emplace(outVar, inputDelayMap);
+      abort(); // abort because out2InDelayMp is not supported
+      //moduleInfo->out2InDelayMp.emplace(outVar, inputDelayMap);
     }
   }
   g_moduleInfoMap.emplace(moduleInfo->name, moduleInfo);
@@ -274,7 +275,7 @@ ModuleInfo_t::~ModuleInfo_t() {
   caseTable.clear();
   funcTable.clear();
   reg2timeIdx.clear();
-  out2InDelayMp.clear();
+  //out2InDelayMp.clear();
 }
 
 

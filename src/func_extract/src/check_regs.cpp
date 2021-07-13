@@ -20,47 +20,31 @@ namespace funcExtract {
 //static std::shared_ptr<KaleidoscopeJIT> TheJIT;
 //static std::map<std::string, std::shared_ptr<llvm::PrototypeAST>> FunctionProtos;
 
-uint32_t bound_limit;
 std::regex pTimed("^(\\S+)"+DELIM+"(\\d+)$");
 std::string CURRENT_VAR;
-// CLEAN_QUEUE includes: input, not-current AS and num
-std::map<astNode*, uint32_t> CLEAN_QUEUE;
-std::map<astNode*, uint32_t> DIRTY_QUEUE;
+
 // DIRTY_QUEUE is mainly not-current AS
 
 std::map<std::string, expr*> INPUT_EXPR_VAL;
 std::map<std::string, expr*> TIMED_VAR2EXPR;
-std::map<std::string, llvm::Function::arg_iterator> g_topFuncArgMp;
-std::map<std::string, llvm::Function*> g_extractFunc;
-std::map<std::string, llvm::Function*> g_concatFunc;
+
 std::map<std::string, uint32_t> g_allRegs;
-std::set<std::string> g_resetedReg;
 std::set<std::string> g_regWithFunc;
 std::vector<Context_t> g_insContextStk;
 
 //std::unordered_map<std::string, expr*> INT_EXPR_VAL;
 std::set<std::string> INT_EXPR_SET;
 std::set<std::string> g_readASV;
-std::vector<std::pair<std::string, std::string>> g_memInstances;
 // remaining variables to be built goal for
 std::queue<std::pair<std::string, uint32_t>> g_goalVars;
+InstrInfo_t g_currInstrInfo;
 std::string g_rootNode;
 std::string g_currentModuleName;
 std::string DELIM = "___#";
-struct InstrInfo_t g_currInstrInfo;
 uint32_t g_destWidth;
-bool g_skipCheck;
-bool g_ignoreSubModules=false;
 bool g_seeInputs;
 uint32_t g_maxDelay = 0;
-uint32_t g_cct_cnt = 0;
-uint32_t g_ext_cnt = 0;
-// for llvm
-std::shared_ptr<llvm::LLVMContext> TheContext;
-std::shared_ptr<llvm::Module> TheModule;
-llvm::Function *TheFunction;
-std::shared_ptr<llvm::IRBuilder<>> Builder;
-llvm::BasicBlock *BB;
+
 
 
 // assume ssaTable and nbTable have been filled
@@ -73,8 +57,9 @@ void check_all_regs() {
   g_insContextStk.clear();
   clean_module_inputs();
   uint32_t i = 1;
-  DestInfo destInfo;  
-  TheContext = std::make_unique<llvm::LLVMContext>();  
+  DestInfo destInfo;
+  UpdateFunctionGen UFGen;  
+  UFGen.TheContext = std::make_unique<llvm::LLVMContext>();
   for(auto instrInfo : g_instrInfo) {
     if(!instrInfo.writeASVVec.empty() && !instrInfo.writeASV.empty()) {
       toCout("Error: does not support single ASV and vector together");
@@ -116,7 +101,7 @@ void check_all_regs() {
         destInfo.set_dest_and_slice(writeVar);
         destInfo.set_module_name(subMod->name);
       }
-      print_llvm_ir(destInfo, cycleCnt, i-1);
+      UFGen.print_llvm_ir(destInfo, cycleCnt, i-1);
       //print_llvm_ir_without_submodules(oneWriteAsv, cycleCnt-1, i-1);
       g_maxDelay = cycleCnt;
     }
@@ -131,7 +116,7 @@ void check_all_regs() {
         destInfo.set_module_name(modName);
       else
         destInfo.set_module_name(g_topModule);
-      print_llvm_ir(destInfo, cycleCnt, i-1);
+      UFGen.print_llvm_ir(destInfo, cycleCnt, i-1);
       g_maxDelay = cycleCnt;    
     }
 
@@ -141,32 +126,33 @@ void check_all_regs() {
 }
 
 
-void clean_data() {
+void UpdateFunctionGen::clean_data() {
   CLEAN_QUEUE.clear();
   DIRTY_QUEUE.clear();
-  g_resetedReg.clear();
+  resetedReg.clear();
 }
 
 
 /// bound is the number of regs from input to output
 /// timeIdx start from 0, max value = bound
-void print_llvm_ir(DestInfo &destInfo, 
-                   uint32_t bound, 
-                   uint32_t instrIdx) {
+void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo, 
+                                      uint32_t bound, 
+                                      uint32_t instrIdx) {
 
   // FIXME: change the following model name
   std::string destName = destInfo.get_dest_name();
   std::string curModName = destInfo.get_mod_name();
   std::string curInsName = destInfo.get_ins_name();
   auto curMod = g_moduleInfoMap[curModName];
+  auto curDynData = get_dyn_data(curMod);
   std::string insName = curInsName.empty() ? curModName : curInsName;
   Context_t insCntxt(insName, "", curMod, nullptr, nullptr);  
-  g_insContextStk.clear();
+  insContextStk.clear();
   clean_all_mod_dynamic_info();
-  g_cct_cnt = 0; 
-  g_ext_cnt = 0;
+  cct_cnt = 0; 
+  ext_cnt = 0;
   if(curModName == g_topModule) {
-    g_insContextStk.push_back(insCntxt);
+    insContextStk.push_back(insCntxt);
   }
   else {
     // if starts from a sub-module, the submodule and all its parent modules
@@ -181,21 +167,21 @@ void print_llvm_ir(DestInfo &destInfo,
         for(auto parentMod: curMod->parentModVec)
           toCout(parentMod->name);
       }
-      curMod->isFunctionedSubMod = false;
+      curDynData->isFunctionedSubMod = false;
       auto parentMod = *(curMod->parentModVec.begin());
       if(insName.empty())
         insName = ask_parent_my_ins_name(curMod->name, parentMod);
       Context_t insCntxt(insName, "", curMod, parentMod, nullptr);  
-      g_insContextStk.insert(g_insContextStk.begin(), insCntxt);
+      insContextStk.insert(insContextStk.begin(), insCntxt);
       curMod = parentMod;
     }
     // curMod is the top module
     Context_t insCntxt(curMod->name, "", curMod, nullptr, nullptr);
-    curMod->isFunctionedSubMod = true;
-    g_insContextStk.insert(g_insContextStk.begin(), insCntxt);    
+    curDynData->isFunctionedSubMod = true;
+    insContextStk.insert(insContextStk.begin(), insCntxt);    
   }
   // TODO: modify the following two lines of code
-  std::string destPrefix = get_hier_name(false);
+  std::string destPrefix = get_hier_name(insContextStk, false);
   if(!destPrefix.empty()) destName = destPrefix + "." + destName;
   TheModule = std::make_unique<llvm::Module>(
     "mod_;_"+curMod->name+"_;_"+destName, 
@@ -207,23 +193,23 @@ void print_llvm_ir(DestInfo &destInfo,
   // input types
   std::vector<llvm::Type *> argTy;
   std::shared_ptr<ModuleInfo_t> topModInfo = g_moduleInfoMap[g_topModule];
-  g_regWidth.clear();
-  collect_regs(topModInfo, "", g_regWidth);
-  print_all_regs(g_regWidth);
+  regWidth.clear();
+  collect_regs(topModInfo, "", regWidth);
+  funcExtract::print_all_regs(regWidth);
 
-  collect_mem_ins(topModInfo, "", g_memInstances);
+  funcExtract::collect_mem_ins(topModInfo, "", memInstances);
 
   // push regs
   // add regs from all instances of sub-modules to the args
   uint32_t argNum = 0;
-  for(auto it = g_regWidth.begin(); it != g_regWidth.end(); it++) {
+  for(auto it = regWidth.begin(); it != regWidth.end(); it++) {
     uint32_t width = it->second;
     argTy.push_back(llvm::IntegerType::get(*TheContext, width));
     argNum++;
   }
 
   // push output ports of memory modules
-  for(auto it = g_memInstances.begin(); it != g_memInstances.end(); it++) {
+  for(auto it = memInstances.begin(); it != memInstances.end(); it++) {
     std::string pathInsName = it->first;
     std::string modName = it->second;
     auto memMod = g_moduleInfoMap[modName];
@@ -246,8 +232,8 @@ void print_llvm_ir(DestInfo &destInfo,
       argNum++;
     }
   // return types
-  llvm::Type* retTy = destInfo.get_ret_type();
-  std::string destSimpleName = var_name_convert(destName, true);
+  llvm::Type* retTy = destInfo.get_ret_type(TheContext);
+  std::string destSimpleName = funcExtract::var_name_convert(destName, true);
 
   llvm::FunctionType *FT =
     llvm::FunctionType::get(retTy, argTy, false);
@@ -260,12 +246,12 @@ void print_llvm_ir(DestInfo &destInfo,
 
   TheFunction = llvm::Function::Create(
     FT, llvm::Function::InternalLinkage, 
-    g_currInstrInfo.name+"_"+destSimpleName, TheModule.get());
+    currInstrInfo.name+"_"+destSimpleName, TheModule.get());
   TheFunction->addFnAttr(llvm::Attribute::NoInline);
   //g_curFunc = TheFunction;
 
-  for(auto it = g_insContextStk.begin();
-      it != g_insContextStk.end(); it++) {
+  for(auto it = insContextStk.begin();
+      it != insContextStk.end(); it++) {
     it->Target = destName;
     it->Func = topFunction;
     initialize_min_delay(it->ModInfo, destName);
@@ -273,18 +259,18 @@ void print_llvm_ir(DestInfo &destInfo,
 
   // set arg name for the function
   uint32_t idx = 0;
-  for(auto it = g_regWidth.begin(); it != g_regWidth.end(); it++) {
+  for(auto it = regWidth.begin(); it != regWidth.end(); it++) {
     std::string regName = it->first;
     std::string regNameBound = regName+DELIM+toStr(bound);
     toCoutVerb("set reg-type func arg: "+regNameBound);
     (TheFunction->args().begin()+idx)->setName(regNameBound);
     (topFunction->args().begin()+idx)->setName(regNameBound);
     argNum--;
-    g_topFuncArgMp.emplace(regNameBound, TheFunction->args().begin()+idx++);
+    topFuncArgMp.emplace(regNameBound, TheFunction->args().begin()+idx++);
   }
 
 
-  for(auto it = g_memInstances.begin(); it != g_memInstances.end(); it++) {
+  for(auto it = memInstances.begin(); it != memInstances.end(); it++) {
     std::string pathInsName = it->first;
     std::string modName = it->second;
     auto memMod = g_moduleInfoMap[modName];
@@ -294,7 +280,7 @@ void print_llvm_ir(DestInfo &destInfo,
       (TheFunction->args().begin()+idx)->setName(portName);
       (topFunction->args().begin()+idx)->setName(portName);
       argNum--;
-      g_topFuncArgMp.emplace(portName, TheFunction->args().begin()+idx++);
+      topFuncArgMp.emplace(portName, TheFunction->args().begin()+idx++);
     }
   }
 
@@ -315,8 +301,8 @@ void print_llvm_ir(DestInfo &destInfo,
   BB = llvm::BasicBlock::Create(*TheContext, "bb_;_"+destName, TheFunction);
   Builder->SetInsertPoint(BB);
 
-  g_ignoreSubModules = false;
-  g_skipCheck = true;
+  ignoreSubModules = false;
+  skipCheck = true;
   clean_data();
   std::ofstream goalFile;
   goalFile.open(g_path+"/goal.txt", std::ofstream::app);
@@ -357,9 +343,9 @@ void print_llvm_ir(DestInfo &destInfo,
 
       //toCout("Error: re-think and check the g_insContextStk");
       assert(modName == g_topModule);
-      g_insContextStk.clear();
+      insContextStk.clear();
       Context_t insCntxt(insName, dest, curMod, nullptr, TheFunction);
-      g_insContextStk.push_back(insCntxt);
+      insContextStk.push_back(insCntxt);
       if(curMod->visitedNode.find(dest) == curMod->visitedNode.end()
           && curMod->reg2Slices.find(dest) == curMod->reg2Slices.end()) {
         toCout("Error: ast node is not found for this var: |"+dest+"|"
@@ -697,9 +683,10 @@ void print_llvm_ir(DestInfo &destInfo,
 //}
 
 
-llvm::Value* add_constraint(std::string varAndSlice, uint32_t timeIdx, context &c,
-                            std::shared_ptr<llvm::IRBuilder<>> &b,
-                            uint32_t bound ) {
+llvm::Value*
+UpdateFunctionGen::add_constraint(std::string varAndSlice, uint32_t timeIdx, context &c,
+                                   std::shared_ptr<llvm::IRBuilder<>> &b,
+                                   uint32_t bound ) {
   auto curMod = get_curMod();
   llvm::Value* ret;
   bool retIsEmpty = true;
@@ -737,12 +724,14 @@ llvm::Value* add_constraint(std::string varAndSlice, uint32_t timeIdx, context &
 /// return: if node->dest is a slice, which means the slice is directly assigned, 
 //            it just returns expr for the slice. Otherwise, it returns expr for
 //            the whole var.
-llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
+llvm::Value* 
+UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context &c,
                             std::shared_ptr<llvm::IRBuilder<>> &b,
                             uint32_t bound ) {
   // Attention: varAndSlice might have a slice, a directly-assigned varAndSlice
   std::string varAndSlice = node->dest;
   auto curMod = get_curMod();
+  std::shared_ptr<ModuleDynInfo_t> curDynData = get_dyn_data(curMod);
   toCoutVerb("add_constraint for: "+varAndSlice+", timeIdx: "+toStr(timeIdx));
   if(varAndSlice == "" && timeIdx == 8) {
     toCoutVerb("find it");
@@ -759,12 +748,12 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
   }
 
   const std::string curTgt = get_target();
-  if(curMod->existedExpr.find(curTgt) == curMod->existedExpr.end() )
-    curMod->existedExpr.emplace(curTgt, std::map<std::string, llvm::Value*>() );
+  if(curDynData->existedExpr.find(curTgt) == curDynData->existedExpr.end() )
+    curDynData->existedExpr.emplace(curTgt, std::map<std::string, llvm::Value*>() );
 
-  if(curMod->existedExpr[curTgt].find(timed_name(varAndSlice, timeIdx)) 
-      != curMod->existedExpr[curTgt].end() ) {
-    return curMod->existedExpr[curTgt][timed_name(varAndSlice, timeIdx)];
+  if(curDynData->existedExpr[curTgt].find(timed_name(varAndSlice, timeIdx)) 
+      != curDynData->existedExpr[curTgt].end() ) {
+    return curDynData->existedExpr[curTgt][timed_name(varAndSlice, timeIdx)];
   }
 
   llvm::Value* retExpr;
@@ -801,19 +790,21 @@ llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
   else { // it is wire
     retExpr = add_ssa_constraint(node, timeIdx, c, b, bound);
   }
-  curMod->existedExpr[curTgt].emplace(timed_name(varAndSlice, timeIdx), retExpr);
+  curDynData->existedExpr[curTgt].emplace(timed_name(varAndSlice, timeIdx), retExpr);
   if(curMod->name == "T" && curTgt == "out" && varAndSlice == "in" && timeIdx == 1)
     toCoutVerb("push into expr!");
   return retExpr;
 }
 
 
-llvm::Value* add_nb_constraint(astNode* const node, 
+llvm::Value* 
+UpdateFunctionGen::add_nb_constraint(astNode* const node, 
                                uint32_t timeIdx, context &c, 
                                std::shared_ptr<llvm::IRBuilder<>> &b,
                                uint32_t bound ) {
   const auto curFunc = get_func();
   const auto curMod = get_curMod();
+  auto curDynData = get_dyn_data(curMod);
   std::string destAndSlice = node->dest;
   std::string dest, destSlice;
   split_slice(destAndSlice, dest, destSlice);
@@ -860,8 +851,8 @@ llvm::Value* add_nb_constraint(astNode* const node,
         //&& curMod->moduleAs.find(dest) != curMod->moduleAs.end())
       //std::string prefix = get_hier_name(false);
       //if(!prefix.empty()) prefix += ".";
-      if(curMod->isFunctionedSubMod == false) {
-        std::string prefix = get_hier_name(false);
+      if(curDynData->isFunctionedSubMod == false) {
+        std::string prefix = get_hier_name(insContextStk, false);
         if(!prefix.empty()) prefix += ".";
         dest = prefix + dest;
       }
@@ -894,10 +885,10 @@ llvm::Value* add_nb_constraint(astNode* const node,
         if(is_top_module())
           return get_arg(timed_name(dest, timeIdx), curFunc);
         else {
-          if(curMod->isFunctionedSubMod)
+          if(curDynData->isFunctionedSubMod)
             return get_arg(timed_name(dest, timeIdx), curFunc);
           else {
-            std::string prefix = get_hier_name(false);
+            std::string prefix = get_hier_name(insContextStk, false);
             dest = prefix + "." + dest;
             return get_arg(timed_name(dest, timeIdx), curFunc);
           }
@@ -915,7 +906,8 @@ llvm::Value* add_nb_constraint(astNode* const node,
 }
 
 
-llvm::Value* add_ssa_constraint(astNode* const node, uint32_t timeIdx, context &c,  
+llvm::Value* 
+UpdateFunctionGen::add_ssa_constraint(astNode* const node, uint32_t timeIdx, context &c,  
                                 std::shared_ptr<llvm::IRBuilder<>> &b, uint32_t bound) {
   toCoutVerb("Add ssa constraint for: " + node->dest+" ------  time: "+toStr(timeIdx));
   std::string var = node->dest;
@@ -947,13 +939,14 @@ llvm::Value* add_ssa_constraint(astNode* const node, uint32_t timeIdx, context &
 }
 
 
-void add_child_constraint(astNode* const parentNode, uint32_t timeIdx, context &c, 
-                          std::shared_ptr<llvm::IRBuilder<>> &b, uint32_t bound) {
-  abort();
-  for( astNode* node: parentNode->childVec ) {
-    add_constraint(node, timeIdx, c, b, bound);
-  }
-}
+//void 
+//UpdateFunctionGen::add_child_constraint(astNode* const parentNode, uint32_t timeIdx, context &c,
+//                          std::shared_ptr<llvm::IRBuilder<>> &b, uint32_t bound) {
+//  abort();
+//  for( astNode* node: parentNode->childVec ) {
+//    add_constraint(node, timeIdx, c, b, bound);
+//  }
+//}
 
 
 // dest may be: input, AS or num
@@ -985,7 +978,7 @@ void add_child_constraint(astNode* const parentNode, uint32_t timeIdx, context &
 //}
 
 
-void push_clean_queue(astNode* node, uint32_t timeIdx) {
+void UpdateFunctionGen::push_clean_queue(astNode* node, uint32_t timeIdx) {
   if(CLEAN_QUEUE.find(node) != CLEAN_QUEUE.end())
     return;
   CLEAN_QUEUE.emplace(node, timeIdx);
@@ -1039,7 +1032,7 @@ void push_clean_queue(astNode* node, uint32_t timeIdx) {
 //};
 
 
-void push_dirty_queue(astNode* node, uint32_t timeIdx) {
+void UpdateFunctionGen::push_dirty_queue(astNode* node, uint32_t timeIdx) {
   if(DIRTY_QUEUE.find(node) != DIRTY_QUEUE.end())
     return;
   DIRTY_QUEUE.emplace(node, timeIdx);
@@ -1098,7 +1091,7 @@ void push_dirty_queue(astNode* node, uint32_t timeIdx) {
 //}
 
 
-void save_regs_for_expand(std::set<std::string> &varToExpand) {
+void UpdateFunctionGen::save_regs_for_expand(std::set<std::string> &varToExpand) {
   varToExpand.clear();
   for(auto pair: DIRTY_QUEUE) {
     varToExpand.insert(pair.first->dest);
@@ -1109,7 +1102,7 @@ void save_regs_for_expand(std::set<std::string> &varToExpand) {
 }
 
 
-bool is_in_clean_queue(std::string var) {
+bool UpdateFunctionGen::is_in_clean_queue(std::string var) {
   if(var.back() == 'T')
     return false;
   std::string cleanVar;
@@ -1124,7 +1117,7 @@ bool is_in_clean_queue(std::string var) {
 }
 
 
-bool is_in_dirty_queue(std::string var) {
+bool UpdateFunctionGen::is_in_dirty_queue(std::string var) {
   if(var.back() == 'T')
     return false;
   std::string cleanVar;
@@ -1184,7 +1177,7 @@ std::string DestInfo::get_dest_name() {
 }
 
 
-llvm::Type* DestInfo::get_ret_type() {
+llvm::Type* DestInfo::get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext) {
   if(!isVector) {
     return llvm::IntegerType::get(*TheContext, 
                                   get_var_slice_width_simp(destAndSlice));
@@ -1205,7 +1198,7 @@ llvm::Type* DestInfo::get_ret_type() {
 }
 
 
-llvm::Type* DestInfo::get_arr_type() {
+llvm::Type* DestInfo::get_arr_type(std::shared_ptr<llvm::LLVMContext> TheContext) {
   assert(isVector);
   // if is reg vector, return an array type pointer
   // first, check if every reg is of the same size
@@ -1292,13 +1285,303 @@ void DestInfo::set_dest_vec(const std::vector<std::string> &vec) {
 }
 
 
-void clean_all_mod_dynamic_info() {
+void UpdateFunctionGen::clean_all_mod_dynamic_info() {
   for(auto pair : g_moduleInfoMap) {
-    pair.second->clean_ir_data();
+    auto dynData = get_dyn_data(pair.second);
+    dynData->clean_ir_data();
   }
 }
 
 
+void ModuleDynInfo_t::clean_ir_data() {
+  existedExpr.clear();
+  minInOutDelay.clear();
+  out2FuncMp.clear();
+  out2InDelayMp.clear();
+}
+
+
+std::shared_ptr<ModuleDynInfo_t>
+UpdateFunctionGen::get_dyn_data(std::shared_ptr<ModuleInfo_t> curMod) {
+  if(dynDataMp.find(curMod->name) == dynDataMp.end()) {
+    auto newDynData = std::make_shared<ModuleDynInfo_t>();
+    dynDataMp.emplace(curMod->name, newDynData);
+  }
+  return dynDataMp[curMod->name];  
+}
+
+
+void 
+UpdateFunctionGen::initialize_min_delay(std::shared_ptr<ModuleInfo_t> &modInfo, 
+                                        std::string outPort) {
+  auto dynData = get_dyn_data(modInfo);
+  if(dynData->minInOutDelay.find(outPort) == dynData->minInOutDelay.end()) {
+    std::map<std::string, uint32_t> toInputDelay;
+    for(std::string input : modInfo->moduleInputs) {
+      toInputDelay.emplace(input, UINT32_MAX);
+    }
+    dynData->minInOutDelay.emplace(outPort, toInputDelay);
+  }
+}
+
+
+
+llvm::Value* 
+UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
+                      std::shared_ptr<llvm::LLVMContext> &c, 
+                      std::shared_ptr<llvm::IRBuilder<>> &b, 
+                      const llvm::Twine &name, bool noinline) {
+  std::string destName = in->getName().str();
+  std::string dest, destSlice;
+  if(destName.find("concat__concat___017____#4") != std::string::npos)
+    toCoutVerb("Find it!");
+  if(!destName.empty()) {
+    split_slice(destName, dest, destSlice);
+    noinline = false;
+  }
+  else if(is_read_asv(dest) || (is_top_module() && is_input(dest))) noinline = true;
+  else noinline = false;
+  toCoutVerb("extract for: "+destName);  
+  llvm::Type* inputTy = in->getType();
+  uint32_t inputWidth = llvm::dyn_cast<llvm::IntegerType>(inputTy)->getBitWidth();
+  std::string app = "";
+  if(!noinline) app = "_in";
+  std::string funcName = "ext_"+toStr(inputWidth)+"_"+toStr(high)+"_"+toStr(low)+app;
+  llvm::Function *func;
+  llvm::FunctionType *FT;  
+  uint32_t len = high-low+1;
+
+  std::string extValName;
+  if(g_use_simple_func_name)
+    extValName = "ext_"+toStr(ext_cnt++);
+  else
+    extValName = destName+" ["+toStr(high)+":"+toStr(low)+"]";
+
+  if(!g_use_concat_extract_func) {
+    auto s1 = b->CreateLShr(in, low, llvm::Twine(destName+"_lshr"));
+    llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c), 
+                        llvm::Twine(extValName));
+    return ret;
+  }
+
+  if(extractFunc.find(funcName) != extractFunc.end()) {
+    func = extractFunc[funcName];
+    FT = func->getFunctionType();
+  }
+  else {
+    auto retTy = llvm::IntegerType::get(*c, len);
+    std::vector<llvm::Type *> argTy;  
+    argTy.push_back(llvm::IntegerType::get(*c, inputWidth));
+    FT = llvm::FunctionType::get(retTy, argTy, false);
+    func = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
+                                        funcName, TheModule.get());
+    if(noinline) func->addFnAttr(llvm::Attribute::NoInline);
+    func->args().begin()->setName("input");
+    llvm::Value* inArg = value(func->args().begin()  );
+
+    llvm::BasicBlock *localBB 
+      = llvm::BasicBlock::Create(*c, "entry", func);
+
+    std::unique_ptr<llvm::IRBuilder<>> build;
+    build = std::make_unique<llvm::IRBuilder<>>(*c);
+    build->SetInsertPoint(localBB);
+    auto s1 = build->CreateLShr(inArg, low, llvm::Twine("lshr"));
+    llvm::Value* ret = build->CreateTrunc(s1, llvmWidth(len, c), llvm::Twine("trunc"));
+    build->CreateRet(ret);
+    extractFunc.emplace(funcName, func);
+  }
+  
+  std::vector<llvm::Value*> args;
+  args.push_back(in);
+  return b->CreateCall(FT, func, args, 
+                       llvm::Twine(extValName));
+}
+
+
+llvm::Value* 
+UpdateFunctionGen::extract(llvm::Value* in, uint32_t high, uint32_t low,
+                      std::shared_ptr<llvm::LLVMContext> &c, 
+                      std::shared_ptr<llvm::IRBuilder<>> &b, 
+                      const llvm::Twine &name) {
+
+  uint32_t inWidth = llvm::dyn_cast<llvm::IntegerType>(in->getType())->getBitWidth();
+  if(inWidth < high+1) {
+    toCout("Error: input value width for extract is less than high index");
+    toCout("wdith: "+toStr(inWidth)+", high: "+toStr(high));
+    std::string tmpName = in->getName().str();
+    toCout("Input value name: "+tmpName);
+    abort();
+  }
+  uint32_t len = high - low + 1;
+  auto s1 = b->CreateLShr(in, low);
+  if(name.isTriviallyEmpty()) {
+    llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c));
+    return ret;
+  }
+  else {
+    llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c), 
+                          llvm::Twine(name.str()+" ["+toStr(high)+":"+toStr(low)+"]"));
+    ret->setName(name.str()+" ["+toStr(high)+":"+toStr(low)+"]");
+    return ret;
+  }
+}
+
+
+llvm::Value* 
+UpdateFunctionGen::extract(llvm::Value* in, uint32_t high, uint32_t low, 
+                      std::shared_ptr<llvm::LLVMContext> &c, 
+                      std::shared_ptr<llvm::IRBuilder<>> &b, 
+                      const std::string &name) {
+
+  return extract(in, high, low, c, b, llvm::Twine(name));
+}
+
+
+llvm::Value* 
+UpdateFunctionGen::concat_func(llvm::Value* val1, llvm::Value* val2, 
+                         std::shared_ptr<llvm::LLVMContext> &c,
+                         std::shared_ptr<llvm::IRBuilder<>> &b,
+                         bool noinline) {
+
+  llvm::Type* val1Ty = val1->getType();
+  llvm::Type* val2Ty = val2->getType();
+  uint32_t val1Width = llvm::dyn_cast<llvm::IntegerType>(val1Ty)->getBitWidth();
+  uint32_t val2Width = llvm::dyn_cast<llvm::IntegerType>(val2Ty)->getBitWidth();
+  uint32_t len = val1Width + val2Width;
+  auto newIntTy = llvm::IntegerType::get(*c, len);
+  std::string name1 = val1->getName().str();
+  std::string name2 = val2->getName().str();
+  toCoutVerb("concat with "+name1+" and "+name2+", total width: "+toStr(val1Width+val2Width));  
+  if(name2 == "cct_mem_rdata_word[15:0] [15:0]_cct_mem_rdata_word[7] [7:7]_cct_mem_rdata_word[7] [7:7]325_cct_mem_rdata_word[7] [7:7]326_cct_mem_rdata_word[7] [7:7]327_cct_mem_rdata_word[7] [7:7]328_cct_mem_rdata_word[7] [7:7]329_cct_mem_rdata_word[7] [7:7]330_cct_mem_rdata_word[7] [7:7]331_cct_mem_rdata_word[7] [7:7]332_cct_mem_rdata_word[7] [7:7]333_cct_mem_rdata_word[7] [7:7]334_cct_mem_rdata_word[7] [7:7]335_cct_mem_rdata_word[7] [7:7]336_cct_mem_rdata_word[7] [7:7]337_cct_mem_rdata_word[7] [7:7]338_cct_mem_rdata_word[7] [7:7]339_cct_mem_rdata_word[7] [7:7]340_cct_mem_rdata_word[7] [7:7]341_cct_mem_rdata_word[7] [7:7]342_cct_mem_rdata_word[7] [7:7]343_cct_mem_rdata_word[7] [7:7]344_cct_mem_rdata_word[7] [7:7]345_cct_mem_rdata_word[7] [7:7]346_cct_mem_rdata_word[7] [7:7]347_mem_rdata_word[7:0] [7:0]") {
+    toCoutVerb("Find it!");
+  }
+
+  std::string cctValName;
+  if(g_use_simple_func_name)
+    cctValName = "cct_"+toStr(cct_cnt++);
+  else
+    cctValName = "cct_"+name1+"_"+name2;
+
+  if(!g_use_concat_extract_func) {
+    llvm::Value* longVal1 = b->CreateZExtOrBitCast(val1, newIntTy, llvm::Twine(name1+"_zext"));
+    llvm::Value* ret = b->CreateAdd(b->CreateShl(longVal1, val2Width), 
+                                    zext(val2, len, c, b), 
+                                    llvm::Twine(cctValName));
+    return ret;
+  }
+
+  std::string n1, n1Slice;
+  std::string n2, n2Slice;
+  if(!name1.empty()) split_slice(name1, n1, n1Slice);
+  if(!name2.empty()) split_slice(name2, n2, n2Slice);
+  if(name1.empty() || name2.empty()) noinline = false;
+  else if( (is_read_asv(n1) || (is_top_module() && is_input(n1)))
+        && (is_read_asv(n2) || (is_top_module() && is_input(n2))) ) noinline = true;
+  else noinline = false;
+
+  std::string app = "";
+  if(!noinline) app = "_in";
+  std::string funcName = "cct_"+toStr(val1Width)+"_"+toStr(val2Width)+app;
+  llvm::Function *func;
+  llvm::FunctionType *FT;  
+  if(concatFunc.find(funcName) != concatFunc.end()) {
+    func = concatFunc[funcName];
+    FT = func->getFunctionType();    
+  }
+  else {
+    auto retTy = llvm::IntegerType::get(*c, len);
+    std::vector<llvm::Type*> argTy;
+    llvm::Type* ty1 = llvm::IntegerType::get(*c, val1Width);
+    llvm::Type* ty2 = llvm::IntegerType::get(*c, val2Width);
+    assert(ty1 == val1->getType());
+    assert(ty2 == val2->getType());
+    argTy.push_back(ty1);
+    argTy.push_back(ty2);
+    FT = llvm::FunctionType::get(retTy, argTy, false);
+    func = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
+                                        funcName, TheModule.get());
+    //func->addFnAttr(llvm::Attribute::NoInline);
+    func->args().begin()->setName("val1");
+    (func->args().begin()+1)->setName("val2");
+
+    llvm::Value* val1Arg = value(func->args().begin()  );
+    llvm::Value* val2Arg = value(func->args().begin()+1); 
+    assert(val1Arg->getType() == val1->getType());
+    assert(val2Arg->getType() == val2->getType());
+
+    llvm::BasicBlock *localBB 
+      = llvm::BasicBlock::Create(*c, "entry", func);
+
+    std::shared_ptr<llvm::IRBuilder<>> build;
+    build = std::make_shared<llvm::IRBuilder<>>(*c);
+    build->SetInsertPoint(localBB);
+
+    llvm::Value* longVal1 = build->CreateZExtOrBitCast(val1Arg, newIntTy);
+
+    llvm::Value* ret = build->CreateAdd(build->CreateShl(longVal1, val2Width), 
+                                                       zext(val2Arg, len, c, build));
+    build->CreateRet(ret);
+    concatFunc.emplace(funcName, func);
+  }
+
+  std::vector<llvm::Value*> args;
+  args.push_back(val1);
+  args.push_back(val2);
+  return b->CreateCall(FT, func, args, llvm::Twine(cctValName));
+}
+
+
+llvm::Value* 
+UpdateFunctionGen::concat_value(llvm::Value* val1, llvm::Value* val2, 
+                          std::shared_ptr<llvm::LLVMContext> &c,
+                          std::shared_ptr<llvm::IRBuilder<>> &b) {
+  uint32_t val1Width = llvm::dyn_cast<llvm::IntegerType>(val1->getType())->getBitWidth();
+  uint32_t val2Width = llvm::dyn_cast<llvm::IntegerType>(val2->getType())->getBitWidth();
+  std::string name1 = val1->getName().str();
+  std::string name2 = val2->getName().str();
+  toCoutVerb("concat "+name1+", len: "+toStr(val1Width));
+  toCoutVerb("and "+name2+", len: "+toStr(val2Width));
+
+  uint32_t newLen = val1Width+val2Width;
+  auto newIntTy = llvm::IntegerType::get(*c, newLen);
+  llvm::Value* longVal1 = b->CreateZExtOrBitCast(val1, newIntTy);
+  return b->CreateAdd(b->CreateShl(longVal1, val2Width), zext(val2, newLen, c, b));
+}
+
+
+llvm::Value* 
+UpdateFunctionGen::long_bv_val(std::string formedBinVar, context &c,
+                         std::shared_ptr<llvm::IRBuilder<>> &b ) {
+  assert(is_number(formedBinVar));
+  if(!is_formed_num(formedBinVar)) {
+    toCout("Error: input to long_bv_val is not well-formed number: "+formedBinVar);
+    abort();
+  }
+  uint32_t width = get_num_len(formedBinVar);
+  if(width <= 32) 
+    return llvm::ConstantInt::get(llvmWidth(width, c), hdb2int(formedBinVar), false);
+
+  if(is_hex(formedBinVar)) formedBinVar = formedHex2bin(formedBinVar);
+  formedBinVar = zero_extend_num(formedBinVar);
+  std::string pureNum = get_pure_num(formedBinVar);
+
+  llvm::Value* ret = llvm::ConstantInt::get(llvmWidth(32, c), bin2int(pureNum.substr(0, 32)), false);
+  width -= 32;
+  size_t pos = 32;  
+  while(width > 32) {
+    std::string subVar = pureNum.substr(pos, 32);
+    pos += 32;
+    width -= 32;
+    llvm::Value* nextNum = llvm::ConstantInt::get(llvmWidth(32, c), bin2int(subVar), false);
+    ret = concat_value(ret, nextNum, c, b);
+  }
+
+  // deal with the remaining bits
+  std::string subVar = pureNum.substr(pos);
+  llvm::Value* nextNum = llvmInt(bin2int(subVar), width, c);
+  ret = concat_value(ret, nextNum, c, b);
+  return ret;
+}
 //void check_invar_regs() {
 //  for(std::string reg : g_invarRegs) {
 //    

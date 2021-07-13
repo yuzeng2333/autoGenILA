@@ -197,32 +197,6 @@ llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low,
 //                      std::shared_ptr<llvm::IRBuilder<>> &b, 
 //                      const std::string &name, bool noinline=true);
 
-llvm::Value* extract_func(llvm::Value* in, uint32_t high, uint32_t low,
-                      std::shared_ptr<llvm::LLVMContext> &c, 
-                      std::shared_ptr<llvm::IRBuilder<>> &b, 
-                      const llvm::Twine &name="", bool noinline=false);
-
-
-llvm::Value* extract(llvm::Value* in, uint32_t high, uint32_t low, 
-                      std::shared_ptr<llvm::LLVMContext> &c, 
-                      std::shared_ptr<llvm::IRBuilder<>> &b,
-                      const llvm::Twine &name="");
-
-
-llvm::Value* extract(llvm::Value* in, uint32_t high, uint32_t low, 
-                      std::shared_ptr<llvm::LLVMContext> &c, 
-                      std::shared_ptr<llvm::IRBuilder<>> &b, 
-                      const std::string &name);
-
-
-llvm::Value* concat_value(llvm::Value* val1, llvm::Value* val2, 
-                          std::shared_ptr<llvm::LLVMContext> &c,
-                          std::shared_ptr<llvm::IRBuilder<>> &b);
-
-llvm::Value* concat_func(llvm::Value* val1, llvm::Value* val2, 
-                         std::shared_ptr<llvm::LLVMContext> &c,
-                         std::shared_ptr<llvm::IRBuilder<>> &b,
-                         bool noinline=false);
 
 bool is_x(const std::string &var);
 
@@ -240,28 +214,14 @@ bool is_submod_output(const std::string &var);
 std::shared_ptr<ModuleInfo_t> get_mod_info(std::string insName,
                                            std::shared_ptr<ModuleInfo_t> curMod=get_curMod());
 
-std::string get_hier_name(bool includeTopModule=true);
+std::string get_hier_name(std::vector<Context_t> &insContextStk,
+                          bool includeTopModule=true);
 
 bool is_top_module();
 
 bool is_sub_module();
 
-void collect_regs(std::shared_ptr<ModuleInfo_t> &curMod, 
-                  std::string regPrefix,
-                  RegWidthVec_t &regWidth = g_regWidth);
 
-void collect_regs_iter(std::shared_ptr<ModuleInfo_t> &curMod,
-                  std::string regPrefix, 
-                  RegWidthVec_t &regWidth );
-
-void collect_mems(std::shared_ptr<ModuleInfo_t> &curMod,
-                  std::string regPrefix, 
-                  std::vector<std::string> &mems);
-
-void collect_mem_ins(std::shared_ptr<ModuleInfo_t> &curMod,
-                  std::string regPrefix, 
-                  std::vector<std::pair<std::string, 
-                                        std::string>> &mems);
 
 void check_mod_name(std::string modName);
 
@@ -298,13 +258,30 @@ bool is_fifo_output(std::string wire);
 
 bool is_fifo_module(std::string modName);
 
+void collect_regs(std::shared_ptr<ModuleInfo_t> &curMod, 
+                  std::string regPrefix,
+                  RegWidthVec_t &regWidth);
+
+void collect_regs_iter(std::shared_ptr<ModuleInfo_t> &curMod,
+                  std::string regPrefix, 
+                  RegWidthVec_t &regWidth );
+
+void collect_mems(std::shared_ptr<ModuleInfo_t> &curMod,
+                  std::string regPrefix, 
+                  std::vector<std::string> &mems);
+
+void collect_mem_ins(std::shared_ptr<ModuleInfo_t> &curMod,
+                  std::string regPrefix, 
+                  std::vector<std::pair<std::string, 
+                                        std::string>> &mems);
+
 void print_all_regs(const std::vector<std::pair<std::string, uint32_t>> &regWidth);
 
 std::string var_name_convert(std::string varName, bool replaceSlash=false);
 
 bool is_letter(char c);
 
-void print_reg_info();
+void print_reg_info(RegWidthVec_t &regWidth);
 
 bool is_pure_num(std::string var);
 
