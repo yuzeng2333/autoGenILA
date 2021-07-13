@@ -1009,22 +1009,23 @@ std::shared_ptr<ModuleInfo_t> get_curMod() {
 }
 
 
+// used in ast
 std::shared_ptr<ModuleInfo_t> get_parentMod() {
   auto parentInfo = g_insContextStk.back().ParentModInfo;
-  uint32_t depth = get_stk_depth();
+  uint32_t depth = get_stk_depth(g_insContextStk);
   if( depth > 1)
     assert(parentInfo == g_insContextStk[depth-2].ModInfo);
   return parentInfo;
 }
 
 
-llvm::Function* get_func() {
-  return g_insContextStk.back().Func;
+llvm::Function* get_func(std::vector<Context_t> &insContextStk) {
+  return insContextStk.back().Func;
 }
 
 
-uint32_t get_stk_depth() {
-  return g_insContextStk.size();
+uint32_t get_stk_depth(std::vector<Context_t> &insContextStk) {
+  return insContextStk.size();
 }
 
 
@@ -1032,7 +1033,7 @@ std::shared_ptr<ModuleInfo_t> get_real_parentMod() {
   auto parentMod = get_parentMod();
   if(parentMod != nullptr) return parentMod;
   else {
-    assert(get_stk_depth() == 1);
+    assert(get_stk_depth(g_insContextStk) == 1);
     auto curMod = get_curMod();
     if(curMod->name == g_topModule) return nullptr;
     else {

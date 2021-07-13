@@ -83,9 +83,11 @@ void get_all_update() {
   std::ofstream asvInfo(g_path+"/asv_info.txt", std::ios::app);
   //std::vector<std::string> g_fileNameVec;
   struct ThreadSafeVector_t g_fileNameVec;
-  std::vector<std::thread> threads;
-  while(!g_workSet.empty() || !vecWorkSet.empty() || g_threadCnt.get() > 0) {
-  
+  std::vector<std::thread> threadVec;
+
+  // schedule 1: outer loop is workSet/target, inner loop is instructions,
+  // suitbale for design with many instructions
+  while(!g_workSet.empty() || !vecWorkSet.empty() ) {
     bool isVec;
     bool doSingleTgt = false;
     bool doVecTgt = false;
@@ -104,19 +106,18 @@ void get_all_update() {
       doVecTgt = true;
       isVec = true;
     }
-    if(!doSingleTgt && !doVecTgt) continue;
-    // code for separate instructions
 
     uint32_t instrIdx = 0;
     for(auto instrInfo : g_instrInfo) {
       instrIdx++;
       std::thread th(get_update_function, target, vecWorkSet, isVec,
                      instrInfo, instrIdx);
-                     //addedWorkSetFile,
-                     //g_topModuleInfo);
-      th.join();
+      //th.join();
       g_threadCnt.increase();
-      //threads.push_back(std::move(th));
+      threadVec.push_back(std::move(th));
+    }
+    for(auto &th: threadVec) {
+      th.join();
     }
     if(isVec) {
       for(auto reg: vecWorkSet) {
@@ -130,6 +131,62 @@ void get_all_update() {
       visitedTgtFile << target << std::endl;
     }
   } // end of while loop
+
+
+  // schedule 2: outer loop is instructions, inner loop is workSet/target
+  while(!g_workSet.empty() || !vecWorkSet.empty()) {
+    uint32_t instrIdx = 0;    
+    for(auto instrInfo : g_instrInfo) {
+      instrIdx++;    
+      bool isVec;
+      bool doSingleTgt = false;
+      bool doVecTgt = false;
+      std::string target;
+      if(!g_workSet.empty()) {
+        isVec = false;
+        doSingleTgt = true;
+        auto targetIt = g_workSet.begin();
+        target = *targetIt;
+        g_workSet.mtxErase(targetIt);
+        if(visitedTgt.find(target) != visitedTgt.end()
+           || g_skippedOutput.find(target) != g_skippedOutput.end())
+          continue;
+      }
+      else if(!vecWorkSet.empty()){
+        doVecTgt = true;
+        isVec = true;
+      }
+      // code for separate instructions
+
+
+        std::thread th(get_update_function, target, vecWorkSet, isVec,
+                       instrInfo, instrIdx);
+                       //addedWorkSetFile,
+                       //g_topModuleInfo);
+        //th.join();
+        g_threadCnt.increase();
+        threadVec.push_back(std::move(th));
+      for(auto &th: threadVec) {
+        th.join();
+      }
+      if(isVec) {
+        for(auto reg: vecWorkSet) {
+          visitedTgt.insert(reg);
+          visitedTgtFile << target << std::endl;
+        }
+        vecWorkSet.clear();
+      }
+      else {
+        visitedTgt.insert(target);
+        visitedTgtFile << target << std::endl;
+      }
+    }
+  } // end of while loop
+
+
+
+
+
 
   print_llvm_script(g_path+"/link.sh");
   print_func_info(funcInfo);
@@ -487,6 +544,10 @@ void RunningThreadCnt_t::increase() {
 
 void RunningThreadCnt_t::decrease() {
   mtx.lock();
+  if(cnt == 0) {
+    toCout("Error: thread count is already 0, cannot decrease!");
+    abort();
+  }
   cnt--;
   mtx.unlock();
 }

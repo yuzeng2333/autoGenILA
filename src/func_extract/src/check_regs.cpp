@@ -737,8 +737,8 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
     toCoutVerb("find it");
   }
 
-  if(varAndSlice.find("aes_reg_key0_i.reg_out") != std::string::npos) {
-    //   && timeIdx == 25) {
+  if(varAndSlice.find("is_slti_blt_slt") != std::string::npos
+       && timeIdx == 9) {
     toCoutVerb("Find it!");
   }
 
@@ -1581,6 +1581,39 @@ UpdateFunctionGen::long_bv_val(std::string formedBinVar, context &c,
   llvm::Value* nextNum = llvmInt(bin2int(subVar), width, c);
   ret = concat_value(ret, nextNum, c, b);
   return ret;
+}
+
+
+llvm::Function* UpdateFunctionGen::get_func() {
+  return insContextStk.back().Func;
+}
+
+
+uint32_t UpdateFunctionGen::get_stk_depth() {
+  return insContextStk.size();
+}
+
+
+llvm::Value* UpdateFunctionGen::get_arg(std::string regName) {
+  auto func = get_func();
+  return get_arg(regName, func);
+}
+
+
+llvm::Value* UpdateFunctionGen::get_arg(std::string regName, llvm::Function *func) {
+  if(regName.find("es_top_0.mem_data_buf") != std::string::npos)
+    toCout("Find the arg!");
+  for(auto it = func->arg_begin(); it != func->arg_end(); it++) {
+    std::string funcName = llvm::dyn_cast<llvm::Value>(func)->getName().str();
+    std::string argName = it->getName().str();
+    //toCout("func name: "+funcName);
+    //toCout("arg name: "+argName);
+    if(argName.find("ata_fifo.r0___#25") != std::string::npos)
+      toCout("Find it!!");
+    if(it->getName().str() == regName) return it;
+  }
+  toCout("Error: function input is not found: "+regName);
+  abort();
 }
 //void check_invar_regs() {
 //  for(std::string reg : g_invarRegs) {

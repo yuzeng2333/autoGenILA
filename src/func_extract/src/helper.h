@@ -73,9 +73,9 @@ std::shared_ptr<ModuleInfo_t> get_curMod();
 
 std::shared_ptr<ModuleInfo_t> get_parentMod();
 
-llvm::Function* get_func();
+llvm::Function* get_func(std::vector<Context_t> &insContextStk);
 
-uint32_t get_stk_depth();
+uint32_t get_stk_depth(std::vector<Context_t> &insContextStk);
 
 std::shared_ptr<ModuleInfo_t> get_real_parentMod();
 
@@ -186,7 +186,6 @@ StrPair_t split_module_asv(const std::string &writeAsvLine);
 
 std::string remove_prefix_module(const std::string &writeAsvLine);
 
-llvm::Value* get_arg(std::string regName, llvm::Function *func=get_func());
 
 llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low, 
                       std::shared_ptr<llvm::LLVMContext> &c, 

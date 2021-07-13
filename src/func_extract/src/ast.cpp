@@ -173,22 +173,25 @@ void build_ast_tree() {
     }
     // collecting vector of target registers
     else {
+      StrVec_t tgtVec;
       std::getline(allowedTgtInFile, line);
       while(line[0] != ']') {
         if(line.substr(0, 2) != "//") {
-          g_allowedTgtVec.push_back(line);
+          tgtVec.push_back(line);
           moduleAs.insert(line);
         }
         std::getline(allowedTgtInFile, line);
       }
+      g_allowedTgtVec.push_back(tgtVec);
     }
   }
   allowedTgtInFile.close();
   for(std::string tgt: g_allowedTgt) {
     build_tree_for_single_as(tgt);
   }
-  for(std::string tgt: g_allowedTgtVec) {
-    build_tree_for_single_as(tgt);
+  for(std::string tgtVec: g_allowedTgtVec) {
+    for(std::string tgt: tgtVec)
+      build_tree_for_single_as(tgt);
   }
 }
 
@@ -491,7 +494,7 @@ void add_input_node(std::string input, uint32_t timeIdx, astNode* const node) {
     node->done = false;
 
     std::shared_ptr<ModuleInfo_t> parentMod;
-    if(get_stk_depth() > 1)
+    if(get_stk_depth(g_insContextStk) > 1)
       parentMod = get_parentMod();
     else {
       assert(curMod->parentModVec.size() == 1);
