@@ -18,7 +18,7 @@ std::map<std::string,
                   std::vector<std::pair<std::string, 
                                         uint32_t>>>> g_dependVarMap;
 struct ThreadSafeMap_t g_asvSet;
-struct RunningThreadCnt_t g_threadCnt;
+//struct RunningThreadCnt_t g_threadCnt;
 struct WorkSet_t g_workSet;
 struct ThreadSafeVector_t g_fileNameVec;
 std::shared_ptr<ModuleInfo_t> g_topModuleInfo;
@@ -363,7 +363,6 @@ void get_update_function(std::string target,
     g_asvSet.emplace(reg, pair.second);
     //addedWorkSetFile << reg << std::endl;
   }
-  g_threadCnt.decrease();  
 }
 
 
