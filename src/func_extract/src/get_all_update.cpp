@@ -30,15 +30,15 @@ std::shared_ptr<ModuleInfo_t> g_topModuleInfo;
 void get_all_update() {
   toCout("### Begin get_all_update ");
   std::set<std::string> visitedTgt;
-  std::ifstream visitedTgtInFile(g_path+"/visited_target.txt");
-  std::string line;
-  while(std::getline(visitedTgtInFile, line)) {
-    remove_two_end_space(line);
-    visitedTgt.insert(line);
-  }
-  visitedTgtInFile.close();
-  std::ofstream visitedTgtFile;
-  visitedTgtFile.open(g_path+"/visited_target.txt", std::ios_base::app);
+  //std::ifstream visitedTgtInFile(g_path+"/visited_target.txt");
+  //std::string line;
+  //while(std::getline(visitedTgtInFile, line)) {
+  //  remove_two_end_space(line);
+  //  visitedTgt.insert(line);
+  //}
+  //visitedTgtInFile.close();
+  //std::ofstream visitedTgtFile;
+  //visitedTgtFile.open(g_path+"/visited_target.txt", std::ios_base::app);
 
   std::ifstream addedWorkSetInFile(g_path+"/added_work_set.txt");
   g_topModuleInfo = g_moduleInfoMap[g_topModule];
@@ -123,17 +123,17 @@ void get_all_update() {
                             instrInfo, instrIdx);
       }
       //for(auto &th: threadVec) th.join();
-      if(isVec) {
-        for(auto reg: tgtVec) {
-          visitedTgt.insert(reg);
-          visitedTgtFile << target << std::endl;
-        }
-        tgtVec.clear();
-      }
-      else {
-        visitedTgt.insert(target);
-        visitedTgtFile << target << std::endl;
-      }
+      //if(isVec) {
+      //  for(auto reg: tgtVec) {
+      //    visitedTgt.insert(reg);
+      //    visitedTgtFile << target << std::endl;
+      //  }
+      //  tgtVec.clear();
+      //}
+      //else {
+      //  visitedTgt.insert(target);
+      //  visitedTgtFile << target << std::endl;
+      //}
     } // end of while loop
   }
   else {
@@ -170,17 +170,17 @@ void get_all_update() {
                || g_skippedOutput.find(target) != g_skippedOutput.end())
               continue;
           }
-          if(isVec) {
-            for(std::string reg: tgtVec) {
-              visitedTgt.insert(reg);
-              visitedTgtFile << target << std::endl;
-            }
-            tgtVec.clear();
-          }
-          else {
-            visitedTgt.insert(target);
-            visitedTgtFile << target << std::endl;
-          }
+          //if(isVec) {
+          //  for(std::string reg: tgtVec) {
+          //    visitedTgt.insert(reg);
+          //    visitedTgtFile << target << std::endl;
+          //  }
+          //  tgtVec.clear();
+          //}
+          //else {
+          //  visitedTgt.insert(target);
+          //  visitedTgtFile << target << std::endl;
+          //}
 
           std::thread th(get_update_function, target, tgtVec, isVec,
                          instrInfo, instrIdx);
@@ -195,7 +195,7 @@ void get_all_update() {
   print_llvm_script(g_path+"/link.sh");
   print_func_info(funcInfo);
   print_asv_info(asvInfo);
-  visitedTgtFile.close();
+  //visitedTgtFile.close();
   addedWorkSetFile.close();
 }
 
