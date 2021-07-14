@@ -30,8 +30,8 @@ std::shared_ptr<ModuleInfo_t> g_topModuleInfo;
 void get_all_update() {
   toCout("### Begin get_all_update ");
   std::set<std::string> visitedTgt;
+  std::string line;  
   //std::ifstream visitedTgtInFile(g_path+"/visited_target.txt");
-  //std::string line;
   //while(std::getline(visitedTgtInFile, line)) {
   //  remove_two_end_space(line);
   //  visitedTgt.insert(line);
@@ -383,7 +383,7 @@ bool read_clean_o3(std::string fileName,
   bool seeReturn = false;
   bool returnConst = false;
   std::regex pDef("^define internal fastcc i(\\d+) @(\\S+)\\((.*)\\) unnamed_addr #1 \\{$");  
-  std::regex pVecDef("^define internal fastcc [(\\d+) x i(\\d+)] @(\\S+)\\((.*)\\) unnamed_addr #1 \\{$");  
+  std::regex pVecDef("^define internal fastcc \\[(\\d+) x i(\\d+)\\] @(\\S+)\\((.*)\\) unnamed_addr #1 \\{$");  
   std::regex pRetZero("^\\s+ret i\\d+ 0$");
   bool internalExist = false;
   while(std::getline(input, line)) {
