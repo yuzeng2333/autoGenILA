@@ -145,20 +145,21 @@ void get_all_update() {
       g_workSet.copy(oldWorkSet);
       g_workSet.mtxClear();
       for(auto instrInfo : g_instrInfo) {
-        localWorkSet = oldWorkSet;   
+        localWorkSet = oldWorkSet;
+        std::vector<std::vector<std::string>> localWorkVec = g_allowedTgtVec;
         instrIdx++;
         threadVec.clear();
-        while(!localWorkSet.empty() || !g_allowedTgtVec.empty()) {
+        while(!localWorkSet.empty() || !localWorkVec.empty()) {
           bool isVec;
           bool doSingleTgt = false;
           bool doVecTgt = false;
           std::string target;
           std::vector<std::string> tgtVec;      
-          if(!g_allowedTgtVec.empty()){
+          if(!localWorkVec.empty()){
             doVecTgt = true;
             isVec = true;
-            tgtVec = g_allowedTgtVec.back();
-            g_allowedTgtVec.pop_back();
+            tgtVec = localWorkVec.back();
+            localWorkVec.pop_back();
           }
           else if(!localWorkSet.empty()) {
             isVec = false;
@@ -189,6 +190,8 @@ void get_all_update() {
         // wait for update functions for all regs to finish
         for(auto &th: threadVec) th.join();
       } // end of for-lopp: for each instruction
+      // targetVectors only executed for one round
+      g_allowedTgtVec.clear();
     } // end of while loop
   }
 
