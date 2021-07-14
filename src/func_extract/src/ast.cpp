@@ -189,7 +189,7 @@ void build_ast_tree() {
   for(std::string tgt: g_allowedTgt) {
     build_tree_for_single_as(tgt);
   }
-  for(std::string tgtVec: g_allowedTgtVec) {
+  for(std::vector<std::string> tgtVec: g_allowedTgtVec) {
     for(std::string tgt: tgtVec)
       build_tree_for_single_as(tgt);
   }

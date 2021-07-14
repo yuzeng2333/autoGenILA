@@ -671,23 +671,6 @@ std::string remove_prefix_module(const std::string &writeAsvLine) {
 }
 
 
-llvm::Value* get_arg(std::string regName, llvm::Function *func) {
-  if(regName.find("es_top_0.mem_data_buf") != std::string::npos)
-    toCout("Find the arg!");
-  for(auto it = func->arg_begin(); it != func->arg_end(); it++) {
-    std::string funcName = llvm::dyn_cast<llvm::Value>(func)->getName().str();
-    std::string argName = it->getName().str();
-    //toCout("func name: "+funcName);
-    //toCout("arg name: "+argName);
-    if(argName.find("ata_fifo.r0___#25") != std::string::npos)
-      toCout("Find it!!");
-    if(it->getName().str() == regName) return it;
-  }
-  toCout("Error: function input is not found: "+regName);
-  abort();
-}
-
-
 llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low, 
                       std::shared_ptr<llvm::LLVMContext> &c, 
                       std::shared_ptr<llvm::IRBuilder<>> &b) {

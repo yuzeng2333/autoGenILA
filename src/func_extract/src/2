@@ -8,9 +8,6 @@
 
 namespace funcExtract {
 
-// TODO: configurations
-bool g_use_multi_thread = true;
-
 std::mutex g_dependVarMapMtx;
 // the first key is instr name, the second key is target name
 std::map<std::string, 
@@ -86,111 +83,113 @@ void get_all_update() {
   struct ThreadSafeVector_t g_fileNameVec;
   std::vector<std::thread> threadVec;
 
-  if(!g_use_multi_thread) {
-    // schedule 1: outer loop is workSet/target, inner loop is instructions,
-    // suitbale for design with many instructions
-    while(!g_workSet.empty() || !g_allowedTgtVec.empty() ) {
-      bool isVec;
-      bool doSingleTgt = false;
-      bool doVecTgt = false;
-      std::string target;
-      std::vector<std::string> tgtVec;
-      // work on target vector first
-      if(!g_allowedTgtVec.empty()){
-        doVecTgt = true;
-        isVec = true;
-        tgtVec = g_allowedTgtVec.back();
-        g_allowedTgtVec.pop_back();
-      }
-      else if(!g_workSet.empty()) {
-        isVec = false;
-        doSingleTgt = true;
-        auto targetIt = g_workSet.begin();
-        target = *targetIt;
-        g_workSet.mtxErase(targetIt);
-        if(visitedTgt.find(target) != visitedTgt.end()
-           || g_skippedOutput.find(target) != g_skippedOutput.end())
-          continue;
-      }
+  // schedule 1: outer loop is workSet/target, inner loop is instructions,
+  // suitbale for design with many instructions
+  while(!g_workSet.empty() || !g_allowedTgtVec.empty() ) {
+    bool isVec;
+    bool doSingleTgt = false;
+    bool doVecTgt = false;
+    std::string target;
+    std::vector<std::string> tgtVec;
+    // work on target vector first
+    if(!g_allowedTgtVec.empty()){
+      doVecTgt = true;
+      isVec = true;
+      tgtVec = g_allowedTgtVec.back();
+      g_allowedTgtVec.pop_back();
+    }
+    else if(!g_workSet.empty()) {
+      isVec = false;
+      doSingleTgt = true;
+      auto targetIt = g_workSet.begin();
+      target = *targetIt;
+      g_workSet.mtxErase(targetIt);
+      if(visitedTgt.find(target) != visitedTgt.end()
+         || g_skippedOutput.find(target) != g_skippedOutput.end())
+        continue;
+    }
 
-      uint32_t instrIdx = 0;
-      for(auto instrInfo : g_instrInfo) {
-        instrIdx++;
-        //std::thread th(get_update_function, target, tgtVec, isVec,
-        //               instrInfo, instrIdx);
-        //threadVec.push_back(std::move(th));
-        get_update_function(target, tgtVec, isVec,
-                            instrInfo, instrIdx);
-      }
-      //for(auto &th: threadVec) th.join();
-      if(isVec) {
-        for(auto reg: tgtVec) {
-          visitedTgt.insert(reg);
-          visitedTgtFile << target << std::endl;
-        }
-        tgtVec.clear();
-      }
-      else {
-        visitedTgt.insert(target);
+    uint32_t instrIdx = 0;
+    for(auto instrInfo : g_instrInfo) {
+      instrIdx++;
+      std::thread th(get_update_function, target, tgtVec, isVec,
+                     instrInfo, instrIdx);
+      threadVec.push_back(std::move(th));
+    }
+    for(auto &th: threadVec) th.join();
+    if(isVec) {
+      for(auto reg: tgtVec) {
+        visitedTgt.insert(reg);
         visitedTgtFile << target << std::endl;
       }
-    } // end of while loop
-  }
-  else {
-    // schedule 2: outer loop is instructions, inner loop is workSet/target
-    while(!g_workSet.empty() || !g_allowedTgtVec.empty()) {
-      uint32_t instrIdx = 0;
-      StrSet_t localWorkSet;
-      StrSet_t oldWorkSet;
-      g_workSet.copy(oldWorkSet);
-      g_workSet.mtxClear();
-      for(auto instrInfo : g_instrInfo) {
-        localWorkSet = oldWorkSet;   
-        instrIdx++;
-        threadVec.clear();
-        while(!localWorkSet.empty() || !g_allowedTgtVec.empty()) {
-          bool isVec;
-          bool doSingleTgt = false;
-          bool doVecTgt = false;
-          std::string target;
-          std::vector<std::string> tgtVec;      
-          if(!g_allowedTgtVec.empty()){
-            doVecTgt = true;
-            isVec = true;
-            tgtVec = g_allowedTgtVec.back();
-            g_allowedTgtVec.pop_back();
-          }
-          else if(!localWorkSet.empty()) {
-            isVec = false;
-            doSingleTgt = true;
-            auto targetIt = localWorkSet.begin();
-            target = *targetIt;
-            localWorkSet.erase(targetIt);
-            if(visitedTgt.find(target) != visitedTgt.end()
-               || g_skippedOutput.find(target) != g_skippedOutput.end())
-              continue;
-          }
-          if(isVec) {
-            for(std::string reg: tgtVec) {
-              visitedTgt.insert(reg);
-              visitedTgtFile << target << std::endl;
-            }
-            tgtVec.clear();
-          }
-          else {
-            visitedTgt.insert(target);
+      tgtVec.clear();
+    }
+    else {
+      visitedTgt.insert(target);
+      visitedTgtFile << target << std::endl;
+    }
+  } // end of while loop
+
+
+  // schedule 2: outer loop is instructions, inner loop is workSet/target
+  while(!g_workSet.empty() || !g_allowedTgtVec.empty()) {
+    uint32_t instrIdx = 0;
+    StrSet_t localWorkSet;
+    StrSet_t oldWorkSet;
+    g_workSet.copy(oldWorkSet);
+    g_workSet.mtxClear();
+    for(auto instrInfo : g_instrInfo) {
+      localWorkSet = oldWorkSet;   
+      instrIdx++;
+      threadVec.clear();
+      while(!localWorkSet.empty() || !g_allowedTgtVec.empty()) {
+        bool isVec;
+        bool doSingleTgt = false;
+        bool doVecTgt = false;
+        std::string target;
+        std::vector<std::string> tgtVec;      
+        if(!g_allowedTgtVec.empty()){
+          doVecTgt = true;
+          isVec = true;
+          tgtVec = g_allowedTgtVec.back();
+          g_allowedTgtVec.pop_back();
+        }
+        else if(!localWorkSet.empty()) {
+          isVec = false;
+          doSingleTgt = true;
+          auto targetIt = localWorkSet.begin();
+          target = *targetIt;
+          g_workSet.mtxErase(targetIt);
+          if(visitedTgt.find(target) != visitedTgt.end()
+             || g_skippedOutput.find(target) != g_skippedOutput.end())
+            continue;
+        }
+        if(isVec) {
+          for(auto reg: vecWorkSet) {
+            visitedTgt.insert(reg);
             visitedTgtFile << target << std::endl;
           }
-
-          std::thread th(get_update_function, target, tgtVec, isVec,
-                         instrInfo, instrIdx);
-          threadVec.push_back(std::move(th));
+          vecWorkSet.clear();
         }
-        // wait for update functions for all regs to finish
-        for(auto &th: threadVec) th.join();
-      } // end of for-lopp: for each instruction
-    } // end of while loop
-  }
+        else {
+          visitedTgt.insert(target);
+          visitedTgtFile << target << std::endl;
+        }
+
+        std::thread th(get_update_function, target, tgtVec, isVec,
+                       instrInfo, instrIdx);
+        threadVec.push_back(std::move(th));
+      }
+      for(auto &th: threadVec) {
+        th.join();
+      }
+    } // end of for-lopp: for each instruction
+  } // end of while loop
+
+
+
+
+
 
   print_llvm_script(g_path+"/link.sh");
   print_func_info(funcInfo);

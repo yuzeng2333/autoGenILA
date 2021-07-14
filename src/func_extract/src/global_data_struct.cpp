@@ -34,7 +34,7 @@ std::map<std::string, uint32_t> g_asv;
 Str2StrVecMap_t g_moduleInputsMap;
 Str2StrVecMap_t g_moduleOutputsMap;
 std::set<std::string> g_allowedTgt;
-std::vector<std::string> g_allowedTgtVec;
+std::vector<std::vector<std::string>> g_allowedTgtVec;
 //VarWidth g_varWidth;
 
 std::string g_mem2acclData;

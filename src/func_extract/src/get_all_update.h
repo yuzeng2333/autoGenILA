@@ -69,6 +69,7 @@ struct WorkSet_t {
     void mtxClear();
     bool empty();
     std::set<std::string>::iterator begin();
+    void copy(std::set<std::string> &copySet);
 
   private:
     std::mutex mtx;
