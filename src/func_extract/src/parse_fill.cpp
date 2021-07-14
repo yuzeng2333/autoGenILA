@@ -300,7 +300,7 @@ void get_io(const std::string &fileName) {
     if(line.empty() || is_comment_line(line)
           || line.find_first_not_of(' ') == line.length())
       continue;
-    if(get_stk_depth(g_insContextStk) > 0)
+    if(g_insContextStk.get_stk_depth() > 0)
       fill_var_width(line, get_curMod()->varWidth);    
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       continue;

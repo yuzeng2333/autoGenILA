@@ -63,23 +63,6 @@ llvm::Value* sext(llvm::Value* v1, uint32_t width,
                  std::shared_ptr<llvm::LLVMContext> &c,
                  std::shared_ptr<llvm::IRBuilder<>> &b);
 
-std::string get_insName();
-
-std::string get_target();
-
-void set_target(const std::string &tgtIn);
-
-std::shared_ptr<ModuleInfo_t> get_curMod();
-
-std::shared_ptr<ModuleInfo_t> get_parentMod();
-
-llvm::Function* get_func(std::vector<Context_t> &insContextStk);
-
-uint32_t get_stk_depth(std::vector<Context_t> &insContextStk);
-
-std::shared_ptr<ModuleInfo_t> get_real_parentMod();
-
-bool isAs(std::string var);
 
 llvm::Value* long_bv_val(std::string formedBinVar, context &c,
                          std::shared_ptr<llvm::IRBuilder<>> &b );
@@ -213,14 +196,9 @@ bool is_submod_output(const std::string &var);
 std::shared_ptr<ModuleInfo_t> get_mod_info(std::string insName,
                                            std::shared_ptr<ModuleInfo_t> curMod=get_curMod());
 
-std::string get_hier_name(std::vector<Context_t> &insContextStk,
-                          bool includeTopModule=true);
-
 bool is_top_module();
 
 bool is_sub_module();
-
-
 
 void check_mod_name(std::string modName);
 

@@ -46,8 +46,8 @@ llvm::Value* sext(llvm::Value* v1, uint32_t width,
 }
 
 
-bool isAs(std::string var) {
-  auto curMod = get_curMod();
+bool isAs(std::string var, HierCtx_t &insContextStk) {
+  auto curMod = get_curMod(insContextStk);
   auto it = std::find( curMod->moduleAs.begin(), curMod->moduleAs.end(), var );
   return it != curMod->moduleAs.end();
 }
@@ -957,66 +957,66 @@ void check_no_slice(std::string varAndSlice) {
 }
 
 
-std::string get_insName() {
-  return g_insContextStk.back().InsName;
+std::string get_insName(HierCtx_t &insContextStk) {
+  return insContextStk.back().InsName;
 }
 
 
-std::string get_target() {
-  return g_insContextStk.back().Target;
+std::string get_target(HierCtx_t &insContextStk) {
+  return insContextStk.back().Target;
 }
 
 
-void set_target(const std::string &tgtIn) {
-  if(!g_insContextStk.back().Target.empty()) {
+void set_target(const std::string &tgtIn, HierCtx_t &insContextStk) {
+  if(!insContextStk.back().Target.empty()) {
     toCout("Warning: target has already been set: "
-             +g_insContextStk.back().Target);
+             +insContextStk.back().Target);
   }
-  g_insContextStk.back().Target = tgtIn;
+  insContextStk.back().Target = tgtIn;
 }
 
 
 // find the first module with True isFunctionedSubMod
-std::shared_ptr<ModuleInfo_t> get_curMod() {
-  if(g_insContextStk.size() == 0) {
-    toCout("Error: g_insContextStk is empty!");
+std::shared_ptr<ModuleInfo_t> get_curMod(HierCtx_t &insContextStk) {
+  if(insContextStk.size() == 0) {
+    toCout("Error: insContextStk is empty!");
     abort();
   }
-  return g_insContextStk.back().ModInfo;
-  //for(auto it = g_insContextStk.rbegin();
-  //    it != g_insContextStk.rend(); it++) {
+  return insContextStk.back().ModInfo;
+  //for(auto it = insContextStk.rbegin();
+  //    it != insContextStk.rend(); it++) {
   //  if(it->ModInfo->isFunctionedSubMod) return it->ModInfo;
   //}
-  //assert(g_insContextStk.front().InsName == g_topModule);
-  //return g_insContextStk.front().ModInfo;
+  //assert(insContextStk.front().InsName == g_topModule);
+  //return insContextStk.front().ModInfo;
 }
 
 
 // used in ast
-std::shared_ptr<ModuleInfo_t> get_parentMod() {
-  auto parentInfo = g_insContextStk.back().ParentModInfo;
-  uint32_t depth = get_stk_depth(g_insContextStk);
+std::shared_ptr<ModuleInfo_t> get_parentMod(HierCtx_t &insContextStk) {
+  auto parentInfo = insContextStk.back().ParentModInfo;
+  uint32_t depth = get_stk_depth(insContextStk);
   if( depth > 1)
-    assert(parentInfo == g_insContextStk[depth-2].ModInfo);
+    assert(parentInfo == insContextStk[depth-2].ModInfo);
   return parentInfo;
 }
 
 
-llvm::Function* get_func(std::vector<Context_t> &insContextStk) {
+llvm::Function* get_func(HierCtx_t &insContextStk) {
   return insContextStk.back().Func;
 }
 
 
-uint32_t get_stk_depth(std::vector<Context_t> &insContextStk) {
+uint32_t get_stk_depth(HierCtx_t &insContextStk) {
   return insContextStk.size();
 }
 
 
-std::shared_ptr<ModuleInfo_t> get_real_parentMod() {
+std::shared_ptr<ModuleInfo_t> get_real_parentMod(HierCtx_t &insContextStk) {
   auto parentMod = get_parentMod();
   if(parentMod != nullptr) return parentMod;
   else {
-    assert(get_stk_depth(g_insContextStk) == 1);
+    assert(get_stk_depth(insContextStk) == 1);
     auto curMod = get_curMod();
     if(curMod->name == g_topModule) return nullptr;
     else {

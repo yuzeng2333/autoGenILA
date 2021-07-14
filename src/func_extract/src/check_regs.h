@@ -6,6 +6,7 @@
 #include "../../taint_method/src/global_data.h"
 #include "../../taint_method/src/helper.h"
 #include "global_data_struct.h"
+#include "ins_context_stack.h"
 #include "ast.h"
 #include <string>
 #include <queue>
@@ -72,7 +73,7 @@ class UpdateFunctionGen {
     // module name, instead of instance name.
     // Currently there is a restriction: the first module in the vector can only
     // have one instance
-    std::vector<Context_t> insContextStk;
+    HierCtx insContextStk;
     uint32_t cct_cnt = 0;
     uint32_t ext_cnt = 0;
     std::vector<std::pair<std::string, uint32_t>> regWidth;

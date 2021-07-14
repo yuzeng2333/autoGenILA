@@ -3,6 +3,8 @@
 #include "op_constraint.h"
 #include "helper.h"
 #include "global_data_struct.h"
+#include "ins_context_stack.h"
+
 
 using namespace taintGen;
 
@@ -30,7 +32,7 @@ std::map<std::string, expr*> TIMED_VAR2EXPR;
 
 std::map<std::string, uint32_t> g_allRegs;
 std::set<std::string> g_regWithFunc;
-std::vector<Context_t> g_insContextStk;
+HierCtx g_insContextStk;
 
 //std::unordered_map<std::string, expr*> INT_EXPR_VAL;
 std::set<std::string> INT_EXPR_SET;
@@ -692,7 +694,7 @@ UpdateFunctionGen::add_constraint(std::string varAndSlice, uint32_t timeIdx, con
   bool retIsEmpty = true;
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
-  const std::string curTgt = get_target();
+  const std::string curTgt = insContextStk.get_target();
   //assert(curMod->visitedNode.find(curTgt) != curMod->visitedNode.end());
   if(curMod->reg2Slices.find(var) == curMod->reg2Slices.end()) {
     if(curMod->visitedNode.find(var) == curMod->visitedNode.end()) {
@@ -733,7 +735,7 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
   auto curMod = get_curMod();
   std::shared_ptr<ModuleDynInfo_t> curDynData = get_dyn_data(curMod);
   toCoutVerb("add_constraint for: "+varAndSlice+", timeIdx: "+toStr(timeIdx));
-  if(varAndSlice == "" && timeIdx == 8) {
+  if(varAndSlice == "out" ) { //&& timeIdx == 8) {
     toCoutVerb("find it");
   }
 
@@ -747,7 +749,7 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
     return llvmInt(0, width, c);
   }
 
-  const std::string curTgt = get_target();
+  const std::string curTgt = insContextStk.get_target();
   if(curDynData->existedExpr.find(curTgt) == curDynData->existedExpr.end() )
     curDynData->existedExpr.emplace(curTgt, std::map<std::string, llvm::Value*>() );
 

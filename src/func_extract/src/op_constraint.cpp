@@ -171,8 +171,8 @@ UpdateFunctionGen::input_constraint(astNode* const node, uint32_t timeIdx,
   std::string destTimed = timed_name(dest, timeIdx);
 
   // treate submodule's input separately
-  const auto curMod = get_curMod();
-  const auto curTgt = get_target();
+  const auto curMod = insContextStk.get_curMod();
+  const auto curTgt = insContextStk.get_target();
   auto curDynData = get_dyn_data(curMod);
   std::shared_ptr<ModuleInfo_t> parentMod;
   auto thisFunc = get_func();
@@ -227,7 +227,7 @@ UpdateFunctionGen::input_constraint(astNode* const node, uint32_t timeIdx,
       // if the stack size is larger than 1, we just pop the stack
 
       // TODO: need to re-consider this code
-      std::string target = get_target();
+      std::string target = insContextStk.get_target();
       auto thisCntxt = g_insContextStk.back();
       toCout("~~~~~~~~~~~~~~~~ Return via input from :"+curMod->name+" to :"+parentMod->name);
       g_insContextStk.pop_back();
