@@ -69,7 +69,7 @@ void parse_verilog(std::string fileName) {
       toCout("Find it!");
     }
     if(!g_insContextStk.empty())
-      fill_var_width(line, get_curMod()->varWidth);
+      fill_var_width(line, g_insContextStk.get_curMod()->varWidth);
     //toCout(line);
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       case_expr(line, input);
@@ -301,7 +301,7 @@ void get_io(const std::string &fileName) {
           || line.find_first_not_of(' ') == line.length())
       continue;
     if(g_insContextStk.get_stk_depth() > 0)
-      fill_var_width(line, get_curMod()->varWidth);    
+      fill_var_width(line, g_insContextStk.get_curMod()->varWidth);    
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       continue;
     }
@@ -408,7 +408,7 @@ void clean_submod(std::ifstream &input,
 // before building ast tree, determine rst and clk for
 // each module. This should be done top-down.
 void determine_clk_rst() {
-  const auto curMod = get_curMod();
+  const auto curMod = g_insContextStk.get_curMod();
   curMod->clk = g_recentClk;
   curMod->rst = g_recentRst;
   std::shared_ptr<ModuleInfo_t> topModInfo = g_moduleInfoMap[g_topModule];

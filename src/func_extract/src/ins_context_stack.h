@@ -18,6 +18,11 @@ class HierCtx {
 
     void insert(std::vector<Context_t>::iterator it, Context_t &ctx);
 
+    Context_t back();
+
+    bool empty();
+
+
     void set_last_tgt(std::string &tgt);
 
     std::string get_insName(HierCtx_t &insContextStk);

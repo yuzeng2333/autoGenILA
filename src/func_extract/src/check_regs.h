@@ -138,13 +138,9 @@ class UpdateFunctionGen {
     llvm::Value* long_bv_val(std::string formedBinVar, context &c,
                              std::shared_ptr<llvm::IRBuilder<>> &b );
 
-    llvm::Function* get_func();
-
     llvm::Value* get_arg(std::string regName, llvm::Function *func);
 
     llvm::Value* get_arg(std::string regName);
-
-    uint32_t get_stk_depth();
 
     std::shared_ptr<ModuleDynInfo_t>
     get_dyn_data(std::shared_ptr<ModuleInfo_t> curMod);

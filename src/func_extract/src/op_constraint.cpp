@@ -212,7 +212,7 @@ UpdateFunctionGen::input_constraint(astNode* const node, uint32_t timeIdx,
     // 2. If the input is connected to a var in parent module, then 
     // continue adding constraints
 
-    parentMod = get_real_parentMod();
+    parentMod = insContextStk.get_real_parentMod();
     assert(node->srcVec.size() == 1);
     std::string srcAndSlice = node->srcVec[0];
     std::string src, srcSlice;
@@ -228,21 +228,21 @@ UpdateFunctionGen::input_constraint(astNode* const node, uint32_t timeIdx,
 
       // TODO: need to re-consider this code
       std::string target = insContextStk.get_target();
-      auto thisCntxt = g_insContextStk.back();
+      auto thisCntxt = insContextStk.back();
       toCout("~~~~~~~~~~~~~~~~ Return via input from :"+curMod->name+" to :"+parentMod->name);
-      g_insContextStk.pop_back();
-      if(get_stk_depth() == 0) {
+      insContextStk.pop_back();
+      if(insContextStk.get_stk_depth() == 0) {
         Context_t insCntxt(parentMod->name, target, parentMod, nullptr, thisFunc);
-        g_insContextStk.push_back(insCntxt);
+        insContextStk.push_back(insCntxt);
         auto ret = add_constraint(node->childVec[0], timeIdx, c, b, bound);
-        g_insContextStk.pop_back();
-        g_insContextStk.push_back(thisCntxt);
+        insContextStk.pop_back();
+        insContextStk.push_back(thisCntxt);
         toCout("~~~~~~~~~~~~~~~~ Reenter via input from :"+parentMod->name+" to :"+curMod->name);      
         return ret;
       }
       else {
         auto ret = add_constraint(node->childVec[0], timeIdx, c, b, bound);
-        g_insContextStk.push_back(thisCntxt);
+        insContextStk.push_back(thisCntxt);
         return ret;      
       }
     }
@@ -417,7 +417,7 @@ llvm::Value*
 UpdateFunctionGen::two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, 
                                      builder &b, uint32_t bound) {
   toCoutVerb("Two op constraint for :"+node->dest);
-  const auto curMod = get_curMod();
+  const auto curMod = insContextStk.get_curMod();
   std::smatch m;  
   bool isReduceOp = node->isReduceOp;
   assert(node->srcVec.size() == 2);
@@ -592,7 +592,7 @@ llvm::Value*
 UpdateFunctionGen::sel_op_constraint(astNode* const node, uint32_t timeIdx, 
                                      context &c, builder &b, uint32_t bound ) {
   toCoutVerb("Sel op constraint for :"+node->dest);
-  const auto curMod = get_curMod();  
+  const auto curMod = insContextStk.get_curMod();  
   if(node->op == "sel5")
     return sel5_op_constraint(node, timeIdx, c, b, bound);
 
@@ -688,7 +688,7 @@ llvm::Value*
 UpdateFunctionGen::src_concat_op_constraint(astNode* const node, uint32_t timeIdx, 
                                             context &c, builder &b, uint32_t bound ) {
   toCoutVerb("Src concat op constraint for: "+node->dest);
-  const auto curMod = get_curMod();  
+  const auto curMod = insContextStk.get_curMod();  
   std::string destAndSlice = node->dest;
   if(destAndSlice == "fangyuan36")
     toCoutVerb("Find it");
@@ -726,7 +726,7 @@ UpdateFunctionGen::src_concat_op_constraint(astNode* const node, uint32_t timeId
 llvm::Value* 
 UpdateFunctionGen::add_one_concat_expr(astNode* const node, uint32_t nxtIdx, uint32_t timeIdx, 
                                        context &c, builder &b, uint32_t bound, bool noinline ) {
-  const auto curMod = get_curMod();  
+  const auto curMod = insContextStk.get_curMod();  
   llvm::Value* firstSrcExpr;
   llvm::Value* retExpr;
   std::string varAndSlice = node->srcVec[nxtIdx];
@@ -766,7 +766,7 @@ llvm::Value*
 UpdateFunctionGen::ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, 
                                      builder &b, uint32_t bound ) {
   toCoutVerb("Ite op constraint for :"+node->dest);
-  const auto curMod = get_curMod();  
+  const auto curMod = insContextStk.get_curMod();  
   assert(node->type == ITE);
   assert(node->srcVec.size() == 3);
 
@@ -985,7 +985,7 @@ llvm::Value*
 UpdateFunctionGen::case_constraint(astNode* const node, uint32_t timeIdx, 
                                    context &c, builder &b, uint32_t bound) {
   toCoutVerb("Case op constraint for :"+node->dest);
-  const auto curMod = get_curMod();  
+  const auto curMod = insContextStk.get_curMod();  
   if(node->dest == "ap_NS_fsm")
     toCoutVerb("Find it!");
   assert(node->type == CASE);
@@ -1043,7 +1043,7 @@ UpdateFunctionGen::add_one_case_branch_expr(astNode* const node, llvm::Value* &c
                                             builder &b, uint32_t bound,
                                             const std::string &dest) {
   astNode *assignNode;
-  const auto curMod = get_curMod();  
+  const auto curMod = insContextStk.get_curMod();  
   std::string assignVarAndSlice = node->srcVec[idx+1];
   uint32_t hi = get_lgc_hi(assignVarAndSlice);
   uint32_t lo = get_lgc_lo(assignVarAndSlice);
@@ -1165,7 +1165,7 @@ llvm::Value*
 UpdateFunctionGen::bbMod_constraint(astNode* const node, uint32_t timeIdx, context &c, 
                                builder &b, uint32_t bound) {
   toCout("begin bbMod: "+node->dest);
-  const auto curMod = get_curMod();  
+  const auto curMod = insContextStk.get_curMod();  
   std::string varAndSlice = node->dest;
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
@@ -1257,7 +1257,7 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
   std::string destAndSlice = node->dest;
   //std::string dest, destSlice
   //split_slice(destAndSlice, dest, destSlice);
-  const auto curMod = get_curMod();
+  const auto curMod = insContextStk.get_curMod();
   const auto curFunc = get_func();
   auto curDynData = get_dyn_data(curMod);
   auto pair = curMod->wire2InsPortMp[destAndSlice];
@@ -1415,7 +1415,7 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
     toCout("~~~~~~~~~~~~~~~~ Enter via output from :"+curMod->name+" to :"+subMod->name);    
     llvm::Value* ret = add_constraint(subMod->get_outport_node(outPort), 
                                       0, c, localBuilder, bound);
-    g_insContextStk.pop_back();
+    insContextStk.pop_back();
     toCout("~~~~~~~~~~~~~~~~ Return via output from :"+subMod->name+" to :"+curMod->name);        
     localBuilder->CreateRet(ret);
     llvm::verifyFunction(*subFunc);

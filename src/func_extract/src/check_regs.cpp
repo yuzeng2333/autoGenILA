@@ -689,7 +689,7 @@ llvm::Value*
 UpdateFunctionGen::add_constraint(std::string varAndSlice, uint32_t timeIdx, context &c,
                                    std::shared_ptr<llvm::IRBuilder<>> &b,
                                    uint32_t bound ) {
-  auto curMod = get_curMod();
+  auto curMod = insContextStk.get_curMod();
   llvm::Value* ret;
   bool retIsEmpty = true;
   std::string var, varSlice;
@@ -732,7 +732,7 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
                             uint32_t bound ) {
   // Attention: varAndSlice might have a slice, a directly-assigned varAndSlice
   std::string varAndSlice = node->dest;
-  auto curMod = get_curMod();
+  auto curMod = insContextStk.get_curMod();
   std::shared_ptr<ModuleDynInfo_t> curDynData = get_dyn_data(curMod);
   toCoutVerb("add_constraint for: "+varAndSlice+", timeIdx: "+toStr(timeIdx));
   if(varAndSlice == "out" ) { //&& timeIdx == 8) {
@@ -804,8 +804,8 @@ UpdateFunctionGen::add_nb_constraint(astNode* const node,
                                uint32_t timeIdx, context &c, 
                                std::shared_ptr<llvm::IRBuilder<>> &b,
                                uint32_t bound ) {
-  const auto curFunc = get_func();
-  const auto curMod = get_curMod();
+  const auto curFunc = insContextStk.get_func();
+  const auto curMod = insContextStk.get_curMod();
   auto curDynData = get_dyn_data(curMod);
   std::string destAndSlice = node->dest;
   std::string dest, destSlice;
@@ -1586,18 +1586,9 @@ UpdateFunctionGen::long_bv_val(std::string formedBinVar, context &c,
 }
 
 
-llvm::Function* UpdateFunctionGen::get_func() {
-  return insContextStk.back().Func;
-}
-
-
-uint32_t UpdateFunctionGen::get_stk_depth() {
-  return insContextStk.size();
-}
-
 
 llvm::Value* UpdateFunctionGen::get_arg(std::string regName) {
-  auto func = get_func();
+  auto func = insContextStk.get_func();
   return get_arg(regName, func);
 }
 

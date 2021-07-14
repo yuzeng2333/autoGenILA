@@ -54,7 +54,7 @@ void module_expr(std::string line) {
 
 
 void input_expr(std::string line) {
-  const auto curMod = get_curMod();
+  const auto curMod = g_insContextStk.get_curMod();
   std::smatch m;
   if (!std::regex_match(line, m, pInput))
     return;
@@ -81,7 +81,7 @@ void input_expr(std::string line) {
 
 
 void reg_expr(std::string line) {
-  const auto curMod = get_curMod();
+  const auto curMod = g_insContextStk.get_curMod();
   if(line.find("puregs[0]") != std::string::npos) {
     toCout("Found it");
   }
@@ -111,7 +111,7 @@ void reg_expr(std::string line) {
 
 
 void wire_expr(std::string line) {
-  const auto curMod = get_curMod();
+  const auto curMod = g_insContextStk.get_curMod();
   std::smatch m;
   if ( !std::regex_match(line, m, pWire) )
     return;
@@ -134,7 +134,7 @@ void wire_expr(std::string line) {
 
 
 void mem_expr(std::string line) {
-  const auto curMod = get_curMod();
+  const auto curMod = g_insContextStk.get_curMod();
   std::smatch m;
   if ( !std::regex_match(line, m, pMem )) 
     return;
@@ -165,7 +165,7 @@ void mem_expr(std::string line) {
 
 // TODO: put output into moduleWires?
 void output_expr(std::string line) {
-  const auto curMod = get_curMod();
+  const auto curMod = g_insContextStk.get_curMod();
   if(line.find("state_out") != std::string::npos) {
     toCout("Found it");
   }
@@ -198,7 +198,7 @@ void output_expr(std::string line) {
 
 
 void single_line_expr(std::string line) {
-  const auto curMod = get_curMod();
+  const auto curMod = g_insContextStk.get_curMod();
   std::smatch m;
   if( !std::regex_match(line, m, pSingleLine) ) {
     toCout("Error in matching single line expression: "+line);
@@ -216,7 +216,7 @@ void single_line_expr(std::string line) {
 
 
 void both_concat_expr(std::string line) {
-  const auto curMod = get_curMod();
+  const auto curMod = g_insContextStk.get_curMod();
   std::smatch m;
   if( !std::regex_match(line, m, pSrcDestBothConcat) ) {
     toCout("Error: Not both_concat!!");
@@ -281,7 +281,7 @@ void both_concat_expr(std::string line) {
 
 
 void dest_concat_expr(std::string line) {
-  const auto curMod = get_curMod();
+  const auto curMod = g_insContextStk.get_curMod();
   std::smatch m;
   if( !std::regex_match(line, m, pDestConcat) ) {
     toCout("Error: Not both_concat!!");
@@ -336,7 +336,7 @@ void dest_concat_expr(std::string line) {
 
 
 void nb_expr(std::string line) {
-  const auto curMod = get_curMod();
+  const auto curMod = g_insContextStk.get_curMod();
   std::smatch m;
   if( !std::regex_match(line, m, pNbLine) ) {
     toCout("Error in matching single line expression: "+line);
@@ -394,7 +394,7 @@ void nonblockif_expr(std::string line, std::ifstream &input) {
   if ( !std::regex_match(line, m, pNonblockIf) )
     return;
 
-  const auto curMod = get_curMod();
+  const auto curMod = g_insContextStk.get_curMod();
   bool hasRst = false;
   std::string rst;
   std::string blank;
@@ -507,7 +507,7 @@ void always_if_else_expr(std::string line, std::ifstream &input) {
   if ( !std::regex_match(line, m, pIf) )
     return;
   std::string condAndSlice = m.str(2);
-  const auto curMod = get_curMod();
+  const auto curMod = g_insContextStk.get_curMod();
 
   std::getline(input, line);
   if ( !std::regex_match(line, m, pNonblock) ) {
@@ -572,7 +572,7 @@ void case_expr(std::string line, std::ifstream &input) {
     toCout("Error: does not match pCase: "+caseFirstLine);
     abort();
   }
-  const auto curMod = get_curMod();  
+  const auto curMod = g_insContextStk.get_curMod();  
   std::string blank = m.str(1);
   std::string sAndSlice = m.str(3);
   std::vector<std::pair<std::string, std::string>> caseAssignPairs;
@@ -586,7 +586,7 @@ void case_expr(std::string line, std::ifstream &input) {
 /// In this function, do not distinguish input and output ports
 /// store all connections in both two maps: wire2InsPortMp & insPort2wireMp
 void submodule_expr(std::string firstLine, std::ifstream &input) {
-  const auto curMod = get_curMod();
+  const auto curMod = g_insContextStk.get_curMod();
   std::smatch m;
   if ( !std::regex_match(firstLine, m, pInstanceBegin) ) {
     toCout("Error: does not match pModuleBegin: "+firstLine);
@@ -660,7 +660,7 @@ bool compareSlice(std::string destAndSlice1, std::string destAndSlice2) {
 
 
 void put_into_reg2Slice(std::string destAndSlice) {
-  const auto curMod = get_curMod();
+  const auto curMod = g_insContextStk.get_curMod();
   std::string dest, destSlice;
   split_slice(destAndSlice, dest, destSlice);
   // if the destAndSlice has slice, put it into the curMod->reg2Slices map

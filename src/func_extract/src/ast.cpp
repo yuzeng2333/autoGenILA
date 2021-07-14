@@ -496,7 +496,7 @@ void add_input_node(std::string input, uint32_t timeIdx, astNode* const node) {
 
     std::shared_ptr<ModuleInfo_t> parentMod;
     if(g_insContextStk.get_stk_depth() > 1)
-      parentMod = get_parentMod();
+      parentMod = insContextStk.get_parentMod();
     else {
       assert(curMod->parentModVec.size() == 1);
       parentMod = *(curMod->parentModVec.begin());
