@@ -127,6 +127,7 @@ uint32_t max_num_dec(uint32_t width);
 
 std::string dec2bin(uint32_t inNum);
 
+//
 std::string get_bits(std::string inNum, uint32_t highIdx, uint32_t lowIdx);
 
 std::string add_taint(std::vector<std::string> &freeBitsVec, std::string taint);
@@ -153,6 +154,7 @@ bool is_destConcat(const std::string &line);
 
 bool is_srcDestConcat(const std::string &line);
 
+//
 std::string extract_bin(std::string num, uint32_t highIdx, uint32_t lowIdx);
 
 std::string hex2bin(std::string hexNum);

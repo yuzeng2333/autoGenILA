@@ -811,6 +811,7 @@ void add_line_taints(std::string line, std::ofstream &output, std::ifstream &inp
 int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   // for the purpose of parse, remove potential $sign()
   //line = remove_signed(line);
+  remove_back_space(line);
   std::smatch m;
   if(line.empty())
     return NONE;

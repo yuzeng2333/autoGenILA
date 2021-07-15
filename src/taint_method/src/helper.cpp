@@ -1499,7 +1499,7 @@ std::string split_long_bit_vec(std::string varList) {
       ret = split_long_hex(var, width, num, ret);
     }
     else {
-      toCout("Error: number does not match any pattern: "+var);
+      toCout("Error: number does not match any pattern1: "+var);
       abort();
     }
   } // end of while
@@ -1510,7 +1510,7 @@ std::string split_long_bit_vec(std::string varList) {
     ret = ret + var;
     return ret;
   }
-  if(std::regex_match(var, m, pBin)) {
+  if(std::regex_match(var, m, pBinX)) {
     uint32_t width = std::stoi(m.str(1));
     std::string num = m.str(2);
     ret = split_long_bin(var, width, num, ret);
@@ -1521,7 +1521,7 @@ std::string split_long_bit_vec(std::string varList) {
     ret = split_long_hex(var, width, num, ret);
   }
   else {
-    toCout("Error: number does not match any pattern: "+var);
+    toCout("Error: number does not match any pattern2: "+var);
     abort();
   }
 
