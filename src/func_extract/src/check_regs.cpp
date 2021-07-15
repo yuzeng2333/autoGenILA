@@ -395,6 +395,13 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
             BB
           );
       Builder->SetInsertPoint(BB);
+
+      // print info
+      uint32_t valWidth = val->getType()->getIntegerBitWidth();
+      auto ty1 = val->getType();
+      auto ty2 = llvm::cast<llvm::ArrayType>(retTy)->getElementType();
+      auto ty3 = llvm::cast<llvm::PointerType>(ptr->getType())->getElementType();
+      auto ty4 = arrPtr->getType();
       llvm::StoreInst* store = Builder->CreateStore(val, value(ptr));  
     }
 
@@ -1196,7 +1203,7 @@ llvm::Type* DestInfo::get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext
     uint32_t size = get_var_slice_width_cmplx(destVec.front());
     for(auto dest: destVec) {
       uint32_t elmtSize = get_var_slice_width_cmplx(dest);
-      assert(size = elmtSize);
+      assert(size == elmtSize);
     }
     llvm::Type* I = llvm::IntegerType::get(*TheContext, size);
     llvm::ArrayType* arrayType = llvm::ArrayType::get(I, destVec.size());

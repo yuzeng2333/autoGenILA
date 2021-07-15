@@ -121,6 +121,9 @@ void wire_expr(std::string line) {
   std::string blank = m.str(1);
   moduleWires.insert(var);  
 
+  if(var == "outAssign")
+    toCout("Find it!");
+
   bool insertDone;
   if(!slice.empty())
     insertDone = curMod->varWidth.var_width_insert(var, get_end(slice), get_begin(slice));

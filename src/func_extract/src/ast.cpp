@@ -383,8 +383,8 @@ void add_nb_node(std::string regAndSlice, uint32_t timeIdx, astNode* const node)
     toCout("Error: not in curMod->nbTable: "+regAndSlice);
     abort();
   }
-  if(regAndSlice == "state_0") {
-    toCout("Found state_0!");
+  if(regAndSlice == "outAssign") {
+    toCout("Found it!");
   }
   std::string destAssign = curMod->nbTable[regAndSlice];
   std::smatch m;
