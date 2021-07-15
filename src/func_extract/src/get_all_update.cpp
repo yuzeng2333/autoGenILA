@@ -1,3 +1,4 @@
+#include "ins_context_stack.h"
 #include "get_all_update.h"
 #include "parse_fill.h"
 #include "check_regs.h"
@@ -230,15 +231,20 @@ void get_update_function(std::string target,
     ///   || g_skippedOutput.find(target) != g_skippedOutput.end())
     ///  continue;
     if(target.find(".") == std::string::npos 
-       || target.substr(0, 1) == "\\")
-      destInfo.set_dest_and_slice(target);
+       || target.substr(0, 1) == "\\") {
+      uint32_t width = get_var_slice_width_simp(target, 
+                                         g_moduleInfoMap[g_topModule]);
+      destInfo.set_dest_and_slice(target, width);
+    }
     else {
       auto pair = split_module_asv(target);
       std::string prefix = pair.first;
       std::string var = pair.second;
       if(g_moduleInfoMap.find(prefix) != g_moduleInfoMap.end()) {
+        uint32_t width = get_var_slice_width_simp(target, 
+                                            g_moduleInfoMap[prefix]);
         destInfo.set_module_name(prefix);
-        destInfo.set_dest_and_slice(var);
+        destInfo.set_dest_and_slice(var, width);
       }
       else {
         assert(g_topModuleInfo->ins2modMap.find(prefix) 
@@ -246,7 +252,9 @@ void get_update_function(std::string target,
         std::string modName = g_topModuleInfo->ins2modMap[prefix];
         destInfo.set_module_name(modName);
         destInfo.set_instance_name(prefix);
-        destInfo.set_dest_and_slice(var);
+        uint32_t width = get_var_slice_width_simp(target, 
+                                            g_moduleInfoMap[modName]);
+        destInfo.set_dest_and_slice(var, width);
       }
     }
     destInfo.isVector = false;
@@ -266,7 +274,9 @@ void get_update_function(std::string target,
       std::string var = pair.second;
       if(g_moduleInfoMap.find(prefix) != g_moduleInfoMap.end()) {
         destInfo.set_module_name(prefix);
-        destInfo.set_dest_and_slice(var);
+        uint32_t width = get_var_slice_width_simp(var, 
+                                    g_moduleInfoMap[prefix]);
+        destInfo.set_dest_and_slice(var, width);
       }
       else {
         assert(g_topModuleInfo->ins2modMap.find(prefix)
@@ -274,7 +284,9 @@ void get_update_function(std::string target,
         std::string modName = g_topModuleInfo->ins2modMap[prefix];
         destInfo.set_module_name(modName);
         destInfo.set_instance_name(prefix);
-        destInfo.set_dest_and_slice(var);
+        uint32_t width = get_var_slice_width_simp(var, 
+                                    g_moduleInfoMap[modName]);
+        destInfo.set_dest_and_slice(var, width);
       }
     }
     else destInfo.set_module_name(g_topModule);

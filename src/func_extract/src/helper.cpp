@@ -46,11 +46,11 @@ llvm::Value* sext(llvm::Value* v1, uint32_t width,
 }
 
 
-bool isAs(std::string var, HierCtx_t &insContextStk) {
-  auto curMod = get_curMod(insContextStk);
-  auto it = std::find( curMod->moduleAs.begin(), curMod->moduleAs.end(), var );
-  return it != curMod->moduleAs.end();
-}
+//bool isAs(std::string var, HierCtx_t &insContextStk) {
+//  auto curMod = get_curMod(insContextStk);
+//  auto it = std::find( curMod->moduleAs.begin(), curMod->moduleAs.end(), var );
+//  return it != curMod->moduleAs.end();
+//}
 
 
 bool is_formed_num(std::string num) {
@@ -220,22 +220,22 @@ void record_expr(expr varExpr) {
 
 
 // extend e to len
-expr sext_full(expr const& e, uint32_t len) {
-  uint32_t eLen = get_var_slice_width_simp(pure(get_name(e)));
-  if(eLen == len)
-    return e; 
-  else
-    return to_expr(e.ctx(), Z3_mk_sign_ext(e.ctx(), len - eLen, e));
-}
-
-
-// extend e to len
-expr zext_full(expr const& e, uint32_t destWidth, uint32_t opWidth) {
-  if(destWidth == opWidth)
-    return e; 
-  else
-    return zext(e, destWidth - opWidth);
-}
+//expr sext_full(expr const& e, uint32_t len) {
+//  uint32_t eLen = get_var_slice_width_simp(pure(get_name(e)));
+//  if(eLen == len)
+//    return e; 
+//  else
+//    return to_expr(e.ctx(), Z3_mk_sign_ext(e.ctx(), len - eLen, e));
+//}
+//
+//
+//// extend e to len
+//expr zext_full(expr const& e, uint32_t destWidth, uint32_t opWidth) {
+//  if(destWidth == opWidth)
+//    return e; 
+//  else
+//    return zext(e, destWidth - opWidth);
+//}
 
 
 bool is_root(std::string var) {
@@ -256,8 +256,8 @@ bool is_taint(std::string var) {
 }
 
 
-bool is_clean(std::string var) {
-  return !is_taint(var) && ( is_input(pure(var)) || is_read_asv(pure(var)) );
+bool is_clean(std::string var, const std::shared_ptr<ModuleInfo_t> &modInfo) {
+  return !is_taint(var) && ( is_input(pure(var), modInfo) || is_read_asv(pure(var), modInfo) );
 }
 
 
@@ -266,9 +266,9 @@ std::string get_name(expr expression) {
 }
 
 
-bool is_read_asv(std::string var) {
-  auto curMod = get_curMod();
-  return g_readASV.find(pure(var)) != g_readASV.end() || g_readASV.find(curMod->name+"."+pure(var)) != g_readASV.end();
+bool is_read_asv(std::string var, const std::shared_ptr<ModuleInfo_t> &curMod) {
+  return g_readASV.find(pure(var)) != g_readASV.end() 
+         || g_readASV.find(curMod->name+"."+pure(var)) != g_readASV.end();
 }
 
 
@@ -287,9 +287,9 @@ bool has_explicit_value(std::string input) {
 }
 
 
-uint32_t expr_len(expr &e) {
-  return get_var_slice_width_simp(pure(get_name(e)));
-}
+//uint32_t expr_len(expr &e) {
+//  return get_var_slice_width_simp(pure(get_name(e)));
+//}
 
 
 bool comparePair(const std::pair<std::string, uint32_t> &p1, 
@@ -312,13 +312,12 @@ uint32_t get_time(std::string var) {
 }
 
 
-bool is_case_dest(std::string var) {
-  auto curMod = get_curMod();
+bool is_case_dest(std::string var, const std::shared_ptr<ModuleInfo_t> &curMod) {
   return curMod->caseTable.find(var) != curMod->caseTable.end();
 }
 
-bool is_func_output(std::string var) {
-  auto curMod = get_curMod();
+bool is_func_output(std::string var, 
+                    const std::shared_ptr<ModuleInfo_t> &curMod) {
   if(curMod->funcTable.find(var) != curMod->funcTable.end())
     return true;
   if(curMod->funcTable.find(var+" ") != curMod->funcTable.end())
@@ -350,8 +349,7 @@ uint32_t get_pos_of_one(std::string value) {
 // Attention:
 // This function is a little counter-intuitive
 // get logical hi
-uint32_t get_lgc_hi(std::string varAndSlice) {
-  auto curMod = get_curMod();
+uint32_t get_lgc_hi(std::string varAndSlice, const std::shared_ptr<ModuleInfo_t> &curMod) {
   varAndSlice = remove_signed(varAndSlice);
   std::smatch m;
   if(is_number(varAndSlice)) {
@@ -365,7 +363,7 @@ uint32_t get_lgc_hi(std::string varAndSlice) {
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
   if(!varSlice.empty()) {
-    if(has_direct_assignment(varAndSlice))
+    if(has_direct_assignment(varAndSlice, curMod))
       return get_end(varSlice) - get_begin(varSlice);
     else
       return get_end(varSlice);
@@ -376,8 +374,7 @@ uint32_t get_lgc_hi(std::string varAndSlice) {
 
 
 // get literal hi
-uint32_t get_ltr_hi(std::string varAndSlice) {
-  auto curMod = get_curMod();
+uint32_t get_ltr_hi(std::string varAndSlice, const std::shared_ptr<ModuleInfo_t> &curMod) {
   varAndSlice = remove_signed(varAndSlice);  
   std::smatch m;
   if(is_number(varAndSlice)) {
@@ -397,8 +394,7 @@ uint32_t get_ltr_hi(std::string varAndSlice) {
 }
 
 
-uint32_t get_lgc_lo(std::string varAndSlice) {
-  auto curMod = get_curMod();
+uint32_t get_lgc_lo(std::string varAndSlice, const std::shared_ptr<ModuleInfo_t> &curMod) {
   varAndSlice = remove_signed(varAndSlice);  
   if(is_number(varAndSlice))
     return 0;
@@ -406,7 +402,7 @@ uint32_t get_lgc_lo(std::string varAndSlice) {
   split_slice(varAndSlice, var, varSlice);
 
   if(!varSlice.empty()) {
-    if(has_direct_assignment(varAndSlice))
+    if(has_direct_assignment(varAndSlice, curMod))
       return 0;
     else
       return get_begin(varSlice);
@@ -416,8 +412,7 @@ uint32_t get_lgc_lo(std::string varAndSlice) {
 }
 
 
-uint32_t get_ltr_lo(std::string varAndSlice) {
-  auto curMod = get_curMod();
+uint32_t get_ltr_lo(std::string varAndSlice, const std::shared_ptr<ModuleInfo_t> &curMod) {
   varAndSlice = remove_signed(varAndSlice);  
   if(is_number(varAndSlice))
     return 0;
@@ -433,8 +428,7 @@ uint32_t get_ltr_lo(std::string varAndSlice) {
 
 // summary: check if a variable's slice is assigned directly
 // input: varAndSlice must have slice
-bool has_direct_assignment(std::string varAndSlice) {
-  auto curMod = get_curMod();
+bool has_direct_assignment(std::string varAndSlice, const std::shared_ptr<ModuleInfo_t> &curMod) {
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
   bool withinReg2Slices = curMod->reg2Slices.find(var) != curMod->reg2Slices.end();
@@ -629,13 +623,15 @@ uint32_t get_var_slice_width_simp(std::string varAndSlice,
 uint32_t get_var_slice_width_cmplx(std::string varAndSlice) {
   if(varAndSlice.find(".") == std::string::npos 
      || varAndSlice.substr(0, 1) == "\\")
-    return get_var_slice_width_simp(varAndSlice);
+    return get_var_slice_width_simp(varAndSlice, g_moduleInfoMap[g_topModule]);
   else {
     size_t pos = varAndSlice.find(".");
     std::string modName = varAndSlice.substr(0, pos);
     std::string varName = varAndSlice.substr(pos+1);
     if(g_moduleInfoMap.find(modName) == g_moduleInfoMap.end()) {
-      return get_var_slice_width_simp(varAndSlice);
+      toCout("Error: mod not found");
+      abort();
+      //return get_var_slice_width_simp(varAndSlice, );
     }
     auto subMod = g_moduleInfoMap[modName];
     return get_var_slice_width_simp(varName, subMod);
@@ -726,10 +722,10 @@ bool is_reg(std::string var) {
 }
 
 
-bool is_reg_in_curMod(std::string varAndSlice) {
+bool is_reg_in_curMod(std::string varAndSlice,
+                      const std::shared_ptr<ModuleInfo_t> &curMod) {
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
-  auto curMod = get_curMod();
   if(var.back() == ' ')
     var.pop_back();
   auto it = std::find( curMod->moduleTrueRegs.begin(), curMod->moduleTrueRegs.end(), var );
@@ -737,8 +733,8 @@ bool is_reg_in_curMod(std::string varAndSlice) {
 }
 
 
-bool is_submod_output(const std::string &var) {
-  auto curMod = get_curMod();
+bool is_submod_output(const std::string &var,
+                      const std::shared_ptr<ModuleInfo_t> &curMod) {
   if( curMod->wire2InsPortMp.find(var) == curMod->wire2InsPortMp.end() )
     return false;
   auto tmpPair = curMod->wire2InsPortMp[var];
@@ -761,34 +757,33 @@ std::shared_ptr<ModuleInfo_t> get_mod_info(std::string insName,
 }
 
 
-std::string get_hier_name(std::vector<Context_t> &insContextStk,
-                          bool includeTopModule) {
-  std::string ret;
-  if(includeTopModule)
-    for(auto it = insContextStk.begin(); 
-          it != insContextStk.end(); it++) {
-      ret = ret + "." + it->InsName;
-    }
-  else {
-    if(insContextStk.size() == 1) return "";
-    for(auto it = insContextStk.begin()+1; 
-          it != insContextStk.end(); it++) {
-      ret = ret + "." + it->InsName;
-    }
-  }
-  ret = ret.substr(1);
-  return ret;
-}
+//std::string get_hier_name(std::vector<Context_t> &insContextStk,
+//                          bool includeTopModule) {
+//  std::string ret;
+//  if(includeTopModule)
+//    for(auto it = insContextStk.begin(); 
+//          it != insContextStk.end(); it++) {
+//      ret = ret + "." + it->InsName;
+//    }
+//  else {
+//    if(insContextStk.size() == 1) return "";
+//    for(auto it = insContextStk.begin()+1; 
+//          it != insContextStk.end(); it++) {
+//      ret = ret + "." + it->InsName;
+//    }
+//  }
+//  ret = ret.substr(1);
+//  return ret;
+//}
 
 
-bool is_top_module() {
-  auto curMod = get_curMod();
+bool is_top_module(const std::shared_ptr<ModuleInfo_t> &curMod) {
   return curMod->name == g_topModule;
 }
 
 
-bool is_sub_module() {
-  return !is_top_module();
+bool is_sub_module(const std::shared_ptr<ModuleInfo_t> &curMod) {
+  return !is_top_module(curMod);
 }
 
 
@@ -922,13 +917,13 @@ std::vector<std::string> print_map_keys(std::map<std::string, astNode*> &map) {
 }
 
 
-std::string ask_for_my_ins_name() {
-  std::string insName = get_insName();
+// only used in ast building
+std::string ask_for_my_ins_name(const std::shared_ptr<ModuleInfo_t> &curMod) {
+  std::string insName = g_insContextStk.get_insName();
   if(!insName.empty()) return insName;
-  const auto curMod = get_curMod();
   std::string myModName = curMod->name;
-  if(get_parentMod() == nullptr) return myModName;
-  auto parentMod = get_parentMod();
+  if(g_insContextStk.get_parentMod() == nullptr) return myModName;
+  auto parentMod = g_insContextStk.get_parentMod();
   insName = ask_parent_my_ins_name(myModName, parentMod);
   return insName;
 }
@@ -957,74 +952,74 @@ void check_no_slice(std::string varAndSlice) {
 }
 
 
-std::string get_insName(HierCtx_t &insContextStk) {
-  return insContextStk.back().InsName;
-}
+//std::string get_insName(HierCtx_t &insContextStk) {
+//  return insContextStk.back().InsName;
+//}
+//
+//
+//std::string get_target(HierCtx_t &insContextStk) {
+//  return insContextStk.back().Target;
+//}
 
 
-std::string get_target(HierCtx_t &insContextStk) {
-  return insContextStk.back().Target;
-}
+//void set_target(const std::string &tgtIn, HierCtx_t &insContextStk) {
+//  if(!insContextStk.back().Target.empty()) {
+//    toCout("Warning: target has already been set: "
+//             +insContextStk.back().Target);
+//  }
+//  insContextStk.back().Target = tgtIn;
+//}
+//
+//
+//// find the first module with True isFunctionedSubMod
+//std::shared_ptr<ModuleInfo_t> get_curMod(HierCtx_t &insContextStk) {
+//  if(insContextStk.size() == 0) {
+//    toCout("Error: insContextStk is empty!");
+//    abort();
+//  }
+//  return insContextStk.back().ModInfo;
+//  //for(auto it = insContextStk.rbegin();
+//  //    it != insContextStk.rend(); it++) {
+//  //  if(it->ModInfo->isFunctionedSubMod) return it->ModInfo;
+//  //}
+//  //assert(insContextStk.front().InsName == g_topModule);
+//  //return insContextStk.front().ModInfo;
+//}
 
 
-void set_target(const std::string &tgtIn, HierCtx_t &insContextStk) {
-  if(!insContextStk.back().Target.empty()) {
-    toCout("Warning: target has already been set: "
-             +insContextStk.back().Target);
-  }
-  insContextStk.back().Target = tgtIn;
-}
-
-
-// find the first module with True isFunctionedSubMod
-std::shared_ptr<ModuleInfo_t> get_curMod(HierCtx_t &insContextStk) {
-  if(insContextStk.size() == 0) {
-    toCout("Error: insContextStk is empty!");
-    abort();
-  }
-  return insContextStk.back().ModInfo;
-  //for(auto it = insContextStk.rbegin();
-  //    it != insContextStk.rend(); it++) {
-  //  if(it->ModInfo->isFunctionedSubMod) return it->ModInfo;
-  //}
-  //assert(insContextStk.front().InsName == g_topModule);
-  //return insContextStk.front().ModInfo;
-}
-
-
-// used in ast
-std::shared_ptr<ModuleInfo_t> get_parentMod(HierCtx_t &insContextStk) {
-  auto parentInfo = insContextStk.back().ParentModInfo;
-  uint32_t depth = get_stk_depth(insContextStk);
-  if( depth > 1)
-    assert(parentInfo == insContextStk[depth-2].ModInfo);
-  return parentInfo;
-}
-
-
-llvm::Function* get_func(HierCtx_t &insContextStk) {
-  return insContextStk.back().Func;
-}
-
-
-uint32_t get_stk_depth(HierCtx_t &insContextStk) {
-  return insContextStk.size();
-}
-
-
-std::shared_ptr<ModuleInfo_t> get_real_parentMod(HierCtx_t &insContextStk) {
-  auto parentMod = get_parentMod();
-  if(parentMod != nullptr) return parentMod;
-  else {
-    assert(get_stk_depth(insContextStk) == 1);
-    auto curMod = get_curMod();
-    if(curMod->name == g_topModule) return nullptr;
-    else {
-      assert(curMod->parentModVec.size() == 1);
-      return *(curMod->parentModVec.begin());
-    }
-  }
-}
+//// used in ast
+//std::shared_ptr<ModuleInfo_t> get_parentMod(HierCtx_t &insContextStk) {
+//  auto parentInfo = insContextStk.back().ParentModInfo;
+//  uint32_t depth = get_stk_depth(insContextStk);
+//  if( depth > 1)
+//    assert(parentInfo == insContextStk[depth-2].ModInfo);
+//  return parentInfo;
+//}
+//
+//
+//llvm::Function* get_func(HierCtx_t &insContextStk) {
+//  return insContextStk.back().Func;
+//}
+//
+//
+//uint32_t get_stk_depth(HierCtx_t &insContextStk) {
+//  return insContextStk.size();
+//}
+//
+//
+//std::shared_ptr<ModuleInfo_t> get_real_parentMod(HierCtx_t &insContextStk) {
+//  auto parentMod = get_parentMod();
+//  if(parentMod != nullptr) return parentMod;
+//  else {
+//    assert(get_stk_depth(insContextStk) == 1);
+//    auto curMod = get_curMod();
+//    if(curMod->name == g_topModule) return nullptr;
+//    else {
+//      assert(curMod->parentModVec.size() == 1);
+//      return *(curMod->parentModVec.begin());
+//    }
+//  }
+//}
 
 
 std::string remove_paramod(std::string modName) {
@@ -1095,8 +1090,8 @@ void set_clk_rst(std::shared_ptr<ModuleInfo_t> &modInfo) {
 
 
 
-std::string get_rst_value(const std::string &destAndSlice, uint32_t timeIdx) {
-  uint32_t width = get_var_slice_width_simp(destAndSlice);
+std::string get_rst_value(const std::string &destAndSlice, 
+                          uint32_t timeIdx, uint32_t width) {
   std::string dest, destSlice;
   split_slice(destAndSlice, dest, destSlice);
   std::string rstVal;

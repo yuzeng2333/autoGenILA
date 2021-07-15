@@ -85,11 +85,15 @@ void check_all_regs() {
       std::string insName;
       destInfo.isVector = false;
       if(prefix.empty()) {
-        destInfo.set_dest_and_slice(writeVar);
+        uint32_t width = get_var_slice_width_simp(writeVar, 
+                                                  g_moduleInfoMap[g_topModule]);
+        destInfo.set_dest_and_slice(writeVar, width);
         destInfo.set_module_name(g_topModule);
       }
       else if(g_moduleInfoMap.find(prefix) != g_moduleInfoMap.end()) {
-        destInfo.set_dest_and_slice(writeVar);
+        uint32_t width = get_var_slice_width_simp(writeVar, 
+                                                  g_moduleInfoMap[prefix]);
+        destInfo.set_dest_and_slice(writeVar, width);
         destInfo.set_module_name(prefix);
         insName = ask_parent_my_ins_name(
                     prefix,
@@ -100,7 +104,8 @@ void check_all_regs() {
       else {
         destInfo.set_instance_name(prefix);
         auto subMod = get_mod_info(prefix, g_moduleInfoMap[g_topModule]);
-        destInfo.set_dest_and_slice(writeVar);
+        uint32_t width = get_var_slice_width_simp(writeVar, subMod);
+        destInfo.set_dest_and_slice(writeVar, width);
         destInfo.set_module_name(subMod->name);
       }
       UFGen.print_llvm_ir(destInfo, cycleCnt, i-1);
@@ -183,7 +188,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     insContextStk.insert(insContextStk.begin(), insCntxt);    
   }
   // TODO: modify the following two lines of code
-  std::string destPrefix = get_hier_name(insContextStk, false);
+  std::string destPrefix = insContextStk.get_hier_name(false);
   if(!destPrefix.empty()) destName = destPrefix + "." + destName;
   TheModule = std::make_unique<llvm::Module>(
     "mod_;_"+curMod->name+"_;_"+destName, 
@@ -745,7 +750,7 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
   }
 
   if(timeIdx > bound) {
-    uint32_t width = get_var_slice_width_simp(varAndSlice);
+    uint32_t width = insContextStk.get_var_slice_width_simp(varAndSlice);
     return llvmInt(0, width, c);
   }
 
@@ -759,10 +764,11 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
   }
 
   llvm::Value* retExpr;
-  if ( is_input(varAndSlice) ) { // input_t is always 0
+  if ( is_input(varAndSlice, curMod) ) { // input_t is always 0
     retExpr = input_constraint(node, timeIdx, c, b, bound);
   }
-  else if( is_reg_in_curMod(varAndSlice) && node->type != SRC_CONCAT ) { 
+  else if( is_reg_in_curMod(varAndSlice, curMod) 
+             && node->type != SRC_CONCAT ) { 
     // AS case is moved to add_nb_constraint
     retExpr = add_nb_constraint(node, timeIdx, c, b, bound);
   }
@@ -773,16 +779,16 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
     //}
     retExpr = num_constraint(node, timeIdx, c, b);
   }
-  else if( is_case_dest(varAndSlice) ) {
+  else if( is_case_dest(varAndSlice, curMod) ) {
     retExpr = case_constraint(node, timeIdx, c, b, bound);
   }
   //else if( is_func_output(varAndSlice) ) {
   //  retExpr = func_constraint(node, timeIdx, c, s, g, bound, isSolve);
   //}
-  else if( is_submod_output(varAndSlice) ) {
+  else if( is_submod_output(varAndSlice, curMod) ) {
     auto pair = curMod->wire2InsPortMp[varAndSlice];
     std::string insName = pair.first;
-    auto subMod = get_mod_info(insName);
+    auto subMod = get_mod_info(insName, curMod);
     std::string modName = subMod->name;
     if(g_blackBoxModSet.find(modName) != g_blackBoxModSet.end())
       retExpr = bbMod_constraint(node, timeIdx, c, b, bound);
@@ -833,7 +839,7 @@ UpdateFunctionGen::add_nb_constraint(astNode* const node,
     destNextExpr = add_constraint(node->childVec.front(), timeIdx+1, c, b, bound);
     return destNextExpr;
   }
-  else if ( is_clean(dest) ){ // the bound has been reached, do not expand its assignment
+  else if ( is_clean(dest, insContextStk.get_curMod()) ){ // the bound has been reached, do not expand its assignment
     push_clean_queue(node, timeIdx);
   }
   else {
@@ -849,12 +855,12 @@ UpdateFunctionGen::add_nb_constraint(astNode* const node,
     toCout("Find it!");
   }
   if(g_use_read_ASV) {
-    if(is_read_asv(dest)) {
+    if(is_read_asv(dest, insContextStk.get_curMod())) {
         //&& curMod->moduleAs.find(dest) != curMod->moduleAs.end())
       //std::string prefix = get_hier_name(false);
       //if(!prefix.empty()) prefix += ".";
       if(curDynData->isFunctionedSubMod == false) {
-        std::string prefix = get_hier_name(insContextStk, false);
+        std::string prefix = insContextStk.get_hier_name(false);
         if(!prefix.empty()) prefix += ".";
         dest = prefix + dest;
       }
@@ -870,8 +876,8 @@ UpdateFunctionGen::add_nb_constraint(astNode* const node,
       }
     }
     else {
-      uint32_t width = get_var_slice_width_simp(destAndSlice);    
-      std::string rstVal = get_rst_value(destAndSlice, timeIdx);
+      uint32_t width = insContextStk.get_var_slice_width_simp(destAndSlice);    
+      std::string rstVal = get_rst_value(destAndSlice, timeIdx, width);
       return var_expr(rstVal, timeIdx, c, b, false, width);    
     }
   }
@@ -884,13 +890,13 @@ UpdateFunctionGen::add_nb_constraint(astNode* const node,
     }
     else {
       if(g_invarRegs[modName].find(dest) == g_invarRegs[modName].end()) {
-        if(is_top_module())
+        if(is_top_module(curMod))
           return get_arg(timed_name(dest, timeIdx), curFunc);
         else {
           if(curDynData->isFunctionedSubMod)
             return get_arg(timed_name(dest, timeIdx), curFunc);
           else {
-            std::string prefix = get_hier_name(insContextStk, false);
+            std::string prefix = insContextStk.get_hier_name(false);
             dest = prefix + "." + dest;
             return get_arg(timed_name(dest, timeIdx), curFunc);
           }
@@ -899,8 +905,8 @@ UpdateFunctionGen::add_nb_constraint(astNode* const node,
       else {
         // if is invariant register, then return its norm value, which is
         // stored in g_rstVal
-        uint32_t width = get_var_slice_width_simp(dest);    
-        std::string rstVal = get_rst_value(dest, timeIdx);
+        uint32_t width = insContextStk.get_var_slice_width_simp(dest);    
+        std::string rstVal = get_rst_value(dest, timeIdx, width);
         return var_expr(rstVal, timeIdx, c, b, false, width);
       }
     }
@@ -1182,7 +1188,7 @@ std::string DestInfo::get_dest_name() {
 llvm::Type* DestInfo::get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext) {
   if(!isVector) {
     return llvm::IntegerType::get(*TheContext, 
-                                  get_var_slice_width_simp(destAndSlice));
+                                  destWidth);
   }
   else {
     // if is reg vector, return an array type pointer
@@ -1262,8 +1268,9 @@ std::string DestInfo::get_instr_name() {
 }
 
 
-void DestInfo::set_dest_and_slice(std::string var) {
+void DestInfo::set_dest_and_slice(std::string var, uint32_t width) {
   destAndSlice = var;
+  destWidth = width;
 }
 
 
@@ -1335,13 +1342,15 @@ UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
                       const llvm::Twine &name, bool noinline) {
   std::string destName = in->getName().str();
   std::string dest, destSlice;
+  auto curMod = insContextStk.get_curMod();
   if(destName.find("concat__concat___017____#4") != std::string::npos)
     toCoutVerb("Find it!");
   if(!destName.empty()) {
     split_slice(destName, dest, destSlice);
     noinline = false;
   }
-  else if(is_read_asv(dest) || (is_top_module() && is_input(dest))) noinline = true;
+  else if(is_read_asv(dest, insContextStk.get_curMod()) 
+          || (is_top_module(curMod) && is_input(dest, insContextStk.get_curMod()))) noinline = true;
   else noinline = false;
   toCoutVerb("extract for: "+destName);  
   llvm::Type* inputTy = in->getType();
@@ -1474,11 +1483,13 @@ UpdateFunctionGen::concat_func(llvm::Value* val1, llvm::Value* val2,
 
   std::string n1, n1Slice;
   std::string n2, n2Slice;
+  auto curMod = insContextStk.get_curMod();
   if(!name1.empty()) split_slice(name1, n1, n1Slice);
   if(!name2.empty()) split_slice(name2, n2, n2Slice);
   if(name1.empty() || name2.empty()) noinline = false;
-  else if( (is_read_asv(n1) || (is_top_module() && is_input(n1)))
-        && (is_read_asv(n2) || (is_top_module() && is_input(n2))) ) noinline = true;
+  else if( (is_read_asv(n1, curMod) || (is_top_module(curMod) && is_input(n1, curMod)))
+        && (is_read_asv(n2, curMod) || (is_top_module(curMod) && is_input(n2, curMod))) ) 
+    noinline = true;
   else noinline = false;
 
   std::string app = "";

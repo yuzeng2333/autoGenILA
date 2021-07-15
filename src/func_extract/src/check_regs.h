@@ -28,6 +28,7 @@ namespace funcExtract {
 class DestInfo {
   private:
     std::string destAndSlice;
+    uint32_t destWidth;
     std::vector<std::string> destVec;
     std::string modName;
     std::string insName;
@@ -41,7 +42,7 @@ class DestInfo {
     std::string get_mod_name();
     std::string get_ins_name();
     std::string get_instr_name();
-    void set_dest_and_slice(std::string var);
+    void set_dest_and_slice(std::string var, uint32_t width);
     void set_module_name(std::string var);
     void set_instr_name(std::string var);
     void set_instance_name(std::string var);

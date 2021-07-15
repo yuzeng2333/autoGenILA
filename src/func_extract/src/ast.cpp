@@ -147,11 +147,11 @@ void build_ast_tree() {
         Context_t insCntxt(curMod->name, "", curMod, nullptr, nullptr);
         curMod->isFunctionedSubMod = true;
         g_insContextStk.insert(g_insContextStk.begin(), insCntxt); 
-        std::string destPrefix = get_hier_name(g_insContextStk, false);
+        std::string destPrefix = g_insContextStk.get_hier_name(false);
         std::string destName = destPrefix + "." + reg;
         for(auto it = g_insContextStk.begin();
           it != g_insContextStk.end(); it++) {
-          it->Target = destName;
+          it->Target = (destName);
         }
         if(curMod->reg2Slices.find(reg) == curMod->reg2Slices.end()) {
           build_tree_for_single_as(reg);
@@ -203,7 +203,7 @@ void build_tree_for_single_as(std::string regAndSlice) {
   std::string reg, regSlice;
   split_slice(regAndSlice, reg, regSlice);
   //assert(regSlice.empty());
-  std::string myInsName = ask_for_my_ins_name();
+  std::string myInsName = ask_for_my_ins_name(curMod);
   //set_target(reg);
   std::string curTgt = g_insContextStk.get_target();
   uint32_t regWidth = get_var_slice_width_cmplx(regAndSlice);
@@ -259,23 +259,23 @@ void add_node(std::string varAndSlice,
   if( curMod->reg2Slices.find(varToAdd) != curMod->reg2Slices.end() ) {
     add_sliced_node(varToAdd, timeIdx, node);
   }
-  else if ( is_input(varToAdd) ) {
+  else if ( is_input(varToAdd, curMod) ) {
     add_input_node(varToAdd, timeIdx, node);
   }
-  else if( is_reg_in_curMod(varToAdd) ) {
+  else if( is_reg_in_curMod(varToAdd, curMod) ) {
     add_nb_node(varToAdd, timeIdx, node);
   }
   else if( is_number(varToAdd) ) {
     add_num_node(varToAdd, timeIdx, node);
   }
-  else if( is_case_dest(varToAdd) ) {
+  else if( is_case_dest(varToAdd, curMod) ) {
     add_case_node(varToAdd, timeIdx, node);
   }
-  else if( is_func_output(varToAdd) ) {
+  else if( is_func_output(varToAdd, curMod) ) {
     abort();
     add_func_node(varToAdd, timeIdx, node);
   }
-  else if( is_submod_output(varToAdd) ) {
+  else if( is_submod_output(varToAdd, curMod) ) {
     add_submod_node(varToAdd, timeIdx, node);
   }
   else if( curMod->ssaTable.find(varAndSlice) 
@@ -309,7 +309,7 @@ void add_child_node(std::string varAndSlice,
   std::string childName;
   if(varSlice.empty()) 
     childName = var;
-  else if(has_direct_assignment(varAndSlice))
+  else if(has_direct_assignment(varAndSlice, curMod))
     childName = varAndSlice;
   else
     childName = var;
@@ -352,8 +352,8 @@ void add_sliced_node(std::string varAndSlice,
   node->done = false;
 
   auto srcVec = curMod->reg2Slices[var];
-  uint32_t srcHi = get_ltr_hi(srcVec.front());
-  uint32_t srcLo = get_ltr_lo(srcVec.back());
+  uint32_t srcHi = get_ltr_hi(srcVec.front(), curMod);
+  uint32_t srcLo = get_ltr_lo(srcVec.back(), curMod);
   auto idxPairs = curMod->varWidth.get_idx_pair(var, "add_sliced_node for:"+var);
   uint32_t destHi = idxPairs.first;
   uint32_t destLo = idxPairs.second;
@@ -391,8 +391,9 @@ void add_nb_node(std::string regAndSlice, uint32_t timeIdx, astNode* const node)
   if(std::regex_match(destAssign, m, pNonblock)) {
     std::string destNext = m.str(3);
     remove_two_end_space(destNext);
-    uint32_t destNextWidth = get_var_slice_width_simp(destNext);
-    uint32_t destWidth = get_var_slice_width_simp(regAndSlice);
+    auto curMod = g_insContextStk.get_curMod();
+    uint32_t destNextWidth = get_var_slice_width_simp(destNext, curMod);
+    uint32_t destWidth = get_var_slice_width_simp(regAndSlice, curMod);
 
     node->type = NONBLOCK;
     node->dest = regAndSlice;
@@ -496,7 +497,7 @@ void add_input_node(std::string input, uint32_t timeIdx, astNode* const node) {
 
     std::shared_ptr<ModuleInfo_t> parentMod;
     if(g_insContextStk.get_stk_depth() > 1)
-      parentMod = insContextStk.get_parentMod();
+      parentMod = g_insContextStk.get_parentMod();
     else {
       assert(curMod->parentModVec.size() == 1);
       parentMod = *(curMod->parentModVec.begin());
@@ -603,9 +604,10 @@ void add_two_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   split_slice(op2AndSlice, op2, op2Slice);
   remove_two_end_space(op1AndSlice);
   remove_two_end_space(op2AndSlice);
-  uint32_t destAndSliceWidth = get_var_slice_width_simp(destAndSlice);
-  uint32_t op1AndSliceWidth = get_var_slice_width_simp(op1AndSlice);
-  uint32_t op2AndSliceWidth = get_var_slice_width_simp(op2AndSlice);
+  auto curMod = g_insContextStk.get_curMod();
+  uint32_t destAndSliceWidth = get_var_slice_width_simp(destAndSlice, curMod);
+  uint32_t op1AndSliceWidth = get_var_slice_width_simp(op1AndSlice, curMod);
+  uint32_t op2AndSliceWidth = get_var_slice_width_simp(op2AndSlice, curMod);
 
   node->type = TWO_OP;
   node->dest = destAndSlice;
@@ -688,7 +690,8 @@ void add_ite_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
 
   uint32_t localWidthNum;
   std::string localWidth;
-  localWidthNum = get_var_slice_width_simp(destAndSlice);
+  auto curMod = g_insContextStk.get_curMod();
+  localWidthNum = get_var_slice_width_simp(destAndSlice, curMod);
 
   localWidth = std::to_string(localWidthNum);
 
@@ -754,7 +757,8 @@ void add_sel_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   split_slice(destAndSlice, dest, destSlice);
   split_slice(op1AndSlice, op1, op1Slice);
   split_slice(op2AndSlice, op2, op2Slice);
-  uint32_t destAndSliceWidth = get_var_slice_width_simp(destAndSlice);
+  auto curMod = g_insContextStk.get_curMod();  
+  uint32_t destAndSliceWidth = get_var_slice_width_simp(destAndSlice, curMod);
   remove_two_end_space(op1AndSlice);
   remove_two_end_space(op2AndSlice);
 

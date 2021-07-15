@@ -3,6 +3,7 @@
 #include "z3++.h"
 #include "ast.h"
 #include "types.h"
+#include "ins_context_stack.h"
 #include <queue>
 #include <memory>
 #include <map>
@@ -174,7 +175,6 @@ struct Context_t {
 };
 
 
-extern std::vector<Context_t> g_insContextStk;
 extern std::shared_ptr<ModuleInfo_t> g_curMod;
 extern uint32_t g_new_var;
 //extern taintGen::VarWidth g_varWidth;

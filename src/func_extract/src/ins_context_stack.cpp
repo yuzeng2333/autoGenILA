@@ -1,6 +1,8 @@
-#include "global_data_struct.h"
+#include "ins_context_stack.h"
 
-void HierCtx::push_back(Context_t &ctx) {
+namespace funcExtract {
+
+void HierCtx::push_back(Context_t ctx) {
   insContextStk.push_back(ctx);
 }
 
@@ -67,7 +69,7 @@ void HierCtx::set_target(const std::string &tgtIn) {
 }
 
 
-std::shared_ptr<ModuleInfo_t> HierCtx::get_curMod() {
+std::shared_ptr<struct ModuleInfo_t> HierCtx::get_curMod() {
   if(insContextStk.size() == 0) {
     toCout("Error: insContextStk is empty!");
     abort();
@@ -76,9 +78,9 @@ std::shared_ptr<ModuleInfo_t> HierCtx::get_curMod() {
 }
 
 
-std::shared_ptr<ModuleInfo_t> HierCtx::get_parentMod() {
+std::shared_ptr<struct ModuleInfo_t> HierCtx::get_parentMod() {
   auto parentInfo = insContextStk.back().ParentModInfo;
-  uint32_t depth = get_stk_depth(insContextStk);
+  uint32_t depth = get_stk_depth();
   if( depth > 1)
     assert(parentInfo == insContextStk[depth-2].ModInfo);
   return parentInfo;
@@ -95,11 +97,11 @@ uint32_t HierCtx::get_stk_depth() {
 }
 
 
-std::shared_ptr<ModuleInfo_t> HierCtx::get_real_parentMod() {
+std::shared_ptr<struct ModuleInfo_t> HierCtx::get_real_parentMod() {
   auto parentMod = get_parentMod();
   if(parentMod != nullptr) return parentMod;
   else {
-    assert(get_stk_depth(insContextStk) == 1);
+    assert(get_stk_depth() == 1);
     auto curMod = get_curMod();
     if(curMod->name == g_topModule) return nullptr;
     else {
@@ -111,7 +113,7 @@ std::shared_ptr<ModuleInfo_t> HierCtx::get_real_parentMod() {
 
 
 bool HierCtx::isAs(std::string var) {
-  auto curMod = get_curMod(insContextStk);
+  auto curMod = get_curMod();
   auto it = std::find( curMod->moduleAs.begin(), curMod->moduleAs.end(), var );
   return it != curMod->moduleAs.end();
 }
@@ -135,3 +137,11 @@ std::string HierCtx::get_hier_name(bool includeTopModule) {
   return ret;
 }
 
+
+uint32_t HierCtx::get_var_slice_width_simp(std::string varAndSlice) {
+  auto mod = get_curMod();
+  return get_var_slice_width( varAndSlice, mod->varWidth);
+}
+
+
+} // end of namespace

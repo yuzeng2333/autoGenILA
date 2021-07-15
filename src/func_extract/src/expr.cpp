@@ -1,6 +1,7 @@
 #include "expr.h"
 #include "parse_fill.h"
 #include "helper.h"
+#include "ins_context_stack.h"
 #include "global_data_struct.h"
 #define toStr(a) std::to_string(a)
 
@@ -148,7 +149,7 @@ void mem_expr(std::string line) {
   toCout("!!!!  Find mem: "+var);
   uint32_t varLen = get_end(sliceTop) + 1;
   moduleMems.emplace(var, varLen);
-  assert(!is_output(var));
+  assert(!is_output(var, curMod));
 
   bool insertDone;
   if(!slice.empty())
@@ -176,7 +177,7 @@ void output_expr(std::string line) {
   std::string var = m.str(3);
   std::string blank = m.str(1);
     
-  if(is_output(var)) {
+  if(is_output(var, curMod)) {
     std::cout << "!! Duplicate output find: " + line << std::endl;
     toCout("module: "+curMod->name);
     abort();
@@ -245,7 +246,7 @@ void both_concat_expr(std::string line) {
       toCout("Unexpected ");
       abort();
     }
-    destTotalWidthNum += get_var_slice_width_simp(destAndSlice);
+    destTotalWidthNum += g_insContextStk.get_var_slice_width_simp(destAndSlice);
   }
 
   uint32_t startIdx = destTotalWidthNum - 1;
@@ -260,7 +261,7 @@ void both_concat_expr(std::string line) {
   
   // if there is number in the list
   for (std::string destAndSlice: destVec) {
-    uint32_t destLocalWidthNum = get_var_slice_width_simp(destAndSlice);
+    uint32_t destLocalWidthNum = g_insContextStk.get_var_slice_width_simp(destAndSlice);
     endIdx = startIdx - destLocalWidthNum + 1;
     if(!is_number(destAndSlice)) {
       split_slice(destAndSlice, dest, destSlice);
@@ -308,7 +309,7 @@ void dest_concat_expr(std::string line) {
       toCout("Unexpected ");
       abort();
     }
-    destTotalWidthNum += get_var_slice_width_simp(destAndSlice);
+    destTotalWidthNum += g_insContextStk.get_var_slice_width_simp(destAndSlice);
   }
 
   uint32_t startIdx = destTotalWidthNum - 1;
@@ -316,7 +317,7 @@ void dest_concat_expr(std::string line) {
   
   // if there is number in the list
   for (std::string destAndSlice: destVec) {
-    uint32_t destLocalWidthNum = get_var_slice_width_simp(destAndSlice);
+    uint32_t destLocalWidthNum = g_insContextStk.get_var_slice_width_simp(destAndSlice);
     //uint32_t hi = get_lgc_hi(destAndSlice);
     //uint32_t lo = get_lgc_lo(destAndSlice);
     //assert(hi >= lo);
@@ -348,7 +349,7 @@ void nb_expr(std::string line) {
   std::string dest, destSlice;
   split_slice(destAndSlice, dest, destSlice);
   curMod->moduleTrueRegs.insert(dest);
-  uint32_t width = get_var_slice_width_simp(dest);
+  uint32_t width = g_insContextStk.get_var_slice_width_simp(dest);
   g_allRegs.emplace(dest, width);
   remove_two_end_space(destAndSlice);
   if(destAndSlice.back() == ']') {
@@ -423,13 +424,13 @@ void nonblockif_expr(std::string line, std::ifstream &input) {
   split_slice(ifSrcAndSlice, src, srcSlice);
   split_slice(condAndSlice, cond, condSlice);
   curMod->moduleTrueRegs.insert(dest);
-  uint32_t destWidth = get_var_slice_width_simp(dest);
+  uint32_t destWidth = g_insContextStk.get_var_slice_width_simp(dest);
   g_allRegs.emplace(dest, destWidth);
 
   std::string yuzengIdx = toStr(g_new_var++);
   std::string destNext = "yuzeng"+yuzengIdx;
   moduleWires.insert("yuzeng"+yuzengIdx);
-  uint32_t localWidth = get_var_slice_width_simp(destAndSlice);
+  uint32_t localWidth = g_insContextStk.get_var_slice_width_simp(destAndSlice);
   bool insertDone;
     insertDone = curMod->varWidth.var_width_insert(destNext, localWidth-1, 0);
   if (!insertDone) {
@@ -472,7 +473,7 @@ void nonblockif_expr(std::string line, std::ifstream &input) {
     std::string sndLine = "  assign yuzeng"+yuzengIdx2+" = "+condAndSlice+" ? "+ifSrcAndSlice+" : yuzeng"+yuzengIdx+" ;";
     toCoutVerb(fstLine);
     toCoutVerb(sndLine);
-    uint32_t destWidth = get_var_slice_width_simp(destAndSlice);
+    uint32_t destWidth = g_insContextStk.get_var_slice_width_simp(destAndSlice);
     curMod->varWidth.var_width_insert("yuzeng"+yuzengIdx, destWidth-1, 0);    
     curMod->varWidth.var_width_insert("yuzeng"+yuzengIdx2, destWidth-1, 0);    
     auto ret = curMod->ssaTable.emplace("yuzeng"+yuzengIdx, fstLine);
@@ -516,12 +517,12 @@ void always_if_else_expr(std::string line, std::ifstream &input) {
   }
   std::string destAndSlice = m.str(2);
   std::string src1AndSlice = m.str(3);
-  uint32_t src1Width = get_var_slice_width_simp(src1AndSlice);
+  uint32_t src1Width = g_insContextStk.get_var_slice_width_simp(src1AndSlice);
 
   std::string dest, destSlice;
   split_slice(destAndSlice, dest, destSlice);
   curMod->moduleTrueRegs.insert(dest);
-  uint32_t destWidth = get_var_slice_width_simp(dest);
+  uint32_t destWidth = g_insContextStk.get_var_slice_width_simp(dest);
   g_allRegs.emplace(dest, destWidth);
 
   std::getline(input, line);
@@ -536,7 +537,7 @@ void always_if_else_expr(std::string line, std::ifstream &input) {
     abort();
   }
   std::string src2AndSlice = m.str(3);
-  uint32_t src2Width = get_var_slice_width_simp(src2AndSlice);
+  uint32_t src2Width = g_insContextStk.get_var_slice_width_simp(src2AndSlice);
   uint32_t localWidth = std::max(src1Width, src2Width);
 
   std::string yuzengIdx = toStr(g_new_var++);
