@@ -231,8 +231,8 @@ extern std::map<std::string, uint32_t> g_asv;
 
 extern Str2StrVecMap_t g_moduleInputsMap;
 extern Str2StrVecMap_t g_moduleOutputsMap;
-extern std::set<std::string> g_allowedTgt;
-extern std::vector<std::vector<std::string>> g_allowedTgtVec;
+extern std::map<std::string, uint32_t> g_allowedTgt;
+extern std::vector<std::pair<std::vector<std::string>, uint32_t>> g_allowedTgtVec;
 extern std::queue<std::pair<std::string, uint32_t>> g_goalVars;
 extern std::ofstream g_outFil;
 extern std::string g_pj_path; 

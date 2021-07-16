@@ -70,8 +70,9 @@ void get_all_update() {
   addedWorkSetFile.open(g_path+"/added_work_set.txt", std::ios_base::app);
 
   if(!g_allowedTgt.empty()) {
-    g_workSet.mtxAssign(g_allowedTgt);
-    for(std::string tgt: g_allowedTgt) {
+    for(auto tgtDelayPair : g_allowedTgt) {
+      std::string tgt = tgtDelayPair.first;    
+      g_workSet.mtxInsert(tgt);
       uint32_t width = get_var_slice_width_cmplx(tgt);
       g_asvSet.emplace(tgt, width);
     }
@@ -90,18 +91,19 @@ void get_all_update() {
   if(!g_use_multi_thread) {
     // schedule 1: outer loop is workSet/target, inner loop is instructions,
     // suitbale for design with many instructions
-    while(!g_workSet.empty() || !g_allowedTgtVec.empty() ) {
+    std::vector<std::pair<std::vector<std::string>, uint32_t>> allowedTgtVec = g_allowedTgtVec;    
+    while(!g_workSet.empty() || !allowedTgtVec.empty() ) {
       bool isVec;
       bool doSingleTgt = false;
       bool doVecTgt = false;
       std::string target;
       std::vector<std::string> tgtVec;
       // work on target vector first
-      if(!g_allowedTgtVec.empty()){
+      if(!allowedTgtVec.empty()){
         doVecTgt = true;
         isVec = true;
-        tgtVec = g_allowedTgtVec.back();
-        g_allowedTgtVec.pop_back();
+        tgtVec = allowedTgtVec.back().first;
+        allowedTgtVec.pop_back();
       }
       else if(!g_workSet.empty()) {
         isVec = false;
@@ -147,7 +149,7 @@ void get_all_update() {
       g_workSet.mtxClear();
       for(auto instrInfo : g_instrInfo) {
         localWorkSet = oldWorkSet;
-        std::vector<std::vector<std::string>> localWorkVec = g_allowedTgtVec;
+        std::vector<std::pair<std::vector<std::string>, uint32_t>> localWorkVec = g_allowedTgtVec;
         instrIdx++;
         threadVec.clear();
         while(!localWorkSet.empty() || !localWorkVec.empty()) {
@@ -159,7 +161,7 @@ void get_all_update() {
           if(!localWorkVec.empty()){
             doVecTgt = true;
             isVec = true;
-            tgtVec = localWorkVec.back();
+            tgtVec = localWorkVec.back().first;
             localWorkVec.pop_back();
           }
           else if(!localWorkSet.empty()) {
@@ -308,13 +310,25 @@ void get_update_function(std::string target,
   toCout("---  BEGIN INSTRUCTION #"+toStr(instrIdx)+" ---");
   uint32_t delayBound = instrInfo.delayBound;
   std::string destNameSimp = destInfo.get_dest_name();
-  if(instrInfo.delayExceptions.find(destNameSimp) != instrInfo.delayExceptions.end() ) {
+  if(destNameSimp.substr(destNameSimp.size()-4) == "_Arr") {
+    std::string firstVar = destNameSimp.substr(0, destNameSimp.size()-4);
+    for(auto pair : g_allowedTgtVec) {
+      if(pair.first.front() != firstVar) continue;
+      delayBound = pair.second;
+    }
+  }
+  // if is not array
+  else if(instrInfo.delayExceptions.find(destNameSimp) != instrInfo.delayExceptions.end() ) {
     delayBound = instrInfo.delayExceptions[destNameSimp];
+  }
+  else if(g_allowedTgt.find(destNameSimp) != g_allowedTgt.end() 
+          && g_allowedTgt[destNameSimp] != 0) {
+    delayBound = g_allowedTgt[destNameSimp];
   }
   remove_front_backslash(destNameSimp);
   std::string fileName = g_path+"/"+instrInfo.name+"_"
                          +destNameSimp+"_"+toStr(delayBound);
-  UpdateFunctionGen UFGen;  
+  UpdateFunctionGen UFGen;
   UFGen.TheContext = std::make_unique<llvm::LLVMContext>();
   UFGen.print_llvm_ir(destInfo, delayBound, instrIdx);
   std::string clean("opt --instsimplify --deadargelim --instsimplify "+fileName+"_tmp.ll -S -o="+fileName+"_clean.ll");
@@ -334,8 +348,8 @@ void get_update_function(std::string target,
     if(g_dependVarMap[instrName].find(target) == g_dependVarMap[instrName].end())
       g_dependVarMap[instrName].emplace(target, argVec);
     else {
-      toCout("Error: for instruction "+instrInfo.name+", target: "+target+" is seen before");
-      abort();
+      toCout("Warning: for instruction "+instrInfo.name+", target: "+target+" is seen before");
+      //abort();
     }
     g_dependVarMapMtx.unlock();
   }

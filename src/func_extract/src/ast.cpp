@@ -169,8 +169,19 @@ void build_ast_tree() {
   while(std::getline(allowedTgtInFile, line)) {
     if(line.substr(0, 2) == "//")  continue;
     if(line != "[") {
-      remove_two_end_space(line);
-      g_allowedTgt.insert(line);
+      if(line.find(":") == std::string::npos) {
+        remove_two_end_space(line);
+        g_allowedTgt.emplace(line, 0);
+      }
+      else {
+        size_t pos = line.find(":");
+        std::string var = line.substr(0, pos);
+        remove_two_end_space(var);
+        std::string delayStr = line.substr(pos+1);
+        remove_two_end_space(delayStr);
+        uint32_t delay = std::stoi(delayStr);
+        g_allowedTgt.emplace(var, delay);
+      }
     }
     // collecting vector of target registers
     else {
@@ -183,15 +194,22 @@ void build_ast_tree() {
         }
         std::getline(allowedTgtInFile, line);
       }
-      g_allowedTgtVec.push_back(tgtVec);
+      uint32_t delay = 0;
+      if(line.find(":") != std::string::npos) {
+        size_t pos = line.find(":");
+        std::string delayStr = line.substr(pos+1);
+        remove_two_end_space(delayStr);
+        delay = std::stoi(delayStr);
+      }
+      g_allowedTgtVec.push_back(std::make_pair(tgtVec, delay));
     }
   }
   allowedTgtInFile.close();
-  for(std::string tgt: g_allowedTgt) {
-    build_tree_for_single_as(tgt);
+  for(auto tgtDelayPair: g_allowedTgt) {
+    build_tree_for_single_as(tgtDelayPair.first);
   }
-  for(std::vector<std::string> tgtVec: g_allowedTgtVec) {
-    for(std::string tgt: tgtVec)
+  for(auto pair: g_allowedTgtVec) {
+    for(std::string tgt: pair.first)
       build_tree_for_single_as(tgt);
   }
 }
