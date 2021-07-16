@@ -70,6 +70,7 @@ void get_all_update() {
   addedWorkSetFile.open(g_path+"/added_work_set.txt", std::ios_base::app);
 
   if(!g_allowedTgt.empty()) {
+    g_workSet.mtxClear();    
     for(auto tgtDelayPair : g_allowedTgt) {
       std::string tgt = tgtDelayPair.first;    
       g_workSet.mtxInsert(tgt);
