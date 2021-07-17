@@ -3,13 +3,12 @@
 #include "../src/vcd_parser.h"
 #include "../src/check_regs.h"
 #include "../src/op_constraint.h"
-#include "../src/clean_goal.h"
-#include "../src/clean_verilog.h"
-#include "../src/inv_gen.h"
-#include "../src/pseudo_vlg_gen.h"
-#include "../src/check_regs.h"
-#include "../src/auxiliary_files_gen.h"
-#include "../src/make_define_fun.h"
+//#include "../src/clean_goal.h"
+//#include "../src/clean_verilog.h"
+//#include "../src/inv_gen.h"
+//#include "../src/pseudo_vlg_gen.h"
+//#include "../src/auxiliary_files_gen.h"
+//#include "../src/make_define_fun.h"
 #include "../src/get_all_update.h"
 #include "../src/helper.h"
 
@@ -129,10 +128,11 @@ int main(int argc, char *argv[]) {
 
   if(printRegInfo) {  
     // collect all regs
-    toCout("#### Gegin collect regs and print info");
+    toCout("#### Begin collect regs and print info");
     auto curMod = g_moduleInfoMap[g_topModule];    
-    collect_regs(curMod, "");
-    print_reg_info();
+    RegWidthVec_t regWidth;
+    collect_regs(curMod, "", regWidth);
+    print_reg_info(regWidth);
     std::vector<std::string> mems;
     collect_mems(curMod, "", mems);
     print_mem_info(mems);

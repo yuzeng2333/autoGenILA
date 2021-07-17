@@ -1,5 +1,6 @@
 #include "ast.h"
 #include "parse_fill.h"
+#include "ins_context_stack.h"
 #include "helper.h"
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/STLExtras.h"
@@ -116,12 +117,12 @@ void build_ast_tree() {
 
       if(prefix.empty()) {
         if(curMod->reg2Slices.find(reg) == curMod->reg2Slices.end()) {
-          g_insContextStk.back().Target = reg;
+          g_insContextStk.set_last_tgt(reg);
           build_tree_for_single_as(reg);
         }
         else { // if different slices are assigned differently
           for(std::string regAndSlice: curMod->reg2Slices[reg]) {
-            g_insContextStk.back().Target = regAndSlice;        
+            g_insContextStk.set_last_tgt(regAndSlice);        
             build_tree_for_single_as(regAndSlice);
           }
         }
@@ -146,11 +147,11 @@ void build_ast_tree() {
         Context_t insCntxt(curMod->name, "", curMod, nullptr, nullptr);
         curMod->isFunctionedSubMod = true;
         g_insContextStk.insert(g_insContextStk.begin(), insCntxt); 
-        std::string destPrefix = get_hier_name(false);
+        std::string destPrefix = g_insContextStk.get_hier_name(false);
         std::string destName = destPrefix + "." + reg;
         for(auto it = g_insContextStk.begin();
           it != g_insContextStk.end(); it++) {
-          it->Target = destName;
+          it->Target = (destName);
         }
         if(curMod->reg2Slices.find(reg) == curMod->reg2Slices.end()) {
           build_tree_for_single_as(reg);
@@ -168,40 +169,61 @@ void build_ast_tree() {
   while(std::getline(allowedTgtInFile, line)) {
     if(line.substr(0, 2) == "//")  continue;
     if(line != "[") {
-      remove_two_end_space(line);
-      g_allowedTgt.insert(line);
+      if(line.find(":") == std::string::npos) {
+        remove_two_end_space(line);
+        g_allowedTgt.emplace(line, 0);
+      }
+      else {
+        size_t pos = line.find(":");
+        std::string var = line.substr(0, pos);
+        remove_two_end_space(var);
+        std::string delayStr = line.substr(pos+1);
+        remove_two_end_space(delayStr);
+        uint32_t delay = std::stoi(delayStr);
+        g_allowedTgt.emplace(var, delay);
+      }
     }
     // collecting vector of target registers
     else {
+      StrVec_t tgtVec;
       std::getline(allowedTgtInFile, line);
       while(line[0] != ']') {
         if(line.substr(0, 2) != "//") {
-          g_allowedTgtVec.push_back(line);
+          tgtVec.push_back(line);
           moduleAs.insert(line);
         }
         std::getline(allowedTgtInFile, line);
       }
+      uint32_t delay = 0;
+      if(line.find(":") != std::string::npos) {
+        size_t pos = line.find(":");
+        std::string delayStr = line.substr(pos+1);
+        remove_two_end_space(delayStr);
+        delay = std::stoi(delayStr);
+      }
+      g_allowedTgtVec.push_back(std::make_pair(tgtVec, delay));
     }
   }
   allowedTgtInFile.close();
-  for(std::string tgt: g_allowedTgt) {
-    build_tree_for_single_as(tgt);
+  for(auto tgtDelayPair: g_allowedTgt) {
+    build_tree_for_single_as(tgtDelayPair.first);
   }
-  for(std::string tgt: g_allowedTgtVec) {
-    build_tree_for_single_as(tgt);
+  for(auto pair: g_allowedTgtVec) {
+    for(std::string tgt: pair.first)
+      build_tree_for_single_as(tgt);
   }
 }
 
 
 void build_tree_for_single_as(std::string regAndSlice) {
   toCoutVerb("### Begin build: "+regAndSlice);
-  const auto curMod = get_curMod();  
+  const auto curMod = g_insContextStk.get_curMod();  
   std::string reg, regSlice;
   split_slice(regAndSlice, reg, regSlice);
   //assert(regSlice.empty());
-  std::string myInsName = ask_for_my_ins_name();
+  std::string myInsName = ask_for_my_ins_name(curMod);
   //set_target(reg);
-  std::string curTgt = get_target();
+  std::string curTgt = g_insContextStk.get_target();
   uint32_t regWidth = get_var_slice_width_cmplx(regAndSlice);
   astNode* root;
 
@@ -220,7 +242,7 @@ void add_node(std::string varAndSlice,
               uint32_t timeIdx, 
               astNode* const node, 
               bool varIsDest) {
-  const auto curMod = get_curMod();  
+  const auto curMod = g_insContextStk.get_curMod();  
   remove_two_end_space(varAndSlice);
   //toCout("Add node for: "+varAndSlice);
   if(varAndSlice.find("aes_reg_key0_i.reg_out") != std::string::npos//) {
@@ -229,7 +251,7 @@ void add_node(std::string varAndSlice,
     s_node = node;
   }
 
-  std::string iName = get_target();
+  std::string iName = g_insContextStk.get_target();
   if(curMod->visitedNode.find(varAndSlice) != curMod->visitedNode.end() 
        && !varIsDest)
     return;
@@ -255,23 +277,23 @@ void add_node(std::string varAndSlice,
   if( curMod->reg2Slices.find(varToAdd) != curMod->reg2Slices.end() ) {
     add_sliced_node(varToAdd, timeIdx, node);
   }
-  else if ( is_input(varToAdd) ) {
+  else if ( is_input(varToAdd, curMod) ) {
     add_input_node(varToAdd, timeIdx, node);
   }
-  else if( is_reg_in_curMod(varToAdd) ) {
+  else if( is_reg_in_curMod(varToAdd, curMod) ) {
     add_nb_node(varToAdd, timeIdx, node);
   }
   else if( is_number(varToAdd) ) {
     add_num_node(varToAdd, timeIdx, node);
   }
-  else if( is_case_dest(varToAdd) ) {
+  else if( is_case_dest(varToAdd, curMod) ) {
     add_case_node(varToAdd, timeIdx, node);
   }
-  else if( is_func_output(varToAdd) ) {
+  else if( is_func_output(varToAdd, curMod) ) {
     abort();
     add_func_node(varToAdd, timeIdx, node);
   }
-  else if( is_submod_output(varToAdd) ) {
+  else if( is_submod_output(varToAdd, curMod) ) {
     add_submod_node(varToAdd, timeIdx, node);
   }
   else if( curMod->ssaTable.find(varAndSlice) 
@@ -294,7 +316,7 @@ void add_node(std::string varAndSlice,
 void add_child_node(std::string varAndSlice, 
                     uint32_t timeIdx, 
                     astNode* const parentNode) {
-  const auto curMod = get_curMod();  
+  const auto curMod = g_insContextStk.get_curMod();  
   toCoutVerb("!! Add child "+varAndSlice+" to "+parentNode->dest);
   if(varAndSlice == "out") {
     toCout("Find it!");
@@ -305,12 +327,12 @@ void add_child_node(std::string varAndSlice,
   std::string childName;
   if(varSlice.empty()) 
     childName = var;
-  else if(has_direct_assignment(varAndSlice))
+  else if(has_direct_assignment(varAndSlice, curMod))
     childName = varAndSlice;
   else
     childName = var;
 
-  std::string iName = get_target();  
+  std::string iName = g_insContextStk.get_target();  
   if(varAndSlice.find("yuzeng34") != std::string::npos
        && timeIdx == 7) {
     toCout("Found it!");
@@ -333,7 +355,7 @@ void add_child_node(std::string varAndSlice,
 void add_sliced_node(std::string varAndSlice, 
                      uint32_t timeIdx, 
                      astNode* const node) {
-  const auto curMod = get_curMod();                     
+  const auto curMod = g_insContextStk.get_curMod();                     
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
   assert(varSlice.empty());
@@ -348,8 +370,8 @@ void add_sliced_node(std::string varAndSlice,
   node->done = false;
 
   auto srcVec = curMod->reg2Slices[var];
-  uint32_t srcHi = get_ltr_hi(srcVec.front());
-  uint32_t srcLo = get_ltr_lo(srcVec.back());
+  uint32_t srcHi = get_ltr_hi(srcVec.front(), curMod);
+  uint32_t srcLo = get_ltr_lo(srcVec.back(), curMod);
   auto idxPairs = curMod->varWidth.get_idx_pair(var, "add_sliced_node for:"+var);
   uint32_t destHi = idxPairs.first;
   uint32_t destLo = idxPairs.second;
@@ -368,27 +390,28 @@ void add_sliced_node(std::string varAndSlice,
 
 // timeIdx is time for dest, not src in the expression
 void add_nb_node(std::string regAndSlice, uint32_t timeIdx, astNode* const node) {
-  const auto curMod = get_curMod();
+  const auto curMod = g_insContextStk.get_curMod();
   if(regAndSlice.find("aes_reg_key0_i.reg_out") != std::string::npos) {
     toCout("Found it!");
   }
   toCoutVerb("Add nb node for :" + regAndSlice);
-  std::string iName = get_target();  
+  std::string iName = g_insContextStk.get_target();  
   curMod->visitedNode.emplace(regAndSlice, node);
   if(curMod->nbTable.find(regAndSlice) == curMod->nbTable.end()) {
     toCout("Error: not in curMod->nbTable: "+regAndSlice);
     abort();
   }
-  if(regAndSlice == "state_0") {
-    toCout("Found state_0!");
+  if(regAndSlice == "outAssign") {
+    toCout("Found it!");
   }
   std::string destAssign = curMod->nbTable[regAndSlice];
   std::smatch m;
   if(std::regex_match(destAssign, m, pNonblock)) {
     std::string destNext = m.str(3);
     remove_two_end_space(destNext);
-    uint32_t destNextWidth = get_var_slice_width_simp(destNext);
-    uint32_t destWidth = get_var_slice_width_simp(regAndSlice);
+    auto curMod = g_insContextStk.get_curMod();
+    uint32_t destNextWidth = get_var_slice_width_simp(destNext, curMod);
+    uint32_t destWidth = get_var_slice_width_simp(regAndSlice, curMod);
 
     node->type = NONBLOCK;
     node->dest = regAndSlice;
@@ -423,8 +446,8 @@ void add_nb_node(std::string regAndSlice, uint32_t timeIdx, astNode* const node)
 // (3) If no slice, build nodes for the whole variable
 void add_ssa_node(std::string varAndSlice, uint32_t timeIdx, astNode* const node) {
   toCoutVerb("Add ssa node for :" + varAndSlice);
-  const auto curMod = get_curMod();  
-  std::string iName = get_target();
+  const auto curMod = g_insContextStk.get_curMod();  
+  std::string iName = g_insContextStk.get_target();
   curMod->visitedNode.emplace(varAndSlice, node);
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
@@ -473,8 +496,8 @@ void add_input_node(std::string input, uint32_t timeIdx, astNode* const node) {
   if(input == "in")
     toCout("Find it!");
   toCoutVerb("Process input node: "+input);
-  const auto curMod = get_curMod();
-  const auto target = get_target();
+  const auto curMod = g_insContextStk.get_curMod();
+  const auto target = g_insContextStk.get_target();
   if(curMod == g_topModInfo) { // is top module
     node->type = INPUT;
     node->dest = input;
@@ -491,8 +514,8 @@ void add_input_node(std::string input, uint32_t timeIdx, astNode* const node) {
     node->done = false;
 
     std::shared_ptr<ModuleInfo_t> parentMod;
-    if(get_stk_depth() > 1)
-      parentMod = get_parentMod();
+    if(g_insContextStk.get_stk_depth() > 1)
+      parentMod = g_insContextStk.get_parentMod();
     else {
       assert(curMod->parentModVec.size() == 1);
       parentMod = *(curMod->parentModVec.begin());
@@ -599,9 +622,10 @@ void add_two_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   split_slice(op2AndSlice, op2, op2Slice);
   remove_two_end_space(op1AndSlice);
   remove_two_end_space(op2AndSlice);
-  uint32_t destAndSliceWidth = get_var_slice_width_simp(destAndSlice);
-  uint32_t op1AndSliceWidth = get_var_slice_width_simp(op1AndSlice);
-  uint32_t op2AndSliceWidth = get_var_slice_width_simp(op2AndSlice);
+  auto curMod = g_insContextStk.get_curMod();
+  uint32_t destAndSliceWidth = get_var_slice_width_simp(destAndSlice, curMod);
+  uint32_t op1AndSliceWidth = get_var_slice_width_simp(op1AndSlice, curMod);
+  uint32_t op2AndSliceWidth = get_var_slice_width_simp(op2AndSlice, curMod);
 
   node->type = TWO_OP;
   node->dest = destAndSlice;
@@ -684,7 +708,8 @@ void add_ite_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
 
   uint32_t localWidthNum;
   std::string localWidth;
-  localWidthNum = get_var_slice_width_simp(destAndSlice);
+  auto curMod = g_insContextStk.get_curMod();
+  localWidthNum = get_var_slice_width_simp(destAndSlice, curMod);
 
   localWidth = std::to_string(localWidthNum);
 
@@ -750,7 +775,8 @@ void add_sel_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   split_slice(destAndSlice, dest, destSlice);
   split_slice(op1AndSlice, op1, op1Slice);
   split_slice(op2AndSlice, op2, op2Slice);
-  uint32_t destAndSliceWidth = get_var_slice_width_simp(destAndSlice);
+  auto curMod = g_insContextStk.get_curMod();  
+  uint32_t destAndSliceWidth = get_var_slice_width_simp(destAndSlice, curMod);
   remove_two_end_space(op1AndSlice);
   remove_two_end_space(op2AndSlice);
 
@@ -810,7 +836,7 @@ void add_src_concat_op_node(std::string line, uint32_t timeIdx, astNode* const n
 
 
 void add_case_node(std::string var, uint32_t timeIdx, astNode* const node) {
-  const auto curMod = get_curMod();
+  const auto curMod = g_insContextStk.get_curMod();
   if(curMod->caseTable.find(var) == curMod->caseTable.end()) {
     toCout("Error: not found in curMod->caseTable: "+var);
     abort();
@@ -846,7 +872,7 @@ void add_case_node(std::string var, uint32_t timeIdx, astNode* const node) {
 
 
 void add_func_node(std::string var, uint32_t timeIdx, astNode* const node) {
-  const auto curMod = get_curMod();
+  const auto curMod = g_insContextStk.get_curMod();
   if(curMod->funcTable.find(var) == curMod->funcTable.end()) {
     toCout("Error: not found in curMod->caseTable: "+var);
     abort();
@@ -865,7 +891,7 @@ void add_func_node(std::string var, uint32_t timeIdx, astNode* const node) {
 
 
 void add_submod_node(std::string var, uint32_t timeIdx, astNode* const node) {
-  const auto curMod = get_curMod();
+  const auto curMod = g_insContextStk.get_curMod();
   node->type = SUBMODOUT;
   node->dest = var;
   std::string insName = curMod->wire2InsPortMp[var].first;

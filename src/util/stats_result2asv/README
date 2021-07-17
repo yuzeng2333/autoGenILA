@@ -1,0 +1,1 @@
+1. gb_after_sim is the result where many changed regs have been removed by the simulations. Therefore, the map_file might be different from the normal ones.

@@ -4,6 +4,7 @@
 #include "helper.h"
 #include "global_data_struct.h"
 #include "read_instr.h"
+#include "ins_context_stack.h"
 #include "../../taint_method/src/global_data.h"
 
 #define toStr(a) std::to_string(a)
@@ -65,11 +66,11 @@ void parse_verilog(std::string fileName) {
     if(line.empty() || is_comment_line(line)
           || line.find_first_not_of(' ') == line.length())
       continue;
-    if(line.find("_0699_") != std::string::npos) {
+    if(line.find("outAssign") != std::string::npos) {
       toCout("Find it!");
     }
     if(!g_insContextStk.empty())
-      fill_var_width(line, get_curMod()->varWidth);
+      fill_var_width(line, g_insContextStk.get_curMod()->varWidth);
     //toCout(line);
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       case_expr(line, input);
@@ -198,7 +199,7 @@ void read_module_info() {
     if(is_module_line(line, moduleName)) {
       // store info of last module
       moduleInfo->name = moduleName;
-      moduleInfo->out2InDelayMp.clear();
+      //moduleInfo->out2InDelayMp.clear();
     }
     else if(line.find(":") == std::string::npos 
               && line.find("}") == std::string::npos) { // output name
@@ -223,7 +224,8 @@ void read_module_info() {
     }
     else {
       seeOutput = false;
-      moduleInfo->out2InDelayMp.emplace(outVar, inputDelayMap);
+      abort(); // abort because out2InDelayMp is not supported
+      //moduleInfo->out2InDelayMp.emplace(outVar, inputDelayMap);
     }
   }
   g_moduleInfoMap.emplace(moduleInfo->name, moduleInfo);
@@ -274,7 +276,7 @@ ModuleInfo_t::~ModuleInfo_t() {
   caseTable.clear();
   funcTable.clear();
   reg2timeIdx.clear();
-  out2InDelayMp.clear();
+  //out2InDelayMp.clear();
 }
 
 
@@ -299,8 +301,8 @@ void get_io(const std::string &fileName) {
     if(line.empty() || is_comment_line(line)
           || line.find_first_not_of(' ') == line.length())
       continue;
-    if(get_stk_depth() > 0)
-      fill_var_width(line, get_curMod()->varWidth);    
+    if(g_insContextStk.get_stk_depth() > 0)
+      fill_var_width(line, g_insContextStk.get_curMod()->varWidth);    
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       continue;
     }
@@ -407,7 +409,7 @@ void clean_submod(std::ifstream &input,
 // before building ast tree, determine rst and clk for
 // each module. This should be done top-down.
 void determine_clk_rst() {
-  const auto curMod = get_curMod();
+  const auto curMod = g_insContextStk.get_curMod();
   curMod->clk = g_recentClk;
   curMod->rst = g_recentRst;
   std::shared_ptr<ModuleInfo_t> topModInfo = g_moduleInfoMap[g_topModule];

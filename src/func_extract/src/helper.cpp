@@ -46,45 +46,11 @@ llvm::Value* sext(llvm::Value* v1, uint32_t width,
 }
 
 
-bool isAs(std::string var) {
-  auto curMod = get_curMod();
-  auto it = std::find( curMod->moduleAs.begin(), curMod->moduleAs.end(), var );
-  return it != curMod->moduleAs.end();
-}
-
-
-llvm::Value* long_bv_val(std::string formedBinVar, context &c,
-                         std::shared_ptr<llvm::IRBuilder<>> &b ) {
-  assert(is_number(formedBinVar));
-  if(!is_formed_num(formedBinVar)) {
-    toCout("Error: input to long_bv_val is not well-formed number: "+formedBinVar);
-    abort();
-  }
-  uint32_t width = get_num_len(formedBinVar);
-  if(width <= 32) 
-    return llvm::ConstantInt::get(llvmWidth(width, c), hdb2int(formedBinVar), false);
-
-  if(is_hex(formedBinVar)) formedBinVar = formedHex2bin(formedBinVar);
-  formedBinVar = zero_extend_num(formedBinVar);
-  std::string pureNum = get_pure_num(formedBinVar);
-
-  llvm::Value* ret = llvm::ConstantInt::get(llvmWidth(32, c), bin2int(pureNum.substr(0, 32)), false);
-  width -= 32;
-  size_t pos = 32;  
-  while(width > 32) {
-    std::string subVar = pureNum.substr(pos, 32);
-    pos += 32;
-    width -= 32;
-    llvm::Value* nextNum = llvm::ConstantInt::get(llvmWidth(32, c), bin2int(subVar), false);
-    ret = concat_value(ret, nextNum, c, b);
-  }
-
-  // deal with the remaining bits
-  std::string subVar = pureNum.substr(pos);
-  llvm::Value* nextNum = llvmInt(bin2int(subVar), width, c);
-  ret = concat_value(ret, nextNum, c, b);
-  return ret;
-}
+//bool isAs(std::string var, HierCtx_t &insContextStk) {
+//  auto curMod = get_curMod(insContextStk);
+//  auto it = std::find( curMod->moduleAs.begin(), curMod->moduleAs.end(), var );
+//  return it != curMod->moduleAs.end();
+//}
 
 
 bool is_formed_num(std::string num) {
@@ -254,22 +220,22 @@ void record_expr(expr varExpr) {
 
 
 // extend e to len
-expr sext_full(expr const& e, uint32_t len) {
-  uint32_t eLen = get_var_slice_width_simp(pure(get_name(e)));
-  if(eLen == len)
-    return e; 
-  else
-    return to_expr(e.ctx(), Z3_mk_sign_ext(e.ctx(), len - eLen, e));
-}
-
-
-// extend e to len
-expr zext_full(expr const& e, uint32_t destWidth, uint32_t opWidth) {
-  if(destWidth == opWidth)
-    return e; 
-  else
-    return zext(e, destWidth - opWidth);
-}
+//expr sext_full(expr const& e, uint32_t len) {
+//  uint32_t eLen = get_var_slice_width_simp(pure(get_name(e)));
+//  if(eLen == len)
+//    return e; 
+//  else
+//    return to_expr(e.ctx(), Z3_mk_sign_ext(e.ctx(), len - eLen, e));
+//}
+//
+//
+//// extend e to len
+//expr zext_full(expr const& e, uint32_t destWidth, uint32_t opWidth) {
+//  if(destWidth == opWidth)
+//    return e; 
+//  else
+//    return zext(e, destWidth - opWidth);
+//}
 
 
 bool is_root(std::string var) {
@@ -290,8 +256,8 @@ bool is_taint(std::string var) {
 }
 
 
-bool is_clean(std::string var) {
-  return !is_taint(var) && ( is_input(pure(var)) || is_read_asv(pure(var)) );
+bool is_clean(std::string var, const std::shared_ptr<ModuleInfo_t> &modInfo) {
+  return !is_taint(var) && ( is_input(pure(var), modInfo) || is_read_asv(pure(var), modInfo) );
 }
 
 
@@ -300,9 +266,9 @@ std::string get_name(expr expression) {
 }
 
 
-bool is_read_asv(std::string var) {
-  auto curMod = get_curMod();
-  return g_readASV.find(pure(var)) != g_readASV.end() || g_readASV.find(curMod->name+"."+pure(var)) != g_readASV.end();
+bool is_read_asv(std::string var, const std::shared_ptr<ModuleInfo_t> &curMod) {
+  return g_readASV.find(pure(var)) != g_readASV.end() 
+         || g_readASV.find(curMod->name+"."+pure(var)) != g_readASV.end();
 }
 
 
@@ -321,9 +287,9 @@ bool has_explicit_value(std::string input) {
 }
 
 
-uint32_t expr_len(expr &e) {
-  return get_var_slice_width_simp(pure(get_name(e)));
-}
+//uint32_t expr_len(expr &e) {
+//  return get_var_slice_width_simp(pure(get_name(e)));
+//}
 
 
 bool comparePair(const std::pair<std::string, uint32_t> &p1, 
@@ -346,13 +312,12 @@ uint32_t get_time(std::string var) {
 }
 
 
-bool is_case_dest(std::string var) {
-  auto curMod = get_curMod();
+bool is_case_dest(std::string var, const std::shared_ptr<ModuleInfo_t> &curMod) {
   return curMod->caseTable.find(var) != curMod->caseTable.end();
 }
 
-bool is_func_output(std::string var) {
-  auto curMod = get_curMod();
+bool is_func_output(std::string var, 
+                    const std::shared_ptr<ModuleInfo_t> &curMod) {
   if(curMod->funcTable.find(var) != curMod->funcTable.end())
     return true;
   if(curMod->funcTable.find(var+" ") != curMod->funcTable.end())
@@ -384,8 +349,7 @@ uint32_t get_pos_of_one(std::string value) {
 // Attention:
 // This function is a little counter-intuitive
 // get logical hi
-uint32_t get_lgc_hi(std::string varAndSlice) {
-  auto curMod = get_curMod();
+uint32_t get_lgc_hi(std::string varAndSlice, const std::shared_ptr<ModuleInfo_t> &curMod) {
   varAndSlice = remove_signed(varAndSlice);
   std::smatch m;
   if(is_number(varAndSlice)) {
@@ -399,7 +363,7 @@ uint32_t get_lgc_hi(std::string varAndSlice) {
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
   if(!varSlice.empty()) {
-    if(has_direct_assignment(varAndSlice))
+    if(has_direct_assignment(varAndSlice, curMod))
       return get_end(varSlice) - get_begin(varSlice);
     else
       return get_end(varSlice);
@@ -410,8 +374,7 @@ uint32_t get_lgc_hi(std::string varAndSlice) {
 
 
 // get literal hi
-uint32_t get_ltr_hi(std::string varAndSlice) {
-  auto curMod = get_curMod();
+uint32_t get_ltr_hi(std::string varAndSlice, const std::shared_ptr<ModuleInfo_t> &curMod) {
   varAndSlice = remove_signed(varAndSlice);  
   std::smatch m;
   if(is_number(varAndSlice)) {
@@ -431,8 +394,7 @@ uint32_t get_ltr_hi(std::string varAndSlice) {
 }
 
 
-uint32_t get_lgc_lo(std::string varAndSlice) {
-  auto curMod = get_curMod();
+uint32_t get_lgc_lo(std::string varAndSlice, const std::shared_ptr<ModuleInfo_t> &curMod) {
   varAndSlice = remove_signed(varAndSlice);  
   if(is_number(varAndSlice))
     return 0;
@@ -440,7 +402,7 @@ uint32_t get_lgc_lo(std::string varAndSlice) {
   split_slice(varAndSlice, var, varSlice);
 
   if(!varSlice.empty()) {
-    if(has_direct_assignment(varAndSlice))
+    if(has_direct_assignment(varAndSlice, curMod))
       return 0;
     else
       return get_begin(varSlice);
@@ -450,8 +412,7 @@ uint32_t get_lgc_lo(std::string varAndSlice) {
 }
 
 
-uint32_t get_ltr_lo(std::string varAndSlice) {
-  auto curMod = get_curMod();
+uint32_t get_ltr_lo(std::string varAndSlice, const std::shared_ptr<ModuleInfo_t> &curMod) {
   varAndSlice = remove_signed(varAndSlice);  
   if(is_number(varAndSlice))
     return 0;
@@ -467,8 +428,7 @@ uint32_t get_ltr_lo(std::string varAndSlice) {
 
 // summary: check if a variable's slice is assigned directly
 // input: varAndSlice must have slice
-bool has_direct_assignment(std::string varAndSlice) {
-  auto curMod = get_curMod();
+bool has_direct_assignment(std::string varAndSlice, const std::shared_ptr<ModuleInfo_t> &curMod) {
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
   bool withinReg2Slices = curMod->reg2Slices.find(var) != curMod->reg2Slices.end();
@@ -663,13 +623,15 @@ uint32_t get_var_slice_width_simp(std::string varAndSlice,
 uint32_t get_var_slice_width_cmplx(std::string varAndSlice) {
   if(varAndSlice.find(".") == std::string::npos 
      || varAndSlice.substr(0, 1) == "\\")
-    return get_var_slice_width_simp(varAndSlice);
+    return get_var_slice_width_simp(varAndSlice, g_moduleInfoMap[g_topModule]);
   else {
     size_t pos = varAndSlice.find(".");
     std::string modName = varAndSlice.substr(0, pos);
     std::string varName = varAndSlice.substr(pos+1);
     if(g_moduleInfoMap.find(modName) == g_moduleInfoMap.end()) {
-      return get_var_slice_width_simp(varAndSlice);
+      toCout("Error: mod not found");
+      abort();
+      //return get_var_slice_width_simp(varAndSlice, );
     }
     auto subMod = g_moduleInfoMap[modName];
     return get_var_slice_width_simp(varName, subMod);
@@ -705,23 +667,6 @@ std::string remove_prefix_module(const std::string &writeAsvLine) {
 }
 
 
-llvm::Value* get_arg(std::string regName, llvm::Function *func) {
-  if(regName.find("es_top_0.mem_data_buf") != std::string::npos)
-    toCout("Find the arg!");
-  for(auto it = func->arg_begin(); it != func->arg_end(); it++) {
-    std::string funcName = llvm::dyn_cast<llvm::Value>(func)->getName().str();
-    std::string argName = it->getName().str();
-    //toCout("func name: "+funcName);
-    //toCout("arg name: "+argName);
-    if(argName.find("ata_fifo.r0___#25") != std::string::npos)
-      toCout("Find it!!");
-    if(it->getName().str() == regName) return it;
-  }
-  toCout("Error: function input is not found: "+regName);
-  abort();
-}
-
-
 llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low, 
                       std::shared_ptr<llvm::LLVMContext> &c, 
                       std::shared_ptr<llvm::IRBuilder<>> &b) {
@@ -751,222 +696,6 @@ llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low,
 
 
 
-llvm::Value* extract_func(llvm::Value* in, uint32_t high, uint32_t low,
-                      std::shared_ptr<llvm::LLVMContext> &c, 
-                      std::shared_ptr<llvm::IRBuilder<>> &b, 
-                      const llvm::Twine &name, bool noinline) {
-  std::string destName = in->getName().str();
-  std::string dest, destSlice;
-  if(destName.find("concat__concat___017____#4") != std::string::npos)
-    toCoutVerb("Find it!");
-  if(!destName.empty()) {
-    split_slice(destName, dest, destSlice);
-    noinline = false;
-  }
-  else if(is_read_asv(dest) || (is_top_module() && is_input(dest))) noinline = true;
-  else noinline = false;
-  toCoutVerb("extract for: "+destName);  
-  llvm::Type* inputTy = in->getType();
-  uint32_t inputWidth = llvm::dyn_cast<llvm::IntegerType>(inputTy)->getBitWidth();
-  std::string app = "";
-  if(!noinline) app = "_in";
-  std::string funcName = "ext_"+toStr(inputWidth)+"_"+toStr(high)+"_"+toStr(low)+app;
-  llvm::Function *func;
-  llvm::FunctionType *FT;  
-  uint32_t len = high-low+1;
-
-  std::string extValName;
-  if(g_use_simple_func_name)
-    extValName = "ext_"+toStr(g_ext_cnt++);
-  else
-    extValName = destName+" ["+toStr(high)+":"+toStr(low)+"]";
-
-  if(!g_use_concat_extract_func) {
-    auto s1 = b->CreateLShr(in, low, llvm::Twine(destName+"_lshr"));
-    llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c), 
-                        llvm::Twine(extValName));
-    return ret;
-  }
-
-  if(g_extractFunc.find(funcName) != g_extractFunc.end()) {
-    func = g_extractFunc[funcName];
-    FT = func->getFunctionType();
-  }
-  else {
-    auto retTy = llvm::IntegerType::get(*c, len);
-    std::vector<llvm::Type *> argTy;  
-    argTy.push_back(llvm::IntegerType::get(*c, inputWidth));
-    FT = llvm::FunctionType::get(retTy, argTy, false);
-    func = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
-                                        funcName, TheModule.get());
-    if(noinline) func->addFnAttr(llvm::Attribute::NoInline);
-    func->args().begin()->setName("input");
-    llvm::Value* inArg = value(func->args().begin()  );
-
-    llvm::BasicBlock *localBB 
-      = llvm::BasicBlock::Create(*c, "entry", func);
-
-    std::shared_ptr<llvm::IRBuilder<>> builder;
-    builder = std::make_unique<llvm::IRBuilder<>>(*c);
-    builder->SetInsertPoint(localBB);
-    auto s1 = builder->CreateLShr(inArg, low, llvm::Twine("lshr"));
-    llvm::Value* ret = builder->CreateTrunc(s1, llvmWidth(len, c), llvm::Twine("trunc"));
-    builder->CreateRet(ret);
-    g_extractFunc.emplace(funcName, func);
-  }
-  
-  std::vector<llvm::Value*> args;
-  args.push_back(in);
-  return b->CreateCall(FT, func, args, 
-                       llvm::Twine(extValName));
-}
-
-
-llvm::Value* extract(llvm::Value* in, uint32_t high, uint32_t low,
-                      std::shared_ptr<llvm::LLVMContext> &c, 
-                      std::shared_ptr<llvm::IRBuilder<>> &b, 
-                      const llvm::Twine &name) {
-
-  uint32_t inWidth = llvm::dyn_cast<llvm::IntegerType>(in->getType())->getBitWidth();
-  if(inWidth < high+1) {
-    toCout("Error: input value width for extract is less than high index");
-    toCout("wdith: "+toStr(inWidth)+", high: "+toStr(high));
-    std::string tmpName = in->getName().str();
-    toCout("Input value name: "+tmpName);
-    abort();
-  }
-  uint32_t len = high - low + 1;
-  auto s1 = b->CreateLShr(in, low);
-  if(name.isTriviallyEmpty()) {
-    llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c));
-    return ret;
-  }
-  else {
-    llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c), 
-                          llvm::Twine(name.str()+" ["+toStr(high)+":"+toStr(low)+"]"));
-    ret->setName(name.str()+" ["+toStr(high)+":"+toStr(low)+"]");
-    return ret;
-  }
-}
-
-
-llvm::Value* extract(llvm::Value* in, uint32_t high, uint32_t low, 
-                      std::shared_ptr<llvm::LLVMContext> &c, 
-                      std::shared_ptr<llvm::IRBuilder<>> &b, 
-                      const std::string &name) {
-
-  return extract(in, high, low, c, b, llvm::Twine(name));
-}
-
-
-llvm::Value* concat_func(llvm::Value* val1, llvm::Value* val2, 
-                         std::shared_ptr<llvm::LLVMContext> &c,
-                         std::shared_ptr<llvm::IRBuilder<>> &b,
-                         bool noinline) {
-
-  llvm::Type* val1Ty = val1->getType();
-  llvm::Type* val2Ty = val2->getType();
-  uint32_t val1Width = llvm::dyn_cast<llvm::IntegerType>(val1Ty)->getBitWidth();
-  uint32_t val2Width = llvm::dyn_cast<llvm::IntegerType>(val2Ty)->getBitWidth();
-  uint32_t len = val1Width + val2Width;
-  auto newIntTy = llvm::IntegerType::get(*c, len);
-  std::string name1 = val1->getName().str();
-  std::string name2 = val2->getName().str();
-  toCoutVerb("concat with "+name1+" and "+name2+", total width: "+toStr(val1Width+val2Width));  
-  if(name2 == "cct_mem_rdata_word[15:0] [15:0]_cct_mem_rdata_word[7] [7:7]_cct_mem_rdata_word[7] [7:7]325_cct_mem_rdata_word[7] [7:7]326_cct_mem_rdata_word[7] [7:7]327_cct_mem_rdata_word[7] [7:7]328_cct_mem_rdata_word[7] [7:7]329_cct_mem_rdata_word[7] [7:7]330_cct_mem_rdata_word[7] [7:7]331_cct_mem_rdata_word[7] [7:7]332_cct_mem_rdata_word[7] [7:7]333_cct_mem_rdata_word[7] [7:7]334_cct_mem_rdata_word[7] [7:7]335_cct_mem_rdata_word[7] [7:7]336_cct_mem_rdata_word[7] [7:7]337_cct_mem_rdata_word[7] [7:7]338_cct_mem_rdata_word[7] [7:7]339_cct_mem_rdata_word[7] [7:7]340_cct_mem_rdata_word[7] [7:7]341_cct_mem_rdata_word[7] [7:7]342_cct_mem_rdata_word[7] [7:7]343_cct_mem_rdata_word[7] [7:7]344_cct_mem_rdata_word[7] [7:7]345_cct_mem_rdata_word[7] [7:7]346_cct_mem_rdata_word[7] [7:7]347_mem_rdata_word[7:0] [7:0]") {
-    toCoutVerb("Find it!");
-  }
-
-  std::string cctValName;
-  if(g_use_simple_func_name)
-    cctValName = "cct_"+toStr(g_cct_cnt++);
-  else
-    cctValName = "cct_"+name1+"_"+name2;
-
-  if(!g_use_concat_extract_func) {
-    llvm::Value* longVal1 = b->CreateZExtOrBitCast(val1, newIntTy, llvm::Twine(name1+"_zext"));
-    llvm::Value* ret = b->CreateAdd(b->CreateShl(longVal1, val2Width), 
-                                    zext(val2, len, c, b), 
-                                    llvm::Twine(cctValName));
-    return ret;
-  }
-
-  std::string n1, n1Slice;
-  std::string n2, n2Slice;
-  if(!name1.empty()) split_slice(name1, n1, n1Slice);
-  if(!name2.empty()) split_slice(name2, n2, n2Slice);
-  if(name1.empty() || name2.empty()) noinline = false;
-  else if( (is_read_asv(n1) || (is_top_module() && is_input(n1)))
-        && (is_read_asv(n2) || (is_top_module() && is_input(n2))) ) noinline = true;
-  else noinline = false;
-
-  std::string app = "";
-  if(!noinline) app = "_in";
-  std::string funcName = "cct_"+toStr(val1Width)+"_"+toStr(val2Width)+app;
-  llvm::Function *func;
-  llvm::FunctionType *FT;  
-  if(g_concatFunc.find(funcName) != g_concatFunc.end()) {
-    func = g_concatFunc[funcName];
-    FT = func->getFunctionType();    
-  }
-  else {
-    auto retTy = llvm::IntegerType::get(*c, len);
-    std::vector<llvm::Type*> argTy;
-    llvm::Type* ty1 = llvm::IntegerType::get(*c, val1Width);
-    llvm::Type* ty2 = llvm::IntegerType::get(*c, val2Width);
-    assert(ty1 == val1->getType());
-    assert(ty2 == val2->getType());
-    argTy.push_back(ty1);
-    argTy.push_back(ty2);
-    FT = llvm::FunctionType::get(retTy, argTy, false);
-    func = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
-                                        funcName, TheModule.get());
-    //func->addFnAttr(llvm::Attribute::NoInline);
-    func->args().begin()->setName("val1");
-    (func->args().begin()+1)->setName("val2");
-
-    llvm::Value* val1Arg = value(func->args().begin()  );
-    llvm::Value* val2Arg = value(func->args().begin()+1); 
-    assert(val1Arg->getType() == val1->getType());
-    assert(val2Arg->getType() == val2->getType());
-
-    llvm::BasicBlock *localBB 
-      = llvm::BasicBlock::Create(*c, "entry", func);
-
-    std::shared_ptr<llvm::IRBuilder<>> builder;
-    builder = std::make_unique<llvm::IRBuilder<>>(*c);
-    builder->SetInsertPoint(localBB);
-
-    llvm::Value* longVal1 = builder->CreateZExtOrBitCast(val1Arg, newIntTy);
-
-    llvm::Value* ret = builder->CreateAdd(builder->CreateShl(longVal1, val2Width), 
-                                                       zext(val2Arg, len, c, builder));
-    builder->CreateRet(ret);
-    g_concatFunc.emplace(funcName, func);
-  }
-
-  std::vector<llvm::Value*> args;
-  args.push_back(val1);
-  args.push_back(val2);
-  return b->CreateCall(FT, func, args, llvm::Twine(cctValName));
-}
-
-
-llvm::Value* concat_value(llvm::Value* val1, llvm::Value* val2, 
-                          std::shared_ptr<llvm::LLVMContext> &c,
-                          std::shared_ptr<llvm::IRBuilder<>> &b) {
-  uint32_t val1Width = llvm::dyn_cast<llvm::IntegerType>(val1->getType())->getBitWidth();
-  uint32_t val2Width = llvm::dyn_cast<llvm::IntegerType>(val2->getType())->getBitWidth();
-  std::string name1 = val1->getName().str();
-  std::string name2 = val2->getName().str();
-  toCoutVerb("concat "+name1+", len: "+toStr(val1Width));
-  toCoutVerb("and "+name2+", len: "+toStr(val2Width));
-
-  uint32_t newLen = val1Width+val2Width;
-  auto newIntTy = llvm::IntegerType::get(*c, newLen);
-  llvm::Value* longVal1 = b->CreateZExtOrBitCast(val1, newIntTy);
-  return b->CreateAdd(b->CreateShl(longVal1, val2Width), zext(val2, newLen, c, b));
-}
 
 
 bool is_x(const std::string &var) {
@@ -993,10 +722,10 @@ bool is_reg(std::string var) {
 }
 
 
-bool is_reg_in_curMod(std::string varAndSlice) {
+bool is_reg_in_curMod(std::string varAndSlice,
+                      const std::shared_ptr<ModuleInfo_t> &curMod) {
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
-  auto curMod = get_curMod();
   if(var.back() == ' ')
     var.pop_back();
   auto it = std::find( curMod->moduleTrueRegs.begin(), curMod->moduleTrueRegs.end(), var );
@@ -1004,8 +733,8 @@ bool is_reg_in_curMod(std::string varAndSlice) {
 }
 
 
-bool is_submod_output(const std::string &var) {
-  auto curMod = get_curMod();
+bool is_submod_output(const std::string &var,
+                      const std::shared_ptr<ModuleInfo_t> &curMod) {
   if( curMod->wire2InsPortMp.find(var) == curMod->wire2InsPortMp.end() )
     return false;
   auto tmpPair = curMod->wire2InsPortMp[var];
@@ -1028,33 +757,33 @@ std::shared_ptr<ModuleInfo_t> get_mod_info(std::string insName,
 }
 
 
-std::string get_hier_name(bool includeTopModule) {
-  std::string ret;
-  if(includeTopModule)
-    for(auto it = g_insContextStk.begin(); 
-          it != g_insContextStk.end(); it++) {
-      ret = ret + "." + it->InsName;
-    }
-  else {
-    if(g_insContextStk.size() == 1) return "";
-    for(auto it = g_insContextStk.begin()+1; 
-          it != g_insContextStk.end(); it++) {
-      ret = ret + "." + it->InsName;
-    }
-  }
-  ret = ret.substr(1);
-  return ret;
-}
+//std::string get_hier_name(std::vector<Context_t> &insContextStk,
+//                          bool includeTopModule) {
+//  std::string ret;
+//  if(includeTopModule)
+//    for(auto it = insContextStk.begin(); 
+//          it != insContextStk.end(); it++) {
+//      ret = ret + "." + it->InsName;
+//    }
+//  else {
+//    if(insContextStk.size() == 1) return "";
+//    for(auto it = insContextStk.begin()+1; 
+//          it != insContextStk.end(); it++) {
+//      ret = ret + "." + it->InsName;
+//    }
+//  }
+//  ret = ret.substr(1);
+//  return ret;
+//}
 
 
-bool is_top_module() {
-  auto curMod = get_curMod();
+bool is_top_module(const std::shared_ptr<ModuleInfo_t> &curMod) {
   return curMod->name == g_topModule;
 }
 
 
-bool is_sub_module() {
-  return !is_top_module();
+bool is_sub_module(const std::shared_ptr<ModuleInfo_t> &curMod) {
+  return !is_top_module(curMod);
 }
 
 
@@ -1188,13 +917,13 @@ std::vector<std::string> print_map_keys(std::map<std::string, astNode*> &map) {
 }
 
 
-std::string ask_for_my_ins_name() {
-  std::string insName = get_insName();
+// only used in ast building
+std::string ask_for_my_ins_name(const std::shared_ptr<ModuleInfo_t> &curMod) {
+  std::string insName = g_insContextStk.get_insName();
   if(!insName.empty()) return insName;
-  const auto curMod = get_curMod();
   std::string myModName = curMod->name;
-  if(get_parentMod() == nullptr) return myModName;
-  auto parentMod = get_parentMod();
+  if(g_insContextStk.get_parentMod() == nullptr) return myModName;
+  auto parentMod = g_insContextStk.get_parentMod();
   insName = ask_parent_my_ins_name(myModName, parentMod);
   return insName;
 }
@@ -1223,73 +952,74 @@ void check_no_slice(std::string varAndSlice) {
 }
 
 
-std::string get_insName() {
-  return g_insContextStk.back().InsName;
-}
+//std::string get_insName(HierCtx_t &insContextStk) {
+//  return insContextStk.back().InsName;
+//}
+//
+//
+//std::string get_target(HierCtx_t &insContextStk) {
+//  return insContextStk.back().Target;
+//}
 
 
-std::string get_target() {
-  return g_insContextStk.back().Target;
-}
+//void set_target(const std::string &tgtIn, HierCtx_t &insContextStk) {
+//  if(!insContextStk.back().Target.empty()) {
+//    toCout("Warning: target has already been set: "
+//             +insContextStk.back().Target);
+//  }
+//  insContextStk.back().Target = tgtIn;
+//}
+//
+//
+//// find the first module with True isFunctionedSubMod
+//std::shared_ptr<ModuleInfo_t> get_curMod(HierCtx_t &insContextStk) {
+//  if(insContextStk.size() == 0) {
+//    toCout("Error: insContextStk is empty!");
+//    abort();
+//  }
+//  return insContextStk.back().ModInfo;
+//  //for(auto it = insContextStk.rbegin();
+//  //    it != insContextStk.rend(); it++) {
+//  //  if(it->ModInfo->isFunctionedSubMod) return it->ModInfo;
+//  //}
+//  //assert(insContextStk.front().InsName == g_topModule);
+//  //return insContextStk.front().ModInfo;
+//}
 
 
-void set_target(const std::string &tgtIn) {
-  if(!g_insContextStk.back().Target.empty()) {
-    toCout("Warning: target has already been set: "
-             +g_insContextStk.back().Target);
-  }
-  g_insContextStk.back().Target = tgtIn;
-}
-
-
-// find the first module with True isFunctionedSubMod
-std::shared_ptr<ModuleInfo_t> get_curMod() {
-  if(g_insContextStk.size() == 0) {
-    toCout("Error: g_insContextStk is empty!");
-    abort();
-  }
-  return g_insContextStk.back().ModInfo;
-  //for(auto it = g_insContextStk.rbegin();
-  //    it != g_insContextStk.rend(); it++) {
-  //  if(it->ModInfo->isFunctionedSubMod) return it->ModInfo;
-  //}
-  //assert(g_insContextStk.front().InsName == g_topModule);
-  //return g_insContextStk.front().ModInfo;
-}
-
-
-std::shared_ptr<ModuleInfo_t> get_parentMod() {
-  auto parentInfo = g_insContextStk.back().ParentModInfo;
-  uint32_t depth = get_stk_depth();
-  if( depth > 1)
-    assert(parentInfo == g_insContextStk[depth-2].ModInfo);
-  return parentInfo;
-}
-
-
-llvm::Function* get_func() {
-  return g_insContextStk.back().Func;
-}
-
-
-uint32_t get_stk_depth() {
-  return g_insContextStk.size();
-}
-
-
-std::shared_ptr<ModuleInfo_t> get_real_parentMod() {
-  auto parentMod = get_parentMod();
-  if(parentMod != nullptr) return parentMod;
-  else {
-    assert(get_stk_depth() == 1);
-    auto curMod = get_curMod();
-    if(curMod->name == g_topModule) return nullptr;
-    else {
-      assert(curMod->parentModVec.size() == 1);
-      return *(curMod->parentModVec.begin());
-    }
-  }
-}
+//// used in ast
+//std::shared_ptr<ModuleInfo_t> get_parentMod(HierCtx_t &insContextStk) {
+//  auto parentInfo = insContextStk.back().ParentModInfo;
+//  uint32_t depth = get_stk_depth(insContextStk);
+//  if( depth > 1)
+//    assert(parentInfo == insContextStk[depth-2].ModInfo);
+//  return parentInfo;
+//}
+//
+//
+//llvm::Function* get_func(HierCtx_t &insContextStk) {
+//  return insContextStk.back().Func;
+//}
+//
+//
+//uint32_t get_stk_depth(HierCtx_t &insContextStk) {
+//  return insContextStk.size();
+//}
+//
+//
+//std::shared_ptr<ModuleInfo_t> get_real_parentMod(HierCtx_t &insContextStk) {
+//  auto parentMod = get_parentMod();
+//  if(parentMod != nullptr) return parentMod;
+//  else {
+//    assert(get_stk_depth(insContextStk) == 1);
+//    auto curMod = get_curMod();
+//    if(curMod->name == g_topModule) return nullptr;
+//    else {
+//      assert(curMod->parentModVec.size() == 1);
+//      return *(curMod->parentModVec.begin());
+//    }
+//  }
+//}
 
 
 std::string remove_paramod(std::string modName) {
@@ -1359,20 +1089,9 @@ void set_clk_rst(std::shared_ptr<ModuleInfo_t> &modInfo) {
 }
 
 
-void initialize_min_delay(std::shared_ptr<ModuleInfo_t> &modInfo, 
-                          std::string outPort) {
-  if(modInfo->minInOutDelay.find(outPort) == modInfo->minInOutDelay.end()) {
-    std::map<std::string, uint32_t> toInputDelay;
-    for(std::string input : modInfo->moduleInputs) {
-      toInputDelay.emplace(input, UINT32_MAX);
-    }
-    modInfo->minInOutDelay.emplace(outPort, toInputDelay);
-  }
-}
 
-
-std::string get_rst_value(const std::string &destAndSlice, uint32_t timeIdx) {
-  uint32_t width = get_var_slice_width_simp(destAndSlice);
+std::string get_rst_value(const std::string &destAndSlice, 
+                          uint32_t timeIdx, uint32_t width) {
   std::string dest, destSlice;
   split_slice(destAndSlice, dest, destSlice);
   std::string rstVal;
@@ -1401,20 +1120,14 @@ std::string get_rst_value(const std::string &destAndSlice, uint32_t timeIdx) {
     rstVal = toStr(width)+"'b0";
 
   toCoutVerb("Replace "+timed_name(dest, timeIdx)+" with "+rstVal);
+  if(dest.find("ddr_fifo.r3") != std::string::npos && timeIdx == 25)
+    toCout("Find it!");
   g_outFile << "Replace "+timed_name(dest, timeIdx)+" with "+rstVal << std::endl;
   g_regValueFile << "Replace "+timed_name(dest, timeIdx)+" with "+rstVal << std::endl;
   if(dest == "buff1" && timeIdx == 15)
     toCoutVerb("Find it!");
 
   return rstVal;
-}
-
-
-void ModuleInfo_t::clean_ir_data() {
-  existedExpr.clear();
-  minInOutDelay.clear();
-  out2FuncMp.clear();
-  out2InDelayMp.clear();
 }
 
 
@@ -1477,10 +1190,10 @@ bool is_letter(char c) {
 }
 
 
-void print_reg_info() {
+void print_reg_info(RegWidthVec_t &regWidth) {
   uint32_t totalWidth = 0;
   std::ofstream output("./reg_info.txt");
-  for(auto it = g_regWidth.begin(); it != g_regWidth.end(); it++) {
+  for(auto it = regWidth.begin(); it != regWidth.end(); it++) {
     std::string regName = it->first;
     uint32_t width = it->second;
     output << regName + ":" + toStr(width) << std::endl;

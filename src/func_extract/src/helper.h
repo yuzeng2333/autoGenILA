@@ -63,23 +63,6 @@ llvm::Value* sext(llvm::Value* v1, uint32_t width,
                  std::shared_ptr<llvm::LLVMContext> &c,
                  std::shared_ptr<llvm::IRBuilder<>> &b);
 
-std::string get_insName();
-
-std::string get_target();
-
-void set_target(const std::string &tgtIn);
-
-std::shared_ptr<ModuleInfo_t> get_curMod();
-
-std::shared_ptr<ModuleInfo_t> get_parentMod();
-
-llvm::Function* get_func();
-
-uint32_t get_stk_depth();
-
-std::shared_ptr<ModuleInfo_t> get_real_parentMod();
-
-bool isAs(std::string var);
 
 llvm::Value* long_bv_val(std::string formedBinVar, context &c,
                          std::shared_ptr<llvm::IRBuilder<>> &b );
@@ -108,11 +91,11 @@ std::string pure(std::string var);
 
 bool is_taint(std::string var);
 
-bool is_clean(std::string var);
+bool is_clean(std::string var, const std::shared_ptr<ModuleInfo_t> &modInfo);
 
 std::string get_name(expr expression);
 
-bool is_read_asv(std::string var);
+bool is_read_asv(std::string var, const std::shared_ptr<ModuleInfo_t> &curMod);
 
 bool has_explicit_value(std::string input);
 
@@ -123,19 +106,23 @@ bool comparePair(const std::pair<std::string, uint32_t> &p1,
 
 uint32_t get_time(std::string var);
 
-bool is_case_dest(std::string var);
+bool is_case_dest(std::string var, const std::shared_ptr<ModuleInfo_t> &curMod);
 
-bool is_func_output(std::string var);
+bool is_func_output(std::string var, const std::shared_ptr<ModuleInfo_t> &mod);
 
 uint32_t get_pos_of_one(std::string value);
 
-uint32_t get_lgc_hi(std::string varAndSlice);
+uint32_t get_lgc_hi(std::string varAndSlice,
+                    const std::shared_ptr<ModuleInfo_t> &curMod);
 
-uint32_t get_ltr_hi(std::string varAndSlice);
+uint32_t get_ltr_hi(std::string varAndSlice,
+                    const std::shared_ptr<ModuleInfo_t> &curMod);
 
-uint32_t get_lgc_lo(std::string varAndSlice);
+uint32_t get_lgc_lo(std::string varAndSlice,
+                    const std::shared_ptr<ModuleInfo_t> &curMod);
 
-uint32_t get_ltr_lo(std::string varAndSlice);
+uint32_t get_ltr_lo(std::string varAndSlice,
+                    const std::shared_ptr<ModuleInfo_t> &curMod);
 
 bool is_assigned_in_slices(std::string varAndSlice);
 
@@ -163,7 +150,9 @@ bool isLetter(const char &c);
 
 std::string purify_line(const std::string &line);
 
-bool has_direct_assignment(std::string varAndSlice);
+bool has_direct_assignment(std::string varAndSlice,
+                            const std::shared_ptr<ModuleInfo_t> &curMod);
+
 
 std::string zero_extend_num(std::string num);
 
@@ -176,7 +165,7 @@ int try_stoi(std::string num);
 std::string get_pure_num(std::string formedNum);
 
 uint32_t get_var_slice_width_simp(std::string varAndSlice, 
-                                  const std::shared_ptr<ModuleInfo_t> &mod=get_curMod());
+                                  const std::shared_ptr<ModuleInfo_t> &mod);
 
 uint32_t get_var_slice_width_cmplx(std::string varAndSlice);
 
@@ -186,7 +175,6 @@ StrPair_t split_module_asv(const std::string &writeAsvLine);
 
 std::string remove_prefix_module(const std::string &writeAsvLine);
 
-llvm::Value* get_arg(std::string regName, llvm::Function *func=get_func());
 
 llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low, 
                       std::shared_ptr<llvm::LLVMContext> &c, 
@@ -197,71 +185,27 @@ llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low,
 //                      std::shared_ptr<llvm::IRBuilder<>> &b, 
 //                      const std::string &name, bool noinline=true);
 
-llvm::Value* extract_func(llvm::Value* in, uint32_t high, uint32_t low,
-                      std::shared_ptr<llvm::LLVMContext> &c, 
-                      std::shared_ptr<llvm::IRBuilder<>> &b, 
-                      const llvm::Twine &name="", bool noinline=false);
-
-
-llvm::Value* extract(llvm::Value* in, uint32_t high, uint32_t low, 
-                      std::shared_ptr<llvm::LLVMContext> &c, 
-                      std::shared_ptr<llvm::IRBuilder<>> &b,
-                      const llvm::Twine &name="");
-
-
-llvm::Value* extract(llvm::Value* in, uint32_t high, uint32_t low, 
-                      std::shared_ptr<llvm::LLVMContext> &c, 
-                      std::shared_ptr<llvm::IRBuilder<>> &b, 
-                      const std::string &name);
-
-
-llvm::Value* concat_value(llvm::Value* val1, llvm::Value* val2, 
-                          std::shared_ptr<llvm::LLVMContext> &c,
-                          std::shared_ptr<llvm::IRBuilder<>> &b);
-
-llvm::Value* concat_func(llvm::Value* val1, llvm::Value* val2, 
-                         std::shared_ptr<llvm::LLVMContext> &c,
-                         std::shared_ptr<llvm::IRBuilder<>> &b,
-                         bool noinline=false);
 
 bool is_x(const std::string &var);
 
-bool is_input(const std::string &var, const std::shared_ptr<ModuleInfo_t> &modInfo=get_curMod());
+bool is_input(const std::string &var, const std::shared_ptr<ModuleInfo_t> &modInfo);
 
 bool is_output(const std::string &var, 
-               std::shared_ptr<ModuleInfo_t> curMod=get_curMod());
+               std::shared_ptr<ModuleInfo_t> curMod);
 
 bool is_reg(std::string var);
 
-bool is_reg_in_curMod(std::string var);
+bool is_reg_in_curMod(std::string var, const std::shared_ptr<ModuleInfo_t> &modInfo);
 
-bool is_submod_output(const std::string &var);
+bool is_submod_output(const std::string &var,
+                      const std::shared_ptr<ModuleInfo_t> &curMod);
 
 std::shared_ptr<ModuleInfo_t> get_mod_info(std::string insName,
-                                           std::shared_ptr<ModuleInfo_t> curMod=get_curMod());
+                                           std::shared_ptr<ModuleInfo_t> curMod);
 
-std::string get_hier_name(bool includeTopModule=true);
+bool is_top_module(const std::shared_ptr<ModuleInfo_t> &curMod); 
 
-bool is_top_module();
-
-bool is_sub_module();
-
-void collect_regs(std::shared_ptr<ModuleInfo_t> &curMod, 
-                  std::string regPrefix,
-                  RegWidthVec_t &regWidth = g_regWidth);
-
-void collect_regs_iter(std::shared_ptr<ModuleInfo_t> &curMod,
-                  std::string regPrefix, 
-                  RegWidthVec_t &regWidth );
-
-void collect_mems(std::shared_ptr<ModuleInfo_t> &curMod,
-                  std::string regPrefix, 
-                  std::vector<std::string> &mems);
-
-void collect_mem_ins(std::shared_ptr<ModuleInfo_t> &curMod,
-                  std::string regPrefix, 
-                  std::vector<std::pair<std::string, 
-                                        std::string>> &mems);
+bool is_sub_module(const std::shared_ptr<ModuleInfo_t> &curMod);
 
 void check_mod_name(std::string modName);
 
@@ -274,7 +218,7 @@ std::pair<std::string, std::string> split_prefix_var(std::string var);
 //template <typename T>
 std::vector<std::string> print_map_keys(std::map<std::string, astNode*> &map);
 
-std::string ask_for_my_ins_name();
+std::string ask_for_my_ins_name(const std::shared_ptr<ModuleInfo_t> &curMod);
 
 std::string ask_parent_my_ins_name(std::string myModName, 
                                    std::shared_ptr<ModuleInfo_t> parentMod);
@@ -292,11 +236,29 @@ void set_clk_rst(std::shared_ptr<ModuleInfo_t> &modInfo);
 void initialize_min_delay(std::shared_ptr<ModuleInfo_t> &modInfo, 
                           std::string outPort);
 
-std::string get_rst_value(const std::string &dest, uint32_t timeIdx);
+std::string get_rst_value(const std::string &dest, 
+                          uint32_t timeIdx, uint32_t width);
 
 bool is_fifo_output(std::string wire);
 
 bool is_fifo_module(std::string modName);
+
+void collect_regs(std::shared_ptr<ModuleInfo_t> &curMod, 
+                  std::string regPrefix,
+                  RegWidthVec_t &regWidth);
+
+void collect_regs_iter(std::shared_ptr<ModuleInfo_t> &curMod,
+                  std::string regPrefix, 
+                  RegWidthVec_t &regWidth );
+
+void collect_mems(std::shared_ptr<ModuleInfo_t> &curMod,
+                  std::string regPrefix, 
+                  std::vector<std::string> &mems);
+
+void collect_mem_ins(std::shared_ptr<ModuleInfo_t> &curMod,
+                  std::string regPrefix, 
+                  std::vector<std::pair<std::string, 
+                                        std::string>> &mems);
 
 void print_all_regs(const std::vector<std::pair<std::string, uint32_t>> &regWidth);
 
@@ -304,7 +266,7 @@ std::string var_name_convert(std::string varName, bool replaceSlash=false);
 
 bool is_letter(char c);
 
-void print_reg_info();
+void print_reg_info(RegWidthVec_t &regWidth);
 
 bool is_pure_num(std::string var);
 

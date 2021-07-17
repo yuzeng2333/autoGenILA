@@ -3,6 +3,7 @@
 #include "z3++.h"
 #include "ast.h"
 #include "types.h"
+#include "ins_context_stack.h"
 #include <queue>
 #include <memory>
 #include <map>
@@ -92,7 +93,8 @@ struct FuncInfo_t {
 // this structu is filled only during parsing
 // ast building only reads info, 
 // except parentMod and rootNode
-// all data should be static
+// all data should be static: building llvm ir
+// only reads these info, but do not modify them
 class ModuleInfo_t {
   private:
   std::map<std::string, astNode*> out2RootNodeMp;
@@ -117,7 +119,6 @@ class ModuleInfo_t {
   uint32_t rootTimeIdx;
   std::set<std::shared_ptr<ModuleInfo_t>> parentModVec;
   StrSet_t moduleAs;
-  bool isFunctionedSubMod = true;
   std::set<std::string> invarRegs;
   std::set<std::string> moduleInputs;
   std::set<std::string> moduleOutputs;
@@ -145,19 +146,9 @@ class ModuleInfo_t {
   std::map<std::string, std::map<std::string, std::string>> insPort2wireMp;
   std::map<std::string, std::string> ins2modMap;  
   std::map<std::string, FuncInfo_t> funcTable;
-  std::map<std::string, uint32_t> reg2timeIdx;  
-
-
-  /// data for making ir
-  /// These data are different for making different irs
-  // first key is target name
-  std::map<std::string, std::map<std::string, llvm::Value*>> existedExpr;
-  // the first key is target name
-  std::map<std::string, std::map<std::string, uint32_t>> minInOutDelay;
-  std::map<std::string, std::pair<llvm::Function*, uint32_t>> out2FuncMp;
-  // first key is output, second key is input
-  std::map<std::string, 
-           std::map<std::string, uint32_t>> out2InDelayMp; 
+  std::map<std::string, uint32_t> reg2timeIdx;
+  // this one is used only in ast building
+  bool isFunctionedSubMod = true;  
 };
 
 
@@ -182,6 +173,7 @@ struct Context_t {
   std::shared_ptr<ModuleInfo_t> ParentModInfo;
   llvm::Function* Func;                       
 };
+
 
 extern std::shared_ptr<ModuleInfo_t> g_curMod;
 extern uint32_t g_new_var;
@@ -212,7 +204,6 @@ extern bool g_read_rst_vcd;
 extern bool g_use_concat_extract_func;
 extern bool g_use_simple_func_name;
 extern uint32_t g_do_instr_num;
-extern std::vector<std::pair<std::string, uint32_t>> g_regWidth;
 extern std::set<std::string> g_readASV;
 extern std::map<std::string, uint32_t> g_fifo;
 extern std::map<std::string, uint32_t> g_allRegs;
@@ -240,8 +231,8 @@ extern std::map<std::string, uint32_t> g_asv;
 
 extern Str2StrVecMap_t g_moduleInputsMap;
 extern Str2StrVecMap_t g_moduleOutputsMap;
-extern std::set<std::string> g_allowedTgt;
-extern std::vector<std::string> g_allowedTgtVec;
+extern std::map<std::string, uint32_t> g_allowedTgt;
+extern std::vector<std::pair<std::vector<std::string>, uint32_t>> g_allowedTgtVec;
 extern std::queue<std::pair<std::string, uint32_t>> g_goalVars;
 extern std::ofstream g_outFil;
 extern std::string g_pj_path; 
@@ -262,7 +253,7 @@ extern std::set<std::string> moduleWriteAs;
 // module name, instead of instance name.
 // Currently there is a restriction: the first module in the vector can only
 // have one instance
-extern std::vector<Context_t> g_insContextStk;
+//extern std::vector<Context_t> g_insContextStk;
 
 // llvm
 extern std::shared_ptr<llvm::LLVMContext> TheContext;
