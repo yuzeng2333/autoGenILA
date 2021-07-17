@@ -373,8 +373,13 @@ void always_expr(std::string line, std::ifstream &input) {
   g_recentClk = m.str(2);
   // parse first assignment
   std::getline(input, line);
+  if(line.find("if (_045_)") != std::string::npos) 
+    toCout("Find it!");
   if( std::regex_match(line, m, pNonblock) || std::regex_match(line, m, pNonblockConcat) ) {
     nb_expr(line);
+  }
+  else if( std::regex_match(line, m, pIf) ) {
+    if_expr(line, input);  
   }
   else if( std::regex_match(line, m, pNonblockIf) ) {
     nonblockif_expr(line, input);
@@ -461,7 +466,15 @@ std::pair<std::string, std::string> nonblockif_expr(std::string line,
       elseValue = elseSrcAndSlice;
     }
 
-    std::string destNextLine = "  assign yuzeng"+yuzengIdx+" = "+condAndSlice+" ? "+ifSrcAndSlice+" : "+elseValue+" ;";
+    std::string destNextLine;
+    remove_two_end_space(condAndSlice);
+    if(condAndSlice.front() != '!') {
+      destNextLine = "  assign yuzeng"+yuzengIdx+" = "+condAndSlice+" ? "+ifSrcAndSlice+" : "+elseValue+" ;";
+    }
+    else {
+      std::string tmpCond = condAndSlice.substr(1);
+      destNextLine = "  assign yuzeng"+yuzengIdx+" = "+tmpCond+" ? "+elseValue+" : "+ifSrcAndSlice+" ;";      
+    }
     toCoutVerb(destNextLine);
     auto ret = curMod->ssaTable.emplace("yuzeng"+yuzengIdx, destNextLine);
     if(!ret.second)
@@ -479,8 +492,20 @@ std::pair<std::string, std::string> nonblockif_expr(std::string line,
     condAndSlice2 = m.str(2);
     destAndSlice2 = m.str(3);
     elseSrcAndSlice = m.str(4);
-    std::string fstLine = "  assign yuzeng"+yuzengIdx+" = "+condAndSlice2+" ? "+elseSrcAndSlice+" : "+destAndSlice+" ;";
-    std::string sndLine = "  assign yuzeng"+yuzengIdx2+" = "+condAndSlice+" ? "+ifSrcAndSlice+" : yuzeng"+yuzengIdx+" ;";
+    std::string fstLine;
+    std::string sndLine;
+    if(condAndSlice2.front() != '!')
+      fstLine = "  assign yuzeng"+yuzengIdx+" = "+condAndSlice2+" ? "+elseSrcAndSlice+" : "+destAndSlice+" ;";
+    else {
+      std::string tmpCond = condAndSlice2.substr(1);
+      fstLine = "  assign yuzeng"+yuzengIdx+" = "+tmpCond+" ? "+destAndSlice+" : "+elseSrcAndSlice+" ;";
+    }
+    if(condAndSlice.front() != '!')
+      sndLine = "  assign yuzeng"+yuzengIdx2+" = "+condAndSlice+" ? "+ifSrcAndSlice+" : yuzeng"+yuzengIdx+" ;";
+    else {
+      std::string tmpCond = condAndSlice.substr(1);
+      sndLine = "  assign yuzeng"+yuzengIdx2+" = "+tmpCond+" ? yuzeng"+yuzengIdx+" : "+ifSrcAndSlice+" ;";
+    }
     toCoutVerb(fstLine);
     toCoutVerb(sndLine);
     uint32_t destWidth = g_insContextStk.get_var_slice_width_simp(destAndSlice);
@@ -516,12 +541,21 @@ void if_expr(std::string line, std::ifstream &input) {
     return;
 
   std::string topCondAndSlice = m.str(2);
-  std::getline(input, line);
-  if ( !std::regex_match(line, m, pNonblockIf)) {
-    toCout("Error: if is not followed by nonblockif: "+line);
+
+  auto endOfIf = input.tellg();
+  std::string nextLine;
+  std::getline(input, nextLine);
+  // if the next line is directly nonblocking, then switch to always_if_else_expr
+  if( std::regex_match(nextLine, m, pNonblock) ) {
+    input.seekg(endOfIf);
+    always_if_else_expr(line, input);
+    return;
+  }
+  else if ( !std::regex_match(nextLine, m, pNonblockIf)) {
+    toCout("Error: if is not followed by nonblockif: "+nextLine);
     abort();
   }
-  auto destYZIdxPair = nonblockif_expr(line, input, false);
+  auto destYZIdxPair = nonblockif_expr(nextLine, input, false);
   std::string retDestVar = destYZIdxPair.first;
   std::string retIdx = destYZIdxPair.second;
 

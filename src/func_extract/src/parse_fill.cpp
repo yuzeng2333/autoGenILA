@@ -66,7 +66,7 @@ void parse_verilog(std::string fileName) {
     if(line.empty() || is_comment_line(line)
           || line.find_first_not_of(' ') == line.length())
       continue;
-    if(line.find("outAssign") != std::string::npos) {
+    if(line.find("if (_045_)") != std::string::npos) {
       toCout("Find it!");
     }
     if(!g_insContextStk.empty())
@@ -141,11 +141,11 @@ void parse_verilog(std::string fileName) {
     case NONBLOCKCONCAT:
       nb_expr(line);
       break;
-    case NONBLOCKIF:
-      nonblockif_expr(line, input);
-      break;
     case IF:
       if_expr(line, input);
+      break;
+    case NONBLOCKIF:
+      nonblockif_expr(line, input);
       break;
     case INSTANCEBEGIN:
       submodule_expr(line, input);
