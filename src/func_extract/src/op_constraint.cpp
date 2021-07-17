@@ -1288,7 +1288,7 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
 
   initialize_min_delay(subMod, outPort);
 
-  toCout("--- Begin submod: "+insName+", port: "+outPort
+  toCoutVerb("--- Begin submod: "+insName+", port: "+outPort
   +", time: "+toStr(timeIdx));
 
   // if sub-module is memory, do not make the submodule
@@ -1519,7 +1519,7 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
   }
   toCoutVerb("************* finish push input, arg number: "+toStr(args.size()));
 
-  toCout("--- To call function for: "+destAndSlice);
+  toCoutVerb("--- To call function for: "+destAndSlice);
   std::string destTimed = timed_name(destAndSlice, timeIdx);
   if(!subModExist && argTy.size() != args.size()) {
     toCout("argTy size: "+toStr(argTy.size())

@@ -36,7 +36,11 @@ void nb_expr(std::string line);
 
 void always_expr(std::string line, std::ifstream &input);
 
-void nonblockif_expr(std::string line, std::ifstream &input);
+std::pair<std::string, std::string> nonblockif_expr(std::string line, 
+                                                    std::ifstream &input,
+                                                    bool insertNBTable=true);
+
+void if_expr(std::string line, std::ifstream &input);
 
 void always_clkrst_expr(std::string line, std::ifstream &input);
 

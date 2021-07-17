@@ -144,6 +144,9 @@ void parse_verilog(std::string fileName) {
     case NONBLOCKIF:
       nonblockif_expr(line, input);
       break;
+    case IF:
+      if_expr(line, input);
+      break;
     case INSTANCEBEGIN:
       submodule_expr(line, input);
       break;

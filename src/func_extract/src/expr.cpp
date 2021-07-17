@@ -393,10 +393,15 @@ void always_expr(std::string line, std::ifstream &input) {
 //  if (cond) var <= data1;
 //  else var <= data2; (optional)
 //  else if(cond2) var <= data2; (optional)
-void nonblockif_expr(std::string line, std::ifstream &input) {
+// first returned is the destName, the second returned is index for yuzeng
+std::pair<std::string, std::string> nonblockif_expr(std::string line, 
+                                                    std::ifstream &input,
+                                                    bool insertNBTable) {
   std::smatch m;
-  if ( !std::regex_match(line, m, pNonblockIf) )
-    return;
+  if ( !std::regex_match(line, m, pNonblockIf) ) {
+    toCout("Error: does not match pNonblockIf: "+line);
+    abort();
+  }
 
   const auto curMod = g_insContextStk.get_curMod();
   bool hasRst = false;
@@ -462,10 +467,12 @@ void nonblockif_expr(std::string line, std::ifstream &input) {
     if(!ret.second)
       toCout("Error in inserting ssaTable for the line: "+line+", "+destNextLine );
 
-    std::string destNbLine = "  "+destAndSlice+" <= yuzeng"+yuzengIdx+";";
-    ret = curMod->nbTable.emplace(destAndSlice, destNbLine);
-    if(!ret.second)
-      toCout("Error in inserting ssaTable for the line: "+line+", "+destNbLine );
+    if(insertNBTable) {
+      std::string destNbLine = "  "+destAndSlice+" <= yuzeng"+yuzengIdx+";";
+      ret = curMod->nbTable.emplace(destAndSlice, destNbLine);
+      if(!ret.second)
+        toCout("Error in inserting ssaTable for the line: "+line+", "+destNbLine );
+    }
   }
   else { // if is "else if" nonblocking assignment
     std::string yuzengIdx2 = toStr(g_new_var++);
@@ -487,10 +494,62 @@ void nonblockif_expr(std::string line, std::ifstream &input) {
     if(!ret.second)
       toCout("Error in inserting ssaTable for the sndLine: "+line+", "+sndLine );
 
-    std::string destNbLine = "  "+destAndSlice+" <= yuzeng"+yuzengIdx2+";";
-    ret = curMod->nbTable.emplace(destAndSlice, destNbLine);
-    if(!ret.second)
-      toCout("Error in inserting ssaTable for the line: "+line+", "+destNbLine );
+    if(insertNBTable) {
+      std::string destNbLine = "  "+destAndSlice+" <= yuzeng"+yuzengIdx2+";";
+      ret = curMod->nbTable.emplace(destAndSlice, destNbLine);
+      if(!ret.second)
+        toCout("Error in inserting ssaTable for the line: "+line+", "+destNbLine );
+    }
+  }
+  return std::make_pair(destAndSlice, yuzengIdx);  
+}
+
+
+
+//always @(posedge clk)
+//  if (cond) var <= data1;
+//  else var <= data2; (optional)
+//  else if(cond2) var <= data2; (optional)
+void if_expr(std::string line, std::ifstream &input) {
+  std::smatch m;
+  if ( !std::regex_match(line, m, pIf) )
+    return;
+
+  std::string topCondAndSlice = m.str(2);
+  std::getline(input, line);
+  if ( !std::regex_match(line, m, pNonblockIf)) {
+    toCout("Error: if is not followed by nonblockif: "+line);
+    abort();
+  }
+  auto destYZIdxPair = nonblockif_expr(line, input, false);
+  std::string retDestVar = destYZIdxPair.first;
+  std::string retIdx = destYZIdxPair.second;
+
+  // make the new line with yuzengIdx as destVar
+  std::string yuzengIdx = toStr(g_new_var++);
+  std::string topYuzeng = "yuzeng"+yuzengIdx;
+  moduleWires.insert("yuzeng"+yuzengIdx);
+  uint32_t localWidth = g_insContextStk.get_var_slice_width_simp(retDestVar);
+  const auto curMod = g_insContextStk.get_curMod();  
+  bool insertDone;
+    insertDone = curMod->varWidth.var_width_insert(topYuzeng, localWidth-1, 0);
+  if (!insertDone) {
+    std::cout << "insert failed: " + line << std::endl;
+  }
+
+  std::string newLine = "  assign "+topYuzeng+" = "+topCondAndSlice+" ? yuzeng"+retIdx+" : "+retDestVar+" ;";
+  toCoutVerb(newLine);
+  auto ret = curMod->ssaTable.emplace(topYuzeng, newLine);
+  if(!ret.second) {
+    toCout("Error in inserting ssaTable for the line: "+topYuzeng+", "+newLine );
+    abort();
+  }
+
+  std::string destNbLine = "  "+retDestVar+" <= "+topYuzeng+" ;";
+  ret = curMod->nbTable.emplace(retDestVar, destNbLine);
+  if(!ret.second) {
+    toCout("Error in inserting ssaTable for the line: "+retDestVar+", "+destNbLine );
+    abort();
   }
 }
 
