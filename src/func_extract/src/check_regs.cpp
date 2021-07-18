@@ -797,7 +797,9 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
     std::string insName = pair.first;
     auto subMod = get_mod_info(insName, curMod);
     std::string modName = subMod->name;
-    if(g_blackBoxModSet.find(modName) != g_blackBoxModSet.end())
+    if(is_mem_module(modName))
+      retExpr = memMod_constraint(node, timeIdx, c, b, bound);
+    else if(g_blackBoxModSet.find(modName) != g_blackBoxModSet.end())
       retExpr = bbMod_constraint(node, timeIdx, c, b, bound);
     else
       retExpr = submod_constraint(node, timeIdx, c, b, bound);

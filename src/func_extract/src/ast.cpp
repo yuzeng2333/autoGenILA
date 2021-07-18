@@ -925,23 +925,25 @@ void add_submod_node(std::string var, uint32_t timeIdx, astNode* const node) {
     g_insContextStk.pop_back();
   }
   //add_child_node(output, timeIdx, node);
-  for(std::string input : subMod->moduleInputs) {
-    std::string connectWire = curMod->insPort2wireMp[insName][input];  
-    if(connectWire == curMod->clk) {
-      subMod->clk = input;
-      continue;
+  if(!is_mem_module(modName)) {
+    for(std::string input : subMod->moduleInputs) {
+      std::string connectWire = curMod->insPort2wireMp[insName][input];  
+      if(connectWire == curMod->clk) {
+        subMod->clk = input;
+        continue;
+      }
+      //if(connectWire == curMod->rst) {
+      //  subMod->rst = input;
+      //  continue;
+      //}
+      node->srcVec.push_back(connectWire);
+      if(connectWire == "ap_clk")
+        toCout("Find ap_clk!");
+      add_child_node(connectWire, timeIdx, node);
     }
-    //if(connectWire == curMod->rst) {
-    //  subMod->rst = input;
-    //  continue;
-    //}
-    node->srcVec.push_back(connectWire);
-    if(connectWire == "ap_clk")
-      toCout("Find ap_clk!");
-    add_child_node(connectWire, timeIdx, node);
   }
   toCoutVerb("~~~~~~~~~~~~~~~~~~~~~~~~ After finish submod: "+insName
-           +", curMod: "+curMod->name);
+             +", curMod: "+curMod->name);
 }
 
 

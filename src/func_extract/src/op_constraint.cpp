@@ -1166,6 +1166,37 @@ UpdateFunctionGen::add_one_case_branch_expr(astNode* const node, llvm::Value* &c
 //}
 
 
+// output ports of memory modules are always symbolic, they
+// should be in the argument list of the top function, so here
+// we just return the argument of the top function
+llvm::Value* 
+UpdateFunctionGen::memMod_constraint(astNode* const node, uint32_t timeIdx, context &c,
+                               builder &b, uint32_t bound) {
+  toCout("begin memMod: "+node->dest);
+  const auto curMod = insContextStk.get_curMod();  
+  std::string varAndSlice = node->dest;
+  std::string var, varSlice;
+  split_slice(varAndSlice, var, varSlice);
+  auto pair = curMod->wire2InsPortMp[varAndSlice];
+  std::string insName = pair.first;
+  std::string outPort = pair.second;  
+  auto subMod = get_mod_info(insName, curMod);
+  auto subDynData = get_dyn_data(subMod);
+  std::string modName = subMod->name;
+  if(!is_mem_module(modName)) {
+    toCout("Error: not a memory module: "+modName);
+    abort();
+  }
+
+  std::string prefix = insContextStk.get_hier_name(false);
+  if(!prefix.empty()) prefix += ".";  
+  std::string destTimed = prefix+insName+"."+outPort+DELIM+toStr(timeIdx);
+
+  return get_arg(destTimed);
+}
+
+
+
 llvm::Value* 
 UpdateFunctionGen::bbMod_constraint(astNode* const node, uint32_t timeIdx, context &c, 
                                builder &b, uint32_t bound) {
@@ -1462,7 +1493,8 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
     std::string modName = it->second;
     auto memMod = g_moduleInfoMap[modName];
     for( auto output : memMod->moduleOutputs ) {
-      auto arg = get_arg(prefix+insName+"."+pathInsName+"."+output+DELIM+toStr(bound), curFunc);
+      //auto arg = get_arg(prefix+insName+"."+pathInsName+"."+output+DELIM+toStr(bound), curFunc);
+      auto arg = get_arg(pathInsName+"."+output+DELIM+toStr(bound), curFunc);
       args.push_back(arg);
     }
   }
