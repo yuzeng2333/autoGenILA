@@ -909,9 +909,12 @@ void add_submod_node(std::string var, uint32_t timeIdx, astNode* const node) {
     toCout("Find it!");
 
   const auto subMod = g_moduleInfoMap[modName];
-  // if this submodule is never seen
+  // if this submodule is blackbox, or if the output port 
+  // has been seen before, or if this module is mem, then 
+  // skip building ast node for this module
   if( g_blackBoxModSet.find(modName) == g_blackBoxModSet.end()
-      && !subMod->is_stored_outport_node(output)) {
+      && !subMod->is_stored_outport_node(output)
+      && !is_mem_module(modName)) {
     Context_t insCntxt(insName, output, subMod, curMod, nullptr);
     g_insContextStk.push_back(insCntxt);
     astNode* nextNode = new astNode;

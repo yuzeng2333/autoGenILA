@@ -1291,6 +1291,9 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
   toCoutVerb("--- Begin submod: "+insName+", port: "+outPort
   +", time: "+toStr(timeIdx));
 
+  if(modName == "hls_target_call_Loop_LB2D_buf_proc_buffer_0_value_V_ram")
+    toCout("Find it!");
+
   // if sub-module is memory, do not make the submodule
   // directly return the function arg correspond to the submodule output
   if( is_mem_module(modName) ) {
