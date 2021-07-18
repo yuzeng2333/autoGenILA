@@ -38,6 +38,8 @@ typedef struct astNode astNode;
 
 void build_ast_tree();
 
+void set_stk_build_tree(std::string varName);
+
 void build_tree_for_single_as(std::string regAndSlice);
 
 void add_node(std::string var, uint32_t timeIdx, astNode* const node, bool varIsDest);

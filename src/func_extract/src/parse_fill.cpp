@@ -69,8 +69,11 @@ void parse_verilog(std::string fileName) {
     if(line.find("if (_045_)") != std::string::npos) {
       toCout("Find it!");
     }
-    if(!g_insContextStk.empty())
+    if(!g_insContextStk.empty()) {
+      std::string modName = g_insContextStk.get_curMod()->name;
+      toCoutVerb(modName);
       fill_var_width(line, g_insContextStk.get_curMod()->varWidth);
+    }
     //toCout(line);
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       case_expr(line, input);
@@ -301,11 +304,16 @@ void get_io(const std::string &fileName) {
   std::smatch match;
   while( std::getline(input, line) ) {
     toCoutVerb(line);
+    if(line.find("arg_0_TDATA_fifo") != std::string::npos)
+      toCout("Find it!");
     if(line.empty() || is_comment_line(line)
           || line.find_first_not_of(' ') == line.length())
       continue;
-    if(g_insContextStk.get_stk_depth() > 0)
-      fill_var_width(line, g_insContextStk.get_curMod()->varWidth);    
+    if(g_insContextStk.get_stk_depth() > 0) {
+      std::string modName = g_insContextStk.get_curMod()->name;
+      toCoutVerb(modName);
+      fill_var_width(line, g_insContextStk.get_curMod()->varWidth);
+    }
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       continue;
     }

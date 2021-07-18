@@ -206,6 +206,9 @@ class UpdateFunctionGen {
                                           builder &b, uint32_t bound, 
                                           const std::string &destTimed);
     
+    llvm::Value* memMod_constraint(astNode* const node, uint32_t timeIdx, context &c,
+                               builder &b, uint32_t bound);
+
     llvm::Value* bbMod_constraint(astNode* const node, uint32_t timeIdx, context &c, 
                                    builder &b, uint32_t bound);
     

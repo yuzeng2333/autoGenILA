@@ -1171,7 +1171,7 @@ UpdateFunctionGen::add_one_case_branch_expr(astNode* const node, llvm::Value* &c
 // we just return the argument of the top function
 llvm::Value* 
 UpdateFunctionGen::memMod_constraint(astNode* const node, uint32_t timeIdx, context &c,
-                               builder &b, uint32_t bound) {
+                                     builder &b, uint32_t bound) {
   toCout("begin memMod: "+node->dest);
   const auto curMod = insContextStk.get_curMod();  
   std::string varAndSlice = node->dest;
