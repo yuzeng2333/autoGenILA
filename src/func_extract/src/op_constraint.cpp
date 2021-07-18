@@ -1370,10 +1370,11 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
       std::string pathInsName = it->first;
       std::string modName = it->second;
       auto memMod = g_moduleInfoMap[modName];
-      for( auto output : memMod->moduleOutputs ) {
-        uint32_t width = get_var_slice_width_simp(output, memMod);
-        argTy.push_back(llvm::IntegerType::get(*TheContext, width));
-      }
+      for(uint32_t i = 0; i <= bound; i++)        
+        for( auto output : memMod->moduleOutputs ) {
+          uint32_t width = get_var_slice_width_simp(output, memMod);
+          argTy.push_back(llvm::IntegerType::get(*TheContext, width));
+        }
     }
 
     // the function args here is redundant. 
@@ -1412,11 +1413,12 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
       std::string pathInsName = it->first;
       std::string modName = it->second;
       auto memMod = g_moduleInfoMap[modName];
-      for( auto output : memMod->moduleOutputs ) {
-        std::string portName = pathInsName+"."+output+DELIM+toStr(bound);
-        toCoutVerb("set mem ouput func arg, mem: "+pathInsName+", output: "+output);
-        (subFunc->args().begin()+idx++)->setName(portName);
-      }
+      for(uint32_t i = 0; i <= bound; i++)      
+        for( auto output : memMod->moduleOutputs ) {
+          std::string portName = pathInsName+"."+output+DELIM+toStr(bound);
+          toCoutVerb("set mem ouput func arg, mem: "+pathInsName+", output: "+output);
+          (subFunc->args().begin()+idx++)->setName(portName);
+        }
     }
     toCoutVerb("************* set arg name, mem-type arg number: "+toStr(idx-1));    
 
@@ -1492,11 +1494,12 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
     std::string pathInsName = it->first;
     std::string modName = it->second;
     auto memMod = g_moduleInfoMap[modName];
-    for( auto output : memMod->moduleOutputs ) {
-      //auto arg = get_arg(prefix+insName+"."+pathInsName+"."+output+DELIM+toStr(bound), curFunc);
-      auto arg = get_arg(pathInsName+"."+output+DELIM+toStr(bound), curFunc);
-      args.push_back(arg);
-    }
+    for(uint32_t i = 0; i <= bound; i++)    
+      for( auto output : memMod->moduleOutputs ) {
+        //auto arg = get_arg(prefix+insName+"."+pathInsName+"."+output+DELIM+toStr(bound), curFunc);
+        auto arg = get_arg(pathInsName+"."+output+DELIM+toStr(bound), curFunc);
+        args.push_back(arg);
+      }
   }
   toCoutVerb("************* finish push mem-output, arg number: "+toStr(args.size()));
 

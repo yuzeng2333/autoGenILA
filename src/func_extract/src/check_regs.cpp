@@ -220,11 +220,12 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     std::string pathInsName = it->first;
     std::string modName = it->second;
     auto memMod = g_moduleInfoMap[modName];
-    for( auto output : memMod->moduleOutputs ) {
-      uint32_t width = get_var_slice_width_simp(output, memMod);
-      argTy.push_back(llvm::IntegerType::get(*TheContext, width));
-      argNum++;
-    }
+    for(uint32_t i = 0; i <= bound; i++)
+      for( auto output : memMod->moduleOutputs ) {
+        uint32_t width = get_var_slice_width_simp(output, memMod);
+        argTy.push_back(llvm::IntegerType::get(*TheContext, width));
+        argNum++;
+      }
   }
 
   // push inputs
@@ -281,14 +282,15 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     std::string pathInsName = it->first;
     std::string modName = it->second;
     auto memMod = g_moduleInfoMap[modName];
-    for( auto output : memMod->moduleOutputs ) {
-      std::string portName = pathInsName+"."+output+DELIM+toStr(bound);
-      toCoutVerb("set mem ouput func arg, mem: "+pathInsName+", output: "+output);
-      (TheFunction->args().begin()+idx)->setName(portName);
-      (topFunction->args().begin()+idx)->setName(portName);
-      argNum--;
-      topFuncArgMp.emplace(portName, TheFunction->args().begin()+idx++);
-    }
+    for(uint32_t i = 0; i <= bound; i++)  
+      for( auto output : memMod->moduleOutputs ) {
+        std::string portName = pathInsName+"."+output+DELIM+toStr(i);
+        toCoutVerb("set mem ouput func arg, mem: "+pathInsName+", output: "+output);
+        (TheFunction->args().begin()+idx)->setName(portName);
+        (topFunction->args().begin()+idx)->setName(portName);
+        argNum--;
+        topFuncArgMp.emplace(portName, TheFunction->args().begin()+idx++);
+      }
   }
 
 
