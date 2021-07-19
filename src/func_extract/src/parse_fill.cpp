@@ -14,7 +14,6 @@ using namespace syntaxPatterns;
 
 namespace funcExtract {
 
-
 void clear_global_vars() {
   moduleInputs.clear();
   moduleOutputs.clear();

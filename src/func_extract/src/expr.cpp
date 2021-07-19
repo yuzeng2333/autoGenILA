@@ -257,6 +257,7 @@ void both_concat_expr(std::string line) {
   moduleWires.insert("yuzeng"+yuzengIdxStr);
   curMod->varWidth.var_width_insert("yuzeng"+yuzengIdxStr, startIdx, 0);
   std::string newAssign = "  assign yuzeng"+yuzengIdxStr+" = "+srcList+" ;";
+  g_outFile << newAssign << std::endl;
 
   auto ret = curMod->ssaTable.emplace("yuzeng"+yuzengIdxStr, line);
   if(!ret.second)
@@ -476,6 +477,7 @@ std::pair<std::string, std::string> nonblockif_expr(std::string line,
       destNextLine = "  assign yuzeng"+yuzengIdx+" = "+tmpCond+" ? "+elseValue+" : "+ifSrcAndSlice+" ;";      
     }
     toCoutVerb(destNextLine);
+    g_outFile << destNextLine << std::endl;
     auto ret = curMod->ssaTable.emplace("yuzeng"+yuzengIdx, destNextLine);
     if(!ret.second)
       toCout("Error in inserting ssaTable for the line: "+line+", "+destNextLine );
@@ -508,6 +510,8 @@ std::pair<std::string, std::string> nonblockif_expr(std::string line,
     }
     toCoutVerb(fstLine);
     toCoutVerb(sndLine);
+    g_outFile << fstLine << std::endl;
+    g_outFile << sndLine << std::endl;
     uint32_t destWidth = g_insContextStk.get_var_slice_width_simp(destAndSlice);
     curMod->varWidth.var_width_insert("yuzeng"+yuzengIdx, destWidth-1, 0);    
     curMod->varWidth.var_width_insert("yuzeng"+yuzengIdx2, destWidth-1, 0);    
@@ -573,6 +577,7 @@ void if_expr(std::string line, std::ifstream &input) {
 
   std::string newLine = "  assign "+topYuzeng+" = "+topCondAndSlice+" ? yuzeng"+retIdx+" : "+retDestVar+" ;";
   toCoutVerb(newLine);
+  g_outFile << newLine << std::endl;
   auto ret = curMod->ssaTable.emplace(topYuzeng, newLine);
   if(!ret.second) {
     toCout("Error in inserting ssaTable for the line: "+topYuzeng+", "+newLine );
@@ -650,6 +655,7 @@ void always_if_else_expr(std::string line, std::ifstream &input) {
   else
     destNextLine = "  assign yuzeng"+yuzengIdx+" = "+condAndSlice.substr(1)+" ? "+src2AndSlice+" : "+src1AndSlice+";";
   auto ret = curMod->ssaTable.emplace("yuzeng"+yuzengIdx, destNextLine);
+  g_outFile << destNextLine << std::endl;
   if(!ret.second)
     toCout("Error in inserting ssaTable for the line: "+line+", "+destNextLine);
 

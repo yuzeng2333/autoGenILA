@@ -334,8 +334,11 @@ void get_update_function(std::string target,
   UFGen.print_llvm_ir(destInfo, delayBound, instrIdx);
   std::string clean("opt --instsimplify --deadargelim --instsimplify "+fileName+"_tmp.ll -S -o="+fileName+"_clean.ll");
   std::string opto3("opt -O1 "+fileName+"_clean.ll -S -o="+fileName+"_tmp.o3.ll; opt -passes=deadargelim "+fileName+"_tmp.o3.ll -S -o="+fileName+"_clean.o3.ll; rm "+fileName+"_tmp.o3.ll");
+  toCout("** Begin clean update function");
   system(clean.c_str());
+  toCout("** Begin simplify update function");  
   system(opto3.c_str());
+  toCout("** End simplify update function");  
   std::vector<std::pair<std::string, uint32_t>> argVec;
   bool usefulFunc = read_clean_o3(fileName+"_clean.o3.ll", argVec, fileName+"_clean.simp.ll");
 

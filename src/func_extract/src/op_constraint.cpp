@@ -787,7 +787,8 @@ UpdateFunctionGen::ite_op_constraint(astNode* const node, uint32_t timeIdx, cont
   std::string op1, op1Slice;
   std::string op2, op2Slice;
 
-  if(destAndSlice.find("yuzeng13") != std::string::npos) {
+  //if(destAndSlice.find("yuzeng5") != std::string::npos) {
+  if(destAndSlice == "yuzeng5") {
     toCoutVerb("Found it!");
   }
 
@@ -1324,7 +1325,7 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
   auto subMod = get_mod_info(insName, curMod);
   auto subDynData = get_dyn_data(subMod);
   std::string modName = subMod->name;
-  if(modName.find("FIFO_hls_target_call_slice_stream_V_value_V_shiftReg") 
+  if(modName.find("FIFO_hls_target_p_p2_in_bounded_stencil_stream_s_shiftReg") 
      != std::string::npos)
     toCoutVerb("Find it!");
 
