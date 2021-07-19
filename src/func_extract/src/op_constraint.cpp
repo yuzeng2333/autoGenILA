@@ -1079,8 +1079,11 @@ UpdateFunctionGen::add_one_case_branch_expr(astNode* const node, llvm::Value* &c
       thenRet = var_expr(assignVarAndSlice, timeIdx, c, b, false);
     }
     else {
-      auto tmp = add_constraint(assignNode, timeIdx, c, b, bound);
-      thenRet = extract_func(tmp, hi, lo, c, b, timed_name( dest+"_;_then"+toStr(posOfOne), timeIdx ), srcNoinline);
+      auto assignValue = add_constraint(assignNode, timeIdx, c, b, bound);
+      uint32_t assignWidth = llvm::dyn_cast<llvm::IntegerType>(assignValue->getType())->getBitWidth();
+      if(hi >= assignWidth && lo == 0) thenRet = assignValue;
+      else
+        thenRet = extract_func(assignValue, hi, lo, c, b, timed_name( dest+"_;_then"+toStr(posOfOne), timeIdx ), srcNoinline);
     }
 
     llvm::Value* elseRet = add_one_case_branch_expr(node, caseVarExpr, idx+2, 
@@ -1095,8 +1098,10 @@ UpdateFunctionGen::add_one_case_branch_expr(astNode* const node, llvm::Value* &c
     if(isNum(assignVarAndSlice))
       elseRet = var_expr(assignVarAndSlice, timeIdx, c, b, false);
     else {
-      elseRet = extract_func(add_constraint(assignNode, timeIdx, c, b, bound),
-                        hi, lo, c, b, timed_name(dest+"_;_default", timeIdx));
+      auto assignValue = add_constraint(assignNode, timeIdx, c, b, bound);
+      uint32_t assignWidth = llvm::dyn_cast<llvm::IntegerType>(assignValue->getType())->getBitWidth();
+      if(hi >= assignWidth && lo == 0) return assignValue;
+      else elseRet = extract_func(assignValue, hi, lo, c, b, timed_name(dest+"_;_default", timeIdx));
     }
     return elseRet; 
   }

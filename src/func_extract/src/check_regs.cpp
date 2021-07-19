@@ -1363,7 +1363,9 @@ UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
   else if(is_read_asv(dest, insContextStk.get_curMod()) 
           || (is_top_module(curMod) && is_input(dest, insContextStk.get_curMod()))) noinline = true;
   else noinline = false;
-  toCoutVerb("extract for: "+destName);  
+  toCoutVerb("extract for: "+destName);
+  if(destName == "cct_715")
+    toCoutVerb("Find it!");
   llvm::Type* inputTy = in->getType();
   uint32_t inputWidth = llvm::dyn_cast<llvm::IntegerType>(inputTy)->getBitWidth();
   std::string app = "";
