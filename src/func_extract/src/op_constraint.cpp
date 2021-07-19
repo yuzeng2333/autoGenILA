@@ -1173,7 +1173,11 @@ llvm::Value*
 UpdateFunctionGen::memMod_constraint(astNode* const node, uint32_t timeIdx, context &c,
                                      builder &b, uint32_t bound) {
   toCout("begin memMod: "+node->dest);
-  const auto curMod = insContextStk.get_curMod();  
+  if(node->dest == "q0")
+    toCout("Find it!");
+  const auto curMod = insContextStk.get_curMod();
+  const auto curFunc = insContextStk.get_func();
+  auto curDynData = get_dyn_data(curMod);
   std::string varAndSlice = node->dest;
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
@@ -1188,11 +1192,13 @@ UpdateFunctionGen::memMod_constraint(astNode* const node, uint32_t timeIdx, cont
     abort();
   }
 
-  std::string prefix = insContextStk.get_hier_name(false);
-  if(!prefix.empty()) prefix += ".";  
+  std::string prefix = "";
+  if(curDynData->isFunctionedSubMod == false) {
+    prefix = insContextStk.get_hier_name(false);
+    if(!prefix.empty()) prefix += ".";  
+  }
   std::string destTimed = prefix+insName+"."+outPort+DELIM+toStr(timeIdx);
-
-  return get_arg(destTimed);
+  return get_arg(destTimed, curFunc);
 }
 
 
@@ -1330,7 +1336,7 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
   if( is_mem_module(modName) ) {
     //std::string prefix = get_hier_name();
     std::string portName = insName+"."+outPort+DELIM+toStr(bound);
-    return get_arg(portName);
+    return get_arg(portName, curFunc);
   }
   
   // making or call the sub-function
@@ -1411,11 +1417,13 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
 
     for(auto it = subModMemInstances.begin(); it != subModMemInstances.end(); it++) {
       std::string pathInsName = it->first;
+      if(pathInsName == "hls_target_call_Loop_LB2D_buf_proc_buffer_0_value_V_ram_U")
+        toCout("Find it!");
       std::string modName = it->second;
       auto memMod = g_moduleInfoMap[modName];
       for(uint32_t i = 0; i <= bound; i++)      
         for( auto output : memMod->moduleOutputs ) {
-          std::string portName = pathInsName+"."+output+DELIM+toStr(bound);
+          std::string portName = pathInsName+"."+output+DELIM+toStr(i);
           toCoutVerb("set mem ouput func arg, mem: "+pathInsName+", output: "+output);
           (subFunc->args().begin()+idx++)->setName(portName);
         }
@@ -1492,12 +1500,14 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
   // push output ports of memory modules
   for(auto it = subModMemInstances.begin(); it != subModMemInstances.end(); it++) {
     std::string pathInsName = it->first;
+    if(pathInsName == "hls_target_call_Loop_LB2D_buf_proc_buffer_0_value_V_ram_U")
+      toCoutVerb("Find it!");
     std::string modName = it->second;
     auto memMod = g_moduleInfoMap[modName];
     for(uint32_t i = 0; i <= bound; i++)    
       for( auto output : memMod->moduleOutputs ) {
         //auto arg = get_arg(prefix+insName+"."+pathInsName+"."+output+DELIM+toStr(bound), curFunc);
-        auto arg = get_arg(pathInsName+"."+output+DELIM+toStr(bound), curFunc);
+        auto arg = get_arg(insName+"."+pathInsName+"."+output+DELIM+toStr(i), curFunc);
         args.push_back(arg);
       }
   }

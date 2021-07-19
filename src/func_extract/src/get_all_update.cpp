@@ -10,7 +10,7 @@
 namespace funcExtract {
 
 // TODO: configurations
-bool g_use_multi_thread = true;
+bool g_use_multi_thread = false;
 
 std::mutex g_dependVarMapMtx;
 // the first key is instr name, the second key is target name

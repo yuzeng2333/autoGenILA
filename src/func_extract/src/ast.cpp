@@ -140,6 +140,10 @@ void set_stk_build_tree(std::string varName) {
   auto prefixVarPair = split_prefix_var(varName);
   std::string prefix = prefixVarPair.first;
   std::string writeVar = prefixVarPair.second; 
+  std::string reg;
+  std::string curModName;
+  std::string curInsName;
+  std::shared_ptr<ModuleInfo_t> curMod;
   if(prefix.empty()) {
     reg = writeVar;
     curModName = g_topModule;
@@ -164,7 +168,7 @@ void set_stk_build_tree(std::string varName) {
   Context_t insCntxt(curInsName, "", curMod, nullptr, nullptr);
 
   if(g_get_all_update 
-      && g_skippedOutput.find(reg) != g_skippedOutput.end()) continue;
+      && g_skippedOutput.find(reg) != g_skippedOutput.end()) return;
   g_insContextStk.clear();
   g_insContextStk.push_back(insCntxt);
   //std::string modName = get_mod_name(reg);

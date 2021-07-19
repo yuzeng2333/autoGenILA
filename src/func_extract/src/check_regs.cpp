@@ -1616,7 +1616,7 @@ llvm::Value* UpdateFunctionGen::get_arg(std::string regName) {
 
 
 llvm::Value* UpdateFunctionGen::get_arg(std::string regName, llvm::Function *func) {
-  if(regName.find("es_top_0.mem_data_buf") != std::string::npos)
+  if(regName.find("hls_target_call_Loop_LB2D_buf_proc_buffer_0_value_V_ram_U.q0___#0") != std::string::npos)
     toCout("Find the arg!");
   for(auto it = func->arg_begin(); it != func->arg_end(); it++) {
     std::string funcName = llvm::dyn_cast<llvm::Value>(func)->getName().str();
