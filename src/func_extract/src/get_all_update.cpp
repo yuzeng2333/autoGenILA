@@ -10,7 +10,7 @@
 namespace funcExtract {
 
 // TODO: configurations
-bool g_use_multi_thread = false;
+bool g_use_multi_thread = true;
 
 std::mutex g_dependVarMapMtx;
 // the first key is instr name, the second key is target name
@@ -120,10 +120,12 @@ void get_all_update() {
       uint32_t instrIdx = 0;
       for(auto instrInfo : g_instrInfo) {
         instrIdx++;
+        uint32_t delayBound = get_delay_bound(target, instrInfo, 
+                                              g_allowedTgtVec, g_allowedTgt);
         //std::thread th(get_update_function, target, tgtVec, isVec,
         //               instrInfo, instrIdx);
         //threadVec.push_back(std::move(th));
-        get_update_function(target, tgtVec, isVec,
+        get_update_function(target, delayBound, tgtVec, isVec,
                             instrInfo, instrIdx);
       }
       //for(auto &th: threadVec) th.join();
@@ -187,8 +189,10 @@ void get_all_update() {
           //  visitedTgtFile << target << std::endl;
           //}
 
-          std::thread th(get_update_function, target, tgtVec, isVec,
-                         instrInfo, instrIdx);
+          uint32_t delayBound = get_delay_bound(target, instrInfo, 
+                                                g_allowedTgtVec, g_allowedTgt);
+          std::thread th(get_update_function, target, delayBound, tgtVec, 
+                         isVec, instrInfo, instrIdx);
           threadVec.push_back(std::move(th));
         }
         // wait for update functions for all regs to finish
@@ -208,6 +212,7 @@ void get_all_update() {
 
 
 void get_update_function(std::string target,
+                         uint32_t delayBound,
                          std::vector<std::string> vecWorkSet,
                          bool isVec,
                          InstrInfo_t instrInfo,
@@ -309,23 +314,7 @@ void get_update_function(std::string target,
   destInfo.set_instr_name(instrInfo.name);      
   assert(!instrInfo.name.empty());
   toCout("---  BEGIN INSTRUCTION #"+toStr(instrIdx)+" ---");
-  uint32_t delayBound = instrInfo.delayBound;
   std::string destNameSimp = destInfo.get_dest_name();
-  if(destNameSimp.substr(destNameSimp.size()-4) == "_Arr") {
-    std::string firstVar = destNameSimp.substr(0, destNameSimp.size()-4);
-    for(auto pair : g_allowedTgtVec) {
-      if(pair.first.front() != firstVar) continue;
-      delayBound = pair.second;
-    }
-  }
-  // if is not array
-  else if(instrInfo.delayExceptions.find(destNameSimp) != instrInfo.delayExceptions.end() ) {
-    delayBound = instrInfo.delayExceptions[destNameSimp];
-  }
-  else if(g_allowedTgt.find(destNameSimp) != g_allowedTgt.end() 
-          && g_allowedTgt[destNameSimp] != 0) {
-    delayBound = g_allowedTgt[destNameSimp];
-  }
   remove_front_backslash(destNameSimp);
   std::string fileName = g_path+"/"+instrInfo.name+"_"
                          +destNameSimp+"_"+toStr(delayBound);
@@ -336,9 +325,9 @@ void get_update_function(std::string target,
   std::string opto3("opt -O1 "+fileName+"_clean.ll -S -o="+fileName+"_tmp.o3.ll; opt -passes=deadargelim "+fileName+"_tmp.o3.ll -S -o="+fileName+"_clean.o3.ll; rm "+fileName+"_tmp.o3.ll");
   toCout("** Begin clean update function");
   system(clean.c_str());
-  toCout("** Begin simplify update function");  
+  toCout("** Begin simplify update function");
   system(opto3.c_str());
-  toCout("** End simplify update function");  
+  toCout("** End simplify update function");
   std::vector<std::pair<std::string, uint32_t>> argVec;
   bool usefulFunc = read_clean_o3(fileName+"_clean.o3.ll", argVec, fileName+"_clean.simp.ll");
 
@@ -398,6 +387,28 @@ void get_update_function(std::string target,
   }
 }
 
+
+uint32_t get_delay_bound(std::string var, struct InstrInfo_t &instrInfo, 
+                   std::vector<std::pair<std::vector<std::string>, uint32_t>> allowedTgtVec,
+                   std::map<std::string, uint32_t> allowedTgt) {
+  uint32_t delayBound = instrInfo.delayBound;
+  if(var.substr(var.size()-4) == "_Arr") {
+    std::string firstVar = var.substr(0, var.size()-4);
+    for(auto pair : allowedTgtVec) {
+      if(pair.first.front() != firstVar) continue;
+      delayBound = pair.second;
+    }
+  }
+  // if is not array
+  else if(instrInfo.delayExceptions.find(var) != instrInfo.delayExceptions.end() ) {
+    delayBound = instrInfo.delayExceptions[var];
+  }
+  else if(allowedTgt.find(var) != allowedTgt.end() 
+          && allowedTgt[var] != 0) {
+    delayBound = g_allowedTgt[var];
+  }
+  return delayBound;
+}
 
 
 
