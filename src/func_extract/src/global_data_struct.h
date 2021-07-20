@@ -40,6 +40,7 @@
 #include "llvm/Analysis/DomTreeUpdater.h"
 #include "llvm/Analysis/InstructionSimplify.h"
 #include "llvm/Analysis/LoopInfo.h"
+#define DELAY_MAX  (0x7fffffff)
 
 using namespace z3;
 using namespace taintGen;

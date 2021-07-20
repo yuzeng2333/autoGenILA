@@ -14,7 +14,6 @@
 //#define llvmInt(val, width, c) llvm::ConstantInt::get(llvmWidth(width, c), val, false);
 #define context std::shared_ptr<llvm::LLVMContext>
 #define builder std::shared_ptr<llvm::IRBuilder<>>
-#define UINT32_MAX  (0xffffffff)
 ///////////////////////////////////////////////////////////////////////////////
 //
 //  The main principle of making llvm::Value*/constraints
@@ -1334,6 +1333,9 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
   toCoutVerb("--- Begin submod: "+insName+", port: "+outPort
   +", time: "+toStr(timeIdx));
 
+  if(insName == "slice_stream_V_value_V_U")
+     //&& outPort == "if_dout" && timeIdx == 18)
+    toCoutVerb("Find it!");
   if(modName == "hls_target_call_Loop_LB2D_buf_proc_buffer_0_value_V_ram")
     toCout("Find it!");
 
@@ -1459,7 +1461,7 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
     // the output-inputVec pairs are stored in out2InDelayMp
     std::string outPortTimed = timed_name(outPort, 0);
     subMod->rootTimeIdx = 0;
-    //subMod->minInOutDelay.emplace(outPort, UINT32_MAX);
+    //subMod->minInOutDelay.emplace(outPort, DELAY_MAX);
     subDynData->isFunctionedSubMod = true;
     // switch func before elaborating
     if(!subMod->is_stored_outport_node(outPort)) {
@@ -1526,6 +1528,8 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
   for(i = timeIdx; i <= bound; i++) {
     for(auto it = subMod->moduleInputs.begin(); it != subMod->moduleInputs.end(); it++) {
       uint32_t minDelay = subDynData->minInOutDelay[outPort][*it];
+      if(*it == "if_read") 
+        toCoutVerb("Find it!");
       if(i < timeIdx + minDelay) {
         // these inputs for submod would not be used, so just give 0.
         toCoutVerb("push input: "+*it+", timeIdx: "+toStr(i));
@@ -1534,7 +1538,7 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
         args.push_back(llvmInt(0, width, c));
       }
       else {
-        toCoutVerb("push input: "+*it+", timeIdx: "+toStr(i));      
+        toCoutVerb("push input : "+*it+", timeIdx: "+toStr(i));      
         if(*it == subMod->clk) continue;      
         std::string connectWire = curMod->insPort2wireMp[insName][*it];
         if(connectWire.empty()) {

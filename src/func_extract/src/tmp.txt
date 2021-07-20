@@ -1,0 +1,291 @@
+Continuing.
+Find it!
+Collecting regs for: FIFO_hls_target_call_slice_stream_V_value_V
+Collect reg: internal_empty_n
+Collect reg: internal_full_n
+Collect reg: mOutPtr
+Find it!
+************* finish push reg, arg number: 3
+************* finish push mem-output, arg number: 22
+push input: clk, timeIdx: 18
+push input: if_din, timeIdx: 18
+--- wire: hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din, timeIdx: 18
+add_constraint for: hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din, timeIdx: 18
+extract for: hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din___#18
+push input: if_read, timeIdx: 18
+--- wire: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_read, timeIdx: 18
+add_constraint for: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_read, timeIdx: 18
+--- Begin submod: hls_target_call_Loop_LB2D_shift_proc_U0, port: slice_stream_V_value_V_read, time: 18
+Collecting regs for: hls_target_call_Loop_LB2D_shift_proc
+Collect reg: ap_CS_fsm
+Collect reg: ap_done_reg
+Collect reg: ap_reg_ppiten_pp0_it0
+Collect reg: ap_reg_ppiten_pp0_it1
+Collect reg: buffer_0_value_V_fu_100
+Collect reg: buffer_1_value_V_fu_104
+Collect reg: buffer_2_value_V_fu_108
+Collect reg: buffer_3_value_V_fu_112
+Collect reg: buffer_4_value_V_fu_116
+Collect reg: buffer_5_value_V_fu_120
+Collect reg: buffer_6_value_V_fu_124
+Collect reg: buffer_7_value_V_fu_96
+Collect reg: exitcond21_i_i_reg_1251
+Collect reg: i_0_i_i_reg_152
+Collect reg: icmp_reg_1260
+Collect reg: n1_1_reg_1246
+Collect reg: n1_reg_141
+************* finish push reg, arg number: 17
+************* finish push mem-output, arg number: 17
+push input: ap_continue, timeIdx: 18
+push input: ap_rst, timeIdx: 18
+--- wire: ap_rst, timeIdx: 18
+add_constraint for: ap_rst, timeIdx: 18
+extract for: ap_rst___#18
+push input: ap_start, timeIdx: 18
+push input: out_stream_V_value_V_full_n, timeIdx: 18
+--- wire: out_stream_V_value_V_full_n, timeIdx: 18
+add_constraint for: out_stream_V_value_V_full_n, timeIdx: 18
+extract for: out_stream_V_value_V_full_n___#18
+push input: slice_stream_V_value_V_dout, timeIdx: 18
+--- wire: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_dout, timeIdx: 18
+add_constraint for: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_dout, timeIdx: 18
+--- Begin submod: slice_stream_V_value_V_U, port: if_dout, time: 18
+
+Breakpoint 1, funcExtract::UpdateFunctionGen::submod_constraint (this=0x7fffffffca80, node=0x5555568eced0, timeIdx=18, c=std::shared_ptr<llvm::LLVMContext> (use count 1, weak count 0) = {...}, 
+    b=std::shared_ptr<llvm::IRBuilder<llvm::ConstantFolder, llvm::IRBuilderDefaultInserter>> (use count 1, weak count 0) = {...}, bound=18)
+    at /home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/op_constraint.cpp:1339
+1339	    toCoutVerb("Find it!");
+(gdb) 
+Continuing.
+Find it!
+Collecting regs for: FIFO_hls_target_call_slice_stream_V_value_V
+Collect reg: internal_empty_n
+Collect reg: internal_full_n
+Collect reg: mOutPtr
+Find it!
+************* finish push reg, arg number: 3
+************* finish push mem-output, arg number: 22
+push input: clk, timeIdx: 18
+push input: if_din, timeIdx: 18
+--- wire: hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din, timeIdx: 18
+add_constraint for: hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din, timeIdx: 18
+extract for: hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din___#18
+push input: if_read, timeIdx: 18
+--- wire: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_read, timeIdx: 18
+add_constraint for: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_read, timeIdx: 18
+--- Begin submod: hls_target_call_Loop_LB2D_shift_proc_U0, port: slice_stream_V_value_V_read, time: 18
+Collecting regs for: hls_target_call_Loop_LB2D_shift_proc
+Collect reg: ap_CS_fsm
+Collect reg: ap_done_reg
+Collect reg: ap_reg_ppiten_pp0_it0
+Collect reg: ap_reg_ppiten_pp0_it1
+Collect reg: buffer_0_value_V_fu_100
+Collect reg: buffer_1_value_V_fu_104
+Collect reg: buffer_2_value_V_fu_108
+Collect reg: buffer_3_value_V_fu_112
+Collect reg: buffer_4_value_V_fu_116
+Collect reg: buffer_5_value_V_fu_120
+Collect reg: buffer_6_value_V_fu_124
+Collect reg: buffer_7_value_V_fu_96
+Collect reg: exitcond21_i_i_reg_1251
+Collect reg: i_0_i_i_reg_152
+Collect reg: icmp_reg_1260
+Collect reg: n1_1_reg_1246
+Collect reg: n1_reg_141
+************* finish push reg, arg number: 17
+************* finish push mem-output, arg number: 17
+push input: ap_continue, timeIdx: 18
+push input: ap_rst, timeIdx: 18
+--- wire: ap_rst, timeIdx: 18
+add_constraint for: ap_rst, timeIdx: 18
+extract for: ap_rst___#18
+push input: ap_start, timeIdx: 18
+push input: out_stream_V_value_V_full_n, timeIdx: 18
+--- wire: out_stream_V_value_V_full_n, timeIdx: 18
+add_constraint for: out_stream_V_value_V_full_n, timeIdx: 18
+extract for: out_stream_V_value_V_full_n___#18
+push input: slice_stream_V_value_V_dout, timeIdx: 18
+--- wire: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_dout, timeIdx: 18
+add_constraint for: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_dout, timeIdx: 18
+--- Begin submod: slice_stream_V_value_V_U, port: if_dout, time: 18
+
+Breakpoint 1, funcExtract::UpdateFunctionGen::submod_constraint (this=0x7fffffffca80, node=0x5555568eced0, timeIdx=18, c=std::shared_ptr<llvm::LLVMContext> (use count 1, weak count 0) = {...}, 
+    b=std::shared_ptr<llvm::IRBuilder<llvm::ConstantFolder, llvm::IRBuilderDefaultInserter>> (use count 1, weak count 0) = {...}, bound=18)
+    at /home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/op_constraint.cpp:1339
+1339	    toCoutVerb("Find it!");
+(gdb) 
+Continuing.
+Find it!
+Collecting regs for: FIFO_hls_target_call_slice_stream_V_value_V
+Collect reg: internal_empty_n
+Collect reg: internal_full_n
+Collect reg: mOutPtr
+Find it!
+************* finish push reg, arg number: 3
+************* finish push mem-output, arg number: 22
+push input: clk, timeIdx: 18
+push input: if_din, timeIdx: 18
+--- wire: hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din, timeIdx: 18
+add_constraint for: hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din, timeIdx: 18
+extract for: hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din___#18
+push input: if_read, timeIdx: 18
+--- wire: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_read, timeIdx: 18
+add_constraint for: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_read, timeIdx: 18
+--- Begin submod: hls_target_call_Loop_LB2D_shift_proc_U0, port: slice_stream_V_value_V_read, time: 18
+Collecting regs for: hls_target_call_Loop_LB2D_shift_proc
+Collect reg: ap_CS_fsm
+Collect reg: ap_done_reg
+Collect reg: ap_reg_ppiten_pp0_it0
+Collect reg: ap_reg_ppiten_pp0_it1
+Collect reg: buffer_0_value_V_fu_100
+Collect reg: buffer_1_value_V_fu_104
+Collect reg: buffer_2_value_V_fu_108
+Collect reg: buffer_3_value_V_fu_112
+Collect reg: buffer_4_value_V_fu_116
+Collect reg: buffer_5_value_V_fu_120
+Collect reg: buffer_6_value_V_fu_124
+Collect reg: buffer_7_value_V_fu_96
+Collect reg: exitcond21_i_i_reg_1251
+Collect reg: i_0_i_i_reg_152
+Collect reg: icmp_reg_1260
+Collect reg: n1_1_reg_1246
+Collect reg: n1_reg_141
+************* finish push reg, arg number: 17
+************* finish push mem-output, arg number: 17
+push input: ap_continue, timeIdx: 18
+push input: ap_rst, timeIdx: 18
+--- wire: ap_rst, timeIdx: 18
+add_constraint for: ap_rst, timeIdx: 18
+extract for: ap_rst___#18
+push input: ap_start, timeIdx: 18
+push input: out_stream_V_value_V_full_n, timeIdx: 18
+--- wire: out_stream_V_value_V_full_n, timeIdx: 18
+add_constraint for: out_stream_V_value_V_full_n, timeIdx: 18
+extract for: out_stream_V_value_V_full_n___#18
+push input: slice_stream_V_value_V_dout, timeIdx: 18
+--- wire: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_dout, timeIdx: 18
+add_constraint for: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_dout, timeIdx: 18
+--- Begin submod: slice_stream_V_value_V_U, port: if_dout, time: 18
+
+Breakpoint 1, funcExtract::UpdateFunctionGen::submod_constraint (this=0x7fffffffca80, node=0x5555568eced0, timeIdx=18, c=std::shared_ptr<llvm::LLVMContext> (use count 1, weak count 0) = {...}, 
+    b=std::shared_ptr<llvm::IRBuilder<llvm::ConstantFolder, llvm::IRBuilderDefaultInserter>> (use count 1, weak count 0) = {...}, bound=18)
+    at /home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/op_constraint.cpp:1339
+1339	    toCoutVerb("Find it!");
+(gdb) 
+Continuing.
+Find it!
+Collecting regs for: FIFO_hls_target_call_slice_stream_V_value_V
+Collect reg: internal_empty_n
+Collect reg: internal_full_n
+Collect reg: mOutPtr
+Find it!
+************* finish push reg, arg number: 3
+************* finish push mem-output, arg number: 22
+push input: clk, timeIdx: 18
+push input: if_din, timeIdx: 18
+--- wire: hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din, timeIdx: 18
+add_constraint for: hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din, timeIdx: 18
+extract for: hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din___#18
+push input: if_read, timeIdx: 18
+--- wire: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_read, timeIdx: 18
+add_constraint for: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_read, timeIdx: 18
+--- Begin submod: hls_target_call_Loop_LB2D_shift_proc_U0, port: slice_stream_V_value_V_read, time: 18
+Collecting regs for: hls_target_call_Loop_LB2D_shift_proc
+Collect reg: ap_CS_fsm
+Collect reg: ap_done_reg
+Collect reg: ap_reg_ppiten_pp0_it0
+Collect reg: ap_reg_ppiten_pp0_it1
+Collect reg: buffer_0_value_V_fu_100
+Collect reg: buffer_1_value_V_fu_104
+Collect reg: buffer_2_value_V_fu_108
+Collect reg: buffer_3_value_V_fu_112
+Collect reg: buffer_4_value_V_fu_116
+Collect reg: buffer_5_value_V_fu_120
+Collect reg: buffer_6_value_V_fu_124
+Collect reg: buffer_7_value_V_fu_96
+Collect reg: exitcond21_i_i_reg_1251
+Collect reg: i_0_i_i_reg_152
+Collect reg: icmp_reg_1260
+Collect reg: n1_1_reg_1246
+Collect reg: n1_reg_141
+************* finish push reg, arg number: 17
+************* finish push mem-output, arg number: 17
+push input: ap_continue, timeIdx: 18
+push input: ap_rst, timeIdx: 18
+--- wire: ap_rst, timeIdx: 18
+add_constraint for: ap_rst, timeIdx: 18
+extract for: ap_rst___#18
+push input: ap_start, timeIdx: 18
+push input: out_stream_V_value_V_full_n, timeIdx: 18
+--- wire: out_stream_V_value_V_full_n, timeIdx: 18
+add_constraint for: out_stream_V_value_V_full_n, timeIdx: 18
+extract for: out_stream_V_value_V_full_n___#18
+push input: slice_stream_V_value_V_dout, timeIdx: 18
+--- wire: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_dout, timeIdx: 18
+add_constraint for: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_dout, timeIdx: 18
+--- Begin submod: slice_stream_V_value_V_U, port: if_dout, time: 18
+
+Breakpoint 1, funcExtract::UpdateFunctionGen::submod_constraint (this=0x7fffffffca80, node=0x5555568eced0, timeIdx=18, c=std::shared_ptr<llvm::LLVMContext> (use count 1, weak count 0) = {...}, 
+    b=std::shared_ptr<llvm::IRBuilder<llvm::ConstantFolder, llvm::IRBuilderDefaultInserter>> (use count 1, weak count 0) = {...}, bound=18)
+    at /home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/op_constraint.cpp:1339
+1339	    toCoutVerb("Find it!");
+(gdb) 
+Continuing.
+Find it!
+Collecting regs for: FIFO_hls_target_call_slice_stream_V_value_V
+Collect reg: internal_empty_n
+Collect reg: internal_full_n
+Collect reg: mOutPtr
+Find it!
+************* finish push reg, arg number: 3
+************* finish push mem-output, arg number: 22
+push input: clk, timeIdx: 18
+push input: if_din, timeIdx: 18
+--- wire: hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din, timeIdx: 18
+add_constraint for: hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din, timeIdx: 18
+extract for: hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din___#18
+push input: if_read, timeIdx: 18
+--- wire: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_read, timeIdx: 18
+add_constraint for: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_read, timeIdx: 18
+--- Begin submod: hls_target_call_Loop_LB2D_shift_proc_U0, port: slice_stream_V_value_V_read, time: 18
+Collecting regs for: hls_target_call_Loop_LB2D_shift_proc
+Collect reg: ap_CS_fsm
+Collect reg: ap_done_reg
+Collect reg: ap_reg_ppiten_pp0_it0
+Collect reg: ap_reg_ppiten_pp0_it1
+Collect reg: buffer_0_value_V_fu_100
+Collect reg: buffer_1_value_V_fu_104
+Collect reg: buffer_2_value_V_fu_108
+Collect reg: buffer_3_value_V_fu_112
+Collect reg: buffer_4_value_V_fu_116
+Collect reg: buffer_5_value_V_fu_120
+Collect reg: buffer_6_value_V_fu_124
+Collect reg: buffer_7_value_V_fu_96
+Collect reg: exitcond21_i_i_reg_1251
+Collect reg: i_0_i_i_reg_152
+Collect reg: icmp_reg_1260
+Collect reg: n1_1_reg_1246
+Collect reg: n1_reg_141
+************* finish push reg, arg number: 17
+************* finish push mem-output, arg number: 17
+push input: ap_continue, timeIdx: 18
+push input: ap_rst, timeIdx: 18
+--- wire: ap_rst, timeIdx: 18
+add_constraint for: ap_rst, timeIdx: 18
+extract for: ap_rst___#18
+push input: ap_start, timeIdx: 18
+push input: out_stream_V_value_V_full_n, timeIdx: 18
+--- wire: out_stream_V_value_V_full_n, timeIdx: 18
+add_constraint for: out_stream_V_value_V_full_n, timeIdx: 18
+extract for: out_stream_V_value_V_full_n___#18
+push input: slice_stream_V_value_V_dout, timeIdx: 18
+--- wire: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_dout, timeIdx: 18
+add_constraint for: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_dout, timeIdx: 18
+--- Begin submod: slice_stream_V_value_V_U, port: if_dout, time: 18
+
+
+
+
+--- Begin submod: hls_target_call_Loop_LB2D_shift_proc_U0, port: slice_stream_V_value_V_read, time: 18
+
+--- Begin submod: slice_stream_V_value_V_U, port: if_dout, time: 18

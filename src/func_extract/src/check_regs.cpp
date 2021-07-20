@@ -1338,7 +1338,7 @@ UpdateFunctionGen::initialize_min_delay(std::shared_ptr<ModuleInfo_t> &modInfo,
   if(dynData->minInOutDelay.find(outPort) == dynData->minInOutDelay.end()) {
     std::map<std::string, uint32_t> toInputDelay;
     for(std::string input : modInfo->moduleInputs) {
-      toInputDelay.emplace(input, UINT32_MAX);
+      toInputDelay.emplace(input, DELAY_MAX);
     }
     dynData->minInOutDelay.emplace(outPort, toInputDelay);
   }
