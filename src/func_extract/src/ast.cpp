@@ -92,7 +92,7 @@ void build_ast_tree() {
     if(line != "[") {
       if(line.find(":") == std::string::npos) {
         remove_two_end_space(line);
-        g_allowedTgt.emplace(line, 0);
+        g_allowedTgt.emplace(line, std::vector<uint32_t>{});
       }
       else {
         size_t pos = line.find(":");
@@ -101,7 +101,10 @@ void build_ast_tree() {
         std::string delayStr = line.substr(pos+1);
         remove_two_end_space(delayStr);
         uint32_t delay = std::stoi(delayStr);
-        g_allowedTgt.emplace(var, delay);
+        if(g_allowedTgt.find(var) == g_allowedTgt.end())
+          g_allowedTgt.emplace(var, std::vector<uint32_t>{delay});
+        else
+          g_allowedTgt[var].push_back(delay);
       }
     }
     // collecting vector of target registers

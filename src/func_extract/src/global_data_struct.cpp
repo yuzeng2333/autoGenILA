@@ -33,7 +33,7 @@ std::map<std::string, uint32_t> g_moduleInportTime;
 std::map<std::string, uint32_t> g_asv;
 Str2StrVecMap_t g_moduleInputsMap;
 Str2StrVecMap_t g_moduleOutputsMap;
-std::map<std::string, uint32_t> g_allowedTgt;
+std::map<std::string, std::vector<uint32_t>> g_allowedTgt;
 std::vector<std::pair<std::vector<std::string>, uint32_t>> g_allowedTgtVec;
 //VarWidth g_varWidth;
 

@@ -40,7 +40,7 @@ bool read_clean_o3(std::string fileName,
 
 uint32_t get_delay_bound(std::string var, struct InstrInfo_t &instrInfo, 
                    std::vector<std::pair<std::vector<std::string>, uint32_t>> allowedTgtVec,
-                   std::map<std::string, uint32_t> allowedTgt);
+                   std::map<std::string, std::vector<uint32_t>> allowedTgt);
 
 void print_func_info(std::ofstream &output);
 

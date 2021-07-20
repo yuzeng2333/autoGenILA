@@ -120,13 +120,22 @@ void get_all_update() {
       uint32_t instrIdx = 0;
       for(auto instrInfo : g_instrInfo) {
         instrIdx++;
-        uint32_t delayBound = get_delay_bound(target, instrInfo, 
-                                              g_allowedTgtVec, g_allowedTgt);
-        //std::thread th(get_update_function, target, tgtVec, isVec,
-        //               instrInfo, instrIdx);
-        //threadVec.push_back(std::move(th));
-        get_update_function(target, delayBound, tgtVec, isVec,
-                            instrInfo, instrIdx);
+        if(!target.empty()
+           && g_allowedTgt.find(target) != g_allowedTgt.end()
+           && g_allowedTgt[target].size() > 1) {
+          for(uint32_t delayBound : g_allowedTgt[target])
+            get_update_function(target, delayBound, tgtVec, isVec,
+                                instrInfo, instrIdx);
+        }
+        else { 
+          uint32_t delayBound = get_delay_bound(target, instrInfo, 
+                                                g_allowedTgtVec, g_allowedTgt);
+          //std::thread th(get_update_function, target, tgtVec, isVec,
+          //               instrInfo, instrIdx);
+          //threadVec.push_back(std::move(th));
+          get_update_function(target, delayBound, tgtVec, isVec,
+                              instrInfo, instrIdx);
+        }
       }
       //for(auto &th: threadVec) th.join();
       //if(isVec) {
@@ -189,11 +198,22 @@ void get_all_update() {
           //  visitedTgtFile << target << std::endl;
           //}
 
-          uint32_t delayBound = get_delay_bound(target, instrInfo, 
-                                                g_allowedTgtVec, g_allowedTgt);
-          std::thread th(get_update_function, target, delayBound, tgtVec, 
-                         isVec, instrInfo, instrIdx);
-          threadVec.push_back(std::move(th));
+          if(!target.empty()
+             && g_allowedTgt.find(target) != g_allowedTgt.end()
+             && g_allowedTgt[target].size() > 1) {
+            for(uint32_t delayBound : g_allowedTgt[target]) {
+              std::thread th(get_update_function, target, delayBound, tgtVec, 
+                             isVec, instrInfo, instrIdx);
+              threadVec.push_back(std::move(th));              
+            }
+          }
+          else {
+            uint32_t delayBound = get_delay_bound(target, instrInfo, 
+                                                  g_allowedTgtVec, g_allowedTgt);
+            std::thread th(get_update_function, target, delayBound, tgtVec, 
+                           isVec, instrInfo, instrIdx);
+            threadVec.push_back(std::move(th));            
+          }
         }
         // wait for update functions for all regs to finish
         for(auto &th: threadVec) th.join();
@@ -390,7 +410,8 @@ void get_update_function(std::string target,
 
 uint32_t get_delay_bound(std::string var, struct InstrInfo_t &instrInfo, 
                    std::vector<std::pair<std::vector<std::string>, uint32_t>> allowedTgtVec,
-                   std::map<std::string, uint32_t> allowedTgt) {
+                   std::map<std::string, std::vector<uint32_t>> allowedTgt) {
+  assert(allowedTgt[var].size() == 1);
   uint32_t delayBound = instrInfo.delayBound;
   if(var.substr(var.size()-4) == "_Arr") {
     std::string firstVar = var.substr(0, var.size()-4);
@@ -404,8 +425,8 @@ uint32_t get_delay_bound(std::string var, struct InstrInfo_t &instrInfo,
     delayBound = instrInfo.delayExceptions[var];
   }
   else if(allowedTgt.find(var) != allowedTgt.end() 
-          && allowedTgt[var] != 0) {
-    delayBound = g_allowedTgt[var];
+          && !allowedTgt[var].empty()) {
+    delayBound = g_allowedTgt[var].front();
   }
   return delayBound;
 }
