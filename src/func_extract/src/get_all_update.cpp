@@ -10,7 +10,7 @@
 namespace funcExtract {
 
 // TODO: configurations
-bool g_use_multi_thread = false;
+bool g_use_multi_thread = true;
 
 std::mutex g_dependVarMapMtx;
 // the first key is instr name, the second key is target name
@@ -117,6 +117,7 @@ void get_all_update() {
           continue;
       }
 
+      if(target.empty()) continue;
       uint32_t instrIdx = 0;
       for(auto instrInfo : g_instrInfo) {
         instrIdx++;
@@ -197,7 +198,7 @@ void get_all_update() {
           //  visitedTgt.insert(target);
           //  visitedTgtFile << target << std::endl;
           //}
-
+          if(target.empty()) continue;
           if(!target.empty()
              && g_allowedTgt.find(target) != g_allowedTgt.end()
              && g_allowedTgt[target].size() > 1) {
@@ -471,12 +472,13 @@ bool read_clean_o3(std::string fileName,
       if(!seeFuncDef) {
         topFuncLine = line;
         seeFuncDef = true;
-        while(line.find("top_bb:") == std::string::npos) {
+        std::getline(input, line);
+        if(line.find("top_bb:") != std::string::npos) {
+          std::getline(input, topRet);
+        }        
+        while(line != "}") {
           std::getline(input, line);
         }
-        std::getline(input, topRet);
-        std::getline(input, line);
-        assert(line == "}");
         continue;
       }
       else if( line.substr(0, 24) == "define internal fastcc [" ) {
@@ -546,7 +548,7 @@ bool read_clean_o3(std::string fileName,
       if(dotPos == argList.size()) break;
     }
   }
-  else {
+  else if(!topRet.empty()){
     // if internal function does not exist, but the top-level-return
     // statement is not empty, then we make a simple function 
     // with the top-level-return statement
