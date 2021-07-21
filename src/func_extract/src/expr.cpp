@@ -374,7 +374,7 @@ void always_expr(std::string line, std::ifstream &input) {
   g_recentClk = m.str(2);
   // parse first assignment
   std::getline(input, line);
-  if(line.find("if (_045_)") != std::string::npos) 
+  if(line.find("if (_127_)") != std::string::npos) 
     toCout("Find it!");
   if( std::regex_match(line, m, pNonblock) || std::regex_match(line, m, pNonblockConcat) ) {
     nb_expr(line);
@@ -456,6 +456,7 @@ std::pair<std::string, std::string> nonblockif_expr(std::string line,
   auto endOfIf = input.tellg();
   std::getline(input, line);
   if( !std::regex_match(line, m, pNBElseIf) ) {
+    assert(line.find("else if") == std::string::npos);
     if ( !std::regex_match(line, m, pNonblockElse) ) {
       input.seekg(endOfIf);
       elseValue = destAndSlice;

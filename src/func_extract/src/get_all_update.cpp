@@ -10,7 +10,7 @@
 namespace funcExtract {
 
 // TODO: configurations
-bool g_use_multi_thread = true;
+bool g_use_multi_thread = false;
 
 std::mutex g_dependVarMapMtx;
 // the first key is instr name, the second key is target name
@@ -336,6 +336,7 @@ void get_update_function(std::string target,
   toCout("---  BEGIN INSTRUCTION #"+toStr(instrIdx)+" ---");
   std::string destNameSimp = destInfo.get_dest_name();
   remove_front_backslash(destNameSimp);
+  std::string funcName = instrInfo.name+"_"+destNameSimp;
   std::string fileName = g_path+"/"+instrInfo.name+"_"
                          +destNameSimp+"_"+toStr(delayBound);
   UpdateFunctionGen UFGen;
@@ -349,7 +350,7 @@ void get_update_function(std::string target,
   system(opto3.c_str());
   toCout("** End simplify update function");
   std::vector<std::pair<std::string, uint32_t>> argVec;
-  bool usefulFunc = read_clean_o3(fileName+"_clean.o3.ll", argVec, fileName+"_clean.simp.ll");
+  bool usefulFunc = read_clean_o3(fileName+"_clean.o3.ll", argVec, fileName+"_clean.simp.ll", funcName);
 
   std::string llvmFileName = instrInfo.name+"_"+destInfo.get_dest_name()
                              +"_"+toStr(delayBound)+".ll";
@@ -411,7 +412,11 @@ void get_update_function(std::string target,
 uint32_t get_delay_bound(std::string var, struct InstrInfo_t &instrInfo, 
                    std::vector<std::pair<std::vector<std::string>, uint32_t>> allowedTgtVec,
                    std::map<std::string, std::vector<uint32_t>> allowedTgt) {
-  assert(allowedTgt[var].size() == 1);
+  if(allowedTgt[var].size() != 1) {
+    toCout("Error: delay number size is not 1: "+var);
+    for(uint32_t delay: allowedTgt[var])
+      toCout(delay);
+  }
   uint32_t delayBound = instrInfo.delayBound;
   if(var.substr(var.size()-4) == "_Arr") {
     std::string firstVar = var.substr(0, var.size()-4);
@@ -438,7 +443,8 @@ uint32_t get_delay_bound(std::string var, struct InstrInfo_t &instrInfo,
 // Assune: if no internal function is found, then this function is discarded
 bool read_clean_o3(std::string fileName, 
                    std::vector<std::pair<std::string, uint32_t>> &argVec,
-                   std::string outFileName) {
+                   std::string outFileName,
+                   std::string funcNameIn) {
   std::ifstream input(fileName);
   std::ofstream output(outFileName);
   std::string line;
@@ -448,14 +454,29 @@ bool read_clean_o3(std::string fileName,
   bool seeReturn = false;
   bool returnConst = false;
   std::regex pDef("^define internal fastcc i(\\d+) @(\\S+)\\((.*)\\) unnamed_addr #1 \\{$");  
-  std::regex pVecDef("^define internal fastcc \\[(\\d+) x i(\\d+)\\] @(\\S+)\\((.*)\\) unnamed_addr #1 \\{$");  
+  std::regex pVecDef(
+    "^define internal fastcc \\[(\\d+) x i(\\d+)\\] @(\\S+)\\((.*)\\) unnamed_addr #1 \\{$"
+  );  
+  std::regex pTopDef("^define i(\\d+) @top_function\\((.*)\\) local_unnamed_addr #0 \\{$");  
+  std::regex pTopVecDef(
+    "^define \\[(\\d+) x i(\\d+)\\] @top_function\\((.*)\\) local_unnamed_addr #0 \\{$"
+  );  
   std::regex pRetZero("^\\s+ret i\\d+ 0$");
   bool internalExist = false;
+  std::string topRet;
+  std::string attributeLine;
+  std::string topFuncLine;
   while(std::getline(input, line)) {
     if(line.substr(0, 6) == "define" && !internalExist) {
       if(!seeFuncDef) {
+        topFuncLine = line;
         seeFuncDef = true;
-        while(line != "}") std::getline(input, line);
+        while(line.find("top_bb:") == std::string::npos) {
+          std::getline(input, line);
+        }
+        std::getline(input, topRet);
+        std::getline(input, line);
+        assert(line == "}");
         continue;
       }
       else if( line.substr(0, 24) == "define internal fastcc [" ) {
@@ -493,7 +514,10 @@ bool read_clean_o3(std::string fileName,
     //    if(std::regex_match(line, m, pRetZero)) returnConst = true;
     //  }
     //}
-    output << line << std::endl;    
+    // make sure the attributes line is at the end of this file
+    if(line.substr(0, 10) != "attributes")
+      output << line << std::endl;
+    else attributeLine = line;
   }
   output.close();
   if(internalExist) {
@@ -522,6 +546,38 @@ bool read_clean_o3(std::string fileName,
       if(dotPos == argList.size()) break;
     }
   }
+  else {
+    // if internal function does not exist, but the top-level-return
+    // statement is not empty, then we make a simple function 
+    // with the top-level-return statement
+    if( topFuncLine.substr(0, 24) == "define [" ) {
+      if(!std::regex_match(topFuncLine, m, pTopVecDef)) {
+        toCout("Error: pTopVecDef is not matched: "+topFuncLine);
+        abort();
+      }
+      std::string arrLen = m.str(1);
+      std::string retWidth = m.str(2);
+      argList = m.str(3);
+      toCout("Error: not supported yet: vec-func with naive return: "+topFuncLine);
+      abort();
+    }
+    else {
+      if(!std::regex_match(topFuncLine, m, pTopDef)) {
+        toCout("Error: pTopDef is not matched: "+topFuncLine);
+        abort();
+      }
+      std::string retWidth = m.str(1);
+      argList = m.str(2);
+      std::string newFuncLine = "define i"+retWidth+
+        " @"+funcNameIn+"() local_unnamed_addr #0 {";
+      output << newFuncLine << std::endl;
+      output << "top_bb:" << std::endl;
+      output << topRet << std::endl;
+      output << "}" << std::endl << std::endl;
+      argVec.clear();
+    }
+  }
+  output << attributeLine << std::endl;
   return internalExist;
 }
 

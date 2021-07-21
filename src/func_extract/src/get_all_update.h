@@ -36,7 +36,8 @@ void get_all_update();
 
 bool read_clean_o3(std::string fileName, 
                    std::vector<std::pair<std::string, uint32_t>> &argVec,
-                   std::string outFileName);                   
+                   std::string outFileName,
+                   std::string funcNameIn);                   
 
 uint32_t get_delay_bound(std::string var, struct InstrInfo_t &instrInfo, 
                    std::vector<std::pair<std::vector<std::string>, uint32_t>> allowedTgtVec,
