@@ -240,7 +240,7 @@ void clean_file(std::string fileName, bool useLogic) {
 
   while( std::getline(cleanFileInput, line) ) {
     //toCout(line);
-    if(line.find("nvdla_cdp_s_lut_access_cfg_0_out") != std::string::npos) {
+    if(line.find("_fifo.wr ) _414_ <= { _000_[15:6], _000_[4:0] };") != std::string::npos) {
       toCout("FIND IT!");
     }
 

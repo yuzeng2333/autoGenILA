@@ -76,9 +76,9 @@ std::regex pEndmodule   ("^(\\s*)endmodule$");
 /* non-blocking assignment */
 std::regex pNonblock    (taintGen::to_re("^(\\s*)(NAME) (?:\\s)?<= (NAME)(\\s*)?;$"));
 std::regex pNonblockConcat    (taintGen::to_re("^(\\s*)(NAME) <= \\{(.+)\\}(\\s*)?;$"));
-std::regex pNonblockIf  (taintGen::to_re("^(\\s*)if \\((NAME)\\) (NAME) <= (NAME)(\\s*)?;$"));
+std::regex pNonblockIf  (taintGen::to_re("^(\\s*)if \\((\\S+)\\s?\\) (NAME) <= (NAME)(\\s*)?;$"));
 std::regex pNonblockElse(taintGen::to_re("^(\\s*)else (NAME) <= (NAME)(\\s*)?;$"));
-std::regex pNBElseIf    (taintGen::to_re("^(\\s*)else if \\((NAME)\\) (NAME) <= (NAME)(\\s*)?;$"));
+std::regex pNBElseIf    (taintGen::to_re("^(\\s*)else if \\((\\S+)\\s?\\) (NAME) <= (NAME)(\\s*)?;$"));
 std::regex pNonblockIf2 (taintGen::to_re("^(\\s*)if \\((NAME)\\) ([a-zA-Z0-9]+)(\\[([a-zA-Z0-9]+)\\[(\\d+)\\]\\]) <= (NAME)(\\s*)?;$"));
 /* function */
 std::regex pFunctionDef   (taintGen::to_re("^(\\s*)function (\\[\\d+\\:0\\] )?(NAME)(\\s*)?;$"));
