@@ -23,7 +23,7 @@ bool is_func_start(std::string line) {
 // have same reset value for same register.
 void hierarchical_vcd_parser(std::string fileName, std::map<std::string, std::unordered_map<std::string, std::string>>& valMap) {
   // key is nXXX, pair is <moduleName, varName>
-  std::unordered_map<std::string, std::pair<std::string, std::string>> nameVarMap;
+  std::map<std::string, std::pair<std::string, std::string>> nameVarMap;
   std::stack<std::string> instanceNameStack;
   std::stack<std::string> moduleNameStack;
 

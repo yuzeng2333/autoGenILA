@@ -84,7 +84,7 @@ bool g_possibleSign;
 bool isTop = false;
 bool g_hasRst;
 bool g_hasClk;
-bool g_verb = false;
+bool g_verb = true;
 bool g_has_read_taint;  // if false, read taint is replaced with x taint
 bool g_rst_pos;
 bool g_clkrst_exist = false;
@@ -112,18 +112,18 @@ bool g_special_equal_taint = false;
 // set the read flag only if reg's value is not reset value
 bool g_set_rflag_if_not_rst_val = false;  // TODO: usually enable it 
 // TODO: enable it for biRISCV
-bool g_set_rflag_if_not_norm_val = false; 
+bool g_set_rflag_if_not_norm_val = true; 
 // TODO: seems problematic, be careful when considering enable it
 // Disable for 8051
 bool g_use_does_keep = false;  
 // enable this to only check if reg's value is invariant when instruction finished
-CheckInvarType g_check_invariance = CheckTwoVal; // TODO: check this setting
+CheckInvarType g_check_invariance = CheckRst; // TODO: check this setting
 // TODO: g_enable_taint set to false when only checking invariance
 // (Used when checking for invariant registers to replace ASVs)
-bool g_enable_taint = false;
+bool g_enable_taint = true;
 // if is true, "assert()" will be generated for jaspergold to check
 // otherwise, a verilog assert module will be generated for simulation-based check
-bool g_use_jasper = true;
+bool g_use_jasper = false;
 uint32_t g_assert_num = 0;
 uint32_t g_case_reg_num = 0;
 std::vector<std::string> g_assertNames;

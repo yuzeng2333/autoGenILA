@@ -1777,10 +1777,9 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
   std::string src, srcSlice;
   std::string cond, condSlice;
   bool isFirstLine = true;
-  std::vector<std::pair<std::string, std::string>> condAndSrcVec;
+  std::vector<std::string> nonConstAssign;
   std::string taintRst;
   if(g_use_taint_rst) taintRst = "|| "+TAINT_RST+" ";
-  std::string dest_t_Or = "";
 
   do{
     if (isFirstLine)
@@ -1801,6 +1800,7 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
     uint32_t localWidthNum = get_var_slice_width(destAndSlice);
 
     // assume: if src is num, the cond must be rst.
+    std::string dest_t_Or = "";
     if(g_wt_keeped) dest_t_Or = "( INSTR_IN_ZY ? 0 :" + dest + _t + " " + destSlice + " ) | ";
 
     if(isNum(src)) {
@@ -1810,7 +1810,7 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
       output << blank + "if (" + condAndSlice + ") " + dest + "_r_flag " + destSlice + " <= 0 ;" << std::endl;
     }
     else {
-      condAndSrcVec.push_back(std::make_pair(condAndSlice, srcAndSlice));
+      nonConstAssign.push_back(line);
       uint32_t localWidthNum = get_var_slice_width(srcAndSlice);
       // FIXME: replace get_recent_rst() with rst_zy?
       output << blank + "if (" + get_recent_rst() + taintRst + ") " + dest + _t + " " + destSlice + " <= 0 ;" << std::endl;
@@ -1839,9 +1839,8 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
   // deal with the next line
   std::string elseDestAndSlice;
   std::string elseSrcAndSlice;
-  bool isElse, isElseIf;
-  isElse = std::regex_match(line, m, pNonblockElse);
-  if(!isElse) isElseIf = std::regex_match(line, m, pNBElseIf);
+  bool isElse = std::regex_match(line, m, pNonblockElse);
+  bool isElseIf = std::regex_match(line, m, pNBElseIf);
   if( isElse || isElseIf ) {
     std::string localCondAndSlice;  
     if(isElse) {
@@ -1865,7 +1864,7 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
       output << blank + "else " + dest + "_r_flag " + destSlice + " <= 0 ;" << std::endl;
     }
     else {
-      condAndSrcVec.push_back(std::make_pair(localCondAndSlice, elseSrcAndSlice));      
+      nonConstAssign.push_back(line);
       uint32_t localWidthNum = get_var_slice_width(elseSrcAndSlice);
       // FIXME: replace get_recent_rst() with rst_zy?
       if(g_use_value_change) {
@@ -1901,22 +1900,28 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
 
   //if(hasRst)
   //  output << blank + "if (" + rst + taintRst + ") " + dest + "_r_flag_top <= 0;" << std::endl;
-  for(auto pair: condAndSrcVec) {
+  for(std::string line: nonConstAssign) {
     //  FIXME: add option for pNonblockElse
-    condAndSlice = pair.first;
-    srcAndSlice = pair.second;
+    std::regex_match(line, m, pNonblockIf);
+    condAndSlice = m.str(2);
+    destAndSlice = m.str(3);
+    srcAndSlice = m.str(4);
+    split_slice(destAndSlice, dest, destSlice);
     split_slice(srcAndSlice, src, srcSlice);
     split_slice(condAndSlice, cond, condSlice);
-
     
     uint32_t localWidthNum = get_var_slice_width(srcAndSlice);
     bool srcIsNew;
     std::string srcVer = toStr(find_version_num(srcAndSlice, srcIsNew, output));
     if(srcIsNew) {
       auto srcIdxPair = varWidth.get_idx_pair(src, line);
+      //output << "  logic [" + toStr(srcIdxPair.first) + ":" + toStr(srcIdxPair.second) + "] " + src + _x + srcVer + " ;" << std::endl;
       output << "  logic [" + toStr(srcIdxPair.first) + ":" + toStr(srcIdxPair.second) + "] " + src + _r + srcVer + " ;" << std::endl;
+      //output << "  logic [" + toStr(srcIdxPair.first) + ":" + toStr(srcIdxPair.second) + "] " + src + _c + srcVer + " ;" << std::endl;
     }
+    //output << "  assign " + src + _x + srcVer + srcSlice + " = " + extend(destAndSlice+" != "+srcAndSlice, localWidthNum) + " ;" << std::endl; 
     output << "  assign " + src + _r + srcVer + srcSlice + " = " + extend(condAndSlice, localWidthNum) + " & " + src + _t + srcSlice + " ;" << std::endl; 
+    //output << "  assign " + src + _c + srcVer + srcSlice + " = " + extend("1'b1", localWidthNum) + " ;" << std::endl;
   }
 }
 
