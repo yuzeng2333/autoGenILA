@@ -123,7 +123,7 @@ CheckInvarType g_check_invariance = CheckRst; // TODO: check this setting
 bool g_enable_taint = true;
 // if is true, "assert()" will be generated for jaspergold to check
 // otherwise, a verilog assert module will be generated for simulation-based check
-bool g_use_jasper = false;
+bool g_use_jasper = true;
 uint32_t g_assert_num = 0;
 uint32_t g_case_reg_num = 0;
 std::vector<std::string> g_assertNames;

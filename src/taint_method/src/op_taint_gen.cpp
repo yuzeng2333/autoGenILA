@@ -1807,10 +1807,41 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
       hasRst = true;
       rst = condAndSlice;
       // FIXME: may need to add assignment to _t here
-      output << always_line << std::endl;
-      output << blank + "if (" + condAndSlice + ") " + dest + "_t_flag " + destSlice + " <= 0 ;" << std::endl;
-      output << always_line << std::endl;
-      output << blank + "if (" + condAndSlice + ") " + dest + "_r_flag " + destSlice + " <= 0 ;" << std::endl;
+      //output << always_line << std::endl;
+      //output << blank + "if (" + condAndSlice + ") " + dest + "_t_flag " + destSlice + " <= 0 ;" << std::endl;
+      //output << always_line << std::endl;
+      //output << blank + "if (" + condAndSlice + ") " + dest + "_r_flag " + destSlice + " <= 0 ;" << std::endl;
+
+      uint32_t localWidthNum = get_var_slice_width(srcAndSlice);
+      // FIXME: replace get_recent_rst() with rst_zy?
+      if(g_use_value_change) {
+        output << always_line << std::endl;
+        output << blank + "if ( " + condAndSlice + " ) " + dest + _t + " " + destSlice + " <= ( " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + destAndSlice + " != " + srcAndSlice + " );" << std::endl;
+
+        output << always_line << std::endl;
+        output << blank + "if ( " + condAndSlice + " ) " + dest + "_t_flag " + destSlice + " <= " + dest + "_t_flag " + destSlice + " ? 1 : (" + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + destAndSlice + " != " + srcAndSlice + " );" << std::endl;
+      }
+      else {
+        output << always_line << std::endl;
+        output << blank + "if ( " + condAndSlice + " ) " + dest + _t + " " + destSlice + " <= ( " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + dest_t_Or + extend( dest+_sig+" != 0", localWidthNum ) + " );" << std::endl;
+
+        output << always_line << std::endl;
+        output << blank + "if ( " + condAndSlice + " ) " + dest + "_t_flag " + destSlice + " <= " + dest + "_t_flag " + destSlice + " ? 1 : (" + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + extend( dest+_sig+" != 0", localWidthNum ) + " );" << std::endl;
+      }
+
+      std::string neqRst = "";
+      if(g_set_rflag_if_not_rst_val) {
+        if(g_rstValMap[moduleName].find(dest) == g_rstValMap[moduleName].end()) {
+          toCout("Error: cannot find in g_rstValMap for module: "+moduleName+", var: "+dest);
+          neqRst = " && "+dest+" "+destSlice+" != 0";          
+        }
+        else
+          neqRst = " && "+dest+" "+destSlice+" != "+g_rstValMap[moduleName][dest];
+      }
+      output << always_line << std::endl;      
+      output << blank + "if ( " + condAndSlice + " ) " + dest + "_r_flag " + destSlice + " <= " + dest + "_r_flag " + destSlice + " ? 1 : " + dest + "_t_flag " + destSlice + " ? 0 : ( |" + dest + _r + " " + destSlice + neqRst + " ) ;" << std::endl;
+
+
     }
     else {
       condAndSrcVec.push_back(std::make_pair(condAndSlice, srcAndSlice));
@@ -1862,21 +1893,53 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
       split_slice(elseSrcAndSlice, src, srcSlice);
       assert(elseDestAndSlice == destAndSlice);
       localCondAndSlice = "!"+condAndSlice;
+      split_slice(condAndSlice, cond, condSlice);
     }
     else {
       elseDestAndSlice = m.str(3);
       elseSrcAndSlice = m.str(4);
       localCondAndSlice = m.str(2);
-      split_slice(elseSrcAndSlice, src, srcSlice);      
+      split_slice(elseSrcAndSlice, src, srcSlice);
+      split_slice(localCondAndSlice, cond, condSlice);
     }
 
     if( isNum(src) ) {
       hasRst = true;
-      toCout("Error: assignment for else branch is num!");
-      abort();
-      rst = localCondAndSlice;
-      output << blank + "else " + dest + "_t_flag " + destSlice + " <= 0 ;" << std::endl;
-      output << blank + "else " + dest + "_r_flag " + destSlice + " <= 0 ;" << std::endl;
+      toCout("Warning: assignment for else branch is num: "+line);
+      //abort();
+      //output << blank + "else " + dest + "_t_flag " + destSlice + " <= 0 ;" << std::endl;
+      //output << blank + "else " + dest + "_r_flag " + destSlice + " <= 0 ;" << std::endl;
+
+      uint32_t localWidthNum = get_var_slice_width(elseSrcAndSlice);
+      // FIXME: replace get_recent_rst() with rst_zy?
+      if(g_use_value_change) {
+        output << always_line << std::endl;
+        output << blank + "if ( " + localCondAndSlice + " ) " + dest + _t + " " + destSlice + " <= ( " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + destAndSlice + " != " + elseSrcAndSlice + " );" << std::endl;
+
+        output << always_line << std::endl;
+        output << blank + "if ( " + localCondAndSlice + " ) " + dest + "_t_flag " + destSlice + " <= " + dest + "_t_flag " + destSlice + " ? 1 : (" + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + destAndSlice + " != " + elseSrcAndSlice + " );" << std::endl;
+      }
+      else {
+        output << always_line << std::endl;
+        output << blank + "if ( " + localCondAndSlice + " ) " + dest + _t + " " + destSlice + " <= ( " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + dest_t_Or + extend( dest+_sig+" != 0", localWidthNum ) + " );" << std::endl;
+
+        output << always_line << std::endl;
+        output << blank + "if ( " + localCondAndSlice + " ) " + dest + "_t_flag " + destSlice + " <= " + dest + "_t_flag " + destSlice + " ? 1 : (" + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + extend( dest+_sig+" != 0", localWidthNum ) + " );" << std::endl;
+      }
+
+      std::string neqRst = "";
+      if(g_set_rflag_if_not_rst_val) {
+        if(g_rstValMap[moduleName].find(dest) == g_rstValMap[moduleName].end()) {
+          toCout("Error: cannot find in g_rstValMap for module: "+moduleName+", var: "+dest);
+          neqRst = " && "+dest+" "+destSlice+" != 0";          
+        }
+        else
+          neqRst = " && "+dest+" "+destSlice+" != "+g_rstValMap[moduleName][dest];
+      }
+      output << always_line << std::endl;      
+      output << blank + "if ( " + localCondAndSlice + " ) " + dest + "_r_flag " + destSlice + " <= " + dest + "_r_flag " + destSlice + " ? 1 : " + dest + "_t_flag " + destSlice + " ? 0 : ( |" + dest + _r + " " + destSlice + neqRst + " ) ;" << std::endl;
+
+
     }
     else {
       condAndSrcVec.push_back(std::make_pair(localCondAndSlice, elseSrcAndSlice));      
