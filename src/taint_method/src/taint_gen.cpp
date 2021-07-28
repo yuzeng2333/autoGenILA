@@ -1731,7 +1731,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
         caseNum++;
         split_slice(localPair.second, rhs, rhsSlice);
         output << blank + "    " + localPair.first + " :" << std::endl;
-        output << blank + "      " + dest + _sig + " = " + rhs + _sig + " [" + toStr(caseNum*g_sig_width-1) + ": (" + toStr(g_sig_width*(caseNum-1)) + "] == " + CONSTANT_SIG + " ) ? " + s + _sig + " : " + rhs + _sig + " [" + toStr(caseNum*g_sig_width-1) + ":" + toStr(g_sig_width*(caseNum-1)) + "] ;" << std::endl;
+        output << blank + "      " + dest + _sig + " = ( " + rhs + _sig + " [" + toStr(caseNum*g_sig_width-1) + " : " + toStr(g_sig_width*(caseNum-1)) + "] == " + CONSTANT_SIG + " ) ? " + s + _sig + " : " + rhs + _sig + " [" + toStr(caseNum*g_sig_width-1) + ":" + toStr(g_sig_width*(caseNum-1)) + "] ;" << std::endl;
       }
       output << blank + "    default :" << std::endl;
       output << blank + "      " + dest + _sig + " = ( " + a + _sig + " == " + CONSTANT_SIG + " ) ? " + s + _sig + " : " + a + _sig + " ;" << std::endl;
@@ -2677,15 +2677,24 @@ std::string separate_modules(std::string fileName,
 
   while(std::getline(input, line)) {
     //toCout(line);
-    if(std::regex_match(line, m, pNonblock)
-        || std::regex_match(line, m, pNonblockConcat)
-        || std::regex_match(line, m, pNonblockIf) ) {
-      std::string regAndSlice = m.str(2);
-      std::string reg, regSlice;
-      split_slice(regAndSlice, reg, regSlice);
-      if(regSet.find(reg) == regSet.end()) {
-        regSet.insert(reg);
-        totalRegCnt++;
+    if(line.find("<=") != std::string::npos) {
+      std::string regAndSlice = "";        
+      if(std::regex_match(line, m, pNonblock))
+        regAndSlice = m.str(2);
+      else if(std::regex_match(line, m, pNonblockConcat))
+        regAndSlice = m.str(2);
+      else if( std::regex_match(line, m, pNonblockIf))
+        regAndSlice = m.str(3);
+      else if( std::regex_match(line, m, pNonblockIf2))
+        regAndSlice = m.str(3);
+
+      if(!regAndSlice.empty()) {
+        std::string reg, regSlice;
+        split_slice(regAndSlice, reg, regSlice);
+        if(regSet.find(reg) == regSet.end()) {
+          regSet.insert(reg);
+          totalRegCnt++;
+        }
       }
     }
 

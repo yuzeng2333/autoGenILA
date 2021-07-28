@@ -1827,6 +1827,9 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
       uint32_t localWidthNum = get_var_slice_width(srcAndSlice);
       // FIXME: replace get_recent_rst() with rst_zy?
       if(g_use_value_change) {
+        output << always_line << std::endl;      
+        output << blank + "if (" + get_recent_rst() + taintRst + ") " + dest + _t + " " + destSlice + " <= 0 ;" << std::endl;
+
         output << always_line << std::endl;
         output << blank + "if ( " + condAndSlice + " ) " + dest + _t + " " + destSlice + " <= ( " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + destAndSlice + " != " + srcAndSlice + " );" << std::endl;
 
