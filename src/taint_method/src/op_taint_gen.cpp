@@ -1299,35 +1299,41 @@ void dest_concat_op_taint_gen(std::string line, std::ofstream &output) {
   std::vector<std::string> destVec;
   parse_var_list(destList, destVec);
   std::string src, srcSlice;
-  split_slice(srcAndSlice, src, srcSlice);
-  assert(!isMem(src));
 
-  //std::string destTList = std::regex_replace(destList, pVarNameGroup, "$1_t$3 ");
-  std::string destTList = get_lhs_taint_list(destList, _t, output);
-  output << blank + "assign { " + destTList + " } = " + src + _t + srcSlice + " ;" << std::endl;
+  if(!isNum(srcAndSlice)) {
+    split_slice(srcAndSlice, src, srcSlice);
+    assert(!isMem(src));
 
-  std::string destSigList = get_lhs_taint_list_no_slice(destList, _sig, output);
-  if(!g_use_value_change)
-    output << blank + "assign { " + destSigList + " } = 0;" << std::endl;
-  
-  std::string destRList = get_rhs_taint_list(destList, _r);
-  //std::string destXList = get_rhs_taint_list(destList, _x);
-  //std::string destCList = get_rhs_taint_list(destList, _c);
+    //std::string destTList = std::regex_replace(destList, pVarNameGroup, "$1_t$3 ");
+    std::string destTList = get_lhs_taint_list(destList, _t, output);
+    output << blank + "assign { " + destTList + " } = " + src + _t + srcSlice + " ;" << std::endl;
 
-  auto srcIdxPair = varWidth.get_idx_pair(src, line);
-  std::string srcHighIdx = toStr(srcIdxPair.first);
-  std::string srcLowIdx  = toStr(srcIdxPair.second);
-  bool isNew;
-  uint32_t localVerNum = find_version_num(srcAndSlice, isNew, output);
-  std::string localVer = std::to_string(localVerNum);
-  if(isNew) {
-    output << blank + "logic [" + srcHighIdx + ":" + srcLowIdx + "] " + src + _r + localVer + " ;" << std::endl;
-    //output << blank + "logic [" + srcHighIdx + ":" + srcLowIdx + "] " + src + _x + localVer + " ;" << std::endl;
-    //output << blank + "logic [" + srcHighIdx + ":" + srcLowIdx + "] " + src + _c + localVer + " ;" << std::endl;
+    std::string destSigList = get_lhs_taint_list_no_slice(destList, _sig, output);
+    if(!g_use_value_change)
+      output << blank + "assign { " + destSigList + " } = 0;" << std::endl;
+    
+    std::string destRList = get_rhs_taint_list(destList, _r);
+
+    auto srcIdxPair = varWidth.get_idx_pair(src, line);
+    std::string srcHighIdx = toStr(srcIdxPair.first);
+    std::string srcLowIdx  = toStr(srcIdxPair.second);
+    bool isNew;
+    uint32_t localVerNum = find_version_num(srcAndSlice, isNew, output);
+    std::string localVer = std::to_string(localVerNum);
+    if(isNew) {
+      output << blank + "logic [" + srcHighIdx + ":" + srcLowIdx + "] " + src + _r + localVer + " ;" << std::endl;
+    }
+    output << blank + "assign " + src + _r + localVer + srcSlice + " = { " + destRList + " };" << std::endl;
   }
-  output << blank + "assign " + src + _r + localVer + srcSlice + " = { " + destRList + " };" << std::endl;
-  //output << blank + "assign " + src + _x + localVer + srcSlice + " = { " + destXList + " };" << std::endl;
-  //output << blank + "assign " + src + _c + localVer + srcSlice + " = { " + destCList + " };" << std::endl;
+  else {
+    //std::string destTList = std::regex_replace(destList, pVarNameGroup, "$1_t$3 ");
+    std::string destTList = get_lhs_taint_list(destList, _t, output);
+    output << blank + "assign { " + destTList + " } = 0 ;" << std::endl;
+
+    std::string destSigList = get_lhs_taint_list_no_slice(destList, _sig, output);
+    if(!g_use_value_change)
+      output << blank + "assign { " + destSigList + " } = 0;" << std::endl;
+  }
 }
 
 
@@ -1766,6 +1772,10 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
 
   if(g_use_zy_count)
     checkCond(false, "ERROR: encounter nonblockif whiling use zy_count! "+line);
+
+  if(line.find("mem_unaligned_e2_q") != std::string::npos)
+    toCout("Find it!");
+
   //output << always_line << std::endl;
   bool hasRst = false;
   std::string rst;
@@ -1782,7 +1792,9 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
   if(g_use_taint_rst) taintRst = "|| "+TAINT_RST+" ";
   std::string dest_t_Or = "";
 
-  do{
+  std::streampos checkPoint;
+  do {
+    checkPoint = input.tellg();  
     if (isFirstLine)
       isFirstLine = false;
     else
@@ -1879,6 +1891,8 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
     }
   } while( std::getline(input, line) && std::regex_match(line, m, pNonblockIf) );
 
+  //input.seekg(checkPoint);
+
   // deal with the next line
   std::string elseDestAndSlice;
   std::string elseSrcAndSlice;
@@ -1973,13 +1987,11 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
       output << blank + "if ( " + localCondAndSlice + " ) " + dest + "_r_flag " + destSlice + " <= " + dest + "_r_flag " + destSlice + " ? 1 : " + dest + "_t_flag " + destSlice + " ? 0 : ( |" + dest + _r + " " + destSlice + neqRst + " ) ;" << std::endl;
     }
   }
-
-
-  auto checkPoint = input.tellg();
-  std::getline(input, line);
-  if( std::regex_match(line, m, pEnd) ) {
+  else if( std::regex_match(line, m, pEnd) ) {
     output << line << std::endl; // this is "end"  
   }
+  // if the next line is not else/elsif/end, 
+  // then recover the seek point
   else input.seekg(checkPoint);
 
 
@@ -2197,9 +2209,12 @@ void always_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream
   g_recentClk = m.str(2);
   g_clk_set.insert(g_recentClk);
   std::string line;
+
   // parse first assignment
   std::getline(input, line);
   output << line << std::endl;
+  if(line.find("_lsu.u_lsu_request.ram_q") != std::string::npos)
+    toCout("Find it!");
   if( std::regex_match(line, m, pNonblock) ) {
     nonblock_taint_gen(line, output);  
   }

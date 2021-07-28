@@ -6,8 +6,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/TaintGenLib.dir/src/taint_gen.cpp.o"
   "CMakeFiles/TaintGenLib.dir/src/varWidth.cpp.o"
   "CMakeFiles/TaintGenLib.dir/src/vcd_parser.cpp.o"
-  "libTaintGenLib.pdb"
   "libTaintGenLib.a"
+  "libTaintGenLib.pdb"
 )
 
 # Per-language clean rules from dependency scanning.
