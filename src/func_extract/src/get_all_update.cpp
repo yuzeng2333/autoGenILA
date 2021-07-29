@@ -117,7 +117,6 @@ void get_all_update() {
           continue;
       }
 
-      if(target.empty()) continue;
       uint32_t instrIdx = 0;
       for(auto instrInfo : g_instrInfo) {
         instrIdx++;
@@ -129,7 +128,7 @@ void get_all_update() {
                                 instrInfo, instrIdx);
         }
         else { 
-          uint32_t delayBound = get_delay_bound(target, instrInfo, 
+          uint32_t delayBound = get_delay_bound(target, tgtVec, instrInfo, 
                                                 g_allowedTgtVec, g_allowedTgt);
           //std::thread th(get_update_function, target, tgtVec, isVec,
           //               instrInfo, instrIdx);
@@ -198,7 +197,6 @@ void get_all_update() {
           //  visitedTgt.insert(target);
           //  visitedTgtFile << target << std::endl;
           //}
-          if(target.empty()) continue;
           if(!target.empty()
              && g_allowedTgt.find(target) != g_allowedTgt.end()
              && g_allowedTgt[target].size() > 1) {
@@ -209,7 +207,7 @@ void get_all_update() {
             }
           }
           else {
-            uint32_t delayBound = get_delay_bound(target, instrInfo, 
+            uint32_t delayBound = get_delay_bound(target, tgtVec, instrInfo, 
                                                   g_allowedTgtVec, g_allowedTgt);
             std::thread th(get_update_function, target, delayBound, tgtVec, 
                            isVec, instrInfo, instrIdx);
@@ -410,20 +408,32 @@ void get_update_function(std::string target,
 }
 
 
-uint32_t get_delay_bound(std::string var, struct InstrInfo_t &instrInfo, 
-                   std::vector<std::pair<std::vector<std::string>, uint32_t>> allowedTgtVec,
-                   std::map<std::string, std::vector<uint32_t>> allowedTgt) {
+uint32_t get_delay_bound(std::string var, std::vector<std::string> tgtVec,
+                         struct InstrInfo_t &instrInfo, 
+                         std::vector<std::pair<std::vector<std::string>, 
+                                               uint32_t>> allowedTgtVec,
+                         std::map<std::string, std::vector<uint32_t>> allowedTgt) {
+  assert(var.empty() || tgtVec.empty());
   if(allowedTgt[var].size() != 1) {
     toCout("Error: delay number size is not 1: "+var);
     for(uint32_t delay: allowedTgt[var])
       toCout(delay);
   }
   uint32_t delayBound = instrInfo.delayBound;
-  if(var.substr(var.size()-4) == "_Arr") {
-    std::string firstVar = var.substr(0, var.size()-4);
+  if(var.empty() && !tgtVec.empty()) {
     for(auto pair : allowedTgtVec) {
-      if(pair.first.front() != firstVar) continue;
-      delayBound = pair.second;
+      if(pair.first.front() != tgtVec.front()
+         || pair.first.size() != tgtVec.size() ) continue;
+      else {
+        uint32_t i;
+        for(i = 0 ; i < tgtVec.size(); i++)
+          if(pair.first[i] != tgtVec[i]) break;
+        if(i == tgtVec.size()) {
+          delayBound = pair.second;
+          break;
+        }
+        else continue;
+      }
     }
   }
   // if is not array
@@ -521,7 +531,6 @@ bool read_clean_o3(std::string fileName,
       output << line << std::endl;
     else attributeLine = line;
   }
-  output.close();
   if(internalExist) {
     uint32_t pos = 0;
     uint32_t startPos = 0;
@@ -580,6 +589,7 @@ bool read_clean_o3(std::string fileName,
     }
   }
   output << attributeLine << std::endl;
+  output.close();  
   return internalExist;
 }
 

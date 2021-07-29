@@ -340,7 +340,6 @@ UpdateFunctionGen::input_constraint(astNode* const node, uint32_t timeIdx,
       }
     }
     else {
-      toCout("Warning: NOP instruction has x value: "+dest);
       return get_arg(destTimed);
     }
   }

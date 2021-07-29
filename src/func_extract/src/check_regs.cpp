@@ -1361,7 +1361,8 @@ UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
     noinline = false;
   }
   else if(is_read_asv(dest, insContextStk.get_curMod()) 
-          || (is_top_module(curMod) && is_input(dest, insContextStk.get_curMod()))) noinline = true;
+          || (is_top_module(curMod) && is_input(dest, insContextStk.get_curMod())))
+    noinline = true;
   else noinline = false;
   toCoutVerb("extract for: "+destName);
   if(destName == "cct_715")
@@ -1382,7 +1383,7 @@ UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
     extValName = destName+" ["+toStr(high)+":"+toStr(low)+"]";
 
   if(!g_use_concat_extract_func) {
-    auto s1 = b->CreateLShr(in, low, llvm::Twine(destName+"_lshr"));
+    auto s1 = b->CreateLShr(in, low, llvm::Twine(destName+"_LSHR_"+toStr(low)+"_"));
     llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c), 
                         llvm::Twine(extValName));
     return ret;
@@ -1439,7 +1440,7 @@ UpdateFunctionGen::extract(llvm::Value* in, uint32_t high, uint32_t low,
   uint32_t len = high - low + 1;
   auto s1 = b->CreateLShr(in, low);
   if(name.isTriviallyEmpty()) {
-    llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c));
+    llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c), llvm::Twine(""));
     return ret;
   }
   else {

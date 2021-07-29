@@ -509,9 +509,14 @@ void read_config(std::string fileName) {
         configNum++;
         toCout("read g_read_rst_vcd: "+value);
       }
+      else if(config == "g_verb") {
+        g_verb = (value == "true");
+        configNum++;
+        toCout("read g_verb: "+value);
+      }
     }
   }
-  if(configNum < 5) {
+  if(configNum < 6) {
     toCout("Error: not enough configurations!");
     abort();
   }
