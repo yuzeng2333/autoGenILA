@@ -21,11 +21,6 @@
 #define toStr(a) std::to_string(a)
 
 
-/* TODO:
- *  1. If a slice of a word is used, how to define its _t, _r, ...?
- *  Now I just do not distinguish slice and the whole word.
- * */
-
 namespace taintGen {
 
 using namespace syntaxPatterns;
@@ -55,8 +50,8 @@ std::unordered_map<std::string, std::string> new_next;
 std::unordered_map<std::string, std::string> update_reg;
 std::unordered_map<std::string, std::pair<std::string, std::string>> memDims;
 std::unordered_map<std::string, uint32_t> reg2sig;
-std::unordered_map<std::string, uint32_t> fangyuanItemNum; // used to check item number in case statementsrs
-std::unordered_map<std::string, uint32_t> fangyuanCaseSliceWidth; // width of each slice used in RHS of case
+std::unordered_map<std::string, uint32_t> addedVarItemNum; // used to check item number in case statementsrs
+std::unordered_map<std::string, uint32_t> addedVarCaseSliceWidth; // width of each slice used in RHS of case
 std::unordered_map<std::string, uint32_t> g_destVersion;
 std::unordered_map<std::string, std::pair<std::string, bool>> g_moduleRst;
 std::unordered_map<std::string, std::string> g_moduleClk;
@@ -68,6 +63,7 @@ std::map<std::string, std::set<std::string>> g_modChangedRegs;
 // first key is module name: which module the instance is within
 // second key is instance name. Value is the corresponding module name
 std::unordered_map<std::string, Str2StrUmap_t> g_instance2moduleMap;
+std::map<std::string, std::set<std::string>> g_trueReg2Slice;
 
 VarWidth varWidth;
 VarWidth funcVarWidth;
@@ -191,8 +187,8 @@ void clean_global_data(uint32_t totalRegCnt, uint32_t nextSig) {
     g_next_sig = nextSig;
   reg2sig.clear();
   g_use_reset_taint = false;
-  fangyuanItemNum.clear();
-  fangyuanCaseSliceWidth.clear();
+  addedVarItemNum.clear();
+  addedVarCaseSliceWidth.clear();
   g_destVersion.clear();
   moduleTrueRegs.clear();
   g_backwardMap.clear();
@@ -258,9 +254,9 @@ void clean_file(std::string fileName, bool useLogic) {
     bool noConcat=true;
     /// if is always line, look ahead for non-blocking concatenation assignments
     std::string retStr;    
-    std::string fangyuanDeclaration;
-    std::string fangyuanAssign;
-    noConcat = extract_concat(cleanLine, output, retStr, fangyuanDeclaration, fangyuanAssign, true);
+    std::string addedVarDeclaration;
+    std::string addedVarAssign;
+    noConcat = extract_concat(cleanLine, output, retStr, addedVarDeclaration, addedVarAssign, true);
     if( !is_srcDestConcat(line) && (!std::regex_match(line, match, pAlwaysClkRst) || !g_remove_adff) ) { // pAlwaysClkRst is printed below
       if(std::regex_match(cleanLine, match, pAlwaysClk)) {
         rsvdLine = cleanLine;
@@ -303,9 +299,9 @@ void clean_file(std::string fileName, bool useLogic) {
         rsvdLine.clear();        
       }
     }
-    if(!fangyuanDeclaration.empty()) {
-      output << fangyuanDeclaration << std::endl;
-      output << fangyuanAssign << std::endl;
+    if(!addedVarDeclaration.empty()) {
+      output << addedVarDeclaration << std::endl;
+      output << addedVarAssign << std::endl;
     }
     /// store the width of wires and regs in varWidth
     uint32_t choice = parse_verilog_line(cleanLine, true);
@@ -668,7 +664,14 @@ void analyze_reg_path( std::string fileName ) {
             dest.pop_back();
           }
           moduleTrueRegs.push_back(dest);
-
+          if(!destSlice.empty()) {
+            if(g_trueReg2Slice.find(dest) != g_trueReg2Slice.end()) {
+              g_trueReg2Slice[dest].insert(destSlice);
+            }
+            else {
+              g_trueReg2Slice.emplace(dest, std::set<std::string>{destSlice});
+            }
+          }
           fill_in_pass_relation(destAndSlice, src, line);
         }
         break;
@@ -815,7 +818,7 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   std::smatch m;
   if(line.empty())
     return NONE;
-  if(line.find("fangyuan0") != std::string::npos)
+  if(line.find("addedVar0") != std::string::npos)
     toCout("Find it!");
   if(line.substr(0, 1) == "X") {
     toCout("begin debug");
@@ -1577,14 +1580,14 @@ void remove_function_wrapper(std::string firstLine, std::ifstream &input, std::o
       output << blank + "    " + localPair.first + " :" << std::endl;
       output << blank + "      " + result + " = " + b + rhsSlice + " ;" << std::endl;
       // FIXME: figure out why this check is important? 
-      //checkCond(b.find("fangyuan") != std::string::npos, "RHS in case is not fangyuan! "+ b);
+      //checkCond(b.find("addedVar") != std::string::npos, "RHS in case is not addedVar! "+ b);
       //fill_in_pass_relation(b+rhsSlice, result, localPair.first);
     }
     output << blank + "    default:" << std::endl;
     output << blank + "      " + result + " = " + a + " ;" << std::endl;
     output << blank + "  endcase" << std::endl;
     output << blank + "end" << std::endl;
-    fangyuanCaseSliceWidth.emplace(b, get_width(rhsSlice));
+    addedVarCaseSliceWidth.emplace(b, get_width(rhsSlice));
   }
   else {
     std::string localIdx = std::to_string(NEW_FANGYUAN++);
@@ -1595,15 +1598,15 @@ void remove_function_wrapper(std::string firstLine, std::ifstream &input, std::o
       toCout("b is: "+b);
       abort();
     }
-    uint32_t fangyuanWidth = std::stoi(m.str(1));
-    bool insertDone = varWidth.var_width_insert("fangyuan"+localIdx, fangyuanWidth-1, 0);
+    uint32_t addedVarWidth = std::stoi(m.str(1));
+    bool insertDone = varWidth.var_width_insert("addedVar"+localIdx, addedVarWidth-1, 0);
     if (!insertDone) {
       std::cout << "insert failed for this line:" + line << std::endl;
       std::cout << "m.str(2):" + m.str(2) << std::endl;
       std::cout << "m.str(3):" + m.str(3) << std::endl;
     }
-    //output << blank + "wire ["+toStr(fangyuanWidth-1)+":0] fangyuan"+localIdx+";" << std::endl;
-    //output << blank + "assign fangyuan"+localIdx+" = "+b+";" << std::endl;
+    //output << blank + "wire ["+toStr(addedVarWidth-1)+":0] addedVar"+localIdx+";" << std::endl;
+    //output << blank + "assign addedVar"+localIdx+" = "+b+";" << std::endl;
     output << blank + "always @("+a+" or "+s+") begin" << std::endl;
     output << blank + "  casez ("+s+")" << std::endl;
     std::string rhs, rhsSlice;
@@ -1620,7 +1623,7 @@ void remove_function_wrapper(std::string firstLine, std::ifstream &input, std::o
       //std::string binWidth = toStr(binNum.length());
       //std::string rhsNum = (selectedBits == 0) ? "0" : (binWidth + "'b" + binNum);
       std::string rhsBin = extract_bin(b, highIdx, lowIdx);
-      //std::string rhsNum = "fangyuan"+localIdx+"["+toStr(highIdx)+":"+toStr(lowIdx)+"]";
+      //std::string rhsNum = "addedVar"+localIdx+"["+toStr(highIdx)+":"+toStr(lowIdx)+"]";
       output << blank + "      " + result + " = " + toStr(rhsBin.length()) + "'b" + rhsBin + " ;" << std::endl;
     }
     output << blank + "    default:" << std::endl;
@@ -1723,7 +1726,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
     output << blank + "end" << std::endl;
 
     // print _sig function
-    if(!g_use_value_change && b.find("fangyuan") != std::string::npos) {
+    if(!g_use_value_change && b.find("addedVar") != std::string::npos) {
       uint32_t caseNum = 0;
       output << blank + "always @( "+a+_sig+" or "+b+_sig+" or "+s+" ) begin" << std::endl;
       output << blank + "  casez ("+sAndSlice+")" << std::endl;
@@ -1737,7 +1740,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
       output << blank + "      " + dest + _sig + " = ( " + a + _sig + " == " + CONSTANT_SIG + " ) ? " + s + _sig + " : " + a + _sig + " ;" << std::endl;
       output << blank + "  endcase" << std::endl;
       output << blank + "end" << std::endl;
-      checkCond(caseNum == fangyuanItemNum[rhs], "case number does not equal fangyuan item number!, var: "+rhs+" , caseNum:"+toStr(caseNum)+" , itemNum:"+toStr(fangyuanItemNum[rhs]));
+      checkCond(caseNum == addedVarItemNum[rhs], "case number does not equal addedVar item number!, var: "+rhs+" , caseNum:"+toStr(caseNum)+" , itemNum:"+toStr(addedVarItemNum[rhs]));
     }
     else if(!g_use_value_change)
       output << "  assign " + dest + _sig + " = 0 ;" << std::endl;
@@ -1876,7 +1879,7 @@ void add_case_taints_limited(std::ifstream &input, std::ofstream &output, std::s
 
 
     // _sig
-    if(!g_use_value_change && b.find("fangyuan") != std::string::npos) {
+    if(!g_use_value_change && b.find("addedVar") != std::string::npos) {
       uint32_t caseNum = 0;
       output << blank + "always @( "+b+_sig+" or "+s+" ) begin" << std::endl;
       output << blank + "  casez ("+sAndSlice+")" << std::endl;
@@ -2296,8 +2299,8 @@ void extend_module_instantiation(std::ifstream &input,
 bool extract_concat(std::string line, 
                     std::ofstream &output, 
                     std::string &returnedStmt, 
-                    std::string &fangyuanDeclaration, 
-                    std::string &fangyuanAssign, 
+                    std::string &addedVarDeclaration, 
+                    std::string &addedVarAssign, 
                     bool isFuncCall) {
   if(line.find("alu_out") != std::string::npos) {
     toCout("find it");
@@ -2322,7 +2325,7 @@ bool extract_concat(std::string line,
   std::string newLine;
   std::vector<std::string> allVarList;
   std::queue<std::string> newVarQueue;
-  // if isNonblockConcat, the declaration of fangyuan is after the nonblock stmt
+  // if isNonblockConcat, the declaration of addedVar is after the nonblock stmt
   bool isNonblockConcat = std::regex_match(line, m, pNonblockConcat);
   if ( (line.find("assign") != std::string::npos
        //&& !std::regex_match(line, m, pSrcConcat)
@@ -2356,24 +2359,24 @@ bool extract_concat(std::string line,
         std::cout << line << std::endl;
         abort();
       }
-      bool insertDone = varWidth.var_width_insert("fangyuan"+localIdx, totalWidth-1, 0);
+      bool insertDone = varWidth.var_width_insert("addedVar"+localIdx, totalWidth-1, 0);
       if (!insertDone) {
         std::cout << "insert failed for this line:" + line << std::endl;
         std::cout << "m.str(2):" + m.str(2) << std::endl;
         std::cout << "m.str(3):" + m.str(3) << std::endl;
       }
       if(!isNonblockConcat) {
-        output << std::string(blankNo, ' ') + "wire [" + toStr(totalWidth-1) + ":0] fangyuan" + localIdx + ";" << std::endl;        
+        output << std::string(blankNo, ' ') + "wire [" + toStr(totalWidth-1) + ":0] addedVar" + localIdx + ";" << std::endl;        
         if(braceIdx == 0 && destIsBrace) // deal with "dest is brace" situation
-          output << std::string(blankNo, ' ') + "assign { " + varList + " } = fangyuan" + localIdx + ";" << std::endl;
+          output << std::string(blankNo, ' ') + "assign { " + varList + " } = addedVar" + localIdx + ";" << std::endl;
         else
-          output << std::string(blankNo, ' ') + "assign fangyuan" + localIdx + " = { " + varList + " };" << std::endl;
+          output << std::string(blankNo, ' ') + "assign addedVar" + localIdx + " = { " + varList + " };" << std::endl;
       }
       else {
-        fangyuanDeclaration = "  wire [" + toStr(totalWidth-1) + ":0] fangyuan" + localIdx + ";"; 
-        fangyuanAssign      = "  assign fangyuan" + localIdx + " = { " + varList + " };";
+        addedVarDeclaration = "  wire [" + toStr(totalWidth-1) + ":0] addedVar" + localIdx + ";"; 
+        addedVarAssign      = "  assign addedVar" + localIdx + " = { " + varList + " };";
       }
-      newVarQueue.push("fangyuan"+localIdx);
+      newVarQueue.push("addedVar"+localIdx);
       braceIdx++;
     }
     char openBrace = '{';

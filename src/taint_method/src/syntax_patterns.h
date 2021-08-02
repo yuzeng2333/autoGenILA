@@ -106,7 +106,6 @@ extern std::regex pNumExist;
 extern std::regex pBin;
 extern std::regex pBinX;
 extern std::regex pHex;
-extern bool g_verb;
 
 } // end of namespace syntaxPatterns
 
