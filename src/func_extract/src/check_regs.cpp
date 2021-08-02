@@ -248,15 +248,19 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 
   // if target is vector, delcare global array before creating
   // the top function
-  Value* retArrPtr;
+  llvm::Value* retArrPtr;
+  llvm::Type* elementTy = llvm::cast<llvm::PointerType>(retTy)->getElementType();
+  std::vector<std::string> destVec = destInfo.get_no_slice_name();  
+  llvm::ArrayType* arrayType = llvm::ArrayType::get(elementTy, destVec.size());  
   if(destInfo.isVector) {
-    retArrPtr = GlobalVariable::GlobalVariable(
-                  TheModule, 
-                  retTy->getElementType(), false, 
-                  GlobalValue::InternalLinkage,
-                  nullptr,
-                  "RET_ARRAY_PTR"
-                );
+    llvm::GlobalVariable* globalArr = new llvm::GlobalVariable(
+        *TheModule, 
+        arrayType, false, 
+        llvm::GlobalValue::InternalLinkage,
+        nullptr,
+        "RET_ARRAY_PTR"
+      );
+    retArrPtr = value(globalArr);
   }
 
   // make a top function
@@ -329,8 +333,6 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   goalFile.open(g_path+"/goal.txt", std::ofstream::app);
   llvm::Value* destNextExpr;
 
-  std::vector<std::string> destVec = destInfo.get_no_slice_name();
-
   curMod = g_moduleInfoMap[curModName];
   if(!destInfo.isVector) {
     std::string dest = destVec.front();
@@ -400,7 +402,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
         = llvm::GetElementPtrInst::Create(
             nullptr,
             arrPtr,
-            std::vector<llvm::Value*>{ 
+            std::vector<llvm::Value*>{
               llvm::ConstantInt::get(
                 llvm::IntegerType::get(*TheContext, bitNum), 
                 0, false),
@@ -413,11 +415,11 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
       Builder->SetInsertPoint(BB);
 
       // print info
-      uint32_t valWidth = val->getType()->getIntegerBitWidth();
-      auto ty1 = val->getType();
-      auto ty2 = llvm::cast<llvm::ArrayType>(retTy)->getElementType();
-      auto ty3 = llvm::cast<llvm::PointerType>(ptr->getType())->getElementType();
-      auto ty4 = arrPtr->getType();
+      //uint32_t valWidth = val->getType()->getIntegerBitWidth();
+      //auto ty1 = val->getType();
+      //auto ty2 = llvm::cast<llvm::ArrayType>(retTy)->getElementType();
+      //auto ty3 = llvm::cast<llvm::PointerType>(ptr->getType())->getElementType();
+      //auto ty4 = arrPtr->getType();
       llvm::StoreInst* store = Builder->CreateStore(val, value(ptr));  
     }
 
@@ -1227,7 +1229,7 @@ llvm::Type* DestInfo::get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext
       assert(size == elmtSize);
     }
     llvm::Type* I = llvm::IntegerType::get(*TheContext, size);    
-    PointerType* pointerTy = PointerType::get(I, 0);
+    llvm::PointerType* pointerTy = llvm::PointerType::get(I, 0);
     //llvm::ArrayType* arrayType = llvm::ArrayType::get(I, destVec.size());
     ////auto ptrTy = llvm::PointerType::get(arrayType, 0);
     //return arrayType;
