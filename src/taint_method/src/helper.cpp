@@ -109,7 +109,7 @@ bool isMem(std::string varAndSlice) {
 
 std::string to_re(std::string input) {
   std::regex pNameBraces("\\(NAME\\)");
-  std::string varNameBraces("([\a\ba-zA-Z0-9_=\\.\\$\\\\'\\[\\]\\(\\)]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?)(?:\\s)?");
+  std::string varNameBraces("([\a\ba-zA-Z0-9_=\\.\\$\\\\'\\[\\]\\(\\)\\/\\:]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?)(?:\\s)?");
   auto res = std::regex_replace(input, pNameBraces, varNameBraces);
 
   std::regex pName("NAME");

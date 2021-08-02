@@ -120,11 +120,22 @@ void get_all_update() {
       uint32_t instrIdx = 0;
       for(auto instrInfo : g_instrInfo) {
         instrIdx++;
-        //std::thread th(get_update_function, target, tgtVec, isVec,
-        //               instrInfo, instrIdx);
-        //threadVec.push_back(std::move(th));
-        get_update_function(target, tgtVec, isVec,
-                            instrInfo, instrIdx);
+        if(!target.empty()
+           && g_allowedTgt.find(target) != g_allowedTgt.end()
+           && g_allowedTgt[target].size() > 1) {
+          for(uint32_t delayBound : g_allowedTgt[target])
+            get_update_function(target, delayBound, tgtVec, isVec,
+                                instrInfo, instrIdx);
+        }
+        else { 
+          uint32_t delayBound = get_delay_bound(target, tgtVec, instrInfo, 
+                                                g_allowedTgtVec, g_allowedTgt);
+          //std::thread th(get_update_function, target, tgtVec, isVec,
+          //               instrInfo, instrIdx);
+          //threadVec.push_back(std::move(th));
+          get_update_function(target, delayBound, tgtVec, isVec,
+                              instrInfo, instrIdx);
+        }
       }
       //for(auto &th: threadVec) th.join();
       //if(isVec) {
@@ -186,10 +197,22 @@ void get_all_update() {
           //  visitedTgt.insert(target);
           //  visitedTgtFile << target << std::endl;
           //}
-
-          std::thread th(get_update_function, target, tgtVec, isVec,
-                         instrInfo, instrIdx);
-          threadVec.push_back(std::move(th));
+          if(!target.empty()
+             && g_allowedTgt.find(target) != g_allowedTgt.end()
+             && g_allowedTgt[target].size() > 1) {
+            for(uint32_t delayBound : g_allowedTgt[target]) {
+              std::thread th(get_update_function, target, delayBound, tgtVec, 
+                             isVec, instrInfo, instrIdx);
+              threadVec.push_back(std::move(th));              
+            }
+          }
+          else {
+            uint32_t delayBound = get_delay_bound(target, tgtVec, instrInfo, 
+                                                  g_allowedTgtVec, g_allowedTgt);
+            std::thread th(get_update_function, target, delayBound, tgtVec, 
+                           isVec, instrInfo, instrIdx);
+            threadVec.push_back(std::move(th));            
+          }
         }
         // wait for update functions for all regs to finish
         for(auto &th: threadVec) th.join();
@@ -208,6 +231,7 @@ void get_all_update() {
 
 
 void get_update_function(std::string target,
+                         uint32_t delayBound,
                          std::vector<std::string> vecWorkSet,
                          bool isVec,
                          InstrInfo_t instrInfo,
@@ -309,24 +333,9 @@ void get_update_function(std::string target,
   destInfo.set_instr_name(instrInfo.name);      
   assert(!instrInfo.name.empty());
   toCout("---  BEGIN INSTRUCTION #"+toStr(instrIdx)+" ---");
-  uint32_t delayBound = instrInfo.delayBound;
   std::string destNameSimp = destInfo.get_dest_name();
-  if(destNameSimp.substr(destNameSimp.size()-4) == "_Arr") {
-    std::string firstVar = destNameSimp.substr(0, destNameSimp.size()-4);
-    for(auto pair : g_allowedTgtVec) {
-      if(pair.first.front() != firstVar) continue;
-      delayBound = pair.second;
-    }
-  }
-  // if is not array
-  else if(instrInfo.delayExceptions.find(destNameSimp) != instrInfo.delayExceptions.end() ) {
-    delayBound = instrInfo.delayExceptions[destNameSimp];
-  }
-  else if(g_allowedTgt.find(destNameSimp) != g_allowedTgt.end() 
-          && g_allowedTgt[destNameSimp] != 0) {
-    delayBound = g_allowedTgt[destNameSimp];
-  }
   remove_front_backslash(destNameSimp);
+  std::string funcName = instrInfo.name+"_"+destNameSimp;
   std::string fileName = g_path+"/"+instrInfo.name+"_"
                          +destNameSimp+"_"+toStr(delayBound);
   UpdateFunctionGen UFGen;
@@ -334,10 +343,13 @@ void get_update_function(std::string target,
   UFGen.print_llvm_ir(destInfo, delayBound, instrIdx);
   std::string clean("opt --instsimplify --deadargelim --instsimplify "+fileName+"_tmp.ll -S -o="+fileName+"_clean.ll");
   std::string opto3("opt -O1 "+fileName+"_clean.ll -S -o="+fileName+"_tmp.o3.ll; opt -passes=deadargelim "+fileName+"_tmp.o3.ll -S -o="+fileName+"_clean.o3.ll; rm "+fileName+"_tmp.o3.ll");
+  toCout("** Begin clean update function");
   system(clean.c_str());
+  toCout("** Begin simplify update function");
   system(opto3.c_str());
+  toCout("** End simplify update function");
   std::vector<std::pair<std::string, uint32_t>> argVec;
-  bool usefulFunc = read_clean_o3(fileName+"_clean.o3.ll", argVec, fileName+"_clean.simp.ll");
+  bool usefulFunc = read_clean_o3(fileName+"_clean.o3.ll", argVec, fileName+"_clean.simp.ll", funcName);
 
   std::string llvmFileName = instrInfo.name+"_"+destInfo.get_dest_name()
                              +"_"+toStr(delayBound)+".ll";
@@ -396,6 +408,45 @@ void get_update_function(std::string target,
 }
 
 
+uint32_t get_delay_bound(std::string var, std::vector<std::string> tgtVec,
+                         struct InstrInfo_t &instrInfo, 
+                         std::vector<std::pair<std::vector<std::string>, 
+                                               uint32_t>> allowedTgtVec,
+                         std::map<std::string, std::vector<uint32_t>> allowedTgt) {
+  assert(var.empty() || tgtVec.empty());
+  if(allowedTgt[var].size() != 1) {
+    toCout("Error: delay number size is not 1: "+var);
+    for(uint32_t delay: allowedTgt[var])
+      toCout(delay);
+  }
+  uint32_t delayBound = instrInfo.delayBound;
+  if(var.empty() && !tgtVec.empty()) {
+    for(auto pair : allowedTgtVec) {
+      if(pair.first.front() != tgtVec.front()
+         || pair.first.size() != tgtVec.size() ) continue;
+      else {
+        uint32_t i;
+        for(i = 0 ; i < tgtVec.size(); i++)
+          if(pair.first[i] != tgtVec[i]) break;
+        if(i == tgtVec.size()) {
+          delayBound = pair.second;
+          break;
+        }
+        else continue;
+      }
+    }
+  }
+  // if is not array
+  else if(instrInfo.delayExceptions.find(var) != instrInfo.delayExceptions.end() ) {
+    delayBound = instrInfo.delayExceptions[var];
+  }
+  else if(allowedTgt.find(var) != allowedTgt.end() 
+          && !allowedTgt[var].empty()) {
+    delayBound = g_allowedTgt[var].front();
+  }
+  return delayBound;
+}
+
 
 
 // returned argVec is empty if the update function just returns 0
@@ -403,7 +454,8 @@ void get_update_function(std::string target,
 // Assune: if no internal function is found, then this function is discarded
 bool read_clean_o3(std::string fileName, 
                    std::vector<std::pair<std::string, uint32_t>> &argVec,
-                   std::string outFileName) {
+                   std::string outFileName,
+                   std::string funcNameIn) {
   std::ifstream input(fileName);
   std::ofstream output(outFileName);
   std::string line;
@@ -413,14 +465,30 @@ bool read_clean_o3(std::string fileName,
   bool seeReturn = false;
   bool returnConst = false;
   std::regex pDef("^define internal fastcc i(\\d+) @(\\S+)\\((.*)\\) unnamed_addr #1 \\{$");  
-  std::regex pVecDef("^define internal fastcc \\[(\\d+) x i(\\d+)\\] @(\\S+)\\((.*)\\) unnamed_addr #1 \\{$");  
+  std::regex pVecDef(
+    "^define internal fastcc \\[(\\d+) x i(\\d+)\\] @(\\S+)\\((.*)\\) unnamed_addr #1 \\{$"
+  );  
+  std::regex pTopDef("^define i(\\d+) @top_function\\((.*)\\) local_unnamed_addr #0 \\{$");  
+  std::regex pTopVecDef(
+    "^define \\[(\\d+) x i(\\d+)\\] @top_function\\((.*)\\) local_unnamed_addr #0 \\{$"
+  );  
   std::regex pRetZero("^\\s+ret i\\d+ 0$");
   bool internalExist = false;
+  std::string topRet;
+  std::string attributeLine;
+  std::string topFuncLine;
   while(std::getline(input, line)) {
     if(line.substr(0, 6) == "define" && !internalExist) {
       if(!seeFuncDef) {
+        topFuncLine = line;
         seeFuncDef = true;
-        while(line != "}") std::getline(input, line);
+        std::getline(input, line);
+        if(line.find("top_bb:") != std::string::npos) {
+          std::getline(input, topRet);
+        }        
+        while(line != "}") {
+          std::getline(input, line);
+        }
         continue;
       }
       else if( line.substr(0, 24) == "define internal fastcc [" ) {
@@ -458,9 +526,11 @@ bool read_clean_o3(std::string fileName,
     //    if(std::regex_match(line, m, pRetZero)) returnConst = true;
     //  }
     //}
-    output << line << std::endl;    
+    // make sure the attributes line is at the end of this file
+    if(line.substr(0, 10) != "attributes")
+      output << line << std::endl;
+    else attributeLine = line;
   }
-  output.close();
   if(internalExist) {
     uint32_t pos = 0;
     uint32_t startPos = 0;
@@ -487,6 +557,39 @@ bool read_clean_o3(std::string fileName,
       if(dotPos == argList.size()) break;
     }
   }
+  else if(!topRet.empty()){
+    // if internal function does not exist, but the top-level-return
+    // statement is not empty, then we make a simple function 
+    // with the top-level-return statement
+    if( topFuncLine.substr(0, 24) == "define [" ) {
+      if(!std::regex_match(topFuncLine, m, pTopVecDef)) {
+        toCout("Error: pTopVecDef is not matched: "+topFuncLine);
+        abort();
+      }
+      std::string arrLen = m.str(1);
+      std::string retWidth = m.str(2);
+      argList = m.str(3);
+      toCout("Error: not supported yet: vec-func with naive return: "+topFuncLine);
+      abort();
+    }
+    else {
+      if(!std::regex_match(topFuncLine, m, pTopDef)) {
+        toCout("Error: pTopDef is not matched: "+topFuncLine);
+        abort();
+      }
+      std::string retWidth = m.str(1);
+      argList = m.str(2);
+      std::string newFuncLine = "define i"+retWidth+
+        " @"+funcNameIn+"() local_unnamed_addr #0 {";
+      output << newFuncLine << std::endl;
+      output << "top_bb:" << std::endl;
+      output << topRet << std::endl;
+      output << "}" << std::endl << std::endl;
+      argVec.clear();
+    }
+  }
+  output << attributeLine << std::endl;
+  output.close();  
   return internalExist;
 }
 

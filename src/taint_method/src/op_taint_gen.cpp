@@ -680,7 +680,7 @@ void one_op_taint_gen(std::string line, std::ofstream &output) {
     isNone = true;
   if( isNum(op1) ) {
     output << blank + "assign " + dest + _t + destSlice + " = 0 ;" << std::endl;   
-    if(!g_use_value_change)
+    if(!g_use_value_change && destSlice.empty())
     output << blank + "assign " + dest + _sig + " = " + CONSTANT_SIG + " ;" << std::endl;
     return;
   }
@@ -707,7 +707,8 @@ void one_op_taint_gen(std::string line, std::ofstream &output) {
     output << blank << "assign " + op1 + _r + sndVer + op1Slice + " = " + dest + _r + destSlice + " ;" << std::endl;
   }
 
-  if(std::regex_match(line, m, pNone) && !g_use_value_change)
+  // FIXME: destSlice.empty
+  if(std::regex_match(line, m, pNone) && !g_use_value_change && destSlice.empty())
     output << blank + "assign " + dest + _sig + " = " + op1 + _sig + " ;" << std::endl;
   else if(!g_use_value_change)
     output << blank + "assign " + dest + _sig + " = 0 ;" << std::endl;
@@ -1299,35 +1300,41 @@ void dest_concat_op_taint_gen(std::string line, std::ofstream &output) {
   std::vector<std::string> destVec;
   parse_var_list(destList, destVec);
   std::string src, srcSlice;
-  split_slice(srcAndSlice, src, srcSlice);
-  assert(!isMem(src));
 
-  //std::string destTList = std::regex_replace(destList, pVarNameGroup, "$1_t$3 ");
-  std::string destTList = get_lhs_taint_list(destList, _t, output);
-  output << blank + "assign { " + destTList + " } = " + src + _t + srcSlice + " ;" << std::endl;
+  if(!isNum(srcAndSlice)) {
+    split_slice(srcAndSlice, src, srcSlice);
+    assert(!isMem(src));
 
-  std::string destSigList = get_lhs_taint_list_no_slice(destList, _sig, output);
-  if(!g_use_value_change)
-    output << blank + "assign { " + destSigList + " } = 0;" << std::endl;
-  
-  std::string destRList = get_rhs_taint_list(destList, _r);
-  //std::string destXList = get_rhs_taint_list(destList, _x);
-  //std::string destCList = get_rhs_taint_list(destList, _c);
+    //std::string destTList = std::regex_replace(destList, pVarNameGroup, "$1_t$3 ");
+    std::string destTList = get_lhs_taint_list(destList, _t, output);
+    output << blank + "assign { " + destTList + " } = " + src + _t + srcSlice + " ;" << std::endl;
 
-  auto srcIdxPair = varWidth.get_idx_pair(src, line);
-  std::string srcHighIdx = toStr(srcIdxPair.first);
-  std::string srcLowIdx  = toStr(srcIdxPair.second);
-  bool isNew;
-  uint32_t localVerNum = find_version_num(srcAndSlice, isNew, output);
-  std::string localVer = std::to_string(localVerNum);
-  if(isNew) {
-    output << blank + "logic [" + srcHighIdx + ":" + srcLowIdx + "] " + src + _r + localVer + " ;" << std::endl;
-    //output << blank + "logic [" + srcHighIdx + ":" + srcLowIdx + "] " + src + _x + localVer + " ;" << std::endl;
-    //output << blank + "logic [" + srcHighIdx + ":" + srcLowIdx + "] " + src + _c + localVer + " ;" << std::endl;
+    std::string destSigList = get_lhs_taint_list_no_slice(destList, _sig, output);
+    if(!g_use_value_change)
+      output << blank + "assign { " + destSigList + " } = 0;" << std::endl;
+    
+    std::string destRList = get_rhs_taint_list(destList, _r);
+
+    auto srcIdxPair = varWidth.get_idx_pair(src, line);
+    std::string srcHighIdx = toStr(srcIdxPair.first);
+    std::string srcLowIdx  = toStr(srcIdxPair.second);
+    bool isNew;
+    uint32_t localVerNum = find_version_num(srcAndSlice, isNew, output);
+    std::string localVer = std::to_string(localVerNum);
+    if(isNew) {
+      output << blank + "logic [" + srcHighIdx + ":" + srcLowIdx + "] " + src + _r + localVer + " ;" << std::endl;
+    }
+    output << blank + "assign " + src + _r + localVer + srcSlice + " = { " + destRList + " };" << std::endl;
   }
-  output << blank + "assign " + src + _r + localVer + srcSlice + " = { " + destRList + " };" << std::endl;
-  //output << blank + "assign " + src + _x + localVer + srcSlice + " = { " + destXList + " };" << std::endl;
-  //output << blank + "assign " + src + _c + localVer + srcSlice + " = { " + destCList + " };" << std::endl;
+  else {
+    //std::string destTList = std::regex_replace(destList, pVarNameGroup, "$1_t$3 ");
+    std::string destTList = get_lhs_taint_list(destList, _t, output);
+    output << blank + "assign { " + destTList + " } = 0 ;" << std::endl;
+
+    std::string destSigList = get_lhs_taint_list_no_slice(destList, _sig, output);
+    if(!g_use_value_change)
+      output << blank + "assign { " + destSigList + " } = 0;" << std::endl;
+  }
 }
 
 
@@ -1766,6 +1773,10 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
 
   if(g_use_zy_count)
     checkCond(false, "ERROR: encounter nonblockif whiling use zy_count! "+line);
+
+  if(line.find("mem_unaligned_e2_q") != std::string::npos)
+    toCout("Find it!");
+
   //output << always_line << std::endl;
   bool hasRst = false;
   std::string rst;
@@ -1777,11 +1788,14 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
   std::string src, srcSlice;
   std::string cond, condSlice;
   bool isFirstLine = true;
-  std::vector<std::string> nonConstAssign;
-  std::string taintRst;  
+  std::vector<std::pair<std::string, std::string>> condAndSrcVec;
+  std::string taintRst;
   if(g_use_taint_rst) taintRst = "|| "+TAINT_RST+" ";
+  std::string dest_t_Or = "";
 
-  do{
+  std::streampos checkPoint;
+  do {
+    checkPoint = input.tellg();  
     if (isFirstLine)
       isFirstLine = false;
     else
@@ -1795,33 +1809,40 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
     split_slice(destAndSlice, dest, destSlice);
     split_slice(srcAndSlice, src, srcSlice);
     split_slice(condAndSlice, cond, condSlice);
-    assert_info(isMem(dest), "dest is: "+dest);
+    //assert_info(isMem(dest), "dest is: "+dest);
 
     uint32_t localWidthNum = get_var_slice_width(destAndSlice);
 
-
     // assume: if src is num, the cond must be rst.
-    std::string dest_t_Or = "";
     if(g_wt_keeped) dest_t_Or = "( INSTR_IN_ZY ? 0 :" + dest + _t + " " + destSlice + " ) | ";
 
     if(isNum(src)) {
       hasRst = true;
       rst = condAndSlice;
-      output << blank + "if (" + condAndSlice + ") " + dest + "_t_flag " + destSlice + " <= 0 ;" << std::endl;
-      output << blank + "if (" + condAndSlice + ") " + dest + "_r_flag " + destSlice + " <= 0 ;" << std::endl;
-    }
-    else {
-      nonConstAssign.push_back(line);
+      // FIXME: may need to add assignment to _t here
+      //output << always_line << std::endl;
+      //output << blank + "if (" + condAndSlice + ") " + dest + "_t_flag " + destSlice + " <= 0 ;" << std::endl;
+      //output << always_line << std::endl;
+      //output << blank + "if (" + condAndSlice + ") " + dest + "_r_flag " + destSlice + " <= 0 ;" << std::endl;
+
       uint32_t localWidthNum = get_var_slice_width(srcAndSlice);
       // FIXME: replace get_recent_rst() with rst_zy?
-      output << blank + "if (" + get_recent_rst() + taintRst + ") " + dest + _t + " " + destSlice + " <= 0 ;" << std::endl;
       if(g_use_value_change) {
-        output << blank + "if (" + condAndSlice + ") " + dest + _t + " " + destSlice + " <= ( " + src + _t+" " + srcSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + destAndSlice + " != " + srcAndSlice + " );" << std::endl;
-        output << blank + "if (" + condAndSlice + ") " + dest + "_t_flag " + destSlice + " <= " + dest + "_t_flag " + destSlice + " ? 1 : (" + src + _t+" " + srcSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + destAndSlice + " != " + srcAndSlice + " );" << std::endl;
+        output << always_line << std::endl;      
+        output << blank + "if (" + get_recent_rst() + taintRst + ") " + dest + _t + " " + destSlice + " <= 0 ;" << std::endl;
+
+        output << always_line << std::endl;
+        output << blank + "if ( " + condAndSlice + " ) " + dest + _t + " " + destSlice + " <= ( " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + extend(destAndSlice+" != "+srcAndSlice, localWidthNum) + " );" << std::endl;
+
+        output << always_line << std::endl;
+        output << blank + "if ( " + condAndSlice + " ) " + dest + "_t_flag " + destSlice + " <= " + dest + "_t_flag " + destSlice + " ? 1 : (" + cond+_t+" "+condSlice + " ) & ( " + destAndSlice + " != " + srcAndSlice + " );" << std::endl;
       }
       else {
-        output << blank + "if (" + condAndSlice + ") " + dest + _t + " " + destSlice + " <= ( " + src + _t+" " + srcSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + dest_t_Or + extend( dest+_sig+" != "+src+_sig, localWidthNum ) + " );" << std::endl;
-        output << blank + "if (" + condAndSlice + ") " + dest + "_t_flag " + destSlice + " <= " + dest + "_t_flag " + destSlice + " ? 1 : (" + src + _t + " " + srcSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + extend( dest+_sig+" != "+src+_sig, localWidthNum ) + " );" << std::endl;
+        output << always_line << std::endl;
+        output << blank + "if ( " + condAndSlice + " ) " + dest + _t + " " + destSlice + " <= ( " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + dest_t_Or + extend( dest+_sig+" != 0", localWidthNum ) + " );" << std::endl;
+
+        output << always_line << std::endl;
+        output << blank + "if ( " + condAndSlice + " ) " + dest + "_t_flag " + destSlice + " <= " + dest + "_t_flag " + destSlice + " ? 1 : (" + cond+_t+" "+condSlice + " ) & ( " + dest+_sig+" != 0 );" << std::endl;
       }
 
       std::string neqRst = "";
@@ -1833,34 +1854,169 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
         else
           neqRst = " && "+dest+" "+destSlice+" != "+g_rstValMap[moduleName][dest];
       }
+      output << always_line << std::endl;      
+      output << blank + "if ( " + condAndSlice + " ) " + dest + "_r_flag " + destSlice + " <= " + dest + "_r_flag " + destSlice + " ? 1 : " + dest + "_t_flag " + destSlice + " ? 0 : ( |" + dest + _r + " " + destSlice + neqRst + " ) ;" << std::endl;
+
+
+    }
+    else {
+      condAndSrcVec.push_back(std::make_pair(condAndSlice, srcAndSlice));
+      uint32_t localWidthNum = get_var_slice_width(srcAndSlice);
+      // FIXME: replace get_recent_rst() with rst_zy?
+      output << always_line << std::endl;      
+      output << blank + "if (" + get_recent_rst() + taintRst + ") " + dest + _t + " " + destSlice + " <= 0 ;" << std::endl;
+
+      if(g_use_value_change) {
+        output << always_line << std::endl;        
+        output << blank + "if (" + condAndSlice + ") " + dest + _t + " " + destSlice + " <= ( " + src + _t+" " + srcSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + extend(destAndSlice+" != "+srcAndSlice, localWidthNum) + " );" << std::endl;
+
+        output << always_line << std::endl;        
+        output << blank + "if (" + condAndSlice + ") " + dest + "_t_flag " + destSlice + " <= " + dest + "_t_flag " + destSlice + " ? 1 : (" + src + _t+" " + srcSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + destAndSlice + " != " + srcAndSlice + " );" << std::endl;
+      }
+      else {
+        output << always_line << std::endl;      
+        output << blank + "if (" + condAndSlice + ") " + dest + _t + " " + destSlice + " <= ( " + src + _t+" " + srcSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + dest_t_Or + extend( dest+_sig+" != "+src+_sig, localWidthNum ) + " );" << std::endl;
+
+        output << always_line << std::endl;        
+        output << blank + "if (" + condAndSlice + ") " + dest + "_t_flag " + destSlice + " <= " + dest + "_t_flag " + destSlice + " ? 1 : ( ( |" + src + _t + " " + srcSlice + " ) || " + cond+_t+" "+condSlice + " ) & ( " + dest+_sig+" != "+src+_sig + " );" << std::endl;
+      }
+
+      std::string neqRst = "";
+      if(g_set_rflag_if_not_rst_val) {
+        if(g_rstValMap[moduleName].find(dest) == g_rstValMap[moduleName].end()) {
+          toCout("Error: cannot find in g_rstValMap for module: "+moduleName+", var: "+dest);
+          neqRst = " && "+dest+" "+destSlice+" != 0";          
+        }
+        else
+          neqRst = " && "+dest+" "+destSlice+" != "+g_rstValMap[moduleName][dest];
+      }
+      output << always_line << std::endl;      
       output << blank + "if (" + condAndSlice + ") " + dest + "_r_flag " + destSlice + " <= " + dest + "_r_flag " + destSlice + " ? 1 : " + dest + "_t_flag " + destSlice + " ? 0 : ( |" + dest + _r + " " + destSlice + neqRst + " ) ;" << std::endl;
     }
   } while( std::getline(input, line) && std::regex_match(line, m, pNonblockIf) );
-  assert( std::regex_match(line, m, pEnd) );
-  if(hasRst)
-    output << blank + "if (" + rst + taintRst + ") " + dest + "_r_flag_top <= 0;" << std::endl;
-  output << line << std::endl; // this is "end"
-  for(std::string line: nonConstAssign) {
-    std::regex_match(line, m, pNonblockIf);
-    condAndSlice = m.str(2);
-    destAndSlice = m.str(3);
-    srcAndSlice = m.str(4);
-    split_slice(destAndSlice, dest, destSlice);
+
+  //input.seekg(checkPoint);
+
+  // deal with the next line
+  std::string elseDestAndSlice;
+  std::string elseSrcAndSlice;
+  bool isElse, isElseIf;
+  isElse = std::regex_match(line, m, pNonblockElse);
+  if(!isElse) isElseIf = std::regex_match(line, m, pNBElseIf);
+  if( isElse || isElseIf ) {
+    std::string localCondAndSlice;  
+    if(isElse) {
+      elseDestAndSlice = m.str(2);
+      elseSrcAndSlice = m.str(3);
+      split_slice(elseSrcAndSlice, src, srcSlice);
+      assert(elseDestAndSlice == destAndSlice);
+      localCondAndSlice = "!"+condAndSlice;
+      split_slice(condAndSlice, cond, condSlice);
+    }
+    else {
+      elseDestAndSlice = m.str(3);
+      elseSrcAndSlice = m.str(4);
+      localCondAndSlice = m.str(2);
+      split_slice(elseSrcAndSlice, src, srcSlice);
+      split_slice(localCondAndSlice, cond, condSlice);
+    }
+
+    if( isNum(src) ) {
+      hasRst = true;
+      toCout("Warning: assignment for else branch is num: "+line);
+      //abort();
+      //output << blank + "else " + dest + "_t_flag " + destSlice + " <= 0 ;" << std::endl;
+      //output << blank + "else " + dest + "_r_flag " + destSlice + " <= 0 ;" << std::endl;
+
+      uint32_t localWidthNum = get_var_slice_width(elseSrcAndSlice);
+      // FIXME: replace get_recent_rst() with rst_zy?
+      if(g_use_value_change) {
+        output << always_line << std::endl;
+        output << blank + "if ( " + localCondAndSlice + " ) " + dest + _t + " " + destSlice + " <= ( " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + extend(destAndSlice+" != "+elseSrcAndSlice, localWidthNum) + " );" << std::endl;
+
+        output << always_line << std::endl;
+        output << blank + "if ( " + localCondAndSlice + " ) " + dest + "_t_flag " + destSlice + " <= " + dest + "_t_flag " + destSlice + " ? 1 : (" + cond+_t+" "+condSlice + " ) & ( " + destAndSlice + " != " + elseSrcAndSlice + " );" << std::endl;
+      }
+      else {
+        output << always_line << std::endl;
+        output << blank + "if ( " + localCondAndSlice + " ) " + dest + _t + " " + destSlice + " <= ( " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + dest_t_Or + extend( dest+_sig+" != 0", localWidthNum ) + " );" << std::endl;
+
+        output << always_line << std::endl;
+        output << blank + "if ( " + localCondAndSlice + " ) " + dest + "_t_flag " + destSlice + " <= " + dest + "_t_flag " + destSlice + " ? 1 : (" + cond+_t+" "+condSlice + " ) & ( " + dest+_sig+" != 0 );" << std::endl;
+      }
+
+      std::string neqRst = "";
+      if(g_set_rflag_if_not_rst_val) {
+        if(g_rstValMap[moduleName].find(dest) == g_rstValMap[moduleName].end()) {
+          toCout("Error: cannot find in g_rstValMap for module: "+moduleName+", var: "+dest);
+          neqRst = " && "+dest+" "+destSlice+" != 0";          
+        }
+        else
+          neqRst = " && "+dest+" "+destSlice+" != "+g_rstValMap[moduleName][dest];
+      }
+      output << always_line << std::endl;      
+      output << blank + "if ( " + localCondAndSlice + " ) " + dest + "_r_flag " + destSlice + " <= " + dest + "_r_flag " + destSlice + " ? 1 : " + dest + "_t_flag " + destSlice + " ? 0 : ( |" + dest + _r + " " + destSlice + neqRst + " ) ;" << std::endl;
+
+
+    }
+    else {
+      condAndSrcVec.push_back(std::make_pair(localCondAndSlice, elseSrcAndSlice));      
+      uint32_t localWidthNum = get_var_slice_width(elseSrcAndSlice);
+      // FIXME: replace get_recent_rst() with rst_zy?
+      if(g_use_value_change) {
+        output << always_line << std::endl;
+        output << blank + "if ( " + localCondAndSlice + " ) " + dest + _t + " " + destSlice + " <= ( " + src + _t +" " + srcSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + extend(destAndSlice+" != "+elseSrcAndSlice, localWidthNum) + " );" << std::endl;
+
+        output << always_line << std::endl;
+        output << blank + "if ( " + localCondAndSlice + " ) " + dest + "_t_flag " + destSlice + " <= " + dest + "_t_flag " + destSlice + " ? 1 : ( ( |" + src + _t +" " + srcSlice + " ) || " + cond+_t+" "+condSlice + " ) & ( " + destAndSlice+" != "+elseSrcAndSlice + " );" << std::endl;
+      }
+      else {
+        output << always_line << std::endl;
+        output << blank + "if ( " + localCondAndSlice + " ) " + dest + _t + " " + destSlice + " <= ( " + src + _t+" " + srcSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + dest_t_Or + extend( dest+_sig+" != "+src+_sig, localWidthNum ) + " );" << std::endl;
+
+        output << always_line << std::endl;
+        output << blank + "if ( " + localCondAndSlice + " ) " + dest + "_t_flag " + destSlice + " <= " + dest + "_t_flag " + destSlice + " ? 1 : ( ( |" + src + _t + " " + srcSlice + " ) || " + cond+_t+" "+condSlice + " ) & ( " + dest+_sig+" != "+src+_sig + " );" << std::endl;
+      }
+
+      std::string neqRst = "";
+      if(g_set_rflag_if_not_rst_val) {
+        if(g_rstValMap[moduleName].find(dest) == g_rstValMap[moduleName].end()) {
+          toCout("Error: cannot find in g_rstValMap for module: "+moduleName+", var: "+dest);
+          neqRst = " && "+dest+" "+destSlice+" != 0";          
+        }
+        else
+          neqRst = " && "+dest+" "+destSlice+" != "+g_rstValMap[moduleName][dest];
+      }
+      output << always_line << std::endl;      
+      output << blank + "if ( " + localCondAndSlice + " ) " + dest + "_r_flag " + destSlice + " <= " + dest + "_r_flag " + destSlice + " ? 1 : " + dest + "_t_flag " + destSlice + " ? 0 : ( |" + dest + _r + " " + destSlice + neqRst + " ) ;" << std::endl;
+    }
+  }
+  else if( std::regex_match(line, m, pEnd) ) {
+    output << line << std::endl; // this is "end"  
+  }
+  // if the next line is not else/elsif/end, 
+  // then recover the seek point
+  else input.seekg(checkPoint);
+
+
+  //if(hasRst)
+  //  output << blank + "if (" + rst + taintRst + ") " + dest + "_r_flag_top <= 0;" << std::endl;
+  for(auto pair: condAndSrcVec) {
+    //  FIXME: add option for pNonblockElse
+    condAndSlice = pair.first;
+    srcAndSlice = pair.second;
     split_slice(srcAndSlice, src, srcSlice);
     split_slice(condAndSlice, cond, condSlice);
+
     
     uint32_t localWidthNum = get_var_slice_width(srcAndSlice);
     bool srcIsNew;
     std::string srcVer = toStr(find_version_num(srcAndSlice, srcIsNew, output));
     if(srcIsNew) {
       auto srcIdxPair = varWidth.get_idx_pair(src, line);
-      //output << "  logic [" + toStr(srcIdxPair.first) + ":" + toStr(srcIdxPair.second) + "] " + src + _x + srcVer + " ;" << std::endl;
       output << "  logic [" + toStr(srcIdxPair.first) + ":" + toStr(srcIdxPair.second) + "] " + src + _r + srcVer + " ;" << std::endl;
-      //output << "  logic [" + toStr(srcIdxPair.first) + ":" + toStr(srcIdxPair.second) + "] " + src + _c + srcVer + " ;" << std::endl;
     }
-    //output << "  assign " + src + _x + srcVer + srcSlice + " = " + extend(destAndSlice+" != "+srcAndSlice, localWidthNum) + " ;" << std::endl; 
     output << "  assign " + src + _r + srcVer + srcSlice + " = " + extend(condAndSlice, localWidthNum) + " & " + src + _t + srcSlice + " ;" << std::endl; 
-    //output << "  assign " + src + _c + srcVer + srcSlice + " = " + extend("1'b1", localWidthNum) + " ;" << std::endl;
   }
 }
 
@@ -2057,9 +2213,12 @@ void always_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream
   g_recentClk = m.str(2);
   g_clk_set.insert(g_recentClk);
   std::string line;
+
   // parse first assignment
   std::getline(input, line);
   output << line << std::endl;
+  if(line.find("_lsu.u_lsu_request.ram_q") != std::string::npos)
+    toCout("Find it!");
   if( std::regex_match(line, m, pNonblock) ) {
     nonblock_taint_gen(line, output);  
   }

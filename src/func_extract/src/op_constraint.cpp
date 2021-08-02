@@ -14,7 +14,6 @@
 //#define llvmInt(val, width, c) llvm::ConstantInt::get(llvmWidth(width, c), val, false);
 #define context std::shared_ptr<llvm::LLVMContext>
 #define builder std::shared_ptr<llvm::IRBuilder<>>
-#define UINT32_MAX  (0xffffffff)
 ///////////////////////////////////////////////////////////////////////////////
 //
 //  The main principle of making llvm::Value*/constraints
@@ -341,7 +340,6 @@ UpdateFunctionGen::input_constraint(astNode* const node, uint32_t timeIdx,
       }
     }
     else {
-      toCout("Warning: NOP instruction has x value: "+dest);
       return get_arg(destTimed);
     }
   }
@@ -787,7 +785,8 @@ UpdateFunctionGen::ite_op_constraint(astNode* const node, uint32_t timeIdx, cont
   std::string op1, op1Slice;
   std::string op2, op2Slice;
 
-  if(destAndSlice.find("yuzeng13") != std::string::npos) {
+  //if(destAndSlice.find("yuzeng5") != std::string::npos) {
+  if(destAndSlice == "yuzeng5") {
     toCoutVerb("Found it!");
   }
 
@@ -1079,8 +1078,11 @@ UpdateFunctionGen::add_one_case_branch_expr(astNode* const node, llvm::Value* &c
       thenRet = var_expr(assignVarAndSlice, timeIdx, c, b, false);
     }
     else {
-      auto tmp = add_constraint(assignNode, timeIdx, c, b, bound);
-      thenRet = extract_func(tmp, hi, lo, c, b, timed_name( dest+"_;_then"+toStr(posOfOne), timeIdx ), srcNoinline);
+      auto assignValue = add_constraint(assignNode, timeIdx, c, b, bound);
+      uint32_t assignWidth = llvm::dyn_cast<llvm::IntegerType>(assignValue->getType())->getBitWidth();
+      if(hi >= assignWidth && lo == 0) thenRet = assignValue;
+      else
+        thenRet = extract_func(assignValue, hi, lo, c, b, timed_name( dest+"_;_then"+toStr(posOfOne), timeIdx ), srcNoinline);
     }
 
     llvm::Value* elseRet = add_one_case_branch_expr(node, caseVarExpr, idx+2, 
@@ -1095,8 +1097,10 @@ UpdateFunctionGen::add_one_case_branch_expr(astNode* const node, llvm::Value* &c
     if(isNum(assignVarAndSlice))
       elseRet = var_expr(assignVarAndSlice, timeIdx, c, b, false);
     else {
-      elseRet = extract_func(add_constraint(assignNode, timeIdx, c, b, bound),
-                        hi, lo, c, b, timed_name(dest+"_;_default", timeIdx));
+      auto assignValue = add_constraint(assignNode, timeIdx, c, b, bound);
+      uint32_t assignWidth = llvm::dyn_cast<llvm::IntegerType>(assignValue->getType())->getBitWidth();
+      if(hi >= assignWidth && lo == 0) return assignValue;
+      else elseRet = extract_func(assignValue, hi, lo, c, b, timed_name(dest+"_;_default", timeIdx));
     }
     return elseRet; 
   }
@@ -1164,6 +1168,43 @@ UpdateFunctionGen::add_one_case_branch_expr(astNode* const node, llvm::Value* &c
 //    return var_expr(destAndSlice, timeIdx, c, false);
 //  }
 //}
+
+
+// output ports of memory modules are always symbolic, they
+// should be in the argument list of the top function, so here
+// we just return the argument of the top function
+llvm::Value* 
+UpdateFunctionGen::memMod_constraint(astNode* const node, uint32_t timeIdx, context &c,
+                                     builder &b, uint32_t bound) {
+  toCout("begin memMod: "+node->dest);
+  if(node->dest == "q0")
+    toCout("Find it!");
+  const auto curMod = insContextStk.get_curMod();
+  const auto curFunc = insContextStk.get_func();
+  auto curDynData = get_dyn_data(curMod);
+  std::string varAndSlice = node->dest;
+  std::string var, varSlice;
+  split_slice(varAndSlice, var, varSlice);
+  auto pair = curMod->wire2InsPortMp[varAndSlice];
+  std::string insName = pair.first;
+  std::string outPort = pair.second;  
+  auto subMod = get_mod_info(insName, curMod);
+  auto subDynData = get_dyn_data(subMod);
+  std::string modName = subMod->name;
+  if(!is_mem_module(modName)) {
+    toCout("Error: not a memory module: "+modName);
+    abort();
+  }
+
+  std::string prefix = "";
+  if(curDynData->isFunctionedSubMod == false) {
+    prefix = insContextStk.get_hier_name(false);
+    if(!prefix.empty()) prefix += ".";  
+  }
+  std::string destTimed = prefix+insName+"."+outPort+DELIM+toStr(timeIdx);
+  return get_arg(destTimed, curFunc);
+}
+
 
 
 llvm::Value* 
@@ -1282,21 +1323,27 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
   auto subMod = get_mod_info(insName, curMod);
   auto subDynData = get_dyn_data(subMod);
   std::string modName = subMod->name;
-  if(modName.find("FIFO_hls_target_call_slice_stream_V_value_V_shiftReg") 
+  if(modName.find("FIFO_hls_target_p_p2_in_bounded_stencil_stream_s_shiftReg") 
      != std::string::npos)
     toCoutVerb("Find it!");
 
   initialize_min_delay(subMod, outPort);
 
-  toCout("--- Begin submod: "+insName+", port: "+outPort
+  toCoutVerb("--- Begin submod: "+insName+", port: "+outPort
   +", time: "+toStr(timeIdx));
+
+  if(insName == "slice_stream_V_value_V_U")
+     //&& outPort == "if_dout" && timeIdx == 18)
+    toCoutVerb("Find it!");
+  if(modName == "hls_target_call_Loop_LB2D_buf_proc_buffer_0_value_V_ram")
+    toCout("Find it!");
 
   // if sub-module is memory, do not make the submodule
   // directly return the function arg correspond to the submodule output
   if( is_mem_module(modName) ) {
     //std::string prefix = get_hier_name();
     std::string portName = insName+"."+outPort+DELIM+toStr(bound);
-    return get_arg(portName);
+    return get_arg(portName, curFunc);
   }
   
   // making or call the sub-function
@@ -1336,10 +1383,11 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
       std::string pathInsName = it->first;
       std::string modName = it->second;
       auto memMod = g_moduleInfoMap[modName];
-      for( auto output : memMod->moduleOutputs ) {
-        uint32_t width = get_var_slice_width_simp(output, memMod);
-        argTy.push_back(llvm::IntegerType::get(*TheContext, width));
-      }
+      for(uint32_t i = 0; i <= bound; i++)        
+        for( auto output : memMod->moduleOutputs ) {
+          uint32_t width = get_var_slice_width_simp(output, memMod);
+          argTy.push_back(llvm::IntegerType::get(*TheContext, width));
+        }
     }
 
     // the function args here is redundant. 
@@ -1376,13 +1424,16 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
 
     for(auto it = subModMemInstances.begin(); it != subModMemInstances.end(); it++) {
       std::string pathInsName = it->first;
+      if(pathInsName == "hls_target_call_Loop_LB2D_buf_proc_buffer_0_value_V_ram_U")
+        toCout("Find it!");
       std::string modName = it->second;
       auto memMod = g_moduleInfoMap[modName];
-      for( auto output : memMod->moduleOutputs ) {
-        std::string portName = pathInsName+"."+output+DELIM+toStr(bound);
-        toCoutVerb("set mem ouput func arg, mem: "+pathInsName+", output: "+output);
-        (subFunc->args().begin()+idx++)->setName(portName);
-      }
+      for(uint32_t i = 0; i <= bound; i++)      
+        for( auto output : memMod->moduleOutputs ) {
+          std::string portName = pathInsName+"."+output+DELIM+toStr(i);
+          toCoutVerb("set mem ouput func arg, mem: "+pathInsName+", output: "+output);
+          (subFunc->args().begin()+idx++)->setName(portName);
+        }
     }
     toCoutVerb("************* set arg name, mem-type arg number: "+toStr(idx-1));    
 
@@ -1409,7 +1460,7 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
     // the output-inputVec pairs are stored in out2InDelayMp
     std::string outPortTimed = timed_name(outPort, 0);
     subMod->rootTimeIdx = 0;
-    //subMod->minInOutDelay.emplace(outPort, UINT32_MAX);
+    //subMod->minInOutDelay.emplace(outPort, DELAY_MAX);
     subDynData->isFunctionedSubMod = true;
     // switch func before elaborating
     if(!subMod->is_stored_outport_node(outPort)) {
@@ -1456,12 +1507,16 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
   // push output ports of memory modules
   for(auto it = subModMemInstances.begin(); it != subModMemInstances.end(); it++) {
     std::string pathInsName = it->first;
+    if(pathInsName == "hls_target_call_Loop_LB2D_buf_proc_buffer_0_value_V_ram_U")
+      toCoutVerb("Find it!");
     std::string modName = it->second;
     auto memMod = g_moduleInfoMap[modName];
-    for( auto output : memMod->moduleOutputs ) {
-      auto arg = get_arg(prefix+insName+"."+pathInsName+"."+output+DELIM+toStr(bound), curFunc);
-      args.push_back(arg);
-    }
+    for(uint32_t i = 0; i <= bound; i++)    
+      for( auto output : memMod->moduleOutputs ) {
+        //auto arg = get_arg(prefix+insName+"."+pathInsName+"."+output+DELIM+toStr(bound), curFunc);
+        auto arg = get_arg(insName+"."+pathInsName+"."+output+DELIM+toStr(i), curFunc);
+        args.push_back(arg);
+      }
   }
   toCoutVerb("************* finish push mem-output, arg number: "+toStr(args.size()));
 
@@ -1472,6 +1527,8 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
   for(i = timeIdx; i <= bound; i++) {
     for(auto it = subMod->moduleInputs.begin(); it != subMod->moduleInputs.end(); it++) {
       uint32_t minDelay = subDynData->minInOutDelay[outPort][*it];
+      if(*it == "if_read") 
+        toCoutVerb("Find it!");
       if(i < timeIdx + minDelay) {
         // these inputs for submod would not be used, so just give 0.
         toCoutVerb("push input: "+*it+", timeIdx: "+toStr(i));
@@ -1480,7 +1537,7 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
         args.push_back(llvmInt(0, width, c));
       }
       else {
-        toCoutVerb("push input: "+*it+", timeIdx: "+toStr(i));      
+        toCoutVerb("push input : "+*it+", timeIdx: "+toStr(i));      
         if(*it == subMod->clk) continue;      
         std::string connectWire = curMod->insPort2wireMp[insName][*it];
         if(connectWire.empty()) {
@@ -1519,7 +1576,7 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
   }
   toCoutVerb("************* finish push input, arg number: "+toStr(args.size()));
 
-  toCout("--- To call function for: "+destAndSlice);
+  toCoutVerb("--- To call function for: "+destAndSlice);
   std::string destTimed = timed_name(destAndSlice, timeIdx);
   if(!subModExist && argTy.size() != args.size()) {
     toCout("argTy size: "+toStr(argTy.size())

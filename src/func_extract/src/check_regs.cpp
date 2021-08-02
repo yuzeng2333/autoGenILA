@@ -220,11 +220,12 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     std::string pathInsName = it->first;
     std::string modName = it->second;
     auto memMod = g_moduleInfoMap[modName];
-    for( auto output : memMod->moduleOutputs ) {
-      uint32_t width = get_var_slice_width_simp(output, memMod);
-      argTy.push_back(llvm::IntegerType::get(*TheContext, width));
-      argNum++;
-    }
+    for(uint32_t i = 0; i <= bound; i++)
+      for( auto output : memMod->moduleOutputs ) {
+        uint32_t width = get_var_slice_width_simp(output, memMod);
+        argTy.push_back(llvm::IntegerType::get(*TheContext, width));
+        argNum++;
+      }
   }
 
   // push inputs
@@ -245,6 +246,18 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   llvm::FunctionType *FT =
     llvm::FunctionType::get(retTy, argTy, false);
 
+  // if target is vector, delcare global array before creating
+  // the top function
+  Value* retArrPtr;
+  if(destInfo.isVector) {
+    retArrPtr = GlobalVariable::GlobalVariable(
+                  TheModule, 
+                  retTy->getElementType(), false, 
+                  GlobalValue::InternalLinkage,
+                  nullptr,
+                  "RET_ARRAY_PTR"
+                );
+  }
 
   // make a top function
   llvm::Function *topFunction 
@@ -281,14 +294,15 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     std::string pathInsName = it->first;
     std::string modName = it->second;
     auto memMod = g_moduleInfoMap[modName];
-    for( auto output : memMod->moduleOutputs ) {
-      std::string portName = pathInsName+"."+output+DELIM+toStr(bound);
-      toCoutVerb("set mem ouput func arg, mem: "+pathInsName+", output: "+output);
-      (TheFunction->args().begin()+idx)->setName(portName);
-      (topFunction->args().begin()+idx)->setName(portName);
-      argNum--;
-      topFuncArgMp.emplace(portName, TheFunction->args().begin()+idx++);
-    }
+    for(uint32_t i = 0; i <= bound; i++)  
+      for( auto output : memMod->moduleOutputs ) {
+        std::string portName = pathInsName+"."+output+DELIM+toStr(i);
+        toCoutVerb("set mem ouput func arg, mem: "+pathInsName+", output: "+output);
+        (TheFunction->args().begin()+idx)->setName(portName);
+        (topFunction->args().begin()+idx)->setName(portName);
+        argNum--;
+        topFuncArgMp.emplace(portName, TheFunction->args().begin()+idx++);
+      }
   }
 
 
@@ -368,16 +382,18 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     uint32_t size = destVec.size();
     uint32_t bitNum = log2(size) + 2;
 
-    llvm::AllocaInst* arrayAlloca 
-        = Builder->CreateAlloca(
-            //allocaTy,
-            retTy,
-            llvm::ConstantInt::get(llvm::IntegerType::get(*TheContext, bitNum), 
-                                                    size, false), // # elements
-            llvm::Twine(destName)
-          );
-    // store values in retVec to memory of array
-    llvm::Value* arrPtr = value(arrayAlloca);
+    // the arrayAlloca is removed because a global array is declared
+    //llvm::AllocaInst* arrayAlloca 
+    //    = Builder->CreateAlloca(
+    //        //allocaTy,
+    //        retTy,
+    //        llvm::ConstantInt::get(llvm::IntegerType::get(*TheContext, bitNum), 
+    //                                                size, false), // # elements
+    //        llvm::Twine(destName)
+    //      );
+
+    // store values in retVec to memory of global array
+    llvm::Value* arrPtr = retArrPtr;
     uint32_t i = 0;
     for(llvm::Value* val : retVec) {
       llvm::GetElementPtrInst* ptr 
@@ -405,8 +421,9 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
       llvm::StoreInst* store = Builder->CreateStore(val, value(ptr));  
     }
 
-    llvm::LoadInst *retArr = Builder->CreateLoad(retTy, arrPtr, llvm::Twine("retArr"));
-    Builder->CreateRet(value(retArr));
+    //llvm::LoadInst *retArr = Builder->CreateLoad(retTy, arrPtr, llvm::Twine("retArr"));
+    //Builder->CreateRet(value(retArr));
+    Builder->CreateRet(arrPtr);
   } // end of add vector
 
   llvm::verifyFunction(*TheFunction);
@@ -797,7 +814,9 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
     std::string insName = pair.first;
     auto subMod = get_mod_info(insName, curMod);
     std::string modName = subMod->name;
-    if(g_blackBoxModSet.find(modName) != g_blackBoxModSet.end())
+    if(is_mem_module(modName))
+      retExpr = memMod_constraint(node, timeIdx, c, b, bound);
+    else if(g_blackBoxModSet.find(modName) != g_blackBoxModSet.end())
       retExpr = bbMod_constraint(node, timeIdx, c, b, bound);
     else
       retExpr = submod_constraint(node, timeIdx, c, b, bound);
@@ -1192,6 +1211,8 @@ std::string DestInfo::get_dest_name() {
 }
 
 
+
+// if is vector, return a pointer of the array-element type
 llvm::Type* DestInfo::get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext) {
   if(!isVector) {
     return llvm::IntegerType::get(*TheContext, 
@@ -1205,10 +1226,12 @@ llvm::Type* DestInfo::get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext
       uint32_t elmtSize = get_var_slice_width_cmplx(dest);
       assert(size == elmtSize);
     }
-    llvm::Type* I = llvm::IntegerType::get(*TheContext, size);
-    llvm::ArrayType* arrayType = llvm::ArrayType::get(I, destVec.size());
-    //auto ptrTy = llvm::PointerType::get(arrayType, 0);
-    return arrayType;
+    llvm::Type* I = llvm::IntegerType::get(*TheContext, size);    
+    PointerType* pointerTy = PointerType::get(I, 0);
+    //llvm::ArrayType* arrayType = llvm::ArrayType::get(I, destVec.size());
+    ////auto ptrTy = llvm::PointerType::get(arrayType, 0);
+    //return arrayType;
+    return pointerTy;
   }
 }
 
@@ -1334,7 +1357,7 @@ UpdateFunctionGen::initialize_min_delay(std::shared_ptr<ModuleInfo_t> &modInfo,
   if(dynData->minInOutDelay.find(outPort) == dynData->minInOutDelay.end()) {
     std::map<std::string, uint32_t> toInputDelay;
     for(std::string input : modInfo->moduleInputs) {
-      toInputDelay.emplace(input, UINT32_MAX);
+      toInputDelay.emplace(input, DELAY_MAX);
     }
     dynData->minInOutDelay.emplace(outPort, toInputDelay);
   }
@@ -1357,9 +1380,12 @@ UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
     noinline = false;
   }
   else if(is_read_asv(dest, insContextStk.get_curMod()) 
-          || (is_top_module(curMod) && is_input(dest, insContextStk.get_curMod()))) noinline = true;
+          || (is_top_module(curMod) && is_input(dest, insContextStk.get_curMod())))
+    noinline = true;
   else noinline = false;
-  toCoutVerb("extract for: "+destName);  
+  toCoutVerb("extract for: "+destName);
+  if(destName == "cct_715")
+    toCoutVerb("Find it!");
   llvm::Type* inputTy = in->getType();
   uint32_t inputWidth = llvm::dyn_cast<llvm::IntegerType>(inputTy)->getBitWidth();
   std::string app = "";
@@ -1376,7 +1402,7 @@ UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
     extValName = destName+" ["+toStr(high)+":"+toStr(low)+"]";
 
   if(!g_use_concat_extract_func) {
-    auto s1 = b->CreateLShr(in, low, llvm::Twine(destName+"_lshr"));
+    auto s1 = b->CreateLShr(in, low, llvm::Twine(destName+"_LSHR_"+toStr(low)+"_"));
     llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c), 
                         llvm::Twine(extValName));
     return ret;
@@ -1433,7 +1459,7 @@ UpdateFunctionGen::extract(llvm::Value* in, uint32_t high, uint32_t low,
   uint32_t len = high - low + 1;
   auto s1 = b->CreateLShr(in, low);
   if(name.isTriviallyEmpty()) {
-    llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c));
+    llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c), llvm::Twine(""));
     return ret;
   }
   else {
@@ -1612,7 +1638,7 @@ llvm::Value* UpdateFunctionGen::get_arg(std::string regName) {
 
 
 llvm::Value* UpdateFunctionGen::get_arg(std::string regName, llvm::Function *func) {
-  if(regName.find("es_top_0.mem_data_buf") != std::string::npos)
+  if(regName.find("hls_target_call_Loop_LB2D_buf_proc_buffer_0_value_V_ram_U.q0___#0") != std::string::npos)
     toCout("Find the arg!");
   for(auto it = func->arg_begin(); it != func->arg_end(); it++) {
     std::string funcName = llvm::dyn_cast<llvm::Value>(func)->getName().str();

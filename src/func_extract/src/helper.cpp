@@ -1,6 +1,7 @@
 #include "helper.h"
 #include "parse_fill.h"
 #include "global_data_struct.h"
+//#include "syntax_patterns.h"
 #include <ctype.h>
 
 #define context std::shared_ptr<llvm::LLVMContext>
@@ -1025,9 +1026,9 @@ void check_no_slice(std::string varAndSlice) {
 std::string remove_paramod(std::string modName) {
   remove_two_end_space(modName);
   std::smatch m;
+  std::regex pParamod1("^\\\\\\$paramod\\\\([_0-9a-zA-Z]+)(\\\\(\\S+)=(\\d+))+$");
+  std::regex pParamod2("^\\\\\\$paramod\\$(?:[_0-9a-zA-Z]+)(\\S+)$");
   if(modName.find("paramod") != std::string::npos) {
-    std::regex pParamod1("^\\\\\\$paramod\\\\(\\S+)(\\\\(\\S+)=(\\d+))+$");
-    std::regex pParamod2("^\\\\\\$paramod\\$(?:[0-9a-z]+)(\\S+)$");
     if(std::regex_match(modName, m, pParamod1)
        || std::regex_match(modName, m, pParamod2) ) {
       modName = m.str(1);

@@ -257,6 +257,7 @@ void both_concat_expr(std::string line) {
   moduleWires.insert("yuzeng"+yuzengIdxStr);
   curMod->varWidth.var_width_insert("yuzeng"+yuzengIdxStr, startIdx, 0);
   std::string newAssign = "  assign yuzeng"+yuzengIdxStr+" = "+srcList+" ;";
+  g_outFile << newAssign << std::endl;
 
   auto ret = curMod->ssaTable.emplace("yuzeng"+yuzengIdxStr, line);
   if(!ret.second)
@@ -373,8 +374,13 @@ void always_expr(std::string line, std::ifstream &input) {
   g_recentClk = m.str(2);
   // parse first assignment
   std::getline(input, line);
+  if(line.find("if (_127_)") != std::string::npos) 
+    toCout("Find it!");
   if( std::regex_match(line, m, pNonblock) || std::regex_match(line, m, pNonblockConcat) ) {
     nb_expr(line);
+  }
+  else if( std::regex_match(line, m, pIf) ) {
+    if_expr(line, input);  
   }
   else if( std::regex_match(line, m, pNonblockIf) ) {
     nonblockif_expr(line, input);
@@ -393,10 +399,15 @@ void always_expr(std::string line, std::ifstream &input) {
 //  if (cond) var <= data1;
 //  else var <= data2; (optional)
 //  else if(cond2) var <= data2; (optional)
-void nonblockif_expr(std::string line, std::ifstream &input) {
+// first returned is the destName, the second returned is index for yuzeng
+std::pair<std::string, std::string> nonblockif_expr(std::string line, 
+                                                    std::ifstream &input,
+                                                    bool insertNBTable) {
   std::smatch m;
-  if ( !std::regex_match(line, m, pNonblockIf) )
-    return;
+  if ( !std::regex_match(line, m, pNonblockIf) ) {
+    toCout("Error: does not match pNonblockIf: "+line);
+    abort();
+  }
 
   const auto curMod = g_insContextStk.get_curMod();
   bool hasRst = false;
@@ -445,6 +456,7 @@ void nonblockif_expr(std::string line, std::ifstream &input) {
   auto endOfIf = input.tellg();
   std::getline(input, line);
   if( !std::regex_match(line, m, pNBElseIf) ) {
+    assert(line.find("else if") == std::string::npos);
     if ( !std::regex_match(line, m, pNonblockElse) ) {
       input.seekg(endOfIf);
       elseValue = destAndSlice;
@@ -456,26 +468,51 @@ void nonblockif_expr(std::string line, std::ifstream &input) {
       elseValue = elseSrcAndSlice;
     }
 
-    std::string destNextLine = "  assign yuzeng"+yuzengIdx+" = "+condAndSlice+" ? "+ifSrcAndSlice+" : "+elseValue+" ;";
+    std::string destNextLine;
+    remove_two_end_space(condAndSlice);
+    if(condAndSlice.front() != '!') {
+      destNextLine = "  assign yuzeng"+yuzengIdx+" = "+condAndSlice+" ? "+ifSrcAndSlice+" : "+elseValue+" ;";
+    }
+    else {
+      std::string tmpCond = condAndSlice.substr(1);
+      destNextLine = "  assign yuzeng"+yuzengIdx+" = "+tmpCond+" ? "+elseValue+" : "+ifSrcAndSlice+" ;";      
+    }
     toCoutVerb(destNextLine);
+    g_outFile << destNextLine << std::endl;
     auto ret = curMod->ssaTable.emplace("yuzeng"+yuzengIdx, destNextLine);
     if(!ret.second)
       toCout("Error in inserting ssaTable for the line: "+line+", "+destNextLine );
 
-    std::string destNbLine = "  "+destAndSlice+" <= yuzeng"+yuzengIdx+";";
-    ret = curMod->nbTable.emplace(destAndSlice, destNbLine);
-    if(!ret.second)
-      toCout("Error in inserting ssaTable for the line: "+line+", "+destNbLine );
+    if(insertNBTable) {
+      std::string destNbLine = "  "+destAndSlice+" <= yuzeng"+yuzengIdx+";";
+      ret = curMod->nbTable.emplace(destAndSlice, destNbLine);
+      if(!ret.second)
+        toCout("Error in inserting ssaTable for the line: "+line+", "+destNbLine );
+    }
   }
   else { // if is "else if" nonblocking assignment
     std::string yuzengIdx2 = toStr(g_new_var++);
     condAndSlice2 = m.str(2);
     destAndSlice2 = m.str(3);
     elseSrcAndSlice = m.str(4);
-    std::string fstLine = "  assign yuzeng"+yuzengIdx+" = "+condAndSlice2+" ? "+elseSrcAndSlice+" : "+destAndSlice+" ;";
-    std::string sndLine = "  assign yuzeng"+yuzengIdx2+" = "+condAndSlice+" ? "+ifSrcAndSlice+" : yuzeng"+yuzengIdx+" ;";
+    std::string fstLine;
+    std::string sndLine;
+    if(condAndSlice2.front() != '!')
+      fstLine = "  assign yuzeng"+yuzengIdx+" = "+condAndSlice2+" ? "+elseSrcAndSlice+" : "+destAndSlice+" ;";
+    else {
+      std::string tmpCond = condAndSlice2.substr(1);
+      fstLine = "  assign yuzeng"+yuzengIdx+" = "+tmpCond+" ? "+destAndSlice+" : "+elseSrcAndSlice+" ;";
+    }
+    if(condAndSlice.front() != '!')
+      sndLine = "  assign yuzeng"+yuzengIdx2+" = "+condAndSlice+" ? "+ifSrcAndSlice+" : yuzeng"+yuzengIdx+" ;";
+    else {
+      std::string tmpCond = condAndSlice.substr(1);
+      sndLine = "  assign yuzeng"+yuzengIdx2+" = "+tmpCond+" ? yuzeng"+yuzengIdx+" : "+ifSrcAndSlice+" ;";
+    }
     toCoutVerb(fstLine);
     toCoutVerb(sndLine);
+    g_outFile << fstLine << std::endl;
+    g_outFile << sndLine << std::endl;
     uint32_t destWidth = g_insContextStk.get_var_slice_width_simp(destAndSlice);
     curMod->varWidth.var_width_insert("yuzeng"+yuzengIdx, destWidth-1, 0);    
     curMod->varWidth.var_width_insert("yuzeng"+yuzengIdx2, destWidth-1, 0);    
@@ -487,10 +524,72 @@ void nonblockif_expr(std::string line, std::ifstream &input) {
     if(!ret.second)
       toCout("Error in inserting ssaTable for the sndLine: "+line+", "+sndLine );
 
-    std::string destNbLine = "  "+destAndSlice+" <= yuzeng"+yuzengIdx2+";";
-    ret = curMod->nbTable.emplace(destAndSlice, destNbLine);
-    if(!ret.second)
-      toCout("Error in inserting ssaTable for the line: "+line+", "+destNbLine );
+    if(insertNBTable) {
+      std::string destNbLine = "  "+destAndSlice+" <= yuzeng"+yuzengIdx2+";";
+      ret = curMod->nbTable.emplace(destAndSlice, destNbLine);
+      if(!ret.second)
+        toCout("Error in inserting ssaTable for the line: "+line+", "+destNbLine );
+    }
+  }
+  return std::make_pair(destAndSlice, yuzengIdx);  
+}
+
+
+
+//always @(posedge clk)
+//  if (cond) var <= data1;
+//  else var <= data2; (optional)
+//  else if(cond2) var <= data2; (optional)
+void if_expr(std::string line, std::ifstream &input) {
+  std::smatch m;
+  if ( !std::regex_match(line, m, pIf) )
+    return;
+
+  std::string topCondAndSlice = m.str(2);
+
+  auto endOfIf = input.tellg();
+  std::string nextLine;
+  std::getline(input, nextLine);
+  // if the next line is directly nonblocking, then switch to always_if_else_expr
+  if( std::regex_match(nextLine, m, pNonblock) ) {
+    input.seekg(endOfIf);
+    always_if_else_expr(line, input);
+    return;
+  }
+  else if ( !std::regex_match(nextLine, m, pNonblockIf)) {
+    toCout("Error: if is not followed by nonblockif: "+nextLine);
+    abort();
+  }
+  auto destYZIdxPair = nonblockif_expr(nextLine, input, false);
+  std::string retDestVar = destYZIdxPair.first;
+  std::string retIdx = destYZIdxPair.second;
+
+  // make the new line with yuzengIdx as destVar
+  std::string yuzengIdx = toStr(g_new_var++);
+  std::string topYuzeng = "yuzeng"+yuzengIdx;
+  moduleWires.insert("yuzeng"+yuzengIdx);
+  uint32_t localWidth = g_insContextStk.get_var_slice_width_simp(retDestVar);
+  const auto curMod = g_insContextStk.get_curMod();  
+  bool insertDone;
+    insertDone = curMod->varWidth.var_width_insert(topYuzeng, localWidth-1, 0);
+  if (!insertDone) {
+    std::cout << "insert failed: " + line << std::endl;
+  }
+
+  std::string newLine = "  assign "+topYuzeng+" = "+topCondAndSlice+" ? yuzeng"+retIdx+" : "+retDestVar+" ;";
+  toCoutVerb(newLine);
+  g_outFile << newLine << std::endl;
+  auto ret = curMod->ssaTable.emplace(topYuzeng, newLine);
+  if(!ret.second) {
+    toCout("Error in inserting ssaTable for the line: "+topYuzeng+", "+newLine );
+    abort();
+  }
+
+  std::string destNbLine = "  "+retDestVar+" <= "+topYuzeng+" ;";
+  ret = curMod->nbTable.emplace(retDestVar, destNbLine);
+  if(!ret.second) {
+    toCout("Error in inserting ssaTable for the line: "+retDestVar+", "+destNbLine );
+    abort();
   }
 }
 
@@ -557,6 +656,7 @@ void always_if_else_expr(std::string line, std::ifstream &input) {
   else
     destNextLine = "  assign yuzeng"+yuzengIdx+" = "+condAndSlice.substr(1)+" ? "+src2AndSlice+" : "+src1AndSlice+";";
   auto ret = curMod->ssaTable.emplace("yuzeng"+yuzengIdx, destNextLine);
+  g_outFile << destNextLine << std::endl;
   if(!ret.second)
     toCout("Error in inserting ssaTable for the line: "+line+", "+destNextLine);
 
