@@ -246,6 +246,18 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   llvm::FunctionType *FT =
     llvm::FunctionType::get(retTy, argTy, false);
 
+  // if target is vector, delcare global array before creating
+  // the top function
+  Value* retArrPtr;
+  if(destInfo.isVector) {
+    retArrPtr = GlobalVariable::GlobalVariable(
+                  TheModule, 
+                  retTy->getElementType(), false, 
+                  GlobalValue::InternalLinkage,
+                  nullptr,
+                  "RET_ARRAY_PTR"
+                );
+  }
 
   // make a top function
   llvm::Function *topFunction 
@@ -370,16 +382,18 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     uint32_t size = destVec.size();
     uint32_t bitNum = log2(size) + 2;
 
-    llvm::AllocaInst* arrayAlloca 
-        = Builder->CreateAlloca(
-            //allocaTy,
-            retTy,
-            llvm::ConstantInt::get(llvm::IntegerType::get(*TheContext, bitNum), 
-                                                    size, false), // # elements
-            llvm::Twine(destName)
-          );
-    // store values in retVec to memory of array
-    llvm::Value* arrPtr = value(arrayAlloca);
+    // the arrayAlloca is removed because a global array is declared
+    //llvm::AllocaInst* arrayAlloca 
+    //    = Builder->CreateAlloca(
+    //        //allocaTy,
+    //        retTy,
+    //        llvm::ConstantInt::get(llvm::IntegerType::get(*TheContext, bitNum), 
+    //                                                size, false), // # elements
+    //        llvm::Twine(destName)
+    //      );
+
+    // store values in retVec to memory of global array
+    llvm::Value* arrPtr = retArrPtr;
     uint32_t i = 0;
     for(llvm::Value* val : retVec) {
       llvm::GetElementPtrInst* ptr 
@@ -407,8 +421,9 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
       llvm::StoreInst* store = Builder->CreateStore(val, value(ptr));  
     }
 
-    llvm::LoadInst *retArr = Builder->CreateLoad(retTy, arrPtr, llvm::Twine("retArr"));
-    Builder->CreateRet(value(retArr));
+    //llvm::LoadInst *retArr = Builder->CreateLoad(retTy, arrPtr, llvm::Twine("retArr"));
+    //Builder->CreateRet(value(retArr));
+    Builder->CreateRet(arrPtr);
   } // end of add vector
 
   llvm::verifyFunction(*TheFunction);
@@ -1211,11 +1226,12 @@ llvm::Type* DestInfo::get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext
       uint32_t elmtSize = get_var_slice_width_cmplx(dest);
       assert(size == elmtSize);
     }
-    llvm::Type* I = llvm::IntegerType::get(*TheContext, size);
+    llvm::Type* I = llvm::IntegerType::get(*TheContext, size);    
+    PointerType* pointerTy = PointerType::get(I, 0);
     //llvm::ArrayType* arrayType = llvm::ArrayType::get(I, destVec.size());
     ////auto ptrTy = llvm::PointerType::get(arrayType, 0);
     //return arrayType;
-    return I;
+    return pointerTy;
   }
 }
 
