@@ -1196,6 +1196,8 @@ std::string DestInfo::get_dest_name() {
 }
 
 
+
+// if is vector, return a pointer of the array-element type
 llvm::Type* DestInfo::get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext) {
   if(!isVector) {
     return llvm::IntegerType::get(*TheContext, 
@@ -1210,9 +1212,10 @@ llvm::Type* DestInfo::get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext
       assert(size == elmtSize);
     }
     llvm::Type* I = llvm::IntegerType::get(*TheContext, size);
-    llvm::ArrayType* arrayType = llvm::ArrayType::get(I, destVec.size());
-    //auto ptrTy = llvm::PointerType::get(arrayType, 0);
-    return arrayType;
+    //llvm::ArrayType* arrayType = llvm::ArrayType::get(I, destVec.size());
+    ////auto ptrTy = llvm::PointerType::get(arrayType, 0);
+    //return arrayType;
+    return I;
   }
 }
 
