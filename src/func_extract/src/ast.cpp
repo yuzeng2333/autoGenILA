@@ -88,7 +88,8 @@ void build_ast_tree() {
   std::string line;
   std::ifstream allowedTgtInFile(g_path+"/allowed_target.txt");
   while(std::getline(allowedTgtInFile, line)) {
-    if(line.substr(0, 2) == "//")  continue;
+    if(line.substr(0, 2) == "//"
+        || line.empty())  continue;
     if(line != "[") {
       if(line.find(":") == std::string::npos) {
         remove_two_end_space(line);
@@ -331,7 +332,8 @@ void add_child_node(std::string varAndSlice,
                     astNode* const parentNode) {
   const auto curMod = g_insContextStk.get_curMod();  
   toCoutVerb("!! Add child "+varAndSlice+" to "+parentNode->dest);
-  if(varAndSlice == "1'b0" && parentNode->dest == "wr_fifo_out9") {
+  if(varAndSlice.find("wr_fifo.r9") != std::string::npos 
+       && parentNode->dest == "yuzeng291") {
     toCout("Find it!");
   }
   std::string var, varSlice;

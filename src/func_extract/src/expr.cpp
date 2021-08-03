@@ -430,7 +430,7 @@ std::pair<std::string, std::string> nonblockif_expr(std::string line,
   ifSrcAndSlice = m.str(4);
   put_into_reg2Slice(destAndSlice);
 
-  if(destAndSlice.find("aes_reg_oplen_i.reg_out") != std::string::npos) {
+  if(destAndSlice.find("wr_fifo.r9") != std::string::npos) {
     toCout("Find it!");
   }
  
