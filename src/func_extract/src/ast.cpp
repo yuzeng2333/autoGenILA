@@ -331,7 +331,7 @@ void add_child_node(std::string varAndSlice,
                     astNode* const parentNode) {
   const auto curMod = g_insContextStk.get_curMod();  
   toCoutVerb("!! Add child "+varAndSlice+" to "+parentNode->dest);
-  if(varAndSlice == "out") {
+  if(varAndSlice == "1'b0" && parentNode->dest == "wr_fifo_out9") {
     toCout("Find it!");
   }
   std::string var, varSlice;

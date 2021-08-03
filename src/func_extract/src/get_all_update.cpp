@@ -464,7 +464,7 @@ bool read_clean_o3(std::string fileName,
   bool seeFuncDef = false;
   bool seeReturn = false;
   bool returnConst = false;
-  std::regex pDef("^define internal fastcc i(\\d+) @(\\S+)\\((.*)\\) unnamed_addr #1 \\{$");  
+  std::regex pDef("^define internal fastcc (\\S+) @(\\S+)\\((.*)\\) unnamed_addr #1 \\{$");  
   std::regex pVecDef(
     "^define internal fastcc \\[(\\d+) x i(\\d+)\\] @(\\S+)\\((.*)\\) unnamed_addr #1 \\{$"
   );  
