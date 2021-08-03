@@ -251,13 +251,15 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   llvm::Value* retArrPtr;
   llvm::Type* elementTy = llvm::cast<llvm::PointerType>(retTy)->getElementType();
   std::vector<std::string> destVec = destInfo.get_no_slice_name();  
-  llvm::ArrayType* arrayType = llvm::ArrayType::get(elementTy, destVec.size());  
+  llvm::ArrayType* arrayType = llvm::ArrayType::get(elementTy, destVec.size());
+  // zero initializer
+  llvm::ConstantAggregateZero* zeroInit = llvm::ConstantAggregateZero::get(arrayType);
   if(destInfo.isVector) {
     llvm::GlobalVariable* globalArr = new llvm::GlobalVariable(
         *TheModule, 
         arrayType, false, 
         llvm::GlobalValue::InternalLinkage,
-        nullptr,
+        zeroInit,
         "RET_ARRAY_PTR"
       );
     retArrPtr = value(globalArr);
@@ -425,7 +427,23 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 
     //llvm::LoadInst *retArr = Builder->CreateLoad(retTy, arrPtr, llvm::Twine("retArr"));
     //Builder->CreateRet(value(retArr));
-    Builder->CreateRet(arrPtr);
+
+    llvm::GetElementPtrInst* retPtr 
+      = llvm::GetElementPtrInst::Create(
+          nullptr,
+          arrPtr,
+          std::vector<llvm::Value*>{
+            llvm::ConstantInt::get(
+              llvm::IntegerType::get(*TheContext, bitNum), 
+              0, false),
+            llvm::ConstantInt::get(
+              llvm::IntegerType::get(*TheContext, bitNum), 
+              0, false) },
+          llvm::Twine("RET_PTR"),
+          BB
+        );
+
+    Builder->CreateRet(value(retPtr));
   } // end of add vector
 
   llvm::verifyFunction(*TheFunction);
