@@ -249,20 +249,23 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   // if target is vector, delcare global array before creating
   // the top function
   llvm::Value* retArrPtr;
-  llvm::Type* elementTy = llvm::cast<llvm::PointerType>(retTy)->getElementType();
   std::vector<std::string> destVec = destInfo.get_no_slice_name();  
-  llvm::ArrayType* arrayType = llvm::ArrayType::get(elementTy, destVec.size());
-  // zero initializer
-  llvm::ConstantAggregateZero* zeroInit = llvm::ConstantAggregateZero::get(arrayType);
+
   if(destInfo.isVector) {
-    llvm::GlobalVariable* globalArr = new llvm::GlobalVariable(
-        *TheModule, 
-        arrayType, false, 
-        llvm::GlobalValue::InternalLinkage,
-        zeroInit,
-        "RET_ARRAY_PTR"
-      );
-    retArrPtr = value(globalArr);
+    llvm::Type* elementTy = llvm::cast<llvm::PointerType>(retTy)->getElementType();
+    llvm::ArrayType* arrayType = llvm::ArrayType::get(elementTy, destVec.size());
+    // zero initializer
+    llvm::ConstantAggregateZero* zeroInit = llvm::ConstantAggregateZero::get(arrayType);
+    if(destInfo.isVector) {
+      llvm::GlobalVariable* globalArr = new llvm::GlobalVariable(
+          *TheModule, 
+          arrayType, false, 
+          llvm::GlobalValue::InternalLinkage,
+          zeroInit,
+          "RET_ARRAY_PTR"
+        );
+      retArrPtr = value(globalArr);
+    }
   }
 
   // make a top function
