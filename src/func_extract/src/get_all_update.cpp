@@ -10,7 +10,7 @@
 namespace funcExtract {
 
 // TODO: configurations
-bool g_use_multi_thread = true;
+bool g_use_multi_thread = false;
 
 std::mutex g_dependVarMapMtx;
 // the first key is instr name, the second key is target name
@@ -23,6 +23,7 @@ struct ThreadSafeMap_t g_asvSet;
 struct WorkSet_t g_workSet;
 struct ThreadSafeVector_t g_fileNameVec;
 std::shared_ptr<ModuleInfo_t> g_topModuleInfo;
+struct WorkSet_t g_visitedTgt;
 
 // A file should be generated, including:
 // 1. all the asvs and their bit numbers
@@ -30,16 +31,15 @@ std::shared_ptr<ModuleInfo_t> g_topModuleInfo;
 // for each of it update function, what are the arguments
 void get_all_update() {
   toCout("### Begin get_all_update ");
-  std::set<std::string> visitedTgt;
   std::string line;  
-  //std::ifstream visitedTgtInFile(g_path+"/visited_target.txt");
-  //while(std::getline(visitedTgtInFile, line)) {
+  //std::ifstream g_visitedTgtInFile(g_path+"/visited_target.txt");
+  //while(std::getline(g_visitedTgtInFile, line)) {
   //  remove_two_end_space(line);
-  //  visitedTgt.insert(line);
+  //  g_visitedTgt.insert(line);
   //}
-  //visitedTgtInFile.close();
-  //std::ofstream visitedTgtFile;
-  //visitedTgtFile.open(g_path+"/visited_target.txt", std::ios_base::app);
+  //g_visitedTgtInFile.close();
+  //std::ofstream g_visitedTgtFile;
+  //g_visitedTgtFile.open(g_path+"/visited_target.txt", std::ios_base::app);
 
   std::ifstream addedWorkSetInFile(g_path+"/added_work_set.txt");
   g_topModuleInfo = g_moduleInfoMap[g_topModule];
@@ -112,7 +112,7 @@ void get_all_update() {
         auto targetIt = g_workSet.begin();
         target = *targetIt;
         g_workSet.mtxErase(targetIt);
-        if(visitedTgt.find(target) != visitedTgt.end()
+        if(!g_visitedTgt.mtxExist(target)
            || g_skippedOutput.find(target) != g_skippedOutput.end())
           continue;
       }
@@ -138,17 +138,17 @@ void get_all_update() {
         }
       }
       //for(auto &th: threadVec) th.join();
-      //if(isVec) {
-      //  for(auto reg: tgtVec) {
-      //    visitedTgt.insert(reg);
-      //    visitedTgtFile << target << std::endl;
-      //  }
-      //  tgtVec.clear();
-      //}
-      //else {
-      //  visitedTgt.insert(target);
-      //  visitedTgtFile << target << std::endl;
-      //}
+      if(isVec) {
+        for(auto reg: tgtVec) {
+          g_visitedTgt.mtxInsert(reg);
+          //g_visitedTgtFile << target << std::endl;
+        }
+        tgtVec.clear();
+      }
+      else {
+        g_visitedTgt.mtxInsert(target);
+        //g_visitedTgtFile << target << std::endl;
+      }
     } // end of while loop
   }
   else {
@@ -182,21 +182,21 @@ void get_all_update() {
             auto targetIt = localWorkSet.begin();
             target = *targetIt;
             localWorkSet.erase(targetIt);
-            if(visitedTgt.find(target) != visitedTgt.end()
+            if(!g_visitedTgt.mtxExist(target)
                || g_skippedOutput.find(target) != g_skippedOutput.end())
               continue;
           }
-          //if(isVec) {
-          //  for(std::string reg: tgtVec) {
-          //    visitedTgt.insert(reg);
-          //    visitedTgtFile << target << std::endl;
-          //  }
-          //  tgtVec.clear();
-          //}
-          //else {
-          //  visitedTgt.insert(target);
-          //  visitedTgtFile << target << std::endl;
-          //}
+          if(isVec) {
+            for(std::string reg: tgtVec) {
+              g_visitedTgt.mtxInsert(reg);
+              //g_visitedTgtFile << target << std::endl;
+            }
+            tgtVec.clear();
+          }
+          else {
+            g_visitedTgt.mtxInsert(target);
+            //g_visitedTgtFile << target << std::endl;
+          }
           if(!target.empty()
              && g_allowedTgt.find(target) != g_allowedTgt.end()
              && g_allowedTgt[target].size() > 1) {
@@ -225,7 +225,7 @@ void get_all_update() {
   print_llvm_script(g_path+"/link.sh");
   print_func_info(funcInfo);
   print_asv_info(asvInfo);
-  //visitedTgtFile.close();
+  //g_visitedTgtFile.close();
   addedWorkSetFile.close();
 }
 
@@ -254,7 +254,7 @@ void get_update_function(std::string target,
       toCoutVerb("Find it!");
     ///else continue;
     ///g_workSet.erase(targetIt);
-    ///if(visitedTgt.find(target) != visitedTgt.end()
+    ///if(g_visitedTgt.find(target) != g_visitedTgt.end()
     ///   || g_skippedOutput.find(target) != g_skippedOutput.end())
     ///  continue;
     if(target.find(".") == std::string::npos 
@@ -400,7 +400,8 @@ void get_update_function(std::string target,
        || reg.find("cpuregs[29]") != std::string::npos
        || reg.find("cpuregs[30]") != std::string::npos)
         continue;
-    if(g_push_new_target) g_workSet.mtxInsert(reg);
+    if(g_push_new_target && !g_visitedTgt.mtxExist(reg)) 
+      g_workSet.mtxInsert(reg);
     // TODO:
     g_asvSet.emplace(reg, pair.second);
     //addedWorkSetFile << reg << std::endl;
@@ -674,6 +675,19 @@ std::set<std::string>::iterator WorkSet_t::begin() {
 void WorkSet_t::copy(std::set<std::string> &copySet) {
   copySet.clear();
   copySet = workSet;
+}
+
+
+bool WorkSet_t::mtxExist(std::string reg) {
+  mtx.lock();
+  if(workSet.find(reg) != workSet.end()) {
+    mtx.unlock();
+    return true;
+  }
+  else {
+    mtx.unlock();
+    return false;
+  }
 }
 
 
