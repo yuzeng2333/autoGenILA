@@ -67,7 +67,9 @@ void read_asv_info(std::string fileName, bool convertName) {
 }
 
 
-void read_func_info(std::string fileName) {
+void read_func_info(std::string fileName, 
+                    std::map<std::string, 
+                             std::pair<uint32_t, uint32_t>> &global_arr) {
   std::ifstream input(fileName);
   std::string instrName, target;
   std::string line;
@@ -79,20 +81,42 @@ void read_func_info(std::string fileName) {
       idx = get_instr_by_name(instrName);
     }
     else if(line.substr(0, 7) == "Target:") {
-      target = line.substr(7);
-      if(g_asv.find(target) == g_asv.end()) {
-        toCout("Error: cannot find in g_asv: "+target);
-        abort();
+      if(line.find("{") == std::string::npos) { // target is single reg
+        target = line.substr(7);
+        if(g_asv.find(target) == g_asv.end()) {
+          toCout("Error: cannot find in g_asv: "+target);
+          abort();
+        }
+        uint32_t targetWidth = g_asv[target];
+        struct FuncTy_t type = { targetWidth, std::vector<std::pair<uint32_t, std::string>>{} };      
+        if(g_instrInfo[idx].funcTypes.find(target) 
+             != g_instrInfo[idx].funcTypes.end()) {
+          toCout("Warning: target: "+target+" already existed for: "+g_instrInfo[idx].name);
+          g_instrInfo[idx].funcTypes[target] = type;
+        }
+        else
+          g_instrInfo[idx].funcTypes.emplace(target, type);
       }
-      uint32_t targetWidth = g_asv[target];
-      struct FuncTy_t tmp = { targetWidth, std::vector<std::pair<uint32_t, std::string>>{} };      
-      if(g_instrInfo[idx].funcTypes.find(target) 
-           != g_instrInfo[idx].funcTypes.end()) {
-        toCout("Warning: target: "+target+" already existed for: "+g_instrInfo[idx].name);
-        g_instrInfo[idx].funcTypes[target] = tmp;
+      else { // target is an array
+        targetArr = line.substr(8);
+        targetArr.pop_back(); // remove the last }
+        targetArr.pop_back();
+        targetArr.pop_back();
+        std::vector<std::string> targetVec;
+        split_by(targetArr, ", ", targetVec);
+        std::string firstVarName = targetVec.front();
+        firstVarName = purify_var_name(firstVarName);
+        target = firstVarName+"_Arr";
+        // 0 target width means return type is void
+        struct FuncTy_t type = { 0, std::vector<std::pair<uint32_t, std::string>>{} };      
+        if(g_instrInfo[idx].funcTypes.find(target) 
+             != g_instrInfo[idx].funcTypes.end()) {
+          toCout("Warning: target: "+target+" already existed for: "+g_instrInfo[idx].name);
+          g_instrInfo[idx].funcTypes[target] = type;
+        }
+        else
+          g_instrInfo[idx].funcTypes.emplace(target, type);
       }
-      else
-        g_instrInfo[idx].funcTypes.emplace(target, tmp);
     }
     else if(line.find(":") != std::string::npos) {
       size_t pos = line.find(":");
