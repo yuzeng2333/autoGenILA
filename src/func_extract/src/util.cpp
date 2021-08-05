@@ -98,15 +98,19 @@ void read_func_info(std::string fileName,
           g_instrInfo[idx].funcTypes.emplace(target, type);
       }
       else { // target is an array
-        targetArr = line.substr(8);
+        std::string targetArr = line.substr(8);
         targetArr.pop_back(); // remove the last }
         targetArr.pop_back();
         targetArr.pop_back();
         std::vector<std::string> targetVec;
         split_by(targetArr, ", ", targetVec);
         std::string firstVarName = targetVec.front();
+        uint32_t targetWidth = g_asv[firstVarName];        
         firstVarName = purify_var_name(firstVarName);
         target = firstVarName+"_Arr";
+        if(global_arr.find(target) != global_arr.end()) {
+          global_arr.emplace(target, std::make_pair(targetWidth, targetVec.size()));
+        }
         // 0 target width means return type is void
         struct FuncTy_t type = { 0, std::vector<std::pair<uint32_t, std::string>>{} };      
         if(g_instrInfo[idx].funcTypes.find(target) 

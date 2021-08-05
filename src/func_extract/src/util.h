@@ -16,7 +16,9 @@ void read_to_do_instr(std::string fileName,
 
 void read_asv_info(std::string fileName, bool convertName=false);
 
-void read_func_info(std::string fileName);
+void read_func_info(std::string fileName,
+                    std::map<std::string, 
+                             std::pair<uint32_t, uint32_t>> &global_arr);
 
 uint32_t get_instr_by_name(std::string instrName);
 

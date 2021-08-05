@@ -30,6 +30,7 @@
 
 using namespace z3;
 using namespace taintGen;
+using namespace syntaxPatterns;
 
 namespace funcExtract {
 
@@ -276,7 +277,8 @@ UpdateFunctionGen::input_constraint(astNode* const node, uint32_t timeIdx,
     uint32_t wordIdx = bound-timeIdx;
     std::string localVal = g_currInstrInfo.instrEncoding[dest][wordIdx];
     uint32_t localWidth = get_var_slice_width_simp(dest, curMod);
-    if(localVal != "x" && localVal != "DIRTY") {
+    std::smatch m;
+    if(localVal != "x" && localVal != "DIRTY" && !std::regex_match(localVal, m, pX) ) {
       if(is_pure_num(localVal)) {
         toCoutVerb("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%B Give "+localVal+" to "+timed_name(dest, timeIdx));
         g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
