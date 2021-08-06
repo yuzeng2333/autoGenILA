@@ -1,0 +1,314 @@
+$date
+	Thu Aug  5 22:28:14 2021
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1s
+$end
+$scope module tb $end
+$var wire 8 ! out7 [7:0] $end
+$var wire 8 " out6 [7:0] $end
+$var wire 8 # out5 [7:0] $end
+$var wire 8 $ out4 [7:0] $end
+$var wire 8 % out3 [7:0] $end
+$var wire 8 & out2 [7:0] $end
+$var wire 8 ' out1 [7:0] $end
+$var wire 8 ( out0 [7:0] $end
+$var wire 1 ) ack $end
+$var reg 1 * clk $end
+$var reg 8 + in [7:0] $end
+$var reg 1 , rst $end
+$var reg 1 - stb $end
+$scope module mem $end
+$var wire 1 ) ack $end
+$var wire 1 * clk $end
+$var wire 8 . in [7:0] $end
+$var wire 1 / new_value $end
+$var wire 8 0 out0 [7:0] $end
+$var wire 8 1 out1 [7:0] $end
+$var wire 8 2 out2 [7:0] $end
+$var wire 8 3 out3 [7:0] $end
+$var wire 8 4 out4 [7:0] $end
+$var wire 8 5 out5 [7:0] $end
+$var wire 8 6 out6 [7:0] $end
+$var wire 8 7 out7 [7:0] $end
+$var wire 1 , rst $end
+$var wire 1 - stb $end
+$var wire 4 8 pointer_nxt [3:0] $end
+$var reg 4 9 pointer [3:0] $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+#0
+$dumpvars
+bx 9
+bx 8
+bx 7
+bx 6
+bx 5
+bx 4
+bx 3
+bx 2
+bx 1
+bx 0
+x/
+b0 .
+0-
+1,
+b0 +
+0*
+0)
+bx (
+bx '
+bx &
+bx %
+bx $
+bx #
+bx "
+bx !
+$end
+#5
+b1 8
+1/
+b0 9
+b0 !
+b0 7
+b0 "
+b0 6
+b0 #
+b0 5
+b0 $
+b0 4
+b0 %
+b0 3
+b0 &
+b0 2
+b0 '
+b0 1
+b0 (
+b0 0
+1*
+#10
+0*
+0,
+#15
+b1 8
+0/
+b1 9
+1*
+#20
+0*
+#25
+1*
+#30
+0*
+#35
+1*
+#40
+0*
+#45
+1*
+#50
+0*
+#55
+1*
+#60
+0*
+#65
+1*
+#70
+0*
+#75
+1*
+#80
+0*
+#85
+1*
+#90
+0*
+#95
+1*
+#100
+0*
+#105
+1*
+#110
+b10 8
+1/
+0*
+b1 +
+b1 .
+#115
+b10 8
+0/
+b1 '
+b1 1
+b10 9
+1*
+#120
+0*
+#125
+1*
+#130
+0*
+#135
+1*
+#140
+0*
+#145
+1*
+#150
+0*
+#155
+1*
+#160
+0*
+#165
+1*
+#170
+0*
+#175
+1*
+#180
+0*
+#185
+1*
+#190
+0*
+#195
+1*
+#200
+0*
+#205
+1*
+#210
+0*
+#215
+1*
+#220
+0*
+#225
+1*
+#230
+b11 8
+1/
+0*
+b10 +
+b10 .
+#235
+b11 8
+0/
+b10 &
+b10 2
+b11 9
+1*
+#240
+0*
+#245
+1*
+#250
+0*
+#255
+1*
+#260
+0*
+#265
+1*
+#270
+0*
+#275
+1*
+#280
+0*
+#285
+1*
+#290
+0*
+#295
+1*
+#300
+0*
+#305
+1*
+#310
+0*
+#315
+1*
+#320
+0*
+#325
+1*
+#330
+0*
+#335
+1*
+#340
+0*
+#345
+1*
+#350
+0*
+#355
+1*
+#360
+b100 8
+1/
+0*
+b111 +
+b111 .
+#365
+b100 8
+0/
+b100 9
+b111 %
+b111 3
+1*
+#370
+0*
+#375
+1*
+#380
+0*
+#385
+1*
+#390
+0*
+#395
+1*
+#400
+0*
+#405
+1*
+#410
+0*
+#415
+1*
+#420
+b101 8
+1/
+0*
+b1010110 +
+b1010110 .
+#425
+b101 8
+0/
+b101 9
+b1010110 $
+b1010110 4
+1*
+#430
+0*
+#435
+1*
+#440
+0*
+#445
+1*
+#450
+0*
+#455
+1*
+#460
+0*
