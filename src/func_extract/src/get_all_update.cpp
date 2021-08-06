@@ -470,7 +470,7 @@ bool read_clean_o3(std::string fileName,
     "^define internal fastcc \\[(\\d+) x i(\\d+)\\] @(\\S+)\\((.*)\\) unnamed_addr #1 \\{$"
   );  
   std::regex pTopDef("^define i(\\d+) @top_function\\((.*)\\) local_unnamed_addr #0 \\{$");  
-  std::regex pTopPartialDef("^define i(\\d+) @top_function(");  
+  std::regex pTopPartialDef("^define i(\\d+) @top_function\\(");  
   std::regex pTopVecDef(
     "^define \\[(\\d+) x i(\\d+)\\] @top_function\\((.*)\\) local_unnamed_addr #0 \\{$"
   );  
@@ -587,7 +587,7 @@ bool read_clean_o3(std::string fileName,
                +topFuncLine);
         abort();
       }
-      std::string topFuncLineFirstPart = topFuncLine.substr(0, pos);
+      std::string topFuncLineFirstPart = topFuncLine.substr(0, pos+1);
       if(!std::regex_match(topFuncLineFirstPart, m, pTopPartialDef)) {
         toCout("Error: pTopPartialDef is not matched: "+topFuncLineFirstPart);
         abort();

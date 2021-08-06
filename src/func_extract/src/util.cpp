@@ -106,9 +106,9 @@ void read_func_info(std::string fileName,
         split_by(targetArr, ", ", targetVec);
         std::string firstVarName = targetVec.front();
         uint32_t targetWidth = g_asv[firstVarName];        
-        firstVarName = purify_var_name(firstVarName);
+        firstVarName = convert_to_c_var(firstVarName);
         target = firstVarName+"_Arr";
-        if(global_arr.find(target) != global_arr.end()) {
+        if(global_arr.find(target) == global_arr.end()) {
           global_arr.emplace(target, std::make_pair(targetWidth, targetVec.size()));
         }
         // 0 target width means return type is void
@@ -209,19 +209,40 @@ bool same_value(std::string val1, std::string val2) {
   std::regex pX("(\\d+)'(d|h|b)x");
   std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");
   if(is_x(val1)) {
-
-    if(!std::regex_match(val1, m, pX)) {
-      toCout("Error: val1 does not match x pattern: "+val1);
-      abort();
+    if(std::regex_match(val1, m, pX)) {
+      std::string width1 = m.str(1);
+      if(!std::regex_match(val2, m, pNum)) {
+        if(val2 == "1") return width1 == "1";
+        if(!is_number(val2)) {
+          toCout("Error: val2 is not number:"+val2);
+          abort();
+        }
+        if(val2 == "0") return true;
+        else {
+          toCout("Error: unexpected val2: "+val2);
+          abort();
+        }
+      }
+      else {
+        std::string width2 = m.str(1);
+        if(width1 == width2) return true;
+        else return false;
+      }
     }
-    std::string width1 = m.str(1);
-    if(!std::regex_match(val2, m, pNum)) {
-      toCout("Error: val2 does not match num pattern: "+val2);
-      abort();
-    }
-    std::string width2 = m.str(1);
-    if(width1 == width2) return true;
-    else return false;
+    //else {
+    //  if(val1 == "1" || val1 == "0") {
+    //    if(val2 == "1" || val2 == "0")
+    //      return val1 == val2;
+    //    else {
+    //      toCout("Error: Unexpected, val1: "+val1+"val2: "+val2);
+    //      abort();
+    //    }
+    //  }
+    //  else {
+    //    toCout("Error: unexpected val1: "+val1);
+    //    abort();
+    //  }
+    //}
   }
 
   //bool isZero = false;

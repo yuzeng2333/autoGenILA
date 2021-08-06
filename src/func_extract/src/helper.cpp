@@ -549,7 +549,7 @@ void remove_front_backslash(std::string &line) {
 
 
 
-std::string purify_var_name(std::string name) {
+std::string convert_to_c_var(std::string name) {
   remove_two_end_space(name);
   if(name.substr(0, 1) != "\\")
     return name;
@@ -594,7 +594,7 @@ std::string purify_line(const std::string &line) {
   std::string firstPart = line.substr(0, pos);
   std::string var = line.substr(pos+1, pos2-pos-1);
   std::string lastPart = line.substr(pos2+1);
-  var = purify_var_name(var);
+  var = convert_to_c_var(var);
   lastPart = purify_line(lastPart);
   return firstPart + "|" + var + "|" + lastPart;
 }

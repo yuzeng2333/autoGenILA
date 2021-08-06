@@ -23,6 +23,7 @@ void read_in_instructions(std::string fileName) {
   enum State state;
   bool firstWord = true;
   bool firstSignalSeen = false;
+  std::string lastMemReadAddr;
   while(std::getline(input, line)) {
     //toCout(line);
     if(line.empty())
@@ -84,10 +85,24 @@ void read_in_instructions(std::string fileName) {
     }
     if(line.substr(0, 9) == "#dataAddr") {
       std::string dataAddr = line.substr(10);
-      remove_two_end_space(dataAddr);
-      g_instrInfo.back().dataAddr = dataAddr;
+      if(dataAddr.find("(array)") == std::string::npos) {
+        remove_two_end_space(dataAddr);
+      }
+      else {
+        size_t pos = dataAddr.find("(array)");
+        dataAddr = dataAddr.substr(0, pos);
+        remove_two_end_space(dataAddr);
+        dataAddr = convert_to_c_var(dataAddr); 
+        dataAddr += "_Arr"; 
+      }
+      lastMemReadAddr = dataAddr;
+      g_instrInfo.back().memReadAddr2TgtMap.emplace(dataAddr, 
+                                std::vector<std::string>{});
       continue;
     }
+    //if(line.substr(0, 9) == "#fromMemData") {
+
+    //}
     if(line.substr(0, 12) == "#needDataTgt") {
       std::string varName = line.substr(13);
       size_t pos = varName.find("{");
@@ -100,7 +115,7 @@ void read_in_instructions(std::string fileName) {
       }
       g_instrInfo.back().loadDataInfo.emplace(varName, std::make_pair("", 0));
       std::string newLine;
-      std::getline(input, newLine);      
+      std::getline(input, newLine);
       while(newLine != "}") {
         remove_two_end_space(newLine);
         if(newLine.substr(0, 2) == "//") {}

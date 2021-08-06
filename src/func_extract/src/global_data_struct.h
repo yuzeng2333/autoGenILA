@@ -75,8 +75,13 @@ struct InstrInfo_t {
   // key is writeASV. Each instruction might update multiple ASVs
   std::map<std::string, FuncTy_t> funcTypes;
   std::string instrAddr;
-  std::string dataAddr;  
-  // key is the name of target
+  // key is the dataAddr to memory, 
+  // value is the data name from memory 
+  std::map<std::string, std::vector<std::string>> memReadAddr2TgtMap;
+  // key is the name of target whose update function needs memory data
+  // first of value pair is argument name (of update function) 
+  // for memory readed data,
+  // second is the index of the argument in the argument list
   std::map<std::string, std::pair<std::string, uint32_t>> loadDataInfo;
   std::map<std::string, uint32_t> delayExceptions;
   // map update function to new target var(s)
