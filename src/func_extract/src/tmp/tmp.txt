@@ -1,0 +1,137 @@
+### Begin get_all_update 
+---  BEGIN Target: \aes_top_0.aes_reg_ctr_i.reg_out ---
+---  BEGIN INSTRUCTION #1 ---
+Warning: modName is not set
+Warning: insName is not set
+** Finish update function for: \aes_top_0.aes_reg_ctr_i.reg_out
+** Begin clean update function
+** Begin simplify update function
+** End simplify update function
+----- For instr set_addr_low, \aes_top_0.aes_reg_ctr_i.reg_out is affected!
+---  BEGIN Target: \aes_top_0.aes_reg_ctr_i.reg_out ---
+---  BEGIN INSTRUCTION #2 ---
+Warning: modName is not set
+Warning: insName is not set
+** Finish update function for: \aes_top_0.aes_reg_ctr_i.reg_out
+** Begin clean update function
+** Begin simplify update function
+** End simplify update function
+----- For instr set_addr_high, \aes_top_0.aes_reg_ctr_i.reg_out is affected!
+---  BEGIN Target: \aes_top_0.aes_reg_ctr_i.reg_out ---
+---  BEGIN INSTRUCTION #3 ---
+Warning: modName is not set
+Warning: insName is not set
+** Finish update function for: \aes_top_0.aes_reg_ctr_i.reg_out
+** Begin clean update function
+** Begin simplify update function
+** End simplify update function
+----- For instr set_len_low, \aes_top_0.aes_reg_ctr_i.reg_out is affected!
+---  BEGIN Target: \aes_top_0.aes_reg_ctr_i.reg_out ---
+---  BEGIN INSTRUCTION #4 ---
+Warning: modName is not set
+Warning: insName is not set
+** Finish update function for: \aes_top_0.aes_reg_ctr_i.reg_out
+** Begin clean update function
+** Begin simplify update function
+** End simplify update function
+----- For instr set_len_high, \aes_top_0.aes_reg_ctr_i.reg_out is affected!
+---  BEGIN Target: \aes_top_0.aes_reg_ctr_i.reg_out ---
+---  BEGIN INSTRUCTION #5 ---
+Warning: modName is not set
+Warning: insName is not set
+** Finish update function for: \aes_top_0.aes_reg_ctr_i.reg_out
+** Begin clean update function
+** Begin simplify update function
+** End simplify update function
+----- For instr set_key, \aes_top_0.aes_reg_ctr_i.reg_out is affected!
+---  BEGIN Target: \aes_top_0.aes_reg_ctr_i.reg_out ---
+---  BEGIN INSTRUCTION #6 ---
+Warning: modName is not set
+Warning: insName is not set
+** Finish update function for: \aes_top_0.aes_reg_ctr_i.reg_out
+** Begin clean update function
+** Begin simplify update function
+** End simplify update function
+----- For instr set_ctr, \aes_top_0.aes_reg_ctr_i.reg_out is affected!
+---  BEGIN Target: \aes_top_0.aes_reg_key0_i.reg_out ---
+---  BEGIN INSTRUCTION #1 ---
+Warning: modName is not set
+Warning: insName is not set
+** Finish update function for: \aes_top_0.aes_reg_key0_i.reg_out
+** Begin clean update function
+** Begin simplify update function
+** End simplify update function
+----- For instr set_addr_low, \aes_top_0.aes_reg_key0_i.reg_out is affected!
+---  BEGIN Target: \aes_top_0.aes_reg_key0_i.reg_out ---
+---  BEGIN INSTRUCTION #2 ---
+Warning: modName is not set
+Warning: insName is not set
+** Finish update function for: \aes_top_0.aes_reg_key0_i.reg_out
+** Begin clean update function
+** Begin simplify update function
+** End simplify update function
+----- For instr set_addr_high, \aes_top_0.aes_reg_key0_i.reg_out is affected!
+---  BEGIN Target: \aes_top_0.aes_reg_key0_i.reg_out ---
+---  BEGIN INSTRUCTION #3 ---
+Warning: modName is not set
+Warning: insName is not set
+** Finish update function for: \aes_top_0.aes_reg_key0_i.reg_out
+** Begin clean update function
+** Begin simplify update function
+** End simplify update function
+----- For instr set_len_low, \aes_top_0.aes_reg_key0_i.reg_out is affected!
+---  BEGIN Target: \aes_top_0.aes_reg_key0_i.reg_out ---
+---  BEGIN INSTRUCTION #4 ---
+Warning: modName is not set
+Warning: insName is not set
+** Finish update function for: \aes_top_0.aes_reg_key0_i.reg_out
+** Begin clean update function
+** Begin simplify update function
+** End simplify update function
+----- For instr set_len_high, \aes_top_0.aes_reg_key0_i.reg_out is affected!
+---  BEGIN Target: \aes_top_0.aes_reg_key0_i.reg_out ---
+---  BEGIN INSTRUCTION #5 ---
+Warning: modName is not set
+Warning: insName is not set
+** Finish update function for: \aes_top_0.aes_reg_key0_i.reg_out
+** Begin clean update function
+** Begin simplify update function
+** End simplify update function
+----- For instr set_key, \aes_top_0.aes_reg_key0_i.reg_out is affected!
+---  BEGIN Target: \aes_top_0.aes_reg_key0_i.reg_out ---
+---  BEGIN INSTRUCTION #6 ---
+Warning: modName is not set
+Warning: insName is not set
+** Finish update function for: \aes_top_0.aes_reg_key0_i.reg_out
+** Begin clean update function
+** Begin simplify update function
+** End simplify update function
+----- For instr set_ctr, \aes_top_0.aes_reg_key0_i.reg_out is affected!
+---  BEGIN Target: \aes_top_0.aes_reg_opaddr_i.reg_out ---
+---  BEGIN INSTRUCTION #1 ---
+Warning: modName is not set
+Warning: insName is not set
+** Finish update function for: \aes_top_0.aes_reg_opaddr_i.reg_out
+** Begin clean update function
+** Begin simplify update function
+** End simplify update function
+----- For instr set_addr_low, \aes_top_0.aes_reg_opaddr_i.reg_out is affected!
+---  BEGIN Target: \aes_top_0.aes_reg_opaddr_i.reg_out ---
+---  BEGIN INSTRUCTION #2 ---
+Warning: modName is not set
+Warning: insName is not set
+** Finish update function for: \aes_top_0.aes_reg_opaddr_i.reg_out
+** Begin clean update function
+** Begin simplify update function
+** End simplify update function
+----- For instr set_addr_high, \aes_top_0.aes_reg_opaddr_i.reg_out is affected!
+---  BEGIN Target: \aes_top_0.aes_reg_opaddr_i.reg_out ---
+---  BEGIN INSTRUCTION #3 ---
+Warning: modName is not set
+Warning: insName is not set
+** Finish update function for: \aes_top_0.aes_reg_opaddr_i.reg_out
+** Begin clean update function
+** Begin simplify update function
+** End simplify update function
+make: *** [Makefile:57: aes] Segmentation fault (core dumped)
+

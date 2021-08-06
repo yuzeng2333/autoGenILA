@@ -112,7 +112,7 @@ void get_all_update() {
         auto targetIt = g_workSet.begin();
         target = *targetIt;
         g_workSet.mtxErase(targetIt);
-        if(!g_visitedTgt.mtxExist(target)
+        if(g_visitedTgt.mtxExist(target)
            || g_skippedOutput.find(target) != g_skippedOutput.end())
           continue;
       }
@@ -182,7 +182,7 @@ void get_all_update() {
             auto targetIt = localWorkSet.begin();
             target = *targetIt;
             localWorkSet.erase(targetIt);
-            if(!g_visitedTgt.mtxExist(target)
+            if(g_visitedTgt.mtxExist(target)
                || g_skippedOutput.find(target) != g_skippedOutput.end())
               continue;
           }
@@ -470,6 +470,7 @@ bool read_clean_o3(std::string fileName,
     "^define internal fastcc \\[(\\d+) x i(\\d+)\\] @(\\S+)\\((.*)\\) unnamed_addr #1 \\{$"
   );  
   std::regex pTopDef("^define i(\\d+) @top_function\\((.*)\\) local_unnamed_addr #0 \\{$");  
+  std::regex pTopPartialDef("^define i(\\d+) @top_function(");  
   std::regex pTopVecDef(
     "^define \\[(\\d+) x i(\\d+)\\] @top_function\\((.*)\\) local_unnamed_addr #0 \\{$"
   );  
@@ -574,12 +575,24 @@ bool read_clean_o3(std::string fileName,
       abort();
     }
     else {
-      if(!std::regex_match(topFuncLine, m, pTopDef)) {
-        toCout("Error: pTopDef is not matched: "+topFuncLine);
+      // the following code caused segment error when the topFuncLine 
+      // is very long
+      //if(!std::regex_match(topFuncLine, m, pTopDef)) {
+      //  toCout("Error: pTopDef is not matched: "+topFuncLine);
+      //  abort();
+      //}
+      size_t pos = topFuncLine.find("(");
+      if(pos == std::string::npos) {
+        toCout("Error: cannot find open brace in top function define line: "
+               +topFuncLine);
+        abort();
+      }
+      std::string topFuncLineFirstPart = topFuncLine.substr(0, pos);
+      if(!std::regex_match(topFuncLineFirstPart, m, pTopPartialDef)) {
+        toCout("Error: pTopPartialDef is not matched: "+topFuncLineFirstPart);
         abort();
       }
       std::string retWidth = m.str(1);
-      argList = m.str(2);
       std::string newFuncLine = "define i"+retWidth+
         " @"+funcNameIn+"() local_unnamed_addr #0 {";
       output << newFuncLine << std::endl;
