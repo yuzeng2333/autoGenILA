@@ -75,7 +75,12 @@ void read_func_info(std::string fileName,
   std::string line;
   uint32_t idx;
   while(std::getline(input, line)) {
-    if(line.substr(0, 2) == "\\\\") continue;
+    toCout(line);
+    if(line.substr(0, 2) == "\\\\") {
+      toCout("Error: find \\\\: "+line);
+      abort();
+    }
+    if(line.substr(0, 2) == "//") continue;
     if(line.substr(0, 6) == "Instr:") {
       instrName = line.substr(6);
       idx = get_instr_by_name(instrName);
@@ -105,8 +110,9 @@ void read_func_info(std::string fileName,
         std::vector<std::string> targetVec;
         split_by(targetArr, ", ", targetVec);
         std::string firstVarName = targetVec.front();
-        uint32_t targetWidth = g_asv[firstVarName];        
-        firstVarName = convert_to_c_var(firstVarName);
+        uint32_t targetWidth = g_asv[firstVarName];    
+        firstVarName = var_name_convert(firstVarName, true);
+        //firstVarName = convert_to_c_var(firstVarName);
         target = firstVarName+"_Arr";
         if(global_arr.find(target) == global_arr.end()) {
           global_arr.emplace(target, std::make_pair(targetWidth, targetVec.size()));
