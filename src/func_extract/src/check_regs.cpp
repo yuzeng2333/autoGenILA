@@ -275,7 +275,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 
   TheFunction = llvm::Function::Create(
     FT, llvm::Function::InternalLinkage, 
-    currInstrInfo.name+"_"+destSimpleName, TheModule.get());
+    destInfo.get_instr_name()+"_"+destSimpleName, TheModule.get());
   TheFunction->addFnAttr(llvm::Attribute::NoInline);
   //g_curFunc = TheFunction;
 
