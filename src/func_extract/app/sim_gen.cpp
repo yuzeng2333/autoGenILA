@@ -6,6 +6,9 @@
 #define toCout(a) std::cout << a << std::endl
 #define toStr(a) std::to_string(a)
 
+// TODO: automatically order :
+// (1) addr to mem (2) data from mem (3) data to mem
+
 using namespace funcExtract;
 using namespace taintGen;
 
@@ -16,13 +19,17 @@ using namespace taintGen;
 /// These data is to be filled by reading a previously generated file
 // key is the asv name, value is its bit number
 
-bool g_use_mem = true;
+// manually fix errors due to longer than 64 bits
+bool g_fix_long_bit = true;
+bool g_fetch_instr_from_mem = false;
 std::string g_instrValueVar = "mem_rdata";
 std::string g_instrAddrVar = "zy_instr_addr";
 std::string g_dataAddrVar = "zy_data_addr";
 std::string g_dataIn = "zy_data_in";
 std::string nxt = "_nxt";
 std::map<std::string, std::string> rstValMap;
+// first of pair is bit number, second is array size
+std::map<std::string, std::pair<uint32_t, uint32_t>> g_global_arr;
 // key of map is var name, the value vector is the
 // vector of values for multiple cycles, since an
 // instruction might span numtiple cycles
@@ -48,7 +55,7 @@ int main(int argc, char *argv[]) {
   read_in_instructions(g_path+"/instr.txt");
   read_asv_info(g_path+"/asv_info.txt");
   // fill the funcTypes in g_instrInfo
-  read_func_info(g_path+"/func_info.txt");
+  read_func_info(g_path+"/func_info.txt", g_global_arr);
   read_to_do_instr(g_path+"/tb.txt", toDoList);
   read_refinement(g_path+"/refinement.txt");
   uint32_t instrNum;
@@ -60,7 +67,16 @@ int main(int argc, char *argv[]) {
 
   // fill cpp file
   cpp << "#include <stdio.h>" << std::endl;
-  cpp << "#include \"ila.h\"" << std::endl;
+  cpp << "#include \"ila.h\"\n" << std::endl;
+
+  // global array declarations
+  for(auto pair: g_global_arr) {
+    std::string arrName = pair.first;
+    uint32_t size = pair.second.second;
+    cpp << "int "+arrName+"["+toStr(size)+"];" << std::endl;
+  }
+
+  cpp << std::endl;
   cpp << "int main() {" << std::endl;
 
   vcd_parser(g_path+"/rst.vcd");
@@ -121,7 +137,7 @@ int main(int argc, char *argv[]) {
   cpp << std::endl;
 
 
-  if(g_use_mem) {
+  if(g_fetch_instr_from_mem) {
     // declare memories
     uint32_t instrNumBits = ceil(log2(instrNum));
     // actually the declaration and initialization of mem is not necessarily
@@ -169,6 +185,7 @@ int main(int argc, char *argv[]) {
       std::string writeASV = pair.first;
       std::string funcName = instrInfo.name + CNCT + writeASV;
       print_func_declare(pair.second, funcName, header);
+      header << std::endl;
     }
   }
 
@@ -187,11 +204,15 @@ void print_instr_calls(std::map<std::string,
   auto instrInfo = g_instrInfo[idx];    
   cpp << prefix+"  // instr"+toStr(idx)+": "+instrInfo.name << std::endl;
   cpp << prefix+"  if(PRINT_ALL) printf( \"// instr"+toStr(idx)+": "+instrInfo.name+", memAddr: "+toStr(memAddr)+" \\n \");" << std::endl;
+  bool instrAddrExist = true;
   if(instrInfo.instrAddr.empty()) {
-    toCout(" Error: instrAddr is not specified for: "+instrInfo.name);
-    abort();
+    toCout(" Warning: instrAddr is not specified for: "+instrInfo.name);
+    instrAddrExist = false;
+    //abort();
   }
-  std::string instrAddr = var_name_convert(instrInfo.instrAddr, true);
+  std::string instrAddr;
+  if(instrAddrExist)
+    instrAddr = var_name_convert(instrInfo.instrAddr, true);
   // reorder the funcTypes, which also reorder the sequence of calling update functions
   // put call for dataAddr at the first
   std::vector<std::pair<std::string, FuncTy_t>> tmpFuncTypes;
@@ -200,7 +221,8 @@ void print_instr_calls(std::map<std::string,
     abort();
   }
   for(auto pair: instrInfo.funcTypes) {
-    if(pair.first == instrInfo.dataAddr) {
+    //if(pair.first == instrInfo.dataAddr) {
+    if(instrInfo.memReadAddr2TgtMap.find(pair.first) != instrInfo.memReadAddr2TgtMap.end()) {
       tmpFuncTypes.insert(tmpFuncTypes.begin(), std::make_pair(pair.first, pair.second));
     }
     else {
@@ -214,11 +236,20 @@ void print_instr_calls(std::map<std::string,
     std::string origWriteASV = pair.first;
     if(remappedVar.find(origWriteASV) != remappedVar.end()) continue;
     bool needData = (instrInfo.loadDataInfo.find(origWriteASV) != instrInfo.loadDataInfo.end()) ;
-    std::string dataAddr = var_name_convert(instrInfo.dataAddr, true);    
+    //std::string dataAddr = var_name_convert(instrInfo.dataAddr, true);    
     std::string writeASV = var_name_convert(origWriteASV, true);
     if(instrInfo.name == "lh" && writeASV == "_u0_cpuregs_1_")
       toCout("Find it!");
     std::string funcName = instrInfo.name + CNCT + writeASV;
+    if(g_fix_long_bit && funcName.find("_LOW") != std::string::npos) {
+      size_t pos = funcName.find("_LOW");
+      funcName = funcName.substr(0, pos);
+    }
+    if(g_fix_long_bit && funcName.find("_HIGH") != std::string::npos) {
+      size_t pos = funcName.find("_HIGH");
+      funcName = funcName.substr(0, pos);
+    }
+
     // should replace the input-type arg in the function call with explicit values 
     // in the instruction
 
@@ -244,13 +275,14 @@ void print_instr_calls(std::map<std::string,
       cpp << prefix+"  if(PRINT_ALL) printf( \""+printName+": %ld\\n\", "+writeASV+nxt+" );" << std::endl;
       cpp << std::endl;
     }
-    if(writeASV == instrAddr) {
+    if(!instrAddr.empty() && writeASV == instrAddr) {
       funcCall = func_call(g_instrAddrVar, funcName, pair.second.argTy, encoding, std::pair<std::string, uint32_t>{});
       cpp << prefix+funcCall << std::endl;
       cpp << prefix+"  if(PRINT_ALL) printf( \""+g_instrAddrVar+": %ld\\n\", "+g_instrAddrVar+" );" << std::endl;
       cpp << std::endl;
     }
-    else if(writeASV == dataAddr) {
+    //else if(writeASV == dataAddr) {
+    else if(instrInfo.funcTgtMap.find(writeASV) != instrInfo.funcTgtMap.end() ) {
       funcCall = func_call(g_dataAddrVar, funcName, pair.second.argTy, encoding, instrInfo.loadDataInfo[origWriteASV]);
       cpp << prefix+funcCall << std::endl;
       cpp << prefix+"  if(PRINT_ALL) printf( \""+g_dataAddrVar+": %ld\\n\", "+g_dataAddrVar+" );" << std::endl;
@@ -282,6 +314,9 @@ std::string asv_type(uint32_t width) {
       break;
     default:
       toCout("Larger than 64 bits is not supported yet: "+toStr(width));
+      toCout("Temporarily assign 64 bits to the long number, needs modifications\
+              for the final llvm ir file!!");
+      ret = "long int";
       break;
   }
   return ret;
@@ -293,7 +328,11 @@ std::string func_call(std::string writeASV, std::string funcName,
                       const std::vector<std::pair<uint32_t, std::string>> &argTy,
                       std::map<std::string, std::vector<std::string>> &inputInstr,
                       std::pair<std::string, uint32_t> dataIn) {
-  std::string ret = "  "+writeASV+" = "+funcName+"( ";
+  std::string ret;
+  if(writeASV.find("_Arr") == std::string::npos)
+    ret = "  "+writeASV+" = "+funcName+"( ";
+  else
+    ret = "  "+funcName+"( ";
   std::map<std::string, uint32_t> varIdxMap; 
   for(auto pair: argTy) {
     std::string arg = pair.second;

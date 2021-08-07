@@ -30,7 +30,13 @@ void to_file(std::string line) {
 std::string materialize_num(std::string val) {
   assert(val.find("+") == std::string::npos);
   std::smatch m;
-  if(!is_x(val)) return val;
+  if(!is_x(val)) {
+    if(val.find("x") != std::string::npos) {
+      toCout("Error: x value is not correctly formatted: "+val);
+      abort();
+    }
+    return val;
+  }
   else {
     if(!std::regex_match(val, m, pX)) {
       toCout("Error: does not match pX");

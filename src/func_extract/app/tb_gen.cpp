@@ -151,7 +151,7 @@ int main(int argc, char *argv[]) {
       assign_instr(instrEncoding);
     }
   }
-
+  to_file("    @(posedge issue_instr)");
   to_file("    $finish;");
   to_file("  end");
   to_file("endmodule");
