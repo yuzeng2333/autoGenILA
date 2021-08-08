@@ -260,7 +260,8 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
       llvm::GlobalVariable* globalArr = new llvm::GlobalVariable(
           *TheModule, 
           arrayType, false, 
-          llvm::GlobalValue::InternalLinkage,
+          //llvm::GlobalValue::InternalLinkage,
+          llvm::GlobalValue::LinkOnceAnyLinkage,
           zeroInit,
           "RET_ARRAY_PTR"
         );
