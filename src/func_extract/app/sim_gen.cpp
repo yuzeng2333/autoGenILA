@@ -43,6 +43,11 @@ uint32_t memSize;
 std::map<std::string, std::string> g_asvTy;
 std::string CNCT = "_";
 
+// if true, update all regs after each instruction's update functions
+// are called. Otherwise, only update regs that are assigned.
+// enable: pico
+// disable: aes
+bool g_update_all_regs = false;
 
 // the second argument is the number of instructions
 int main(int argc, char *argv[]) {
@@ -77,6 +82,7 @@ int main(int argc, char *argv[]) {
   }
 
   cpp << std::endl;
+  cpp << "int mem[1024];\n" << std::endl;
   cpp << "int main() {" << std::endl;
 
   vcd_parser(g_path+"/rst.vcd");
@@ -166,14 +172,14 @@ int main(int argc, char *argv[]) {
     cpp << "        break;" << std::endl;
     }
     cpp << "    }" <<std::endl;
-    update_asvs(cpp, "    ");
+    update_all_asvs(cpp, "    ");
     cpp << "  }" << std::endl;
   }
   else {
     // ========== update asvs according to instructions
     for(auto encoding : toDoList) {
       print_instr_calls(encoding, "  ", cpp, 0);
-      update_asvs(cpp, "  ");
+      if(g_update_all_regs) update_all_asvs(cpp, "  ");
     }
   }
   cpp << std::endl;
@@ -204,8 +210,9 @@ void print_instr_calls(std::map<std::string,
   std::string instrName = decode(encoding);
   uint32_t idx = get_instr_by_name(instrName);
   auto instrInfo = g_instrInfo[idx];    
-  cpp << prefix+"  // instr"+toStr(idx)+": "+instrInfo.name << std::endl;
-  cpp << prefix+"  if(PRINT_ALL) printf( \"// instr"+toStr(idx)+": "+instrInfo.name+", memAddr: "+toStr(memAddr)+" \\n \");" << std::endl;
+  cpp << prefix+"  // instr"+toStr(idx)+": "+instrInfo.name+"\n" << std::endl;
+  cpp << prefix+"  if(PRINT_ALL) printf( \"// instr"+toStr(idx)+": "
+               +instrInfo.name+", memAddr: "+toStr(memAddr)+" \\n \");" << std::endl;
   bool instrAddrExist = true;
   if(instrInfo.instrAddr.empty()) {
     toCout(" Warning: instrAddr is not specified for: "+instrInfo.name);
@@ -265,8 +272,10 @@ void print_instr_calls(std::map<std::string,
         funcCall = func_call(mappedVar+nxt, funcName, pair.second.argTy, 
                              encoding, instrInfo.loadDataInfo[origWriteASV]);
         cpp << prefix+funcCall << std::endl;
-        if(mappedVar.find("_Arr") == std::string::npos)
+        if(mappedVar.find("_Arr") == std::string::npos) {
           cpp << prefix+"  if(PRINT_ALL) printf( \""+mappedVar+": %ld\\n\", "+mappedVar+nxt+" );" << std::endl;
+          if(!g_update_all_regs) cpp << prefix+"  "+mappedVar+" = "+mappedVar+nxt+" ;\n" << std::endl;
+        }
         else {
           print_array(mappedVar, cpp);
         }
@@ -281,8 +290,10 @@ void print_instr_calls(std::map<std::string,
       std::string printName = writeASV;
       if(g_refineMap[instrName].find(writeASV) != g_refineMap[instrName].end())
         printName = g_refineMap[instrName][writeASV];
-      if(writeASV.find("_Arr") == std::string::npos)
+      if(writeASV.find("_Arr") == std::string::npos) {
         cpp << prefix+"  if(PRINT_ALL) printf( \""+printName+": %ld\\n\", "+writeASV+nxt+" );" << std::endl;
+        if(!g_update_all_regs) cpp << prefix+"  "+writeASV+" = "+writeASV+nxt+" ;\n" << std::endl;
+      }
       else
         print_array(writeASV, cpp);
       cpp << std::endl;
@@ -434,7 +445,7 @@ uint32_t convert_to_single_num(std::string numIn) {
 }
 
 
-void update_asvs(std::ofstream &cpp, std::string prefix) {
+void update_all_asvs(std::ofstream &cpp, std::string prefix) {
   // update asvs with their nxt counterparts
   for(auto pair : g_asv) {
     std::string asv = pair.first;
@@ -499,9 +510,9 @@ void print_array(std::string arrName, std::ofstream &cpp) {
   }
   auto bitDepthPair = g_global_arr[arrName];
   uint32_t depth = bitDepthPair.second;
-  cpp << "  if(PRINT_ALL) {" << std::endl;
-  cpp << "    for(int i = 0; i < "+toStr(depth)+"; i++) {" << std::endl;
-  cpp << "      printf( \""+arrName+"[\%d]: \%d\", i, "+arrName+"[i] );" << std::endl;
+  cpp << "    if(PRINT_ALL) {" << std::endl;
+  cpp << "      for(int i = 0; i < "+toStr(depth)+"; i++) {" << std::endl;
+  cpp << "        printf( \""+arrName+"[\%d]: \%d \\n \", i, "+arrName+"[i] );" << std::endl;
+  cpp << "      }" << std::endl;
   cpp << "    }" << std::endl;
-  cpp << "  }" << std::endl;
 }

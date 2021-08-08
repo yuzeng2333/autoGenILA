@@ -92,7 +92,7 @@ void read_in_instructions(std::string fileName) {
         size_t pos = dataAddr.find("(array)");
         dataAddr = dataAddr.substr(0, pos);
         remove_two_end_space(dataAddr);
-        dataAddr = convert_to_c_var(dataAddr); 
+        dataAddr = var_name_convert(dataAddr, true); 
         dataAddr += "_Arr"; 
       }
       lastMemReadAddr = dataAddr;

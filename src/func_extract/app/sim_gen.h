@@ -28,7 +28,7 @@ void print_instr_calls(std::map<std::string,
                        std::ofstream &cpp,
                        uint32_t instrAddr);
 
-void update_asvs(std::ofstream &cpp, std::string prefix);
+void update_all_asvs(std::ofstream &cpp, std::string prefix);
 
 void read_refinement(std::string fileName);
 
