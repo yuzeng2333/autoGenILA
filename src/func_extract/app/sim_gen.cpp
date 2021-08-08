@@ -75,11 +75,14 @@ int main(int argc, char *argv[]) {
   cpp << "#include \"ila.h\"\n" << std::endl;
 
   // ========== global array declarations
-  for(auto pair: g_global_arr) {
-    std::string arrName = pair.first;
-    uint32_t size = pair.second.second;
-    cpp << "int "+arrName+"["+toStr(size)+"];" << std::endl;
-  }
+  // Do not put declarations of arrays in the
+  // c file. Put them only in the llvm-ir file
+
+  //for(auto pair: g_global_arr) {
+  //  std::string arrName = pair.first;
+  //  uint32_t size = pair.second.second;
+  //  cpp << "int "+arrName+"["+toStr(size)+"];" << std::endl;
+  //}
 
   cpp << std::endl;
   cpp << "int mem[1024];\n" << std::endl;
