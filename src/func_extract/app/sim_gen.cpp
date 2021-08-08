@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
   cpp << "#include <stdio.h>" << std::endl;
   cpp << "#include \"ila.h\"\n" << std::endl;
 
-  // global array declarations
+  // ========== global array declarations
   for(auto pair: g_global_arr) {
     std::string arrName = pair.first;
     uint32_t size = pair.second.second;
@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
 
   vcd_parser(g_path+"/rst.vcd");
 
-  // asv declarations
+  // ==========  asv declarations
   for(auto pair : g_asv) {
     std::string asv = pair.first;
     toCout(asv);
@@ -117,7 +117,9 @@ int main(int argc, char *argv[]) {
   cpp << "  int PRINT_ALL = 1;" << std::endl;
   cpp << std::endl;
 
-  // initialization of regs
+
+
+  // ========= initialization of regs
   std::set<std::string> initializedReg;
   cpp << "  if(PRINT_ALL) printf( \" // Initialization \\n\" );" << std::endl;
   for(auto pair : rstValMap) {
@@ -125,7 +127,7 @@ int main(int argc, char *argv[]) {
     initializedReg.insert(reg);
     cpp << "  if(PRINT_ALL) printf( \""+reg+": "+pair.second+"\\n\" );" << std::endl;
   }
-  // initialized rtlVars in the refinement map
+  // ========  initialized rtlVars in the refinement map
   for(auto pair1 : g_refineMap) {
     for(auto pair2 : pair1.second) {
       std::string rtlVar = pair2.second;
@@ -168,7 +170,7 @@ int main(int argc, char *argv[]) {
     cpp << "  }" << std::endl;
   }
   else {
-    // update asvs according to instructions
+    // ========== update asvs according to instructions
     for(auto encoding : toDoList) {
       print_instr_calls(encoding, "  ", cpp, 0);
       update_asvs(cpp, "  ");
@@ -179,7 +181,7 @@ int main(int argc, char *argv[]) {
   cpp << "}" << std::endl; // end of main function
   cpp.close();  
 
-  // generate header file for update functions
+  // =========== generate header file for update functions
   for(auto instrInfo : g_instrInfo) {
     for(auto pair : instrInfo.funcTypes) {
       std::string writeASV = pair.first;
@@ -220,6 +222,9 @@ void print_instr_calls(std::map<std::string,
     toCout("Error: no func_info found for instruction: "+instrInfo.name);
     abort();
   }
+
+
+  // ===== collect function types(return type+argument-type)
   for(auto pair: instrInfo.funcTypes) {
     //if(pair.first == instrInfo.dataAddr) {
     if(instrInfo.memReadAddr2TgtMap.find(pair.first) != instrInfo.memReadAddr2TgtMap.end()) {
@@ -260,7 +265,11 @@ void print_instr_calls(std::map<std::string,
         funcCall = func_call(mappedVar+nxt, funcName, pair.second.argTy, 
                              encoding, instrInfo.loadDataInfo[origWriteASV]);
         cpp << prefix+funcCall << std::endl;
-        cpp << prefix+"  if(PRINT_ALL) printf( \""+mappedVar+": %ld\\n\", "+mappedVar+nxt+" );" << std::endl;
+        if(mappedVar.find("_Arr") == std::string::npos)
+          cpp << prefix+"  if(PRINT_ALL) printf( \""+mappedVar+": %ld\\n\", "+mappedVar+nxt+" );" << std::endl;
+        else {
+          print_array(mappedVar, cpp);
+        }
         cpp << std::endl;
         remappedVar.insert(origMappedVar);
       }
@@ -272,7 +281,10 @@ void print_instr_calls(std::map<std::string,
       std::string printName = writeASV;
       if(g_refineMap[instrName].find(writeASV) != g_refineMap[instrName].end())
         printName = g_refineMap[instrName][writeASV];
-      cpp << prefix+"  if(PRINT_ALL) printf( \""+printName+": %ld\\n\", "+writeASV+nxt+" );" << std::endl;
+      if(writeASV.find("_Arr") == std::string::npos)
+        cpp << prefix+"  if(PRINT_ALL) printf( \""+printName+": %ld\\n\", "+writeASV+nxt+" );" << std::endl;
+      else
+        print_array(writeASV, cpp);
       cpp << std::endl;
     }
     if(!instrAddr.empty() && writeASV == instrAddr) {
@@ -285,7 +297,8 @@ void print_instr_calls(std::map<std::string,
     else if(instrInfo.funcTgtMap.find(writeASV) != instrInfo.funcTgtMap.end() ) {
       funcCall = func_call(g_dataAddrVar, funcName, pair.second.argTy, encoding, instrInfo.loadDataInfo[origWriteASV]);
       cpp << prefix+funcCall << std::endl;
-      cpp << prefix+"  if(PRINT_ALL) printf( \""+g_dataAddrVar+": %ld\\n\", "+g_dataAddrVar+" );" << std::endl;
+      if(g_dataAddrVar.find("_Arr") == std::string::npos)
+        cpp << prefix+"  if(PRINT_ALL) printf( \""+g_dataAddrVar+": %ld\\n\", "+g_dataAddrVar+" );" << std::endl;
       cpp << std::endl;
       cpp << prefix+"  data_byte_addr = ("+g_dataAddrVar+" >> 2) % "+toStr(memSize)+";" << std::endl;
       cpp << prefix+"  "+g_dataIn+" = mem[data_byte_addr] ;" << std::endl;
@@ -471,5 +484,24 @@ void print_final_results(std::ofstream &cpp) {
       cpp << "    printf( \""+rtlVar+": %ld\\n\", "+rtlVar+" );" << std::endl;
     }
   }
+  cpp << "  }" << std::endl;
+}
+
+
+void print_array(std::string arrName, std::ofstream &cpp) {
+  if(arrName.find("_Arr") == std::string::npos) {
+    toCout("Error: this name is not array: "+arrName);
+    abort();
+  }
+  if(g_global_arr.find(arrName) == g_global_arr.end()) {
+    toCout("Error: cannot find info for the array: "+arrName);
+    abort();
+  }
+  auto bitDepthPair = g_global_arr[arrName];
+  uint32_t depth = bitDepthPair.second;
+  cpp << "  if(PRINT_ALL) {" << std::endl;
+  cpp << "    for(int i = 0; i < "+toStr(depth)+"; i++) {" << std::endl;
+  cpp << "      printf( \""+arrName+"[\%d]: \%d\", i, "+arrName+"[i] );" << std::endl;
+  cpp << "    }" << std::endl;
   cpp << "  }" << std::endl;
 }

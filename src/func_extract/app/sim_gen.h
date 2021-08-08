@@ -33,3 +33,5 @@ void update_asvs(std::ofstream &cpp, std::string prefix);
 void read_refinement(std::string fileName);
 
 void print_final_results(std::ofstream &cpp);
+
+void print_array(std::string arrName, std::ofstream &cpp);
