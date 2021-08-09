@@ -9,6 +9,8 @@ using namespace funcExtract;
 using namespace taintGen;
 
 
+extern std::map<std::string, std::string> g_aes_special_func_call;
+
 std::string asv_type(uint32_t width);
 
 std::string func_call(std::string writeASV, std::string funcName, 
@@ -35,3 +37,9 @@ void read_refinement(std::string fileName);
 void print_final_results(std::ofstream &cpp);
 
 void print_array(std::string arrName, std::ofstream &cpp);
+
+std::string initialize_mem(std::string fileName);
+
+void print_update_mem(std::ofstream &cpp);
+
+void print_update_mem_call(std::ofstream &cpp);

@@ -49,8 +49,14 @@ std::string CNCT = "_";
 // disable: aes
 bool g_update_all_regs = false;
 
+enum DESIGN{AES, PICO, GB};
+enum DESIGN g_design;
+
 // the second argument is the number of instructions
 int main(int argc, char *argv[]) {
+  // TODO: specify which example to apply to:
+  g_design = AES;
+
   g_path = argv[1];
   if(argc < 3) {
     toCout("Error: did not specify the number of instructions!");
@@ -78,15 +84,27 @@ int main(int argc, char *argv[]) {
   // Do not put declarations of arrays in the
   // c file. Put them only in the llvm-ir file
 
-  //for(auto pair: g_global_arr) {
-  //  std::string arrName = pair.first;
-  //  uint32_t size = pair.second.second;
-  //  cpp << "int "+arrName+"["+toStr(size)+"];" << std::endl;
-  //}
+  for(auto pair: g_global_arr) {
+    std::string arrName = pair.first;
+    uint32_t size = pair.second.second;
+    std::string dataTy = asv_type(pair.second.first);
+    cpp << dataTy+" "+arrName+"["+toStr(size)+"];" << std::endl;
+  }
 
   cpp << std::endl;
-  cpp << "int mem[1024];\n" << std::endl;
-  cpp << "int main() {" << std::endl;
+  std::string initValue = initialize_mem(g_path+"/mem.txt");
+  if(initValue.empty())
+    cpp << "unsigned short mem[1024];\n" << std::endl;
+  else
+    cpp << "unsigned short mem[1024] = { "+initValue+" };\n" << std::endl;
+
+  toCout("Remember to change the data type of mem !!");
+
+  if(g_design == AES) print_update_mem(cpp);
+
+  cpp << "int main() {\n" << std::endl;
+
+
 
   vcd_parser(g_path+"/rst.vcd");
 
@@ -205,6 +223,8 @@ int main(int argc, char *argv[]) {
 }
 
 
+
+// if write target is array, then update memory
 void print_instr_calls(std::map<std::string, 
                                 std::vector<std::string>> &encoding,
                        std::string prefix,
@@ -227,7 +247,7 @@ void print_instr_calls(std::map<std::string,
     instrAddr = var_name_convert(instrInfo.instrAddr, true);
   // reorder the funcTypes, which also reorder the sequence of calling update functions
   // put call for dataAddr at the first
-  std::vector<std::pair<std::string, FuncTy_t>> tmpFuncTypes;
+  std::vector<std::pair<std::string, FuncTy_t>> thisInstrFuncTypes;
   if(instrInfo.funcTypes.empty()) {
     toCout("Error: no func_info found for instruction: "+instrInfo.name);
     abort();
@@ -238,16 +258,17 @@ void print_instr_calls(std::map<std::string,
   for(auto pair: instrInfo.funcTypes) {
     //if(pair.first == instrInfo.dataAddr) {
     if(instrInfo.memReadAddr2TgtMap.find(pair.first) != instrInfo.memReadAddr2TgtMap.end()) {
-      tmpFuncTypes.insert(tmpFuncTypes.begin(), std::make_pair(pair.first, pair.second));
+      thisInstrFuncTypes.insert(thisInstrFuncTypes.begin(), std::make_pair(pair.first, pair.second));
     }
     else {
-      tmpFuncTypes.push_back(std::make_pair(pair.first, pair.second));
+      thisInstrFuncTypes.push_back(std::make_pair(pair.first, pair.second));
     }
   }
 
   // use to collect mapped var, its original update functions are skipped
   std::set<std::string> remappedVar;
-  for(auto pair : tmpFuncTypes) {
+  bool updateMem = false;  
+  for(auto pair : thisInstrFuncTypes) {
     std::string origWriteASV = pair.first;
     if(remappedVar.find(origWriteASV) != remappedVar.end()) continue;
     bool needData = (instrInfo.loadDataInfo.find(origWriteASV) != instrInfo.loadDataInfo.end()) ;
@@ -278,9 +299,10 @@ void print_instr_calls(std::map<std::string,
         if(mappedVar.find("_Arr") == std::string::npos) {
           cpp << prefix+"  if(PRINT_ALL) printf( \""+mappedVar+": %ld\\n\", "+mappedVar+nxt+" );" << std::endl;
           if(!g_update_all_regs) cpp << prefix+"  "+mappedVar+" = "+mappedVar+nxt+" ;\n" << std::endl;
-        }
+        }        
         else {
           print_array(mappedVar, cpp);
+          updateMem = true;
         }
         cpp << std::endl;
         remappedVar.insert(origMappedVar);
@@ -294,25 +316,30 @@ void print_instr_calls(std::map<std::string,
       if(g_refineMap[instrName].find(writeASV) != g_refineMap[instrName].end())
         printName = g_refineMap[instrName][writeASV];
       if(writeASV.find("_Arr") == std::string::npos) {
-        cpp << prefix+"  if(PRINT_ALL) printf( \""+printName+": %ld\\n\", "+writeASV+nxt+" );" << std::endl;
-        if(!g_update_all_regs) cpp << prefix+"  "+writeASV+" = "+writeASV+nxt+" ;\n" << std::endl;
+        cpp << prefix+"  if(PRINT_ALL) printf( \""+printName
+               +": %ld\\n\", "+writeASV+nxt+" );" << std::endl;
+        if(!g_update_all_regs) cpp << prefix+"  "+writeASV
+                                      +" = "+writeASV+nxt+" ;\n" << std::endl;
       }
-      else
+      else {
         print_array(writeASV, cpp);
+        updateMem = true;
+      }
       cpp << std::endl;
     }
     if(!instrAddr.empty() && writeASV == instrAddr) {
-      funcCall = func_call(g_instrAddrVar, funcName, pair.second.argTy, encoding, std::pair<std::string, uint32_t>{});
+      funcCall = func_call(g_instrAddrVar, funcName, pair.second.argTy, 
+                           encoding, std::pair<std::string, uint32_t>{});
       cpp << prefix+funcCall << std::endl;
       cpp << prefix+"  if(PRINT_ALL) printf( \""+g_instrAddrVar+": %ld\\n\", "+g_instrAddrVar+" );" << std::endl;
       cpp << std::endl;
     }
-    //else if(writeASV == dataAddr) {
     else if(instrInfo.funcTgtMap.find(writeASV) != instrInfo.funcTgtMap.end() ) {
-      funcCall = func_call(g_dataAddrVar, funcName, pair.second.argTy, encoding, instrInfo.loadDataInfo[origWriteASV]);
+      funcCall = func_call(g_dataAddrVar, funcName, pair.second.argTy, 
+                           encoding, instrInfo.loadDataInfo[origWriteASV]);
       cpp << prefix+funcCall << std::endl;
       if(g_dataAddrVar.find("_Arr") == std::string::npos)
-        cpp << prefix+"  if(PRINT_ALL) printf( \""+g_dataAddrVar+": %ld\\n\", "+g_dataAddrVar+" );" << std::endl;
+        cpp << prefix+"  if(PRINT_ALL) printf( \""+g_dataAddrVar+": %ld\\n\", "+g_dataAddrVar+" );" << std::endl;      
       cpp << std::endl;
       cpp << prefix+"  data_byte_addr = ("+g_dataAddrVar+" >> 2) % "+toStr(memSize)+";" << std::endl;
       cpp << prefix+"  "+g_dataIn+" = mem[data_byte_addr] ;" << std::endl;
@@ -321,6 +348,7 @@ void print_instr_calls(std::map<std::string,
   }
   cpp << prefix+"  if(PRINT_ALL) printf( \"\\n\" );" << std::endl;
   cpp << std::endl;
+  if(updateMem && g_design == AES) print_update_mem_call(cpp);
 }
 
 
@@ -355,6 +383,13 @@ std::string func_call(std::string writeASV, std::string funcName,
                       const std::vector<std::pair<uint32_t, std::string>> &argTy,
                       std::map<std::string, std::vector<std::string>> &inputInstr,
                       std::pair<std::string, uint32_t> dataIn) {
+
+  // check if need to use special funcCall
+  if(g_design == AES 
+     && g_aes_special_func_call.find(funcName) != g_aes_special_func_call.end()) {
+    return g_aes_special_func_call[funcName];
+  }
+
   std::string ret;
   if(writeASV.find("_Arr") == std::string::npos)
     ret = "  "+writeASV+" = "+funcName+"( ";
@@ -519,3 +554,43 @@ void print_array(std::string arrName, std::ofstream &cpp) {
   cpp << "      }" << std::endl;
   cpp << "    }" << std::endl;
 }
+
+
+std::string initialize_mem(std::string fileName) {
+  std::ifstream input(fileName);
+  std::string ret;
+  if(input.good()) {
+    std::string line;
+    while(std::getline(input, line)) {
+      uint32_t dec = hex2int(line);
+      ret = ret + toStr(dec) + ", ";
+    }
+    if(ret.size() > 2) {
+      ret.pop_back();
+      ret.pop_back();
+    }
+  }
+  return ret;
+}
+
+
+
+// for AES:
+void print_update_mem(std::ofstream &cpp) {
+  cpp << "void update_mem() {"                                               << std::endl;
+  cpp << "  for(int i = 0; i < 16; i++) {"                                   << std::endl;
+  cpp << "    mem[ _write_addr_fifo_out0_Arr[i] ] = _data_fifo_out0_Arr[i];" << std::endl;
+  cpp << "  }"                                                               << std::endl;
+  cpp << "}\n"                                                               << std::endl;
+}
+
+
+void print_update_mem_call(std::ofstream &cpp) {
+  cpp << "update_mem();\n" << std::endl;
+}
+
+
+
+// key is funcName, value is function call statement
+std::map<std::string, std::string> g_aes_special_func_call 
+= { {"start__data_fifo_out0_Arr", "    start__data_fifo_out0_Arr( 0, _aes_top_0_aes_reg_ctr_i_reg_out_LOW, 0,  _aes_top_0_aes_reg_key0_i_reg_out_LOW, mem[_read_addr_fifo_out0_Arr[15]], mem[_read_addr_fifo_out0_Arr[14]], mem[_read_addr_fifo_out0_Arr[13]], mem[_read_addr_fifo_out0_Arr[12]], mem[_read_addr_fifo_out0_Arr[11]], mem[_read_addr_fifo_out0_Arr[10]], mem[_read_addr_fifo_out0_Arr[9]], mem[_read_addr_fifo_out0_Arr[8]], mem[_read_addr_fifo_out0_Arr[7]], mem[_read_addr_fifo_out0_Arr[6]], mem[_read_addr_fifo_out0_Arr[5]], mem[_read_addr_fifo_out0_Arr[4]], mem[_read_addr_fifo_out0_Arr[3]], mem[_read_addr_fifo_out0_Arr[2]], mem[_read_addr_fifo_out0_Arr[1]], mem[_read_addr_fifo_out0_Arr[0]] );\n"} };
