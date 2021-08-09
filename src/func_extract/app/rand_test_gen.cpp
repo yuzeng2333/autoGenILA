@@ -20,7 +20,9 @@ uint32_t InstrNum = 10;
 std::regex pX("(\\d+)'[b|h][x|X]$");
 std::map<std::string, std::string> regValueMap;
 
-
+enum DESIGN{AES, PICO};
+// TODO: set the current design!
+enum DESIGN g_design = AES;
 
 void to_file(std::string line) {
   g_output << line << std::endl;
@@ -147,10 +149,28 @@ int main(int argc, char *argv[]) {
   srand(time(NULL));
   //srand(1);
 
-  uint32_t idx = 0;
-  while(idx++ < InstrNum) {
-    uint32_t instrIdx = rand() % g_instrInfo.size();
-    make_instr(instrIdx);
+  if(g_design == PICO) {
+    uint32_t idx = 0;
+    while(idx++ < InstrNum) {
+      uint32_t instrIdx = rand() % g_instrInfo.size();
+      make_instr(instrIdx);
+    }
+  }
+  else if(g_design == AES){
+    // for AES, execute start instr. every two instructions
+    bool doStart = false;
+    uint32_t idx = 0;
+    while(idx++ < InstrNum) {
+      if(doStart) {
+        make_instr(0);
+        doStart = false;
+      }
+      else {
+        uint32_t instrIdx = rand() % g_instrInfo.size();
+        make_instr(instrIdx);
+        doStart = true;
+      }
+    }
   }
 }
 

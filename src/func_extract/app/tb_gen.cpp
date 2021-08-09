@@ -21,6 +21,11 @@ uint32_t simulatedInstrNum = 20;
 bool reset_regs = true;
 bool use_protect_signal = false;
 
+enum DESIGN{AES, PICO};
+// TODO: specify the design name
+enum DESIGN g_design = AES;
+
+
 int main(int argc, char *argv[]) {
   g_path = argv[1];
   if(argc < 3) {
@@ -263,6 +268,8 @@ void assign_value(std::string var, uint32_t value) {
 
 
 void assign_value(std::string var, std::string value, bool rand) {
+  if(g_design == AES 
+     && (var == "wr" || var == "xram_data_in") ) return;
   value = value_format_convert(value, rand);
   to_file("    "+var+" = "+value+" ;");
 }
