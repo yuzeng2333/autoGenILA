@@ -14,6 +14,7 @@ using namespace taintGen;
 
 bool g_use_event_driven = true;
 std::ofstream g_output;
+std::ofstream g_vltr_output;
 uint32_t g_cycleLen = 10;
 bool g_rand_sim = false;
 uint32_t protectedInstrNum = 3;
@@ -43,6 +44,7 @@ int main(int argc, char *argv[]) {
   read_asv_info(g_path+"/asv_info.txt");
   vcd_parser(g_path+"/rst.vcd");  
   g_output.open(g_path+"/tb_vlg.v", std::ios::out);
+  g_vltr_output.open(g_path+"/verilator.txt", std::ios::out);
   to_file("`include \"./design.v.clean\"");
   to_file("module tb;");
 
@@ -153,7 +155,7 @@ int main(int argc, char *argv[]) {
   }
   else {
     for(auto instrEncoding : toDoList) {
-      assign_instr(instrEncoding);
+      assign_instr(instrEncoding, true);
     }
   }
   to_file("    @(posedge issue_instr)");
@@ -184,27 +186,27 @@ void assign_random_sparse_instr() {
 }
 
 
-void assign_instr(uint32_t instrIdx) {
+void assign_instr(uint32_t instrIdx, bool printVltr) {
   auto instrInfo = g_instrInfo[instrIdx];
 
   // first assign instruction encodings
   uint32_t instrLen = instrInfo.instrEncoding.begin()->second.size();
-  assign_value("INSTR_IN_ZY", 1);
+  assign_value("INSTR_IN_ZY", 1, printVltr);
   for(uint32_t i = 0; i < instrLen; i++) {
     for(auto pair: instrInfo.instrEncoding) {
-      assign_value(pair.first, pair.second[i], true);
+      assign_value(pair.first, pair.second[i], printVltr);
     }
-    wait_time(g_cycleLen);    
+    wait_time(g_cycleLen, printVltr);    
   }
-  assign_value("INSTR_IN_ZY", 0);  
+  assign_value("INSTR_IN_ZY", 0, printVltr);  
 
   // then assign nop instruction
   uint32_t nopLen = instrInfo.delayBound - instrLen;
   uint32_t i = 0;
   for(auto pair : g_nopInstr) {
-    assign_value(pair.first, pair.second);
+    assign_value(pair.first, pair.second, printVltr);
   }
-  wait_time(nopLen*g_cycleLen);
+  wait_time(nopLen*g_cycleLen, printVltr);
   // display all asv values
 
   to_file("    $display( \"// "+instrInfo.name+"\" );");
@@ -217,32 +219,38 @@ void assign_instr(uint32_t instrIdx) {
 }
 
 
-void assign_instr(const std::map<std::string, std::vector<std::string>> &inputInstr) {
+void assign_instr(const std::map<std::string, std::vector<std::string>> &inputInstr,
+                  bool printVltr) {
   std::string instrName = decode(inputInstr);
   uint32_t instrIdx = get_instr_by_name(instrName);
   auto instrInfo = g_instrInfo[instrIdx];
 
   // first assign instruction encodings
   uint32_t instrLen = instrInfo.instrEncoding.begin()->second.size();
-  if(g_use_event_driven) to_file("    @(posedge issue_instr)");
-  assign_value("INSTR_IN_ZY", 1);
+  if(g_use_event_driven) {
+    to_file("    @(posedge issue_instr)");
+    to_vltr("while(tb->issue_instr == 0) {");
+    proceed_one_cycle();
+    to_vltr("}");
+  }
+  assign_value("INSTR_IN_ZY", 1, printVltr);
   //to_file("    instr_name = \""+instrInfo.name+"\" ;");
   for(uint32_t i = 0; i < instrLen; i++) {
     for(auto pair: inputInstr) {
-      assign_value(pair.first, pair.second[i]);
+      assign_value(pair.first, pair.second[i], printVltr);
     }
-    wait_time(g_cycleLen);    
+    wait_time(g_cycleLen, printVltr);    
   }
-  assign_value("INSTR_IN_ZY", 0);  
+  assign_value("INSTR_IN_ZY", 0, printVltr);  
 
   if(!g_use_event_driven) {
     // then assign nop instruction
     uint32_t nopLen = instrInfo.delayBound - instrLen;
     uint32_t i = 0;
     for(auto pair : g_nopInstr) {
-      assign_value(pair.first, pair.second);
+      assign_value(pair.first, pair.second, printVltr);
     }
-    wait_time(nopLen*g_cycleLen);
+    wait_time(nopLen*g_cycleLen, printVltr);
     // display all asv values
 
     to_file("    $display( \"// "+instrInfo.name+"\" );");
@@ -255,28 +263,30 @@ void assign_instr(const std::map<std::string, std::vector<std::string>> &inputIn
  
     // if there are extraDelay, then continue wait with NOP
     if(instrInfo.extraDelay > 0)
-      wait_time(g_cycleLen*instrInfo.extraDelay);
+      wait_time(g_cycleLen*instrInfo.extraDelay, printVltr);
 
     to_file("    $display(\"\\n\");");
   }
 }
 
 
-void assign_value(std::string var, uint32_t value) {
-  assign_value(var, toStr(value));
+void assign_value(std::string var, uint32_t value, bool printVltr) {
+  assign_value(var, toStr(value), printVltr);
 }
 
 
-void assign_value(std::string var, std::string value, bool rand) {
+void assign_value(std::string var, std::string value, bool printVltr) {
   if(g_design == AES 
      && (var == "wr" || var == "xram_data_in") ) return;
-  value = value_format_convert(value, rand);
+  value = value_format_convert(value);
   to_file("    "+var+" = "+value+" ;");
+  std::string oxValue = hex_to_ox(value);
+  if(printVltr) to_vltr("tb->"+var+" = "+oxValue+" ;");
 }
 
 
 // convert 4'h1+4'h2 to { 4'h1, 4'h2 }
-std::string value_format_convert(std::string val, bool isRand) {
+std::string value_format_convert(std::string val) {
   std::regex pX("(\\d+)'[b|h][x|X]$");
   if(val.find("+") == std::string::npos) return val;
   remove_two_end_space(val);
@@ -304,7 +314,47 @@ void to_file(std::string line) {
 }
 
 
-void wait_time(uint32_t time) {
-  to_file("    #"+toStr(time));
+void to_vltr(std::string line) {
+  g_vltr_output << line << std::endl;
 }
 
+
+void wait_time(uint32_t time, bool printVltr) {
+  to_file("    #"+toStr(time));
+  uint32_t cycleCnt = time / 10;
+  if(time % 10 != 0 ) {
+    toCout("Error: time is not multiple of 10: "+toStr(time));
+    abort();
+  }
+  if(printVltr) {
+    for(uint32_t i = 0 ; i < cycleCnt ; i++) {
+      proceed_one_cycle();
+    }
+  }
+}
+
+
+void proceed_one_cycle() {
+  to_vltr("tb->clk = 1;");
+  to_vltr("tb->eval();");
+  to_vltr("tb->clk = 0;");
+  to_vltr("tb->eval();");
+  to_vltr("\n");
+}
+
+
+std::string hex_to_ox(std::string value) {
+  std::smatch m;
+  if(std::regex_match(value, m, pHex)) {
+    std::string num = m.str(2);
+    return "0x"+num;
+  }
+  else if(std::regex_match(value, m, pDec))
+    return m.str(2);
+  else if(std::regex_match(value, m, pBin)) {
+    toCout("Error: binary number not supported yet: "+value);
+    abort();
+  }
+  else
+    return value;
+}
