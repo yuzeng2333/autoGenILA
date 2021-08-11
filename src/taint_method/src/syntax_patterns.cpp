@@ -100,7 +100,8 @@ std::regex pElse      (taintGen::to_re("^(\\s*)else$"));
 /* multiple/un-certain # of ops */
 //std::regex pBitExOrConcat (taintGen::to_re("^(\\s*)assign (NAME) = \\{\\} \\^ (NAME)(\\s*)?;$"));
 //std::regex pSrcConcat (taintGen::to_re("^(\\s*)assign (NAME) = \\{ ((?:NAME, )*NAME) \\}\\s?;$"));
-std::regex pSrcConcat (taintGen::to_re("^(\\s*)assign (NAME) = \\{ (.+) \\}\\s?;$"));
+std::regex pSrcConcat (taintGen::to_re("^(\\s*)assign (NAME) = \\{ (.+)\\s?\\}\\s?;$"));
+std::regex pSrcConcatFirstPart (taintGen::to_re("^(\\s*)assign (NAME) = \\{\\s?$"));
 // here actually src can be only one var
 std::regex pSrcDestBothConcat(taintGen::to_re("^(\\s*)assign \\{ (.+)\\s*\\} = \\{ (.+) \\}(\\s*)?;$"));
 std::regex pDestConcat(taintGen::to_re("^(\\s*)assign \\{ (.+)\\s*\\} = (NAME)(\\s*)?;$"));
@@ -115,5 +116,6 @@ std::regex pNumExist("(\\d+)'(h|d|b)[\\dabcdef\\?]+");
 std::regex pBin("(\\d+)'b([01]+)");
 std::regex pBinX("(\\d+)'b([01x]+)");
 std::regex pHex("(\\d+)'h([\\dabcdefx\\?]+)");
+std::regex pX("(\\d+)'(h|d|b)x");
 } // end of namespace syntaxPatterns
 

@@ -95,6 +95,7 @@ extern std::regex pIf;
 extern std::regex pElse;
 
 extern std::regex pSrcConcat;
+extern std::regex pSrcConcatFirstPart;
 extern std::regex pSrcDestBothConcat;
 extern std::regex pDestConcat;
 
@@ -106,6 +107,7 @@ extern std::regex pNumExist;
 extern std::regex pBin;
 extern std::regex pBinX;
 extern std::regex pHex;
+extern std::regex pX;
 
 } // end of namespace syntaxPatterns
 
