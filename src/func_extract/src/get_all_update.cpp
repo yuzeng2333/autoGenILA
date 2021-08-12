@@ -10,7 +10,7 @@
 namespace funcExtract {
 
 // TODO: configurations
-bool g_use_multi_thread = false;
+bool g_use_multi_thread = true;
 
 std::mutex g_dependVarMapMtx;
 // the first key is instr name, the second key is target name
@@ -170,13 +170,8 @@ void get_all_update() {
           bool doVecTgt = false;
           std::string target;
           std::vector<std::string> tgtVec;      
-          if(!localWorkVec.empty()){
-            doVecTgt = true;
-            isVec = true;
-            tgtVec = localWorkVec.back().first;
-            localWorkVec.pop_back();
-          }
-          else if(!localWorkSet.empty()) {
+
+          if(!localWorkSet.empty()) {
             isVec = false;
             doSingleTgt = true;
             auto targetIt = localWorkSet.begin();
@@ -185,6 +180,12 @@ void get_all_update() {
             if(g_visitedTgt.mtxExist(target)
                || g_skippedOutput.find(target) != g_skippedOutput.end())
               continue;
+          }
+          else if(!localWorkVec.empty()){
+            doVecTgt = true;
+            isVec = true;
+            tgtVec = localWorkVec.back().first;
+            localWorkVec.pop_back();
           }
           if(isVec) {
             for(std::string reg: tgtVec) {

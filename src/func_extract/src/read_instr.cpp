@@ -83,6 +83,12 @@ void read_in_instructions(std::string fileName) {
       g_instrInfo.back().instrAddr = instrAddr;
       continue;
     }
+    if(line.substr(0, 8) == "#memAddr") {
+      std::string instrAddr = line.substr(11);
+      remove_two_end_space(instrAddr);
+      g_instrInfo.back().instrAddr = instrAddr;
+      continue;
+    }
     if(line.substr(0, 9) == "#dataAddr") {
       std::string dataAddr = line.substr(10);
       if(dataAddr.find("(array)") == std::string::npos) {

@@ -230,7 +230,7 @@ void set_stk_build_tree(std::string varName) {
 void build_tree_for_single_as(std::string regAndSlice) {
   toCoutVerb("### Begin build: "+regAndSlice);
   if(regAndSlice == "arg_0_TDATA_fifo")
-    toCout("Find it!");
+    toCoutVerb("Find it!");
   const auto curMod = g_insContextStk.get_curMod();  
   std::string reg, regSlice;
   split_slice(regAndSlice, reg, regSlice);
@@ -334,7 +334,7 @@ void add_child_node(std::string varAndSlice,
   toCoutVerb("!! Add child "+varAndSlice+" to "+parentNode->dest);
   if(varAndSlice.find("wr_fifo.r9") != std::string::npos 
        && parentNode->dest == "yuzeng291") {
-    toCout("Find it!");
+    toCoutVerb("Find it!");
   }
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
@@ -509,7 +509,7 @@ void add_ssa_node(std::string varAndSlice, uint32_t timeIdx, astNode* const node
 /// Treat differently for top module and sub module
 void add_input_node(std::string input, uint32_t timeIdx, astNode* const node) {
   if(input == "in")
-    toCout("Find it!");
+    toCoutVerb("Find it!");
   toCoutVerb("Process input node: "+input);
   const auto curMod = g_insContextStk.get_curMod();
   const auto target = g_insContextStk.get_target();
@@ -592,7 +592,7 @@ void add_input_node(std::string input, uint32_t timeIdx, astNode* const node) {
 void add_num_node(std::string num, uint32_t timeIdx, astNode* const node) {
   toCoutVerb("Process num node: "+num);
   if(num == "8'b00010110")
-    toCout("Find it!");
+    toCoutVerb("Find it!");
   node->type = FE_NUM;
   node->dest = num;
   node->op = "";
@@ -823,7 +823,7 @@ void add_src_concat_op_node(std::string line, uint32_t timeIdx, astNode* const n
   std::string op;
   std::string destAndSlice = m.str(2);
   if(destAndSlice.compare("fangyuan23") == 0) {
-    toCout("Find it!");
+    toCoutVerb("Find it!");
   }
   std::string srcList = m.str(3);
 
@@ -841,7 +841,7 @@ void add_src_concat_op_node(std::string line, uint32_t timeIdx, astNode* const n
 
   for(auto src: srcVec) {
     if(destAndSlice.compare("fangyuan23") == 0) {
-      toCout("Find it!");
+      toCoutVerb("Find it!");
     }
     add_child_node(src, timeIdx, node);  
   }
@@ -858,7 +858,7 @@ void add_case_node(std::string var, uint32_t timeIdx, astNode* const node) {
   }
 
   if(var == "cpuregs_wrdata")
-    toCout("Find it!");
+    toCoutVerb("Find it!");
 
   auto localPair = curMod->caseTable[var];
   std::string caseVar = localPair.first;
@@ -921,7 +921,7 @@ void add_submod_node(std::string var, uint32_t timeIdx, astNode* const node) {
   std::string parentModName = curMod->name;
   std::string modName = curMod->ins2modMap[insName];
   if(modName == "S4")
-    toCout("Find it!");
+    toCoutVerb("Find it!");
 
   const auto subMod = g_moduleInfoMap[modName];
   // if this submodule is blackbox, or if the output port 

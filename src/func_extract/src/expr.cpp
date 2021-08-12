@@ -62,7 +62,7 @@ void input_expr(std::string line) {
   std::string slice = m.str(2);
   std::string var = m.str(3);
   if(var == "rst")
-    toCout("Find it!");
+    toCoutVerb("Find it!");
   
   if(var != g_recentClk)
     curMod->moduleInputs.insert(var);
@@ -122,7 +122,7 @@ void wire_expr(std::string line) {
   moduleWires.insert(var);  
 
   if(var == "outAssign")
-    toCout("Find it!");
+    toCoutVerb("Find it!");
 
   bool insertDone;
   if(!slice.empty())
@@ -375,7 +375,7 @@ void always_expr(std::string line, std::ifstream &input) {
   // parse first assignment
   std::getline(input, line);
   if(line.find("if (_127_)") != std::string::npos) 
-    toCout("Find it!");
+    toCoutVerb("Find it!");
   if( std::regex_match(line, m, pNonblock) || std::regex_match(line, m, pNonblockConcat) ) {
     nb_expr(line);
   }
@@ -431,7 +431,7 @@ std::pair<std::string, std::string> nonblockif_expr(std::string line,
   put_into_reg2Slice(destAndSlice);
 
   if(destAndSlice.find("wr_fifo.r9") != std::string::npos) {
-    toCout("Find it!");
+    toCoutVerb("Find it!");
   }
  
   split_slice(destAndSlice, dest, destSlice);
@@ -456,7 +456,10 @@ std::pair<std::string, std::string> nonblockif_expr(std::string line,
   auto endOfIf = input.tellg();
   std::getline(input, line);
   if( !std::regex_match(line, m, pNBElseIf) ) {
-    assert(line.find("else if") == std::string::npos);
+    if(line.find("else if") != std::string::npos) {
+      toCout("Error: unexpected else if: "+line);
+      abort();
+    }
     if ( !std::regex_match(line, m, pNonblockElse) ) {
       input.seekg(endOfIf);
       elseValue = destAndSlice;
@@ -702,7 +705,7 @@ void submodule_expr(std::string firstLine, std::ifstream &input) {
     g_fifoIns.emplace(instanceName, moduleName);
   }
   if(moduleName == "expand_key_128" && instanceName == "a10")
-    toCout("Find it!");
+    toCoutVerb("Find it!");
 
   if(g_moduleInfoMap.find(moduleName) == g_moduleInfoMap.end()) {
     toCout("Error: submodule has not been seen before: "+moduleName);

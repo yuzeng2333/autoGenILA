@@ -191,7 +191,7 @@ UpdateFunctionGen::input_constraint(astNode* const node, uint32_t timeIdx,
       toCout("!!!!!!!! change min delay for: "+curMod->name+", target: "
              +curTgt+", delay: "+toStr(delay)+", input: "+dest );
       if(dest == "if_din") {
-        toCout("Find it!");
+        toCoutVerb("Find it!");
       }
     }    
     // ====== design consideration: ================================
@@ -1180,7 +1180,7 @@ UpdateFunctionGen::memMod_constraint(astNode* const node, uint32_t timeIdx, cont
                                      builder &b, uint32_t bound) {
   toCout("begin memMod: "+node->dest);
   if(node->dest == "q0")
-    toCout("Find it!");
+    toCoutVerb("Find it!");
   const auto curMod = insContextStk.get_curMod();
   const auto curFunc = insContextStk.get_func();
   auto curDynData = get_dyn_data(curMod);
@@ -1315,7 +1315,7 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
     toCoutVerb("Find it!");
   }
   if(insName == "hls_target_Loop_1_proc_U0") {
-    toCout("Find it!");
+    toCoutVerb("Find it!");
   }
   if(insName != node->op) {
     toCout("Warning: insName: "+insName+", node->op: "+node->op);
@@ -1338,7 +1338,7 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
      //&& outPort == "if_dout" && timeIdx == 18)
     toCoutVerb("Find it!");
   if(modName == "hls_target_call_Loop_LB2D_buf_proc_buffer_0_value_V_ram")
-    toCout("Find it!");
+    toCoutVerb("Find it!");
 
   // if sub-module is memory, do not make the submodule
   // directly return the function arg correspond to the submodule output
@@ -1427,7 +1427,7 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
     for(auto it = subModMemInstances.begin(); it != subModMemInstances.end(); it++) {
       std::string pathInsName = it->first;
       if(pathInsName == "hls_target_call_Loop_LB2D_buf_proc_buffer_0_value_V_ram_U")
-        toCout("Find it!");
+        toCoutVerb("Find it!");
       std::string modName = it->second;
       auto memMod = g_moduleInfoMap[modName];
       for(uint32_t i = 0; i <= bound; i++)      
@@ -1487,7 +1487,7 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
   for(uint32_t i = 0; i < node->srcVec.size(); i++) {
     if(node->srcVec[i].find("aes_reg_key0_i.reg_out")
          != std::string::npos)
-       toCout("Find it!");
+       toCoutVerb("Find it!");
     input2AstMp.emplace(node->srcVec[i], node->childVec[i]);
   }
 

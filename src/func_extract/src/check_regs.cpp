@@ -742,6 +742,8 @@ llvm::Value*
 UpdateFunctionGen::add_constraint(std::string varAndSlice, uint32_t timeIdx, context &c,
                                    std::shared_ptr<llvm::IRBuilder<>> &b,
                                    uint32_t bound ) {
+  if(varAndSlice.find("\\u_div.q_mask_q [31]") != std::string::npos)
+    toCoutVerb("Find it!");
   auto curMod = insContextStk.get_curMod();
   llvm::Value* ret;
   bool retIsEmpty = true;
@@ -785,6 +787,9 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
                             uint32_t bound ) {
   // Attention: varAndSlice might have a slice, a directly-assigned varAndSlice
   std::string varAndSlice = node->dest;
+  if(varAndSlice.find("\\u_div.q_mask_q [31]") != std::string::npos)
+    toCoutVerb("Find it!");
+
   auto curMod = insContextStk.get_curMod();
   std::shared_ptr<ModuleDynInfo_t> curDynData = get_dyn_data(curMod);
   toCoutVerb("add_constraint for: "+varAndSlice+", timeIdx: "+toStr(timeIdx));
@@ -902,7 +907,7 @@ UpdateFunctionGen::add_nb_constraint(astNode* const node,
 
   //if(curMod->invarRegs.find(dest) == curMod->invarRegs.end()) {
   if(dest.find("internal_empty_n") != std::string::npos) {
-    toCout("Find it!");
+    toCoutVerb("Find it!");
   }
   if(g_use_read_ASV) {
     if(is_read_asv(dest, insContextStk.get_curMod())) {
@@ -1670,7 +1675,7 @@ llvm::Value* UpdateFunctionGen::get_arg(std::string regName, llvm::Function *fun
     //toCout("func name: "+funcName);
     //toCout("arg name: "+argName);
     if(argName.find("ata_fifo.r0___#25") != std::string::npos)
-      toCout("Find it!!");
+      toCoutVerb("Find it!!");
     if(it->getName().str() == regName) return it;
   }
   toCout("Error: function input is not found: "+regName);
