@@ -112,12 +112,12 @@ std::string to_re(std::string input) {
   // Below is the old varNameBraces. It has been used without errors for many designs.
   // The reason I replace it with the new one is because it failed in the ultra_riscv case
   //std::string varNameBraces("([\a\ba-zA-Z0-9_=\\.\\$\\\\'\\[\\]\\(\\)\\/\\:]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?)(?:\\s)?");
-  std::string varNameBraces("((?:\\\\\\S+|[0-9a-zA-Z_]+|[0-9]+\\'[bdh][0-9a-fx]+)(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?)(?:\\s)?");  
+  std::string varNameBraces("((?:\\\\\\S+|[0-9a-zA-Z_]+|[0-9]+\\'[bdh][0-9a-fx]+|\\$signed\\([0-9]+\\'[bdh][0-9a-fx]+\\))(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?)(?:\\s)?");  
   auto res = std::regex_replace(input, pNameBraces, varNameBraces);
 
   std::regex pName("NAME");
   //std::string varName("[\a\ba-zA-Z0-9_=\\.\\$\\\\'\\[\\]\\(\\)\\/\\:]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?(?:\\s)?");
-  std::string varName("(?:\\\\\\S+|[0-9a-zA-Z_]+|[0-9]+\\'[bdh][0-9a-fx]+)(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?(?:\\s)?");
+  std::string varName("(?:\\\\\\S+|[0-9a-zA-Z_]+|[0-9]+\\'[bdh][0-9a-fx]+|\\$signed\\([0-9]+\\'[bdh][0-9a-fx]+\\))(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?(?:\\s)?");
 
   res = std::regex_replace(res, pName, varName);
 
@@ -1744,14 +1744,16 @@ bool is_srcConcat(const std::string &line) {
     toCout("Find src concat!");
   }
   else return false;
+  if(line.find("[") != std::string::npos)
+    toCout("Find it!");
   std::smatch m;
   //if(!std::regex_match(line, m, pSrcConcat))
   //  return false;
   size_t openBracePos = line.find("= {");
   std::string firstPart = line.substr(0, openBracePos+4);
   std::string secondPart = line.substr(openBracePos+5);
-  size_t closeBracePos = line.find("};");
-  secondPart = line.substr(0, closeBracePos);
+  size_t closeBracePos = secondPart.find("};");
+  secondPart = secondPart.substr(0, closeBracePos);
   if(!std::regex_match(firstPart, m, pSrcConcatFirstPart)) {
     toCout("Error: pSrcConcatFirstPart is not matched: "+firstPart);
     abort();
