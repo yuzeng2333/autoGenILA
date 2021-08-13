@@ -74,6 +74,13 @@ void parse_verilog(std::string fileName) {
       fill_var_width(line, g_insContextStk.get_curMod()->varWidth);
     }
     //toCout(line);
+
+    // add jump table implementation for long case statement
+    if(line.find("/* switch */") != std::string::npos) {
+      switch_expr(input);
+      continue;
+    }
+
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       case_expr(line, input);
       continue;

@@ -821,7 +821,7 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
     retExpr = input_constraint(node, timeIdx, c, b, bound);
   }
   else if( is_reg_in_curMod(varAndSlice, curMod) 
-             && node->type != SRC_CONCAT ) { 
+             && node->type != SRC_CONCAT && node->type != SWITCH) { 
     // AS case is moved to add_nb_constraint
     retExpr = add_nb_constraint(node, timeIdx, c, b, bound);
   }
@@ -835,6 +835,10 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
   else if( is_case_dest(varAndSlice, curMod) ) {
     retExpr = case_constraint(node, timeIdx, c, b, bound);
   }
+  else if( is_switch_dest(varAndSlice, curMod) ) {
+    retExpr = switch_constraint(node, timeIdx, c, b, bound);
+  }
+
   //else if( is_func_output(varAndSlice) ) {
   //  retExpr = func_constraint(node, timeIdx, c, s, g, bound, isSolve);
   //}

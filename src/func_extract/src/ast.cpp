@@ -247,7 +247,8 @@ void build_tree_for_single_as(std::string regAndSlice) {
   else
     root = curMod->visitedNode[regAndSlice];
 
-  add_node(regAndSlice, 0, root, true);
+  // FIXME: is there any case that the last arg should be true?
+  add_node(regAndSlice, 0, root, false);
 }
 
 // Attention: If different slices of var are assigned in different expressions, they should have different nodes
@@ -259,8 +260,8 @@ void add_node(std::string varAndSlice,
   const auto curMod = g_insContextStk.get_curMod();  
   remove_two_end_space(varAndSlice);
   //toCout("Add node for: "+varAndSlice);
-  if(varAndSlice.find("aes_reg_key0_i.reg_out") != std::string::npos//) {
-       && timeIdx == 25) {
+  if(varAndSlice.find("d_wr_addr_fifo_out0") != std::string::npos) {
+       //&& timeIdx == 25) {
     toCout("Found it!");
     s_node = node;
   }
@@ -303,6 +304,9 @@ void add_node(std::string varAndSlice,
   else if( is_case_dest(varToAdd, curMod) ) {
     add_case_node(varToAdd, timeIdx, node);
   }
+  else if( is_switch_dest(varToAdd, curMod) ) {
+    add_switch_node(varToAdd, timeIdx, node);
+  }
   else if( is_func_output(varToAdd, curMod) ) {
     abort();
     add_func_node(varToAdd, timeIdx, node);
@@ -330,6 +334,8 @@ void add_node(std::string varAndSlice,
 void add_child_node(std::string varAndSlice, 
                     uint32_t timeIdx, 
                     astNode* const parentNode) {
+  if(parentNode->dest.find("d_wr_addr_fifo_out0") != std::string::npos )
+    toCoutVerb("Find it!");
   const auto curMod = g_insContextStk.get_curMod();  
   toCoutVerb("!! Add child "+varAndSlice+" to "+parentNode->dest);
   if(varAndSlice.find("wr_fifo.r9") != std::string::npos 
@@ -884,6 +890,38 @@ void add_case_node(std::string var, uint32_t timeIdx, astNode* const node) {
   node->done = false;
   return;
 }
+
+
+void add_switch_node(std::string var, uint32_t timeIdx, astNode* const node) {
+  const auto curMod = g_insContextStk.get_curMod();
+  if(curMod->switchTable.find(var) == curMod->switchTable.end()) {
+    toCout("Error: not found in curMod->switchTable: "+var);
+    abort();
+  }
+
+  if(var == "cpuregs_wrdata")
+    toCoutVerb("Find it!");
+
+  auto switchInfo = curMod->switchTable[var];
+  std::string caseVar = switchInfo.switchVar;
+  auto caseAssignPairs = switchInfo.assignVec;
+
+  node->type = SWITCH;
+  node->dest = var;
+  node->op = "";
+  //node->srcVec = SV{op1AndSlice, op2AndSlice, integer};
+  // srcVec must follow this format:
+  // 1st is the sAndSlice(case variable)
+  // then followed are N pairs of (caseValue, assignVariable).
+  // So the total number is 2N+1
+  node->srcVec.push_back(caseVar);
+  add_child_node(caseVar, timeIdx+1, node);
+  node->isReduceOp = false;
+  node->done = false;
+  return;
+}
+
+
 
 
 void add_func_node(std::string var, uint32_t timeIdx, astNode* const node) {

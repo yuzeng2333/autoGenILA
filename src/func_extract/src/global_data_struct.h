@@ -89,6 +89,14 @@ struct InstrInfo_t {
 };
 
 
+struct Switch_info {
+  std::string switchVar;
+  // first is the value for switch variable, 
+  // second is the correspoding assign value
+  std::vector<std::pair<std::string, std::string>> assignVec;
+};
+
+
 // one for each sub-module
 struct FuncInfo_t {
   std::string moduleName;
@@ -144,6 +152,7 @@ class ModuleInfo_t {
            std::pair<std::string,
                      std::vector<std::pair<std::string, 
                                            std::string>>>> caseTable;
+  std::map<std::string, Switch_info> switchTable;
   /// first key is wire/reg name, first of pair is instance name, 
   /// second of pair is connected instance output port
   std::map<std::string, std::pair<std::string, std::string>> wire2InsPortMp;

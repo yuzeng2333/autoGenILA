@@ -85,6 +85,23 @@ uint32_t hdb2int(std::string num) {
     return try_stoi(num);
 }
 
+
+uint32_t get_formed_width(std::string num) {
+  num = remove_signed(num);
+  std::smatch m;
+  if(std::regex_match(num, m, pDec)
+     || std::regex_match(num, m, pHex)
+     || std::regex_match(num, m, pBin)) {
+    std::string width = m.str(1);
+    return std::stoi(width);
+  }
+  else {
+    toCout("Error: the number is not well-formed: "+num);
+    abort();
+  }
+}
+
+
 uint32_t hex2int(std::string num) {
   uint32_t res = 0;
   for(auto it = num.begin(); it != num.end(); it++) {
@@ -316,6 +333,12 @@ uint32_t get_time(std::string var) {
 bool is_case_dest(std::string var, const std::shared_ptr<ModuleInfo_t> &curMod) {
   return curMod->caseTable.find(var) != curMod->caseTable.end();
 }
+
+
+bool is_switch_dest(std::string var, const std::shared_ptr<ModuleInfo_t> &curMod) {
+  return curMod->switchTable.find(var) != curMod->switchTable.end();
+}
+
 
 bool is_func_output(std::string var, 
                     const std::shared_ptr<ModuleInfo_t> &curMod) {

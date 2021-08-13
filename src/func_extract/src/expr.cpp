@@ -754,6 +754,69 @@ void submodule_expr(std::string firstLine, std::ifstream &input) {
   }
 }
 
+     
+void switch_expr(std::ifstream &input) {
+  const auto curMod = g_insContextStk.get_curMod();
+
+  std::string alwaysLine;
+  std::getline(input, alwaysLine);
+  if(alwaysLine.find("always @(posedge") == std::string::npos) {
+    toCout("Error: not expected always line: "+alwaysLine);
+    abort();
+  }
+
+  std::string caseLine;
+  std::getline(input, caseLine);
+  if(caseLine.find("case") == std::string::npos) {
+    toCout("Error: not expected case line: "+caseLine);
+    abort();
+  }
+  std::smatch m;
+  if(!std::regex_match(caseLine, m, pCase)) {
+    toCout("Error: does not match pCase: "+caseLine);
+    abort();
+  }
+  std::string switchVar = m.str(3);
+
+  std::string assignLine;
+  std::getline(input, assignLine);
+  std::string destVar;
+  std::vector<std::pair<std::string, std::string>> assignVec;
+  bool isFirst = true;
+  uint32_t lastSwitchValue;
+  while(assignLine.find("endcase") == std::string::npos) {
+    if(!std::regex_match(assignLine, m, pSwitchAssign)) {
+      toCout("Error: does not match pSwitchAssign: "+assignLine);
+      abort();
+    }
+    std::string switchVal = m.str(2);
+    std::string dest = m.str(3);
+    if(destVar.empty()) destVar = dest;
+    else if(destVar != dest) {
+      toCout("dest not matched: "+dest);
+      abort();
+    }
+    std::string assignVal = m.str(4);
+    assignVec.push_back(std::make_pair(switchVal, assignVal));
+    uint32_t switchNum = hdb2int(switchVal);
+    if(isFirst) {
+      lastSwitchValue = switchNum;
+      assert(lastSwitchValue == 0 && "First switch values is not 0!");
+    }
+    else if(switchNum != lastSwitchValue + 1) {
+      toCout("Error: switch values are not consecutive, not supported!");
+      abort();
+    }
+  }
+
+  if(curMod->switchTable.find(destVar) != curMod->switchTable.end()) {
+    toCout("Error: var already in switchTable: "+destVar);
+    abort();
+  }
+  curMod->switchTable.emplace(destVar, Switch_info{switchVar, assignVec});
+}
+
+
 
 bool compareSlice(std::string destAndSlice1, std::string destAndSlice2) {
   std::string dest1, destSlice1;

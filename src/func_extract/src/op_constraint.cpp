@@ -740,6 +740,9 @@ UpdateFunctionGen::add_one_concat_expr(astNode* const node, uint32_t nxtIdx, uin
   uint32_t hi = get_lgc_hi(varAndSlice, curMod);
   uint32_t lo = get_lgc_lo(varAndSlice, curMod);
 
+  if(node->dest == "d_wr_addr_fifo_out0")
+    toCoutVerb("Find it!");
+
   if(node->childVec.size() != node->srcVec.size()) {
     toCout("Error: srcVec and childVec have different sizes for: "+node->dest);
     abort();
@@ -1017,9 +1020,10 @@ UpdateFunctionGen::case_constraint(astNode* const node, uint32_t timeIdx,
   std::string name1 = caseVarExpr->getName().str();
   std::string name2 = "1";
   toCoutVerb("compare4: "+name1+", "+name2);
-  llvm::Value* iteCond = b->CreateICmpEQ(extract_func(caseVarExpr, posOfOne, posOfOne, c, b, "_", condNoinline), 
-                                         llvmInt(1, 1, c), 
-                                         llvm::Twine( timed_name(destAndSlice+"_;_case"+toStr(posOfOne), timeIdx) ));
+  llvm::Value* iteCond = b->CreateICmpEQ(
+      extract_func(caseVarExpr, posOfOne, posOfOne, c, b, "_", condNoinline), 
+      llvmInt(1, 1, c), 
+      llvm::Twine( timed_name(destAndSlice+"_;_case"+toStr(posOfOne), timeIdx) ));
 
   // top level ite is constructed here
   std::string destTimed = timed_name(destAndSlice, timeIdx);  
@@ -1034,13 +1038,83 @@ UpdateFunctionGen::case_constraint(astNode* const node, uint32_t timeIdx,
   }
   else {
     llvm::Value* tmp = add_constraint(node->childVec[1], timeIdx, c, b, bound);
-    thenRet = extract_func(tmp, hi, lo, c, b, timed_name(destAndSlice+"_;_then0", timeIdx), srcNoinline);
+    thenRet = extract_func(tmp, hi, lo, c, b, 
+                           timed_name(destAndSlice+"_;_then0", timeIdx), srcNoinline);
   }
   llvm::Value* elseRet = add_one_case_branch_expr(node, caseVarExpr, 3, timeIdx, 
                                                   c, b, bound, destAndSlice);
 
   return b->CreateSelect(iteCond, thenRet, elseRet, llvm::Twine(destTimed));
 }
+
+
+// This function only deals with the case that switch values are 
+// consecutive values
+llvm::Value* 
+UpdateFunctionGen::switch_constraint(astNode* const node, uint32_t timeIdx, 
+                                   context &c, builder &b, uint32_t bound) {
+  const auto curMod = insContextStk.get_curMod();                                   
+  std::string switchVarAndSlice = node->srcVec[0];
+  std::string switchVar, switchVarSlice;
+  split_slice(switchVarAndSlice, switchVar, switchVarSlice);
+  uint32_t hi = get_lgc_hi(switchVarAndSlice, curMod);
+  uint32_t lo = get_lgc_lo(switchVarAndSlice, curMod);
+  llvm::Value* switchVarExpr;
+  if(switchVarSlice.empty() || has_direct_assignment(switchVarAndSlice, curMod))
+    switchVarExpr = add_constraint( node->childVec[0], timeIdx+1, c, b, bound);    
+  else
+    switchVarExpr = extract_func(add_constraint( node->childVec[0], timeIdx+1, c, b, bound), 
+                                                hi, lo, c, b);
+
+
+  std::string destAndSlice = node->dest;
+  std::string destTimed = timed_name(destAndSlice, timeIdx);  
+  auto switchInfo = curMod->switchTable[destAndSlice];
+  auto assignVec = switchInfo.assignVec;
+  std::string firstSwitchVal = assignVec.front().first;
+  std::string firstAssignVal = assignVec.front().second;
+  uint32_t size = assignVec.size();
+  
+
+  // declare a memory for assigned values
+  uint32_t switchValueWidth = get_formed_width(firstSwitchVal);
+  uint32_t assignValueWidth = get_formed_width(firstAssignVal);
+  llvm::Type* elementTy = llvmWidth(assignValueWidth, c);
+  llvm::ArrayType* arrayType = llvm::ArrayType::get(elementTy, size);
+  std::vector<llvm::Constant*> initList;
+  for(auto pair: assignVec) {
+    uint32_t assignValue = hdb2int(pair.second);
+    initList.push_back(
+      llvm::ConstantInt::get(llvm::IntegerType::get(*c, assignValueWidth), 
+                             assignValue, false)
+    );
+  }
+  llvm::GlobalVariable* assignmentArr = new llvm::GlobalVariable(
+    *TheModule, 
+    arrayType, false, 
+    //llvm::GlobalValue::InternalLinkage,
+    llvm::GlobalValue::LinkOnceAnyLinkage,
+    llvm::ConstantArray::get(arrayType, llvm::ArrayRef<llvm::Constant*>(initList)),
+    destAndSlice+"_SWITCH_ASSIGN_ARR"
+  );
+
+  llvm::Value* assignArrValue = assignmentArr;
+
+  llvm::GetElementPtrInst* ptr 
+    = llvm::GetElementPtrInst::Create(
+        nullptr,
+        assignArrValue,
+        std::vector<llvm::Value*>{
+          llvm::ConstantInt::get(
+            llvm::IntegerType::get(*TheContext, switchValueWidth), 
+            0, false),
+          switchVarExpr },
+        llvm::Twine(destAndSlice+"_SWITCH_ASSIGN"),
+        BB
+      );
+   return b->CreateLoad(elementTy, ptr, llvm::Twine(destTimed));
+}
+
 
 
 llvm::Value* 

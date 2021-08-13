@@ -10,9 +10,10 @@
 namespace funcExtract {
 
 // TODO: configurations
-bool g_use_multi_thread = true;
+bool g_use_multi_thread = false;
 
 std::mutex g_dependVarMapMtx;
+std::mutex g_TimeFileMtx;
 // the first key is instr name, the second key is target name
 std::map<std::string, 
          std::map<std::string, 
@@ -99,14 +100,8 @@ void get_all_update() {
       bool doVecTgt = false;
       std::string target;
       std::vector<std::string> tgtVec;
-      // work on target vector first
-      if(!allowedTgtVec.empty()){
-        doVecTgt = true;
-        isVec = true;
-        tgtVec = allowedTgtVec.back().first;
-        allowedTgtVec.pop_back();
-      }
-      else if(!g_workSet.empty()) {
+      // work on single register target first
+      if(!g_workSet.empty()) {
         isVec = false;
         doSingleTgt = true;
         auto targetIt = g_workSet.begin();
@@ -115,6 +110,12 @@ void get_all_update() {
         if(g_visitedTgt.mtxExist(target)
            || g_skippedOutput.find(target) != g_skippedOutput.end())
           continue;
+      }
+      else if(!allowedTgtVec.empty()){
+        doVecTgt = true;
+        isVec = true;
+        tgtVec = allowedTgtVec.back().first;
+        allowedTgtVec.pop_back();
       }
 
       uint32_t instrIdx = 0;
@@ -247,6 +248,8 @@ void get_update_function(std::string target,
                          //std::shared_ptr<ModuleInfo_t> g_topModuleInfo) {
                          //struct ThreadSafeVector_t &g_fileNameVec) {
 
+  time_t startTime = time(NULL);
+
   // set the destInfo according to the target
   DestInfo destInfo;
   if(!isVec) {
@@ -339,9 +342,14 @@ void get_update_function(std::string target,
   std::string funcName = instrInfo.name+"_"+destNameSimp;
   std::string fileName = g_path+"/"+instrInfo.name+"_"
                          +destNameSimp+"_"+toStr(delayBound);
+
+  // generate update function
   UpdateFunctionGen UFGen;
   UFGen.TheContext = std::make_unique<llvm::LLVMContext>();
   UFGen.print_llvm_ir(destInfo, delayBound, instrIdx);
+
+  time_t upGenEndTime = time(NULL);  
+
   std::string clean("opt --instsimplify --deadargelim --instsimplify "+fileName+"_tmp.ll -S -o="+fileName+"_clean.ll");
   std::string opto3("opt -O1 "+fileName+"_clean.ll -S -o="+fileName+"_tmp.o3.ll; opt -passes=deadargelim "+fileName+"_tmp.o3.ll -S -o="+fileName+"_clean.o3.ll; rm "+fileName+"_tmp.o3.ll");
   toCout("** Begin clean update function");
@@ -349,6 +357,19 @@ void get_update_function(std::string target,
   toCout("** Begin simplify update function");
   system(opto3.c_str());
   toCout("** End simplify update function");
+
+  time_t simplifyEndTime = time(NULL);
+  uint32_t upGenTime = upGenEndTime - startTime;
+  uint32_t simplifyTime = simplifyEndTime - upGenEndTime;
+  g_TimeFileMtx.lock();
+  std::ofstream genTimeFile(g_path+"/up_gen_time.txt", std::ios::app);
+  genTimeFile << funcName+":\t"+toStr(upGenTime) << std::endl;
+  genTimeFile.close();
+  std::ofstream simplifyTimeFile(g_path+"/simplify_time.txt", std::ios::app);
+  simplifyTimeFile << funcName+":\t"+toStr(simplifyTime) << std::endl;
+  simplifyTimeFile.close();
+  g_TimeFileMtx.unlock();
+
   std::vector<std::pair<std::string, uint32_t>> argVec;
   bool usefulFunc = read_clean_o3(fileName+"_clean.o3.ll", argVec, fileName+"_clean.simp.ll", funcName);
 

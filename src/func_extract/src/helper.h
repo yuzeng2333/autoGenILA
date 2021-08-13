@@ -71,6 +71,8 @@ bool is_formed_num(std::string num);
 
 uint32_t hdb2int(std::string num);
 
+uint32_t get_formed_width(std::string num);
+
 uint32_t hex2int(std::string num);
 
 uint32_t bin2int(std::string num);
@@ -107,6 +109,8 @@ bool comparePair(const std::pair<std::string, uint32_t> &p1,
 uint32_t get_time(std::string var);
 
 bool is_case_dest(std::string var, const std::shared_ptr<ModuleInfo_t> &curMod);
+
+bool is_switch_dest(std::string var, const std::shared_ptr<ModuleInfo_t> &curMod);
 
 bool is_func_output(std::string var, const std::shared_ptr<ModuleInfo_t> &mod);
 
