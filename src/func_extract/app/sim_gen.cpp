@@ -21,7 +21,7 @@ using namespace taintGen;
 
 // manually fix errors due to longer than 64 bits
 bool g_fix_long_bit = true;
-bool g_fetch_instr_from_mem = false;
+bool g_fetch_instr_from_mem = true;
 std::string g_instrValueVar = "mem_rdata";
 std::string g_instrAddrVar = "zy_instr_addr";
 std::string g_dataAddrVar = "zy_data_addr";
@@ -37,6 +37,7 @@ std::vector<std::map<std::string,
                      std::vector<std::string>>> toDoList;
 std::map<std::string, std::map<std::string, 
                                std::string>> g_refineMap;
+std::set<std::string> g_skippedTgt;
 uint32_t memSize;
 
 // key is the asv name, value is its c data type name
@@ -49,13 +50,29 @@ std::string CNCT = "_";
 // disable: aes
 bool g_update_all_regs = false;
 
-enum DESIGN{AES, PICO, GB};
+enum DESIGN{AES, PICO, GB, URV};
 enum DESIGN g_design;
 
 // the second argument is the number of instructions
 int main(int argc, char *argv[]) {
   // TODO: specify which example to apply to:
-  g_design = AES;
+  g_design = PICO;
+
+  // set global variables accordingly
+  if(g_design == PICO) {
+    g_fetch_instr_from_mem = true;
+    g_instrValueVar = "mem_rdata";
+  }
+  else if(g_design == AES) {
+    g_fetch_instr_from_mem = false;
+  }
+  else if(g_design == URV) {
+    g_fetch_instr_from_mem = true;
+    g_instrValueVar = "mem_i_inst_i";
+  }
+
+
+
 
   g_path = argv[1];
   if(argc < 3) {
@@ -69,6 +86,7 @@ int main(int argc, char *argv[]) {
   read_func_info(g_path+"/func_info.txt", g_global_arr);
   read_to_do_instr(g_path+"/tb.txt", toDoList);
   read_refinement(g_path+"/refinement.txt");
+  read_skipped_target(g_path+"/skipped_target.txt");
   uint32_t instrNum;
   instrNum = std::stoi(argv[2]);
   memSize = toDoList.size();
@@ -174,6 +192,10 @@ int main(int argc, char *argv[]) {
     cpp << "  unsigned int mem["+toStr(memSize)+"];" << std::endl;
     uint32_t idx = 0;
     for(auto encoding: toDoList) {
+      if(encoding.find(g_instrValueVar) == encoding.end()) {
+        toCout("Error: the instr value variables is not expected: "+g_instrValueVar);
+        abort();
+      }
       uint32_t intValue = convert_to_single_num(encoding[g_instrValueVar].front());    
       cpp << "  mem["+toStr(idx++)+"] = "+toStr(intValue)+" ;" << std::endl;
     }
@@ -272,6 +294,7 @@ void print_instr_calls(std::map<std::string,
   bool updateMem = false;  
   for(auto pair : thisInstrFuncTypes) {
     std::string origWriteASV = pair.first;
+    if(g_skippedTgt.find(origWriteASV) != g_skippedTgt.end()) continue;
     if(remappedVar.find(origWriteASV) != remappedVar.end()) continue;
     bool needData = (instrInfo.loadDataInfo.find(origWriteASV) != instrInfo.loadDataInfo.end()) ;
     //std::string dataAddr = var_name_convert(instrInfo.dataAddr, true);    
@@ -516,6 +539,17 @@ void read_refinement(std::string fileName) {
       remove_two_end_space(rtlVar);
       g_refineMap[instrName].emplace(ilaVar, rtlVar);
     }
+  }
+}
+
+
+void read_skipped_target(std::string fileName) {
+  std::ifstream input(fileName);
+  std::string line;
+  std::string instrName;
+  while(std::getline(input, line)) {
+    remove_two_end_space(line);
+    g_skippedTgt.insert(line);
   }
 }
 

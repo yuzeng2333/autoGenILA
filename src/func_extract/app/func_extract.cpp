@@ -105,7 +105,7 @@ int main(int argc, char *argv[]) {
     get_io(g_path+"/design.v.nocomment");
 
     toCout("##### Begin remove_functions");
-    funcExtract::remove_functions(g_path+"/design.v.nocomment");
+    funcExtract::remove_functions(g_path+"/design.v");
 
     toCout("##### Begin parse_verilog");
     parse_verilog(g_path+"/design.v.clean");
