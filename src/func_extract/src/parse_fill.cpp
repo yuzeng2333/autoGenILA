@@ -342,10 +342,19 @@ void get_io(const std::string &fileName) {
 
 
 void remove_functions(std::string fileName) {
+  toCout("#### Begin remove_functions in funcExtract domain!");
   std::ifstream input(fileName+".nocomment");
   std::ofstream output(fileName + ".clean");
   std::string line;
   while( std::getline(input, line) ) {
+    if(line.find("S4 S4_0 (") != std::string::npos
+       //|| line.find("module expand_key_128") != std::string::npos 
+       //|| line.find("assign v1 = addedVar133 ^ in[95:64];") != std::string::npos 
+       //|| line.find("assign k3b = k3a ^ k4a;") != std::string::npos 
+       //|| line.find("assign addedVar133 = { v0[31:24], in[119:96] };") != std::string::npos 
+       //|| line.find("input [7:0] rcon;") != std::string::npos 
+      )
+      toCoutVerb("Find it!");
     toCoutVerb(line);
     uint32_t choice = parse_verilog_line(line, true);
     if ( choice == FUNCDEF ) {

@@ -10,7 +10,7 @@
 namespace funcExtract {
 
 // TODO: configurations
-bool g_use_multi_thread = false;
+bool g_use_multi_thread = true;
 
 std::mutex g_dependVarMapMtx;
 std::mutex g_TimeFileMtx;
@@ -162,7 +162,8 @@ void get_all_update() {
       g_workSet.mtxClear();
       for(auto instrInfo : g_instrInfo) {
         localWorkSet = oldWorkSet;
-        std::vector<std::pair<std::vector<std::string>, uint32_t>> localWorkVec = g_allowedTgtVec;
+        std::vector<std::pair<std::vector<std::string>, 
+                              uint32_t>> localWorkVec = g_allowedTgtVec;
         instrIdx++;
         threadVec.clear();
         while(!localWorkSet.empty() || !localWorkVec.empty()) {
@@ -188,17 +189,6 @@ void get_all_update() {
             tgtVec = localWorkVec.back().first;
             localWorkVec.pop_back();
           }
-          if(isVec) {
-            for(std::string reg: tgtVec) {
-              g_visitedTgt.mtxInsert(reg);
-              //g_visitedTgtFile << target << std::endl;
-            }
-            tgtVec.clear();
-          }
-          else {
-            g_visitedTgt.mtxInsert(target);
-            //g_visitedTgtFile << target << std::endl;
-          }
           if(!target.empty()
              && g_allowedTgt.find(target) != g_allowedTgt.end()
              && g_allowedTgt[target].size() > 1) {
@@ -219,6 +209,16 @@ void get_all_update() {
         // wait for update functions for all regs to finish
         for(auto &th: threadVec) th.join();
       } // end of for-lopp: for each instruction
+
+      for(auto pair: g_allowedTgtVec) {
+        for(std::string reg: pair.first) {
+          g_visitedTgt.mtxInsert(reg);
+          //g_visitedTgtFile << target << std::endl;
+        }
+      }
+      for(std::string target: oldWorkSet) {
+        g_visitedTgt.mtxInsert(target);
+      }
       // targetVectors only executed for one round
       g_allowedTgtVec.clear();
     } // end of while loop
