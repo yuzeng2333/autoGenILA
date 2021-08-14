@@ -63,7 +63,7 @@ void parse_verilog(std::string fileName) {
   while( std::getline(input, line) ) {
     toCoutVerb(line);
     if(line.empty() || is_comment_line(line)
-          || line.find_first_not_of(' ') == line.length())
+          || line.find_first_not_of(' ') == std::string::npos)
       continue;
     if(line.find("if (_045_)") != std::string::npos) {
       toCout("Find it!");
@@ -310,10 +310,12 @@ void get_io(const std::string &fileName) {
   std::smatch match;
   while( std::getline(input, line) ) {
     toCoutVerb(line);
-    if(line.find("arg_0_TDATA_fifo") != std::string::npos)
+    if(line.find("reg [7:0] out;") != std::string::npos)
       toCout("Find it!");
-    if(line.empty() || is_comment_line(line)
-          || line.find_first_not_of(' ') == line.length())
+    if(line.empty() 
+          || line.find_first_not_of(' ') == std::string::npos
+          || is_comment_line(line)
+      )
       continue;
     if(g_insContextStk.get_stk_depth() > 0) {
       std::string modName = g_insContextStk.get_curMod()->name;
