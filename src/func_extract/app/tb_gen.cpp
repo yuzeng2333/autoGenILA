@@ -154,7 +154,9 @@ int main(int argc, char *argv[]) {
       assign_random_sparse_instr();
   }
   else {
+    uint32_t idx = 0;
     for(auto instrEncoding : toDoList) {
+      toCout("Instr "+toStr(idx++));
       assign_instr(instrEncoding, true);
     }
   }

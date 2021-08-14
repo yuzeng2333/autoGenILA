@@ -47,6 +47,7 @@ std::string materialize_num(std::string val) {
     uint32_t width = std::stoi(m.str(1));
     uint32_t randVal = rand() % (2 << width);
     std::string hexVal = dec2hex(randVal);
+    if(width == 8 && hexVal.size() > 2) hexVal = hexVal.substr(0, 2);
     return toStr(width)+"'h"+hexVal;
   }
 }
@@ -156,11 +157,12 @@ int main(int argc, char *argv[]) {
       make_instr(instrIdx);
     }
   }
-  else if(g_design == AES){
+  else if(g_design == AES) {
     // for AES, execute start instr. every two instructions
     bool doStart = false;
     uint32_t idx = 0;
     while(idx++ < InstrNum) {
+      toCout("Make instr: "+toStr(idx));
       if(doStart) {
         make_instr(0);
         doStart = false;

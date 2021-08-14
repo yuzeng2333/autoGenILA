@@ -198,7 +198,9 @@ int main(int argc, char *argv[]) {
   }
   else {
     // ========== update asvs according to instructions
+    uint32_t idx = 0;
     for(auto encoding : toDoList) {
+      toCout("Instr: "+toStr(idx++));
       print_instr_calls(encoding, "  ", cpp, 0);
       if(g_update_all_regs) update_all_asvs(cpp, "  ");
     }
@@ -238,7 +240,7 @@ void print_instr_calls(std::map<std::string,
                +instrInfo.name+", memAddr: "+toStr(memAddr)+" \\n \");" << std::endl;
   bool instrAddrExist = true;
   if(instrInfo.instrAddr.empty()) {
-    toCout(" Warning: instrAddr is not specified for: "+instrInfo.name);
+    if(g_design == PICO) toCout(" Warning: instrAddr is not specified for: "+instrInfo.name);
     instrAddrExist = false;
     //abort();
   }
