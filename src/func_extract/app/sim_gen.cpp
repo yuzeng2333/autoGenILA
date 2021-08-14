@@ -56,7 +56,7 @@ enum DESIGN g_design;
 // the second argument is the number of instructions
 int main(int argc, char *argv[]) {
   // TODO: specify which example to apply to:
-  g_design = PICO;
+  g_design = URV;
 
   // set global variables accordingly
   if(g_design == PICO) {
@@ -262,7 +262,8 @@ void print_instr_calls(std::map<std::string,
                +instrInfo.name+", memAddr: "+toStr(memAddr)+" \\n \");" << std::endl;
   bool instrAddrExist = true;
   if(instrInfo.instrAddr.empty()) {
-    if(g_design == PICO) toCout(" Warning: instrAddr is not specified for: "+instrInfo.name);
+    if(g_design == PICO || g_design == URV) 
+      toCout(" Warning: instrAddr is not specified for: "+instrInfo.name);
     instrAddrExist = false;
     //abort();
   }
