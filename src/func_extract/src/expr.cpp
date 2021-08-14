@@ -734,7 +734,8 @@ void submodule_expr(std::string firstLine, std::ifstream &input) {
     }
     //if(m.str(3) == g_recentClk)
     //  continue;
-    wire2PortMp.emplace(m.str(2), m.str(3));
+    if(!m.str(3).empty())
+      wire2PortMp.emplace(m.str(2), m.str(3));
   }
   for(auto pair : wire2PortMp) {
     std::string port = pair.first;
@@ -760,7 +761,8 @@ void switch_expr(std::ifstream &input) {
 
   std::string alwaysLine;
   std::getline(input, alwaysLine);
-  if(alwaysLine.find("always @(posedge") == std::string::npos) {
+  if(alwaysLine.find("always @(posedge") == std::string::npos
+      && alwaysLine.find("always @ (posedge") == std::string::npos ) {
     toCout("Error: not expected always line: "+alwaysLine);
     abort();
   }
@@ -800,13 +802,15 @@ void switch_expr(std::ifstream &input) {
     assignVec.push_back(std::make_pair(switchVal, assignVal));
     uint32_t switchNum = hdb2int(switchVal);
     if(isFirst) {
-      lastSwitchValue = switchNum;
-      assert(lastSwitchValue == 0 && "First switch values is not 0!");
+      assert(switchNum == 0 && "First switch values is not 0!");
+      isFirst = false;
     }
     else if(switchNum != lastSwitchValue + 1) {
       toCout("Error: switch values are not consecutive, not supported!");
       abort();
     }
+    lastSwitchValue = switchNum;
+    std::getline(input, assignLine);    
   }
 
   if(curMod->switchTable.find(destVar) != curMod->switchTable.end()) {
