@@ -119,7 +119,7 @@ CheckInvarType g_check_invariance = CheckRst; // TODO: check this setting
 bool g_enable_taint = true;
 // if is true, "assert()" will be generated for jaspergold to check
 // otherwise, a verilog assert module will be generated for simulation-based check
-bool g_use_jasper = true;
+bool g_use_jasper = false;
 uint32_t g_assert_num = 0;
 uint32_t g_case_reg_num = 0;
 std::vector<std::string> g_assertNames;
@@ -236,7 +236,7 @@ void clean_file(std::string fileName, bool useLogic) {
 
   while( std::getline(cleanFileInput, line) ) {
     //toCout(line);
-    if(line.find("_fifo.wr ) _414_ <= { _000_[15:6], _000_[4:0] };") != std::string::npos) {
+    if(line.find("S4 S4_0 (") != std::string::npos) {
       toCout("FIND IT!");
     }
 
@@ -580,6 +580,14 @@ void remove_functions(std::string fileName) {
   std::ofstream output(fileName + ".clean");
   std::string line;
   while( std::getline(input, line) ) {
+    if(line.find("S4 S4_0 (") != std::string::npos
+       || line.find("module expand_key_128") != std::string::npos 
+       || line.find("assign v1 = addedVar133 ^ in[95:64];") != std::string::npos 
+       || line.find("assign k3b = k3a ^ k4a;") != std::string::npos 
+       || line.find("assign addedVar133 = { v0[31:24], in[119:96] };") != std::string::npos 
+       || line.find("input [7:0] rcon;") != std::string::npos 
+      )
+      toCoutVerb("Find it!");
     uint32_t choice = parse_verilog_line(line, true);
     if ( choice == FUNCDEF && g_use_jasper) {
       remove_function_wrapper(line, input, output);

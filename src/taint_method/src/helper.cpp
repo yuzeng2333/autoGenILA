@@ -122,7 +122,7 @@ std::string to_re(std::string input) {
   res = std::regex_replace(res, pName, varName);
 
   std::regex pNUM("NUM");
-  std::string regexNum("\\d+'(h|b)[\\dabcdef]+");
+  std::string regexNum("\\d+'(?:h|b)[\\dabcdef]+");
   res = std::regex_replace(res, pNUM, regexNum);
   std::regex pInt("INT");
   std::string regexInt("\\d+");
@@ -1163,6 +1163,7 @@ std::string dec2bin(uint32_t inNum) {
 
 // input is a string of binary-format number
 std::string get_bits(std::string inNum, uint32_t highIdx, uint32_t lowIdx) {
+  if(inNum == "0") return "0";
   // input number must be binary
   uint32_t len = inNum.length();
   return inNum.substr(len-highIdx-1, highIdx-lowIdx+1);
@@ -1741,7 +1742,7 @@ void remove_two_end_space(std::string &str) {
 bool is_srcConcat(const std::string &line) {
   if(line.find(" = {") != std::string::npos
       && line.find("assign") != std::string::npos) {
-    toCout("Find src concat!");
+    toCoutVerb("Find src concat!");
   }
   else return false;
   if(line.find("[") != std::string::npos)

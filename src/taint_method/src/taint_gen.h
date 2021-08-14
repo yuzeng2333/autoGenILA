@@ -42,6 +42,7 @@ namespace taintGen {
 #define FUNC            29
 #define SUBMODOUT       30
 #define SUBMODIN        31
+#define SWITCH          32
 #define UNSUPPORT       99
 #define NONE            100
 

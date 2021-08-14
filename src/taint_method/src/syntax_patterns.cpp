@@ -94,6 +94,7 @@ std::regex pCase      (taintGen::to_re("^(\\s*)case(\\S)? \\((NAME)\\)"));
 std::regex pEndcase   (taintGen::to_re("^(\\s*)endcase$"));
 std::regex pDefault   (taintGen::to_re("^(\\s*)default\\:$"));
 std::regex pBlock     (taintGen::to_re("^(\\s*)(NAME) = (NAME)(\\s*)?;$"));
+std::regex pSwitchAssign (taintGen::to_re("^(\\s*)(NUM): (NAME) <= (NUM);$"));
 // if else
 std::regex pIf        (taintGen::to_re("^(\\s*)if \\((.*)\\)$"));
 std::regex pElse      (taintGen::to_re("^(\\s*)else$"));

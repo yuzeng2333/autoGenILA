@@ -93,6 +93,7 @@ extern std::regex pDefault;
 extern std::regex pBlock;
 extern std::regex pIf;
 extern std::regex pElse;
+extern std::regex pSwitchAssign;
 
 extern std::regex pSrcConcat;
 extern std::regex pSrcConcatFirstPart;
