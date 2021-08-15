@@ -1120,7 +1120,9 @@ std::string get_rst_value(const std::string &destAndSlice,
   split_slice(destAndSlice, dest, destSlice);
   std::string rstVal;
   if(g_rstVal.find(dest) != g_rstVal.end()) {
-    rstVal = g_rstVal[dest];  
+    rstVal = g_rstVal[dest];
+    if(rstVal.find("z") != std::string::npos)
+      replace_with(rstVal, "z", "0");
     if(!destSlice.empty()) {
       uint32_t hi = get_end(destSlice);
       uint32_t lo = get_begin(destSlice);
@@ -1235,7 +1237,7 @@ bool is_pure_num(std::string var) {
 }
 
 
-void replace_with(std::string str, std::string subStr, std::string newSubStr) {
+void replace_with(std::string &str, std::string subStr, std::string newSubStr) {
   size_t index = 0;
   uint32_t len = subStr.size();
   while (true) {

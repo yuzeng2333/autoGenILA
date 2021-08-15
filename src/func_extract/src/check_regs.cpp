@@ -742,7 +742,7 @@ llvm::Value*
 UpdateFunctionGen::add_constraint(std::string varAndSlice, uint32_t timeIdx, context &c,
                                    std::shared_ptr<llvm::IRBuilder<>> &b,
                                    uint32_t bound ) {
-  if(varAndSlice.find("\\u_div.q_mask_q [31]") != std::string::npos)
+  if(varAndSlice.find("_0913_") != std::string::npos)
     toCoutVerb("Find it!");
   auto curMod = insContextStk.get_curMod();
   llvm::Value* ret;
@@ -787,13 +787,13 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
                             uint32_t bound ) {
   // Attention: varAndSlice might have a slice, a directly-assigned varAndSlice
   std::string varAndSlice = node->dest;
-  if(varAndSlice.find("\\u_div.q_mask_q [31]") != std::string::npos)
+  if(varAndSlice.find("_0913_") != std::string::npos)
     toCoutVerb("Find it!");
 
   auto curMod = insContextStk.get_curMod();
   std::shared_ptr<ModuleDynInfo_t> curDynData = get_dyn_data(curMod);
   toCoutVerb("add_constraint for: "+varAndSlice+", timeIdx: "+toStr(timeIdx));
-  if(varAndSlice == "out" ) { //&& timeIdx == 8) {
+  if(varAndSlice == "r0" && timeIdx == 40) {
     toCoutVerb("find it");
   }
 
