@@ -1052,8 +1052,9 @@ UpdateFunctionGen::case_constraint(astNode* const node, uint32_t timeIdx,
 // consecutive values
 llvm::Value* 
 UpdateFunctionGen::switch_constraint(astNode* const node, uint32_t timeIdx, 
-                                   context &c, builder &b, uint32_t bound) {
-  const auto curMod = insContextStk.get_curMod();                                   
+                                     context &c, builder &b, uint32_t bound) {
+  const auto curMod = insContextStk.get_curMod();
+  auto curFunc = insContextStk.get_func();
   std::string switchVarAndSlice = node->srcVec[0];
   std::string switchVar, switchVarSlice;
   split_slice(switchVarAndSlice, switchVar, switchVarSlice);
@@ -1095,11 +1096,17 @@ UpdateFunctionGen::switch_constraint(astNode* const node, uint32_t timeIdx,
     //llvm::GlobalValue::InternalLinkage,
     llvm::GlobalValue::LinkOnceAnyLinkage,
     llvm::ConstantArray::get(arrayType, llvm::ArrayRef<llvm::Constant*>(initList)),
-    destAndSlice+"_SWITCH_ASSIGN_ARR"
+    destAndSlice+"_SWITCH_STATEMENT_ASSIGN_ARR"
   );
 
   llvm::Value* assignArrValue = assignmentArr;
 
+  //auto bb = curFunc->getEntryBlock();
+  //auto bb = curFunc->front();
+  //auto bbList = curFunc->getBasicBlockList();
+  //auto bb = *(curFunc->begin());
+  llvm::BasicBlock &BBlock = curFunc->getEntryBlock();
+  llvm::BasicBlock *bb = &BBlock;
   llvm::GetElementPtrInst* ptr 
     = llvm::GetElementPtrInst::Create(
         nullptr,
@@ -1109,8 +1116,8 @@ UpdateFunctionGen::switch_constraint(astNode* const node, uint32_t timeIdx,
             llvm::IntegerType::get(*TheContext, switchValueWidth), 
             0, false),
           switchVarExpr },
-        llvm::Twine(destAndSlice+"_SWITCH_ASSIGN"),
-        BB
+        llvm::Twine(destAndSlice+"_SWITCH_STATEMENT_ASSIGN"),
+        bb
       );
    return b->CreateLoad(elementTy, ptr, llvm::Twine(destTimed));
 }
