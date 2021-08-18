@@ -17,7 +17,7 @@ using namespace syntaxPatterns;
 
 namespace funcExtract {
 
-void module_expr(std::string line) {
+void module_expr(std::string line, bool isMem) {
   std::smatch m;
   if (!std::regex_match(line, m, pModule))
     return;
@@ -47,6 +47,7 @@ void module_expr(std::string line) {
     }
   }
 
+  if(isMem) curMod->isMem = true;
   Context_t insCntxt(curMod->name, "", curMod, nullptr, nullptr);
   g_insContextStk.clear();
   g_insContextStk.push_back(insCntxt);

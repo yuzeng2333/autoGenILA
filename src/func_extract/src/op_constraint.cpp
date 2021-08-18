@@ -425,8 +425,8 @@ UpdateFunctionGen::two_op_constraint(astNode* const node, uint32_t timeIdx, cont
   bool isReduceOp = node->isReduceOp;
   assert(node->srcVec.size() == 2);
   std::string destAndSlice = node->dest;
-  if(destAndSlice == "_04_") {
-    toCoutVerb("find 05");
+  if(destAndSlice == "_082_" && timeIdx == 18) {
+    toCoutVerb("find it!");
   }
   std::string op1AndSlice = node->srcVec[0];
   std::string op2AndSlice = node->srcVec[1];
@@ -1406,7 +1406,7 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
   auto subMod = get_mod_info(insName, curMod);
   auto subDynData = get_dyn_data(subMod);
   std::string modName = subMod->name;
-  if(modName.find("FIFO_hls_target_p_p2_in_bounded_stencil_stream_s_shiftReg") 
+  if(modName.find("hls_target_Loop_1_proc") 
      != std::string::npos)
     toCoutVerb("Find it!");
 

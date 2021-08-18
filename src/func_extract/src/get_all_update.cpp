@@ -272,7 +272,7 @@ void get_update_function(std::string target,
       std::string prefix = pair.first;
       std::string var = pair.second;
       if(g_moduleInfoMap.find(prefix) != g_moduleInfoMap.end()) {
-        uint32_t width = get_var_slice_width_simp(target, 
+        uint32_t width = get_var_slice_width_simp(var, 
                                             g_moduleInfoMap[prefix]);
         destInfo.set_module_name(prefix);
         destInfo.set_dest_and_slice(var, width);
@@ -283,7 +283,7 @@ void get_update_function(std::string target,
         std::string modName = g_topModuleInfo->ins2modMap[prefix];
         destInfo.set_module_name(modName);
         destInfo.set_instance_name(prefix);
-        uint32_t width = get_var_slice_width_simp(target, 
+        uint32_t width = get_var_slice_width_simp(var, 
                                             g_moduleInfoMap[modName]);
         destInfo.set_dest_and_slice(var, width);
       }

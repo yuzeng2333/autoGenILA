@@ -14,7 +14,7 @@
 
 namespace funcExtract {
 
-void module_expr(std::string line);
+void module_expr(std::string line, bool isMem=false);
 
 void input_expr(std::string line);
 

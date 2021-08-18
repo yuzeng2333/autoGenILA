@@ -164,6 +164,7 @@ class ModuleInfo_t {
   std::map<std::string, uint32_t> reg2timeIdx;
   // this one is used only in ast building
   bool isFunctionedSubMod = true;  
+  bool isMem = false;
 };
 
 

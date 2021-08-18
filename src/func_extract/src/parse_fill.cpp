@@ -77,11 +77,23 @@ void parse_verilog(std::string fileName) {
     }
     //toCout(line);
 
+    // === process special comments
     // add jump table implementation for long case statement
     if(line.find("/* switch */") != std::string::npos) {
       switch_expr(input);
       continue;
     }
+
+    if(line.find("/* memory */") != std::string::npos) {
+      std::getline(input, line);
+      if(line.find("module") == std::string::npos) {
+        toCout("Error: does not find the module definition for memory: "+line);
+        abort();
+      }
+      module_expr(line, true);
+      continue;
+    }
+
 
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       case_expr(line, input);

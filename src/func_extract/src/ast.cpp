@@ -229,7 +229,7 @@ void set_stk_build_tree(std::string varName) {
 
 void build_tree_for_single_as(std::string regAndSlice) {
   toCoutVerb("### Begin build: "+regAndSlice);
-  if(regAndSlice == "arg_0_TDATA_fifo")
+  if(regAndSlice == "arg_0_V_value_V_1_data_reg")
     toCoutVerb("Find it!");
   const auto curMod = g_insContextStk.get_curMod();  
   std::string reg, regSlice;
@@ -238,7 +238,9 @@ void build_tree_for_single_as(std::string regAndSlice) {
   std::string myInsName = ask_for_my_ins_name(curMod);
   //set_target(reg);
   std::string curTgt = g_insContextStk.get_target();
-  uint32_t regWidth = get_var_slice_width_cmplx(regAndSlice);
+  // FIXME: previously used get_var_slice_width_cmplx
+  // for GB, replace with get_var_slice_width_simp
+  uint32_t regWidth = get_var_slice_width_simp(regAndSlice, curMod);
   astNode* root;
 
   if(curMod->visitedNode.find(regAndSlice) 

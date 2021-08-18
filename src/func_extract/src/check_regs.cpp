@@ -742,7 +742,8 @@ llvm::Value*
 UpdateFunctionGen::add_constraint(std::string varAndSlice, uint32_t timeIdx, context &c,
                                    std::shared_ptr<llvm::IRBuilder<>> &b,
                                    uint32_t bound ) {
-  if(varAndSlice.find("_0913_") != std::string::npos)
+  if(varAndSlice.find("ap_CS_fsm") != std::string::npos
+       && timeIdx == 17)
     toCoutVerb("Find it!");
   auto curMod = insContextStk.get_curMod();
   llvm::Value* ret;
@@ -793,7 +794,7 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
   auto curMod = insContextStk.get_curMod();
   std::shared_ptr<ModuleDynInfo_t> curDynData = get_dyn_data(curMod);
   toCoutVerb("add_constraint for: "+varAndSlice+", timeIdx: "+toStr(timeIdx));
-  if(varAndSlice == "r0" && timeIdx == 40) {
+  if(varAndSlice == "ap_CS_fsm" && timeIdx == 17) {
     toCoutVerb("find it");
   }
 
@@ -1671,7 +1672,9 @@ llvm::Value* UpdateFunctionGen::get_arg(std::string regName) {
 
 
 llvm::Value* UpdateFunctionGen::get_arg(std::string regName, llvm::Function *func) {
-  if(regName.find("hls_target_call_Loop_LB2D_buf_proc_buffer_0_value_V_ram_U.q0___#0") != std::string::npos)
+  auto curMod = insContextStk.get_curMod();
+  if(regName.find("hls_target_call_Loop_LB2D_buf_proc_buffer_0_value_V_ram_U.q0___#0") 
+       != std::string::npos)
     toCout("Find the arg!");
   for(auto it = func->arg_begin(); it != func->arg_end(); it++) {
     std::string funcName = llvm::dyn_cast<llvm::Value>(func)->getName().str();
@@ -1682,7 +1685,8 @@ llvm::Value* UpdateFunctionGen::get_arg(std::string regName, llvm::Function *fun
       toCoutVerb("Find it!!");
     if(it->getName().str() == regName) return it;
   }
-  toCout("Error: function input is not found: "+regName);
+  toCout("Error: function input is not found: "+regName
+         +", modName: "+curMod->name+", func: "+func->getName().str());
   abort();
 }
 //void check_invar_regs() {
