@@ -48,6 +48,17 @@ std::string materialize_num(std::string val) {
     }
     uint32_t width = std::stoi(m.str(1));
     uint32_t randVal;
+
+    // FIXME: special treatment for 5'hx(no 1 and 2) because
+    // the update function does not cover 1 and 2 currenly.
+    // Remove the following code when the bug is fixed.
+    if(width == 5) {
+      randVal = rand() % 29;
+      randVal += 3;
+      std::string hexVal = dec2hex(randVal);
+      return "5'h"+hexVal;
+    }
+
     if(width == 32) randVal = rand();
     else if(width > 0) randVal = rand() % (2 << (width-1));
     else randVal = rand() % 2;
@@ -74,11 +85,11 @@ std::string replace_x(std::string val) {
       uint32_t width = std::stoi(m.str(1));
       std::string hexVal;
       if(width != 5) {
-        uint32_t base = exp2(width);
+        uint32_t base = exp2(width-1);
         uint32_t newVal = rand() % base;
         hexVal = dec2hex(newVal);
       }
-      else {
+      else if(g_design == PICO){
         uint32_t newVal = rand() % 4;
         switch(newVal) {
           case 0:
@@ -94,6 +105,11 @@ std::string replace_x(std::string val) {
             hexVal = "1f";
             break;
         }
+      }
+      else if(g_design == URV) {
+        uint32_t randVal = rand() % 29;
+        randVal += 3;
+        hexVal = dec2hex(randVal);
       }
       *it = toStr(width)+"'h"+hexVal;
     }

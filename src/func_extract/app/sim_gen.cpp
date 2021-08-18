@@ -165,6 +165,18 @@ int main(int argc, char *argv[]) {
   cpp << std::endl;
 
 
+  // ======== add alias from memory array to registers
+  if(g_design == URV) {
+    for(int i = 1; i < 32; i++) {
+      // FIXME:
+      if(i == 1 || i == 2)
+      cpp << "unsigned int _u_issue_u_regfile_REGFILE_reg_r"+toStr(i)+"_q = 0;" << std::endl;
+      else
+      cpp << "unsigned int& _u_issue_u_regfile_REGFILE_reg_r"+toStr(i)+"_q = _u_issue_u_regfile_REGFILE_reg_r3_q_Arr["+toStr(i-3)+"] ;" << std::endl;
+    }
+  }
+  cpp << std::endl;
+
 
   // ========= initialization of regs
   std::set<std::string> initializedReg;
@@ -682,8 +694,9 @@ std::map<std::string, std::string> g_aes_special_func_call
 
 
 // for URV:
+// FIXME:
 void print_urv_update_mem(std::ofstream &cpp) {
-  cpp << "\n        _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[mem_d_addr_o_nxt % 64] = mem_d_data_wr_o_nxt ;\n" << std::endl;
+  cpp << "\n        _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[mem_d_addr_o_nxt % 32 - 3] = mem_d_data_wr_o_nxt ;\n" << std::endl;
 }
 
 
