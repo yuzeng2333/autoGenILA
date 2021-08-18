@@ -30,6 +30,8 @@ void to_file(std::string line) {
 
 
 std::string materialize_num(std::string val) {
+  if(val == "11'hx")
+    toCoutVerb("Find it!");
   assert(val.find("+") == std::string::npos);
   std::smatch m;
   if(!is_x(val)) {
@@ -45,7 +47,10 @@ std::string materialize_num(std::string val) {
       abort();
     }
     uint32_t width = std::stoi(m.str(1));
-    uint32_t randVal = rand() % (2 << width);
+    uint32_t randVal;
+    if(width == 32) randVal = rand();
+    else if(width > 0) randVal = rand() % (2 << (width-1));
+    else randVal = rand() % 2;
     std::string hexVal = dec2hex(randVal);
     if(width == 8 && hexVal.size() > 2) hexVal = hexVal.substr(0, 2);
     return toStr(width)+"'h"+hexVal;
@@ -198,6 +203,11 @@ int main(int argc, char *argv[]) {
   }
   else if(g_design == URV) {
     gen_rand_dmem(32, 64);
+    uint32_t idx = 0;
+    while(idx++ < InstrNum) {
+      uint32_t instrIdx = rand() % g_instrInfo.size();
+      make_instr(instrIdx);
+    }
   }
 }
 

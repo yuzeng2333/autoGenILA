@@ -22,6 +22,8 @@ using namespace taintGen;
 // manually fix errors due to longer than 64 bits
 bool g_fix_long_bit = true;
 bool g_fetch_instr_from_mem = true;
+bool g_set_dmem = false;
+uint32_t g_dmem_width = 32;
 std::string g_instrValueVar = "mem_rdata";
 std::string g_instrAddrVar = "zy_instr_addr";
 std::string g_dataAddrVar = "zy_data_addr";
@@ -69,9 +71,9 @@ int main(int argc, char *argv[]) {
   else if(g_design == URV) {
     g_fetch_instr_from_mem = true;
     g_instrValueVar = "mem_i_inst_i";
+    g_set_dmem = true;
+    g_dmem_width = 32;
   }
-
-
 
 
   g_path = argv[1];
@@ -184,6 +186,30 @@ int main(int argc, char *argv[]) {
   cpp << std::endl;
 
 
+  // ========== initialize dmem
+  if(g_set_dmem) {
+    std::string type;
+    if(g_dmem_width == 32) {
+      type = "unsigned int";
+    }
+    else if(g_dmem_width == 16) {
+      type = "unsigned short";
+    }
+    else {
+      toCout("Error: unexpected dmem width: "+toStr(g_dmem_width));
+      abort();
+    }
+    cpp << "  "+type +" dmem[64];" << std::endl;
+    uint32_t i = 0;
+    std::ifstream input(g_path+"/dmem.txt");
+    std::string line;
+    while(std::getline(input, line)) {
+      cpp << "  dmem["+toStr(i++)+"] = "+line+" ;" << std::endl;
+    }
+    cpp << std::endl;
+  }
+
+
   if(g_fetch_instr_from_mem) {
     // declare memories
     uint32_t instrNumBits = ceil(log2(instrNum));
@@ -261,6 +287,9 @@ void print_instr_calls(std::map<std::string,
   cpp << prefix+"  if(PRINT_ALL) printf( \"// instr"+toStr(idx)+": "
                +instrInfo.name+", memAddr: "+toStr(memAddr)+" \\n \");" << std::endl;
   bool instrAddrExist = true;
+
+
+  // =====  specify address for reading instructions
   if(instrInfo.instrAddr.empty()) {
     if(g_design == PICO || g_design == URV) 
       toCout(" Warning: instrAddr is not specified for: "+instrInfo.name);
@@ -279,7 +308,7 @@ void print_instr_calls(std::map<std::string,
   }
 
 
-  // ===== collect function types(return type+argument-type)
+  // ===== collect function types(return type+argument-type), and re-order functions
   for(auto pair: instrInfo.funcTypes) {
     //if(pair.first == instrInfo.dataAddr) {
     if(instrInfo.memReadAddr2TgtMap.find(pair.first) != instrInfo.memReadAddr2TgtMap.end()) {
@@ -290,7 +319,7 @@ void print_instr_calls(std::map<std::string,
     }
   }
 
-  // use to collect mapped var, its original update functions are skipped
+  // ===== use to collect mapped var, its original update functions are skipped
   std::set<std::string> remappedVar;
   bool updateMem = false;  
   for(auto pair : thisInstrFuncTypes) {
@@ -353,10 +382,14 @@ void print_instr_calls(std::map<std::string,
       }
       cpp << std::endl;
     }
+
+
+    // ==== update instrAddr
+
     if(!instrAddr.empty() && writeASV == instrAddr) {
       funcCall = func_call(g_instrAddrVar, funcName, pair.second.argTy, 
                            encoding, std::pair<std::string, uint32_t>{});
-      cpp << prefix+funcCall << std::endl;
+      cpp << prefix+g_instrAddrVar+" = "+writeASV+nxt+" ;" << std::endl;
       cpp << prefix+"  if(PRINT_ALL) printf( \""+g_instrAddrVar+": %ld\\n\", "+g_instrAddrVar+" );" << std::endl;
       cpp << std::endl;
     }
@@ -372,6 +405,14 @@ void print_instr_calls(std::map<std::string,
       cpp << prefix+"  if(PRINT_ALL) printf( \"load data addr : %d\\n\", data_byte_addr );" << std::endl;      
     }
   }
+  
+  // update dmem for store instructions of URV
+  if(g_design == URV
+     && (instrInfo.name == "sb" || instrInfo.name == "sh"
+     || instrInfo.name == "sw")) {
+    print_urv_update_mem(cpp);
+  }
+
   cpp << prefix+"  if(PRINT_ALL) printf( \"\\n\" );" << std::endl;
   cpp << std::endl;
   if(updateMem && g_design == AES) print_update_mem_call(cpp);
@@ -410,10 +451,16 @@ std::string func_call(std::string writeASV, std::string funcName,
                       std::map<std::string, std::vector<std::string>> &inputInstr,
                       std::pair<std::string, uint32_t> dataIn) {
 
-  // check if need to use special funcCall
+  // TODO: check if need to use special funcCall
   if(g_design == AES 
      && g_aes_special_func_call.find(funcName) != g_aes_special_func_call.end()) {
     return g_aes_special_func_call[funcName];
+  }
+
+  if(g_design == URV
+     && g_urv_special_func_call.find(funcName) != g_urv_special_func_call.end()) {
+    uint32_t instrValue = convert_to_single_num( inputInstr["mem_i_inst_i"].front() );
+    return g_urv_special_func_call[funcName]+toStr(instrValue)+" );";
   }
 
   std::string ret;
@@ -631,3 +678,25 @@ void print_update_mem_call(std::ofstream &cpp) {
 // key is funcName, value is function call statement
 std::map<std::string, std::string> g_aes_special_func_call 
 = { {"start__data_fifo_out0_Arr", "    start__data_fifo_out0_Arr( 0, _aes_top_0_aes_reg_ctr_i_reg_out_LOW, 0,  _aes_top_0_aes_reg_key0_i_reg_out_LOW, mem[_read_addr_fifo_out0_Arr[15]], mem[_read_addr_fifo_out0_Arr[14]], mem[_read_addr_fifo_out0_Arr[13]], mem[_read_addr_fifo_out0_Arr[12]], mem[_read_addr_fifo_out0_Arr[11]], mem[_read_addr_fifo_out0_Arr[10]], mem[_read_addr_fifo_out0_Arr[9]], mem[_read_addr_fifo_out0_Arr[8]], mem[_read_addr_fifo_out0_Arr[7]], mem[_read_addr_fifo_out0_Arr[6]], mem[_read_addr_fifo_out0_Arr[5]], mem[_read_addr_fifo_out0_Arr[4]], mem[_read_addr_fifo_out0_Arr[3]], mem[_read_addr_fifo_out0_Arr[2]], mem[_read_addr_fifo_out0_Arr[1]], mem[_read_addr_fifo_out0_Arr[0]] );\n"} };
+
+
+
+// for URV:
+void print_urv_update_mem(std::ofstream &cpp) {
+  cpp << "\n        _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[mem_d_addr_o_nxt % 64] = mem_d_data_wr_o_nxt ;\n" << std::endl;
+}
+
+
+std::map<std::string, std::string> g_urv_special_func_call
+= { {"lb__u_issue_u_regfile_REGFILE_reg_r1_q_Arr", "        lb__u_issue_u_regfile_REGFILE_reg_r1_q_Arr( _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[10], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[11], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[12], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[13], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[14], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[15], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[16], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[17], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[18], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[19], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[1], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[20], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[21], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[22], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[23], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[24], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[25], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[26], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[27], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[28], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[29], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[2], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[30], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[31], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[3], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[4], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[5], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[6], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[7], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[8], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[9], dmem[mem_d_addr_o_nxt % 64], "},
+
+{"lh__u_issue_u_regfile_REGFILE_reg_r1_q_Arr", "        lh__u_issue_u_regfile_REGFILE_reg_r1_q_Arr( _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[10], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[11], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[12], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[13], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[14], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[15], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[16], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[17], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[18], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[19], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[1], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[20], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[21], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[22], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[23], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[24], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[25], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[26], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[27], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[28], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[29], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[2], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[30], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[31], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[3], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[4], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[5], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[6], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[7], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[8], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[9], dmem[mem_d_addr_o_nxt % 64], "},
+
+
+{"lbu__u_issue_u_regfile_REGFILE_reg_r1_q_Arr", "        lbu__u_issue_u_regfile_REGFILE_reg_r1_q_Arr( _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[10], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[11], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[12], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[13], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[14], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[15], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[16], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[17], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[18], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[19], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[1], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[20], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[21], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[22], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[23], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[24], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[25], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[26], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[27], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[28], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[29], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[2], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[30], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[31], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[3], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[4], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[5], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[6], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[7], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[8], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[9], dmem[mem_d_addr_o_nxt % 64], "},
+
+{"lhu__u_issue_u_regfile_REGFILE_reg_r1_q_Arr", "        lhu__u_issue_u_regfile_REGFILE_reg_r1_q_Arr( _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[10], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[11], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[12], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[13], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[14], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[15], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[16], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[17], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[18], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[19], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[1], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[20], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[21], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[22], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[23], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[24], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[25], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[26], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[27], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[28], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[29], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[2], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[30], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[31], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[3], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[4], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[5], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[6], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[7], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[8], _u_issue_u_regfile_REGFILE_reg_r1_q_Arr[9], dmem[mem_d_addr_o_nxt % 64], "},
+
+};
+
+
