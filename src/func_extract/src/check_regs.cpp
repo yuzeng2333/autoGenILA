@@ -152,7 +152,8 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   std::string curInsName = destInfo.get_ins_name();
   auto curMod = g_moduleInfoMap[curModName];
   auto curDynData = get_dyn_data(curMod);
-  std::string insName = curInsName.empty() ? curModName : curInsName;
+  //std::string insName = curInsName.empty() ? curModName : curInsName;
+  std::string insName = curModName == g_topModule ? curModName : curInsName;
   Context_t insCntxt(insName, "", curMod, nullptr, nullptr);  
   insContextStk.clear();
   clean_all_mod_dynamic_info();
@@ -177,8 +178,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
       }
       curDynData->isFunctionedSubMod = false;
       auto parentMod = *(curMod->parentModVec.begin());
-      if(insName.empty())
-        insName = ask_parent_my_ins_name(curMod->name, parentMod);
+      insName = ask_parent_my_ins_name(curMod->name, parentMod);
       Context_t insCntxt(insName, "", curMod, parentMod, nullptr);  
       insContextStk.insert(insContextStk.begin(), insCntxt);
       curMod = parentMod;
