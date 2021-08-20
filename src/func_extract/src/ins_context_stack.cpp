@@ -8,6 +8,7 @@ void HierCtx::push_back(Context_t ctx) {
 
 
 void HierCtx::pop_back() {
+  toCout("%%% To pop out mod: "+insContextStk.back().ModInfo->name);
   insContextStk.pop_back();
 }
 

@@ -174,6 +174,7 @@ UpdateFunctionGen::input_constraint(astNode* const node, uint32_t timeIdx,
 
   // treate submodule's input separately
   const auto curMod = insContextStk.get_curMod();
+
   const auto curTgt = insContextStk.get_target();
   auto curDynData = get_dyn_data(curMod);
   std::shared_ptr<ModuleInfo_t> parentMod;
@@ -245,6 +246,8 @@ UpdateFunctionGen::input_constraint(astNode* const node, uint32_t timeIdx,
         return ret;
       }
       else {
+        if(curMod->name == "hls_target_Loop_1_proc")
+          toCoutVerb("Find it!");
         auto ret = add_constraint(node->childVec[0], timeIdx, c, b, bound);
         insContextStk.push_back(thisCntxt);
         print_context_info(thisCntxt);        
@@ -511,6 +514,9 @@ UpdateFunctionGen::two_op_constraint(astNode* const node, uint32_t timeIdx, cont
     assert(is_number(op1AndSlice) || is_number(op2AndSlice));
     assert(!is_x(op1AndSlice) && !is_x(op2AndSlice));
   }
+
+  if(curMod->name == "hls_target_Loop_1_proc")
+    toCout("Find it!");
   toCoutVerb("go to make_llvm_instr from two-op: "+op1AndSlice+", "+op2AndSlice);
   return make_llvm_instr(b, c, node->op, op1Expr, op2Expr, 
                          destWidthNum, op1WidthNum, op2WidthNum, llvm::Twine(destTimed));
@@ -550,6 +556,9 @@ UpdateFunctionGen::one_op_constraint(astNode* const node, uint32_t timeIdx,
   if(!curDynData->isFunctionedSubMod) prefix = insContextStk.get_hier_name(false);
   std::string destTimed = timed_name(prefix+destAndSlice, timeIdx);
   toCoutVerb("go to make_llvm_instr from one-op: "+op1AndSlice+", dest: "+destAndSlice);
+
+  if(curMod->name == "hls_target_Loop_1_proc")
+    toCout("Find it!");
   return make_llvm_instr(b, c, node->op, op1Expr, op1WidthNum, llvm::Twine(destTimed));
 }
 
@@ -1428,9 +1437,12 @@ UpdateFunctionGen::bbMod_constraint(astNode* const node, uint32_t timeIdx, conte
 
 llvm::Value* 
 UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, context &c, 
-                               builder &b, uint32_t bound) {
+                                     builder &b, uint32_t bound) {
   // destAndSlice is the wire, not port
   std::string destAndSlice = node->dest;
+  if(destAndSlice.find("hls_target_Loop_1_proc_U0_p_p2_in_bounded_stencil_stream_V_value_V_empty_n") 
+      != std::string::npos && timeIdx == 17)
+    toCoutVerb("Find it!");
   //std::string dest, destSlice
   //split_slice(destAndSlice, dest, destSlice);
   const auto curMod = insContextStk.get_curMod();
@@ -1462,12 +1474,14 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
 
   // If the submod is not functionalized(because it is one of the starting modules),
   // then push the new context to the stack and continue with normal constraints
-  if(!curDynData->isFunctionedSubMod) {
+  if(!subDynData->isFunctionedSubMod) {
     assert(curFunc->getName().str() == "top_function");
     Context_t insCntxt(insName, curTarget, subMod, curMod, curFunc);
     insContextStk.push_back(insCntxt);
     print_context_info(insCntxt);
-    return add_constraint(outPort, timeIdx, c, b, bound);
+    auto expr = add_constraint(outPort, timeIdx, c, b, bound);
+    insContextStk.pop_back();
+    return expr;
   }
 
 

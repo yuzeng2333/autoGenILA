@@ -46,7 +46,7 @@ std::string DELIM = "___#";
 uint32_t g_destWidth;
 bool g_seeInputs;
 uint32_t g_maxDelay = 0;
-
+uint32_t g_pushNum = 0;
 
 
 // assume ssaTable and nbTable have been filled
@@ -745,10 +745,12 @@ llvm::Value*
 UpdateFunctionGen::add_constraint(std::string varAndSlice, uint32_t timeIdx, context &c,
                                    std::shared_ptr<llvm::IRBuilder<>> &b,
                                    uint32_t bound ) {
-  if(varAndSlice.find("ap_CS_fsm") != std::string::npos
-       && timeIdx == 17)
+  if(varAndSlice.find("hls_target_linebuffer_1_U0_out_stream_V_value_V_write") != std::string::npos)
+       //&& timeIdx == 17)
     toCoutVerb("Find it!");
   auto curMod = insContextStk.get_curMod();
+  if(curMod->name == "hls_target_Loop_1_proc")
+    toCout("Find it!");
   llvm::Value* ret;
   bool retIsEmpty = true;
   std::string var, varSlice;
@@ -791,10 +793,13 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
                             uint32_t bound ) {
   // Attention: varAndSlice might have a slice, a directly-assigned varAndSlice
   std::string varAndSlice = node->dest;
-  if(varAndSlice.find("_0913_") != std::string::npos)
+  if(varAndSlice.find("hls_target_linebuffer_1_U0_out_stream_V_value_V_write") != std::string::npos)
     toCoutVerb("Find it!");
 
   auto curMod = insContextStk.get_curMod();
+  if(curMod->name == "hls_target_Loop_1_proc")
+    toCout("Find it!");
+
   std::shared_ptr<ModuleDynInfo_t> curDynData = get_dyn_data(curMod);
   toCoutVerb("add_constraint for: "+varAndSlice+", timeIdx: "+toStr(timeIdx));
   if(varAndSlice == "ap_CS_fsm" && timeIdx == 17) {
@@ -1003,7 +1008,7 @@ UpdateFunctionGen::add_ssa_constraint(astNode* const node, uint32_t timeIdx, con
       return ite_op_constraint(node, timeIdx, c, b, bound);
       break;
     default:
-      toCout("Error in add_ssa_constraint for: "+var);
+      toCout("Error no ssa_constraint found for: "+var);
       abort();
       break;
   }
@@ -1696,9 +1701,12 @@ llvm::Value* UpdateFunctionGen::get_arg(std::string regName, llvm::Function *fun
 
 
 void print_context_info(Context_t& insCntxt) {
+  g_pushNum++;
+  if(g_pushNum == 21)
+    toCoutVerb("Find it!");
   std::string modName = insCntxt.ModInfo->name;
   std::string funcName = insCntxt.Func->getName().str();
-  toCout("push mod: "+modName+", func: "+funcName);
+  toCout("push mod("+toStr(g_pushNum)+"): "+modName+", func: "+funcName);
   if(modName == "hls_target_Loop_1_proc" && funcName == "top_function")
     toCout("Find it!");
 }
