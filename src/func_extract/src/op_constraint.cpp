@@ -236,16 +236,19 @@ UpdateFunctionGen::input_constraint(astNode* const node, uint32_t timeIdx,
       if(insContextStk.get_stk_depth() == 0) {
         Context_t insCntxt(parentMod->name, target, parentMod, nullptr, thisFunc);
         insContextStk.push_back(insCntxt);
+        print_context_info(insCntxt);
         auto ret = add_constraint(node->childVec[0], timeIdx, c, b, bound);
         insContextStk.pop_back();
         insContextStk.push_back(thisCntxt);
-        toCout("~~~~~~~~~~~~~~~~ Reenter via input from :"+parentMod->name+" to :"+curMod->name);      
+        print_context_info(thisCntxt);
+        toCout("~~~~~~~~~~~~~~~~ Reenter via input from :"+parentMod->name+" to :"+curMod->name);
         return ret;
       }
       else {
         auto ret = add_constraint(node->childVec[0], timeIdx, c, b, bound);
         insContextStk.push_back(thisCntxt);
-        return ret;      
+        print_context_info(thisCntxt);        
+        return ret;
       }
     }
   }
@@ -1388,6 +1391,7 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
   //split_slice(destAndSlice, dest, destSlice);
   const auto curMod = insContextStk.get_curMod();
   const auto curFunc = insContextStk.get_func();
+  std::string curTarget = insContextStk.get_target();
   auto curDynData = get_dyn_data(curMod);
   auto pair = curMod->wire2InsPortMp[destAndSlice];
   std::string insName = pair.first;
@@ -1403,12 +1407,25 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
   }
   std::string outPort = pair.second;
 
+
   auto subMod = get_mod_info(insName, curMod);
   auto subDynData = get_dyn_data(subMod);
   std::string modName = subMod->name;
   if(modName.find("hls_target_Loop_1_proc") 
      != std::string::npos)
     toCoutVerb("Find it!");
+
+
+  // If the submod is not functionalized(because it is one of the starting modules),
+  // then push the new context to the stack and continue with normal constraints
+  if(!curDynData->isFunctionedSubMod) {
+    assert(curFunc->getName().str() == "top_function");
+    Context_t insCntxt(insName, curTarget, subMod, curMod, curFunc);
+    insContextStk.push_back(insCntxt);
+    print_context_info(insCntxt);
+    return add_constraint(outPort, timeIdx, c, b, bound);
+  }
+
 
   initialize_min_delay(subMod, outPort);
 
@@ -1475,8 +1492,6 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
 
     // the function args here is redundant. 
     // Later constraint elaboration will tell which inputs are necessary
-    // TODO: start from timeIdx is wrong
-    // TODO: start from timeIdx is wrong
     for(uint32_t i = 0; i <= bound; i++) {
       for(auto it = subMod->moduleInputs.begin(); 
             it != subMod->moduleInputs.end(); it++) {
@@ -1539,6 +1554,7 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
 
     Context_t insCntxt(insName, outPort, subMod, curMod, subFunc);
     insContextStk.push_back(insCntxt);
+    print_context_info(insCntxt);    
     // which inputs are valid should be collected in the following operation
     // the output-inputVec pairs are stored in out2InDelayMp
     std::string outPortTimed = timed_name(outPort, 0);

@@ -1253,4 +1253,5 @@ void replace_with(std::string &str, std::string subStr, std::string newSubStr) {
   }
 }
 
+
 } // end of namespace funcExtract

@@ -302,6 +302,8 @@ void clean_module_inputs();
 
 void print_mem_info(std::vector<std::string> &mems);
 
+void print_context_info(Context_t& insCntxt);
+
 } // end of namespace funcExtract
 
 #endif

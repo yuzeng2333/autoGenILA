@@ -160,6 +160,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   ext_cnt = 0;
   if(curModName == g_topModule) {
     insContextStk.push_back(insCntxt);
+    print_context_info(insCntxt);
   }
   else {
     // if starts from a sub-module, the submodule and all its parent modules
@@ -375,6 +376,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
       insContextStk.clear();
       Context_t insCntxt(insName, dest, curMod, nullptr, TheFunction);
       insContextStk.push_back(insCntxt);
+      print_context_info(insCntxt);      
       if(curMod->visitedNode.find(dest) == curMod->visitedNode.end()
           && curMod->reg2Slices.find(dest) == curMod->reg2Slices.end()) {
         toCout("Error: ast node is not found for this var: |"+dest+"|"
@@ -1689,10 +1691,14 @@ llvm::Value* UpdateFunctionGen::get_arg(std::string regName, llvm::Function *fun
          +", modName: "+curMod->name+", func: "+func->getName().str());
   abort();
 }
-//void check_invar_regs() {
-//  for(std::string reg : g_invarRegs) {
-//    
-//  }
-//}
+
+
+void print_context_info(Context_t& insCntxt) {
+  std::string modName = insCntxt.ModInfo->name;
+  std::string funcName = insCntxt.Func->getName().str();
+  toCout("push mod: "+modName+", func: "+funcName);
+  if(modName == "hls_target_Loop_1_proc" && funcName == "top_function")
+    toCout("Find it!");
+}
 
 } // end of namespace funcExtract
