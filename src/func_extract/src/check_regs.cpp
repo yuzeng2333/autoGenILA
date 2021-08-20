@@ -182,6 +182,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
       Context_t insCntxt(insName, "", curMod, parentMod, nullptr);  
       insContextStk.insert(insContextStk.begin(), insCntxt);
       curMod = parentMod;
+      curDynData = get_dyn_data(curMod);
     }
     // curMod is the top module
     Context_t insCntxt(curMod->name, "", curMod, nullptr, nullptr);
