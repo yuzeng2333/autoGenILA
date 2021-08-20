@@ -1409,6 +1409,10 @@ UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
   std::string destName = in->getName().str();
   std::string dest, destSlice;
   auto curMod = insContextStk.get_curMod();
+  auto curDynData = get_dyn_data(curMod);
+  std::string prefix = "";
+  if(!curDynData->isFunctionedSubMod) prefix = insContextStk.get_hier_name(false);
+
   if(destName.find("concat__concat___017____#4") != std::string::npos)
     toCoutVerb("Find it!");
   if(!destName.empty()) {
@@ -1438,7 +1442,7 @@ UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
     extValName = destName+" ["+toStr(high)+":"+toStr(low)+"]";
 
   if(!g_use_concat_extract_func) {
-    auto s1 = b->CreateLShr(in, low, llvm::Twine(destName+"_LSHR_"+toStr(low)+"_"));
+    auto s1 = b->CreateLShr(in, low, llvm::Twine(prefix+destName+"_LSHR_"+toStr(low)+"_"));
     llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c), 
                         llvm::Twine(extValName));
     return ret;
@@ -1532,9 +1536,6 @@ UpdateFunctionGen::concat_func(llvm::Value* val1, llvm::Value* val2,
   std::string name1 = val1->getName().str();
   std::string name2 = val2->getName().str();
   toCoutVerb("concat with "+name1+" and "+name2+", total width: "+toStr(val1Width+val2Width));  
-  if(name2 == "cct_mem_rdata_word[15:0] [15:0]_cct_mem_rdata_word[7] [7:7]_cct_mem_rdata_word[7] [7:7]325_cct_mem_rdata_word[7] [7:7]326_cct_mem_rdata_word[7] [7:7]327_cct_mem_rdata_word[7] [7:7]328_cct_mem_rdata_word[7] [7:7]329_cct_mem_rdata_word[7] [7:7]330_cct_mem_rdata_word[7] [7:7]331_cct_mem_rdata_word[7] [7:7]332_cct_mem_rdata_word[7] [7:7]333_cct_mem_rdata_word[7] [7:7]334_cct_mem_rdata_word[7] [7:7]335_cct_mem_rdata_word[7] [7:7]336_cct_mem_rdata_word[7] [7:7]337_cct_mem_rdata_word[7] [7:7]338_cct_mem_rdata_word[7] [7:7]339_cct_mem_rdata_word[7] [7:7]340_cct_mem_rdata_word[7] [7:7]341_cct_mem_rdata_word[7] [7:7]342_cct_mem_rdata_word[7] [7:7]343_cct_mem_rdata_word[7] [7:7]344_cct_mem_rdata_word[7] [7:7]345_cct_mem_rdata_word[7] [7:7]346_cct_mem_rdata_word[7] [7:7]347_mem_rdata_word[7:0] [7:0]") {
-    toCoutVerb("Find it!");
-  }
 
   std::string cctValName;
   if(g_use_simple_func_name)
