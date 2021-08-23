@@ -137,7 +137,8 @@ class ModuleInfo_t {
   std::set<std::string> moduleInputs;
   std::set<std::string> moduleOutputs;
   std::set<std::string> moduleTrueRegs;
-  std::set<std::string> moduleMems;
+  // the first of pair is line width, the second is number of lines
+  std::map<std::string, std::pair<uint32_t, uint32_t>> moduleMems;
   taintGen::VarWidth varWidth;
   // only sub-modules has the two data below
   //std::map<std::string, std::vector<astNode*>> out2LeafNodeMp;

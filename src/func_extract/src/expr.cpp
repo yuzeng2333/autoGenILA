@@ -148,11 +148,12 @@ void mem_expr(std::string line) {
   std::string var = m.str(3);
   std::string sliceTop = m.str(4);
   memDims.emplace(var, std::make_pair(slice, sliceTop));
-  curMod->moduleMems.insert(var);
   
   toCout("!!!!  Find mem: "+var);
   uint32_t varLen = get_end(sliceTop) + 1;
+  uint32_t lineWidth = get_end(slice) + 1;
   moduleMems.emplace(var, varLen);
+  curMod->moduleMems.emplace(var, std::make_pair(lineWidth, varLen));  
   assert(!is_output(var, curMod));
 
   bool insertDone;
@@ -359,7 +360,10 @@ void nb_expr(std::string line) {
   remove_two_end_space(destAndSlice);
   if(destAndSlice.back() == ']') {
     toCout("!!! Find mem: "+dest);
-    curMod->moduleMems.insert(dest);
+    if(curMod->moduleMems.find(dest) == curMod->moduleMems.end()) {
+      toCout("Error: cannot find the mem: "+dest);
+      abort();
+    }
   }
   if(!ret.second)
     toCout("Error in inserting ssaTable in nb for key: "+m.str(2));

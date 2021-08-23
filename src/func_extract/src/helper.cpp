@@ -850,7 +850,8 @@ void collect_mems(std::shared_ptr<ModuleInfo_t> &curMod,
                   std::vector<std::string> &mems) {
   if(!regPrefix.empty())
     regPrefix = regPrefix + ".";
-  for(std::string mem : curMod->moduleMems) {
+  for(auto pair : curMod->moduleMems) {
+    std::string mem = pair.first;
     mems.push_back(regPrefix+mem);
     toCout("Collect mem: "+mem);
   }
