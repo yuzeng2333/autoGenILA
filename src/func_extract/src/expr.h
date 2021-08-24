@@ -24,9 +24,13 @@ void wire_expr(std::string line);
 
 void mem_expr(std::string line);
 
+void dyn_sel_expr(std::string line);
+
 void output_expr(std::string line);
 
 void single_line_expr(std::string line);
+
+void mem_if_assign_expr(std::string line);
 
 void both_concat_expr(std::string line);
 

@@ -321,6 +321,10 @@ void add_node(std::string varAndSlice,
     // it is wire
     add_ssa_node(varToAdd, timeIdx, node);
   }
+  else if( curMod->moduleMems.find(varToAdd)
+             != curMod->moduleMems.end() ) {
+    add_mem_node(varToAdd, timeIdx, node)
+  }
   else {
     toCout("Error: cannot find assignment statement for: "+varToAdd
            +", curMod: "+curMod->name);
@@ -507,6 +511,8 @@ void add_ssa_node(std::string varAndSlice, uint32_t timeIdx, astNode* const node
     case ITE:
       add_ite_op_node(varAssign, timeIdx, node);
       break;
+    case DYNSEL:
+      add_dyn_sel_node(varAssign, timeIdx, node);
     default:
       toCout("Error in add_ssa_node for: "+var);
       break;
@@ -665,6 +671,67 @@ void add_two_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
 
   assert(!isMem(op1));
   assert(!isMem(op2));
+}
+
+
+void add_dyn_sel_node(std::string line, uint32_t timeIdx, astNode* const node) {
+
+  toCoutVerb("Process Dyn Sel for :"+line);
+  std::smatch m;
+  if ( !std::regex_match(line, m, pDynSel)) 
+    return;
+  std::string blank = m.str(1);
+  std::string destAndSlice = m.str(2);  
+  std::string src = m.str(3);
+  std::string addrAndSlice = m.str(4);
+
+  std::string dest, destSlice;
+  std::string addr, addrSlice;
+
+  split_slice(destAndSlice, dest, destSlice);
+  split_slice(addrAndSlice, addr, addrSlice);
+  remove_two_end_space(destAndSlice);
+  remove_two_end_space(addrAndSlice);
+
+  node->type = DYNSEL;
+  node->dest = destAndSlice;
+  node->op = "";
+  node->srcVec = SV{src, addrAndSlice};
+  node->isReduceOp = false;
+  node->done = false;
+
+  add_child_node(src, timeIdx, node);
+  add_child_node(addrAndSlice, timeIdx, node);
+}
+
+
+void add_mem_node(std::string var, uint32_t timeIdx, astNode* const node) {
+  std::string varAssign = curMod->ssaTable[var];
+  std::smatch m;
+  if(!std::regex_match(varAssign, m, pMemIf)) {
+    toCout("Error: do not match pMemIf: "+varAssign);
+    abort();
+  }
+  std::string ifVar = m.str(2);
+  std::string mem = m.str(3);
+  std::string addrAndSlice = m.str(4);
+  std::string srcAndSlice = m.str(5);
+
+  remove_two_end_space(ifVar);
+  remove_two_end_space(mem);
+  remove_two_end_space(addrAndSlice);
+  remove_two_end_space(srcAndSlice);
+
+  node->type = MEM_IF_ASSIGN;
+  node->dest = mem;
+  node->op = "";
+  node->srcVec = SV{ifVar, addrAndSlice, srcAndSlice};
+  node->isReduceOp = false;
+  node->done = false;
+
+  add_child_node(ifVar, timeIdx+1, node);
+  add_child_node(addrAndSlice, timeIdx+1, node);
+  add_child_node(srcAndSlice, timeIdx+1, node);
 }
 
 

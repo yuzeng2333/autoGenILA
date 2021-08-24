@@ -158,7 +158,8 @@ void mem_expr(std::string line) {
 
   bool insertDone;
   if(!slice.empty())
-    insertDone = curMod->varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+    insertDone = curMod->varWidth.var_width_insert(var, get_end(slice), 
+                                                   get_begin(slice));
   else
     insertDone = curMod->varWidth.var_width_insert(var, 0, 0);
   //if (!insertDone) {
@@ -167,6 +168,34 @@ void mem_expr(std::string line) {
   //  std::cout << "m.str(3):" + m.str(3) << std::endl;
   //}
 }
+
+
+
+// the src being selected must be memory
+void dyn_sel_expr(std::string line) {
+  const auto curMod = g_insContextStk.get_curMod();
+  std::smatch m;
+  if ( !std::regex_match(line, m, pDynSel)) 
+    return;
+  std::string blank = m.str(1);
+  std::string destAndSlice = m.str(2);  
+  std::string src = m.str(3);
+  std::string addrAndSlice = m.str(4);
+
+  if(curMod->moduleMems.find(src) == curMod->moduleMems.end()) {
+    toCout("Error: the src is not memory: "+src);
+    abort();
+  }
+  put_into_reg2Slice(destAndSlice);
+  auto ret = curMod->ssaTable.emplace(destAndSlice, line);
+  if(!ret.second) {
+    toCout("Error in inserting ssaTable in single_line for key: "+m.str(2));
+    toCout("Did you check the design.v/design.v.clean file can only have the top module??");
+    abort();
+  }
+}
+
+
 
 
 // TODO: put output into moduleWires?
@@ -393,11 +422,32 @@ void always_expr(std::string line, std::ifstream &input) {
   else if( std::regex_match(line, m, pIf) ) {
     always_if_else_expr(line, input);
   }
+  else if( std::regex_match(line, m, pMemIf) ) {
+    mem_if_assign_expr(line);
+  }
   else {
     toCout("Error in parsing nonblocking(always_expr): "+line);
     abort();
   }
 }
+
+
+void mem_if_assign_expr(std::string line) {
+  std::smatch m;
+  if ( !std::regex_match(line, m, pMemIf) ) {
+    toCout("Error: does not match pNonblockIf: "+line);
+    abort();
+  }
+  std::string destAndSlice = m.str(3);
+  put_into_reg2Slice(destAndSlice);
+  auto ret = curMod->nbTable.emplace(destAndSlice, line);
+  if(!ret.second) {
+    toCout("Error in inserting nbTable in mem_if_assign_expr for key: "
+           +m.str(2));
+    abort();
+  }
+}
+
 
 
 //always @(posedge clk)

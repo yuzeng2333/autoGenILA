@@ -80,6 +80,9 @@ void add_submod_node(std::string var, uint32_t timeIdx, astNode* const node);
 
 void add_ite_op_node(std::string line, uint32_t timeIdx, astNode* const node);
 
+void add_dyn_sel_node(std::string line, uint32_t timeIdx, astNode* const node);
+
+void add_mem_node(std::string var, uint32_t timeIdx, astNode* const node);
 
 bool check_two_op(std::string line, std::string &op, std::string &dest, std::string &op1, std::string &op2, bool &isReduceOp);
 

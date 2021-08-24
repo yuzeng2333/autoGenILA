@@ -41,7 +41,8 @@ void clear_global_vars() {
 //  }
 //  for(std::string module: modules) {
 //    bool isTop = (g_topModule.compare(module) == 0);
-//    parse_verilog_bottom_up(g_path, module, moduleReady, childModules, g_topModule, moduleInputsMap, moduleOutputsMap, moduleRFlagsMap, totalRegCnt, nextSig, doProcessPathInfo);
+//    parse_verilog_bottom_up(g_path, module, moduleReady, childModules, g_topModule, moduleInputsMap, 
+//      moduleOutputsMap, moduleRFlagsMap, totalRegCnt, nextSig, doProcessPathInfo);
 //  }
 //}
 
@@ -136,6 +137,9 @@ void parse_verilog(std::string fileName) {
       break;
     case MEM:
       mem_expr(line);
+      break;
+    case DYNSEL:
+      dyn_sel_expr(line);
       break;
     case TWO_OP:
     case ONE_OP:
