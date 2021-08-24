@@ -218,6 +218,9 @@ class UpdateFunctionGen {
     llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c, 
                                    builder &b, uint32_t bound);
 
+    llvm::Value* dyn_sel_constraint( astNode* const node, uint32_t timeIdx, context &c,  
+                                    std::shared_ptr<llvm::IRBuilder<>> &b, uint32_t bound);
+
     llvm::Value* extract_func(llvm::Value* in, uint32_t high, uint32_t low,
                           std::shared_ptr<llvm::LLVMContext> &c, 
                           std::shared_ptr<llvm::IRBuilder<>> &b, 

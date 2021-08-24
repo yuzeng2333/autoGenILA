@@ -745,7 +745,8 @@ llvm::Value*
 UpdateFunctionGen::add_constraint(std::string varAndSlice, uint32_t timeIdx, context &c,
                                    std::shared_ptr<llvm::IRBuilder<>> &b,
                                    uint32_t bound ) {
-  if(varAndSlice.find("hls_target_linebuffer_1_U0_out_stream_V_value_V_write") != std::string::npos)
+  if(varAndSlice.find("hls_target_linebuffer_1_U0_out_stream_V_value_V_write") 
+       != std::string::npos)
        //&& timeIdx == 17)
     toCoutVerb("Find it!");
   auto curMod = insContextStk.get_curMod();
@@ -770,7 +771,8 @@ UpdateFunctionGen::add_constraint(std::string varAndSlice, uint32_t timeIdx, con
         toCout("!!! Error: cannot find node for: "+varSlice);
         abort();
       }
-      llvm::Value* tmpSlice = add_constraint(curMod->visitedNode[varSlice], timeIdx, c, b, bound);
+      llvm::Value* tmpSlice = add_constraint(curMod->visitedNode[varSlice], 
+                                             timeIdx, c, b, bound);
       if(retIsEmpty) {
         retIsEmpty = false;
         ret = tmpSlice;
@@ -793,7 +795,8 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
                             uint32_t bound ) {
   // Attention: varAndSlice might have a slice, a directly-assigned varAndSlice
   std::string varAndSlice = node->dest;
-  if(varAndSlice.find("hls_target_linebuffer_1_U0_out_stream_V_value_V_write") != std::string::npos)
+  if(varAndSlice.find("hls_target_linebuffer_1_U0_out_stream_V_value_V_write") 
+       != std::string::npos)
     toCoutVerb("Find it!");
 
   auto curMod = insContextStk.get_curMod();
@@ -818,7 +821,8 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
 
   const std::string curTgt = insContextStk.get_target();
   if(curDynData->existedExpr.find(curTgt) == curDynData->existedExpr.end() )
-    curDynData->existedExpr.emplace(curTgt, std::map<std::string, llvm::Value*>() );
+    curDynData->existedExpr.emplace(curTgt, 
+                                    std::map<std::string, llvm::Value*>() );
 
   if(curDynData->existedExpr[curTgt].find(timed_name(varAndSlice, timeIdx)) 
       != curDynData->existedExpr[curTgt].end() ) {
@@ -836,7 +840,8 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
   }
   else if( is_number(varAndSlice) ) { // num_t is always 0
     //if(varAndSlice.find("x") != std::string::npos) {
-    //  toCout("!! Warning: number in add_constraint should not have x: "+varAndSlice);
+    //  toCout("!! Warning: number in add_constraint should not have x: "
+    //           +varAndSlice);
     //  //abort();
     //}
     retExpr = num_constraint(node, timeIdx, c, b);
@@ -863,11 +868,22 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
     else
       retExpr = submod_constraint(node, timeIdx, c, b, bound);
   }
+  else if( node->type == MEM_IF_ASSIGN ) {
+    // TODO
+    // TODO
+    // TODO
+
+  }
+  else if( node->type = DYNSEL ) {
+    retExpr = dyn_sel_constraint(node, timeIdx, c, b, bound);
+  }
   else { // it is wire
     retExpr = add_ssa_constraint(node, timeIdx, c, b, bound);
   }
-  curDynData->existedExpr[curTgt].emplace(timed_name(varAndSlice, timeIdx), retExpr);
-  if(curMod->name == "T" && curTgt == "out" && varAndSlice == "in" && timeIdx == 1)
+  curDynData->existedExpr[curTgt].emplace(timed_name(varAndSlice, timeIdx), 
+                                          retExpr);
+  if(curMod->name == "T" && curTgt == "out" 
+       && varAndSlice == "in" && timeIdx == 1)
     toCoutVerb("push into expr!");
   return retExpr;
 }
@@ -899,7 +915,8 @@ UpdateFunctionGen::add_nb_constraint(astNode* const node,
   //if(!g_seeInputs && timeIdx == bound) bound++;
 
   if(timeIdx < bound) {
-    toCoutVerb("Add nb constraint for: " + destAndSlice+" ------  time: "+toStr(timeIdx));
+    toCoutVerb("Add nb constraint for: " + destAndSlice
+               +" ------  time: "+toStr(timeIdx));
     if(destAndSlice == "decoder_trigger_q" && timeIdx == 3)
       toCoutVerb("Find it!");
     std::string destNext = node->srcVec.front();
@@ -907,7 +924,8 @@ UpdateFunctionGen::add_nb_constraint(astNode* const node,
     destNextExpr = add_constraint(node->childVec.front(), timeIdx+1, c, b, bound);
     return destNextExpr;
   }
-  else if ( is_clean(dest, insContextStk.get_curMod()) ){ // the bound has been reached, do not expand its assignment
+  else if ( is_clean(dest, insContextStk.get_curMod()) ){ 
+    // the bound has been reached, do not expand its assignment
     push_clean_queue(node, timeIdx);
   }
   else {
@@ -983,7 +1001,7 @@ UpdateFunctionGen::add_nb_constraint(astNode* const node,
 
 
 llvm::Value* 
-UpdateFunctionGen::add_ssa_constraint(astNode* const node, uint32_t timeIdx, context &c,  
+UpdateFunctionGen::add_ssa_constraint(astNode* const node, uint32_t timeIdx, context &c,
                                 std::shared_ptr<llvm::IRBuilder<>> &b, uint32_t bound) {
   toCoutVerb("Add ssa constraint for: " + node->dest+" ------  time: "+toStr(timeIdx));
   std::string var = node->dest;

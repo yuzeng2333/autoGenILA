@@ -1745,6 +1745,87 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
 }
 
 
+
+llvm::Value* dyn_sel_constraint( astNode* const node, uint32_t timeIdx, context &c,  
+                                std::shared_ptr<llvm::IRBuilder<>> &b, uint32_t bound){
+  toCoutVerb("dyn sel constraint for :"+node->dest);
+  auto curMod = insContextStk.get_curMod();
+  auto curFunc = insContextStk.get_func();  
+  auto curDynData = get_dyn_data(curMod);
+                                
+  std::string mem = node->srcVec[0];
+  std::string addrAndSlice = node->srcVec[1];
+  uint32_t addrHi = get_lgc_hi(addrAndSlice, curMod);
+  uint32_t addrLo = get_lgc_lo(addrAndSlice, curMod);
+  uint32_t addrWidth = get_var_slice_width_simp(addrAndSlice, curMod);
+
+  std::string addr, addrSlice;
+  split_slice(addrAndSlice, addr, addrSlice);
+
+  llvm::Value* tmpExpr = add_constraint(node->childVec[1], timeIdx, c, b, bound);
+  llvm::Value* addrExpr;
+  if(addrSlice.empty() || has_direct_assignment(addrAndSlice, curMod))
+    addrExpr = tmpExpr;
+  else
+    addrExpr = extract_func(tmpExpr, addrHi, addrLo, c, b, op1AndSlice);
+
+  if(curMod->moduleMems.find(mem) == curMod->moduleMems.end()) {
+    toCout("Error: not memory for dyn_sel: "+mem);
+    abort();
+  }
+
+  // declare a global variable for the buffer
+  uint32_t lineWidth = curMod->moduleMems[mem].first;
+  uint32_t lineNum = curMod->moduleMems[mem].second;
+
+  llvm::Type* elementTy = llvmWidth(lineWidth, c);
+  llvm::ArrayType* arrayType = llvm::ArrayType::get(elementTy, lineNum);
+  std::vector<llvm::Constant*> initList;  
+  for(uint32_t i = 0; i < lineNum; i++) {
+    initList.push_back(
+      llvm::ConstantInt::get(llvm::IntegerType::get(*c, lineWidth), 
+                             0, false)
+    );
+  }
+  llvm::GlobalVariable* memArr = new llvm::GlobalVariable(
+    *TheModule, 
+    arrayType, false, 
+    //llvm::GlobalValue::InternalLinkage,
+    llvm::GlobalValue::LinkOnceAnyLinkage,
+    llvm::ConstantArray::get(arrayType, llvm::ArrayRef<llvm::Constant*>(initList)),
+    mem+"_ARR"
+  );
+
+  llvm::Value* memValue = memArr;
+
+  llvm::BasicBlock &BBlock = curFunc->getEntryBlock();
+  llvm::BasicBlock *bb = &BBlock;
+  llvm::GetElementPtrInst* ptr 
+    = llvm::GetElementPtrInst::Create(
+        nullptr,
+        memValue,
+        std::vector<llvm::Value*>{
+          llvm::ConstantInt::get(
+            llvm::IntegerType::get(*TheContext, addrWidth), 
+            0, false),
+          addrExpr },
+        llvm::Twine(addr+"_PTR"),
+        bb
+      );
+
+  std::string prefix = "";
+  if(!curDynData->isFunctionedSubMod) prefix = insContextStk.get_hier_name(false);
+  std::string destTimed = timed_name(prefix+destAndSlice, timeIdx);  
+
+  // add updated to the memory buffer
+  //TODO
+
+  return b->CreateLoad(elementTy, ptr, llvm::Twine(destTimed));
+}
+
+
+
+
 // for two operators
 llvm::Value* 
 UpdateFunctionGen::make_llvm_instr(std::shared_ptr<llvm::IRBuilder<>> &b, 
