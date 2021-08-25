@@ -105,6 +105,7 @@ class UpdateFunctionGen {
     std::shared_ptr<llvm::IRBuilder<>> Builder;
     llvm::BasicBlock *BB;
     std::map<std::string, std::shared_ptr<ModuleDynInfo_t>> dynDataMp;
+    std::map<std::string, astNode*> memNodeMap;
 
     llvm::Value* add_constraint(std::string varAndSlice, uint32_t timeIdx, context &c,
                                 std::shared_ptr<llvm::IRBuilder<>> &b,

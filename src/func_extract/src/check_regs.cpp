@@ -154,7 +154,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   auto curDynData = get_dyn_data(curMod);
   //std::string insName = curInsName.empty() ? curModName : curInsName;
   std::string insName = curModName == g_topModule ? curModName : curInsName;
-  Context_t insCntxt(insName, "", curMod, nullptr, nullptr);  
+  Context_t insCntxt(insName, "", curMod, nullptr, nullptr);
   insContextStk.clear();
   clean_all_mod_dynamic_info();
   cct_cnt = 0; 
@@ -390,6 +390,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
         retVec.push_back(destNextExpr);
       }
     }
+
     uint32_t size = destVec.size();
     uint32_t bitNum = log2(size) + 2;
 
@@ -452,6 +453,20 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 
     Builder->CreateRet(value(retPtr));
   } // end of add vector
+
+
+  // if the top module contains memories, add the additional memory
+  // writes from lastMemReadAddr+1 to bound-1
+  if(!curMod->moduleMems.empty()) {
+  `for(auto pair : curDynData->memDynInfo) {
+      std::string mem = pair.first;
+      astNode* node = curMod->memNodeMap[mem];
+      uint32_t lastWriteTimeIdx = pair.second.lastWriteTimeIdx;
+      for(uint32_t i = lastWriteTimeIdx+1; i < bound; i++) {
+        mem_assign_constraint(node, i, TheContext, Builder, bound);
+      }
+    }
+  }
 
   llvm::verifyFunction(*TheFunction);
 
@@ -868,11 +883,13 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
     else
       retExpr = submod_constraint(node, timeIdx, c, b, bound);
   }
+  // By design, the memory assign statement is always called directly
+  // in dyn_sel_constraint(when it is read). So it should not appear in 
+  // add_constraint
   else if( node->type == MEM_IF_ASSIGN ) {
-    // TODO
-    // TODO
-    // TODO
-
+    toCout("Error: mem_if_assign should not appear in add_constraint:"
+            +node->dest);
+    abort();
   }
   else if( node->type = DYNSEL ) {
     retExpr = dyn_sel_constraint(node, timeIdx, c, b, bound);

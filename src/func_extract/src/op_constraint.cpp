@@ -1465,6 +1465,10 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
 
 
   auto subMod = get_mod_info(insName, curMod);
+  if(!subMod->moduleMems.empty()) {
+    toCout("Error: does not support memory within sub modules yet: "+subMod->name);
+    abort();
+  }
   auto subDynData = get_dyn_data(subMod);
   std::string modName = subMod->name;
   if(modName.find("hls_target_Loop_1_proc") 
@@ -1931,13 +1935,17 @@ llvm::Value* dyn_sel_constraint( astNode* const node, uint32_t timeIdx, context 
   if(!curDynData->isFunctionedSubMod) prefix = insContextStk.get_hier_name(false);
   std::string destTimed = timed_name(prefix+destAndSlice, timeIdx);  
 
+  auto childNode = node->childVec[0];
+  if(memNodeMap.find(childNode) == memNodeMap.end()) {
+    memNodeMap.emplace(mem, childNode);
+  }
+
   uint32_t lastWriteTimeIdx = curDynData.memDynInfo[mem].lastWriteTimeIdx;
   mem_assign_constraint(childNode, timeIdx, c, b, bound);
 
   llvm::Value* memLoad = b->CreateLoad(elementTy, ptr, llvm::Twine(destTimed));
 
   // add previous updated to the memory buffer
-  auto childNode = node->childVec[0];
   if(lastWriteTimeIdx > 0)
     for(uint32_t i = lastWriteTimeIdx+1; i <= timeIdx; i++) {
       mem_assign_constraint(childNode, i, c, b, bound);
@@ -1961,7 +1969,8 @@ UpdateFunctionGen::make_llvm_instr(std::shared_ptr<llvm::IRBuilder<>> &b,
     return b->CreateAnd(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
   }
   else if(op == "&&") {
-    return b->CreateAnd( b->CreateICmpNE(op1Expr, llvmInt(0, op1Width, c)), b->CreateICmpNE(op2Expr, llvmInt(0, op2Width, c)) , name);
+    return b->CreateAnd( b->CreateICmpNE(op1Expr, llvmInt(0, op1Width, c)), 
+                         b->CreateICmpNE(op2Expr, llvmInt(0, op2Width, c)) , name);
   }
   else if(op == "|") {
     return b->CreateOr(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
@@ -2032,7 +2041,8 @@ UpdateFunctionGen::make_llvm_instr(std::shared_ptr<llvm::IRBuilder<>> &b,
     if(destWidth >= op1Width)
       return b->CreateAShr(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
     else
-      return extract_func(b->CreateAShr(op1Expr, zext(op2Expr, op1Width, c, b)), destWidth-1, 0, c, b, name);
+      return extract_func(b->CreateAShr(op1Expr, zext(op2Expr, op1Width, c, b)), 
+                          destWidth-1, 0, c, b, name);
   }
   else {
     toCout("Not supported 2-op in make_llvm_instr, op is: "+op);
