@@ -1745,6 +1745,111 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
 }
 
 
+// the RAW dependency for memory is a little tricky
+void mem_assign_constraint( astNode* const node, uint32_t timeIdx, context &c,  
+                            std::shared_ptr<llvm::IRBuilder<>> &b, uint32_t bound){
+  auto curMod = insContextStk.get_curMod();
+  auto curDynData = get_dyn_data(curMod);
+  auto curFunc = insContextStk.get_func();  
+
+  std::string mem = node->dest;
+  if(curDynData.memDynInfo.find(mem) == curDynData.memDynInfo.end()) {
+    toCout("Error: the mem is not yet defined: "+mem);
+    abort();
+  }
+  else {
+    uint32_t lastIdx = curDynData.memDynInfo[mem].lastWriteTimeIdx;
+    if(timeIdx > lastIdx)
+      curDynData.memDynInfo[mem].lastWriteTimeIdx = timeIdx;
+  }
+
+  assert(node->type == MEM_IF_ASSIGN);
+  std::string ifVarAndSlice = node->srcVec[0]; 
+  std::string addrAndSlice = node->srcVec[1];
+  std::string srcAndSlice = node->srcVec[2];
+
+  std::string ifVar, ifVarSlice;
+  std::string addr, addrSlice;
+  std::string src, srcSlice;
+  split_slice(ifVarAndSlice, ifVar, ifVarSlice);
+  split_slice(addrAndSlice, addr, addrSlice);
+  split_slice(srcAndSlice, src, srcSlice);
+  
+  uint32_t addrWidth = get_var_slice_width_simp(addrAndSlice, curMod);
+  uint32_t ifVarHi = get_lgc_hi(ifVarAndSlice, curMod);
+  uint32_t ifVarLo = get_lgc_lo(ifVarAndSlice, curMod);
+  uint32_t addrHi = get_lgc_hi(addrAndSlice, curMod);
+  uint32_t addrLo = get_lgc_lo(addrAndSlice, curMod);
+  uint32_t srcHi = get_lgc_hi(srcAndSlice, curMod);
+  uint32_t srcLo = get_lgc_lo(srcAndSlice, curMod);
+
+  llvm::Value* tmpExpr = add_constraint(node->childVec[0], timeIdx+1, c, b, bound);
+  llvm::Value* ifVarExpr;
+  if(ifVarSlice.empty() || has_direct_assignment(ifVarAndSlice, curMod))
+    ifVarExpr = tmpExpr;
+  else
+    ifVarExpr = extract_func(tmpExpr, ifVarHi, ifVarLo, c, b, ifVarAndSlice);
+
+  llvm::Value* addrExpr;
+  tmpExpr = add_constraint(node->childVec[1], timeIdx+1, c, b, bound);
+  if(addrSlice.empty() || has_direct_assignment(addrAndSlice, curMod))
+    addrExpr = tmpExpr;
+  else
+    addrExpr = extract_func(tmpExpr, addrHi, addrLo, c, b, addrAndSlice);
+
+  llvm::Value* srcExpr;
+  tmpExpr = add_constraint(node->childVec[2], timeIdx+1, c, b, bound);
+  if(srcSlice.empty() || has_direct_assignment(srcAndSlice, curMod))
+    srcExpr = tmpExpr;
+  else
+    srcExpr = extract_func(tmpExpr, srcHi, srcLo, c, b, srcAndSlice);
+
+
+  // add store instruction. It should be skipped if ifVar is false
+  llvm::Value* mem = curDynData.memDynInfo[mem].memValue;
+
+  llvm::BasicBlock* BB = addrExpr->getParent();
+  llvm::GetElementPtrInst* ptr 
+  = llvm::GetElementPtrInst::Create(
+      nullptr,
+      mem,
+      std::vector<llvm::Value*>{
+        llvm::ConstantInt::get(
+          llvm::IntegerType::get(*TheContext, addrWidth), 
+          0, false),
+          addrExpr},
+      llvm::Twine(addrAndSlice->getName().str()+"_PTR"+DELIM+toStr(timeIdx)),
+      BB
+    );
+
+  llvm::StoreInst* store = b->CreateStore(srcExpr, value(ptr));
+  llvm::Instruction* storeInst = store;
+ 
+  auto storeBB = BB->splitBasicBlock(
+                   storeInst, 
+                   Twine("MemStore_"+mem->getName().str()+"_"+addr->getName().str())
+                 );
+
+  // if we use select, then an extra memory read is needed. That is not good.
+  // So I choose to use branch here.
+  llvm::BasicBlock* newBB
+    = llvm::BasicBlock::Create(
+         c, Twine("AfterStore_"+mem->getName().str()+"_"+addr->getName().str()), 
+         curFunc
+       );
+  
+  // add conditional branch at the old BB
+  llvm::BranchInst::Create(storeBB, newBB, ifVarExpr, BB);
+
+  // add jump from storeBB to newBB
+  llvm::BranchInst::Create(newBB, storeBB);
+
+  // change insert point of b to the newBB
+  b->setInsertPoint(newBB);
+}
+
+
+
 
 llvm::Value* dyn_sel_constraint( astNode* const node, uint32_t timeIdx, context &c,  
                                 std::shared_ptr<llvm::IRBuilder<>> &b, uint32_t bound){
@@ -1787,16 +1892,25 @@ llvm::Value* dyn_sel_constraint( astNode* const node, uint32_t timeIdx, context 
                              0, false)
     );
   }
-  llvm::GlobalVariable* memArr = new llvm::GlobalVariable(
-    *TheModule, 
-    arrayType, false, 
-    //llvm::GlobalValue::InternalLinkage,
-    llvm::GlobalValue::LinkOnceAnyLinkage,
-    llvm::ConstantArray::get(arrayType, llvm::ArrayRef<llvm::Constant*>(initList)),
-    mem+"_ARR"
-  );
 
-  llvm::Value* memValue = memArr;
+  llvm::GlobalVariable* memArr;
+  llvm::Value* memValue;  
+  if(curDynData.memDynInfo.find(mem) == curDynData.memDynInfo.end()) {
+    llvm::GlobalVariable* memArr = new llvm::GlobalVariable(
+      *TheModule, 
+      arrayType, false, 
+      //llvm::GlobalValue::InternalLinkage,
+      llvm::GlobalValue::LinkOnceAnyLinkage,
+      llvm::ConstantArray::get(arrayType, llvm::ArrayRef<llvm::Constant*>(initList)),
+      mem+"_ARR"
+    );
+    memValue = memArr;
+    // the first time the item is initialized
+    curDynData.memDynInfo.emplace(mem, MemDynInfo_t{0, memValue});
+  }
+  else {
+    memValue = curDynData.memDynInfo[mem].memValue;
+  }
 
   llvm::BasicBlock &BBlock = curFunc->getEntryBlock();
   llvm::BasicBlock *bb = &BBlock;
@@ -1809,7 +1923,7 @@ llvm::Value* dyn_sel_constraint( astNode* const node, uint32_t timeIdx, context 
             llvm::IntegerType::get(*TheContext, addrWidth), 
             0, false),
           addrExpr },
-        llvm::Twine(addr+"_PTR"),
+        llvm::Twine(addr+"_PTR"+DELIM+toStr(timeIdx)),
         bb
       );
 
@@ -1817,10 +1931,19 @@ llvm::Value* dyn_sel_constraint( astNode* const node, uint32_t timeIdx, context 
   if(!curDynData->isFunctionedSubMod) prefix = insContextStk.get_hier_name(false);
   std::string destTimed = timed_name(prefix+destAndSlice, timeIdx);  
 
-  // add updated to the memory buffer
-  //TODO
+  uint32_t lastWriteTimeIdx = curDynData.memDynInfo[mem].lastWriteTimeIdx;
+  mem_assign_constraint(childNode, timeIdx, c, b, bound);
 
-  return b->CreateLoad(elementTy, ptr, llvm::Twine(destTimed));
+  llvm::Value* memLoad = b->CreateLoad(elementTy, ptr, llvm::Twine(destTimed));
+
+  // add previous updated to the memory buffer
+  auto childNode = node->childVec[0];
+  if(lastWriteTimeIdx > 0)
+    for(uint32_t i = lastWriteTimeIdx+1; i <= timeIdx; i++) {
+      mem_assign_constraint(childNode, i, c, b, bound);
+    }
+
+  return memLoad;
 }
 
 

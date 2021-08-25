@@ -51,6 +51,12 @@ class DestInfo {
 };
 
 
+struct MemDynInfo_t {
+  uint32_t lastWriteTimeIdx;
+  llvm::Value* memValue;
+};
+
+
 struct ModuleDynInfo_t {
   /// data for making ir
   /// These data are different for making different irs
@@ -65,6 +71,8 @@ struct ModuleDynInfo_t {
   bool isFunctionedSubMod = true;
 
   void clean_ir_data();  
+
+  std::map<std::string, uint32_t> memDynInfo;
 };
 
 
@@ -220,6 +228,9 @@ class UpdateFunctionGen {
 
     llvm::Value* dyn_sel_constraint( astNode* const node, uint32_t timeIdx, context &c,  
                                     std::shared_ptr<llvm::IRBuilder<>> &b, uint32_t bound);
+
+    void mem_assign_constraint( astNode* const node, uint32_t timeIdx, context &c,  
+                                std::shared_ptr<llvm::IRBuilder<>> &b, uint32_t bound);
 
     llvm::Value* extract_func(llvm::Value* in, uint32_t high, uint32_t low,
                           std::shared_ptr<llvm::LLVMContext> &c, 
