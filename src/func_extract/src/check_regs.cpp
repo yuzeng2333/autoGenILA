@@ -285,7 +285,9 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   for(auto it = insContextStk.begin();
       it != insContextStk.end(); it++) {
     it->Target = destName;
-    it->Func = topFunction;
+    // FIXME: change topFunction to TheFunction
+    //it->Func = topFunction;
+    it->Func = TheFunction;
     initialize_min_delay(it->ModInfo, destName);
   }
 
@@ -458,9 +460,9 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   // if the top module contains memories, add the additional memory
   // writes from lastMemReadAddr+1 to bound-1
   if(!curMod->moduleMems.empty()) {
-  `for(auto pair : curDynData->memDynInfo) {
+    for(auto pair : curDynData->memDynInfo) {
       std::string mem = pair.first;
-      astNode* node = curMod->memNodeMap[mem];
+      astNode* node = memNodeMap[mem];
       uint32_t lastWriteTimeIdx = pair.second.lastWriteTimeIdx;
       for(uint32_t i = lastWriteTimeIdx+1; i < bound; i++) {
         mem_assign_constraint(node, i, TheContext, Builder, bound);
@@ -891,7 +893,7 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
             +node->dest);
     abort();
   }
-  else if( node->type = DYNSEL ) {
+  else if( node->type == DYNSEL ) {
     retExpr = dyn_sel_constraint(node, timeIdx, c, b, bound);
   }
   else { // it is wire
@@ -1740,7 +1742,12 @@ void print_context_info(Context_t& insCntxt) {
   if(g_pushNum == 21)
     toCoutVerb("Find it!");
   std::string modName = insCntxt.ModInfo->name;
-  std::string funcName = insCntxt.Func->getName().str();
+  std::string funcName;
+  if(insCntxt.Func != nullptr)
+    funcName = insCntxt.Func->getName().str();
+  else
+    funcName = "Not set yet!";
+
   toCout("push mod("+toStr(g_pushNum)+"): "+modName+", func: "+funcName);
   if(modName == "hls_target_Loop_1_proc" && funcName == "top_function")
     toCout("Find it!");

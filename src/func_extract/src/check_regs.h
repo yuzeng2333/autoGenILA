@@ -72,7 +72,7 @@ struct ModuleDynInfo_t {
 
   void clean_ir_data();  
 
-  std::map<std::string, uint32_t> memDynInfo;
+  std::map<std::string, MemDynInfo_t> memDynInfo;
 };
 
 

@@ -323,7 +323,7 @@ void add_node(std::string varAndSlice,
   }
   else if( curMod->moduleMems.find(varToAdd)
              != curMod->moduleMems.end() ) {
-    add_mem_node(varToAdd, timeIdx, node)
+    add_mem_node(varToAdd, timeIdx, node);
   }
   else {
     toCout("Error: cannot find assignment statement for: "+varToAdd
@@ -706,7 +706,12 @@ void add_dyn_sel_node(std::string line, uint32_t timeIdx, astNode* const node) {
 
 
 void add_mem_node(std::string var, uint32_t timeIdx, astNode* const node) {
-  std::string varAssign = curMod->ssaTable[var];
+  const auto curMod = g_insContextStk.get_curMod();
+  if(curMod->name != g_topModule) {
+    toCout("Error: found memory in submodules: "+curMod->name);
+    abort();
+  }
+  std::string varAssign = curMod->nbTable[var];
   std::smatch m;
   if(!std::regex_match(varAssign, m, pMemIf)) {
     toCout("Error: do not match pMemIf: "+varAssign);

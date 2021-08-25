@@ -387,7 +387,7 @@ void nb_expr(std::string line) {
   uint32_t width = g_insContextStk.get_var_slice_width_simp(dest);
   g_allRegs.emplace(dest, width);
   remove_two_end_space(destAndSlice);
-  if(destAndSlice.back() == ']') {
+  if(destAndSlice.front() != '\\' && destAndSlice.back() == ']') {
     toCout("!!! Find mem: "+dest);
     if(curMod->moduleMems.find(dest) == curMod->moduleMems.end()) {
       toCout("Error: cannot find the mem: "+dest);
@@ -433,6 +433,7 @@ void always_expr(std::string line, std::ifstream &input) {
 
 
 void mem_if_assign_expr(std::string line) {
+  const auto curMod = g_insContextStk.get_curMod();
   std::smatch m;
   if ( !std::regex_match(line, m, pMemIf) ) {
     toCout("Error: does not match pNonblockIf: "+line);
