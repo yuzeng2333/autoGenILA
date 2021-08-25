@@ -1837,14 +1837,18 @@ void UpdateFunctionGen::mem_assign_constraint(
       BB
     );
 
-  llvm::StoreInst* store = b->CreateStore(srcExpr, llvm::dyn_cast<llvm::Value>(ptr));
-  llvm::Instruction* storeInst = store;
- 
-  auto storeBB = BB->splitBasicBlock(
-                   storeInst, 
-                   llvm::Twine("MemStore_"+mem+"_"+addr)
-                 );
 
+  // we cannot use splitBasicBlock here because the BB is degenerated: no terminator
+  // So we make a new BB for the store instruction.
+  llvm::BasicBlock* storeBB
+    = llvm::BasicBlock::Create(
+         *c, llvm::Twine("MemStore_"+mem+"_"+addr), 
+         curFunc
+       );
+
+  b->SetInsertPoint(storeBB);
+  llvm::StoreInst* store = b->CreateStore(srcExpr, llvm::dyn_cast<llvm::Value>(ptr));
+ 
   // if we use select, then an extra memory read is needed. That is not good.
   // So I choose to use branch here.
   llvm::BasicBlock* newBB
