@@ -293,9 +293,15 @@ void read_in_instructions(std::string fileName) {
                 std::string asName = line.substr(0, pos);
                 std::string subLine = line.substr(0, pos);
                 if(subLine.find("(skip)") != std::string::npos) {
-                  asName = line.substr(0, pos-6);
+                  size_t bracePos = subLine.find("(skip)");
+                  asName = line.substr(0, bracePos);
                   g_instrInfo.back().skipWriteASV.insert(asName);                
                 }
+                // TODO
+                // even if no "skip" is found, still treat it as a skipWriteASV
+                //else {
+
+                //}
                 g_instrInfo.back().writeASV.insert(std::make_pair(uint32_t(std::stoi(cycleCnt)), 
                                                                   asName));
                 moduleAs.insert(asName);

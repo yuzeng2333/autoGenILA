@@ -1096,6 +1096,12 @@ bool check_two_op(std::string line,
     op = "&&";
     isReduceOp = true;
   }
+  else if( std::regex_match(line, m, pDvd) ) {
+    op = "/";
+  }
+  else if( std::regex_match(line, m, pMod) ) {
+    op = "%";
+  }
   else if ( std::regex_match(line, m, pOr)) {
     op = "||";
   }

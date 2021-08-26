@@ -2076,6 +2076,13 @@ UpdateFunctionGen::make_llvm_instr(std::shared_ptr<llvm::IRBuilder<>> &b,
   else if(op == "*") {
     return b->CreateMul(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
   }
+  else if(op == "/") {
+    toCout("Error: not support divide operation yet!");
+    abort();
+  }
+  else if(op == "%") {
+    return b->CreateURem(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
+  }
   else if(op == "<<") {
     return b->CreateShl(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
   }
