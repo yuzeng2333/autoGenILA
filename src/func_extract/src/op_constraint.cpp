@@ -886,33 +886,33 @@ UpdateFunctionGen::ite_op_constraint(astNode* const node, uint32_t timeIdx, cont
 
 
   // early pruning: if cond is constant, then ignore the un-selected branch
-  if(llvm::isa<llvm::ConstantInt>(condExpr)) {
-    auto constant = llvm::dyn_cast<llvm::ConstantInt>(condExpr);
-    uint32_t value = constant->getZExtValue();
-    if(value == 0) {
-      llvm::Value* op2Expr;
-      if(!op2Slice.empty()) 
-        op2Expr = extract_func(add_constraint(node->childVec[2], timeIdx, c, b, bound), 
-                               op2Hi, op2Lo, c, b, op2AndSlice);
-      else
-        op2Expr = add_constraint(node->childVec[2], timeIdx, c, b, bound);
-      return op2Expr;
-    }
-    else if(value == 1) {
-      llvm::Value* op1Expr;
-      if(!op1Slice.empty()) 
-        op1Expr = extract_func(add_constraint(node->childVec[1], timeIdx, c, b, bound), 
-                               op1Hi, op1Lo, c, b, op1AndSlice);
-      else
-        op1Expr = add_constraint(node->childVec[1], timeIdx, c, b, bound);
-      return op1Expr;
-    }
-    else {
-      toCout("Error: the conditional value is neither 0 or 1: "
-              +condAndSlice+", value: "+toStr(value));
-      abort();
-    }
-  }
+  //if(llvm::isa<llvm::ConstantInt>(condExpr)) {
+  //  auto constant = llvm::dyn_cast<llvm::ConstantInt>(condExpr);
+  //  uint32_t value = constant->getZExtValue();
+  //  if(value == 0) {
+  //    llvm::Value* op2Expr;
+  //    if(!op2Slice.empty()) 
+  //      op2Expr = extract_func(add_constraint(node->childVec[2], timeIdx, c, b, bound), 
+  //                             op2Hi, op2Lo, c, b, op2AndSlice);
+  //    else
+  //      op2Expr = add_constraint(node->childVec[2], timeIdx, c, b, bound);
+  //    return op2Expr;
+  //  }
+  //  else if(value == 1) {
+  //    llvm::Value* op1Expr;
+  //    if(!op1Slice.empty()) 
+  //      op1Expr = extract_func(add_constraint(node->childVec[1], timeIdx, c, b, bound), 
+  //                             op1Hi, op1Lo, c, b, op1AndSlice);
+  //    else
+  //      op1Expr = add_constraint(node->childVec[1], timeIdx, c, b, bound);
+  //    return op1Expr;
+  //  }
+  //  else {
+  //    toCout("Error: the conditional value is neither 0 or 1: "
+  //            +condAndSlice+", value: "+toStr(value));
+  //    abort();
+  //  }
+  //}
 
 
 
@@ -1171,8 +1171,8 @@ UpdateFunctionGen::switch_constraint(astNode* const node, uint32_t timeIdx,
   //auto bb = curFunc->front();
   //auto bbList = curFunc->getBasicBlockList();
   //auto bb = *(curFunc->begin());
-  llvm::BasicBlock &BBlock = curFunc->getEntryBlock();
-  llvm::BasicBlock *bb = &BBlock;
+  //llvm::BasicBlock &BBlock = curFunc->getEntryBlock();
+  llvm::BasicBlock *bb = b->GetInsertBlock();
   llvm::GetElementPtrInst* ptr 
     = llvm::GetElementPtrInst::Create(
         nullptr,
@@ -1833,15 +1833,15 @@ void UpdateFunctionGen::mem_assign_constraint(
   // add store instruction. It should be skipped if ifVar is false
   llvm::Value* memValue = curDynData->memDynInfo[mem].memValue;
 
-  llvm::BasicBlock* BB;
-  if(llvm::isa<llvm::Instruction>(addrExpr)) {
-    llvm::Instruction* addrInst = llvm::dyn_cast<llvm::Instruction>(addrExpr);
-    BB = addrInst->getParent();
-  }
-  else {
-    llvm::BasicBlock &BBlock = curFunc->getEntryBlock();
-    BB = &BBlock;
-  }
+  llvm::BasicBlock* BB = b->GetInsertBlock();
+  //if(llvm::isa<llvm::Instruction>(addrExpr)) {
+  //  llvm::Instruction* addrInst = llvm::dyn_cast<llvm::Instruction>(addrExpr);
+  //  BB = addrInst->getParent();
+  //}
+  //else {
+  //  llvm::BasicBlock &BBlock = curFunc->getEntryBlock();
+  //  BB = &BBlock;
+  //}
 
   llvm::GetElementPtrInst* ptr 
   = llvm::GetElementPtrInst::Create(
@@ -1954,15 +1954,15 @@ UpdateFunctionGen::dyn_sel_constraint( astNode* const node, uint32_t timeIdx, co
   }
 
   //llvm::BasicBlock &BBlock = curFunc->getEntryBlock();
-  llvm::BasicBlock* bb;
-  if(llvm::isa<llvm::Instruction>(addrExpr)) {
-    llvm::Instruction* addrInst = llvm::dyn_cast<llvm::Instruction>(addrExpr);
-    bb = addrInst->getParent();
-  }
-  else {
-    llvm::BasicBlock &BBlock = curFunc->getEntryBlock();
-    bb = &BBlock;
-  }
+  llvm::BasicBlock* bb = b->GetInsertBlock();
+  //if(llvm::isa<llvm::Instruction>(addrExpr)) {
+  //  llvm::Instruction* addrInst = llvm::dyn_cast<llvm::Instruction>(addrExpr);
+  //  bb = addrInst->getParent();
+  //}
+  //else {
+  //  llvm::BasicBlock &BBlock = curFunc->getEntryBlock();
+  //  bb = &BBlock;
+  //}
   llvm::GetElementPtrInst* ptr 
     = llvm::GetElementPtrInst::Create(
         nullptr,

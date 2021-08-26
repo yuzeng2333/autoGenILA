@@ -465,7 +465,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
       astNode* node = memNodeMap[mem];
       uint32_t lastWriteTimeIdx = pair.second.lastWriteTimeIdx;
       for(uint32_t i = lastWriteTimeIdx+1; i < bound; i++) {
-        mem_assign_constraint(node, i, TheContext, Builder, bound);
+        //mem_assign_constraint(node, i, TheContext, Builder, bound);
       }
     }
   }
