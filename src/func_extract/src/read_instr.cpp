@@ -232,7 +232,9 @@ void read_in_instructions(std::string fileName) {
               firstWord = false;
             auto pos = line.find("=");
             std::string signalName = line.substr(0, pos-1);
+            remove_two_end_space(signalName);
             std::string encoding = line.substr(pos+2);
+            remove_two_end_space(encoding);
             if(!check_input_val(encoding)) {
               toCout("Encoding is not x or number[1], line is: "+line);
               abort();
@@ -258,7 +260,9 @@ void read_in_instructions(std::string fileName) {
           {
             auto pos = line.find("=");
             std::string signalName = line.substr(0, pos-1);
+            remove_two_end_space(signalName);            
             std::string encoding = line.substr(pos+2);
+            remove_two_end_space(encoding);            
             if(!check_input_val(encoding)) {
               toCout("Encoding is not x or number[2], line is: "+line);
               abort();
@@ -350,7 +354,9 @@ void read_in_instructions(std::string fileName) {
           {
             auto pos = line.find("=");
             std::string signalName = line.substr(0, pos-1);
+            remove_two_end_space(signalName);            
             std::string encoding = line.substr(pos+2);
+            remove_two_end_space(encoding);            
             if(!check_input_val(encoding)) {
               toCout("Encoding is not x or number[3], line is: "+line);
               abort();
@@ -363,7 +369,9 @@ void read_in_instructions(std::string fileName) {
           {
             auto pos = line.find("=");
             std::string signalName = line.substr(0, pos-1);
+            remove_two_end_space(signalName);            
             std::string encoding = line.substr(pos+2);
+            remove_two_end_space(encoding);
             if(!check_input_val(encoding)) {
               toCout("Encoding is not x or number[4], line is: "+line);
               abort();

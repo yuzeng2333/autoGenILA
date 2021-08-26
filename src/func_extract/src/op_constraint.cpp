@@ -167,7 +167,7 @@ UpdateFunctionGen::input_constraint(astNode* const node, uint32_t timeIdx,
   if(dest == "mem_rdata" ) {
     toCoutVerb("Find it!");
   }
-  if(dest == "addr" && timeIdx == 4)
+  if(dest == "io_vme_rd_2_cmd_ready" && timeIdx == 3)
     toCoutVerb("Find it!");
   toCoutVerb("See input:"+timed_name(dest, timeIdx));
   std::string destTimed = timed_name(dest, timeIdx);
