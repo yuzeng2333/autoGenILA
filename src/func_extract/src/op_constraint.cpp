@@ -874,12 +874,7 @@ UpdateFunctionGen::ite_op_constraint(astNode* const node, uint32_t timeIdx, cont
   uint32_t condWidth = get_var_slice_width_simp(condAndSlice, curMod);
   destWidth = std::to_string(destWidthNum);
 
-  bool op1IsReadRoot = is_root(op1AndSlice) && is_read_asv(op1AndSlice, curMod);
-  bool op2IsReadRoot = is_root(op2AndSlice) && is_read_asv(op2AndSlice, curMod);
 
-  bool op1IsNum = is_number(op1);
-  bool op2IsNum = is_number(op2);
- 
   llvm::Value* destExpr;
   llvm::Value* condExpr;
   
@@ -888,6 +883,38 @@ UpdateFunctionGen::ite_op_constraint(astNode* const node, uint32_t timeIdx, cont
     condExpr = tmpExpr;
   else
     condExpr = extract_func(tmpExpr, condHi, condLo, c, b, condAndSlice);
+
+
+  // early pruning: if cond is constant, then ignore the un-selected branch
+  if(llvm::isa<llvm::ConstantInt>(condExpr)) {
+    auto constant = llvm::dyn_cast<llvm::ConstantInt>(condExpr);
+    uint32_t value = constant->getZExtValue();
+    if(value == 0) {
+      llvm::Value* op2Expr;
+      if(!op2Slice.empty()) 
+        op2Expr = extract_func(add_constraint(node->childVec[2], timeIdx, c, b, bound), 
+                               op2Hi, op2Lo, c, b, op2AndSlice);
+      else
+        op2Expr = add_constraint(node->childVec[2], timeIdx, c, b, bound);
+      return op2Expr;
+    }
+    else if(value == 1) {
+      llvm::Value* op1Expr;
+      if(!op1Slice.empty()) 
+        op1Expr = extract_func(add_constraint(node->childVec[1], timeIdx, c, b, bound), 
+                               op1Hi, op1Lo, c, b, op1AndSlice);
+      else
+        op1Expr = add_constraint(node->childVec[1], timeIdx, c, b, bound);
+      return op1Expr;
+    }
+    else {
+      toCout("Error: the conditional value is neither 0 or 1: "
+              +condAndSlice+", value: "+toStr(value));
+      abort();
+    }
+  }
+
+
 
   uint32_t condValueWidth = get_value_width(condExpr);
   toCoutVerb("Width of cond var: "+toStr(condValueWidth));
@@ -915,14 +942,6 @@ UpdateFunctionGen::ite_op_constraint(astNode* const node, uint32_t timeIdx, cont
   else
     op2Expr = add_constraint(node->childVec[2], timeIdx, c, b, bound);
 
-  //const char *ret = llvm::SelectInst::areInvalidOperands(iteCond, op1Expr, op2Expr);
-  //uint32_t ret = llvm::SelectInst::areInvalidOperands(iteCond, op1Expr, op2Expr);
-  //toCout("ret value is:");
-  //printf("%c", *ret);
-  //assert(llvm::SelectInst::areInvalidOperands(iteCond, op1Expr, op2Expr) == 0);
-  //std::string retStr(ret);
-  //if(ret == 0)
-  //  toCout("ret is 0");
 
   return b->CreateSelect(iteCond, op1Expr, op2Expr, llvm::Twine(destTimed));
 }
@@ -1750,7 +1769,7 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
 
 
 // the RAW dependency for memory is a little tricky
-void UpdateFunctionGen::mem_assign_constraint( 
+void UpdateFunctionGen::mem_assign_constraint(
                           astNode* const node, uint32_t timeIdx, context &c,  
                           std::shared_ptr<llvm::IRBuilder<>> &b, uint32_t bound
                         ){
@@ -1841,7 +1860,7 @@ void UpdateFunctionGen::mem_assign_constraint(
   // we cannot use splitBasicBlock here because the BB is degenerated: no terminator
   // So we make a new BB for the store instruction.
   llvm::BasicBlock* storeBB
-    = llvm::BasicBlock::Create(
+    = llvm::BasicBlock::Create (
          *c, llvm::Twine("MemStore_"+mem+"_"+addr), 
          curFunc
        );
@@ -1852,7 +1871,7 @@ void UpdateFunctionGen::mem_assign_constraint(
   // if we use select, then an extra memory read is needed. That is not good.
   // So I choose to use branch here.
   llvm::BasicBlock* newBB
-    = llvm::BasicBlock::Create(
+    = llvm::BasicBlock::Create (
          *c, llvm::Twine("AfterStore_"+mem+"_"+addr), 
          curFunc
        );

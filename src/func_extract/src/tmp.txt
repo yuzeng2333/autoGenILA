@@ -1,291 +1,361 @@
-Continuing.
+add_constraint for: out, timeIdx: 0
+Add nb constraint for: out ------  time: 0
+add_constraint for: _03_, timeIdx: 1
+Add ssa constraint for: _03_ ------  time: 1
+Ite op constraint for :_03_
+add_constraint for: rst, timeIdx: 1
+See input:rst___#1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give 0 to rst___#1
+Width of cond var: 1
+add_constraint for: 4'b0000, timeIdx: 1
+add_constraint for: _12_, timeIdx: 1
+Add ssa constraint for: _12_ ------  time: 1
+Ite op constraint for :_12_
+add_constraint for: wr, timeIdx: 1
+See input:wr___#1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give 0 to wr___#1
+Width of cond var: 1
+add_constraint for: out, timeIdx: 1
+Add nb constraint for: out ------  time: 1
+add_constraint for: _03_, timeIdx: 2
+Add ssa constraint for: _03_ ------  time: 2
+Ite op constraint for :_03_
+add_constraint for: rst, timeIdx: 2
+See input:rst___#2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give 0 to rst___#2
+Width of cond var: 1
+add_constraint for: 4'b0000, timeIdx: 2
+add_constraint for: _12_, timeIdx: 2
+Add ssa constraint for: _12_ ------  time: 2
+Ite op constraint for :_12_
+add_constraint for: wr, timeIdx: 2
+See input:wr___#2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give 0 to wr___#2
+Width of cond var: 1
+add_constraint for: out, timeIdx: 2
+Add nb constraint for: out ------  time: 2
+add_constraint for: _03_, timeIdx: 3
+Add ssa constraint for: _03_ ------  time: 3
+Ite op constraint for :_03_
+add_constraint for: rst, timeIdx: 3
+See input:rst___#3
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give 0 to rst___#3
+Width of cond var: 1
+add_constraint for: 4'b0000, timeIdx: 3
+add_constraint for: _12_, timeIdx: 3
+Add ssa constraint for: _12_ ------  time: 3
+Ite op constraint for :_12_
+add_constraint for: wr, timeIdx: 3
+See input:wr___#3
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give 0 to wr___#3
+Width of cond var: 1
+add_constraint for: out, timeIdx: 3
+Add nb constraint for: out ------  time: 3
+add_constraint for: _03_, timeIdx: 4
+Add ssa constraint for: _03_ ------  time: 4
+Ite op constraint for :_03_
+add_constraint for: rst, timeIdx: 4
+See input:rst___#4
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%B Give 0 to rst___#4
+Width of cond var: 1
+add_constraint for: 4'b0000, timeIdx: 4
+add_constraint for: _12_, timeIdx: 4
+Add ssa constraint for: _12_ ------  time: 4
+Ite op constraint for :_12_
+add_constraint for: wr, timeIdx: 4
+See input:wr___#4
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%B Give 1 to wr___#4
+Width of cond var: 1
+add_constraint for: out, timeIdx: 4
+push into dirty queue: out
+Replace out___#4 with 4'b0000
+add_constraint for: _11_, timeIdx: 4
+Add ssa constraint for: _11_ ------  time: 4
+Ite op constraint for :_11_
+add_constraint for: _06_, timeIdx: 4
+Add ssa constraint for: _06_ ------  time: 4
+Two op constraint for :_06_
+add_constraint for: state, timeIdx: 4
+push into dirty queue: state
+Replace state___#4 with 2'b00
+go to make_llvm_instr from two-op: state, 2'b11
+compare1: , 
+Width of cond var: 1
+add_constraint for: _07_, timeIdx: 4
+dyn sel constraint for :_07_
+add_constraint for: addr, timeIdx: 4
 Find it!
-Collecting regs for: FIFO_hls_target_call_slice_stream_V_value_V
-Collect reg: internal_empty_n
-Collect reg: internal_full_n
-Collect reg: mOutPtr
-Find it!
-************* finish push reg, arg number: 3
-************* finish push mem-output, arg number: 22
-push input: clk, timeIdx: 18
-push input: if_din, timeIdx: 18
---- wire: hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din, timeIdx: 18
-add_constraint for: hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din, timeIdx: 18
-extract for: hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din___#18
-push input: if_read, timeIdx: 18
---- wire: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_read, timeIdx: 18
-add_constraint for: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_read, timeIdx: 18
---- Begin submod: hls_target_call_Loop_LB2D_shift_proc_U0, port: slice_stream_V_value_V_read, time: 18
-Collecting regs for: hls_target_call_Loop_LB2D_shift_proc
-Collect reg: ap_CS_fsm
-Collect reg: ap_done_reg
-Collect reg: ap_reg_ppiten_pp0_it0
-Collect reg: ap_reg_ppiten_pp0_it1
-Collect reg: buffer_0_value_V_fu_100
-Collect reg: buffer_1_value_V_fu_104
-Collect reg: buffer_2_value_V_fu_108
-Collect reg: buffer_3_value_V_fu_112
-Collect reg: buffer_4_value_V_fu_116
-Collect reg: buffer_5_value_V_fu_120
-Collect reg: buffer_6_value_V_fu_124
-Collect reg: buffer_7_value_V_fu_96
-Collect reg: exitcond21_i_i_reg_1251
-Collect reg: i_0_i_i_reg_152
-Collect reg: icmp_reg_1260
-Collect reg: n1_1_reg_1246
-Collect reg: n1_reg_141
-************* finish push reg, arg number: 17
-************* finish push mem-output, arg number: 17
-push input: ap_continue, timeIdx: 18
-push input: ap_rst, timeIdx: 18
---- wire: ap_rst, timeIdx: 18
-add_constraint for: ap_rst, timeIdx: 18
-extract for: ap_rst___#18
-push input: ap_start, timeIdx: 18
-push input: out_stream_V_value_V_full_n, timeIdx: 18
---- wire: out_stream_V_value_V_full_n, timeIdx: 18
-add_constraint for: out_stream_V_value_V_full_n, timeIdx: 18
-extract for: out_stream_V_value_V_full_n___#18
-push input: slice_stream_V_value_V_dout, timeIdx: 18
---- wire: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_dout, timeIdx: 18
-add_constraint for: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_dout, timeIdx: 18
---- Begin submod: slice_stream_V_value_V_U, port: if_dout, time: 18
+See input:addr___#4
+add_constraint for: _02_[3], timeIdx: 5
+add_constraint for: _00_, timeIdx: 5
+add_constraint for: _01_, timeIdx: 5
+add_constraint for: out, timeIdx: 4
+add_constraint for: _11_, timeIdx: 3
+Add ssa constraint for: _11_ ------  time: 3
+Ite op constraint for :_11_
+add_constraint for: _06_, timeIdx: 3
+Add ssa constraint for: _06_ ------  time: 3
+Two op constraint for :_06_
+add_constraint for: state, timeIdx: 3
+Add nb constraint for: state ------  time: 3
+add_constraint for: _04_, timeIdx: 4
+Add ssa constraint for: _04_ ------  time: 4
+Ite op constraint for :_04_
+add_constraint for: rst, timeIdx: 4
+Width of cond var: 1
+add_constraint for: 2'b00, timeIdx: 4
+add_constraint for: _15_, timeIdx: 4
+Add ssa constraint for: _15_ ------  time: 4
+Ite op constraint for :_15_
+add_constraint for: wr, timeIdx: 4
+Width of cond var: 1
+add_constraint for: 2'b01, timeIdx: 4
+add_constraint for: _14_, timeIdx: 4
+Add ssa constraint for: _14_ ------  time: 4
+Ite op constraint for :_14_
+add_constraint for: _05_, timeIdx: 4
+Add ssa constraint for: _05_ ------  time: 4
+Two op constraint for :_05_
+add_constraint for: state, timeIdx: 4
+go to make_llvm_instr from two-op: state, 1'b1
+compare1: , 
+Width of cond var: 1
+add_constraint for: 2'b10, timeIdx: 4
+add_constraint for: _13_, timeIdx: 4
+Add ssa constraint for: _13_ ------  time: 4
+Ite op constraint for :_13_
+add_constraint for: _06_, timeIdx: 4
+Width of cond var: 1
+add_constraint for: 2'b00, timeIdx: 4
+add_constraint for: state, timeIdx: 4
+go to make_llvm_instr from two-op: state, 2'b11
+compare1: , 
+Width of cond var: 1
+add_constraint for: _07_, timeIdx: 3
+dyn sel constraint for :_07_
+add_constraint for: addr, timeIdx: 3
+See input:addr___#3
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give 10'h0 to addr___#3
+add_constraint for: _02_[3], timeIdx: 4
+Add ssa constraint for: _02_[3] ------  time: 4
+Ite op constraint for :_02_[3]
+add_constraint for: rst, timeIdx: 4
+Width of cond var: 1
+add_constraint for: 1'b0, timeIdx: 4
+add_constraint for: _08_[3], timeIdx: 4
+Add ssa constraint for: _08_[3] ------  time: 4
+Ite op constraint for :_08_[3]
+add_constraint for: wr, timeIdx: 4
+Width of cond var: 1
+add_constraint for: 1'b1, timeIdx: 4
+add_constraint for: 1'b0, timeIdx: 4
+extract for: 
+add_constraint for: _00_, timeIdx: 4
+Add ssa constraint for: _00_ ------  time: 4
+Ite op constraint for :_00_
+add_constraint for: rst, timeIdx: 4
+Width of cond var: 1
+add_constraint for: 10'bxxxxxxxxxx, timeIdx: 4
+add_constraint for: _10_, timeIdx: 4
+Add ssa constraint for: _10_ ------  time: 4
+Ite op constraint for :_10_
+add_constraint for: wr, timeIdx: 4
+Width of cond var: 1
+add_constraint for: addr, timeIdx: 4
+add_constraint for: 10'bxxxxxxxxxx, timeIdx: 4
+add_constraint for: _01_, timeIdx: 4
+Add ssa constraint for: _01_ ------  time: 4
+Ite op constraint for :_01_
+add_constraint for: rst, timeIdx: 4
+Width of cond var: 1
+add_constraint for: 4'bxxxx, timeIdx: 4
+add_constraint for: _09_, timeIdx: 4
+Add ssa constraint for: _09_ ------  time: 4
+Ite op constraint for :_09_
+add_constraint for: wr, timeIdx: 4
+Width of cond var: 1
+add_constraint for: in, timeIdx: 4
+See input:in___#4
+add_constraint for: 4'bxxxx, timeIdx: 4
+add_constraint for: out, timeIdx: 3
+add_constraint for: _11_, timeIdx: 2
+Add ssa constraint for: _11_ ------  time: 2
+Ite op constraint for :_11_
+add_constraint for: _06_, timeIdx: 2
+Add ssa constraint for: _06_ ------  time: 2
+Two op constraint for :_06_
+add_constraint for: state, timeIdx: 2
+Add nb constraint for: state ------  time: 2
+add_constraint for: _04_, timeIdx: 3
+Add ssa constraint for: _04_ ------  time: 3
+Ite op constraint for :_04_
+add_constraint for: rst, timeIdx: 3
+Width of cond var: 1
+add_constraint for: 2'b00, timeIdx: 3
+add_constraint for: _15_, timeIdx: 3
+Add ssa constraint for: _15_ ------  time: 3
+Ite op constraint for :_15_
+add_constraint for: wr, timeIdx: 3
+Width of cond var: 1
+add_constraint for: 2'b01, timeIdx: 3
+add_constraint for: _14_, timeIdx: 3
+Add ssa constraint for: _14_ ------  time: 3
+Ite op constraint for :_14_
+add_constraint for: _05_, timeIdx: 3
+Add ssa constraint for: _05_ ------  time: 3
+Two op constraint for :_05_
+add_constraint for: state, timeIdx: 3
+go to make_llvm_instr from two-op: state, 1'b1
+compare1: , 
+Width of cond var: 1
+add_constraint for: 2'b10, timeIdx: 3
+add_constraint for: _13_, timeIdx: 3
+Add ssa constraint for: _13_ ------  time: 3
+Ite op constraint for :_13_
+add_constraint for: _06_, timeIdx: 3
+Width of cond var: 1
+add_constraint for: 2'b00, timeIdx: 3
+add_constraint for: state, timeIdx: 3
+go to make_llvm_instr from two-op: state, 2'b11
+compare1: , 
+Width of cond var: 1
+add_constraint for: _07_, timeIdx: 2
+dyn sel constraint for :_07_
+add_constraint for: addr, timeIdx: 2
+See input:addr___#2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give 10'h0 to addr___#2
+add_constraint for: _02_[3], timeIdx: 3
+Add ssa constraint for: _02_[3] ------  time: 3
+Ite op constraint for :_02_[3]
+add_constraint for: rst, timeIdx: 3
+Width of cond var: 1
+add_constraint for: 1'b0, timeIdx: 3
+add_constraint for: _08_[3], timeIdx: 3
+Add ssa constraint for: _08_[3] ------  time: 3
+Ite op constraint for :_08_[3]
+add_constraint for: wr, timeIdx: 3
+Width of cond var: 1
+add_constraint for: 1'b1, timeIdx: 3
+add_constraint for: 1'b0, timeIdx: 3
+extract for: 
+add_constraint for: _00_, timeIdx: 3
+Add ssa constraint for: _00_ ------  time: 3
+Ite op constraint for :_00_
+add_constraint for: rst, timeIdx: 3
+Width of cond var: 1
+add_constraint for: 10'bxxxxxxxxxx, timeIdx: 3
+add_constraint for: _10_, timeIdx: 3
+Add ssa constraint for: _10_ ------  time: 3
+Ite op constraint for :_10_
+add_constraint for: wr, timeIdx: 3
+Width of cond var: 1
+add_constraint for: addr, timeIdx: 3
+add_constraint for: 10'bxxxxxxxxxx, timeIdx: 3
+add_constraint for: _01_, timeIdx: 3
+Add ssa constraint for: _01_ ------  time: 3
+Ite op constraint for :_01_
+add_constraint for: rst, timeIdx: 3
+Width of cond var: 1
+add_constraint for: 4'bxxxx, timeIdx: 3
+add_constraint for: _09_, timeIdx: 3
+Add ssa constraint for: _09_ ------  time: 3
+Ite op constraint for :_09_
+add_constraint for: wr, timeIdx: 3
+Width of cond var: 1
+add_constraint for: in, timeIdx: 3
+See input:in___#3
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give 4'h0000 to in___#3
+add_constraint for: 4'bxxxx, timeIdx: 3
+add_constraint for: out, timeIdx: 2
+add_constraint for: _11_, timeIdx: 1
+Add ssa constraint for: _11_ ------  time: 1
+Ite op constraint for :_11_
+add_constraint for: _06_, timeIdx: 1
+Add ssa constraint for: _06_ ------  time: 1
+Two op constraint for :_06_
+add_constraint for: state, timeIdx: 1
+Add nb constraint for: state ------  time: 1
+add_constraint for: _04_, timeIdx: 2
+Add ssa constraint for: _04_ ------  time: 2
+Ite op constraint for :_04_
+add_constraint for: rst, timeIdx: 2
+Width of cond var: 1
+add_constraint for: 2'b00, timeIdx: 2
+add_constraint for: _15_, timeIdx: 2
+Add ssa constraint for: _15_ ------  time: 2
+Ite op constraint for :_15_
+add_constraint for: wr, timeIdx: 2
+Width of cond var: 1
+add_constraint for: 2'b01, timeIdx: 2
+add_constraint for: _14_, timeIdx: 2
+Add ssa constraint for: _14_ ------  time: 2
+Ite op constraint for :_14_
+add_constraint for: _05_, timeIdx: 2
+Add ssa constraint for: _05_ ------  time: 2
+Two op constraint for :_05_
+add_constraint for: state, timeIdx: 2
+go to make_llvm_instr from two-op: state, 1'b1
+compare1: , 
+Width of cond var: 1
+add_constraint for: 2'b10, timeIdx: 2
+add_constraint for: _13_, timeIdx: 2
+Add ssa constraint for: _13_ ------  time: 2
+Ite op constraint for :_13_
+add_constraint for: _06_, timeIdx: 2
+Width of cond var: 1
+add_constraint for: 2'b00, timeIdx: 2
+add_constraint for: state, timeIdx: 2
+go to make_llvm_instr from two-op: state, 2'b11
+compare1: , 
+Width of cond var: 1
+add_constraint for: _07_, timeIdx: 1
+dyn sel constraint for :_07_
+add_constraint for: addr, timeIdx: 1
+See input:addr___#1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give 10'h0 to addr___#1
+add_constraint for: _02_[3], timeIdx: 2
+Add ssa constraint for: _02_[3] ------  time: 2
+Ite op constraint for :_02_[3]
+add_constraint for: rst, timeIdx: 2
+Width of cond var: 1
+add_constraint for: 1'b0, timeIdx: 2
+add_constraint for: _08_[3], timeIdx: 2
+Add ssa constraint for: _08_[3] ------  time: 2
+Ite op constraint for :_08_[3]
+add_constraint for: wr, timeIdx: 2
+Width of cond var: 1
+add_constraint for: 1'b1, timeIdx: 2
+add_constraint for: 1'b0, timeIdx: 2
+extract for: 
+add_constraint for: _00_, timeIdx: 2
+Add ssa constraint for: _00_ ------  time: 2
+Ite op constraint for :_00_
+add_constraint for: rst, timeIdx: 2
+Width of cond var: 1
+add_constraint for: 10'bxxxxxxxxxx, timeIdx: 2
+add_constraint for: _10_, timeIdx: 2
+Add ssa constraint for: _10_ ------  time: 2
+Ite op constraint for :_10_
+add_constraint for: wr, timeIdx: 2
+Width of cond var: 1
+add_constraint for: addr, timeIdx: 2
+add_constraint for: 10'bxxxxxxxxxx, timeIdx: 2
+add_constraint for: _01_, timeIdx: 2
+Add ssa constraint for: _01_ ------  time: 2
+Ite op constraint for :_01_
+add_constraint for: rst, timeIdx: 2
+Width of cond var: 1
+add_constraint for: 4'bxxxx, timeIdx: 2
+add_constraint for: _09_, timeIdx: 2
+Add ssa constraint for: _09_ ------  time: 2
+Ite op constraint for :_09_
+add_constraint for: wr, timeIdx: 2
+Width of cond var: 1
+add_constraint for: in, timeIdx: 2
+See input:in___#2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give 4'h0000 to in___#2
+add_constraint for: 4'bxxxx, timeIdx: 2
+add_constraint for: out, timeIdx: 1
+** Finish update function for: out
+** Begin clean update function
 
-Breakpoint 1, funcExtract::UpdateFunctionGen::submod_constraint (this=0x7fffffffca80, node=0x5555568eced0, timeIdx=18, c=std::shared_ptr<llvm::LLVMContext> (use count 1, weak count 0) = {...}, 
-    b=std::shared_ptr<llvm::IRBuilder<llvm::ConstantFolder, llvm::IRBuilderDefaultInserter>> (use count 1, weak count 0) = {...}, bound=18)
-    at /home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/op_constraint.cpp:1339
-1339	    toCoutVerb("Find it!");
-(gdb) 
-Continuing.
-Find it!
-Collecting regs for: FIFO_hls_target_call_slice_stream_V_value_V
-Collect reg: internal_empty_n
-Collect reg: internal_full_n
-Collect reg: mOutPtr
-Find it!
-************* finish push reg, arg number: 3
-************* finish push mem-output, arg number: 22
-push input: clk, timeIdx: 18
-push input: if_din, timeIdx: 18
---- wire: hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din, timeIdx: 18
-add_constraint for: hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din, timeIdx: 18
-extract for: hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din___#18
-push input: if_read, timeIdx: 18
---- wire: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_read, timeIdx: 18
-add_constraint for: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_read, timeIdx: 18
---- Begin submod: hls_target_call_Loop_LB2D_shift_proc_U0, port: slice_stream_V_value_V_read, time: 18
-Collecting regs for: hls_target_call_Loop_LB2D_shift_proc
-Collect reg: ap_CS_fsm
-Collect reg: ap_done_reg
-Collect reg: ap_reg_ppiten_pp0_it0
-Collect reg: ap_reg_ppiten_pp0_it1
-Collect reg: buffer_0_value_V_fu_100
-Collect reg: buffer_1_value_V_fu_104
-Collect reg: buffer_2_value_V_fu_108
-Collect reg: buffer_3_value_V_fu_112
-Collect reg: buffer_4_value_V_fu_116
-Collect reg: buffer_5_value_V_fu_120
-Collect reg: buffer_6_value_V_fu_124
-Collect reg: buffer_7_value_V_fu_96
-Collect reg: exitcond21_i_i_reg_1251
-Collect reg: i_0_i_i_reg_152
-Collect reg: icmp_reg_1260
-Collect reg: n1_1_reg_1246
-Collect reg: n1_reg_141
-************* finish push reg, arg number: 17
-************* finish push mem-output, arg number: 17
-push input: ap_continue, timeIdx: 18
-push input: ap_rst, timeIdx: 18
---- wire: ap_rst, timeIdx: 18
-add_constraint for: ap_rst, timeIdx: 18
-extract for: ap_rst___#18
-push input: ap_start, timeIdx: 18
-push input: out_stream_V_value_V_full_n, timeIdx: 18
---- wire: out_stream_V_value_V_full_n, timeIdx: 18
-add_constraint for: out_stream_V_value_V_full_n, timeIdx: 18
-extract for: out_stream_V_value_V_full_n___#18
-push input: slice_stream_V_value_V_dout, timeIdx: 18
---- wire: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_dout, timeIdx: 18
-add_constraint for: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_dout, timeIdx: 18
---- Begin submod: slice_stream_V_value_V_U, port: if_dout, time: 18
-
-Breakpoint 1, funcExtract::UpdateFunctionGen::submod_constraint (this=0x7fffffffca80, node=0x5555568eced0, timeIdx=18, c=std::shared_ptr<llvm::LLVMContext> (use count 1, weak count 0) = {...}, 
-    b=std::shared_ptr<llvm::IRBuilder<llvm::ConstantFolder, llvm::IRBuilderDefaultInserter>> (use count 1, weak count 0) = {...}, bound=18)
-    at /home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/op_constraint.cpp:1339
-1339	    toCoutVerb("Find it!");
-(gdb) 
-Continuing.
-Find it!
-Collecting regs for: FIFO_hls_target_call_slice_stream_V_value_V
-Collect reg: internal_empty_n
-Collect reg: internal_full_n
-Collect reg: mOutPtr
-Find it!
-************* finish push reg, arg number: 3
-************* finish push mem-output, arg number: 22
-push input: clk, timeIdx: 18
-push input: if_din, timeIdx: 18
---- wire: hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din, timeIdx: 18
-add_constraint for: hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din, timeIdx: 18
-extract for: hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din___#18
-push input: if_read, timeIdx: 18
---- wire: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_read, timeIdx: 18
-add_constraint for: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_read, timeIdx: 18
---- Begin submod: hls_target_call_Loop_LB2D_shift_proc_U0, port: slice_stream_V_value_V_read, time: 18
-Collecting regs for: hls_target_call_Loop_LB2D_shift_proc
-Collect reg: ap_CS_fsm
-Collect reg: ap_done_reg
-Collect reg: ap_reg_ppiten_pp0_it0
-Collect reg: ap_reg_ppiten_pp0_it1
-Collect reg: buffer_0_value_V_fu_100
-Collect reg: buffer_1_value_V_fu_104
-Collect reg: buffer_2_value_V_fu_108
-Collect reg: buffer_3_value_V_fu_112
-Collect reg: buffer_4_value_V_fu_116
-Collect reg: buffer_5_value_V_fu_120
-Collect reg: buffer_6_value_V_fu_124
-Collect reg: buffer_7_value_V_fu_96
-Collect reg: exitcond21_i_i_reg_1251
-Collect reg: i_0_i_i_reg_152
-Collect reg: icmp_reg_1260
-Collect reg: n1_1_reg_1246
-Collect reg: n1_reg_141
-************* finish push reg, arg number: 17
-************* finish push mem-output, arg number: 17
-push input: ap_continue, timeIdx: 18
-push input: ap_rst, timeIdx: 18
---- wire: ap_rst, timeIdx: 18
-add_constraint for: ap_rst, timeIdx: 18
-extract for: ap_rst___#18
-push input: ap_start, timeIdx: 18
-push input: out_stream_V_value_V_full_n, timeIdx: 18
---- wire: out_stream_V_value_V_full_n, timeIdx: 18
-add_constraint for: out_stream_V_value_V_full_n, timeIdx: 18
-extract for: out_stream_V_value_V_full_n___#18
-push input: slice_stream_V_value_V_dout, timeIdx: 18
---- wire: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_dout, timeIdx: 18
-add_constraint for: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_dout, timeIdx: 18
---- Begin submod: slice_stream_V_value_V_U, port: if_dout, time: 18
-
-Breakpoint 1, funcExtract::UpdateFunctionGen::submod_constraint (this=0x7fffffffca80, node=0x5555568eced0, timeIdx=18, c=std::shared_ptr<llvm::LLVMContext> (use count 1, weak count 0) = {...}, 
-    b=std::shared_ptr<llvm::IRBuilder<llvm::ConstantFolder, llvm::IRBuilderDefaultInserter>> (use count 1, weak count 0) = {...}, bound=18)
-    at /home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/op_constraint.cpp:1339
-1339	    toCoutVerb("Find it!");
-(gdb) 
-Continuing.
-Find it!
-Collecting regs for: FIFO_hls_target_call_slice_stream_V_value_V
-Collect reg: internal_empty_n
-Collect reg: internal_full_n
-Collect reg: mOutPtr
-Find it!
-************* finish push reg, arg number: 3
-************* finish push mem-output, arg number: 22
-push input: clk, timeIdx: 18
-push input: if_din, timeIdx: 18
---- wire: hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din, timeIdx: 18
-add_constraint for: hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din, timeIdx: 18
-extract for: hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din___#18
-push input: if_read, timeIdx: 18
---- wire: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_read, timeIdx: 18
-add_constraint for: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_read, timeIdx: 18
---- Begin submod: hls_target_call_Loop_LB2D_shift_proc_U0, port: slice_stream_V_value_V_read, time: 18
-Collecting regs for: hls_target_call_Loop_LB2D_shift_proc
-Collect reg: ap_CS_fsm
-Collect reg: ap_done_reg
-Collect reg: ap_reg_ppiten_pp0_it0
-Collect reg: ap_reg_ppiten_pp0_it1
-Collect reg: buffer_0_value_V_fu_100
-Collect reg: buffer_1_value_V_fu_104
-Collect reg: buffer_2_value_V_fu_108
-Collect reg: buffer_3_value_V_fu_112
-Collect reg: buffer_4_value_V_fu_116
-Collect reg: buffer_5_value_V_fu_120
-Collect reg: buffer_6_value_V_fu_124
-Collect reg: buffer_7_value_V_fu_96
-Collect reg: exitcond21_i_i_reg_1251
-Collect reg: i_0_i_i_reg_152
-Collect reg: icmp_reg_1260
-Collect reg: n1_1_reg_1246
-Collect reg: n1_reg_141
-************* finish push reg, arg number: 17
-************* finish push mem-output, arg number: 17
-push input: ap_continue, timeIdx: 18
-push input: ap_rst, timeIdx: 18
---- wire: ap_rst, timeIdx: 18
-add_constraint for: ap_rst, timeIdx: 18
-extract for: ap_rst___#18
-push input: ap_start, timeIdx: 18
-push input: out_stream_V_value_V_full_n, timeIdx: 18
---- wire: out_stream_V_value_V_full_n, timeIdx: 18
-add_constraint for: out_stream_V_value_V_full_n, timeIdx: 18
-extract for: out_stream_V_value_V_full_n___#18
-push input: slice_stream_V_value_V_dout, timeIdx: 18
---- wire: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_dout, timeIdx: 18
-add_constraint for: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_dout, timeIdx: 18
---- Begin submod: slice_stream_V_value_V_U, port: if_dout, time: 18
-
-Breakpoint 1, funcExtract::UpdateFunctionGen::submod_constraint (this=0x7fffffffca80, node=0x5555568eced0, timeIdx=18, c=std::shared_ptr<llvm::LLVMContext> (use count 1, weak count 0) = {...}, 
-    b=std::shared_ptr<llvm::IRBuilder<llvm::ConstantFolder, llvm::IRBuilderDefaultInserter>> (use count 1, weak count 0) = {...}, bound=18)
-    at /home/yuzeng/workspace/research/autoGenILA/src/func_extract/src/op_constraint.cpp:1339
-1339	    toCoutVerb("Find it!");
-(gdb) 
-Continuing.
-Find it!
-Collecting regs for: FIFO_hls_target_call_slice_stream_V_value_V
-Collect reg: internal_empty_n
-Collect reg: internal_full_n
-Collect reg: mOutPtr
-Find it!
-************* finish push reg, arg number: 3
-************* finish push mem-output, arg number: 22
-push input: clk, timeIdx: 18
-push input: if_din, timeIdx: 18
---- wire: hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din, timeIdx: 18
-add_constraint for: hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din, timeIdx: 18
-extract for: hls_target_call_Loop_LB2D_buf_proc_U0_slice_stream_V_value_V_din___#18
-push input: if_read, timeIdx: 18
---- wire: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_read, timeIdx: 18
-add_constraint for: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_read, timeIdx: 18
---- Begin submod: hls_target_call_Loop_LB2D_shift_proc_U0, port: slice_stream_V_value_V_read, time: 18
-Collecting regs for: hls_target_call_Loop_LB2D_shift_proc
-Collect reg: ap_CS_fsm
-Collect reg: ap_done_reg
-Collect reg: ap_reg_ppiten_pp0_it0
-Collect reg: ap_reg_ppiten_pp0_it1
-Collect reg: buffer_0_value_V_fu_100
-Collect reg: buffer_1_value_V_fu_104
-Collect reg: buffer_2_value_V_fu_108
-Collect reg: buffer_3_value_V_fu_112
-Collect reg: buffer_4_value_V_fu_116
-Collect reg: buffer_5_value_V_fu_120
-Collect reg: buffer_6_value_V_fu_124
-Collect reg: buffer_7_value_V_fu_96
-Collect reg: exitcond21_i_i_reg_1251
-Collect reg: i_0_i_i_reg_152
-Collect reg: icmp_reg_1260
-Collect reg: n1_1_reg_1246
-Collect reg: n1_reg_141
-************* finish push reg, arg number: 17
-************* finish push mem-output, arg number: 17
-push input: ap_continue, timeIdx: 18
-push input: ap_rst, timeIdx: 18
---- wire: ap_rst, timeIdx: 18
-add_constraint for: ap_rst, timeIdx: 18
-extract for: ap_rst___#18
-push input: ap_start, timeIdx: 18
-push input: out_stream_V_value_V_full_n, timeIdx: 18
---- wire: out_stream_V_value_V_full_n, timeIdx: 18
-add_constraint for: out_stream_V_value_V_full_n, timeIdx: 18
-extract for: out_stream_V_value_V_full_n___#18
-push input: slice_stream_V_value_V_dout, timeIdx: 18
---- wire: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_dout, timeIdx: 18
-add_constraint for: hls_target_call_Loop_LB2D_shift_proc_U0_slice_stream_V_value_V_dout, timeIdx: 18
---- Begin submod: slice_stream_V_value_V_U, port: if_dout, time: 18
-
-
-
-
---- Begin submod: hls_target_call_Loop_LB2D_shift_proc_U0, port: slice_stream_V_value_V_read, time: 18
-
---- Begin submod: slice_stream_V_value_V_U, port: if_dout, time: 18
