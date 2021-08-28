@@ -826,8 +826,8 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
     toCoutVerb("find it");
   }
 
-  if(varAndSlice.find("is_slti_blt_slt") != std::string::npos
-       && timeIdx == 9) {
+  if(varAndSlice.find("compute.loadUop.sIdx") != std::string::npos
+       && timeIdx == 4) {
     toCoutVerb("Find it!");
   }
 
@@ -919,7 +919,8 @@ UpdateFunctionGen::add_nb_constraint(astNode* const node,
   std::string destAndSlice = node->dest;
   std::string dest, destSlice;
   split_slice(destAndSlice, dest, destSlice);
-  if(destAndSlice.find("cpu_state") != std::string::npos && timeIdx == 8) {
+  if(destAndSlice.find("compute.loadUop.sIdx_reg[0]") != std::string::npos){
+       //&& timeIdx == 8) {
     //toCoutVerb("target reg found! time: "+toStr(timeIdx));
     toCout("Find it");
   }
@@ -940,7 +941,16 @@ UpdateFunctionGen::add_nb_constraint(astNode* const node,
       toCoutVerb("Find it!");
     std::string destNext = node->srcVec.front();
 
-    destNextExpr = add_constraint(node->childVec.front(), timeIdx+1, c, b, bound);
+    auto srcExpr = add_constraint(node->childVec.front(), timeIdx+1, c, b, bound);
+    std::string srcAndSlice = node->srcVec[0];
+    std::string src, srcSlice;
+    split_slice(srcAndSlice, src, srcSlice);
+    uint32_t srcHi = get_lgc_hi(srcAndSlice, curMod);
+    uint32_t srcLo = get_lgc_lo(srcAndSlice, curMod);
+    if(srcSlice.empty() || has_direct_assignment(srcAndSlice, curMod))
+      destNextExpr = srcExpr;
+    else
+      destNextExpr = extract_func(srcExpr, srcHi, srcLo, c, b, srcAndSlice);
     return destNextExpr;
   }
   else if ( is_clean(dest, insContextStk.get_curMod()) ){ 

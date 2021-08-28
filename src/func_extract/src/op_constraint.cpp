@@ -266,6 +266,8 @@ UpdateFunctionGen::input_constraint(astNode* const node, uint32_t timeIdx,
   //}
 
   // the module is top module
+  // TODO: add special case: input is memory data port, which is always x1
+
   // if input instruction should be given to the input ports
   if(timeIdx + g_currInstrInfo.instrLen >= bound+1) { // input signal is explicitly given
     if(!is_sub_module(curMod) 
@@ -886,6 +888,7 @@ UpdateFunctionGen::ite_op_constraint(astNode* const node, uint32_t timeIdx, cont
 
 
   // early pruning: if cond is constant, then ignore the un-selected branch
+  // FIXME: the code below has bugs, comment it out before fixing the bug
   //if(llvm::isa<llvm::ConstantInt>(condExpr)) {
   //  auto constant = llvm::dyn_cast<llvm::ConstantInt>(condExpr);
   //  uint32_t value = constant->getZExtValue();
