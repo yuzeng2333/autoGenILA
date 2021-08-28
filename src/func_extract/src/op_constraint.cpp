@@ -501,6 +501,37 @@ UpdateFunctionGen::two_op_constraint(astNode* const node, uint32_t timeIdx, cont
   else
     op2Expr = var_expr(op2AndSlice, timeIdx, c, b, false, op2WidthNum);
 
+
+  // make new expr is the operands are sign/unsign extended
+  llvm::Value* op1ExtExpr;
+  llvm::Value* op2ExtExpr;
+  auto destTy = llvmWidth(destWidthNum, c);
+  if(node->extVec.empty()) {
+    op1ExtExpr = op1Expr;
+  }
+  else if(node->extVec[0] == 1) {
+    std::string op1Timed = timed_name(prefix+op1AndSlice+"_SIGN", timeIdx);    
+    op1ExtExpr = b->CreateSExt(op1Expr, destTy, llvm::Twine(op1Timed));
+  }
+  else if(node->extVec[0] == 2) {
+    std::string op1Timed = timed_name(prefix+op1AndSlice+"_UNSIGN", timeIdx);    
+    op1ExtExpr = b->CreateZExt(op1Expr, destTy, llvm::Twine(op1Timed));
+  }
+
+  if(node->extVec.empty()) {
+    op2ExtExpr = op2Expr;
+  }
+  else if(node->extVec[1] == 1) {
+    std::string op2Timed = timed_name(prefix+op2AndSlice+"_SIGN", timeIdx);    
+    op2ExtExpr = b->CreateSExt(op2Expr, destTy, llvm::Twine(op2Timed));
+  }
+  else if(node->extVec[1] == 2) {
+    std::string op2Timed = timed_name(prefix+op2AndSlice+"_UNSIGN", timeIdx);    
+    op2ExtExpr = b->CreateZExt(op2Expr, destTy, llvm::Twine(op2Timed));
+  }
+
+
+
   //bool op1IsReadRoot = is_root(op1AndSlice) && is_read_asv(op1AndSlice) && timeIdx == bound + 1;
   //bool op2IsReadRoot = is_root(op2AndSlice) && is_read_asv(op2AndSlice) && timeIdx == bound + 1;
   bool op1IsReadRoot = false;
@@ -520,7 +551,7 @@ UpdateFunctionGen::two_op_constraint(astNode* const node, uint32_t timeIdx, cont
   if(curMod->name == "hls_target_Loop_1_proc")
     toCout("Find it!");
   toCoutVerb("go to make_llvm_instr from two-op: "+op1AndSlice+", "+op2AndSlice);
-  return make_llvm_instr(b, c, node->op, op1Expr, op2Expr, 
+  return make_llvm_instr(b, c, node->op, op1ExtExpr, op2ExtExpr, 
                          destWidthNum, op1WidthNum, op2WidthNum, llvm::Twine(destTimed));
 }
 

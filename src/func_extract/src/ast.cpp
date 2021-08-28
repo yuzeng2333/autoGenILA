@@ -639,6 +639,30 @@ void add_two_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
     toCout("Found it!");
   }
 
+  uint32_t op1Ext = 0;
+  uint32_t op2Ext = 0;
+  if(op1AndSlice.find("$signed") != std::string::npos) {
+    op1Ext = 1;
+    op1AndSlice = remove_signed(op1AndSlice);
+    assert(op1AndSlice.find("$signed") != std::string::npos);
+  }
+  else if(op1AndSlice.find("$unsigned") != std::string::npos) {
+    op1Ext = 2;
+    op1AndSlice = remove_signed(op1AndSlice);
+    assert(op1AndSlice.find("$unsigned") != std::string::npos);
+  }
+
+  if(op2AndSlice.find("$signed") != std::string::npos) {
+    op2Ext = 1;
+    op2AndSlice = remove_signed(op2AndSlice);
+    assert(op2AndSlice.find("$signed") != std::string::npos);
+  }
+  else if(op2AndSlice.find("$unsigned") != std::string::npos) {
+    op2Ext = 2;
+    op2AndSlice = remove_signed(op2AndSlice);
+    assert(op2AndSlice.find("$unsigned") != std::string::npos);
+  }
+
   //if(destAndSlice.compare("adr_check") == 0) {
   //  toCout("Found adr_check");
   //}
@@ -660,6 +684,7 @@ void add_two_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   node->dest = destAndSlice;
   node->op = op;
   node->srcVec = SV{op1AndSlice, op2AndSlice};
+  node->extVec = std::vector<uint32_t>{op1Ext, op2Ext};
   node->isReduceOp = isReduceOp;
   node->done = false;
 

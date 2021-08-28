@@ -29,6 +29,8 @@ struct astNode{
   std::string dest;
   std::string op;
   std::vector<std::string> srcVec;
+  // 0 is none, 1 is $signed, 2 is $unsigned
+  std::vector<uint32_t> extVec;
   std::vector<astNode*> childVec;
   bool isReduceOp;
   bool done;

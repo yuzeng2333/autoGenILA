@@ -1255,4 +1255,14 @@ void replace_with(std::string &str, std::string subStr, std::string newSubStr) {
 }
 
 
+std::string remove_unsigned(std::string &line) {
+  std::smatch m;
+  std::regex pSigned("\\$unsigned\\((.*)\\)");
+  if(line.find("$unsigned") != std::string::npos) {
+    return std::regex_replace(line, pSigned, "$1");
+    //toCout("line to be matched: "+line);
+  }
+  else return line;
+}
+
 } // end of namespace funcExtract

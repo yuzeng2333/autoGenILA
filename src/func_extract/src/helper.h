@@ -275,6 +275,9 @@ void print_reg_info(RegWidthVec_t &regWidth);
 bool is_pure_num(std::string var);
 
 void replace_with(std::string &str, std::string subStr, std::string newSubStr);
+
+std::string remove_unsigned(std::string &line);
+
 } // end of namespace funcExtract
 
 #endif
