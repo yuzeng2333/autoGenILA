@@ -43,6 +43,8 @@ namespace taintGen {
 #define SUBMODOUT       30
 #define SUBMODIN        31
 #define SWITCH          32
+#define DYNSEL          33
+#define MEM_IF_ASSIGN   34
 #define UNSUPPORT       99
 #define NONE            100
 

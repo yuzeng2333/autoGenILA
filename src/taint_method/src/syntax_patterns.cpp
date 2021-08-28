@@ -41,7 +41,9 @@ std::regex pSel2        (taintGen::to_re("^(\\s*)assign (NAME) = (NAME)(\\[(NAME
 std::regex pSel3        (taintGen::to_re("^(\\s*)assign (NAME) = (NAME)(\\[\\$signed\\((NAME)\\) \\-\\: (INT)\\])(\\s*)?;$"));
 std::regex pSel4        (taintGen::to_re("^(\\s*)assign (NAME) = (NAME)(\\[(NAME) \\-\\: (INT)\\])(\\s*)?;$"));
 std::regex pSel5        (taintGen::to_re("^(\\s*)assign (NAME) = (NAME)(\\[(INT) \\: (INT)\\])(\\s*)?;$"));
-std::regex pDbSel       (taintGen::to_re("^(\\s*)assign (NAME) = (NAME)(\\[(NAME)\\[(\\d+):(\\d+)\\]\\])$"));
+std::regex pDbSel       (taintGen::to_re("^(\\s*)assign (NAME) = (NAME)(\\[(NAME)\\[(\\d+):(\\d+)\\]\\]);$"));
+std::regex pDynSel      (taintGen::to_re("^(\\s*)assign (NAME) = (NAME)\\[(NAME)\\];$"));
+
 std::regex pBitOrRed2   (taintGen::to_re("^(\\s*)assign (NAME) = \\| \\{ (NAME), (NAME) \\}(\\s*)?;$"));
 std::regex pLeftShift   (taintGen::to_re("^(\\s*)assign (NAME) = (NAME) << (NAME)(\\s*)?;$"));
 std::regex pRightShift  (taintGen::to_re("^(\\s*)assign (NAME) = (NAME) >> (NAME)(\\s*)?;$"));
@@ -80,6 +82,7 @@ std::regex pNonblockIf  (taintGen::to_re("^(\\s*)if \\((\\S+)\\s?\\) (NAME) <= (
 std::regex pNonblockElse(taintGen::to_re("^(\\s*)else (NAME) <= (NAME)(\\s*)?;$"));
 std::regex pNBElseIf    (taintGen::to_re("^(\\s*)else if \\((\\S+)\\s?\\) (NAME) <= (NAME)(\\s*)?;$"));
 std::regex pNonblockIf2 (taintGen::to_re("^(\\s*)if \\((NAME)\\) ([a-zA-Z0-9]+)(\\[([a-zA-Z0-9]+)\\[(\\d+)\\]\\]) <= (NAME)(\\s*)?;$"));
+std::regex pMemIf       (taintGen::to_re("^(\\s*)if \\((NAME)\\s?\\) (NAME)\\[(NAME)\\] <= (NAME)(\\s*)?;$"));
 /* function */
 std::regex pFunctionDef   (taintGen::to_re("^(\\s*)function (\\[\\d+\\:0\\] )?(NAME)(\\s*)?;$"));
 std::regex pEndfunction   (taintGen::to_re("^(\\s*)endfunction$"));
