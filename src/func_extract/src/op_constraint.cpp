@@ -441,7 +441,9 @@ UpdateFunctionGen::two_op_constraint(astNode* const node, uint32_t timeIdx, cont
   bool isReduceOp = node->isReduceOp;
   assert(node->srcVec.size() == 2);
   std::string destAndSlice = node->dest;
-  if(destAndSlice == "_082_" && timeIdx == 18) {
+  if(destAndSlice.find("compute.tensorAlu.AluVector.f_15.alu._T_17") 
+       != std::string::npos) {
+    //&& timeIdx == 18) {
     toCoutVerb("find it!");
   }
   std::string op1AndSlice = node->srcVec[0];
@@ -543,8 +545,8 @@ UpdateFunctionGen::two_op_constraint(astNode* const node, uint32_t timeIdx, cont
   }
   if( (node->extVec[0] == 1 && node->extVec[1] != 1) 
       || (node->extVec[0] != 1 && node->extVec[1] == 1) ) {
-    toCout("Error: only one op is signed: "+destAndSlice);
-    abort();
+    toCout("Warning: only one op is signed: "+destAndSlice);
+    assert(node->op == "<<" || node->op == ">>" || node->op == ">>>");
   }
   bool isSigned = node->extVec[0] == 1;
 
@@ -2119,7 +2121,7 @@ UpdateFunctionGen::make_llvm_instr(std::shared_ptr<llvm::IRBuilder<>> &b,
   }
   else if (op == ">") {
     if(isSigned)
-      return b->CreateICmpUGT(sext(op1Expr, opWidth, c, b), sext(op2Expr, opWidth, c, b), name);
+      return b->CreateICmpSGT(sext(op1Expr, opWidth, c, b), sext(op2Expr, opWidth, c, b), name);
     else
       return b->CreateICmpUGT(zext(op1Expr, opWidth, c, b), zext(op2Expr, opWidth, c, b), name);
   }
@@ -2128,7 +2130,7 @@ UpdateFunctionGen::make_llvm_instr(std::shared_ptr<llvm::IRBuilder<>> &b,
   }
   else if (op == ">=") {
     if(isSigned)
-      return b->CreateICmpUGE(sext(op1Expr, opWidth, c, b), sext(op2Expr, opWidth, c, b), name);
+      return b->CreateICmpSGE(sext(op1Expr, opWidth, c, b), sext(op2Expr, opWidth, c, b), name);
     else
       return b->CreateICmpUGE(zext(op1Expr, opWidth, c, b), zext(op2Expr, opWidth, c, b), name);
   }
@@ -2137,7 +2139,7 @@ UpdateFunctionGen::make_llvm_instr(std::shared_ptr<llvm::IRBuilder<>> &b,
   }
   else if (op == "<") {
     if(isSigned)
-      return b->CreateICmpULT(sext(op1Expr, opWidth, c, b), sext(op2Expr, opWidth, c, b), name);
+      return b->CreateICmpSLT(sext(op1Expr, opWidth, c, b), sext(op2Expr, opWidth, c, b), name);
     else
       return b->CreateICmpULT(zext(op1Expr, opWidth, c, b), zext(op2Expr, opWidth, c, b), name);
   }
@@ -2146,7 +2148,7 @@ UpdateFunctionGen::make_llvm_instr(std::shared_ptr<llvm::IRBuilder<>> &b,
   }
   else if (op == "<=") {
     if(isSigned)
-      return b->CreateICmpULE(sext(op1Expr, opWidth, c, b), sext(op2Expr, opWidth, c, b), name);
+      return b->CreateICmpSLE(sext(op1Expr, opWidth, c, b), sext(op2Expr, opWidth, c, b), name);
     else
       return b->CreateICmpULE(zext(op1Expr, opWidth, c, b), zext(op2Expr, opWidth, c, b), name);
   }
@@ -2177,31 +2179,32 @@ UpdateFunctionGen::make_llvm_instr(std::shared_ptr<llvm::IRBuilder<>> &b,
   }
   else if(op == "%") {
     if(isSigned)
-      return b->CreateURem(sext(op1Expr, destWidth, c, b), sext(op2Expr, destWidth, c, b), name);
+      return b->CreateSRem(sext(op1Expr, destWidth, c, b), sext(op2Expr, destWidth, c, b), name);
     else
       return b->CreateURem(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
   }
   else if(op == "<<") {
     if(isSigned)
-      return b->CreateShl(sext(op1Expr, destWidth, c, b), sext(op2Expr, destWidth, c, b), name);
+      return b->CreateShl(sext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
     else
       return b->CreateShl(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
   }
   else if(op == ">>") {
     if(isSigned)
-      return b->CreateLShr(sext(op1Expr, destWidth, c, b), sext(op2Expr, destWidth, c, b), name);
+      return b->CreateLShr(sext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
     else
       return b->CreateLShr(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
   }
   else if(op == ">>>") {
     if(destWidth >= op1Width)
       if(isSigned)
-        return b->CreateAShr(sext(op1Expr, destWidth, c, b), sext(op2Expr, destWidth, c, b), name);
+        return b->CreateAShr(sext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
       else
         return b->CreateAShr(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
     else
       if(isSigned)
         return extract_func(b->CreateAShr(op1Expr, sext(op2Expr, op1Width, c, b)), 
+                          destWidth-1, 0, c, b, name);
       else
         return extract_func(b->CreateAShr(op1Expr, zext(op2Expr, op1Width, c, b)), 
                           destWidth-1, 0, c, b, name);
