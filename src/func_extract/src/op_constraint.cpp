@@ -506,31 +506,47 @@ UpdateFunctionGen::two_op_constraint(astNode* const node, uint32_t timeIdx, cont
   llvm::Value* op1ExtExpr;
   llvm::Value* op2ExtExpr;
   auto destTy = llvmWidth(destWidthNum, c);
-  if(node->extVec.empty()) {
+  if(node->extVec.empty() || node->extVec[0] == 0) {
     op1ExtExpr = op1Expr;
   }
   else if(node->extVec[0] == 1) {
     std::string op1Timed = timed_name(prefix+op1AndSlice+"_SIGN", timeIdx);    
-    op1ExtExpr = b->CreateSExt(op1Expr, destTy, llvm::Twine(op1Timed));
+    //op1ExtExpr = b->CreateSExt(op1Expr, destTy, llvm::Twine(op1Timed));
   }
   else if(node->extVec[0] == 2) {
+    toCout("Error: do not support $unsigned yet: "+destAndSlice);
+    abort();
     std::string op1Timed = timed_name(prefix+op1AndSlice+"_UNSIGN", timeIdx);    
     op1ExtExpr = b->CreateZExt(op1Expr, destTy, llvm::Twine(op1Timed));
   }
+  else {
+    toCout("Error: unexpected extVec value: "+toStr(node->extVec[0]));
+    abort();
+  }
 
-  if(node->extVec.empty()) {
+  if(node->extVec.empty() || node->extVec[1] == 0) {
     op2ExtExpr = op2Expr;
   }
   else if(node->extVec[1] == 1) {
     std::string op2Timed = timed_name(prefix+op2AndSlice+"_SIGN", timeIdx);    
-    op2ExtExpr = b->CreateSExt(op2Expr, destTy, llvm::Twine(op2Timed));
+    //op2ExtExpr = b->CreateSExt(op2Expr, destTy, llvm::Twine(op2Timed));
   }
   else if(node->extVec[1] == 2) {
+    toCout("Error: do not support $unsigned yet!");
+    abort();
     std::string op2Timed = timed_name(prefix+op2AndSlice+"_UNSIGN", timeIdx);    
     op2ExtExpr = b->CreateZExt(op2Expr, destTy, llvm::Twine(op2Timed));
   }
-
-
+  else {
+    toCout("Error: unexpected extVec value: "+toStr(node->extVec[0]));
+    abort();
+  }
+  if( (node->extVec[0] == 1 && node->extVec[1] != 1) 
+      || (node->extVec[0] != 1 && node->extVec[1] == 1) ) {
+    toCout("Error: only one op is signed: "+destAndSlice);
+    abort();
+  }
+  bool isSigned = node->extVec[0] == 1;
 
   //bool op1IsReadRoot = is_root(op1AndSlice) && is_read_asv(op1AndSlice) && timeIdx == bound + 1;
   //bool op2IsReadRoot = is_root(op2AndSlice) && is_read_asv(op2AndSlice) && timeIdx == bound + 1;
@@ -551,8 +567,10 @@ UpdateFunctionGen::two_op_constraint(astNode* const node, uint32_t timeIdx, cont
   if(curMod->name == "hls_target_Loop_1_proc")
     toCout("Find it!");
   toCoutVerb("go to make_llvm_instr from two-op: "+op1AndSlice+", "+op2AndSlice);
-  return make_llvm_instr(b, c, node->op, op1ExtExpr, op2ExtExpr, 
-                         destWidthNum, op1WidthNum, op2WidthNum, llvm::Twine(destTimed));
+  if(op1AndSlice == "\\compute.inst_q.value")
+    toCoutVerb("Find it!");
+  return make_llvm_instr(b, c, node->op, op1Expr, op2Expr, destWidthNum, 
+                         op1WidthNum, op2WidthNum, llvm::Twine(destTimed), isSigned);
 }
 
 
@@ -590,7 +608,8 @@ UpdateFunctionGen::one_op_constraint(astNode* const node, uint32_t timeIdx,
   std::string destTimed = timed_name(prefix+destAndSlice, timeIdx);
   toCoutVerb("go to make_llvm_instr from one-op: "+op1AndSlice+", dest: "+destAndSlice);
 
-  if(curMod->name == "hls_target_Loop_1_proc")
+  //if(curMod->name == "hls_target_Loop_1_proc")
+  if(destAndSlice.find("\\compute.tensorAlu.AluVector.f_15.alu.io_b") != std::string::npos)
     toCout("Find it!");
   return make_llvm_instr(b, c, node->op, op1Expr, op1WidthNum, llvm::Twine(destTimed));
 }
@@ -859,7 +878,7 @@ UpdateFunctionGen::ite_op_constraint(astNode* const node, uint32_t timeIdx, cont
   std::string op2, op2Slice;
 
   //if(destAndSlice.find("yuzeng5") != std::string::npos) {
-  if(destAndSlice == "yuzeng5") {
+  if(destAndSlice == "_0004_" && timeIdx == 11) {
     toCoutVerb("Found it!");
   }
 
@@ -2041,17 +2060,23 @@ UpdateFunctionGen::make_llvm_instr(std::shared_ptr<llvm::IRBuilder<>> &b,
                              context &c, std::string op, 
                              llvm::Value* op1Expr, llvm::Value* op2Expr, 
                              uint32_t destWidth, uint32_t op1Width, uint32_t op2Width,
-                             const llvm::Twine &name) {
+                             const llvm::Twine &name, bool isSigned) {
   uint32_t opWidth = std::max(op1Width, op2Width);
   if(op == "&") {
-    return b->CreateAnd(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
+    if(isSigned)
+      return b->CreateAnd(sext(op1Expr, destWidth, c, b), sext(op2Expr, destWidth, c, b), name);
+    else
+      return b->CreateAnd(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
   }
   else if(op == "&&") {
     return b->CreateAnd( b->CreateICmpNE(op1Expr, llvmInt(0, op1Width, c)), 
                          b->CreateICmpNE(op2Expr, llvmInt(0, op2Width, c)) , name);
   }
   else if(op == "|") {
-    return b->CreateOr(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
+    if(isSigned)
+      return b->CreateOr(sext(op1Expr, destWidth, c, b), sext(op2Expr, destWidth, c, b), name);
+    else
+      return b->CreateOr(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
   }
   else if(op == "||") {
     assert(op1Width == 1 && op2Width == 1);
@@ -2059,74 +2084,126 @@ UpdateFunctionGen::make_llvm_instr(std::shared_ptr<llvm::IRBuilder<>> &b,
     return b->CreateOr( op1Expr, op2Expr, name );    
   }
   else if(op == "^") {
-    return b->CreateXor(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
+    if(isSigned)  
+      return b->CreateXor(sext(op1Expr, destWidth, c, b), sext(op2Expr, destWidth, c, b), name);
+    else
+      return b->CreateXor(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
   }
   else if (op == "==") {
-    std::string name1 = op1Expr->getName().str();
-    std::string name2 = op2Expr->getName().str();
-    toCoutVerb("compare1: "+name1+", "+name2);    
-    return b->CreateICmpEQ(zext(op1Expr, opWidth, c, b), zext(op2Expr, opWidth, c, b), name);
+    std::string name1; 
+    if(op1Expr->hasName())
+      name1 = op1Expr->getName().str();
+    std::string name2; 
+    if(op2Expr->hasName())
+      name2 = op2Expr->getName().str();
+    toCoutVerb("compare1: "+name1+", "+name2);
+    if(isSigned)
+      return b->CreateICmpEQ(sext(op1Expr, opWidth, c, b), sext(op2Expr, opWidth, c, b), name);
+    else
+      return b->CreateICmpEQ(zext(op1Expr, opWidth, c, b), zext(op2Expr, opWidth, c, b), name);
   }
   else if (op == "===") {
     std::string name1 = op1Expr->getName().str();
     std::string name2 = op2Expr->getName().str();
-    toCoutVerb("compare2: "+name1+", "+name2);    
-    return b->CreateICmpEQ(zext(op1Expr, opWidth, c, b), zext(op2Expr, opWidth, c, b), name);
+    toCoutVerb("compare2: "+name1+", "+name2);
+    if(isSigned)
+      return b->CreateICmpEQ(sext(op1Expr, opWidth, c, b), sext(op2Expr, opWidth, c, b), name);
+    else
+      return b->CreateICmpEQ(zext(op1Expr, opWidth, c, b), zext(op2Expr, opWidth, c, b), name);
   }
   else if (op == "!=") {
-    return b->CreateICmpNE(zext(op1Expr, opWidth, c, b), zext(op2Expr, opWidth, c, b), name);
+    if(isSigned)
+      return b->CreateICmpNE(sext(op1Expr, opWidth, c, b), sext(op2Expr, opWidth, c, b), name);
+    else
+      return b->CreateICmpNE(zext(op1Expr, opWidth, c, b), zext(op2Expr, opWidth, c, b), name);
   }
   else if (op == ">") {
-    return b->CreateICmpUGT(zext(op1Expr, opWidth, c, b), zext(op2Expr, opWidth, c, b), name);
+    if(isSigned)
+      return b->CreateICmpUGT(sext(op1Expr, opWidth, c, b), sext(op2Expr, opWidth, c, b), name);
+    else
+      return b->CreateICmpUGT(zext(op1Expr, opWidth, c, b), zext(op2Expr, opWidth, c, b), name);
   }
   else if (op == "$>") { // signed great than?
     return b->CreateICmpSGT(sext(op1Expr, opWidth, c, b), sext(op2Expr, opWidth, c, b), name);
   }
   else if (op == ">=") {
-    return b->CreateICmpUGE(zext(op1Expr, opWidth, c, b), zext(op2Expr, opWidth, c, b), name);
+    if(isSigned)
+      return b->CreateICmpUGE(sext(op1Expr, opWidth, c, b), sext(op2Expr, opWidth, c, b), name);
+    else
+      return b->CreateICmpUGE(zext(op1Expr, opWidth, c, b), zext(op2Expr, opWidth, c, b), name);
   }
   else if (op == "$>=") {
     return b->CreateICmpSGE(sext(op1Expr, opWidth, c, b), sext(op2Expr, opWidth, c, b), name);
   }
   else if (op == "<") {
-    return b->CreateICmpULT(zext(op1Expr, opWidth, c, b), zext(op2Expr, opWidth, c, b), name);
+    if(isSigned)
+      return b->CreateICmpULT(sext(op1Expr, opWidth, c, b), sext(op2Expr, opWidth, c, b), name);
+    else
+      return b->CreateICmpULT(zext(op1Expr, opWidth, c, b), zext(op2Expr, opWidth, c, b), name);
   }
   else if (op == "$<") {
     return b->CreateICmpSLT(sext(op1Expr, opWidth, c, b), sext(op2Expr, opWidth, c, b), name);
   }
   else if (op == "<=") {
-    return b->CreateICmpULE(zext(op1Expr, opWidth, c, b), zext(op2Expr, opWidth, c, b), name);
+    if(isSigned)
+      return b->CreateICmpULE(sext(op1Expr, opWidth, c, b), sext(op2Expr, opWidth, c, b), name);
+    else
+      return b->CreateICmpULE(zext(op1Expr, opWidth, c, b), zext(op2Expr, opWidth, c, b), name);
   }
   else if (op == "$<=") {
     return b->CreateICmpSLE(sext(op1Expr, opWidth, c, b), sext(op2Expr, opWidth, c, b), name);
   }
   else if(op == "+") {
-    return b->CreateAdd(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
+    if(isSigned)    
+      return b->CreateAdd(sext(op1Expr, destWidth, c, b), sext(op2Expr, destWidth, c, b), name);
+    else
+      return b->CreateAdd(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
   }
   else if(op == "-") {
-    return b->CreateSub(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
+    if(isSigned)
+      return b->CreateSub(sext(op1Expr, destWidth, c, b), sext(op2Expr, destWidth, c, b), name);
+    else
+      return b->CreateSub(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
   }
   else if(op == "*") {
-    return b->CreateMul(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
+    if(isSigned)
+      return b->CreateMul(sext(op1Expr, destWidth, c, b), sext(op2Expr, destWidth, c, b), name);
+    else
+      return b->CreateMul(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
   }
   else if(op == "/") {
     toCout("Error: not support divide operation yet!");
     abort();
   }
   else if(op == "%") {
-    return b->CreateURem(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
+    if(isSigned)
+      return b->CreateURem(sext(op1Expr, destWidth, c, b), sext(op2Expr, destWidth, c, b), name);
+    else
+      return b->CreateURem(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
   }
   else if(op == "<<") {
-    return b->CreateShl(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
+    if(isSigned)
+      return b->CreateShl(sext(op1Expr, destWidth, c, b), sext(op2Expr, destWidth, c, b), name);
+    else
+      return b->CreateShl(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
   }
   else if(op == ">>") {
-    return b->CreateLShr(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
+    if(isSigned)
+      return b->CreateLShr(sext(op1Expr, destWidth, c, b), sext(op2Expr, destWidth, c, b), name);
+    else
+      return b->CreateLShr(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
   }
   else if(op == ">>>") {
     if(destWidth >= op1Width)
-      return b->CreateAShr(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
+      if(isSigned)
+        return b->CreateAShr(sext(op1Expr, destWidth, c, b), sext(op2Expr, destWidth, c, b), name);
+      else
+        return b->CreateAShr(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
     else
-      return extract_func(b->CreateAShr(op1Expr, zext(op2Expr, op1Width, c, b)), 
+      if(isSigned)
+        return extract_func(b->CreateAShr(op1Expr, sext(op2Expr, op1Width, c, b)), 
+      else
+        return extract_func(b->CreateAShr(op1Expr, zext(op2Expr, op1Width, c, b)), 
                           destWidth-1, 0, c, b, name);
   }
   else {

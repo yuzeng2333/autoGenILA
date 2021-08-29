@@ -812,7 +812,7 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
                             uint32_t bound ) {
   // Attention: varAndSlice might have a slice, a directly-assigned varAndSlice
   std::string varAndSlice = node->dest;
-  if(varAndSlice.find("hls_target_linebuffer_1_U0_out_stream_V_value_V_write") 
+  if(varAndSlice.find("\\compute.inst_q.value_1") 
        != std::string::npos)
     toCoutVerb("Find it!");
 

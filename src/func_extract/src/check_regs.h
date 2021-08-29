@@ -265,7 +265,7 @@ class UpdateFunctionGen {
                              context &c, std::string op, 
                              llvm::Value* op1Expr, llvm::Value* op2Expr, 
                              uint32_t destWidth, uint32_t op1Width, uint32_t op2Width,
-                             const llvm::Twine &name);
+                             const llvm::Twine &name, bool isSigned=false);
 
     llvm::Value* make_llvm_instr(builder &b, context &c, std::string op, 
                              llvm::Value* op1Expr, uint32_t op1WidthNum,
