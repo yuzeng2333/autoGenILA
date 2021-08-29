@@ -465,7 +465,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
       astNode* node = memNodeMap[mem];
       uint32_t lastWriteTimeIdx = pair.second.lastWriteTimeIdx;
       for(uint32_t i = lastWriteTimeIdx+1; i < bound; i++) {
-        //mem_assign_constraint(node, i, TheContext, Builder, bound);
+        mem_assign_constraint(node, i, TheContext, Builder, bound);
       }
     }
   }
@@ -885,13 +885,39 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
     else
       retExpr = submod_constraint(node, timeIdx, c, b, bound);
   }
-  // By design, the memory assign statement is always called directly
-  // in dyn_sel_constraint(when it is read). So it should not appear in 
-  // add_constraint
   else if( node->type == MEM_IF_ASSIGN ) {
-    toCout("Error: mem_if_assign should not appear in add_constraint:"
-            +node->dest);
-    abort();
+    //toCout("Error: mem_if_assign should not appear in add_constraint:"
+    //        +node->dest);
+    //abort();
+
+    std::string mem = node->dest;
+    uint32_t lineWidth = curMod->moduleMems[mem].first;
+    uint32_t lineNum = curMod->moduleMems[mem].second;
+
+    llvm::Type* elementTy = llvmWidth(lineWidth, c);
+    llvm::ArrayType* arrayType = llvm::ArrayType::get(elementTy, lineNum);
+    std::vector<llvm::Constant*> initList;  
+    for(uint32_t i = 0; i < lineNum; i++) {
+      initList.push_back(
+        llvm::ConstantInt::get(llvm::IntegerType::get(*c, lineWidth), 
+                               0, false)
+      );
+    }
+    // initialize the MemDynInfo_t
+    llvm::Value* memValue;    
+    llvm::GlobalVariable* memArr = new llvm::GlobalVariable(
+      *TheModule,
+      arrayType, false,
+      // llvm::GlobalValue::InternalLinkage,
+      llvm::GlobalValue::LinkOnceAnyLinkage,
+      llvm::ConstantArray::get(arrayType, 
+                              llvm::ArrayRef<llvm::Constant*>(initList)),
+      mem+"_ARR"
+    );
+    memValue = memArr;
+    curDynData->memDynInfo.emplace(mem, MemDynInfo_t{0, memValue});
+    mem_assign_constraint(node, timeIdx, c, b, bound);
+    return nullptr;
   }
   else if( node->type == DYNSEL ) {
     retExpr = dyn_sel_constraint(node, timeIdx, c, b, bound);

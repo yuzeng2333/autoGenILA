@@ -1973,7 +1973,7 @@ UpdateFunctionGen::dyn_sel_constraint( astNode* const node, uint32_t timeIdx, co
     llvm::GlobalVariable* memArr = new llvm::GlobalVariable(
       *TheModule,
       arrayType, false,
-      //llvm::GlobalValue::InternalLinkage,
+      // llvm::GlobalValue::InternalLinkage,
       llvm::GlobalValue::LinkOnceAnyLinkage,
       llvm::ConstantArray::get(arrayType, 
                               llvm::ArrayRef<llvm::Constant*>(initList)),
@@ -2032,7 +2032,6 @@ UpdateFunctionGen::dyn_sel_constraint( astNode* const node, uint32_t timeIdx, co
 
   return memLoad;
 }
-
 
 
 

@@ -644,23 +644,23 @@ void add_two_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   if(op1AndSlice.find("$signed") != std::string::npos) {
     op1Ext = 1;
     op1AndSlice = remove_signed(op1AndSlice);
-    assert(op1AndSlice.find("$signed") != std::string::npos);
+    assert(op1AndSlice.find("$signed") == std::string::npos);
   }
   else if(op1AndSlice.find("$unsigned") != std::string::npos) {
     op1Ext = 2;
-    op1AndSlice = remove_signed(op1AndSlice);
-    assert(op1AndSlice.find("$unsigned") != std::string::npos);
+    op1AndSlice = remove_unsigned(op1AndSlice);
+    assert(op1AndSlice.find("$unsigned") == std::string::npos);
   }
 
   if(op2AndSlice.find("$signed") != std::string::npos) {
     op2Ext = 1;
     op2AndSlice = remove_signed(op2AndSlice);
-    assert(op2AndSlice.find("$signed") != std::string::npos);
+    assert(op2AndSlice.find("$signed") == std::string::npos);
   }
   else if(op2AndSlice.find("$unsigned") != std::string::npos) {
     op2Ext = 2;
-    op2AndSlice = remove_signed(op2AndSlice);
-    assert(op2AndSlice.find("$unsigned") != std::string::npos);
+    op2AndSlice = remove_unsigned(op2AndSlice);
+    assert(op2AndSlice.find("$unsigned") == std::string::npos);
   }
 
   //if(destAndSlice.compare("adr_check") == 0) {
@@ -1105,7 +1105,10 @@ bool check_two_op(std::string line,
                   std::string &op1, 
                   std::string &op2, 
                   bool &isReduceOp) {
-  line = remove_signed(line);
+  //line = remove_signed(line);
+  if(line.find("compute.tensorGemm.mvc_0.add_0_15") 
+       != std::string::npos)
+    toCout("Find it!");
   isReduceOp = false;
   std::smatch m;
   if ( std::regex_match(line, m, pAdd)) {
