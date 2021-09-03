@@ -1832,7 +1832,12 @@ void UpdateFunctionGen::mem_assign_constraint(
   auto curDynData = get_dyn_data(curMod);
   auto curFunc = insContextStk.get_func();  
 
+  if(node == nullptr) {
+    toCout("Error: the node ptr is null!");
+    abort();
+  }
   std::string mem = node->dest;
+  toCoutVerb("mem_assign_constraint for: "+mem);
   if(curDynData->memDynInfo.find(mem) == curDynData->memDynInfo.end()) {
     toCout("Error: the mem is not yet defined: "+mem);
     abort();

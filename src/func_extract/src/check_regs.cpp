@@ -459,11 +459,19 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 
   // if the top module contains memories, add the additional memory
   // writes from lastMemReadAddr+1 to bound-1
+  uint32_t i = 0;
   if(!curMod->moduleMems.empty()) {
     for(auto pair : curDynData->memDynInfo) {
       std::string mem = pair.first;
+      toCoutVerb("check mem: "+mem);
+      if(i == 48)
+        toCoutVerb("Find i!");
+      toCoutVerb("i: "+toStr(i++));
+      if(mem.find("\\store.tensorStore.tensorFile_0_0") != std::string::npos)
+        toCoutVerb("Find it!");
       astNode* node = memNodeMap[mem];
       uint32_t lastWriteTimeIdx = pair.second.lastWriteTimeIdx;
+      if(lastWriteTimeIdx == 0) continue;
       for(uint32_t i = lastWriteTimeIdx+1; i < bound; i++) {
         mem_assign_constraint(node, i, TheContext, Builder, bound);
       }
@@ -822,7 +830,7 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
 
   std::shared_ptr<ModuleDynInfo_t> curDynData = get_dyn_data(curMod);
   toCoutVerb("add_constraint for: "+varAndSlice+", timeIdx: "+toStr(timeIdx));
-  if(varAndSlice == "ap_CS_fsm" && timeIdx == 17) {
+  if(varAndSlice == "64'hxxxxxxxxxxxxxxxx" && timeIdx == 1) {
     toCoutVerb("find it");
   }
 
