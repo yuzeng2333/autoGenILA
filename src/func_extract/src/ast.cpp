@@ -513,6 +513,7 @@ void add_ssa_node(std::string varAndSlice, uint32_t timeIdx, astNode* const node
       break;
     case DYNSEL:
       add_dyn_sel_node(varAssign, timeIdx, node);
+      break;
     default:
       toCout("Error in add_ssa_node for: "+var);
       break;
