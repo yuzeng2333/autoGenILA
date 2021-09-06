@@ -53,6 +53,7 @@ class DestInfo {
 
 struct MemDynInfo_t {
   uint32_t lastWriteTimeIdx;
+  bool hasBeenWritten;
   llvm::Value* memValue;
 };
 

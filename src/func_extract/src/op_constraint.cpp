@@ -1852,6 +1852,7 @@ void UpdateFunctionGen::mem_assign_constraint(
     abort();
   }
   else {
+    curDynData->memDynInfo[mem].hasBeenWritten = true;
     uint32_t lastIdx = curDynData->memDynInfo[mem].lastWriteTimeIdx;
     if(timeIdx > lastIdx)
       curDynData->memDynInfo[mem].lastWriteTimeIdx = timeIdx;
@@ -2016,7 +2017,7 @@ UpdateFunctionGen::dyn_sel_constraint( astNode* const node, uint32_t timeIdx, co
     );
     memValue = memArr;
     // the first time the item is initialized
-    curDynData->memDynInfo.emplace(mem, MemDynInfo_t{0, memValue});
+    curDynData->memDynInfo.emplace(mem, MemDynInfo_t{0, false, memValue});
   }
   else {
     memValue = curDynData->memDynInfo[mem].memValue;

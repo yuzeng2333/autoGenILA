@@ -470,8 +470,8 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
       if(mem.find("\\store.tensorStore.tensorFile_0_0") != std::string::npos)
         toCoutVerb("Find it!");
       astNode* node = memNodeMap[mem];
+      if(!pair.second.hasBeenWritten) continue;      
       uint32_t lastWriteTimeIdx = pair.second.lastWriteTimeIdx;
-      if(lastWriteTimeIdx == 0) continue;
       for(uint32_t i = lastWriteTimeIdx+1; i < bound; i++) {
         mem_assign_constraint(node, i, TheContext, Builder, bound);
       }
@@ -900,6 +900,10 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
     //abort();
 
     std::string mem = node->dest;
+    if(curDynData->memDynInfo.find(mem) != curDynData->memDynInfo.end()) {
+      toCout("Error: the mem is already in curDynData->memDynInfo: "+mem);
+      abort();
+    }
     uint32_t lineWidth = curMod->moduleMems[mem].first;
     uint32_t lineNum = curMod->moduleMems[mem].second;
 
@@ -924,7 +928,7 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
       mem+"_ARR"
     );
     memValue = memArr;
-    curDynData->memDynInfo.emplace(mem, MemDynInfo_t{0, memValue});
+    curDynData->memDynInfo.emplace(mem, MemDynInfo_t{0, false, memValue});
     mem_assign_constraint(node, timeIdx, c, b, bound);
     return nullptr;
   }
