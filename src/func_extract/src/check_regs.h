@@ -109,23 +109,23 @@ class UpdateFunctionGen {
 
     llvm::Value* add_constraint(std::string varAndSlice, uint32_t timeIdx, context &c,
                                 std::shared_ptr<llvm::IRBuilder<>> &b,
-                                uint32_t bound);
+                                const uint32_t bound);
     
     llvm::Value* add_constraint(astNode* const node, uint32_t timeIdx, context &c,
                                 std::shared_ptr<llvm::IRBuilder<>> &b,
-                                uint32_t bound );
+                                const uint32_t bound );
 
     llvm::Value* add_nb_constraint(astNode* const node, 
                                    uint32_t timeIdx, context &c, 
                                    std::shared_ptr<llvm::IRBuilder<>> &b,
-                                   uint32_t bound);
+                                   const uint32_t bound);
     
     llvm::Value* add_ssa_constraint(astNode* const node, uint32_t timeIdx, context &c,  
-                                    std::shared_ptr<llvm::IRBuilder<>> &b, uint32_t bound);
+                                    std::shared_ptr<llvm::IRBuilder<>> &b, const uint32_t bound);
     
     void add_child_constraint(astNode* const parentNode, uint32_t timeIdx, 
                               context &c, solver &s, goal &g, 
-                              uint32_t bound, bool isSolve);
+                              const uint32_t bound, bool isSolve);
 
     void push_clean_queue(astNode* node, uint32_t timeIdx);
     
@@ -156,7 +156,7 @@ class UpdateFunctionGen {
     get_dyn_data(std::shared_ptr<ModuleInfo_t> curMod);
     
     void print_llvm_ir(DestInfo &destInfo, 
-                       uint32_t bound, 
+                       const uint32_t bound, 
                        uint32_t instrIdx);
     
     
@@ -170,7 +170,7 @@ class UpdateFunctionGen {
     
     llvm::Value* input_constraint(astNode* const node, uint32_t timeIdx, context &c, 
                                   std::shared_ptr<llvm::IRBuilder<>> &b, 
-                                  uint32_t bound);
+                                  const uint32_t bound);
     
     llvm::Value* mixed_value_expr(std::string value, context &c, std::string varName, 
                                   uint32_t timeIdx, uint32_t idx,
@@ -184,54 +184,54 @@ class UpdateFunctionGen {
                                 std::shared_ptr<llvm::IRBuilder<>> &b);
     
     llvm::Value* two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, 
-                                   std::shared_ptr<llvm::IRBuilder<>> &b, uint32_t bound);
+                                   std::shared_ptr<llvm::IRBuilder<>> &b, const uint32_t bound);
     
     llvm::Value* one_op_constraint(astNode* const node, uint32_t timeIdx, 
-                                   context &c, builder &b, uint32_t bound);
+                                   context &c, builder &b, const uint32_t bound);
     
     llvm::Value* reduce_one_op_constraint(astNode* const node, uint32_t timeIdx, 
-                                          context &c, builder &b, uint32_t bound);
+                                          context &c, builder &b, const uint32_t bound);
     
     llvm::Value* sel5_op_constraint(astNode* const node, uint32_t timeIdx, 
-                                    context &c, builder &b, uint32_t bound );
+                                    context &c, builder &b, const uint32_t bound );
     
     llvm::Value* sel_op_constraint(astNode* const node, uint32_t timeIdx, 
-                                   context &c, builder &b, uint32_t bound );
+                                   context &c, builder &b, const uint32_t bound );
     
     llvm::Value* src_concat_op_constraint(astNode* const node, uint32_t timeIdx, 
-                                          context &c, builder &b, uint32_t bound );
+                                          context &c, builder &b, const uint32_t bound );
     
     llvm::Value* add_one_concat_expr(astNode* const node, uint32_t nxtIdx, uint32_t timeIdx, 
-                                     context &c, builder &b, uint32_t bound, bool noinline=true );
+                                     context &c, builder &b, const uint32_t bound, bool noinline=true );
     
     llvm::Value* ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, 
-                                   builder &b, uint32_t bound );
+                                   builder &b, const uint32_t bound );
     
     llvm::Value* case_constraint(astNode* const node, uint32_t timeIdx, 
-                                 context &c, builder &b, uint32_t bound);
+                                 context &c, builder &b, const uint32_t bound);
     
     llvm::Value* switch_constraint(astNode* const node, uint32_t timeIdx, 
-                                   context &c, builder &b, uint32_t bound);
+                                   context &c, builder &b, const uint32_t bound);
 
     llvm::Value* add_one_case_branch_expr(astNode* const node, llvm::Value* &caseVarExpr, 
                                           uint32_t idx, uint32_t timeIdx, context &c, 
-                                          builder &b, uint32_t bound, 
+                                          builder &b, const uint32_t bound, 
                                           const std::string &destTimed);
     
     llvm::Value* memMod_constraint(astNode* const node, uint32_t timeIdx, context &c,
-                               builder &b, uint32_t bound);
+                               builder &b, const uint32_t bound);
 
     llvm::Value* bbMod_constraint(astNode* const node, uint32_t timeIdx, context &c, 
-                                   builder &b, uint32_t bound);
+                                   builder &b, const uint32_t bound);
     
     llvm::Value* submod_constraint(astNode* const node, uint32_t timeIdx, context &c, 
-                                   builder &b, uint32_t bound);
+                                   builder &b, const uint32_t bound);
 
     llvm::Value* dyn_sel_constraint( astNode* const node, uint32_t timeIdx, context &c,  
-                                    std::shared_ptr<llvm::IRBuilder<>> &b, uint32_t bound);
+                                    std::shared_ptr<llvm::IRBuilder<>> &b, const uint32_t bound);
 
     void mem_assign_constraint( astNode* const node, uint32_t timeIdx, context &c,  
-                                std::shared_ptr<llvm::IRBuilder<>> &b, uint32_t bound);
+                                std::shared_ptr<llvm::IRBuilder<>> &b, const uint32_t bound);
 
     llvm::Value* extract_func(llvm::Value* in, uint32_t high, uint32_t low,
                           std::shared_ptr<llvm::LLVMContext> &c, 
@@ -286,7 +286,7 @@ void check_all_regs();
 void clean_data();
 
 void print_llvm_ir_without_submodules(std::string destAndSlice, 
-                                      uint32_t bound, 
+                                      const uint32_t bound, 
                                       uint32_t instrIdx);
 
 //void check_single_reg_and_slice(std::string regAndSlice, 
@@ -295,21 +295,21 @@ void print_llvm_ir_without_submodules(std::string destAndSlice,
 
 
 //void add_clean_constraint(astNode* const node, uint32_t timeIdx, context &c, 
-//                          solver &s, goal &g, uint32_t bound, bool isSolve);
+//                          solver &s, goal &g, const uint32_t bound, bool isSolve);
 
 
 //void add_all_clean_constraints(context &c, solver &s, goal &g, 
-//                               uint32_t bound, bool isSolve=true);
+//                               const uint32_t bound, bool isSolve=true);
 
 //void add_dirty_constraint(astNode* const node, uint32_t timeIdx, 
-//                          context &c, solver &s, uint32_t bound);
+//                          context &c, solver &s, const uint32_t bound);
 
 
-//void add_all_dirty_constraints(context &c, solver &s, uint32_t bound);
+//void add_all_dirty_constraints(context &c, solver &s, const uint32_t bound);
 
-//void add_input_values(context &c, solver &s, uint32_t bound);
+//void add_input_values(context &c, solver &s, const uint32_t bound);
 
-//void add_nop(context &c, solver &s, uint32_t bound);
+//void add_nop(context &c, solver &s, const uint32_t bound);
 
 void print_time(); 
 

@@ -161,13 +161,13 @@ llvm::Value* UpdateFunctionGen::bv_val(std::string var, context &c) {
 
 llvm::Value* 
 UpdateFunctionGen::input_constraint(astNode* const node, uint32_t timeIdx, 
-                                    context &c, builder &b, uint32_t bound) {
+                                    context &c, builder &b, const uint32_t bound) {
   //if(is_top_module()) g_seeInputs = true;
   std::string dest = node->dest;
   if(dest == "mem_rdata" ) {
     toCoutVerb("Find it!");
   }
-  if(dest == "io_vme_rd_2_cmd_ready" && timeIdx == 3)
+  if(dest == "io_vme_rd_0_data_bits")// && timeIdx == 3)
     toCoutVerb("Find it!");
   toCoutVerb("See input:"+timed_name(dest, timeIdx));
   std::string destTimed = timed_name(dest, timeIdx);
@@ -430,7 +430,7 @@ UpdateFunctionGen::num_constraint(astNode* const node, uint32_t timeIdx,
 
 llvm::Value* 
 UpdateFunctionGen::two_op_constraint(astNode* const node, uint32_t timeIdx, context &c, 
-                                     builder &b, uint32_t bound) {
+                                     builder &b, const uint32_t bound) {
   toCoutVerb("Two op constraint for :"+node->dest);
   const auto curMod = insContextStk.get_curMod();
   auto curDynData = get_dyn_data(curMod);
@@ -578,7 +578,7 @@ UpdateFunctionGen::two_op_constraint(astNode* const node, uint32_t timeIdx, cont
 
 llvm::Value* 
 UpdateFunctionGen::one_op_constraint(astNode* const node, uint32_t timeIdx, 
-                                     context &c, builder &b, uint32_t bound) {
+                                     context &c, builder &b, const uint32_t bound) {
   toCoutVerb("One op constraint for :"+node->dest);
   auto curMod = insContextStk.get_curMod();
   auto curDynData = get_dyn_data(curMod);
@@ -619,7 +619,7 @@ UpdateFunctionGen::one_op_constraint(astNode* const node, uint32_t timeIdx,
 
 llvm::Value* 
 UpdateFunctionGen::reduce_one_op_constraint(astNode* const node, uint32_t timeIdx, 
-                                            context &c, builder &b, uint32_t bound) {
+                                            context &c, builder &b, const uint32_t bound) {
   toCoutVerb("Reduce one op constraint for: "+node->dest);
   auto curMod = insContextStk.get_curMod();
   auto curDynData = get_dyn_data(curMod);
@@ -658,7 +658,7 @@ UpdateFunctionGen::reduce_one_op_constraint(astNode* const node, uint32_t timeId
 
 llvm::Value* 
 UpdateFunctionGen::sel5_op_constraint(astNode* const node, uint32_t timeIdx, 
-                                      context &c, builder &b, uint32_t bound  ) {
+                                      context &c, builder &b, const uint32_t bound  ) {
   std::smatch m;  
   assert(node->srcVec.size() == 3);
   std::string destAndSlice = node->dest;
@@ -677,7 +677,7 @@ UpdateFunctionGen::sel5_op_constraint(astNode* const node, uint32_t timeIdx,
 
 llvm::Value* 
 UpdateFunctionGen::sel_op_constraint(astNode* const node, uint32_t timeIdx, 
-                                     context &c, builder &b, uint32_t bound ) {
+                                     context &c, builder &b, const uint32_t bound ) {
   toCoutVerb("Sel op constraint for :"+node->dest);
   const auto curMod = insContextStk.get_curMod();  
   auto curDynData = get_dyn_data(curMod);
@@ -779,7 +779,7 @@ UpdateFunctionGen::sel_op_constraint(astNode* const node, uint32_t timeIdx,
 // TODO: call an explicit concat function in LLVM IR
 llvm::Value* 
 UpdateFunctionGen::src_concat_op_constraint(astNode* const node, uint32_t timeIdx, 
-                                            context &c, builder &b, uint32_t bound ) {
+                                            context &c, builder &b, const uint32_t bound ) {
   toCoutVerb("Src concat op constraint for: "+node->dest);
   const auto curMod = insContextStk.get_curMod();  
   std::string destAndSlice = node->dest;
@@ -818,7 +818,7 @@ UpdateFunctionGen::src_concat_op_constraint(astNode* const node, uint32_t timeId
 
 llvm::Value* 
 UpdateFunctionGen::add_one_concat_expr(astNode* const node, uint32_t nxtIdx, uint32_t timeIdx, 
-                                       context &c, builder &b, uint32_t bound, bool noinline ) {
+                                       context &c, builder &b, const uint32_t bound, bool noinline ) {
   const auto curMod = insContextStk.get_curMod();  
   llvm::Value* firstSrcExpr;
   llvm::Value* retExpr;
@@ -860,7 +860,7 @@ UpdateFunctionGen::add_one_concat_expr(astNode* const node, uint32_t nxtIdx, uin
 
 llvm::Value* 
 UpdateFunctionGen::ite_op_constraint(astNode* const node, uint32_t timeIdx, context &c, 
-                                     builder &b, uint32_t bound ) {
+                                     builder &b, const uint32_t bound ) {
   toCoutVerb("Ite op constraint for :"+node->dest);
   const auto curMod = insContextStk.get_curMod();  
   auto curDynData = get_dyn_data(curMod);
@@ -1004,7 +1004,7 @@ UpdateFunctionGen::ite_op_constraint(astNode* const node, uint32_t timeIdx, cont
 
 // old case function
 //llvm::Value* case_constraint(astNode* const node, uint32_t timeIdx, 
-//                             context &c, builder &b, uint32_t bound) {
+//                             context &c, builder &b, const uint32_t bound) {
 //  toCoutVerb("Case op constraint for :"+node->dest);  
 //  assert(node->type == CASE);
 //  assert(node->srcVec.size() % 2 == 1);
@@ -1106,7 +1106,7 @@ UpdateFunctionGen::ite_op_constraint(astNode* const node, uint32_t timeIdx, cont
 
 llvm::Value* 
 UpdateFunctionGen::case_constraint(astNode* const node, uint32_t timeIdx, 
-                                   context &c, builder &b, uint32_t bound) {
+                                   context &c, builder &b, const uint32_t bound) {
   toCoutVerb("Case op constraint for :"+node->dest);
   const auto curMod = insContextStk.get_curMod();  
   auto curDynData = get_dyn_data(curMod);
@@ -1170,7 +1170,7 @@ UpdateFunctionGen::case_constraint(astNode* const node, uint32_t timeIdx,
 // consecutive values
 llvm::Value* 
 UpdateFunctionGen::switch_constraint(astNode* const node, uint32_t timeIdx, 
-                                     context &c, builder &b, uint32_t bound) {
+                                     context &c, builder &b, const uint32_t bound) {
   const auto curMod = insContextStk.get_curMod();
   auto curDynData = get_dyn_data(curMod);
   auto curFunc = insContextStk.get_func();
@@ -1248,7 +1248,7 @@ UpdateFunctionGen::switch_constraint(astNode* const node, uint32_t timeIdx,
 llvm::Value* 
 UpdateFunctionGen::add_one_case_branch_expr(astNode* const node, llvm::Value* &caseVarExpr, 
                                             uint32_t idx, uint32_t timeIdx, context &c, 
-                                            builder &b, uint32_t bound,
+                                            builder &b, const uint32_t bound,
                                             const std::string &dest) {
   astNode *assignNode;
   const auto curMod = insContextStk.get_curMod();  
@@ -1317,7 +1317,7 @@ UpdateFunctionGen::add_one_case_branch_expr(astNode* const node, llvm::Value* &c
 } 
 
 
-//llvm::Value* func_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, uint32_t bound, bool isSolve) {
+//llvm::Value* func_constraint(astNode* const node, uint32_t timeIdx, context &c, solver &s, goal &g, const uint32_t bound, bool isSolve) {
 //  std::string destAndSlice = node->dest;
 //  g_moduleOutportTime.emplace(destAndSlice, timeIdx);
 //  toCout("Func constraint for:"+destAndSlice);  
@@ -1385,7 +1385,7 @@ UpdateFunctionGen::add_one_case_branch_expr(astNode* const node, llvm::Value* &c
 // we just return the argument of the top function
 llvm::Value* 
 UpdateFunctionGen::memMod_constraint(astNode* const node, uint32_t timeIdx, context &c,
-                                     builder &b, uint32_t bound) {
+                                     builder &b, const uint32_t bound) {
   toCout("begin memMod: "+node->dest);
   if(node->dest == "q0")
     toCoutVerb("Find it!");
@@ -1419,7 +1419,7 @@ UpdateFunctionGen::memMod_constraint(astNode* const node, uint32_t timeIdx, cont
 
 llvm::Value* 
 UpdateFunctionGen::bbMod_constraint(astNode* const node, uint32_t timeIdx, context &c, 
-                               builder &b, uint32_t bound) {
+                               builder &b, const uint32_t bound) {
   toCout("begin bbMod: "+node->dest);
   const auto curMod = insContextStk.get_curMod();  
   auto curDynData = get_dyn_data(curMod);
@@ -1511,7 +1511,7 @@ UpdateFunctionGen::bbMod_constraint(astNode* const node, uint32_t timeIdx, conte
 
 llvm::Value* 
 UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, context &c, 
-                                     builder &b, uint32_t bound) {
+                                     builder &b, const uint32_t bound) {
   // destAndSlice is the wire, not port
   std::string destAndSlice = node->dest;
   if(destAndSlice.find("hls_target_Loop_1_proc_U0_p_p2_in_bounded_stencil_stream_V_value_V_empty_n") 
@@ -1826,7 +1826,7 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
 // the RAW dependency for memory is a little tricky
 void UpdateFunctionGen::mem_assign_constraint(
                           astNode* const node, uint32_t timeIdx, context &c,  
-                          std::shared_ptr<llvm::IRBuilder<>> &b, uint32_t bound
+                          std::shared_ptr<llvm::IRBuilder<>> &b, const uint32_t bound
                         ){
   auto curMod = insContextStk.get_curMod();
   auto curDynData = get_dyn_data(curMod);
@@ -1951,7 +1951,7 @@ void UpdateFunctionGen::mem_assign_constraint(
 
 llvm::Value* 
 UpdateFunctionGen::dyn_sel_constraint( astNode* const node, uint32_t timeIdx, context &c,  
-                                    std::shared_ptr<llvm::IRBuilder<>> &b, uint32_t bound){
+                                    std::shared_ptr<llvm::IRBuilder<>> &b, const uint32_t bound){
   toCoutVerb("dyn sel constraint for :"+node->dest);
   auto curMod = insContextStk.get_curMod();
   auto curFunc = insContextStk.get_func();  

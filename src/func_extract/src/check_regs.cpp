@@ -143,7 +143,7 @@ void UpdateFunctionGen::clean_data() {
 /// bound is the number of regs from input to output
 /// timeIdx start from 0, max value = bound
 void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo, 
-                                      uint32_t bound, 
+                                      const uint32_t bound, 
                                       uint32_t instrIdx) {
 
   // FIXME: change the following model name
@@ -515,7 +515,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 
 // submodules are treated as another module, communicated with ports
 //void simplify_goal_without_submodules(std::string destAndSlice, 
-//                                      uint32_t bound, 
+//                                      const uint32_t bound, 
 //                                      uint32_t instrIdx) {
 //  g_skipCheck = true;
 //  g_ignoreSubModules = true;
@@ -564,7 +564,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 // constructed only one. But the SMT equation may need to be constructed
 // multiple times, until a solution is obtained or a bound is reached.
 //void check_single_reg_and_slice(std::string destAndSlice, 
-//                                uint32_t boundIn, 
+//                                const uint32_t boundIn, 
 //                                uint32_t instrIdx) {
 //  g_skipCheck = false;  
 //  std::ofstream goalFile;
@@ -574,7 +574,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 //  toCout("========== Begin check SAT for: "+destAndSlice+" ==========");
 //  uint32_t regWidth = get_var_slice_width_simp(destAndSlice);
 //  CURRENT_VAR = destAndSlice;
-//  uint32_t bound = boundIn > 0 ? boundIn : 0;
+//  const uint32_t bound = boundIn > 0 ? boundIn : 0;
 //  bound_limit = boundIn+2;
 //  bool z3Res = false;
 //  context c;
@@ -769,7 +769,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 llvm::Value*
 UpdateFunctionGen::add_constraint(std::string varAndSlice, uint32_t timeIdx, context &c,
                                    std::shared_ptr<llvm::IRBuilder<>> &b,
-                                   uint32_t bound ) {
+                                   const uint32_t bound ) {
   if(varAndSlice.find("hls_target_linebuffer_1_U0_out_stream_V_value_V_write") 
        != std::string::npos)
        //&& timeIdx == 17)
@@ -817,7 +817,7 @@ UpdateFunctionGen::add_constraint(std::string varAndSlice, uint32_t timeIdx, con
 llvm::Value* 
 UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context &c,
                             std::shared_ptr<llvm::IRBuilder<>> &b,
-                            uint32_t bound ) {
+                            const uint32_t bound ) {
   // Attention: varAndSlice might have a slice, a directly-assigned varAndSlice
   std::string varAndSlice = node->dest;
   if(varAndSlice.find("\\compute.inst_q.value_1") 
@@ -946,7 +946,7 @@ llvm::Value*
 UpdateFunctionGen::add_nb_constraint(astNode* const node, 
                                uint32_t timeIdx, context &c, 
                                std::shared_ptr<llvm::IRBuilder<>> &b,
-                               uint32_t bound ) {
+                               const uint32_t bound ) {
   const auto curFunc = insContextStk.get_func();
   const auto curMod = insContextStk.get_curMod();
   auto curDynData = get_dyn_data(curMod);
@@ -1065,7 +1065,7 @@ UpdateFunctionGen::add_nb_constraint(astNode* const node,
 
 llvm::Value* 
 UpdateFunctionGen::add_ssa_constraint(astNode* const node, uint32_t timeIdx, context &c,
-                                std::shared_ptr<llvm::IRBuilder<>> &b, uint32_t bound) {
+                                std::shared_ptr<llvm::IRBuilder<>> &b, const uint32_t bound) {
   toCoutVerb("Add ssa constraint for: " + node->dest+" ------  time: "+toStr(timeIdx));
   std::string var = node->dest;
 
@@ -1098,7 +1098,7 @@ UpdateFunctionGen::add_ssa_constraint(astNode* const node, uint32_t timeIdx, con
 
 //void 
 //UpdateFunctionGen::add_child_constraint(astNode* const parentNode, uint32_t timeIdx, context &c,
-//                          std::shared_ptr<llvm::IRBuilder<>> &b, uint32_t bound) {
+//                          std::shared_ptr<llvm::IRBuilder<>> &b, const uint32_t bound) {
 //  abort();
 //  for( astNode* node: parentNode->childVec ) {
 //    add_constraint(node, timeIdx, c, b, bound);
@@ -1108,7 +1108,7 @@ UpdateFunctionGen::add_ssa_constraint(astNode* const node, uint32_t timeIdx, con
 
 // dest may be: input, AS or num
 //void add_clean_constraint(astNode* const node, uint32_t timeIdx, context &c, 
-//                          solver &s, goal &g, uint32_t bound, bool isSolve) {
+//                          solver &s, goal &g, const uint32_t bound, bool isSolve) {
 //  //toCoutVerb("Add clean constraint for: " + node->dest);
 //  std::string dest = node->dest;
 //  // add clean taint
@@ -1143,7 +1143,7 @@ void UpdateFunctionGen::push_clean_queue(astNode* node, uint32_t timeIdx) {
 
 
 //void add_all_clean_constraints(context &c, solver &s, goal &g, 
-//                               uint32_t bound, bool isSolve) {
+//                               const uint32_t bound, bool isSolve) {
 //  toCout("-------- Begin Add all clean ----------");
 //  for(auto it = CLEAN_QUEUE.begin(); it != CLEAN_QUEUE.end(); it++) {
 //    add_clean_constraint(it->first, it->second, c, s, g, bound, isSolve);
@@ -1152,7 +1152,7 @@ void UpdateFunctionGen::push_clean_queue(astNode* node, uint32_t timeIdx) {
 
 
 //void add_dirty_constraint(astNode* const node, uint32_t timeIdx, 
-//                          context &c, solver &s, uint32_t bound) {
+//                          context &c, solver &s, const uint32_t bound) {
 //  toCoutVerb("Add dirty constraint for: "+node->dest+" ------  time: "+toStr(timeIdx));  
 //  std::string destAndSlice = node->dest;
 //  if(destAndSlice.compare("wack") == 0) {
@@ -1197,7 +1197,7 @@ void UpdateFunctionGen::push_dirty_queue(astNode* node, uint32_t timeIdx) {
 }
 
 
-//void add_all_dirty_constraints(context &c, solver &s, uint32_t bound) {
+//void add_all_dirty_constraints(context &c, solver &s, const uint32_t bound) {
 //  toCout("-------- Begin Add all dirty ----------");  
 //  for(auto pair: DIRTY_QUEUE) {
 //    add_dirty_constraint(pair.first, pair.second, c, s, bound);
@@ -1207,7 +1207,7 @@ void UpdateFunctionGen::push_dirty_queue(astNode* node, uint32_t timeIdx) {
 
 // value at bound+1 should be from instrInfo
 // values in other cycles should all be NOP instructions
-//void add_input_values(context &c, solver &s, uint32_t bound) {
+//void add_input_values(context &c, solver &s, const uint32_t bound) {
 //  toCout("-------- Begin add input vals ----------");
 //  uint32_t encodingSize = g_currInstrInfo.instrEncoding.begin()->second.size();
 //  for(auto pair: g_currInstrInfo.instrEncoding) {
@@ -1228,7 +1228,7 @@ void UpdateFunctionGen::push_dirty_queue(astNode* node, uint32_t timeIdx) {
 //}
 
 
-//void add_nop(context &c, solver &s, uint32_t bound) {
+//void add_nop(context &c, solver &s, const uint32_t bound) {
 //  std::vector<uint32_t> bVec{0};
 //  for(uint32_t b = 1; b <= bound; b++)
 //  //for(uint32_t b: bVec)
