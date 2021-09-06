@@ -829,7 +829,8 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
     toCout("Find it!");
 
   std::shared_ptr<ModuleDynInfo_t> curDynData = get_dyn_data(curMod);
-  toCoutVerb("add_constraint for: "+varAndSlice+", timeIdx: "+toStr(timeIdx));
+  toCoutVerb("add_constraint for: "+varAndSlice+", timeIdx: "+toStr(timeIdx)
+             +", bound: "+toStr(bound));
   if(varAndSlice == "64'hxxxxxxxxxxxxxxxx" && timeIdx == 1) {
     toCoutVerb("find it");
   }

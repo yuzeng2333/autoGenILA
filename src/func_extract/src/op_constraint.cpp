@@ -288,6 +288,15 @@ UpdateFunctionGen::input_constraint(astNode* const node, uint32_t timeIdx,
     std::smatch m;
     if(localVal != "x" && localVal != "DIRTY" && !std::regex_match(localVal, m, pX) ) {
       if(is_pure_num(localVal)) {
+        std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");
+        std::smatch m;
+        if(std::regex_match(localVal, m, pNum)) {
+          uint32_t width = std::stoi(m.str(1));
+          if(width > 32) {
+            toCout("Error: input width larger than 32: "+localVal);
+            abort();
+          }
+        }
         toCoutVerb("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%B Give "+localVal+" to "+timed_name(dest, timeIdx));
         g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
         return llvmInt(hdb2int(localVal), localWidth, c);
