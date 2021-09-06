@@ -710,7 +710,7 @@ void add_dyn_sel_node(std::string line, uint32_t timeIdx, astNode* const node) {
   std::string mem = m.str(3);
   std::string addrAndSlice = m.str(4);
 
-  mem = var_name_convert(mem, true);
+  //mem = var_name_convert(mem, true);
 
   std::string dest, destSlice;
   std::string addr, addrSlice;
@@ -749,7 +749,7 @@ void add_mem_node(std::string var, uint32_t timeIdx, astNode* const node) {
   std::string addrAndSlice = m.str(4);
   std::string srcAndSlice = m.str(5);
 
-  mem = var_name_convert(mem, true);  
+  //mem = var_name_convert(mem, true);  
 
   remove_two_end_space(ifVar);
   remove_two_end_space(mem);
