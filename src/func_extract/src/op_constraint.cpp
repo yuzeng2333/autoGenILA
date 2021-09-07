@@ -1835,7 +1835,8 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
 // the RAW dependency for memory is a little tricky
 void UpdateFunctionGen::mem_assign_constraint(
                           astNode* const node, uint32_t timeIdx, context &c,  
-                          std::shared_ptr<llvm::IRBuilder<>> &b, const uint32_t bound
+                          std::shared_ptr<llvm::IRBuilder<>> &b, 
+                          const uint32_t bound
                         ){
   auto curMod = insContextStk.get_curMod();
   auto curDynData = get_dyn_data(curMod);
@@ -1846,7 +1847,10 @@ void UpdateFunctionGen::mem_assign_constraint(
     abort();
   }
   std::string mem = node->dest;
+  if(memNodeMap.find(mem) == memNodeMap.end())
+    memNodeMap.emplace(mem, node);
   toCoutVerb("mem_assign_constraint for: "+mem);
+
   if(curDynData->memDynInfo.find(mem) == curDynData->memDynInfo.end()) {
     toCout("Error: the mem is not yet defined: "+mem);
     abort();
@@ -1955,8 +1959,6 @@ void UpdateFunctionGen::mem_assign_constraint(
   // change insert point of b to the newBB
   b->SetInsertPoint(newBB);
 }
-
-
 
 
 llvm::Value* 
