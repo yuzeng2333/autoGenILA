@@ -344,6 +344,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   llvm::Value* destNextExpr;
 
   curMod = g_moduleInfoMap[curModName];
+  llvm::Instruction* retInst;
   if(!destInfo.isVector) {
     std::string dest = destVec.front();
     if(is_output(destName, curMod)) initialize_min_delay(curMod, destName);
@@ -357,7 +358,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     else 
       destNextExpr = add_constraint(dest, 
                                     0, TheContext, Builder, bound);
-    Builder->CreateRet(destNextExpr);
+    retInst = Builder->CreateRet(destNextExpr);
   }
   else {
     // if destName is a vector, return an array
@@ -453,13 +454,14 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
           BB
         );
 
-    Builder->CreateRet(value(retPtr));
+    retInst = Builder->CreateRet(value(retPtr));
   } // end of add vector
 
 
   // if the top module contains memories, add the additional memory
   // writes from lastMemReadAddr+1 to bound-1
   uint32_t i = 0;
+  Builder->SetInsertPoint(retInst);
   if(!curMod->moduleMems.empty()) {
     for(auto pair : curDynData->memDynInfo) {
       std::string mem = pair.first;
