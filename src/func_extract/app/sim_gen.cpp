@@ -559,8 +559,18 @@ void print_func_declare(struct funcExtract::FuncTy_t funcTy,
 
 uint32_t convert_to_single_num(std::string numIn) {
   std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");
-  if(numIn.find("+") == std::string::npos)
+  std::smatch m;
+  if(numIn.find("+") == std::string::npos) {
+    if(std::regex_match(numIn, m, pNum)) {
+      uint32_t width = std::stoi(m.str(1));
+      if(width > 32) {
+        toCout("Error: too long number, use convert_to_long_single_num:"
+              +numIn);
+        abort();
+      }
+    }
     return hdb2int(numIn);
+  }
   else {
     std::vector<std::string> vec;
     split_by(numIn, "+", vec);
@@ -578,6 +588,40 @@ uint32_t convert_to_single_num(std::string numIn) {
     return ret;
   }
 }
+
+
+uint64_t convert_to_long_single_num(std::string numIn) {
+  std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");
+  std::smatch m;
+  if(numIn.find("+") == std::string::npos) {
+    if(std::regex_match(numIn, m, pNum)) {
+      uint32_t width = std::stoi(m.str(1));
+      if(width > 32) {
+        toCout("Error: too long number:"
+              +numIn);
+        abort();
+      }
+    }
+    return hdb2int(numIn);
+  }
+  else {
+    std::vector<std::string> vec;
+    split_by(numIn, "+", vec);
+    uint64_t ret = 0;
+    for(std::string num : vec) {
+      std::smatch m;
+      if(!std::regex_match(num, m, pNum)) {
+        toCout("Error: does not match pNum: "+num);
+        abort();
+      }
+      uint32_t width = std::stoi(m.str(1));
+      uint32_t localVal = hdb2int(num);
+      ret = (ret << width) + localVal;
+    }
+    return ret;
+  }
+}
+
 
 
 void update_all_asvs(std::ofstream &cpp, std::string prefix) {
@@ -748,17 +792,19 @@ void vta_ila_model(std::ofstream &cpp) {
     toCout("instr "+toStr(instrIdx));
     std::string firstByte = encoding["io_vme_rd_0_data_bits"][2];
     std::string secondByte = encoding["io_vme_rd_0_data_bits"][3];
+    uint64_t firstByteNum = convert_to_long_single_num(firstByte);    
+    uint64_t secondByteNum = convert_to_long_single_num(secondByte);    
     std::string instrName = decode(encoding);
     uint32_t idx = get_instr_by_name(instrName);    
     cpp << "  // instr "+toStr(instrIdx++)+": "+instrName+"\n" << std::endl;
     if(instrName.find("gemm") != std::string::npos) {
       cpp << "  int writeValue = gemm__store_tensorStore_tensorFile_0_0( 0, 0, 0, 0, 0, 0, 0, "
-             +firstByte+", "+secondByte+" );" << std::endl;
+             +toStr(firstByteNum)+", "+toStr(secondByteNum)+" );" << std::endl;
       cpp << "  if(PRINT_ALL) printf( \"write value for gemm: %d \", writeValue );\n"<< std::endl;
     }
     else if(instrName.find("alu") != std::string::npos ) {
       cpp << "  int writeValue = alu_add_imme1__store_tensorStore_tensorFile_0_0( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "
-             +firstByte+", "+secondByte+" );" << std::endl;
+             +toStr(firstByteNum)+", "+toStr(secondByteNum)+" );" << std::endl;
       cpp << "  if(PRINT_ALL) printf( \"write value for alu: %d \", writeValue );\n"<< std::endl;
     }
     else {

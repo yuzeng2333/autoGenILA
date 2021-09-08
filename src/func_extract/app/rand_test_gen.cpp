@@ -22,7 +22,7 @@ std::map<std::string, std::string> regValueMap;
 
 enum DESIGN{AES, PICO, URV, VTA};
 // TODO: set the current design!
-enum DESIGN g_design = URV;
+enum DESIGN g_design = VTA;
 
 void to_file(std::string line) {
   g_output << line << std::endl;
