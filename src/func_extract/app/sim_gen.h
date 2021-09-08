@@ -49,3 +49,5 @@ void print_update_mem(std::ofstream &cpp);
 void print_update_mem_call(std::ofstream &cpp);
 
 void print_urv_update_mem(std::ofstream &cpp);
+
+void vta_ila_model(std::ofstream &cpp);

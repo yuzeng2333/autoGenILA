@@ -140,12 +140,12 @@ int main(int argc, char *argv[]) {
   }
   determine_clk_rst();
   build_ast_tree();
-  if(!g_get_all_update) {
-    check_all_regs();
-  }
-  else {
+  //if(!g_get_all_update) {
+  //  check_all_regs();
+  //}
+  //else {
     get_all_update();
-  }
+  //}
   //print_time();  
   //clean_goal();
   //make_dirs(g_path);

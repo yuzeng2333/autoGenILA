@@ -52,13 +52,13 @@ std::string CNCT = "_";
 // disable: aes
 bool g_update_all_regs = false;
 
-enum DESIGN{AES, PICO, GB, URV};
+enum DESIGN{AES, PICO, GB, URV, VTA};
 enum DESIGN g_design;
 
 // the second argument is the number of instructions
 int main(int argc, char *argv[]) {
   // TODO: specify which example to apply to:
-  g_design = URV;
+  g_design = AES;
 
   // set global variables accordingly
   if(g_design == PICO) {
@@ -100,15 +100,23 @@ int main(int argc, char *argv[]) {
   cpp << "#include <stdio.h>" << std::endl;
   cpp << "#include \"ila.h\"\n" << std::endl;
 
+  if(g_design == VTA) {
+    vta_ila_model(cpp);
+    return 0;
+  }
+
+
   // ========== global array declarations
   // Do not put declarations of arrays in the
   // c file. Put them only in the llvm-ir file
 
-  for(auto pair: g_global_arr) {
-    std::string arrName = pair.first;
-    uint32_t size = pair.second.second;
-    std::string dataTy = asv_type(pair.second.first);
-    cpp << dataTy+" "+arrName+"["+toStr(size)+"];" << std::endl;
+  if(g_design != VTA) {
+    for(auto pair: g_global_arr) {
+      std::string arrName = pair.first;
+      uint32_t size = pair.second.second;
+      std::string dataTy = asv_type(pair.second.first);
+      cpp << dataTy+" "+arrName+"["+toStr(size)+"];" << std::endl;
+    }
   }
 
   cpp << std::endl;
@@ -122,7 +130,7 @@ int main(int argc, char *argv[]) {
 
   if(g_design == AES) print_update_mem(cpp);
 
-  cpp << "int main() {\n" << std::endl;
+  cpp << "int main(int argc, char *argv[]) {\n" << std::endl;
 
 
 
@@ -161,7 +169,7 @@ int main(int argc, char *argv[]) {
   cpp << "  unsigned int "+g_dataAddrVar+" = 0;" << std::endl;
   cpp << "  unsigned int "+g_dataIn+" = 0;" << std::endl;
   cpp << "  unsigned int data_byte_addr = 0; " << std::endl;  
-  cpp << "  int PRINT_ALL = 1;" << std::endl;
+  cpp << "  int PRINT_ALL = argc > 1 ? 1 : 0;" << std::endl;
   cpp << std::endl;
 
 
@@ -427,7 +435,10 @@ void print_instr_calls(std::map<std::string,
 
   cpp << prefix+"  if(PRINT_ALL) printf( \"\\n\" );" << std::endl;
   cpp << std::endl;
-  if(updateMem && g_design == AES) print_update_mem_call(cpp);
+  if(updateMem && g_design == AES ) 
+       //&& ( funcName == "start__data_fifo_out0_Arr"
+       //     || funcName == "start_data_fifo_out0_Arr" ) ) 
+    print_update_mem_call(cpp);
 }
 
 
@@ -689,7 +700,20 @@ void print_update_mem_call(std::ofstream &cpp) {
 
 // key is funcName, value is function call statement
 std::map<std::string, std::string> g_aes_special_func_call 
-= { {"start__data_fifo_out0_Arr", "    start__data_fifo_out0_Arr( 0, _aes_top_0_aes_reg_ctr_i_reg_out_LOW, 0,  _aes_top_0_aes_reg_key0_i_reg_out_LOW, mem[_read_addr_fifo_out0_Arr[15]], mem[_read_addr_fifo_out0_Arr[14]], mem[_read_addr_fifo_out0_Arr[13]], mem[_read_addr_fifo_out0_Arr[12]], mem[_read_addr_fifo_out0_Arr[11]], mem[_read_addr_fifo_out0_Arr[10]], mem[_read_addr_fifo_out0_Arr[9]], mem[_read_addr_fifo_out0_Arr[8]], mem[_read_addr_fifo_out0_Arr[7]], mem[_read_addr_fifo_out0_Arr[6]], mem[_read_addr_fifo_out0_Arr[5]], mem[_read_addr_fifo_out0_Arr[4]], mem[_read_addr_fifo_out0_Arr[3]], mem[_read_addr_fifo_out0_Arr[2]], mem[_read_addr_fifo_out0_Arr[1]], mem[_read_addr_fifo_out0_Arr[0]] );\n"} };
+= { {"start__data_fifo_out0_Arr", "    start__data_fifo_out0_Arr( 0, _aes_top_0_aes_reg_ctr_i_reg_out_LOW, 0,  _aes_top_0_aes_reg_key0_i_reg_out_LOW, mem[_read_addr_fifo_out0_Arr[15]], mem[_read_addr_fifo_out0_Arr[14]], mem[_read_addr_fifo_out0_Arr[13]], mem[_read_addr_fifo_out0_Arr[12]], mem[_read_addr_fifo_out0_Arr[11]], mem[_read_addr_fifo_out0_Arr[10]], mem[_read_addr_fifo_out0_Arr[9]], mem[_read_addr_fifo_out0_Arr[8]], mem[_read_addr_fifo_out0_Arr[7]], mem[_read_addr_fifo_out0_Arr[6]], mem[_read_addr_fifo_out0_Arr[5]], mem[_read_addr_fifo_out0_Arr[4]], mem[_read_addr_fifo_out0_Arr[3]], mem[_read_addr_fifo_out0_Arr[2]], mem[_read_addr_fifo_out0_Arr[1]], mem[_read_addr_fifo_out0_Arr[0]] );\n"},
+{"start_data_fifo_out0_Arr", "    start__data_fifo_out0_Arr( 0, _aes_top_0_aes_reg_ctr_i_reg_out_LOW, 0,  _aes_top_0_aes_reg_key0_i_reg_out_LOW, mem[_read_addr_fifo_out0_Arr[15]], mem[_read_addr_fifo_out0_Arr[14]], mem[_read_addr_fifo_out0_Arr[13]], mem[_read_addr_fifo_out0_Arr[12]], mem[_read_addr_fifo_out0_Arr[11]], mem[_read_addr_fifo_out0_Arr[10]], mem[_read_addr_fifo_out0_Arr[9]], mem[_read_addr_fifo_out0_Arr[8]], mem[_read_addr_fifo_out0_Arr[7]], mem[_read_addr_fifo_out0_Arr[6]], mem[_read_addr_fifo_out0_Arr[5]], mem[_read_addr_fifo_out0_Arr[4]], mem[_read_addr_fifo_out0_Arr[3]], mem[_read_addr_fifo_out0_Arr[2]], mem[_read_addr_fifo_out0_Arr[1]], mem[_read_addr_fifo_out0_Arr[0]] );\n"}
+
+};
+
+
+
+std::map<std::string, std::string> g_vta_special_func_call
+= { {"gemm__store_tensorStore_tensorFile_0_0", "    gemm__store_tensorStore_tensorFile_0_0( 0, 0, 0, 0, 0, 0, 0,  );\n"},
+
+{"start_data_fifo_out0_Arr", "    start__data_fifo_out0_Arr( 0, _aes_top_0_aes_reg_ctr_i_reg_out_LOW, 0,  _aes_top_0_aes_reg_key0_i_reg_out_LOW, mem[_read_addr_fifo_out0_Arr[15]], mem[_read_addr_fifo_out0_Arr[14]], mem[_read_addr_fifo_out0_Arr[13]], mem[_read_addr_fifo_out0_Arr[12]], mem[_read_addr_fifo_out0_Arr[11]], mem[_read_addr_fifo_out0_Arr[10]], mem[_read_addr_fifo_out0_Arr[9]], mem[_read_addr_fifo_out0_Arr[8]], mem[_read_addr_fifo_out0_Arr[7]], mem[_read_addr_fifo_out0_Arr[6]], mem[_read_addr_fifo_out0_Arr[5]], mem[_read_addr_fifo_out0_Arr[4]], mem[_read_addr_fifo_out0_Arr[3]], mem[_read_addr_fifo_out0_Arr[2]], mem[_read_addr_fifo_out0_Arr[1]], mem[_read_addr_fifo_out0_Arr[0]] );\n"}
+
+};
+
 
 
 
@@ -713,3 +737,32 @@ std::map<std::string, std::string> g_urv_special_func_call
 };
 
 
+
+void vta_ila_model(std::ofstream &cpp) {
+  cpp << std::endl;
+  cpp << "int PRINT_ALL = 0;\n" << std::endl;
+  cpp << "int main(int argc, char *argv[]) {\n" << std::endl;
+  uint32_t instrIdx = 0;
+  for(auto encoding: toDoList) {
+    std::string firstByte = encoding["io_vme_rd_0_data_bits"][2];
+    std::string secondByte = encoding["io_vme_rd_0_data_bits"][3];
+    std::string instrName = decode(encoding);
+    uint32_t idx = get_instr_by_name(instrName);    
+    cpp << "  // instr "+toStr(instrIdx++)+": "+instrName+"\n" << std::endl;
+    if(instrName.find("gemm") != std::string::npos) {
+      cpp << "  int writeValue = gemm__store_tensorStore_tensorFile_0_0( 0, 0, 0, 0, 0, 0, 0, "
+             +firstByte+", "+secondByte+" );" << std::endl;
+      cpp << "  if(PRINT_ALL) printf( \"write value for gemm: %d \", writeValue );\n"<< std::endl;
+    }
+    else if(instrName.find("alu") != std::string::npos ) {
+      cpp << "  int writeValue = alu_add_imme1__store_tensorStore_tensorFile_0_0( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "
+             +firstByte+", "+secondByte+" );" << std::endl;
+      cpp << "  if(PRINT_ALL) printf( \"write value for alu: %d \", writeValue );\n"<< std::endl;
+    }
+    else {
+      toCout("Error: unexpected instruction:"+instrName);
+      abort();
+    }
+  }
+  cpp << "}" << std::endl;
+}
