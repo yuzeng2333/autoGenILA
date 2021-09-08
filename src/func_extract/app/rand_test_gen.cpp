@@ -20,7 +20,7 @@ uint32_t InstrNum = 10;
 std::regex pX("(\\d+)'[b|h][x|X]$");
 std::map<std::string, std::string> regValueMap;
 
-enum DESIGN{AES, PICO, URV};
+enum DESIGN{AES, PICO, URV, VTA};
 // TODO: set the current design!
 enum DESIGN g_design = URV;
 
@@ -131,7 +131,7 @@ void assign_instr_value(std::string var, std::string value, bool rand) {
 }
 
 
-void make_instr(uint32_t instrIdx) {
+void make_instr(uint32_t instrIdx, bool constantEncod=true) {
   auto instrInfo = g_instrInfo[instrIdx];
 
   // FIXME: currently assume 
@@ -148,10 +148,15 @@ void make_instr(uint32_t instrIdx) {
       //  to_file(""+var+" = FROM_MEM");
       //}
       //else {
-      if(i == 0)
-        assign_instr_value(var, pair.second[i], true);
-      else
-        assign_instr_value(var, regValueMap[pair.first], true);
+      if(constantEncod) {
+        if(i == 0)
+          assign_instr_value(var, pair.second[i], true);
+        else
+          assign_instr_value(var, regValueMap[pair.first], true);
+      }
+      else {
+        assign_instr_value(var, pair.second[i], true);        
+      }
       //}
     }
   }
@@ -223,6 +228,13 @@ int main(int argc, char *argv[]) {
     while(idx++ < InstrNum) {
       uint32_t instrIdx = rand() % g_instrInfo.size();
       make_instr(instrIdx);
+    }
+  }
+  else if(g_design == VTA) {
+    uint32_t idx = 0;
+    while(idx++ < InstrNum) {
+      uint32_t instrIdx = rand() % g_instrInfo.size();
+      make_instr(instrIdx, false);
     }
   }
 }

@@ -58,7 +58,7 @@ enum DESIGN g_design;
 // the second argument is the number of instructions
 int main(int argc, char *argv[]) {
   // TODO: specify which example to apply to:
-  g_design = AES;
+  g_design = VTA;
 
   // set global variables accordingly
   if(g_design == PICO) {
@@ -85,7 +85,8 @@ int main(int argc, char *argv[]) {
   read_in_instructions(g_path+"/instr.txt");
   read_asv_info(g_path+"/asv_info.txt");
   // fill the funcTypes in g_instrInfo
-  read_func_info(g_path+"/func_info.txt", g_global_arr);
+  if(g_design != VTA)
+    read_func_info(g_path+"/func_info.txt", g_global_arr);
   read_to_do_instr(g_path+"/tb.txt", toDoList);
   read_refinement(g_path+"/refinement.txt");
   read_skipped_target(g_path+"/skipped_target.txt");
@@ -744,6 +745,7 @@ void vta_ila_model(std::ofstream &cpp) {
   cpp << "int main(int argc, char *argv[]) {\n" << std::endl;
   uint32_t instrIdx = 0;
   for(auto encoding: toDoList) {
+    toCout("instr "+toStr(instrIdx));
     std::string firstByte = encoding["io_vme_rd_0_data_bits"][2];
     std::string secondByte = encoding["io_vme_rd_0_data_bits"][3];
     std::string instrName = decode(encoding);
