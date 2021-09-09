@@ -72,6 +72,7 @@ std::string materialize_num(std::string val) {
 // convert 4'h1+4'h2 to { 4'h1, 4'h2 }
 std::string replace_x(std::string val) {
   std::smatch m;
+  std::regex pWidth("(\\d+)'(h|d|b)");
   if(val.find("+") == std::string::npos)
     return materialize_num(val);
   else {
@@ -80,7 +81,69 @@ std::string replace_x(std::string val) {
     std::vector<std::string> vec;
     split_by(val, "+", vec);
     // replace x with number value
+    int zValue = -1;
     for(auto it = vec.begin(); it != vec.end(); it++) {
+      if((*it).find("Z") != std::string::npos) {
+        // ==================
+        // allow adjacent variables to have Z-patterns:
+        // Zp3 and Z: the former is the sum of 3 and the latter
+        // Zm3 and Z: the former is the later subtracted by 3
+
+        std::string num = *it;
+        if(num.find("(") != std::string::npos) {
+          auto pos = num.find("(");
+          std::string formedWidth = num.substr(0, pos);
+          std::string expr = num.substr(pos+1);
+          expr.pop_back();
+          if(!std::regex_match(formedWidth, m, pWidth)) {
+            toCout("Error: the width does not match pWidth: "+formedWidth);
+            abort();
+          }
+          uint32_t width = std::stoi(m.str(1));
+          uint32_t base = exp2(width-1);
+          if(expr.find("p") != std::string::npos) {
+            auto pos = expr.find("p");
+            assert(pos == 1);
+            uint32_t operand = std::stoi(expr.substr(pos+1));
+            uint32_t newVal = rand() % (base-operand);
+            zValue = newVal;
+            newVal += operand;
+            std::string hexVal = dec2hex(newVal);
+            *it = toStr(width)+"'h"+hexVal;            
+          }
+          else if(num.find("m") != std::string::npos) {
+            auto pos = expr.find("m");
+            assert(pos == 1);
+            uint32_t operand = std::stoi(expr.substr(pos+1));
+            uint32_t newVal = rand() % (base-operand);
+            zValue = newVal + operand;
+            std::string hexVal = dec2hex(newVal);
+            *it = toStr(width)+"'h"+hexVal;
+          }
+          else {
+            toCout("Error: unexpected number format: "+num);
+            abort();
+          }
+        }
+        else { // if does not have braces
+          std::regex pZ("(\\d+)'(h|d|b)Z");
+          std::smatch m;
+          std::string num = *it;
+          if(!std::regex_match(num, m, pZ)) {
+            toCout("Error: does not match pZ: "+num);
+            abort();
+          }
+          std::string width = m.str(1);
+          if(zValue == -1) {
+            toCout("Error: zValue is not assigned!");
+            abort();
+          }
+          std::string hexVal = dec2hex(zValue);
+          *it = width+"'h"+hexVal;
+        }
+        continue;
+      }
+
       if(!std::regex_match(*it, m, pX)) continue;
       uint32_t width = std::stoi(m.str(1));
       std::string hexVal;
