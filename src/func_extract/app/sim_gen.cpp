@@ -1,4 +1,5 @@
 #include "sim_gen.h"
+#include <boost/algorithm/string.hpp>
 #include "../src/helper.h"
 #include "../src/util.h"
 #include "../src/vcd_parser.h"
@@ -782,28 +783,69 @@ std::map<std::string, std::string> g_urv_special_func_call
 };
 
 
+void convert_concat_to_hex(std::string line, std::ofstream &imem) {
+  std::vector<std::string> numVec;
+  std::regex pNum("(\\d+)'b([01]+)");  
+  if(line.find("//") != std::string::npos) abort();
+  if(line.empty()) abort();
+  boost::split(numVec, line, boost::is_any_of("+"));
+  uint32_t totalWidth = 0;
+  std::smatch m;
+  std::string wholeBinNum;
+  for(std::string num: numVec) {
+    if(!std::regex_match(num, m, pNum)) {
+      toCout("Error: do not match pNum: "+num);
+      abort();
+    }
+    uint32_t width = std::stoi(m.str(1));
+    totalWidth += width;
+    std::string digits = m.str(2);
+    std::string extraZero (width - digits.size(), '0');
+    digits = extraZero + digits;
+    wholeBinNum = wholeBinNum + digits;
+  }
+  assert(totalWidth == wholeBinNum.size());
+  // FIXME: set the totalWidth separately
+  std::bitset<64> set(wholeBinNum);
+  std::stringstream ret;
+  imem << std::hex << set.to_ulong() << std::endl;
+}
 
+
+// also generate the imem.txt
 void vta_ila_model(std::ofstream &cpp) {
   cpp << std::endl;
   cpp << "int PRINT_ALL = 0;\n" << std::endl;
   cpp << "int main(int argc, char *argv[]) {\n" << std::endl;
   uint32_t instrIdx = 0;
+  std::ofstream imem("./imem.txt");
   for(auto encoding: toDoList) {
     toCout("instr "+toStr(instrIdx));
     std::string firstByte = encoding["io_vme_rd_0_data_bits"][2];
     std::string secondByte = encoding["io_vme_rd_0_data_bits"][3];
+    convert_concat_to_hex(firstByte, imem);
+    convert_concat_to_hex(secondByte, imem);
     uint64_t firstByteNum = convert_to_long_single_num(firstByte);    
     uint64_t secondByteNum = convert_to_long_single_num(secondByte);    
     std::string instrName = decode(encoding);
     uint32_t idx = get_instr_by_name(instrName);    
     cpp << "  // instr "+toStr(instrIdx++)+": "+instrName+"\n" << std::endl;
     if(instrName.find("gemm") != std::string::npos) {
-      cpp << "  int writeValue = gemm__store_tensorStore_tensorFile_0_0( 0, 0, 0, 0, 0, 0, 0, "
+      cpp << "  writeValue = gemm__store_tensorStore_tensorFile_0_0( 0, 0, 0, 0, 0, 0, 0, "
              +toStr(firstByteNum)+", "+toStr(secondByteNum)+" );" << std::endl;
       cpp << "  if(PRINT_ALL) printf( \"write value for gemm: %d \", writeValue );\n"<< std::endl;
+
+      cpp << "  writeValue = gemm__store_tensorStore_tensorFile_0_1( 0, 0, 0, 0, 0, 0, 0, "
+             +toStr(firstByteNum)+", "+toStr(secondByteNum)+" );" << std::endl;
+      cpp << "  if(PRINT_ALL) printf( \"write value for gemm: %d \", writeValue );\n"<< std::endl;
+
     }
     else if(instrName.find("alu") != std::string::npos ) {
-      cpp << "  int writeValue = alu_add_imme1__store_tensorStore_tensorFile_0_0( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "
+      cpp << "  writeValue = alu_add_imme1__store_tensorStore_tensorFile_0_0( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "
+             +toStr(firstByteNum)+", "+toStr(secondByteNum)+" );" << std::endl;
+      cpp << "  if(PRINT_ALL) printf( \"write value for alu: %d \", writeValue );\n"<< std::endl;
+
+      cpp << "  writeValue = alu_add_imme1__store_tensorStore_tensorFile_0_1( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "
              +toStr(firstByteNum)+", "+toStr(secondByteNum)+" );" << std::endl;
       cpp << "  if(PRINT_ALL) printf( \"write value for alu: %d \", writeValue );\n"<< std::endl;
     }
@@ -812,5 +854,6 @@ void vta_ila_model(std::ofstream &cpp) {
       abort();
     }
   }
+  imem.close();
   cpp << "}" << std::endl;
 }
