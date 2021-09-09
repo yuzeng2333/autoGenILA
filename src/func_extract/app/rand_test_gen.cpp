@@ -85,7 +85,7 @@ std::string replace_x(std::string val) {
     for(auto it = vec.begin(); it != vec.end(); it++) {
       if((*it).find("Z") != std::string::npos) {
         // ==================
-        // allow adjacent variables to have Z-patterns:
+        // allow adjacent variables to have relations:
         // Zp3 and Z: the former is the sum of 3 and the latter
         // Zm3 and Z: the former is the later subtracted by 3
 
@@ -101,6 +101,7 @@ std::string replace_x(std::string val) {
           }
           uint32_t width = std::stoi(m.str(1));
           uint32_t base = exp2(width-1);
+          if(g_design == VTA) base = 100;
           if(expr.find("p") != std::string::npos) {
             auto pos = expr.find("p");
             assert(pos == 1);
