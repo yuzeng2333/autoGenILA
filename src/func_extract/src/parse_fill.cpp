@@ -222,13 +222,14 @@ void read_module_info() {
   ModuleInfo_t *moduleInfo = new ModuleInfo_t;
   bool seeOutput = false;
   std::string outVar;  
-  std::map<std::string, uint32_t> inputDelayMap;
+  //std::map<std::string, uint32_t> inputDelayMap;
   while(std::getline(input, line)) {
     if(is_comment_line(line))
       continue;
     if(is_module_line(line, moduleName)) {
       // store info of last module
       moduleInfo->name = moduleName;
+      moduleInfo->isBB = true;
       //moduleInfo->out2InDelayMp.clear();
     }
     else if(line.find(":") == std::string::npos 
@@ -238,7 +239,9 @@ void read_module_info() {
       else
         outVar = line;
       remove_back_space(outVar);
-      inputDelayMap.clear();
+      //inputDelayMap.clear();
+      moduleInfo->bbOut2InDelayMp.emplace(outVar, 
+                                         std::map<std::string, uint32_t>{});
       seeOutput = true;
       moduleInfo->moduleOutputs.insert(outVar);      
     }
@@ -249,10 +252,11 @@ void read_module_info() {
       std::string delay = line.substr(pos+1);
       remove_two_end_space(input);
       remove_two_end_space(delay);
-      inputDelayMap.emplace(input, std::stoi(delay));
+      //inputDelayMap.emplace(input, std::stoi(delay));
+      moduleInfo->bbOut2InDelayMp[outVar].emplace(input, std::stoi(delay));
       moduleInfo->moduleInputs.insert(input);
     }
-    else {
+    else if(line != "}") {
       seeOutput = false;
       abort(); // abort because out2InDelayMp is not supported
       //moduleInfo->out2InDelayMp.emplace(outVar, inputDelayMap);

@@ -75,6 +75,12 @@ uint32_t get_formed_width(std::string num);
 
 uint32_t hex2int(std::string num);
 
+//std::string dec2hex(std::string dec);
+
+std::string longDec2hex(std::string decimalValue);
+
+std::string longDec2hex(uint64_t decimalValue);
+
 uint32_t bin2int(std::string num);
 
 std::string timed_name(std::string name, uint32_t timeIdx);

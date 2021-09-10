@@ -69,6 +69,16 @@ uint32_t hdb2int(std::string num) {
   }
   num = remove_signed(num);
   std::smatch m;
+  std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");  
+  if(std::regex_match(num, m, pNum)) {
+    uint32_t width = std::stoi(m.str(1));
+    if(width > 32) {
+      toCout("Error: too long number, use convert_to_long_single_num:"
+            +num);
+      abort();
+    }
+  }
+
   if(std::regex_match(num, m, pDec)) {
     std::string pureNum = m.str(2);
     return str2int(pureNum, "input num in hdb is: "+num);
@@ -121,6 +131,29 @@ uint32_t hex2int(std::string num) {
     else
       res += (*it - '0');
   }
+  return res;
+}
+
+// dec2hex is already defined in taint_gen
+//std::string dec2hex(std::string dec) {
+//  std::stringstream ss;
+//  ss << std::hex << dec; // int decimal_value
+//  std::string res ( ss.str() );
+//  
+//  return res;
+//}
+
+
+std::string longDec2hex(std::string decimalValue) {
+  uint64_t val = std::stol(decimalValue);
+  return longDec2hex(val);
+}
+
+
+std::string longDec2hex(uint64_t decimalValue) {
+  std::stringstream ss;
+  ss << std::hex << decimalValue; // int decimal_value
+  std::string res ( ss.str() );
   return res;
 }
 

@@ -212,9 +212,8 @@ void output_expr(std::string line) {
   std::string blank = m.str(1);
     
   if(is_output(var, curMod)) {
-    std::cout << "!! Duplicate output find: " + line << std::endl;
+    std::cout << " Warning: Duplicate output find: " + line << std::endl;
     toCout("module: "+curMod->name);
-    abort();
   }
   else 
     curMod->moduleOutputs.insert(var);

@@ -82,6 +82,8 @@ void build_ast_tree() {
     for(auto it = beginIt; it != endIt; it++) {
       // prepare context info
       std::string writeASV = *it;
+      if(writeASV == "xram_ack")
+        toCoutVerb("Find it!");
       set_stk_build_tree(writeASV);
     } // end of for loop
   }
@@ -113,10 +115,11 @@ void build_ast_tree() {
       StrVec_t tgtVec;
       std::getline(allowedTgtInFile, line);
       while(line[0] != ']') {
-        if(line.substr(0, 2) != "//") {
-          tgtVec.push_back(line);
-          moduleAs.insert(line);
-        }
+        if(line.substr(0, 2) == "//"
+           || line.empty() )
+          continue;
+        tgtVec.push_back(line);
+        moduleAs.insert(line);
         std::getline(allowedTgtInFile, line);
       }
       uint32_t delay = 0;
@@ -128,7 +131,7 @@ void build_ast_tree() {
       }
       g_allowedTgtVec.push_back(std::make_pair(tgtVec, delay));
     }
-  }
+  } // end of while loop
   allowedTgtInFile.close();
   for(auto tgtDelayPair: g_allowedTgt) {
     set_stk_build_tree(tgtDelayPair.first);
@@ -229,7 +232,7 @@ void set_stk_build_tree(std::string varName) {
 
 void build_tree_for_single_as(std::string regAndSlice) {
   toCoutVerb("### Begin build: "+regAndSlice);
-  if(regAndSlice == "arg_0_V_value_V_1_data_reg")
+  if(regAndSlice == "xram_wr")
     toCoutVerb("Find it!");
   const auto curMod = g_insContextStk.get_curMod();  
   std::string reg, regSlice;
@@ -262,7 +265,7 @@ void add_node(std::string varAndSlice,
   const auto curMod = g_insContextStk.get_curMod();  
   remove_two_end_space(varAndSlice);
   //toCout("Add node for: "+varAndSlice);
-  if(varAndSlice.find("d_wr_addr_fifo_out0") != std::string::npos) {
+  if(varAndSlice.find("xram_ack") != std::string::npos) {
        //&& timeIdx == 25) {
     toCout("Found it!");
     s_node = node;
@@ -1076,9 +1079,11 @@ void add_submod_node(std::string var, uint32_t timeIdx, astNode* const node) {
     g_insContextStk.push_back(insCntxt);
     astNode* nextNode = new astNode;
     subMod->emplace_outport_node(output, nextNode);    
-    toCout("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Enter mode: "+modName+", out: "+output);
+    toCout("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+            "~~~~~~~~~~~~~~~~~~~ Enter mode: "+modName+", out: "+output);
     add_node(output, timeIdx, nextNode, false);
-    toCout("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Return from: "+modName+", out: "+output+" to: "+parentModName);
+    toCout("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+            "~~~~~~~~~ Return from: "+modName+", out: "+output+" to: "+parentModName);
     g_insContextStk.pop_back();
   }
   //add_child_node(output, timeIdx, node);

@@ -67,7 +67,8 @@ UpdateFunctionGen::var_expr(std::string varAndSlice, uint32_t timeIdx, context &
       && !is_number(varAndSlice) 
       && isTaint && width > 0 
       && width != get_var_slice_width_simp(varAndSlice, curMod)) {
-    toCout("Error: input taint width does not equal var's width: "+toStr(get_var_slice_width_simp(varAndSlice, curMod))+", "+toStr(width));
+    toCout("Error: input taint width does not equal var's width: "
+           +toStr(get_var_slice_width_simp(varAndSlice, curMod))+", "+toStr(width));
     abort();
   }
   if(width == 0) {
@@ -92,11 +93,11 @@ UpdateFunctionGen::var_expr(std::string varAndSlice, uint32_t timeIdx, context &
       return llvm::ConstantInt::get(llvmWidth(localWidth, c), 0, false);
     }
     else {
-      uint64_t localNum = hdb2int(var);
-      if(localNum > 4294967295) {
-        toCout("Error: too large number is found : "+var);
-        abort();
-      }
+      //uint64_t localNum = hdb2int(var);
+      //if(localNum > 4294967295) {
+      //  toCout("Error: too large number is found : "+var);
+      //  abort();
+      //}
       varTimed = var + DELIM + toStr(timeIdx) + "_"+toStr(localWidth)+"b";
       if(is_formed_num(var))
         return long_bv_val(var, c, b);
@@ -1428,10 +1429,12 @@ UpdateFunctionGen::memMod_constraint(astNode* const node, uint32_t timeIdx, cont
 
 llvm::Value* 
 UpdateFunctionGen::bbMod_constraint(astNode* const node, uint32_t timeIdx, context &c, 
-                               builder &b, const uint32_t bound) {
+                                    builder &b, const uint32_t bound) {
   toCout("begin bbMod: "+node->dest);
   const auto curMod = insContextStk.get_curMod();  
   auto curDynData = get_dyn_data(curMod);
+  assert(curMod->isBB);
+
   std::string varAndSlice = node->dest;
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
@@ -1449,6 +1452,7 @@ UpdateFunctionGen::bbMod_constraint(astNode* const node, uint32_t timeIdx, conte
   llvm::FunctionType *FT;
   //llvm::Function *parentFunc = g_curFunc;
   llvm::Function *subFunc;
+  
   if(subDynData->out2FuncMp.find(outPort) != subDynData->out2FuncMp.end()) {
     subFunc = subDynData->out2FuncMp[outPort].first;
     FT = subFunc->getFunctionType();
@@ -1456,8 +1460,8 @@ UpdateFunctionGen::bbMod_constraint(astNode* const node, uint32_t timeIdx, conte
   else {
     auto retTy = llvm::IntegerType::get(*c, get_var_slice_width_simp(varAndSlice, curMod));
     std::vector<llvm::Type *> argTy;  
-    for(auto it = subDynData->out2InDelayMp[outPort].begin(); 
-          it != subDynData->out2InDelayMp[outPort].end(); it++) {
+    for(auto it = subMod->bbOut2InDelayMp[outPort].begin(); 
+          it != subMod->bbOut2InDelayMp[outPort].end(); it++) {
       std::string input = it->first;
       std::string connectWire = curMod->insPort2wireMp[insName][input];
       uint32_t delay = it->second;
@@ -1475,8 +1479,8 @@ UpdateFunctionGen::bbMod_constraint(astNode* const node, uint32_t timeIdx, conte
   }
 
   uint32_t idx = 0;
-  for(auto it = subDynData->out2InDelayMp[outPort].begin(); 
-        it != subDynData->out2InDelayMp[outPort].end(); it++) {
+  for(auto it = subMod->bbOut2InDelayMp[outPort].begin(); 
+        it != subMod->bbOut2InDelayMp[outPort].end(); it++) {
     std::string input = it->first;
     uint32_t delay = it->second;    
     toCoutVerb("set func arg: "+input+DELIM+toStr(delay));
@@ -1489,8 +1493,8 @@ UpdateFunctionGen::bbMod_constraint(astNode* const node, uint32_t timeIdx, conte
     input2AstMp.emplace(node->srcVec[i], node->childVec[i]);
 
   std::vector<llvm::Value*> args;
-  for(auto it = subDynData->out2InDelayMp[outPort].begin(); 
-      it != subDynData->out2InDelayMp[outPort].end(); it++) {
+  for(auto it = subMod->bbOut2InDelayMp[outPort].begin(); 
+      it != subMod->bbOut2InDelayMp[outPort].end(); it++) {
     std::string input = it->first;
     uint32_t delay = it->second;
     std::string connectWire = curMod->insPort2wireMp[insName][input];

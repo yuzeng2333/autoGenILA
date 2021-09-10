@@ -166,6 +166,8 @@ class ModuleInfo_t {
   // this one is used only in ast building
   bool isFunctionedSubMod = true;  
   bool isMem = false;
+  bool isBB; // is blackboxed module
+  std::map<std::string, std::map<std::string, uint32_t>> bbOut2InDelayMp;
 };
 
 

@@ -158,6 +158,8 @@ std::string decode(const std::map<std::string, std::vector<std::string>> &inputI
     isCompatible = true;
     for(auto pair : inputInstr) {
       std::string varName = pair.first;
+      if(varName == "io_vme_rd_0_data_bits")
+        toCoutVerb("Find it!");
       auto inputValue = pair.second;
       auto instrValue = instr.instrEncoding[varName];
       if(!is_compatible(instrValue, inputValue)) {
@@ -213,9 +215,11 @@ bool same_value(std::string val1, std::string val2) {
     toCout("Find it!");
   std::smatch m;
   std::regex pX("(\\d+)'(d|h|b)x");
+  std::regex pZ("(\\d+)'(d|h|b)(\\(Z\\S+\\)|Z)");
   std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");
-  if(is_x(val1)) {
-    if(std::regex_match(val1, m, pX)) {
+  if(is_x(val1) || val1.find("Z") != std::string::npos) {
+    if(std::regex_match(val1, m, pX)
+       || std::regex_match(val1, m, pZ) ) {
       std::string width1 = m.str(1);
       if(!std::regex_match(val2, m, pNum)) {
         if(val2 == "1") return width1 == "1";
