@@ -1473,7 +1473,7 @@ UpdateFunctionGen::bbMod_constraint(astNode* const node, uint32_t timeIdx, conte
     std::string hierName = insContextStk.get_hier_name();
     std::string funcNane = "func_;_"+hierName+"."+modName+"_$"+outPort;
     FT = llvm::FunctionType::get(retTy, argTy, false);
-    subFunc = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
+    subFunc = llvm::Function::Create(FT, llvm::Function::ExternalLinkage, 
                                         funcNane, TheModule.get());
     subDynData->out2FuncMp.emplace(outPort, std::make_pair(subFunc, bound-timeIdx));
   }
