@@ -32,6 +32,14 @@ struct WorkSet_t g_visitedTgt;
 // for each of it update function, what are the arguments
 void get_all_update() {
   toCout("### Begin get_all_update ");
+  std::ofstream genTimeFile(g_path+"/up_gen_time.txt", std::ios::app);
+  genTimeFile << "\n===== Begin a new run!" << std::endl;
+  genTimeFile.close();
+
+  std::ofstream simplifyTimeFile(g_path+"/simplify_time.txt", std::ios::app);
+  simplifyTimeFile <<"\n===== Begin a new run!"  << std::endl;
+  simplifyTimeFile.close();
+
   std::string line;  
   //std::ifstream g_visitedTgtInFile(g_path+"/visited_target.txt");
   //while(std::getline(g_visitedTgtInFile, line)) {
