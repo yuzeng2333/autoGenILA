@@ -823,10 +823,19 @@ void vta_ila_model(std::ofstream &cpp) {
     toCout("instr "+toStr(instrIdx));
     std::string firstByte = encoding["io_vme_rd_0_data_bits"][2];
     std::string secondByte = encoding["io_vme_rd_0_data_bits"][3];
-    convert_concat_to_hex(firstByte, imem);
-    convert_concat_to_hex(secondByte, imem);
     uint64_t firstByteNum = convert_to_long_single_num(firstByte);    
-    uint64_t secondByteNum = convert_to_long_single_num(secondByte);    
+    uint64_t secondByteNum = convert_to_long_single_num(secondByte);
+
+    std::string firstByteHex = longDec2hex(toStr(firstByteNum));
+    std::string secondByteHex = longDec2hex(toStr(secondByteNum));
+
+    if(firstByteHex.size() < 16) 
+      firstByteHex = std::string(16-firstByteHex.size(), '0') + firstByteHex;
+    if(secondByteHex.size() < 16) 
+      secondByteHex = std::string(16-secondByteHex.size(), '0') + secondByteHex;
+    imem << firstByteHex << std::endl;
+    imem << secondByteHex << std::endl;
+
     std::string instrName = decode(encoding);
     uint32_t idx = get_instr_by_name(instrName);    
     cpp << "  // instr "+toStr(instrIdx++)+": "+instrName+"\n" << std::endl;

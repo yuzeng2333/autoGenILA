@@ -1,0 +1,144 @@
+$date
+	Sat Jun 12 17:28:59 2021
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1s
+$end
+$scope module tb $end
+$var wire 4 ! out [3:0] $end
+$var reg 1 " clk $end
+$var reg 4 # data [3:0] $end
+$var reg 1 $ rst $end
+$var reg 1 % wr $end
+$scope module u0 $end
+$var wire 1 " clk $end
+$var wire 4 & data [3:0] $end
+$var wire 1 $ rst $end
+$var wire 1 % wr $end
+$var wire 1 ' t1 $end
+$var wire 4 ( sum_nxt [3:0] $end
+$var wire 4 ) out [3:0] $end
+$var wire 4 * const_nxt [3:0] $end
+$var reg 4 + const [3:0] $end
+$var reg 4 , sum [3:0] $end
+$scope module a0 $end
+$var wire 1 " clk $end
+$var wire 1 ' test $end
+$upscope $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+#0
+$dumpvars
+bx ,
+bx +
+b0 *
+bx )
+bx (
+x'
+b0 &
+0%
+1$
+b0 #
+0"
+bx !
+$end
+#5
+0'
+b0 !
+b0 )
+b0 +
+b0 (
+b0 ,
+1"
+#10
+0"
+b1 (
+b0 *
+b1 #
+b1 &
+0$
+#15
+b10 (
+1'
+b1 !
+b1 )
+b1 ,
+1"
+#20
+0"
+#25
+b11 (
+b10 !
+b10 )
+b10 ,
+1"
+#30
+0"
+#35
+b100 (
+b11 !
+b11 )
+b11 ,
+1"
+#40
+0"
+#45
+b101 (
+b100 !
+b100 )
+b100 ,
+1"
+#50
+0"
+#55
+b110 (
+b101 !
+b101 )
+b101 ,
+1"
+#60
+0"
+#65
+b111 (
+b110 !
+b110 )
+b110 ,
+1"
+#70
+0"
+#75
+b1000 (
+b111 !
+b111 )
+b111 ,
+1"
+#80
+0"
+#85
+b1001 (
+b1000 !
+b1000 )
+b1000 ,
+1"
+#90
+0"
+#95
+b1010 (
+b1001 !
+b1001 )
+b1001 ,
+1"
+#100
+0"
+#105
+b1011 (
+b1010 !
+b1010 )
+b1010 ,
+1"
+#110
+0"

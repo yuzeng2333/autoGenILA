@@ -1,1 +1,1 @@
-long int adder(int a, int b);
+long long unsigned int adder(int a, int b);

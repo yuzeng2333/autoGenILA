@@ -37,7 +37,7 @@ target_link_libraries(${VERILOG_EXE} z3)
 target_link_libraries(${VERILOG_EXE} glog::glog)
 target_link_libraries(${VERILOG_EXE} ${llvm_libs})
 target_link_libraries(${VERILOG_EXE} TaintGenLib)
-target_link_libraries(${TEST_GEN} FuncExtractLib)
+target_link_libraries(${VERILOG_EXE} FuncExtractLib)
 
 add_executable(${TEST_GEN} ./app/rand_test_gen.cpp)
 target_link_libraries(${TEST_GEN} z3)

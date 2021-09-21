@@ -10,17 +10,18 @@ define dso_local i32 @main() #0 {
   %1 = alloca i32, align 4
   %2 = alloca i32, align 4
   %3 = alloca i32, align 4
-  %4 = alloca i32, align 4
+  %4 = alloca i16, align 2
   store i32 0, i32* %1, align 4
   store i32 5, i32* %2, align 4
   store i32 7, i32* %3, align 4
   %5 = load i32, i32* %2, align 4
   %6 = load i32, i32* %3, align 4
   %7 = call i64 @adder(i32 %5, i32 %6)
-  %8 = trunc i64 %7 to i32
-  store i32 %8, i32* %4, align 4
-  %9 = load i32, i32* %4, align 4
-  %10 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([14 x i8], [14 x i8]* @.str, i64 0, i64 0), i32 %9)
+  %8 = trunc i64 %7 to i16
+  store i16 %8, i16* %4, align 2
+  %9 = load i16, i16* %4, align 2
+  %10 = zext i16 %9 to i32
+  %11 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([14 x i8], [14 x i8]* @.str, i64 0, i64 0), i32 %10)
   ret i32 0
 }
 

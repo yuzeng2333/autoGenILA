@@ -1,0 +1,108 @@
+module Sha256Accel(clock, reset, io_first, io_inputData, io_inputValid, io_inputReady, io_outputData_0, io_outputData_1, io_outputData_2, io_outputData_3, io_outputData_4, io_outputData_5, io_outputData_6, io_outputData_7, io_outputValid);
+  wire [7:0] _00_;
+  wire _01_;
+  wire [7:0] _02_;
+  wire [7:0] _03_;
+  wire [7:0] _04_;
+  wire [7:0] _05_;
+  wire _GEN_0;
+  wire _GEN_1;
+  wire _T;
+  wire [7:0] _T_11;
+  wire _T_12;
+  reg [7:0] _T_3;
+  wire _T_4;
+  wire _T_5;
+  wire _T_6;
+  wire _T_7;
+  wire _T_8;
+  wire _T_9;
+  wire accel_clock;
+  wire accel_io_first;
+  wire accel_io_newChunk;
+  wire [31:0] accel_io_out_0;
+  wire [31:0] accel_io_out_1;
+  wire [31:0] accel_io_out_2;
+  wire [31:0] accel_io_out_3;
+  wire [31:0] accel_io_out_4;
+  wire [31:0] accel_io_out_5;
+  wire [31:0] accel_io_out_6;
+  wire [31:0] accel_io_out_7;
+  wire accel_io_shiftIn;
+  wire accel_io_valid;
+  wire [31:0] accel_io_wordIn;
+  wire accel_reset;
+  input clock;
+  reg [7:0] ctr;
+  reg first;
+  input io_first;
+  input [31:0] io_inputData;
+  output io_inputReady;
+  input io_inputValid;
+  output [31:0] io_outputData_0;
+  output [31:0] io_outputData_1;
+  output [31:0] io_outputData_2;
+  output [31:0] io_outputData_3;
+  output [31:0] io_outputData_4;
+  output [31:0] io_outputData_5;
+  output [31:0] io_outputData_6;
+  output [31:0] io_outputData_7;
+  output io_outputValid;
+  input reset;
+  assign _T_11 = ctr + 1'b1;
+  assign _T_6 = _T_4 & _T_5;
+  assign _T_8 = _T_6 & _T_7;
+  assign accel_io_first = first & accel_io_shiftIn;
+  assign accel_io_newChunk = _T & accel_io_shiftIn;
+  assign _T = ! ctr;
+  assign _T_12 = ctr == 6'b111111;
+  assign _T_9 = ctr >= 5'b10000;
+  assign _T_4 = _T_3 < 5'b10000;
+  assign _T_5 = ctr < 5'b10000;
+  assign _T_7 = ~ io_first;
+  assign _GEN_0 = io_first | first;
+  assign accel_io_shiftIn = _T_9 | io_inputValid;
+  assign _01_ = reset | _GEN_1;
+  always @(posedge clock)
+      _T_3 <= ctr;
+  always @(posedge clock)
+      first <= _01_;
+  always @(posedge clock)
+      ctr <= _00_;
+  assign _02_ = io_inputValid ? _T_11 : ctr;
+  assign _03_ = _T_12 ? 8'b00000000 : _T_11;
+  assign _04_ = _T_9 ? _03_ : _02_;
+  assign _05_ = io_first ? 8'b00000000 : _04_;
+  assign _00_ = reset ? 8'b00000000 : _05_;
+  assign _GEN_1 = accel_io_shiftIn ? 1'b0 : _GEN_0;
+  assign io_inputReady = _T_9 ? 1'b0 : _T_8;
+  CompressionFunction accel (
+    .clock(clock),
+    .io_first(accel_io_first),
+    .io_newChunk(accel_io_newChunk),
+    .io_out_0(accel_io_out_0),
+    .io_out_1(accel_io_out_1),
+    .io_out_2(accel_io_out_2),
+    .io_out_3(accel_io_out_3),
+    .io_out_4(accel_io_out_4),
+    .io_out_5(accel_io_out_5),
+    .io_out_6(accel_io_out_6),
+    .io_out_7(accel_io_out_7),
+    .io_shiftIn(accel_io_shiftIn),
+    .io_valid(accel_io_valid),
+    .io_wordIn(io_inputData),
+    .reset(reset)
+  );
+  assign accel_clock = clock;
+  assign accel_io_wordIn = io_inputData;
+  assign accel_reset = reset;
+  assign io_outputData_0 = accel_io_out_0;
+  assign io_outputData_1 = accel_io_out_1;
+  assign io_outputData_2 = accel_io_out_2;
+  assign io_outputData_3 = accel_io_out_3;
+  assign io_outputData_4 = accel_io_out_4;
+  assign io_outputData_5 = accel_io_out_5;
+  assign io_outputData_6 = accel_io_out_6;
+  assign io_outputData_7 = accel_io_out_7;
+  assign io_outputValid = accel_io_valid;
+endmodule

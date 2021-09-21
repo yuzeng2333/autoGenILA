@@ -1,7 +1,0 @@
-#1:
-in = x
-W:
-out(skip) 3
-$NOP:
-in = x
-*RESET:

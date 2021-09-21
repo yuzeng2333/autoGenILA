@@ -1,4 +1,0 @@
-// only specify needed mapping from ila model to rtl
-$sw
-_fifo_addr_r0: _u0_mem_addr
-_u0_mem_addr: _u0_mem_addr_sw

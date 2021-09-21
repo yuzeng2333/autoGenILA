@@ -1,7 +1,0 @@
-Begin main!
-Start time: Sun May 16 15:15:44 2021
-
-Replace out___#21 with 8'b0
-Replace k0___#21 with 128'b0
-Replace out___#21 with 8'b0
-Replace s0___#21 with 128'b0

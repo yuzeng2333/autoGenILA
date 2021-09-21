@@ -69,3 +69,6 @@ wcase:
 
 bi:
 	./build/taint_gen ~/workspace/research/autoGenILA/biriscv/SYN_wr/biriscv_yosys.v
+
+urv:
+	./build/taint_gen ~/workspace/research/autoGenILA/ultra_riscv/SYN_wr/riscv_flatten_yosys.v

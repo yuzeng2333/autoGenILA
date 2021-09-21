@@ -1,0 +1,80 @@
+module AcceleratorTop(clock, reset, io_bus_cyc, io_bus_stb, io_bus_we, io_bus_sel, io_bus_addr, io_bus_data_wr, io_bus_ack, io_bus_err, io_bus_data_rd);
+  wire _T_2;
+  wire _T_6;
+  wire aes_clock;
+  wire aes_io_bus_ack;
+  wire [15:0] aes_io_bus_addr;
+  wire aes_io_bus_cyc;
+  wire [31:0] aes_io_bus_data_rd;
+  wire [31:0] aes_io_bus_data_wr;
+  wire [3:0] aes_io_bus_sel;
+  wire aes_io_bus_stb;
+  wire aes_io_bus_we;
+  wire aes_reset;
+  input clock;
+  output io_bus_ack;
+  input [31:0] io_bus_addr;
+  input io_bus_cyc;
+  output [31:0] io_bus_data_rd;
+  input [31:0] io_bus_data_wr;
+  output io_bus_err;
+  input [3:0] io_bus_sel;
+  input io_bus_stb;
+  input io_bus_we;
+  input reset;
+  wire sha256_clock;
+  wire sha256_io_bus_ack;
+  wire [15:0] sha256_io_bus_addr;
+  wire sha256_io_bus_cyc;
+  wire [31:0] sha256_io_bus_data_rd;
+  wire [31:0] sha256_io_bus_data_wr;
+  wire [3:0] sha256_io_bus_sel;
+  wire sha256_io_bus_stb;
+  wire sha256_io_bus_we;
+  wire sha256_reset;
+  assign aes_io_bus_cyc = io_bus_cyc & _T_2;
+  assign sha256_io_bus_cyc = io_bus_cyc & _T_6;
+  assign _T_2 = ! io_bus_addr[19:16];
+  assign _T_6 = io_bus_addr[19:16] == 1'b1;
+  assign io_bus_ack = _T_2 ? aes_io_bus_ack : sha256_io_bus_ack;
+  assign io_bus_data_rd = _T_2 ? aes_io_bus_data_rd : sha256_io_bus_data_rd;
+  AesWishbone aes (
+    .clock(clock),
+    .io_bus_ack(aes_io_bus_ack),
+    .io_bus_addr({ 16'b0000000000000000, io_bus_addr[15:0] }),
+    .io_bus_cyc(aes_io_bus_cyc),
+    .io_bus_data_rd(aes_io_bus_data_rd),
+    .io_bus_data_wr(io_bus_data_wr),
+    .io_bus_sel(io_bus_sel),
+    .io_bus_stb(io_bus_stb),
+    .io_bus_we(io_bus_we),
+    .reset(reset)
+  );
+  Sha256Wishbone sha256 (
+    .clock(clock),
+    .io_bus_ack(sha256_io_bus_ack),
+    .io_bus_addr({ 16'b0000000000000000, io_bus_addr[15:0] }),
+    .io_bus_cyc(sha256_io_bus_cyc),
+    .io_bus_data_rd(sha256_io_bus_data_rd),
+    .io_bus_data_wr(io_bus_data_wr),
+    .io_bus_sel(io_bus_sel),
+    .io_bus_stb(io_bus_stb),
+    .io_bus_we(io_bus_we),
+    .reset(reset)
+  );
+  assign aes_clock = clock;
+  assign aes_io_bus_addr = io_bus_addr[15:0];
+  assign aes_io_bus_data_wr = io_bus_data_wr;
+  assign aes_io_bus_sel = io_bus_sel;
+  assign aes_io_bus_stb = io_bus_stb;
+  assign aes_io_bus_we = io_bus_we;
+  assign aes_reset = reset;
+  assign io_bus_err = 1'b0;
+  assign sha256_clock = clock;
+  assign sha256_io_bus_addr = io_bus_addr[15:0];
+  assign sha256_io_bus_data_wr = io_bus_data_wr;
+  assign sha256_io_bus_sel = io_bus_sel;
+  assign sha256_io_bus_stb = io_bus_stb;
+  assign sha256_io_bus_we = io_bus_we;
+  assign sha256_reset = reset;
+endmodule

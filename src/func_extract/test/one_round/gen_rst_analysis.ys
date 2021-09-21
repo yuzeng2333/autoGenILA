@@ -1,5 +1,0 @@
-read_verilog -sv design.v
-
-prep -top one_round
-
-sim -clock clk -rstlen 20 -zinit -vcd rst.vcd

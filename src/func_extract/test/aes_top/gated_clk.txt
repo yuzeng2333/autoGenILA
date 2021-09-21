@@ -1,1 +1,0 @@
-These are found potential gated clk, check it:

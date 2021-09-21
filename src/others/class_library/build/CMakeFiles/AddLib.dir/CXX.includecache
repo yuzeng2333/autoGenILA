@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/yuzeng/workspace/research/autoGenILA/src/others/class_library/class.cpp
+class.h
+/home/yuzeng/workspace/research/autoGenILA/src/others/class_library/class.h
+
+/home/yuzeng/workspace/research/autoGenILA/src/others/class_library/class.h
+iostream
+-
+
