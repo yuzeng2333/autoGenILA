@@ -100,15 +100,15 @@ bool g_write_assert = false;
 // used when start from arbitraty state, only reset taints
 bool g_use_taint_rst = false;
 // used to end verification after a certain time of instruction begins, TODO: enable it for 8051
-bool g_use_end_sig = true;
+bool g_use_end_sig = false;
 // INSTR_IN_ZY needs to be defined, TODO: enable it for 8051
 bool g_wt_keeped = false; 
 // TODO: enable it for biRISCV
 bool g_special_equal_taint = false; 
 // set the read flag only if reg's value is not reset value
-bool g_set_rflag_if_not_rst_val = false;  // TODO: usually enable it 
+bool g_set_rflag_if_not_rst_val = true;  // TODO: usually enable it 
 // TODO: enable it for biRISCV
-bool g_set_rflag_if_not_norm_val = true; 
+bool g_set_rflag_if_not_norm_val = false; 
 // TODO: seems problematic, be careful when considering enable it
 // Disable for 8051
 bool g_use_does_keep = false;  
@@ -119,7 +119,7 @@ CheckInvarType g_check_invariance = CheckRst; // TODO: check this setting
 bool g_enable_taint = true;
 // if is true, "assert()" will be generated for jaspergold to check
 // otherwise, a verilog assert module will be generated for simulation-based check
-bool g_use_jasper = false;
+bool g_use_jasper = true;
 uint32_t g_assert_num = 0;
 uint32_t g_case_reg_num = 0;
 std::vector<std::string> g_assertNames;

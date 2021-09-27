@@ -160,7 +160,7 @@ void reg_taint_gen(std::string line, std::ofstream &output) {
     }
 
     output << blank << "logic " + var + "_t_flag ;" << std::endl;
-    output << blank << "logic " + var + "_r_flag ;" << std::endl;
+    output << blank << "logic " + var + "_r_flag = 0;" << std::endl;
 
     if(isTrueReg(var) && !g_use_value_change) {
       output << blank << "assign " + var + _sig + " = " + toStr(g_next_sig++) + " ;" << std::endl;
@@ -210,9 +210,9 @@ void mem_taint_gen(std::string line, std::ofstream &output) {
     output << blank << "logic " + slice + " " + var + _t + " " + sliceTop + " ;" << std::endl;
 
     output << blank << "logic " + sliceTop + " " + var + "_t_flag ;" << std::endl;
-    output << blank << "logic " + sliceTop + " " + var + "_r_flag ;" << std::endl;
+    output << blank << "logic " + sliceTop + " " + var + "_r_flag = 0;" << std::endl;
     output << blank << "logic " + slice + " " + var + _r + " " + sliceTop + " ;" << std::endl;
-    output << blank << "logic " + var + "_r_flag_top ;" << std::endl;
+    output << blank << "logic " + var + "_r_flag_top = 0;" << std::endl;
     // _sig
     if(!g_use_value_change)
     output << blank << "logic [" + toStr(g_sig_width-1) + ":0] " + var + _sig + " ;" << std::endl;
