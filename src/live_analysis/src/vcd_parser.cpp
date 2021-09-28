@@ -40,8 +40,9 @@ void hierarchical_vcd_parser(std::string fileName, std::map<std::string, std::un
   bool isInFunc = false;
   while(std::getline(input, line)) {
     toCout(line);
-    if(line.find("M9") != std::string::npos) {
-      toCout("Find it!");
+    if(line.find("n135 ap_CS_fsm") != std::string::npos
+         || line.find("b0001 n135") != std::string::npos) {
+      toCout("Find n135!");
     }
     if(isInFunc) {
       if (is_end_scope(line)) isInFunc = false;
@@ -84,8 +85,8 @@ void hierarchical_vcd_parser(std::string fileName, std::map<std::string, std::un
       instanceNameStack.pop();
       moduleNameStack.pop();
     }
-    else if(passLine)
-      continue;
+    //else if(passLine)
+    //  continue;
     else if(state == readName){
       if(!std::regex_match(line, m, pName))
         continue;
@@ -100,8 +101,8 @@ void hierarchical_vcd_parser(std::string fileName, std::map<std::string, std::un
         toCout("Warning: "+name+" is not found in map");
         continue;
       }
-      if(name == "n14") {
-        toCoutVerb("Found cpu_state");
+      if(name == "n135") {
+        toCoutVerb("Found n135");
       }
 
       std::string rstVal = line.substr(1, blankPos-1);

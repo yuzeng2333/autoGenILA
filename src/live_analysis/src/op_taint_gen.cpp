@@ -1707,7 +1707,7 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
   if(g_use_zy_count)
     checkCond(false, "ERROR: encounter nonblockif whiling use zy_count! "+line);
 
-  if(line.find("ap_enable_reg_pp0_iter1") != std::string::npos)
+  if(line.find("ap_CS_fsm") != std::string::npos)
     toCout("Find it!");
 
   //output << always_line << std::endl;
