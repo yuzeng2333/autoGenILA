@@ -2676,21 +2676,37 @@ void convert_nb_if_to_ite(std::ifstream &input,
     std::string line3;
     std::getline(input, line3);
     std::string newVarIdx = toStr(NEW_FANGYUAN++);
-    output << "  wire ["+toStr(width-1)+":0] NewNBIte"+newVarIdx+";" << std::endl;    
+    output << "  wire ["+toStr(width-1)+":0] NewNBIte"+newVarIdx+";" << std::endl;
+    varWidth.var_width_insert("NewNBIte"+newVarIdx, width-1, 0);
     if(std::regex_match(line3, m, pNonblockElse)) {
       std::string elseSrcAndSlice = m.str(3);
-      output << "  assign NewNBIte"+newVarIdx+" = "+ifCondAndSlice+" ? "+ifSrcAndSlice+" : "+elseSrcAndSlice+";" << std::endl;
+      if(ifCondAndSlice.front() != '!')
+        output << "  assign NewNBIte"+newVarIdx+" = "+ifCondAndSlice+" ? "+ifSrcAndSlice+" : "+elseSrcAndSlice+";" << std::endl;
+      else
+        output << "  assign NewNBIte"+newVarIdx+" = "+ifCondAndSlice.substr(1)+" ? "+elseSrcAndSlice+" : "+ifSrcAndSlice+";" << std::endl;
     }
     else if(std::regex_match(line3, m, pNBElseIf)) {
       std::string elseIfCondAndSlice = m.str(2);      
       std::string elseSrcAndSlice = m.str(4);
       std::string newVarIdx2 = toStr(NEW_FANGYUAN++);
-      output << "  wire ["+toStr(width-1)+":0] NewNBIte"+newVarIdx2+";" << std::endl;    
-      output << "  assign NewNBIte"+newVarIdx2+" = "+elseIfCondAndSlice+" ? "+elseSrcAndSlice+" : "+destAndSlice+";" << std::endl;
-      output << "  assign NewNBIte"+newVarIdx+" = "+ifCondAndSlice+" ? "+ifSrcAndSlice+" : NewNBIte"+newVarIdx2+";" << std::endl;
+      output << "  wire ["+toStr(width-1)+":0] NewNBIte"+newVarIdx2+";" << std::endl;
+      varWidth.var_width_insert("NewNBIte"+newVarIdx2, width-1, 0);
+      if(elseIfCondAndSlice.front() != '!')
+        output << "  assign NewNBIte"+newVarIdx2+" = "+elseIfCondAndSlice+" ? "+elseSrcAndSlice+" : "+destAndSlice+";" << std::endl;
+      else
+        output << "  assign NewNBIte"+newVarIdx2+" = "+elseIfCondAndSlice.substr(1)+" ? "+destAndSlice+" : "+elseSrcAndSlice+";" << std::endl;
+
+      if(ifCondAndSlice.front() != '!')
+        output << "  assign NewNBIte"+newVarIdx+" = "+ifCondAndSlice+" ? "+ifSrcAndSlice+" : NewNBIte"+newVarIdx2+";" << std::endl;
+      else
+        output << "  assign NewNBIte"+newVarIdx+" = "+ifCondAndSlice.substr(1)+" ? NewNBIte"+newVarIdx2+" : "+ifSrcAndSlice+";" << std::endl;
     }
     else { // if line3 is neither
-      output << "  assign NewNBIte"+newVarIdx+" = "+ifCondAndSlice+" ? "+ifSrcAndSlice+" : "+destAndSlice+";" << std::endl;
+      if(ifCondAndSlice.front() != '!')
+        output << "  assign NewNBIte"+newVarIdx+" = "+ifCondAndSlice+" ? "+ifSrcAndSlice+" : "+destAndSlice+";" << std::endl;
+      else
+        output << "  assign NewNBIte"+newVarIdx+" = "+ifCondAndSlice.substr(1)+" ? "+destAndSlice+" : "+ifSrcAndSlice+";" << std::endl;
+
       input.seekg(currentPos);
     }
     output << line << std::endl;
