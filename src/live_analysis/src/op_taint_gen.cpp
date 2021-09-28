@@ -1572,6 +1572,8 @@ void nonblock_taint_gen(std::string line, std::ofstream &output) {
       toCout("Warning: cannot find in g_rstValMap for module: "+moduleName+", var: "+dest);
       neqRst = " && ("+dest+" != 0";
     }
+    else if(std::regex_match(g_rstValMap[moduleName][dest], m, pX))
+      neqRst = " && ("+dest+" != 0";
     else
       neqRst = " && ("+dest+" != "+g_rstValMap[moduleName][dest];
     if(g_set_rflag_if_not_norm_val) {
@@ -1680,6 +1682,8 @@ void nonblockconcat_taint_gen(std::string line, std::ofstream &output) {
       toCout("Warning: cannot find in g_rstValMap for module: "+moduleName+", var: "+dest);
       neqRst = " && ("+dest+" != 0";
     }
+    else if(std::regex_match(g_rstValMap[moduleName][dest], m, pX))
+      neqRst = " && ("+dest+" != 0";
     else
       neqRst = " && ("+dest+" != "+g_rstValMap[moduleName][dest];
     if(g_set_rflag_if_not_norm_val) {
@@ -1782,11 +1786,14 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
       }
 
       std::string neqRst = "";
+      std::smatch m;      
       if(g_set_rflag_if_not_rst_val) {
         if(g_rstValMap[moduleName].find(dest) == g_rstValMap[moduleName].end()) {
           toCout("Error: cannot find in g_rstValMap for module: "+moduleName+", var: "+dest);
           neqRst = " && "+dest+" "+destSlice+" != 0";          
         }
+        else if(std::regex_match(g_rstValMap[moduleName][dest], m, pX))
+          neqRst = " && "+dest+" "+destSlice+" != 0";          
         else
           neqRst = " && "+dest+" "+destSlice+" != "+g_rstValMap[moduleName][dest];
       }
@@ -1821,11 +1828,14 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
       }
 
       std::string neqRst = "";
+      std::smatch m;      
       if(g_set_rflag_if_not_rst_val) {
         if(g_rstValMap[moduleName].find(dest) == g_rstValMap[moduleName].end()) {
           toCout("Error: cannot find in g_rstValMap for module: "+moduleName+", var: "+dest);
           neqRst = " && "+dest+" "+destSlice+" != 0";          
         }
+        else if(std::regex_match(g_rstValMap[moduleName][dest], m, pX))
+          neqRst = " && "+dest+" "+destSlice+" != 0";
         else
           neqRst = " && "+dest+" "+destSlice+" != "+g_rstValMap[moduleName][dest];
       }
@@ -1920,11 +1930,14 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
       }
 
       std::string neqRst = "";
+      std::smatch m;      
       if(g_set_rflag_if_not_rst_val) {
         if(g_rstValMap[moduleName].find(dest) == g_rstValMap[moduleName].end()) {
           toCout("Error: cannot find in g_rstValMap for module: "+moduleName+", var: "+dest);
           neqRst = " && "+dest+" "+destSlice+" != 0";          
         }
+        else if(std::regex_match(g_rstValMap[moduleName][dest], m, pX))
+          neqRst = " && "+dest+" "+destSlice+" != 0";
         else
           neqRst = " && "+dest+" "+destSlice+" != "+g_rstValMap[moduleName][dest];
       }
@@ -1958,11 +1971,14 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
       }
 
       std::string neqRst = "";
+      std::smatch m;        
       if(g_set_rflag_if_not_rst_val) {
         if(g_rstValMap[moduleName].find(dest) == g_rstValMap[moduleName].end()) {
           toCout("Error: cannot find in g_rstValMap for module: "+moduleName+", var: "+dest);
           neqRst = " && "+dest+" "+destSlice+" != 0";          
         }
+        else if(std::regex_match(g_rstValMap[moduleName][dest], m, pX))
+          neqRst = " && "+dest+" "+destSlice+" != 0"; 
         else
           neqRst = " && "+dest+" "+destSlice+" != "+g_rstValMap[moduleName][dest];
       }
@@ -2054,11 +2070,14 @@ void nonblockif2_taint_gen(std::string line, std::string always_line, std::ifstr
     output << blank + "if (" + condAndSlice + ") " + dest + "_t_flag " + destSlice + " <= " + dest + "_t_flag " + destSlice + " ? 1 : (" + src + _t+" " + srcSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " | " + extend(idxVar+_t, localWidthNum) + " ) & ( " + dest + destSlice + " != " + srcAndSlice + " );" << std::endl;
 
     std::string neqRst = "";
+    std::smatch m;
     if(g_set_rflag_if_not_rst_val) {
       if(g_rstValMap[moduleName].find(dest) == g_rstValMap[moduleName].end()) {
         toCout("Error: cannot find in g_rstValMap for module: "+moduleName+", var: "+dest);
         neqRst = " && "+dest+" "+destSlice+" != 0";          
       }
+      else if(std::regex_match(g_rstValMap[moduleName][dest], m, pX))
+        neqRst = " && "+dest+" "+destSlice+" != 0"; 
       else
         neqRst = " && "+dest+" "+destSlice+" != "+g_rstValMap[moduleName][dest];
     }
