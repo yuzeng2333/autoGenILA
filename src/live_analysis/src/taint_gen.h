@@ -114,6 +114,10 @@ void determine_regs_to_check();
 
 void check_changed_regs(std::string modName);
 
+void convert_nb_if_to_ite(std::ifstream &input, 
+                          std::ofstream &output, 
+                          std::string line);
+
 std::string separate_modules(std::string fileName, 
                              std::vector<std::string> &modules,
                              std::map<std::string, std::vector<std::string>> &childModules,

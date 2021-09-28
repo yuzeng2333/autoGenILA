@@ -575,22 +575,20 @@ void clean_file(std::string fileName, bool useLogic) {
 }
 
 
+
+// remove functions
+// convert nonblockif/nonblockif-else to nonblock+ite
 void remove_functions(std::string fileName) {
   std::ifstream input(fileName+".nocomment");
   std::ofstream output(fileName + ".clean");
   std::string line;
   while( std::getline(input, line) ) {
-    if(line.find("S4 S4_0 (") != std::string::npos
-       || line.find("module expand_key_128") != std::string::npos 
-       || line.find("assign v1 = addedVar133 ^ in[95:64];") != std::string::npos 
-       || line.find("assign k3b = k3a ^ k4a;") != std::string::npos 
-       || line.find("assign addedVar133 = { v0[31:24], in[119:96] };") != std::string::npos 
-       || line.find("input [7:0] rcon;") != std::string::npos 
-      )
-      toCoutVerb("Find it!");
     uint32_t choice = parse_verilog_line(line, true);
     if ( choice == FUNCDEF && g_use_jasper) {
       remove_function_wrapper(line, input, output);
+    }
+    else if(line.find("always @(") != std::string::npos) {
+      convert_nb_if_to_ite(input, output, line);
     }
     else
       output << line << std::endl;
@@ -2657,6 +2655,50 @@ void check_changed_regs(std::string modName) {
   }
 }
 
+
+void convert_nb_if_to_ite(std::ifstream &input, 
+                          std::ofstream &output, 
+                          std::string line) {
+  std::string line2;
+  std::getline(input, line2);
+  std::smatch m;
+  if(!std::regex_match(line2, m, pNonblockIf)) {
+    output << line << std::endl;  
+    output << line2 << std::endl;
+    return;
+  }
+  else { // if line2 is nb-if
+    std::string ifCondAndSlice = m.str(2);
+    std::string destAndSlice = m.str(3);
+    std::string ifSrcAndSlice = m.str(4);
+    uint32_t width = get_var_slice_width(destAndSlice);
+    auto currentPos = input.tellg();
+    std::string line3;
+    std::getline(input, line3);
+    std::string newVarIdx = toStr(NEW_FANGYUAN++);
+    output << "  wire ["+toStr(width-1)+":0] NewNBIte"+newVarIdx+";" << std::endl;    
+    if(std::regex_match(line3, m, pNonblockElse)) {
+      std::string elseSrcAndSlice = m.str(3);
+      output << "  assign NewNBIte"+newVarIdx+" = "+ifCondAndSlice+" ? "+ifSrcAndSlice+" : "+elseSrcAndSlice+";" << std::endl;
+    }
+    else if(std::regex_match(line3, m, pNBElseIf)) {
+      std::string elseIfCondAndSlice = m.str(2);      
+      std::string elseSrcAndSlice = m.str(4);
+      std::string newVarIdx2 = toStr(NEW_FANGYUAN++);
+      output << "  wire ["+toStr(width-1)+":0] NewNBIte"+newVarIdx2+";" << std::endl;    
+      output << "  assign NewNBIte"+newVarIdx2+" = "+elseIfCondAndSlice+" ? "+elseSrcAndSlice+" : "+destAndSlice+";" << std::endl;
+      output << "  assign NewNBIte"+newVarIdx+" = "+ifCondAndSlice+" ? "+ifSrcAndSlice+" : NewNBIte"+newVarIdx2+";" << std::endl;
+    }
+    else { // if line3 is neither
+      output << "  assign NewNBIte"+newVarIdx+" = "+ifCondAndSlice+" ? "+ifSrcAndSlice+" : "+destAndSlice+";" << std::endl;
+      input.seekg(currentPos);
+    }
+    output << line << std::endl;
+    output << "    "+destAndSlice+" <= NewNBIte"+newVarIdx+";" << std::endl;
+    return;
+  }
+}
+ 
 
 // 1. separate the original file into multiple files, each containing one module
 // 2. analyze for each module, which sub-modules it uses
