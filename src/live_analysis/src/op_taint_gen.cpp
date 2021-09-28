@@ -1851,13 +1851,24 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
     else {
       elseDestAndSlice = m.str(3);
       elseSrcAndSlice = m.str(4);
-      localCondAndSlice = "!"+condAndSlice+" && "+m.str(2);
+      if(condAndSlice.front() != '!') {
+        uint32_t newVarIdx = NEW_FANGYUAN++;
+        output << "  wire addedVar"+toStr(newVarIdx)+";" << std::endl;
+        output << "  assign addedVar"+toStr(newVarIdx)+" = ! "+localCondAndSlice+";" << std::endl;
+        localCondAndSlice = "addedVar"+toStr(newVarIdx)+" && "+m.str(2);
+      }
+      else {
+        localCondAndSlice = condAndSlice.substr(1)+" && "+m.str(2);
+      }
       split_slice(elseSrcAndSlice, src, srcSlice);
       split_slice(localCondAndSlice, cond, condSlice);
     }
 
+    uint32_t newVarIdx = NEW_FANGYUAN++;
+    output << "  wire addedVar"+toStr(newVarIdx)+";" << std::endl;
+    output << "  assign addedVar"+toStr(newVarIdx)+" = "+localCondAndSlice+";" << std::endl;
     output << always_line << std::endl;
-    output << blank + "if ( " + localCondAndSlice + " ) " + destAndSlice + " <= " + elseSrcAndSlice + " ;" << std::endl;
+    output << blank + "if ( " + "addedVar"+toStr(newVarIdx) + " ) " + destAndSlice + " <= " + elseSrcAndSlice + " ;" << std::endl;
 
     if( isNum(src) ) {
       hasRst = true;
@@ -1870,19 +1881,19 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
       // FIXME: replace get_recent_rst() with rst_zy?
       if(g_use_value_change) {
         output << always_line << std::endl;
-        output << blank + "if ( " + localCondAndSlice + " ) " + dest + _t + " " + destSlice + " <= ( " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + extend(destAndSlice+" != "+elseSrcAndSlice, localWidthNum) + " );" << std::endl;
+        output << blank + "if ( addedVar"+toStr(newVarIdx) + " ) " + dest + _t + " " + destSlice + " <= ( " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + extend(destAndSlice+" != "+elseSrcAndSlice, localWidthNum) + " );" << std::endl;
 
         output << always_line << std::endl;
         output << blank + "if(rst_zy) " + dest + "_t_flag <= 0;" << std::endl;        
-        output << blank + "else if ( " + localCondAndSlice + " ) " + dest + "_t_flag " + destSlice + " <= " + dest + "_t_flag " + destSlice + " ? 1 : (" + cond+_t+" "+condSlice + " ) & ( " + destAndSlice + " != " + elseSrcAndSlice + " );" << std::endl;
+        output << blank + "else if ( addedVar"+toStr(newVarIdx) + " ) " + dest + "_t_flag " + destSlice + " <= " + dest + "_t_flag " + destSlice + " ? 1 : (" + cond+_t+" "+condSlice + " ) & ( " + destAndSlice + " != " + elseSrcAndSlice + " );" << std::endl;
       }
       else {
         output << always_line << std::endl;
-        output << blank + "if ( " + localCondAndSlice + " ) " + dest + _t + " " + destSlice + " <= ( " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + dest_t_Or + extend( dest+_sig+" != 0", localWidthNum ) + " );" << std::endl;
+        output << blank + "if ( addedVar"+toStr(newVarIdx) + " ) " + dest + _t + " " + destSlice + " <= ( " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + dest_t_Or + extend( dest+_sig+" != 0", localWidthNum ) + " );" << std::endl;
 
         output << always_line << std::endl;
         output << blank + "if(rst_zy) " + dest + "_t_flag <= 0;" << std::endl;                
-        output << blank + "else if ( " + localCondAndSlice + " ) " + dest + "_t_flag " + destSlice + " <= " + dest + "_t_flag " + destSlice + " ? 1 : (" + cond+_t+" "+condSlice + " ) & ( " + dest+_sig+" != 0 );" << std::endl;
+        output << blank + "else if ( addedVar"+toStr(newVarIdx) + " ) " + dest + "_t_flag " + destSlice + " <= " + dest + "_t_flag " + destSlice + " ? 1 : (" + cond+_t+" "+condSlice + " ) & ( " + dest+_sig+" != 0 );" << std::endl;
       }
 
       std::string neqRst = "";
@@ -1896,29 +1907,29 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
       }
       output << always_line << std::endl; 
       output << blank + "if(rst_zy) " + dest + "_r_flag <= 0;" << std::endl;      
-      output << blank + "else if ( " + localCondAndSlice + " ) " + dest + "_r_flag " + destSlice + " <= " + dest + "_r_flag " + destSlice + " ? 1 : " + dest + "_t_flag " + destSlice + " ? 0 : ( |" + dest + _r + " " + destSlice + neqRst + " ) ;" << std::endl;
+      output << blank + "else if ( addedVar"+toStr(newVarIdx) + " ) " + dest + "_r_flag " + destSlice + " <= " + dest + "_r_flag " + destSlice + " ? 1 : " + dest + "_t_flag " + destSlice + " ? 0 : ( |" + dest + _r + " " + destSlice + neqRst + " ) ;" << std::endl;
 
 
     }
     else {
-      condAndSrcVec.push_back(std::make_pair(localCondAndSlice, elseSrcAndSlice));      
+      condAndSrcVec.push_back(std::make_pair("addedVar"+toStr(newVarIdx), elseSrcAndSlice));      
       uint32_t localWidthNum = get_var_slice_width(elseSrcAndSlice);
       // FIXME: replace get_recent_rst() with rst_zy?
       if(g_use_value_change) {
         output << always_line << std::endl;
-        output << blank + "if ( " + localCondAndSlice + " ) " + dest + _t + " " + destSlice + " <= ( " + src + _t +" " + srcSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + extend(destAndSlice+" != "+elseSrcAndSlice, localWidthNum) + " );" << std::endl;
+        output << blank + "if ( addedVar"+toStr(newVarIdx) + " ) " + dest + _t + " " + destSlice + " <= ( " + src + _t +" " + srcSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + extend(destAndSlice+" != "+elseSrcAndSlice, localWidthNum) + " );" << std::endl;
 
         output << always_line << std::endl;
         output << blank + "if(rst_zy) " + dest + "_t_flag <= 0;" << std::endl;                
-        output << blank + "else if ( " + localCondAndSlice + " ) " + dest + "_t_flag " + destSlice + " <= " + dest + "_t_flag " + destSlice + " ? 1 : ( ( |" + src + _t +" " + srcSlice + " ) || " + cond+_t+" "+condSlice + " ) & ( " + destAndSlice+" != "+elseSrcAndSlice + " );" << std::endl;
+        output << blank + "else if ( addedVar"+toStr(newVarIdx) + " ) " + dest + "_t_flag " + destSlice + " <= " + dest + "_t_flag " + destSlice + " ? 1 : ( ( |" + src + _t +" " + srcSlice + " ) || " + cond+_t+" "+condSlice + " ) & ( " + destAndSlice+" != "+elseSrcAndSlice + " );" << std::endl;
       }
       else {
         output << always_line << std::endl;
-        output << blank + "if ( " + localCondAndSlice + " ) " + dest + _t + " " + destSlice + " <= ( " + src + _t+" " + srcSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + dest_t_Or + extend( dest+_sig+" != "+src+_sig, localWidthNum ) + " );" << std::endl;
+        output << blank + "if ( addedVar"+toStr(newVarIdx) + " ) " + dest + _t + " " + destSlice + " <= ( " + src + _t+" " + srcSlice + " | " + extend(cond+_t+" "+condSlice, localWidthNum) + " ) & ( " + dest_t_Or + extend( dest+_sig+" != "+src+_sig, localWidthNum ) + " );" << std::endl;
 
         output << always_line << std::endl;
         output << blank + "if(rst_zy) " + dest + "_t_flag <= 0;" << std::endl;                
-        output << blank + "else if ( " + localCondAndSlice + " ) " + dest + "_t_flag " + destSlice + " <= " + dest + "_t_flag " + destSlice + " ? 1 : ( ( |" + src + _t + " " + srcSlice + " ) || " + cond+_t+" "+condSlice + " ) & ( " + dest+_sig+" != "+src+_sig + " );" << std::endl;
+        output << blank + "else if ( addedVar"+toStr(newVarIdx) + " ) " + dest + "_t_flag " + destSlice + " <= " + dest + "_t_flag " + destSlice + " ? 1 : ( ( |" + src + _t + " " + srcSlice + " ) || " + cond+_t+" "+condSlice + " ) & ( " + dest+_sig+" != "+src+_sig + " );" << std::endl;
       }
 
       std::string neqRst = "";
@@ -1932,7 +1943,7 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
       }
       output << always_line << std::endl;
       output << blank + "if(rst_zy) " + dest + "_r_flag <= 0;" << std::endl;      
-      output << blank + "else if ( " + localCondAndSlice + " ) " + dest + "_r_flag " + destSlice + " <= " + dest + "_r_flag " + destSlice + " ? 1 : " + dest + "_t_flag " + destSlice + " ? 0 : ( |" + dest + _r + " " + destSlice + neqRst + " ) ;" << std::endl;
+      output << blank + "else if ( addedVar"+toStr(newVarIdx) + " ) " + dest + "_r_flag " + destSlice + " <= " + dest + "_r_flag " + destSlice + " ? 1 : " + dest + "_t_flag " + destSlice + " ? 0 : ( |" + dest + _r + " " + destSlice + neqRst + " ) ;" << std::endl;
     }
   }
   else if( std::regex_match(line, m, pEnd) ) {
