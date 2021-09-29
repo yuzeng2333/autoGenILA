@@ -91,6 +91,9 @@ std::regex pNonblock    (to_re("^(\\s*)(NAME) (?:\\s)?<= (NAME)(\\s*)?;$"));
 std::regex pNonblockConcat    (to_re("^(\\s*)(NAME) <= \\{(.+)\\}(\\s*)?;$"));
 std::regex pNonblockIf  (to_re("^(\\s*)if \\((NAME)\\) (NAME) <= (NAME)(\\s*)?;$"));
 std::regex pNonblockIf2 (to_re("^(\\s*)if \\((NAME)\\) ([a-zA-Z0-9]+)(\\[([a-zA-Z0-9]+)\\[(\\d+)\\]\\]) <= (NAME)(\\s*)?;$"));
+std::regex pNonblockElse(to_re("^(\\s*)else (NAME) <= (NAME)(\\s*)?;$"));
+std::regex pNBElseIf    (to_re("^(\\s*)else if \\((\\S+)\\s?\\) (NAME) <= (NAME)(\\s*)?;$"));
+
 /* function */
 std::regex pFunctionDef   (to_re("^(\\s*)function (\\[\\d+\\:0\\] )?(NAME)(\\s*)?;$"));
 std::regex pEndfunction   (to_re("^(\\s*)endfunction$"));
@@ -637,6 +640,9 @@ void remove_functions(std::string fileName) {
     uint32_t choice = parse_verilog_line(line, true);
     if ( choice == FUNCDEF ) {
       remove_function_wrapper(line, input, output);
+    }
+    else if(line.find("always @(") != std::string::npos) {
+      convert_nb_if_to_ite(input, output, line);
     }
     else
       output << line << std::endl;
@@ -1970,6 +1976,66 @@ void collect_case_dest(const std::string &line) {
   std::string dest, destSlice;
   split_slice(destAndSlice, dest, destSlice);
   g_iteDest.insert(dest);
+}
+
+
+void convert_nb_if_to_ite(std::ifstream &input, 
+                          std::ofstream &output, 
+                          std::string line) {
+  std::string line2;
+  std::getline(input, line2);
+  std::smatch m;
+  if(!std::regex_match(line2, m, pNonblockIf)) {
+    output << line << std::endl;  
+    output << line2 << std::endl;
+    return;
+  }
+  else { // if line2 is nb-if
+    std::string ifCondAndSlice = m.str(2);
+    std::string destAndSlice = m.str(3);
+    std::string ifSrcAndSlice = m.str(4);
+    uint32_t width = get_var_slice_width(destAndSlice);
+    auto currentPos = input.tellg();
+    std::string line3;
+    std::getline(input, line3);
+    std::string newVarIdx = toStr(NEW_FANGYUAN++);
+    output << "  wire ["+toStr(width-1)+":0] NewNBIte"+newVarIdx+";" << std::endl;
+    varWidth.var_width_insert("NewNBIte"+newVarIdx, width-1, 0);
+    if(std::regex_match(line3, m, pNonblockElse)) {
+      std::string elseSrcAndSlice = m.str(3);
+      if(ifCondAndSlice.front() != '!')
+        output << "  assign NewNBIte"+newVarIdx+" = "+ifCondAndSlice+" ? "+ifSrcAndSlice+" : "+elseSrcAndSlice+";" << std::endl;
+      else
+        output << "  assign NewNBIte"+newVarIdx+" = "+ifCondAndSlice.substr(1)+" ? "+elseSrcAndSlice+" : "+ifSrcAndSlice+";" << std::endl;
+    }
+    else if(std::regex_match(line3, m, pNBElseIf)) {
+      std::string elseIfCondAndSlice = m.str(2);      
+      std::string elseSrcAndSlice = m.str(4);
+      std::string newVarIdx2 = toStr(NEW_FANGYUAN++);
+      output << "  wire ["+toStr(width-1)+":0] NewNBIte"+newVarIdx2+";" << std::endl;
+      varWidth.var_width_insert("NewNBIte"+newVarIdx2, width-1, 0);
+      if(elseIfCondAndSlice.front() != '!')
+        output << "  assign NewNBIte"+newVarIdx2+" = "+elseIfCondAndSlice+" ? "+elseSrcAndSlice+" : "+destAndSlice+";" << std::endl;
+      else
+        output << "  assign NewNBIte"+newVarIdx2+" = "+elseIfCondAndSlice.substr(1)+" ? "+destAndSlice+" : "+elseSrcAndSlice+";" << std::endl;
+
+      if(ifCondAndSlice.front() != '!')
+        output << "  assign NewNBIte"+newVarIdx+" = "+ifCondAndSlice+" ? "+ifSrcAndSlice+" : NewNBIte"+newVarIdx2+";" << std::endl;
+      else
+        output << "  assign NewNBIte"+newVarIdx+" = "+ifCondAndSlice.substr(1)+" ? NewNBIte"+newVarIdx2+" : "+ifSrcAndSlice+";" << std::endl;
+    }
+    else { // if line3 is neither
+      if(ifCondAndSlice.front() != '!')
+        output << "  assign NewNBIte"+newVarIdx+" = "+ifCondAndSlice+" ? "+ifSrcAndSlice+" : "+destAndSlice+";" << std::endl;
+      else
+        output << "  assign NewNBIte"+newVarIdx+" = "+ifCondAndSlice.substr(1)+" ? "+destAndSlice+" : "+ifSrcAndSlice+";" << std::endl;
+
+      input.seekg(currentPos);
+    }
+    output << line << std::endl;
+    output << "    "+destAndSlice+" <= NewNBIte"+newVarIdx+";" << std::endl;
+    return;
+  }
 }
 
 
