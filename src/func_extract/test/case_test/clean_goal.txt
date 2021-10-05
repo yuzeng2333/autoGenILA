@@ -1,8 +1,0 @@
-#1#word_sum#2
-(goals
-(goal
-  (= |word_sum|
-     (bvadd (concat #x00 ((_ extract 3 3) |inWord|))
-            (concat #x00 ((_ extract 2 2) |inWord|)))))
-)
-assume -name zy_assume0 {__START__ == 1 |-> (rst == 1'd0 && func == 2'd2  ##1 ( word_sum == 9'd0 && counter == 5'd4 && word == 9'd0  )[*4] ) }

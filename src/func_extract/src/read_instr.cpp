@@ -23,6 +23,7 @@ void read_in_instructions(std::string fileName) {
   enum State state;
   bool firstWord = true;
   bool firstSignalSeen = false;
+  std::string lastMemReadAddr;
   while(std::getline(input, line)) {
     //toCout(line);
     if(line.empty())
@@ -82,12 +83,32 @@ void read_in_instructions(std::string fileName) {
       g_instrInfo.back().instrAddr = instrAddr;
       continue;
     }
-    if(line.substr(0, 9) == "#dataAddr") {
-      std::string dataAddr = line.substr(10);
-      remove_two_end_space(dataAddr);
-      g_instrInfo.back().dataAddr = dataAddr;
+    if(line.substr(0, 8) == "#memAddr") {
+      std::string instrAddr = line.substr(11);
+      remove_two_end_space(instrAddr);
+      g_instrInfo.back().instrAddr = instrAddr;
       continue;
     }
+    if(line.substr(0, 9) == "#dataAddr") {
+      std::string dataAddr = line.substr(10);
+      if(dataAddr.find("(array)") == std::string::npos) {
+        remove_two_end_space(dataAddr);
+      }
+      else {
+        size_t pos = dataAddr.find("(array)");
+        dataAddr = dataAddr.substr(0, pos);
+        remove_two_end_space(dataAddr);
+        dataAddr = var_name_convert(dataAddr, true); 
+        dataAddr += "_Arr"; 
+      }
+      lastMemReadAddr = dataAddr;
+      g_instrInfo.back().memReadAddr2TgtMap.emplace(dataAddr, 
+                                std::vector<std::string>{});
+      continue;
+    }
+    //if(line.substr(0, 9) == "#fromMemData") {
+
+    //}
     if(line.substr(0, 12) == "#needDataTgt") {
       std::string varName = line.substr(13);
       size_t pos = varName.find("{");
@@ -100,7 +121,7 @@ void read_in_instructions(std::string fileName) {
       }
       g_instrInfo.back().loadDataInfo.emplace(varName, std::make_pair("", 0));
       std::string newLine;
-      std::getline(input, newLine);      
+      std::getline(input, newLine);
       while(newLine != "}") {
         remove_two_end_space(newLine);
         if(newLine.substr(0, 2) == "//") {}
@@ -211,7 +232,9 @@ void read_in_instructions(std::string fileName) {
               firstWord = false;
             auto pos = line.find("=");
             std::string signalName = line.substr(0, pos-1);
+            remove_two_end_space(signalName);
             std::string encoding = line.substr(pos+2);
+            remove_two_end_space(encoding);
             if(!check_input_val(encoding)) {
               toCout("Encoding is not x or number[1], line is: "+line);
               abort();
@@ -237,7 +260,9 @@ void read_in_instructions(std::string fileName) {
           {
             auto pos = line.find("=");
             std::string signalName = line.substr(0, pos-1);
+            remove_two_end_space(signalName);            
             std::string encoding = line.substr(pos+2);
+            remove_two_end_space(encoding);            
             if(!check_input_val(encoding)) {
               toCout("Encoding is not x or number[2], line is: "+line);
               abort();
@@ -272,9 +297,15 @@ void read_in_instructions(std::string fileName) {
                 std::string asName = line.substr(0, pos);
                 std::string subLine = line.substr(0, pos);
                 if(subLine.find("(skip)") != std::string::npos) {
-                  asName = line.substr(0, pos-6);
+                  size_t bracePos = subLine.find("(skip)");
+                  asName = line.substr(0, bracePos);
                   g_instrInfo.back().skipWriteASV.insert(asName);                
                 }
+                // TODO
+                // even if no "skip" is found, still treat it as a skipWriteASV
+                //else {
+
+                //}
                 g_instrInfo.back().writeASV.insert(std::make_pair(uint32_t(std::stoi(cycleCnt)), 
                                                                   asName));
                 moduleAs.insert(asName);
@@ -323,7 +354,9 @@ void read_in_instructions(std::string fileName) {
           {
             auto pos = line.find("=");
             std::string signalName = line.substr(0, pos-1);
+            remove_two_end_space(signalName);            
             std::string encoding = line.substr(pos+2);
+            remove_two_end_space(encoding);            
             if(!check_input_val(encoding)) {
               toCout("Encoding is not x or number[3], line is: "+line);
               abort();
@@ -336,7 +369,9 @@ void read_in_instructions(std::string fileName) {
           {
             auto pos = line.find("=");
             std::string signalName = line.substr(0, pos-1);
+            remove_two_end_space(signalName);            
             std::string encoding = line.substr(pos+2);
+            remove_two_end_space(encoding);
             if(!check_input_val(encoding)) {
               toCout("Encoding is not x or number[4], line is: "+line);
               abort();

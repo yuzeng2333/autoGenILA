@@ -1,1 +1,0 @@
-/usr/bin/c++  -O0 -Wall -g   -rdynamic CMakeFiles/word_addr_sim.dir/word_adder.cpp.o  -o word_addr_sim  -L/workspace/tools/z3-4.8.8/z3/build -Wl,-rpath,/workspace/tools/z3-4.8.8/z3/build -lz3 

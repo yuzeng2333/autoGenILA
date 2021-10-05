@@ -71,7 +71,15 @@ bool is_formed_num(std::string num);
 
 uint32_t hdb2int(std::string num);
 
+uint32_t get_formed_width(std::string num);
+
 uint32_t hex2int(std::string num);
+
+//std::string dec2hex(std::string dec);
+
+std::string longDec2hex(std::string decimalValue);
+
+std::string longDec2hex(uint64_t decimalValue);
 
 uint32_t bin2int(std::string num);
 
@@ -107,6 +115,8 @@ bool comparePair(const std::pair<std::string, uint32_t> &p1,
 uint32_t get_time(std::string var);
 
 bool is_case_dest(std::string var, const std::shared_ptr<ModuleInfo_t> &curMod);
+
+bool is_switch_dest(std::string var, const std::shared_ptr<ModuleInfo_t> &curMod);
 
 bool is_func_output(std::string var, const std::shared_ptr<ModuleInfo_t> &mod);
 
@@ -144,7 +154,7 @@ void add_front_backslash(std::string &line);
 
 void remove_front_backslash(std::string &line);
 
-std::string purify_var_name(std::string name);
+std::string convert_to_c_var(std::string name);
 
 bool isLetter(const char &c);
 
@@ -270,8 +280,10 @@ void print_reg_info(RegWidthVec_t &regWidth);
 
 bool is_pure_num(std::string var);
 
-void replace_with(std::string str, std::string subStr, std::string newSubStr);
-} // end of namespace funcExtract
+void replace_with(std::string &str, std::string subStr, std::string newSubStr);
 
+std::string remove_unsigned(std::string &line);
+
+} // end of namespace funcExtract
 
 #endif

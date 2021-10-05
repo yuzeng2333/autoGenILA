@@ -1,0 +1,2 @@
+/usr/bin/ar qc libAddLib.a  CMakeFiles/AddLib.dir/class.cpp.o CMakeFiles/AddLib.dir/main.cpp.o
+/usr/bin/ranlib libAddLib.a

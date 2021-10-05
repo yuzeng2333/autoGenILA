@@ -1,5 +1,0 @@
-#1#word#1
-(goals
-(goal
-  (= |word___#1001| |inWord___#1|))
-)

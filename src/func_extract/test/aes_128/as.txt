@@ -1,3 +1,0 @@
-result
-word
-word_sum

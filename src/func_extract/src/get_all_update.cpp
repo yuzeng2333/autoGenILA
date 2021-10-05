@@ -13,6 +13,7 @@ namespace funcExtract {
 bool g_use_multi_thread = true;
 
 std::mutex g_dependVarMapMtx;
+std::mutex g_TimeFileMtx;
 // the first key is instr name, the second key is target name
 std::map<std::string, 
          std::map<std::string, 
@@ -23,6 +24,7 @@ struct ThreadSafeMap_t g_asvSet;
 struct WorkSet_t g_workSet;
 struct ThreadSafeVector_t g_fileNameVec;
 std::shared_ptr<ModuleInfo_t> g_topModuleInfo;
+struct WorkSet_t g_visitedTgt;
 
 // A file should be generated, including:
 // 1. all the asvs and their bit numbers
@@ -30,16 +32,23 @@ std::shared_ptr<ModuleInfo_t> g_topModuleInfo;
 // for each of it update function, what are the arguments
 void get_all_update() {
   toCout("### Begin get_all_update ");
-  std::set<std::string> visitedTgt;
+  std::ofstream genTimeFile(g_path+"/up_gen_time.txt", std::ios::app);
+  genTimeFile << "\n===== Begin a new run!" << std::endl;
+  genTimeFile.close();
+
+  std::ofstream simplifyTimeFile(g_path+"/simplify_time.txt", std::ios::app);
+  simplifyTimeFile <<"\n===== Begin a new run!"  << std::endl;
+  simplifyTimeFile.close();
+
   std::string line;  
-  //std::ifstream visitedTgtInFile(g_path+"/visited_target.txt");
-  //while(std::getline(visitedTgtInFile, line)) {
+  //std::ifstream g_visitedTgtInFile(g_path+"/visited_target.txt");
+  //while(std::getline(g_visitedTgtInFile, line)) {
   //  remove_two_end_space(line);
-  //  visitedTgt.insert(line);
+  //  g_visitedTgt.insert(line);
   //}
-  //visitedTgtInFile.close();
-  //std::ofstream visitedTgtFile;
-  //visitedTgtFile.open(g_path+"/visited_target.txt", std::ios_base::app);
+  //g_visitedTgtInFile.close();
+  //std::ofstream g_visitedTgtFile;
+  //g_visitedTgtFile.open(g_path+"/visited_target.txt", std::ios_base::app);
 
   std::ifstream addedWorkSetInFile(g_path+"/added_work_set.txt");
   g_topModuleInfo = g_moduleInfoMap[g_topModule];
@@ -99,22 +108,22 @@ void get_all_update() {
       bool doVecTgt = false;
       std::string target;
       std::vector<std::string> tgtVec;
-      // work on target vector first
-      if(!allowedTgtVec.empty()){
-        doVecTgt = true;
-        isVec = true;
-        tgtVec = allowedTgtVec.back().first;
-        allowedTgtVec.pop_back();
-      }
-      else if(!g_workSet.empty()) {
+      // work on single register target first
+      if(!g_workSet.empty()) {
         isVec = false;
         doSingleTgt = true;
         auto targetIt = g_workSet.begin();
         target = *targetIt;
         g_workSet.mtxErase(targetIt);
-        if(visitedTgt.find(target) != visitedTgt.end()
+        if(g_visitedTgt.mtxExist(target)
            || g_skippedOutput.find(target) != g_skippedOutput.end())
           continue;
+      }
+      else if(!allowedTgtVec.empty()){
+        doVecTgt = true;
+        isVec = true;
+        tgtVec = allowedTgtVec.back().first;
+        allowedTgtVec.pop_back();
       }
 
       uint32_t instrIdx = 0;
@@ -138,17 +147,17 @@ void get_all_update() {
         }
       }
       //for(auto &th: threadVec) th.join();
-      //if(isVec) {
-      //  for(auto reg: tgtVec) {
-      //    visitedTgt.insert(reg);
-      //    visitedTgtFile << target << std::endl;
-      //  }
-      //  tgtVec.clear();
-      //}
-      //else {
-      //  visitedTgt.insert(target);
-      //  visitedTgtFile << target << std::endl;
-      //}
+      if(isVec) {
+        for(auto reg: tgtVec) {
+          g_visitedTgt.mtxInsert(reg);
+          //g_visitedTgtFile << target << std::endl;
+        }
+        tgtVec.clear();
+      }
+      else {
+        g_visitedTgt.mtxInsert(target);
+        //g_visitedTgtFile << target << std::endl;
+      }
     } // end of while loop
   }
   else {
@@ -161,7 +170,8 @@ void get_all_update() {
       g_workSet.mtxClear();
       for(auto instrInfo : g_instrInfo) {
         localWorkSet = oldWorkSet;
-        std::vector<std::pair<std::vector<std::string>, uint32_t>> localWorkVec = g_allowedTgtVec;
+        std::vector<std::pair<std::vector<std::string>, 
+                              uint32_t>> localWorkVec = g_allowedTgtVec;
         instrIdx++;
         threadVec.clear();
         while(!localWorkSet.empty() || !localWorkVec.empty()) {
@@ -170,33 +180,23 @@ void get_all_update() {
           bool doVecTgt = false;
           std::string target;
           std::vector<std::string> tgtVec;      
-          if(!localWorkVec.empty()){
-            doVecTgt = true;
-            isVec = true;
-            tgtVec = localWorkVec.back().first;
-            localWorkVec.pop_back();
-          }
-          else if(!localWorkSet.empty()) {
+
+          if(!localWorkSet.empty()) {
             isVec = false;
             doSingleTgt = true;
             auto targetIt = localWorkSet.begin();
             target = *targetIt;
             localWorkSet.erase(targetIt);
-            if(visitedTgt.find(target) != visitedTgt.end()
+            if(g_visitedTgt.mtxExist(target)
                || g_skippedOutput.find(target) != g_skippedOutput.end())
               continue;
           }
-          //if(isVec) {
-          //  for(std::string reg: tgtVec) {
-          //    visitedTgt.insert(reg);
-          //    visitedTgtFile << target << std::endl;
-          //  }
-          //  tgtVec.clear();
-          //}
-          //else {
-          //  visitedTgt.insert(target);
-          //  visitedTgtFile << target << std::endl;
-          //}
+          else if(!localWorkVec.empty()){
+            doVecTgt = true;
+            isVec = true;
+            tgtVec = localWorkVec.back().first;
+            localWorkVec.pop_back();
+          }
           if(!target.empty()
              && g_allowedTgt.find(target) != g_allowedTgt.end()
              && g_allowedTgt[target].size() > 1) {
@@ -217,6 +217,16 @@ void get_all_update() {
         // wait for update functions for all regs to finish
         for(auto &th: threadVec) th.join();
       } // end of for-lopp: for each instruction
+
+      for(auto pair: g_allowedTgtVec) {
+        for(std::string reg: pair.first) {
+          g_visitedTgt.mtxInsert(reg);
+          //g_visitedTgtFile << target << std::endl;
+        }
+      }
+      for(std::string target: oldWorkSet) {
+        g_visitedTgt.mtxInsert(target);
+      }
       // targetVectors only executed for one round
       g_allowedTgtVec.clear();
     } // end of while loop
@@ -225,7 +235,7 @@ void get_all_update() {
   print_llvm_script(g_path+"/link.sh");
   print_func_info(funcInfo);
   print_asv_info(asvInfo);
-  //visitedTgtFile.close();
+  //g_visitedTgtFile.close();
   addedWorkSetFile.close();
 }
 
@@ -246,6 +256,8 @@ void get_update_function(std::string target,
                          //std::shared_ptr<ModuleInfo_t> g_topModuleInfo) {
                          //struct ThreadSafeVector_t &g_fileNameVec) {
 
+  time_t startTime = time(NULL);
+
   // set the destInfo according to the target
   DestInfo destInfo;
   if(!isVec) {
@@ -254,7 +266,7 @@ void get_update_function(std::string target,
       toCoutVerb("Find it!");
     ///else continue;
     ///g_workSet.erase(targetIt);
-    ///if(visitedTgt.find(target) != visitedTgt.end()
+    ///if(g_visitedTgt.find(target) != g_visitedTgt.end()
     ///   || g_skippedOutput.find(target) != g_skippedOutput.end())
     ///  continue;
     if(target.find(".") == std::string::npos 
@@ -268,7 +280,7 @@ void get_update_function(std::string target,
       std::string prefix = pair.first;
       std::string var = pair.second;
       if(g_moduleInfoMap.find(prefix) != g_moduleInfoMap.end()) {
-        uint32_t width = get_var_slice_width_simp(target, 
+        uint32_t width = get_var_slice_width_simp(var, 
                                             g_moduleInfoMap[prefix]);
         destInfo.set_module_name(prefix);
         destInfo.set_dest_and_slice(var, width);
@@ -279,7 +291,7 @@ void get_update_function(std::string target,
         std::string modName = g_topModuleInfo->ins2modMap[prefix];
         destInfo.set_module_name(modName);
         destInfo.set_instance_name(prefix);
-        uint32_t width = get_var_slice_width_simp(target, 
+        uint32_t width = get_var_slice_width_simp(var, 
                                             g_moduleInfoMap[modName]);
         destInfo.set_dest_and_slice(var, width);
       }
@@ -338,9 +350,14 @@ void get_update_function(std::string target,
   std::string funcName = instrInfo.name+"_"+destNameSimp;
   std::string fileName = g_path+"/"+instrInfo.name+"_"
                          +destNameSimp+"_"+toStr(delayBound);
+
+  // generate update function
   UpdateFunctionGen UFGen;
   UFGen.TheContext = std::make_unique<llvm::LLVMContext>();
   UFGen.print_llvm_ir(destInfo, delayBound, instrIdx);
+
+  time_t upGenEndTime = time(NULL);  
+
   std::string clean("opt --instsimplify --deadargelim --instsimplify "+fileName+"_tmp.ll -S -o="+fileName+"_clean.ll");
   std::string opto3("opt -O1 "+fileName+"_clean.ll -S -o="+fileName+"_tmp.o3.ll; opt -passes=deadargelim "+fileName+"_tmp.o3.ll -S -o="+fileName+"_clean.o3.ll; rm "+fileName+"_tmp.o3.ll");
   toCout("** Begin clean update function");
@@ -348,6 +365,19 @@ void get_update_function(std::string target,
   toCout("** Begin simplify update function");
   system(opto3.c_str());
   toCout("** End simplify update function");
+
+  time_t simplifyEndTime = time(NULL);
+  uint32_t upGenTime = upGenEndTime - startTime;
+  uint32_t simplifyTime = simplifyEndTime - upGenEndTime;
+  g_TimeFileMtx.lock();
+  std::ofstream genTimeFile(g_path+"/up_gen_time.txt", std::ios::app);
+  genTimeFile << funcName+":\t"+toStr(upGenTime) << std::endl;
+  genTimeFile.close();
+  std::ofstream simplifyTimeFile(g_path+"/simplify_time.txt", std::ios::app);
+  simplifyTimeFile << funcName+":\t"+toStr(simplifyTime) << std::endl;
+  simplifyTimeFile.close();
+  g_TimeFileMtx.unlock();
+
   std::vector<std::pair<std::string, uint32_t>> argVec;
   bool usefulFunc = read_clean_o3(fileName+"_clean.o3.ll", argVec, fileName+"_clean.simp.ll", funcName);
 
@@ -400,7 +430,8 @@ void get_update_function(std::string target,
        || reg.find("cpuregs[29]") != std::string::npos
        || reg.find("cpuregs[30]") != std::string::npos)
         continue;
-    if(g_push_new_target) g_workSet.mtxInsert(reg);
+    if(g_push_new_target && !g_visitedTgt.mtxExist(reg)) 
+      g_workSet.mtxInsert(reg);
     // TODO:
     g_asvSet.emplace(reg, pair.second);
     //addedWorkSetFile << reg << std::endl;
@@ -464,11 +495,12 @@ bool read_clean_o3(std::string fileName,
   bool seeFuncDef = false;
   bool seeReturn = false;
   bool returnConst = false;
-  std::regex pDef("^define internal fastcc i(\\d+) @(\\S+)\\((.*)\\) unnamed_addr #1 \\{$");  
+  std::regex pDef("^define internal fastcc (\\S+) @(\\S+)\\((.*)\\) unnamed_addr #1 \\{$");  
   std::regex pVecDef(
     "^define internal fastcc \\[(\\d+) x i(\\d+)\\] @(\\S+)\\((.*)\\) unnamed_addr #1 \\{$"
   );  
   std::regex pTopDef("^define i(\\d+) @top_function\\((.*)\\) local_unnamed_addr #0 \\{$");  
+  std::regex pTopPartialDef("^define i(\\d+) @top_function\\(");  
   std::regex pTopVecDef(
     "^define \\[(\\d+) x i(\\d+)\\] @top_function\\((.*)\\) local_unnamed_addr #0 \\{$"
   );  
@@ -573,12 +605,24 @@ bool read_clean_o3(std::string fileName,
       abort();
     }
     else {
-      if(!std::regex_match(topFuncLine, m, pTopDef)) {
-        toCout("Error: pTopDef is not matched: "+topFuncLine);
+      // the following code caused segment error when the topFuncLine 
+      // is very long
+      //if(!std::regex_match(topFuncLine, m, pTopDef)) {
+      //  toCout("Error: pTopDef is not matched: "+topFuncLine);
+      //  abort();
+      //}
+      size_t pos = topFuncLine.find("(");
+      if(pos == std::string::npos) {
+        toCout("Error: cannot find open brace in top function define line: "
+               +topFuncLine);
+        abort();
+      }
+      std::string topFuncLineFirstPart = topFuncLine.substr(0, pos+1);
+      if(!std::regex_match(topFuncLineFirstPart, m, pTopPartialDef)) {
+        toCout("Error: pTopPartialDef is not matched: "+topFuncLineFirstPart);
         abort();
       }
       std::string retWidth = m.str(1);
-      argList = m.str(2);
       std::string newFuncLine = "define i"+retWidth+
         " @"+funcNameIn+"() local_unnamed_addr #0 {";
       output << newFuncLine << std::endl;
@@ -674,6 +718,19 @@ std::set<std::string>::iterator WorkSet_t::begin() {
 void WorkSet_t::copy(std::set<std::string> &copySet) {
   copySet.clear();
   copySet = workSet;
+}
+
+
+bool WorkSet_t::mtxExist(std::string reg) {
+  mtx.lock();
+  if(workSet.find(reg) != workSet.end()) {
+    mtx.unlock();
+    return true;
+  }
+  else {
+    mtx.unlock();
+    return false;
+  }
 }
 
 

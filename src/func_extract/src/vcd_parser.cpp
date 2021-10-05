@@ -26,7 +26,7 @@ void vcd_parser(std::string fileName) {
   enum State state;
   std::smatch m;
   while(std::getline(input, line)) {
-    //toCout(line);
+    toCoutVerb(line);
     if(line.find("ap_CS_fsm") != std::string::npos) {
       toCout("Find it");
     }
@@ -94,6 +94,7 @@ void vcd_parser(std::string fileName) {
     }
   }
   print_rst_val();
+  toCout("### End vcd_parser");  
 }
 
 

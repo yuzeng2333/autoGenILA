@@ -75,12 +75,25 @@ struct InstrInfo_t {
   // key is writeASV. Each instruction might update multiple ASVs
   std::map<std::string, FuncTy_t> funcTypes;
   std::string instrAddr;
-  std::string dataAddr;  
-  // key is the name of target
+  // key is the dataAddr to memory, 
+  // value is the data name from memory 
+  std::map<std::string, std::vector<std::string>> memReadAddr2TgtMap;
+  // key is the name of target whose update function needs memory data
+  // first of value pair is argument name (of update function) 
+  // for memory readed data,
+  // second is the index of the argument in the argument list
   std::map<std::string, std::pair<std::string, uint32_t>> loadDataInfo;
   std::map<std::string, uint32_t> delayExceptions;
   // map update function to new target var(s)
   std::map<std::string, std::set<std::string>> funcTgtMap;
+};
+
+
+struct Switch_info {
+  std::string switchVar;
+  // first is the value for switch variable, 
+  // second is the correspoding assign value
+  std::vector<std::pair<std::string, std::string>> assignVec;
 };
 
 
@@ -124,7 +137,8 @@ class ModuleInfo_t {
   std::set<std::string> moduleInputs;
   std::set<std::string> moduleOutputs;
   std::set<std::string> moduleTrueRegs;
-  std::set<std::string> moduleMems;
+  // the first of pair is line width, the second is number of lines
+  std::map<std::string, std::pair<uint32_t, uint32_t>> moduleMems;
   taintGen::VarWidth varWidth;
   // only sub-modules has the two data below
   //std::map<std::string, std::vector<astNode*>> out2LeafNodeMp;
@@ -139,6 +153,7 @@ class ModuleInfo_t {
            std::pair<std::string,
                      std::vector<std::pair<std::string, 
                                            std::string>>>> caseTable;
+  std::map<std::string, Switch_info> switchTable;
   /// first key is wire/reg name, first of pair is instance name, 
   /// second of pair is connected instance output port
   std::map<std::string, std::pair<std::string, std::string>> wire2InsPortMp;
@@ -150,6 +165,9 @@ class ModuleInfo_t {
   std::map<std::string, uint32_t> reg2timeIdx;
   // this one is used only in ast building
   bool isFunctionedSubMod = true;  
+  bool isMem = false;
+  bool isBB; // is blackboxed module
+  std::map<std::string, std::map<std::string, uint32_t>> bbOut2InDelayMp;
 };
 
 

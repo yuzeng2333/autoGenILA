@@ -1,3 +1,0 @@
-mem2accl_data: xram_data_in
-accl2mem_addr: xram_addr
-accl2mem_data: xram_data_out

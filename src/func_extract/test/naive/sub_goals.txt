@@ -1,7 +1,0 @@
-#1#word_sum#3
-(goals
-(goal
-  (= |word_sum___#100|
-     (bvadd (concat #x00 ((_ extract 2 2) |inWord___#4|))
-            (concat #x00 ((_ extract 1 1) |inWord___#4|)))))
-)

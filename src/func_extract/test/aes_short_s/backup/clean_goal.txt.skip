@@ -1,5 +1,0 @@
-#1#out#1
-(goals
-(goal
-  (= |out| #x63))
-)

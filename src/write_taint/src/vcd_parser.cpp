@@ -65,8 +65,8 @@ void hierarchical_vcd_parser(std::string fileName) {
       instanceNameStack.pop();
       moduleNameStack.pop();
     }
-    else if(passLine)
-      continue;
+    //else if(passLine)
+    //  continue;
     else if(state == readName){
       if(!std::regex_match(line, m, pName))
         continue;

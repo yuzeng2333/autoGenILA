@@ -1,0 +1,250 @@
+module Sha256Accel ( clock , io_first , io_inputData , io_inputValid , reset , INSTR_IN_ZY , rst_zy , YZC , io_first_T , io_inputData_T , io_inputValid_T , reset_T , io_inputReady , io_outputData_0 , io_outputData_1 , io_outputData_2 , io_outputData_3 , io_outputData_4 , io_outputData_5 , io_outputData_6 , io_outputData_7 , io_outputValid , io_inputReady_T , io_outputData_0_T , io_outputData_1_T , io_outputData_2_T , io_outputData_3_T , io_outputData_4_T , io_outputData_5_T , io_outputData_6_T , io_outputData_7_T , io_outputValid_T );
+  input rst_zy;
+  integer i;
+  input INSTR_IN_ZY;
+  input [39:0] YZC;
+  logic [7:0] _00_;
+  logic [7:0] _00__T ;
+  logic _01_;
+  logic _01__T ;
+  logic [7:0] _02_;
+  logic [7:0] _02__T ;
+  logic [7:0] _03_;
+  logic [7:0] _03__T ;
+  logic [7:0] _04_;
+  logic [7:0] _04__T ;
+  logic [7:0] _05_;
+  logic [7:0] _05__T ;
+  logic _GEN_0;
+  logic _GEN_0_T ;
+  logic _GEN_1;
+  logic _GEN_1_T ;
+  logic _T;
+  logic _T_T ;
+  logic [7:0] _T_11;
+  logic [7:0] _T_11_T ;
+  logic _T_12;
+  logic _T_12_T ;
+  logic [7:0] _T_3;
+  logic [7:0]  _T_3_T ;
+  logic [7:0]  _T_3_TZ ;
+  logic [7:0]  _T_3_PREV_VAL1 ;
+  logic [7:0]  _T_3_PREV_VAL2 ;
+  assign _T_3_T = _T_3_TZ | { 8{ YZC[0] && _T_3 != 0 }} ;
+  logic _T_4;
+  logic _T_4_T ;
+  logic _T_5;
+  logic _T_5_T ;
+  logic _T_6;
+  logic _T_6_T ;
+  logic _T_7;
+  logic _T_7_T ;
+  logic _T_8;
+  logic _T_8_T ;
+  logic _T_9;
+  logic _T_9_T ;
+  logic accel_clock;
+  logic accel_clock_T ;
+  logic accel_io_first;
+  logic accel_io_first_T ;
+  logic accel_io_newChunk;
+  logic accel_io_newChunk_T ;
+  logic [31:0] accel_io_out_0;
+  logic [31:0] accel_io_out_0_T ;
+  logic [31:0] accel_io_out_1;
+  logic [31:0] accel_io_out_1_T ;
+  logic [31:0] accel_io_out_2;
+  logic [31:0] accel_io_out_2_T ;
+  logic [31:0] accel_io_out_3;
+  logic [31:0] accel_io_out_3_T ;
+  logic [31:0] accel_io_out_4;
+  logic [31:0] accel_io_out_4_T ;
+  logic [31:0] accel_io_out_5;
+  logic [31:0] accel_io_out_5_T ;
+  logic [31:0] accel_io_out_6;
+  logic [31:0] accel_io_out_6_T ;
+  logic [31:0] accel_io_out_7;
+  logic [31:0] accel_io_out_7_T ;
+  logic accel_io_shiftIn;
+  logic accel_io_shiftIn_T ;
+  logic accel_io_valid;
+  logic accel_io_valid_T ;
+  logic [31:0] accel_io_wordIn;
+  logic [31:0] accel_io_wordIn_T ;
+  logic accel_reset;
+  logic accel_reset_T ;
+  input clock;
+  logic [7:0] ctr;
+  logic [7:0]  ctr_T ;
+  logic [7:0]  ctr_TZ ;
+  logic [7:0]  ctr_PREV_VAL1 ;
+  logic [7:0]  ctr_PREV_VAL2 ;
+  assign ctr_T = ctr_TZ | { 8{ YZC[1] && ctr != 0 }} ;
+  logic first;
+  logic  first_T ;
+  logic  first_TZ ;
+  logic  first_PREV_VAL1 ;
+  logic  first_PREV_VAL2 ;
+  assign first_T = first_TZ | { 1{ YZC[2] && first != 0 }} ;
+  input io_first;
+  input io_first_T ;
+  input [31:0] io_inputData;
+  input [31:0] io_inputData_T ;
+  output io_inputReady;
+  logic io_inputReady ;
+  output io_inputReady_T ;
+  logic io_inputReady_T ;
+  input io_inputValid;
+  input io_inputValid_T ;
+  output [31:0] io_outputData_0;
+  logic [31:0] io_outputData_0 ;
+  output [31:0] io_outputData_0_T ;
+  logic [31:0] io_outputData_0_T ;
+  output [31:0] io_outputData_1;
+  logic [31:0] io_outputData_1 ;
+  output [31:0] io_outputData_1_T ;
+  logic [31:0] io_outputData_1_T ;
+  output [31:0] io_outputData_2;
+  logic [31:0] io_outputData_2 ;
+  output [31:0] io_outputData_2_T ;
+  logic [31:0] io_outputData_2_T ;
+  output [31:0] io_outputData_3;
+  logic [31:0] io_outputData_3 ;
+  output [31:0] io_outputData_3_T ;
+  logic [31:0] io_outputData_3_T ;
+  output [31:0] io_outputData_4;
+  logic [31:0] io_outputData_4 ;
+  output [31:0] io_outputData_4_T ;
+  logic [31:0] io_outputData_4_T ;
+  output [31:0] io_outputData_5;
+  logic [31:0] io_outputData_5 ;
+  output [31:0] io_outputData_5_T ;
+  logic [31:0] io_outputData_5_T ;
+  output [31:0] io_outputData_6;
+  logic [31:0] io_outputData_6 ;
+  output [31:0] io_outputData_6_T ;
+  logic [31:0] io_outputData_6_T ;
+  output [31:0] io_outputData_7;
+  logic [31:0] io_outputData_7 ;
+  output [31:0] io_outputData_7_T ;
+  logic [31:0] io_outputData_7_T ;
+  output io_outputValid;
+  logic io_outputValid ;
+  output io_outputValid_T ;
+  logic io_outputValid_T ;
+  input reset;
+  input reset_T ;
+  assign _T_11 = ctr + 1'b1;
+  assign _T_11_T = ctr_T ;
+  assign _T_6 = _T_4 & _T_5;
+  assign _T_6_T = ( _T_4_T & _T_5 ) | ( _T_5_T & _T_4 ) ;
+  assign _T_8 = _T_6 & _T_7;
+  assign _T_8_T = ( _T_6_T & _T_7 ) | ( _T_7_T & _T_6 ) ;
+  assign accel_io_first = first & accel_io_shiftIn;
+  assign accel_io_first_T = ( first_T & accel_io_shiftIn ) | ( accel_io_shiftIn_T & first ) ;
+  assign accel_io_newChunk = _T & accel_io_shiftIn;
+  assign accel_io_newChunk_T = ( _T_T & accel_io_shiftIn ) | ( accel_io_shiftIn_T & _T ) ;
+  assign _T = ! ctr;
+  assign _T_T = | ctr_T ;
+  assign _T_12 = ctr == 6'b111111;
+  assign _T_12_T = | ctr_T ;
+  assign _T_9 = ctr >= 5'b10000;
+  assign _T_9_T = | ctr_T ;
+  assign _T_4 = _T_3 < 5'b10000;
+  assign _T_4_T = | _T_3_T ;
+  assign _T_5 = ctr < 5'b10000;
+  assign _T_5_T = | ctr_T ;
+  assign _T_7 = ~ io_first;
+  assign _T_7_T = io_first_T ;
+  assign _GEN_0 = io_first | first;
+  assign _GEN_0_T = ( io_first_T & ~first ) | ( first_T & ~io_first ) ;
+  assign accel_io_shiftIn = _T_9 | io_inputValid;
+  assign accel_io_shiftIn_T = ( _T_9_T & ~io_inputValid ) | ( io_inputValid_T & ~_T_9 ) ;
+  assign _01_ = reset | _GEN_1;
+  assign _01__T = ( reset_T & ~_GEN_1 ) | ( _GEN_1_T & ~reset ) ;
+  always @(posedge clock)
+      _T_3 <= ctr;
+  always @( posedge clock )
+      _T_3_TZ 		<= rst_zy ? 0 : ( ctr_T );
+  always @(posedge clock)
+      first <= _01_;
+  always @( posedge clock )
+      first_TZ 		<= rst_zy ? 0 : ( _01__T );
+  always @(posedge clock)
+      ctr <= _00_;
+  always @( posedge clock )
+      ctr_TZ 		<= rst_zy ? 0 : ( _00__T );
+  assign _02_ = io_inputValid ? _T_11 : ctr;
+  assign _02__T = io_inputValid ? ( { 8{ io_inputValid_T  }} | _T_11_T ) : ( { 8{ io_inputValid_T  }} | ctr_T );
+  assign _03_ = _T_12 ? 8'b00000000 : _T_11;
+  assign _03__T = _T_12 ? { 8{ | _T_12_T  }} : ( { 8{ | _T_12_T  }} | _T_11_T );
+  assign _04_ = _T_9 ? _03_ : _02_;
+  assign _04__T = _T_9 ? ( { 8{ _T_9_T  }} | _03__T ) : ( { 8{ _T_9_T  }} | _02__T );
+  assign _05_ = io_first ? 8'b00000000 : _04_;
+  assign _05__T = io_first ? { 8{ | io_first_T  }} : ( { 8{ | io_first_T  }} | _04__T );
+  assign _00_ = reset ? 8'b00000000 : _05_;
+  assign _00__T = reset ? { 8{ | reset_T  }} : ( { 8{ | reset_T  }} | _05__T );
+  assign _GEN_1 = accel_io_shiftIn ? 1'b0 : _GEN_0;
+  assign _GEN_1_T = accel_io_shiftIn ? { 1{ | accel_io_shiftIn_T  }} : ( { 1{ | accel_io_shiftIn_T  }} | _GEN_0_T );
+  assign io_inputReady = _T_9 ? 1'b0 : _T_8;
+  assign io_inputReady_T = _T_9 ? { 1{ | _T_9_T  }} : ( { 1{ | _T_9_T  }} | _T_8_T );
+// module: CompressionFunction
+  CompressionFunction accel (
+    .YZC(YZC[39:3]),
+    .io_first_T (  accel_io_first_T  ),
+    .io_newChunk_T (  accel_io_newChunk_T  ),
+    .io_shiftIn_T (  accel_io_shiftIn_T  ),
+    .io_wordIn_T (  io_inputData_T  ),
+    .reset_T (  reset_T  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .rst_zy(rst_zy),
+    .io_out_0_T (  accel_io_out_0_T  ),
+    .io_out_1_T (  accel_io_out_1_T  ),
+    .io_out_2_T (  accel_io_out_2_T  ),
+    .io_out_3_T (  accel_io_out_3_T  ),
+    .io_out_4_T (  accel_io_out_4_T  ),
+    .io_out_5_T (  accel_io_out_5_T  ),
+    .io_out_6_T (  accel_io_out_6_T  ),
+    .io_out_7_T (  accel_io_out_7_T  ),
+    .io_valid_T (  accel_io_valid_T  ),
+    .clock ( clock ),
+    .reset ( reset ),
+    .io_wordIn ( io_inputData ),
+    .io_first ( accel_io_first ),
+    .io_out_1 ( accel_io_out_1 ),
+    .io_valid ( accel_io_valid ),
+    .io_out_0 ( accel_io_out_0 ),
+    .io_out_5 ( accel_io_out_5 ),
+    .io_newChunk ( accel_io_newChunk ),
+    .io_out_3 ( accel_io_out_3 ),
+    .io_out_2 ( accel_io_out_2 ),
+    .io_out_6 ( accel_io_out_6 ),
+    .io_out_4 ( accel_io_out_4 ),
+    .io_out_7 ( accel_io_out_7 ),
+    .io_shiftIn ( accel_io_shiftIn )
+  );
+  assign accel_clock = clock;
+  assign accel_clock_T = clock_T ;
+  assign accel_io_wordIn = io_inputData;
+  assign accel_io_wordIn_T = io_inputData_T ;
+  assign accel_reset = reset;
+  assign accel_reset_T = reset_T ;
+  assign io_outputData_0 = accel_io_out_0;
+  assign io_outputData_0_T = accel_io_out_0_T ;
+  assign io_outputData_1 = accel_io_out_1;
+  assign io_outputData_1_T = accel_io_out_1_T ;
+  assign io_outputData_2 = accel_io_out_2;
+  assign io_outputData_2_T = accel_io_out_2_T ;
+  assign io_outputData_3 = accel_io_out_3;
+  assign io_outputData_3_T = accel_io_out_3_T ;
+  assign io_outputData_4 = accel_io_out_4;
+  assign io_outputData_4_T = accel_io_out_4_T ;
+  assign io_outputData_5 = accel_io_out_5;
+  assign io_outputData_5_T = accel_io_out_5_T ;
+  assign io_outputData_6 = accel_io_out_6;
+  assign io_outputData_6_T = accel_io_out_6_T ;
+  assign io_outputData_7 = accel_io_out_7;
+  assign io_outputData_7_T = accel_io_out_7_T ;
+  assign io_outputValid = accel_io_valid;
+  assign io_outputValid_T = accel_io_valid_T ;
+endmodule

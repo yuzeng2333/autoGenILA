@@ -1,5 +1,0 @@
-1. for beq instruction, if mem_i_valid_i = 0, then the update function for pc_f_q is just pc_f_q + 4, which is absolutely wrong. Therefore, it seems the whole processor stopped proceeding when the valid signal is 0. So the valid signal must be 1. 
-
-2. this riscv has a warm-up phase after being reset: the memmory address to access instruction memory is first set to reset_vector_i. Therefore, we should use normal value instead of reset values
-
-3. for urv, the branch instructions should first set pc to pc+4, and then in the next cycle, set pc to pc+offset. therefore, here I generate update functions for r0 and r1 in fifo_pc_out.

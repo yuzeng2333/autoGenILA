@@ -215,7 +215,7 @@ void wire_taint_gen(std::string line, std::ofstream &output) {
   moduleWires.insert(var);  
   //debug_line(line);  
   output << blank + "logic " + slice + var + _t+" ;" << std::endl;
-  // for wires named fangyuan, delay declaring it until assignment
+  // for wires named addedVar, delay declaring it until assignment
 
   if (!did_clean_file) {
     bool insertDone;
@@ -689,11 +689,11 @@ void mult_op_taint_gen(std::string line, std::ofstream &output) {
   split_slice(destAndSlice, dest, destSlice);
   //assert(destSlice.empty());
   std::string updateList = m.str(3);
-  // assume only fangyuan variable can be LHS of src concatenation statement
-  //checkCond(dest.find("fangyuan") != std::string::npos, "Var not name fangyuan appeared in src_concat! "+line);
-  bool isFangyuan = (dest.find("fangyuan") != std::string::npos);
+  // assume only addedVar variable can be LHS of src concatenation statement
+  //checkCond(dest.find("addedVar") != std::string::npos, "Var not name addedVar appeared in src_concat! "+line);
+  bool isFangyuan = (dest.find("addedVar") != std::string::npos);
   //if(!isFangyuan) { 
-  //  toCout("Var not name fangyuan appeared in src_concat! "+line+", check if it is used in case or if it is splitted later!!");
+  //  toCout("Var not name addedVar appeared in src_concat! "+line+", check if it is used in case or if it is splitted later!!");
   //}
 
   std::vector<std::string> updateVec;

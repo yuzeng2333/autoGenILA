@@ -17,7 +17,7 @@ using namespace syntaxPatterns;
 
 namespace funcExtract {
 
-void module_expr(std::string line) {
+void module_expr(std::string line, bool isMem) {
   std::smatch m;
   if (!std::regex_match(line, m, pModule))
     return;
@@ -47,6 +47,7 @@ void module_expr(std::string line) {
     }
   }
 
+  if(isMem) curMod->isMem = true;
   Context_t insCntxt(curMod->name, "", curMod, nullptr, nullptr);
   g_insContextStk.clear();
   g_insContextStk.push_back(insCntxt);
@@ -62,7 +63,7 @@ void input_expr(std::string line) {
   std::string slice = m.str(2);
   std::string var = m.str(3);
   if(var == "rst")
-    toCout("Find it!");
+    toCoutVerb("Find it!");
   
   if(var != g_recentClk)
     curMod->moduleInputs.insert(var);
@@ -122,7 +123,7 @@ void wire_expr(std::string line) {
   moduleWires.insert(var);  
 
   if(var == "outAssign")
-    toCout("Find it!");
+    toCoutVerb("Find it!");
 
   bool insertDone;
   if(!slice.empty())
@@ -147,16 +148,18 @@ void mem_expr(std::string line) {
   std::string var = m.str(3);
   std::string sliceTop = m.str(4);
   memDims.emplace(var, std::make_pair(slice, sliceTop));
-  curMod->moduleMems.insert(var);
   
   toCout("!!!!  Find mem: "+var);
   uint32_t varLen = get_end(sliceTop) + 1;
+  uint32_t lineWidth = get_end(slice) + 1;
   moduleMems.emplace(var, varLen);
+  curMod->moduleMems.emplace(var, std::make_pair(lineWidth, varLen));  
   assert(!is_output(var, curMod));
 
   bool insertDone;
   if(!slice.empty())
-    insertDone = curMod->varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+    insertDone = curMod->varWidth.var_width_insert(var, get_end(slice), 
+                                                   get_begin(slice));
   else
     insertDone = curMod->varWidth.var_width_insert(var, 0, 0);
   //if (!insertDone) {
@@ -165,6 +168,34 @@ void mem_expr(std::string line) {
   //  std::cout << "m.str(3):" + m.str(3) << std::endl;
   //}
 }
+
+
+
+// the src being selected must be memory
+void dyn_sel_expr(std::string line) {
+  const auto curMod = g_insContextStk.get_curMod();
+  std::smatch m;
+  if ( !std::regex_match(line, m, pDynSel)) 
+    return;
+  std::string blank = m.str(1);
+  std::string destAndSlice = m.str(2);  
+  std::string src = m.str(3);
+  std::string addrAndSlice = m.str(4);
+
+  if(curMod->moduleMems.find(src) == curMod->moduleMems.end()) {
+    toCout("Error: the src is not memory: "+src);
+    abort();
+  }
+  put_into_reg2Slice(destAndSlice);
+  auto ret = curMod->ssaTable.emplace(destAndSlice, line);
+  if(!ret.second) {
+    toCout("Error in inserting ssaTable in single_line for key: "+m.str(2));
+    toCout("Did you check the design.v/design.v.clean file can only have the top module??");
+    abort();
+  }
+}
+
+
 
 
 // TODO: put output into moduleWires?
@@ -181,9 +212,8 @@ void output_expr(std::string line) {
   std::string blank = m.str(1);
     
   if(is_output(var, curMod)) {
-    std::cout << "!! Duplicate output find: " + line << std::endl;
+    std::cout << " Warning: Duplicate output find: " + line << std::endl;
     toCout("module: "+curMod->name);
-    abort();
   }
   else 
     curMod->moduleOutputs.insert(var);
@@ -356,9 +386,12 @@ void nb_expr(std::string line) {
   uint32_t width = g_insContextStk.get_var_slice_width_simp(dest);
   g_allRegs.emplace(dest, width);
   remove_two_end_space(destAndSlice);
-  if(destAndSlice.back() == ']') {
+  if(destAndSlice.front() != '\\' && destAndSlice.back() == ']') {
     toCout("!!! Find mem: "+dest);
-    curMod->moduleMems.insert(dest);
+    if(curMod->moduleMems.find(dest) == curMod->moduleMems.end()) {
+      toCout("Error: cannot find the mem: "+dest);
+      abort();
+    }
   }
   if(!ret.second)
     toCout("Error in inserting ssaTable in nb for key: "+m.str(2));
@@ -375,7 +408,7 @@ void always_expr(std::string line, std::ifstream &input) {
   // parse first assignment
   std::getline(input, line);
   if(line.find("if (_127_)") != std::string::npos) 
-    toCout("Find it!");
+    toCoutVerb("Find it!");
   if( std::regex_match(line, m, pNonblock) || std::regex_match(line, m, pNonblockConcat) ) {
     nb_expr(line);
   }
@@ -388,11 +421,33 @@ void always_expr(std::string line, std::ifstream &input) {
   else if( std::regex_match(line, m, pIf) ) {
     always_if_else_expr(line, input);
   }
+  else if( std::regex_match(line, m, pMemIf) ) {
+    mem_if_assign_expr(line);
+  }
   else {
     toCout("Error in parsing nonblocking(always_expr): "+line);
     abort();
   }
 }
+
+
+void mem_if_assign_expr(std::string line) {
+  const auto curMod = g_insContextStk.get_curMod();
+  std::smatch m;
+  if ( !std::regex_match(line, m, pMemIf) ) {
+    toCout("Error: does not match pNonblockIf: "+line);
+    abort();
+  }
+  std::string destAndSlice = m.str(3);
+  put_into_reg2Slice(destAndSlice);
+  auto ret = curMod->nbTable.emplace(destAndSlice, line);
+  if(!ret.second) {
+    toCout("Error in inserting nbTable in mem_if_assign_expr for key: "
+           +m.str(2));
+    abort();
+  }
+}
+
 
 
 //always @(posedge clk)
@@ -430,8 +485,8 @@ std::pair<std::string, std::string> nonblockif_expr(std::string line,
   ifSrcAndSlice = m.str(4);
   put_into_reg2Slice(destAndSlice);
 
-  if(destAndSlice.find("aes_reg_oplen_i.reg_out") != std::string::npos) {
-    toCout("Find it!");
+  if(destAndSlice.find("wr_fifo.r9") != std::string::npos) {
+    toCoutVerb("Find it!");
   }
  
   split_slice(destAndSlice, dest, destSlice);
@@ -456,7 +511,10 @@ std::pair<std::string, std::string> nonblockif_expr(std::string line,
   auto endOfIf = input.tellg();
   std::getline(input, line);
   if( !std::regex_match(line, m, pNBElseIf) ) {
-    assert(line.find("else if") == std::string::npos);
+    if(line.find("else if") != std::string::npos) {
+      toCout("Error: unexpected else if: "+line);
+      abort();
+    }
     if ( !std::regex_match(line, m, pNonblockElse) ) {
       input.seekg(endOfIf);
       elseValue = destAndSlice;
@@ -702,7 +760,7 @@ void submodule_expr(std::string firstLine, std::ifstream &input) {
     g_fifoIns.emplace(instanceName, moduleName);
   }
   if(moduleName == "expand_key_128" && instanceName == "a10")
-    toCout("Find it!");
+    toCoutVerb("Find it!");
 
   if(g_moduleInfoMap.find(moduleName) == g_moduleInfoMap.end()) {
     toCout("Error: submodule has not been seen before: "+moduleName);
@@ -731,7 +789,8 @@ void submodule_expr(std::string firstLine, std::ifstream &input) {
     }
     //if(m.str(3) == g_recentClk)
     //  continue;
-    wire2PortMp.emplace(m.str(2), m.str(3));
+    if(!m.str(3).empty())
+      wire2PortMp.emplace(m.str(2), m.str(3));
   }
   for(auto pair : wire2PortMp) {
     std::string port = pair.first;
@@ -750,6 +809,72 @@ void submodule_expr(std::string firstLine, std::ifstream &input) {
     }
   }
 }
+
+     
+void switch_expr(std::ifstream &input) {
+  const auto curMod = g_insContextStk.get_curMod();
+
+  std::string alwaysLine;
+  std::getline(input, alwaysLine);
+  if(alwaysLine.find("always @(posedge") == std::string::npos
+      && alwaysLine.find("always @ (posedge") == std::string::npos ) {
+    toCout("Error: not expected always line: "+alwaysLine);
+    abort();
+  }
+
+  std::string caseLine;
+  std::getline(input, caseLine);
+  if(caseLine.find("case") == std::string::npos) {
+    toCout("Error: not expected case line: "+caseLine);
+    abort();
+  }
+  std::smatch m;
+  if(!std::regex_match(caseLine, m, pCase)) {
+    toCout("Error: does not match pCase: "+caseLine);
+    abort();
+  }
+  std::string switchVar = m.str(3);
+
+  std::string assignLine;
+  std::getline(input, assignLine);
+  std::string destVar;
+  std::vector<std::pair<std::string, std::string>> assignVec;
+  bool isFirst = true;
+  uint32_t lastSwitchValue;
+  while(assignLine.find("endcase") == std::string::npos) {
+    if(!std::regex_match(assignLine, m, pSwitchAssign)) {
+      toCout("Error: does not match pSwitchAssign: "+assignLine);
+      abort();
+    }
+    std::string switchVal = m.str(2);
+    std::string dest = m.str(3);
+    if(destVar.empty()) destVar = dest;
+    else if(destVar != dest) {
+      toCout("dest not matched: "+dest);
+      abort();
+    }
+    std::string assignVal = m.str(4);
+    assignVec.push_back(std::make_pair(switchVal, assignVal));
+    uint32_t switchNum = hdb2int(switchVal);
+    if(isFirst) {
+      assert(switchNum == 0 && "First switch values is not 0!");
+      isFirst = false;
+    }
+    else if(switchNum != lastSwitchValue + 1) {
+      toCout("Error: switch values are not consecutive, not supported!");
+      abort();
+    }
+    lastSwitchValue = switchNum;
+    std::getline(input, assignLine);    
+  }
+
+  if(curMod->switchTable.find(destVar) != curMod->switchTable.end()) {
+    toCout("Error: var already in switchTable: "+destVar);
+    abort();
+  }
+  curMod->switchTable.emplace(destVar, Switch_info{switchVar, assignVec});
+}
+
 
 
 bool compareSlice(std::string destAndSlice1, std::string destAndSlice2) {

@@ -41,7 +41,8 @@ void clear_global_vars() {
 //  }
 //  for(std::string module: modules) {
 //    bool isTop = (g_topModule.compare(module) == 0);
-//    parse_verilog_bottom_up(g_path, module, moduleReady, childModules, g_topModule, moduleInputsMap, moduleOutputsMap, moduleRFlagsMap, totalRegCnt, nextSig, doProcessPathInfo);
+//    parse_verilog_bottom_up(g_path, module, moduleReady, childModules, g_topModule, moduleInputsMap, 
+//      moduleOutputsMap, moduleRFlagsMap, totalRegCnt, nextSig, doProcessPathInfo);
 //  }
 //}
 
@@ -62,10 +63,12 @@ void parse_verilog(std::string fileName) {
   //g_moduleInfoMap.emplace(g_topModule, g_curMod);
   while( std::getline(input, line) ) {
     toCoutVerb(line);
-    if(line.empty() || is_comment_line(line)
-          || line.find_first_not_of(' ') == line.length())
+    if(line.empty() 
+         || line.find_first_not_of(' ') == std::string::npos
+         || is_comment_line(line)
+      )
       continue;
-    if(line.find("if (_045_)") != std::string::npos) {
+    if(line.find("reg [7:0] out;") != std::string::npos) {
       toCout("Find it!");
     }
     if(!g_insContextStk.empty()) {
@@ -74,6 +77,25 @@ void parse_verilog(std::string fileName) {
       fill_var_width(line, g_insContextStk.get_curMod()->varWidth);
     }
     //toCout(line);
+
+    // === process special comments
+    // add jump table implementation for long case statement
+    if(line.find("/* switch */") != std::string::npos) {
+      switch_expr(input);
+      continue;
+    }
+
+    if(line.find("/* memory */") != std::string::npos) {
+      std::getline(input, line);
+      if(line.find("module") == std::string::npos) {
+        toCout("Error: does not find the module definition for memory: "+line);
+        abort();
+      }
+      module_expr(line, true);
+      continue;
+    }
+
+
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       case_expr(line, input);
       continue;
@@ -115,6 +137,9 @@ void parse_verilog(std::string fileName) {
       break;
     case MEM:
       mem_expr(line);
+      break;
+    case DYNSEL:
+      dyn_sel_expr(line);
       break;
     case TWO_OP:
     case ONE_OP:
@@ -197,13 +222,14 @@ void read_module_info() {
   ModuleInfo_t *moduleInfo = new ModuleInfo_t;
   bool seeOutput = false;
   std::string outVar;  
-  std::map<std::string, uint32_t> inputDelayMap;
+  //std::map<std::string, uint32_t> inputDelayMap;
   while(std::getline(input, line)) {
     if(is_comment_line(line))
       continue;
     if(is_module_line(line, moduleName)) {
       // store info of last module
       moduleInfo->name = moduleName;
+      moduleInfo->isBB = true;
       //moduleInfo->out2InDelayMp.clear();
     }
     else if(line.find(":") == std::string::npos 
@@ -213,7 +239,9 @@ void read_module_info() {
       else
         outVar = line;
       remove_back_space(outVar);
-      inputDelayMap.clear();
+      //inputDelayMap.clear();
+      moduleInfo->bbOut2InDelayMp.emplace(outVar, 
+                                         std::map<std::string, uint32_t>{});
       seeOutput = true;
       moduleInfo->moduleOutputs.insert(outVar);      
     }
@@ -224,10 +252,11 @@ void read_module_info() {
       std::string delay = line.substr(pos+1);
       remove_two_end_space(input);
       remove_two_end_space(delay);
-      inputDelayMap.emplace(input, std::stoi(delay));
+      //inputDelayMap.emplace(input, std::stoi(delay));
+      moduleInfo->bbOut2InDelayMp[outVar].emplace(input, std::stoi(delay));
       moduleInfo->moduleInputs.insert(input);
     }
-    else {
+    else if(line != "}") {
       seeOutput = false;
       abort(); // abort because out2InDelayMp is not supported
       //moduleInfo->out2InDelayMp.emplace(outVar, inputDelayMap);
@@ -303,10 +332,12 @@ void get_io(const std::string &fileName) {
   std::smatch match;
   while( std::getline(input, line) ) {
     toCoutVerb(line);
-    if(line.find("arg_0_TDATA_fifo") != std::string::npos)
+    if(line.find("reg [7:0] out;") != std::string::npos)
       toCout("Find it!");
-    if(line.empty() || is_comment_line(line)
-          || line.find_first_not_of(' ') == line.length())
+    if(line.empty() 
+          || line.find_first_not_of(' ') == std::string::npos
+          || is_comment_line(line)
+      )
       continue;
     if(g_insContextStk.get_stk_depth() > 0) {
       std::string modName = g_insContextStk.get_curMod()->name;
@@ -335,10 +366,19 @@ void get_io(const std::string &fileName) {
 
 
 void remove_functions(std::string fileName) {
+  toCout("#### Begin remove_functions in funcExtract domain!");
   std::ifstream input(fileName+".nocomment");
   std::ofstream output(fileName + ".clean");
   std::string line;
   while( std::getline(input, line) ) {
+    if(line.find("S4 S4_0 (") != std::string::npos
+       //|| line.find("module expand_key_128") != std::string::npos 
+       //|| line.find("assign v1 = addedVar133 ^ in[95:64];") != std::string::npos 
+       //|| line.find("assign k3b = k3a ^ k4a;") != std::string::npos 
+       //|| line.find("assign addedVar133 = { v0[31:24], in[119:96] };") != std::string::npos 
+       //|| line.find("input [7:0] rcon;") != std::string::npos 
+      )
+      toCoutVerb("Find it!");
     toCoutVerb(line);
     uint32_t choice = parse_verilog_line(line, true);
     if ( choice == FUNCDEF ) {

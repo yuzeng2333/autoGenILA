@@ -1,1 +1,0 @@
-/usr/bin/c++  -O0 -Wall -g   -rdynamic CMakeFiles/sim.dir/aes.cpp.o  -o sim  -L/workspace/tools/z3-4.8.8/z3/build -Wl,-rpath,/workspace/tools/z3-4.8.8/z3/build -lz3 

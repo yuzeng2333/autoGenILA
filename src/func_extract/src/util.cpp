@@ -67,32 +67,66 @@ void read_asv_info(std::string fileName, bool convertName) {
 }
 
 
-void read_func_info(std::string fileName) {
+void read_func_info(std::string fileName, 
+                    std::map<std::string, 
+                             std::pair<uint32_t, uint32_t>> &global_arr) {
   std::ifstream input(fileName);
   std::string instrName, target;
   std::string line;
   uint32_t idx;
   while(std::getline(input, line)) {
-    if(line.substr(0, 2) == "\\\\") continue;
+    toCout(line);
+    if(line.substr(0, 2) == "\\\\") {
+      toCout("Error: find \\\\: "+line);
+      abort();
+    }
+    if(line.substr(0, 2) == "//") continue;
     if(line.substr(0, 6) == "Instr:") {
       instrName = line.substr(6);
       idx = get_instr_by_name(instrName);
     }
     else if(line.substr(0, 7) == "Target:") {
-      target = line.substr(7);
-      if(g_asv.find(target) == g_asv.end()) {
-        toCout("Error: cannot find in g_asv: "+target);
-        abort();
+      if(line.find("{") == std::string::npos) { // target is single reg
+        target = line.substr(7);
+        if(g_asv.find(target) == g_asv.end()) {
+          toCout("Error: cannot find in g_asv: "+target);
+          abort();
+        }
+        uint32_t targetWidth = g_asv[target];
+        struct FuncTy_t type = { targetWidth, std::vector<std::pair<uint32_t, std::string>>{} };      
+        if(g_instrInfo[idx].funcTypes.find(target) 
+             != g_instrInfo[idx].funcTypes.end()) {
+          toCout("Warning: target: "+target+" already existed for: "+g_instrInfo[idx].name);
+          g_instrInfo[idx].funcTypes[target] = type;
+        }
+        else
+          g_instrInfo[idx].funcTypes.emplace(target, type);
       }
-      uint32_t targetWidth = g_asv[target];
-      struct FuncTy_t tmp = { targetWidth, std::vector<std::pair<uint32_t, std::string>>{} };      
-      if(g_instrInfo[idx].funcTypes.find(target) 
-           != g_instrInfo[idx].funcTypes.end()) {
-        toCout("Warning: target: "+target+" already existed for: "+g_instrInfo[idx].name);
-        g_instrInfo[idx].funcTypes[target] = tmp;
+      else { // target is an array
+        std::string targetArr = line.substr(8);
+        targetArr.pop_back(); // remove the last }
+        targetArr.pop_back();
+        targetArr.pop_back();
+        std::vector<std::string> targetVec;
+        split_by(targetArr, ", ", targetVec);
+        std::string firstVarName = targetVec.front();
+        uint32_t targetWidth = g_asv[firstVarName];    
+        firstVarName = var_name_convert(firstVarName, true);
+        //firstVarName = convert_to_c_var(firstVarName);
+        target = firstVarName+"_Arr";
+        if(global_arr.find(target) == global_arr.end()) {
+          global_arr.emplace(target, std::make_pair(targetWidth, targetVec.size()));
+        }
+        // 0 target width means return type is void
+        struct FuncTy_t type = { 0, std::vector<std::pair<uint32_t, std::string>>{} };      
+        if(g_instrInfo[idx].funcTypes.find(target) 
+             != g_instrInfo[idx].funcTypes.end()) {
+          toCout("Warning: target: "+target+" already existed for: "+g_instrInfo[idx].name);
+          g_instrInfo[idx].funcTypes[target] = type;
+        }
+        else
+          g_instrInfo[idx].funcTypes.emplace(target, type);
       }
-      else
-        g_instrInfo[idx].funcTypes.emplace(target, tmp);
     }
     else if(line.find(":") != std::string::npos) {
       size_t pos = line.find(":");
@@ -124,6 +158,8 @@ std::string decode(const std::map<std::string, std::vector<std::string>> &inputI
     isCompatible = true;
     for(auto pair : inputInstr) {
       std::string varName = pair.first;
+      if(varName == "io_vme_rd_0_data_bits")
+        toCoutVerb("Find it!");
       auto inputValue = pair.second;
       auto instrValue = instr.instrEncoding[varName];
       if(!is_compatible(instrValue, inputValue)) {
@@ -179,21 +215,44 @@ bool same_value(std::string val1, std::string val2) {
     toCout("Find it!");
   std::smatch m;
   std::regex pX("(\\d+)'(d|h|b)x");
+  std::regex pZ("(\\d+)'(d|h|b)(\\(Z\\S+\\)|Z)");
   std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");
-  if(is_x(val1)) {
-
-    if(!std::regex_match(val1, m, pX)) {
-      toCout("Error: val1 does not match x pattern: "+val1);
-      abort();
+  if(is_x(val1) || val1.find("Z") != std::string::npos) {
+    if(std::regex_match(val1, m, pX)
+       || std::regex_match(val1, m, pZ) ) {
+      std::string width1 = m.str(1);
+      if(!std::regex_match(val2, m, pNum)) {
+        if(val2 == "1") return width1 == "1";
+        if(!is_number(val2)) {
+          toCout("Error: val2 is not number:"+val2);
+          abort();
+        }
+        if(val2 == "0") return true;
+        else {
+          toCout("Error: unexpected val2: "+val2);
+          abort();
+        }
+      }
+      else {
+        std::string width2 = m.str(1);
+        if(width1 == width2) return true;
+        else return false;
+      }
     }
-    std::string width1 = m.str(1);
-    if(!std::regex_match(val2, m, pNum)) {
-      toCout("Error: val2 does not match num pattern: "+val2);
-      abort();
-    }
-    std::string width2 = m.str(1);
-    if(width1 == width2) return true;
-    else return false;
+    //else {
+    //  if(val1 == "1" || val1 == "0") {
+    //    if(val2 == "1" || val2 == "0")
+    //      return val1 == val2;
+    //    else {
+    //      toCout("Error: Unexpected, val1: "+val1+"val2: "+val2);
+    //      abort();
+    //    }
+    //  }
+    //  else {
+    //    toCout("Error: unexpected val1: "+val1);
+    //    abort();
+    //  }
+    //}
   }
 
   //bool isZero = false;

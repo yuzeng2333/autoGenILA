@@ -1,5 +1,0 @@
-aes_128:
-out {
-  key: 21
-  state: 21
-}

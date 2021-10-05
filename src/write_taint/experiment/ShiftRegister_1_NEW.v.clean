@@ -1,0 +1,93 @@
+module ShiftRegister_1(clock, io_input, io_enable, io_output_1, io_output_6, io_output_14, io_output_15);
+  wire [31:0] _00_;
+  wire [31:0] _01_;
+  wire [31:0] _02_;
+  wire [31:0] _03_;
+  wire [31:0] _04_;
+  wire [31:0] _05_;
+  wire [31:0] _06_;
+  wire [31:0] _07_;
+  wire [31:0] _08_;
+  wire [31:0] _09_;
+  wire [31:0] _10_;
+  wire [31:0] _11_;
+  wire [31:0] _12_;
+  wire [31:0] _13_;
+  wire [31:0] _14_;
+  wire [31:0] _15_;
+  input clock;
+  input io_enable;
+  input [31:0] io_input;
+  output [31:0] io_output_1;
+  output [31:0] io_output_14;
+  output [31:0] io_output_15;
+  output [31:0] io_output_6;
+  reg [31:0] reg_0;
+  reg [31:0] reg_1;
+  reg [31:0] reg_10;
+  reg [31:0] reg_11;
+  reg [31:0] reg_12;
+  reg [31:0] reg_13;
+  reg [31:0] reg_14;
+  reg [31:0] reg_15;
+  reg [31:0] reg_2;
+  reg [31:0] reg_3;
+  reg [31:0] reg_4;
+  reg [31:0] reg_5;
+  reg [31:0] reg_6;
+  reg [31:0] reg_7;
+  reg [31:0] reg_8;
+  reg [31:0] reg_9;
+  always @(posedge clock)
+      reg_0 <= _00_;
+  always @(posedge clock)
+      reg_1 <= _07_;
+  always @(posedge clock)
+      reg_2 <= _08_;
+  always @(posedge clock)
+      reg_3 <= _09_;
+  always @(posedge clock)
+      reg_4 <= _10_;
+  always @(posedge clock)
+      reg_5 <= _11_;
+  always @(posedge clock)
+      reg_6 <= _12_;
+  always @(posedge clock)
+      reg_7 <= _13_;
+  always @(posedge clock)
+      reg_8 <= _14_;
+  always @(posedge clock)
+      reg_9 <= _15_;
+  always @(posedge clock)
+      reg_10 <= _01_;
+  always @(posedge clock)
+      reg_11 <= _02_;
+  always @(posedge clock)
+      reg_12 <= _03_;
+  always @(posedge clock)
+      reg_13 <= _04_;
+  always @(posedge clock)
+      reg_14 <= _05_;
+  always @(posedge clock)
+      reg_15 <= _06_;
+  assign _06_ = io_enable ? reg_14 : reg_15;
+  assign _05_ = io_enable ? reg_13 : reg_14;
+  assign _04_ = io_enable ? reg_12 : reg_13;
+  assign _03_ = io_enable ? reg_11 : reg_12;
+  assign _02_ = io_enable ? reg_10 : reg_11;
+  assign _01_ = io_enable ? reg_9 : reg_10;
+  assign _15_ = io_enable ? reg_8 : reg_9;
+  assign _14_ = io_enable ? reg_7 : reg_8;
+  assign _13_ = io_enable ? reg_6 : reg_7;
+  assign _12_ = io_enable ? reg_5 : reg_6;
+  assign _11_ = io_enable ? reg_4 : reg_5;
+  assign _10_ = io_enable ? reg_3 : reg_4;
+  assign _09_ = io_enable ? reg_2 : reg_3;
+  assign _08_ = io_enable ? reg_1 : reg_2;
+  assign _07_ = io_enable ? reg_0 : reg_1;
+  assign _00_ = io_enable ? io_input : reg_0;
+  assign io_output_1 = reg_1;
+  assign io_output_14 = reg_14;
+  assign io_output_15 = reg_15;
+  assign io_output_6 = reg_6;
+endmodule

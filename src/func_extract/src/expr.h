@@ -14,7 +14,7 @@
 
 namespace funcExtract {
 
-void module_expr(std::string line);
+void module_expr(std::string line, bool isMem=false);
 
 void input_expr(std::string line);
 
@@ -24,9 +24,13 @@ void wire_expr(std::string line);
 
 void mem_expr(std::string line);
 
+void dyn_sel_expr(std::string line);
+
 void output_expr(std::string line);
 
 void single_line_expr(std::string line);
+
+void mem_if_assign_expr(std::string line);
 
 void both_concat_expr(std::string line);
 
@@ -47,6 +51,8 @@ void always_clkrst_expr(std::string line, std::ifstream &input);
 void always_if_else_expr(std::string line, std::ifstream &input);
 
 void case_expr(std::string line, std::ifstream &input);
+
+void switch_expr(std::ifstream &input);
 
 void submodule_expr(std::string line, std::ifstream &input);
 

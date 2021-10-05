@@ -82,13 +82,16 @@ void build_ast_tree() {
     for(auto it = beginIt; it != endIt; it++) {
       // prepare context info
       std::string writeASV = *it;
+      if(writeASV == "xram_ack")
+        toCoutVerb("Find it!");
       set_stk_build_tree(writeASV);
     } // end of for loop
   }
   std::string line;
   std::ifstream allowedTgtInFile(g_path+"/allowed_target.txt");
   while(std::getline(allowedTgtInFile, line)) {
-    if(line.substr(0, 2) == "//")  continue;
+    if(line.substr(0, 2) == "//"
+        || line.empty())  continue;
     if(line != "[") {
       if(line.find(":") == std::string::npos) {
         remove_two_end_space(line);
@@ -112,10 +115,11 @@ void build_ast_tree() {
       StrVec_t tgtVec;
       std::getline(allowedTgtInFile, line);
       while(line[0] != ']') {
-        if(line.substr(0, 2) != "//") {
-          tgtVec.push_back(line);
-          moduleAs.insert(line);
-        }
+        if(line.substr(0, 2) == "//"
+           || line.empty() )
+          continue;
+        tgtVec.push_back(line);
+        moduleAs.insert(line);
         std::getline(allowedTgtInFile, line);
       }
       uint32_t delay = 0;
@@ -127,7 +131,7 @@ void build_ast_tree() {
       }
       g_allowedTgtVec.push_back(std::make_pair(tgtVec, delay));
     }
-  }
+  } // end of while loop
   allowedTgtInFile.close();
   for(auto tgtDelayPair: g_allowedTgt) {
     set_stk_build_tree(tgtDelayPair.first);
@@ -228,8 +232,8 @@ void set_stk_build_tree(std::string varName) {
 
 void build_tree_for_single_as(std::string regAndSlice) {
   toCoutVerb("### Begin build: "+regAndSlice);
-  if(regAndSlice == "arg_0_TDATA_fifo")
-    toCout("Find it!");
+  if(regAndSlice == "xram_wr")
+    toCoutVerb("Find it!");
   const auto curMod = g_insContextStk.get_curMod();  
   std::string reg, regSlice;
   split_slice(regAndSlice, reg, regSlice);
@@ -237,7 +241,9 @@ void build_tree_for_single_as(std::string regAndSlice) {
   std::string myInsName = ask_for_my_ins_name(curMod);
   //set_target(reg);
   std::string curTgt = g_insContextStk.get_target();
-  uint32_t regWidth = get_var_slice_width_cmplx(regAndSlice);
+  // FIXME: previously used get_var_slice_width_cmplx
+  // for GB, replace with get_var_slice_width_simp
+  uint32_t regWidth = get_var_slice_width_simp(regAndSlice, curMod);
   astNode* root;
 
   if(curMod->visitedNode.find(regAndSlice) 
@@ -246,7 +252,8 @@ void build_tree_for_single_as(std::string regAndSlice) {
   else
     root = curMod->visitedNode[regAndSlice];
 
-  add_node(regAndSlice, 0, root, true);
+  // FIXME: is there any case that the last arg should be true?
+  add_node(regAndSlice, 0, root, false);
 }
 
 // Attention: If different slices of var are assigned in different expressions, they should have different nodes
@@ -258,8 +265,8 @@ void add_node(std::string varAndSlice,
   const auto curMod = g_insContextStk.get_curMod();  
   remove_two_end_space(varAndSlice);
   //toCout("Add node for: "+varAndSlice);
-  if(varAndSlice.find("aes_reg_key0_i.reg_out") != std::string::npos//) {
-       && timeIdx == 25) {
+  if(varAndSlice.find("xram_ack") != std::string::npos) {
+       //&& timeIdx == 25) {
     toCout("Found it!");
     s_node = node;
   }
@@ -302,6 +309,9 @@ void add_node(std::string varAndSlice,
   else if( is_case_dest(varToAdd, curMod) ) {
     add_case_node(varToAdd, timeIdx, node);
   }
+  else if( is_switch_dest(varToAdd, curMod) ) {
+    add_switch_node(varToAdd, timeIdx, node);
+  }
   else if( is_func_output(varToAdd, curMod) ) {
     abort();
     add_func_node(varToAdd, timeIdx, node);
@@ -313,6 +323,10 @@ void add_node(std::string varAndSlice,
              != curMod->ssaTable.end() ){ 
     // it is wire
     add_ssa_node(varToAdd, timeIdx, node);
+  }
+  else if( curMod->moduleMems.find(varToAdd)
+             != curMod->moduleMems.end() ) {
+    add_mem_node(varToAdd, timeIdx, node);
   }
   else {
     toCout("Error: cannot find assignment statement for: "+varToAdd
@@ -329,10 +343,13 @@ void add_node(std::string varAndSlice,
 void add_child_node(std::string varAndSlice, 
                     uint32_t timeIdx, 
                     astNode* const parentNode) {
+  if(parentNode->dest.find("d_wr_addr_fifo_out0") != std::string::npos )
+    toCoutVerb("Find it!");
   const auto curMod = g_insContextStk.get_curMod();  
   toCoutVerb("!! Add child "+varAndSlice+" to "+parentNode->dest);
-  if(varAndSlice == "out") {
-    toCout("Find it!");
+  if(varAndSlice.find("wr_fifo.r9") != std::string::npos 
+       && parentNode->dest == "yuzeng291") {
+    toCoutVerb("Find it!");
   }
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
@@ -497,6 +514,9 @@ void add_ssa_node(std::string varAndSlice, uint32_t timeIdx, astNode* const node
     case ITE:
       add_ite_op_node(varAssign, timeIdx, node);
       break;
+    case DYNSEL:
+      add_dyn_sel_node(varAssign, timeIdx, node);
+      break;
     default:
       toCout("Error in add_ssa_node for: "+var);
       break;
@@ -507,7 +527,7 @@ void add_ssa_node(std::string varAndSlice, uint32_t timeIdx, astNode* const node
 /// Treat differently for top module and sub module
 void add_input_node(std::string input, uint32_t timeIdx, astNode* const node) {
   if(input == "in")
-    toCout("Find it!");
+    toCoutVerb("Find it!");
   toCoutVerb("Process input node: "+input);
   const auto curMod = g_insContextStk.get_curMod();
   const auto target = g_insContextStk.get_target();
@@ -590,7 +610,7 @@ void add_input_node(std::string input, uint32_t timeIdx, astNode* const node) {
 void add_num_node(std::string num, uint32_t timeIdx, astNode* const node) {
   toCoutVerb("Process num node: "+num);
   if(num == "8'b00010110")
-    toCout("Find it!");
+    toCoutVerb("Find it!");
   node->type = FE_NUM;
   node->dest = num;
   node->op = "";
@@ -623,6 +643,30 @@ void add_two_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
     toCout("Found it!");
   }
 
+  uint32_t op1Ext = 0;
+  uint32_t op2Ext = 0;
+  if(op1AndSlice.find("$signed") != std::string::npos) {
+    op1Ext = 1;
+    op1AndSlice = remove_signed(op1AndSlice);
+    assert(op1AndSlice.find("$signed") == std::string::npos);
+  }
+  else if(op1AndSlice.find("$unsigned") != std::string::npos) {
+    op1Ext = 2;
+    op1AndSlice = remove_unsigned(op1AndSlice);
+    assert(op1AndSlice.find("$unsigned") == std::string::npos);
+  }
+
+  if(op2AndSlice.find("$signed") != std::string::npos) {
+    op2Ext = 1;
+    op2AndSlice = remove_signed(op2AndSlice);
+    assert(op2AndSlice.find("$signed") == std::string::npos);
+  }
+  else if(op2AndSlice.find("$unsigned") != std::string::npos) {
+    op2Ext = 2;
+    op2AndSlice = remove_unsigned(op2AndSlice);
+    assert(op2AndSlice.find("$unsigned") == std::string::npos);
+  }
+
   //if(destAndSlice.compare("adr_check") == 0) {
   //  toCout("Found adr_check");
   //}
@@ -644,6 +688,7 @@ void add_two_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   node->dest = destAndSlice;
   node->op = op;
   node->srcVec = SV{op1AndSlice, op2AndSlice};
+  node->extVec = std::vector<uint32_t>{op1Ext, op2Ext};
   node->isReduceOp = isReduceOp;
   node->done = false;
 
@@ -655,6 +700,76 @@ void add_two_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
 
   assert(!isMem(op1));
   assert(!isMem(op2));
+}
+
+
+void add_dyn_sel_node(std::string line, uint32_t timeIdx, astNode* const node) {
+
+  toCoutVerb("Process Dyn Sel for :"+line);
+  std::smatch m;
+  if ( !std::regex_match(line, m, pDynSel)) 
+    return;
+  std::string blank = m.str(1);
+  std::string destAndSlice = m.str(2);  
+  std::string mem = m.str(3);
+  std::string addrAndSlice = m.str(4);
+
+  //mem = var_name_convert(mem, true);
+
+  std::string dest, destSlice;
+  std::string addr, addrSlice;
+
+  split_slice(destAndSlice, dest, destSlice);
+  split_slice(addrAndSlice, addr, addrSlice);
+  remove_two_end_space(destAndSlice);
+  remove_two_end_space(addrAndSlice);
+
+  node->type = DYNSEL;
+  node->dest = destAndSlice;
+  node->op = "";
+  node->srcVec = SV{mem, addrAndSlice};
+  node->isReduceOp = false;
+  node->done = false;
+
+  add_child_node(mem, timeIdx, node);
+  add_child_node(addrAndSlice, timeIdx, node);
+}
+
+
+void add_mem_node(std::string var, uint32_t timeIdx, astNode* const node) {
+  const auto curMod = g_insContextStk.get_curMod();
+  if(curMod->name != g_topModule) {
+    toCout("Error: found memory in submodules: "+curMod->name);
+    abort();
+  }
+  std::string varAssign = curMod->nbTable[var];
+  std::smatch m;
+  if(!std::regex_match(varAssign, m, pMemIf)) {
+    toCout("Error: do not match pMemIf: "+varAssign);
+    abort();
+  }
+  std::string ifVar = m.str(2);
+  std::string mem = m.str(3);
+  std::string addrAndSlice = m.str(4);
+  std::string srcAndSlice = m.str(5);
+
+  //mem = var_name_convert(mem, true);  
+
+  remove_two_end_space(ifVar);
+  remove_two_end_space(mem);
+  remove_two_end_space(addrAndSlice);
+  remove_two_end_space(srcAndSlice);
+
+  node->type = MEM_IF_ASSIGN;
+  node->dest = mem;
+  node->op = "";
+  node->srcVec = SV{ifVar, addrAndSlice, srcAndSlice};
+  node->isReduceOp = false;
+  node->done = false;
+
+  add_child_node(ifVar, timeIdx+1, node);
+  add_child_node(addrAndSlice, timeIdx+1, node);
+  add_child_node(srcAndSlice, timeIdx+1, node);
 }
 
 
@@ -821,7 +936,7 @@ void add_src_concat_op_node(std::string line, uint32_t timeIdx, astNode* const n
   std::string op;
   std::string destAndSlice = m.str(2);
   if(destAndSlice.compare("fangyuan23") == 0) {
-    toCout("Find it!");
+    toCoutVerb("Find it!");
   }
   std::string srcList = m.str(3);
 
@@ -839,7 +954,7 @@ void add_src_concat_op_node(std::string line, uint32_t timeIdx, astNode* const n
 
   for(auto src: srcVec) {
     if(destAndSlice.compare("fangyuan23") == 0) {
-      toCout("Find it!");
+      toCoutVerb("Find it!");
     }
     add_child_node(src, timeIdx, node);  
   }
@@ -856,7 +971,7 @@ void add_case_node(std::string var, uint32_t timeIdx, astNode* const node) {
   }
 
   if(var == "cpuregs_wrdata")
-    toCout("Find it!");
+    toCoutVerb("Find it!");
 
   auto localPair = curMod->caseTable[var];
   std::string caseVar = localPair.first;
@@ -882,6 +997,38 @@ void add_case_node(std::string var, uint32_t timeIdx, astNode* const node) {
   node->done = false;
   return;
 }
+
+
+void add_switch_node(std::string var, uint32_t timeIdx, astNode* const node) {
+  const auto curMod = g_insContextStk.get_curMod();
+  if(curMod->switchTable.find(var) == curMod->switchTable.end()) {
+    toCout("Error: not found in curMod->switchTable: "+var);
+    abort();
+  }
+
+  if(var == "cpuregs_wrdata")
+    toCoutVerb("Find it!");
+
+  auto switchInfo = curMod->switchTable[var];
+  std::string caseVar = switchInfo.switchVar;
+  auto caseAssignPairs = switchInfo.assignVec;
+
+  node->type = SWITCH;
+  node->dest = var;
+  node->op = "";
+  //node->srcVec = SV{op1AndSlice, op2AndSlice, integer};
+  // srcVec must follow this format:
+  // 1st is the sAndSlice(case variable)
+  // then followed are N pairs of (caseValue, assignVariable).
+  // So the total number is 2N+1
+  node->srcVec.push_back(caseVar);
+  add_child_node(caseVar, timeIdx+1, node);
+  node->isReduceOp = false;
+  node->done = false;
+  return;
+}
+
+
 
 
 void add_func_node(std::string var, uint32_t timeIdx, astNode* const node) {
@@ -919,7 +1066,7 @@ void add_submod_node(std::string var, uint32_t timeIdx, astNode* const node) {
   std::string parentModName = curMod->name;
   std::string modName = curMod->ins2modMap[insName];
   if(modName == "S4")
-    toCout("Find it!");
+    toCoutVerb("Find it!");
 
   const auto subMod = g_moduleInfoMap[modName];
   // if this submodule is blackbox, or if the output port 
@@ -932,9 +1079,11 @@ void add_submod_node(std::string var, uint32_t timeIdx, astNode* const node) {
     g_insContextStk.push_back(insCntxt);
     astNode* nextNode = new astNode;
     subMod->emplace_outport_node(output, nextNode);    
-    toCout("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Enter mode: "+modName+", out: "+output);
+    toCout("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+            "~~~~~~~~~~~~~~~~~~~ Enter mode: "+modName+", out: "+output);
     add_node(output, timeIdx, nextNode, false);
-    toCout("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Return from: "+modName+", out: "+output+" to: "+parentModName);
+    toCout("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+            "~~~~~~~~~ Return from: "+modName+", out: "+output+" to: "+parentModName);
     g_insContextStk.pop_back();
   }
   //add_child_node(output, timeIdx, node);
@@ -966,7 +1115,10 @@ bool check_two_op(std::string line,
                   std::string &op1, 
                   std::string &op2, 
                   bool &isReduceOp) {
-  line = remove_signed(line);
+  //line = remove_signed(line);
+  if(line.find("compute.tensorGemm.mvc_0.add_0_15") 
+       != std::string::npos)
+    toCout("Find it!");
   isReduceOp = false;
   std::smatch m;
   if ( std::regex_match(line, m, pAdd)) {
@@ -981,6 +1133,12 @@ bool check_two_op(std::string line,
   else if ( std::regex_match(line, m, pAnd)) {
     op = "&&";
     isReduceOp = true;
+  }
+  else if( std::regex_match(line, m, pDvd) ) {
+    op = "/";
+  }
+  else if( std::regex_match(line, m, pMod) ) {
+    op = "%";
   }
   else if ( std::regex_match(line, m, pOr)) {
     op = "||";

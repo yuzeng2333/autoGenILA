@@ -1,6 +1,0 @@
-#1#result#8
-(goals
-(goal
-  (= |result___#1008|
-     (|adder__result0__#0| #b0 #b0 (|adder__result0__#4| #b1 #b0 |word___#8|))))
-)

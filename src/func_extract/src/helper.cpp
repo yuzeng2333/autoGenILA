@@ -69,6 +69,16 @@ uint32_t hdb2int(std::string num) {
   }
   num = remove_signed(num);
   std::smatch m;
+  std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");  
+  if(std::regex_match(num, m, pNum)) {
+    uint32_t width = std::stoi(m.str(1));
+    if(width > 32) {
+      toCout("Error: too long number, use convert_to_long_single_num:"
+            +num);
+      abort();
+    }
+  }
+
   if(std::regex_match(num, m, pDec)) {
     std::string pureNum = m.str(2);
     return str2int(pureNum, "input num in hdb is: "+num);
@@ -84,6 +94,23 @@ uint32_t hdb2int(std::string num) {
   else 
     return try_stoi(num);
 }
+
+
+uint32_t get_formed_width(std::string num) {
+  num = remove_signed(num);
+  std::smatch m;
+  if(std::regex_match(num, m, pDec)
+     || std::regex_match(num, m, pHex)
+     || std::regex_match(num, m, pBin)) {
+    std::string width = m.str(1);
+    return std::stoi(width);
+  }
+  else {
+    toCout("Error: the number is not well-formed: "+num);
+    abort();
+  }
+}
+
 
 uint32_t hex2int(std::string num) {
   uint32_t res = 0;
@@ -104,6 +131,29 @@ uint32_t hex2int(std::string num) {
     else
       res += (*it - '0');
   }
+  return res;
+}
+
+// dec2hex is already defined in taint_gen
+//std::string dec2hex(std::string dec) {
+//  std::stringstream ss;
+//  ss << std::hex << dec; // int decimal_value
+//  std::string res ( ss.str() );
+//  
+//  return res;
+//}
+
+
+std::string longDec2hex(std::string decimalValue) {
+  uint64_t val = std::stol(decimalValue);
+  return longDec2hex(val);
+}
+
+
+std::string longDec2hex(uint64_t decimalValue) {
+  std::stringstream ss;
+  ss << std::hex << decimalValue; // int decimal_value
+  std::string res ( ss.str() );
   return res;
 }
 
@@ -316,6 +366,12 @@ uint32_t get_time(std::string var) {
 bool is_case_dest(std::string var, const std::shared_ptr<ModuleInfo_t> &curMod) {
   return curMod->caseTable.find(var) != curMod->caseTable.end();
 }
+
+
+bool is_switch_dest(std::string var, const std::shared_ptr<ModuleInfo_t> &curMod) {
+  return curMod->switchTable.find(var) != curMod->switchTable.end();
+}
+
 
 bool is_func_output(std::string var, 
                     const std::shared_ptr<ModuleInfo_t> &curMod) {
@@ -549,7 +605,7 @@ void remove_front_backslash(std::string &line) {
 
 
 
-std::string purify_var_name(std::string name) {
+std::string convert_to_c_var(std::string name) {
   remove_two_end_space(name);
   if(name.substr(0, 1) != "\\")
     return name;
@@ -594,7 +650,7 @@ std::string purify_line(const std::string &line) {
   std::string firstPart = line.substr(0, pos);
   std::string var = line.substr(pos+1, pos2-pos-1);
   std::string lastPart = line.substr(pos2+1);
-  var = purify_var_name(var);
+  var = convert_to_c_var(var);
   lastPart = purify_line(lastPart);
   return firstPart + "|" + var + "|" + lastPart;
 }
@@ -808,7 +864,7 @@ void collect_regs_iter(std::shared_ptr<ModuleInfo_t> &curMod,
     std::string fullRegName = regPrefix+reg;
     toCoutVerb("Collect reg: "+fullRegName);
     if(fullRegName == "mOutPtr") {
-      toCout("Find it!");
+      toCoutVerb("Find it!");
     }
   }
 
@@ -827,7 +883,8 @@ void collect_mems(std::shared_ptr<ModuleInfo_t> &curMod,
                   std::vector<std::string> &mems) {
   if(!regPrefix.empty())
     regPrefix = regPrefix + ".";
-  for(std::string mem : curMod->moduleMems) {
+  for(auto pair : curMod->moduleMems) {
+    std::string mem = pair.first;
     mems.push_back(regPrefix+mem);
     toCout("Collect mem: "+mem);
   }
@@ -1097,7 +1154,9 @@ std::string get_rst_value(const std::string &destAndSlice,
   split_slice(destAndSlice, dest, destSlice);
   std::string rstVal;
   if(g_rstVal.find(dest) != g_rstVal.end()) {
-    rstVal = g_rstVal[dest];  
+    rstVal = g_rstVal[dest];
+    if(rstVal.find("z") != std::string::npos)
+      replace_with(rstVal, "z", "0");
     if(!destSlice.empty()) {
       uint32_t hi = get_end(destSlice);
       uint32_t lo = get_begin(destSlice);
@@ -1122,7 +1181,7 @@ std::string get_rst_value(const std::string &destAndSlice,
 
   toCoutVerb("Replace "+timed_name(dest, timeIdx)+" with "+rstVal);
   if(dest.find("ddr_fifo.r3") != std::string::npos && timeIdx == 25)
-    toCout("Find it!");
+    toCoutVerb("Find it!");
   g_outFile << "Replace "+timed_name(dest, timeIdx)+" with "+rstVal << std::endl;
   g_regValueFile << "Replace "+timed_name(dest, timeIdx)+" with "+rstVal << std::endl;
   if(dest == "buff1" && timeIdx == 15)
@@ -1212,7 +1271,7 @@ bool is_pure_num(std::string var) {
 }
 
 
-void replace_with(std::string str, std::string subStr, std::string newSubStr) {
+void replace_with(std::string &str, std::string subStr, std::string newSubStr) {
   size_t index = 0;
   uint32_t len = subStr.size();
   while (true) {
@@ -1226,6 +1285,17 @@ void replace_with(std::string str, std::string subStr, std::string newSubStr) {
     /* Advance index forward so the next iteration doesn't pick it up as well. */
     index += len;
   }
+}
+
+
+std::string remove_unsigned(std::string &line) {
+  std::smatch m;
+  std::regex pSigned("\\$unsigned\\((.*)\\)");
+  if(line.find("$unsigned") != std::string::npos) {
+    return std::regex_replace(line, pSigned, "$1");
+    //toCout("line to be matched: "+line);
+  }
+  else return line;
 }
 
 } // end of namespace funcExtract

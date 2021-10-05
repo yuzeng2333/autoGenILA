@@ -1,8 +1,0 @@
-"\S4_0.S_0.out == 0",
-"\S4_0.S_1.out == 0",
-"\S4_0.S_2.out == 0",
-"\S4_0.S_3.out == 0",
-"k0a == 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-"k1a == 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-"k2a == 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-"k3a == 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",

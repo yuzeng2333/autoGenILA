@@ -91,6 +91,9 @@ std::regex pNonblock    (to_re("^(\\s*)(NAME) (?:\\s)?<= (NAME)(\\s*)?;$"));
 std::regex pNonblockConcat    (to_re("^(\\s*)(NAME) <= \\{(.+)\\}(\\s*)?;$"));
 std::regex pNonblockIf  (to_re("^(\\s*)if \\((NAME)\\) (NAME) <= (NAME)(\\s*)?;$"));
 std::regex pNonblockIf2 (to_re("^(\\s*)if \\((NAME)\\) ([a-zA-Z0-9]+)(\\[([a-zA-Z0-9]+)\\[(\\d+)\\]\\]) <= (NAME)(\\s*)?;$"));
+std::regex pNonblockElse(to_re("^(\\s*)else (NAME) <= (NAME)(\\s*)?;$"));
+std::regex pNBElseIf    (to_re("^(\\s*)else if \\((\\S+)\\s?\\) (NAME) <= (NAME)(\\s*)?;$"));
+
 /* function */
 std::regex pFunctionDef   (to_re("^(\\s*)function (\\[\\d+\\:0\\] )?(NAME)(\\s*)?;$"));
 std::regex pEndfunction   (to_re("^(\\s*)endfunction$"));
@@ -150,8 +153,8 @@ std::unordered_map<std::string, std::string> new_next;
 std::unordered_map<std::string, std::string> update_reg;
 std::unordered_map<std::string, std::pair<std::string, std::string>> memDims;
 std::unordered_map<std::string, uint32_t> reg2sig;
-std::unordered_map<std::string, uint32_t> fangyuanItemNum; // used to check item number in case statementsrs
-std::unordered_map<std::string, uint32_t> fangyuanCaseSliceWidth; // width of each slice used in RHS of case
+std::unordered_map<std::string, uint32_t> addedVarItemNum; // used to check item number in case statementsrs
+std::unordered_map<std::string, uint32_t> addedVarCaseSliceWidth; // width of each slice used in RHS of case
 std::unordered_map<std::string, uint32_t> g_destVersion;
 std::unordered_map<std::string, std::pair<std::string, bool>> g_moduleRst;
 std::unordered_map<std::string, std::string> g_moduleClk;
@@ -260,8 +263,8 @@ void clean_global_data(uint32_t totalRegCnt, uint32_t nextSig) {
     g_next_sig = nextSig;
   reg2sig.clear();
   g_use_reset_taint = false;
-  fangyuanItemNum.clear();
-  fangyuanCaseSliceWidth.clear();
+  addedVarItemNum.clear();
+  addedVarCaseSliceWidth.clear();
   g_destVersion.clear();
   moduleTrueRegs.clear();
   g_backwardMap.clear();
@@ -322,9 +325,9 @@ void clean_file(std::string fileName, bool useLogic) {
     bool noConcat=true;
     /// if is always line, look ahead for non-blocking concatenation assignments
     std::string retStr;    
-    std::string fangyuanDeclaration;
-    std::string fangyuanAssign;
-    noConcat = extract_concat(cleanLine, output, retStr, fangyuanDeclaration, fangyuanAssign, true);
+    std::string addedVarDeclaration;
+    std::string addedVarAssign;
+    noConcat = extract_concat(cleanLine, output, retStr, addedVarDeclaration, addedVarAssign, true);
     if( !is_srcDestConcat(line) && (!std::regex_match(line, match, pAlwaysClkRst) || !g_remove_adff) ) { // pAlwaysClkRst is printed below
       if(std::regex_match(cleanLine, match, pAlwaysClk)) {
         rsvdLine = cleanLine;
@@ -353,9 +356,9 @@ void clean_file(std::string fileName, bool useLogic) {
         rsvdLine.clear();        
       }
     }
-    if(!fangyuanDeclaration.empty()) {
-      output << fangyuanDeclaration << std::endl;
-      output << fangyuanAssign << std::endl;
+    if(!addedVarDeclaration.empty()) {
+      output << addedVarDeclaration << std::endl;
+      output << addedVarAssign << std::endl;
     }
     /// store the width of wires and regs in varWidth
     uint32_t choice = parse_verilog_line(cleanLine, true);
@@ -637,6 +640,9 @@ void remove_functions(std::string fileName) {
     uint32_t choice = parse_verilog_line(line, true);
     if ( choice == FUNCDEF ) {
       remove_function_wrapper(line, input, output);
+    }
+    else if(line.find("always @(") != std::string::npos) {
+      convert_nb_if_to_ite(input, output, line);
     }
     else
       output << line << std::endl;
@@ -1349,14 +1355,14 @@ void remove_function_wrapper(std::string firstLine, std::ifstream &input, std::o
       split_slice(localPair.second, rhs, rhsSlice);
       output << blank + "    " + localPair.first + " :" << std::endl;
       output << blank + "      " + result + " = " + b + rhsSlice + " ;" << std::endl;
-      //checkCond(b.find("fangyuan") != std::string::npos, "RHS in case is not fangyuan! "+ b);
+      //checkCond(b.find("addedVar") != std::string::npos, "RHS in case is not addedVar! "+ b);
       //fill_in_pass_relation(b+rhsSlice, result, localPair.first);
     }
     output << blank + "    default:" << std::endl;
     output << blank + "      " + result + " = " + a + " ;" << std::endl;
     output << blank + "  endcase" << std::endl;
     output << blank + "end" << std::endl;
-    fangyuanCaseSliceWidth.emplace(b, get_width(rhsSlice));
+    addedVarCaseSliceWidth.emplace(b, get_width(rhsSlice));
   }
   else {
     std::string localIdx = std::to_string(NEW_FANGYUAN++);
@@ -1367,15 +1373,15 @@ void remove_function_wrapper(std::string firstLine, std::ifstream &input, std::o
       toCout("b is: "+b);
       abort();
     }
-    uint32_t fangyuanWidth = std::stoi(m.str(1));
-    bool insertDone = varWidth.var_width_insert("fangyuan"+localIdx, fangyuanWidth-1, 0);
+    uint32_t addedVarWidth = std::stoi(m.str(1));
+    bool insertDone = varWidth.var_width_insert("addedVar"+localIdx, addedVarWidth-1, 0);
     if (!insertDone) {
       std::cout << "insert failed for this line:" + line << std::endl;
       std::cout << "m.str(2):" + m.str(2) << std::endl;
       std::cout << "m.str(3):" + m.str(3) << std::endl;
     }
-    //output << blank + "wire ["+toStr(fangyuanWidth-1)+":0] fangyuan"+localIdx+";" << std::endl;
-    //output << blank + "assign fangyuan"+localIdx+" = "+b+";" << std::endl;
+    //output << blank + "wire ["+toStr(addedVarWidth-1)+":0] addedVar"+localIdx+";" << std::endl;
+    //output << blank + "assign addedVar"+localIdx+" = "+b+";" << std::endl;
     output << blank + "always @("+a+" or "+s+") begin" << std::endl;
     output << blank + "  casez ("+s+")" << std::endl;
     std::string rhs, rhsSlice;
@@ -1392,7 +1398,7 @@ void remove_function_wrapper(std::string firstLine, std::ifstream &input, std::o
       //std::string binWidth = toStr(binNum.length());
       //std::string rhsNum = (selectedBits == 0) ? "0" : (binWidth + "'b" + binNum);
       std::string rhsBin = extract_bin(b, highIdx, lowIdx);
-      //std::string rhsNum = "fangyuan"+localIdx+"["+toStr(highIdx)+":"+toStr(lowIdx)+"]";
+      //std::string rhsNum = "addedVar"+localIdx+"["+toStr(highIdx)+":"+toStr(lowIdx)+"]";
       output << blank + "      " + result + " = " + toStr(rhsBin.length()) + "'b" + rhsBin + " ;" << std::endl;
     }
     output << blank + "    default:" << std::endl;
@@ -1814,7 +1820,7 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
 /* if a basic operator contains concatenated input, 
  * declare a new variable representing the concatenated input*/
 // if a long number(>32bit) is found, split it if g_split_long_num is true
-bool extract_concat(std::string line, std::ofstream &output, std::string &returnedStmt, std::string &fangyuanDeclaration, std::string &fangyuanAssign, bool isFuncCall) {
+bool extract_concat(std::string line, std::ofstream &output, std::string &returnedStmt, std::string &addedVarDeclaration, std::string &addedVarAssign, bool isFuncCall) {
   std::string retStr = "";
   std::smatch m;
   int blankNo = line.find('a', 0);  
@@ -1835,7 +1841,7 @@ bool extract_concat(std::string line, std::ofstream &output, std::string &return
   std::string newLine;
   std::vector<std::string> allVarList;
   std::queue<std::string> newVarQueue;
-  // if isNonblockConcat, the declaration of fangyuan is after the nonblock stmt
+  // if isNonblockConcat, the declaration of addedVar is after the nonblock stmt
   bool isNonblockConcat = std::regex_match(line, m, pNonblockConcat);
   if ( (line.find("assign") != std::string::npos
        //&& !std::regex_match(line, m, pSrcConcat)
@@ -1869,24 +1875,24 @@ bool extract_concat(std::string line, std::ofstream &output, std::string &return
         std::cout << line << std::endl;
         abort();
       }
-      bool insertDone = varWidth.var_width_insert("fangyuan"+localIdx, totalWidth-1, 0);
+      bool insertDone = varWidth.var_width_insert("addedVar"+localIdx, totalWidth-1, 0);
       if (!insertDone) {
         std::cout << "insert failed for this line:" + line << std::endl;
         std::cout << "m.str(2):" + m.str(2) << std::endl;
         std::cout << "m.str(3):" + m.str(3) << std::endl;
       }
       if(!isNonblockConcat) {
-        output << std::string(blankNo, ' ') + "wire [" + toStr(totalWidth-1) + ":0] fangyuan" + localIdx + ";" << std::endl;        
+        output << std::string(blankNo, ' ') + "wire [" + toStr(totalWidth-1) + ":0] addedVar" + localIdx + ";" << std::endl;        
         if(braceIdx == 0 && destIsBrace) // deal with "dest is brace" situation
-          output << std::string(blankNo, ' ') + "assign { " + varList + " } = fangyuan" + localIdx + ";" << std::endl;
+          output << std::string(blankNo, ' ') + "assign { " + varList + " } = addedVar" + localIdx + ";" << std::endl;
         else
-          output << std::string(blankNo, ' ') + "assign fangyuan" + localIdx + " = { " + varList + " };" << std::endl;
+          output << std::string(blankNo, ' ') + "assign addedVar" + localIdx + " = { " + varList + " };" << std::endl;
       }
       else {
-        fangyuanDeclaration = "  wire [" + toStr(totalWidth-1) + ":0] fangyuan" + localIdx + ";"; 
-        fangyuanAssign      = "  assign fangyuan" + localIdx + " = { " + varList + " };";
+        addedVarDeclaration = "  wire [" + toStr(totalWidth-1) + ":0] addedVar" + localIdx + ";"; 
+        addedVarAssign      = "  assign addedVar" + localIdx + " = { " + varList + " };";
       }
-      newVarQueue.push("fangyuan"+localIdx);
+      newVarQueue.push("addedVar"+localIdx);
       braceIdx++;
     }
     char openBrace = '{';
@@ -1970,6 +1976,66 @@ void collect_case_dest(const std::string &line) {
   std::string dest, destSlice;
   split_slice(destAndSlice, dest, destSlice);
   g_iteDest.insert(dest);
+}
+
+
+void convert_nb_if_to_ite(std::ifstream &input, 
+                          std::ofstream &output, 
+                          std::string line) {
+  std::string line2;
+  std::getline(input, line2);
+  std::smatch m;
+  if(!std::regex_match(line2, m, pNonblockIf)) {
+    output << line << std::endl;  
+    output << line2 << std::endl;
+    return;
+  }
+  else { // if line2 is nb-if
+    std::string ifCondAndSlice = m.str(2);
+    std::string destAndSlice = m.str(3);
+    std::string ifSrcAndSlice = m.str(4);
+    uint32_t width = get_var_slice_width(destAndSlice);
+    auto currentPos = input.tellg();
+    std::string line3;
+    std::getline(input, line3);
+    std::string newVarIdx = toStr(NEW_FANGYUAN++);
+    output << "  wire ["+toStr(width-1)+":0] NewNBIte"+newVarIdx+";" << std::endl;
+    varWidth.var_width_insert("NewNBIte"+newVarIdx, width-1, 0);
+    if(std::regex_match(line3, m, pNonblockElse)) {
+      std::string elseSrcAndSlice = m.str(3);
+      if(ifCondAndSlice.front() != '!')
+        output << "  assign NewNBIte"+newVarIdx+" = "+ifCondAndSlice+" ? "+ifSrcAndSlice+" : "+elseSrcAndSlice+";" << std::endl;
+      else
+        output << "  assign NewNBIte"+newVarIdx+" = "+ifCondAndSlice.substr(1)+" ? "+elseSrcAndSlice+" : "+ifSrcAndSlice+";" << std::endl;
+    }
+    else if(std::regex_match(line3, m, pNBElseIf)) {
+      std::string elseIfCondAndSlice = m.str(2);      
+      std::string elseSrcAndSlice = m.str(4);
+      std::string newVarIdx2 = toStr(NEW_FANGYUAN++);
+      output << "  wire ["+toStr(width-1)+":0] NewNBIte"+newVarIdx2+";" << std::endl;
+      varWidth.var_width_insert("NewNBIte"+newVarIdx2, width-1, 0);
+      if(elseIfCondAndSlice.front() != '!')
+        output << "  assign NewNBIte"+newVarIdx2+" = "+elseIfCondAndSlice+" ? "+elseSrcAndSlice+" : "+destAndSlice+";" << std::endl;
+      else
+        output << "  assign NewNBIte"+newVarIdx2+" = "+elseIfCondAndSlice.substr(1)+" ? "+destAndSlice+" : "+elseSrcAndSlice+";" << std::endl;
+
+      if(ifCondAndSlice.front() != '!')
+        output << "  assign NewNBIte"+newVarIdx+" = "+ifCondAndSlice+" ? "+ifSrcAndSlice+" : NewNBIte"+newVarIdx2+";" << std::endl;
+      else
+        output << "  assign NewNBIte"+newVarIdx+" = "+ifCondAndSlice.substr(1)+" ? NewNBIte"+newVarIdx2+" : "+ifSrcAndSlice+";" << std::endl;
+    }
+    else { // if line3 is neither
+      if(ifCondAndSlice.front() != '!')
+        output << "  assign NewNBIte"+newVarIdx+" = "+ifCondAndSlice+" ? "+ifSrcAndSlice+" : "+destAndSlice+";" << std::endl;
+      else
+        output << "  assign NewNBIte"+newVarIdx+" = "+ifCondAndSlice.substr(1)+" ? "+destAndSlice+" : "+ifSrcAndSlice+";" << std::endl;
+
+      input.seekg(currentPos);
+    }
+    output << line << std::endl;
+    output << "    "+destAndSlice+" <= NewNBIte"+newVarIdx+";" << std::endl;
+    return;
+  }
 }
 
 

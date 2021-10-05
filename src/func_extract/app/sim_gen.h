@@ -9,6 +9,10 @@ using namespace funcExtract;
 using namespace taintGen;
 
 
+extern std::map<std::string, std::string> g_aes_special_func_call;
+extern std::map<std::string, std::string> g_urv_special_func_call;
+
+
 std::string asv_type(uint32_t width);
 
 std::string func_call(std::string writeASV, std::string funcName, 
@@ -22,14 +26,30 @@ void print_func_declare(struct FuncTy_t funcTy,
 
 uint32_t convert_to_single_num(std::string numIn);
 
+uint64_t convert_to_long_single_num(std::string numIn);
+
 void print_instr_calls(std::map<std::string, 
                                 std::vector<std::string>> &encoding,
                        std::string prefix,
                        std::ofstream &cpp,
                        uint32_t instrAddr);
 
-void update_asvs(std::ofstream &cpp, std::string prefix);
+void update_all_asvs(std::ofstream &cpp, std::string prefix);
 
 void read_refinement(std::string fileName);
 
+void read_skipped_target(std::string fileName);
+
 void print_final_results(std::ofstream &cpp);
+
+void print_array(std::string arrName, std::ofstream &cpp);
+
+std::string initialize_mem(std::string fileName);
+
+void print_update_mem(std::ofstream &cpp);
+
+void print_update_mem_call(std::ofstream &cpp);
+
+void print_urv_update_mem(std::ofstream &cpp);
+
+void vta_ila_model(std::ofstream &cpp);

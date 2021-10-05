@@ -46,7 +46,7 @@ std::string DELIM = "___#";
 uint32_t g_destWidth;
 bool g_seeInputs;
 uint32_t g_maxDelay = 0;
-
+uint32_t g_pushNum = 0;
 
 
 // assume ssaTable and nbTable have been filled
@@ -143,7 +143,7 @@ void UpdateFunctionGen::clean_data() {
 /// bound is the number of regs from input to output
 /// timeIdx start from 0, max value = bound
 void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo, 
-                                      uint32_t bound, 
+                                      const uint32_t bound, 
                                       uint32_t instrIdx) {
 
   // FIXME: change the following model name
@@ -152,14 +152,16 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   std::string curInsName = destInfo.get_ins_name();
   auto curMod = g_moduleInfoMap[curModName];
   auto curDynData = get_dyn_data(curMod);
-  std::string insName = curInsName.empty() ? curModName : curInsName;
-  Context_t insCntxt(insName, "", curMod, nullptr, nullptr);  
+  //std::string insName = curInsName.empty() ? curModName : curInsName;
+  std::string insName = curModName == g_topModule ? curModName : curInsName;
+  Context_t insCntxt(insName, "", curMod, nullptr, nullptr);
   insContextStk.clear();
   clean_all_mod_dynamic_info();
   cct_cnt = 0; 
   ext_cnt = 0;
   if(curModName == g_topModule) {
     insContextStk.push_back(insCntxt);
+    print_context_info(insCntxt);
   }
   else {
     // if starts from a sub-module, the submodule and all its parent modules
@@ -176,11 +178,11 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
       }
       curDynData->isFunctionedSubMod = false;
       auto parentMod = *(curMod->parentModVec.begin());
-      if(insName.empty())
-        insName = ask_parent_my_ins_name(curMod->name, parentMod);
+      insName = ask_parent_my_ins_name(curMod->name, parentMod);
       Context_t insCntxt(insName, "", curMod, parentMod, nullptr);  
       insContextStk.insert(insContextStk.begin(), insCntxt);
       curMod = parentMod;
+      curDynData = get_dyn_data(curMod);
     }
     // curMod is the top module
     Context_t insCntxt(curMod->name, "", curMod, nullptr, nullptr);
@@ -248,15 +250,25 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 
   // if target is vector, delcare global array before creating
   // the top function
-  Value* retArrPtr;
+  llvm::Value* retArrPtr;
+  std::vector<std::string> destVec = destInfo.get_no_slice_name();  
+
   if(destInfo.isVector) {
-    retArrPtr = GlobalVariable::GlobalVariable(
-                  TheModule, 
-                  retTy->getElementType(), false, 
-                  GlobalValue::InternalLinkage,
-                  nullptr,
-                  "RET_ARRAY_PTR"
-                );
+    llvm::Type* elementTy = llvm::cast<llvm::PointerType>(retTy)->getElementType();
+    llvm::ArrayType* arrayType = llvm::ArrayType::get(elementTy, destVec.size());
+    // zero initializer
+    llvm::ConstantAggregateZero* zeroInit = llvm::ConstantAggregateZero::get(arrayType);
+    if(destInfo.isVector) {
+      llvm::GlobalVariable* globalArr = new llvm::GlobalVariable(
+          *TheModule, 
+          arrayType, false, 
+          //llvm::GlobalValue::InternalLinkage,
+          llvm::GlobalValue::LinkOnceAnyLinkage,
+          zeroInit,
+          "RET_ARRAY_PTR"
+        );
+      retArrPtr = value(globalArr);
+    }
   }
 
   // make a top function
@@ -266,14 +278,16 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 
   TheFunction = llvm::Function::Create(
     FT, llvm::Function::InternalLinkage, 
-    currInstrInfo.name+"_"+destSimpleName, TheModule.get());
+    destInfo.get_instr_name()+"_"+destSimpleName, TheModule.get());
   TheFunction->addFnAttr(llvm::Attribute::NoInline);
   //g_curFunc = TheFunction;
 
   for(auto it = insContextStk.begin();
       it != insContextStk.end(); it++) {
     it->Target = destName;
-    it->Func = topFunction;
+    // FIXME: change topFunction to TheFunction
+    //it->Func = topFunction;
+    it->Func = TheFunction;
     initialize_min_delay(it->ModInfo, destName);
   }
 
@@ -329,9 +343,8 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   goalFile.open(g_path+"/goal.txt", std::ofstream::app);
   llvm::Value* destNextExpr;
 
-  std::vector<std::string> destVec = destInfo.get_no_slice_name();
-
   curMod = g_moduleInfoMap[curModName];
+  llvm::Instruction* retInst;
   if(!destInfo.isVector) {
     std::string dest = destVec.front();
     if(is_output(destName, curMod)) initialize_min_delay(curMod, destName);
@@ -345,7 +358,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     else 
       destNextExpr = add_constraint(dest, 
                                     0, TheContext, Builder, bound);
-    Builder->CreateRet(destNextExpr);
+    retInst = Builder->CreateRet(destNextExpr);
   }
   else {
     // if destName is a vector, return an array
@@ -367,6 +380,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
       insContextStk.clear();
       Context_t insCntxt(insName, dest, curMod, nullptr, TheFunction);
       insContextStk.push_back(insCntxt);
+      print_context_info(insCntxt);      
       if(curMod->visitedNode.find(dest) == curMod->visitedNode.end()
           && curMod->reg2Slices.find(dest) == curMod->reg2Slices.end()) {
         toCout("Error: ast node is not found for this var: |"+dest+"|"
@@ -379,6 +393,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
         retVec.push_back(destNextExpr);
       }
     }
+
     uint32_t size = destVec.size();
     uint32_t bitNum = log2(size) + 2;
 
@@ -400,7 +415,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
         = llvm::GetElementPtrInst::Create(
             nullptr,
             arrPtr,
-            std::vector<llvm::Value*>{ 
+            std::vector<llvm::Value*>{
               llvm::ConstantInt::get(
                 llvm::IntegerType::get(*TheContext, bitNum), 
                 0, false),
@@ -413,18 +428,57 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
       Builder->SetInsertPoint(BB);
 
       // print info
-      uint32_t valWidth = val->getType()->getIntegerBitWidth();
-      auto ty1 = val->getType();
-      auto ty2 = llvm::cast<llvm::ArrayType>(retTy)->getElementType();
-      auto ty3 = llvm::cast<llvm::PointerType>(ptr->getType())->getElementType();
-      auto ty4 = arrPtr->getType();
+      //uint32_t valWidth = val->getType()->getIntegerBitWidth();
+      //auto ty1 = val->getType();
+      //auto ty2 = llvm::cast<llvm::ArrayType>(retTy)->getElementType();
+      //auto ty3 = llvm::cast<llvm::PointerType>(ptr->getType())->getElementType();
+      //auto ty4 = arrPtr->getType();
       llvm::StoreInst* store = Builder->CreateStore(val, value(ptr));  
     }
 
     //llvm::LoadInst *retArr = Builder->CreateLoad(retTy, arrPtr, llvm::Twine("retArr"));
     //Builder->CreateRet(value(retArr));
-    Builder->CreateRet(arrPtr);
+
+    llvm::GetElementPtrInst* retPtr 
+      = llvm::GetElementPtrInst::Create(
+          nullptr,
+          arrPtr,
+          std::vector<llvm::Value*>{
+            llvm::ConstantInt::get(
+              llvm::IntegerType::get(*TheContext, bitNum), 
+              0, false),
+            llvm::ConstantInt::get(
+              llvm::IntegerType::get(*TheContext, bitNum), 
+              0, false) },
+          llvm::Twine("RET_PTR"),
+          BB
+        );
+
+    retInst = Builder->CreateRet(value(retPtr));
   } // end of add vector
+
+
+  // if the top module contains memories, add the additional memory
+  // writes from lastMemReadAddr+1 to bound-1
+  uint32_t i = 0;
+  Builder->SetInsertPoint(retInst);
+  if(!curMod->moduleMems.empty()) {
+    for(auto pair : curDynData->memDynInfo) {
+      std::string mem = pair.first;
+      toCoutVerb("check mem: "+mem);
+      if(i == 48)
+        toCoutVerb("Find i!");
+      toCoutVerb("i: "+toStr(i++));
+      if(mem.find("\\store.tensorStore.tensorFile_0_0") != std::string::npos)
+        toCoutVerb("Find it!");
+      astNode* node = memNodeMap[mem];
+      if(!pair.second.hasBeenWritten) continue;      
+      uint32_t lastWriteTimeIdx = pair.second.lastWriteTimeIdx;
+      for(uint32_t i = lastWriteTimeIdx+1; i < bound; i++) {
+        mem_assign_constraint(node, i, TheContext, Builder, bound);
+      }
+    }
+  }
 
   llvm::verifyFunction(*TheFunction);
 
@@ -463,7 +517,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 
 // submodules are treated as another module, communicated with ports
 //void simplify_goal_without_submodules(std::string destAndSlice, 
-//                                      uint32_t bound, 
+//                                      const uint32_t bound, 
 //                                      uint32_t instrIdx) {
 //  g_skipCheck = true;
 //  g_ignoreSubModules = true;
@@ -512,7 +566,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 // constructed only one. But the SMT equation may need to be constructed
 // multiple times, until a solution is obtained or a bound is reached.
 //void check_single_reg_and_slice(std::string destAndSlice, 
-//                                uint32_t boundIn, 
+//                                const uint32_t boundIn, 
 //                                uint32_t instrIdx) {
 //  g_skipCheck = false;  
 //  std::ofstream goalFile;
@@ -522,7 +576,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 //  toCout("========== Begin check SAT for: "+destAndSlice+" ==========");
 //  uint32_t regWidth = get_var_slice_width_simp(destAndSlice);
 //  CURRENT_VAR = destAndSlice;
-//  uint32_t bound = boundIn > 0 ? boundIn : 0;
+//  const uint32_t bound = boundIn > 0 ? boundIn : 0;
 //  bound_limit = boundIn+2;
 //  bool z3Res = false;
 //  context c;
@@ -717,8 +771,14 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 llvm::Value*
 UpdateFunctionGen::add_constraint(std::string varAndSlice, uint32_t timeIdx, context &c,
                                    std::shared_ptr<llvm::IRBuilder<>> &b,
-                                   uint32_t bound ) {
+                                   const uint32_t bound ) {
+  if(varAndSlice.find("hls_target_linebuffer_1_U0_out_stream_V_value_V_write") 
+       != std::string::npos)
+       //&& timeIdx == 17)
+    toCoutVerb("Find it!");
   auto curMod = insContextStk.get_curMod();
+  if(curMod->name == "hls_target_Loop_1_proc")
+    toCout("Find it!");
   llvm::Value* ret;
   bool retIsEmpty = true;
   std::string var, varSlice;
@@ -738,7 +798,8 @@ UpdateFunctionGen::add_constraint(std::string varAndSlice, uint32_t timeIdx, con
         toCout("!!! Error: cannot find node for: "+varSlice);
         abort();
       }
-      llvm::Value* tmpSlice = add_constraint(curMod->visitedNode[varSlice], timeIdx, c, b, bound);
+      llvm::Value* tmpSlice = add_constraint(curMod->visitedNode[varSlice], 
+                                             timeIdx, c, b, bound);
       if(retIsEmpty) {
         retIsEmpty = false;
         ret = tmpSlice;
@@ -758,18 +819,26 @@ UpdateFunctionGen::add_constraint(std::string varAndSlice, uint32_t timeIdx, con
 llvm::Value* 
 UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context &c,
                             std::shared_ptr<llvm::IRBuilder<>> &b,
-                            uint32_t bound ) {
+                            const uint32_t bound ) {
   // Attention: varAndSlice might have a slice, a directly-assigned varAndSlice
   std::string varAndSlice = node->dest;
+  if(varAndSlice.find("\\compute.inst_q.value_1") 
+       != std::string::npos)
+    toCoutVerb("Find it!");
+
   auto curMod = insContextStk.get_curMod();
+  if(curMod->name == "hls_target_Loop_1_proc")
+    toCout("Find it!");
+
   std::shared_ptr<ModuleDynInfo_t> curDynData = get_dyn_data(curMod);
-  toCoutVerb("add_constraint for: "+varAndSlice+", timeIdx: "+toStr(timeIdx));
-  if(varAndSlice == "out" ) { //&& timeIdx == 8) {
+  toCoutVerb("add_constraint for: "+varAndSlice+", timeIdx: "+toStr(timeIdx)
+             +", bound: "+toStr(bound));
+  if(varAndSlice == "64'hxxxxxxxxxxxxxxxx" && timeIdx == 1) {
     toCoutVerb("find it");
   }
 
-  if(varAndSlice.find("is_slti_blt_slt") != std::string::npos
-       && timeIdx == 9) {
+  if(varAndSlice.find("compute.loadUop.sIdx") != std::string::npos
+       && timeIdx == 4) {
     toCoutVerb("Find it!");
   }
 
@@ -780,7 +849,8 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
 
   const std::string curTgt = insContextStk.get_target();
   if(curDynData->existedExpr.find(curTgt) == curDynData->existedExpr.end() )
-    curDynData->existedExpr.emplace(curTgt, std::map<std::string, llvm::Value*>() );
+    curDynData->existedExpr.emplace(curTgt, 
+                                    std::map<std::string, llvm::Value*>() );
 
   if(curDynData->existedExpr[curTgt].find(timed_name(varAndSlice, timeIdx)) 
       != curDynData->existedExpr[curTgt].end() ) {
@@ -792,13 +862,14 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
     retExpr = input_constraint(node, timeIdx, c, b, bound);
   }
   else if( is_reg_in_curMod(varAndSlice, curMod) 
-             && node->type != SRC_CONCAT ) { 
+             && node->type != SRC_CONCAT && node->type != SWITCH) { 
     // AS case is moved to add_nb_constraint
     retExpr = add_nb_constraint(node, timeIdx, c, b, bound);
   }
   else if( is_number(varAndSlice) ) { // num_t is always 0
     //if(varAndSlice.find("x") != std::string::npos) {
-    //  toCout("!! Warning: number in add_constraint should not have x: "+varAndSlice);
+    //  toCout("!! Warning: number in add_constraint should not have x: "
+    //           +varAndSlice);
     //  //abort();
     //}
     retExpr = num_constraint(node, timeIdx, c, b);
@@ -806,6 +877,10 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
   else if( is_case_dest(varAndSlice, curMod) ) {
     retExpr = case_constraint(node, timeIdx, c, b, bound);
   }
+  else if( is_switch_dest(varAndSlice, curMod) ) {
+    retExpr = switch_constraint(node, timeIdx, c, b, bound);
+  }
+
   //else if( is_func_output(varAndSlice) ) {
   //  retExpr = func_constraint(node, timeIdx, c, s, g, bound, isSolve);
   //}
@@ -814,6 +889,8 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
     std::string insName = pair.first;
     auto subMod = get_mod_info(insName, curMod);
     std::string modName = subMod->name;
+    if(modName == "aes_128")
+      toCoutVerb("Find it!");
     if(is_mem_module(modName))
       retExpr = memMod_constraint(node, timeIdx, c, b, bound);
     else if(g_blackBoxModSet.find(modName) != g_blackBoxModSet.end())
@@ -821,11 +898,54 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
     else
       retExpr = submod_constraint(node, timeIdx, c, b, bound);
   }
+  else if( node->type == MEM_IF_ASSIGN ) {
+    //toCout("Error: mem_if_assign should not appear in add_constraint:"
+    //        +node->dest);
+    //abort();
+
+    std::string mem = node->dest;
+    if(curDynData->memDynInfo.find(mem) != curDynData->memDynInfo.end()) {
+      toCout("Error: the mem is already in curDynData->memDynInfo: "+mem);
+      abort();
+    }
+    uint32_t lineWidth = curMod->moduleMems[mem].first;
+    uint32_t lineNum = curMod->moduleMems[mem].second;
+
+    llvm::Type* elementTy = llvmWidth(lineWidth, c);
+    llvm::ArrayType* arrayType = llvm::ArrayType::get(elementTy, lineNum);
+    std::vector<llvm::Constant*> initList;  
+    for(uint32_t i = 0; i < lineNum; i++) {
+      initList.push_back(
+        llvm::ConstantInt::get(llvm::IntegerType::get(*c, lineWidth), 
+                               0, false)
+      );
+    }
+    // initialize the MemDynInfo_t
+    llvm::Value* memValue;    
+    llvm::GlobalVariable* memArr = new llvm::GlobalVariable(
+      *TheModule,
+      arrayType, false,
+      // llvm::GlobalValue::InternalLinkage,
+      llvm::GlobalValue::LinkOnceAnyLinkage,
+      llvm::ConstantArray::get(arrayType, 
+                              llvm::ArrayRef<llvm::Constant*>(initList)),
+      mem+"_ARR"
+    );
+    memValue = memArr;
+    curDynData->memDynInfo.emplace(mem, MemDynInfo_t{0, false, memValue});
+    mem_assign_constraint(node, timeIdx, c, b, bound);
+    return nullptr;
+  }
+  else if( node->type == DYNSEL ) {
+    retExpr = dyn_sel_constraint(node, timeIdx, c, b, bound);
+  }
   else { // it is wire
     retExpr = add_ssa_constraint(node, timeIdx, c, b, bound);
   }
-  curDynData->existedExpr[curTgt].emplace(timed_name(varAndSlice, timeIdx), retExpr);
-  if(curMod->name == "T" && curTgt == "out" && varAndSlice == "in" && timeIdx == 1)
+  curDynData->existedExpr[curTgt].emplace(timed_name(varAndSlice, timeIdx), 
+                                          retExpr);
+  if(curMod->name == "T" && curTgt == "out" 
+       && varAndSlice == "in" && timeIdx == 1)
     toCoutVerb("push into expr!");
   return retExpr;
 }
@@ -835,14 +955,15 @@ llvm::Value*
 UpdateFunctionGen::add_nb_constraint(astNode* const node, 
                                uint32_t timeIdx, context &c, 
                                std::shared_ptr<llvm::IRBuilder<>> &b,
-                               uint32_t bound ) {
+                               const uint32_t bound ) {
   const auto curFunc = insContextStk.get_func();
   const auto curMod = insContextStk.get_curMod();
   auto curDynData = get_dyn_data(curMod);
   std::string destAndSlice = node->dest;
   std::string dest, destSlice;
   split_slice(destAndSlice, dest, destSlice);
-  if(destAndSlice.find("cpu_state") != std::string::npos && timeIdx == 8) {
+  if(destAndSlice.find("compute.loadUop.sIdx_reg[0]") != std::string::npos){
+       //&& timeIdx == 8) {
     //toCoutVerb("target reg found! time: "+toStr(timeIdx));
     toCout("Find it");
   }
@@ -857,15 +978,26 @@ UpdateFunctionGen::add_nb_constraint(astNode* const node,
   //if(!g_seeInputs && timeIdx == bound) bound++;
 
   if(timeIdx < bound) {
-    toCoutVerb("Add nb constraint for: " + destAndSlice+" ------  time: "+toStr(timeIdx));
+    toCoutVerb("Add nb constraint for: " + destAndSlice
+               +" ------  time: "+toStr(timeIdx));
     if(destAndSlice == "decoder_trigger_q" && timeIdx == 3)
       toCoutVerb("Find it!");
     std::string destNext = node->srcVec.front();
 
-    destNextExpr = add_constraint(node->childVec.front(), timeIdx+1, c, b, bound);
+    auto srcExpr = add_constraint(node->childVec.front(), timeIdx+1, c, b, bound);
+    std::string srcAndSlice = node->srcVec[0];
+    std::string src, srcSlice;
+    split_slice(srcAndSlice, src, srcSlice);
+    uint32_t srcHi = get_lgc_hi(srcAndSlice, curMod);
+    uint32_t srcLo = get_lgc_lo(srcAndSlice, curMod);
+    if(srcSlice.empty() || has_direct_assignment(srcAndSlice, curMod))
+      destNextExpr = srcExpr;
+    else
+      destNextExpr = extract_func(srcExpr, srcHi, srcLo, c, b, srcAndSlice);
     return destNextExpr;
   }
-  else if ( is_clean(dest, insContextStk.get_curMod()) ){ // the bound has been reached, do not expand its assignment
+  else if ( is_clean(dest, insContextStk.get_curMod()) ){ 
+    // the bound has been reached, do not expand its assignment
     push_clean_queue(node, timeIdx);
   }
   else {
@@ -878,7 +1010,7 @@ UpdateFunctionGen::add_nb_constraint(astNode* const node,
 
   //if(curMod->invarRegs.find(dest) == curMod->invarRegs.end()) {
   if(dest.find("internal_empty_n") != std::string::npos) {
-    toCout("Find it!");
+    toCoutVerb("Find it!");
   }
   if(g_use_read_ASV) {
     if(is_read_asv(dest, insContextStk.get_curMod())) {
@@ -941,8 +1073,8 @@ UpdateFunctionGen::add_nb_constraint(astNode* const node,
 
 
 llvm::Value* 
-UpdateFunctionGen::add_ssa_constraint(astNode* const node, uint32_t timeIdx, context &c,  
-                                std::shared_ptr<llvm::IRBuilder<>> &b, uint32_t bound) {
+UpdateFunctionGen::add_ssa_constraint(astNode* const node, uint32_t timeIdx, context &c,
+                                std::shared_ptr<llvm::IRBuilder<>> &b, const uint32_t bound) {
   toCoutVerb("Add ssa constraint for: " + node->dest+" ------  time: "+toStr(timeIdx));
   std::string var = node->dest;
 
@@ -966,7 +1098,7 @@ UpdateFunctionGen::add_ssa_constraint(astNode* const node, uint32_t timeIdx, con
       return ite_op_constraint(node, timeIdx, c, b, bound);
       break;
     default:
-      toCout("Error in add_ssa_constraint for: "+var);
+      toCout("Error no ssa_constraint found for: "+var);
       abort();
       break;
   }
@@ -975,7 +1107,7 @@ UpdateFunctionGen::add_ssa_constraint(astNode* const node, uint32_t timeIdx, con
 
 //void 
 //UpdateFunctionGen::add_child_constraint(astNode* const parentNode, uint32_t timeIdx, context &c,
-//                          std::shared_ptr<llvm::IRBuilder<>> &b, uint32_t bound) {
+//                          std::shared_ptr<llvm::IRBuilder<>> &b, const uint32_t bound) {
 //  abort();
 //  for( astNode* node: parentNode->childVec ) {
 //    add_constraint(node, timeIdx, c, b, bound);
@@ -985,7 +1117,7 @@ UpdateFunctionGen::add_ssa_constraint(astNode* const node, uint32_t timeIdx, con
 
 // dest may be: input, AS or num
 //void add_clean_constraint(astNode* const node, uint32_t timeIdx, context &c, 
-//                          solver &s, goal &g, uint32_t bound, bool isSolve) {
+//                          solver &s, goal &g, const uint32_t bound, bool isSolve) {
 //  //toCoutVerb("Add clean constraint for: " + node->dest);
 //  std::string dest = node->dest;
 //  // add clean taint
@@ -1020,7 +1152,7 @@ void UpdateFunctionGen::push_clean_queue(astNode* node, uint32_t timeIdx) {
 
 
 //void add_all_clean_constraints(context &c, solver &s, goal &g, 
-//                               uint32_t bound, bool isSolve) {
+//                               const uint32_t bound, bool isSolve) {
 //  toCout("-------- Begin Add all clean ----------");
 //  for(auto it = CLEAN_QUEUE.begin(); it != CLEAN_QUEUE.end(); it++) {
 //    add_clean_constraint(it->first, it->second, c, s, g, bound, isSolve);
@@ -1029,7 +1161,7 @@ void UpdateFunctionGen::push_clean_queue(astNode* node, uint32_t timeIdx) {
 
 
 //void add_dirty_constraint(astNode* const node, uint32_t timeIdx, 
-//                          context &c, solver &s, uint32_t bound) {
+//                          context &c, solver &s, const uint32_t bound) {
 //  toCoutVerb("Add dirty constraint for: "+node->dest+" ------  time: "+toStr(timeIdx));  
 //  std::string destAndSlice = node->dest;
 //  if(destAndSlice.compare("wack") == 0) {
@@ -1074,7 +1206,7 @@ void UpdateFunctionGen::push_dirty_queue(astNode* node, uint32_t timeIdx) {
 }
 
 
-//void add_all_dirty_constraints(context &c, solver &s, uint32_t bound) {
+//void add_all_dirty_constraints(context &c, solver &s, const uint32_t bound) {
 //  toCout("-------- Begin Add all dirty ----------");  
 //  for(auto pair: DIRTY_QUEUE) {
 //    add_dirty_constraint(pair.first, pair.second, c, s, bound);
@@ -1084,7 +1216,7 @@ void UpdateFunctionGen::push_dirty_queue(astNode* node, uint32_t timeIdx) {
 
 // value at bound+1 should be from instrInfo
 // values in other cycles should all be NOP instructions
-//void add_input_values(context &c, solver &s, uint32_t bound) {
+//void add_input_values(context &c, solver &s, const uint32_t bound) {
 //  toCout("-------- Begin add input vals ----------");
 //  uint32_t encodingSize = g_currInstrInfo.instrEncoding.begin()->second.size();
 //  for(auto pair: g_currInstrInfo.instrEncoding) {
@@ -1105,7 +1237,7 @@ void UpdateFunctionGen::push_dirty_queue(astNode* node, uint32_t timeIdx) {
 //}
 
 
-//void add_nop(context &c, solver &s, uint32_t bound) {
+//void add_nop(context &c, solver &s, const uint32_t bound) {
 //  std::vector<uint32_t> bVec{0};
 //  for(uint32_t b = 1; b <= bound; b++)
 //  //for(uint32_t b: bVec)
@@ -1227,7 +1359,7 @@ llvm::Type* DestInfo::get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext
       assert(size == elmtSize);
     }
     llvm::Type* I = llvm::IntegerType::get(*TheContext, size);    
-    PointerType* pointerTy = PointerType::get(I, 0);
+    llvm::PointerType* pointerTy = llvm::PointerType::get(I, 0);
     //llvm::ArrayType* arrayType = llvm::ArrayType::get(I, destVec.size());
     ////auto ptrTy = llvm::PointerType::get(arrayType, 0);
     //return arrayType;
@@ -1373,6 +1505,10 @@ UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
   std::string destName = in->getName().str();
   std::string dest, destSlice;
   auto curMod = insContextStk.get_curMod();
+  auto curDynData = get_dyn_data(curMod);
+  std::string prefix = "";
+  if(!curDynData->isFunctionedSubMod) prefix = insContextStk.get_hier_name(false);
+
   if(destName.find("concat__concat___017____#4") != std::string::npos)
     toCoutVerb("Find it!");
   if(!destName.empty()) {
@@ -1402,7 +1538,7 @@ UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
     extValName = destName+" ["+toStr(high)+":"+toStr(low)+"]";
 
   if(!g_use_concat_extract_func) {
-    auto s1 = b->CreateLShr(in, low, llvm::Twine(destName+"_LSHR_"+toStr(low)+"_"));
+    auto s1 = b->CreateLShr(in, low, llvm::Twine(prefix+destName+"_LSHR_"+toStr(low)+"_"));
     llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c), 
                         llvm::Twine(extValName));
     return ret;
@@ -1496,9 +1632,6 @@ UpdateFunctionGen::concat_func(llvm::Value* val1, llvm::Value* val2,
   std::string name1 = val1->getName().str();
   std::string name2 = val2->getName().str();
   toCoutVerb("concat with "+name1+" and "+name2+", total width: "+toStr(val1Width+val2Width));  
-  if(name2 == "cct_mem_rdata_word[15:0] [15:0]_cct_mem_rdata_word[7] [7:7]_cct_mem_rdata_word[7] [7:7]325_cct_mem_rdata_word[7] [7:7]326_cct_mem_rdata_word[7] [7:7]327_cct_mem_rdata_word[7] [7:7]328_cct_mem_rdata_word[7] [7:7]329_cct_mem_rdata_word[7] [7:7]330_cct_mem_rdata_word[7] [7:7]331_cct_mem_rdata_word[7] [7:7]332_cct_mem_rdata_word[7] [7:7]333_cct_mem_rdata_word[7] [7:7]334_cct_mem_rdata_word[7] [7:7]335_cct_mem_rdata_word[7] [7:7]336_cct_mem_rdata_word[7] [7:7]337_cct_mem_rdata_word[7] [7:7]338_cct_mem_rdata_word[7] [7:7]339_cct_mem_rdata_word[7] [7:7]340_cct_mem_rdata_word[7] [7:7]341_cct_mem_rdata_word[7] [7:7]342_cct_mem_rdata_word[7] [7:7]343_cct_mem_rdata_word[7] [7:7]344_cct_mem_rdata_word[7] [7:7]345_cct_mem_rdata_word[7] [7:7]346_cct_mem_rdata_word[7] [7:7]347_mem_rdata_word[7:0] [7:0]") {
-    toCoutVerb("Find it!");
-  }
 
   std::string cctValName;
   if(g_use_simple_func_name)
@@ -1638,7 +1771,9 @@ llvm::Value* UpdateFunctionGen::get_arg(std::string regName) {
 
 
 llvm::Value* UpdateFunctionGen::get_arg(std::string regName, llvm::Function *func) {
-  if(regName.find("hls_target_call_Loop_LB2D_buf_proc_buffer_0_value_V_ram_U.q0___#0") != std::string::npos)
+  auto curMod = insContextStk.get_curMod();
+  if(regName.find("hls_target_call_Loop_LB2D_buf_proc_buffer_0_value_V_ram_U.q0___#0") 
+       != std::string::npos)
     toCout("Find the arg!");
   for(auto it = func->arg_begin(); it != func->arg_end(); it++) {
     std::string funcName = llvm::dyn_cast<llvm::Value>(func)->getName().str();
@@ -1646,16 +1781,29 @@ llvm::Value* UpdateFunctionGen::get_arg(std::string regName, llvm::Function *fun
     //toCout("func name: "+funcName);
     //toCout("arg name: "+argName);
     if(argName.find("ata_fifo.r0___#25") != std::string::npos)
-      toCout("Find it!!");
+      toCoutVerb("Find it!!");
     if(it->getName().str() == regName) return it;
   }
-  toCout("Error: function input is not found: "+regName);
+  toCout("Error: function input is not found: "+regName
+         +", modName: "+curMod->name+", func: "+func->getName().str());
   abort();
 }
-//void check_invar_regs() {
-//  for(std::string reg : g_invarRegs) {
-//    
-//  }
-//}
+
+
+void print_context_info(Context_t& insCntxt) {
+  g_pushNum++;
+  if(g_pushNum == 21)
+    toCoutVerb("Find it!");
+  std::string modName = insCntxt.ModInfo->name;
+  std::string funcName;
+  if(insCntxt.Func != nullptr)
+    funcName = insCntxt.Func->getName().str();
+  else
+    funcName = "Not set yet!";
+
+  toCout("push mod("+toStr(g_pushNum)+"): "+modName+", func: "+funcName);
+  if(modName == "hls_target_Loop_1_proc" && funcName == "top_function")
+    toCout("Find it!");
+}
 
 } // end of namespace funcExtract

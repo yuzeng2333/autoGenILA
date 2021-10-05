@@ -1,0 +1,37 @@
+// gemm
+//1'b0+14'b1+14'b1+14'b10+13'b1+1'b0+4'b0+3'b010
+//10'b1+10'b1+11'b1+11'b1+11'b1+11'b1
+
+// alu-add-imme1
+//1'b0+14'b1+14'b1+14'b10+13'b1+1'b0+4'b0+3'b100
+//16'b1+1'b1+3'b010+11'b1+11'b1+11'b1+11'b1
+
+//  assign _T_44 = 3'h4 == io_inst_2to0 && ; // @[Lookup.scala 9:38:@923.4]
+//
+//  %"\\compute.tensorAcc.wdata_0_0___#8" = select i1 %185, i64 0, i64 %"io_vme_rd_4_data_bits___#8"
+//  %184 = add nsw i3 %"_0138____#9", -1
+//  %185 = icmp ult i3 %184, 2
+//  %"_0138____#9" = select i1 %"\\compute.tensorAcc_io_start___#9", i3 %36, i3 0
+//  %35 = select i1 %"\\compute.tensorAcc._T_1410___#9", i3 2, i3 3
+//  %36 = select i1 %"\\compute.tensorAcc._T_1408___#9", i3 1, i3 %35
+//  %"\\compute.tensorAcc._T_1410___#9" = icmp ne i4 %ext_1107, 0
+//  %ext_1107 = trunc i128 %"\\compute.inst_q.io_deq_bits___#9_LSHR_120_" to i4
+//  %"\\compute.inst_q.io_deq_bits___#9_LSHR_120_" = lshr i128 %cct_378_zext, 56
+//  %cct_378_zext = zext i64 %cct_378 to i128
+//  %cct_378 = or i64 %"io_vme_rd_0_data_bits___#11_LSHR_54_", %21 -------
+//  %"io_vme_rd_0_data_bits___#11_LSHR_54_" = and i64 %"io_vme_rd_0_data_bits___#11", -18014398509481984 ----------
+//
+//
+//  %"\\compute.tensorAcc.wdata_0_0___#8" = select i1 %8552, i64 0, i64 %"io_vme_rd_4_data_bits___#8"
+//  %8552 = icmp eq i1 %"\\compute.tensorAcc.isZeroPad___#8", true
+//  %"\\compute.tensorAcc.isZeroPad___#8" = or i1 %"\\compute.tensorAcc._T_1521___#8", %"\\compute.tensorAcc._T_1522___#8"
+//  %"\\compute.tensorAcc._T_1521___#8" = or i1 %"\\compute.tensorAcc._T_1519___#8", %"\\compute.tensorAcc._T_1478___#8"
+//  %"\\compute.tensorAcc._T_1519___#8" = or i1 %"\\compute.tensorAcc._T_1487___#8", %"\\compute.tensorAcc._T_1518___#8"
+//  %"\\compute.tensorAcc._T_1518___#8" = icmp eq i3 %"_0095____#9", 2
+
+
+//1'b0+14'h1+14'h1+14'h47+13'h45+1'b0+4'b0+3'b100
+
+1'b0+14'b1+14'b1+14'b01000111+13'b01000101+1'b0+4'b0+3'b100
+
+//16'h3766+1'b1+3'b010+11'hf6+11'h2b8+11'h245+11'h7e

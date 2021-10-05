@@ -1,2 +1,0 @@
-(define-fun INV ( (|enable| (_ BitVec 1))  ) (_ BitVec 1)
-  (bvadd #b0 #b1))
