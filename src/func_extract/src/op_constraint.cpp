@@ -389,7 +389,7 @@ UpdateFunctionGen::mixed_value_expr(std::string value, context &c, std::string v
     uint32_t localWidth = std::stoi(widthStr);
     return concat_func(single_expr(value.substr(0, pos), c, varName, timeIdx, idx, b), 
                        mixed_value_expr(value.substr(pos+1), c, varName, timeIdx, idx-localWidth, b), 
-                       c, b, false);
+                       c, b, timeIdx, false);
   }
 }
 
@@ -856,7 +856,7 @@ UpdateFunctionGen::add_one_concat_expr(astNode* const node, uint32_t nxtIdx, uin
     llvm::Value* restConcatExpr = add_one_concat_expr(node, nxtIdx+1, timeIdx, c, b, bound, noinline);
     auto ty = restConcatExpr->getType();
     auto width = llvm::dyn_cast<llvm::IntegerType>(ty)->getBitWidth();
-    retExpr = concat_func(firstSrcExpr, restConcatExpr, c, b, noinline);
+    retExpr = concat_func(firstSrcExpr, restConcatExpr, c, b, timeIdx, noinline);
   }
   toCoutVerb("Finished idx: "+toStr(nxtIdx)+" for: "+node->dest);
   if(node->dest == "fangyuan27" && nxtIdx == 1) {
@@ -984,7 +984,8 @@ UpdateFunctionGen::ite_op_constraint(astNode* const node, uint32_t timeIdx, cont
   uint32_t condValueWidth = get_value_width(condExpr);
   toCoutVerb("Width of cond var: "+toStr(condValueWidth));
 
-  llvm::Value* iteCond = b->CreateICmpEQ(condExpr, llvmInt(1, 1, c));
+  llvm::Value* iteCond = b->CreateICmpEQ(condExpr, llvmInt(1, 1, c), 
+                              llvm::Twine(timed_name(destAndSlice+"_ITE_Cond", timeIdx)));
 
   std::string destTimed = timed_name(destAndSlice, timeIdx);
   std::string prefix = "";
@@ -1288,7 +1289,7 @@ UpdateFunctionGen::add_one_case_branch_expr(astNode* const node, llvm::Value* &c
     llvm::Value* iteCond = b->CreateICmpEQ(
                              extract_func(caseVarExpr, posOfOne, posOfOne, c, b, "_", condNoinline), 
                              llvmInt(1, 1, c),
-                             llvm::Twine( timed_name(prefix+dest+"_;_case"+toStr(posOfOne), timeIdx) )
+                             llvm::Twine(timed_name(prefix+dest+"_;_case"+toStr(posOfOne), timeIdx))
                            );
 
     llvm::Value* thenRet;
@@ -1308,7 +1309,7 @@ UpdateFunctionGen::add_one_case_branch_expr(astNode* const node, llvm::Value* &c
     llvm::Value* elseRet = add_one_case_branch_expr(node, caseVarExpr, idx+2, 
                                                     timeIdx, c, b, bound, dest);
     return b->CreateSelect(iteCond, thenRet, elseRet, 
-                           llvm::Twine( timed_name(prefix+dest+"_;_case_src"+toStr(idx), timeIdx)));
+                           llvm::Twine(timed_name(prefix+dest+"_;_case_src"+toStr(idx), timeIdx)));
   }
   else {
     assignNode = node->childVec[2];

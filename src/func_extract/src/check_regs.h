@@ -1,10 +1,10 @@
 #ifndef VLG2Z3 
 #define VLG2Z3
 
-#include "../../taint_method/src/varWidth.h"
-#include "../../taint_method/src/taint_gen.h"
-#include "../../taint_method/src/global_data.h"
-#include "../../taint_method/src/helper.h"
+#include "../../live_analysis/src/varWidth.h"
+#include "../../live_analysis/src/taint_gen.h"
+#include "../../live_analysis/src/global_data.h"
+#include "../../live_analysis/src/helper.h"
 #include "global_data_struct.h"
 #include "ins_context_stack.h"
 #include "ast.h"
@@ -259,6 +259,7 @@ class UpdateFunctionGen {
     llvm::Value* concat_func(llvm::Value* val1, llvm::Value* val2, 
                              std::shared_ptr<llvm::LLVMContext> &c,
                              std::shared_ptr<llvm::IRBuilder<>> &b,
+                             uint32_t timeIdx,                             
                              bool noinline=false);
 
 

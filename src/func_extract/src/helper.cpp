@@ -36,14 +36,16 @@ llvm::Value* llvmInt(uint32_t value, uint32_t width,
 llvm::Value* zext(llvm::Value* v1, uint32_t width,
                  std::shared_ptr<llvm::LLVMContext> &c,
                  std::shared_ptr<llvm::IRBuilder<>> &b) {
-  return b->CreateZExtOrTrunc(v1, llvmWidth(width, c));
+  std::string name = v1->getName().str();
+  return b->CreateZExtOrTrunc(v1, llvmWidth(width, c), llvm::Twine(name+"_ZEXT"));
 }
 
 
 llvm::Value* sext(llvm::Value* v1, uint32_t width,
                  std::shared_ptr<llvm::LLVMContext> &c,
                  std::shared_ptr<llvm::IRBuilder<>> &b) {
-  return b->CreateSExtOrTrunc(v1, llvmWidth(width, c));
+  std::string name = v1->getName().str();                 
+  return b->CreateSExtOrTrunc(v1, llvmWidth(width, c), llvm::Twine(name+"_SEXT"));
 }
 
 
@@ -731,6 +733,7 @@ llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low,
   uint32_t len = high - low + 1;
   auto IntTy = llvm::IntegerType::get(*c, high+2);
   auto constOne = llvm::ConstantInt::get(IntTy, 1, false);
+  std::string name = v1->getName().str();
   //constOne->print(llvm::errs());
   auto s1 = b->CreateShl(constOne, len);
   //s1->print(llvm::errs());
@@ -738,7 +741,7 @@ llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low,
   //s2->print(llvm::errs());
   llvm::Value* mask = b->CreateShl(s2, low);
   //mask->print(llvm::errs());
-  return b->CreateAnd(in, mask);
+  return b->CreateAnd(in, mask, llvm::Twine(name+"_MASKED"));
 }
 
 

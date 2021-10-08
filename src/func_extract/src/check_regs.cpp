@@ -805,7 +805,7 @@ UpdateFunctionGen::add_constraint(std::string varAndSlice, uint32_t timeIdx, con
         ret = tmpSlice;
       }
       else {
-        ret = concat_func(ret, tmpSlice, c, b);
+        ret = concat_func(ret, tmpSlice, c, b, timeIdx);
       }
     }
     return ret;
@@ -1500,7 +1500,7 @@ UpdateFunctionGen::initialize_min_delay(std::shared_ptr<ModuleInfo_t> &modInfo,
 llvm::Value* 
 UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
                       std::shared_ptr<llvm::LLVMContext> &c, 
-                      std::shared_ptr<llvm::IRBuilder<>> &b, 
+                      std::shared_ptr<llvm::IRBuilder<>> &b, uint32_t timeIdx, 
                       const llvm::Twine &name, bool noinline) {
   std::string destName = in->getName().str();
   std::string dest, destSlice;
@@ -1538,9 +1538,12 @@ UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
     extValName = destName+" ["+toStr(high)+":"+toStr(low)+"]";
 
   if(!g_use_concat_extract_func) {
-    auto s1 = b->CreateLShr(in, low, llvm::Twine(prefix+destName+"_LSHR_"+toStr(low)+"_"));
+    auto s1 = b->CreateLShr(
+      in, low, 
+      llvm::Twine(timed_name(prefix+destName+"_LSHR_"+toStr(low)+"_", timeIdx))
+    );
     llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c), 
-                        llvm::Twine(extValName));
+                        llvm::Twine(timed_name(extValName, timeIdx)));
     return ret;
   }
 
@@ -1549,6 +1552,7 @@ UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
     FT = func->getFunctionType();
   }
   else {
+    abort(); // not supported anymore
     auto retTy = llvm::IntegerType::get(*c, len);
     std::vector<llvm::Type *> argTy;  
     argTy.push_back(llvm::IntegerType::get(*c, inputWidth));
@@ -1574,7 +1578,7 @@ UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
   std::vector<llvm::Value*> args;
   args.push_back(in);
   return b->CreateCall(FT, func, args, 
-                       llvm::Twine(extValName));
+                       llvm::Twine(timed_name(extValName, timeIdx)));
 }
 
 
@@ -1583,7 +1587,7 @@ UpdateFunctionGen::extract(llvm::Value* in, uint32_t high, uint32_t low,
                       std::shared_ptr<llvm::LLVMContext> &c, 
                       std::shared_ptr<llvm::IRBuilder<>> &b, 
                       const llvm::Twine &name) {
-
+  abort(); // not supported anymore
   uint32_t inWidth = llvm::dyn_cast<llvm::IntegerType>(in->getType())->getBitWidth();
   if(inWidth < high+1) {
     toCout("Error: input value width for extract is less than high index");
@@ -1621,6 +1625,7 @@ llvm::Value*
 UpdateFunctionGen::concat_func(llvm::Value* val1, llvm::Value* val2, 
                          std::shared_ptr<llvm::LLVMContext> &c,
                          std::shared_ptr<llvm::IRBuilder<>> &b,
+                         uint32_t timeIdx,
                          bool noinline) {
 
   llvm::Type* val1Ty = val1->getType();
@@ -1640,10 +1645,11 @@ UpdateFunctionGen::concat_func(llvm::Value* val1, llvm::Value* val2,
     cctValName = "cct_"+name1+"_"+name2;
 
   if(!g_use_concat_extract_func) {
-    llvm::Value* longVal1 = b->CreateZExtOrBitCast(val1, newIntTy, llvm::Twine(name1+"_zext"));
+    llvm::Value* longVal1 = b->CreateZExtOrBitCast(val1, newIntTy, 
+                                                   llvm::Twine(timed_name(name1+"_zext", timeIdx)));
     llvm::Value* ret = b->CreateAdd(b->CreateShl(longVal1, val2Width), 
                                     zext(val2, len, c, b), 
-                                    llvm::Twine(cctValName));
+                                    llvm::Twine(timed_name(cctValName, timeIdx)));
     return ret;
   }
 
@@ -1706,7 +1712,7 @@ UpdateFunctionGen::concat_func(llvm::Value* val1, llvm::Value* val2,
   std::vector<llvm::Value*> args;
   args.push_back(val1);
   args.push_back(val2);
-  return b->CreateCall(FT, func, args, llvm::Twine(cctValName));
+  return b->CreateCall(FT, func, args, llvm::Twine(timed_name(cctValName, timeIdx)));
 }
 
 

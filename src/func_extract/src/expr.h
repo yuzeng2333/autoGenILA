@@ -8,8 +8,8 @@
 #include <vector>
 #include <algorithm>
 #include <unordered_map>
-#include "../../taint_method/src/global_data.h"
-#include "../../taint_method/src/helper.h"
+#include "../../live_analysis/src/global_data.h"
+#include "../../live_analysis/src/helper.h"
 #include <assert.h>
 
 namespace funcExtract {

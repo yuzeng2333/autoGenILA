@@ -12,9 +12,9 @@
 #include <utility>
 #include <vector>
 #include <memory>
-#include "../../taint_method/src/taint_gen.h"
-#include "../../taint_method/src/helper.h"
-#include "../../taint_method/src/varWidth.h"
+#include "../../live_analysis/src/taint_gen.h"
+#include "../../live_analysis/src/helper.h"
+#include "../../live_analysis/src/varWidth.h"
 #include "global_data_struct.h"
 
 namespace funcExtract {

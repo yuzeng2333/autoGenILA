@@ -5,7 +5,7 @@
 #include "global_data_struct.h"
 #include "read_instr.h"
 #include "ins_context_stack.h"
-#include "../../taint_method/src/global_data.h"
+#include "../../live_analysis/src/global_data.h"
 
 #define toStr(a) std::to_string(a)
 
