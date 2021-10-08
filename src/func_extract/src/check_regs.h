@@ -236,7 +236,7 @@ class UpdateFunctionGen {
 
     llvm::Value* extract_func(llvm::Value* in, uint32_t high, uint32_t low,
                           std::shared_ptr<llvm::LLVMContext> &c, 
-                          std::shared_ptr<llvm::IRBuilder<>> &b, 
+                          std::shared_ptr<llvm::IRBuilder<>> &b, uint32_t timeIdx,
                           const llvm::Twine &name="", bool noinline=false);
     
     

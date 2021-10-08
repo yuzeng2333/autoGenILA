@@ -993,7 +993,8 @@ UpdateFunctionGen::add_nb_constraint(astNode* const node,
     if(srcSlice.empty() || has_direct_assignment(srcAndSlice, curMod))
       destNextExpr = srcExpr;
     else
-      destNextExpr = extract_func(srcExpr, srcHi, srcLo, c, b, srcAndSlice);
+      destNextExpr = extract_func(srcExpr, srcHi, srcLo, 
+                                  c, b, timeIdx+1, srcAndSlice);
     return destNextExpr;
   }
   else if ( is_clean(dest, insContextStk.get_curMod()) ){ 
@@ -1030,7 +1031,7 @@ UpdateFunctionGen::add_nb_constraint(astNode* const node,
         uint32_t hi = get_end(destSlice);
         uint32_t lo = get_begin(destSlice);
         return extract_func(destExpr, hi, lo, 
-                            c, b, llvm::Twine(destTimed), true);
+                            c, b, timeIdx, llvm::Twine(destTimed), true);
       }
     }
     else {
