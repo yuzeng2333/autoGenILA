@@ -411,7 +411,7 @@ UpdateFunctionGen::single_expr(std::string value, context &c, std::string varNam
     std::string varTimed = prefix+varName + DELIM + toStr(timeIdx);
     assert(is_input(varName, insContextStk.get_curMod()));
     llvm::Value* val = get_arg(varTimed);
-    return extract_func(val, idx, idx-localWidth+1, c, b, llvm::Twine(varTimed), true);
+    return extract_func(val, idx, idx-localWidth+1, c, b, timeIdx, llvm::Twine(varTimed), true);
     //return c.bv_const((varTimed).c_str(), totalWidth).extract_func(idx, idx-localWidth+1);
   }
   else if(is_pure_num(value)) {
@@ -498,7 +498,7 @@ UpdateFunctionGen::two_op_constraint(astNode* const node, uint32_t timeIdx, cont
     if(op1Slice.empty() || has_direct_assignment(op1AndSlice, curMod))
       op1Expr = tmpExpr;
     else
-      op1Expr = extract_func(tmpExpr, op1Hi, op1Lo, c, b, op1AndSlice);
+      op1Expr = extract_func(tmpExpr, op1Hi, op1Lo, c, b, timeIdx, op1AndSlice);
   }
   else
     op1Expr = var_expr(op1AndSlice, timeIdx, c, b, false, op1WidthNum);
@@ -508,7 +508,7 @@ UpdateFunctionGen::two_op_constraint(astNode* const node, uint32_t timeIdx, cont
     if(op2Slice.empty() || has_direct_assignment(op2AndSlice, curMod))
       op2Expr = tmpExpr;
     else
-      op2Expr = extract_func(tmpExpr, op2Hi, op2Lo, c, b, op2AndSlice);
+      op2Expr = extract_func(tmpExpr, op2Hi, op2Lo, c, b, timeIdx, op2AndSlice);
   }
   else
     op2Expr = var_expr(op2AndSlice, timeIdx, c, b, false, op2WidthNum);
@@ -612,7 +612,7 @@ UpdateFunctionGen::one_op_constraint(astNode* const node, uint32_t timeIdx,
   if(op1Slice.empty() || has_direct_assignment(op1AndSlice, curMod))
     op1Expr = tmpExpr;
   else
-    op1Expr = extract_func(tmpExpr, op1Hi, op1Lo, c, b, op1AndSlice);
+    op1Expr = extract_func(tmpExpr, op1Hi, op1Lo, c, b, timeIdx, op1AndSlice);
 
 
   std::string prefix = "";
@@ -653,7 +653,7 @@ UpdateFunctionGen::reduce_one_op_constraint(astNode* const node, uint32_t timeId
     op1Expr = add_constraint(node->childVec[0], timeIdx, c, b, bound);
   else
     op1Expr = extract_func(add_constraint(node->childVec[0], timeIdx, c, b, bound), 
-                           op1Hi, op1Lo, c, b, op1AndSlice);
+                           op1Hi, op1Lo, c, b, timeIdx, op1AndSlice);
 
   auto Ty = llvm::dyn_cast<llvm::IntegerType>(op1Expr->getType());
   uint32_t op1W = Ty->getBitWidth();
@@ -681,7 +681,7 @@ UpdateFunctionGen::sel5_op_constraint(astNode* const node, uint32_t timeIdx,
 
   llvm::Value* opExpr = add_constraint(node->childVec[0], timeIdx, c, b, bound);
 
-  return extract_func(opExpr, int1, int2, c, b, destAndSlice, true);
+  return extract_func(opExpr, int1, int2, c, b, timeIdx, destAndSlice, true);
 }
 
 
@@ -748,7 +748,7 @@ UpdateFunctionGen::sel_op_constraint(astNode* const node, uint32_t timeIdx,
   llvm::Value* op2Expr;
   if(!op1IsNum)
     if(!op1Slice.empty()) op1Expr = extract_func(add_constraint(node->childVec[0], timeIdx, c, b, bound), 
-                                            op1Hi, op1Lo, c, b, op1AndSlice);
+                                            op1Hi, op1Lo, c, b, timeIdx, op1AndSlice);
     else                  op1Expr = add_constraint(node->childVec[0], timeIdx, c, b, bound);
   else
     op1Expr = var_expr(op1AndSlice, timeIdx, c, b, false, op1WidthNum);
@@ -758,7 +758,7 @@ UpdateFunctionGen::sel_op_constraint(astNode* const node, uint32_t timeIdx,
       op2Expr = add_constraint(node->childVec[1], timeIdx, c, b, bound);
     else
       op2Expr = extract_func(add_constraint(node->childVec[1], timeIdx, c, b, bound), 
-                        op2Hi, op2Lo, c, b, op2AndSlice);
+                        op2Hi, op2Lo, c, b, timeIdx, op2AndSlice);
   else
     op2Expr = var_expr(op2AndSlice, timeIdx, c, b, false, op1WidthNum);
   
@@ -779,7 +779,7 @@ UpdateFunctionGen::sel_op_constraint(astNode* const node, uint32_t timeIdx,
   auto tmp = make_llvm_instr(b, c, ">>", op1Expr, op2Expr,
                              maxOpWidth, op1WidthNum, op2WidthNum, 
                              prefix+op1AndSlice+"_lshr_"+op2AndSlice+DELIM+toStr(timeIdx));
-  return extract_func(tmp, upBound, 0, c, b, destAndSlice);
+  return extract_func(tmp, upBound, 0, c, b, timeIdx, destAndSlice);
   //return extract_func(b->CreateLShr(op1Expr, op2Expr), upBound, 0, c, b, destAndSlice);
 }
 
@@ -848,7 +848,8 @@ UpdateFunctionGen::add_one_concat_expr(astNode* const node, uint32_t nxtIdx, uin
   if(varSlice.empty() || has_direct_assignment(varAndSlice, curMod))
     firstSrcExpr = add_constraint(node->childVec[nxtIdx], timeIdx, c, b, bound);
   else
-    firstSrcExpr = extract_func(add_constraint(node->childVec[nxtIdx], timeIdx, c, b, bound), hi, lo, c, b, varAndSlice);
+    firstSrcExpr = extract_func(add_constraint(node->childVec[nxtIdx], timeIdx, c, b, bound), 
+                                hi, lo, c, b, timeIdx, varAndSlice);
 
   if(nxtIdx == node->childVec.size() - 1)
     retExpr = firstSrcExpr;
@@ -946,7 +947,7 @@ UpdateFunctionGen::ite_op_constraint(astNode* const node, uint32_t timeIdx, cont
   if(condSlice.empty() || has_direct_assignment(condAndSlice, curMod))
     condExpr = tmpExpr;
   else
-    condExpr = extract_func(tmpExpr, condHi, condLo, c, b, condAndSlice);
+    condExpr = extract_func(tmpExpr, condHi, condLo, c, b, timeIdx, condAndSlice);
 
 
   // early pruning: if cond is constant, then ignore the un-selected branch
@@ -996,7 +997,7 @@ UpdateFunctionGen::ite_op_constraint(astNode* const node, uint32_t timeIdx, cont
   llvm::Value* op1Expr;
   if(!op1Slice.empty()) 
     op1Expr = extract_func(add_constraint(node->childVec[1], timeIdx, c, b, bound), 
-                           op1Hi, op1Lo, c, b, op1AndSlice);
+                           op1Hi, op1Lo, c, b, timeIdx, op1AndSlice);
   else
     op1Expr = add_constraint(node->childVec[1], timeIdx, c, b, bound);
 
@@ -1004,7 +1005,7 @@ UpdateFunctionGen::ite_op_constraint(astNode* const node, uint32_t timeIdx, cont
   llvm::Value* op2Expr;
   if(!op2Slice.empty()) 
     op2Expr = extract_func(add_constraint(node->childVec[2], timeIdx, c, b, bound), 
-                           op2Hi, op2Lo, c, b, op2AndSlice);
+                           op2Hi, op2Lo, c, b, timeIdx, op2AndSlice);
   else
     op2Expr = add_constraint(node->childVec[2], timeIdx, c, b, bound);
 
@@ -1139,7 +1140,7 @@ UpdateFunctionGen::case_constraint(astNode* const node, uint32_t timeIdx,
     caseVarExpr = add_constraint( node->childVec[0], timeIdx, c, b, bound);    
   else
     caseVarExpr = extract_func(add_constraint( node->childVec[0], timeIdx, c, b, bound), 
-                               caseHi, caseLo, c, b);
+                               caseHi, caseLo, c, b, timeIdx);
 
   std::string caseValueStr = node->srcVec[1];
   uint32_t posOfOne = get_pos_of_one(caseValueStr);
@@ -1150,7 +1151,7 @@ UpdateFunctionGen::case_constraint(astNode* const node, uint32_t timeIdx,
   if(!curDynData->isFunctionedSubMod) prefix = insContextStk.get_hier_name(false);
 
   llvm::Value* iteCond = b->CreateICmpEQ(
-      extract_func(caseVarExpr, posOfOne, posOfOne, c, b, "_", condNoinline), 
+      extract_func(caseVarExpr, posOfOne, posOfOne, c, b, timeIdx, "_", condNoinline), 
       llvmInt(1, 1, c), 
       llvm::Twine( timed_name(prefix+destAndSlice+"_;_case"+toStr(posOfOne), timeIdx) ));
 
@@ -1167,7 +1168,7 @@ UpdateFunctionGen::case_constraint(astNode* const node, uint32_t timeIdx,
   }
   else {
     llvm::Value* tmp = add_constraint(node->childVec[1], timeIdx, c, b, bound);
-    thenRet = extract_func(tmp, hi, lo, c, b, 
+    thenRet = extract_func(tmp, hi, lo, c, b, timeIdx, 
                            timed_name(destAndSlice+"_;_then0", timeIdx), srcNoinline);
   }
   llvm::Value* elseRet = add_one_case_branch_expr(node, caseVarExpr, 3, timeIdx, 
@@ -1195,7 +1196,7 @@ UpdateFunctionGen::switch_constraint(astNode* const node, uint32_t timeIdx,
     switchVarExpr = add_constraint( node->childVec[0], timeIdx+1, c, b, bound);    
   else
     switchVarExpr = extract_func(add_constraint( node->childVec[0], timeIdx+1, c, b, bound), 
-                                                hi, lo, c, b);
+                                                hi, lo, c, b, timeIdx );
 
 
   std::string destAndSlice = node->dest;
@@ -1287,7 +1288,7 @@ UpdateFunctionGen::add_one_case_branch_expr(astNode* const node, llvm::Value* &c
     std::string name2 = "1";
     toCoutVerb("compare3: "+name1+", "+name2);    
     llvm::Value* iteCond = b->CreateICmpEQ(
-                             extract_func(caseVarExpr, posOfOne, posOfOne, c, b, "_", condNoinline), 
+                             extract_func(caseVarExpr, posOfOne, posOfOne, c, b, timeIdx, "_", condNoinline), 
                              llvmInt(1, 1, c),
                              llvm::Twine(timed_name(prefix+dest+"_;_case"+toStr(posOfOne), timeIdx))
                            );
@@ -1302,7 +1303,7 @@ UpdateFunctionGen::add_one_case_branch_expr(astNode* const node, llvm::Value* &c
       uint32_t assignWidth = llvm::dyn_cast<llvm::IntegerType>(assignValue->getType())->getBitWidth();
       if(hi >= assignWidth && lo == 0) thenRet = assignValue;
       else
-        thenRet = extract_func(assignValue, hi, lo, c, b, 
+        thenRet = extract_func(assignValue, hi, lo, c, b, timeIdx, 
                                timed_name( prefix+dest+"_;_then"+toStr(posOfOne), timeIdx ), srcNoinline);
     }
 
@@ -1321,7 +1322,8 @@ UpdateFunctionGen::add_one_case_branch_expr(astNode* const node, llvm::Value* &c
       auto assignValue = add_constraint(assignNode, timeIdx, c, b, bound);
       uint32_t assignWidth = llvm::dyn_cast<llvm::IntegerType>(assignValue->getType())->getBitWidth();
       if(hi >= assignWidth && lo == 0) return assignValue;
-      else elseRet = extract_func(assignValue, hi, lo, c, b, timed_name(prefix+dest+"_;_default", timeIdx));
+      else elseRet = extract_func(assignValue, hi, lo, c, b, timeIdx, 
+                                  timed_name(prefix+dest+"_;_default", timeIdx));
     }
     return elseRet; 
   }
@@ -1512,7 +1514,7 @@ UpdateFunctionGen::bbMod_constraint(astNode* const node, uint32_t timeIdx, conte
     astNode *child = input2AstMp[connectWire];
     // FIXME: child->destTime should not be used since it is wrong
     llvm::Value* srcVal = add_constraint(child, timeIdx+delay, c, b, bound);
-    args.push_back(extract_func(srcVal, hi, lo, c, b));
+    args.push_back(extract_func(srcVal, hi, lo, c, b, timeIdx));
   }
 
   toCoutVerb("--- To call blackbox function!");
@@ -1807,7 +1809,7 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
         else {
           uint32_t hi = get_lgc_hi(connectWire, curMod);
           uint32_t lo = get_lgc_lo(connectWire, curMod);
-          args.push_back(extract_func(srcVal, hi, lo, c, b));
+          args.push_back(extract_func(srcVal, hi, lo, c, b, timeIdx));
         }
       }
     }
@@ -1892,21 +1894,21 @@ void UpdateFunctionGen::mem_assign_constraint(
   if(ifVarSlice.empty() || has_direct_assignment(ifVarAndSlice, curMod))
     ifVarExpr = tmpExpr;
   else
-    ifVarExpr = extract_func(tmpExpr, ifVarHi, ifVarLo, c, b, ifVarAndSlice);
+    ifVarExpr = extract_func(tmpExpr, ifVarHi, ifVarLo, c, b, timeIdx, ifVarAndSlice);
 
   llvm::Value* addrExpr;
   tmpExpr = add_constraint(node->childVec[1], timeIdx+1, c, b, bound);
   if(addrSlice.empty() || has_direct_assignment(addrAndSlice, curMod))
     addrExpr = tmpExpr;
   else
-    addrExpr = extract_func(tmpExpr, addrHi, addrLo, c, b, addrAndSlice);
+    addrExpr = extract_func(tmpExpr, addrHi, addrLo, c, b, timeIdx, addrAndSlice);
 
   llvm::Value* srcExpr;
   tmpExpr = add_constraint(node->childVec[2], timeIdx+1, c, b, bound);
   if(srcSlice.empty() || has_direct_assignment(srcAndSlice, curMod))
     srcExpr = tmpExpr;
   else
-    srcExpr = extract_func(tmpExpr, srcHi, srcLo, c, b, srcAndSlice);
+    srcExpr = extract_func(tmpExpr, srcHi, srcLo, c, b, timeIdx, srcAndSlice);
 
 
   // add store instruction. It should be skipped if ifVar is false
@@ -1989,7 +1991,7 @@ UpdateFunctionGen::dyn_sel_constraint( astNode* const node, uint32_t timeIdx, co
   if(addrSlice.empty() || has_direct_assignment(addrAndSlice, curMod))
     addrExpr = tmpExpr;
   else
-    addrExpr = extract_func(tmpExpr, addrHi, addrLo, c, b, addrAndSlice);
+    addrExpr = extract_func(tmpExpr, addrHi, addrLo, c, b, timeIdx, addrAndSlice);
 
   if(curMod->moduleMems.find(mem) == curMod->moduleMems.end()) {
     toCout("Error: not memory for dyn_sel: "+mem);
@@ -2085,6 +2087,11 @@ UpdateFunctionGen::make_llvm_instr(std::shared_ptr<llvm::IRBuilder<>> &b,
                              llvm::Value* op1Expr, llvm::Value* op2Expr, 
                              uint32_t destWidth, uint32_t op1Width, uint32_t op2Width,
                              const llvm::Twine &name, bool isSigned) {
+  std::string destName = name.str();
+  std::string name1 = op1Expr->getName().str();
+  std::string name2 = op2Expr->getName().str();
+  auto pair = parse_name_idx(destName);
+  uint32_t timeIdx = pair.second.first;
   uint32_t opWidth = std::max(op1Width, op2Width);
   if(op == "&") {
     if(isSigned)
@@ -2093,8 +2100,9 @@ UpdateFunctionGen::make_llvm_instr(std::shared_ptr<llvm::IRBuilder<>> &b,
       return b->CreateAnd(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
   }
   else if(op == "&&") {
-    return b->CreateAnd( b->CreateICmpNE(op1Expr, llvmInt(0, op1Width, c)), 
-                         b->CreateICmpNE(op2Expr, llvmInt(0, op2Width, c)) , name);
+    return b->CreateAnd( b->CreateICmpNE(op1Expr, llvmInt(0, op1Width, c), llvm::Twine(name1+"_NE0")), 
+                         b->CreateICmpNE(op2Expr, llvmInt(0, op2Width, c), llvm::Twine(name1+"_NE0")), 
+                         name);
   }
   else if(op == "|") {
     if(isSigned)
@@ -2127,8 +2135,6 @@ UpdateFunctionGen::make_llvm_instr(std::shared_ptr<llvm::IRBuilder<>> &b,
       return b->CreateICmpEQ(zext(op1Expr, opWidth, c, b), zext(op2Expr, opWidth, c, b), name);
   }
   else if (op == "===") {
-    std::string name1 = op1Expr->getName().str();
-    std::string name2 = op2Expr->getName().str();
     toCoutVerb("compare2: "+name1+", "+name2);
     if(isSigned)
       return b->CreateICmpEQ(sext(op1Expr, opWidth, c, b), sext(op2Expr, opWidth, c, b), name);
@@ -2218,6 +2224,8 @@ UpdateFunctionGen::make_llvm_instr(std::shared_ptr<llvm::IRBuilder<>> &b,
       return b->CreateLShr(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
   }
   else if(op == ">>>") {
+    std::string name1 = op1Expr->getName().str();
+    std::string name2 = op2Expr->getName().str();
     if(destWidth >= op1Width)
       if(isSigned)
         return b->CreateAShr(sext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
@@ -2225,11 +2233,11 @@ UpdateFunctionGen::make_llvm_instr(std::shared_ptr<llvm::IRBuilder<>> &b,
         return b->CreateAShr(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
     else
       if(isSigned)
-        return extract_func(b->CreateAShr(op1Expr, sext(op2Expr, op1Width, c, b)), 
-                          destWidth-1, 0, c, b, name);
+        return extract_func(b->CreateAShr(op1Expr, sext(op2Expr, op1Width, c, b), llvm::Twine(name1+"_ASHR")), 
+                            destWidth-1, 0, c, b, timeIdx, name);
       else
-        return extract_func(b->CreateAShr(op1Expr, zext(op2Expr, op1Width, c, b)), 
-                          destWidth-1, 0, c, b, name);
+        return extract_func(b->CreateAShr(op1Expr, zext(op2Expr, op1Width, c, b), llvm::Twine(name1+"_ASHR")), 
+                            destWidth-1, 0, c, b, timeIdx, name);
   }
   else {
     toCout("Not supported 2-op in make_llvm_instr, op is: "+op);

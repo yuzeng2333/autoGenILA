@@ -1535,51 +1535,59 @@ UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
   std::string extValName;
   if(g_use_simple_func_name)
     extValName = "ext_"+toStr(ext_cnt++);
-  else
-    extValName = destName+" ["+toStr(high)+":"+toStr(low)+"]";
+  else {
+    uint32_t extIdx;
+    std::string origExtName = destName+"_["+toStr(high)+":"+toStr(low)+"]"; 
+    if(extNameIdxMap.find(origExtName) == extNameIdxMap.end()) {
+      extIdx = ext_cnt;
+      extNameIdxMap.emplace(origExtName, ext_cnt++);
+    }
+    else extIdx = extNameIdxMap[origExtName];
+    extValName = "ext_"+toStr(extIdx);
+  }
 
   if(!g_use_concat_extract_func) {
     auto s1 = b->CreateLShr(
       in, low, 
-      llvm::Twine(timed_name(prefix+destName+"_LSHR_"+toStr(low)+"_", timeIdx))
+      llvm::Twine(prefix+destName+"_LSHR_"+toStr(low)+"_")
     );
     llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c), 
                         llvm::Twine(timed_name(extValName, timeIdx)));
     return ret;
   }
 
-  if(extractFunc.find(funcName) != extractFunc.end()) {
-    func = extractFunc[funcName];
-    FT = func->getFunctionType();
-  }
-  else {
-    abort(); // not supported anymore
-    auto retTy = llvm::IntegerType::get(*c, len);
-    std::vector<llvm::Type *> argTy;  
-    argTy.push_back(llvm::IntegerType::get(*c, inputWidth));
-    FT = llvm::FunctionType::get(retTy, argTy, false);
-    func = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
-                                        funcName, TheModule.get());
-    if(noinline) func->addFnAttr(llvm::Attribute::NoInline);
-    func->args().begin()->setName("input");
-    llvm::Value* inArg = value(func->args().begin()  );
+  //if(extractFunc.find(funcName) != extractFunc.end()) {
+  //  func = extractFunc[funcName];
+  //  FT = func->getFunctionType();
+  //}
+  //else {
+  //  abort(); // not supported anymore
+  //  auto retTy = llvm::IntegerType::get(*c, len);
+  //  std::vector<llvm::Type *> argTy;  
+  //  argTy.push_back(llvm::IntegerType::get(*c, inputWidth));
+  //  FT = llvm::FunctionType::get(retTy, argTy, false);
+  //  func = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
+  //                                      funcName, TheModule.get());
+  //  if(noinline) func->addFnAttr(llvm::Attribute::NoInline);
+  //  func->args().begin()->setName("input");
+  //  llvm::Value* inArg = value(func->args().begin()  );
 
-    llvm::BasicBlock *localBB 
-      = llvm::BasicBlock::Create(*c, "entry", func);
+  //  llvm::BasicBlock *localBB 
+  //    = llvm::BasicBlock::Create(*c, "entry", func);
 
-    std::unique_ptr<llvm::IRBuilder<>> build;
-    build = std::make_unique<llvm::IRBuilder<>>(*c);
-    build->SetInsertPoint(localBB);
-    auto s1 = build->CreateLShr(inArg, low, llvm::Twine("lshr"));
-    llvm::Value* ret = build->CreateTrunc(s1, llvmWidth(len, c), llvm::Twine("trunc"));
-    build->CreateRet(ret);
-    extractFunc.emplace(funcName, func);
-  }
-  
-  std::vector<llvm::Value*> args;
-  args.push_back(in);
-  return b->CreateCall(FT, func, args, 
-                       llvm::Twine(timed_name(extValName, timeIdx)));
+  //  std::unique_ptr<llvm::IRBuilder<>> build;
+  //  build = std::make_unique<llvm::IRBuilder<>>(*c);
+  //  build->SetInsertPoint(localBB);
+  //  auto s1 = build->CreateLShr(inArg, low, llvm::Twine("lshr"));
+  //  llvm::Value* ret = build->CreateTrunc(s1, llvmWidth(len, c), llvm::Twine("trunc"));
+  //  build->CreateRet(ret);
+  //  extractFunc.emplace(funcName, func);
+  //}
+  //
+  //std::vector<llvm::Value*> args;
+  //args.push_back(in);
+  //return b->CreateCall(FT, func, args, 
+  //                     llvm::Twine(timed_name(extValName, timeIdx)));
 }
 
 
@@ -1637,83 +1645,98 @@ UpdateFunctionGen::concat_func(llvm::Value* val1, llvm::Value* val2,
   auto newIntTy = llvm::IntegerType::get(*c, len);
   std::string name1 = val1->getName().str();
   std::string name2 = val2->getName().str();
+  auto pair1 = parse_name_idx(name1);
+  auto pair2 = parse_name_idx(name2);
+  //uint32_t timeIdx1 = pair1.second.first;
+  //uint32_t timeIdx2 = pair2.second.first;
+  //uint32_t timeIdx = (timeIdx1 > timeIdx2) ? timeIdx2 : timeIdx1;
+  std::string pureName1 = pair1.first + pair1.second.second;
+  std::string pureName2 = pair2.first + pair2.second.second;
   toCoutVerb("concat with "+name1+" and "+name2+", total width: "+toStr(val1Width+val2Width));  
 
   std::string cctValName;
   if(g_use_simple_func_name)
     cctValName = "cct_"+toStr(cct_cnt++);
-  else
-    cctValName = "cct_"+name1+"_"+name2;
+  else {
+    uint32_t cctIdx;
+    std::string origCctName = "cct_"+pureName1+"_"+pureName2; 
+    if(cctNameIdxMap.find(origCctName) == cctNameIdxMap.end()) {
+      cctIdx = cct_cnt;
+      cctNameIdxMap.emplace(origCctName, cct_cnt++);
+    }
+    else cctIdx = cctNameIdxMap[origCctName];
+    cctValName = "cct_"+toStr(cctIdx);
+  }
 
   if(!g_use_concat_extract_func) {
     llvm::Value* longVal1 = b->CreateZExtOrBitCast(val1, newIntTy, 
-                                                   llvm::Twine(timed_name(name1+"_zext", timeIdx)));
+                                                   llvm::Twine(name1+"_zext"));
     llvm::Value* ret = b->CreateAdd(b->CreateShl(longVal1, val2Width), 
                                     zext(val2, len, c, b), 
                                     llvm::Twine(timed_name(cctValName, timeIdx)));
     return ret;
   }
 
-  std::string n1, n1Slice;
-  std::string n2, n2Slice;
-  auto curMod = insContextStk.get_curMod();
-  if(!name1.empty()) split_slice(name1, n1, n1Slice);
-  if(!name2.empty()) split_slice(name2, n2, n2Slice);
-  if(name1.empty() || name2.empty()) noinline = false;
-  else if( (is_read_asv(n1, curMod) || (is_top_module(curMod) && is_input(n1, curMod)))
-        && (is_read_asv(n2, curMod) || (is_top_module(curMod) && is_input(n2, curMod))) ) 
-    noinline = true;
-  else noinline = false;
+  //std::string n1, n1Slice;
+  //std::string n2, n2Slice;
+  //auto curMod = insContextStk.get_curMod();
+  //if(!name1.empty()) split_slice(name1, n1, n1Slice);
+  //if(!name2.empty()) split_slice(name2, n2, n2Slice);
+  //if(name1.empty() || name2.empty()) noinline = false;
+  //else if( (is_read_asv(n1, curMod) || (is_top_module(curMod) && is_input(n1, curMod)))
+  //      && (is_read_asv(n2, curMod) || (is_top_module(curMod) && is_input(n2, curMod))) ) 
+  //  noinline = true;
+  //else noinline = false;
 
-  std::string app = "";
-  if(!noinline) app = "_in";
-  std::string funcName = "cct_"+toStr(val1Width)+"_"+toStr(val2Width)+app;
-  llvm::Function *func;
-  llvm::FunctionType *FT;  
-  if(concatFunc.find(funcName) != concatFunc.end()) {
-    func = concatFunc[funcName];
-    FT = func->getFunctionType();    
-  }
-  else {
-    auto retTy = llvm::IntegerType::get(*c, len);
-    std::vector<llvm::Type*> argTy;
-    llvm::Type* ty1 = llvm::IntegerType::get(*c, val1Width);
-    llvm::Type* ty2 = llvm::IntegerType::get(*c, val2Width);
-    assert(ty1 == val1->getType());
-    assert(ty2 == val2->getType());
-    argTy.push_back(ty1);
-    argTy.push_back(ty2);
-    FT = llvm::FunctionType::get(retTy, argTy, false);
-    func = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
-                                        funcName, TheModule.get());
-    //func->addFnAttr(llvm::Attribute::NoInline);
-    func->args().begin()->setName("val1");
-    (func->args().begin()+1)->setName("val2");
+  //std::string app = "";
+  //if(!noinline) app = "_in";
+  //std::string funcName = "cct_"+toStr(val1Width)+"_"+toStr(val2Width)+app;
+  //llvm::Function *func;
+  //llvm::FunctionType *FT;  
+  //if(concatFunc.find(funcName) != concatFunc.end()) {
+  //  func = concatFunc[funcName];
+  //  FT = func->getFunctionType();    
+  //}
+  //else {
+  //  auto retTy = llvm::IntegerType::get(*c, len);
+  //  std::vector<llvm::Type*> argTy;
+  //  llvm::Type* ty1 = llvm::IntegerType::get(*c, val1Width);
+  //  llvm::Type* ty2 = llvm::IntegerType::get(*c, val2Width);
+  //  assert(ty1 == val1->getType());
+  //  assert(ty2 == val2->getType());
+  //  argTy.push_back(ty1);
+  //  argTy.push_back(ty2);
+  //  FT = llvm::FunctionType::get(retTy, argTy, false);
+  //  func = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
+  //                                      funcName, TheModule.get());
+  //  //func->addFnAttr(llvm::Attribute::NoInline);
+  //  func->args().begin()->setName("val1");
+  //  (func->args().begin()+1)->setName("val2");
 
-    llvm::Value* val1Arg = value(func->args().begin()  );
-    llvm::Value* val2Arg = value(func->args().begin()+1); 
-    assert(val1Arg->getType() == val1->getType());
-    assert(val2Arg->getType() == val2->getType());
+  //  llvm::Value* val1Arg = value(func->args().begin()  );
+  //  llvm::Value* val2Arg = value(func->args().begin()+1); 
+  //  assert(val1Arg->getType() == val1->getType());
+  //  assert(val2Arg->getType() == val2->getType());
 
-    llvm::BasicBlock *localBB 
-      = llvm::BasicBlock::Create(*c, "entry", func);
+  //  llvm::BasicBlock *localBB 
+  //    = llvm::BasicBlock::Create(*c, "entry", func);
 
-    std::shared_ptr<llvm::IRBuilder<>> build;
-    build = std::make_shared<llvm::IRBuilder<>>(*c);
-    build->SetInsertPoint(localBB);
+  //  std::shared_ptr<llvm::IRBuilder<>> build;
+  //  build = std::make_shared<llvm::IRBuilder<>>(*c);
+  //  build->SetInsertPoint(localBB);
 
-    llvm::Value* longVal1 = build->CreateZExtOrBitCast(val1Arg, newIntTy);
+  //  llvm::Value* longVal1 = build->CreateZExtOrBitCast(val1Arg, newIntTy);
 
-    llvm::Value* ret = build->CreateAdd(build->CreateShl(longVal1, val2Width), 
-                                                       zext(val2Arg, len, c, build));
-    build->CreateRet(ret);
-    concatFunc.emplace(funcName, func);
-  }
+  //  llvm::Value* ret = build->CreateAdd(build->CreateShl(longVal1, val2Width, llvm::Twine(name1+"")), 
+  //                                      zext(val2Arg, len, c, build));
+  //  build->CreateRet(ret);
+  //  concatFunc.emplace(funcName, func);
+  //}
 
-  std::vector<llvm::Value*> args;
-  args.push_back(val1);
-  args.push_back(val2);
-  return b->CreateCall(FT, func, args, llvm::Twine(timed_name(cctValName, timeIdx)));
+  //std::vector<llvm::Value*> args;
+  //args.push_back(val1);
+  //args.push_back(val2);
+  //return b->CreateCall(FT, func, args, llvm::Twine(timed_name(cctValName, timeIdx)));
 }
 
 
@@ -1731,7 +1754,9 @@ UpdateFunctionGen::concat_value(llvm::Value* val1, llvm::Value* val2,
   uint32_t newLen = val1Width+val2Width;
   auto newIntTy = llvm::IntegerType::get(*c, newLen);
   llvm::Value* longVal1 = b->CreateZExtOrBitCast(val1, newIntTy);
-  return b->CreateAdd(b->CreateShl(longVal1, val2Width), zext(val2, newLen, c, b));
+  return b->CreateAdd(b->CreateShl(longVal1, val2Width, 
+                                   llvm::Twine(name1+"_SHL_"+toStr(val2Width))), 
+                      zext(val2, newLen, c, b));
 }
 
 

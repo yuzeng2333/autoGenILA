@@ -284,6 +284,9 @@ void replace_with(std::string &str, std::string subStr, std::string newSubStr);
 
 std::string remove_unsigned(std::string &line);
 
+std::pair<std::string, std::pair<uint32_t, std::string>> 
+parse_name_idx(const std::string &name);
+
 } // end of namespace funcExtract
 
 #endif

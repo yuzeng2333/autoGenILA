@@ -733,7 +733,7 @@ llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low,
   uint32_t len = high - low + 1;
   auto IntTy = llvm::IntegerType::get(*c, high+2);
   auto constOne = llvm::ConstantInt::get(IntTy, 1, false);
-  std::string name = v1->getName().str();
+  std::string name = in->getName().str();
   //constOne->print(llvm::errs());
   auto s1 = b->CreateShl(constOne, len);
   //s1->print(llvm::errs());
@@ -1300,5 +1300,32 @@ std::string remove_unsigned(std::string &line) {
   }
   else return line;
 }
+
+
+std::pair<std::string, std::pair<uint32_t, std::string>>
+parse_name_idx(const std::string &name) {
+  //toErrs("parse name: "+name);
+  std::regex pTimed("^(.*)"+DELIM+"(\\d+)(\\S*)$");  
+  if(name.empty()) {
+    toCout("Warning: variable name is empty");
+  }
+  size_t pos = name.rfind(DELIM);
+  if(pos == std::string::npos)
+    return std::make_pair(name, std::make_pair(0, ""));
+  
+  std::smatch m;
+  if(!std::regex_match(name, m, pTimed)) {
+    toCout("Error: name does not match pTimed: "+name);
+    abort();
+  }
+  std::string varName = m.str(1);
+  std::string idx = m.str(2);
+  std::string postFix = m.str(3);
+  uint32_t idxNum;
+  idxNum = std::stoi(idx);
+  return std::make_pair(varName, std::make_pair(idxNum, postFix));
+}
+
+
 
 } // end of namespace funcExtract
