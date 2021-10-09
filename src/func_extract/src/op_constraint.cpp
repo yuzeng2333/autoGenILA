@@ -175,7 +175,6 @@ UpdateFunctionGen::input_constraint(astNode* const node, uint32_t timeIdx,
 
   // treate submodule's input separately
   const auto curMod = insContextStk.get_curMod();
-
   const auto curTgt = insContextStk.get_target();
   auto curDynData = get_dyn_data(curMod);
   std::shared_ptr<ModuleInfo_t> parentMod;

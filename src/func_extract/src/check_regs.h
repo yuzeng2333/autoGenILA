@@ -264,6 +264,15 @@ class UpdateFunctionGen {
                              uint32_t timeIdx,                             
                              bool noinline=false);
 
+    llvm::Value* zext(llvm::Value* v1, uint32_t width,
+                      std::shared_ptr<llvm::LLVMContext> &c,
+                      std::shared_ptr<llvm::IRBuilder<>> &b);
+
+
+    llvm::Value* sext(llvm::Value* v1, uint32_t width,
+                      std::shared_ptr<llvm::LLVMContext> &c,
+                      std::shared_ptr<llvm::IRBuilder<>> &b);
+
 
     llvm::Value* make_llvm_instr(std::shared_ptr<llvm::IRBuilder<>> &b, 
                              context &c, std::string op, 

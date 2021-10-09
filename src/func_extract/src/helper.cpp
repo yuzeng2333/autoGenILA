@@ -33,22 +33,6 @@ llvm::Value* llvmInt(uint32_t value, uint32_t width,
 }
 
 
-llvm::Value* zext(llvm::Value* v1, uint32_t width,
-                 std::shared_ptr<llvm::LLVMContext> &c,
-                 std::shared_ptr<llvm::IRBuilder<>> &b) {
-  std::string name = v1->getName().str();
-  return b->CreateZExtOrTrunc(v1, llvmWidth(width, c), llvm::Twine(name+"_ZEXT"));
-}
-
-
-llvm::Value* sext(llvm::Value* v1, uint32_t width,
-                 std::shared_ptr<llvm::LLVMContext> &c,
-                 std::shared_ptr<llvm::IRBuilder<>> &b) {
-  std::string name = v1->getName().str();                 
-  return b->CreateSExtOrTrunc(v1, llvmWidth(width, c), llvm::Twine(name+"_SEXT"));
-}
-
-
 //bool isAs(std::string var, HierCtx_t &insContextStk) {
 //  auto curMod = get_curMod(insContextStk);
 //  auto it = std::find( curMod->moduleAs.begin(), curMod->moduleAs.end(), var );

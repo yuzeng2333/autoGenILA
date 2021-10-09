@@ -1510,32 +1510,14 @@ UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
   std::string prefix = "";
   if(!curDynData->isFunctionedSubMod) prefix = insContextStk.get_hier_name(false);
 
-  if(destName.find("concat__concat___017____#4") != std::string::npos)
-    toCoutVerb("Find it!");
-  if(!destName.empty()) {
-    split_slice(destName, dest, destSlice);
-    noinline = false;
-  }
-  else if(is_read_asv(dest, insContextStk.get_curMod()) 
-          || (is_top_module(curMod) && is_input(dest, insContextStk.get_curMod())))
-    noinline = true;
-  else noinline = false;
   toCoutVerb("extract for: "+destName);
-  if(destName == "cct_715")
-    toCoutVerb("Find it!");
-  llvm::Type* inputTy = in->getType();
-  uint32_t inputWidth = llvm::dyn_cast<llvm::IntegerType>(inputTy)->getBitWidth();
-  std::string app = "";
-  if(!noinline) app = "_in";
-  std::string funcName = "ext_"+toStr(inputWidth)+"_"+toStr(high)+"_"+toStr(low)+app;
-  llvm::Function *func;
-  llvm::FunctionType *FT;  
-  uint32_t len = high-low+1;
 
+  uint32_t len = high-low+1;
   std::string extValName;
+  std::string lshrName;
   if(g_use_simple_func_name)
     extValName = "ext_"+toStr(ext_cnt++);
-  else {
+  else if(false){
     uint32_t extIdx;
     std::string origExtName = destName+"_["+toStr(high)+":"+toStr(low)+"]"; 
     if(extNameIdxMap.find(origExtName) == extNameIdxMap.end()) {
@@ -1545,17 +1527,54 @@ UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
     else extIdx = extNameIdxMap[origExtName];
     extValName = "ext_"+toStr(extIdx);
   }
+  else {
+    extValName = destName+"_["+toStr(high)+":"+toStr(low)+"]";
+  }
+  
+  bool timeIdxExist = (destName.find("___#") != std::string::npos);
+  if(timeIdxExist) extValName = timed_name(extValName, timeIdx);
+  lshrName = prefix+destName+"_LSHR_"+toStr(low)+"_";
+
+  const std::string curTgt = insContextStk.get_target();
+  if(curDynData->existedExpr[curTgt].find(extValName) 
+      != curDynData->existedExpr[curTgt].end() ) {
+    return curDynData->existedExpr[curTgt][extValName];
+  }
 
   if(!g_use_concat_extract_func) {
-    auto s1 = b->CreateLShr(
-      in, low, 
-      llvm::Twine(prefix+destName+"_LSHR_"+toStr(low)+"_")
-    );
-    llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c), 
-                        llvm::Twine(timed_name(extValName, timeIdx)));
+    llvm::Value* lshrVal;
+    if(curDynData->existedExpr[curTgt].find(lshrName) 
+        != curDynData->existedExpr[curTgt].end() ) {
+      lshrVal = curDynData->existedExpr[curTgt][lshrName];
+    }
+    else {
+      lshrVal = b->CreateLShr(
+        in, low, 
+        llvm::Twine(lshrName)
+      );
+      curDynData->existedExpr[curTgt].emplace(lshrName, lshrVal);
+    }
+
+    llvm::Value* ret = b->CreateTrunc(lshrVal, llvmWidth(len, c), llvm::Twine(extValName));
+    curDynData->existedExpr[curTgt].emplace(extValName, ret);
     return ret;
   }
 
+  //llvm::Type* inputTy = in->getType();
+  //uint32_t inputWidth = llvm::dyn_cast<llvm::IntegerType>(inputTy)->getBitWidth();
+  //llvm::Function *func;
+  //llvm::FunctionType *FT;  
+  //if(!destName.empty()) {
+  //  split_slice(destName, dest, destSlice);
+  //  noinline = false;
+  //}
+  //else if(is_read_asv(dest, insContextStk.get_curMod()) 
+  //        || (is_top_module(curMod) && is_input(dest, insContextStk.get_curMod())))
+  //  noinline = true;
+  //else noinline = false;
+  //std::string app = "";
+  //if(!noinline) app = "_in";
+  //std::string funcName = "ext_"+toStr(inputWidth)+"_"+toStr(high)+"_"+toStr(low)+app;
   //if(extractFunc.find(funcName) != extractFunc.end()) {
   //  func = extractFunc[funcName];
   //  FT = func->getFunctionType();
@@ -1657,7 +1676,7 @@ UpdateFunctionGen::concat_func(llvm::Value* val1, llvm::Value* val2,
   std::string cctValName;
   if(g_use_simple_func_name)
     cctValName = "cct_"+toStr(cct_cnt++);
-  else {
+  else if(false) {
     uint32_t cctIdx;
     std::string origCctName = "cct_"+pureName1+"_"+pureName2; 
     if(cctNameIdxMap.find(origCctName) == cctNameIdxMap.end()) {
@@ -1666,6 +1685,9 @@ UpdateFunctionGen::concat_func(llvm::Value* val1, llvm::Value* val2,
     }
     else cctIdx = cctNameIdxMap[origCctName];
     cctValName = "cct_"+toStr(cctIdx);
+  }
+  else {
+    cctValName = "cct_"+pureName1+"_"+pureName2;
   }
 
   if(!g_use_concat_extract_func) {
@@ -1820,6 +1842,54 @@ llvm::Value* UpdateFunctionGen::get_arg(std::string regName, llvm::Function *fun
          +", modName: "+curMod->name+", func: "+func->getName().str());
   abort();
 }
+
+
+llvm::Value* UpdateFunctionGen::zext(llvm::Value* v1, uint32_t width,
+                                     std::shared_ptr<llvm::LLVMContext> &c,
+                                     std::shared_ptr<llvm::IRBuilder<>> &b) {
+
+  if(llvm::isa<llvm::Constant>(v1)) return b->CreateZExtOrTrunc(v1, llvmWidth(width, c));
+
+  std::string name = v1->getName().str()+"_ZEXT_TO_"+toStr(width);
+
+  const std::string curTgt = insContextStk.get_target();
+  const auto curMod = insContextStk.get_curMod();  
+  auto curDynData = get_dyn_data(curMod);
+  
+  if(curDynData->existedExpr[curTgt].find(name) 
+      != curDynData->existedExpr[curTgt].end() ) {
+    return curDynData->existedExpr[curTgt][name];
+  }
+
+  llvm::Value* val = b->CreateZExtOrTrunc(v1, llvmWidth(width, c), llvm::Twine(name));
+  curDynData->existedExpr[curTgt].emplace(name, val);
+  return val;
+}
+
+
+llvm::Value* UpdateFunctionGen::sext(llvm::Value* v1, uint32_t width,
+                                     std::shared_ptr<llvm::LLVMContext> &c,
+                                     std::shared_ptr<llvm::IRBuilder<>> &b) {
+
+  if(llvm::isa<llvm::Constant>(v1)) return b->CreateSExtOrTrunc(v1, llvmWidth(width, c));
+
+  std::string name = v1->getName().str()+"_SEXT_TO_"+toStr(width);
+
+  const std::string curTgt = insContextStk.get_target();
+  const auto curMod = insContextStk.get_curMod();  
+  auto curDynData = get_dyn_data(curMod);
+
+  if(curDynData->existedExpr[curTgt].find(name) 
+      != curDynData->existedExpr[curTgt].end() ) {
+    return curDynData->existedExpr[curTgt][name];
+  }
+
+  llvm::Value* val = b->CreateSExtOrTrunc(v1, llvmWidth(width, c), llvm::Twine(name));
+  curDynData->existedExpr[curTgt].emplace(name, val);
+  return val;
+}
+
+
 
 
 void print_context_info(Context_t& insCntxt) {
