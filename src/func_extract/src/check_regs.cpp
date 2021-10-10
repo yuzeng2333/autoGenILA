@@ -822,7 +822,7 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
                             const uint32_t bound ) {
   // Attention: varAndSlice might have a slice, a directly-assigned varAndSlice
   std::string varAndSlice = node->dest;
-  if(varAndSlice.find("\\compute.inst_q.value_1") 
+  if(varAndSlice.find("\\fetch.xsize") 
        != std::string::npos)
     toCoutVerb("Find it!");
 
@@ -1503,6 +1503,14 @@ UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
                       std::shared_ptr<llvm::LLVMContext> &c, 
                       std::shared_ptr<llvm::IRBuilder<>> &b, uint32_t timeIdx, 
                       const llvm::Twine &name, bool noinline) {
+  
+  uint32_t len = high-low+1;  
+  if(llvm::isa<llvm::ConstantInt>(in)) {
+    auto lshrVal = b->CreateLShr( in, low );
+    llvm::Value* ret = b->CreateTrunc(lshrVal, llvmWidth(len, c));
+    return ret;
+  }
+
   std::string destName = in->getName().str();
   std::string dest, destSlice;
   auto curMod = insContextStk.get_curMod();
@@ -1512,7 +1520,6 @@ UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
 
   toCoutVerb("extract for: "+destName);
 
-  uint32_t len = high-low+1;
   std::string extValName;
   std::string lshrName;
   if(g_use_simple_func_name)
@@ -1532,7 +1539,7 @@ UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
   }
   
   bool timeIdxExist = (destName.find("___#") != std::string::npos);
-  if(timeIdxExist) extValName = timed_name(extValName, timeIdx);
+  if(!timeIdxExist) extValName = timed_name(extValName, timeIdx);
   lshrName = prefix+destName+"_LSHR_"+toStr(low)+"_";
 
   const std::string curTgt = insContextStk.get_target();
@@ -1655,6 +1662,8 @@ UpdateFunctionGen::concat_func(llvm::Value* val1, llvm::Value* val2,
                          std::shared_ptr<llvm::IRBuilder<>> &b,
                          uint32_t timeIdx,
                          bool noinline) {
+  // TODO: use memorization for values generated here:
+  // note that, names for constant op should be generated in a different way!
 
   llvm::Type* val1Ty = val1->getType();
   llvm::Type* val2Ty = val2->getType();

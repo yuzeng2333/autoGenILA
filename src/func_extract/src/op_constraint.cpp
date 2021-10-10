@@ -175,6 +175,7 @@ UpdateFunctionGen::input_constraint(astNode* const node, uint32_t timeIdx,
 
   // treate submodule's input separately
   const auto curMod = insContextStk.get_curMod();
+
   const auto curTgt = insContextStk.get_target();
   auto curDynData = get_dyn_data(curMod);
   std::shared_ptr<ModuleInfo_t> parentMod;
@@ -580,8 +581,9 @@ UpdateFunctionGen::two_op_constraint(astNode* const node, uint32_t timeIdx, cont
   toCoutVerb("go to make_llvm_instr from two-op: "+op1AndSlice+", "+op2AndSlice);
   if(op1AndSlice == "\\compute.inst_q.value")
     toCoutVerb("Find it!");
-  return make_llvm_instr(b, c, node->op, op1Expr, op2Expr, destWidthNum, 
+  llvm::Value* ret = make_llvm_instr(b, c, node->op, op1Expr, op2Expr, destWidthNum, 
                          op1WidthNum, op2WidthNum, llvm::Twine(destTimed), isSigned);
+  return ret;
 }
 
 
@@ -804,7 +806,7 @@ UpdateFunctionGen::src_concat_op_constraint(astNode* const node, uint32_t timeId
   uint32_t srcHi = get_lgc_hi(node->srcVec[0], curMod);
   uint32_t srcLo = get_lgc_lo(node->srcVec.back(), curMod);
   bool noinline;
-  if(destAndSlice.find("fangyuan") != std::string::npos) noinline = false;
+  if(destAndSlice.find("addedVar") != std::string::npos) noinline = false;
   llvm::Value* restConcatExpr = add_one_concat_expr(node, 0, timeIdx, c, b, bound, noinline);
 
   uint32_t concatWidth = get_value_width(restConcatExpr);
@@ -2189,10 +2191,20 @@ UpdateFunctionGen::make_llvm_instr(std::shared_ptr<llvm::IRBuilder<>> &b,
       return b->CreateAdd(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
   }
   else if(op == "-") {
-    if(isSigned)
-      return b->CreateSub(sext(op1Expr, destWidth, c, b), sext(op2Expr, destWidth, c, b), name);
-    else
-      return b->CreateSub(zext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
+    if(destName.find("\\fetch.xsize___#24") != std::string::npos)
+      toCoutVerb("Find it!");
+    if(isSigned) {
+      llvm::Value* op1 = sext(op1Expr, destWidth, c, b);
+      llvm::Value* op2 = sext(op2Expr, destWidth, c, b);
+      llvm::Value* ret = b->CreateSub(op1, op2, name);
+      return ret;
+    }
+    else {
+      llvm::Value* op1 = zext(op1Expr, destWidth, c, b);
+      llvm::Value* op2 = zext(op2Expr, destWidth, c, b);
+      llvm::Value* ret = b->CreateSub(op1, op2, name);
+      return ret;
+    }
   }
   else if(op == "*") {
     if(isSigned)
