@@ -1540,7 +1540,7 @@ UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
   
   bool timeIdxExist = (destName.find("___#") != std::string::npos);
   if(!timeIdxExist) extValName = timed_name(extValName, timeIdx);
-  lshrName = prefix+destName+"_LSHR_"+toStr(low)+"_";
+  lshrName = prefix+destName+"_LSHR_"+toStr(low)+"__(";
 
   const std::string curTgt = insContextStk.get_target();
   if(curDynData->existedExpr[curTgt].find(extValName) 
