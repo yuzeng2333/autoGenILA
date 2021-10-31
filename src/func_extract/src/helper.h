@@ -287,6 +287,8 @@ std::string remove_unsigned(std::string &line);
 std::pair<std::string, std::pair<uint32_t, std::string>> 
 parse_name_idx(const std::string &name);
 
+std::string post_fix(uint32_t timeIdx);
+
 } // end of namespace funcExtract
 
 #endif

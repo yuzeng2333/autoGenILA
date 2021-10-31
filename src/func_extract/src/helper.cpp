@@ -240,7 +240,7 @@ uint32_t bin2int(std::string num) {
 
 
 std::string timed_name(std::string name, uint32_t timeIdx) {
-  return name + DELIM + toStr(timeIdx);
+  return name + post_fix(timeIdx);
 }
 
 
@@ -1310,6 +1310,10 @@ parse_name_idx(const std::string &name) {
   return std::make_pair(varName, std::make_pair(idxNum, postFix));
 }
 
+
+std::string post_fix(uint32_t timeIdx) {
+  return DELIM+toStr(timeIdx)+"_";
+}
 
 
 } // end of namespace funcExtract

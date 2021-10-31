@@ -295,7 +295,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   uint32_t idx = 0;
   for(auto it = regWidth.begin(); it != regWidth.end(); it++) {
     std::string regName = it->first;
-    std::string regNameBound = regName+DELIM+toStr(bound);
+    std::string regNameBound = regName+post_fix(bound);
     toCoutVerb("set reg-type func arg: "+regNameBound);
     (TheFunction->args().begin()+idx)->setName(regNameBound);
     (topFunction->args().begin()+idx)->setName(regNameBound);
@@ -310,7 +310,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     auto memMod = g_moduleInfoMap[modName];
     for(uint32_t i = 0; i <= bound; i++)  
       for( auto output : memMod->moduleOutputs ) {
-        std::string portName = pathInsName+"."+output+DELIM+toStr(i);
+        std::string portName = pathInsName+"."+output+post_fix(i);
         toCoutVerb("set mem ouput func arg, mem: "+pathInsName+", output: "+output);
         (TheFunction->args().begin()+idx)->setName(portName);
         (topFunction->args().begin()+idx)->setName(portName);
@@ -326,9 +326,9 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     for(auto it = curMod->moduleInputs.begin(); it != curMod->moduleInputs.end(); it++) {
       if(*it == curMod->clk) continue;    
       uint32_t width = get_var_slice_width_simp(*it, curMod);
-      toCoutVerb("set func arg: "+*it+DELIM+toStr(i));
-      (TheFunction->args().begin()+idx)->setName(*it+DELIM+toStr(i));
-      (topFunction->args().begin()+idx++)->setName(*it+DELIM+toStr(i));
+      toCoutVerb("set func arg: "+*it+post_fix(i));
+      (TheFunction->args().begin()+idx)->setName(*it+post_fix(i));
+      (topFunction->args().begin()+idx++)->setName(*it+post_fix(i));
       argNum--;
     }
 

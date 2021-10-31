@@ -89,7 +89,7 @@ UpdateFunctionGen::var_expr(std::string varAndSlice, uint32_t timeIdx, context &
   } 
   else if(is_pure_num(var)) {
     if(isTaint) {
-      varTimed = var + DELIM + toStr(timeIdx) + "_" + toStr(localWidth) + "b" + _t;
+      varTimed = var + post_fix(timeIdx) + "_" + toStr(localWidth) + "b" + _t;
       return llvm::ConstantInt::get(llvmWidth(localWidth, c), 0, false);
     }
     else {
@@ -98,7 +98,7 @@ UpdateFunctionGen::var_expr(std::string varAndSlice, uint32_t timeIdx, context &
       //  toCout("Error: too large number is found : "+var);
       //  abort();
       //}
-      varTimed = var + DELIM + toStr(timeIdx) + "_"+toStr(localWidth)+"b";
+      varTimed = var + post_fix(timeIdx) + "_"+toStr(localWidth)+"b";
       if(is_formed_num(var))
         return long_bv_val(var, c, b);
       else if(is_all_digits(var))
@@ -408,7 +408,7 @@ UpdateFunctionGen::single_expr(std::string value, context &c, std::string varNam
     std::string widthStr = m.str(1);
     uint32_t localWidth = std::stoi(widthStr);
     uint32_t totalWidth = get_var_slice_width_simp(varName, curMod);
-    std::string varTimed = prefix+varName + DELIM + toStr(timeIdx);
+    std::string varTimed = prefix+varName + post_fix(timeIdx);
     assert(is_input(varName, insContextStk.get_curMod()));
     llvm::Value* val = get_arg(varTimed);
     return extract_func(val, idx, idx-localWidth+1, c, b, timeIdx, llvm::Twine(varTimed), true);
@@ -779,7 +779,7 @@ UpdateFunctionGen::sel_op_constraint(astNode* const node, uint32_t timeIdx,
   toCoutVerb("go to make_llvm_instr from sel-op: "+op1AndSlice+", "+op2AndSlice+", dest: "+destAndSlice);  
   auto tmp = make_llvm_instr(b, c, ">>", op1Expr, op2Expr,
                              maxOpWidth, op1WidthNum, op2WidthNum, 
-                             prefix+op1AndSlice+"_lshr_"+op2AndSlice+DELIM+toStr(timeIdx));
+                             prefix+op1AndSlice+"_lshr_"+op2AndSlice+post_fix(timeIdx));
   return extract_func(tmp, upBound, 0, c, b, timeIdx, destAndSlice);
   //return extract_func(b->CreateLShr(op1Expr, op2Expr), upBound, 0, c, b, destAndSlice);
 }
@@ -1425,7 +1425,7 @@ UpdateFunctionGen::memMod_constraint(astNode* const node, uint32_t timeIdx, cont
     prefix = insContextStk.get_hier_name(false);
     if(!prefix.empty()) prefix += ".";  
   }
-  std::string destTimed = prefix+insName+"."+outPort+DELIM+toStr(timeIdx);
+  std::string destTimed = prefix+insName+"."+outPort+post_fix(timeIdx);
   return get_arg(destTimed, curFunc);
 }
 
@@ -1487,8 +1487,8 @@ UpdateFunctionGen::bbMod_constraint(astNode* const node, uint32_t timeIdx, conte
         it != subMod->bbOut2InDelayMp[outPort].end(); it++) {
     std::string input = it->first;
     uint32_t delay = it->second;    
-    toCoutVerb("set func arg: "+input+DELIM+toStr(delay));
-    (subFunc->args().begin()+idx++)->setName(input+DELIM+toStr(delay));
+    toCoutVerb("set func arg: "+input+post_fix(delay));
+    (subFunc->args().begin()+idx++)->setName(input+post_fix(delay));
   }
 
   // apply args
@@ -1595,7 +1595,7 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
   // directly return the function arg correspond to the submodule output
   if( is_mem_module(modName) ) {
     //std::string prefix = get_hier_name();
-    std::string portName = insName+"."+outPort+DELIM+toStr(bound);
+    std::string portName = insName+"."+outPort+post_fix(bound);
     return get_arg(portName, curFunc);
   }
   
@@ -1667,9 +1667,9 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
     // set name for args
     uint32_t idx = 0;
     for(auto it = subModRegWidth.begin(); it != subModRegWidth.end(); it++) {
-      toCoutVerb("set func arg: "+it->first+DELIM+toStr(bound));
+      toCoutVerb("set func arg: "+it->first+post_fix(bound));
       // TODO: change bound to bound
-      (subFunc->args().begin()+idx++)->setName(it->first+DELIM+toStr(bound));
+      (subFunc->args().begin()+idx++)->setName(it->first+post_fix(bound));
     }
     toCoutVerb("************* set arg name, reg-type arg number: "+toStr(idx-1));
 
@@ -1681,7 +1681,7 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
       auto memMod = g_moduleInfoMap[modName];
       for(uint32_t i = 0; i <= bound; i++)      
         for( auto output : memMod->moduleOutputs ) {
-          std::string portName = pathInsName+"."+output+DELIM+toStr(i);
+          std::string portName = pathInsName+"."+output+post_fix(i);
           toCoutVerb("set mem ouput func arg, mem: "+pathInsName+", output: "+output);
           (subFunc->args().begin()+idx++)->setName(portName);
         }
@@ -1692,8 +1692,8 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
       for(auto it = subMod->moduleInputs.begin(); 
             it != subMod->moduleInputs.end(); it++) {
         if(*it == subMod->clk) continue;
-        toCoutVerb("set func arg: "+*it+DELIM+toStr(i));
-        (subFunc->args().begin()+idx++)->setName(*it+DELIM+toStr(i));
+        toCoutVerb("set func arg: "+*it+post_fix(i));
+        (subFunc->args().begin()+idx++)->setName(*it+post_fix(i));
       }
     }
     toCoutVerb("************* set arg name, input-type arg number: "+toStr(idx-1));    
@@ -1750,7 +1750,7 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
   for(auto it = subModRegWidth.begin(); it != subModRegWidth.end(); it++) {
     // find corresponding top func arg 
     std::string regName = it->first;
-    auto arg = get_arg(prefix+insName+"."+regName+DELIM+toStr(bound), curFunc);
+    auto arg = get_arg(prefix+insName+"."+regName+post_fix(bound), curFunc);
     args.push_back(arg);
   }
   toCoutVerb("************* finish push reg, arg number: "+toStr(args.size()));
@@ -1765,8 +1765,8 @@ UpdateFunctionGen::submod_constraint(astNode* const node, uint32_t timeIdx, cont
     auto memMod = g_moduleInfoMap[modName];
     for(uint32_t i = 0; i <= bound; i++)    
       for( auto output : memMod->moduleOutputs ) {
-        //auto arg = get_arg(prefix+insName+"."+pathInsName+"."+output+DELIM+toStr(bound), curFunc);
-        auto arg = get_arg(insName+"."+pathInsName+"."+output+DELIM+toStr(i), curFunc);
+        //auto arg = get_arg(prefix+insName+"."+pathInsName+"."+output+post_fix(bound), curFunc);
+        auto arg = get_arg(insName+"."+pathInsName+"."+output+post_fix(i), curFunc);
         args.push_back(arg);
       }
   }
@@ -1934,7 +1934,7 @@ void UpdateFunctionGen::mem_assign_constraint(
           llvm::IntegerType::get(*TheContext, addrWidth), 
           0, false),
           addrExpr},
-      llvm::Twine(addrAndSlice+"_PTR"+DELIM+toStr(timeIdx)),
+      llvm::Twine(addrAndSlice+"_PTR"+post_fix(timeIdx)),
       BB
     );
 
@@ -2052,7 +2052,7 @@ UpdateFunctionGen::dyn_sel_constraint( astNode* const node, uint32_t timeIdx, co
             llvm::IntegerType::get(*TheContext, addrWidth), 
             0, false),
           addrExpr },
-        llvm::Twine(addr+"_PTR"+DELIM+toStr(timeIdx)),
+        llvm::Twine(addr+"_PTR"+post_fix(timeIdx)),
         bb
       );
 
