@@ -994,7 +994,7 @@ UpdateFunctionGen::add_nb_constraint(astNode* const node,
       destNextExpr = srcExpr;
     else
       destNextExpr = extract_func(srcExpr, srcHi, srcLo, 
-                                  c, b, timeIdx+1, srcAndSlice);
+                                  c, b, timeIdx+1, llvm::Twine(srcAndSlice));
     return destNextExpr;
   }
   else if ( is_clean(dest, insContextStk.get_curMod()) ){ 
@@ -1506,8 +1506,9 @@ UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
   
   uint32_t len = high-low+1;  
   if(llvm::isa<llvm::ConstantInt>(in)) {
-    auto lshrVal = b->CreateLShr( in, low );
-    llvm::Value* ret = b->CreateTrunc(lshrVal, llvmWidth(len, c));
+    auto lshrVal = b->CreateLShr( in, low, timed_name("CONST_LSHR", timeIdx));
+    llvm::Value* ret = b->CreateTrunc(lshrVal, llvmWidth(len, c), 
+                                      timed_name("CONST_TRUNC", timeIdx) );
     return ret;
   }
 
@@ -1617,43 +1618,43 @@ UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
 }
 
 
-llvm::Value* 
-UpdateFunctionGen::extract(llvm::Value* in, uint32_t high, uint32_t low,
-                      std::shared_ptr<llvm::LLVMContext> &c, 
-                      std::shared_ptr<llvm::IRBuilder<>> &b, 
-                      const llvm::Twine &name) {
-  abort(); // not supported anymore
-  uint32_t inWidth = llvm::dyn_cast<llvm::IntegerType>(in->getType())->getBitWidth();
-  if(inWidth < high+1) {
-    toCout("Error: input value width for extract is less than high index");
-    toCout("wdith: "+toStr(inWidth)+", high: "+toStr(high));
-    std::string tmpName = in->getName().str();
-    toCout("Input value name: "+tmpName);
-    abort();
-  }
-  uint32_t len = high - low + 1;
-  auto s1 = b->CreateLShr(in, low);
-  if(name.isTriviallyEmpty()) {
-    llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c), llvm::Twine(""));
-    return ret;
-  }
-  else {
-    llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c), 
-                          llvm::Twine(name.str()+" ["+toStr(high)+":"+toStr(low)+"]"));
-    ret->setName(name.str()+" ["+toStr(high)+":"+toStr(low)+"]");
-    return ret;
-  }
-}
-
-
-llvm::Value* 
-UpdateFunctionGen::extract(llvm::Value* in, uint32_t high, uint32_t low, 
-                      std::shared_ptr<llvm::LLVMContext> &c, 
-                      std::shared_ptr<llvm::IRBuilder<>> &b, 
-                      const std::string &name) {
-
-  return extract(in, high, low, c, b, llvm::Twine(name));
-}
+//llvm::Value* 
+//UpdateFunctionGen::extract(llvm::Value* in, uint32_t high, uint32_t low,
+//                      std::shared_ptr<llvm::LLVMContext> &c, 
+//                      std::shared_ptr<llvm::IRBuilder<>> &b, 
+//                      const llvm::Twine &name) {
+//  abort(); // not supported anymore
+//  uint32_t inWidth = llvm::dyn_cast<llvm::IntegerType>(in->getType())->getBitWidth();
+//  if(inWidth < high+1) {
+//    toCout("Error: input value width for extract is less than high index");
+//    toCout("wdith: "+toStr(inWidth)+", high: "+toStr(high));
+//    std::string tmpName = in->getName().str();
+//    toCout("Input value name: "+tmpName);
+//    abort();
+//  }
+//  uint32_t len = high - low + 1;
+//  auto s1 = b->CreateLShr(in, low);
+//  if(name.isTriviallyEmpty()) {
+//    llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c), llvm::Twine(""));
+//    return ret;
+//  }
+//  else {
+//    llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c), 
+//                          llvm::Twine(name.str()+" ["+toStr(high)+":"+toStr(low)+"]"));
+//    ret->setName(name.str()+" ["+toStr(high)+":"+toStr(low)+"]");
+//    return ret;
+//  }
+//}
+//
+//
+//llvm::Value* 
+//UpdateFunctionGen::extract(llvm::Value* in, uint32_t high, uint32_t low, 
+//                      std::shared_ptr<llvm::LLVMContext> &c, 
+//                      std::shared_ptr<llvm::IRBuilder<>> &b, 
+//                      const std::string &name) {
+//
+//  return extract(in, high, low, c, b, llvm::Twine(name));
+//}
 
 
 llvm::Value* 
@@ -1702,7 +1703,8 @@ UpdateFunctionGen::concat_func(llvm::Value* val1, llvm::Value* val2,
   if(!g_use_concat_extract_func) {
     llvm::Value* longVal1 = b->CreateZExtOrBitCast(val1, newIntTy, 
                                                    llvm::Twine(name1+"_zext"));
-    llvm::Value* ret = b->CreateAdd(b->CreateShl(longVal1, val2Width), 
+    llvm::Value* ret = b->CreateAdd(b->CreateShl(longVal1, val2Width, 
+                                      llvm::Twine(name1+"_zext_SHL_"+toStr(val2Width))), 
                                     zext(val2, len, c, b), 
                                     llvm::Twine(timed_name(cctValName, timeIdx)));
     return ret;
