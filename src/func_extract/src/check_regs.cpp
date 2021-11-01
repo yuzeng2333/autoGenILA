@@ -43,6 +43,7 @@ InstrInfo_t g_currInstrInfo;
 std::string g_rootNode;
 std::string g_currentModuleName;
 std::string DELIM = "___#";
+std::string ENDSIGN = "__(";
 uint32_t g_destWidth;
 bool g_seeInputs;
 uint32_t g_maxDelay = 0;
@@ -1541,7 +1542,7 @@ UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
   
   bool timeIdxExist = (destName.find("___#") != std::string::npos);
   if(!timeIdxExist) extValName = timed_name(extValName, timeIdx);
-  lshrName = prefix+destName+"_LSHR_"+toStr(low)+"__(";
+  lshrName = prefix+destName+"_LSHR_"+toStr(low)+ENDSIGN;
 
   const std::string curTgt = insContextStk.get_target();
   if(curDynData->existedExpr[curTgt].find(extValName) 
@@ -1704,7 +1705,7 @@ UpdateFunctionGen::concat_func(llvm::Value* val1, llvm::Value* val2,
     llvm::Value* longVal1 = b->CreateZExtOrBitCast(val1, newIntTy, 
                                                    llvm::Twine(name1+"_zext"));
     llvm::Value* ret = b->CreateAdd(b->CreateShl(longVal1, val2Width, 
-                                      llvm::Twine(name1+"_zext_SHL_"+toStr(val2Width))), 
+                                      llvm::Twine(name1+"_zext_SHL_"+toStr(val2Width)+ENDSIGN)), 
                                     zext(val2, len, c, b), 
                                     llvm::Twine(timed_name(cctValName, timeIdx)));
     return ret;
