@@ -556,7 +556,12 @@ UpdateFunctionGen::two_op_constraint(astNode* const node, uint32_t timeIdx, cont
   if( (node->extVec[0] == 1 && node->extVec[1] != 1) 
       || (node->extVec[0] != 1 && node->extVec[1] == 1) ) {
     toCout("Warning: only one op is signed: "+destAndSlice);
-    assert(node->op == "<<" || node->op == ">>" || node->op == ">>>");
+    if(node->extVec[0] == 1)
+      assert( is_number(op1AndSlice) 
+              || (node->op == "<<" || node->op == ">>" || node->op == ">>>"));
+    else if(node->extVec[1] == 1)
+      assert( is_number(op2AndSlice) 
+              || (node->op == "<<" || node->op == ">>" || node->op == ">>>"));
   }
   bool isSigned = node->extVec[0] == 1;
 
