@@ -49,7 +49,7 @@ bool is_formed_num(std::string num) {
 
 
 // convert a string number, in hex|decimal|binary form, into uint32_t
-uint32_t hdb2int(std::string num) {
+uint64_t hdb2int(std::string num) {
   if(num.find("x") != std::string::npos) {
     replace_with(num, "x", "0");
   }
@@ -58,7 +58,7 @@ uint32_t hdb2int(std::string num) {
   std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");  
   if(std::regex_match(num, m, pNum)) {
     uint32_t width = std::stoi(m.str(1));
-    if(width > 32) {
+    if(width > 64) {
       toCout("Error: too long number, use convert_to_long_single_num:"
             +num);
       abort();
@@ -67,7 +67,7 @@ uint32_t hdb2int(std::string num) {
 
   if(std::regex_match(num, m, pDec)) {
     std::string pureNum = m.str(2);
-    return str2int(pureNum, "input num in hdb is: "+num);
+    return str2int64(pureNum, "input num in hdb is: "+num);
   }
   else if(std::regex_match(num, m, pHex)) {
     std::string pureNum = m.str(2); 
@@ -98,8 +98,8 @@ uint32_t get_formed_width(std::string num) {
 }
 
 
-uint32_t hex2int(std::string num) {
-  uint32_t res = 0;
+uint64_t hex2int(std::string num) {
+  uint64_t res = 0;
   for(auto it = num.begin(); it != num.end(); it++) {
     res = res * 16;
     if(*it == 'f')
@@ -230,8 +230,8 @@ bool is_hex(std::string num) {
 }
 
 
-uint32_t bin2int(std::string num) {
-  uint32_t res = 0;
+uint64_t bin2int(std::string num) {
+  uint64_t res = 0;
   for(char &c: num) {
     res = (res << 1) + (c - '0');
   }
@@ -646,6 +646,17 @@ int try_stoi(std::string num) {
   int ret;
   try {
     ret = std::stoi(num);
+  } catch(const std::exception& e) {
+    toCout("Error for stoi, input is: "+num);
+  }
+  return ret;
+}
+
+
+uint64_t try_stol(std::string num) {
+  uint64_t ret;
+  try {
+    ret = std::stol(num);
   } catch(const std::exception& e) {
     toCout("Error for stoi, input is: "+num);
   }
@@ -1313,6 +1324,23 @@ parse_name_idx(const std::string &name) {
 
 std::string post_fix(uint32_t timeIdx) {
   return DELIM+toStr(timeIdx)+"_";
+}
+
+
+uint64_t str2int64(std::string str, std::string info) {
+  if(str.length() > 16) {
+    toCout("Error: too large int found: "+str);
+  }
+  uint64_t res;
+  try{
+    res = std::stol(str);
+  }
+  catch(std::invalid_argument arg) {
+    std::cout << "Wrong input to stoi:" + str << std::endl;
+    std::cout << "Info:" + info << std::endl;
+    abort();
+  }
+  return res;
 }
 
 
