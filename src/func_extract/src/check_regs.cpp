@@ -218,6 +218,8 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     argNum++;
   }
 
+  toCout("=== Finished adding reg-type args!");
+
   // push output ports of memory modules
   for(auto it = memInstances.begin(); it != memInstances.end(); it++) {
     std::string pathInsName = it->first;
@@ -231,6 +233,8 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
       }
   }
 
+  toCout("=== Finished adding memory-output args!");
+
   // push inputs
   // bound = (delay in instr.txt) - 1
   for(uint32_t i = 0; i <= bound; i++)  
@@ -242,8 +246,15 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
       argTy.push_back(llvm::IntegerType::get(*TheContext, width));
       argNum++;
     }
+
+  toCout("=== Finished adding module input args!");
   // return types
   llvm::Type* retTy = destInfo.get_ret_type(TheContext);
+  if(retTy == nullptr) {
+    toCout("Error: retTy is nullptr");
+    abort();
+  }
+
   std::string destSimpleName = funcExtract::var_name_convert(destName, true);
 
   llvm::FunctionType *FT =
@@ -304,6 +315,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     topFuncArgMp.emplace(regNameBound, TheFunction->args().begin()+idx++);
   }
 
+  toCout("=== Finished setting reg-type arg name!");
 
   for(auto it = memInstances.begin(); it != memInstances.end(); it++) {
     std::string pathInsName = it->first;
@@ -320,6 +332,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
       }
   }
 
+  toCout("=== Finished setting memory output arg name!");
 
   uint32_t argSize = TheFunction->arg_size();
   toCoutVerb("Function arg size is: "+toStr(argSize));
@@ -332,6 +345,8 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
       (topFunction->args().begin()+idx++)->setName(*it+post_fix(i));
       argNum--;
     }
+
+  toCout("=== Finished setting module input arg name!");
 
   // basic block
   BB = llvm::BasicBlock::Create(*TheContext, "bb_;_"+destName, TheFunction);
@@ -412,31 +427,34 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     // store values in retVec to memory of global array
     llvm::Value* arrPtr = retArrPtr;
     uint32_t i = 0;
-    for(llvm::Value* val : retVec) {
-      llvm::GetElementPtrInst* ptr 
-        = llvm::GetElementPtrInst::Create(
-            nullptr,
-            arrPtr,
-            std::vector<llvm::Value*>{
-              llvm::ConstantInt::get(
-                llvm::IntegerType::get(*TheContext, bitNum), 
-                0, false),
-              llvm::ConstantInt::get(
-                llvm::IntegerType::get(*TheContext, bitNum), 
-                i++, false) },
-            llvm::Twine(val->getName().str()+"_mem"),
-            BB
-          );
-      Builder->SetInsertPoint(BB);
+    if(!retVec.empty()) {
+      for(llvm::Value* val : retVec) {
+        llvm::GetElementPtrInst* ptr 
+          = llvm::GetElementPtrInst::Create(
+              nullptr,
+              arrPtr,
+              std::vector<llvm::Value*>{
+                llvm::ConstantInt::get(
+                  llvm::IntegerType::get(*TheContext, bitNum), 
+                  0, false),
+                llvm::ConstantInt::get(
+                  llvm::IntegerType::get(*TheContext, bitNum), 
+                  i++, false) },
+              llvm::Twine(val->getName().str()+"_mem"),
+              BB
+            );
+        Builder->SetInsertPoint(BB);
 
-      // print info
-      //uint32_t valWidth = val->getType()->getIntegerBitWidth();
-      //auto ty1 = val->getType();
-      //auto ty2 = llvm::cast<llvm::ArrayType>(retTy)->getElementType();
-      //auto ty3 = llvm::cast<llvm::PointerType>(ptr->getType())->getElementType();
-      //auto ty4 = arrPtr->getType();
-      llvm::StoreInst* store = Builder->CreateStore(val, value(ptr));  
+        // print info
+        //uint32_t valWidth = val->getType()->getIntegerBitWidth();
+        //auto ty1 = val->getType();
+        //auto ty2 = llvm::cast<llvm::ArrayType>(retTy)->getElementType();
+        //auto ty3 = llvm::cast<llvm::PointerType>(ptr->getType())->getElementType();
+        //auto ty4 = arrPtr->getType();
+        llvm::StoreInst* store = Builder->CreateStore(val, value(ptr));  
+      }
     }
+    else assert(destInfo.isMemVec);
 
     //llvm::LoadInst *retArr = Builder->CreateLoad(retTy, arrPtr, llvm::Twine("retArr"));
     //Builder->CreateRet(value(retArr));
@@ -459,14 +477,19 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 
       retInst = Builder->CreateRet(value(retPtr));
     }
+    else {
+      assert(destInfo.isMemVec);    
+      retInst = Builder->CreateRet(
+                  llvm::UndefValue::get(llvm::Type::getVoidTy(*TheContext)));
+    }
   } // end of add vector
 
 
   // if the top module contains memories, add the additional memory
   // writes from lastMemReadAddr+1 to bound-1
   uint32_t i = 0;
-  Builder->SetInsertPoint(retInst);
   if(!curMod->moduleMems.empty()) {
+    Builder->SetInsertPoint(retInst);  
     for(auto pair : curDynData->memDynInfo) {
       std::string mem = pair.first;
       toCoutVerb("check mem: "+mem);
@@ -1372,7 +1395,9 @@ llvm::Type* DestInfo::get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext
   }
   // TODO: implement the else case: the destVar is either single memory
   // or an array of memory
-  //else 
+  else { // isVector && isMemVec
+    return llvm::Type::getVoidTy(*TheContext);
+  }
 }
 
 
