@@ -254,7 +254,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   llvm::Value* retArrPtr;
   std::vector<std::string> destVec = destInfo.get_no_slice_name();  
 
-  if(destInfo.isVector) {
+  if(destInfo.isVector && !destInfo.isMemVec) {
     llvm::Type* elementTy = llvm::cast<llvm::PointerType>(retTy)->getElementType();
     llvm::ArrayType* arrayType = llvm::ArrayType::get(elementTy, destVec.size());
     // zero initializer
@@ -391,7 +391,8 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
       else {
         destNextExpr = add_constraint(dest, 
                                       0, TheContext, Builder, bound);
-        retVec.push_back(destNextExpr);
+        if(!destInfo.isMemVec)
+          retVec.push_back(destNextExpr);
       }
     }
 
@@ -440,22 +441,24 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     //llvm::LoadInst *retArr = Builder->CreateLoad(retTy, arrPtr, llvm::Twine("retArr"));
     //Builder->CreateRet(value(retArr));
 
-    llvm::GetElementPtrInst* retPtr 
-      = llvm::GetElementPtrInst::Create(
-          nullptr,
-          arrPtr,
-          std::vector<llvm::Value*>{
-            llvm::ConstantInt::get(
-              llvm::IntegerType::get(*TheContext, bitNum), 
-              0, false),
-            llvm::ConstantInt::get(
-              llvm::IntegerType::get(*TheContext, bitNum), 
-              0, false) },
-          llvm::Twine("RET_PTR"),
-          BB
-        );
+    if(!retVec.empty()) {
+      llvm::GetElementPtrInst* retPtr 
+        = llvm::GetElementPtrInst::Create(
+            nullptr,
+            arrPtr,
+            std::vector<llvm::Value*>{
+              llvm::ConstantInt::get(
+                llvm::IntegerType::get(*TheContext, bitNum), 
+                0, false),
+              llvm::ConstantInt::get(
+                llvm::IntegerType::get(*TheContext, bitNum), 
+                0, false) },
+            llvm::Twine("RET_PTR"),
+            BB
+          );
 
-    retInst = Builder->CreateRet(value(retPtr));
+      retInst = Builder->CreateRet(value(retPtr));
+    }
   } // end of add vector
 
 
@@ -1352,7 +1355,7 @@ llvm::Type* DestInfo::get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext
     return llvm::IntegerType::get(*TheContext, 
                                   destWidth);
   }
-  else {
+  else if(isVector && !isMemVec){
     // if is reg vector, return an array type pointer
     // first, check if every reg is of the same size
     uint32_t size = get_var_slice_width_cmplx(destVec.front());
@@ -1367,6 +1370,9 @@ llvm::Type* DestInfo::get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext
     //return arrayType;
     return pointerTy;
   }
+  // TODO: implement the else case: the destVar is either single memory
+  // or an array of memory
+  //else 
 }
 
 

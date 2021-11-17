@@ -36,6 +36,8 @@ class DestInfo {
 
   public:
     bool isVector;
+    bool isMemVec;
+    bool isSingleMem;
     std::string get_dest_name();
     llvm::Type* get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext);
     std::vector<std::string> get_no_slice_name();
