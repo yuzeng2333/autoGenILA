@@ -406,11 +406,11 @@ void read_in_instructions(std::string fileName) {
     }
   }
   if(g_recentClk.empty()) {
-    toCout("Error: top module clk is not set!");
+    toCout("Error: clock of top module is not set!");
     abort();
   }
   if(g_topModule.empty()) {
-    toCout("Error: top module name is not set!");
+    toCout("Error: name of top module is not set!");
     abort();
   }
 }

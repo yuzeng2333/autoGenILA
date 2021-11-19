@@ -89,7 +89,7 @@ std::regex pEndmodule   ("^(\\s*)endmodule$");
 /* non-blocking assignment */
 std::regex pNonblock    (to_re("^(\\s*)(NAME) (?:\\s)?<= (NAME)(\\s*)?;$"));
 std::regex pNonblockConcat    (to_re("^(\\s*)(NAME) <= \\{(.+)\\}(\\s*)?;$"));
-std::regex pNonblockIf  (to_re("^(\\s*)if \\((NAME)\\) (NAME) <= (NAME)(\\s*)?;$"));
+std::regex pNonblockIf  (to_re("^(\\s*)if \\((\\S+)\\s?\\) (NAME) <= (NAME)(\\s*)?;$"));
 std::regex pNonblockIf2 (to_re("^(\\s*)if \\((NAME)\\) ([a-zA-Z0-9]+)(\\[([a-zA-Z0-9]+)\\[(\\d+)\\]\\]) <= (NAME)(\\s*)?;$"));
 std::regex pNonblockElse(to_re("^(\\s*)else (NAME) <= (NAME)(\\s*)?;$"));
 std::regex pNBElseIf    (to_re("^(\\s*)else if \\((\\S+)\\s?\\) (NAME) <= (NAME)(\\s*)?;$"));
@@ -158,12 +158,12 @@ std::unordered_map<std::string, uint32_t> addedVarCaseSliceWidth; // width of ea
 std::unordered_map<std::string, uint32_t> g_destVersion;
 std::unordered_map<std::string, std::pair<std::string, bool>> g_moduleRst;
 std::unordered_map<std::string, std::string> g_moduleClk;
-// for allocating YZC
+// for allocating REG_SEL
 std::unordered_map<std::string, uint32_t> g_modTotalRegCnt; // how many regs each module has, including regs in submodules
 uint32_t g_yzcNxtIdx;
 std::map<uint32_t, std::string> g_yzc2regMap; // Filled at the very end
 std::unordered_map<std::string, std::unordered_map<std::string, uint32_t>> g_mod2RegYzc;
-// first string is moduleName, second string is instance name, third string is corresponding submodule name, int is begin YZC
+// first string is moduleName, second string is instance name, third string is corresponding submodule name, int is begin REG_SEL
 std::unordered_map<std::string, std::unordered_map<std::string, std::pair<std::string, uint32_t>>> g_mod2instYzc;
 
 VarWidth varWidth;
@@ -1099,6 +1099,8 @@ void add_file_taints(std::string fileName, std::map<std::string, std::vector<std
   // Reserve first line for module declaration
   while( std::getline(input, line) ) {
     toCout(line);
+    if(line.find("assign NewNBIte13 = ap_rst_n ? ap_NS_fsm : 4'h1;") != std::string::npos)
+      toCout("Find it!");
     lineNo++;
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       add_case_taints_limited(input, output, line);
@@ -1162,7 +1164,7 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
   if(!isTop) {
     moduleInputs.push_back("rst_zy");
   }
-  if(g_yzcNxtIdx > 0) moduleInputs.push_back("YZC");
+  if(g_yzcNxtIdx > 0) moduleInputs.push_back("REG_SEL");
   out << "module " + moduleName + " ( ";
   for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) {
     out << *it + " , ";
@@ -1192,14 +1194,14 @@ void add_module_name(std::string fileName, std::map<std::string, std::vector<std
     out << "  logic INSTR_IN_ZY;" << std::endl;
     out << "  assign INSTR_IN_ZY = ";
     for (auto it = moduleInputs.begin(); it != moduleInputs.end(); ++it) {
-      if((*it).compare(g_recentClk) == 0 || (*it).compare(g_recentRst) == 0 || (*it).compare("rst_zy") == 0 || (*it).compare("YZC") == 0)
+      if((*it).compare(g_recentClk) == 0 || (*it).compare(g_recentRst) == 0 || (*it).compare("rst_zy") == 0 || (*it).compare("REG_SEL") == 0)
         continue;
       out << *it + _t + " > 0 || ";
     }
     out << "0 ;" << std::endl;
   }
-  // declarations for YZC
-  if(g_yzcNxtIdx > 0) out << "  input ["+toStr(g_yzcNxtIdx-1)+":0] YZC;" << std::endl;
+  // declarations for REG_SEL
+  if(g_yzcNxtIdx > 0) out << "  input ["+toStr(g_yzcNxtIdx-1)+":0] REG_SEL;" << std::endl;
   while( std::getline(in, line) ) {
     out << line << std::endl;
   }
@@ -1693,7 +1695,7 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
   std::unordered_map<std::string, std::vector<bool>> inputSignalIsNewMap;
   
   for(std::string input: moduleInputsMap[localModuleName]) {
-    if(input.compare(g_recentClk) == 0 || input.compare("rst_zy") == 0 || input.compare("INSTR_IN_ZY") == 0 || input.compare("YZC") == 0 )
+    if(input.compare(g_recentClk) == 0 || input.compare("rst_zy") == 0 || input.compare("INSTR_IN_ZY") == 0 || input.compare("REG_SEL") == 0 )
       continue;
     if( port2SignalMap.find(input) == port2SignalMap.end() ) {
       toCout("Error: the module input has not been seen before: "+input);
@@ -1735,7 +1737,7 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
   // printed extended module instantiation
   output << "// module: "+localModuleName << std::endl;
   output << moduleFirstLine << std::endl;
-  // add connection to YZC
+  // add connection to REG_SEL
   if(g_modTotalRegCnt[localModuleName] > 0) {
     uint32_t beginIdx = g_yzcNxtIdx;
     if(g_mod2instYzc.find(g_moduleName) == g_mod2instYzc.end()) 
@@ -1744,12 +1746,12 @@ void extend_module_instantiation(std::ifstream &input, std::ofstream &output, st
       g_mod2instYzc[g_moduleName].emplace(instanceName, std::make_pair(localModuleName, beginIdx));
     uint32_t endIdx = g_yzcNxtIdx + g_modTotalRegCnt[localModuleName] - 1;
     g_yzcNxtIdx = g_yzcNxtIdx + g_modTotalRegCnt[localModuleName];
-    output << "    .YZC(YZC["+toStr(endIdx)+":"+toStr(beginIdx)+"])," << std::endl;
+    output << "    .REG_SEL(REG_SEL["+toStr(endIdx)+":"+toStr(beginIdx)+"])," << std::endl;
   }
   std::string newLogic;
   std::vector<std::string> newLogicVec;
   for(std::string inPort: moduleInputsMap[localModuleName]) {
-    if(inPort.compare(g_recentClk) == 0 || g_clk_set.find(inPort) != g_clk_set.end() || inPort.compare("YZC") == 0)
+    if(inPort.compare(g_recentClk) == 0 || g_clk_set.find(inPort) != g_clk_set.end() || inPort.compare("REG_SEL") == 0)
       continue;
     if(inPort.compare("rst_zy") == 0) {
       output << "    .rst_zy(rst_zy)," << std::endl;
@@ -1984,6 +1986,8 @@ void convert_nb_if_to_ite(std::ifstream &input,
                           std::string line) {
   std::string line2;
   std::getline(input, line2);
+  if(line2.find("ap_CS_fsm") != std::string::npos)
+    toCout("Find it!");
   std::smatch m;
   if(!std::regex_match(line2, m, pNonblockIf)) {
     output << line << std::endl;  

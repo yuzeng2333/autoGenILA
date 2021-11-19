@@ -3,8 +3,8 @@
 
 #include <string>
 #include <regex>
-#include "../../taint_method/src/global_data.h"
-#include "../../taint_method/src/helper.h"
+#include "../../live_analysis/src/global_data.h"
+#include "../../live_analysis/src/helper.h"
 #include "z3++.h"
 #include "types.h"
 #include "global_data_struct.h"
@@ -69,11 +69,11 @@ llvm::Value* long_bv_val(std::string formedBinVar, context &c,
 
 bool is_formed_num(std::string num);
 
-uint32_t hdb2int(std::string num);
+uint64_t hdb2int(std::string num);
 
 uint32_t get_formed_width(std::string num);
 
-uint32_t hex2int(std::string num);
+uint64_t hex2int(std::string num);
 
 //std::string dec2hex(std::string dec);
 
@@ -81,7 +81,7 @@ std::string longDec2hex(std::string decimalValue);
 
 std::string longDec2hex(uint64_t decimalValue);
 
-uint32_t bin2int(std::string num);
+uint64_t bin2int(std::string num);
 
 std::string timed_name(std::string name, uint32_t timeIdx);
 
@@ -171,6 +171,8 @@ std::string formedHex2bin(std::string num);
 bool is_hex(std::string num);;
 
 int try_stoi(std::string num);
+
+uint64_t try_stol(std::string num);
 
 std::string get_pure_num(std::string formedNum);
 
@@ -283,6 +285,13 @@ bool is_pure_num(std::string var);
 void replace_with(std::string &str, std::string subStr, std::string newSubStr);
 
 std::string remove_unsigned(std::string &line);
+
+std::pair<std::string, std::pair<uint32_t, std::string>> 
+parse_name_idx(const std::string &name);
+
+std::string post_fix(uint32_t timeIdx);
+
+uint64_t str2int64(std::string str, std::string info);
 
 } // end of namespace funcExtract
 

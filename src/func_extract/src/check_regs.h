@@ -1,10 +1,10 @@
 #ifndef VLG2Z3 
 #define VLG2Z3
 
-#include "../../taint_method/src/varWidth.h"
-#include "../../taint_method/src/taint_gen.h"
-#include "../../taint_method/src/global_data.h"
-#include "../../taint_method/src/helper.h"
+#include "../../live_analysis/src/varWidth.h"
+#include "../../live_analysis/src/taint_gen.h"
+#include "../../live_analysis/src/global_data.h"
+#include "../../live_analysis/src/helper.h"
 #include "global_data_struct.h"
 #include "ins_context_stack.h"
 #include "ast.h"
@@ -36,6 +36,8 @@ class DestInfo {
 
   public:
     bool isVector;
+    bool isMemVec;
+    bool isSingleMem;
     std::string get_dest_name();
     llvm::Type* get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext);
     std::vector<std::string> get_no_slice_name();
@@ -86,6 +88,8 @@ class UpdateFunctionGen {
     HierCtx insContextStk;
     uint32_t cct_cnt = 0;
     uint32_t ext_cnt = 0;
+    std::map<std::string, uint32_t> cctNameIdxMap;
+    std::map<std::string, uint32_t> extNameIdxMap;
     std::vector<std::pair<std::string, uint32_t>> regWidth;
     std::vector<std::pair<std::string, std::string>> memInstances;
     struct InstrInfo_t currInstrInfo;
@@ -236,20 +240,20 @@ class UpdateFunctionGen {
 
     llvm::Value* extract_func(llvm::Value* in, uint32_t high, uint32_t low,
                           std::shared_ptr<llvm::LLVMContext> &c, 
-                          std::shared_ptr<llvm::IRBuilder<>> &b, 
+                          std::shared_ptr<llvm::IRBuilder<>> &b, uint32_t timeIdx,
                           const llvm::Twine &name="", bool noinline=false);
     
     
-    llvm::Value* extract(llvm::Value* in, uint32_t high, uint32_t low, 
-                          std::shared_ptr<llvm::LLVMContext> &c, 
-                          std::shared_ptr<llvm::IRBuilder<>> &b,
-                          const llvm::Twine &name="");
-    
-    
-    llvm::Value* extract(llvm::Value* in, uint32_t high, uint32_t low, 
-                          std::shared_ptr<llvm::LLVMContext> &c, 
-                          std::shared_ptr<llvm::IRBuilder<>> &b, 
-                          const std::string &name);
+    //llvm::Value* extract(llvm::Value* in, uint32_t high, uint32_t low, 
+    //                      std::shared_ptr<llvm::LLVMContext> &c, 
+    //                      std::shared_ptr<llvm::IRBuilder<>> &b,
+    //                      const llvm::Twine &name="");
+    //
+    //
+    //llvm::Value* extract(llvm::Value* in, uint32_t high, uint32_t low, 
+    //                      std::shared_ptr<llvm::LLVMContext> &c, 
+    //                      std::shared_ptr<llvm::IRBuilder<>> &b, 
+    //                      const std::string &name);
     
     
     llvm::Value* concat_value(llvm::Value* val1, llvm::Value* val2, 
@@ -259,7 +263,17 @@ class UpdateFunctionGen {
     llvm::Value* concat_func(llvm::Value* val1, llvm::Value* val2, 
                              std::shared_ptr<llvm::LLVMContext> &c,
                              std::shared_ptr<llvm::IRBuilder<>> &b,
+                             uint32_t timeIdx,                             
                              bool noinline=false);
+
+    llvm::Value* zext(llvm::Value* v1, uint32_t width,
+                      std::shared_ptr<llvm::LLVMContext> &c,
+                      std::shared_ptr<llvm::IRBuilder<>> &b);
+
+
+    llvm::Value* sext(llvm::Value* v1, uint32_t width,
+                      std::shared_ptr<llvm::LLVMContext> &c,
+                      std::shared_ptr<llvm::IRBuilder<>> &b);
 
 
     llvm::Value* make_llvm_instr(std::shared_ptr<llvm::IRBuilder<>> &b, 

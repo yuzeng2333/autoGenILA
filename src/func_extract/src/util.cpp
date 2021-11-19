@@ -2,7 +2,7 @@
 #include "parse_fill.h"
 #include "global_data_struct.h"
 #include "helper.h"
-#include "../../taint_method/src/global_data.h"
+#include "../../live_analysis/src/global_data.h"
 #define toCout(a) std::cout << a << std::endl;
 #define toStr(a) std::to_string(a)
 

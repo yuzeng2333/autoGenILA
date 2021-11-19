@@ -33,20 +33,6 @@ llvm::Value* llvmInt(uint32_t value, uint32_t width,
 }
 
 
-llvm::Value* zext(llvm::Value* v1, uint32_t width,
-                 std::shared_ptr<llvm::LLVMContext> &c,
-                 std::shared_ptr<llvm::IRBuilder<>> &b) {
-  return b->CreateZExtOrTrunc(v1, llvmWidth(width, c));
-}
-
-
-llvm::Value* sext(llvm::Value* v1, uint32_t width,
-                 std::shared_ptr<llvm::LLVMContext> &c,
-                 std::shared_ptr<llvm::IRBuilder<>> &b) {
-  return b->CreateSExtOrTrunc(v1, llvmWidth(width, c));
-}
-
-
 //bool isAs(std::string var, HierCtx_t &insContextStk) {
 //  auto curMod = get_curMod(insContextStk);
 //  auto it = std::find( curMod->moduleAs.begin(), curMod->moduleAs.end(), var );
@@ -63,7 +49,7 @@ bool is_formed_num(std::string num) {
 
 
 // convert a string number, in hex|decimal|binary form, into uint32_t
-uint32_t hdb2int(std::string num) {
+uint64_t hdb2int(std::string num) {
   if(num.find("x") != std::string::npos) {
     replace_with(num, "x", "0");
   }
@@ -72,7 +58,7 @@ uint32_t hdb2int(std::string num) {
   std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");  
   if(std::regex_match(num, m, pNum)) {
     uint32_t width = std::stoi(m.str(1));
-    if(width > 32) {
+    if(width > 64) {
       toCout("Error: too long number, use convert_to_long_single_num:"
             +num);
       abort();
@@ -81,7 +67,7 @@ uint32_t hdb2int(std::string num) {
 
   if(std::regex_match(num, m, pDec)) {
     std::string pureNum = m.str(2);
-    return str2int(pureNum, "input num in hdb is: "+num);
+    return str2int64(pureNum, "input num in hdb is: "+num);
   }
   else if(std::regex_match(num, m, pHex)) {
     std::string pureNum = m.str(2); 
@@ -112,8 +98,8 @@ uint32_t get_formed_width(std::string num) {
 }
 
 
-uint32_t hex2int(std::string num) {
-  uint32_t res = 0;
+uint64_t hex2int(std::string num) {
+  uint64_t res = 0;
   for(auto it = num.begin(); it != num.end(); it++) {
     res = res * 16;
     if(*it == 'f')
@@ -244,8 +230,8 @@ bool is_hex(std::string num) {
 }
 
 
-uint32_t bin2int(std::string num) {
-  uint32_t res = 0;
+uint64_t bin2int(std::string num) {
+  uint64_t res = 0;
   for(char &c: num) {
     res = (res << 1) + (c - '0');
   }
@@ -254,7 +240,7 @@ uint32_t bin2int(std::string num) {
 
 
 std::string timed_name(std::string name, uint32_t timeIdx) {
-  return name + DELIM + toStr(timeIdx);
+  return name + post_fix(timeIdx);
 }
 
 
@@ -667,6 +653,17 @@ int try_stoi(std::string num) {
 }
 
 
+uint64_t try_stol(std::string num) {
+  uint64_t ret;
+  try {
+    ret = std::stol(num);
+  } catch(const std::exception& e) {
+    toCout("Error for stoi, input is: "+num);
+  }
+  return ret;
+}
+
+
 // ATTENTION: for func_extract, you can only use get_var_slice_width_simp
 // get_var_slice_width cannot be used!!
 uint32_t get_var_slice_width_simp(std::string varAndSlice, 
@@ -731,6 +728,7 @@ llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low,
   uint32_t len = high - low + 1;
   auto IntTy = llvm::IntegerType::get(*c, high+2);
   auto constOne = llvm::ConstantInt::get(IntTy, 1, false);
+  std::string name = in->getName().str();
   //constOne->print(llvm::errs());
   auto s1 = b->CreateShl(constOne, len);
   //s1->print(llvm::errs());
@@ -738,7 +736,7 @@ llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low,
   //s2->print(llvm::errs());
   llvm::Value* mask = b->CreateShl(s2, low);
   //mask->print(llvm::errs());
-  return b->CreateAnd(in, mask);
+  return b->CreateAnd(in, mask, llvm::Twine(name+"_MASKED"));
 }
 
 
@@ -1297,5 +1295,53 @@ std::string remove_unsigned(std::string &line) {
   }
   else return line;
 }
+
+
+std::pair<std::string, std::pair<uint32_t, std::string>>
+parse_name_idx(const std::string &name) {
+  //toErrs("parse name: "+name);
+  std::regex pTimed("^(.*)"+DELIM+"(\\d+)(\\S*)$");  
+  if(name.empty()) {
+    toCout("Warning: variable name is empty");
+  }
+  size_t pos = name.rfind(DELIM);
+  if(pos == std::string::npos)
+    return std::make_pair(name, std::make_pair(0, ""));
+  
+  std::smatch m;
+  if(!std::regex_match(name, m, pTimed)) {
+    toCout("Error: name does not match pTimed: "+name);
+    abort();
+  }
+  std::string varName = m.str(1);
+  std::string idx = m.str(2);
+  std::string postFix = m.str(3);
+  uint32_t idxNum;
+  idxNum = std::stoi(idx);
+  return std::make_pair(varName, std::make_pair(idxNum, postFix));
+}
+
+
+std::string post_fix(uint32_t timeIdx) {
+  return DELIM+toStr(timeIdx)+"_";
+}
+
+
+uint64_t str2int64(std::string str, std::string info) {
+  if(str.length() > 16) {
+    toCout("Error: too large int found: "+str);
+  }
+  uint64_t res;
+  try{
+    res = std::stol(str);
+  }
+  catch(std::invalid_argument arg) {
+    std::cout << "Wrong input to stoi:" + str << std::endl;
+    std::cout << "Info:" + info << std::endl;
+    abort();
+  }
+  return res;
+}
+
 
 } // end of namespace funcExtract

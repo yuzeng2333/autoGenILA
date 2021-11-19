@@ -7,8 +7,8 @@
 #include <cassert>
 #include <regex>
 #include <algorithm>
-#include "../../taint_method/src/taint_gen.h"
-#include "../../taint_method/src/helper.h"
+#include "../../live_analysis/src/taint_gen.h"
+#include "../../live_analysis/src/helper.h"
 
 #define FE_AS  101
 #define FE_NUM 102

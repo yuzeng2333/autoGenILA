@@ -43,6 +43,7 @@ InstrInfo_t g_currInstrInfo;
 std::string g_rootNode;
 std::string g_currentModuleName;
 std::string DELIM = "___#";
+std::string ENDSIGN = "__(";
 uint32_t g_destWidth;
 bool g_seeInputs;
 uint32_t g_maxDelay = 0;
@@ -217,6 +218,8 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     argNum++;
   }
 
+  toCout("=== Finished adding reg-type args!");
+
   // push output ports of memory modules
   for(auto it = memInstances.begin(); it != memInstances.end(); it++) {
     std::string pathInsName = it->first;
@@ -230,6 +233,8 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
       }
   }
 
+  toCout("=== Finished adding memory-output args!");
+
   // push inputs
   // bound = (delay in instr.txt) - 1
   for(uint32_t i = 0; i <= bound; i++)  
@@ -241,8 +246,15 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
       argTy.push_back(llvm::IntegerType::get(*TheContext, width));
       argNum++;
     }
+
+  toCout("=== Finished adding module input args!");
   // return types
   llvm::Type* retTy = destInfo.get_ret_type(TheContext);
+  if(retTy == nullptr) {
+    toCout("Error: retTy is nullptr");
+    abort();
+  }
+
   std::string destSimpleName = funcExtract::var_name_convert(destName, true);
 
   llvm::FunctionType *FT =
@@ -253,7 +265,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   llvm::Value* retArrPtr;
   std::vector<std::string> destVec = destInfo.get_no_slice_name();  
 
-  if(destInfo.isVector) {
+  if(destInfo.isVector && !destInfo.isMemVec) {
     llvm::Type* elementTy = llvm::cast<llvm::PointerType>(retTy)->getElementType();
     llvm::ArrayType* arrayType = llvm::ArrayType::get(elementTy, destVec.size());
     // zero initializer
@@ -295,7 +307,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   uint32_t idx = 0;
   for(auto it = regWidth.begin(); it != regWidth.end(); it++) {
     std::string regName = it->first;
-    std::string regNameBound = regName+DELIM+toStr(bound);
+    std::string regNameBound = regName+post_fix(bound);
     toCoutVerb("set reg-type func arg: "+regNameBound);
     (TheFunction->args().begin()+idx)->setName(regNameBound);
     (topFunction->args().begin()+idx)->setName(regNameBound);
@@ -303,6 +315,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     topFuncArgMp.emplace(regNameBound, TheFunction->args().begin()+idx++);
   }
 
+  toCout("=== Finished setting reg-type arg name!");
 
   for(auto it = memInstances.begin(); it != memInstances.end(); it++) {
     std::string pathInsName = it->first;
@@ -310,7 +323,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     auto memMod = g_moduleInfoMap[modName];
     for(uint32_t i = 0; i <= bound; i++)  
       for( auto output : memMod->moduleOutputs ) {
-        std::string portName = pathInsName+"."+output+DELIM+toStr(i);
+        std::string portName = pathInsName+"."+output+post_fix(i);
         toCoutVerb("set mem ouput func arg, mem: "+pathInsName+", output: "+output);
         (TheFunction->args().begin()+idx)->setName(portName);
         (topFunction->args().begin()+idx)->setName(portName);
@@ -319,6 +332,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
       }
   }
 
+  toCout("=== Finished setting memory output arg name!");
 
   uint32_t argSize = TheFunction->arg_size();
   toCoutVerb("Function arg size is: "+toStr(argSize));
@@ -326,11 +340,13 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     for(auto it = curMod->moduleInputs.begin(); it != curMod->moduleInputs.end(); it++) {
       if(*it == curMod->clk) continue;    
       uint32_t width = get_var_slice_width_simp(*it, curMod);
-      toCoutVerb("set func arg: "+*it+DELIM+toStr(i));
-      (TheFunction->args().begin()+idx)->setName(*it+DELIM+toStr(i));
-      (topFunction->args().begin()+idx++)->setName(*it+DELIM+toStr(i));
+      toCoutVerb("set func arg: "+*it+post_fix(i));
+      (TheFunction->args().begin()+idx)->setName(*it+post_fix(i));
+      (topFunction->args().begin()+idx++)->setName(*it+post_fix(i));
       argNum--;
     }
+
+  toCout("=== Finished setting module input arg name!");
 
   // basic block
   BB = llvm::BasicBlock::Create(*TheContext, "bb_;_"+destName, TheFunction);
@@ -390,7 +406,8 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
       else {
         destNextExpr = add_constraint(dest, 
                                       0, TheContext, Builder, bound);
-        retVec.push_back(destNextExpr);
+        if(!destInfo.isMemVec)
+          retVec.push_back(destNextExpr);
       }
     }
 
@@ -410,8 +427,40 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     // store values in retVec to memory of global array
     llvm::Value* arrPtr = retArrPtr;
     uint32_t i = 0;
-    for(llvm::Value* val : retVec) {
-      llvm::GetElementPtrInst* ptr 
+    if(!retVec.empty()) {
+      for(llvm::Value* val : retVec) {
+        llvm::GetElementPtrInst* ptr 
+          = llvm::GetElementPtrInst::Create(
+              nullptr,
+              arrPtr,
+              std::vector<llvm::Value*>{
+                llvm::ConstantInt::get(
+                  llvm::IntegerType::get(*TheContext, bitNum), 
+                  0, false),
+                llvm::ConstantInt::get(
+                  llvm::IntegerType::get(*TheContext, bitNum), 
+                  i++, false) },
+              llvm::Twine(val->getName().str()+"_mem"),
+              BB
+            );
+        Builder->SetInsertPoint(BB);
+
+        // print info
+        //uint32_t valWidth = val->getType()->getIntegerBitWidth();
+        //auto ty1 = val->getType();
+        //auto ty2 = llvm::cast<llvm::ArrayType>(retTy)->getElementType();
+        //auto ty3 = llvm::cast<llvm::PointerType>(ptr->getType())->getElementType();
+        //auto ty4 = arrPtr->getType();
+        llvm::StoreInst* store = Builder->CreateStore(val, value(ptr));  
+      }
+    }
+    else assert(destInfo.isMemVec);
+
+    //llvm::LoadInst *retArr = Builder->CreateLoad(retTy, arrPtr, llvm::Twine("retArr"));
+    //Builder->CreateRet(value(retArr));
+
+    if(!retVec.empty()) {
+      llvm::GetElementPtrInst* retPtr 
         = llvm::GetElementPtrInst::Create(
             nullptr,
             arrPtr,
@@ -421,48 +470,26 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
                 0, false),
               llvm::ConstantInt::get(
                 llvm::IntegerType::get(*TheContext, bitNum), 
-                i++, false) },
-            llvm::Twine(val->getName().str()+"_mem"),
+                0, false) },
+            llvm::Twine("RET_PTR"),
             BB
           );
-      Builder->SetInsertPoint(BB);
 
-      // print info
-      //uint32_t valWidth = val->getType()->getIntegerBitWidth();
-      //auto ty1 = val->getType();
-      //auto ty2 = llvm::cast<llvm::ArrayType>(retTy)->getElementType();
-      //auto ty3 = llvm::cast<llvm::PointerType>(ptr->getType())->getElementType();
-      //auto ty4 = arrPtr->getType();
-      llvm::StoreInst* store = Builder->CreateStore(val, value(ptr));  
+      retInst = Builder->CreateRet(value(retPtr));
     }
-
-    //llvm::LoadInst *retArr = Builder->CreateLoad(retTy, arrPtr, llvm::Twine("retArr"));
-    //Builder->CreateRet(value(retArr));
-
-    llvm::GetElementPtrInst* retPtr 
-      = llvm::GetElementPtrInst::Create(
-          nullptr,
-          arrPtr,
-          std::vector<llvm::Value*>{
-            llvm::ConstantInt::get(
-              llvm::IntegerType::get(*TheContext, bitNum), 
-              0, false),
-            llvm::ConstantInt::get(
-              llvm::IntegerType::get(*TheContext, bitNum), 
-              0, false) },
-          llvm::Twine("RET_PTR"),
-          BB
-        );
-
-    retInst = Builder->CreateRet(value(retPtr));
+    else {
+      assert(destInfo.isMemVec);    
+      retInst = Builder->CreateRet(
+                  llvm::UndefValue::get(llvm::Type::getVoidTy(*TheContext)));
+    }
   } // end of add vector
 
 
   // if the top module contains memories, add the additional memory
   // writes from lastMemReadAddr+1 to bound-1
   uint32_t i = 0;
-  Builder->SetInsertPoint(retInst);
   if(!curMod->moduleMems.empty()) {
+    Builder->SetInsertPoint(retInst);  
     for(auto pair : curDynData->memDynInfo) {
       std::string mem = pair.first;
       toCoutVerb("check mem: "+mem);
@@ -805,7 +832,7 @@ UpdateFunctionGen::add_constraint(std::string varAndSlice, uint32_t timeIdx, con
         ret = tmpSlice;
       }
       else {
-        ret = concat_func(ret, tmpSlice, c, b);
+        ret = concat_func(ret, tmpSlice, c, b, timeIdx);
       }
     }
     return ret;
@@ -822,7 +849,7 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
                             const uint32_t bound ) {
   // Attention: varAndSlice might have a slice, a directly-assigned varAndSlice
   std::string varAndSlice = node->dest;
-  if(varAndSlice.find("\\compute.inst_q.value_1") 
+  if(varAndSlice.find("\\fetch.xsize") 
        != std::string::npos)
     toCoutVerb("Find it!");
 
@@ -993,7 +1020,8 @@ UpdateFunctionGen::add_nb_constraint(astNode* const node,
     if(srcSlice.empty() || has_direct_assignment(srcAndSlice, curMod))
       destNextExpr = srcExpr;
     else
-      destNextExpr = extract_func(srcExpr, srcHi, srcLo, c, b, srcAndSlice);
+      destNextExpr = extract_func(srcExpr, srcHi, srcLo, 
+                                  c, b, timeIdx+1, llvm::Twine(srcAndSlice));
     return destNextExpr;
   }
   else if ( is_clean(dest, insContextStk.get_curMod()) ){ 
@@ -1030,7 +1058,7 @@ UpdateFunctionGen::add_nb_constraint(astNode* const node,
         uint32_t hi = get_end(destSlice);
         uint32_t lo = get_begin(destSlice);
         return extract_func(destExpr, hi, lo, 
-                            c, b, llvm::Twine(destTimed), true);
+                            c, b, timeIdx, llvm::Twine(destTimed), true);
       }
     }
     else {
@@ -1350,7 +1378,7 @@ llvm::Type* DestInfo::get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext
     return llvm::IntegerType::get(*TheContext, 
                                   destWidth);
   }
-  else {
+  else if(isVector && !isMemVec){
     // if is reg vector, return an array type pointer
     // first, check if every reg is of the same size
     uint32_t size = get_var_slice_width_cmplx(destVec.front());
@@ -1364,6 +1392,11 @@ llvm::Type* DestInfo::get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext
     ////auto ptrTy = llvm::PointerType::get(arrayType, 0);
     //return arrayType;
     return pointerTy;
+  }
+  // TODO: implement the else case: the destVar is either single memory
+  // or an array of memory
+  else { // isVector && isMemVec
+    return llvm::Type::getVoidTy(*TheContext);
   }
 }
 
@@ -1500,8 +1533,17 @@ UpdateFunctionGen::initialize_min_delay(std::shared_ptr<ModuleInfo_t> &modInfo,
 llvm::Value* 
 UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
                       std::shared_ptr<llvm::LLVMContext> &c, 
-                      std::shared_ptr<llvm::IRBuilder<>> &b, 
+                      std::shared_ptr<llvm::IRBuilder<>> &b, uint32_t timeIdx, 
                       const llvm::Twine &name, bool noinline) {
+  
+  uint32_t len = high-low+1;  
+  if(llvm::isa<llvm::ConstantInt>(in)) {
+    auto lshrVal = b->CreateLShr( in, low, timed_name("CONST_LSHR", timeIdx));
+    llvm::Value* ret = b->CreateTrunc(lshrVal, llvmWidth(len, c), 
+                                      timed_name("CONST_TRUNC", timeIdx) );
+    return ret;
+  }
+
   std::string destName = in->getName().str();
   std::string dest, destSlice;
   auto curMod = insContextStk.get_curMod();
@@ -1509,119 +1551,152 @@ UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
   std::string prefix = "";
   if(!curDynData->isFunctionedSubMod) prefix = insContextStk.get_hier_name(false);
 
-  if(destName.find("concat__concat___017____#4") != std::string::npos)
-    toCoutVerb("Find it!");
-  if(!destName.empty()) {
-    split_slice(destName, dest, destSlice);
-    noinline = false;
-  }
-  else if(is_read_asv(dest, insContextStk.get_curMod()) 
-          || (is_top_module(curMod) && is_input(dest, insContextStk.get_curMod())))
-    noinline = true;
-  else noinline = false;
   toCoutVerb("extract for: "+destName);
-  if(destName == "cct_715")
-    toCoutVerb("Find it!");
-  llvm::Type* inputTy = in->getType();
-  uint32_t inputWidth = llvm::dyn_cast<llvm::IntegerType>(inputTy)->getBitWidth();
-  std::string app = "";
-  if(!noinline) app = "_in";
-  std::string funcName = "ext_"+toStr(inputWidth)+"_"+toStr(high)+"_"+toStr(low)+app;
-  llvm::Function *func;
-  llvm::FunctionType *FT;  
-  uint32_t len = high-low+1;
 
   std::string extValName;
+  std::string lshrName;
   if(g_use_simple_func_name)
     extValName = "ext_"+toStr(ext_cnt++);
-  else
-    extValName = destName+" ["+toStr(high)+":"+toStr(low)+"]";
-
-  if(!g_use_concat_extract_func) {
-    auto s1 = b->CreateLShr(in, low, llvm::Twine(prefix+destName+"_LSHR_"+toStr(low)+"_"));
-    llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c), 
-                        llvm::Twine(extValName));
-    return ret;
-  }
-
-  if(extractFunc.find(funcName) != extractFunc.end()) {
-    func = extractFunc[funcName];
-    FT = func->getFunctionType();
+  else if(false){
+    uint32_t extIdx;
+    std::string origExtName = destName+"_["+toStr(high)+":"+toStr(low)+"]"; 
+    if(extNameIdxMap.find(origExtName) == extNameIdxMap.end()) {
+      extIdx = ext_cnt;
+      extNameIdxMap.emplace(origExtName, ext_cnt++);
+    }
+    else extIdx = extNameIdxMap[origExtName];
+    extValName = "ext_"+toStr(extIdx);
   }
   else {
-    auto retTy = llvm::IntegerType::get(*c, len);
-    std::vector<llvm::Type *> argTy;  
-    argTy.push_back(llvm::IntegerType::get(*c, inputWidth));
-    FT = llvm::FunctionType::get(retTy, argTy, false);
-    func = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
-                                        funcName, TheModule.get());
-    if(noinline) func->addFnAttr(llvm::Attribute::NoInline);
-    func->args().begin()->setName("input");
-    llvm::Value* inArg = value(func->args().begin()  );
-
-    llvm::BasicBlock *localBB 
-      = llvm::BasicBlock::Create(*c, "entry", func);
-
-    std::unique_ptr<llvm::IRBuilder<>> build;
-    build = std::make_unique<llvm::IRBuilder<>>(*c);
-    build->SetInsertPoint(localBB);
-    auto s1 = build->CreateLShr(inArg, low, llvm::Twine("lshr"));
-    llvm::Value* ret = build->CreateTrunc(s1, llvmWidth(len, c), llvm::Twine("trunc"));
-    build->CreateRet(ret);
-    extractFunc.emplace(funcName, func);
+    extValName = destName+"_["+toStr(high)+":"+toStr(low)+"]";
   }
   
-  std::vector<llvm::Value*> args;
-  args.push_back(in);
-  return b->CreateCall(FT, func, args, 
-                       llvm::Twine(extValName));
-}
+  bool timeIdxExist = (destName.find("___#") != std::string::npos);
+  if(!timeIdxExist) extValName = timed_name(extValName, timeIdx);
+  lshrName = prefix+destName+"_LSHR_"+toStr(low)+ENDSIGN;
 
-
-llvm::Value* 
-UpdateFunctionGen::extract(llvm::Value* in, uint32_t high, uint32_t low,
-                      std::shared_ptr<llvm::LLVMContext> &c, 
-                      std::shared_ptr<llvm::IRBuilder<>> &b, 
-                      const llvm::Twine &name) {
-
-  uint32_t inWidth = llvm::dyn_cast<llvm::IntegerType>(in->getType())->getBitWidth();
-  if(inWidth < high+1) {
-    toCout("Error: input value width for extract is less than high index");
-    toCout("wdith: "+toStr(inWidth)+", high: "+toStr(high));
-    std::string tmpName = in->getName().str();
-    toCout("Input value name: "+tmpName);
-    abort();
+  const std::string curTgt = insContextStk.get_target();
+  if(curDynData->existedExpr[curTgt].find(extValName) 
+      != curDynData->existedExpr[curTgt].end() ) {
+    return curDynData->existedExpr[curTgt][extValName];
   }
-  uint32_t len = high - low + 1;
-  auto s1 = b->CreateLShr(in, low);
-  if(name.isTriviallyEmpty()) {
-    llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c), llvm::Twine(""));
+
+  if(!g_use_concat_extract_func) {
+    llvm::Value* lshrVal;
+    if(curDynData->existedExpr[curTgt].find(lshrName) 
+        != curDynData->existedExpr[curTgt].end() ) {
+      lshrVal = curDynData->existedExpr[curTgt][lshrName];
+    }
+    else {
+      lshrVal = b->CreateLShr(
+        in, low, 
+        llvm::Twine(lshrName)
+      );
+      curDynData->existedExpr[curTgt].emplace(lshrName, lshrVal);
+    }
+
+    llvm::Value* ret = b->CreateTrunc(lshrVal, llvmWidth(len, c), llvm::Twine(extValName));
+    curDynData->existedExpr[curTgt].emplace(extValName, ret);
     return ret;
   }
-  else {
-    llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c), 
-                          llvm::Twine(name.str()+" ["+toStr(high)+":"+toStr(low)+"]"));
-    ret->setName(name.str()+" ["+toStr(high)+":"+toStr(low)+"]");
-    return ret;
-  }
+
+  //llvm::Type* inputTy = in->getType();
+  //uint32_t inputWidth = llvm::dyn_cast<llvm::IntegerType>(inputTy)->getBitWidth();
+  //llvm::Function *func;
+  //llvm::FunctionType *FT;  
+  //if(!destName.empty()) {
+  //  split_slice(destName, dest, destSlice);
+  //  noinline = false;
+  //}
+  //else if(is_read_asv(dest, insContextStk.get_curMod()) 
+  //        || (is_top_module(curMod) && is_input(dest, insContextStk.get_curMod())))
+  //  noinline = true;
+  //else noinline = false;
+  //std::string app = "";
+  //if(!noinline) app = "_in";
+  //std::string funcName = "ext_"+toStr(inputWidth)+"_"+toStr(high)+"_"+toStr(low)+app;
+  //if(extractFunc.find(funcName) != extractFunc.end()) {
+  //  func = extractFunc[funcName];
+  //  FT = func->getFunctionType();
+  //}
+  //else {
+  //  abort(); // not supported anymore
+  //  auto retTy = llvm::IntegerType::get(*c, len);
+  //  std::vector<llvm::Type *> argTy;  
+  //  argTy.push_back(llvm::IntegerType::get(*c, inputWidth));
+  //  FT = llvm::FunctionType::get(retTy, argTy, false);
+  //  func = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
+  //                                      funcName, TheModule.get());
+  //  if(noinline) func->addFnAttr(llvm::Attribute::NoInline);
+  //  func->args().begin()->setName("input");
+  //  llvm::Value* inArg = value(func->args().begin()  );
+
+  //  llvm::BasicBlock *localBB 
+  //    = llvm::BasicBlock::Create(*c, "entry", func);
+
+  //  std::unique_ptr<llvm::IRBuilder<>> build;
+  //  build = std::make_unique<llvm::IRBuilder<>>(*c);
+  //  build->SetInsertPoint(localBB);
+  //  auto s1 = build->CreateLShr(inArg, low, llvm::Twine("lshr"));
+  //  llvm::Value* ret = build->CreateTrunc(s1, llvmWidth(len, c), llvm::Twine("trunc"));
+  //  build->CreateRet(ret);
+  //  extractFunc.emplace(funcName, func);
+  //}
+  //
+  //std::vector<llvm::Value*> args;
+  //args.push_back(in);
+  //return b->CreateCall(FT, func, args, 
+  //                     llvm::Twine(timed_name(extValName, timeIdx)));
 }
 
 
-llvm::Value* 
-UpdateFunctionGen::extract(llvm::Value* in, uint32_t high, uint32_t low, 
-                      std::shared_ptr<llvm::LLVMContext> &c, 
-                      std::shared_ptr<llvm::IRBuilder<>> &b, 
-                      const std::string &name) {
-
-  return extract(in, high, low, c, b, llvm::Twine(name));
-}
+//llvm::Value* 
+//UpdateFunctionGen::extract(llvm::Value* in, uint32_t high, uint32_t low,
+//                      std::shared_ptr<llvm::LLVMContext> &c, 
+//                      std::shared_ptr<llvm::IRBuilder<>> &b, 
+//                      const llvm::Twine &name) {
+//  abort(); // not supported anymore
+//  uint32_t inWidth = llvm::dyn_cast<llvm::IntegerType>(in->getType())->getBitWidth();
+//  if(inWidth < high+1) {
+//    toCout("Error: input value width for extract is less than high index");
+//    toCout("wdith: "+toStr(inWidth)+", high: "+toStr(high));
+//    std::string tmpName = in->getName().str();
+//    toCout("Input value name: "+tmpName);
+//    abort();
+//  }
+//  uint32_t len = high - low + 1;
+//  auto s1 = b->CreateLShr(in, low);
+//  if(name.isTriviallyEmpty()) {
+//    llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c), llvm::Twine(""));
+//    return ret;
+//  }
+//  else {
+//    llvm::Value* ret = b->CreateTrunc(s1, llvmWidth(len, c), 
+//                          llvm::Twine(name.str()+" ["+toStr(high)+":"+toStr(low)+"]"));
+//    ret->setName(name.str()+" ["+toStr(high)+":"+toStr(low)+"]");
+//    return ret;
+//  }
+//}
+//
+//
+//llvm::Value* 
+//UpdateFunctionGen::extract(llvm::Value* in, uint32_t high, uint32_t low, 
+//                      std::shared_ptr<llvm::LLVMContext> &c, 
+//                      std::shared_ptr<llvm::IRBuilder<>> &b, 
+//                      const std::string &name) {
+//
+//  return extract(in, high, low, c, b, llvm::Twine(name));
+//}
 
 
 llvm::Value* 
 UpdateFunctionGen::concat_func(llvm::Value* val1, llvm::Value* val2, 
                          std::shared_ptr<llvm::LLVMContext> &c,
                          std::shared_ptr<llvm::IRBuilder<>> &b,
+                         uint32_t timeIdx,
                          bool noinline) {
+  // TODO: use memorization for values generated here:
+  // note that, names for constant op should be generated in a different way!
 
   llvm::Type* val1Ty = val1->getType();
   llvm::Type* val2Ty = val2->getType();
@@ -1631,82 +1706,102 @@ UpdateFunctionGen::concat_func(llvm::Value* val1, llvm::Value* val2,
   auto newIntTy = llvm::IntegerType::get(*c, len);
   std::string name1 = val1->getName().str();
   std::string name2 = val2->getName().str();
+  auto pair1 = parse_name_idx(name1);
+  auto pair2 = parse_name_idx(name2);
+  //uint32_t timeIdx1 = pair1.second.first;
+  //uint32_t timeIdx2 = pair2.second.first;
+  //uint32_t timeIdx = (timeIdx1 > timeIdx2) ? timeIdx2 : timeIdx1;
+  std::string pureName1 = pair1.first + pair1.second.second;
+  std::string pureName2 = pair2.first + pair2.second.second;
   toCoutVerb("concat with "+name1+" and "+name2+", total width: "+toStr(val1Width+val2Width));  
 
   std::string cctValName;
   if(g_use_simple_func_name)
     cctValName = "cct_"+toStr(cct_cnt++);
-  else
-    cctValName = "cct_"+name1+"_"+name2;
+  else if(false) {
+    uint32_t cctIdx;
+    std::string origCctName = "cct_"+pureName1+"_"+pureName2; 
+    if(cctNameIdxMap.find(origCctName) == cctNameIdxMap.end()) {
+      cctIdx = cct_cnt;
+      cctNameIdxMap.emplace(origCctName, cct_cnt++);
+    }
+    else cctIdx = cctNameIdxMap[origCctName];
+    cctValName = "cct_"+toStr(cctIdx);
+  }
+  else {
+    cctValName = "cct_"+pureName1+"_"+pureName2;
+  }
 
   if(!g_use_concat_extract_func) {
-    llvm::Value* longVal1 = b->CreateZExtOrBitCast(val1, newIntTy, llvm::Twine(name1+"_zext"));
-    llvm::Value* ret = b->CreateAdd(b->CreateShl(longVal1, val2Width), 
+    llvm::Value* longVal1 = b->CreateZExtOrBitCast(val1, newIntTy, 
+                                                   llvm::Twine(name1+"_zext"));
+    llvm::Value* ret = b->CreateAdd(b->CreateShl(longVal1, val2Width, 
+                                      llvm::Twine(name1+"_zext_SHL_"+toStr(val2Width)+ENDSIGN)), 
                                     zext(val2, len, c, b), 
-                                    llvm::Twine(cctValName));
+                                    llvm::Twine(timed_name(cctValName, timeIdx)));
     return ret;
   }
 
-  std::string n1, n1Slice;
-  std::string n2, n2Slice;
-  auto curMod = insContextStk.get_curMod();
-  if(!name1.empty()) split_slice(name1, n1, n1Slice);
-  if(!name2.empty()) split_slice(name2, n2, n2Slice);
-  if(name1.empty() || name2.empty()) noinline = false;
-  else if( (is_read_asv(n1, curMod) || (is_top_module(curMod) && is_input(n1, curMod)))
-        && (is_read_asv(n2, curMod) || (is_top_module(curMod) && is_input(n2, curMod))) ) 
-    noinline = true;
-  else noinline = false;
+  //std::string n1, n1Slice;
+  //std::string n2, n2Slice;
+  //auto curMod = insContextStk.get_curMod();
+  //if(!name1.empty()) split_slice(name1, n1, n1Slice);
+  //if(!name2.empty()) split_slice(name2, n2, n2Slice);
+  //if(name1.empty() || name2.empty()) noinline = false;
+  //else if( (is_read_asv(n1, curMod) || (is_top_module(curMod) && is_input(n1, curMod)))
+  //      && (is_read_asv(n2, curMod) || (is_top_module(curMod) && is_input(n2, curMod))) ) 
+  //  noinline = true;
+  //else noinline = false;
 
-  std::string app = "";
-  if(!noinline) app = "_in";
-  std::string funcName = "cct_"+toStr(val1Width)+"_"+toStr(val2Width)+app;
-  llvm::Function *func;
-  llvm::FunctionType *FT;  
-  if(concatFunc.find(funcName) != concatFunc.end()) {
-    func = concatFunc[funcName];
-    FT = func->getFunctionType();    
-  }
-  else {
-    auto retTy = llvm::IntegerType::get(*c, len);
-    std::vector<llvm::Type*> argTy;
-    llvm::Type* ty1 = llvm::IntegerType::get(*c, val1Width);
-    llvm::Type* ty2 = llvm::IntegerType::get(*c, val2Width);
-    assert(ty1 == val1->getType());
-    assert(ty2 == val2->getType());
-    argTy.push_back(ty1);
-    argTy.push_back(ty2);
-    FT = llvm::FunctionType::get(retTy, argTy, false);
-    func = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
-                                        funcName, TheModule.get());
-    //func->addFnAttr(llvm::Attribute::NoInline);
-    func->args().begin()->setName("val1");
-    (func->args().begin()+1)->setName("val2");
+  //std::string app = "";
+  //if(!noinline) app = "_in";
+  //std::string funcName = "cct_"+toStr(val1Width)+"_"+toStr(val2Width)+app;
+  //llvm::Function *func;
+  //llvm::FunctionType *FT;  
+  //if(concatFunc.find(funcName) != concatFunc.end()) {
+  //  func = concatFunc[funcName];
+  //  FT = func->getFunctionType();    
+  //}
+  //else {
+  //  auto retTy = llvm::IntegerType::get(*c, len);
+  //  std::vector<llvm::Type*> argTy;
+  //  llvm::Type* ty1 = llvm::IntegerType::get(*c, val1Width);
+  //  llvm::Type* ty2 = llvm::IntegerType::get(*c, val2Width);
+  //  assert(ty1 == val1->getType());
+  //  assert(ty2 == val2->getType());
+  //  argTy.push_back(ty1);
+  //  argTy.push_back(ty2);
+  //  FT = llvm::FunctionType::get(retTy, argTy, false);
+  //  func = llvm::Function::Create(FT, llvm::Function::InternalLinkage, 
+  //                                      funcName, TheModule.get());
+  //  //func->addFnAttr(llvm::Attribute::NoInline);
+  //  func->args().begin()->setName("val1");
+  //  (func->args().begin()+1)->setName("val2");
 
-    llvm::Value* val1Arg = value(func->args().begin()  );
-    llvm::Value* val2Arg = value(func->args().begin()+1); 
-    assert(val1Arg->getType() == val1->getType());
-    assert(val2Arg->getType() == val2->getType());
+  //  llvm::Value* val1Arg = value(func->args().begin()  );
+  //  llvm::Value* val2Arg = value(func->args().begin()+1); 
+  //  assert(val1Arg->getType() == val1->getType());
+  //  assert(val2Arg->getType() == val2->getType());
 
-    llvm::BasicBlock *localBB 
-      = llvm::BasicBlock::Create(*c, "entry", func);
+  //  llvm::BasicBlock *localBB 
+  //    = llvm::BasicBlock::Create(*c, "entry", func);
 
-    std::shared_ptr<llvm::IRBuilder<>> build;
-    build = std::make_shared<llvm::IRBuilder<>>(*c);
-    build->SetInsertPoint(localBB);
+  //  std::shared_ptr<llvm::IRBuilder<>> build;
+  //  build = std::make_shared<llvm::IRBuilder<>>(*c);
+  //  build->SetInsertPoint(localBB);
 
-    llvm::Value* longVal1 = build->CreateZExtOrBitCast(val1Arg, newIntTy);
+  //  llvm::Value* longVal1 = build->CreateZExtOrBitCast(val1Arg, newIntTy);
 
-    llvm::Value* ret = build->CreateAdd(build->CreateShl(longVal1, val2Width), 
-                                                       zext(val2Arg, len, c, build));
-    build->CreateRet(ret);
-    concatFunc.emplace(funcName, func);
-  }
+  //  llvm::Value* ret = build->CreateAdd(build->CreateShl(longVal1, val2Width, llvm::Twine(name1+"")), 
+  //                                      zext(val2Arg, len, c, build));
+  //  build->CreateRet(ret);
+  //  concatFunc.emplace(funcName, func);
+  //}
 
-  std::vector<llvm::Value*> args;
-  args.push_back(val1);
-  args.push_back(val2);
-  return b->CreateCall(FT, func, args, llvm::Twine(cctValName));
+  //std::vector<llvm::Value*> args;
+  //args.push_back(val1);
+  //args.push_back(val2);
+  //return b->CreateCall(FT, func, args, llvm::Twine(timed_name(cctValName, timeIdx)));
 }
 
 
@@ -1724,7 +1819,9 @@ UpdateFunctionGen::concat_value(llvm::Value* val1, llvm::Value* val2,
   uint32_t newLen = val1Width+val2Width;
   auto newIntTy = llvm::IntegerType::get(*c, newLen);
   llvm::Value* longVal1 = b->CreateZExtOrBitCast(val1, newIntTy);
-  return b->CreateAdd(b->CreateShl(longVal1, val2Width), zext(val2, newLen, c, b));
+  return b->CreateAdd(b->CreateShl(longVal1, val2Width, 
+                                   llvm::Twine(name1+"_SHL_"+toStr(val2Width))), 
+                      zext(val2, newLen, c, b));
 }
 
 
@@ -1788,6 +1885,54 @@ llvm::Value* UpdateFunctionGen::get_arg(std::string regName, llvm::Function *fun
          +", modName: "+curMod->name+", func: "+func->getName().str());
   abort();
 }
+
+
+llvm::Value* UpdateFunctionGen::zext(llvm::Value* v1, uint32_t width,
+                                     std::shared_ptr<llvm::LLVMContext> &c,
+                                     std::shared_ptr<llvm::IRBuilder<>> &b) {
+
+  if(llvm::isa<llvm::Constant>(v1)) return b->CreateZExtOrTrunc(v1, llvmWidth(width, c));
+
+  std::string name = v1->getName().str()+"_ZEXT_TO_"+toStr(width);
+
+  const std::string curTgt = insContextStk.get_target();
+  const auto curMod = insContextStk.get_curMod();  
+  auto curDynData = get_dyn_data(curMod);
+  
+  if(curDynData->existedExpr[curTgt].find(name) 
+      != curDynData->existedExpr[curTgt].end() ) {
+    return curDynData->existedExpr[curTgt][name];
+  }
+
+  llvm::Value* val = b->CreateZExtOrTrunc(v1, llvmWidth(width, c), llvm::Twine(name));
+  curDynData->existedExpr[curTgt].emplace(name, val);
+  return val;
+}
+
+
+llvm::Value* UpdateFunctionGen::sext(llvm::Value* v1, uint32_t width,
+                                     std::shared_ptr<llvm::LLVMContext> &c,
+                                     std::shared_ptr<llvm::IRBuilder<>> &b) {
+
+  if(llvm::isa<llvm::Constant>(v1)) return b->CreateSExtOrTrunc(v1, llvmWidth(width, c));
+
+  std::string name = v1->getName().str()+"_SEXT_TO_"+toStr(width);
+
+  const std::string curTgt = insContextStk.get_target();
+  const auto curMod = insContextStk.get_curMod();  
+  auto curDynData = get_dyn_data(curMod);
+
+  if(curDynData->existedExpr[curTgt].find(name) 
+      != curDynData->existedExpr[curTgt].end() ) {
+    return curDynData->existedExpr[curTgt][name];
+  }
+
+  llvm::Value* val = b->CreateSExtOrTrunc(v1, llvmWidth(width, c), llvm::Twine(name));
+  curDynData->existedExpr[curTgt].emplace(name, val);
+  return val;
+}
+
+
 
 
 void print_context_info(Context_t& insCntxt) {

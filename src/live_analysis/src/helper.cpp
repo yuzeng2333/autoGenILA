@@ -1742,7 +1742,12 @@ void remove_two_end_space(std::string &str) {
 bool is_srcConcat(const std::string &line) {
   if(line.find(" = {") != std::string::npos
       && line.find("assign") != std::string::npos) {
-    toCoutVerb("Find src concat!");
+    auto pos = line.find(" = {");
+    std::string destPart = line.substr(0, pos);
+    if(destPart.find("{") == std::string::npos)
+      toCoutVerb("Find src concat!");
+    else
+      return false;
   }
   else return false;
   if(line.find("[") != std::string::npos)

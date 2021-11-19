@@ -260,6 +260,7 @@ void get_update_function(std::string target,
 
   // set the destInfo according to the target
   DestInfo destInfo;
+  destInfo.isMemVec = false;
   if(!isVec) {
     toCout("---  BEGIN Target: "+target+" ---");
     if(target.find("puregs[2]") != std::string::npos)
@@ -306,6 +307,7 @@ void get_update_function(std::string target,
     target += "}";
     destInfo.set_dest_vec(vecWorkSet);
     std::string firstASV = vecWorkSet.front();
+    if(isMem(firstASV)) destInfo.isMemVec = true;
     if(firstASV.find(".") != std::string::npos 
        && firstASV.substr(0, 1) != "\\") {
       auto pair = split_module_asv(firstASV);
