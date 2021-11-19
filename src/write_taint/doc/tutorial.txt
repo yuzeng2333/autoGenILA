@@ -1,0 +1,23 @@
+=== How to use
+Here I use an example to show how to use the programs in this directory to add taints to Verilog files.
+
+(1) go to the "example" folder. In "rtl" folder are the original RTL code for an AES accelerator.
+
+(2) The yosys_script.ys script, is a script for running Yosys. It reads all the RTL code in "rtl", pre-process it, and generate a syntax-simplified Verilog file in "yosys_rtl". The purpose of this step is to pre-process the original Verilog files, so that we do not need to deal with all kinds of complex syntax in Verilog.
+
+(3) go to the write_taint directory, type in "make eg". Then our program begins running. All the warnings and errors can be ignored. If the last output is "*** Finish add taint for module: ./example/yosys_rtl/aes_top_NEW.v", then it succeeds.
+
+(4) go back to the ./example/yosys_rtl folder. You will see a lot of generated Verilog files for each module. This is because, we separate the modules into different files, and most of the newly generated files are temporal. We only need the files ending with ".final".
+
+(5) open aes_top_NEW.v.clean.tainted.final, which is the file for the top module. All the variables ending with "_T" are the added taint variables.
+There are some other generated variables, which are for the pusrpose of checking ASVS, and you can ignored.
+ATTENTION: to correctly use the taint signals, you must do two things:
+a. set REG_SEL always to 0
+b. assign the reset signal of the top module to the "rst_zy" signal
+
+Then, the files are ready to use.
+
+
+=== How the code works
+The code works in a straightforward way: it first do some cleaning to the Verilog file, then it reads each Verilog line, declare new taint variables, and add new statements for those taint variables.
+The most important function is add_line_taints in taint_gen.cpp. It reads in the Verilog line, and call the corresponding taint generation function according to the type of the statement.

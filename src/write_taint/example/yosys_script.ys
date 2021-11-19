@@ -1,0 +1,25 @@
+read_verilog ./rtl/aes_128.v
+read_verilog ./rtl/expand_key_128.v
+read_verilog ./rtl/final_round.v
+read_verilog ./rtl/one_round.v
+read_verilog ./rtl/table_lookup.v
+read_verilog ./rtl/reg16byte.v
+read_verilog ./rtl/reg2byte.v
+read_verilog ./rtl/reg32byte.v
+read_verilog ./rtl/reg256byte.v
+read_verilog ./rtl/S.v
+read_verilog ./rtl/T.v
+read_verilog ./rtl/xS.v
+read_verilog ./rtl/S4.v
+read_verilog ./rtl/aes_top.v
+
+prep -top aes_top
+
+hierarchy -check
+proc
+opt
+opt_expr -mux_undef
+memory -nordff
+proc
+opt;;
+write_verilog -nohex -noattr ./yosys_rtl/aes_yosys.v
