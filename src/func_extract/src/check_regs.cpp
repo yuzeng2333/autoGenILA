@@ -479,8 +479,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     }
     else {
       assert(destInfo.isMemVec);    
-      retInst = Builder->CreateRet(
-                  llvm::UndefValue::get(llvm::Type::getVoidTy(*TheContext)));
+      retInst = Builder->CreateRetVoid();
     }
   } // end of add vector
 

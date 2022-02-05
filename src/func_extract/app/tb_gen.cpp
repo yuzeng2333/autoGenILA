@@ -2,7 +2,7 @@
 #include "../src/util.h"
 #include "../src/parse_fill.h"
 #include "../src/vcd_parser.h"
-#include "../../taint_method/src/global_data.h"
+#include "../../live_analysis/src/global_data.h"
 #include "tb_gen.h"
 
 #define toCout(a) std::cout << a << std::endl

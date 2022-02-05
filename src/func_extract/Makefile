@@ -4,6 +4,9 @@ two_reg:
 word:
 	./build/func_extract ../../func_test/word_adder 0#make sure design.v is cleaned with taint_gen!
 
+word1:
+	./build/func_extract ../../func_test/word_adder 1
+
 pid:
 	./build/func_extract ../../func_test/PID 1
 
@@ -226,3 +229,11 @@ buf1:
 
 buf:
 	./build/func_extract ../../func_test/buffer_test 0
+
+
+3d1:
+	./build/func_extract ../../func_test/threeDloop 1
+
+3d:
+	./build/func_extract ../../func_test/threeDloop 0
+
