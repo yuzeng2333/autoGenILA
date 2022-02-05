@@ -23,3 +23,5 @@ pairing/
 ultra_riscv/
 src/taint_method/build
 src/func_extract/build
+src/func_extract/*.ll
+src/func_extract/doc
