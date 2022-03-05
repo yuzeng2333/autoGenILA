@@ -1,0 +1,386 @@
+module final_round ( clk , key_in , state_in , INSTR_IN_ZY , zy_end_sig , rst_zy , key_in_T , key_in_S , state_in_T , state_in_S , state_out_R0 , state_out , key_in_R , state_in_R , state_out_T , state_out_S );
+  input rst_zy;
+  input zy_end_sig;
+  integer i;
+  input INSTR_IN_ZY;
+  input clk;
+  wire [31:0] k0;
+  logic [31:0] k0_T ;
+  logic [31:0] k0_R ;
+  logic [4:0] k0_S ;
+  wire [31:0] k1;
+  logic [31:0] k1_T ;
+  logic [31:0] k1_R ;
+  logic [4:0] k1_S ;
+  wire [31:0] k2;
+  logic [31:0] k2_T ;
+  logic [31:0] k2_R ;
+  logic [4:0] k2_S ;
+  wire [31:0] k3;
+  logic [31:0] k3_T ;
+  logic [31:0] k3_R ;
+  logic [4:0] k3_S ;
+  input [127:0] key_in;
+  input [127:0] key_in_T ;
+  output [127:0] key_in_R ;
+  input [4:0] key_in_S ;
+  wire [7:0] p00;
+  logic [7:0] p00_T ;
+  logic [7:0] p00_R ;
+  logic [4:0] p00_S ;
+  wire [7:0] p01;
+  logic [7:0] p01_T ;
+  logic [7:0] p01_R ;
+  logic [4:0] p01_S ;
+  wire [7:0] p02;
+  logic [7:0] p02_T ;
+  logic [7:0] p02_R ;
+  logic [4:0] p02_S ;
+  wire [7:0] p03;
+  logic [7:0] p03_T ;
+  logic [7:0] p03_R ;
+  logic [4:0] p03_S ;
+  wire [7:0] p10;
+  logic [7:0] p10_T ;
+  logic [7:0] p10_R ;
+  logic [4:0] p10_S ;
+  wire [7:0] p11;
+  logic [7:0] p11_T ;
+  logic [7:0] p11_R ;
+  logic [4:0] p11_S ;
+  wire [7:0] p12;
+  logic [7:0] p12_T ;
+  logic [7:0] p12_R ;
+  logic [4:0] p12_S ;
+  wire [7:0] p13;
+  logic [7:0] p13_T ;
+  logic [7:0] p13_R ;
+  logic [4:0] p13_S ;
+  wire [7:0] p20;
+  logic [7:0] p20_T ;
+  logic [7:0] p20_R ;
+  logic [4:0] p20_S ;
+  wire [7:0] p21;
+  logic [7:0] p21_T ;
+  logic [7:0] p21_R ;
+  logic [4:0] p21_S ;
+  wire [7:0] p22;
+  logic [7:0] p22_T ;
+  logic [7:0] p22_R ;
+  logic [4:0] p22_S ;
+  wire [7:0] p23;
+  logic [7:0] p23_T ;
+  logic [7:0] p23_R ;
+  logic [4:0] p23_S ;
+  wire [7:0] p30;
+  logic [7:0] p30_T ;
+  logic [7:0] p30_R ;
+  logic [4:0] p30_S ;
+  wire [7:0] p31;
+  logic [7:0] p31_T ;
+  logic [7:0] p31_R ;
+  logic [4:0] p31_S ;
+  wire [7:0] p32;
+  logic [7:0] p32_T ;
+  logic [7:0] p32_R ;
+  logic [4:0] p32_S ;
+  wire [7:0] p33;
+  logic [7:0] p33_T ;
+  logic [7:0] p33_R ;
+  logic [4:0] p33_S ;
+  wire [31:0] s0;
+  logic [31:0] s0_T ;
+  logic [31:0] s0_R ;
+  logic [4:0] s0_S ;
+  wire [31:0] s1;
+  logic [31:0] s1_T ;
+  logic [31:0] s1_R ;
+  logic [4:0] s1_S ;
+  wire [31:0] s2;
+  logic [31:0] s2_T ;
+  logic [31:0] s2_R ;
+  logic [4:0] s2_S ;
+  wire [31:0] s3;
+  logic [31:0] s3_T ;
+  logic [31:0] s3_R ;
+  logic [4:0] s3_S ;
+  input [127:0] state_in;
+  input [127:0] state_in_T ;
+  output [127:0] state_in_R ;
+  input [4:0] state_in_S ;
+  output [127:0] state_out;
+  output [127:0] state_out_T ;
+  logic [127:0] state_out_T ;
+  logic [127:0] state_out_R ;
+  logic [4:0] state_out_S ;
+  input [127:0] state_out_R0 ;
+  output [4:0] state_out_S ;
+  reg [127:0] state_out;
+  logic [127:0]  state_out_T ;
+  logic state_out_t_flag ;
+  logic state_out_r_flag ;
+  assign state_out_S = 11 ;
+  wire [31:0] z0;
+  logic [31:0] z0_T ;
+  logic [31:0] z0_R ;
+  logic [4:0] z0_S ;
+  wire [31:0] z1;
+  logic [31:0] z1_T ;
+  logic [31:0] z1_R ;
+  logic [4:0] z1_S ;
+  wire [31:0] z2;
+  logic [31:0] z2_T ;
+  logic [31:0] z2_R ;
+  logic [4:0] z2_S ;
+  wire [31:0] z3;
+  logic [31:0] z3_T ;
+  logic [31:0] z3_R ;
+  logic [4:0] z3_S ;
+  always @(posedge clk)
+    state_out <= addedVar0;
+logic [127:0] addedVar0_R0 ;
+assign addedVar0_R0 = 0 ;
+always @( posedge clk )
+    state_out_T 		<= rst_zy ? 0 : ( addedVar0_T & ( { 128{ state_out_S != addedVar0_S }} ));
+always @( posedge clk )
+    state_out_t_flag 	<= rst_zy ? 0 : state_out_t_flag ? 1 : | addedVar0_T & ( state_out_S != addedVar0_S );
+always @( posedge clk )
+    state_out_r_flag 	<= rst_zy ? 0 : state_out_r_flag ? 1 : state_out_t_flag ? 0 : ( | state_out_R ) ;
+  wire [127:0] addedVar0;
+  logic [127:0] addedVar0_T ;
+  logic [127:0] addedVar0_R ;
+  assign addedVar0 = { z0, z1, z2, z3 };
+  assign addedVar0_T = {  z0_T , z1_T , z2_T , z3_T  };
+  logic [4:0] addedVar0_S ;
+  assign addedVar0_S = 0 ;
+  logic [31:0] z0_R0 ;
+  assign z0_R0 = addedVar0_R [127:96] ;
+  logic [31:0] z1_R0 ;
+  assign z1_R0 = addedVar0_R [95:64] ;
+  logic [31:0] z2_R0 ;
+  assign z2_R0 = addedVar0_R [63:32] ;
+  logic [31:0] z3_R0 ;
+  assign z3_R0 = addedVar0_R [31:0] ;
+  wire [31:0] addedVar1;
+  logic [31:0] addedVar1_T ;
+  logic [31:0] addedVar1_R ;
+  assign addedVar1 = { p00, p11, p22, p33 };
+  assign addedVar1_T = {  p00_T , p11_T , p22_T , p33_T  };
+  logic [4:0] addedVar1_S ;
+  assign addedVar1_S = 0 ;
+  logic [7:0] p00_R0 ;
+  assign p00_R0 = addedVar1_R [31:24] ;
+  logic [7:0] p11_R0 ;
+  assign p11_R0 = addedVar1_R [23:16] ;
+  logic [7:0] p22_R0 ;
+  assign p22_R0 = addedVar1_R [15:8] ;
+  logic [7:0] p33_R0 ;
+  assign p33_R0 = addedVar1_R [7:0] ;
+  assign z0 = addedVar1 ^ key_in[127:96];
+  assign z0_S = 0 ;
+  logic [31:0] addedVar1_R0 ;
+  logic [127:0] key_in_R0 ;
+  assign z0_T = addedVar1_T | key_in_T [127:96] ;
+  assign addedVar1_R0 = z0_R ;
+  assign key_in_R0 [127:96] = z0_R ;
+  wire [31:0] addedVar2;
+  logic [31:0] addedVar2_T ;
+  logic [31:0] addedVar2_R ;
+  assign addedVar2 = { p10, p21, p32, p03 };
+  assign addedVar2_T = {  p10_T , p21_T , p32_T , p03_T  };
+  logic [4:0] addedVar2_S ;
+  assign addedVar2_S = 0 ;
+  logic [7:0] p10_R0 ;
+  assign p10_R0 = addedVar2_R [31:24] ;
+  logic [7:0] p21_R0 ;
+  assign p21_R0 = addedVar2_R [23:16] ;
+  logic [7:0] p32_R0 ;
+  assign p32_R0 = addedVar2_R [15:8] ;
+  logic [7:0] p03_R0 ;
+  assign p03_R0 = addedVar2_R [7:0] ;
+  assign z1 = addedVar2 ^ key_in[95:64];
+  assign z1_S = 0 ;
+  logic [31:0] addedVar2_R0 ;
+  assign z1_T = addedVar2_T | key_in_T [95:64] ;
+  assign addedVar2_R0 = z1_R ;
+  assign key_in_R0 [95:64] = z1_R ;
+  wire [31:0] addedVar3;
+  logic [31:0] addedVar3_T ;
+  logic [31:0] addedVar3_R ;
+  assign addedVar3 = { p20, p31, p02, p13 };
+  assign addedVar3_T = {  p20_T , p31_T , p02_T , p13_T  };
+  logic [4:0] addedVar3_S ;
+  assign addedVar3_S = 0 ;
+  logic [7:0] p20_R0 ;
+  assign p20_R0 = addedVar3_R [31:24] ;
+  logic [7:0] p31_R0 ;
+  assign p31_R0 = addedVar3_R [23:16] ;
+  logic [7:0] p02_R0 ;
+  assign p02_R0 = addedVar3_R [15:8] ;
+  logic [7:0] p13_R0 ;
+  assign p13_R0 = addedVar3_R [7:0] ;
+  assign z2 = addedVar3 ^ key_in[63:32];
+  assign z2_S = 0 ;
+  logic [31:0] addedVar3_R0 ;
+  assign z2_T = addedVar3_T | key_in_T [63:32] ;
+  assign addedVar3_R0 = z2_R ;
+  assign key_in_R0 [63:32] = z2_R ;
+  wire [31:0] addedVar4;
+  logic [31:0] addedVar4_T ;
+  logic [31:0] addedVar4_R ;
+  assign addedVar4 = { p30, p01, p12, p23 };
+  assign addedVar4_T = {  p30_T , p01_T , p12_T , p23_T  };
+  logic [4:0] addedVar4_S ;
+  assign addedVar4_S = 0 ;
+  logic [7:0] p30_R0 ;
+  assign p30_R0 = addedVar4_R [31:24] ;
+  logic [7:0] p01_R0 ;
+  assign p01_R0 = addedVar4_R [23:16] ;
+  logic [7:0] p12_R0 ;
+  assign p12_R0 = addedVar4_R [15:8] ;
+  logic [7:0] p23_R0 ;
+  assign p23_R0 = addedVar4_R [7:0] ;
+  assign z3 = addedVar4 ^ key_in[31:0];
+  assign z3_S = 0 ;
+  logic [31:0] addedVar4_R0 ;
+  assign z3_T = addedVar4_T | key_in_T [31:0] ;
+  assign addedVar4_R0 = z3_R ;
+  assign key_in_R0 [31:0] = z3_R ;
+  logic [127:0] state_in_R0 ;
+// module: S4
+  S4 S4_1 (
+    .in_T (  state_in_T [127:96]  ),
+    .in_R (  state_in_R0 [127:96]  ),
+    .in_S (  state_in_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .zy_end_sig(zy_end_sig),
+    .rst_zy(rst_zy),
+    .out_T ( {  p00_T , p01_T , p02_T , p03_T  } ),
+    .out_R0 ( {  p00_R , p01_R , p02_R , p03_R  } ),
+    .out_S (  ),
+    .out ( { p00, p01, p02, p03 } ),
+    .in ( state_in[127:96] ),
+    .clk ( clk )
+  );
+  assign {  p00_S , p01_S , p02_S , p03_S  } = 0 ;
+// module: S4
+  S4 S4_2 (
+    .in_T (  state_in_T [95:64]  ),
+    .in_R (  state_in_R0 [95:64]  ),
+    .in_S (  state_in_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .zy_end_sig(zy_end_sig),
+    .rst_zy(rst_zy),
+    .out_T ( {  p10_T , p11_T , p12_T , p13_T  } ),
+    .out_R0 ( {  p10_R , p11_R , p12_R , p13_R  } ),
+    .out_S (  ),
+    .out ( { p10, p11, p12, p13 } ),
+    .in ( state_in[95:64] ),
+    .clk ( clk )
+  );
+  assign {  p10_S , p11_S , p12_S , p13_S  } = 0 ;
+// module: S4
+  S4 S4_3 (
+    .in_T (  state_in_T [63:32]  ),
+    .in_R (  state_in_R0 [63:32]  ),
+    .in_S (  state_in_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .zy_end_sig(zy_end_sig),
+    .rst_zy(rst_zy),
+    .out_T ( {  p20_T , p21_T , p22_T , p23_T  } ),
+    .out_R0 ( {  p20_R , p21_R , p22_R , p23_R  } ),
+    .out_S (  ),
+    .out ( { p20, p21, p22, p23 } ),
+    .in ( state_in[63:32] ),
+    .clk ( clk )
+  );
+  assign {  p20_S , p21_S , p22_S , p23_S  } = 0 ;
+// module: S4
+  S4 S4_4 (
+    .in_T (  state_in_T [31:0]  ),
+    .in_R (  state_in_R0 [31:0]  ),
+    .in_S (  state_in_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .zy_end_sig(zy_end_sig),
+    .rst_zy(rst_zy),
+    .out_T ( {  p30_T , p31_T , p32_T , p33_T  } ),
+    .out_R0 ( {  p30_R , p31_R , p32_R , p33_R  } ),
+    .out_S (  ),
+    .out ( { p30, p31, p32, p33 } ),
+    .in ( state_in[31:0] ),
+    .clk ( clk )
+  );
+  assign {  p30_S , p31_S , p32_S , p33_S  } = 0 ;
+  assign k0 = key_in[127:96];
+  logic [127:0] key_in_R1 ;
+  assign k0_T = key_in_T [127:96] ;
+  assign key_in_R1 [127:96] = k0_R ;
+  assign k0_S = key_in_S ;
+  assign k1 = key_in[95:64];
+  assign k1_T = key_in_T [95:64] ;
+  assign key_in_R1 [95:64] = k1_R ;
+  assign k1_S = key_in_S ;
+  assign k2 = key_in[63:32];
+  assign k2_T = key_in_T [63:32] ;
+  assign key_in_R1 [63:32] = k2_R ;
+  assign k2_S = key_in_S ;
+  assign k3 = key_in[31:0];
+  assign k3_T = key_in_T [31:0] ;
+  assign key_in_R1 [31:0] = k3_R ;
+  assign k3_S = key_in_S ;
+  assign s0 = state_in[127:96];
+  logic [127:0] state_in_R1 ;
+  assign s0_T = state_in_T [127:96] ;
+  assign state_in_R1 [127:96] = s0_R ;
+  assign s0_S = state_in_S ;
+  assign s1 = state_in[95:64];
+  assign s1_T = state_in_T [95:64] ;
+  assign state_in_R1 [95:64] = s1_R ;
+  assign s1_S = state_in_S ;
+  assign s2 = state_in[63:32];
+  assign s2_T = state_in_T [63:32] ;
+  assign state_in_R1 [63:32] = s2_R ;
+  assign s2_S = state_in_S ;
+  assign s3 = state_in[31:0];
+  assign s3_T = state_in_T [31:0] ;
+  assign state_in_R1 [31:0] = s3_R ;
+  assign s3_S = state_in_S ;
+  assign state_in_R = ( state_in_R0 ) | ( state_in_R1 );
+  assign addedVar4_R = ( addedVar4_R0 );
+  assign p23_R = ( p23_R0 );
+  assign p12_R = ( p12_R0 );
+  assign p01_R = ( p01_R0 );
+  assign p30_R = ( p30_R0 );
+  assign addedVar3_R = ( addedVar3_R0 );
+  assign p13_R = ( p13_R0 );
+  assign p02_R = ( p02_R0 );
+  assign p31_R = ( p31_R0 );
+  assign p20_R = ( p20_R0 );
+  assign addedVar2_R = ( addedVar2_R0 );
+  assign p03_R = ( p03_R0 );
+  assign p32_R = ( p32_R0 );
+  assign p21_R = ( p21_R0 );
+  assign p10_R = ( p10_R0 );
+  assign key_in_R = ( key_in_R0 ) | ( key_in_R1 );
+  assign addedVar1_R = ( addedVar1_R0 );
+  assign p33_R = ( p33_R0 );
+  assign p22_R = ( p22_R0 );
+  assign p11_R = ( p11_R0 );
+  assign p00_R = ( p00_R0 );
+  assign z3_R = ( z3_R0 );
+  assign z2_R = ( z2_R0 );
+  assign z1_R = ( z1_R0 );
+  assign z0_R = ( z0_R0 );
+  assign addedVar0_R = ( addedVar0_R0 );
+  assign state_out_R = ( state_out_R0 );
+ // ground taints for floating regs
+ // ground taints for unused wires
+  assign { k0_R , k1_R , k2_R , k3_R , s0_R , s1_R , s2_R , s3_R , clk_R  } = 0;
+ // ground taints for unused wire slices
+  wire zy_assert8 = ( state_out_r_flag == 0 )  || zy_end_sig ;
+  assert state_out_asst (
+    .clk( clk ),
+    .test( zy_assert8 )
+  );
+endmodule
+

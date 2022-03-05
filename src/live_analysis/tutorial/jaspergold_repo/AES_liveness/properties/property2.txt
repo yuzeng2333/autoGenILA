@@ -1,0 +1,36 @@
+
+  property input1;
+    rst_T == 0;
+  endproperty
+
+  property input2;
+    wr_T == 1 && addr_T == 16'hffff && data_in_T == 8'hff && stb_T == 1
+    || wr_T == 0 && addr_T == 0 && data_in_T == 0 && stb_T == 0;
+  endproperty
+ 
+  // aes_reg_state can be replaced with aes_state
+  property input3;
+    //aes_reg_state != 0 |-> wr_T == 0;
+    reg_flipping == 1 |-> wr_T == 0;
+  endproperty
+
+  property input4;
+    wr_T == 1 |=> wr_T == 0;
+  endproperty
+
+  property input5;
+    xram_data_in_T == 0 && xram_ack_T == 0;
+  endproperty
+
+  property input6;
+    xram_addr_R0 == 0 && xram_data_out_R0 == 0 && xram_stb_R0 == 0 && xram_wr_R0 == 0;
+  endproperty
+
+  assume property (input1);
+  assume property (input2);
+  assume property (input3);
+  assume property (input4);
+  assume property (input5);
+  assume property (input6);
+
+endmodule

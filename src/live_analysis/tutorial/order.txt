@@ -1,0 +1,12 @@
+S_NEW.v.clean
+S4_NEW.v.clean
+xS_NEW.v.clean
+T_NEW.v.clean
+expand_key_128_NEW.v.clean
+table_lookup_NEW.v.clean
+one_round_NEW.v.clean
+final_round_NEW.v.clean
+aes_128_NEW.v.clean
+reg16byte_NEW.v.clean
+reg2byte_NEW.v.clean
+aes_top_NEW.v.clean

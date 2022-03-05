@@ -1,7 +1,0 @@
-4/25: no reset_sig, (dest_sig != op1_sig | dest != op1) is used in assignment of reg_t and reg_t_flag:
-sha:
-instr2: 160s
-
-./a.out /workspace/research/ILA/autoGenILA/AES/Verilog/aes_128_yosys.v 0
-
-1e9f473e5a3d222625f32f9b85a2f8a11e34782e branch finished prvoving aes in 0.3s

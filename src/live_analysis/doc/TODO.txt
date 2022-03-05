@@ -1,1 +1,0 @@
-1. the current PREV_VAL1 != PREV_VAL2 check has one drawback: reg1 might be recognized as AS falsely during execution of instr1. But it can havs different values at the start of instr2. Therefore I need to check if PREV_VAL1 != PREV_VAL2 at the start of only instr1.
