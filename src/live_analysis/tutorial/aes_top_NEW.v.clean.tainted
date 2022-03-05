@@ -1,0 +1,2440 @@
+  wire [15:0] _000_;
+  logic [15:0] _000__T ;
+  logic [15:0] _000__R ;
+  logic [4:0] _000__S ;
+  wire [15:0] _001_;
+  logic [15:0] _001__T ;
+  logic [15:0] _001__R ;
+  logic [4:0] _001__S ;
+  wire [3:0] _002_;
+  logic [3:0] _002__T ;
+  logic [3:0] _002__R ;
+  logic [4:0] _002__S ;
+  wire [15:0] _003_;
+  logic [15:0] _003__T ;
+  logic [15:0] _003__R ;
+  logic [4:0] _003__S ;
+  wire [127:0] _004_;
+  logic [127:0] _004__T ;
+  logic [127:0] _004__R ;
+  logic [4:0] _004__S ;
+  wire [4:0] _005_;
+  logic [4:0] _005__T ;
+  logic [4:0] _005__R ;
+  logic [4:0] _005__S ;
+  wire _006_;
+  logic _006__T ;
+  logic _006__R ;
+  logic [4:0] _006__S ;
+  wire _007_;
+  logic _007__T ;
+  logic _007__R ;
+  logic [4:0] _007__S ;
+  wire _008_;
+  logic _008__T ;
+  logic _008__R ;
+  logic [4:0] _008__S ;
+  wire _009_;
+  logic _009__T ;
+  logic _009__R ;
+  logic [4:0] _009__S ;
+  wire _010_;
+  logic _010__T ;
+  logic _010__R ;
+  logic [4:0] _010__S ;
+  wire _011_;
+  logic _011__T ;
+  logic _011__R ;
+  logic [4:0] _011__S ;
+  wire _012_;
+  logic _012__T ;
+  logic _012__R ;
+  logic [4:0] _012__S ;
+  wire _013_;
+  logic _013__T ;
+  logic _013__R ;
+  logic [4:0] _013__S ;
+  wire _014_;
+  logic _014__T ;
+  logic _014__R ;
+  logic [4:0] _014__S ;
+  wire _015_;
+  logic _015__T ;
+  logic _015__R ;
+  logic [4:0] _015__S ;
+  wire _016_;
+  logic _016__T ;
+  logic _016__R ;
+  logic [4:0] _016__S ;
+  wire _017_;
+  logic _017__T ;
+  logic _017__R ;
+  logic [4:0] _017__S ;
+  wire _018_;
+  logic _018__T ;
+  logic _018__R ;
+  logic [4:0] _018__S ;
+  wire _019_;
+  logic _019__T ;
+  logic _019__R ;
+  logic [4:0] _019__S ;
+  wire _020_;
+  logic _020__T ;
+  logic _020__R ;
+  logic [4:0] _020__S ;
+  wire _021_;
+  logic _021__T ;
+  logic _021__R ;
+  logic [4:0] _021__S ;
+  wire _022_;
+  logic _022__T ;
+  logic _022__R ;
+  logic [4:0] _022__S ;
+  wire _023_;
+  logic _023__T ;
+  logic _023__R ;
+  logic [4:0] _023__S ;
+  wire _024_;
+  logic _024__T ;
+  logic _024__R ;
+  logic [4:0] _024__S ;
+  wire _025_;
+  logic _025__T ;
+  logic _025__R ;
+  logic [4:0] _025__S ;
+  wire _026_;
+  logic _026__T ;
+  logic _026__R ;
+  logic [4:0] _026__S ;
+  wire [31:0] _027_;
+  logic [31:0] _027__T ;
+  logic [31:0] _027__R ;
+  logic [4:0] _027__S ;
+  wire _028_;
+  logic _028__T ;
+  logic _028__R ;
+  logic [4:0] _028__S ;
+  wire _029_;
+  logic _029__T ;
+  logic _029__R ;
+  logic [4:0] _029__S ;
+  wire _030_;
+  logic _030__T ;
+  logic _030__R ;
+  logic [4:0] _030__S ;
+  wire _031_;
+  logic _031__T ;
+  logic _031__R ;
+  logic [4:0] _031__S ;
+  wire _032_;
+  logic _032__T ;
+  logic _032__R ;
+  logic [4:0] _032__S ;
+  wire _033_;
+  logic _033__T ;
+  logic _033__R ;
+  logic [4:0] _033__S ;
+  wire _034_;
+  logic _034__T ;
+  logic _034__R ;
+  logic [4:0] _034__S ;
+  wire _035_;
+  logic _035__T ;
+  logic _035__R ;
+  logic [4:0] _035__S ;
+  wire _036_;
+  logic _036__T ;
+  logic _036__R ;
+  logic [4:0] _036__S ;
+  wire _037_;
+  logic _037__T ;
+  logic _037__R ;
+  logic [4:0] _037__S ;
+  wire _038_;
+  logic _038__T ;
+  logic _038__R ;
+  logic [4:0] _038__S ;
+  wire _039_;
+  logic _039__T ;
+  logic _039__R ;
+  logic [4:0] _039__S ;
+  wire _040_;
+  logic _040__T ;
+  logic _040__R ;
+  logic [4:0] _040__S ;
+  wire _041_;
+  logic _041__T ;
+  logic _041__R ;
+  logic [4:0] _041__S ;
+  wire _042_;
+  logic _042__T ;
+  logic _042__R ;
+  logic [4:0] _042__S ;
+  wire _043_;
+  logic _043__T ;
+  logic _043__R ;
+  logic [4:0] _043__S ;
+  wire _044_;
+  logic _044__T ;
+  logic _044__R ;
+  logic [4:0] _044__S ;
+  wire _045_;
+  logic _045__T ;
+  logic _045__R ;
+  logic [4:0] _045__S ;
+  wire _046_;
+  logic _046__T ;
+  logic _046__R ;
+  logic [4:0] _046__S ;
+  wire _047_;
+  logic _047__T ;
+  logic _047__R ;
+  logic [4:0] _047__S ;
+  wire _048_;
+  logic _048__T ;
+  logic _048__R ;
+  logic [4:0] _048__S ;
+  wire _049_;
+  logic _049__T ;
+  logic _049__R ;
+  logic [4:0] _049__S ;
+  wire _050_;
+  logic _050__T ;
+  logic _050__R ;
+  logic [4:0] _050__S ;
+  wire _051_;
+  logic _051__T ;
+  logic _051__R ;
+  logic [4:0] _051__S ;
+  wire _052_;
+  logic _052__T ;
+  logic _052__R ;
+  logic [4:0] _052__S ;
+  wire _053_;
+  logic _053__T ;
+  logic _053__R ;
+  logic [4:0] _053__S ;
+  wire _054_;
+  logic _054__T ;
+  logic _054__R ;
+  logic [4:0] _054__S ;
+  wire _055_;
+  logic _055__T ;
+  logic _055__R ;
+  logic [4:0] _055__S ;
+  wire _056_;
+  logic _056__T ;
+  logic _056__R ;
+  logic [4:0] _056__S ;
+  wire _057_;
+  logic _057__T ;
+  logic _057__R ;
+  logic [4:0] _057__S ;
+  wire _058_;
+  logic _058__T ;
+  logic _058__R ;
+  logic [4:0] _058__S ;
+  wire _059_;
+  logic _059__T ;
+  logic _059__R ;
+  logic [4:0] _059__S ;
+  wire _060_;
+  logic _060__T ;
+  logic _060__R ;
+  logic [4:0] _060__S ;
+  wire _061_;
+  logic _061__T ;
+  logic _061__R ;
+  logic [4:0] _061__S ;
+  wire _062_;
+  logic _062__T ;
+  logic _062__R ;
+  logic [4:0] _062__S ;
+  wire _063_;
+  logic _063__T ;
+  logic _063__R ;
+  logic [4:0] _063__S ;
+  wire _064_;
+  logic _064__T ;
+  logic _064__R ;
+  logic [4:0] _064__S ;
+  wire _065_;
+  logic _065__T ;
+  logic _065__R ;
+  logic [4:0] _065__S ;
+  wire _066_;
+  logic _066__T ;
+  logic _066__R ;
+  logic [4:0] _066__S ;
+  wire _067_;
+  logic _067__T ;
+  logic _067__R ;
+  logic [4:0] _067__S ;
+  wire _068_;
+  logic _068__T ;
+  logic _068__R ;
+  logic [4:0] _068__S ;
+  wire _069_;
+  logic _069__T ;
+  logic _069__R ;
+  logic [4:0] _069__S ;
+  wire _070_;
+  logic _070__T ;
+  logic _070__R ;
+  logic [4:0] _070__S ;
+  wire [7:0] _071_;
+  logic [7:0] _071__T ;
+  logic [7:0] _071__R ;
+  logic [4:0] _071__S ;
+  wire [7:0] _072_;
+  logic [7:0] _072__T ;
+  logic [7:0] _072__R ;
+  logic [4:0] _072__S ;
+  wire [7:0] _073_;
+  logic [7:0] _073__T ;
+  logic [7:0] _073__R ;
+  logic [4:0] _073__S ;
+  wire [7:0] _074_;
+  logic [7:0] _074__T ;
+  logic [7:0] _074__R ;
+  logic [4:0] _074__S ;
+  wire [1:0] _075_;
+  logic [1:0] _075__T ;
+  logic [1:0] _075__R ;
+  logic [4:0] _075__S ;
+  wire [1:0] _076_;
+  logic [1:0] _076__T ;
+  logic [1:0] _076__R ;
+  logic [4:0] _076__S ;
+  wire [1:0] _077_;
+  logic [1:0] _077__T ;
+  logic [1:0] _077__R ;
+  logic [4:0] _077__S ;
+  wire [1:0] _078_;
+  logic [1:0] _078__T ;
+  logic [1:0] _078__R ;
+  logic [4:0] _078__S ;
+  wire [7:0] _079_;
+  logic [7:0] _079__T ;
+  logic [7:0] _079__R ;
+  logic [4:0] _079__S ;
+  wire [7:0] _080_;
+  logic [7:0] _080__T ;
+  logic [7:0] _080__R ;
+  logic [4:0] _080__S ;
+  wire [7:0] _081_;
+  logic [7:0] _081__T ;
+  logic [7:0] _081__R ;
+  logic [4:0] _081__S ;
+  wire [7:0] _082_;
+  logic [7:0] _082__T ;
+  logic [7:0] _082__R ;
+  logic [4:0] _082__S ;
+  wire [7:0] _083_;
+  logic [7:0] _083__T ;
+  logic [7:0] _083__R ;
+  logic [4:0] _083__S ;
+  wire [7:0] _084_;
+  logic [7:0] _084__T ;
+  logic [7:0] _084__R ;
+  logic [4:0] _084__S ;
+  wire [7:0] _085_;
+  logic [7:0] _085__T ;
+  logic [7:0] _085__R ;
+  logic [4:0] _085__S ;
+  wire [7:0] _086_;
+  logic [7:0] _086__T ;
+  logic [7:0] _086__R ;
+  logic [4:0] _086__S ;
+  wire [7:0] _087_;
+  logic [7:0] _087__T ;
+  logic [7:0] _087__R ;
+  logic [4:0] _087__S ;
+  wire [7:0] _088_;
+  logic [7:0] _088__T ;
+  logic [7:0] _088__R ;
+  logic [4:0] _088__S ;
+  wire [7:0] _089_;
+  logic [7:0] _089__T ;
+  logic [7:0] _089__R ;
+  logic [4:0] _089__S ;
+  wire [7:0] _090_;
+  logic [7:0] _090__T ;
+  logic [7:0] _090__R ;
+  logic [4:0] _090__S ;
+  wire [7:0] _091_;
+  logic [7:0] _091__T ;
+  logic [7:0] _091__R ;
+  logic [4:0] _091__S ;
+  wire [7:0] _092_;
+  logic [7:0] _092__T ;
+  logic [7:0] _092__R ;
+  logic [4:0] _092__S ;
+  output ack;
+  output ack_T ;
+  logic ack_T ;
+  logic ack_R ;
+  logic [4:0] ack_S ;
+  input ack_R0 ;
+  input [15:0] addr;
+  input [15:0] addr_T ;
+  output [15:0] addr_R ;
+  wire [4:0] addr_S ;
+  assign addr_S = 0 ;
+  output [15:0] aes_addr;
+  output [15:0] aes_addr_T ;
+  logic [15:0] aes_addr_T ;
+  logic [15:0] aes_addr_R ;
+  logic [4:0] aes_addr_S ;
+  input [15:0] aes_addr_R0 ;
+  wire [7:0] aes_addr_dataout;
+  logic [7:0] aes_addr_dataout_T ;
+  logic [7:0] aes_addr_dataout_R ;
+  logic [4:0] aes_addr_dataout_S ;
+  output [127:0] aes_ctr;
+  output [127:0] aes_ctr_T ;
+  logic [127:0] aes_ctr_T ;
+  logic [127:0] aes_ctr_R ;
+  logic [4:0] aes_ctr_S ;
+  input [127:0] aes_ctr_R0 ;
+  wire [7:0] aes_ctr_dataout;
+  logic [7:0] aes_ctr_dataout_T ;
+  logic [7:0] aes_ctr_dataout_R ;
+  logic [4:0] aes_ctr_dataout_S ;
+  wire [127:0] aes_curr_key;
+  logic [127:0] aes_curr_key_T ;
+  logic [127:0] aes_curr_key_R ;
+  logic [4:0] aes_curr_key_S ;
+  output [127:0] aes_key0;
+  output [127:0] aes_key0_T ;
+  logic [127:0] aes_key0_T ;
+  logic [127:0] aes_key0_R ;
+  logic [4:0] aes_key0_S ;
+  input [127:0] aes_key0_R0 ;
+  wire [7:0] aes_key0_dataout;
+  logic [7:0] aes_key0_dataout_T ;
+  logic [7:0] aes_key0_dataout_R ;
+  logic [4:0] aes_key0_dataout_S ;
+  output [15:0] aes_len;
+  output [15:0] aes_len_T ;
+  logic [15:0] aes_len_T ;
+  logic [15:0] aes_len_R ;
+  logic [4:0] aes_len_S ;
+  input [15:0] aes_len_R0 ;
+  wire [7:0] aes_len_dataout;
+  logic [7:0] aes_len_dataout_T ;
+  logic [7:0] aes_len_dataout_R ;
+  logic [4:0] aes_len_dataout_S ;
+  wire [127:0] aes_out;
+  logic [127:0] aes_out_T ;
+  logic [127:0] aes_out_R ;
+  logic [4:0] aes_out_S ;
+  wire [127:0] aes_reg_ctr;
+  logic [127:0] aes_reg_ctr_T ;
+  logic [127:0] aes_reg_ctr_R ;
+  logic [4:0] aes_reg_ctr_S ;
+  wire [127:0] aes_reg_key0;
+  logic [127:0] aes_reg_key0_T ;
+  logic [127:0] aes_reg_key0_R ;
+  logic [4:0] aes_reg_key0_S ;
+  wire [15:0] aes_reg_opaddr;
+  logic [15:0] aes_reg_opaddr_T ;
+  logic [15:0] aes_reg_opaddr_R ;
+  logic [4:0] aes_reg_opaddr_S ;
+  wire [15:0] aes_reg_oplen;
+  logic [15:0] aes_reg_oplen_T ;
+  logic [15:0] aes_reg_oplen_R ;
+  logic [4:0] aes_reg_oplen_S ;
+  reg [1:0] aes_reg_state;
+  logic [1:0]  aes_reg_state_T ;
+  logic [1:0]  aes_reg_state_R ;
+  logic [4:0] aes_reg_state_S ;
+  logic aes_reg_state_t_flag ;
+  logic aes_reg_state_r_flag ;
+  assign aes_reg_state_S = 16 ;
+  wire [1:0] aes_reg_state_next;
+  logic [1:0] aes_reg_state_next_T ;
+  logic [1:0] aes_reg_state_next_R ;
+  logic [4:0] aes_reg_state_next_S ;
+  wire aes_reg_state_next_idle;
+  logic aes_reg_state_next_idle_T ;
+  logic aes_reg_state_next_idle_R ;
+  logic [4:0] aes_reg_state_next_idle_S ;
+  wire aes_reg_state_next_operate;
+  logic aes_reg_state_next_operate_T ;
+  logic aes_reg_state_next_operate_R ;
+  logic [4:0] aes_reg_state_next_operate_S ;
+  wire [1:0] aes_reg_state_next_read_data;
+  logic [1:0] aes_reg_state_next_read_data_T ;
+  logic [1:0] aes_reg_state_next_read_data_R ;
+  logic [4:0] aes_reg_state_next_read_data_S ;
+  wire [1:0] aes_reg_state_next_write_data;
+  logic [1:0] aes_reg_state_next_write_data_T ;
+  logic [1:0] aes_reg_state_next_write_data_R ;
+  logic [4:0] aes_reg_state_next_write_data_S ;
+  output [1:0] aes_state;
+  output [1:0] aes_state_T ;
+  logic [1:0] aes_state_T ;
+  logic [1:0] aes_state_R ;
+  logic [4:0] aes_state_S ;
+  input [1:0] aes_state_R0 ;
+  wire aes_state_idle;
+  logic aes_state_idle_T ;
+  logic aes_state_idle_R ;
+  logic [4:0] aes_state_idle_S ;
+  wire aes_state_operate;
+  logic aes_state_operate_T ;
+  logic aes_state_operate_R ;
+  logic [4:0] aes_state_operate_S ;
+  wire aes_state_read_data;
+  logic aes_state_read_data_T ;
+  logic aes_state_read_data_R ;
+  logic [4:0] aes_state_read_data_S ;
+  wire aes_state_write_data;
+  logic aes_state_write_data_T ;
+  logic aes_state_write_data_R ;
+  logic [4:0] aes_state_write_data_S ;
+  output aes_step;
+  output aes_step_T ;
+  logic aes_step_T ;
+  logic aes_step_R ;
+  logic [4:0] aes_step_S ;
+  input aes_step_R0 ;
+  reg [4:0] aes_time_counter;
+  logic [4:0]  aes_time_counter_T ;
+  logic [4:0]  aes_time_counter_R ;
+  logic [4:0] aes_time_counter_S ;
+  logic aes_time_counter_t_flag ;
+  logic aes_time_counter_r_flag ;
+  assign aes_time_counter_S = 17 ;
+  wire aes_time_enough;
+  logic aes_time_enough_T ;
+  logic aes_time_enough_R ;
+  logic [4:0] aes_time_enough_S ;
+  reg [15:0] block_counter;
+  logic [15:0]  block_counter_T ;
+  logic [15:0]  block_counter_R ;
+  logic [4:0] block_counter_S ;
+  logic block_counter_t_flag ;
+  logic block_counter_r_flag ;
+  assign block_counter_S = 18 ;
+  reg [3:0] byte_counter;
+  logic [3:0]  byte_counter_T ;
+  logic [3:0]  byte_counter_R ;
+  logic [4:0] byte_counter_S ;
+  logic byte_counter_t_flag ;
+  logic byte_counter_r_flag ;
+  assign byte_counter_S = 19 ;
+  input clk;
+  assign clk_S = 0 ;
+  input [7:0] data_in;
+  input [7:0] data_in_T ;
+  output [7:0] data_in_R ;
+  wire [4:0] data_in_S ;
+  assign data_in_S = 0 ;
+  output [7:0] data_out;
+  output [7:0] data_out_T ;
+  logic [7:0] data_out_T ;
+  logic [7:0] data_out_R ;
+  logic [4:0] data_out_S ;
+  input [7:0] data_out_R0 ;
+  wire [127:0] encrypted_data;
+  logic [127:0] encrypted_data_T ;
+  logic [127:0] encrypted_data_R ;
+  logic [4:0] encrypted_data_S ;
+  reg [127:0] encrypted_data_buf;
+  logic [127:0]  encrypted_data_buf_T ;
+  logic [127:0]  encrypted_data_buf_R ;
+  logic [4:0] encrypted_data_buf_S ;
+  logic encrypted_data_buf_t_flag ;
+  logic encrypted_data_buf_r_flag ;
+  assign encrypted_data_buf_S = 20 ;
+  wire in_addr_range;
+  logic in_addr_range_T ;
+  logic in_addr_range_R ;
+  logic [4:0] in_addr_range_S ;
+  wire incr_byte_counter;
+  logic incr_byte_counter_T ;
+  logic incr_byte_counter_R ;
+  logic [4:0] incr_byte_counter_S ;
+  wire last_byte_acked;
+  logic last_byte_acked_T ;
+  logic last_byte_acked_R ;
+  logic [4:0] last_byte_acked_S ;
+  reg [127:0] mem_data_buf;
+  logic [127:0]  mem_data_buf_T ;
+  logic [127:0]  mem_data_buf_R ;
+  logic [4:0] mem_data_buf_S ;
+  logic mem_data_buf_t_flag ;
+  logic mem_data_buf_r_flag ;
+  assign mem_data_buf_S = 21 ;
+  wire more_blocks;
+  logic more_blocks_T ;
+  logic more_blocks_R ;
+  logic [4:0] more_blocks_S ;
+  reg [15:0] operated_bytes_count;
+  logic [15:0]  operated_bytes_count_T ;
+  logic [15:0]  operated_bytes_count_R ;
+  logic [4:0] operated_bytes_count_S ;
+  logic operated_bytes_count_t_flag ;
+  logic operated_bytes_count_r_flag ;
+  assign operated_bytes_count_S = 22 ;
+  wire [15:0] operated_bytes_count_next;
+  logic [15:0] operated_bytes_count_next_T ;
+  logic [15:0] operated_bytes_count_next_R ;
+  logic [4:0] operated_bytes_count_next_S ;
+  wire reset_byte_counter;
+  logic reset_byte_counter_T ;
+  logic reset_byte_counter_R ;
+  logic [4:0] reset_byte_counter_S ;
+  input rst;
+  input rst_T ;
+  output rst_R ;
+  wire [4:0] rst_S ;
+  assign rst_S = 0 ;
+  wire sel_reg_addr;
+  logic sel_reg_addr_T ;
+  logic sel_reg_addr_R ;
+  logic [4:0] sel_reg_addr_S ;
+  wire sel_reg_ctr;
+  logic sel_reg_ctr_T ;
+  logic sel_reg_ctr_R ;
+  logic [4:0] sel_reg_ctr_S ;
+  wire sel_reg_key0;
+  logic sel_reg_key0_T ;
+  logic sel_reg_key0_R ;
+  logic [4:0] sel_reg_key0_S ;
+  wire sel_reg_len;
+  logic sel_reg_len_T ;
+  logic sel_reg_len_R ;
+  logic [4:0] sel_reg_len_S ;
+  wire sel_reg_start;
+  logic sel_reg_start_T ;
+  logic sel_reg_start_R ;
+  logic [4:0] sel_reg_start_S ;
+  wire sel_reg_state;
+  logic sel_reg_state_T ;
+  logic sel_reg_state_R ;
+  logic [4:0] sel_reg_state_S ;
+  wire start_op;
+  logic start_op_T ;
+  logic start_op_R ;
+  logic [4:0] start_op_S ;
+  input stb;
+  input stb_T ;
+  output stb_R ;
+  wire [4:0] stb_S ;
+  assign stb_S = 0 ;
+  reg [127:0] uaes_ctr;
+  logic [127:0]  uaes_ctr_T ;
+  logic [127:0]  uaes_ctr_R ;
+  logic [4:0] uaes_ctr_S ;
+  logic uaes_ctr_t_flag ;
+  logic uaes_ctr_r_flag ;
+  assign uaes_ctr_S = 23 ;
+  wire [127:0] uaes_ctr_nxt;
+  logic [127:0] uaes_ctr_nxt_T ;
+  logic [127:0] uaes_ctr_nxt_R ;
+  logic [4:0] uaes_ctr_nxt_S ;
+  input wr;
+  input wr_T ;
+  output wr_R ;
+  wire [4:0] wr_S ;
+  assign wr_S = 0 ;
+  wire wren;
+  logic wren_T ;
+  logic wren_R ;
+  logic [4:0] wren_S ;
+  input xram_ack;
+  input xram_ack_T ;
+  output xram_ack_R ;
+  wire [4:0] xram_ack_S ;
+  assign xram_ack_S = 0 ;
+  output [15:0] xram_addr;
+  output [15:0] xram_addr_T ;
+  logic [15:0] xram_addr_T ;
+  logic [15:0] xram_addr_R ;
+  logic [4:0] xram_addr_S ;
+  input [15:0] xram_addr_R0 ;
+  input [7:0] xram_data_in;
+  input [7:0] xram_data_in_T ;
+  output [7:0] xram_data_in_R ;
+  wire [4:0] xram_data_in_S ;
+  assign xram_data_in_S = 0 ;
+  output [7:0] xram_data_out;
+  output [7:0] xram_data_out_T ;
+  logic [7:0] xram_data_out_T ;
+  logic [7:0] xram_data_out_R ;
+  logic [4:0] xram_data_out_S ;
+  input [7:0] xram_data_out_R0 ;
+  output xram_stb;
+  output xram_stb_T ;
+  logic xram_stb_T ;
+  logic xram_stb_R ;
+  logic [4:0] xram_stb_S ;
+  input xram_stb_R0 ;
+  output xram_wr;
+  output xram_wr_T ;
+  logic xram_wr_T ;
+  logic xram_wr_R ;
+  logic [4:0] xram_wr_S ;
+  input xram_wr_R0 ;
+  assign _000_ = operated_bytes_count + 5'b10000;
+  assign _000__S = 0 ;
+  logic [15:0] operated_bytes_count_R0 ;
+  assign _000__T = operated_bytes_count_T ;
+  assign operated_bytes_count_R0 = _000__R ;
+  assign _001_ = block_counter + 5'b10000;
+  assign _001__S = 0 ;
+  logic [15:0] block_counter_R0 ;
+  assign _001__T = block_counter_T ;
+  assign block_counter_R0 = _001__R ;
+  assign _002_ = byte_counter + 1'b1;
+  assign _002__S = 0 ;
+  logic [3:0] byte_counter_R0 ;
+  assign _002__T = byte_counter_T ;
+  assign byte_counter_R0 = _002__R ;
+  assign _003_ = aes_reg_opaddr + block_counter;
+  assign _003__S = 0 ;
+  logic [15:0] aes_reg_opaddr_R0 ;
+  logic [15:0] block_counter_R1 ;
+  assign _003__T = aes_reg_opaddr_T | block_counter_T ;
+  assign aes_reg_opaddr_R0 = _003__R ;
+  assign block_counter_R1 = _003__R ;
+  assign xram_addr = _003_ + byte_counter;
+  assign xram_addr_S = 0 ;
+  logic [15:0] _003__R0 ;
+  logic [3:0] byte_counter_R1 ;
+  assign xram_addr_T = _003__T | byte_counter_T ;
+  assign _003__R0 = xram_addr_R ;
+  assign byte_counter_R1 = xram_addr_R ;
+  assign _004_ = uaes_ctr + 5'b10000;
+  assign _004__S = 0 ;
+  logic [127:0] uaes_ctr_R0 ;
+  assign _004__T = uaes_ctr_T ;
+  assign uaes_ctr_R0 = _004__R ;
+  assign _005_ = aes_time_counter + 1'b1;
+  assign _005__S = 0 ;
+  logic [4:0] aes_time_counter_R0 ;
+  assign _005__T = aes_time_counter_T ;
+  assign aes_time_counter_R0 = _005__R ;
+  wire [1:0] addedVar0;
+  logic [1:0] addedVar0_T ;
+  logic [1:0] addedVar0_R ;
+  assign addedVar0 = { more_blocks, reset_byte_counter };
+  assign addedVar0_T = {  more_blocks_T , reset_byte_counter_T  };
+  logic [4:0] addedVar0_S ;
+  assign addedVar0_S = 0 ;
+  logic [0:0] more_blocks_R0 ;
+  assign more_blocks_R0 = addedVar0_R [1:1] ;
+  logic [0:0] reset_byte_counter_R0 ;
+  assign reset_byte_counter_R0 = addedVar0_R [0:0] ;
+  assign _006_ = | addedVar0;
+  logic [1:0] addedVar0_R0 ;
+  assign _006__T = | addedVar0_T ;
+  assign addedVar0_R0 = { 2{ _006__R }} & addedVar0 ;
+  assign _006__S = 0 ;
+  assign _026_ = ~ rst;
+  logic [0:0] rst_R0 ;
+  assign _026__T = rst_T ;
+  assign rst_R0 = _026__R ;
+  assign _026__S = 0 ;
+  wire [1:0] addedVar1;
+  logic [1:0] addedVar1_T ;
+  logic [1:0] addedVar1_R ;
+  assign addedVar1 = { _026_, aes_state_operate };
+  assign addedVar1_T = {  _026__T , aes_state_operate_T  };
+  logic [4:0] addedVar1_S ;
+  assign addedVar1_S = 0 ;
+  logic [0:0] _026__R0 ;
+  assign _026__R0 = addedVar1_R [1:1] ;
+  logic [0:0] aes_state_operate_R0 ;
+  assign aes_state_operate_R0 = addedVar1_R [0:0] ;
+  assign _007_ = & addedVar1;
+  logic [1:0] addedVar1_R0 ;
+  assign _007__T = | addedVar1_T ;
+  assign addedVar1_R0 = { 2{ _007__R }} & ~addedVar1 ;
+  assign _007__S = 0 ;
+  wire [1:0] addedVar2;
+  logic [1:0] addedVar2_T ;
+  logic [1:0] addedVar2_R ;
+  assign addedVar2 = { _026_, last_byte_acked };
+  assign addedVar2_T = {  _026__T , last_byte_acked_T  };
+  logic [4:0] addedVar2_S ;
+  assign addedVar2_S = 0 ;
+  logic [0:0] _026__R1 ;
+  assign _026__R1 = addedVar2_R [1:1] ;
+  logic [0:0] last_byte_acked_R0 ;
+  assign last_byte_acked_R0 = addedVar2_R [0:0] ;
+  assign _008_ = & addedVar2;
+  logic [1:0] addedVar2_R0 ;
+  assign _008__T = | addedVar2_T ;
+  assign addedVar2_R0 = { 2{ _008__R }} & ~addedVar2 ;
+  assign _008__S = 0 ;
+  wire [1:0] addedVar3;
+  logic [1:0] addedVar3_T ;
+  logic [1:0] addedVar3_R ;
+  assign addedVar3 = { _052_, _026_ };
+  assign addedVar3_T = {  _052__T , _026__T  };
+  logic [4:0] addedVar3_S ;
+  assign addedVar3_S = 0 ;
+  logic [0:0] _052__R0 ;
+  assign _052__R0 = addedVar3_R [1:1] ;
+  logic [0:0] _026__R2 ;
+  assign _026__R2 = addedVar3_R [0:0] ;
+  assign _009_ = & addedVar3;
+  logic [1:0] addedVar3_R0 ;
+  assign _009__T = | addedVar3_T ;
+  assign addedVar3_R0 = { 2{ _009__R }} & ~addedVar3 ;
+  assign _009__S = 0 ;
+  wire [1:0] addedVar4;
+  logic [1:0] addedVar4_T ;
+  logic [1:0] addedVar4_R ;
+  assign addedVar4 = { _053_, _026_ };
+  assign addedVar4_T = {  _053__T , _026__T  };
+  logic [4:0] addedVar4_S ;
+  assign addedVar4_S = 0 ;
+  logic [0:0] _053__R0 ;
+  assign _053__R0 = addedVar4_R [1:1] ;
+  logic [0:0] _026__R3 ;
+  assign _026__R3 = addedVar4_R [0:0] ;
+  assign _010_ = & addedVar4;
+  logic [1:0] addedVar4_R0 ;
+  assign _010__T = | addedVar4_T ;
+  assign addedVar4_R0 = { 2{ _010__R }} & ~addedVar4 ;
+  assign _010__S = 0 ;
+  wire [1:0] addedVar5;
+  logic [1:0] addedVar5_T ;
+  logic [1:0] addedVar5_R ;
+  assign addedVar5 = { _054_, _026_ };
+  assign addedVar5_T = {  _054__T , _026__T  };
+  logic [4:0] addedVar5_S ;
+  assign addedVar5_S = 0 ;
+  logic [0:0] _054__R0 ;
+  assign _054__R0 = addedVar5_R [1:1] ;
+  logic [0:0] _026__R4 ;
+  assign _026__R4 = addedVar5_R [0:0] ;
+  assign _011_ = & addedVar5;
+  logic [1:0] addedVar5_R0 ;
+  assign _011__T = | addedVar5_T ;
+  assign addedVar5_R0 = { 2{ _011__R }} & ~addedVar5 ;
+  assign _011__S = 0 ;
+  wire [1:0] addedVar6;
+  logic [1:0] addedVar6_T ;
+  logic [1:0] addedVar6_R ;
+  assign addedVar6 = { _055_, _026_ };
+  assign addedVar6_T = {  _055__T , _026__T  };
+  logic [4:0] addedVar6_S ;
+  assign addedVar6_S = 0 ;
+  logic [0:0] _055__R0 ;
+  assign _055__R0 = addedVar6_R [1:1] ;
+  logic [0:0] _026__R5 ;
+  assign _026__R5 = addedVar6_R [0:0] ;
+  assign _012_ = & addedVar6;
+  logic [1:0] addedVar6_R0 ;
+  assign _012__T = | addedVar6_T ;
+  assign addedVar6_R0 = { 2{ _012__R }} & ~addedVar6 ;
+  assign _012__S = 0 ;
+  wire [1:0] addedVar7;
+  logic [1:0] addedVar7_T ;
+  logic [1:0] addedVar7_R ;
+  assign addedVar7 = { _056_, _026_ };
+  assign addedVar7_T = {  _056__T , _026__T  };
+  logic [4:0] addedVar7_S ;
+  assign addedVar7_S = 0 ;
+  logic [0:0] _056__R0 ;
+  assign _056__R0 = addedVar7_R [1:1] ;
+  logic [0:0] _026__R6 ;
+  assign _026__R6 = addedVar7_R [0:0] ;
+  assign _013_ = & addedVar7;
+  logic [1:0] addedVar7_R0 ;
+  assign _013__T = | addedVar7_T ;
+  assign addedVar7_R0 = { 2{ _013__R }} & ~addedVar7 ;
+  assign _013__S = 0 ;
+  wire [1:0] addedVar8;
+  logic [1:0] addedVar8_T ;
+  logic [1:0] addedVar8_R ;
+  assign addedVar8 = { _057_, _026_ };
+  assign addedVar8_T = {  _057__T , _026__T  };
+  logic [4:0] addedVar8_S ;
+  assign addedVar8_S = 0 ;
+  logic [0:0] _057__R0 ;
+  assign _057__R0 = addedVar8_R [1:1] ;
+  logic [0:0] _026__R7 ;
+  assign _026__R7 = addedVar8_R [0:0] ;
+  assign _014_ = & addedVar8;
+  logic [1:0] addedVar8_R0 ;
+  assign _014__T = | addedVar8_T ;
+  assign addedVar8_R0 = { 2{ _014__R }} & ~addedVar8 ;
+  assign _014__S = 0 ;
+  wire [1:0] addedVar9;
+  logic [1:0] addedVar9_T ;
+  logic [1:0] addedVar9_R ;
+  assign addedVar9 = { _058_, _026_ };
+  assign addedVar9_T = {  _058__T , _026__T  };
+  logic [4:0] addedVar9_S ;
+  assign addedVar9_S = 0 ;
+  logic [0:0] _058__R0 ;
+  assign _058__R0 = addedVar9_R [1:1] ;
+  logic [0:0] _026__R8 ;
+  assign _026__R8 = addedVar9_R [0:0] ;
+  assign _015_ = & addedVar9;
+  logic [1:0] addedVar9_R0 ;
+  assign _015__T = | addedVar9_T ;
+  assign addedVar9_R0 = { 2{ _015__R }} & ~addedVar9 ;
+  assign _015__S = 0 ;
+  wire [1:0] addedVar10;
+  logic [1:0] addedVar10_T ;
+  logic [1:0] addedVar10_R ;
+  assign addedVar10 = { _059_, _026_ };
+  assign addedVar10_T = {  _059__T , _026__T  };
+  logic [4:0] addedVar10_S ;
+  assign addedVar10_S = 0 ;
+  logic [0:0] _059__R0 ;
+  assign _059__R0 = addedVar10_R [1:1] ;
+  logic [0:0] _026__R9 ;
+  assign _026__R9 = addedVar10_R [0:0] ;
+  assign _016_ = & addedVar10;
+  logic [1:0] addedVar10_R0 ;
+  assign _016__T = | addedVar10_T ;
+  assign addedVar10_R0 = { 2{ _016__R }} & ~addedVar10 ;
+  assign _016__S = 0 ;
+  wire [1:0] addedVar11;
+  logic [1:0] addedVar11_T ;
+  logic [1:0] addedVar11_R ;
+  assign addedVar11 = { _060_, _026_ };
+  assign addedVar11_T = {  _060__T , _026__T  };
+  logic [4:0] addedVar11_S ;
+  assign addedVar11_S = 0 ;
+  logic [0:0] _060__R0 ;
+  assign _060__R0 = addedVar11_R [1:1] ;
+  logic [0:0] _026__R10 ;
+  assign _026__R10 = addedVar11_R [0:0] ;
+  assign _017_ = & addedVar11;
+  logic [1:0] addedVar11_R0 ;
+  assign _017__T = | addedVar11_T ;
+  assign addedVar11_R0 = { 2{ _017__R }} & ~addedVar11 ;
+  assign _017__S = 0 ;
+  wire [1:0] addedVar12;
+  logic [1:0] addedVar12_T ;
+  logic [1:0] addedVar12_R ;
+  assign addedVar12 = { _061_, _026_ };
+  assign addedVar12_T = {  _061__T , _026__T  };
+  logic [4:0] addedVar12_S ;
+  assign addedVar12_S = 0 ;
+  logic [0:0] _061__R0 ;
+  assign _061__R0 = addedVar12_R [1:1] ;
+  logic [0:0] _026__R11 ;
+  assign _026__R11 = addedVar12_R [0:0] ;
+  assign _018_ = & addedVar12;
+  logic [1:0] addedVar12_R0 ;
+  assign _018__T = | addedVar12_T ;
+  assign addedVar12_R0 = { 2{ _018__R }} & ~addedVar12 ;
+  assign _018__S = 0 ;
+  wire [1:0] addedVar13;
+  logic [1:0] addedVar13_T ;
+  logic [1:0] addedVar13_R ;
+  assign addedVar13 = { _062_, _026_ };
+  assign addedVar13_T = {  _062__T , _026__T  };
+  logic [4:0] addedVar13_S ;
+  assign addedVar13_S = 0 ;
+  logic [0:0] _062__R0 ;
+  assign _062__R0 = addedVar13_R [1:1] ;
+  logic [0:0] _026__R12 ;
+  assign _026__R12 = addedVar13_R [0:0] ;
+  assign _019_ = & addedVar13;
+  logic [1:0] addedVar13_R0 ;
+  assign _019__T = | addedVar13_T ;
+  assign addedVar13_R0 = { 2{ _019__R }} & ~addedVar13 ;
+  assign _019__S = 0 ;
+  wire [1:0] addedVar14;
+  logic [1:0] addedVar14_T ;
+  logic [1:0] addedVar14_R ;
+  assign addedVar14 = { _063_, _026_ };
+  assign addedVar14_T = {  _063__T , _026__T  };
+  logic [4:0] addedVar14_S ;
+  assign addedVar14_S = 0 ;
+  logic [0:0] _063__R0 ;
+  assign _063__R0 = addedVar14_R [1:1] ;
+  logic [0:0] _026__R13 ;
+  assign _026__R13 = addedVar14_R [0:0] ;
+  assign _020_ = & addedVar14;
+  logic [1:0] addedVar14_R0 ;
+  assign _020__T = | addedVar14_T ;
+  assign addedVar14_R0 = { 2{ _020__R }} & ~addedVar14 ;
+  assign _020__S = 0 ;
+  wire [1:0] addedVar15;
+  logic [1:0] addedVar15_T ;
+  logic [1:0] addedVar15_R ;
+  assign addedVar15 = { _064_, _026_ };
+  assign addedVar15_T = {  _064__T , _026__T  };
+  logic [4:0] addedVar15_S ;
+  assign addedVar15_S = 0 ;
+  logic [0:0] _064__R0 ;
+  assign _064__R0 = addedVar15_R [1:1] ;
+  logic [0:0] _026__R14 ;
+  assign _026__R14 = addedVar15_R [0:0] ;
+  assign _021_ = & addedVar15;
+  logic [1:0] addedVar15_R0 ;
+  assign _021__T = | addedVar15_T ;
+  assign addedVar15_R0 = { 2{ _021__R }} & ~addedVar15 ;
+  assign _021__S = 0 ;
+  wire [1:0] addedVar16;
+  logic [1:0] addedVar16_T ;
+  logic [1:0] addedVar16_R ;
+  assign addedVar16 = { _065_, _026_ };
+  assign addedVar16_T = {  _065__T , _026__T  };
+  logic [4:0] addedVar16_S ;
+  assign addedVar16_S = 0 ;
+  logic [0:0] _065__R0 ;
+  assign _065__R0 = addedVar16_R [1:1] ;
+  logic [0:0] _026__R15 ;
+  assign _026__R15 = addedVar16_R [0:0] ;
+  assign _022_ = & addedVar16;
+  logic [1:0] addedVar16_R0 ;
+  assign _022__T = | addedVar16_T ;
+  assign addedVar16_R0 = { 2{ _022__R }} & ~addedVar16 ;
+  assign _022__S = 0 ;
+  wire [1:0] addedVar17;
+  logic [1:0] addedVar17_T ;
+  logic [1:0] addedVar17_R ;
+  assign addedVar17 = { _066_, _026_ };
+  assign addedVar17_T = {  _066__T , _026__T  };
+  logic [4:0] addedVar17_S ;
+  assign addedVar17_S = 0 ;
+  logic [0:0] _066__R0 ;
+  assign _066__R0 = addedVar17_R [1:1] ;
+  logic [0:0] _026__R16 ;
+  assign _026__R16 = addedVar17_R [0:0] ;
+  assign _023_ = & addedVar17;
+  logic [1:0] addedVar17_R0 ;
+  assign _023__T = | addedVar17_T ;
+  assign addedVar17_R0 = { 2{ _023__R }} & ~addedVar17 ;
+  assign _023__S = 0 ;
+  wire [1:0] addedVar18;
+  logic [1:0] addedVar18_T ;
+  logic [1:0] addedVar18_R ;
+  assign addedVar18 = { _067_, rst };
+  assign addedVar18_T = {  _067__T , rst_T  };
+  logic [4:0] addedVar18_S ;
+  assign addedVar18_S = 0 ;
+  logic [0:0] _067__R0 ;
+  assign _067__R0 = addedVar18_R [1:1] ;
+  logic [0:0] rst_R1 ;
+  assign rst_R1 = addedVar18_R [0:0] ;
+  assign _024_ = | addedVar18;
+  logic [1:0] addedVar18_R0 ;
+  assign _024__T = | addedVar18_T ;
+  assign addedVar18_R0 = { 2{ _024__R }} & addedVar18 ;
+  assign _024__S = 0 ;
+  wire [1:0] addedVar19;
+  logic [1:0] addedVar19_T ;
+  logic [1:0] addedVar19_R ;
+  assign addedVar19 = { reset_byte_counter, rst };
+  assign addedVar19_T = {  reset_byte_counter_T , rst_T  };
+  logic [4:0] addedVar19_S ;
+  assign addedVar19_S = 0 ;
+  logic [0:0] reset_byte_counter_R1 ;
+  assign reset_byte_counter_R1 = addedVar19_R [1:1] ;
+  logic [0:0] rst_R2 ;
+  assign rst_R2 = addedVar19_R [0:0] ;
+  assign _025_ = | addedVar19;
+  logic [1:0] addedVar19_R0 ;
+  assign _025__T = | addedVar19_T ;
+  assign addedVar19_R0 = { 2{ _025__R }} & addedVar19 ;
+  assign _025__S = 0 ;
+  always @(posedge clk)
+    if (rst) operated_bytes_count <= 16'b0000000000000000;
+  always @(posedge clk)
+    if ( rst ) operated_bytes_count_T  <= ( { 16{ rst_T  }} ) & ( { 16{ operated_bytes_count_S != 0 }} );
+  always @(posedge clk)
+    if ( rst ) operated_bytes_count_t_flag  <= operated_bytes_count_t_flag  ? 1 : (rst_T  ) & ( operated_bytes_count_S != 0 );
+  always @(posedge clk)
+    if ( rst ) operated_bytes_count_r_flag  <= operated_bytes_count_r_flag  ? 1 : operated_bytes_count_t_flag  ? 0 : ( |operated_bytes_count_R  ) ;
+  always @(posedge clk)
+    if ( !rst ) operated_bytes_count_T  <= ( operated_bytes_count_next_T  | { 16{ rst_T  }} ) & ( { 16{ operated_bytes_count_S != operated_bytes_count_next_S }} );
+  always @(posedge clk)
+    if ( !rst ) operated_bytes_count_t_flag  <= operated_bytes_count_t_flag  ? 1 : ( ( |operated_bytes_count_next_T  ) || rst_T  ) & ( operated_bytes_count_S != operated_bytes_count_next_S );
+  always @(posedge clk)
+    if ( !rst ) operated_bytes_count_r_flag  <= operated_bytes_count_r_flag  ? 1 : operated_bytes_count_t_flag  ? 0 : ( |operated_bytes_count_R  ) ;
+  logic [15:0] operated_bytes_count_next_R0 ;
+  assign operated_bytes_count_next_R0 = { 16{ !rst }} & operated_bytes_count_next_T ;
+  always @(posedge clk)
+    if (rst) aes_reg_state <= 2'b00;
+  always @(posedge clk)
+    if ( rst ) aes_reg_state_T  <= ( { 2{ rst_T  }} ) & ( { 2{ aes_reg_state_S != 0 }} );
+  always @(posedge clk)
+    if ( rst ) aes_reg_state_t_flag  <= aes_reg_state_t_flag  ? 1 : (rst_T  ) & ( aes_reg_state_S != 0 );
+  always @(posedge clk)
+    if ( rst ) aes_reg_state_r_flag  <= aes_reg_state_r_flag  ? 1 : aes_reg_state_t_flag  ? 0 : ( |aes_reg_state_R  ) ;
+  always @(posedge clk)
+    if ( !rst ) aes_reg_state_T  <= ( aes_reg_state_next_T  | { 2{ rst_T  }} ) & ( { 2{ aes_reg_state_S != aes_reg_state_next_S }} );
+  always @(posedge clk)
+    if ( !rst ) aes_reg_state_t_flag  <= aes_reg_state_t_flag  ? 1 : ( ( |aes_reg_state_next_T  ) || rst_T  ) & ( aes_reg_state_S != aes_reg_state_next_S );
+  always @(posedge clk)
+    if ( !rst ) aes_reg_state_r_flag  <= aes_reg_state_r_flag  ? 1 : aes_reg_state_t_flag  ? 0 : ( |aes_reg_state_R  ) ;
+  logic [1:0] aes_reg_state_next_R0 ;
+  assign aes_reg_state_next_R0 = { 2{ !rst }} & aes_reg_state_next_T ;
+  always @(posedge clk)
+    if (rst) uaes_ctr <= 128'b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
+  always @(posedge clk)
+    if ( rst ) uaes_ctr_T  <= ( { 128{ rst_T  }} ) & ( { 128{ uaes_ctr_S != 0 }} );
+  always @(posedge clk)
+    if ( rst ) uaes_ctr_t_flag  <= uaes_ctr_t_flag  ? 1 : (rst_T  ) & ( uaes_ctr_S != 0 );
+  always @(posedge clk)
+    if ( rst ) uaes_ctr_r_flag  <= uaes_ctr_r_flag  ? 1 : uaes_ctr_t_flag  ? 0 : ( |uaes_ctr_R  ) ;
+  always @(posedge clk)
+    if ( _006_ ) uaes_ctr_T  <= ( uaes_ctr_nxt_T  | { 128{ _006__T  }} ) & ( { 128{ uaes_ctr_S != uaes_ctr_nxt_S }} );
+  always @(posedge clk)
+    if ( _006_ ) uaes_ctr_t_flag  <= uaes_ctr_t_flag  ? 1 : ( ( |uaes_ctr_nxt_T  ) || _006__T  ) & ( uaes_ctr_S != uaes_ctr_nxt_S );
+  always @(posedge clk)
+    if ( _006_ ) uaes_ctr_r_flag  <= uaes_ctr_r_flag  ? 1 : uaes_ctr_t_flag  ? 0 : ( |uaes_ctr_R  ) ;
+  logic [127:0] uaes_ctr_nxt_R0 ;
+  assign uaes_ctr_nxt_R0 = { 128{ _006_ }} & uaes_ctr_nxt_T ;
+  always @(posedge clk)
+    if (_024_) aes_time_counter <= 5'b00000;
+  always @(posedge clk)
+    if ( _024_ ) aes_time_counter_T  <= ( { 5{ _024__T  }} ) & ( { 5{ aes_time_counter_S != 0 }} );
+  always @(posedge clk)
+    if ( _024_ ) aes_time_counter_t_flag  <= aes_time_counter_t_flag  ? 1 : (_024__T  ) & ( aes_time_counter_S != 0 );
+  always @(posedge clk)
+    if ( _024_ ) aes_time_counter_r_flag  <= aes_time_counter_r_flag  ? 1 : aes_time_counter_t_flag  ? 0 : ( |aes_time_counter_R  ) ;
+  always @(posedge clk)
+    if ( _070_ ) aes_time_counter_T  <= ( _005__T  | { 5{ _070__T  }} ) & ( { 5{ aes_time_counter_S != _005__S }} );
+  always @(posedge clk)
+    if ( _070_ ) aes_time_counter_t_flag  <= aes_time_counter_t_flag  ? 1 : ( ( |_005__T  ) || _070__T  ) & ( aes_time_counter_S != _005__S );
+  always @(posedge clk)
+    if ( _070_ ) aes_time_counter_r_flag  <= aes_time_counter_r_flag  ? 1 : aes_time_counter_t_flag  ? 0 : ( |aes_time_counter_R  ) ;
+  logic [4:0] _005__R0 ;
+  assign _005__R0 = { 5{ _070_ }} & _005__T ;
+  always @(posedge clk)
+    if (_007_) encrypted_data_buf <= encrypted_data;
+  always @(posedge clk)
+    if (rst) encrypted_data_buf_T  <= 0 ;
+  always @(posedge clk)
+    if (_007_) encrypted_data_buf_T  <= ( encrypted_data_T  | { 128{ _007__T  }} ) & ( { 128{ encrypted_data_buf_S != encrypted_data_S }} );
+  always @(posedge clk)
+    if (_007_) encrypted_data_buf_t_flag  <= encrypted_data_buf_t_flag  ? 1 : ( ( |encrypted_data_T  ) || _007__T  ) & ( encrypted_data_buf_S != encrypted_data_S );
+  always @(posedge clk)
+    if (_007_) encrypted_data_buf_r_flag  <= encrypted_data_buf_r_flag  ? 1 : encrypted_data_buf_t_flag  ? 0 : ( |encrypted_data_buf_R  ) ;
+  logic [127:0] encrypted_data_R0 ;
+  assign encrypted_data_R0 = { 128{ _007_ }} & encrypted_data_T ;
+  always @(posedge clk)
+    if (_008_) mem_data_buf[127:120] <= xram_data_in;
+  always @(posedge clk)
+    if (rst) mem_data_buf_T  [127:120] <= 0 ;
+  always @(posedge clk)
+    if (_008_) mem_data_buf_T  [127:120] <= ( xram_data_in_T  | { 8{ _008__T  }} ) & ( { 8{ mem_data_buf_S != xram_data_in_S }} );
+  always @(posedge clk)
+    if (_008_) mem_data_buf_t_flag  [127:120] <= mem_data_buf_t_flag  [127:120] ? 1 : ( ( |xram_data_in_T  ) || _008__T  ) & ( mem_data_buf_S != xram_data_in_S );
+  always @(posedge clk)
+    if (_008_) mem_data_buf_r_flag  [127:120] <= mem_data_buf_r_flag  [127:120] ? 1 : mem_data_buf_t_flag  [127:120] ? 0 : ( |mem_data_buf_R  [127:120] ) ;
+  logic [7:0] xram_data_in_R0 ;
+  assign xram_data_in_R0 = { 8{ _008_ }} & xram_data_in_T ;
+  always @(posedge clk)
+    if (_009_) mem_data_buf[7:0] <= xram_data_in;
+  always @(posedge clk)
+    if (rst) mem_data_buf_T  [7:0] <= 0 ;
+  always @(posedge clk)
+    if (_009_) mem_data_buf_T  [7:0] <= ( xram_data_in_T  | { 8{ _009__T  }} ) & ( { 8{ mem_data_buf_S != xram_data_in_S }} );
+  always @(posedge clk)
+    if (_009_) mem_data_buf_t_flag  [7:0] <= mem_data_buf_t_flag  [7:0] ? 1 : ( ( |xram_data_in_T  ) || _009__T  ) & ( mem_data_buf_S != xram_data_in_S );
+  always @(posedge clk)
+    if (_009_) mem_data_buf_r_flag  [7:0] <= mem_data_buf_r_flag  [7:0] ? 1 : mem_data_buf_t_flag  [7:0] ? 0 : ( |mem_data_buf_R  [7:0] ) ;
+  logic [7:0] xram_data_in_R1 ;
+  assign xram_data_in_R1 = { 8{ _009_ }} & xram_data_in_T ;
+  always @(posedge clk)
+    if (_010_) mem_data_buf[15:8] <= xram_data_in;
+  always @(posedge clk)
+    if (rst) mem_data_buf_T  [15:8] <= 0 ;
+  always @(posedge clk)
+    if (_010_) mem_data_buf_T  [15:8] <= ( xram_data_in_T  | { 8{ _010__T  }} ) & ( { 8{ mem_data_buf_S != xram_data_in_S }} );
+  always @(posedge clk)
+    if (_010_) mem_data_buf_t_flag  [15:8] <= mem_data_buf_t_flag  [15:8] ? 1 : ( ( |xram_data_in_T  ) || _010__T  ) & ( mem_data_buf_S != xram_data_in_S );
+  always @(posedge clk)
+    if (_010_) mem_data_buf_r_flag  [15:8] <= mem_data_buf_r_flag  [15:8] ? 1 : mem_data_buf_t_flag  [15:8] ? 0 : ( |mem_data_buf_R  [15:8] ) ;
+  logic [7:0] xram_data_in_R2 ;
+  assign xram_data_in_R2 = { 8{ _010_ }} & xram_data_in_T ;
+  always @(posedge clk)
+    if (_011_) mem_data_buf[23:16] <= xram_data_in;
+  always @(posedge clk)
+    if (rst) mem_data_buf_T  [23:16] <= 0 ;
+  always @(posedge clk)
+    if (_011_) mem_data_buf_T  [23:16] <= ( xram_data_in_T  | { 8{ _011__T  }} ) & ( { 8{ mem_data_buf_S != xram_data_in_S }} );
+  always @(posedge clk)
+    if (_011_) mem_data_buf_t_flag  [23:16] <= mem_data_buf_t_flag  [23:16] ? 1 : ( ( |xram_data_in_T  ) || _011__T  ) & ( mem_data_buf_S != xram_data_in_S );
+  always @(posedge clk)
+    if (_011_) mem_data_buf_r_flag  [23:16] <= mem_data_buf_r_flag  [23:16] ? 1 : mem_data_buf_t_flag  [23:16] ? 0 : ( |mem_data_buf_R  [23:16] ) ;
+  logic [7:0] xram_data_in_R3 ;
+  assign xram_data_in_R3 = { 8{ _011_ }} & xram_data_in_T ;
+  always @(posedge clk)
+    if (_012_) mem_data_buf[31:24] <= xram_data_in;
+  always @(posedge clk)
+    if (rst) mem_data_buf_T  [31:24] <= 0 ;
+  always @(posedge clk)
+    if (_012_) mem_data_buf_T  [31:24] <= ( xram_data_in_T  | { 8{ _012__T  }} ) & ( { 8{ mem_data_buf_S != xram_data_in_S }} );
+  always @(posedge clk)
+    if (_012_) mem_data_buf_t_flag  [31:24] <= mem_data_buf_t_flag  [31:24] ? 1 : ( ( |xram_data_in_T  ) || _012__T  ) & ( mem_data_buf_S != xram_data_in_S );
+  always @(posedge clk)
+    if (_012_) mem_data_buf_r_flag  [31:24] <= mem_data_buf_r_flag  [31:24] ? 1 : mem_data_buf_t_flag  [31:24] ? 0 : ( |mem_data_buf_R  [31:24] ) ;
+  logic [7:0] xram_data_in_R4 ;
+  assign xram_data_in_R4 = { 8{ _012_ }} & xram_data_in_T ;
+  always @(posedge clk)
+    if (_013_) mem_data_buf[39:32] <= xram_data_in;
+  always @(posedge clk)
+    if (rst) mem_data_buf_T  [39:32] <= 0 ;
+  always @(posedge clk)
+    if (_013_) mem_data_buf_T  [39:32] <= ( xram_data_in_T  | { 8{ _013__T  }} ) & ( { 8{ mem_data_buf_S != xram_data_in_S }} );
+  always @(posedge clk)
+    if (_013_) mem_data_buf_t_flag  [39:32] <= mem_data_buf_t_flag  [39:32] ? 1 : ( ( |xram_data_in_T  ) || _013__T  ) & ( mem_data_buf_S != xram_data_in_S );
+  always @(posedge clk)
+    if (_013_) mem_data_buf_r_flag  [39:32] <= mem_data_buf_r_flag  [39:32] ? 1 : mem_data_buf_t_flag  [39:32] ? 0 : ( |mem_data_buf_R  [39:32] ) ;
+  logic [7:0] xram_data_in_R5 ;
+  assign xram_data_in_R5 = { 8{ _013_ }} & xram_data_in_T ;
+  always @(posedge clk)
+    if (_014_) mem_data_buf[47:40] <= xram_data_in;
+  always @(posedge clk)
+    if (rst) mem_data_buf_T  [47:40] <= 0 ;
+  always @(posedge clk)
+    if (_014_) mem_data_buf_T  [47:40] <= ( xram_data_in_T  | { 8{ _014__T  }} ) & ( { 8{ mem_data_buf_S != xram_data_in_S }} );
+  always @(posedge clk)
+    if (_014_) mem_data_buf_t_flag  [47:40] <= mem_data_buf_t_flag  [47:40] ? 1 : ( ( |xram_data_in_T  ) || _014__T  ) & ( mem_data_buf_S != xram_data_in_S );
+  always @(posedge clk)
+    if (_014_) mem_data_buf_r_flag  [47:40] <= mem_data_buf_r_flag  [47:40] ? 1 : mem_data_buf_t_flag  [47:40] ? 0 : ( |mem_data_buf_R  [47:40] ) ;
+  logic [7:0] xram_data_in_R6 ;
+  assign xram_data_in_R6 = { 8{ _014_ }} & xram_data_in_T ;
+  always @(posedge clk)
+    if (_015_) mem_data_buf[55:48] <= xram_data_in;
+  always @(posedge clk)
+    if (rst) mem_data_buf_T  [55:48] <= 0 ;
+  always @(posedge clk)
+    if (_015_) mem_data_buf_T  [55:48] <= ( xram_data_in_T  | { 8{ _015__T  }} ) & ( { 8{ mem_data_buf_S != xram_data_in_S }} );
+  always @(posedge clk)
+    if (_015_) mem_data_buf_t_flag  [55:48] <= mem_data_buf_t_flag  [55:48] ? 1 : ( ( |xram_data_in_T  ) || _015__T  ) & ( mem_data_buf_S != xram_data_in_S );
+  always @(posedge clk)
+    if (_015_) mem_data_buf_r_flag  [55:48] <= mem_data_buf_r_flag  [55:48] ? 1 : mem_data_buf_t_flag  [55:48] ? 0 : ( |mem_data_buf_R  [55:48] ) ;
+  logic [7:0] xram_data_in_R7 ;
+  assign xram_data_in_R7 = { 8{ _015_ }} & xram_data_in_T ;
+  always @(posedge clk)
+    if (_016_) mem_data_buf[63:56] <= xram_data_in;
+  always @(posedge clk)
+    if (rst) mem_data_buf_T  [63:56] <= 0 ;
+  always @(posedge clk)
+    if (_016_) mem_data_buf_T  [63:56] <= ( xram_data_in_T  | { 8{ _016__T  }} ) & ( { 8{ mem_data_buf_S != xram_data_in_S }} );
+  always @(posedge clk)
+    if (_016_) mem_data_buf_t_flag  [63:56] <= mem_data_buf_t_flag  [63:56] ? 1 : ( ( |xram_data_in_T  ) || _016__T  ) & ( mem_data_buf_S != xram_data_in_S );
+  always @(posedge clk)
+    if (_016_) mem_data_buf_r_flag  [63:56] <= mem_data_buf_r_flag  [63:56] ? 1 : mem_data_buf_t_flag  [63:56] ? 0 : ( |mem_data_buf_R  [63:56] ) ;
+  logic [7:0] xram_data_in_R8 ;
+  assign xram_data_in_R8 = { 8{ _016_ }} & xram_data_in_T ;
+  always @(posedge clk)
+    if (_017_) mem_data_buf[71:64] <= xram_data_in;
+  always @(posedge clk)
+    if (rst) mem_data_buf_T  [71:64] <= 0 ;
+  always @(posedge clk)
+    if (_017_) mem_data_buf_T  [71:64] <= ( xram_data_in_T  | { 8{ _017__T  }} ) & ( { 8{ mem_data_buf_S != xram_data_in_S }} );
+  always @(posedge clk)
+    if (_017_) mem_data_buf_t_flag  [71:64] <= mem_data_buf_t_flag  [71:64] ? 1 : ( ( |xram_data_in_T  ) || _017__T  ) & ( mem_data_buf_S != xram_data_in_S );
+  always @(posedge clk)
+    if (_017_) mem_data_buf_r_flag  [71:64] <= mem_data_buf_r_flag  [71:64] ? 1 : mem_data_buf_t_flag  [71:64] ? 0 : ( |mem_data_buf_R  [71:64] ) ;
+  logic [7:0] xram_data_in_R9 ;
+  assign xram_data_in_R9 = { 8{ _017_ }} & xram_data_in_T ;
+  always @(posedge clk)
+    if (_018_) mem_data_buf[79:72] <= xram_data_in;
+  always @(posedge clk)
+    if (rst) mem_data_buf_T  [79:72] <= 0 ;
+  always @(posedge clk)
+    if (_018_) mem_data_buf_T  [79:72] <= ( xram_data_in_T  | { 8{ _018__T  }} ) & ( { 8{ mem_data_buf_S != xram_data_in_S }} );
+  always @(posedge clk)
+    if (_018_) mem_data_buf_t_flag  [79:72] <= mem_data_buf_t_flag  [79:72] ? 1 : ( ( |xram_data_in_T  ) || _018__T  ) & ( mem_data_buf_S != xram_data_in_S );
+  always @(posedge clk)
+    if (_018_) mem_data_buf_r_flag  [79:72] <= mem_data_buf_r_flag  [79:72] ? 1 : mem_data_buf_t_flag  [79:72] ? 0 : ( |mem_data_buf_R  [79:72] ) ;
+  logic [7:0] xram_data_in_R10 ;
+  assign xram_data_in_R10 = { 8{ _018_ }} & xram_data_in_T ;
+  always @(posedge clk)
+    if (_019_) mem_data_buf[87:80] <= xram_data_in;
+  always @(posedge clk)
+    if (rst) mem_data_buf_T  [87:80] <= 0 ;
+  always @(posedge clk)
+    if (_019_) mem_data_buf_T  [87:80] <= ( xram_data_in_T  | { 8{ _019__T  }} ) & ( { 8{ mem_data_buf_S != xram_data_in_S }} );
+  always @(posedge clk)
+    if (_019_) mem_data_buf_t_flag  [87:80] <= mem_data_buf_t_flag  [87:80] ? 1 : ( ( |xram_data_in_T  ) || _019__T  ) & ( mem_data_buf_S != xram_data_in_S );
+  always @(posedge clk)
+    if (_019_) mem_data_buf_r_flag  [87:80] <= mem_data_buf_r_flag  [87:80] ? 1 : mem_data_buf_t_flag  [87:80] ? 0 : ( |mem_data_buf_R  [87:80] ) ;
+  logic [7:0] xram_data_in_R11 ;
+  assign xram_data_in_R11 = { 8{ _019_ }} & xram_data_in_T ;
+  always @(posedge clk)
+    if (_020_) mem_data_buf[95:88] <= xram_data_in;
+  always @(posedge clk)
+    if (rst) mem_data_buf_T  [95:88] <= 0 ;
+  always @(posedge clk)
+    if (_020_) mem_data_buf_T  [95:88] <= ( xram_data_in_T  | { 8{ _020__T  }} ) & ( { 8{ mem_data_buf_S != xram_data_in_S }} );
+  always @(posedge clk)
+    if (_020_) mem_data_buf_t_flag  [95:88] <= mem_data_buf_t_flag  [95:88] ? 1 : ( ( |xram_data_in_T  ) || _020__T  ) & ( mem_data_buf_S != xram_data_in_S );
+  always @(posedge clk)
+    if (_020_) mem_data_buf_r_flag  [95:88] <= mem_data_buf_r_flag  [95:88] ? 1 : mem_data_buf_t_flag  [95:88] ? 0 : ( |mem_data_buf_R  [95:88] ) ;
+  logic [7:0] xram_data_in_R12 ;
+  assign xram_data_in_R12 = { 8{ _020_ }} & xram_data_in_T ;
+  always @(posedge clk)
+    if (_021_) mem_data_buf[103:96] <= xram_data_in;
+  always @(posedge clk)
+    if (rst) mem_data_buf_T  [103:96] <= 0 ;
+  always @(posedge clk)
+    if (_021_) mem_data_buf_T  [103:96] <= ( xram_data_in_T  | { 8{ _021__T  }} ) & ( { 8{ mem_data_buf_S != xram_data_in_S }} );
+  always @(posedge clk)
+    if (_021_) mem_data_buf_t_flag  [103:96] <= mem_data_buf_t_flag  [103:96] ? 1 : ( ( |xram_data_in_T  ) || _021__T  ) & ( mem_data_buf_S != xram_data_in_S );
+  always @(posedge clk)
+    if (_021_) mem_data_buf_r_flag  [103:96] <= mem_data_buf_r_flag  [103:96] ? 1 : mem_data_buf_t_flag  [103:96] ? 0 : ( |mem_data_buf_R  [103:96] ) ;
+  logic [7:0] xram_data_in_R13 ;
+  assign xram_data_in_R13 = { 8{ _021_ }} & xram_data_in_T ;
+  always @(posedge clk)
+    if (_022_) mem_data_buf[111:104] <= xram_data_in;
+  always @(posedge clk)
+    if (rst) mem_data_buf_T  [111:104] <= 0 ;
+  always @(posedge clk)
+    if (_022_) mem_data_buf_T  [111:104] <= ( xram_data_in_T  | { 8{ _022__T  }} ) & ( { 8{ mem_data_buf_S != xram_data_in_S }} );
+  always @(posedge clk)
+    if (_022_) mem_data_buf_t_flag  [111:104] <= mem_data_buf_t_flag  [111:104] ? 1 : ( ( |xram_data_in_T  ) || _022__T  ) & ( mem_data_buf_S != xram_data_in_S );
+  always @(posedge clk)
+    if (_022_) mem_data_buf_r_flag  [111:104] <= mem_data_buf_r_flag  [111:104] ? 1 : mem_data_buf_t_flag  [111:104] ? 0 : ( |mem_data_buf_R  [111:104] ) ;
+  logic [7:0] xram_data_in_R14 ;
+  assign xram_data_in_R14 = { 8{ _022_ }} & xram_data_in_T ;
+  always @(posedge clk)
+    if (_023_) mem_data_buf[119:112] <= xram_data_in;
+  always @(posedge clk)
+    if (rst) mem_data_buf_T  [119:112] <= 0 ;
+  always @(posedge clk)
+    if (_023_) mem_data_buf_T  [119:112] <= ( xram_data_in_T  | { 8{ _023__T  }} ) & ( { 8{ mem_data_buf_S != xram_data_in_S }} );
+  always @(posedge clk)
+    if (_023_) mem_data_buf_t_flag  [119:112] <= mem_data_buf_t_flag  [119:112] ? 1 : ( ( |xram_data_in_T  ) || _023__T  ) & ( mem_data_buf_S != xram_data_in_S );
+  always @(posedge clk)
+    if (_023_) mem_data_buf_r_flag  [119:112] <= mem_data_buf_r_flag  [119:112] ? 1 : mem_data_buf_t_flag  [119:112] ? 0 : ( |mem_data_buf_R  [119:112] ) ;
+  logic [7:0] xram_data_in_R15 ;
+  assign xram_data_in_R15 = { 8{ _023_ }} & xram_data_in_T ;
+  always @(posedge clk)
+    if (_025_) byte_counter <= 4'b0000;
+  always @(posedge clk)
+    if ( _025_ ) byte_counter_T  <= ( { 4{ _025__T  }} ) & ( { 4{ byte_counter_S != 0 }} );
+  always @(posedge clk)
+    if ( _025_ ) byte_counter_t_flag  <= byte_counter_t_flag  ? 1 : (_025__T  ) & ( byte_counter_S != 0 );
+  always @(posedge clk)
+    if ( _025_ ) byte_counter_r_flag  <= byte_counter_r_flag  ? 1 : byte_counter_t_flag  ? 0 : ( |byte_counter_R  ) ;
+  always @(posedge clk)
+    if ( xram_ack ) byte_counter_T  <= ( _002__T  | { 4{ xram_ack_T  }} ) & ( { 4{ byte_counter_S != _002__S }} );
+  always @(posedge clk)
+    if ( xram_ack ) byte_counter_t_flag  <= byte_counter_t_flag  ? 1 : ( ( |_002__T  ) || xram_ack_T  ) & ( byte_counter_S != _002__S );
+  always @(posedge clk)
+    if ( xram_ack ) byte_counter_r_flag  <= byte_counter_r_flag  ? 1 : byte_counter_t_flag  ? 0 : ( |byte_counter_R  ) ;
+  logic [3:0] _002__R0 ;
+  assign _002__R0 = { 4{ xram_ack }} & _002__T ;
+  always @(posedge clk)
+    if (_025_) block_counter <= 16'b0000000000000000;
+  always @(posedge clk)
+    if ( _025_ ) block_counter_T  <= ( { 16{ _025__T  }} ) & ( { 16{ block_counter_S != 0 }} );
+  always @(posedge clk)
+    if ( _025_ ) block_counter_t_flag  <= block_counter_t_flag  ? 1 : (_025__T  ) & ( block_counter_S != 0 );
+  always @(posedge clk)
+    if ( _025_ ) block_counter_r_flag  <= block_counter_r_flag  ? 1 : block_counter_t_flag  ? 0 : ( |block_counter_R  ) ;
+  always @(posedge clk)
+    if ( more_blocks ) block_counter_T  <= ( _001__T  | { 16{ more_blocks_T  }} ) & ( { 16{ block_counter_S != _001__S }} );
+  always @(posedge clk)
+    if ( more_blocks ) block_counter_t_flag  <= block_counter_t_flag  ? 1 : ( ( |_001__T  ) || more_blocks_T  ) & ( block_counter_S != _001__S );
+  always @(posedge clk)
+    if ( more_blocks ) block_counter_r_flag  <= block_counter_r_flag  ? 1 : block_counter_t_flag  ? 0 : ( |block_counter_R  ) ;
+  logic [15:0] _001__R0 ;
+  assign _001__R0 = { 16{ more_blocks }} & _001__T ;
+  assign sel_reg_start = addr == 16'b1111111100000000;
+  assign sel_reg_start_S = 0 ;
+  logic [15:0] addr_R0 ;
+  assign sel_reg_start_T = | addr_T ;
+  assign addr_R0 = { 16{ sel_reg_start_R }} ;
+  assign sel_reg_state = addr == 16'b1111111100000001;
+  assign sel_reg_state_S = 0 ;
+  logic [15:0] addr_R1 ;
+  assign sel_reg_state_T = | addr_T ;
+  assign addr_R1 = { 16{ sel_reg_state_R }} ;
+  assign sel_reg_addr = addr[15:1] == 15'b111111110000001;
+  assign sel_reg_addr_S = 0 ;
+  logic [15:0] addr_R2 ;
+  assign sel_reg_addr_T = | addr_T [15:1] ;
+  assign addr_R2 [15:1] = { 15{ sel_reg_addr_R }} ;
+  assign sel_reg_len = addr[15:1] == 15'b111111110000010;
+  assign sel_reg_len_S = 0 ;
+  assign { addr_R2 [0] } = 0;
+  logic [15:0] addr_R3 ;
+  assign sel_reg_len_T = | addr_T [15:1] ;
+  assign addr_R3 [15:1] = { 15{ sel_reg_len_R }} ;
+  assign sel_reg_ctr = addr[15:4] == 12'b111111110010;
+  assign sel_reg_ctr_S = 0 ;
+  assign { addr_R3 [0] } = 0;
+  logic [15:0] addr_R4 ;
+  assign sel_reg_ctr_T = | addr_T [15:4] ;
+  assign addr_R4 [15:4] = { 12{ sel_reg_ctr_R }} ;
+  assign sel_reg_key0 = addr[15:4] == 12'b111111110001;
+  assign sel_reg_key0_S = 0 ;
+  assign { addr_R4 [0], addr_R4 [1], addr_R4 [2], addr_R4 [3] } = 0;
+  logic [15:0] addr_R5 ;
+  assign sel_reg_key0_T = | addr_T [15:4] ;
+  assign addr_R5 [15:4] = { 12{ sel_reg_key0_R }} ;
+  assign aes_state_idle = ! aes_reg_state;
+  logic [1:0] aes_reg_state_R0 ;
+  assign aes_state_idle_T = | aes_reg_state_T ;
+  assign aes_reg_state_R0 = { 2{ aes_state_idle_R }} ;
+  assign aes_state_idle_S = 0 ;
+  assign aes_state_read_data = aes_reg_state == 1'b1;
+  assign aes_state_read_data_S = 0 ;
+  logic [1:0] aes_reg_state_R1 ;
+  assign aes_state_read_data_T = | aes_reg_state_T ;
+  assign aes_reg_state_R1 = { 2{ aes_state_read_data_R }} ;
+  assign aes_state_operate = aes_reg_state == 2'b10;
+  assign aes_state_operate_S = 0 ;
+  logic [1:0] aes_reg_state_R2 ;
+  assign aes_state_operate_T = | aes_reg_state_T ;
+  assign aes_reg_state_R2 = { 2{ aes_state_operate_R }} ;
+  assign aes_state_write_data = aes_reg_state == 2'b11;
+  assign aes_state_write_data_S = 0 ;
+  logic [1:0] aes_reg_state_R3 ;
+  assign aes_state_write_data_T = | aes_reg_state_T ;
+  assign aes_reg_state_R3 = { 2{ aes_state_write_data_R }} ;
+  assign _028_ = byte_counter == 4'b1111;
+  assign _028__S = 0 ;
+  logic [3:0] byte_counter_R2 ;
+  assign _028__T = | byte_counter_T ;
+  assign byte_counter_R2 = { 4{ _028__R }} ;
+  assign _029_ = ! byte_counter;
+  logic [3:0] byte_counter_R3 ;
+  assign _029__T = | byte_counter_T ;
+  assign byte_counter_R3 = { 4{ _029__R }} ;
+  assign _029__S = 0 ;
+  assign _030_ = byte_counter == 1'b1;
+  assign _030__S = 0 ;
+  logic [3:0] byte_counter_R4 ;
+  assign _030__T = | byte_counter_T ;
+  assign byte_counter_R4 = { 4{ _030__R }} ;
+  assign _031_ = byte_counter == 2'b10;
+  assign _031__S = 0 ;
+  logic [3:0] byte_counter_R5 ;
+  assign _031__T = | byte_counter_T ;
+  assign byte_counter_R5 = { 4{ _031__R }} ;
+  assign _032_ = byte_counter == 2'b11;
+  assign _032__S = 0 ;
+  logic [3:0] byte_counter_R6 ;
+  assign _032__T = | byte_counter_T ;
+  assign byte_counter_R6 = { 4{ _032__R }} ;
+  assign _033_ = byte_counter == 3'b100;
+  assign _033__S = 0 ;
+  logic [3:0] byte_counter_R7 ;
+  assign _033__T = | byte_counter_T ;
+  assign byte_counter_R7 = { 4{ _033__R }} ;
+  assign _034_ = byte_counter == 3'b101;
+  assign _034__S = 0 ;
+  logic [3:0] byte_counter_R8 ;
+  assign _034__T = | byte_counter_T ;
+  assign byte_counter_R8 = { 4{ _034__R }} ;
+  assign _035_ = byte_counter == 3'b110;
+  assign _035__S = 0 ;
+  logic [3:0] byte_counter_R9 ;
+  assign _035__T = | byte_counter_T ;
+  assign byte_counter_R9 = { 4{ _035__R }} ;
+  assign _036_ = byte_counter == 3'b111;
+  assign _036__S = 0 ;
+  logic [3:0] byte_counter_R10 ;
+  assign _036__T = | byte_counter_T ;
+  assign byte_counter_R10 = { 4{ _036__R }} ;
+  assign _037_ = byte_counter == 4'b1000;
+  assign _037__S = 0 ;
+  logic [3:0] byte_counter_R11 ;
+  assign _037__T = | byte_counter_T ;
+  assign byte_counter_R11 = { 4{ _037__R }} ;
+  assign _038_ = byte_counter == 4'b1001;
+  assign _038__S = 0 ;
+  logic [3:0] byte_counter_R12 ;
+  assign _038__T = | byte_counter_T ;
+  assign byte_counter_R12 = { 4{ _038__R }} ;
+  assign _039_ = byte_counter == 4'b1010;
+  assign _039__S = 0 ;
+  logic [3:0] byte_counter_R13 ;
+  assign _039__T = | byte_counter_T ;
+  assign byte_counter_R13 = { 4{ _039__R }} ;
+  assign _040_ = byte_counter == 4'b1011;
+  assign _040__S = 0 ;
+  logic [3:0] byte_counter_R14 ;
+  assign _040__T = | byte_counter_T ;
+  assign byte_counter_R14 = { 4{ _040__R }} ;
+  assign _041_ = byte_counter == 4'b1100;
+  assign _041__S = 0 ;
+  logic [3:0] byte_counter_R15 ;
+  assign _041__T = | byte_counter_T ;
+  assign byte_counter_R15 = { 4{ _041__R }} ;
+  assign _042_ = byte_counter == 4'b1101;
+  assign _042__S = 0 ;
+  logic [3:0] byte_counter_R16 ;
+  assign _042__T = | byte_counter_T ;
+  assign byte_counter_R16 = { 4{ _042__R }} ;
+  assign _043_ = byte_counter == 4'b1110;
+  assign _043__S = 0 ;
+  logic [3:0] byte_counter_R17 ;
+  assign _043__T = | byte_counter_T ;
+  assign byte_counter_R17 = { 4{ _043__R }} ;
+  assign _044_ = addr >= 16'b1111111100000000;
+  assign _044__S = 0 ;
+  assign { addr_R5 [0], addr_R5 [1], addr_R5 [2], addr_R5 [3] } = 0;
+  logic [15:0] addr_R6 ;
+  assign _044__T = | addr_T ;
+  assign addr_R6 = { 16{ _044__R }} ;
+  assign aes_time_enough = aes_time_counter >= 5'b10101;
+  assign aes_time_enough_S = 0 ;
+  logic [4:0] aes_time_counter_R1 ;
+  assign aes_time_enough_T = | aes_time_counter_T ;
+  assign aes_time_counter_R1 = { 5{ aes_time_enough_R }} ;
+  assign in_addr_range = _044_ && _068_;
+  assign in_addr_range_S = 0 ;
+  logic [0:0] _044__R0 ;
+  logic [0:0] _068__R0 ;
+  assign in_addr_range_T = ( _044__T && _068_ ) | ( _068__T && _044_ ) ;
+  assign _044__R0 =  in_addr_range_R & { 1{ _068_ != 0 }} ;
+  assign _068__R0 =  in_addr_range_R & { 1{ _044_ != 0 }} ;
+  assign ack = stb && in_addr_range;
+  assign ack_S = 0 ;
+  logic [0:0] stb_R0 ;
+  logic [0:0] in_addr_range_R0 ;
+  assign ack_T = ( stb_T && in_addr_range ) | ( in_addr_range_T && stb ) ;
+  assign stb_R0 = ack_R ;
+  assign in_addr_range_R0 = ack_R ;
+  assign wren = wr && aes_state_idle;
+  assign wren_S = 0 ;
+  logic [0:0] wr_R0 ;
+  logic [0:0] aes_state_idle_R0 ;
+  assign wren_T = ( wr_T && aes_state_idle ) | ( aes_state_idle_T && wr ) ;
+  assign wr_R0 =  wren_R & { 1{ aes_state_idle != 0 }} ;
+  assign aes_state_idle_R0 =  wren_R & { 1{ wr != 0 }} ;
+  assign _045_ = sel_reg_start && data_in[0];
+  assign _045__S = 0 ;
+  logic [0:0] sel_reg_start_R0 ;
+  logic [7:0] data_in_R0 ;
+  assign _045__T = ( sel_reg_start_T && data_in[0] ) | ( data_in_T [0] && sel_reg_start ) ;
+  assign sel_reg_start_R0 =  _045__R & { 1{ data_in[0] != 0 }} ;
+  assign data_in_R0 [0] =  _045__R & { 1{ sel_reg_start != 0 }} ;
+  assign reset_byte_counter = _045_ && wren;
+  assign reset_byte_counter_S = 0 ;
+  logic [0:0] _045__R0 ;
+  logic [0:0] wren_R0 ;
+  assign reset_byte_counter_T = ( _045__T && wren ) | ( wren_T && _045_ ) ;
+  assign _045__R0 =  reset_byte_counter_R & { 1{ wren != 0 }} ;
+  assign wren_R0 =  reset_byte_counter_R & { 1{ _045_ != 0 }} ;
+  assign _046_ = sel_reg_addr && wren;
+  assign _046__S = 0 ;
+  logic [0:0] sel_reg_addr_R0 ;
+  logic [0:0] wren_R1 ;
+  assign _046__T = ( sel_reg_addr_T && wren ) | ( wren_T && sel_reg_addr ) ;
+  assign sel_reg_addr_R0 =  _046__R & { 1{ wren != 0 }} ;
+  assign wren_R1 =  _046__R & { 1{ sel_reg_addr != 0 }} ;
+  assign _047_ = sel_reg_len && wren;
+  assign _047__S = 0 ;
+  logic [0:0] sel_reg_len_R0 ;
+  logic [0:0] wren_R2 ;
+  assign _047__T = ( sel_reg_len_T && wren ) | ( wren_T && sel_reg_len ) ;
+  assign sel_reg_len_R0 =  _047__R & { 1{ wren != 0 }} ;
+  assign wren_R2 =  _047__R & { 1{ sel_reg_len != 0 }} ;
+  assign _048_ = sel_reg_ctr && wren;
+  assign _048__S = 0 ;
+  logic [0:0] sel_reg_ctr_R0 ;
+  logic [0:0] wren_R3 ;
+  assign _048__T = ( sel_reg_ctr_T && wren ) | ( wren_T && sel_reg_ctr ) ;
+  assign sel_reg_ctr_R0 =  _048__R & { 1{ wren != 0 }} ;
+  assign wren_R3 =  _048__R & { 1{ sel_reg_ctr != 0 }} ;
+  assign _049_ = sel_reg_key0 && wren;
+  assign _049__S = 0 ;
+  logic [0:0] sel_reg_key0_R0 ;
+  logic [0:0] wren_R4 ;
+  assign _049__T = ( sel_reg_key0_T && wren ) | ( wren_T && sel_reg_key0 ) ;
+  assign sel_reg_key0_R0 =  _049__R & { 1{ wren != 0 }} ;
+  assign wren_R4 =  _049__R & { 1{ sel_reg_key0 != 0 }} ;
+  assign _050_ = last_byte_acked && aes_state_write_data;
+  assign _050__S = 0 ;
+  logic [0:0] last_byte_acked_R1 ;
+  logic [0:0] aes_state_write_data_R0 ;
+  assign _050__T = ( last_byte_acked_T && aes_state_write_data ) | ( aes_state_write_data_T && last_byte_acked ) ;
+  assign last_byte_acked_R1 =  _050__R & { 1{ aes_state_write_data != 0 }} ;
+  assign aes_state_write_data_R0 =  _050__R & { 1{ last_byte_acked != 0 }} ;
+  assign last_byte_acked = _028_ && xram_ack;
+  assign last_byte_acked_S = 0 ;
+  logic [0:0] _028__R0 ;
+  logic [0:0] xram_ack_R0 ;
+  assign last_byte_acked_T = ( _028__T && xram_ack ) | ( xram_ack_T && _028_ ) ;
+  assign _028__R0 =  last_byte_acked_R & { 1{ xram_ack != 0 }} ;
+  assign xram_ack_R0 =  last_byte_acked_R & { 1{ _028_ != 0 }} ;
+  assign more_blocks = _050_ && _069_;
+  assign more_blocks_S = 0 ;
+  logic [0:0] _050__R0 ;
+  logic [0:0] _069__R0 ;
+  assign more_blocks_T = ( _050__T && _069_ ) | ( _069__T && _050_ ) ;
+  assign _050__R0 =  more_blocks_R & { 1{ _069_ != 0 }} ;
+  assign _069__R0 =  more_blocks_R & { 1{ _050_ != 0 }} ;
+  assign _051_ = last_byte_acked && more_blocks;
+  assign _051__S = 0 ;
+  logic [0:0] last_byte_acked_R2 ;
+  logic [0:0] more_blocks_R1 ;
+  assign _051__T = ( last_byte_acked_T && more_blocks ) | ( more_blocks_T && last_byte_acked ) ;
+  assign last_byte_acked_R2 =  _051__R & { 1{ more_blocks != 0 }} ;
+  assign more_blocks_R1 =  _051__R & { 1{ last_byte_acked != 0 }} ;
+  assign _052_ = xram_ack && _029_;
+  assign _052__S = 0 ;
+  logic [0:0] xram_ack_R1 ;
+  logic [0:0] _029__R0 ;
+  assign _052__T = ( xram_ack_T && _029_ ) | ( _029__T && xram_ack ) ;
+  assign xram_ack_R1 =  _052__R & { 1{ _029_ != 0 }} ;
+  assign _029__R0 =  _052__R & { 1{ xram_ack != 0 }} ;
+  assign _053_ = xram_ack && _030_;
+  assign _053__S = 0 ;
+  logic [0:0] xram_ack_R2 ;
+  logic [0:0] _030__R0 ;
+  assign _053__T = ( xram_ack_T && _030_ ) | ( _030__T && xram_ack ) ;
+  assign xram_ack_R2 =  _053__R & { 1{ _030_ != 0 }} ;
+  assign _030__R0 =  _053__R & { 1{ xram_ack != 0 }} ;
+  assign _054_ = xram_ack && _031_;
+  assign _054__S = 0 ;
+  logic [0:0] xram_ack_R3 ;
+  logic [0:0] _031__R0 ;
+  assign _054__T = ( xram_ack_T && _031_ ) | ( _031__T && xram_ack ) ;
+  assign xram_ack_R3 =  _054__R & { 1{ _031_ != 0 }} ;
+  assign _031__R0 =  _054__R & { 1{ xram_ack != 0 }} ;
+  assign _055_ = xram_ack && _032_;
+  assign _055__S = 0 ;
+  logic [0:0] xram_ack_R4 ;
+  logic [0:0] _032__R0 ;
+  assign _055__T = ( xram_ack_T && _032_ ) | ( _032__T && xram_ack ) ;
+  assign xram_ack_R4 =  _055__R & { 1{ _032_ != 0 }} ;
+  assign _032__R0 =  _055__R & { 1{ xram_ack != 0 }} ;
+  assign _056_ = xram_ack && _033_;
+  assign _056__S = 0 ;
+  logic [0:0] xram_ack_R5 ;
+  logic [0:0] _033__R0 ;
+  assign _056__T = ( xram_ack_T && _033_ ) | ( _033__T && xram_ack ) ;
+  assign xram_ack_R5 =  _056__R & { 1{ _033_ != 0 }} ;
+  assign _033__R0 =  _056__R & { 1{ xram_ack != 0 }} ;
+  assign _057_ = xram_ack && _034_;
+  assign _057__S = 0 ;
+  logic [0:0] xram_ack_R6 ;
+  logic [0:0] _034__R0 ;
+  assign _057__T = ( xram_ack_T && _034_ ) | ( _034__T && xram_ack ) ;
+  assign xram_ack_R6 =  _057__R & { 1{ _034_ != 0 }} ;
+  assign _034__R0 =  _057__R & { 1{ xram_ack != 0 }} ;
+  assign _058_ = xram_ack && _035_;
+  assign _058__S = 0 ;
+  logic [0:0] xram_ack_R7 ;
+  logic [0:0] _035__R0 ;
+  assign _058__T = ( xram_ack_T && _035_ ) | ( _035__T && xram_ack ) ;
+  assign xram_ack_R7 =  _058__R & { 1{ _035_ != 0 }} ;
+  assign _035__R0 =  _058__R & { 1{ xram_ack != 0 }} ;
+  assign _059_ = xram_ack && _036_;
+  assign _059__S = 0 ;
+  logic [0:0] xram_ack_R8 ;
+  logic [0:0] _036__R0 ;
+  assign _059__T = ( xram_ack_T && _036_ ) | ( _036__T && xram_ack ) ;
+  assign xram_ack_R8 =  _059__R & { 1{ _036_ != 0 }} ;
+  assign _036__R0 =  _059__R & { 1{ xram_ack != 0 }} ;
+  assign _060_ = xram_ack && _037_;
+  assign _060__S = 0 ;
+  logic [0:0] xram_ack_R9 ;
+  logic [0:0] _037__R0 ;
+  assign _060__T = ( xram_ack_T && _037_ ) | ( _037__T && xram_ack ) ;
+  assign xram_ack_R9 =  _060__R & { 1{ _037_ != 0 }} ;
+  assign _037__R0 =  _060__R & { 1{ xram_ack != 0 }} ;
+  assign _061_ = xram_ack && _038_;
+  assign _061__S = 0 ;
+  logic [0:0] xram_ack_R10 ;
+  logic [0:0] _038__R0 ;
+  assign _061__T = ( xram_ack_T && _038_ ) | ( _038__T && xram_ack ) ;
+  assign xram_ack_R10 =  _061__R & { 1{ _038_ != 0 }} ;
+  assign _038__R0 =  _061__R & { 1{ xram_ack != 0 }} ;
+  assign _062_ = xram_ack && _039_;
+  assign _062__S = 0 ;
+  logic [0:0] xram_ack_R11 ;
+  logic [0:0] _039__R0 ;
+  assign _062__T = ( xram_ack_T && _039_ ) | ( _039__T && xram_ack ) ;
+  assign xram_ack_R11 =  _062__R & { 1{ _039_ != 0 }} ;
+  assign _039__R0 =  _062__R & { 1{ xram_ack != 0 }} ;
+  assign _063_ = xram_ack && _040_;
+  assign _063__S = 0 ;
+  logic [0:0] xram_ack_R12 ;
+  logic [0:0] _040__R0 ;
+  assign _063__T = ( xram_ack_T && _040_ ) | ( _040__T && xram_ack ) ;
+  assign xram_ack_R12 =  _063__R & { 1{ _040_ != 0 }} ;
+  assign _040__R0 =  _063__R & { 1{ xram_ack != 0 }} ;
+  assign _064_ = xram_ack && _041_;
+  assign _064__S = 0 ;
+  logic [0:0] xram_ack_R13 ;
+  logic [0:0] _041__R0 ;
+  assign _064__T = ( xram_ack_T && _041_ ) | ( _041__T && xram_ack ) ;
+  assign xram_ack_R13 =  _064__R & { 1{ _041_ != 0 }} ;
+  assign _041__R0 =  _064__R & { 1{ xram_ack != 0 }} ;
+  assign _065_ = xram_ack && _042_;
+  assign _065__S = 0 ;
+  logic [0:0] xram_ack_R14 ;
+  logic [0:0] _042__R0 ;
+  assign _065__T = ( xram_ack_T && _042_ ) | ( _042__T && xram_ack ) ;
+  assign xram_ack_R14 =  _065__R & { 1{ _042_ != 0 }} ;
+  assign _042__R0 =  _065__R & { 1{ xram_ack != 0 }} ;
+  assign _066_ = xram_ack && _043_;
+  assign _066__S = 0 ;
+  logic [0:0] xram_ack_R15 ;
+  logic [0:0] _043__R0 ;
+  assign _066__T = ( xram_ack_T && _043_ ) | ( _043__T && xram_ack ) ;
+  assign xram_ack_R15 =  _066__R & { 1{ _043_ != 0 }} ;
+  assign _043__R0 =  _066__R & { 1{ xram_ack != 0 }} ;
+  assign xram_stb = aes_state_read_data || aes_state_write_data;
+  assign xram_stb_S = 0 ;
+  logic [0:0] aes_state_read_data_R0 ;
+  logic [0:0] aes_state_write_data_R1 ;
+  assign xram_stb_T = ( aes_state_read_data_T && aes_state_write_data != 1 ) | ( aes_state_write_data_T && aes_state_read_data != 1 ) ;
+  assign aes_state_read_data_R0 = xram_stb_R ;
+  assign aes_state_write_data_R1 = xram_stb_R ;
+  assign _067_ = more_blocks || reset_byte_counter;
+  assign _067__S = 0 ;
+  logic [0:0] more_blocks_R2 ;
+  logic [0:0] reset_byte_counter_R2 ;
+  assign _067__T = ( more_blocks_T && reset_byte_counter != 1 ) | ( reset_byte_counter_T && more_blocks != 1 ) ;
+  assign more_blocks_R2 = _067__R & { 1{ reset_byte_counter == 0 }} ;
+  assign reset_byte_counter_R2 = _067__R & { 1{ more_blocks == 0 }} ;
+  assign _068_ = addr < 16'b1111111100110000;
+  assign _068__S = 0 ;
+  logic [15:0] addr_R7 ;
+  assign _068__T = | addr_T ;
+  assign addr_R7 = { 16{ _068__R }} ;
+  assign _069_ = operated_bytes_count_next < aes_reg_oplen;
+  assign _069__S = 0 ;
+  logic [15:0] operated_bytes_count_next_R1 ;
+  logic [15:0] aes_reg_oplen_R0 ;
+  assign _069__T = (| operated_bytes_count_next_T ) | (|aes_reg_oplen_T ) ;
+  assign operated_bytes_count_next_R1 = { 16{ _069__R }} ;
+  assign aes_reg_oplen_R0 = { 16{ _069__R }} ;
+  assign _070_ = aes_time_counter < 5'b11111;
+  assign _070__S = 0 ;
+  logic [4:0] aes_time_counter_R2 ;
+  assign _070__T = | aes_time_counter_T ;
+  assign aes_time_counter_R2 = { 5{ _070__R }} ;
+  assign aes_step = aes_reg_state != aes_reg_state_next;
+  assign aes_step_S = 0 ;
+  logic [1:0] aes_reg_state_R4 ;
+  logic [1:0] aes_reg_state_next_R1 ;
+  assign aes_step_T = (| aes_reg_state_T ) | (|aes_reg_state_next_T ) ;
+  assign aes_reg_state_R4 = { 2{ aes_step_R }} ;
+  assign aes_reg_state_next_R1 = { 2{ aes_step_R }} ;
+  wire [7:0] addedVar20;
+  logic [7:0] addedVar20_T ;
+  logic [7:0] addedVar20_R ;
+  assign addedVar20 = { 6'b000000, aes_reg_state };
+  assign addedVar20_T = {  6'h0 , aes_reg_state_T  };
+  logic [4:0] addedVar20_S ;
+  assign addedVar20_S = 0 ;
+  logic [1:0] aes_reg_state_R5 ;
+  assign aes_reg_state_R5 = addedVar20_R [1:0] ;
+  assign data_out = sel_reg_state ? addedVar20 : _071_;
+  logic [0:0] sel_reg_state_R0 ;
+  assign sel_reg_state_R0 = ( | data_out_R ) && addedVar20 != _071_ ;
+  assign data_out_T = sel_reg_state ? ( { 8{ sel_reg_state_T  }} | addedVar20_T ) : ( { 8{ sel_reg_state_T  }} | _071__T );
+  assign data_out_S = sel_reg_state ? addedVar20_S : _071__S ;
+  logic [7:0] addedVar20_R0 ;
+  assign addedVar20_R0 = { 8{ sel_reg_state }} & ( data_out_R );
+  logic [7:0] _071__R0 ;
+  assign _071__R0 = { 8{ !sel_reg_state }} & ( data_out_R );
+  assign _071_ = sel_reg_addr ? aes_addr_dataout : _072_;
+  logic [0:0] sel_reg_addr_R1 ;
+  assign sel_reg_addr_R1 = ( | _071__R ) && aes_addr_dataout != _072_ ;
+  assign _071__T = sel_reg_addr ? ( { 8{ sel_reg_addr_T  }} | aes_addr_dataout_T ) : ( { 8{ sel_reg_addr_T  }} | _072__T );
+  assign _071__S = sel_reg_addr ? aes_addr_dataout_S : _072__S ;
+  logic [7:0] aes_addr_dataout_R0 ;
+  assign aes_addr_dataout_R0 = { 8{ sel_reg_addr }} & ( _071__R );
+  logic [7:0] _072__R0 ;
+  assign _072__R0 = { 8{ !sel_reg_addr }} & ( _071__R );
+  assign _072_ = sel_reg_len ? aes_len_dataout : _073_;
+  logic [0:0] sel_reg_len_R1 ;
+  assign sel_reg_len_R1 = ( | _072__R ) && aes_len_dataout != _073_ ;
+  assign _072__T = sel_reg_len ? ( { 8{ sel_reg_len_T  }} | aes_len_dataout_T ) : ( { 8{ sel_reg_len_T  }} | _073__T );
+  assign _072__S = sel_reg_len ? aes_len_dataout_S : _073__S ;
+  logic [7:0] aes_len_dataout_R0 ;
+  assign aes_len_dataout_R0 = { 8{ sel_reg_len }} & ( _072__R );
+  logic [7:0] _073__R0 ;
+  assign _073__R0 = { 8{ !sel_reg_len }} & ( _072__R );
+  assign _073_ = sel_reg_ctr ? aes_ctr_dataout : _074_;
+  logic [0:0] sel_reg_ctr_R1 ;
+  assign sel_reg_ctr_R1 = ( | _073__R ) && aes_ctr_dataout != _074_ ;
+  assign _073__T = sel_reg_ctr ? ( { 8{ sel_reg_ctr_T  }} | aes_ctr_dataout_T ) : ( { 8{ sel_reg_ctr_T  }} | _074__T );
+  assign _073__S = sel_reg_ctr ? aes_ctr_dataout_S : _074__S ;
+  logic [7:0] aes_ctr_dataout_R0 ;
+  assign aes_ctr_dataout_R0 = { 8{ sel_reg_ctr }} & ( _073__R );
+  logic [7:0] _074__R0 ;
+  assign _074__R0 = { 8{ !sel_reg_ctr }} & ( _073__R );
+  assign _074_ = sel_reg_key0 ? aes_key0_dataout : 8'b00000000;
+  logic [0:0] sel_reg_key0_R1 ;
+  assign sel_reg_key0_R1 = ( | _074__R ) && aes_key0_dataout != 8'b00000000 ;
+  logic [7:0] aes_key0_dataout_R0 ;
+  assign aes_key0_dataout_R0 = { 8{ sel_reg_key0 }} & ( _074__R );
+  assign _074__T = sel_reg_key0 ? ( { 8{ | sel_reg_key0_T  }} | aes_key0_dataout_T ) : { 8{ | sel_reg_key0_T  }};
+  assign _074__S = sel_reg_key0 ? aes_key0_dataout_S : 0 ;
+  assign operated_bytes_count_next = reset_byte_counter ? 16'b0000000000000000 : _027_[15:0];
+  logic [0:0] reset_byte_counter_R3 ;
+  assign reset_byte_counter_R3 = ( | operated_bytes_count_next_R ) && 16'b0000000000000000 != _027_[15:0] ;
+  logic [31:0] _027__R0 ;
+  assign _027__R0 [15:0] = { 16{ !reset_byte_counter }} & ( operated_bytes_count_next_R );
+  assign operated_bytes_count_next_T = reset_byte_counter ? { 16{ | reset_byte_counter_T  }} : ( { 16{ | reset_byte_counter_T  }} | _027__T [15:0] );
+  assign operated_bytes_count_next_S = reset_byte_counter ? 0 : _027__S ;
+  assign _027_[15:0] = _050_ ? _000_ : operated_bytes_count;
+  logic [0:0] _050__R1 ;
+  assign _050__R1 = ( | _027__R [15:0] ) && _000_ != operated_bytes_count ;
+  assign _027__T [15:0] = _050_ ? ( { 16{ _050__T  }} | _000__T ) : ( { 16{ _050__T  }} | operated_bytes_count_T );
+  assign _027__S = _050_ ? _000__S : operated_bytes_count_S ;
+  logic [15:0] _000__R0 ;
+  assign _000__R0 = { 16{ _050_ }} & ( _027__R [15:0] );
+  logic [15:0] operated_bytes_count_R1 ;
+  assign operated_bytes_count_R1 = { 16{ !_050_ }} & ( _027__R [15:0] );
+  assign aes_reg_state_next_read_data = last_byte_acked ? 2'b10 : 2'b01;
+  logic [0:0] last_byte_acked_R3 ;
+  assign last_byte_acked_R3 = ( | aes_reg_state_next_read_data_R ) && 2'b10 != 2'b01 ;
+  assign aes_reg_state_next_read_data_T = { 2{ last_byte_acked_T  }} ;
+  assign aes_reg_state_next_read_data_S = 0 ;
+  assign aes_reg_state_next_write_data = _051_ ? 2'b01 : _075_;
+  logic [0:0] _051__R0 ;
+  assign _051__R0 = ( | aes_reg_state_next_write_data_R ) && 2'b01 != _075_ ;
+  logic [1:0] _075__R0 ;
+  assign _075__R0 = { 2{ !_051_ }} & ( aes_reg_state_next_write_data_R );
+  assign aes_reg_state_next_write_data_T = _051_ ? { 2{ | _051__T  }} : ( { 2{ | _051__T  }} | _075__T );
+  assign aes_reg_state_next_write_data_S = _051_ ? 0 : _075__S ;
+  assign _075_ = last_byte_acked ? 2'b00 : 2'b11;
+  logic [0:0] last_byte_acked_R4 ;
+  assign last_byte_acked_R4 = ( | _075__R ) && 2'b00 != 2'b11 ;
+  assign _075__T = { 2{ last_byte_acked_T  }} ;
+  assign _075__S = 0 ;
+  wire [1:0] addedVar21;
+  logic [1:0] addedVar21_T ;
+  logic [1:0] addedVar21_R ;
+  assign addedVar21 = { 1'b0, reset_byte_counter };
+  assign addedVar21_T = {  1'h0 , reset_byte_counter_T  };
+  logic [4:0] addedVar21_S ;
+  assign addedVar21_S = 0 ;
+  logic [0:0] reset_byte_counter_R4 ;
+  assign reset_byte_counter_R4 = addedVar21_R [0:0] ;
+  assign aes_reg_state_next = aes_state_idle ? addedVar21 : _076_;
+  logic [0:0] aes_state_idle_R1 ;
+  assign aes_state_idle_R1 = ( | aes_reg_state_next_R ) && addedVar21 != _076_ ;
+  assign aes_reg_state_next_T = aes_state_idle ? ( { 2{ aes_state_idle_T  }} | addedVar21_T ) : ( { 2{ aes_state_idle_T  }} | _076__T );
+  assign aes_reg_state_next_S = aes_state_idle ? addedVar21_S : _076__S ;
+  logic [1:0] addedVar21_R0 ;
+  assign addedVar21_R0 = { 2{ aes_state_idle }} & ( aes_reg_state_next_R );
+  logic [1:0] _076__R0 ;
+  assign _076__R0 = { 2{ !aes_state_idle }} & ( aes_reg_state_next_R );
+  assign _076_ = aes_state_read_data ? aes_reg_state_next_read_data : _077_;
+  logic [0:0] aes_state_read_data_R1 ;
+  assign aes_state_read_data_R1 = ( | _076__R ) && aes_reg_state_next_read_data != _077_ ;
+  assign _076__T = aes_state_read_data ? ( { 2{ aes_state_read_data_T  }} | aes_reg_state_next_read_data_T ) : ( { 2{ aes_state_read_data_T  }} | _077__T );
+  assign _076__S = aes_state_read_data ? aes_reg_state_next_read_data_S : _077__S ;
+  logic [1:0] aes_reg_state_next_read_data_R0 ;
+  assign aes_reg_state_next_read_data_R0 = { 2{ aes_state_read_data }} & ( _076__R );
+  logic [1:0] _077__R0 ;
+  assign _077__R0 = { 2{ !aes_state_read_data }} & ( _076__R );
+  wire [1:0] addedVar22;
+  logic [1:0] addedVar22_T ;
+  logic [1:0] addedVar22_R ;
+  assign addedVar22 = { 1'b1, aes_time_enough };
+  assign addedVar22_T = {  1'h0 , aes_time_enough_T  };
+  logic [4:0] addedVar22_S ;
+  assign addedVar22_S = 0 ;
+  logic [0:0] aes_time_enough_R0 ;
+  assign aes_time_enough_R0 = addedVar22_R [0:0] ;
+  assign _077_ = aes_state_operate ? addedVar22 : _078_;
+  logic [0:0] aes_state_operate_R1 ;
+  assign aes_state_operate_R1 = ( | _077__R ) && addedVar22 != _078_ ;
+  assign _077__T = aes_state_operate ? ( { 2{ aes_state_operate_T  }} | addedVar22_T ) : ( { 2{ aes_state_operate_T  }} | _078__T );
+  assign _077__S = aes_state_operate ? addedVar22_S : _078__S ;
+  logic [1:0] addedVar22_R0 ;
+  assign addedVar22_R0 = { 2{ aes_state_operate }} & ( _077__R );
+  logic [1:0] _078__R0 ;
+  assign _078__R0 = { 2{ !aes_state_operate }} & ( _077__R );
+  assign _078_ = aes_state_write_data ? aes_reg_state_next_write_data : 2'b00;
+  logic [0:0] aes_state_write_data_R2 ;
+  assign aes_state_write_data_R2 = ( | _078__R ) && aes_reg_state_next_write_data != 2'b00 ;
+  logic [1:0] aes_reg_state_next_write_data_R0 ;
+  assign aes_reg_state_next_write_data_R0 = { 2{ aes_state_write_data }} & ( _078__R );
+  assign _078__T = aes_state_write_data ? ( { 2{ | aes_state_write_data_T  }} | aes_reg_state_next_write_data_T ) : { 2{ | aes_state_write_data_T  }};
+  assign _078__S = aes_state_write_data ? aes_reg_state_next_write_data_S : 0 ;
+  assign uaes_ctr_nxt = reset_byte_counter ? aes_reg_ctr : _004_;
+  logic [0:0] reset_byte_counter_R5 ;
+  assign reset_byte_counter_R5 = ( | uaes_ctr_nxt_R ) && aes_reg_ctr != _004_ ;
+  assign uaes_ctr_nxt_T = reset_byte_counter ? ( { 128{ reset_byte_counter_T  }} | aes_reg_ctr_T ) : ( { 128{ reset_byte_counter_T  }} | _004__T );
+  assign uaes_ctr_nxt_S = reset_byte_counter ? aes_reg_ctr_S : _004__S ;
+  logic [127:0] aes_reg_ctr_R0 ;
+  assign aes_reg_ctr_R0 = { 128{ reset_byte_counter }} & ( uaes_ctr_nxt_R );
+  logic [127:0] _004__R0 ;
+  assign _004__R0 = { 128{ !reset_byte_counter }} & ( uaes_ctr_nxt_R );
+  assign xram_data_out = _029_ ? encrypted_data_buf[7:0] : _079_;
+  logic [0:0] _029__R1 ;
+  assign _029__R1 = ( | xram_data_out_R ) && encrypted_data_buf[7:0] != _079_ ;
+  assign xram_data_out_T = _029_ ? ( { 8{ _029__T  }} | encrypted_data_buf_T [7:0] ) : ( { 8{ _029__T  }} | _079__T );
+  assign xram_data_out_S = _029_ ? encrypted_data_buf_S : _079__S ;
+  logic [127:0] encrypted_data_buf_R0 ;
+  assign encrypted_data_buf_R0 [7:0] = { 8{ _029_ }} & ( xram_data_out_R );
+  logic [7:0] _079__R0 ;
+  assign _079__R0 = { 8{ !_029_ }} & ( xram_data_out_R );
+  assign _079_ = _030_ ? encrypted_data_buf[15:8] : _080_;
+  logic [0:0] _030__R1 ;
+  assign _030__R1 = ( | _079__R ) && encrypted_data_buf[15:8] != _080_ ;
+  assign _079__T = _030_ ? ( { 8{ _030__T  }} | encrypted_data_buf_T [15:8] ) : ( { 8{ _030__T  }} | _080__T );
+  assign _079__S = _030_ ? encrypted_data_buf_S : _080__S ;
+  assign encrypted_data_buf_R0 [15:8] = { 8{ _030_ }} & ( _079__R );
+  logic [7:0] _080__R0 ;
+  assign _080__R0 = { 8{ !_030_ }} & ( _079__R );
+  assign _080_ = _031_ ? encrypted_data_buf[23:16] : _081_;
+  logic [0:0] _031__R1 ;
+  assign _031__R1 = ( | _080__R ) && encrypted_data_buf[23:16] != _081_ ;
+  assign _080__T = _031_ ? ( { 8{ _031__T  }} | encrypted_data_buf_T [23:16] ) : ( { 8{ _031__T  }} | _081__T );
+  assign _080__S = _031_ ? encrypted_data_buf_S : _081__S ;
+  assign encrypted_data_buf_R0 [23:16] = { 8{ _031_ }} & ( _080__R );
+  logic [7:0] _081__R0 ;
+  assign _081__R0 = { 8{ !_031_ }} & ( _080__R );
+  assign _081_ = _032_ ? encrypted_data_buf[31:24] : _082_;
+  logic [0:0] _032__R1 ;
+  assign _032__R1 = ( | _081__R ) && encrypted_data_buf[31:24] != _082_ ;
+  assign _081__T = _032_ ? ( { 8{ _032__T  }} | encrypted_data_buf_T [31:24] ) : ( { 8{ _032__T  }} | _082__T );
+  assign _081__S = _032_ ? encrypted_data_buf_S : _082__S ;
+  assign encrypted_data_buf_R0 [31:24] = { 8{ _032_ }} & ( _081__R );
+  logic [7:0] _082__R0 ;
+  assign _082__R0 = { 8{ !_032_ }} & ( _081__R );
+  assign _082_ = _033_ ? encrypted_data_buf[39:32] : _083_;
+  logic [0:0] _033__R1 ;
+  assign _033__R1 = ( | _082__R ) && encrypted_data_buf[39:32] != _083_ ;
+  assign _082__T = _033_ ? ( { 8{ _033__T  }} | encrypted_data_buf_T [39:32] ) : ( { 8{ _033__T  }} | _083__T );
+  assign _082__S = _033_ ? encrypted_data_buf_S : _083__S ;
+  assign encrypted_data_buf_R0 [39:32] = { 8{ _033_ }} & ( _082__R );
+  logic [7:0] _083__R0 ;
+  assign _083__R0 = { 8{ !_033_ }} & ( _082__R );
+  assign _083_ = _034_ ? encrypted_data_buf[47:40] : _084_;
+  logic [0:0] _034__R1 ;
+  assign _034__R1 = ( | _083__R ) && encrypted_data_buf[47:40] != _084_ ;
+  assign _083__T = _034_ ? ( { 8{ _034__T  }} | encrypted_data_buf_T [47:40] ) : ( { 8{ _034__T  }} | _084__T );
+  assign _083__S = _034_ ? encrypted_data_buf_S : _084__S ;
+  assign encrypted_data_buf_R0 [47:40] = { 8{ _034_ }} & ( _083__R );
+  logic [7:0] _084__R0 ;
+  assign _084__R0 = { 8{ !_034_ }} & ( _083__R );
+  assign _084_ = _035_ ? encrypted_data_buf[55:48] : _085_;
+  logic [0:0] _035__R1 ;
+  assign _035__R1 = ( | _084__R ) && encrypted_data_buf[55:48] != _085_ ;
+  assign _084__T = _035_ ? ( { 8{ _035__T  }} | encrypted_data_buf_T [55:48] ) : ( { 8{ _035__T  }} | _085__T );
+  assign _084__S = _035_ ? encrypted_data_buf_S : _085__S ;
+  assign encrypted_data_buf_R0 [55:48] = { 8{ _035_ }} & ( _084__R );
+  logic [7:0] _085__R0 ;
+  assign _085__R0 = { 8{ !_035_ }} & ( _084__R );
+  assign _085_ = _036_ ? encrypted_data_buf[63:56] : _086_;
+  logic [0:0] _036__R1 ;
+  assign _036__R1 = ( | _085__R ) && encrypted_data_buf[63:56] != _086_ ;
+  assign _085__T = _036_ ? ( { 8{ _036__T  }} | encrypted_data_buf_T [63:56] ) : ( { 8{ _036__T  }} | _086__T );
+  assign _085__S = _036_ ? encrypted_data_buf_S : _086__S ;
+  assign encrypted_data_buf_R0 [63:56] = { 8{ _036_ }} & ( _085__R );
+  logic [7:0] _086__R0 ;
+  assign _086__R0 = { 8{ !_036_ }} & ( _085__R );
+  assign _086_ = _037_ ? encrypted_data_buf[71:64] : _087_;
+  logic [0:0] _037__R1 ;
+  assign _037__R1 = ( | _086__R ) && encrypted_data_buf[71:64] != _087_ ;
+  assign _086__T = _037_ ? ( { 8{ _037__T  }} | encrypted_data_buf_T [71:64] ) : ( { 8{ _037__T  }} | _087__T );
+  assign _086__S = _037_ ? encrypted_data_buf_S : _087__S ;
+  assign encrypted_data_buf_R0 [71:64] = { 8{ _037_ }} & ( _086__R );
+  logic [7:0] _087__R0 ;
+  assign _087__R0 = { 8{ !_037_ }} & ( _086__R );
+  assign _087_ = _038_ ? encrypted_data_buf[79:72] : _088_;
+  logic [0:0] _038__R1 ;
+  assign _038__R1 = ( | _087__R ) && encrypted_data_buf[79:72] != _088_ ;
+  assign _087__T = _038_ ? ( { 8{ _038__T  }} | encrypted_data_buf_T [79:72] ) : ( { 8{ _038__T  }} | _088__T );
+  assign _087__S = _038_ ? encrypted_data_buf_S : _088__S ;
+  assign encrypted_data_buf_R0 [79:72] = { 8{ _038_ }} & ( _087__R );
+  logic [7:0] _088__R0 ;
+  assign _088__R0 = { 8{ !_038_ }} & ( _087__R );
+  assign _088_ = _039_ ? encrypted_data_buf[87:80] : _089_;
+  logic [0:0] _039__R1 ;
+  assign _039__R1 = ( | _088__R ) && encrypted_data_buf[87:80] != _089_ ;
+  assign _088__T = _039_ ? ( { 8{ _039__T  }} | encrypted_data_buf_T [87:80] ) : ( { 8{ _039__T  }} | _089__T );
+  assign _088__S = _039_ ? encrypted_data_buf_S : _089__S ;
+  assign encrypted_data_buf_R0 [87:80] = { 8{ _039_ }} & ( _088__R );
+  logic [7:0] _089__R0 ;
+  assign _089__R0 = { 8{ !_039_ }} & ( _088__R );
+  assign _089_ = _040_ ? encrypted_data_buf[95:88] : _090_;
+  logic [0:0] _040__R1 ;
+  assign _040__R1 = ( | _089__R ) && encrypted_data_buf[95:88] != _090_ ;
+  assign _089__T = _040_ ? ( { 8{ _040__T  }} | encrypted_data_buf_T [95:88] ) : ( { 8{ _040__T  }} | _090__T );
+  assign _089__S = _040_ ? encrypted_data_buf_S : _090__S ;
+  assign encrypted_data_buf_R0 [95:88] = { 8{ _040_ }} & ( _089__R );
+  logic [7:0] _090__R0 ;
+  assign _090__R0 = { 8{ !_040_ }} & ( _089__R );
+  assign _090_ = _041_ ? encrypted_data_buf[103:96] : _091_;
+  logic [0:0] _041__R1 ;
+  assign _041__R1 = ( | _090__R ) && encrypted_data_buf[103:96] != _091_ ;
+  assign _090__T = _041_ ? ( { 8{ _041__T  }} | encrypted_data_buf_T [103:96] ) : ( { 8{ _041__T  }} | _091__T );
+  assign _090__S = _041_ ? encrypted_data_buf_S : _091__S ;
+  assign encrypted_data_buf_R0 [103:96] = { 8{ _041_ }} & ( _090__R );
+  logic [7:0] _091__R0 ;
+  assign _091__R0 = { 8{ !_041_ }} & ( _090__R );
+  assign _091_ = _042_ ? encrypted_data_buf[111:104] : _092_;
+  logic [0:0] _042__R1 ;
+  assign _042__R1 = ( | _091__R ) && encrypted_data_buf[111:104] != _092_ ;
+  assign _091__T = _042_ ? ( { 8{ _042__T  }} | encrypted_data_buf_T [111:104] ) : ( { 8{ _042__T  }} | _092__T );
+  assign _091__S = _042_ ? encrypted_data_buf_S : _092__S ;
+  assign encrypted_data_buf_R0 [111:104] = { 8{ _042_ }} & ( _091__R );
+  logic [7:0] _092__R0 ;
+  assign _092__R0 = { 8{ !_042_ }} & ( _091__R );
+  assign _092_ = _043_ ? encrypted_data_buf[119:112] : encrypted_data_buf[127:120];
+  logic [0:0] _043__R1 ;
+  assign _043__R1 = ( | _092__R ) && encrypted_data_buf[119:112] != encrypted_data_buf[127:120] ;
+  assign _092__T = _043_ ? ( { 8{ _043__T  }} | encrypted_data_buf_T [119:112] ) : ( { 8{ _043__T  }} | encrypted_data_buf_T [127:120] );
+  assign _092__S = _043_ ? encrypted_data_buf_S : encrypted_data_buf_S ;
+  assign encrypted_data_buf_R0 [119:112] = { 8{ _043_ }} & ( _092__R );
+  assign encrypted_data_buf_R0 [127:120] = { 8{ !_043_ }} & ( _092__R );
+  assign encrypted_data = aes_out ^ mem_data_buf;
+  assign encrypted_data_S = 0 ;
+  logic [127:0] aes_out_R0 ;
+  logic [127:0] mem_data_buf_R0 ;
+  assign encrypted_data_T = aes_out_T | mem_data_buf_T ;
+  assign aes_out_R0 = encrypted_data_R ;
+  assign mem_data_buf_R0 = encrypted_data_R ;
+  logic [127:0] aes_curr_key_R0 ;
+  logic [127:0] uaes_ctr_R1 ;
+// module: aes_128
+  aes_128 aes_128_i (
+    .key_T (  aes_curr_key_T  ),
+    .key_R (  aes_curr_key_R0  ),
+    .key_S (  aes_curr_key_S  ),
+    .state_T (  uaes_ctr_T  ),
+    .state_R (  uaes_ctr_R1  ),
+    .state_S (  uaes_ctr_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .zy_end_sig(zy_end_sig),
+    .rst_zy(rst_zy),
+    .out_T (  aes_out_T  ),
+    .out_R0 (  aes_out_R  ),
+    .out_S (  aes_out_S  ),
+    .state ( uaes_ctr ),
+    .out ( aes_out ),
+    .key ( aes_curr_key ),
+    .clk ( clk )
+  );
+  logic [15:0] addr_R8 ;
+  assign { data_in_R0 [7:1] } = 0;
+  logic [7:0] data_in_R1 ;
+  logic [0:0] sel_reg_ctr_R2 ;
+  logic [0:0] rst_R3 ;
+  logic [0:0] _048__R0 ;
+// module: reg16byte
+  reg16byte aes_reg_ctr_i (
+    .addr_T (  addr_T [3:0]  ),
+    .addr_R (  addr_R8 [3:0]  ),
+    .addr_S (  addr_S  ),
+    .data_in_T (  data_in_T  ),
+    .data_in_R (  data_in_R1  ),
+    .data_in_S (  data_in_S  ),
+    .en_T (  sel_reg_ctr_T  ),
+    .en_R (  sel_reg_ctr_R2  ),
+    .en_S (  sel_reg_ctr_S  ),
+    .rst_T (  rst_T  ),
+    .rst_R (  rst_R3  ),
+    .rst_S (  rst_S  ),
+    .wr_T (  _048__T  ),
+    .wr_R (  _048__R0  ),
+    .wr_S (  _048__S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .zy_end_sig(zy_end_sig),
+    .rst_zy(rst_zy),
+    .data_out_T (  aes_ctr_dataout_T  ),
+    .data_out_R0 (  aes_ctr_dataout_R  ),
+    .data_out_S (  aes_ctr_dataout_S  ),
+    .reg_out_T (  aes_reg_ctr_T  ),
+    .reg_out_R0 (  aes_reg_ctr_R  ),
+    .reg_out_S (  aes_reg_ctr_S  ),
+    .reg_out ( aes_reg_ctr ),
+    .wr ( _048_ ),
+    .data_out ( aes_ctr_dataout ),
+    .rst ( rst ),
+    .en ( sel_reg_ctr ),
+    .data_in ( data_in ),
+    .clk ( clk ),
+    .addr ( addr[3:0] )
+  );
+  assign { addr_R8 [15:4] } = 0;
+  logic [15:0] addr_R9 ;
+  logic [7:0] data_in_R2 ;
+  logic [0:0] sel_reg_key0_R2 ;
+  logic [0:0] rst_R4 ;
+  logic [0:0] _049__R0 ;
+// module: reg16byte
+  reg16byte aes_reg_key0_i (
+    .addr_T (  addr_T [3:0]  ),
+    .addr_R (  addr_R9 [3:0]  ),
+    .addr_S (  addr_S  ),
+    .data_in_T (  data_in_T  ),
+    .data_in_R (  data_in_R2  ),
+    .data_in_S (  data_in_S  ),
+    .en_T (  sel_reg_key0_T  ),
+    .en_R (  sel_reg_key0_R2  ),
+    .en_S (  sel_reg_key0_S  ),
+    .rst_T (  rst_T  ),
+    .rst_R (  rst_R4  ),
+    .rst_S (  rst_S  ),
+    .wr_T (  _049__T  ),
+    .wr_R (  _049__R0  ),
+    .wr_S (  _049__S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .zy_end_sig(zy_end_sig),
+    .rst_zy(rst_zy),
+    .data_out_T (  aes_key0_dataout_T  ),
+    .data_out_R0 (  aes_key0_dataout_R  ),
+    .data_out_S (  aes_key0_dataout_S  ),
+    .reg_out_T (  aes_curr_key_T  ),
+    .reg_out_R0 (  aes_curr_key_R  ),
+    .reg_out_S (  aes_curr_key_S  ),
+    .reg_out ( aes_curr_key ),
+    .wr ( _049_ ),
+    .data_out ( aes_key0_dataout ),
+    .rst ( rst ),
+    .en ( sel_reg_key0 ),
+    .data_in ( data_in ),
+    .clk ( clk ),
+    .addr ( addr[3:0] )
+  );
+  assign { addr_R9 [15:4] } = 0;
+  logic [15:0] addr_R10 ;
+  logic [7:0] data_in_R3 ;
+  logic [0:0] sel_reg_addr_R2 ;
+  logic [0:0] rst_R5 ;
+  logic [0:0] _046__R0 ;
+// module: reg2byte
+  reg2byte aes_reg_opaddr_i (
+    .addr_T (  addr_T [0]  ),
+    .addr_R (  addr_R10 [0]  ),
+    .addr_S (  addr_S  ),
+    .data_in_T (  data_in_T  ),
+    .data_in_R (  data_in_R3  ),
+    .data_in_S (  data_in_S  ),
+    .en_T (  sel_reg_addr_T  ),
+    .en_R (  sel_reg_addr_R2  ),
+    .en_S (  sel_reg_addr_S  ),
+    .rst_T (  rst_T  ),
+    .rst_R (  rst_R5  ),
+    .rst_S (  rst_S  ),
+    .wr_T (  _046__T  ),
+    .wr_R (  _046__R0  ),
+    .wr_S (  _046__S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .zy_end_sig(zy_end_sig),
+    .rst_zy(rst_zy),
+    .data_out_T (  aes_addr_dataout_T  ),
+    .data_out_R0 (  aes_addr_dataout_R  ),
+    .data_out_S (  aes_addr_dataout_S  ),
+    .reg_out_T (  aes_reg_opaddr_T  ),
+    .reg_out_R0 (  aes_reg_opaddr_R  ),
+    .reg_out_S (  aes_reg_opaddr_S  ),
+    .reg_out ( aes_reg_opaddr ),
+    .wr ( _046_ ),
+    .data_out ( aes_addr_dataout ),
+    .rst ( rst ),
+    .en ( sel_reg_addr ),
+    .data_in ( data_in ),
+    .clk ( clk ),
+    .addr ( addr[0] )
+  );
+  assign { addr_R10 [15:1] } = 0;
+  logic [15:0] addr_R11 ;
+  logic [7:0] data_in_R4 ;
+  logic [0:0] sel_reg_len_R2 ;
+  logic [0:0] rst_R6 ;
+  logic [0:0] _047__R0 ;
+// module: reg2byte
+  reg2byte aes_reg_oplen_i (
+    .addr_T (  addr_T [0]  ),
+    .addr_R (  addr_R11 [0]  ),
+    .addr_S (  addr_S  ),
+    .data_in_T (  data_in_T  ),
+    .data_in_R (  data_in_R4  ),
+    .data_in_S (  data_in_S  ),
+    .en_T (  sel_reg_len_T  ),
+    .en_R (  sel_reg_len_R2  ),
+    .en_S (  sel_reg_len_S  ),
+    .rst_T (  rst_T  ),
+    .rst_R (  rst_R6  ),
+    .rst_S (  rst_S  ),
+    .wr_T (  _047__T  ),
+    .wr_R (  _047__R0  ),
+    .wr_S (  _047__S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .zy_end_sig(zy_end_sig),
+    .rst_zy(rst_zy),
+    .data_out_T (  aes_len_dataout_T  ),
+    .data_out_R0 (  aes_len_dataout_R  ),
+    .data_out_S (  aes_len_dataout_S  ),
+    .reg_out_T (  aes_reg_oplen_T  ),
+    .reg_out_R0 (  aes_reg_oplen_R  ),
+    .reg_out_S (  aes_reg_oplen_S  ),
+    .reg_out ( aes_reg_oplen ),
+    .wr ( _047_ ),
+    .data_out ( aes_len_dataout ),
+    .rst ( rst ),
+    .en ( sel_reg_len ),
+    .data_in ( data_in ),
+    .clk ( clk ),
+    .addr ( addr[0] )
+  );
+  assign _027_[31:16] = 16'b000000000000000x;
+  assign _027__T [31:16] = 0 ;
+  assign aes_addr = aes_reg_opaddr;
+  logic [15:0] aes_reg_opaddr_R1 ;
+  assign aes_addr_T = aes_reg_opaddr_T ;
+  assign aes_reg_opaddr_R1 = aes_addr_R ;
+  assign aes_addr_S = aes_reg_opaddr_S ;
+  assign aes_ctr = aes_reg_ctr;
+  logic [127:0] aes_reg_ctr_R1 ;
+  assign aes_ctr_T = aes_reg_ctr_T ;
+  assign aes_reg_ctr_R1 = aes_ctr_R ;
+  assign aes_ctr_S = aes_reg_ctr_S ;
+  assign aes_key0 = aes_curr_key;
+  logic [127:0] aes_curr_key_R1 ;
+  assign aes_key0_T = aes_curr_key_T ;
+  assign aes_curr_key_R1 = aes_key0_R ;
+  assign aes_key0_S = aes_curr_key_S ;
+  assign aes_len = aes_reg_oplen;
+  logic [15:0] aes_reg_oplen_R1 ;
+  assign aes_len_T = aes_reg_oplen_T ;
+  assign aes_reg_oplen_R1 = aes_len_R ;
+  assign aes_len_S = aes_reg_oplen_S ;
+  assign aes_reg_key0 = aes_curr_key;
+  logic [127:0] aes_curr_key_R2 ;
+  assign aes_reg_key0_T = aes_curr_key_T ;
+  assign aes_curr_key_R2 = aes_reg_key0_R ;
+  assign aes_reg_key0_S = aes_curr_key_S ;
+  assign aes_reg_state_next_idle = reset_byte_counter;
+  logic [0:0] reset_byte_counter_R6 ;
+  assign aes_reg_state_next_idle_T = reset_byte_counter_T ;
+  assign reset_byte_counter_R6 = aes_reg_state_next_idle_R ;
+  assign aes_reg_state_next_idle_S = reset_byte_counter_S ;
+  assign aes_reg_state_next_operate = aes_time_enough;
+  logic [0:0] aes_time_enough_R1 ;
+  assign aes_reg_state_next_operate_T = aes_time_enough_T ;
+  assign aes_time_enough_R1 = aes_reg_state_next_operate_R ;
+  assign aes_reg_state_next_operate_S = aes_time_enough_S ;
+  assign aes_state = aes_reg_state;
+  logic [1:0] aes_reg_state_R6 ;
+  assign aes_state_T = aes_reg_state_T ;
+  assign aes_reg_state_R6 = aes_state_R ;
+  assign aes_state_S = aes_reg_state_S ;
+  assign incr_byte_counter = xram_ack;
+  logic [0:0] xram_ack_R16 ;
+  assign incr_byte_counter_T = xram_ack_T ;
+  assign xram_ack_R16 = incr_byte_counter_R ;
+  assign incr_byte_counter_S = xram_ack_S ;
+  assign start_op = reset_byte_counter;
+  logic [0:0] reset_byte_counter_R7 ;
+  assign start_op_T = reset_byte_counter_T ;
+  assign reset_byte_counter_R7 = start_op_R ;
+  assign start_op_S = reset_byte_counter_S ;
+  assign xram_wr = aes_state_write_data;
+  logic [0:0] aes_state_write_data_R3 ;
+  assign xram_wr_T = aes_state_write_data_T ;
+  assign aes_state_write_data_R3 = xram_wr_R ;
+  assign xram_wr_S = aes_state_write_data_S ;
+  assign _047__R = ( _047__R0 );
+  assign _046__R = ( _046__R0 );
+  assign _049__R = ( _049__R0 );
+  assign _048__R = ( _048__R0 );
+  assign aes_curr_key_R = ( aes_curr_key_R0 ) | ( aes_curr_key_R1 ) | ( aes_curr_key_R2 );
+  assign aes_out_R = ( aes_out_R0 );
+  assign _092__R = ( _092__R0 );
+  assign _091__R = ( _091__R0 );
+  assign _090__R = ( _090__R0 );
+  assign _089__R = ( _089__R0 );
+  assign _088__R = ( _088__R0 );
+  assign _085__R = ( _085__R0 );
+  assign _083__R = ( _083__R0 );
+  assign _082__R = ( _082__R0 );
+  assign _081__R = ( _081__R0 );
+  assign _080__R = ( _080__R0 );
+  assign encrypted_data_buf_R = ( encrypted_data_buf_R0 );
+  assign _004__R = ( _004__R0 );
+  assign _078__R = ( _078__R0 );
+  assign _079__R = ( _079__R0 );
+  assign addedVar22_R = ( addedVar22_R0 );
+  assign aes_time_enough_R = ( aes_time_enough_R0 ) | ( aes_time_enough_R1 );
+  assign _077__R = ( _077__R0 );
+  assign aes_reg_state_next_read_data_R = ( aes_reg_state_next_read_data_R0 );
+  assign addedVar21_R = ( addedVar21_R0 );
+  assign _075__R = ( _075__R0 );
+  assign _051__R = ( _051__R0 );
+  assign _027__R = ( _027__R0 );
+  assign aes_key0_dataout_R = ( aes_key0_dataout_R0 );
+  assign _074__R = ( _074__R0 );
+  assign aes_ctr_dataout_R = ( aes_ctr_dataout_R0 );
+  assign _073__R = ( _073__R0 );
+  assign aes_len_dataout_R = ( aes_len_dataout_R0 );
+  assign _076__R = ( _076__R0 );
+  assign _072__R = ( _072__R0 );
+  assign _071__R = ( _071__R0 );
+  assign addedVar20_R = ( addedVar20_R0 );
+  assign sel_reg_state_R = ( sel_reg_state_R0 );
+  assign aes_reg_oplen_R = ( aes_reg_oplen_R0 ) | ( aes_reg_oplen_R1 );
+  assign aes_state_read_data_R = ( aes_state_read_data_R0 ) | ( aes_state_read_data_R1 );
+  assign _043__R = ( _043__R0 ) | ( _043__R1 );
+  assign _087__R = ( _087__R0 );
+  assign _042__R = ( _042__R0 ) | ( _042__R1 );
+  assign _041__R = ( _041__R0 ) | ( _041__R1 );
+  assign _040__R = ( _040__R0 ) | ( _040__R1 );
+  assign _039__R = ( _039__R0 ) | ( _039__R1 );
+  assign _038__R = ( _038__R0 ) | ( _038__R1 );
+  assign _037__R = ( _037__R0 ) | ( _037__R1 );
+  assign _036__R = ( _036__R0 ) | ( _036__R1 );
+  assign _034__R = ( _034__R0 ) | ( _034__R1 );
+  assign _033__R = ( _033__R0 ) | ( _033__R1 );
+  assign _032__R = ( _032__R0 ) | ( _032__R1 );
+  assign _031__R = ( _031__R0 ) | ( _031__R1 );
+  assign _030__R = ( _030__R0 ) | ( _030__R1 );
+  assign _069__R = ( _069__R0 );
+  assign _000__R = ( _000__R0 );
+  assign _050__R = ( _050__R0 ) | ( _050__R1 );
+  assign xram_ack_R = ( xram_ack_R0 ) | ( xram_ack_R1 ) | ( xram_ack_R2 ) | ( xram_ack_R3 ) | ( xram_ack_R4 ) | ( xram_ack_R5 ) | ( xram_ack_R6 ) | ( xram_ack_R7 ) | ( xram_ack_R8 ) | ( xram_ack_R9 ) | ( xram_ack_R10 ) | ( xram_ack_R11 ) | ( xram_ack_R12 ) | ( xram_ack_R13 ) | ( xram_ack_R14 ) | ( xram_ack_R15 ) | ( xram_ack_R16 );
+  assign _028__R = ( _028__R0 );
+  assign sel_reg_ctr_R = ( sel_reg_ctr_R0 ) | ( sel_reg_ctr_R1 ) | ( sel_reg_ctr_R2 );
+  assign sel_reg_key0_R = ( sel_reg_key0_R0 ) | ( sel_reg_key0_R1 ) | ( sel_reg_key0_R2 );
+  assign sel_reg_len_R = ( sel_reg_len_R0 ) | ( sel_reg_len_R1 ) | ( sel_reg_len_R2 );
+  assign aes_state_write_data_R = ( aes_state_write_data_R0 ) | ( aes_state_write_data_R1 ) | ( aes_state_write_data_R2 ) | ( aes_state_write_data_R3 );
+  assign sel_reg_addr_R = ( sel_reg_addr_R0 ) | ( sel_reg_addr_R1 ) | ( sel_reg_addr_R2 );
+  assign wren_R = ( wren_R0 ) | ( wren_R1 ) | ( wren_R2 ) | ( wren_R3 ) | ( wren_R4 );
+  assign _045__R = ( _045__R0 );
+  assign data_in_R = ( data_in_R0 ) | ( data_in_R1 ) | ( data_in_R2 ) | ( data_in_R3 ) | ( data_in_R4 );
+  assign sel_reg_start_R = ( sel_reg_start_R0 );
+  assign aes_state_idle_R = ( aes_state_idle_R0 ) | ( aes_state_idle_R1 );
+  assign wr_R = ( wr_R0 );
+  assign _029__R = ( _029__R0 ) | ( _029__R1 );
+  assign in_addr_range_R = ( in_addr_range_R0 );
+  assign stb_R = ( stb_R0 );
+  assign aes_addr_dataout_R = ( aes_addr_dataout_R0 );
+  assign _068__R = ( _068__R0 );
+  assign _044__R = ( _044__R0 );
+  assign aes_reg_state_R = ( aes_reg_state_R0 ) | ( aes_reg_state_R1 ) | ( aes_reg_state_R2 ) | ( aes_reg_state_R3 ) | ( aes_reg_state_R4 ) | ( aes_reg_state_R5 ) | ( aes_reg_state_R6 );
+  assign mem_data_buf_R = ( mem_data_buf_R0 );
+  assign _001__R = ( _001__R0 );
+  assign _002__R = ( _002__R0 );
+  assign xram_data_in_R = ( xram_data_in_R0 ) | ( xram_data_in_R1 ) | ( xram_data_in_R2 ) | ( xram_data_in_R3 ) | ( xram_data_in_R4 ) | ( xram_data_in_R5 ) | ( xram_data_in_R6 ) | ( xram_data_in_R7 ) | ( xram_data_in_R8 ) | ( xram_data_in_R9 ) | ( xram_data_in_R10 ) | ( xram_data_in_R11 ) | ( xram_data_in_R12 ) | ( xram_data_in_R13 ) | ( xram_data_in_R14 ) | ( xram_data_in_R15 );
+  assign aes_reg_ctr_R = ( aes_reg_ctr_R0 ) | ( aes_reg_ctr_R1 );
+  assign encrypted_data_R = ( encrypted_data_R0 );
+  assign _005__R = ( _005__R0 );
+  assign operated_bytes_count_next_R = ( operated_bytes_count_next_R0 ) | ( operated_bytes_count_next_R1 );
+  assign addedVar19_R = ( addedVar19_R0 );
+  assign addedVar17_R = ( addedVar17_R0 );
+  assign _035__R = ( _035__R0 ) | ( _035__R1 );
+  assign _066__R = ( _066__R0 );
+  assign addedVar16_R = ( addedVar16_R0 );
+  assign _065__R = ( _065__R0 );
+  assign addedVar15_R = ( addedVar15_R0 );
+  assign _086__R = ( _086__R0 );
+  assign _064__R = ( _064__R0 );
+  assign addedVar14_R = ( addedVar14_R0 );
+  assign _063__R = ( _063__R0 );
+  assign addedVar13_R = ( addedVar13_R0 );
+  assign _062__R = ( _062__R0 );
+  assign addedVar12_R = ( addedVar12_R0 );
+  assign _061__R = ( _061__R0 );
+  assign aes_reg_state_next_R = ( aes_reg_state_next_R0 ) | ( aes_reg_state_next_R1 );
+  assign _067__R = ( _067__R0 );
+  assign addedVar11_R = ( addedVar11_R0 );
+  assign _060__R = ( _060__R0 );
+  assign addedVar10_R = ( addedVar10_R0 );
+  assign _059__R = ( _059__R0 );
+  assign addedVar9_R = ( addedVar9_R0 );
+  assign _058__R = ( _058__R0 );
+  assign addedVar8_R = ( addedVar8_R0 );
+  assign _057__R = ( _057__R0 );
+  assign addedVar7_R = ( addedVar7_R0 );
+  assign _056__R = ( _056__R0 );
+  assign addedVar6_R = ( addedVar6_R0 );
+  assign _055__R = ( _055__R0 );
+  assign addedVar5_R = ( addedVar5_R0 );
+  assign _054__R = ( _054__R0 );
+  assign addedVar4_R = ( addedVar4_R0 );
+  assign _053__R = ( _053__R0 );
+  assign addedVar3_R = ( addedVar3_R0 );
+  assign _052__R = ( _052__R0 );
+  assign addedVar2_R = ( addedVar2_R0 );
+  assign last_byte_acked_R = ( last_byte_acked_R0 ) | ( last_byte_acked_R1 ) | ( last_byte_acked_R2 ) | ( last_byte_acked_R3 ) | ( last_byte_acked_R4 );
+  assign addedVar1_R = ( addedVar1_R0 );
+  assign aes_state_operate_R = ( aes_state_operate_R0 ) | ( aes_state_operate_R1 );
+  assign _026__R = ( _026__R0 ) | ( _026__R1 ) | ( _026__R2 ) | ( _026__R3 ) | ( _026__R4 ) | ( _026__R5 ) | ( _026__R6 ) | ( _026__R7 ) | ( _026__R8 ) | ( _026__R9 ) | ( _026__R10 ) | ( _026__R11 ) | ( _026__R12 ) | ( _026__R13 ) | ( _026__R14 ) | ( _026__R15 ) | ( _026__R16 );
+  assign rst_R = ( rst_R0 ) | ( rst_R1 ) | ( rst_R2 ) | ( rst_R3 ) | ( rst_R4 ) | ( rst_R5 ) | ( rst_R6 );
+  assign addedVar0_R = ( addedVar0_R0 );
+  assign reset_byte_counter_R = ( reset_byte_counter_R0 ) | ( reset_byte_counter_R1 ) | ( reset_byte_counter_R2 ) | ( reset_byte_counter_R3 ) | ( reset_byte_counter_R4 ) | ( reset_byte_counter_R5 ) | ( reset_byte_counter_R6 ) | ( reset_byte_counter_R7 );
+  assign more_blocks_R = ( more_blocks_R0 ) | ( more_blocks_R1 ) | ( more_blocks_R2 );
+  assign addedVar18_R = ( addedVar18_R0 );
+  assign aes_time_counter_R = ( aes_time_counter_R0 ) | ( aes_time_counter_R1 ) | ( aes_time_counter_R2 );
+  assign uaes_ctr_R = ( uaes_ctr_R0 ) | ( uaes_ctr_R1 );
+  assign addr_R = ( addr_R0 ) | ( addr_R1 ) | ( addr_R2 ) | ( addr_R3 ) | ( addr_R4 ) | ( addr_R5 ) | ( addr_R6 ) | ( addr_R7 ) | ( addr_R8 ) | ( addr_R9 ) | ( addr_R10 ) | ( addr_R11 );
+  assign _003__R = ( _003__R0 );
+  assign aes_reg_opaddr_R = ( aes_reg_opaddr_R0 ) | ( aes_reg_opaddr_R1 );
+  assign byte_counter_R = ( byte_counter_R0 ) | ( byte_counter_R1 ) | ( byte_counter_R2 ) | ( byte_counter_R3 ) | ( byte_counter_R4 ) | ( byte_counter_R5 ) | ( byte_counter_R6 ) | ( byte_counter_R7 ) | ( byte_counter_R8 ) | ( byte_counter_R9 ) | ( byte_counter_R10 ) | ( byte_counter_R11 ) | ( byte_counter_R12 ) | ( byte_counter_R13 ) | ( byte_counter_R14 ) | ( byte_counter_R15 ) | ( byte_counter_R16 ) | ( byte_counter_R17 );
+  assign block_counter_R = ( block_counter_R0 ) | ( block_counter_R1 );
+  assign operated_bytes_count_R = ( operated_bytes_count_R0 ) | ( operated_bytes_count_R1 );
+  assign xram_wr_R = ( xram_wr_R0 );
+  assign _084__R = ( _084__R0 );
+  assign xram_stb_R = ( xram_stb_R0 );
+  assign xram_data_out_R = ( xram_data_out_R0 );
+  assign xram_addr_R = ( xram_addr_R0 );
+  assign data_out_R = ( data_out_R0 );
+  assign aes_step_R = ( aes_step_R0 );
+  assign aes_state_R = ( aes_state_R0 );
+  assign aes_len_R = ( aes_len_R0 );
+  assign aes_key0_R = ( aes_key0_R0 );
+  assign aes_ctr_R = ( aes_ctr_R0 );
+  assign aes_addr_R = ( aes_addr_R0 );
+  assign aes_reg_state_next_write_data_R = ( aes_reg_state_next_write_data_R0 );
+  assign uaes_ctr_nxt_R = ( uaes_ctr_nxt_R0 );
+  assign ack_R = ( ack_R0 );
+ // ground taints for floating regs
+ // ground taints for unused wires
+  assign { _006__R , _007__R , _008__R , _009__R , _010__R , _011__R , _012__R , _013__R , _014__R , _015__R , _016__R , _017__R , _018__R , _019__R , _020__R , _021__R , _022__R , _023__R , _024__R , _025__R , _070__R , aes_reg_key0_R , aes_reg_state_next_idle_R , aes_reg_state_next_operate_R , incr_byte_counter_R , start_op_R , clk_R  } = 0;
+ // ground taints for unused wire slices
+  assign { _027__R0 [31:16] } = 0;
+  assign { addr_R11 [15:1] } = 0;
+  wire zy_assert13 = ( aes_reg_state_r_flag == 0 )  || zy_end_sig ;
+  assert aes_reg_state_asst (
+    .clk( clk ),
+    .test( zy_assert13 )
+  );
+  wire zy_assert14 = ( aes_time_counter_r_flag == 0 )  || zy_end_sig ;
+  assert aes_time_counter_asst (
+    .clk( clk ),
+    .test( zy_assert14 )
+  );
+  wire zy_assert15 = ( block_counter_r_flag == 0 )  || zy_end_sig ;
+  assert block_counter_asst (
+    .clk( clk ),
+    .test( zy_assert15 )
+  );
+  wire zy_assert16 = ( byte_counter_r_flag == 0 )  || zy_end_sig ;
+  assert byte_counter_asst (
+    .clk( clk ),
+    .test( zy_assert16 )
+  );
+  wire zy_assert17 = ( encrypted_data_buf_r_flag == 0 )  || zy_end_sig ;
+  assert encrypted_data_buf_asst (
+    .clk( clk ),
+    .test( zy_assert17 )
+  );
+  wire zy_assert18 = ( mem_data_buf_r_flag == 0 )  || zy_end_sig ;
+  assert mem_data_buf_asst (
+    .clk( clk ),
+    .test( zy_assert18 )
+  );
+  wire zy_assert19 = ( operated_bytes_count_r_flag == 0 )  || zy_end_sig ;
+  assert operated_bytes_count_asst (
+    .clk( clk ),
+    .test( zy_assert19 )
+  );
+  wire zy_assert20 = ( uaes_ctr_r_flag == 0 )  || zy_end_sig ;
+  assert uaes_ctr_asst (
+    .clk( clk ),
+    .test( zy_assert20 )
+  );
+  assign rst_zy = rst ;
+endmodule
+

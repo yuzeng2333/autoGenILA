@@ -1,0 +1,45 @@
+
+  property input0;
+    reset_n_t == 0;
+  endproperty
+
+  property input1;
+    init == 1 && next == 0 |-> ##2 init == 0 && next == 0;
+  endproperty
+
+  property input2;
+    init == 1 && next == 0 |-> init_t == 1 && next_t == 1 && block_t == 128'hffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
+  endproperty
+
+  // between reset and next there must exist init.
+  property input3;
+    reset_n == 0 |=> ( (next == 0) until_with (init == 1 && next == 0) )
+  endproperty
+
+  property input4;
+    init == 0 && next == 1 |-> ##2 init == 0 && next == 0;
+  endproperty
+
+  property input5;
+    init == 0 && next == 1 |-> init_t == 1 && next_t == 1 && block_t == 128'hffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
+  endproperty
+
+  // this is idle state
+  property input6;
+    init == 0 && next == 0 |-> init_t == 0 && next_t == 0 && block_t == 0;
+  endproperty
+
+  property input7;
+    init == 1 && next == 0 || init == 0 && next == 1;
+  endproperty
+
+  assume property (input0);
+  assume property (input1);
+  assume property (input2);
+  assume property (input3);
+  assume property (input4);
+  assume property (input5);
+  assume property (input6);
+  assume property (input7);
+
+  `include "./SHA_assert_property.txt"

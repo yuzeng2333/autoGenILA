@@ -1,0 +1,105 @@
+module one_round(clk, state_in, key, state_out);
+  wire [31:0] _00_;
+  wire [31:0] _01_;
+  wire [31:0] _02_;
+  wire [31:0] _03_;
+  wire [31:0] _04_;
+  wire [31:0] _05_;
+  wire [31:0] _06_;
+  wire [31:0] _07_;
+  wire [31:0] _08_;
+  wire [31:0] _09_;
+  wire [31:0] _10_;
+  wire [31:0] _11_;
+  input clk;
+  wire [31:0] k0;
+  wire [31:0] k1;
+  wire [31:0] k2;
+  wire [31:0] k3;
+  input [127:0] key;
+  wire [31:0] p00;
+  wire [31:0] p01;
+  wire [31:0] p02;
+  wire [31:0] p03;
+  wire [31:0] p10;
+  wire [31:0] p11;
+  wire [31:0] p12;
+  wire [31:0] p13;
+  wire [31:0] p20;
+  wire [31:0] p21;
+  wire [31:0] p22;
+  wire [31:0] p23;
+  wire [31:0] p30;
+  wire [31:0] p31;
+  wire [31:0] p32;
+  wire [31:0] p33;
+  wire [31:0] s0;
+  wire [31:0] s1;
+  wire [31:0] s2;
+  wire [31:0] s3;
+  input [127:0] state_in;
+  output [127:0] state_out;
+  reg [127:0] state_out;
+  wire [31:0] z0;
+  wire [31:0] z1;
+  wire [31:0] z2;
+  wire [31:0] z3;
+  always @(posedge clk)
+    state_out <= { z0, z1, z2, z3 };
+  assign _00_ = p00 ^ p11;
+  assign _01_ = _00_ ^ p22;
+  assign _02_ = _01_ ^ p33;
+  assign z0 = _02_ ^ key[127:96];
+  assign _03_ = p03 ^ p10;
+  assign _04_ = _03_ ^ p21;
+  assign _05_ = _04_ ^ p32;
+  assign z1 = _05_ ^ key[95:64];
+  assign _06_ = p02 ^ p13;
+  assign _07_ = _06_ ^ p20;
+  assign _08_ = _07_ ^ p31;
+  assign z2 = _08_ ^ key[63:32];
+  assign _09_ = p01 ^ p12;
+  assign _10_ = _09_ ^ p23;
+  assign _11_ = _10_ ^ p30;
+  assign z3 = _11_ ^ key[31:0];
+  table_lookup t0 (
+    .clk(clk),
+    .p0(p00),
+    .p1(p01),
+    .p2(p02),
+    .p3(p03),
+    .state(state_in[127:96])
+  );
+  table_lookup t1 (
+    .clk(clk),
+    .p0(p10),
+    .p1(p11),
+    .p2(p12),
+    .p3(p13),
+    .state(state_in[95:64])
+  );
+  table_lookup t2 (
+    .clk(clk),
+    .p0(p20),
+    .p1(p21),
+    .p2(p22),
+    .p3(p23),
+    .state(state_in[63:32])
+  );
+  table_lookup t3 (
+    .clk(clk),
+    .p0(p30),
+    .p1(p31),
+    .p2(p32),
+    .p3(p33),
+    .state(state_in[31:0])
+  );
+  assign k0 = key[127:96];
+  assign k1 = key[95:64];
+  assign k2 = key[63:32];
+  assign k3 = key[31:0];
+  assign s0 = state_in[127:96];
+  assign s1 = state_in[95:64];
+  assign s2 = state_in[63:32];
+  assign s3 = state_in[31:0];
+endmodule

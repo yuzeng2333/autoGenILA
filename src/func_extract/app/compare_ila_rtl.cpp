@@ -1,4 +1,4 @@
-#include "../../taint_method/src/global_data.h"
+#include "../../live_analysis/src/global_data.h"
 #include "../src/helper.h"
 #include "../src/util.h"
 #include "compare_ila_rtl.h"

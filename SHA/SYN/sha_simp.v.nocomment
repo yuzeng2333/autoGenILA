@@ -1,0 +1,766 @@
+module sha1_core(clk, reset_n, init, next, block, ready, digest, digest_valid);
+  wire [31:0] _000_;
+  wire [31:0] _001_;
+  wire [31:0] _002_;
+  wire [31:0] _003_;
+  wire [31:0] _004_;
+  wire [31:0] _005_;
+  wire [31:0] _006_;
+  wire [31:0] _007_;
+  wire [31:0] _008_;
+  wire _009_;
+  wire [31:0] _010_;
+  wire [6:0] _011_;
+  wire [1:0] _012_;
+  wire [30:0] _013_;
+  wire [31:0] _014_;
+  wire [31:0] _015_;
+  wire [28:0] _016_;
+  wire [31:0] _017_;
+  wire _018_;
+  wire _019_;
+  wire [31:0] _020_;
+  wire [31:0] _021_;
+  wire [31:0] _022_;
+  wire [31:0] _023_;
+  wire [31:0] _024_;
+  wire [31:0] _025_;
+  wire [31:0] _026_;
+  wire [31:0] _027_;
+  wire [31:0] _028_;
+  wire _029_;
+  wire [31:0] _030_;
+  wire [31:0] _031_;
+  wire [31:0] _032_;
+  wire _033_;
+  wire [31:0] _034_;
+  wire [31:0] _035_;
+  wire [31:0] _036_;
+  wire [31:0] _037_;
+  wire [1:0] _038_;
+  wire _039_;
+  wire [31:0] _040_;
+  wire [31:0] _041_;
+  wire [31:0] _042_;
+  wire [31:0] _043_;
+  wire [31:0] _044_;
+  wire [31:0] _045_;
+  wire [31:0] _046_;
+  wire [31:0] _047_;
+  wire [31:0] _048_;
+  wire [31:0] _049_;
+  wire [31:0] _050_;
+  wire [6:0] _051_;
+  wire [31:0] _052_;
+  wire [31:0] _053_;
+  wire _054_;
+  wire _055_;
+  wire _056_;
+  wire _057_;
+  wire _058_;
+  wire _059_;
+  wire _060_;
+  wire _061_;
+  wire _062_;
+  wire [31:0] _063_;
+  wire [31:0] _064_;
+  wire [31:0] _065_;
+  wire [31:0] _066_;
+  wire _067_;
+  wire _068_;
+  wire _069_;
+  wire _070_;
+  wire [6:0] _071_;
+  wire [31:0] _072_;
+  wire [31:0] _073_;
+  wire [31:0] _074_;
+  wire [31:0] _075_;
+  wire [31:0] _076_;
+  wire [31:0] _077_;
+  wire [31:0] _078_;
+  wire [31:0] _079_;
+  wire [31:0] _080_;
+  wire [31:0] _081_;
+  wire [31:0] _082_;
+  wire [31:0] _083_;
+  wire [31:0] _084_;
+  wire [31:0] _085_;
+  wire [31:0] _086_;
+  wire [31:0] _087_;
+  wire _088_;
+  wire [31:0] _089_;
+  wire _090_;
+  wire _091_;
+  wire [31:0] _092_;
+  wire [31:0] _093_;
+  wire [31:0] _094_;
+  wire [31:0] _095_;
+  wire [31:0] _096_;
+  wire [31:0] _097_;
+  wire [31:0] _098_;
+  wire [31:0] _099_;
+  wire [31:0] _100_;
+  wire [31:0] _101_;
+  wire [31:0] _102_;
+  wire [31:0] _103_;
+  wire [31:0] _104_;
+  wire [31:0] _105_;
+  wire [31:0] _106_;
+  wire [31:0] _107_;
+  wire _108_;
+  wire _109_;
+  wire [6:0] _110_;
+  wire _111_;
+  wire _112_;
+  wire _113_;
+  wire _114_;
+  wire _115_;
+  wire _116_;
+  wire _117_;
+  wire _118_;
+  wire _119_;
+  wire _120_;
+  wire _121_;
+  wire _122_;
+  wire _123_;
+  wire _124_;
+  wire _125_;
+  wire _126_;
+  wire _127_;
+  wire _128_;
+  wire _129_;
+  wire _130_;
+  wire [31:0] _131_;
+  wire [31:0] _132_;
+  wire [31:0] _133_;
+  wire [31:0] _134_;
+  wire [31:0] _135_;
+  wire [31:0] _136_;
+  wire [31:0] _137_;
+  wire [31:0] H0_new;
+  reg [31:0] H0_reg;
+  wire [31:0] H1_new;
+  reg [31:0] H1_reg;
+  wire [31:0] H2_new;
+  reg [31:0] H2_reg;
+  wire [31:0] H3_new;
+  reg [31:0] H3_reg;
+  wire [31:0] H4_new;
+  reg [31:0] H4_reg;
+  wire H_we;
+  wire a_e_we;
+  wire [31:0] a_new;
+  reg [31:0] a_reg;
+  wire [31:0] b_new;
+  reg [31:0] b_reg;
+  input [511:0] block;
+  wire [31:0] c_new;
+  reg [31:0] c_reg;
+  input clk;
+  wire [31:0] d_new;
+  reg [31:0] d_reg;
+  output [159:0] digest;
+  wire digest_init;
+  wire digest_update;
+  output digest_valid;
+  wire digest_valid_new;
+  reg digest_valid_reg;
+  wire digest_valid_we;
+  wire [31:0] e_new;
+  reg [31:0] e_reg;
+  wire first_block;
+  input init;
+  input next;
+  output ready;
+  wire ready_flag;
+  input reset_n;
+  wire round_ctr_inc;
+  wire [6:0] round_ctr_new;
+  reg [6:0] round_ctr_reg;
+  wire round_ctr_rst;
+  wire round_ctr_we;
+  wire [1:0] sha1_ctrl_new;
+  reg [1:0] sha1_ctrl_reg;
+  wire sha1_ctrl_we;
+  wire state_init;
+  wire state_update;
+  wire [31:0] w;
+  wire w_init;
+  wire [511:0] \w_mem_inst.block ;
+  wire \w_mem_inst.clk ;
+  wire \w_mem_inst.init ;
+  wire \w_mem_inst.next ;
+  wire \w_mem_inst.reset_n ;
+  wire \w_mem_inst.sha1_w_mem_ctrl_new ;
+  reg \w_mem_inst.sha1_w_mem_ctrl_reg ;
+  wire \w_mem_inst.sha1_w_mem_ctrl_we ;
+  wire [31:0] \w_mem_inst.w ;
+  wire [31:0] \w_mem_inst.w_0 ;
+  wire [31:0] \w_mem_inst.w_13 ;
+  wire [31:0] \w_mem_inst.w_16 ;
+  wire [31:0] \w_mem_inst.w_2 ;
+  wire [31:0] \w_mem_inst.w_8 ;
+  wire \w_mem_inst.w_ctr_inc ;
+  wire [6:0] \w_mem_inst.w_ctr_new ;
+  reg [6:0] \w_mem_inst.w_ctr_reg ;
+  wire \w_mem_inst.w_ctr_rst ;
+  wire \w_mem_inst.w_ctr_we ;
+  wire [31:0] \w_mem_inst.w_mem00_new ;
+  wire [31:0] \w_mem_inst.w_mem01_new ;
+  wire [31:0] \w_mem_inst.w_mem02_new ;
+  wire [31:0] \w_mem_inst.w_mem03_new ;
+  wire [31:0] \w_mem_inst.w_mem04_new ;
+  wire [31:0] \w_mem_inst.w_mem05_new ;
+  wire [31:0] \w_mem_inst.w_mem06_new ;
+  wire [31:0] \w_mem_inst.w_mem07_new ;
+  wire [31:0] \w_mem_inst.w_mem08_new ;
+  wire [31:0] \w_mem_inst.w_mem09_new ;
+  wire [31:0] \w_mem_inst.w_mem10_new ;
+  wire [31:0] \w_mem_inst.w_mem11_new ;
+  wire [31:0] \w_mem_inst.w_mem12_new ;
+  wire [31:0] \w_mem_inst.w_mem13_new ;
+  wire [31:0] \w_mem_inst.w_mem14_new ;
+  wire [31:0] \w_mem_inst.w_mem15_new ;
+  reg [31:0] \w_mem_inst.w_mem[0] ;
+  reg [31:0] \w_mem_inst.w_mem[10] ;
+  reg [31:0] \w_mem_inst.w_mem[11] ;
+  reg [31:0] \w_mem_inst.w_mem[12] ;
+  reg [31:0] \w_mem_inst.w_mem[13] ;
+  reg [31:0] \w_mem_inst.w_mem[14] ;
+  reg [31:0] \w_mem_inst.w_mem[15] ;
+  reg [31:0] \w_mem_inst.w_mem[1] ;
+  reg [31:0] \w_mem_inst.w_mem[2] ;
+  reg [31:0] \w_mem_inst.w_mem[3] ;
+  reg [31:0] \w_mem_inst.w_mem[4] ;
+  reg [31:0] \w_mem_inst.w_mem[5] ;
+  reg [31:0] \w_mem_inst.w_mem[6] ;
+  reg [31:0] \w_mem_inst.w_mem[7] ;
+  reg [31:0] \w_mem_inst.w_mem[8] ;
+  reg [31:0] \w_mem_inst.w_mem[9] ;
+  wire \w_mem_inst.w_mem_we ;
+  wire [31:0] \w_mem_inst.w_new ;
+  wire [31:0] \w_mem_inst.w_tmp ;
+  wire w_next;
+  assign _042_ = H0_reg + a_reg;
+  assign _043_ = H1_reg + b_reg;
+  assign _044_ = H2_reg + c_reg;
+  assign _045_ = H3_reg + d_reg;
+  assign _046_ = H4_reg + e_reg;
+  wire [31:0] fangyuan0;
+  assign fangyuan0 = { a_reg[26:0], a_reg[31:27] };
+  assign _047_ = fangyuan0 + e_reg;
+  assign _048_ = _047_ + _031_;
+  assign _049_ = _048_ + _032_;
+  assign _050_ = _049_ + w;
+  assign _051_ = round_ctr_reg + 1'b1;
+  assign _052_ = b_reg & c_reg;
+  assign _053_ = _063_ & d_reg;
+  assign _054_ = round_ctr_reg == 7'b1001111;
+  assign _055_ = round_ctr_reg >= 5'b10100;
+  assign _056_ = round_ctr_reg >= 6'b101000;
+  assign _057_ = round_ctr_reg >= 6'b111100;
+  assign _058_ = round_ctr_reg <= 5'b10011;
+  assign _059_ = round_ctr_reg <= 6'b100111;
+  assign _060_ = round_ctr_reg <= 6'b111011;
+  assign _061_ = _055_ && _059_;
+  assign _062_ = _056_ && _060_;
+  assign _063_ = ~ b_reg;
+  assign _064_ = b_reg | c_reg;
+  assign _065_ = b_reg | d_reg;
+  assign _066_ = c_reg | d_reg;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      a_reg <= 32'd0;
+    else
+      a_reg <= _005_;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      b_reg <= 32'd0;
+    else
+      b_reg <= _006_;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      c_reg <= 32'd0;
+    else
+      c_reg <= _007_;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      d_reg <= 32'd0;
+    else
+      d_reg <= _008_;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      e_reg <= 32'd0;
+    else
+      e_reg <= _010_;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      H0_reg <= 32'd0;
+    else
+      H0_reg <= _000_;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      H1_reg <= 32'd0;
+    else
+      H1_reg <= _001_;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      H2_reg <= 32'd0;
+    else
+      H2_reg <= _002_;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      H3_reg <= 32'd0;
+    else
+      H3_reg <= _003_;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      H4_reg <= 32'd0;
+    else
+      H4_reg <= _004_;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      round_ctr_reg <= 7'b0000000;
+    else
+      round_ctr_reg <= _011_;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      digest_valid_reg <= 1'b0;
+    else
+      digest_valid_reg <= _009_;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      sha1_ctrl_reg <= 2'b00;
+    else
+      sha1_ctrl_reg <= _012_;
+  assign _039_ = _054_ ? 1'b1 : 1'b0;
+  assign _067_ = sha1_ctrl_reg == 1'b1;
+  assign _038_ = _054_ ? 2'b10 : 2'b00;
+  assign _068_ = ! sha1_ctrl_reg;
+  assign _033_ = next ? 1'b1 : _029_;
+  assign _029_ = init ? 1'b1 : 1'b0;
+  function [0:0] _182_;
+    input [0:0] a;
+    input [2:0] b;
+    input [2:0] s;
+    casez (s)
+      3'b??1:
+        _182_ = b[0:0];
+      3'b?1?:
+        _182_ = b[1:1];
+      3'b1??:
+        _182_ = b[2:2];
+      default:
+        _182_ = a;
+    endcase
+  endfunction
+  wire [2:0] fangyuan1;
+  assign fangyuan1 = { _033_, _039_, 1'b1 };
+  wire [2:0] fangyuan2;
+  assign fangyuan2 = { _068_, _067_, _069_ };
+  assign sha1_ctrl_we = _182_(1'b0, fangyuan1, fangyuan2);
+  assign _069_ = sha1_ctrl_reg == 2'b10;
+  function [1:0] _184_;
+    input [1:0] a;
+    input [3:0] b;
+    input [1:0] s;
+    casez (s)
+      2'b?1:
+        _184_ = b[1:0];
+      2'b1?:
+        _184_ = b[3:2];
+      default:
+        _184_ = a;
+    endcase
+  endfunction
+  wire [3:0] fangyuan3;
+  assign fangyuan3 = { 1'b0, _033_, _038_ };
+  wire [1:0] fangyuan4;
+  assign fangyuan4 = { _068_, _067_ };
+  assign sha1_ctrl_new = _184_(2'b00, fangyuan3, fangyuan4);
+  function [0:0] _185_;
+    input [0:0] a;
+    input [1:0] b;
+    input [1:0] s;
+    casez (s)
+      2'b?1:
+        _185_ = b[0:0];
+      2'b1?:
+        _185_ = b[1:1];
+      default:
+        _185_ = a;
+    endcase
+  endfunction
+  wire [1:0] fangyuan5;
+  assign fangyuan5 = { _033_, 1'b1 };
+  wire [1:0] fangyuan6;
+  assign fangyuan6 = { _068_, _069_ };
+  assign digest_valid_we = _185_(1'b0, fangyuan5, fangyuan6);
+  assign digest_update = _069_ ? 1'b1 : 1'b0;
+  assign round_ctr_rst = _068_ ? _033_ : 1'b0;
+  assign digest_init = _068_ ? _029_ : 1'b0;
+  assign ready = _068_ ? 1'b1 : 1'b0;
+  assign round_ctr_inc = _067_ ? 1'b1 : 1'b0;
+  assign a_e_we = round_ctr_inc ? 1'b1 : _019_;
+  assign round_ctr_new = round_ctr_inc ? _051_ : 7'b0000000;
+  assign _019_ = round_ctr_rst ? 1'b1 : 1'b0;
+  assign _040_ = _057_ ? _135_ : 32'd0;
+  assign _041_ = _057_ ? 32'd3395469782 : 32'd0;
+  assign _036_ = _062_ ? _137_ : _040_;
+  assign _037_ = _062_ ? 32'd2400959708 : _041_;
+  assign _034_ = _061_ ? _135_ : _036_;
+  assign _035_ = _061_ ? 32'd1859775393 : _037_;
+  assign _031_ = _058_ ? _133_ : _034_;
+  assign _032_ = _058_ ? 32'd1518500249 : _035_;
+  assign e_new = round_ctr_inc ? d_reg : _024_;
+  assign d_new = round_ctr_inc ? c_reg : _023_;
+  wire [31:0] fangyuan7;
+  assign fangyuan7 = { b_reg[1:0], b_reg[31:2] };
+  assign c_new = round_ctr_inc ? fangyuan7 : _022_;
+  assign b_new = round_ctr_inc ? a_reg : _021_;
+  assign a_new = round_ctr_inc ? _050_ : _020_;
+  assign _030_ = digest_init ? 32'd3285377520 : H4_reg;
+  assign _028_ = digest_init ? 32'd271733878 : H3_reg;
+  assign _027_ = digest_init ? 32'd2562383102 : H2_reg;
+  assign _026_ = digest_init ? 32'd4023233417 : H1_reg;
+  assign _025_ = digest_init ? 32'd1732584193 : H0_reg;
+  assign _024_ = round_ctr_rst ? _030_ : 32'd0;
+  assign _023_ = round_ctr_rst ? _028_ : 32'd0;
+  assign _022_ = round_ctr_rst ? _027_ : 32'd0;
+  assign _021_ = round_ctr_rst ? _026_ : 32'd0;
+  assign _020_ = round_ctr_rst ? _025_ : 32'd0;
+  assign H_we = digest_update ? 1'b1 : _018_;
+  assign H4_new = digest_update ? _046_ : _017_;
+  wire [31:0] fangyuan8;
+  assign fangyuan8 = { 3'b000, _016_ };
+  assign H3_new = digest_update ? _045_ : fangyuan8;
+  assign H2_new = digest_update ? _044_ : _015_;
+  assign H1_new = digest_update ? _043_ : _014_;
+  wire [31:0] fangyuan9;
+  assign fangyuan9 = { 1'b0, _013_ };
+  assign H0_new = digest_update ? _042_ : fangyuan9;
+  assign _018_ = digest_init ? 1'b1 : 1'b0;
+  assign _017_ = digest_init ? 32'd3285377520 : 32'd0;
+  assign _016_ = digest_init ? 29'b10000001100100101010001110110 : 29'b00000000000000000000000000000;
+  assign _015_ = digest_init ? 32'd2562383102 : 32'd0;
+  assign _014_ = digest_init ? 32'd4023233417 : 32'd0;
+  assign _013_ = digest_init ? 31'b1100111010001010010001100000001 : 31'b0000000000000000000000000000000;
+  assign _012_ = sha1_ctrl_we ? sha1_ctrl_new : sha1_ctrl_reg;
+  assign _009_ = digest_valid_we ? digest_update : digest_valid_reg;
+  assign _011_ = a_e_we ? round_ctr_new : round_ctr_reg;
+  assign _004_ = H_we ? H4_new : H4_reg;
+  assign _003_ = H_we ? H3_new : H3_reg;
+  assign _002_ = H_we ? H2_new : H2_reg;
+  assign _001_ = H_we ? H1_new : H1_reg;
+  assign _000_ = H_we ? H0_new : H0_reg;
+  assign _010_ = a_e_we ? e_new : e_reg;
+  assign _008_ = a_e_we ? d_new : d_reg;
+  assign _007_ = a_e_we ? c_new : c_reg;
+  assign _006_ = a_e_we ? b_new : b_reg;
+  assign _005_ = a_e_we ? a_new : a_reg;
+  assign _110_ = \w_mem_inst.w_ctr_reg + 1'b1;
+  assign _111_ = \w_mem_inst.w_ctr_reg == 7'b1001111;
+  assign _112_ = \w_mem_inst.w_ctr_reg > 4'b1111;
+  assign _113_ = \w_mem_inst.w_ctr_reg < 5'b10000;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      \w_mem_inst.w_ctr_reg <= 7'b0000000;
+    else
+      \w_mem_inst.w_ctr_reg <= _071_;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      \w_mem_inst.sha1_w_mem_ctrl_reg <= 1'b0;
+    else
+      \w_mem_inst.sha1_w_mem_ctrl_reg <= _070_;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      \w_mem_inst.w_mem[0] <= 32'd0;
+    else
+      \w_mem_inst.w_mem[0] <= _072_;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      \w_mem_inst.w_mem[1] <= 32'd0;
+    else
+      \w_mem_inst.w_mem[1] <= _079_;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      \w_mem_inst.w_mem[2] <= 32'd0;
+    else
+      \w_mem_inst.w_mem[2] <= _080_;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      \w_mem_inst.w_mem[3] <= 32'd0;
+    else
+      \w_mem_inst.w_mem[3] <= _081_;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      \w_mem_inst.w_mem[4] <= 32'd0;
+    else
+      \w_mem_inst.w_mem[4] <= _082_;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      \w_mem_inst.w_mem[5] <= 32'd0;
+    else
+      \w_mem_inst.w_mem[5] <= _083_;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      \w_mem_inst.w_mem[6] <= 32'd0;
+    else
+      \w_mem_inst.w_mem[6] <= _084_;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      \w_mem_inst.w_mem[7] <= 32'd0;
+    else
+      \w_mem_inst.w_mem[7] <= _085_;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      \w_mem_inst.w_mem[8] <= 32'd0;
+    else
+      \w_mem_inst.w_mem[8] <= _086_;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      \w_mem_inst.w_mem[9] <= 32'd0;
+    else
+      \w_mem_inst.w_mem[9] <= _087_;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      \w_mem_inst.w_mem[10] <= 32'd0;
+    else
+      \w_mem_inst.w_mem[10] <= _073_;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      \w_mem_inst.w_mem[11] <= 32'd0;
+    else
+      \w_mem_inst.w_mem[11] <= _074_;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      \w_mem_inst.w_mem[12] <= 32'd0;
+    else
+      \w_mem_inst.w_mem[12] <= _075_;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      \w_mem_inst.w_mem[13] <= 32'd0;
+    else
+      \w_mem_inst.w_mem[13] <= _076_;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      \w_mem_inst.w_mem[14] <= 32'd0;
+    else
+      \w_mem_inst.w_mem[14] <= _077_;
+  always @(posedge clk or negedge reset_n)
+    if (!reset_n)
+      \w_mem_inst.w_mem[15] <= 32'd0;
+    else
+      \w_mem_inst.w_mem[15] <= _078_;
+  assign _109_ = _111_ ? 1'b1 : 1'b0;
+  assign _091_ = round_ctr_inc ? 1'b1 : 1'b0;
+  assign _090_ = round_ctr_rst ? 1'b1 : 1'b0;
+  function [0:0] _267_;
+    input [0:0] a;
+    input [1:0] b;
+    input [1:0] s;
+    casez (s)
+      2'b?1:
+        _267_ = b[0:0];
+      2'b1?:
+        _267_ = b[1:1];
+      default:
+        _267_ = a;
+    endcase
+  endfunction
+  wire [1:0] fangyuan10;
+  assign fangyuan10 = { _090_, _109_ };
+  wire [1:0] fangyuan11;
+  assign fangyuan11 = { _114_, \w_mem_inst.sha1_w_mem_ctrl_reg };
+  assign \w_mem_inst.sha1_w_mem_ctrl_we = _267_(1'bx, fangyuan10, fangyuan11);
+  assign _114_ = ~ \w_mem_inst.sha1_w_mem_ctrl_reg ;
+  function [0:0] _269_;
+    input [0:0] a;
+    input [1:0] b;
+    input [1:0] s;
+    casez (s)
+      2'b?1:
+        _269_ = b[0:0];
+      2'b1?:
+        _269_ = b[1:1];
+      default:
+        _269_ = a;
+    endcase
+  endfunction
+  wire [1:0] fangyuan12;
+  assign fangyuan12 = { _090_, 1'b0 };
+  wire [1:0] fangyuan13;
+  assign fangyuan13 = { _114_, \w_mem_inst.sha1_w_mem_ctrl_reg };
+  assign \w_mem_inst.sha1_w_mem_ctrl_new = _269_(1'bx, fangyuan12, fangyuan13);
+  function [0:0] _270_;
+    input [0:0] a;
+    input [1:0] b;
+    input [1:0] s;
+    casez (s)
+      2'b?1:
+        _270_ = b[0:0];
+      2'b1?:
+        _270_ = b[1:1];
+      default:
+        _270_ = a;
+    endcase
+  endfunction
+  wire [1:0] fangyuan14;
+  assign fangyuan14 = { 1'b0, _091_ };
+  wire [1:0] fangyuan15;
+  assign fangyuan15 = { _114_, \w_mem_inst.sha1_w_mem_ctrl_reg };
+  assign \w_mem_inst.w_ctr_inc = _270_(1'bx, fangyuan14, fangyuan15);
+  assign \w_mem_inst.w_ctr_we = \w_mem_inst.w_ctr_inc ? 1'b1 : _088_;
+  assign \w_mem_inst.w_ctr_new = \w_mem_inst.w_ctr_inc ? _110_ : 7'b0000000;
+  assign _088_ = \w_mem_inst.sha1_w_mem_ctrl_new ? 1'b1 : 1'b0;
+  assign _108_ = _112_ ? 1'b1 : 1'b0;
+  wire [31:0] fangyuan16;
+  assign fangyuan16 = { \w_mem_inst.w_16 [30:0], \w_mem_inst.w_16 [31] };
+  assign _107_ = _112_ ? fangyuan16 : 32'd0;
+  assign _106_ = _112_ ? \w_mem_inst.w_mem[15] : 32'd0;
+  assign _105_ = _112_ ? \w_mem_inst.w_mem[14] : 32'd0;
+  assign _104_ = _112_ ? \w_mem_inst.w_mem[13] : 32'd0;
+  assign _103_ = _112_ ? \w_mem_inst.w_mem[12] : 32'd0;
+  assign _102_ = _112_ ? \w_mem_inst.w_mem[11] : 32'd0;
+  assign _101_ = _112_ ? \w_mem_inst.w_mem[10] : 32'd0;
+  assign _100_ = _112_ ? \w_mem_inst.w_mem[9] : 32'd0;
+  assign _099_ = _112_ ? \w_mem_inst.w_mem[8] : 32'd0;
+  assign _098_ = _112_ ? \w_mem_inst.w_mem[7] : 32'd0;
+  assign _097_ = _112_ ? \w_mem_inst.w_mem[6] : 32'd0;
+  assign _096_ = _112_ ? \w_mem_inst.w_mem[5] : 32'd0;
+  assign _095_ = _112_ ? \w_mem_inst.w_mem[4] : 32'd0;
+  assign _094_ = _112_ ? \w_mem_inst.w_mem[3] : 32'd0;
+  assign _093_ = _112_ ? \w_mem_inst.w_mem[2] : 32'd0;
+  assign _092_ = _112_ ? \w_mem_inst.w_mem[1] : 32'd0;
+  assign \w_mem_inst.w_mem_we = round_ctr_rst ? 1'b1 : _108_;
+  assign \w_mem_inst.w_mem15_new = round_ctr_rst ? block[31:0] : _107_;
+  assign \w_mem_inst.w_mem14_new = round_ctr_rst ? block[63:32] : _106_;
+  assign \w_mem_inst.w_mem13_new = round_ctr_rst ? block[95:64] : _105_;
+  assign \w_mem_inst.w_mem12_new = round_ctr_rst ? block[127:96] : _104_;
+  assign \w_mem_inst.w_mem11_new = round_ctr_rst ? block[159:128] : _103_;
+  assign \w_mem_inst.w_mem10_new = round_ctr_rst ? block[191:160] : _102_;
+  assign \w_mem_inst.w_mem09_new = round_ctr_rst ? block[223:192] : _101_;
+  assign \w_mem_inst.w_mem08_new = round_ctr_rst ? block[255:224] : _100_;
+  assign \w_mem_inst.w_mem07_new = round_ctr_rst ? block[287:256] : _099_;
+  assign \w_mem_inst.w_mem06_new = round_ctr_rst ? block[319:288] : _098_;
+  assign \w_mem_inst.w_mem05_new = round_ctr_rst ? block[351:320] : _097_;
+  assign \w_mem_inst.w_mem04_new = round_ctr_rst ? block[383:352] : _096_;
+  assign \w_mem_inst.w_mem03_new = round_ctr_rst ? block[415:384] : _095_;
+  assign \w_mem_inst.w_mem02_new = round_ctr_rst ? block[447:416] : _094_;
+  assign \w_mem_inst.w_mem01_new = round_ctr_rst ? block[479:448] : _093_;
+  assign \w_mem_inst.w_mem00_new = round_ctr_rst ? block[511:480] : _092_;
+  function [31:0] _308_;
+    input [31:0] a;
+    input [511:0] b;
+    input [15:0] s;
+    casez (s)
+      16'b???????????????1:
+        _308_ = b[31:0];
+      16'b??????????????1?:
+        _308_ = b[63:32];
+      16'b?????????????1??:
+        _308_ = b[95:64];
+      16'b????????????1???:
+        _308_ = b[127:96];
+      16'b???????????1????:
+        _308_ = b[159:128];
+      16'b??????????1?????:
+        _308_ = b[191:160];
+      16'b?????????1??????:
+        _308_ = b[223:192];
+      16'b????????1???????:
+        _308_ = b[255:224];
+      16'b???????1????????:
+        _308_ = b[287:256];
+      16'b??????1?????????:
+        _308_ = b[319:288];
+      16'b?????1??????????:
+        _308_ = b[351:320];
+      16'b????1???????????:
+        _308_ = b[383:352];
+      16'b???1????????????:
+        _308_ = b[415:384];
+      16'b??1?????????????:
+        _308_ = b[447:416];
+      16'b?1??????????????:
+        _308_ = b[479:448];
+      16'b1???????????????:
+        _308_ = b[511:480];
+      default:
+        _308_ = a;
+    endcase
+  endfunction
+  wire [511:0] fangyuan17;
+  assign fangyuan17 = { \w_mem_inst.w_mem[0] , \w_mem_inst.w_mem[1] , \w_mem_inst.w_mem[2] , \w_mem_inst.w_mem[3] , \w_mem_inst.w_mem[4] , \w_mem_inst.w_mem[5] , \w_mem_inst.w_mem[6] , \w_mem_inst.w_mem[7] , \w_mem_inst.w_mem[8] , \w_mem_inst.w_mem[9] , \w_mem_inst.w_mem[10] , \w_mem_inst.w_mem[11] , \w_mem_inst.w_mem[12] , \w_mem_inst.w_mem[13] , \w_mem_inst.w_mem[14] , \w_mem_inst.w_mem[15] };
+  wire [15:0] fangyuan18;
+  assign fangyuan18 = { _130_, _129_, _128_, _127_, _126_, _125_, _124_, _123_, _122_, _121_, _120_, _119_, _118_, _117_, _116_, _115_ };
+  assign _089_ = _308_(32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx, fangyuan17, fangyuan18);
+  assign _115_ = \w_mem_inst.w_ctr_reg [3:0] == 4'b1111;
+  assign _116_ = \w_mem_inst.w_ctr_reg [3:0] == 4'b1110;
+  assign _117_ = \w_mem_inst.w_ctr_reg [3:0] == 4'b1101;
+  assign _118_ = \w_mem_inst.w_ctr_reg [3:0] == 4'b1100;
+  assign _119_ = \w_mem_inst.w_ctr_reg [3:0] == 4'b1011;
+  assign _120_ = \w_mem_inst.w_ctr_reg [3:0] == 4'b1010;
+  assign _121_ = \w_mem_inst.w_ctr_reg [3:0] == 4'b1001;
+  assign _122_ = \w_mem_inst.w_ctr_reg [3:0] == 4'b1000;
+  assign _123_ = \w_mem_inst.w_ctr_reg [3:0] == 3'b111;
+  assign _124_ = \w_mem_inst.w_ctr_reg [3:0] == 3'b110;
+  assign _125_ = \w_mem_inst.w_ctr_reg [3:0] == 3'b101;
+  assign _126_ = \w_mem_inst.w_ctr_reg [3:0] == 3'b100;
+  assign _127_ = \w_mem_inst.w_ctr_reg [3:0] == 2'b11;
+  assign _128_ = \w_mem_inst.w_ctr_reg [3:0] == 2'b10;
+  assign _129_ = \w_mem_inst.w_ctr_reg [3:0] == 1'b1;
+  assign _130_ = ! \w_mem_inst.w_ctr_reg [3:0];
+  wire [31:0] fangyuan19;
+  assign fangyuan19 = { \w_mem_inst.w_16 [30:0], \w_mem_inst.w_16 [31] };
+  assign w = _113_ ? _089_ : fangyuan19;
+  assign _078_ = \w_mem_inst.w_mem_we ? \w_mem_inst.w_mem15_new : \w_mem_inst.w_mem[15] ;
+  assign _077_ = \w_mem_inst.w_mem_we ? \w_mem_inst.w_mem14_new : \w_mem_inst.w_mem[14] ;
+  assign _076_ = \w_mem_inst.w_mem_we ? \w_mem_inst.w_mem13_new : \w_mem_inst.w_mem[13] ;
+  assign _075_ = \w_mem_inst.w_mem_we ? \w_mem_inst.w_mem12_new : \w_mem_inst.w_mem[12] ;
+  assign _074_ = \w_mem_inst.w_mem_we ? \w_mem_inst.w_mem11_new : \w_mem_inst.w_mem[11] ;
+  assign _073_ = \w_mem_inst.w_mem_we ? \w_mem_inst.w_mem10_new : \w_mem_inst.w_mem[10] ;
+  assign _087_ = \w_mem_inst.w_mem_we ? \w_mem_inst.w_mem09_new : \w_mem_inst.w_mem[9] ;
+  assign _086_ = \w_mem_inst.w_mem_we ? \w_mem_inst.w_mem08_new : \w_mem_inst.w_mem[8] ;
+  assign _085_ = \w_mem_inst.w_mem_we ? \w_mem_inst.w_mem07_new : \w_mem_inst.w_mem[7] ;
+  assign _084_ = \w_mem_inst.w_mem_we ? \w_mem_inst.w_mem06_new : \w_mem_inst.w_mem[6] ;
+  assign _083_ = \w_mem_inst.w_mem_we ? \w_mem_inst.w_mem05_new : \w_mem_inst.w_mem[5] ;
+  assign _082_ = \w_mem_inst.w_mem_we ? \w_mem_inst.w_mem04_new : \w_mem_inst.w_mem[4] ;
+  assign _081_ = \w_mem_inst.w_mem_we ? \w_mem_inst.w_mem03_new : \w_mem_inst.w_mem[3] ;
+  assign _080_ = \w_mem_inst.w_mem_we ? \w_mem_inst.w_mem02_new : \w_mem_inst.w_mem[2] ;
+  assign _079_ = \w_mem_inst.w_mem_we ? \w_mem_inst.w_mem01_new : \w_mem_inst.w_mem[1] ;
+  assign _072_ = \w_mem_inst.w_mem_we ? \w_mem_inst.w_mem00_new : \w_mem_inst.w_mem[0] ;
+  assign _070_ = \w_mem_inst.sha1_w_mem_ctrl_we ? \w_mem_inst.sha1_w_mem_ctrl_new : \w_mem_inst.sha1_w_mem_ctrl_reg ;
+  assign _071_ = \w_mem_inst.w_ctr_we ? \w_mem_inst.w_ctr_new : \w_mem_inst.w_ctr_reg ;
+  assign _131_ = \w_mem_inst.w_mem[13] ^ \w_mem_inst.w_mem[8] ;
+  assign _132_ = _131_ ^ \w_mem_inst.w_mem[2] ;
+  assign \w_mem_inst.w_16 = _132_ ^ \w_mem_inst.w_mem[0] ;
+  assign _133_ = _052_ ^ _053_;
+  assign _134_ = b_reg ^ c_reg;
+  assign _135_ = _134_ ^ d_reg;
+  assign _136_ = _064_ ^ _065_;
+  assign _137_ = _136_ ^ _066_;
+  assign digest = { H0_reg, H1_reg, H2_reg, H3_reg, H4_reg };
+  assign digest_valid = digest_valid_reg;
+  assign digest_valid_new = digest_update;
+  assign first_block = digest_init;
+  assign ready_flag = ready;
+  assign round_ctr_we = a_e_we;
+  assign state_init = round_ctr_rst;
+  assign state_update = round_ctr_inc;
+  assign w_init = round_ctr_rst;
+  assign \w_mem_inst.block = block;
+  assign \w_mem_inst.clk = clk;
+  assign \w_mem_inst.init = round_ctr_rst;
+  assign \w_mem_inst.next = round_ctr_inc;
+  assign \w_mem_inst.reset_n = reset_n;
+  assign \w_mem_inst.w = w;
+  assign \w_mem_inst.w_0 = \w_mem_inst.w_mem[0] ;
+  assign \w_mem_inst.w_13 = \w_mem_inst.w_mem[13] ;
+  assign \w_mem_inst.w_2 = \w_mem_inst.w_mem[2] ;
+  assign \w_mem_inst.w_8 = \w_mem_inst.w_mem[8] ;
+  assign \w_mem_inst.w_ctr_rst = \w_mem_inst.sha1_w_mem_ctrl_new ;
+  assign \w_mem_inst.w_new = { \w_mem_inst.w_16 [30:0], \w_mem_inst.w_16 [31] };
+  assign \w_mem_inst.w_tmp = w;
+  assign w_next = round_ctr_inc;
+endmodule

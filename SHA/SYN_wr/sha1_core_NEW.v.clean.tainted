@@ -1,0 +1,711 @@
+  logic [31:0] _000_;
+  logic [31:0] _000__T ;
+  logic [31:0] _001_;
+  logic [31:0] _001__T ;
+  logic [31:0] _002_;
+  logic [31:0] _002__T ;
+  logic [31:0] _003_;
+  logic [31:0] _003__T ;
+  logic [31:0] _004_;
+  logic [31:0] _004__T ;
+  logic [31:0] _005_;
+  logic [31:0] _005__T ;
+  logic [31:0] _006_;
+  logic [31:0] _006__T ;
+  logic [31:0] _007_;
+  logic [31:0] _007__T ;
+  logic [31:0] _008_;
+  logic [31:0] _008__T ;
+  logic _009_;
+  logic _009__T ;
+  logic [31:0] _010_;
+  logic [31:0] _010__T ;
+  logic [6:0] _011_;
+  logic [6:0] _011__T ;
+  logic [1:0] _012_;
+  logic [1:0] _012__T ;
+  logic [30:0] _013_;
+  logic [30:0] _013__T ;
+  logic [31:0] _014_;
+  logic [31:0] _014__T ;
+  logic [31:0] _015_;
+  logic [31:0] _015__T ;
+  logic [28:0] _016_;
+  logic [28:0] _016__T ;
+  logic [31:0] _017_;
+  logic [31:0] _017__T ;
+  logic [31:0] _018_;
+  logic [31:0] _018__T ;
+  logic [31:0] _019_;
+  logic [31:0] _019__T ;
+  logic [31:0] _020_;
+  logic [31:0] _020__T ;
+  logic [31:0] _021_;
+  logic [31:0] _021__T ;
+  logic [31:0] _022_;
+  logic [31:0] _022__T ;
+  logic [31:0] _023_;
+  logic [31:0] _023__T ;
+  logic [31:0] _024_;
+  logic [31:0] _024__T ;
+  logic [31:0] _025_;
+  logic [31:0] _025__T ;
+  logic [31:0] _026_;
+  logic [31:0] _026__T ;
+  logic [31:0] _027_;
+  logic [31:0] _027__T ;
+  logic [31:0] _028_;
+  logic [31:0] _028__T ;
+  logic [31:0] _029_;
+  logic [31:0] _029__T ;
+  logic _030_;
+  logic _030__T ;
+  logic [31:0] _031_;
+  logic [31:0] _031__T ;
+  logic [31:0] _032_;
+  logic [31:0] _032__T ;
+  logic [31:0] _033_;
+  logic [31:0] _033__T ;
+  logic [31:0] _034_;
+  logic [31:0] _034__T ;
+  logic [1:0] _035_;
+  logic [1:0] _035__T ;
+  logic _036_;
+  logic _036__T ;
+  logic [31:0] _037_;
+  logic [31:0] _037__T ;
+  logic [31:0] _038_;
+  logic [31:0] _038__T ;
+  logic [31:0] _039_;
+  logic [31:0] _039__T ;
+  logic [31:0] _040_;
+  logic [31:0] _040__T ;
+  logic [31:0] _041_;
+  logic [31:0] _041__T ;
+  logic [31:0] _042_;
+  logic [31:0] _042__T ;
+  logic [31:0] _043_;
+  logic [31:0] _043__T ;
+  logic [31:0] _044_;
+  logic [31:0] _044__T ;
+  logic [31:0] _045_;
+  logic [31:0] _045__T ;
+  logic [31:0] _046_;
+  logic [31:0] _046__T ;
+  logic [31:0] _047_;
+  logic [31:0] _047__T ;
+  logic [6:0] _048_;
+  logic [6:0] _048__T ;
+  logic [31:0] _049_;
+  logic [31:0] _049__T ;
+  logic [31:0] _050_;
+  logic [31:0] _050__T ;
+  logic _051_;
+  logic _051__T ;
+  logic _052_;
+  logic _052__T ;
+  logic _053_;
+  logic _053__T ;
+  logic _054_;
+  logic _054__T ;
+  logic _055_;
+  logic _055__T ;
+  logic _056_;
+  logic _056__T ;
+  logic _057_;
+  logic _057__T ;
+  logic _058_;
+  logic _058__T ;
+  logic [31:0] _059_;
+  logic [31:0] _059__T ;
+  logic [31:0] _060_;
+  logic [31:0] _060__T ;
+  logic [31:0] _061_;
+  logic [31:0] _061__T ;
+  logic [31:0] _062_;
+  logic [31:0] _062__T ;
+  logic [1:0] _063_;
+  logic [1:0] _063__T ;
+  logic _064_;
+  logic _064__T ;
+  logic [6:0] _065_;
+  logic [6:0] _065__T ;
+  logic [31:0] _066_;
+  logic [31:0] _066__T ;
+  logic [31:0] _067_;
+  logic [31:0] _067__T ;
+  logic [31:0] _068_;
+  logic [31:0] _068__T ;
+  logic [31:0] _069_;
+  logic [31:0] _069__T ;
+  logic [31:0] _070_;
+  logic [31:0] _070__T ;
+  logic [31:0] _071_;
+  logic [31:0] _071__T ;
+  logic [31:0] _072_;
+  logic [31:0] _072__T ;
+  logic [31:0] _073_;
+  logic [31:0] _073__T ;
+  logic [31:0] _074_;
+  logic [31:0] _074__T ;
+  logic [31:0] _075_;
+  logic [31:0] _075__T ;
+  logic [31:0] _076_;
+  logic [31:0] _076__T ;
+  logic [31:0] _077_;
+  logic [31:0] _077__T ;
+  logic [31:0] _078_;
+  logic [31:0] _078__T ;
+  logic [31:0] _079_;
+  logic [31:0] _079__T ;
+  logic [31:0] _080_;
+  logic [31:0] _080__T ;
+  logic [31:0] H0_new;
+  logic [31:0] H0_new_T ;
+  logic [31:0] H0_reg;
+  logic [31:0]  H0_reg_T ;
+  logic [31:0]  H0_reg_TZ ;
+  logic [31:0]  H0_reg_PREV_VAL1 ;
+  logic [31:0]  H0_reg_PREV_VAL2 ;
+  assign H0_reg_T = H0_reg_TZ | { 32{ YZC[0] && H0_reg != 0 }} ;
+  logic [31:0] H1_new;
+  logic [31:0] H1_new_T ;
+  logic [31:0] H1_reg;
+  logic [31:0]  H1_reg_T ;
+  logic [31:0]  H1_reg_TZ ;
+  logic [31:0]  H1_reg_PREV_VAL1 ;
+  logic [31:0]  H1_reg_PREV_VAL2 ;
+  assign H1_reg_T = H1_reg_TZ | { 32{ YZC[1] && H1_reg != 0 }} ;
+  logic [31:0] H2_new;
+  logic [31:0] H2_new_T ;
+  logic [31:0] H2_reg;
+  logic [31:0]  H2_reg_T ;
+  logic [31:0]  H2_reg_TZ ;
+  logic [31:0]  H2_reg_PREV_VAL1 ;
+  logic [31:0]  H2_reg_PREV_VAL2 ;
+  assign H2_reg_T = H2_reg_TZ | { 32{ YZC[2] && H2_reg != 0 }} ;
+  logic [31:0] H3_new;
+  logic [31:0] H3_new_T ;
+  logic [31:0] H3_reg;
+  logic [31:0]  H3_reg_T ;
+  logic [31:0]  H3_reg_TZ ;
+  logic [31:0]  H3_reg_PREV_VAL1 ;
+  logic [31:0]  H3_reg_PREV_VAL2 ;
+  assign H3_reg_T = H3_reg_TZ | { 32{ YZC[3] && H3_reg != 0 }} ;
+  logic [31:0] H4_new;
+  logic [31:0] H4_new_T ;
+  logic [31:0] H4_reg;
+  logic [31:0]  H4_reg_T ;
+  logic [31:0]  H4_reg_TZ ;
+  logic [31:0]  H4_reg_PREV_VAL1 ;
+  logic [31:0]  H4_reg_PREV_VAL2 ;
+  assign H4_reg_T = H4_reg_TZ | { 32{ YZC[4] && H4_reg != 0 }} ;
+  logic H_we;
+  logic H_we_T ;
+  logic a_e_we;
+  logic a_e_we_T ;
+  logic [31:0] a_new;
+  logic [31:0] a_new_T ;
+  logic [31:0] a_reg;
+  logic [31:0]  a_reg_T ;
+  logic [31:0]  a_reg_TZ ;
+  logic [31:0]  a_reg_PREV_VAL1 ;
+  logic [31:0]  a_reg_PREV_VAL2 ;
+  assign a_reg_T = a_reg_TZ | { 32{ YZC[5] && a_reg != 0 }} ;
+  logic [31:0] b_new;
+  logic [31:0] b_new_T ;
+  logic [31:0] b_reg;
+  logic [31:0]  b_reg_T ;
+  logic [31:0]  b_reg_TZ ;
+  logic [31:0]  b_reg_PREV_VAL1 ;
+  logic [31:0]  b_reg_PREV_VAL2 ;
+  assign b_reg_T = b_reg_TZ | { 32{ YZC[6] && b_reg != 0 }} ;
+  input [511:0] block;
+  input [511:0] block_T ;
+  logic [31:0] c_new;
+  logic [31:0] c_new_T ;
+  logic [31:0] c_reg;
+  logic [31:0]  c_reg_T ;
+  logic [31:0]  c_reg_TZ ;
+  logic [31:0]  c_reg_PREV_VAL1 ;
+  logic [31:0]  c_reg_PREV_VAL2 ;
+  assign c_reg_T = c_reg_TZ | { 32{ YZC[7] && c_reg != 0 }} ;
+  input clk;
+  logic [31:0] d_new;
+  logic [31:0] d_new_T ;
+  logic [31:0] d_reg;
+  logic [31:0]  d_reg_T ;
+  logic [31:0]  d_reg_TZ ;
+  logic [31:0]  d_reg_PREV_VAL1 ;
+  logic [31:0]  d_reg_PREV_VAL2 ;
+  assign d_reg_T = d_reg_TZ | { 32{ YZC[8] && d_reg != 0 }} ;
+  output [159:0] digest;
+  logic [159:0] digest ;
+  output [159:0] digest_T ;
+  logic [159:0] digest_T ;
+  logic digest_init;
+  logic digest_init_T ;
+  logic digest_update;
+  logic digest_update_T ;
+  output digest_valid;
+  logic digest_valid ;
+  output digest_valid_T ;
+  logic digest_valid_T ;
+  logic digest_valid_new;
+  logic digest_valid_new_T ;
+  logic digest_valid_reg;
+  logic  digest_valid_reg_T ;
+  logic  digest_valid_reg_TZ ;
+  logic  digest_valid_reg_PREV_VAL1 ;
+  logic  digest_valid_reg_PREV_VAL2 ;
+  assign digest_valid_reg_T = digest_valid_reg_TZ | { 1{ YZC[9] && digest_valid_reg != 0 }} ;
+  logic digest_valid_we;
+  logic digest_valid_we_T ;
+  logic [31:0] e_new;
+  logic [31:0] e_new_T ;
+  logic [31:0] e_reg;
+  logic [31:0]  e_reg_T ;
+  logic [31:0]  e_reg_TZ ;
+  logic [31:0]  e_reg_PREV_VAL1 ;
+  logic [31:0]  e_reg_PREV_VAL2 ;
+  assign e_reg_T = e_reg_TZ | { 32{ YZC[10] && e_reg != 0 }} ;
+  logic first_block;
+  logic first_block_T ;
+  input init;
+  input init_T ;
+  input next;
+  input next_T ;
+  output ready;
+  logic ready ;
+  output ready_T ;
+  logic ready_T ;
+  logic ready_flag;
+  logic ready_flag_T ;
+  input reset_n;
+  input reset_n_T ;
+  logic round_ctr_inc;
+  logic round_ctr_inc_T ;
+  logic [6:0] round_ctr_new;
+  logic [6:0] round_ctr_new_T ;
+  logic [6:0] round_ctr_reg;
+  logic [6:0]  round_ctr_reg_T ;
+  logic [6:0]  round_ctr_reg_TZ ;
+  logic [6:0]  round_ctr_reg_PREV_VAL1 ;
+  logic [6:0]  round_ctr_reg_PREV_VAL2 ;
+  assign round_ctr_reg_T = round_ctr_reg_TZ | { 7{ YZC[11] && round_ctr_reg != 0 }} ;
+  logic round_ctr_rst;
+  logic round_ctr_rst_T ;
+  logic round_ctr_we;
+  logic round_ctr_we_T ;
+  logic [1:0] sha1_ctrl_new;
+  logic [1:0] sha1_ctrl_new_T ;
+  logic [1:0] sha1_ctrl_reg;
+  logic [1:0]  sha1_ctrl_reg_T ;
+  logic [1:0]  sha1_ctrl_reg_TZ ;
+  logic [1:0]  sha1_ctrl_reg_PREV_VAL1 ;
+  logic [1:0]  sha1_ctrl_reg_PREV_VAL2 ;
+  assign sha1_ctrl_reg_T = sha1_ctrl_reg_TZ | { 2{ YZC[12] && sha1_ctrl_reg != 0 }} ;
+  logic sha1_ctrl_we;
+  logic sha1_ctrl_we_T ;
+  logic state_init;
+  logic state_init_T ;
+  logic state_update;
+  logic state_update_T ;
+  logic [31:0] w;
+  logic [31:0] w_T ;
+  logic w_init;
+  logic w_init_T ;
+  logic w_next;
+  logic w_next_T ;
+  assign _039_ = H0_reg + a_reg;
+  assign _039__T = H0_reg_T | a_reg_T ;
+  assign _040_ = H1_reg + b_reg;
+  assign _040__T = H1_reg_T | b_reg_T ;
+  assign _041_ = H2_reg + c_reg;
+  assign _041__T = H2_reg_T | c_reg_T ;
+  assign _042_ = H3_reg + d_reg;
+  assign _042__T = H3_reg_T | d_reg_T ;
+  assign _043_ = H4_reg + e_reg;
+  assign _043__T = H4_reg_T | e_reg_T ;
+  logic [31:0] fangyuan0;
+  logic [31:0] fangyuan0_T ;
+  assign fangyuan0 = { a_reg[26:0], a_reg[31:27] };
+  assign fangyuan0_T = {  a_reg_T [26:0] , a_reg_T [31:27]  };
+  assign _044_ = fangyuan0 + e_reg;
+  assign _044__T = fangyuan0_T | e_reg_T ;
+  assign _045_ = _044_ + _028_;
+  assign _045__T = _044__T | _028__T ;
+  assign _046_ = _045_ + _029_;
+  assign _046__T = _045__T | _029__T ;
+  assign _047_ = _046_ + w;
+  assign _047__T = _046__T | w_T ;
+  assign _048_ = round_ctr_reg + 1'b1;
+  assign _048__T = round_ctr_reg_T ;
+  assign _049_ = b_reg & c_reg;
+  assign _049__T = ( b_reg_T & c_reg ) | ( c_reg_T & b_reg ) ;
+  assign _050_ = _059_ & d_reg;
+  assign _050__T = ( _059__T & d_reg ) | ( d_reg_T & _059_ ) ;
+  assign _036_ = round_ctr_reg == 7'b1001111;
+  assign _036__T = (| round_ctr_reg_T ) & ( round_ctr_reg == 7'b1001111 ) ;
+  assign _051_ = round_ctr_reg >= 5'b10100;
+  assign _051__T = | round_ctr_reg_T ;
+  assign _052_ = round_ctr_reg >= 6'b101000;
+  assign _052__T = | round_ctr_reg_T ;
+  assign _053_ = round_ctr_reg >= 6'b111100;
+  assign _053__T = | round_ctr_reg_T ;
+  assign _054_ = round_ctr_reg <= 5'b10011;
+  assign _054__T = | round_ctr_reg_T ;
+  assign _055_ = round_ctr_reg <= 6'b100111;
+  assign _055__T = | round_ctr_reg_T ;
+  assign _056_ = round_ctr_reg <= 6'b111011;
+  assign _056__T = | round_ctr_reg_T ;
+  assign _057_ = _051_ && _055_;
+  assign _057__T = ( _051__T && _055_ ) | ( _055__T && _051_ ) ;
+  assign _058_ = _052_ && _056_;
+  assign _058__T = ( _052__T && _056_ ) | ( _056__T && _052_ ) ;
+  assign _059_ = ~ b_reg;
+  assign _059__T = b_reg_T ;
+  assign _060_ = b_reg | c_reg;
+  assign _060__T = ( b_reg_T & ~c_reg ) | ( c_reg_T & ~b_reg ) ;
+  assign _061_ = b_reg | d_reg;
+  assign _061__T = ( b_reg_T & ~d_reg ) | ( d_reg_T & ~b_reg ) ;
+  assign _062_ = c_reg | d_reg;
+  assign _062__T = ( c_reg_T & ~d_reg ) | ( d_reg_T & ~c_reg ) ;
+  always @(posedge clk)
+      a_reg <= _005_;
+  always @( posedge clk )
+      a_reg_TZ 		<= !reset_n ? 0 : ( _005__T );
+  always @(posedge clk)
+      b_reg <= _006_;
+  always @( posedge clk )
+      b_reg_TZ 		<= !reset_n ? 0 : ( _006__T );
+  always @(posedge clk)
+      c_reg <= _007_;
+  always @( posedge clk )
+      c_reg_TZ 		<= !reset_n ? 0 : ( _007__T );
+  always @(posedge clk)
+      d_reg <= _008_;
+  always @( posedge clk )
+      d_reg_TZ 		<= !reset_n ? 0 : ( _008__T );
+  always @(posedge clk)
+      e_reg <= _010_;
+  always @( posedge clk )
+      e_reg_TZ 		<= !reset_n ? 0 : ( _010__T );
+  always @(posedge clk)
+      H0_reg <= _000_;
+  always @( posedge clk )
+      H0_reg_TZ 		<= !reset_n ? 0 : ( _000__T );
+  always @(posedge clk)
+      H1_reg <= _001_;
+  always @( posedge clk )
+      H1_reg_TZ 		<= !reset_n ? 0 : ( _001__T );
+  always @(posedge clk)
+      H2_reg <= _002_;
+  always @( posedge clk )
+      H2_reg_TZ 		<= !reset_n ? 0 : ( _002__T );
+  always @(posedge clk)
+      H3_reg <= _003_;
+  always @( posedge clk )
+      H3_reg_TZ 		<= !reset_n ? 0 : ( _003__T );
+  always @(posedge clk)
+      H4_reg <= _004_;
+  always @( posedge clk )
+      H4_reg_TZ 		<= !reset_n ? 0 : ( _004__T );
+  always @(posedge clk)
+      round_ctr_reg <= _011_;
+  always @( posedge clk )
+      round_ctr_reg_TZ 		<= !reset_n ? 0 : ( _011__T );
+  always @(posedge clk)
+      digest_valid_reg <= _009_;
+  always @( posedge clk )
+      digest_valid_reg_TZ 		<= !reset_n ? 0 : ( _009__T );
+  always @(posedge clk)
+      sha1_ctrl_reg <= _012_;
+  always @( posedge clk )
+      sha1_ctrl_reg_TZ 		<= !reset_n ? 0 : ( _012__T );
+  assign round_ctr_inc = sha1_ctrl_reg == 1'b1;
+  assign round_ctr_inc_T = (| sha1_ctrl_reg_T ) & ( sha1_ctrl_reg == 1'b1 ) ;
+  assign _035_ = _036_ ? 2'b10 : 2'b00;
+  assign _035__T = { 2{ _036__T  }} ;
+  assign ready = ! sha1_ctrl_reg;
+  assign ready_T = | sha1_ctrl_reg_T ;
+  assign _030_ = next ? 1'b1 : init;
+  assign _030__T = next ? { 1{ | next_T  }} : ( { 1{ | next_T  }} | init_T );
+  logic [2:0] fangyuan1;
+  logic [2:0] fangyuan1_T ;
+  assign fangyuan1 = { _030_, _036_, 1'b1 };
+  assign fangyuan1_T = {  _030__T , _036__T , 1'h0  };
+  logic [2:0] fangyuan2;
+  logic [2:0] fangyuan2_T ;
+  assign fangyuan2 = { ready, round_ctr_inc, digest_update };
+  assign fangyuan2_T = {  ready_T , round_ctr_inc_T , digest_update_T  };
+  always @(1'b0 or fangyuan1 or fangyuan2) begin
+    casez (fangyuan2)
+      3'b??1 :
+        sha1_ctrl_we = fangyuan1 [0:0] ;
+      3'b?1? :
+        sha1_ctrl_we = fangyuan1 [1:1] ;
+      3'b1?? :
+        sha1_ctrl_we = fangyuan1 [2:2] ;
+      default:
+        sha1_ctrl_we = 1'b0 ;
+    endcase
+  end
+    always @( fangyuan1_T or fangyuan2_T or fangyuan2 ) begin
+      casez (fangyuan2)
+        3'b??1 :
+          sha1_ctrl_we_T = fangyuan1_T  [0:0] | { 1{ fangyuan2_T[0] }} ;
+        3'b?1? :
+          sha1_ctrl_we_T = fangyuan1_T  [1:1] | { 1{ fangyuan2_T[1] }} ;
+        3'b1?? :
+          sha1_ctrl_we_T = fangyuan1_T  [2:2] | { 1{ fangyuan2_T[2] }} ;
+        default:
+          sha1_ctrl_we_T = { 1{ | fangyuan2_T }} ;
+      endcase
+    end
+  assign digest_update = sha1_ctrl_reg == 2'b10;
+  assign digest_update_T = (| sha1_ctrl_reg_T ) & ( sha1_ctrl_reg == 2'b10 ) ;
+  logic [3:0] fangyuan3;
+  logic [3:0] fangyuan3_T ;
+  assign fangyuan3 = { 1'b0, _030_, _035_ };
+  assign fangyuan3_T = {  1'h0 , _030__T , _035__T  };
+  logic [1:0] fangyuan4;
+  logic [1:0] fangyuan4_T ;
+  assign fangyuan4 = { ready, round_ctr_inc };
+  assign fangyuan4_T = {  ready_T , round_ctr_inc_T  };
+  always @(2'b00 or fangyuan3 or fangyuan4) begin
+    casez (fangyuan4)
+      2'b?1 :
+        sha1_ctrl_new = fangyuan3 [1:0] ;
+      2'b1? :
+        sha1_ctrl_new = fangyuan3 [3:2] ;
+      default:
+        sha1_ctrl_new = 2'b00 ;
+    endcase
+  end
+    always @( fangyuan3_T or fangyuan4_T or fangyuan4 ) begin
+      casez (fangyuan4)
+        2'b?1 :
+          sha1_ctrl_new_T = fangyuan3_T  [1:0] | { 2{ fangyuan4_T[0] }} ;
+        2'b1? :
+          sha1_ctrl_new_T = fangyuan3_T  [3:2] | { 2{ fangyuan4_T[1] }} ;
+        default:
+          sha1_ctrl_new_T = { 2{ | fangyuan4_T }} ;
+      endcase
+    end
+  logic [1:0] fangyuan5;
+  logic [1:0] fangyuan5_T ;
+  assign fangyuan5 = { _030_, 1'b1 };
+  assign fangyuan5_T = {  _030__T , 1'h0  };
+  logic [1:0] fangyuan6;
+  logic [1:0] fangyuan6_T ;
+  assign fangyuan6 = { ready, digest_update };
+  assign fangyuan6_T = {  ready_T , digest_update_T  };
+  always @(1'b0 or fangyuan5 or fangyuan6) begin
+    casez (fangyuan6)
+      2'b?1 :
+        digest_valid_we = fangyuan5 [0:0] ;
+      2'b1? :
+        digest_valid_we = fangyuan5 [1:1] ;
+      default:
+        digest_valid_we = 1'b0 ;
+    endcase
+  end
+    always @( fangyuan5_T or fangyuan6_T or fangyuan6 ) begin
+      casez (fangyuan6)
+        2'b?1 :
+          digest_valid_we_T = fangyuan5_T  [0:0] | { 1{ fangyuan6_T[0] }} ;
+        2'b1? :
+          digest_valid_we_T = fangyuan5_T  [1:1] | { 1{ fangyuan6_T[1] }} ;
+        default:
+          digest_valid_we_T = { 1{ | fangyuan6_T }} ;
+      endcase
+    end
+  assign round_ctr_rst = ready ? _030_ : 1'b0;
+  assign round_ctr_rst_T = ready ? ( { 1{ | ready_T  }} | _030__T ) : { 1{ | ready_T  }};
+  assign digest_init = ready ? init : 1'b0;
+  assign digest_init_T = ready ? ( { 1{ | ready_T  }} | init_T ) : { 1{ | ready_T  }};
+  assign a_e_we = round_ctr_inc ? 1'b1 : round_ctr_rst;
+  assign a_e_we_T = round_ctr_inc ? { 1{ | round_ctr_inc_T  }} : ( { 1{ | round_ctr_inc_T  }} | round_ctr_rst_T );
+  assign round_ctr_new = round_ctr_inc ? _048_ : 7'b0000000;
+  assign round_ctr_new_T = round_ctr_inc ? ( { 7{ | round_ctr_inc_T  }} | _048__T ) : { 7{ | round_ctr_inc_T  }};
+  assign _037_ = _053_ ? _078_ : 32'd0;
+  assign _037__T = _053_ ? ( { 32{ | _053__T  }} | _078__T ) : { 32{ | _053__T  }};
+  assign _038_ = _053_ ? 32'd3395469782 : 32'd0;
+  assign _038__T = { 32{ _053__T  }} ;
+  assign _033_ = _058_ ? _080_ : _037_;
+  assign _033__T = _058_ ? ( { 32{ _058__T  }} | _080__T ) : ( { 32{ _058__T  }} | _037__T );
+  assign _034_ = _058_ ? 32'd2400959708 : _038_;
+  assign _034__T = _058_ ? { 32{ | _058__T  }} : ( { 32{ | _058__T  }} | _038__T );
+  assign _031_ = _057_ ? _078_ : _033_;
+  assign _031__T = _057_ ? ( { 32{ _057__T  }} | _078__T ) : ( { 32{ _057__T  }} | _033__T );
+  assign _032_ = _057_ ? 32'd1859775393 : _034_;
+  assign _032__T = _057_ ? { 32{ | _057__T  }} : ( { 32{ | _057__T  }} | _034__T );
+  assign _028_ = _054_ ? _076_ : _031_;
+  assign _028__T = _054_ ? ( { 32{ _054__T  }} | _076__T ) : ( { 32{ _054__T  }} | _031__T );
+  assign _029_ = _054_ ? 32'd1518500249 : _032_;
+  assign _029__T = _054_ ? { 32{ | _054__T  }} : ( { 32{ | _054__T  }} | _032__T );
+  assign e_new = round_ctr_inc ? d_reg : _022_;
+  assign e_new_T = round_ctr_inc ? ( { 32{ round_ctr_inc_T  }} | d_reg_T ) : ( { 32{ round_ctr_inc_T  }} | _022__T );
+  assign d_new = round_ctr_inc ? c_reg : _021_;
+  assign d_new_T = round_ctr_inc ? ( { 32{ round_ctr_inc_T  }} | c_reg_T ) : ( { 32{ round_ctr_inc_T  }} | _021__T );
+  logic [31:0] fangyuan7;
+  logic [31:0] fangyuan7_T ;
+  assign fangyuan7 = { b_reg[1:0], b_reg[31:2] };
+  assign fangyuan7_T = {  b_reg_T [1:0] , b_reg_T [31:2]  };
+  assign c_new = round_ctr_inc ? fangyuan7 : _020_;
+  assign c_new_T = round_ctr_inc ? ( { 32{ round_ctr_inc_T  }} | fangyuan7_T ) : ( { 32{ round_ctr_inc_T  }} | _020__T );
+  assign b_new = round_ctr_inc ? a_reg : _019_;
+  assign b_new_T = round_ctr_inc ? ( { 32{ round_ctr_inc_T  }} | a_reg_T ) : ( { 32{ round_ctr_inc_T  }} | _019__T );
+  assign a_new = round_ctr_inc ? _047_ : _018_;
+  assign a_new_T = round_ctr_inc ? ( { 32{ round_ctr_inc_T  }} | _047__T ) : ( { 32{ round_ctr_inc_T  }} | _018__T );
+  assign _027_ = digest_init ? 32'd3285377520 : H4_reg;
+  assign _027__T = digest_init ? { 32{ | digest_init_T  }} : ( { 32{ | digest_init_T  }} | H4_reg_T );
+  assign _026_ = digest_init ? 32'd271733878 : H3_reg;
+  assign _026__T = digest_init ? { 32{ | digest_init_T  }} : ( { 32{ | digest_init_T  }} | H3_reg_T );
+  assign _025_ = digest_init ? 32'd2562383102 : H2_reg;
+  assign _025__T = digest_init ? { 32{ | digest_init_T  }} : ( { 32{ | digest_init_T  }} | H2_reg_T );
+  assign _024_ = digest_init ? 32'd4023233417 : H1_reg;
+  assign _024__T = digest_init ? { 32{ | digest_init_T  }} : ( { 32{ | digest_init_T  }} | H1_reg_T );
+  assign _023_ = digest_init ? 32'd1732584193 : H0_reg;
+  assign _023__T = digest_init ? { 32{ | digest_init_T  }} : ( { 32{ | digest_init_T  }} | H0_reg_T );
+  assign _022_ = round_ctr_rst ? _027_ : 32'd0;
+  assign _022__T = round_ctr_rst ? ( { 32{ | round_ctr_rst_T  }} | _027__T ) : { 32{ | round_ctr_rst_T  }};
+  assign _021_ = round_ctr_rst ? _026_ : 32'd0;
+  assign _021__T = round_ctr_rst ? ( { 32{ | round_ctr_rst_T  }} | _026__T ) : { 32{ | round_ctr_rst_T  }};
+  assign _020_ = round_ctr_rst ? _025_ : 32'd0;
+  assign _020__T = round_ctr_rst ? ( { 32{ | round_ctr_rst_T  }} | _025__T ) : { 32{ | round_ctr_rst_T  }};
+  assign _019_ = round_ctr_rst ? _024_ : 32'd0;
+  assign _019__T = round_ctr_rst ? ( { 32{ | round_ctr_rst_T  }} | _024__T ) : { 32{ | round_ctr_rst_T  }};
+  assign _018_ = round_ctr_rst ? _023_ : 32'd0;
+  assign _018__T = round_ctr_rst ? ( { 32{ | round_ctr_rst_T  }} | _023__T ) : { 32{ | round_ctr_rst_T  }};
+  assign H_we = digest_update ? 1'b1 : digest_init;
+  assign H_we_T = digest_update ? { 1{ | digest_update_T  }} : ( { 1{ | digest_update_T  }} | digest_init_T );
+  assign H4_new = digest_update ? _043_ : _017_;
+  assign H4_new_T = digest_update ? ( { 32{ digest_update_T  }} | _043__T ) : ( { 32{ digest_update_T  }} | _017__T );
+  logic [31:0] fangyuan8;
+  logic [31:0] fangyuan8_T ;
+  assign fangyuan8 = { 3'b000, _016_ };
+  assign fangyuan8_T = {  3'h0 , _016__T  };
+  assign H3_new = digest_update ? _042_ : fangyuan8;
+  assign H3_new_T = digest_update ? ( { 32{ digest_update_T  }} | _042__T ) : ( { 32{ digest_update_T  }} | fangyuan8_T );
+  assign H2_new = digest_update ? _041_ : _015_;
+  assign H2_new_T = digest_update ? ( { 32{ digest_update_T  }} | _041__T ) : ( { 32{ digest_update_T  }} | _015__T );
+  assign H1_new = digest_update ? _040_ : _014_;
+  assign H1_new_T = digest_update ? ( { 32{ digest_update_T  }} | _040__T ) : ( { 32{ digest_update_T  }} | _014__T );
+  logic [31:0] fangyuan9;
+  logic [31:0] fangyuan9_T ;
+  assign fangyuan9 = { 1'b0, _013_ };
+  assign fangyuan9_T = {  1'h0 , _013__T  };
+  assign H0_new = digest_update ? _039_ : fangyuan9;
+  assign H0_new_T = digest_update ? ( { 32{ digest_update_T  }} | _039__T ) : ( { 32{ digest_update_T  }} | fangyuan9_T );
+  assign _017_ = digest_init ? 32'd3285377520 : 32'd0;
+  assign _017__T = { 32{ digest_init_T  }} ;
+  assign _016_ = digest_init ? 29'b10000001100100101010001110110 : 29'b00000000000000000000000000000;
+  assign _016__T = { 29{ digest_init_T  }} ;
+  assign _015_ = digest_init ? 32'd2562383102 : 32'd0;
+  assign _015__T = { 32{ digest_init_T  }} ;
+  assign _014_ = digest_init ? 32'd4023233417 : 32'd0;
+  assign _014__T = { 32{ digest_init_T  }} ;
+  assign _013_ = digest_init ? 31'b1100111010001010010001100000001 : 31'b0000000000000000000000000000000;
+  assign _013__T = { 31{ digest_init_T  }} ;
+  assign _063_ = sha1_ctrl_we ? sha1_ctrl_new : sha1_ctrl_reg;
+  assign _063__T = sha1_ctrl_we ? ( { 2{ sha1_ctrl_we_T  }} | sha1_ctrl_new_T ) : ( { 2{ sha1_ctrl_we_T  }} | sha1_ctrl_reg_T );
+  assign _012_ = reset_n ? _063_ : 2'b00;
+  assign _012__T = reset_n ? ( { 2{ | reset_n_T  }} | _063__T ) : { 2{ | reset_n_T  }};
+  assign _064_ = digest_valid_we ? digest_update : digest_valid_reg;
+  assign _064__T = digest_valid_we ? ( { 1{ digest_valid_we_T  }} | digest_update_T ) : ( { 1{ digest_valid_we_T  }} | digest_valid_reg_T );
+  assign _009_ = reset_n ? _064_ : 1'b0;
+  assign _009__T = reset_n ? ( { 1{ | reset_n_T  }} | _064__T ) : { 1{ | reset_n_T  }};
+  assign _065_ = a_e_we ? round_ctr_new : round_ctr_reg;
+  assign _065__T = a_e_we ? ( { 7{ a_e_we_T  }} | round_ctr_new_T ) : ( { 7{ a_e_we_T  }} | round_ctr_reg_T );
+  assign _011_ = reset_n ? _065_ : 7'b0000000;
+  assign _011__T = reset_n ? ( { 7{ | reset_n_T  }} | _065__T ) : { 7{ | reset_n_T  }};
+  assign _066_ = H_we ? H4_new : H4_reg;
+  assign _066__T = H_we ? ( { 32{ H_we_T  }} | H4_new_T ) : ( { 32{ H_we_T  }} | H4_reg_T );
+  assign _004_ = reset_n ? _066_ : 32'd0;
+  assign _004__T = reset_n ? ( { 32{ | reset_n_T  }} | _066__T ) : { 32{ | reset_n_T  }};
+  assign _067_ = H_we ? H3_new : H3_reg;
+  assign _067__T = H_we ? ( { 32{ H_we_T  }} | H3_new_T ) : ( { 32{ H_we_T  }} | H3_reg_T );
+  assign _003_ = reset_n ? _067_ : 32'd0;
+  assign _003__T = reset_n ? ( { 32{ | reset_n_T  }} | _067__T ) : { 32{ | reset_n_T  }};
+  assign _068_ = H_we ? H2_new : H2_reg;
+  assign _068__T = H_we ? ( { 32{ H_we_T  }} | H2_new_T ) : ( { 32{ H_we_T  }} | H2_reg_T );
+  assign _002_ = reset_n ? _068_ : 32'd0;
+  assign _002__T = reset_n ? ( { 32{ | reset_n_T  }} | _068__T ) : { 32{ | reset_n_T  }};
+  assign _069_ = H_we ? H1_new : H1_reg;
+  assign _069__T = H_we ? ( { 32{ H_we_T  }} | H1_new_T ) : ( { 32{ H_we_T  }} | H1_reg_T );
+  assign _001_ = reset_n ? _069_ : 32'd0;
+  assign _001__T = reset_n ? ( { 32{ | reset_n_T  }} | _069__T ) : { 32{ | reset_n_T  }};
+  assign _070_ = H_we ? H0_new : H0_reg;
+  assign _070__T = H_we ? ( { 32{ H_we_T  }} | H0_new_T ) : ( { 32{ H_we_T  }} | H0_reg_T );
+  assign _000_ = reset_n ? _070_ : 32'd0;
+  assign _000__T = reset_n ? ( { 32{ | reset_n_T  }} | _070__T ) : { 32{ | reset_n_T  }};
+  assign _071_ = a_e_we ? e_new : e_reg;
+  assign _071__T = a_e_we ? ( { 32{ a_e_we_T  }} | e_new_T ) : ( { 32{ a_e_we_T  }} | e_reg_T );
+  assign _010_ = reset_n ? _071_ : 32'd0;
+  assign _010__T = reset_n ? ( { 32{ | reset_n_T  }} | _071__T ) : { 32{ | reset_n_T  }};
+  assign _072_ = a_e_we ? d_new : d_reg;
+  assign _072__T = a_e_we ? ( { 32{ a_e_we_T  }} | d_new_T ) : ( { 32{ a_e_we_T  }} | d_reg_T );
+  assign _008_ = reset_n ? _072_ : 32'd0;
+  assign _008__T = reset_n ? ( { 32{ | reset_n_T  }} | _072__T ) : { 32{ | reset_n_T  }};
+  assign _073_ = a_e_we ? c_new : c_reg;
+  assign _073__T = a_e_we ? ( { 32{ a_e_we_T  }} | c_new_T ) : ( { 32{ a_e_we_T  }} | c_reg_T );
+  assign _007_ = reset_n ? _073_ : 32'd0;
+  assign _007__T = reset_n ? ( { 32{ | reset_n_T  }} | _073__T ) : { 32{ | reset_n_T  }};
+  assign _074_ = a_e_we ? b_new : b_reg;
+  assign _074__T = a_e_we ? ( { 32{ a_e_we_T  }} | b_new_T ) : ( { 32{ a_e_we_T  }} | b_reg_T );
+  assign _006_ = reset_n ? _074_ : 32'd0;
+  assign _006__T = reset_n ? ( { 32{ | reset_n_T  }} | _074__T ) : { 32{ | reset_n_T  }};
+  assign _075_ = a_e_we ? a_new : a_reg;
+  assign _075__T = a_e_we ? ( { 32{ a_e_we_T  }} | a_new_T ) : ( { 32{ a_e_we_T  }} | a_reg_T );
+  assign _005_ = reset_n ? _075_ : 32'd0;
+  assign _005__T = reset_n ? ( { 32{ | reset_n_T  }} | _075__T ) : { 32{ | reset_n_T  }};
+  assign _076_ = _049_ ^ _050_;
+  assign _076__T = _049__T | _050__T ;
+  assign _077_ = b_reg ^ c_reg;
+  assign _077__T = b_reg_T | c_reg_T ;
+  assign _078_ = _077_ ^ d_reg;
+  assign _078__T = _077__T | d_reg_T ;
+  assign _079_ = _060_ ^ _061_;
+  assign _079__T = _060__T | _061__T ;
+  assign _080_ = _079_ ^ _062_;
+  assign _080__T = _079__T | _062__T ;
+// module: sha1_w_mem
+  sha1_w_mem w_mem_inst (
+    .YZC(YZC[30:13]),
+    .block_T (  block_T  ),
+    .init_T (  round_ctr_rst_T  ),
+    .next_T (  round_ctr_inc_T  ),
+    .reset_n_T (  reset_n_T  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .w_T (  w_T  ),
+    .clk ( clk ),
+    .block ( block ),
+    .w ( w ),
+    .init ( round_ctr_rst ),
+    .next ( round_ctr_inc ),
+    .reset_n ( reset_n )
+  );
+  assign digest = { H0_reg, H1_reg, H2_reg, H3_reg, H4_reg };
+  assign digest_T = {  H0_reg_T , H1_reg_T , H2_reg_T , H3_reg_T , H4_reg_T  };
+  assign digest_valid = digest_valid_reg;
+  assign digest_valid_T = digest_valid_reg_T ;
+  assign digest_valid_new = digest_update;
+  assign digest_valid_new_T = digest_update_T ;
+  assign first_block = digest_init;
+  assign first_block_T = digest_init_T ;
+  assign ready_flag = ready;
+  assign ready_flag_T = ready_T ;
+  assign round_ctr_we = a_e_we;
+  assign round_ctr_we_T = a_e_we_T ;
+  assign state_init = round_ctr_rst;
+  assign state_init_T = round_ctr_rst_T ;
+  assign state_update = round_ctr_inc;
+  assign state_update_T = round_ctr_inc_T ;
+  assign w_init = round_ctr_rst;
+  assign w_init_T = round_ctr_rst_T ;
+  assign w_next = round_ctr_inc;
+  assign w_next_T = round_ctr_inc_T ;
+  assign rst_zy = !reset_n ;
+endmodule

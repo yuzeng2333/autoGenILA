@@ -20,9 +20,9 @@ uint32_t InstrNum = 10;
 std::regex pX("(\\d+)'[b|h][x|X]$");
 std::map<std::string, std::string> regValueMap;
 
-enum DESIGN{AES, PICO, URV, VTA};
+enum DESIGN{AES, PICO, URV, VTA, BI};
 // TODO: set the current design!
-enum DESIGN g_design = VTA;
+enum DESIGN g_design = BI;
 
 void to_file(std::string line) {
   g_output << line << std::endl;
@@ -175,6 +175,11 @@ std::string replace_x(std::string val) {
         randVal += 3;
         hexVal = dec2hex(randVal);
       }
+      else if(g_design == BI) {
+        uint32_t randVal = rand() % 31;
+        randVal += 1;
+        hexVal = dec2hex(randVal);
+      }
       *it = toStr(width)+"'h"+hexVal;
     }
     ret = merge_with(vec, "+");
@@ -286,7 +291,8 @@ int main(int argc, char *argv[]) {
       }
     }
   }
-  else if(g_design == URV) {
+  else if(g_design == URV ||
+          g_design == BI) {
     gen_rand_dmem(32, 64);
     uint32_t idx = 0;
     while(idx++ < InstrNum) {

@@ -1,0 +1,10 @@
+read_verilog ./RTL//picorv32.v
+
+prep -top picorv32
+
+hierarchy -check
+proc
+memory -nordff
+proc
+opt_clean
+write_verilog -nodec ./files/design.v

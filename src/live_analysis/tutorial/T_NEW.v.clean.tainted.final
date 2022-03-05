@@ -1,0 +1,70 @@
+module T ( clk , in , INSTR_IN_ZY , zy_end_sig , rst_zy , in_T , in_S , out_R0 , out , in_R , out_T , out_S );
+  input rst_zy;
+  input zy_end_sig;
+  integer i;
+  input INSTR_IN_ZY;
+  input clk;
+  input [7:0] in;
+  input [7:0] in_T ;
+  output [7:0] in_R ;
+  input [4:0] in_S ;
+  output [31:0] out;
+  output [31:0] out_T ;
+  logic [31:0] out_T ;
+  logic [31:0] out_R ;
+  logic [4:0] out_S ;
+  input [31:0] out_R0 ;
+  output [4:0] out_S ;
+  assign out[15:8] = out[31:24] ^ out[7:0];
+  assign out_S = 0 ;
+  logic [31:0] out_R1 ;
+  assign out_T [15:8] = out_T [31:24] | out_T [7:0] ;
+  assign out_R1 [31:24] = out_R [15:8] ;
+  assign out_R1 [7:0] = out_R [15:8] ;
+  logic [7:0] in_R0 ;
+// module: S
+  S s0 (
+    .in_T (  in_T  ),
+    .in_R (  in_R0  ),
+    .in_S (  in_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .zy_end_sig(zy_end_sig),
+    .rst_zy(rst_zy),
+    .out_T (  out_T [31:24]  ),
+    .out_R0 (  out_R [31:24]  ),
+    .out_S (  out_S  ),
+    .out ( out[31:24] ),
+    .in ( in ),
+    .clk ( clk )
+  );
+  logic [7:0] in_R1 ;
+// module: xS
+  xS s4 (
+    .in_T (  in_T  ),
+    .in_R (  in_R1  ),
+    .in_S (  in_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .zy_end_sig(zy_end_sig),
+    .rst_zy(rst_zy),
+    .out_T (  out_T [7:0]  ),
+    .out_R0 (  out_R [7:0]  ),
+    .out_S (  out_S  ),
+    .out ( out[7:0] ),
+    .in ( in ),
+    .clk ( clk )
+  );
+  assign out[23:16] = out[31:24];
+  assign { out_R1 [8], out_R1 [9], out_R1 [10], out_R1 [11], out_R1 [12], out_R1 [13], out_R1 [14], out_R1 [15], out_R1 [16], out_R1 [17], out_R1 [18], out_R1 [19], out_R1 [20], out_R1 [21], out_R1 [22], out_R1 [23] } = 0;
+  logic [31:0] out_R2 ;
+  assign out_T [23:16] = out_T [31:24] ;
+  assign out_R2 [31:24] = out_R [23:16] ;
+  assign out_S = 0 ;
+  assign in_R = ( in_R0 ) | ( in_R1 );
+  assign out_R = ( out_R0 ) | ( out_R1 ) | ( out_R2 );
+ // ground taints for floating regs
+ // ground taints for unused wires
+  assign { clk_R  } = 0;
+ // ground taints for unused wire slices
+  assign { out_R2 [0], out_R2 [1], out_R2 [2], out_R2 [3], out_R2 [4], out_R2 [5], out_R2 [6], out_R2 [7], out_R2 [8], out_R2 [9], out_R2 [10], out_R2 [11], out_R2 [12], out_R2 [13], out_R2 [14], out_R2 [15], out_R2 [16], out_R2 [17], out_R2 [18], out_R2 [19], out_R2 [20], out_R2 [21], out_R2 [22], out_R2 [23] } = 0;
+endmodule
+

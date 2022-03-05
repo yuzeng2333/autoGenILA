@@ -12,7 +12,7 @@
 #include "../src/auxiliary_files_gen.h"
 #include "../src/make_define_fun.h"
 #include "../src/get_all_update.h"
-#include "../../taint_method/src/global_data.h"
+#include "../../live_analysis/src/global_data.h"
 
 #define toCout(a) std::cout << a << std::endl
 

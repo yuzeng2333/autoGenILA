@@ -81,3 +81,12 @@ tmp:
 
 urv:
 	./build/taint_gen ../../ultra_riscv/SYN/riscv_flatten_yosys.v
+
+tutorial:
+	./build/taint_gen ./tutorial/aes_top_yosys.v
+
+aeshls:
+	./build/taint_gen ../../aes_hls/SYN/aes_yosys.v
+
+ride:
+	./build/taint_gen ../../ridecore/src/SYN/ride_yosys.v

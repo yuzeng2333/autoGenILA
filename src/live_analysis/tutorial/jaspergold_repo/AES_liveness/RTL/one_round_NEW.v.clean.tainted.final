@@ -1,0 +1,189 @@
+module one_round ( clk , key , state_in , INSTR_IN_ZY , zy_end_sig , rst_zy , state_out , state_in_R );
+  input rst_zy;
+  input zy_end_sig;
+  integer i;
+  input INSTR_IN_ZY;
+  logic [31:0] _00_;
+  logic [31:0] _01_;
+  logic [31:0] _02_;
+  logic [31:0] _03_;
+  logic [31:0] _04_;
+  logic [31:0] _05_;
+  logic [31:0] _06_;
+  logic [31:0] _07_;
+  logic [31:0] _08_;
+  logic [31:0] _09_;
+  logic [31:0] _10_;
+  logic [31:0] _11_;
+  input clk;
+  logic [31:0] k0;
+  logic [31:0] k1;
+  logic [31:0] k2;
+  logic [31:0] k3;
+  input [127:0] key;
+  logic [31:0] p00;
+  logic [31:0] p01;
+  logic [31:0] p02;
+  logic [31:0] p03;
+  logic [31:0] p10;
+  logic [31:0] p11;
+  logic [31:0] p12;
+  logic [31:0] p13;
+  logic [31:0] p20;
+  logic [31:0] p21;
+  logic [31:0] p22;
+  logic [31:0] p23;
+  logic [31:0] p30;
+  logic [31:0] p31;
+  logic [31:0] p32;
+  logic [31:0] p33;
+  logic [31:0] s0;
+  logic [31:0] s1;
+  logic [31:0] s2;
+  logic [31:0] s3;
+  input [127:0] state_in;
+  output [127:0] state_out;
+  logic [127:0] state_out ;
+  logic [127:0] state_out;
+  logic [127:0]  state_out_PREV_VAL1 ;
+  logic [31:0] z0;
+  logic [31:0] z1;
+  logic [31:0] z2;
+  logic [31:0] z3;
+  always @(posedge clk)
+      state_out <= fangyuan0;
+  logic [127:0] fangyuan0;
+  assign fangyuan0 = { z0, z1, z2, z3 };
+  assign _00_ = p00 ^ p11;
+  assign _01_ = _00_ ^ p22;
+  assign _02_ = _01_ ^ p33;
+  assign z0 = _02_ ^ key[127:96];
+  assign _03_ = p03 ^ p10;
+  assign _04_ = _03_ ^ p21;
+  assign _05_ = _04_ ^ p32;
+  assign z1 = _05_ ^ key[95:64];
+  assign _06_ = p02 ^ p13;
+  assign _07_ = _06_ ^ p20;
+  assign _08_ = _07_ ^ p31;
+  assign z2 = _08_ ^ key[63:32];
+  assign _09_ = p01 ^ p12;
+  assign _10_ = _09_ ^ p23;
+  assign _11_ = _10_ ^ p30;
+  assign z3 = _11_ ^ key[31:0];
+  logic [127:0] state_in_R0 ;
+// module: table_lookup
+  table_lookup t0 (
+    .state_T (  state_in_T [127:96]  ),
+    .state_R (  state_in_R0 [127:96]  ),
+    .state_S (  state_in_S  ),
+    .p0_T (  p00_T  ),
+    .p0_R0 (  p00_R  ),
+    .p0_S (  p00_S  ),
+    .p1_T (  p01_T  ),
+    .p1_R0 (  p01_R  ),
+    .p1_S (  p01_S  ),
+    .p2_T (  p02_T  ),
+    .p2_R0 (  p02_R  ),
+    .p2_S (  p02_S  ),
+    .p3_T (  p03_T  ),
+    .p3_R0 (  p03_R  ),
+    .p3_S (  p03_S  ),
+    .state ( state_in[127:96] ),
+    .p0 ( p00 ),
+    .clk ( clk ),
+    .p1 ( p01 ),
+    .p2 ( p02 ),
+    .p3 ( p03 )
+  );
+// module: table_lookup
+  table_lookup t1 (
+    .state_T (  state_in_T [95:64]  ),
+    .state_R (  state_in_R0 [95:64]  ),
+    .state_S (  state_in_S  ),
+    .p0_T (  p10_T  ),
+    .p0_R0 (  p10_R  ),
+    .p0_S (  p10_S  ),
+    .p1_T (  p11_T  ),
+    .p1_R0 (  p11_R  ),
+    .p1_S (  p11_S  ),
+    .p2_T (  p12_T  ),
+    .p2_R0 (  p12_R  ),
+    .p2_S (  p12_S  ),
+    .p3_T (  p13_T  ),
+    .p3_R0 (  p13_R  ),
+    .p3_S (  p13_S  ),
+    .state ( state_in[95:64] ),
+    .p0 ( p10 ),
+    .clk ( clk ),
+    .p1 ( p11 ),
+    .p2 ( p12 ),
+    .p3 ( p13 )
+  );
+// module: table_lookup
+  table_lookup t2 (
+    .state_T (  state_in_T [63:32]  ),
+    .state_R (  state_in_R0 [63:32]  ),
+    .state_S (  state_in_S  ),
+    .p0_T (  p20_T  ),
+    .p0_R0 (  p20_R  ),
+    .p0_S (  p20_S  ),
+    .p1_T (  p21_T  ),
+    .p1_R0 (  p21_R  ),
+    .p1_S (  p21_S  ),
+    .p2_T (  p22_T  ),
+    .p2_R0 (  p22_R  ),
+    .p2_S (  p22_S  ),
+    .p3_T (  p23_T  ),
+    .p3_R0 (  p23_R  ),
+    .p3_S (  p23_S  ),
+    .state ( state_in[63:32] ),
+    .p0 ( p20 ),
+    .clk ( clk ),
+    .p1 ( p21 ),
+    .p2 ( p22 ),
+    .p3 ( p23 )
+  );
+// module: table_lookup
+  table_lookup t3 (
+    .state_T (  state_in_T [31:0]  ),
+    .state_R (  state_in_R0 [31:0]  ),
+    .state_S (  state_in_S  ),
+    .p0_T (  p30_T  ),
+    .p0_R0 (  p30_R  ),
+    .p0_S (  p30_S  ),
+    .p1_T (  p31_T  ),
+    .p1_R0 (  p31_R  ),
+    .p1_S (  p31_S  ),
+    .p2_T (  p32_T  ),
+    .p2_R0 (  p32_R  ),
+    .p2_S (  p32_S  ),
+    .p3_T (  p33_T  ),
+    .p3_R0 (  p33_R  ),
+    .p3_S (  p33_S  ),
+    .state ( state_in[31:0] ),
+    .p0 ( p30 ),
+    .clk ( clk ),
+    .p1 ( p31 ),
+    .p2 ( p32 ),
+    .p3 ( p33 )
+  );
+  assign k0 = key[127:96];
+  assign k1 = key[95:64];
+  assign k2 = key[63:32];
+  assign k3 = key[31:0];
+  assign s0 = state_in[127:96];
+  assign s1 = state_in[95:64];
+  assign s2 = state_in[63:32];
+  assign s3 = state_in[31:0];
+  assign state_in_R = ( state_in_R0 );
+ // ground taints for floating regs
+  assign state_out_R = 0;
+ // ground taints for unused wires
+  assign { _00__R , _01__R , _02__R , _03__R , _04__R , _05__R , _06__R , _07__R , _08__R , _09__R , _10__R , _11__R , fangyuan0_R , k0_R , k1_R , k2_R , k3_R , p00_R , p01_R , p02_R , p03_R , p10_R , p11_R , p12_R , p13_R , p20_R , p21_R , p22_R , p23_R , p30_R , p31_R , p32_R , p33_R , s0_R , s1_R , s2_R , s3_R , z0_R , z1_R , z2_R , z3_R , clk_R , key_R  } = 0;
+  always @( posedge clk ) begin
+    if( rst_zy ) state_out_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) state_out_PREV_VAL1 <= state_out ;
+  end
+ // ground taints for unused wire slices
+  assert property( !INSTR_IN_ZY  || state_out_PREV_VAL1 == 0 );
+endmodule

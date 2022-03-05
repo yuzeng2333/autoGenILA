@@ -1,0 +1,417 @@
+  logic _000_;
+  logic [6:0] _001_;
+  logic [31:0] _002_;
+  logic [31:0] _003_;
+  logic [31:0] _004_;
+  logic [31:0] _005_;
+  logic [31:0] _006_;
+  logic [31:0] _007_;
+  logic [31:0] _008_;
+  logic [31:0] _009_;
+  logic [31:0] _010_;
+  logic [31:0] _011_;
+  logic [31:0] _012_;
+  logic [31:0] _013_;
+  logic [31:0] _014_;
+  logic [31:0] _015_;
+  logic [31:0] _016_;
+  logic [31:0] _017_;
+  logic [31:0] _018_;
+  logic [31:0] _019_;
+  logic [31:0] _020_;
+  logic [31:0] _021_;
+  logic [31:0] _022_;
+  logic [31:0] _023_;
+  logic [31:0] _024_;
+  logic [31:0] _025_;
+  logic [31:0] _026_;
+  logic [31:0] _027_;
+  logic [31:0] _028_;
+  logic [31:0] _029_;
+  logic [31:0] _030_;
+  logic [31:0] _031_;
+  logic [31:0] _032_;
+  logic [31:0] _033_;
+  logic _034_;
+  logic _035_;
+  logic [6:0] _036_;
+  logic _037_;
+  logic _038_;
+  logic _039_;
+  logic _040_;
+  logic _041_;
+  logic _042_;
+  logic _043_;
+  logic _044_;
+  logic _045_;
+  logic _046_;
+  logic _047_;
+  logic _048_;
+  logic _049_;
+  logic _050_;
+  logic _051_;
+  logic _052_;
+  logic _053_;
+  logic [31:0] _054_;
+  logic [31:0] _055_;
+  logic [31:0] _056_;
+  logic [31:0] _057_;
+  logic [31:0] _058_;
+  logic [31:0] _059_;
+  logic [31:0] _060_;
+  logic [31:0] _061_;
+  logic [31:0] _062_;
+  logic [31:0] _063_;
+  logic [31:0] _064_;
+  logic [31:0] _065_;
+  logic [31:0] _066_;
+  logic [31:0] _067_;
+  logic [31:0] _068_;
+  logic [31:0] _069_;
+  logic [31:0] _070_;
+  logic [31:0] _071_;
+  input [511:0] block;
+  input clk;
+  input init;
+  input next;
+  input reset_n;
+  logic sha1_w_mem_ctrl_new;
+  logic sha1_w_mem_ctrl_reg;
+  logic  sha1_w_mem_ctrl_reg_PREV_VAL1 ;
+  logic sha1_w_mem_ctrl_we;
+  output [31:0] w;
+  logic [31:0] w ;
+  logic [31:0] w_0;
+  logic [31:0] w_13;
+  logic [31:0] w_16;
+  logic [31:0] w_2;
+  logic [31:0] w_8;
+  logic w_ctr_inc;
+  logic [6:0] w_ctr_new;
+  logic [6:0] w_ctr_reg;
+  logic [6:0]  w_ctr_reg_PREV_VAL1 ;
+  logic [31:0] w_mem00_new;
+  logic [31:0] w_mem01_new;
+  logic [31:0] w_mem02_new;
+  logic [31:0] w_mem03_new;
+  logic [31:0] w_mem04_new;
+  logic [31:0] w_mem05_new;
+  logic [31:0] w_mem06_new;
+  logic [31:0] w_mem07_new;
+  logic [31:0] w_mem08_new;
+  logic [31:0] w_mem09_new;
+  logic [31:0] w_mem10_new;
+  logic [31:0] w_mem11_new;
+  logic [31:0] w_mem12_new;
+  logic [31:0] w_mem13_new;
+  logic [31:0] w_mem14_new;
+  logic [31:0] w_mem15_new;
+  logic [31:0] w_mem_00;
+  logic [31:0]  w_mem_00_PREV_VAL1 ;
+  logic [31:0] w_mem_01;
+  logic [31:0]  w_mem_01_PREV_VAL1 ;
+  logic [31:0] w_mem_02;
+  logic [31:0]  w_mem_02_PREV_VAL1 ;
+  logic [31:0] w_mem_03;
+  logic [31:0]  w_mem_03_PREV_VAL1 ;
+  logic [31:0] w_mem_04;
+  logic [31:0]  w_mem_04_PREV_VAL1 ;
+  logic [31:0] w_mem_05;
+  logic [31:0]  w_mem_05_PREV_VAL1 ;
+  logic [31:0] w_mem_06;
+  logic [31:0]  w_mem_06_PREV_VAL1 ;
+  logic [31:0] w_mem_07;
+  logic [31:0]  w_mem_07_PREV_VAL1 ;
+  logic [31:0] w_mem_08;
+  logic [31:0]  w_mem_08_PREV_VAL1 ;
+  logic [31:0] w_mem_09;
+  logic [31:0]  w_mem_09_PREV_VAL1 ;
+  logic [31:0] w_mem_10;
+  logic [31:0]  w_mem_10_PREV_VAL1 ;
+  logic [31:0] w_mem_11;
+  logic [31:0]  w_mem_11_PREV_VAL1 ;
+  logic [31:0] w_mem_12;
+  logic [31:0]  w_mem_12_PREV_VAL1 ;
+  logic [31:0] w_mem_13;
+  logic [31:0]  w_mem_13_PREV_VAL1 ;
+  logic [31:0] w_mem_14;
+  logic [31:0]  w_mem_14_PREV_VAL1 ;
+  logic [31:0] w_mem_15;
+  logic [31:0]  w_mem_15_PREV_VAL1 ;
+  logic w_mem_we;
+  logic [31:0] w_new;
+  logic [31:0] w_tmp;
+  logic [31:0] w_tmp_case;
+  assign _036_ = w_ctr_reg + 1'b1;
+  assign _035_ = w_ctr_reg == 7'b1001111;
+  assign _034_ = w_ctr_reg > 4'b1111;
+  assign _037_ = w_ctr_reg < 5'b10000;
+  always @(posedge clk)
+      w_mem_00 <= _002_;
+  always @(posedge clk)
+      w_mem_01 <= _003_;
+  always @(posedge clk)
+      w_mem_02 <= _004_;
+  always @(posedge clk)
+      w_mem_03 <= _005_;
+  always @(posedge clk)
+      w_mem_04 <= _006_;
+  always @(posedge clk)
+      w_mem_05 <= _007_;
+  always @(posedge clk)
+      w_mem_06 <= _008_;
+  always @(posedge clk)
+      w_mem_07 <= _009_;
+  always @(posedge clk)
+      w_mem_08 <= _010_;
+  always @(posedge clk)
+      w_mem_09 <= _011_;
+  always @(posedge clk)
+      w_mem_10 <= _012_;
+  always @(posedge clk)
+      w_mem_11 <= _013_;
+  always @(posedge clk)
+      w_mem_12 <= _014_;
+  always @(posedge clk)
+      w_mem_13 <= _015_;
+  always @(posedge clk)
+      w_mem_14 <= _016_;
+  always @(posedge clk)
+      w_mem_15 <= _017_;
+  always @(posedge clk)
+      w_ctr_reg <= _001_;
+  always @(posedge clk)
+      sha1_w_mem_ctrl_reg <= _000_;
+  assign sha1_w_mem_ctrl_we = sha1_w_mem_ctrl_reg ? _035_ : init;
+  assign sha1_w_mem_ctrl_new = sha1_w_mem_ctrl_reg ? 1'b0 : init;
+  assign w_ctr_inc = sha1_w_mem_ctrl_reg ? next : 1'b0;
+  assign w_ctr_new = w_ctr_inc ? _036_ : 7'b0000000;
+  logic [31:0] fangyuan0;
+  assign fangyuan0 = { w_16[30:0], w_16[31] };
+  assign _033_ = _034_ ? fangyuan0 : 32'd0;
+  assign _032_ = _034_ ? w_mem_15 : 32'd0;
+  assign _031_ = _034_ ? w_mem_14 : 32'd0;
+  assign _030_ = _034_ ? w_mem_13 : 32'd0;
+  assign _029_ = _034_ ? w_mem_12 : 32'd0;
+  assign _028_ = _034_ ? w_mem_11 : 32'd0;
+  assign _027_ = _034_ ? w_mem_10 : 32'd0;
+  assign _026_ = _034_ ? w_mem_09 : 32'd0;
+  assign _025_ = _034_ ? w_mem_08 : 32'd0;
+  assign _024_ = _034_ ? w_mem_07 : 32'd0;
+  assign _023_ = _034_ ? w_mem_06 : 32'd0;
+  assign _022_ = _034_ ? w_mem_05 : 32'd0;
+  assign _021_ = _034_ ? w_mem_04 : 32'd0;
+  assign _020_ = _034_ ? w_mem_03 : 32'd0;
+  assign _019_ = _034_ ? w_mem_02 : 32'd0;
+  assign _018_ = _034_ ? w_mem_01 : 32'd0;
+  assign w_mem_we = init ? 1'b1 : _034_;
+  assign w_mem15_new = init ? block[31:0] : _033_;
+  assign w_mem14_new = init ? block[63:32] : _032_;
+  assign w_mem13_new = init ? block[95:64] : _031_;
+  assign w_mem12_new = init ? block[127:96] : _030_;
+  assign w_mem11_new = init ? block[159:128] : _029_;
+  assign w_mem10_new = init ? block[191:160] : _028_;
+  assign w_mem09_new = init ? block[223:192] : _027_;
+  assign w_mem08_new = init ? block[255:224] : _026_;
+  assign w_mem07_new = init ? block[287:256] : _025_;
+  assign w_mem06_new = init ? block[319:288] : _024_;
+  assign w_mem05_new = init ? block[351:320] : _023_;
+  assign w_mem04_new = init ? block[383:352] : _022_;
+  assign w_mem03_new = init ? block[415:384] : _021_;
+  assign w_mem02_new = init ? block[447:416] : _020_;
+  assign w_mem01_new = init ? block[479:448] : _019_;
+  assign w_mem00_new = init ? block[511:480] : _018_;
+  logic [31:0] fangyuan1;
+  assign fangyuan1 = { w_16[30:0], w_16[31] };
+  assign w = _037_ ? w_tmp_case : fangyuan1;
+  logic [479:0] fangyuan2;
+  assign fangyuan2 = { w_mem_01, w_mem_02, w_mem_03, w_mem_04, w_mem_05, w_mem_06, w_mem_07, w_mem_08, w_mem_09, w_mem_10, w_mem_11, w_mem_12, w_mem_13, w_mem_14, w_mem_15 };
+  logic [14:0] fangyuan3;
+  assign fangyuan3 = { _052_, _051_, _050_, _049_, _048_, _047_, _046_, _045_, _044_, _043_, _042_, _041_, _040_, _039_, _038_ };
+  always @(w_mem_00 or fangyuan2 or fangyuan3) begin
+    casez (fangyuan3)
+      15'b??????????????1 :
+        w_tmp_case = fangyuan2 [31:0] ;
+      15'b?????????????1? :
+        w_tmp_case = fangyuan2 [63:32] ;
+      15'b????????????1?? :
+        w_tmp_case = fangyuan2 [95:64] ;
+      15'b???????????1??? :
+        w_tmp_case = fangyuan2 [127:96] ;
+      15'b??????????1???? :
+        w_tmp_case = fangyuan2 [159:128] ;
+      15'b?????????1????? :
+        w_tmp_case = fangyuan2 [191:160] ;
+      15'b????????1?????? :
+        w_tmp_case = fangyuan2 [223:192] ;
+      15'b???????1??????? :
+        w_tmp_case = fangyuan2 [255:224] ;
+      15'b??????1???????? :
+        w_tmp_case = fangyuan2 [287:256] ;
+      15'b?????1????????? :
+        w_tmp_case = fangyuan2 [319:288] ;
+      15'b????1?????????? :
+        w_tmp_case = fangyuan2 [351:320] ;
+      15'b???1??????????? :
+        w_tmp_case = fangyuan2 [383:352] ;
+      15'b??1???????????? :
+        w_tmp_case = fangyuan2 [415:384] ;
+      15'b?1????????????? :
+        w_tmp_case = fangyuan2 [447:416] ;
+      15'b1?????????????? :
+        w_tmp_case = fangyuan2 [479:448] ;
+      default:
+        w_tmp_case = w_mem_00 ;
+    endcase
+  end
+  assign _038_ = w_ctr_reg[3:0] == 4'b1111;
+  assign _039_ = w_ctr_reg[3:0] == 4'b1110;
+  assign _040_ = w_ctr_reg[3:0] == 4'b1101;
+  assign _041_ = w_ctr_reg[3:0] == 4'b1100;
+  assign _042_ = w_ctr_reg[3:0] == 4'b1011;
+  assign _043_ = w_ctr_reg[3:0] == 4'b1010;
+  assign _044_ = w_ctr_reg[3:0] == 4'b1001;
+  assign _045_ = w_ctr_reg[3:0] == 4'b1000;
+  assign _046_ = w_ctr_reg[3:0] == 3'b111;
+  assign _047_ = w_ctr_reg[3:0] == 3'b110;
+  assign _048_ = w_ctr_reg[3:0] == 3'b101;
+  assign _049_ = w_ctr_reg[3:0] == 3'b100;
+  assign _050_ = w_ctr_reg[3:0] == 2'b11;
+  assign _051_ = w_ctr_reg[3:0] == 2'b10;
+  assign _052_ = w_ctr_reg[3:0] == 1'b1;
+  assign _053_ = sha1_w_mem_ctrl_we ? sha1_w_mem_ctrl_new : sha1_w_mem_ctrl_reg;
+  assign _000_ = reset_n ? _053_ : 1'b0;
+  assign _001_ = reset_n ? w_ctr_new : 7'b0000000;
+  assign _054_ = w_mem_we ? w_mem15_new : w_mem_15;
+  assign _017_ = reset_n ? _054_ : 32'd0;
+  assign _055_ = w_mem_we ? w_mem14_new : w_mem_14;
+  assign _016_ = reset_n ? _055_ : 32'd0;
+  assign _056_ = w_mem_we ? w_mem13_new : w_mem_13;
+  assign _015_ = reset_n ? _056_ : 32'd0;
+  assign _057_ = w_mem_we ? w_mem12_new : w_mem_12;
+  assign _014_ = reset_n ? _057_ : 32'd0;
+  assign _058_ = w_mem_we ? w_mem11_new : w_mem_11;
+  assign _013_ = reset_n ? _058_ : 32'd0;
+  assign _059_ = w_mem_we ? w_mem10_new : w_mem_10;
+  assign _012_ = reset_n ? _059_ : 32'd0;
+  assign _060_ = w_mem_we ? w_mem09_new : w_mem_09;
+  assign _011_ = reset_n ? _060_ : 32'd0;
+  assign _061_ = w_mem_we ? w_mem08_new : w_mem_08;
+  assign _010_ = reset_n ? _061_ : 32'd0;
+  assign _062_ = w_mem_we ? w_mem07_new : w_mem_07;
+  assign _009_ = reset_n ? _062_ : 32'd0;
+  assign _063_ = w_mem_we ? w_mem06_new : w_mem_06;
+  assign _008_ = reset_n ? _063_ : 32'd0;
+  assign _064_ = w_mem_we ? w_mem05_new : w_mem_05;
+  assign _007_ = reset_n ? _064_ : 32'd0;
+  assign _065_ = w_mem_we ? w_mem04_new : w_mem_04;
+  assign _006_ = reset_n ? _065_ : 32'd0;
+  assign _066_ = w_mem_we ? w_mem03_new : w_mem_03;
+  assign _005_ = reset_n ? _066_ : 32'd0;
+  assign _067_ = w_mem_we ? w_mem02_new : w_mem_02;
+  assign _004_ = reset_n ? _067_ : 32'd0;
+  assign _068_ = w_mem_we ? w_mem01_new : w_mem_01;
+  assign _003_ = reset_n ? _068_ : 32'd0;
+  assign _069_ = w_mem_we ? w_mem00_new : w_mem_00;
+  assign _002_ = reset_n ? _069_ : 32'd0;
+  assign _070_ = w_mem_13 ^ w_mem_08;
+  assign _071_ = _070_ ^ w_mem_02;
+  assign w_16 = _071_ ^ w_mem_00;
+  assign w_0 = w_mem_00;
+  assign w_13 = w_mem_13;
+  assign w_2 = w_mem_02;
+  assign w_8 = w_mem_08;
+  assign w_new = { w_16[30:0], w_16[31] };
+  assign w_tmp = w;
+  always @( posedge clk ) begin
+    if( rst_zy ) w_mem_00_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) w_mem_00_PREV_VAL1 <= w_mem_00 ;
+  end
+  always @( posedge clk ) begin
+    if( rst_zy ) w_mem_01_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) w_mem_01_PREV_VAL1 <= w_mem_01 ;
+  end
+  always @( posedge clk ) begin
+    if( rst_zy ) w_mem_02_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) w_mem_02_PREV_VAL1 <= w_mem_02 ;
+  end
+  always @( posedge clk ) begin
+    if( rst_zy ) w_mem_03_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) w_mem_03_PREV_VAL1 <= w_mem_03 ;
+  end
+  always @( posedge clk ) begin
+    if( rst_zy ) w_mem_04_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) w_mem_04_PREV_VAL1 <= w_mem_04 ;
+  end
+  always @( posedge clk ) begin
+    if( rst_zy ) w_mem_05_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) w_mem_05_PREV_VAL1 <= w_mem_05 ;
+  end
+  always @( posedge clk ) begin
+    if( rst_zy ) w_mem_06_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) w_mem_06_PREV_VAL1 <= w_mem_06 ;
+  end
+  always @( posedge clk ) begin
+    if( rst_zy ) w_mem_07_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) w_mem_07_PREV_VAL1 <= w_mem_07 ;
+  end
+  always @( posedge clk ) begin
+    if( rst_zy ) w_mem_08_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) w_mem_08_PREV_VAL1 <= w_mem_08 ;
+  end
+  always @( posedge clk ) begin
+    if( rst_zy ) w_mem_09_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) w_mem_09_PREV_VAL1 <= w_mem_09 ;
+  end
+  always @( posedge clk ) begin
+    if( rst_zy ) w_mem_10_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) w_mem_10_PREV_VAL1 <= w_mem_10 ;
+  end
+  always @( posedge clk ) begin
+    if( rst_zy ) w_mem_11_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) w_mem_11_PREV_VAL1 <= w_mem_11 ;
+  end
+  always @( posedge clk ) begin
+    if( rst_zy ) w_mem_12_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) w_mem_12_PREV_VAL1 <= w_mem_12 ;
+  end
+  always @( posedge clk ) begin
+    if( rst_zy ) w_mem_13_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) w_mem_13_PREV_VAL1 <= w_mem_13 ;
+  end
+  always @( posedge clk ) begin
+    if( rst_zy ) w_mem_14_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) w_mem_14_PREV_VAL1 <= w_mem_14 ;
+  end
+  always @( posedge clk ) begin
+    if( rst_zy ) w_mem_15_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) w_mem_15_PREV_VAL1 <= w_mem_15 ;
+  end
+  always @( posedge clk ) begin
+    if( rst_zy ) w_ctr_reg_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) w_ctr_reg_PREV_VAL1 <= w_ctr_reg ;
+  end
+  always @( posedge clk ) begin
+    if( rst_zy ) sha1_w_mem_ctrl_reg_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) sha1_w_mem_ctrl_reg_PREV_VAL1 <= sha1_w_mem_ctrl_reg ;
+  end
+ // ground taints for unused wire slices
+  assert property( !INSTR_IN_ZY  || sha1_w_mem_ctrl_reg_PREV_VAL1 == 0 );
+  assert property( !INSTR_IN_ZY  || w_ctr_reg_PREV_VAL1 == 0 );
+  assert property( !INSTR_IN_ZY  || w_mem_00_PREV_VAL1 == 0 );
+  assert property( !INSTR_IN_ZY  || w_mem_01_PREV_VAL1 == 0 );
+  assert property( !INSTR_IN_ZY  || w_mem_02_PREV_VAL1 == 0 );
+  assert property( !INSTR_IN_ZY  || w_mem_03_PREV_VAL1 == 0 );
+  assert property( !INSTR_IN_ZY  || w_mem_04_PREV_VAL1 == 0 );
+  assert property( !INSTR_IN_ZY  || w_mem_05_PREV_VAL1 == 0 );
+  assert property( !INSTR_IN_ZY  || w_mem_06_PREV_VAL1 == 0 );
+  assert property( !INSTR_IN_ZY  || w_mem_07_PREV_VAL1 == 0 );
+  assert property( !INSTR_IN_ZY  || w_mem_08_PREV_VAL1 == 0 );
+  assert property( !INSTR_IN_ZY  || w_mem_09_PREV_VAL1 == 0 );
+  assert property( !INSTR_IN_ZY  || w_mem_10_PREV_VAL1 == 0 );
+  assert property( !INSTR_IN_ZY  || w_mem_11_PREV_VAL1 == 0 );
+  assert property( !INSTR_IN_ZY  || w_mem_12_PREV_VAL1 == 0 );
+  assert property( !INSTR_IN_ZY  || w_mem_13_PREV_VAL1 == 0 );
+  assert property( !INSTR_IN_ZY  || w_mem_14_PREV_VAL1 == 0 );
+  assert property( !INSTR_IN_ZY  || w_mem_15_PREV_VAL1 == 0 );
+endmodule

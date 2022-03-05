@@ -9,7 +9,7 @@ aux_source_directory(./src SRC_DIR)
 aux_source_directory(/workspace/tools/z3-4.8.8/z3/src/api/c++ HEADER1)
 aux_source_directory(/workspace/tools/z3-4.8.8/z3/src/api HEADER2)
 
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../taint_method/build)
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../live_analysis/build)
 link_directories(/workspace/tools/z3-4.8.8/z3/build)
 
 set(VERILOG_EXE func_extract)

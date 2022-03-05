@@ -1,0 +1,5 @@
+read_verilog ./RTL/picorv32.v
+
+prep -top picorv32
+
+sim -clock clk -resetn resetn -rstlen 50 -vcd ./files/rst.vcd

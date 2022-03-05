@@ -1,0 +1,58 @@
+
+  // reset taint is always 0
+  property input1;
+    rst_T == 0;
+  endproperty
+
+  // inputs are either all 1 or all 0
+  property input2;
+    wr_T == 1 && addr_T == 16'hffff && data_in_T == 8'hff && stb_T == 1
+    || wr_T == 0 && addr_T == 0 && data_in_T == 0 && stb_T == 0;
+  endproperty
+
+
+  // do not inject positive taints when the previous instruction is still runnning
+  property input3;
+    aes_state != 0 |-> wr_T == 0;
+  endproperty
+
+  // this instruction takes only 1 cycles to feed to the accelerator,
+  // so set input taint to 0 in the next cycle
+  property input4;
+    wr_T == 1 |=> wr_T == 0;
+  endproperty
+
+
+  // set read flag of outputs to 0
+  property input7;
+    aes_state_R0 == 0 && aes_addr_R0 == 0 && aes_len_R0 == 0 && aes_ctr_R0 == 0 && aes_key0_R0 == 0 && aes_step_R0 == 0;
+  endproperty
+
+
+  // set valid values for input signals
+  property input8;
+    addr == 16'hff00 || addr == 16'hff01 || addr == 16'hff02 || addr == 16'hff04 || addr == 16'hff10 || addr == 16'hff20;
+  endproperty
+
+
+  // when wr == 0, input is invalid, cannot have positive taints
+  property input10;
+    wr == 0 |-> wr_T == 0;
+  endproperty
+
+  // when data_in[0] == 0, the instruction does not take effect
+  property input11;
+    addr == 16'hff00 && data_in[0] == 0 |-> wr_T == 0;
+  endproperty
+
+  assume property (input1);
+  assume property (input2);
+  assume property (input3);
+  assume property (input4);
+
+  assume property (input7);
+  assume property (input8);
+  assume property (input10);
+  assume property (input11);
+
+endmodule

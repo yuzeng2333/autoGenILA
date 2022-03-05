@@ -1,0 +1,141 @@
+  wire [7:0] b0;
+  logic [7:0] b0_T ;
+  logic [7:0] b0_R ;
+  logic [4:0] b0_S ;
+  wire [7:0] b1;
+  logic [7:0] b1_T ;
+  logic [7:0] b1_R ;
+  logic [4:0] b1_S ;
+  wire [7:0] b2;
+  logic [7:0] b2_T ;
+  logic [7:0] b2_R ;
+  logic [4:0] b2_S ;
+  wire [7:0] b3;
+  logic [7:0] b3_T ;
+  logic [7:0] b3_R ;
+  logic [4:0] b3_S ;
+  input clk;
+  output [31:0] p0;
+  output [31:0] p0_T ;
+  logic [31:0] p0_T ;
+  logic [31:0] p0_R ;
+  logic [4:0] p0_S ;
+  input [31:0] p0_R0 ;
+  output [4:0] p0_S ;
+  output [31:0] p1;
+  output [31:0] p1_T ;
+  logic [31:0] p1_T ;
+  logic [31:0] p1_R ;
+  logic [4:0] p1_S ;
+  input [31:0] p1_R0 ;
+  output [4:0] p1_S ;
+  output [31:0] p2;
+  output [31:0] p2_T ;
+  logic [31:0] p2_T ;
+  logic [31:0] p2_R ;
+  logic [4:0] p2_S ;
+  input [31:0] p2_R0 ;
+  output [4:0] p2_S ;
+  output [31:0] p3;
+  output [31:0] p3_T ;
+  logic [31:0] p3_T ;
+  logic [31:0] p3_R ;
+  logic [4:0] p3_S ;
+  input [31:0] p3_R0 ;
+  output [4:0] p3_S ;
+  input [31:0] state;
+  input [31:0] state_T ;
+  output [31:0] state_R ;
+  input [4:0] state_S ;
+  logic [31:0] state_R0 ;
+// module: T
+  T t0 (
+    .in_T (  state_T [31:24]  ),
+    .in_R (  state_R0 [31:24]  ),
+    .in_S (  state_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .zy_end_sig(zy_end_sig),
+    .rst_zy(rst_zy),
+    .out_T ( {  p0_T [23:0] , p0_T [31:24]  } ),
+    .out_R0 ( {  p0_R [23:0] , p0_R [31:24]  } ),
+    .out_S (  ),
+    .out ( { p0[23:0], p0[31:24] } ),
+    .in ( state[31:24] ),
+    .clk ( clk )
+  );
+  assign {  p0_S , p0_S  } = 0 ;
+// module: T
+  T t1 (
+    .in_T (  state_T [23:16]  ),
+    .in_R (  state_R0 [23:16]  ),
+    .in_S (  state_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .zy_end_sig(zy_end_sig),
+    .rst_zy(rst_zy),
+    .out_T ( {  p1_T [15:0] , p1_T [31:16]  } ),
+    .out_R0 ( {  p1_R [15:0] , p1_R [31:16]  } ),
+    .out_S (  ),
+    .out ( { p1[15:0], p1[31:16] } ),
+    .in ( state[23:16] ),
+    .clk ( clk )
+  );
+  assign {  p1_S , p1_S  } = 0 ;
+// module: T
+  T t2 (
+    .in_T (  state_T [15:8]  ),
+    .in_R (  state_R0 [15:8]  ),
+    .in_S (  state_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .zy_end_sig(zy_end_sig),
+    .rst_zy(rst_zy),
+    .out_T ( {  p2_T [7:0] , p2_T [31:8]  } ),
+    .out_R0 ( {  p2_R [7:0] , p2_R [31:8]  } ),
+    .out_S (  ),
+    .out ( { p2[7:0], p2[31:8] } ),
+    .in ( state[15:8] ),
+    .clk ( clk )
+  );
+  assign {  p2_S , p2_S  } = 0 ;
+// module: T
+  T t3 (
+    .in_T (  state_T [7:0]  ),
+    .in_R (  state_R0 [7:0]  ),
+    .in_S (  state_S  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .zy_end_sig(zy_end_sig),
+    .rst_zy(rst_zy),
+    .out_T (  p3_T  ),
+    .out_R0 (  p3_R  ),
+    .out_S (  p3_S  ),
+    .out ( p3 ),
+    .in ( state[7:0] ),
+    .clk ( clk )
+  );
+  assign b0 = state[31:24];
+  logic [31:0] state_R1 ;
+  assign b0_T = state_T [31:24] ;
+  assign state_R1 [31:24] = b0_R ;
+  assign b0_S = state_S ;
+  assign b1 = state[23:16];
+  assign b1_T = state_T [23:16] ;
+  assign state_R1 [23:16] = b1_R ;
+  assign b1_S = state_S ;
+  assign b2 = state[15:8];
+  assign b2_T = state_T [15:8] ;
+  assign state_R1 [15:8] = b2_R ;
+  assign b2_S = state_S ;
+  assign b3 = state[7:0];
+  assign b3_T = state_T [7:0] ;
+  assign state_R1 [7:0] = b3_R ;
+  assign b3_S = state_S ;
+  assign state_R = ( state_R0 ) | ( state_R1 );
+  assign p3_R = ( p3_R0 );
+  assign p2_R = ( p2_R0 );
+  assign p1_R = ( p1_R0 );
+  assign p0_R = ( p0_R0 );
+ // ground taints for floating regs
+ // ground taints for unused wires
+  assign { b0_R , b1_R , b2_R , b3_R , clk_R  } = 0;
+ // ground taints for unused wire slices
+endmodule
+

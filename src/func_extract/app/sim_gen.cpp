@@ -53,13 +53,13 @@ std::string CNCT = "_";
 // disable: aes
 bool g_update_all_regs = false;
 
-enum DESIGN{AES, PICO, GB, URV, VTA};
+enum DESIGN{AES, PICO, GB, URV, VTA, BI};
 enum DESIGN g_design;
 
 // the second argument is the number of instructions
 int main(int argc, char *argv[]) {
   // TODO: specify which example to apply to:
-  g_design = VTA;
+  g_design = BI;
 
   // set global variables accordingly
   if(g_design == PICO) {
@@ -69,7 +69,8 @@ int main(int argc, char *argv[]) {
   else if(g_design == AES) {
     g_fetch_instr_from_mem = false;
   }
-  else if(g_design == URV) {
+  else if(g_design == URV
+          || g_design == BI ) {
     g_fetch_instr_from_mem = true;
     g_instrValueVar = "mem_i_inst_i";
     g_set_dmem = true;

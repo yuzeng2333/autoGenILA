@@ -20,6 +20,7 @@ Here are the steps for generating ILA update functions and simulation files
 4. run ./build/test_gen (with arg: instrNum), it takes the instr.txt file and
    generate tb.txt file, which includes instructions to be 
    used in rtl and ila simulations.
+   ATTENTIOM: change the g_design before using it!
 
 5. run ./build/sim_gen (with arg: instrNum), generate ila.cpp and ila.h file
    may need to modify the mem_rdata and mem_addr in ila.cpp
@@ -28,6 +29,6 @@ Here are the steps for generating ILA update functions and simulation files
 6. copy ila.cpp and ila.h to ILA_SIM folder
 
 7. (1) option1: run ./build/tb_gen (with arg: instrNum) to generate rtl testbench
-   (2) option2: update the memd.txt file by ila.c, and generate mem.txt with ./rtl_sim/util.a.out
+   (2) option2: update the memd.txt file (needs to be manually extracted from ila.c, the assignment to mem), and generate mem.txt with /app/util/a.out
 
 8. run ./build/cmp to compare the ila_results.txt and rtl_results.txt. "ignore_asv.txt" will be read, the 

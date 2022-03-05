@@ -1,0 +1,17 @@
+read_verilog -sv ../rtl/reg16byte.v
+read_verilog -sv ../rtl/reg256byte.v
+read_verilog -sv ../rtl/reg2byte.v
+read_verilog -sv ../rtl/reg32byte.v
+read_verilog -sv ../rtl/sha1_core.v
+read_verilog -sv ../rtl/sha_top.v
+read_verilog -sv ../rtl/sha1_w_mem.v
+
+prep -top sha_top
+
+hierarchy -check
+proc
+opt
+opt_expr -mux_undef
+proc
+opt;;
+write_verilog -nohex sha_top_hier.v

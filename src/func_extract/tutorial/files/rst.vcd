@@ -1,0 +1,462 @@
+$version Yosys 0.9+3901 (git sha1 9f7cd10c, gcc 9.3.0-17ubuntu1~20.04 -fPIC -Os) $end
+$date Fri Feb  4 21:28:35 2022 $end
+$scope module picorv32 $end
+$var wire 32 n1 alu_add_sub $end
+$var wire 1 n2 alu_eq $end
+$var wire 1 n3 alu_lts $end
+$var wire 1 n4 alu_ltu $end
+$var wire 32 n5 alu_out $end
+$var wire 1 n6 alu_out_0 $end
+$var wire 32 n7 alu_out_q $end
+$var wire 32 n8 alu_shl $end
+$var wire 32 n9 alu_shr $end
+$var wire 1 n10 clk $end
+$var wire 1 n11 compressed_instr $end
+$var wire 64 n12 count_cycle $end
+$var wire 64 n13 count_instr $end
+$var wire 8 n14 cpu_state $end
+$var wire 32 n15 cpuregs_rs1 $end
+$var wire 32 n16 cpuregs_rs2 $end
+$var wire 32 n17 cpuregs_wrdata $end
+$var wire 1 n18 cpuregs_write $end
+$var wire 32 n19 dbg_mem_addr $end
+$var wire 1 n20 dbg_mem_instr $end
+$var wire 32 n21 dbg_mem_rdata $end
+$var wire 1 n22 dbg_mem_ready $end
+$var wire 1 n23 dbg_mem_valid $end
+$var wire 32 n24 dbg_mem_wdata $end
+$var wire 4 n25 dbg_mem_wstrb $end
+$var wire 32 n26 dbg_reg_x0 $end
+$var wire 32 n27 decoded_imm $end
+$var wire 32 n28 decoded_imm_j $end
+$var wire 5 n29 decoded_rd $end
+$var wire 5 n30 decoded_rs $end
+$var wire 5 n31 decoded_rs1 $end
+$var wire 5 n32 decoded_rs2 $end
+$var wire 1 n33 decoder_pseudo_trigger $end
+$var wire 1 n34 decoder_pseudo_trigger_q $end
+$var wire 1 n35 decoder_trigger $end
+$var wire 1 n36 decoder_trigger_q $end
+$var wire 1 n37 do_waitirq $end
+$var wire 32 n38 eoi $end
+$var wire 1 n39 instr_add $end
+$var wire 1 n40 instr_addi $end
+$var wire 1 n41 instr_and $end
+$var wire 1 n42 instr_andi $end
+$var wire 1 n43 instr_auipc $end
+$var wire 1 n44 instr_beq $end
+$var wire 1 n45 instr_bge $end
+$var wire 1 n46 instr_bgeu $end
+$var wire 1 n47 instr_blt $end
+$var wire 1 n48 instr_bltu $end
+$var wire 1 n49 instr_bne $end
+$var wire 1 n50 instr_ecall_ebreak $end
+$var wire 1 n51 instr_jal $end
+$var wire 1 n52 instr_jalr $end
+$var wire 1 n53 instr_lb $end
+$var wire 1 n54 instr_lbu $end
+$var wire 1 n55 instr_lh $end
+$var wire 1 n56 instr_lhu $end
+$var wire 1 n57 instr_lui $end
+$var wire 1 n58 instr_lw $end
+$var wire 1 n59 instr_or $end
+$var wire 1 n60 instr_ori $end
+$var wire 1 n61 instr_rdcycle $end
+$var wire 1 n62 instr_rdcycleh $end
+$var wire 1 n63 instr_rdinstr $end
+$var wire 1 n64 instr_rdinstrh $end
+$var wire 1 n65 instr_retirq $end
+$var wire 1 n66 instr_sb $end
+$var wire 1 n67 instr_sh $end
+$var wire 1 n68 instr_sll $end
+$var wire 1 n69 instr_slli $end
+$var wire 1 n70 instr_slt $end
+$var wire 1 n71 instr_slti $end
+$var wire 1 n72 instr_sltiu $end
+$var wire 1 n73 instr_sltu $end
+$var wire 1 n74 instr_sra $end
+$var wire 1 n75 instr_srai $end
+$var wire 1 n76 instr_srl $end
+$var wire 1 n77 instr_srli $end
+$var wire 1 n78 instr_sub $end
+$var wire 1 n79 instr_sw $end
+$var wire 1 n80 instr_trap $end
+$var wire 1 n81 instr_xor $end
+$var wire 1 n82 instr_xori $end
+$var wire 32 n83 irq $end
+$var wire 1 n84 is_alu_reg_imm $end
+$var wire 1 n85 is_alu_reg_reg $end
+$var wire 1 n86 is_beq_bne_blt_bge_bltu_bgeu $end
+$var wire 1 n87 is_compare $end
+$var wire 1 n88 is_jalr_addi_slti_sltiu_xori_ori_andi $end
+$var wire 1 n89 is_lb_lh_lw_lbu_lhu $end
+$var wire 1 n90 is_lbu_lhu_lw $end
+$var wire 1 n91 is_lui_auipc_jal $end
+$var wire 1 n92 is_lui_auipc_jal_jalr_addi_add_sub $end
+$var wire 1 n93 is_rdcycle_rdcycleh_rdinstr_rdinstrh $end
+$var wire 1 n94 is_sb_sh_sw $end
+$var wire 1 n95 is_slli_srli_srai $end
+$var wire 1 n96 is_slti_blt_slt $end
+$var wire 1 n97 is_sltiu_bltu_sltu $end
+$var wire 1 n98 latched_branch $end
+$var wire 1 n99 latched_compr $end
+$var wire 1 n100 latched_is_lb $end
+$var wire 1 n101 latched_is_lh $end
+$var wire 1 n102 latched_is_lu $end
+$var wire 5 n103 latched_rd $end
+$var wire 1 n104 latched_stalu $end
+$var wire 1 n105 latched_store $end
+$var wire 32 n106 mem_addr $end
+$var wire 1 n107 mem_do_prefetch $end
+$var wire 1 n108 mem_do_rdata $end
+$var wire 1 n109 mem_do_rinst $end
+$var wire 1 n110 mem_do_wdata $end
+$var wire 1 n111 mem_done $end
+$var wire 1 n112 mem_instr $end
+$var wire 32 n113 mem_la_addr $end
+$var wire 1 n114 mem_la_firstword $end
+$var wire 1 n115 mem_la_firstword_xfer $end
+$var wire 1 n116 mem_la_read $end
+$var wire 1 n117 mem_la_use_prefetched_high_word $end
+$var wire 32 n118 mem_la_wdata $end
+$var wire 1 n119 mem_la_write $end
+$var wire 4 n120 mem_la_wstrb $end
+$var wire 32 n121 mem_rdata $end
+$var wire 32 n122 mem_rdata_latched $end
+$var wire 32 n123 mem_rdata_latched_noshuffle $end
+$var wire 32 n124 mem_rdata_q $end
+$var wire 32 n125 mem_rdata_word $end
+$var wire 1 n126 mem_ready $end
+$var wire 2 n127 mem_state $end
+$var wire 1 n128 mem_valid $end
+$var wire 32 n129 mem_wdata $end
+$var wire 2 n130 mem_wordsize $end
+$var wire 4 n131 mem_wstrb $end
+$var wire 1 n132 mem_xfer $end
+$var wire 32 n133 next_pc $end
+$var wire 32 n134 pcpi_div_rd $end
+$var wire 1 n135 pcpi_div_ready $end
+$var wire 1 n136 pcpi_div_wait $end
+$var wire 1 n137 pcpi_div_wr $end
+$var wire 32 n138 pcpi_insn $end
+$var wire 1 n139 pcpi_int_ready $end
+$var wire 1 n140 pcpi_int_wait $end
+$var wire 32 n141 pcpi_mul_rd $end
+$var wire 1 n142 pcpi_mul_ready $end
+$var wire 1 n143 pcpi_mul_wait $end
+$var wire 1 n144 pcpi_mul_wr $end
+$var wire 32 n145 pcpi_rd $end
+$var wire 1 n146 pcpi_ready $end
+$var wire 32 n147 pcpi_rs1 $end
+$var wire 32 n148 pcpi_rs2 $end
+$var wire 1 n149 pcpi_valid $end
+$var wire 1 n150 pcpi_wait $end
+$var wire 1 n151 pcpi_wr $end
+$var wire 32 n152 reg_next_pc $end
+$var wire 32 n153 reg_op1 $end
+$var wire 32 n154 reg_op2 $end
+$var wire 32 n155 reg_out $end
+$var wire 32 n156 reg_pc $end
+$var wire 5 n157 reg_sh $end
+$var wire 1 n158 resetn $end
+$var wire 36 n159 trace_data $end
+$var wire 1 n160 trace_valid $end
+$var wire 1 n161 trap $end
+$upscope $end
+$enddefinitions $end
+#0
+bx n161
+b0 n160
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n159
+b0 n158
+bxxxxx n157
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n156
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n155
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n154
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n153
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n152
+bx n151
+bx n150
+bx n149
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n148
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n147
+bx n146
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n145
+b0 n144
+b0 n143
+b0 n142
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n141
+b0 n140
+b0 n139
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n138
+b0 n137
+b0 n136
+b0 n135
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n134
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n133
+bx n132
+bxxxx n131
+bxx n130
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n129
+bx n128
+bxx n127
+bx n126
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n125
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n124
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n123
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n122
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n121
+bxxxx n120
+b0 n119
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n118
+b0 n117
+b0 n116
+b0 n115
+b0 n114
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx00 n113
+bx n112
+b0 n111
+bx n110
+bx n109
+bx n108
+bx n107
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n106
+bx n105
+bx n104
+bxxxxx n103
+bx n102
+bx n101
+bx n100
+bx n99
+bx n98
+bx n97
+bx n96
+bx n95
+bx n94
+bx n93
+bx n92
+bx n91
+bx n90
+bx n89
+bx n88
+bx n87
+bx n86
+bx n85
+bx n84
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n83
+bx n82
+bx n81
+b0 n80
+bx n79
+bx n78
+bx n77
+bx n76
+bx n75
+bx n74
+bx n73
+bx n72
+bx n71
+bx n70
+bx n69
+bx n68
+bx n67
+bx n66
+bx n65
+bx n64
+bx n63
+bx n62
+bx n61
+bx n60
+bx n59
+bx n58
+bx n57
+bx n56
+bx n55
+bx n54
+bx n53
+bx n52
+bx n51
+bx n50
+bx n49
+bx n48
+bx n47
+bx n46
+bx n45
+bx n44
+bx n43
+bx n42
+bx n41
+bx n40
+bx n39
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n38
+b0 n37
+bx n36
+bx n35
+bx n34
+bx n33
+bxxxxx n32
+bxxxxx n31
+bxxxxx n30
+bxxxxx n29
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n28
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n27
+b00000000000000000000000000000000 n26
+bxxxx n25
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n24
+bx n23
+bx n22
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n21
+bx n20
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n19
+b0 n18
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n17
+b00000000000000000000000000000000 n16
+b00000000000000000000000000000000 n15
+bxxxxxxxx n14
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n13
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n12
+bx n11
+bx n10
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n9
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n8
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n7
+bx n6
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n5
+bx n4
+bx n3
+bx n2
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n1
+#5
+b0 n10
+#10
+b0 n161
+b00000000000000000000000000000000 n156
+b00000000000000000000000000000000 n152
+b0 n149
+b00000000000000000000000000000000 n133
+b0 n132
+b0 n128
+b00 n127
+b0 n110
+b0 n109
+b0 n108
+b0 n107
+b0 n105
+b0 n104
+b0 n102
+b0 n101
+b0 n100
+b0 n98
+b0 n87
+b0 n86
+b0 n82
+b0 n81
+b0 n78
+b0 n76
+b0 n74
+b0 n73
+b0 n72
+b0 n71
+b0 n70
+b0 n68
+b0 n60
+b0 n59
+b0 n49
+b0 n48
+b0 n47
+b0 n46
+b0 n45
+b0 n44
+b0 n42
+b0 n41
+b0 n40
+b0 n39
+b00000000000000000000000000000000 n38
+b0 n35
+b0 n33
+b0 n23
+b01000000 n14
+b0000000000000000000000000000000000000000000000000000000000000000 n13
+b0000000000000000000000000000000000000000000000000000000000000000 n12
+b1 n10
+#15
+b0 n10
+#20
+b0 n97
+b0 n96
+b0 n36
+b0 n34
+b1 n10
+#25
+b0 n10
+#30
+b1 n10
+#35
+b0 n10
+#40
+b1 n10
+#45
+b0 n10
+#50
+b1 n10
+#55
+b0 n10
+#60
+b1 n10
+#65
+b0 n10
+#70
+b1 n10
+#75
+b0 n10
+#80
+b1 n10
+#85
+b0 n10
+#90
+b1 n10
+#95
+b0 n10
+#100
+b1 n10
+#105
+b0 n10
+#110
+b1 n10
+#115
+b0 n10
+#120
+b1 n10
+#125
+b0 n10
+#130
+b1 n10
+#135
+b0 n10
+#140
+b1 n10
+#145
+b0 n10
+#150
+b1 n10
+#155
+b0 n10
+#160
+b1 n10
+#165
+b0 n10
+#170
+b1 n10
+#175
+b0 n10
+#180
+b1 n10
+#185
+b0 n10
+#190
+b1 n10
+#195
+b0 n10
+#200
+b1 n10
+#202

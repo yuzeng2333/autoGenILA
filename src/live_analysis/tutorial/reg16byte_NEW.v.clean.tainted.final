@@ -1,0 +1,865 @@
+module reg16byte ( addr , clk , data_in , en , rst , wr , INSTR_IN_ZY , zy_end_sig , rst_zy , addr_T , addr_S , data_in_T , data_in_S , data_out_R0 , en_T , en_S , reg_out_R0 , rst_T , rst_S , wr_T , wr_S , data_out , reg_out , addr_R , data_in_R , data_out_T , data_out_S , en_R , reg_out_T , reg_out_S , rst_R , wr_R );
+  input rst_zy;
+  input zy_end_sig;
+  integer i;
+  input INSTR_IN_ZY;
+  wire _00_;
+  logic _00__T ;
+  logic _00__R ;
+  logic [4:0] _00__S ;
+  wire _01_;
+  logic _01__T ;
+  logic _01__R ;
+  logic [4:0] _01__S ;
+  wire _02_;
+  logic _02__T ;
+  logic _02__R ;
+  logic [4:0] _02__S ;
+  wire _03_;
+  logic _03__T ;
+  logic _03__R ;
+  logic [4:0] _03__S ;
+  wire _04_;
+  logic _04__T ;
+  logic _04__R ;
+  logic [4:0] _04__S ;
+  wire _05_;
+  logic _05__T ;
+  logic _05__R ;
+  logic [4:0] _05__S ;
+  wire _06_;
+  logic _06__T ;
+  logic _06__R ;
+  logic [4:0] _06__S ;
+  wire _07_;
+  logic _07__T ;
+  logic _07__R ;
+  logic [4:0] _07__S ;
+  wire _08_;
+  logic _08__T ;
+  logic _08__R ;
+  logic [4:0] _08__S ;
+  wire _09_;
+  logic _09__T ;
+  logic _09__R ;
+  logic [4:0] _09__S ;
+  wire _10_;
+  logic _10__T ;
+  logic _10__R ;
+  logic [4:0] _10__S ;
+  wire _11_;
+  logic _11__T ;
+  logic _11__R ;
+  logic [4:0] _11__S ;
+  wire _12_;
+  logic _12__T ;
+  logic _12__R ;
+  logic [4:0] _12__S ;
+  wire _13_;
+  logic _13__T ;
+  logic _13__R ;
+  logic [4:0] _13__S ;
+  wire _14_;
+  logic _14__T ;
+  logic _14__R ;
+  logic [4:0] _14__S ;
+  wire _15_;
+  logic _15__T ;
+  logic _15__R ;
+  logic [4:0] _15__S ;
+  wire _16_;
+  logic _16__T ;
+  logic _16__R ;
+  logic [4:0] _16__S ;
+  wire [7:0] _17_;
+  logic [7:0] _17__T ;
+  logic [7:0] _17__R ;
+  logic [4:0] _17__S ;
+  wire [7:0] _18_;
+  logic [7:0] _18__T ;
+  logic [7:0] _18__R ;
+  logic [4:0] _18__S ;
+  wire [7:0] _19_;
+  logic [7:0] _19__T ;
+  logic [7:0] _19__R ;
+  logic [4:0] _19__S ;
+  wire [7:0] _20_;
+  logic [7:0] _20__T ;
+  logic [7:0] _20__R ;
+  logic [4:0] _20__S ;
+  wire [7:0] _21_;
+  logic [7:0] _21__T ;
+  logic [7:0] _21__R ;
+  logic [4:0] _21__S ;
+  wire [7:0] _22_;
+  logic [7:0] _22__T ;
+  logic [7:0] _22__R ;
+  logic [4:0] _22__S ;
+  wire [7:0] _23_;
+  logic [7:0] _23__T ;
+  logic [7:0] _23__R ;
+  logic [4:0] _23__S ;
+  wire [7:0] _24_;
+  logic [7:0] _24__T ;
+  logic [7:0] _24__R ;
+  logic [4:0] _24__S ;
+  wire [7:0] _25_;
+  logic [7:0] _25__T ;
+  logic [7:0] _25__R ;
+  logic [4:0] _25__S ;
+  wire [7:0] _26_;
+  logic [7:0] _26__T ;
+  logic [7:0] _26__R ;
+  logic [4:0] _26__S ;
+  wire [7:0] _27_;
+  logic [7:0] _27__T ;
+  logic [7:0] _27__R ;
+  logic [4:0] _27__S ;
+  wire [7:0] _28_;
+  logic [7:0] _28__T ;
+  logic [7:0] _28__R ;
+  logic [4:0] _28__S ;
+  wire [7:0] _29_;
+  logic [7:0] _29__T ;
+  logic [7:0] _29__R ;
+  logic [4:0] _29__S ;
+  wire [7:0] _30_;
+  logic [7:0] _30__T ;
+  logic [7:0] _30__R ;
+  logic [4:0] _30__S ;
+  input [3:0] addr;
+  input [3:0] addr_T ;
+  output [3:0] addr_R ;
+  input [4:0] addr_S ;
+  input clk;
+  input [7:0] data_in;
+  input [7:0] data_in_T ;
+  output [7:0] data_in_R ;
+  input [4:0] data_in_S ;
+  output [7:0] data_out;
+  output [7:0] data_out_T ;
+  logic [7:0] data_out_T ;
+  logic [7:0] data_out_R ;
+  logic [4:0] data_out_S ;
+  input [7:0] data_out_R0 ;
+  output [4:0] data_out_S ;
+  wire [7:0] data_out_mux;
+  logic [7:0] data_out_mux_T ;
+  logic [7:0] data_out_mux_R ;
+  logic [4:0] data_out_mux_S ;
+  input en;
+  input en_T ;
+  output en_R ;
+  input [4:0] en_S ;
+  output [127:0] reg_out;
+  output [127:0] reg_out_T ;
+  logic [127:0] reg_out_T ;
+  logic [127:0] reg_out_R ;
+  logic [4:0] reg_out_S ;
+  input [127:0] reg_out_R0 ;
+  output [4:0] reg_out_S ;
+  reg [127:0] reg_out;
+  logic [127:0]  reg_out_T ;
+  logic reg_out_t_flag ;
+  logic reg_out_r_flag ;
+  assign reg_out_S = 14 ;
+  input rst;
+  input rst_T ;
+  output rst_R ;
+  input [4:0] rst_S ;
+  input wr;
+  input wr_T ;
+  output wr_R ;
+  input [4:0] wr_S ;
+  wire wr0;
+  logic wr0_T ;
+  logic wr0_R ;
+  logic [4:0] wr0_S ;
+  wire wr1;
+  logic wr1_T ;
+  logic wr1_R ;
+  logic [4:0] wr1_S ;
+  wire wr10;
+  logic wr10_T ;
+  logic wr10_R ;
+  logic [4:0] wr10_S ;
+  wire wr11;
+  logic wr11_T ;
+  logic wr11_R ;
+  logic [4:0] wr11_S ;
+  wire wr12;
+  logic wr12_T ;
+  logic wr12_R ;
+  logic [4:0] wr12_S ;
+  wire wr13;
+  logic wr13_T ;
+  logic wr13_R ;
+  logic [4:0] wr13_S ;
+  wire wr14;
+  logic wr14_T ;
+  logic wr14_R ;
+  logic [4:0] wr14_S ;
+  wire wr15;
+  logic wr15_T ;
+  logic wr15_R ;
+  logic [4:0] wr15_S ;
+  wire wr2;
+  logic wr2_T ;
+  logic wr2_R ;
+  logic [4:0] wr2_S ;
+  wire wr3;
+  logic wr3_T ;
+  logic wr3_R ;
+  logic [4:0] wr3_S ;
+  wire wr4;
+  logic wr4_T ;
+  logic wr4_R ;
+  logic [4:0] wr4_S ;
+  wire wr5;
+  logic wr5_T ;
+  logic wr5_R ;
+  logic [4:0] wr5_S ;
+  wire wr6;
+  logic wr6_T ;
+  logic wr6_R ;
+  logic [4:0] wr6_S ;
+  wire wr7;
+  logic wr7_T ;
+  logic wr7_R ;
+  logic [4:0] wr7_S ;
+  wire wr8;
+  logic wr8_T ;
+  logic wr8_R ;
+  logic [4:0] wr8_S ;
+  wire wr9;
+  logic wr9_T ;
+  logic wr9_R ;
+  logic [4:0] wr9_S ;
+  always @(posedge clk)
+    if (rst) reg_out[7:0] <= 8'b00000000;
+  always @(posedge clk)
+    if ( rst ) reg_out_T  [7:0] <= ( { 8{ rst_T  }} ) & ( { 8{ reg_out_S != 0 }} );
+  always @(posedge clk)
+    if ( rst ) reg_out_t_flag  [7:0] <= reg_out_t_flag  [7:0] ? 1 : (rst_T  ) & ( reg_out_S != 0 );
+  always @(posedge clk)
+    if ( rst ) reg_out_r_flag  [7:0] <= reg_out_r_flag  [7:0] ? 1 : reg_out_t_flag  [7:0] ? 0 : ( |reg_out_R  [7:0] ) ;
+  always @(posedge clk)
+    if ( wr0 ) reg_out_T  [7:0] <= ( data_in_T  | { 8{ wr0_T  }} ) & ( { 8{ reg_out_S != data_in_S }} );
+  always @(posedge clk)
+    if ( wr0 ) reg_out_t_flag  [7:0] <= reg_out_t_flag  [7:0] ? 1 : ( ( |data_in_T  ) || wr0_T  ) & ( reg_out_S != data_in_S );
+  always @(posedge clk)
+    if ( wr0 ) reg_out_r_flag  [7:0] <= reg_out_r_flag  [7:0] ? 1 : reg_out_t_flag  [7:0] ? 0 : ( |reg_out_R  [7:0] ) ;
+  logic [7:0] data_in_R0 ;
+  assign data_in_R0 = { 8{ wr0 }} & data_in_T ;
+  always @(posedge clk)
+    if (rst) reg_out[15:8] <= 8'b00000000;
+  always @(posedge clk)
+    if ( rst ) reg_out_T  [15:8] <= ( { 8{ rst_T  }} ) & ( { 8{ reg_out_S != 0 }} );
+  always @(posedge clk)
+    if ( rst ) reg_out_t_flag  [15:8] <= reg_out_t_flag  [15:8] ? 1 : (rst_T  ) & ( reg_out_S != 0 );
+  always @(posedge clk)
+    if ( rst ) reg_out_r_flag  [15:8] <= reg_out_r_flag  [15:8] ? 1 : reg_out_t_flag  [15:8] ? 0 : ( |reg_out_R  [15:8] ) ;
+  always @(posedge clk)
+    if ( wr1 ) reg_out_T  [15:8] <= ( data_in_T  | { 8{ wr1_T  }} ) & ( { 8{ reg_out_S != data_in_S }} );
+  always @(posedge clk)
+    if ( wr1 ) reg_out_t_flag  [15:8] <= reg_out_t_flag  [15:8] ? 1 : ( ( |data_in_T  ) || wr1_T  ) & ( reg_out_S != data_in_S );
+  always @(posedge clk)
+    if ( wr1 ) reg_out_r_flag  [15:8] <= reg_out_r_flag  [15:8] ? 1 : reg_out_t_flag  [15:8] ? 0 : ( |reg_out_R  [15:8] ) ;
+  logic [7:0] data_in_R1 ;
+  assign data_in_R1 = { 8{ wr1 }} & data_in_T ;
+  always @(posedge clk)
+    if (rst) reg_out[23:16] <= 8'b00000000;
+  always @(posedge clk)
+    if ( rst ) reg_out_T  [23:16] <= ( { 8{ rst_T  }} ) & ( { 8{ reg_out_S != 0 }} );
+  always @(posedge clk)
+    if ( rst ) reg_out_t_flag  [23:16] <= reg_out_t_flag  [23:16] ? 1 : (rst_T  ) & ( reg_out_S != 0 );
+  always @(posedge clk)
+    if ( rst ) reg_out_r_flag  [23:16] <= reg_out_r_flag  [23:16] ? 1 : reg_out_t_flag  [23:16] ? 0 : ( |reg_out_R  [23:16] ) ;
+  always @(posedge clk)
+    if ( wr2 ) reg_out_T  [23:16] <= ( data_in_T  | { 8{ wr2_T  }} ) & ( { 8{ reg_out_S != data_in_S }} );
+  always @(posedge clk)
+    if ( wr2 ) reg_out_t_flag  [23:16] <= reg_out_t_flag  [23:16] ? 1 : ( ( |data_in_T  ) || wr2_T  ) & ( reg_out_S != data_in_S );
+  always @(posedge clk)
+    if ( wr2 ) reg_out_r_flag  [23:16] <= reg_out_r_flag  [23:16] ? 1 : reg_out_t_flag  [23:16] ? 0 : ( |reg_out_R  [23:16] ) ;
+  logic [7:0] data_in_R2 ;
+  assign data_in_R2 = { 8{ wr2 }} & data_in_T ;
+  always @(posedge clk)
+    if (rst) reg_out[31:24] <= 8'b00000000;
+  always @(posedge clk)
+    if ( rst ) reg_out_T  [31:24] <= ( { 8{ rst_T  }} ) & ( { 8{ reg_out_S != 0 }} );
+  always @(posedge clk)
+    if ( rst ) reg_out_t_flag  [31:24] <= reg_out_t_flag  [31:24] ? 1 : (rst_T  ) & ( reg_out_S != 0 );
+  always @(posedge clk)
+    if ( rst ) reg_out_r_flag  [31:24] <= reg_out_r_flag  [31:24] ? 1 : reg_out_t_flag  [31:24] ? 0 : ( |reg_out_R  [31:24] ) ;
+  always @(posedge clk)
+    if ( wr3 ) reg_out_T  [31:24] <= ( data_in_T  | { 8{ wr3_T  }} ) & ( { 8{ reg_out_S != data_in_S }} );
+  always @(posedge clk)
+    if ( wr3 ) reg_out_t_flag  [31:24] <= reg_out_t_flag  [31:24] ? 1 : ( ( |data_in_T  ) || wr3_T  ) & ( reg_out_S != data_in_S );
+  always @(posedge clk)
+    if ( wr3 ) reg_out_r_flag  [31:24] <= reg_out_r_flag  [31:24] ? 1 : reg_out_t_flag  [31:24] ? 0 : ( |reg_out_R  [31:24] ) ;
+  logic [7:0] data_in_R3 ;
+  assign data_in_R3 = { 8{ wr3 }} & data_in_T ;
+  always @(posedge clk)
+    if (rst) reg_out[39:32] <= 8'b00000000;
+  always @(posedge clk)
+    if ( rst ) reg_out_T  [39:32] <= ( { 8{ rst_T  }} ) & ( { 8{ reg_out_S != 0 }} );
+  always @(posedge clk)
+    if ( rst ) reg_out_t_flag  [39:32] <= reg_out_t_flag  [39:32] ? 1 : (rst_T  ) & ( reg_out_S != 0 );
+  always @(posedge clk)
+    if ( rst ) reg_out_r_flag  [39:32] <= reg_out_r_flag  [39:32] ? 1 : reg_out_t_flag  [39:32] ? 0 : ( |reg_out_R  [39:32] ) ;
+  always @(posedge clk)
+    if ( wr4 ) reg_out_T  [39:32] <= ( data_in_T  | { 8{ wr4_T  }} ) & ( { 8{ reg_out_S != data_in_S }} );
+  always @(posedge clk)
+    if ( wr4 ) reg_out_t_flag  [39:32] <= reg_out_t_flag  [39:32] ? 1 : ( ( |data_in_T  ) || wr4_T  ) & ( reg_out_S != data_in_S );
+  always @(posedge clk)
+    if ( wr4 ) reg_out_r_flag  [39:32] <= reg_out_r_flag  [39:32] ? 1 : reg_out_t_flag  [39:32] ? 0 : ( |reg_out_R  [39:32] ) ;
+  logic [7:0] data_in_R4 ;
+  assign data_in_R4 = { 8{ wr4 }} & data_in_T ;
+  always @(posedge clk)
+    if (rst) reg_out[47:40] <= 8'b00000000;
+  always @(posedge clk)
+    if ( rst ) reg_out_T  [47:40] <= ( { 8{ rst_T  }} ) & ( { 8{ reg_out_S != 0 }} );
+  always @(posedge clk)
+    if ( rst ) reg_out_t_flag  [47:40] <= reg_out_t_flag  [47:40] ? 1 : (rst_T  ) & ( reg_out_S != 0 );
+  always @(posedge clk)
+    if ( rst ) reg_out_r_flag  [47:40] <= reg_out_r_flag  [47:40] ? 1 : reg_out_t_flag  [47:40] ? 0 : ( |reg_out_R  [47:40] ) ;
+  always @(posedge clk)
+    if ( wr5 ) reg_out_T  [47:40] <= ( data_in_T  | { 8{ wr5_T  }} ) & ( { 8{ reg_out_S != data_in_S }} );
+  always @(posedge clk)
+    if ( wr5 ) reg_out_t_flag  [47:40] <= reg_out_t_flag  [47:40] ? 1 : ( ( |data_in_T  ) || wr5_T  ) & ( reg_out_S != data_in_S );
+  always @(posedge clk)
+    if ( wr5 ) reg_out_r_flag  [47:40] <= reg_out_r_flag  [47:40] ? 1 : reg_out_t_flag  [47:40] ? 0 : ( |reg_out_R  [47:40] ) ;
+  logic [7:0] data_in_R5 ;
+  assign data_in_R5 = { 8{ wr5 }} & data_in_T ;
+  always @(posedge clk)
+    if (rst) reg_out[55:48] <= 8'b00000000;
+  always @(posedge clk)
+    if ( rst ) reg_out_T  [55:48] <= ( { 8{ rst_T  }} ) & ( { 8{ reg_out_S != 0 }} );
+  always @(posedge clk)
+    if ( rst ) reg_out_t_flag  [55:48] <= reg_out_t_flag  [55:48] ? 1 : (rst_T  ) & ( reg_out_S != 0 );
+  always @(posedge clk)
+    if ( rst ) reg_out_r_flag  [55:48] <= reg_out_r_flag  [55:48] ? 1 : reg_out_t_flag  [55:48] ? 0 : ( |reg_out_R  [55:48] ) ;
+  always @(posedge clk)
+    if ( wr6 ) reg_out_T  [55:48] <= ( data_in_T  | { 8{ wr6_T  }} ) & ( { 8{ reg_out_S != data_in_S }} );
+  always @(posedge clk)
+    if ( wr6 ) reg_out_t_flag  [55:48] <= reg_out_t_flag  [55:48] ? 1 : ( ( |data_in_T  ) || wr6_T  ) & ( reg_out_S != data_in_S );
+  always @(posedge clk)
+    if ( wr6 ) reg_out_r_flag  [55:48] <= reg_out_r_flag  [55:48] ? 1 : reg_out_t_flag  [55:48] ? 0 : ( |reg_out_R  [55:48] ) ;
+  logic [7:0] data_in_R6 ;
+  assign data_in_R6 = { 8{ wr6 }} & data_in_T ;
+  always @(posedge clk)
+    if (rst) reg_out[63:56] <= 8'b00000000;
+  always @(posedge clk)
+    if ( rst ) reg_out_T  [63:56] <= ( { 8{ rst_T  }} ) & ( { 8{ reg_out_S != 0 }} );
+  always @(posedge clk)
+    if ( rst ) reg_out_t_flag  [63:56] <= reg_out_t_flag  [63:56] ? 1 : (rst_T  ) & ( reg_out_S != 0 );
+  always @(posedge clk)
+    if ( rst ) reg_out_r_flag  [63:56] <= reg_out_r_flag  [63:56] ? 1 : reg_out_t_flag  [63:56] ? 0 : ( |reg_out_R  [63:56] ) ;
+  always @(posedge clk)
+    if ( wr7 ) reg_out_T  [63:56] <= ( data_in_T  | { 8{ wr7_T  }} ) & ( { 8{ reg_out_S != data_in_S }} );
+  always @(posedge clk)
+    if ( wr7 ) reg_out_t_flag  [63:56] <= reg_out_t_flag  [63:56] ? 1 : ( ( |data_in_T  ) || wr7_T  ) & ( reg_out_S != data_in_S );
+  always @(posedge clk)
+    if ( wr7 ) reg_out_r_flag  [63:56] <= reg_out_r_flag  [63:56] ? 1 : reg_out_t_flag  [63:56] ? 0 : ( |reg_out_R  [63:56] ) ;
+  logic [7:0] data_in_R7 ;
+  assign data_in_R7 = { 8{ wr7 }} & data_in_T ;
+  always @(posedge clk)
+    if (rst) reg_out[71:64] <= 8'b00000000;
+  always @(posedge clk)
+    if ( rst ) reg_out_T  [71:64] <= ( { 8{ rst_T  }} ) & ( { 8{ reg_out_S != 0 }} );
+  always @(posedge clk)
+    if ( rst ) reg_out_t_flag  [71:64] <= reg_out_t_flag  [71:64] ? 1 : (rst_T  ) & ( reg_out_S != 0 );
+  always @(posedge clk)
+    if ( rst ) reg_out_r_flag  [71:64] <= reg_out_r_flag  [71:64] ? 1 : reg_out_t_flag  [71:64] ? 0 : ( |reg_out_R  [71:64] ) ;
+  always @(posedge clk)
+    if ( wr8 ) reg_out_T  [71:64] <= ( data_in_T  | { 8{ wr8_T  }} ) & ( { 8{ reg_out_S != data_in_S }} );
+  always @(posedge clk)
+    if ( wr8 ) reg_out_t_flag  [71:64] <= reg_out_t_flag  [71:64] ? 1 : ( ( |data_in_T  ) || wr8_T  ) & ( reg_out_S != data_in_S );
+  always @(posedge clk)
+    if ( wr8 ) reg_out_r_flag  [71:64] <= reg_out_r_flag  [71:64] ? 1 : reg_out_t_flag  [71:64] ? 0 : ( |reg_out_R  [71:64] ) ;
+  logic [7:0] data_in_R8 ;
+  assign data_in_R8 = { 8{ wr8 }} & data_in_T ;
+  always @(posedge clk)
+    if (rst) reg_out[79:72] <= 8'b00000000;
+  always @(posedge clk)
+    if ( rst ) reg_out_T  [79:72] <= ( { 8{ rst_T  }} ) & ( { 8{ reg_out_S != 0 }} );
+  always @(posedge clk)
+    if ( rst ) reg_out_t_flag  [79:72] <= reg_out_t_flag  [79:72] ? 1 : (rst_T  ) & ( reg_out_S != 0 );
+  always @(posedge clk)
+    if ( rst ) reg_out_r_flag  [79:72] <= reg_out_r_flag  [79:72] ? 1 : reg_out_t_flag  [79:72] ? 0 : ( |reg_out_R  [79:72] ) ;
+  always @(posedge clk)
+    if ( wr9 ) reg_out_T  [79:72] <= ( data_in_T  | { 8{ wr9_T  }} ) & ( { 8{ reg_out_S != data_in_S }} );
+  always @(posedge clk)
+    if ( wr9 ) reg_out_t_flag  [79:72] <= reg_out_t_flag  [79:72] ? 1 : ( ( |data_in_T  ) || wr9_T  ) & ( reg_out_S != data_in_S );
+  always @(posedge clk)
+    if ( wr9 ) reg_out_r_flag  [79:72] <= reg_out_r_flag  [79:72] ? 1 : reg_out_t_flag  [79:72] ? 0 : ( |reg_out_R  [79:72] ) ;
+  logic [7:0] data_in_R9 ;
+  assign data_in_R9 = { 8{ wr9 }} & data_in_T ;
+  always @(posedge clk)
+    if (rst) reg_out[87:80] <= 8'b00000000;
+  always @(posedge clk)
+    if ( rst ) reg_out_T  [87:80] <= ( { 8{ rst_T  }} ) & ( { 8{ reg_out_S != 0 }} );
+  always @(posedge clk)
+    if ( rst ) reg_out_t_flag  [87:80] <= reg_out_t_flag  [87:80] ? 1 : (rst_T  ) & ( reg_out_S != 0 );
+  always @(posedge clk)
+    if ( rst ) reg_out_r_flag  [87:80] <= reg_out_r_flag  [87:80] ? 1 : reg_out_t_flag  [87:80] ? 0 : ( |reg_out_R  [87:80] ) ;
+  always @(posedge clk)
+    if ( wr10 ) reg_out_T  [87:80] <= ( data_in_T  | { 8{ wr10_T  }} ) & ( { 8{ reg_out_S != data_in_S }} );
+  always @(posedge clk)
+    if ( wr10 ) reg_out_t_flag  [87:80] <= reg_out_t_flag  [87:80] ? 1 : ( ( |data_in_T  ) || wr10_T  ) & ( reg_out_S != data_in_S );
+  always @(posedge clk)
+    if ( wr10 ) reg_out_r_flag  [87:80] <= reg_out_r_flag  [87:80] ? 1 : reg_out_t_flag  [87:80] ? 0 : ( |reg_out_R  [87:80] ) ;
+  logic [7:0] data_in_R10 ;
+  assign data_in_R10 = { 8{ wr10 }} & data_in_T ;
+  always @(posedge clk)
+    if (rst) reg_out[95:88] <= 8'b00000000;
+  always @(posedge clk)
+    if ( rst ) reg_out_T  [95:88] <= ( { 8{ rst_T  }} ) & ( { 8{ reg_out_S != 0 }} );
+  always @(posedge clk)
+    if ( rst ) reg_out_t_flag  [95:88] <= reg_out_t_flag  [95:88] ? 1 : (rst_T  ) & ( reg_out_S != 0 );
+  always @(posedge clk)
+    if ( rst ) reg_out_r_flag  [95:88] <= reg_out_r_flag  [95:88] ? 1 : reg_out_t_flag  [95:88] ? 0 : ( |reg_out_R  [95:88] ) ;
+  always @(posedge clk)
+    if ( wr11 ) reg_out_T  [95:88] <= ( data_in_T  | { 8{ wr11_T  }} ) & ( { 8{ reg_out_S != data_in_S }} );
+  always @(posedge clk)
+    if ( wr11 ) reg_out_t_flag  [95:88] <= reg_out_t_flag  [95:88] ? 1 : ( ( |data_in_T  ) || wr11_T  ) & ( reg_out_S != data_in_S );
+  always @(posedge clk)
+    if ( wr11 ) reg_out_r_flag  [95:88] <= reg_out_r_flag  [95:88] ? 1 : reg_out_t_flag  [95:88] ? 0 : ( |reg_out_R  [95:88] ) ;
+  logic [7:0] data_in_R11 ;
+  assign data_in_R11 = { 8{ wr11 }} & data_in_T ;
+  always @(posedge clk)
+    if (rst) reg_out[103:96] <= 8'b00000000;
+  always @(posedge clk)
+    if ( rst ) reg_out_T  [103:96] <= ( { 8{ rst_T  }} ) & ( { 8{ reg_out_S != 0 }} );
+  always @(posedge clk)
+    if ( rst ) reg_out_t_flag  [103:96] <= reg_out_t_flag  [103:96] ? 1 : (rst_T  ) & ( reg_out_S != 0 );
+  always @(posedge clk)
+    if ( rst ) reg_out_r_flag  [103:96] <= reg_out_r_flag  [103:96] ? 1 : reg_out_t_flag  [103:96] ? 0 : ( |reg_out_R  [103:96] ) ;
+  always @(posedge clk)
+    if ( wr12 ) reg_out_T  [103:96] <= ( data_in_T  | { 8{ wr12_T  }} ) & ( { 8{ reg_out_S != data_in_S }} );
+  always @(posedge clk)
+    if ( wr12 ) reg_out_t_flag  [103:96] <= reg_out_t_flag  [103:96] ? 1 : ( ( |data_in_T  ) || wr12_T  ) & ( reg_out_S != data_in_S );
+  always @(posedge clk)
+    if ( wr12 ) reg_out_r_flag  [103:96] <= reg_out_r_flag  [103:96] ? 1 : reg_out_t_flag  [103:96] ? 0 : ( |reg_out_R  [103:96] ) ;
+  logic [7:0] data_in_R12 ;
+  assign data_in_R12 = { 8{ wr12 }} & data_in_T ;
+  always @(posedge clk)
+    if (rst) reg_out[111:104] <= 8'b00000000;
+  always @(posedge clk)
+    if ( rst ) reg_out_T  [111:104] <= ( { 8{ rst_T  }} ) & ( { 8{ reg_out_S != 0 }} );
+  always @(posedge clk)
+    if ( rst ) reg_out_t_flag  [111:104] <= reg_out_t_flag  [111:104] ? 1 : (rst_T  ) & ( reg_out_S != 0 );
+  always @(posedge clk)
+    if ( rst ) reg_out_r_flag  [111:104] <= reg_out_r_flag  [111:104] ? 1 : reg_out_t_flag  [111:104] ? 0 : ( |reg_out_R  [111:104] ) ;
+  always @(posedge clk)
+    if ( wr13 ) reg_out_T  [111:104] <= ( data_in_T  | { 8{ wr13_T  }} ) & ( { 8{ reg_out_S != data_in_S }} );
+  always @(posedge clk)
+    if ( wr13 ) reg_out_t_flag  [111:104] <= reg_out_t_flag  [111:104] ? 1 : ( ( |data_in_T  ) || wr13_T  ) & ( reg_out_S != data_in_S );
+  always @(posedge clk)
+    if ( wr13 ) reg_out_r_flag  [111:104] <= reg_out_r_flag  [111:104] ? 1 : reg_out_t_flag  [111:104] ? 0 : ( |reg_out_R  [111:104] ) ;
+  logic [7:0] data_in_R13 ;
+  assign data_in_R13 = { 8{ wr13 }} & data_in_T ;
+  always @(posedge clk)
+    if (rst) reg_out[119:112] <= 8'b00000000;
+  always @(posedge clk)
+    if ( rst ) reg_out_T  [119:112] <= ( { 8{ rst_T  }} ) & ( { 8{ reg_out_S != 0 }} );
+  always @(posedge clk)
+    if ( rst ) reg_out_t_flag  [119:112] <= reg_out_t_flag  [119:112] ? 1 : (rst_T  ) & ( reg_out_S != 0 );
+  always @(posedge clk)
+    if ( rst ) reg_out_r_flag  [119:112] <= reg_out_r_flag  [119:112] ? 1 : reg_out_t_flag  [119:112] ? 0 : ( |reg_out_R  [119:112] ) ;
+  always @(posedge clk)
+    if ( wr14 ) reg_out_T  [119:112] <= ( data_in_T  | { 8{ wr14_T  }} ) & ( { 8{ reg_out_S != data_in_S }} );
+  always @(posedge clk)
+    if ( wr14 ) reg_out_t_flag  [119:112] <= reg_out_t_flag  [119:112] ? 1 : ( ( |data_in_T  ) || wr14_T  ) & ( reg_out_S != data_in_S );
+  always @(posedge clk)
+    if ( wr14 ) reg_out_r_flag  [119:112] <= reg_out_r_flag  [119:112] ? 1 : reg_out_t_flag  [119:112] ? 0 : ( |reg_out_R  [119:112] ) ;
+  logic [7:0] data_in_R14 ;
+  assign data_in_R14 = { 8{ wr14 }} & data_in_T ;
+  always @(posedge clk)
+    if (rst) reg_out[127:120] <= 8'b00000000;
+  always @(posedge clk)
+    if ( rst ) reg_out_T  [127:120] <= ( { 8{ rst_T  }} ) & ( { 8{ reg_out_S != 0 }} );
+  always @(posedge clk)
+    if ( rst ) reg_out_t_flag  [127:120] <= reg_out_t_flag  [127:120] ? 1 : (rst_T  ) & ( reg_out_S != 0 );
+  always @(posedge clk)
+    if ( rst ) reg_out_r_flag  [127:120] <= reg_out_r_flag  [127:120] ? 1 : reg_out_t_flag  [127:120] ? 0 : ( |reg_out_R  [127:120] ) ;
+  always @(posedge clk)
+    if ( wr15 ) reg_out_T  [127:120] <= ( data_in_T  | { 8{ wr15_T  }} ) & ( { 8{ reg_out_S != data_in_S }} );
+  always @(posedge clk)
+    if ( wr15 ) reg_out_t_flag  [127:120] <= reg_out_t_flag  [127:120] ? 1 : ( ( |data_in_T  ) || wr15_T  ) & ( reg_out_S != data_in_S );
+  always @(posedge clk)
+    if ( wr15 ) reg_out_r_flag  [127:120] <= reg_out_r_flag  [127:120] ? 1 : reg_out_t_flag  [127:120] ? 0 : ( |reg_out_R  [127:120] ) ;
+  logic [7:0] data_in_R15 ;
+  assign data_in_R15 = { 8{ wr15 }} & data_in_T ;
+  assign _00_ = ! addr;
+  logic [3:0] addr_R0 ;
+  assign _00__T = | addr_T ;
+  assign addr_R0 = { 4{ _00__R }} ;
+  assign _00__S = 0 ;
+  assign _01_ = addr == 1'b1;
+  assign _01__S = 0 ;
+  logic [3:0] addr_R1 ;
+  assign _01__T = | addr_T ;
+  assign addr_R1 = { 4{ _01__R }} ;
+  assign _02_ = addr == 2'b10;
+  assign _02__S = 0 ;
+  logic [3:0] addr_R2 ;
+  assign _02__T = | addr_T ;
+  assign addr_R2 = { 4{ _02__R }} ;
+  assign _03_ = addr == 2'b11;
+  assign _03__S = 0 ;
+  logic [3:0] addr_R3 ;
+  assign _03__T = | addr_T ;
+  assign addr_R3 = { 4{ _03__R }} ;
+  assign _04_ = addr == 3'b100;
+  assign _04__S = 0 ;
+  logic [3:0] addr_R4 ;
+  assign _04__T = | addr_T ;
+  assign addr_R4 = { 4{ _04__R }} ;
+  assign _05_ = addr == 3'b101;
+  assign _05__S = 0 ;
+  logic [3:0] addr_R5 ;
+  assign _05__T = | addr_T ;
+  assign addr_R5 = { 4{ _05__R }} ;
+  assign _06_ = addr == 3'b110;
+  assign _06__S = 0 ;
+  logic [3:0] addr_R6 ;
+  assign _06__T = | addr_T ;
+  assign addr_R6 = { 4{ _06__R }} ;
+  assign _07_ = addr == 3'b111;
+  assign _07__S = 0 ;
+  logic [3:0] addr_R7 ;
+  assign _07__T = | addr_T ;
+  assign addr_R7 = { 4{ _07__R }} ;
+  assign _08_ = addr == 4'b1000;
+  assign _08__S = 0 ;
+  logic [3:0] addr_R8 ;
+  assign _08__T = | addr_T ;
+  assign addr_R8 = { 4{ _08__R }} ;
+  assign _09_ = addr == 4'b1001;
+  assign _09__S = 0 ;
+  logic [3:0] addr_R9 ;
+  assign _09__T = | addr_T ;
+  assign addr_R9 = { 4{ _09__R }} ;
+  assign _10_ = addr == 4'b1010;
+  assign _10__S = 0 ;
+  logic [3:0] addr_R10 ;
+  assign _10__T = | addr_T ;
+  assign addr_R10 = { 4{ _10__R }} ;
+  assign _11_ = addr == 4'b1011;
+  assign _11__S = 0 ;
+  logic [3:0] addr_R11 ;
+  assign _11__T = | addr_T ;
+  assign addr_R11 = { 4{ _11__R }} ;
+  assign _12_ = addr == 4'b1100;
+  assign _12__S = 0 ;
+  logic [3:0] addr_R12 ;
+  assign _12__T = | addr_T ;
+  assign addr_R12 = { 4{ _12__R }} ;
+  assign _13_ = addr == 4'b1101;
+  assign _13__S = 0 ;
+  logic [3:0] addr_R13 ;
+  assign _13__T = | addr_T ;
+  assign addr_R13 = { 4{ _13__R }} ;
+  assign _14_ = addr == 4'b1110;
+  assign _14__S = 0 ;
+  logic [3:0] addr_R14 ;
+  assign _14__T = | addr_T ;
+  assign addr_R14 = { 4{ _14__R }} ;
+  assign _15_ = addr == 4'b1111;
+  assign _15__S = 0 ;
+  logic [3:0] addr_R15 ;
+  assign _15__T = | addr_T ;
+  assign addr_R15 = { 4{ _15__R }} ;
+  assign _16_ = en && wr;
+  assign _16__S = 0 ;
+  logic [0:0] en_R0 ;
+  logic [0:0] wr_R0 ;
+  assign _16__T = ( en_T && wr ) | ( wr_T && en ) ;
+  assign en_R0 =  _16__R & { 1{ wr != 0 }} ;
+  assign wr_R0 =  _16__R & { 1{ en != 0 }} ;
+  assign wr0 = _16_ && _00_;
+  assign wr0_S = 0 ;
+  logic [0:0] _16__R0 ;
+  logic [0:0] _00__R0 ;
+  assign wr0_T = ( _16__T && _00_ ) | ( _00__T && _16_ ) ;
+  assign _16__R0 =  wr0_R & { 1{ _00_ != 0 }} ;
+  assign _00__R0 =  wr0_R & { 1{ _16_ != 0 }} ;
+  assign wr1 = _16_ && _01_;
+  assign wr1_S = 0 ;
+  logic [0:0] _16__R1 ;
+  logic [0:0] _01__R0 ;
+  assign wr1_T = ( _16__T && _01_ ) | ( _01__T && _16_ ) ;
+  assign _16__R1 =  wr1_R & { 1{ _01_ != 0 }} ;
+  assign _01__R0 =  wr1_R & { 1{ _16_ != 0 }} ;
+  assign wr2 = _16_ && _02_;
+  assign wr2_S = 0 ;
+  logic [0:0] _16__R2 ;
+  logic [0:0] _02__R0 ;
+  assign wr2_T = ( _16__T && _02_ ) | ( _02__T && _16_ ) ;
+  assign _16__R2 =  wr2_R & { 1{ _02_ != 0 }} ;
+  assign _02__R0 =  wr2_R & { 1{ _16_ != 0 }} ;
+  assign wr3 = _16_ && _03_;
+  assign wr3_S = 0 ;
+  logic [0:0] _16__R3 ;
+  logic [0:0] _03__R0 ;
+  assign wr3_T = ( _16__T && _03_ ) | ( _03__T && _16_ ) ;
+  assign _16__R3 =  wr3_R & { 1{ _03_ != 0 }} ;
+  assign _03__R0 =  wr3_R & { 1{ _16_ != 0 }} ;
+  assign wr4 = _16_ && _04_;
+  assign wr4_S = 0 ;
+  logic [0:0] _16__R4 ;
+  logic [0:0] _04__R0 ;
+  assign wr4_T = ( _16__T && _04_ ) | ( _04__T && _16_ ) ;
+  assign _16__R4 =  wr4_R & { 1{ _04_ != 0 }} ;
+  assign _04__R0 =  wr4_R & { 1{ _16_ != 0 }} ;
+  assign wr5 = _16_ && _05_;
+  assign wr5_S = 0 ;
+  logic [0:0] _16__R5 ;
+  logic [0:0] _05__R0 ;
+  assign wr5_T = ( _16__T && _05_ ) | ( _05__T && _16_ ) ;
+  assign _16__R5 =  wr5_R & { 1{ _05_ != 0 }} ;
+  assign _05__R0 =  wr5_R & { 1{ _16_ != 0 }} ;
+  assign wr6 = _16_ && _06_;
+  assign wr6_S = 0 ;
+  logic [0:0] _16__R6 ;
+  logic [0:0] _06__R0 ;
+  assign wr6_T = ( _16__T && _06_ ) | ( _06__T && _16_ ) ;
+  assign _16__R6 =  wr6_R & { 1{ _06_ != 0 }} ;
+  assign _06__R0 =  wr6_R & { 1{ _16_ != 0 }} ;
+  assign wr7 = _16_ && _07_;
+  assign wr7_S = 0 ;
+  logic [0:0] _16__R7 ;
+  logic [0:0] _07__R0 ;
+  assign wr7_T = ( _16__T && _07_ ) | ( _07__T && _16_ ) ;
+  assign _16__R7 =  wr7_R & { 1{ _07_ != 0 }} ;
+  assign _07__R0 =  wr7_R & { 1{ _16_ != 0 }} ;
+  assign wr8 = _16_ && _08_;
+  assign wr8_S = 0 ;
+  logic [0:0] _16__R8 ;
+  logic [0:0] _08__R0 ;
+  assign wr8_T = ( _16__T && _08_ ) | ( _08__T && _16_ ) ;
+  assign _16__R8 =  wr8_R & { 1{ _08_ != 0 }} ;
+  assign _08__R0 =  wr8_R & { 1{ _16_ != 0 }} ;
+  assign wr9 = _16_ && _09_;
+  assign wr9_S = 0 ;
+  logic [0:0] _16__R9 ;
+  logic [0:0] _09__R0 ;
+  assign wr9_T = ( _16__T && _09_ ) | ( _09__T && _16_ ) ;
+  assign _16__R9 =  wr9_R & { 1{ _09_ != 0 }} ;
+  assign _09__R0 =  wr9_R & { 1{ _16_ != 0 }} ;
+  assign wr10 = _16_ && _10_;
+  assign wr10_S = 0 ;
+  logic [0:0] _16__R10 ;
+  logic [0:0] _10__R0 ;
+  assign wr10_T = ( _16__T && _10_ ) | ( _10__T && _16_ ) ;
+  assign _16__R10 =  wr10_R & { 1{ _10_ != 0 }} ;
+  assign _10__R0 =  wr10_R & { 1{ _16_ != 0 }} ;
+  assign wr11 = _16_ && _11_;
+  assign wr11_S = 0 ;
+  logic [0:0] _16__R11 ;
+  logic [0:0] _11__R0 ;
+  assign wr11_T = ( _16__T && _11_ ) | ( _11__T && _16_ ) ;
+  assign _16__R11 =  wr11_R & { 1{ _11_ != 0 }} ;
+  assign _11__R0 =  wr11_R & { 1{ _16_ != 0 }} ;
+  assign wr12 = _16_ && _12_;
+  assign wr12_S = 0 ;
+  logic [0:0] _16__R12 ;
+  logic [0:0] _12__R0 ;
+  assign wr12_T = ( _16__T && _12_ ) | ( _12__T && _16_ ) ;
+  assign _16__R12 =  wr12_R & { 1{ _12_ != 0 }} ;
+  assign _12__R0 =  wr12_R & { 1{ _16_ != 0 }} ;
+  assign wr13 = _16_ && _13_;
+  assign wr13_S = 0 ;
+  logic [0:0] _16__R13 ;
+  logic [0:0] _13__R0 ;
+  assign wr13_T = ( _16__T && _13_ ) | ( _13__T && _16_ ) ;
+  assign _16__R13 =  wr13_R & { 1{ _13_ != 0 }} ;
+  assign _13__R0 =  wr13_R & { 1{ _16_ != 0 }} ;
+  assign wr14 = _16_ && _14_;
+  assign wr14_S = 0 ;
+  logic [0:0] _16__R14 ;
+  logic [0:0] _14__R0 ;
+  assign wr14_T = ( _16__T && _14_ ) | ( _14__T && _16_ ) ;
+  assign _16__R14 =  wr14_R & { 1{ _14_ != 0 }} ;
+  assign _14__R0 =  wr14_R & { 1{ _16_ != 0 }} ;
+  assign wr15 = _16_ && _15_;
+  assign wr15_S = 0 ;
+  logic [0:0] _16__R15 ;
+  logic [0:0] _15__R0 ;
+  assign wr15_T = ( _16__T && _15_ ) | ( _15__T && _16_ ) ;
+  assign _16__R15 =  wr15_R & { 1{ _15_ != 0 }} ;
+  assign _15__R0 =  wr15_R & { 1{ _16_ != 0 }} ;
+  assign data_out = _00_ ? reg_out[7:0] : _17_;
+  logic [0:0] _00__R1 ;
+  assign _00__R1 = ( | data_out_R ) && reg_out[7:0] != _17_ ;
+  assign data_out_T = _00_ ? ( { 8{ _00__T  }} | reg_out_T [7:0] ) : ( { 8{ _00__T  }} | _17__T );
+  assign data_out_S = _00_ ? reg_out_S : _17__S ;
+  logic [127:0] reg_out_R1 ;
+  assign reg_out_R1 [7:0] = { 8{ _00_ }} & ( data_out_R );
+  logic [7:0] _17__R0 ;
+  assign _17__R0 = { 8{ !_00_ }} & ( data_out_R );
+  assign _17_ = _01_ ? reg_out[15:8] : _18_;
+  logic [0:0] _01__R1 ;
+  assign _01__R1 = ( | _17__R ) && reg_out[15:8] != _18_ ;
+  assign _17__T = _01_ ? ( { 8{ _01__T  }} | reg_out_T [15:8] ) : ( { 8{ _01__T  }} | _18__T );
+  assign _17__S = _01_ ? reg_out_S : _18__S ;
+  assign reg_out_R1 [15:8] = { 8{ _01_ }} & ( _17__R );
+  logic [7:0] _18__R0 ;
+  assign _18__R0 = { 8{ !_01_ }} & ( _17__R );
+  assign _18_ = _02_ ? reg_out[23:16] : _19_;
+  logic [0:0] _02__R1 ;
+  assign _02__R1 = ( | _18__R ) && reg_out[23:16] != _19_ ;
+  assign _18__T = _02_ ? ( { 8{ _02__T  }} | reg_out_T [23:16] ) : ( { 8{ _02__T  }} | _19__T );
+  assign _18__S = _02_ ? reg_out_S : _19__S ;
+  assign reg_out_R1 [23:16] = { 8{ _02_ }} & ( _18__R );
+  logic [7:0] _19__R0 ;
+  assign _19__R0 = { 8{ !_02_ }} & ( _18__R );
+  assign _19_ = _03_ ? reg_out[31:24] : _20_;
+  logic [0:0] _03__R1 ;
+  assign _03__R1 = ( | _19__R ) && reg_out[31:24] != _20_ ;
+  assign _19__T = _03_ ? ( { 8{ _03__T  }} | reg_out_T [31:24] ) : ( { 8{ _03__T  }} | _20__T );
+  assign _19__S = _03_ ? reg_out_S : _20__S ;
+  assign reg_out_R1 [31:24] = { 8{ _03_ }} & ( _19__R );
+  logic [7:0] _20__R0 ;
+  assign _20__R0 = { 8{ !_03_ }} & ( _19__R );
+  assign _20_ = _04_ ? reg_out[39:32] : _21_;
+  logic [0:0] _04__R1 ;
+  assign _04__R1 = ( | _20__R ) && reg_out[39:32] != _21_ ;
+  assign _20__T = _04_ ? ( { 8{ _04__T  }} | reg_out_T [39:32] ) : ( { 8{ _04__T  }} | _21__T );
+  assign _20__S = _04_ ? reg_out_S : _21__S ;
+  assign reg_out_R1 [39:32] = { 8{ _04_ }} & ( _20__R );
+  logic [7:0] _21__R0 ;
+  assign _21__R0 = { 8{ !_04_ }} & ( _20__R );
+  assign _21_ = _05_ ? reg_out[47:40] : _22_;
+  logic [0:0] _05__R1 ;
+  assign _05__R1 = ( | _21__R ) && reg_out[47:40] != _22_ ;
+  assign _21__T = _05_ ? ( { 8{ _05__T  }} | reg_out_T [47:40] ) : ( { 8{ _05__T  }} | _22__T );
+  assign _21__S = _05_ ? reg_out_S : _22__S ;
+  assign reg_out_R1 [47:40] = { 8{ _05_ }} & ( _21__R );
+  logic [7:0] _22__R0 ;
+  assign _22__R0 = { 8{ !_05_ }} & ( _21__R );
+  assign _22_ = _06_ ? reg_out[55:48] : _23_;
+  logic [0:0] _06__R1 ;
+  assign _06__R1 = ( | _22__R ) && reg_out[55:48] != _23_ ;
+  assign _22__T = _06_ ? ( { 8{ _06__T  }} | reg_out_T [55:48] ) : ( { 8{ _06__T  }} | _23__T );
+  assign _22__S = _06_ ? reg_out_S : _23__S ;
+  assign reg_out_R1 [55:48] = { 8{ _06_ }} & ( _22__R );
+  logic [7:0] _23__R0 ;
+  assign _23__R0 = { 8{ !_06_ }} & ( _22__R );
+  assign _23_ = _07_ ? reg_out[63:56] : _24_;
+  logic [0:0] _07__R1 ;
+  assign _07__R1 = ( | _23__R ) && reg_out[63:56] != _24_ ;
+  assign _23__T = _07_ ? ( { 8{ _07__T  }} | reg_out_T [63:56] ) : ( { 8{ _07__T  }} | _24__T );
+  assign _23__S = _07_ ? reg_out_S : _24__S ;
+  assign reg_out_R1 [63:56] = { 8{ _07_ }} & ( _23__R );
+  logic [7:0] _24__R0 ;
+  assign _24__R0 = { 8{ !_07_ }} & ( _23__R );
+  assign _24_ = _08_ ? reg_out[71:64] : _25_;
+  logic [0:0] _08__R1 ;
+  assign _08__R1 = ( | _24__R ) && reg_out[71:64] != _25_ ;
+  assign _24__T = _08_ ? ( { 8{ _08__T  }} | reg_out_T [71:64] ) : ( { 8{ _08__T  }} | _25__T );
+  assign _24__S = _08_ ? reg_out_S : _25__S ;
+  assign reg_out_R1 [71:64] = { 8{ _08_ }} & ( _24__R );
+  logic [7:0] _25__R0 ;
+  assign _25__R0 = { 8{ !_08_ }} & ( _24__R );
+  assign _25_ = _09_ ? reg_out[79:72] : _26_;
+  logic [0:0] _09__R1 ;
+  assign _09__R1 = ( | _25__R ) && reg_out[79:72] != _26_ ;
+  assign _25__T = _09_ ? ( { 8{ _09__T  }} | reg_out_T [79:72] ) : ( { 8{ _09__T  }} | _26__T );
+  assign _25__S = _09_ ? reg_out_S : _26__S ;
+  assign reg_out_R1 [79:72] = { 8{ _09_ }} & ( _25__R );
+  logic [7:0] _26__R0 ;
+  assign _26__R0 = { 8{ !_09_ }} & ( _25__R );
+  assign _26_ = _10_ ? reg_out[87:80] : _27_;
+  logic [0:0] _10__R1 ;
+  assign _10__R1 = ( | _26__R ) && reg_out[87:80] != _27_ ;
+  assign _26__T = _10_ ? ( { 8{ _10__T  }} | reg_out_T [87:80] ) : ( { 8{ _10__T  }} | _27__T );
+  assign _26__S = _10_ ? reg_out_S : _27__S ;
+  assign reg_out_R1 [87:80] = { 8{ _10_ }} & ( _26__R );
+  logic [7:0] _27__R0 ;
+  assign _27__R0 = { 8{ !_10_ }} & ( _26__R );
+  assign _27_ = _11_ ? reg_out[95:88] : _28_;
+  logic [0:0] _11__R1 ;
+  assign _11__R1 = ( | _27__R ) && reg_out[95:88] != _28_ ;
+  assign _27__T = _11_ ? ( { 8{ _11__T  }} | reg_out_T [95:88] ) : ( { 8{ _11__T  }} | _28__T );
+  assign _27__S = _11_ ? reg_out_S : _28__S ;
+  assign reg_out_R1 [95:88] = { 8{ _11_ }} & ( _27__R );
+  logic [7:0] _28__R0 ;
+  assign _28__R0 = { 8{ !_11_ }} & ( _27__R );
+  assign _28_ = _12_ ? reg_out[103:96] : _29_;
+  logic [0:0] _12__R1 ;
+  assign _12__R1 = ( | _28__R ) && reg_out[103:96] != _29_ ;
+  assign _28__T = _12_ ? ( { 8{ _12__T  }} | reg_out_T [103:96] ) : ( { 8{ _12__T  }} | _29__T );
+  assign _28__S = _12_ ? reg_out_S : _29__S ;
+  assign reg_out_R1 [103:96] = { 8{ _12_ }} & ( _28__R );
+  logic [7:0] _29__R0 ;
+  assign _29__R0 = { 8{ !_12_ }} & ( _28__R );
+  assign _29_ = _13_ ? reg_out[111:104] : _30_;
+  logic [0:0] _13__R1 ;
+  assign _13__R1 = ( | _29__R ) && reg_out[111:104] != _30_ ;
+  assign _29__T = _13_ ? ( { 8{ _13__T  }} | reg_out_T [111:104] ) : ( { 8{ _13__T  }} | _30__T );
+  assign _29__S = _13_ ? reg_out_S : _30__S ;
+  assign reg_out_R1 [111:104] = { 8{ _13_ }} & ( _29__R );
+  logic [7:0] _30__R0 ;
+  assign _30__R0 = { 8{ !_13_ }} & ( _29__R );
+  assign _30_ = _14_ ? reg_out[119:112] : reg_out[127:120];
+  logic [0:0] _14__R1 ;
+  assign _14__R1 = ( | _30__R ) && reg_out[119:112] != reg_out[127:120] ;
+  assign _30__T = _14_ ? ( { 8{ _14__T  }} | reg_out_T [119:112] ) : ( { 8{ _14__T  }} | reg_out_T [127:120] );
+  assign _30__S = _14_ ? reg_out_S : reg_out_S ;
+  assign reg_out_R1 [119:112] = { 8{ _14_ }} & ( _30__R );
+  assign reg_out_R1 [127:120] = { 8{ !_14_ }} & ( _30__R );
+  assign data_out_mux = data_out;
+  logic [7:0] data_out_R1 ;
+  assign data_out_mux_T = data_out_T ;
+  assign data_out_R1 = data_out_mux_R ;
+  assign data_out_mux_S = data_out_S ;
+  assign _29__R = ( _29__R0 );
+  assign _28__R = ( _28__R0 );
+  assign _27__R = ( _27__R0 );
+  assign _26__R = ( _26__R0 );
+  assign _30__R = ( _30__R0 );
+  assign _25__R = ( _25__R0 );
+  assign _24__R = ( _24__R0 );
+  assign _23__R = ( _23__R0 );
+  assign _22__R = ( _22__R0 );
+  assign _21__R = ( _21__R0 );
+  assign _20__R = ( _20__R0 );
+  assign _19__R = ( _19__R0 );
+  assign _18__R = ( _18__R0 );
+  assign _17__R = ( _17__R0 );
+  assign _15__R = ( _15__R0 );
+  assign _14__R = ( _14__R0 ) | ( _14__R1 );
+  assign _13__R = ( _13__R0 ) | ( _13__R1 );
+  assign _12__R = ( _12__R0 ) | ( _12__R1 );
+  assign _11__R = ( _11__R0 ) | ( _11__R1 );
+  assign _10__R = ( _10__R0 ) | ( _10__R1 );
+  assign _09__R = ( _09__R0 ) | ( _09__R1 );
+  assign _08__R = ( _08__R0 ) | ( _08__R1 );
+  assign _07__R = ( _07__R0 ) | ( _07__R1 );
+  assign _06__R = ( _06__R0 ) | ( _06__R1 );
+  assign _04__R = ( _04__R0 ) | ( _04__R1 );
+  assign _05__R = ( _05__R0 ) | ( _05__R1 );
+  assign _03__R = ( _03__R0 ) | ( _03__R1 );
+  assign _02__R = ( _02__R0 ) | ( _02__R1 );
+  assign _01__R = ( _01__R0 ) | ( _01__R1 );
+  assign _00__R = ( _00__R0 ) | ( _00__R1 );
+  assign _16__R = ( _16__R0 ) | ( _16__R1 ) | ( _16__R2 ) | ( _16__R3 ) | ( _16__R4 ) | ( _16__R5 ) | ( _16__R6 ) | ( _16__R7 ) | ( _16__R8 ) | ( _16__R9 ) | ( _16__R10 ) | ( _16__R11 ) | ( _16__R12 ) | ( _16__R13 ) | ( _16__R14 ) | ( _16__R15 );
+  assign wr_R = ( wr_R0 );
+  assign en_R = ( en_R0 );
+  assign addr_R = ( addr_R0 ) | ( addr_R1 ) | ( addr_R2 ) | ( addr_R3 ) | ( addr_R4 ) | ( addr_R5 ) | ( addr_R6 ) | ( addr_R7 ) | ( addr_R8 ) | ( addr_R9 ) | ( addr_R10 ) | ( addr_R11 ) | ( addr_R12 ) | ( addr_R13 ) | ( addr_R14 ) | ( addr_R15 );
+  assign data_in_R = ( data_in_R0 ) | ( data_in_R1 ) | ( data_in_R2 ) | ( data_in_R3 ) | ( data_in_R4 ) | ( data_in_R5 ) | ( data_in_R6 ) | ( data_in_R7 ) | ( data_in_R8 ) | ( data_in_R9 ) | ( data_in_R10 ) | ( data_in_R11 ) | ( data_in_R12 ) | ( data_in_R13 ) | ( data_in_R14 ) | ( data_in_R15 );
+  assign reg_out_R = ( reg_out_R0 ) | ( reg_out_R1 );
+  assign data_out_R = ( data_out_R0 ) | ( data_out_R1 );
+ // ground taints for floating regs
+ // ground taints for unused wires
+  assign { data_out_mux_R , wr0_R , wr1_R , wr10_R , wr11_R , wr12_R , wr13_R , wr14_R , wr15_R , wr2_R , wr3_R , wr4_R , wr5_R , wr6_R , wr7_R , wr8_R , wr9_R , clk_R , rst_R  } = 0;
+ // ground taints for unused wire slices
+  wire zy_assert11 = ( reg_out_r_flag == 0 )  || zy_end_sig ;
+  assert reg_out_asst (
+    .clk( clk ),
+    .test( zy_assert11 )
+  );
+endmodule
+

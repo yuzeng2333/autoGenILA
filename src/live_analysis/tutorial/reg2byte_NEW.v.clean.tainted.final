@@ -1,0 +1,155 @@
+module reg2byte ( addr , clk , data_in , en , rst , wr , INSTR_IN_ZY , zy_end_sig , rst_zy , addr_T , addr_S , data_in_T , data_in_S , data_out_R0 , en_T , en_S , reg_out_R0 , rst_T , rst_S , wr_T , wr_S , data_out , reg_out , addr_R , data_in_R , data_out_T , data_out_S , en_R , reg_out_T , reg_out_S , rst_R , wr_R );
+  input rst_zy;
+  input zy_end_sig;
+  integer i;
+  input INSTR_IN_ZY;
+  wire _0_;
+  logic _0__T ;
+  logic _0__R ;
+  logic [4:0] _0__S ;
+  wire _1_;
+  logic _1__T ;
+  logic _1__R ;
+  logic [4:0] _1__S ;
+  input addr;
+  input addr_T ;
+  output addr_R ;
+  input [4:0] addr_S ;
+  input clk;
+  input [7:0] data_in;
+  input [7:0] data_in_T ;
+  output [7:0] data_in_R ;
+  input [4:0] data_in_S ;
+  output [7:0] data_out;
+  output [7:0] data_out_T ;
+  logic [7:0] data_out_T ;
+  logic [7:0] data_out_R ;
+  logic [4:0] data_out_S ;
+  input [7:0] data_out_R0 ;
+  output [4:0] data_out_S ;
+  wire [7:0] data_out_mux;
+  logic [7:0] data_out_mux_T ;
+  logic [7:0] data_out_mux_R ;
+  logic [4:0] data_out_mux_S ;
+  input en;
+  input en_T ;
+  output en_R ;
+  input [4:0] en_S ;
+  output [15:0] reg_out;
+  output [15:0] reg_out_T ;
+  logic [15:0] reg_out_T ;
+  logic [15:0] reg_out_R ;
+  logic [4:0] reg_out_S ;
+  input [15:0] reg_out_R0 ;
+  output [4:0] reg_out_S ;
+  reg [15:0] reg_out;
+  logic [15:0]  reg_out_T ;
+  logic reg_out_t_flag ;
+  logic reg_out_r_flag ;
+  assign reg_out_S = 15 ;
+  input rst;
+  input rst_T ;
+  output rst_R ;
+  input [4:0] rst_S ;
+  input wr;
+  input wr_T ;
+  output wr_R ;
+  input [4:0] wr_S ;
+  wire wr0;
+  logic wr0_T ;
+  logic wr0_R ;
+  logic [4:0] wr0_S ;
+  wire wr1;
+  logic wr1_T ;
+  logic wr1_R ;
+  logic [4:0] wr1_S ;
+  always @(posedge clk)
+    if (rst) reg_out[7:0] <= 8'b00000000;
+  always @(posedge clk)
+    if ( rst ) reg_out_T  [7:0] <= ( { 8{ rst_T  }} ) & ( { 8{ reg_out_S != 0 }} );
+  always @(posedge clk)
+    if ( rst ) reg_out_t_flag  [7:0] <= reg_out_t_flag  [7:0] ? 1 : (rst_T  ) & ( reg_out_S != 0 );
+  always @(posedge clk)
+    if ( rst ) reg_out_r_flag  [7:0] <= reg_out_r_flag  [7:0] ? 1 : reg_out_t_flag  [7:0] ? 0 : ( |reg_out_R  [7:0] ) ;
+  always @(posedge clk)
+    if ( wr0 ) reg_out_T  [7:0] <= ( data_in_T  | { 8{ wr0_T  }} ) & ( { 8{ reg_out_S != data_in_S }} );
+  always @(posedge clk)
+    if ( wr0 ) reg_out_t_flag  [7:0] <= reg_out_t_flag  [7:0] ? 1 : ( ( |data_in_T  ) || wr0_T  ) & ( reg_out_S != data_in_S );
+  always @(posedge clk)
+    if ( wr0 ) reg_out_r_flag  [7:0] <= reg_out_r_flag  [7:0] ? 1 : reg_out_t_flag  [7:0] ? 0 : ( |reg_out_R  [7:0] ) ;
+  logic [7:0] data_in_R0 ;
+  assign data_in_R0 = { 8{ wr0 }} & data_in_T ;
+  always @(posedge clk)
+    if (rst) reg_out[15:8] <= 8'b00000000;
+  always @(posedge clk)
+    if ( rst ) reg_out_T  [15:8] <= ( { 8{ rst_T  }} ) & ( { 8{ reg_out_S != 0 }} );
+  always @(posedge clk)
+    if ( rst ) reg_out_t_flag  [15:8] <= reg_out_t_flag  [15:8] ? 1 : (rst_T  ) & ( reg_out_S != 0 );
+  always @(posedge clk)
+    if ( rst ) reg_out_r_flag  [15:8] <= reg_out_r_flag  [15:8] ? 1 : reg_out_t_flag  [15:8] ? 0 : ( |reg_out_R  [15:8] ) ;
+  always @(posedge clk)
+    if ( wr1 ) reg_out_T  [15:8] <= ( data_in_T  | { 8{ wr1_T  }} ) & ( { 8{ reg_out_S != data_in_S }} );
+  always @(posedge clk)
+    if ( wr1 ) reg_out_t_flag  [15:8] <= reg_out_t_flag  [15:8] ? 1 : ( ( |data_in_T  ) || wr1_T  ) & ( reg_out_S != data_in_S );
+  always @(posedge clk)
+    if ( wr1 ) reg_out_r_flag  [15:8] <= reg_out_r_flag  [15:8] ? 1 : reg_out_t_flag  [15:8] ? 0 : ( |reg_out_R  [15:8] ) ;
+  logic [7:0] data_in_R1 ;
+  assign data_in_R1 = { 8{ wr1 }} & data_in_T ;
+  assign _0_ = ~ addr;
+  logic [0:0] addr_R0 ;
+  assign _0__T = addr_T ;
+  assign addr_R0 = _0__R ;
+  assign _0__S = 0 ;
+  assign _1_ = en && wr;
+  assign _1__S = 0 ;
+  logic [0:0] en_R0 ;
+  logic [0:0] wr_R0 ;
+  assign _1__T = ( en_T && wr ) | ( wr_T && en ) ;
+  assign en_R0 =  _1__R & { 1{ wr != 0 }} ;
+  assign wr_R0 =  _1__R & { 1{ en != 0 }} ;
+  assign wr0 = _1_ && _0_;
+  assign wr0_S = 0 ;
+  logic [0:0] _1__R0 ;
+  logic [0:0] _0__R0 ;
+  assign wr0_T = ( _1__T && _0_ ) | ( _0__T && _1_ ) ;
+  assign _1__R0 =  wr0_R & { 1{ _0_ != 0 }} ;
+  assign _0__R0 =  wr0_R & { 1{ _1_ != 0 }} ;
+  assign wr1 = _1_ && addr;
+  assign wr1_S = 0 ;
+  logic [0:0] _1__R1 ;
+  logic [0:0] addr_R1 ;
+  assign wr1_T = ( _1__T && addr ) | ( addr_T && _1_ ) ;
+  assign _1__R1 =  wr1_R & { 1{ addr != 0 }} ;
+  assign addr_R1 =  wr1_R & { 1{ _1_ != 0 }} ;
+  assign data_out = addr ? reg_out[15:8] : reg_out[7:0];
+  logic [0:0] addr_R2 ;
+  assign addr_R2 = ( | data_out_R ) && reg_out[15:8] != reg_out[7:0] ;
+  assign data_out_T = addr ? ( { 8{ addr_T  }} | reg_out_T [15:8] ) : ( { 8{ addr_T  }} | reg_out_T [7:0] );
+  assign data_out_S = addr ? reg_out_S : reg_out_S ;
+  logic [15:0] reg_out_R1 ;
+  assign reg_out_R1 [15:8] = { 8{ addr }} & ( data_out_R );
+  assign reg_out_R1 [7:0] = { 8{ !addr }} & ( data_out_R );
+  assign data_out_mux = data_out;
+  logic [7:0] data_out_R1 ;
+  assign data_out_mux_T = data_out_T ;
+  assign data_out_R1 = data_out_mux_R ;
+  assign data_out_mux_S = data_out_S ;
+  assign _0__R = ( _0__R0 );
+  assign _1__R = ( _1__R0 ) | ( _1__R1 );
+  assign wr_R = ( wr_R0 );
+  assign en_R = ( en_R0 );
+  assign addr_R = ( addr_R0 ) | ( addr_R1 ) | ( addr_R2 );
+  assign data_in_R = ( data_in_R0 ) | ( data_in_R1 );
+  assign reg_out_R = ( reg_out_R0 ) | ( reg_out_R1 );
+  assign data_out_R = ( data_out_R0 ) | ( data_out_R1 );
+ // ground taints for floating regs
+ // ground taints for unused wires
+  assign { data_out_mux_R , wr0_R , wr1_R , clk_R , rst_R  } = 0;
+ // ground taints for unused wire slices
+  wire zy_assert12 = ( reg_out_r_flag == 0 )  || zy_end_sig ;
+  assert reg_out_asst (
+    .clk( clk ),
+    .test( zy_assert12 )
+  );
+endmodule
+

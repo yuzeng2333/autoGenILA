@@ -1,0 +1,129 @@
+module final_round ( clk , key_in , state_in , INSTR_IN_ZY , zy_end_sig , rst_zy , state_out , state_in_R );
+  input rst_zy;
+  input zy_end_sig;
+  integer i;
+  input INSTR_IN_ZY;
+  input clk;
+  logic [31:0] k0;
+  logic [31:0] k1;
+  logic [31:0] k2;
+  logic [31:0] k3;
+  input [127:0] key_in;
+  logic [7:0] p00;
+  logic [7:0] p01;
+  logic [7:0] p02;
+  logic [7:0] p03;
+  logic [7:0] p10;
+  logic [7:0] p11;
+  logic [7:0] p12;
+  logic [7:0] p13;
+  logic [7:0] p20;
+  logic [7:0] p21;
+  logic [7:0] p22;
+  logic [7:0] p23;
+  logic [7:0] p30;
+  logic [7:0] p31;
+  logic [7:0] p32;
+  logic [7:0] p33;
+  logic [31:0] s0;
+  logic [31:0] s1;
+  logic [31:0] s2;
+  logic [31:0] s3;
+  input [127:0] state_in;
+  output [127:0] state_out;
+  logic [127:0] state_out ;
+  logic [127:0] state_out;
+  logic [127:0]  state_out_PREV_VAL1 ;
+  logic [31:0] z0;
+  logic [31:0] z1;
+  logic [31:0] z2;
+  logic [31:0] z3;
+  always @(posedge clk)
+      state_out <= fangyuan0;
+  logic [127:0] fangyuan0;
+  assign fangyuan0 = { z0, z1, z2, z3 };
+  logic [31:0] fangyuan1;
+  assign fangyuan1 = { p00, p11, p22, p33 };
+  assign z0 = fangyuan1 ^ key_in[127:96];
+  logic [31:0] fangyuan2;
+  assign fangyuan2 = { p10, p21, p32, p03 };
+  assign z1 = fangyuan2 ^ key_in[95:64];
+  logic [31:0] fangyuan3;
+  assign fangyuan3 = { p20, p31, p02, p13 };
+  assign z2 = fangyuan3 ^ key_in[63:32];
+  logic [31:0] fangyuan4;
+  assign fangyuan4 = { p30, p01, p12, p23 };
+  assign z3 = fangyuan4 ^ key_in[31:0];
+  logic [127:0] state_in_R0 ;
+// module: S4
+  S4 S4_1 (
+    .in_T (  state_in_T [127:96]  ),
+    .in_R (  state_in_R0 [127:96]  ),
+    .in_S (  state_in_S  ),
+    .out_T ( {  p00_T , p01_T , p02_T , p03_T  } ),
+    .out_R0 ( {  p00_R , p01_R , p02_R , p03_R  } ),
+    .out_S (  ),
+    .out ( { p00, p01, p02, p03 } ),
+    .clk ( clk ),
+    .in ( state_in[127:96] )
+  );
+  assign {  p00_S , p01_S , p02_S , p03_S  } = 0 ;
+// module: S4
+  S4 S4_2 (
+    .in_T (  state_in_T [95:64]  ),
+    .in_R (  state_in_R0 [95:64]  ),
+    .in_S (  state_in_S  ),
+    .out_T ( {  p10_T , p11_T , p12_T , p13_T  } ),
+    .out_R0 ( {  p10_R , p11_R , p12_R , p13_R  } ),
+    .out_S (  ),
+    .out ( { p10, p11, p12, p13 } ),
+    .clk ( clk ),
+    .in ( state_in[95:64] )
+  );
+  assign {  p10_S , p11_S , p12_S , p13_S  } = 0 ;
+// module: S4
+  S4 S4_3 (
+    .in_T (  state_in_T [63:32]  ),
+    .in_R (  state_in_R0 [63:32]  ),
+    .in_S (  state_in_S  ),
+    .out_T ( {  p20_T , p21_T , p22_T , p23_T  } ),
+    .out_R0 ( {  p20_R , p21_R , p22_R , p23_R  } ),
+    .out_S (  ),
+    .out ( { p20, p21, p22, p23 } ),
+    .clk ( clk ),
+    .in ( state_in[63:32] )
+  );
+  assign {  p20_S , p21_S , p22_S , p23_S  } = 0 ;
+// module: S4
+  S4 S4_4 (
+    .in_T (  state_in_T [31:0]  ),
+    .in_R (  state_in_R0 [31:0]  ),
+    .in_S (  state_in_S  ),
+    .out_T ( {  p30_T , p31_T , p32_T , p33_T  } ),
+    .out_R0 ( {  p30_R , p31_R , p32_R , p33_R  } ),
+    .out_S (  ),
+    .out ( { p30, p31, p32, p33 } ),
+    .clk ( clk ),
+    .in ( state_in[31:0] )
+  );
+  assign {  p30_S , p31_S , p32_S , p33_S  } = 0 ;
+  assign k0 = key_in[127:96];
+  assign k1 = key_in[95:64];
+  assign k2 = key_in[63:32];
+  assign k3 = key_in[31:0];
+  assign s0 = state_in[127:96];
+  assign s1 = state_in[95:64];
+  assign s2 = state_in[63:32];
+  assign s3 = state_in[31:0];
+  assign state_in_R = ( state_in_R0 );
+ // ground taints for floating regs
+  assign state_out_R = 0;
+ // ground taints for unused wires
+  assign { fangyuan0_R , fangyuan1_R , fangyuan2_R , fangyuan3_R , fangyuan4_R , k0_R , k1_R , k2_R , k3_R , p00_R , p01_R , p02_R , p03_R , p10_R , p11_R , p12_R , p13_R , p20_R , p21_R , p22_R , p23_R , p30_R , p31_R , p32_R , p33_R , s0_R , s1_R , s2_R , s3_R , z0_R , z1_R , z2_R , z3_R , clk_R , key_in_R  } = 0;
+  always @( posedge clk ) begin
+    if( rst_zy ) state_out_PREV_VAL1 <= 0 ;
+    if( INSTR_IN_ZY ) state_out_PREV_VAL1 <= state_out ;
+  end
+ // ground taints for unused wire slices
+  assert property( !INSTR_IN_ZY  || state_out_PREV_VAL1 == 0 );
+endmodule

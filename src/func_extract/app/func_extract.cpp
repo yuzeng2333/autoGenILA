@@ -17,9 +17,9 @@
 #include <time.h>
 #include <glog/logging.h>
 
-#include "../../taint_method/src/global_data.h"
-#include "../../taint_method/src/helper.h"
-#include "../../taint_method/src/taint_gen.h"
+#include "../../live_analysis/src/global_data.h"
+#include "../../live_analysis/src/helper.h"
+#include "../../live_analysis/src/taint_gen.h"
 
 
 /// ========= Needed files
