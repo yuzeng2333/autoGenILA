@@ -6,7 +6,6 @@ Piccolo-iu/
 picorv32/
 PID/
 RBM/
-SHA/
 *.out
 *.swo
 *.swp
