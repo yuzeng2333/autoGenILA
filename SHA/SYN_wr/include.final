@@ -1,0 +1,5 @@
+`include "../RTL/XRAM_NEW.v.clean.tainted.final"
+`include "../RTL/reg2byte_NEW.v.clean.tainted.final"
+`include "../RTL/sha1_core_NEW.v.clean.tainted.final"
+`include "../RTL/sha1_w_mem_NEW.v.clean.tainted.final"
+`include "../RTL/sha_top_NEW.v.clean.tainted.final"

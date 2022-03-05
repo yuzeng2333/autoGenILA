@@ -1,0 +1,97 @@
+module sha_top_with_xram ( addr , clk , data_in , rst , stb , wr , YZC , addr_T , data_in_T , rst_T , stb_T , wr_T , ack , data_out , in_addr_range , ack_T , data_out_T , in_addr_range_T );
+  logic rst_zy;
+  integer i;
+  logic INSTR_IN_ZY;
+  assign INSTR_IN_ZY = addr_T > 0 || data_in_T > 0 || stb_T > 0 || wr_T > 0 || 0 ;
+  input [49:0] YZC;
+  output ack;
+  logic ack ;
+  output ack_T ;
+  logic ack_T ;
+  input [15:0] addr;
+  input [15:0] addr_T ;
+  input clk;
+  input [7:0] data_in;
+  input [7:0] data_in_T ;
+  output [7:0] data_out;
+  logic [7:0] data_out ;
+  output [7:0] data_out_T ;
+  logic [7:0] data_out_T ;
+  output in_addr_range;
+  logic in_addr_range ;
+  output in_addr_range_T ;
+  logic in_addr_range_T ;
+  input rst;
+  input rst_T ;
+  input stb;
+  input stb_T ;
+  input wr;
+  input wr_T ;
+  logic xram_ack;
+  logic xram_ack_T ;
+  logic [15:0] xram_addr;
+  logic [15:0] xram_addr_T ;
+  logic [7:0] xram_data_in;
+  logic [7:0] xram_data_in_T ;
+  logic [7:0] xram_data_out;
+  logic [7:0] xram_data_out_T ;
+  logic xram_stb;
+  logic xram_stb_T ;
+  logic xram_wr;
+  logic xram_wr_T ;
+// module: XRAM
+  XRAM ram (
+    .YZC(YZC[8:0]),
+    .addr_in_T (  xram_addr_T  ),
+    .data_in_T (  xram_data_out_T  ),
+    .rst_T (  rst_T  ),
+    .stb_T (  xram_stb_T  ),
+    .wr_T (  xram_wr_T  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .ack_T (  xram_ack_T  ),
+    .data_out_T (  xram_data_in_T  ),
+    .stb ( xram_stb ),
+    .rst ( rst ),
+    .wr ( xram_wr ),
+    .addr_in ( xram_addr ),
+    .clk ( clk ),
+    .data_in ( xram_data_out ),
+    .ack ( xram_ack ),
+    .data_out ( xram_data_in )
+  );
+// module: sha_top
+  sha_top sha_top_0 (
+    .YZC(YZC[49:9]),
+    .addr_T (  addr_T  ),
+    .data_in_T (  data_in_T  ),
+    .rst_T (  rst_T  ),
+    .stb_T (  stb_T  ),
+    .wr_T (  wr_T  ),
+    .xram_ack_T (  xram_ack_T  ),
+    .xram_data_in_T (  xram_data_in_T  ),
+    .INSTR_IN_ZY(INSTR_IN_ZY),
+    .ack_T (  ack_T  ),
+    .data_out_T (  data_out_T  ),
+    .in_addr_range_T (  in_addr_range_T  ),
+    .xram_addr_T (  xram_addr_T  ),
+    .xram_data_out_T (  xram_data_out_T  ),
+    .xram_stb_T (  xram_stb_T  ),
+    .xram_wr_T (  xram_wr_T  ),
+    .xram_stb ( xram_stb ),
+    .xram_data_out ( xram_data_out ),
+    .xram_data_in ( xram_data_in ),
+    .data_out ( data_out ),
+    .ack ( ack ),
+    .data_in ( data_in ),
+    .clk ( clk ),
+    .wr ( wr ),
+    .addr ( addr ),
+    .xram_addr ( xram_addr ),
+    .in_addr_range ( in_addr_range ),
+    .xram_wr ( xram_wr ),
+    .xram_ack ( xram_ack ),
+    .rst ( rst ),
+    .stb ( stb )
+  );
+  assign rst_zy = rst ;
+endmodule
