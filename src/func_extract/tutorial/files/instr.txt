@@ -1,3 +1,4 @@
+// instruction encoding: use "x" to represent arbitrary values, and if the instruction takes multiple cycles to inject into hardware, specify the encoding for each of the cycles. In the case of Pico-RISCV, sometimes it cannot read in the instruction at the input immediately, so we let the input be persistent for three cycles
 // add
 #1:add
 (1)
@@ -31,173 +32,13 @@ pcpi_wait = 0
 pcpi_ready = 0
 irq = 0
 
-#delay:7
 
-W:
-\cpuregs[1](skip) 8
-// this delay must be 7 because add instruction takes 4 cycles.
-// if delay is 8, then the reg_next_pc is 9 cycles later, and 
-// it will be added by 8 instead of 4
-//reg_next_pc(skip) 7
+// delay of instruction. If it is already specified in allowed_target, the value here will be ignored.
+#delay:8
 
 
-
-//// jal
-//#10:jal
-//(1)
-//mem_rdata = 20'bx+5'bx+5'h1b+2'h3
-////mem_rdata = 20'bx+5'b1+5'h1b+2'h3
-//resetn = 1
-//mem_ready = 1
-//pcpi_wr = 0
-//pcpi_rd = 0
-//pcpi_wait = 0
-//pcpi_ready = 0
-//irq = 0
-//(2)
-//mem_rdata = 20'bx+5'bx+5'h1b+2'h3
-//resetn = 1
-//mem_ready = 1
-//pcpi_wr = 0
-//pcpi_rd = 0
-//pcpi_wait = 0
-//pcpi_ready = 0
-//irq = 0
-//(3)
-//mem_rdata = 20'bx+5'bx+5'h1b+2'h3
-//resetn = 1
-//mem_ready = 1
-//pcpi_wr = 0
-//pcpi_rd = 0
-//pcpi_wait = 0
-//pcpi_ready = 0
-//irq = 0
-//
-//#delay: 5
-//
-//W:
-//\cpuregs[10](skip) 5
-//reg_next_pc(skip) 5
-//mem_addr(skip) 5
-//
-//
-//
-//// beq
-//#2:beq
-//(1)
-//// for brevity
-//mem_rdata = 7'hx+5'hx+5'hx+3'h0+5'hx+5'h18+2'h3
-////mem_rdata = 7'hx+5'h1+5'h2+3'h0+5'hx+5'h18+2'h3
-//resetn = 1
-//mem_ready = 1
-//pcpi_wr = 0
-//pcpi_rd = 0
-//pcpi_wait = 0
-//pcpi_ready = 0
-//irq = 0
-//(2)
-//mem_rdata = 7'hx+5'hx+5'hx+3'h0+5'hx+5'h18+2'h3
-//resetn = 1
-//mem_ready = 1
-//pcpi_wr = 0
-//pcpi_rd = 0
-//pcpi_wait = 0
-//pcpi_ready = 0
-//irq = 0
-//(3)
-//mem_rdata = 7'hx+5'hx+5'hx+3'h0+5'hx+5'h18+2'h3
-//resetn = 1
-//mem_ready = 1
-//pcpi_wr = 0
-//pcpi_rd = 0
-//pcpi_wait = 0
-//pcpi_ready = 0
-//irq = 0
-//
-//#delay:8
-//
-//W:
-//reg_next_pc(skip) 8 
-//
-//
-//
-//// jal
-//#3:jal
-//(1)
-//mem_rdata = 20'bx+5'bx+5'h1b+2'h3
-////mem_rdata = 20'bx+5'b1+5'h1b+2'h3
-//resetn = 1
-//mem_ready = 1
-//pcpi_wr = 0
-//pcpi_rd = 0
-//pcpi_wait = 0
-//pcpi_ready = 0
-//irq = 0
-//(2)
-//mem_rdata = 20'bx+5'bx+5'h1b+2'h3
-//resetn = 1
-//mem_ready = 1
-//pcpi_wr = 0
-//pcpi_rd = 0
-//pcpi_wait = 0
-//pcpi_ready = 0
-//irq = 0
-//(3)
-//mem_rdata = 20'bx+5'bx+5'h1b+2'h3
-//resetn = 1
-//mem_ready = 1
-//pcpi_wr = 0
-//pcpi_rd = 0
-//pcpi_wait = 0
-//pcpi_ready = 0
-//irq = 0
-//
-//#delay: 8
-//
-//W:
-//reg_next_pc(skip) 8 
-//reg_next_pc(skip) 4 
-//
-//
-//// sw
-//#12:sw
-//(1)
-//mem_rdata = 7'hx+5'bx+5'bx+3'h2+5'bx+5'h8+2'b11
-//resetn = 1
-//mem_ready = 1
-//pcpi_wr = 0
-//pcpi_rd = 0
-//pcpi_wait = 0
-//pcpi_ready = 0
-//irq = 0
-//(2)
-//mem_rdata = 7'hx+5'bx+5'bx+3'h2+5'bx+5'h8+2'b11
-//resetn = 1
-//mem_ready = 1
-//pcpi_wr = 0
-//pcpi_rd = 0
-//pcpi_wait = 0
-//pcpi_ready = 0
-//irq = 0
-//(3)
-//mem_rdata = 7'hx+5'bx+5'bx+3'h2+5'bx+5'h8+2'b11
-//resetn = 1
-//mem_ready = 1
-//pcpi_wr = 0
-//pcpi_rd = 0
-//pcpi_wait = 0
-//pcpi_ready = 0
-//irq = 0
-//
-//#delay:8
-//#extraDelay:3
-//
-//W:
-//mem_wdata(skip) 8
-
-
-// universal information
-
+// registers that may be read by this instruction
+// must start with "R:"
 R:
 \cpuregs[1]
 \cpuregs[2]
@@ -234,10 +75,12 @@ reg_pc
 //reg_next_pc
 
 
+// top module name
 $TOP:
 picorv32
 
 
+// encoding for the NOP instruction
 $NOP:
 mem_rdata = 25'b0+5'b00100+2'b11
 resetn = 1
@@ -248,6 +91,8 @@ pcpi_wait = 0
 pcpi_ready = 0
 irq = 0
 
-
+// clock signal name
 #CLK:clk
+
+// reset signal name
 #RST:resetn
