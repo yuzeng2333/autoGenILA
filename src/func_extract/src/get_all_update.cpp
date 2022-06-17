@@ -403,38 +403,37 @@ void get_update_function(std::string target,
   }
   for(auto pair : argVec) {
     std::string reg = pair.first;
-    if(reg.find("cpuregs[3]") != std::string::npos
-       || reg.find("cpuregs[4]") != std::string::npos
-       || reg.find("cpuregs[5]") != std::string::npos
-       || reg.find("cpuregs[6]") != std::string::npos
-       || reg.find("cpuregs[7]") != std::string::npos
-       || reg.find("cpuregs[8]") != std::string::npos
-       || reg.find("cpuregs[9]") != std::string::npos
-       || reg.find("cpuregs[10]") != std::string::npos
-       || reg.find("cpuregs[11]") != std::string::npos
-       || reg.find("cpuregs[12]") != std::string::npos
-       || reg.find("cpuregs[13]") != std::string::npos
-       || reg.find("cpuregs[14]") != std::string::npos
-       || reg.find("cpuregs[15]") != std::string::npos
-       || reg.find("cpuregs[16]") != std::string::npos
-       || reg.find("cpuregs[17]") != std::string::npos
-       || reg.find("cpuregs[18]") != std::string::npos
-       || reg.find("cpuregs[19]") != std::string::npos
-       || reg.find("cpuregs[20]") != std::string::npos
-       || reg.find("cpuregs[21]") != std::string::npos
-       || reg.find("cpuregs[22]") != std::string::npos
-       || reg.find("cpuregs[23]") != std::string::npos
-       || reg.find("cpuregs[24]") != std::string::npos
-       || reg.find("cpuregs[25]") != std::string::npos
-       || reg.find("cpuregs[26]") != std::string::npos
-       || reg.find("cpuregs[27]") != std::string::npos
-       || reg.find("cpuregs[28]") != std::string::npos
-       || reg.find("cpuregs[29]") != std::string::npos
-       || reg.find("cpuregs[30]") != std::string::npos)
-        continue;
+    //if(reg.find("cpuregs[3]") != std::string::npos
+    //   || reg.find("cpuregs[4]") != std::string::npos
+    //   || reg.find("cpuregs[5]") != std::string::npos
+    //   || reg.find("cpuregs[6]") != std::string::npos
+    //   || reg.find("cpuregs[7]") != std::string::npos
+    //   || reg.find("cpuregs[8]") != std::string::npos
+    //   || reg.find("cpuregs[9]") != std::string::npos
+    //   || reg.find("cpuregs[10]") != std::string::npos
+    //   || reg.find("cpuregs[11]") != std::string::npos
+    //   || reg.find("cpuregs[12]") != std::string::npos
+    //   || reg.find("cpuregs[13]") != std::string::npos
+    //   || reg.find("cpuregs[14]") != std::string::npos
+    //   || reg.find("cpuregs[15]") != std::string::npos
+    //   || reg.find("cpuregs[16]") != std::string::npos
+    //   || reg.find("cpuregs[17]") != std::string::npos
+    //   || reg.find("cpuregs[18]") != std::string::npos
+    //   || reg.find("cpuregs[19]") != std::string::npos
+    //   || reg.find("cpuregs[20]") != std::string::npos
+    //   || reg.find("cpuregs[21]") != std::string::npos
+    //   || reg.find("cpuregs[22]") != std::string::npos
+    //   || reg.find("cpuregs[23]") != std::string::npos
+    //   || reg.find("cpuregs[24]") != std::string::npos
+    //   || reg.find("cpuregs[25]") != std::string::npos
+    //   || reg.find("cpuregs[26]") != std::string::npos
+    //   || reg.find("cpuregs[27]") != std::string::npos
+    //   || reg.find("cpuregs[28]") != std::string::npos
+    //   || reg.find("cpuregs[29]") != std::string::npos
+    //   || reg.find("cpuregs[30]") != std::string::npos)
+    //    continue;
     if(g_push_new_target && !g_visitedTgt.mtxExist(reg)) 
       g_workSet.mtxInsert(reg);
-    // TODO:
     g_asvSet.emplace(reg, pair.second);
     //addedWorkSetFile << reg << std::endl;
   }

@@ -1,3 +1,9 @@
+tutorial_clean:
+	./build/func_extract ./tutorial/files 1
+  
+tutorial:
+	./build/func_extract ./tutorial/files 0
+
 two_reg: 
 	./build/func_extract ../../func_test/two_reg/two_reg_yosys.v.clean ../../func_test/two_reg/two_reg_as.txt 0
 
