@@ -18,15 +18,7 @@ This project contains several sub-projects. They should be installed one-by-one
 [Google glog](https://github.com/google/glog), version: v0.5.0-rc2-2-g8d40d75
 
 ### Steps:
-cd ./src/live_analysis
-
-mkdir build
-
-cd build
-
-cmake ..
-
-make
+cd ./src/live_analysis; mkdir build; cd build; cmake ..; make
 
 
 Should be able to see libTaintGenLib.a and taint_gen in the build folder
@@ -41,15 +33,7 @@ The build process of func_extract depends on the libTaintGenLib.a generated in t
 [llvm](https://github.com/llvm/llvm-project), version: 13, but the newest version should be compatible
 
 ### Step:
-cd ./src/func_extract
-
-mkdir build
-
-cd build
-
-cmake ..
-
-make
+cd ./src/func_extract; mkdir build; cd build; cmake ..; make
 
 
 should be able to see: cmp  func_extract  libFuncExtractLib.a  sim_gen  tb_gen  test_gen
