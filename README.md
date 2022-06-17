@@ -19,10 +19,15 @@ This project contains several sub-projects. They should be installed one-by-one
 
 ### Steps:
 cd ./src/live_analysis
+
 mkdir build
+
 cd build
+
 cmake ..
+
 make
+
 
 Should be able to see libTaintGenLib.a and taint_gen in the build folder
 
@@ -32,13 +37,19 @@ The build process of func_extract depends on the libTaintGenLib.a generated in t
 
 ### dependencies:
 [z3](https://github.com/Z3Prover/z3), version: 4.8.8
+
 [llvm](https://github.com/llvm/llvm-project), version: 13, but the newest version should be compatible
 
 ### Step:
 cd ./src/func_extract
+
 mkdir build
+
 cd build
+
 cmake ..
+
 make
+
 
 should be able to see: cmp  func_extract  libFuncExtractLib.a  sim_gen  tb_gen  test_gen
