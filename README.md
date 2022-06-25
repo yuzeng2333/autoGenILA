@@ -31,7 +31,7 @@ The build process of func_extract depends on the libTaintGenLib.a generated in t
 ### dependencies:
 [z3](https://github.com/Z3Prover/z3), version: 4.8.8
 
-[llvm](https://github.com/llvm/llvm-project), version: 13, but the latest version should be compatible
+[llvm](https://github.com/llvm/llvm-project), version: 13
 
 ### Step:
 cd ./src/func_extract; mkdir build; cd build; cmake ..; make
