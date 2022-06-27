@@ -16,6 +16,7 @@ This project contains several sub-projects. They should be installed one-by-one
 
 ### dependencies:
 [Google glog](https://github.com/google/glog), version: v0.5.0-rc2-2-g8d40d75
+
 [boost](https://www.boost.org/), should be compatible with the latest version
 
 ### Steps:
@@ -31,7 +32,7 @@ The build process of func_extract depends on the libTaintGenLib.a generated in t
 ### dependencies:
 [z3](https://github.com/Z3Prover/z3), version: 4.8.8
 
-[llvm](https://github.com/llvm/llvm-project), version: 13
+[llvm](https://github.com/llvm/llvm-project), version: 14. NOTE: the latest LLVM is not compatible!
 
 ### Step:
 cd ./src/func_extract; mkdir build; cd build; cmake ..; make
