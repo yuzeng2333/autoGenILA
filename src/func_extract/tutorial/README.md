@@ -8,3 +8,8 @@ This is a tutorial for how to generate update functions from RTL designs. We use
 - config.txt: this contains some configurations for the update function generation program. This is only for experimental purpose, usually you do not need to modify it.
 - instr.txt: this contains information for the instruction we are interested in. See the comments in the files for details.
 5. How to run: in the func_extract directory, the first time you need to type "make tutorial_clean". Later, you only need to type "make tutorial". Then you will see the generated LLVM-IR based update functions in "files" folder.
+6. In the generated files you can find these files:
+- 'add_cpuregs[1]_Arr_8_tmp.ll': a temporal file, just ignore it.
+- 'add_cpuregs[1]_Arr_8.ll': the original llvm-based update function for the array of cpuregs by the add instruction, without being optimized by LLVM
+- 'add_cpuregs[1]_Arr_8_clean.ll': a cleaner version by removing most comments
+- 'add_cpuregs[1]_Arr_8_clean.o3.ll': the final update function we are looking for! It has been optimized by LLVM-o3 optimization.
