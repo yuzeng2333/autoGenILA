@@ -9,6 +9,6 @@ This tutorial shows how to use the liveness-analysis based algorithm for determi
    - RTL: move all the files ended with ".final" in last step to this folder.
    - properties: it contains files that specify constraints for the input signals and input taints. Please see the example "property1.txt" file for how to write such constraints. Some constraints are design-specific: they come from your understanding of how to use this accelerator, e.g. what are the valid instructions, or some instructions must be used before some other.
    - combine.py: this is script that combines all the useful files and generate a final file to be used by JasperGold
-   - sv_files: the folder contains the final file generated in (3)
+   - sv_files: the folder contains the final file generated in the last step
    - scripts: contains the JasperGold script. (It seems there is some bug with JasperGold: the "s_until" keyword can only be used in the tcl script. That is why in the "script_top_instr1.tcl" you will see an assume that uses s_until. It should be in the property1.txt file but JasperGold does not accept that)
  5. open JasperGold, and run the "script_top_instr1.tcl", you should see the results. The registers that have counterexample found are ASVs.
