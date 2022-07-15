@@ -1,0 +1,2560 @@
+module picorv32(clk, resetn, trap, mem_valid, mem_instr, mem_ready, mem_addr, mem_wdata, mem_wstrb, mem_rdata, mem_la_read, mem_la_write, mem_la_addr, mem_la_wdata, mem_la_wstrb, pcpi_valid, pcpi_insn, pcpi_rs1, pcpi_rs2, pcpi_wr, pcpi_rd, pcpi_wait, pcpi_ready, irq, eoi, trace_valid, trace_data);
+  wire [4:0] _0000_;
+  wire [31:0] _0001_;
+  wire [31:0] _0002_;
+  wire _0003_;
+  wire [63:0] _0004_;
+  wire [63:0] _0005_;
+  wire [7:0] _0006_;
+  wire [31:0] _0007_;
+  wire [31:0] _0008_;
+  wire [4:0] _0009_;
+  wire [4:0] _0010_;
+  wire [4:0] _0011_;
+  wire _0012_;
+  wire _0013_;
+  wire [31:0] _0014_;
+  wire _0015_;
+  wire _0016_;
+  wire _0017_;
+  wire _0018_;
+  wire _0019_;
+  wire _0020_;
+  wire _0021_;
+  wire _0022_;
+  wire _0023_;
+  wire _0024_;
+  wire _0025_;
+  wire _0026_;
+  wire _0027_;
+  wire _0028_;
+  wire _0029_;
+  wire _0030_;
+  wire _0031_;
+  wire _0032_;
+  wire _0033_;
+  wire _0034_;
+  wire _0035_;
+  wire _0036_;
+  wire _0037_;
+  wire _0038_;
+  wire _0039_;
+  wire _0040_;
+  wire _0041_;
+  wire _0042_;
+  wire _0043_;
+  wire _0044_;
+  wire _0045_;
+  wire _0046_;
+  wire _0047_;
+  wire _0048_;
+  wire _0049_;
+  wire _0050_;
+  wire _0051_;
+  wire _0052_;
+  wire _0053_;
+  wire _0054_;
+  wire _0055_;
+  wire _0056_;
+  wire _0057_;
+  wire _0058_;
+  wire _0059_;
+  wire _0060_;
+  wire _0061_;
+  wire _0062_;
+  wire _0063_;
+  wire _0064_;
+  wire _0065_;
+  wire _0066_;
+  wire _0067_;
+  wire _0068_;
+  wire _0069_;
+  wire _0070_;
+  wire _0071_;
+  wire _0072_;
+  wire _0073_;
+  wire _0074_;
+  wire _0075_;
+  wire [4:0] _0076_;
+  wire _0077_;
+  wire _0078_;
+  wire [31:0] _0079_;
+  wire _0080_;
+  wire _0081_;
+  wire _0082_;
+  wire _0083_;
+  wire _0084_;
+  wire [31:0] _0085_;
+  wire [1:0] _0086_;
+  wire _0087_;
+  wire [31:0] _0088_;
+  wire [1:0] _0089_;
+  wire [3:0] _0090_;
+  wire [31:0] _0091_;
+  wire _0092_;
+  wire [31:0] _0093_;
+  wire [31:0] _0094_;
+  wire [31:0] _0095_;
+  wire [31:0] _0096_;
+  wire [31:0] _0097_;
+  wire [4:0] _0098_;
+  wire _0099_;
+  wire _0100_;
+  wire _0101_;
+  wire _0102_;
+  wire [31:0] _0103_;
+  wire _0104_;
+  wire [31:0] _0105_;
+  wire _0106_;
+  wire _0107_;
+  wire _0108_;
+  wire [31:0] _0109_;
+  wire [31:0] _0110_;
+  wire _0111_;
+  wire _0112_;
+  wire _0113_;
+  wire _0114_;
+  wire _0115_;
+  wire _0116_;
+  wire [31:0] _0117_;
+  wire [31:0] _0118_;
+  wire [63:0] _0119_;
+  wire [31:0] _0120_;
+  wire [63:0] _0121_;
+  wire [31:0] _0122_;
+  wire [31:0] _0123_;
+  wire [31:0] _0124_;
+  wire [29:0] _0125_;
+  wire [31:0] _0126_;
+  wire [31:0] _0127_;
+  wire [31:0] _0128_;
+  wire [3:0] _0129_;
+  wire _0130_;
+  wire _0131_;
+  wire _0132_;
+  wire _0133_;
+  wire _0134_;
+  wire _0135_;
+  wire _0136_;
+  wire _0137_;
+  wire _0138_;
+  wire _0139_;
+  wire _0140_;
+  wire _0141_;
+  wire _0142_;
+  wire _0143_;
+  wire _0144_;
+  wire _0145_;
+  wire _0146_;
+  wire _0147_;
+  wire _0148_;
+  wire _0149_;
+  wire _0150_;
+  wire _0151_;
+  wire _0152_;
+  wire _0153_;
+  wire _0154_;
+  wire _0155_;
+  wire _0156_;
+  wire _0157_;
+  wire _0158_;
+  wire _0159_;
+  wire _0160_;
+  wire _0161_;
+  wire _0162_;
+  wire _0163_;
+  wire _0164_;
+  wire _0165_;
+  wire _0166_;
+  wire _0167_;
+  wire _0168_;
+  wire _0169_;
+  wire _0170_;
+  wire _0171_;
+  wire _0172_;
+  wire _0173_;
+  wire _0174_;
+  wire _0175_;
+  wire _0176_;
+  wire _0177_;
+  wire _0178_;
+  wire _0179_;
+  wire _0180_;
+  wire _0181_;
+  wire _0182_;
+  wire _0183_;
+  wire _0184_;
+  wire _0185_;
+  wire _0186_;
+  wire _0187_;
+  wire _0188_;
+  wire _0189_;
+  wire _0190_;
+  wire _0191_;
+  wire _0192_;
+  wire _0193_;
+  wire _0194_;
+  wire _0195_;
+  wire [7:0] _0196_;
+  wire [7:0] _0197_;
+  wire [31:0] _0198_;
+  wire [31:0] _0199_;
+  wire [31:0] _0200_;
+  wire [31:0] _0201_;
+  wire _0202_;
+  wire _0203_;
+  wire _0204_;
+  wire _0205_;
+  wire _0206_;
+  wire _0207_;
+  wire _0208_;
+  wire _0209_;
+  wire _0210_;
+  wire _0211_;
+  wire _0212_;
+  wire _0213_;
+  wire _0214_;
+  wire _0215_;
+  wire _0216_;
+  wire _0217_;
+  wire _0218_;
+  wire _0219_;
+  wire _0220_;
+  wire _0221_;
+  wire _0222_;
+  wire _0223_;
+  wire _0224_;
+  wire _0225_;
+  wire _0226_;
+  wire _0227_;
+  wire _0228_;
+  wire _0229_;
+  wire _0230_;
+  wire _0231_;
+  wire _0232_;
+  wire _0233_;
+  wire _0234_;
+  wire _0235_;
+  wire _0236_;
+  wire _0237_;
+  wire _0238_;
+  wire _0239_;
+  wire _0240_;
+  wire _0241_;
+  wire _0242_;
+  wire _0243_;
+  wire _0244_;
+  wire _0245_;
+  wire _0246_;
+  wire _0247_;
+  wire _0248_;
+  wire _0249_;
+  wire _0250_;
+  wire _0251_;
+  wire _0252_;
+  wire _0253_;
+  wire _0254_;
+  wire _0255_;
+  wire _0256_;
+  wire _0257_;
+  wire _0258_;
+  wire _0259_;
+  wire _0260_;
+  wire _0261_;
+  wire _0262_;
+  wire _0263_;
+  wire _0264_;
+  wire _0265_;
+  wire _0266_;
+  wire _0267_;
+  wire _0268_;
+  wire _0269_;
+  wire _0270_;
+  wire _0271_;
+  wire _0272_;
+  wire _0273_;
+  wire _0274_;
+  wire _0275_;
+  wire _0276_;
+  wire _0277_;
+  wire _0278_;
+  wire _0279_;
+  wire _0280_;
+  wire _0281_;
+  wire _0282_;
+  wire _0283_;
+  wire _0284_;
+  wire _0285_;
+  wire _0286_;
+  wire _0287_;
+  wire _0288_;
+  wire _0289_;
+  wire _0290_;
+  wire _0291_;
+  wire _0292_;
+  wire _0293_;
+  wire _0294_;
+  wire _0295_;
+  wire _0296_;
+  wire _0297_;
+  wire _0298_;
+  wire _0299_;
+  wire _0300_;
+  wire _0301_;
+  wire _0302_;
+  wire _0303_;
+  wire _0304_;
+  wire _0305_;
+  wire _0306_;
+  wire _0307_;
+  wire _0308_;
+  wire _0309_;
+  wire _0310_;
+  wire _0311_;
+  wire _0312_;
+  wire _0313_;
+  wire _0314_;
+  wire _0315_;
+  wire _0316_;
+  wire _0317_;
+  wire _0318_;
+  wire _0319_;
+  wire _0320_;
+  wire _0321_;
+  wire _0322_;
+  wire _0323_;
+  wire _0324_;
+  wire _0325_;
+  wire _0326_;
+  wire _0327_;
+  wire _0328_;
+  wire _0329_;
+  wire _0330_;
+  wire _0331_;
+  wire _0332_;
+  wire _0333_;
+  wire _0334_;
+  wire _0335_;
+  wire _0336_;
+  wire _0337_;
+  wire _0338_;
+  wire _0339_;
+  wire _0340_;
+  wire _0341_;
+  wire [31:0] _0342_;
+  wire [31:0] _0343_;
+  wire [31:0] _0344_;
+  wire [31:0] _0345_;
+  wire [31:0] _0346_;
+  wire [31:0] _0347_;
+  wire [31:0] _0348_;
+  wire [31:0] _0349_;
+  wire [31:0] _0350_;
+  wire [31:0] _0351_;
+  wire [31:0] _0352_;
+  wire [31:0] _0353_;
+  wire [31:0] _0354_;
+  wire [31:0] _0355_;
+  wire [31:0] _0356_;
+  wire [31:0] _0357_;
+  wire [31:0] _0358_;
+  wire [31:0] _0359_;
+  wire [31:0] _0360_;
+  wire [31:0] _0361_;
+  wire [31:0] _0362_;
+  wire [31:0] _0363_;
+  wire [31:0] _0364_;
+  wire [31:0] _0365_;
+  wire [31:0] _0366_;
+  wire [31:0] _0367_;
+  wire [31:0] _0368_;
+  wire [31:0] _0369_;
+  wire [31:0] _0370_;
+  wire [31:0] _0371_;
+  wire _0372_;
+  wire _0373_;
+  wire _0374_;
+  wire _0375_;
+  wire _0376_;
+  wire _0377_;
+  wire _0378_;
+  wire _0379_;
+  wire _0380_;
+  wire _0381_;
+  wire _0382_;
+  wire _0383_;
+  wire _0384_;
+  wire _0385_;
+  wire _0386_;
+  wire _0387_;
+  wire _0388_;
+  wire _0389_;
+  wire _0390_;
+  wire _0391_;
+  wire _0392_;
+  wire _0393_;
+  wire _0394_;
+  wire _0395_;
+  wire _0396_;
+  wire _0397_;
+  wire _0398_;
+  wire _0399_;
+  wire _0400_;
+  wire _0401_;
+  wire _0402_;
+  wire _0403_;
+  wire [31:0] _0404_;
+  wire [31:0] _0405_;
+  wire [31:0] _0406_;
+  wire [31:0] _0407_;
+  wire [31:0] _0408_;
+  wire [31:0] _0409_;
+  wire [31:0] _0410_;
+  wire [31:0] _0411_;
+  wire [31:0] _0412_;
+  wire [31:0] _0413_;
+  wire [31:0] _0414_;
+  wire [31:0] _0415_;
+  wire [31:0] _0416_;
+  wire [31:0] _0417_;
+  wire [31:0] _0418_;
+  wire [31:0] _0419_;
+  wire [31:0] _0420_;
+  wire [31:0] _0421_;
+  wire [31:0] _0422_;
+  wire [31:0] _0423_;
+  wire [31:0] _0424_;
+  wire [31:0] _0425_;
+  wire [31:0] _0426_;
+  wire [31:0] _0427_;
+  wire [31:0] _0428_;
+  wire [31:0] _0429_;
+  wire [31:0] _0430_;
+  wire [31:0] _0431_;
+  wire [31:0] _0432_;
+  wire [31:0] _0433_;
+  wire [31:0] _0434_;
+  wire [31:0] _0435_;
+  wire [31:0] _0436_;
+  wire [31:0] _0437_;
+  wire _0438_;
+  wire [31:0] _0439_;
+  wire [31:0] _0440_;
+  wire _0441_;
+  wire _0442_;
+  wire _0443_;
+  wire _0444_;
+  wire _0445_;
+  wire _0446_;
+  wire _0447_;
+  wire _0448_;
+  wire _0449_;
+  wire _0450_;
+  wire _0451_;
+  wire _0452_;
+  wire _0453_;
+  wire [31:0] _0454_;
+  wire [31:0] _0455_;
+  wire [31:0] _0456_;
+  wire [31:0] _0457_;
+  wire [31:0] _0458_;
+  wire [31:0] _0459_;
+  wire [31:0] _0460_;
+  wire [4:0] _0461_;
+  wire [4:0] _0462_;
+  wire [4:0] _0463_;
+  wire _0464_;
+  wire [4:0] _0465_;
+  wire [4:0] _0466_;
+  wire _0467_;
+  wire _0468_;
+  wire _0469_;
+  wire _0470_;
+  wire _0471_;
+  wire _0472_;
+  wire _0473_;
+  wire _0474_;
+  wire _0475_;
+  wire _0476_;
+  wire _0477_;
+  wire _0478_;
+  wire _0479_;
+  wire _0480_;
+  wire _0481_;
+  wire _0482_;
+  wire _0483_;
+  wire _0484_;
+  wire _0485_;
+  wire [7:0] _0486_;
+  wire [7:0] _0487_;
+  wire [7:0] _0488_;
+  wire [7:0] _0489_;
+  wire [7:0] _0490_;
+  wire [7:0] _0491_;
+  wire _0492_;
+  wire [7:0] _0493_;
+  wire [7:0] _0494_;
+  wire [7:0] _0495_;
+  wire _0496_;
+  wire _0497_;
+  wire _0498_;
+  wire _0499_;
+  wire _0500_;
+  wire _0501_;
+  wire _0502_;
+  wire _0503_;
+  wire _0504_;
+  wire _0505_;
+  wire _0506_;
+  wire _0507_;
+  wire _0508_;
+  wire [1:0] _0509_;
+  wire [1:0] _0510_;
+  wire [1:0] _0511_;
+  wire [1:0] _0512_;
+  wire [1:0] _0513_;
+  wire [1:0] _0514_;
+  wire [1:0] _0515_;
+  wire [31:0] _0516_;
+  wire [31:0] _0517_;
+  wire [31:0] _0518_;
+  wire [31:0] _0519_;
+  wire [31:0] _0520_;
+  wire [31:0] _0521_;
+  wire [31:0] _0522_;
+  wire [31:0] _0523_;
+  wire [31:0] _0524_;
+  wire [31:0] _0525_;
+  wire [31:0] _0526_;
+  wire [31:0] _0527_;
+  wire [29:0] _0528_;
+  wire [63:0] _0529_;
+  wire [63:0] _0530_;
+  wire _0531_;
+  wire _0532_;
+  wire [31:0] _0533_;
+  wire _0534_;
+  wire _0535_;
+  wire _0536_;
+  wire _0537_;
+  wire _0538_;
+  wire _0539_;
+  wire _0540_;
+  wire _0541_;
+  wire _0542_;
+  wire _0543_;
+  wire _0544_;
+  wire _0545_;
+  wire _0546_;
+  wire _0547_;
+  wire _0548_;
+  wire _0549_;
+  wire _0550_;
+  wire _0551_;
+  wire _0552_;
+  wire _0553_;
+  wire _0554_;
+  wire _0555_;
+  wire _0556_;
+  wire _0557_;
+  wire [1:0] _0558_;
+  wire [1:0] _0559_;
+  wire _0560_;
+  wire [1:0] _0561_;
+  wire _0562_;
+  wire [1:0] _0563_;
+  wire [1:0] _0564_;
+  wire _0565_;
+  wire [1:0] _0566_;
+  wire [1:0] _0567_;
+  wire [1:0] _0568_;
+  wire [3:0] _0569_;
+  wire [3:0] _0570_;
+  wire [3:0] _0571_;
+  wire [31:0] _0572_;
+  wire [31:0] _0573_;
+  wire _0574_;
+  wire _0575_;
+  wire _0576_;
+  wire _0577_;
+  wire _0578_;
+  wire _0579_;
+  wire _0580_;
+  wire _0581_;
+  wire _0582_;
+  wire _0583_;
+  wire _0584_;
+  wire _0585_;
+  wire _0586_;
+  wire _0587_;
+  wire _0588_;
+  wire _0589_;
+  wire [29:0] _0590_;
+  wire [29:0] _0591_;
+  wire [29:0] _0592_;
+  wire _0593_;
+  wire _0594_;
+  wire _0595_;
+  wire _0596_;
+  wire _0597_;
+  wire _0598_;
+  wire _0599_;
+  wire [3:0] _0600_;
+  wire [31:0] _0601_;
+  wire _0602_;
+  wire [31:0] _0603_;
+  wire [31:0] _0604_;
+  wire [31:0] _0605_;
+  wire [31:0] _0606_;
+  wire [3:0] _0607_;
+  wire [31:0] _0608_;
+  wire [31:0] alu_add_sub;
+  wire alu_eq;
+  wire alu_lts;
+  wire alu_ltu;
+  wire [31:0] alu_out;
+  wire alu_out_0;
+  reg [31:0] alu_out_q;
+  wire [31:0] alu_shl;
+  wire [31:0] alu_shr;
+  input clk;
+  reg compressed_instr;
+  reg [63:0] count_cycle;
+  reg [63:0] count_instr;
+  reg [7:0] cpu_state;
+  reg [31:0] \cpuregs[0] ;
+  reg [31:0] \cpuregs[10] ;
+  reg [31:0] \cpuregs[11] ;
+  reg [31:0] \cpuregs[12] ;
+  reg [31:0] \cpuregs[13] ;
+  reg [31:0] \cpuregs[14] ;
+  reg [31:0] \cpuregs[15] ;
+  reg [31:0] \cpuregs[16] ;
+  reg [31:0] \cpuregs[17] ;
+  reg [31:0] \cpuregs[18] ;
+  reg [31:0] \cpuregs[19] ;
+  reg [31:0] \cpuregs[1] ;
+  reg [31:0] \cpuregs[20] ;
+  reg [31:0] \cpuregs[21] ;
+  reg [31:0] \cpuregs[22] ;
+  reg [31:0] \cpuregs[23] ;
+  reg [31:0] \cpuregs[24] ;
+  reg [31:0] \cpuregs[25] ;
+  reg [31:0] \cpuregs[26] ;
+  reg [31:0] \cpuregs[27] ;
+  reg [31:0] \cpuregs[28] ;
+  reg [31:0] \cpuregs[29] ;
+  reg [31:0] \cpuregs[2] ;
+  reg [31:0] \cpuregs[30] ;
+  reg [31:0] \cpuregs[31] ;
+  reg [31:0] \cpuregs[3] ;
+  reg [31:0] \cpuregs[4] ;
+  reg [31:0] \cpuregs[5] ;
+  reg [31:0] \cpuregs[6] ;
+  reg [31:0] \cpuregs[7] ;
+  reg [31:0] \cpuregs[8] ;
+  reg [31:0] \cpuregs[9] ;
+  wire [31:0] cpuregs_rs1;
+  wire [31:0] cpuregs_rs2;
+  wire [31:0] cpuregs_wrdata;
+  wire cpuregs_write;
+  wire [31:0] dbg_mem_addr;
+  wire dbg_mem_instr;
+  wire [31:0] dbg_mem_rdata;
+  wire dbg_mem_ready;
+  wire dbg_mem_valid;
+  wire [31:0] dbg_mem_wdata;
+  wire [3:0] dbg_mem_wstrb;
+  wire [31:0] dbg_reg_x0;
+  reg [31:0] decoded_imm;
+  reg [31:0] decoded_imm_j;
+  reg [4:0] decoded_rd;
+  wire [4:0] decoded_rs;
+  reg [4:0] decoded_rs1;
+  reg [4:0] decoded_rs2;
+  reg decoder_pseudo_trigger;
+  reg decoder_pseudo_trigger_q;
+  reg decoder_trigger;
+  reg decoder_trigger_q;
+  wire do_waitirq;
+  output [31:0] eoi;
+  reg [31:0] eoi;
+  reg instr_add;
+  reg instr_addi;
+  reg instr_and;
+  reg instr_andi;
+  reg instr_auipc;
+  reg instr_beq;
+  reg instr_bge;
+  reg instr_bgeu;
+  reg instr_blt;
+  reg instr_bltu;
+  reg instr_bne;
+  reg instr_ecall_ebreak;
+  reg instr_jal;
+  reg instr_jalr;
+  reg instr_lb;
+  reg instr_lbu;
+  reg instr_lh;
+  reg instr_lhu;
+  reg instr_lui;
+  reg instr_lw;
+  reg instr_or;
+  reg instr_ori;
+  reg instr_rdcycle;
+  reg instr_rdcycleh;
+  reg instr_rdinstr;
+  reg instr_rdinstrh;
+  reg instr_retirq;
+  reg instr_sb;
+  reg instr_sh;
+  reg instr_sll;
+  reg instr_slli;
+  reg instr_slt;
+  reg instr_slti;
+  reg instr_sltiu;
+  reg instr_sltu;
+  reg instr_sra;
+  reg instr_srai;
+  reg instr_srl;
+  reg instr_srli;
+  reg instr_sub;
+  reg instr_sw;
+  wire instr_trap;
+  reg instr_xor;
+  reg instr_xori;
+  input [31:0] irq;
+  reg is_alu_reg_imm;
+  reg is_alu_reg_reg;
+  reg is_beq_bne_blt_bge_bltu_bgeu;
+  reg is_compare;
+  reg is_jalr_addi_slti_sltiu_xori_ori_andi;
+  reg is_lb_lh_lw_lbu_lhu;
+  reg is_lbu_lhu_lw;
+  reg is_lui_auipc_jal;
+  reg is_lui_auipc_jal_jalr_addi_add_sub;
+  wire is_rdcycle_rdcycleh_rdinstr_rdinstrh;
+  reg is_sb_sh_sw;
+  reg is_slli_srli_srai;
+  reg is_slti_blt_slt;
+  reg is_sltiu_bltu_sltu;
+  reg latched_branch;
+  reg latched_compr;
+  reg latched_is_lb;
+  reg latched_is_lh;
+  reg latched_is_lu;
+  reg [4:0] latched_rd;
+  reg latched_stalu;
+  reg latched_store;
+  output [31:0] mem_addr;
+  reg [31:0] mem_addr;
+  reg mem_do_prefetch;
+  reg mem_do_rdata;
+  reg mem_do_rinst;
+  reg mem_do_wdata;
+  wire mem_done;
+  output mem_instr;
+  reg mem_instr;
+  output [31:0] mem_la_addr;
+  wire mem_la_firstword;
+  wire mem_la_firstword_xfer;
+  output mem_la_read;
+  wire mem_la_use_prefetched_high_word;
+  output [31:0] mem_la_wdata;
+  output mem_la_write;
+  output [3:0] mem_la_wstrb;
+  input [31:0] mem_rdata;
+  wire [31:0] mem_rdata_latched;
+  wire [31:0] mem_rdata_latched_noshuffle;
+  reg [31:0] mem_rdata_q;
+  wire [31:0] mem_rdata_word;
+  input mem_ready;
+  reg [1:0] mem_state;
+  output mem_valid;
+  reg mem_valid;
+  output [31:0] mem_wdata;
+  reg [31:0] mem_wdata;
+  reg [1:0] mem_wordsize;
+  output [3:0] mem_wstrb;
+  reg [3:0] mem_wstrb;
+  wire mem_xfer;
+  wire [31:0] next_pc;
+  wire [31:0] pcpi_div_rd;
+  wire pcpi_div_ready;
+  wire pcpi_div_wait;
+  wire pcpi_div_wr;
+  output [31:0] pcpi_insn;
+  reg [31:0] pcpi_insn;
+  wire pcpi_int_ready;
+  wire pcpi_int_wait;
+  wire [31:0] pcpi_mul_rd;
+  wire pcpi_mul_ready;
+  wire pcpi_mul_wait;
+  wire pcpi_mul_wr;
+  input [31:0] pcpi_rd;
+  input pcpi_ready;
+  output [31:0] pcpi_rs1;
+  output [31:0] pcpi_rs2;
+  output pcpi_valid;
+  reg pcpi_valid;
+  input pcpi_wait;
+  input pcpi_wr;
+  reg [31:0] reg_next_pc;
+  reg [31:0] reg_op1;
+  reg [31:0] reg_op2;
+  reg [31:0] reg_out;
+  reg [31:0] reg_pc;
+  reg [4:0] reg_sh;
+  input resetn;
+  output [35:0] trace_data;
+  output trace_valid;
+  output trap;
+  reg trap;
+  assign _0117_ = reg_op1 + reg_op2;
+  assign _0118_ = reg_pc + _0200_[2:0];
+  assign _0119_ = count_cycle + 1'h1;
+  assign _0120_ = _0109_ + _0201_[2:0];
+  assign _0121_ = count_instr + 1'h1;
+  assign _0122_ = _0109_ + decoded_imm_j;
+  assign _0123_ = reg_pc + decoded_imm;
+  assign _0124_ = reg_op1 + decoded_imm;
+  assign _0125_ = next_pc[31:2] + 1'h0;
+  assign _0126_ = reg_out & 32'hfffffffe;
+  assign _0127_ = reg_op1 & reg_op2;
+  assign _0128_ = _0603_ & 32'hfffffffe;
+  wire [3:0] addedVar0;
+  assign addedVar0 = { mem_la_write, mem_la_write, mem_la_write, mem_la_write };
+  assign _0129_ = mem_la_wstrb & addedVar0;
+  assign _0186_ = _0000_[0] == 1'h0;
+  assign _0187_ = _0000_[1] == 1'h0;
+  assign _0188_ = _0000_[2] == 1'h0;
+  assign _0189_ = _0000_[3] == 1'h0;
+  assign _0190_ = _0000_[4] == 1'h0;
+  assign _0191_ = _0000_[0] == 1'h1;
+  assign _0192_ = _0000_[1] == 1'h1;
+  assign _0193_ = _0000_[2] == 1'h1;
+  assign _0194_ = _0000_[3] == 1'h1;
+  assign _0195_ = _0000_[4] == 1'h1;
+  assign _0138_ = _0186_ & _0187_;
+  assign _0139_ = _0189_ & _0190_;
+  assign _0140_ = _0188_ & _0139_;
+  assign _0141_ = _0138_ & _0140_;
+  assign _0142_ = _0191_ & _0187_;
+  assign _0143_ = _0142_ & _0140_;
+  assign _0144_ = _0186_ & _0192_;
+  assign _0145_ = _0144_ & _0140_;
+  assign _0146_ = _0191_ & _0192_;
+  assign _0147_ = _0146_ & _0140_;
+  assign _0148_ = _0193_ & _0139_;
+  assign _0149_ = _0138_ & _0148_;
+  assign _0150_ = _0142_ & _0148_;
+  assign _0151_ = _0144_ & _0148_;
+  assign _0152_ = _0146_ & _0148_;
+  assign _0153_ = _0194_ & _0190_;
+  assign _0154_ = _0188_ & _0153_;
+  assign _0155_ = _0138_ & _0154_;
+  assign _0156_ = _0142_ & _0154_;
+  assign _0157_ = _0144_ & _0154_;
+  assign _0158_ = _0146_ & _0154_;
+  assign _0159_ = _0193_ & _0153_;
+  assign _0160_ = _0138_ & _0159_;
+  assign _0161_ = _0142_ & _0159_;
+  assign _0162_ = _0144_ & _0159_;
+  assign _0163_ = _0146_ & _0159_;
+  assign _0164_ = _0189_ & _0195_;
+  assign _0165_ = _0188_ & _0164_;
+  assign _0166_ = _0138_ & _0165_;
+  assign _0167_ = _0142_ & _0165_;
+  assign _0168_ = _0144_ & _0165_;
+  assign _0169_ = _0146_ & _0165_;
+  assign _0170_ = _0193_ & _0164_;
+  assign _0171_ = _0138_ & _0170_;
+  assign _0172_ = _0142_ & _0170_;
+  assign _0173_ = _0144_ & _0170_;
+  assign _0174_ = _0146_ & _0170_;
+  assign _0175_ = _0194_ & _0195_;
+  assign _0176_ = _0188_ & _0175_;
+  assign _0177_ = _0138_ & _0176_;
+  assign _0178_ = _0142_ & _0176_;
+  assign _0179_ = _0144_ & _0176_;
+  assign _0180_ = _0146_ & _0176_;
+  assign _0181_ = _0193_ & _0175_;
+  assign _0182_ = _0138_ & _0181_;
+  assign _0183_ = _0142_ & _0181_;
+  assign _0184_ = _0144_ & _0181_;
+  assign _0185_ = _0146_ & _0181_;
+  wire [6:0] addedVar1;
+  assign addedVar1 = { _0445_, _0444_, _0443_, _0441_, _0438_, _0220_, _0219_ };
+  assign _0130_ = | addedVar1;
+  wire [6:0] addedVar2;
+  assign addedVar2 = { _0445_, _0444_, _0443_, _0442_, _0438_, _0220_, _0219_ };
+  assign _0131_ = | addedVar2;
+  wire [6:0] addedVar3;
+  assign addedVar3 = { _0445_, _0444_, _0443_, _0442_, _0441_, _0220_, _0219_ };
+  assign _0132_ = | addedVar3;
+  wire [1:0] addedVar4;
+  assign addedVar4 = { _0443_, _0441_ };
+  assign _0133_ = | addedVar4;
+  wire [2:0] addedVar5;
+  assign addedVar5 = { is_jalr_addi_slti_sltiu_xori_ori_andi, is_slli_srli_srai, is_lui_auipc_jal };
+  assign _0134_ = | addedVar5;
+  wire [1:0] addedVar6;
+  assign addedVar6 = { _0295_, latched_branch };
+  assign _0135_ = | addedVar6;
+  wire [1:0] addedVar7;
+  assign addedVar7 = { _0442_, _0441_ };
+  assign _0136_ = | addedVar7;
+  wire [1:0] addedVar8;
+  assign addedVar8 = { _0565_, _0562_ };
+  assign _0137_ = | addedVar8;
+  assign _0202_ = ! mem_rdata_q[14:12];
+  assign _0203_ = mem_rdata_q[14:12] == 1'h1;
+  assign _0204_ = mem_rdata_q[14:12] == 3'h4;
+  assign _0205_ = mem_rdata_q[14:12] == 3'h5;
+  assign _0206_ = mem_rdata_q[14:12] == 3'h6;
+  assign _0207_ = mem_rdata_q[14:12] == 3'h7;
+  assign _0208_ = mem_rdata_q[14:12] == 2'h2;
+  assign _0209_ = mem_rdata_q[14:12] == 2'h3;
+  assign _0210_ = ! mem_rdata_q[31:25];
+  assign _0211_ = mem_rdata_q[31:25] == 6'h20;
+  assign _0212_ = mem_rdata_q[6:0] == 7'h73;
+  assign _0213_ = mem_rdata_q[31:12] == 20'hc0002;
+  assign _0214_ = mem_rdata_q[31:12] == 20'hc0102;
+  assign _0215_ = mem_rdata_q[31:12] == 20'hc8002;
+  assign _0216_ = mem_rdata_q[31:12] == 20'hc8102;
+  assign _0217_ = mem_rdata_q[31:12] == 20'hc0202;
+  assign _0218_ = mem_rdata_q[31:12] == 20'hc8202;
+  assign alu_eq = reg_op1 == reg_op2;
+  assign _0219_ = cpu_state == 7'h40;
+  assign _0220_ = cpu_state == 5'h10;
+  assign _0221_ = ! reg_sh;
+  assign _0222_ = mem_rdata_latched[6:0] == 6'h37;
+  assign _0223_ = mem_rdata_latched[6:0] == 5'h17;
+  assign _0224_ = mem_rdata_latched[6:0] == 7'h6f;
+  assign _0225_ = mem_rdata_latched[6:0] == 7'h67;
+  assign _0226_ = ! mem_rdata_latched[14:12];
+  assign _0227_ = mem_rdata_latched[6:0] == 7'h63;
+  assign _0228_ = mem_rdata_latched[6:0] == 2'h3;
+  assign _0229_ = mem_rdata_latched[6:0] == 6'h23;
+  assign _0230_ = mem_rdata_latched[6:0] == 5'h13;
+  assign _0231_ = mem_rdata_latched[6:0] == 6'h33;
+  assign _0232_ = reg_sh >= 3'h4;
+  assign _0233_ = decoder_trigger && _0311_;
+  assign _0234_ = is_beq_bne_blt_bge_bltu_bgeu && _0202_;
+  assign _0235_ = is_beq_bne_blt_bge_bltu_bgeu && _0203_;
+  assign _0236_ = is_beq_bne_blt_bge_bltu_bgeu && _0204_;
+  assign _0237_ = is_beq_bne_blt_bge_bltu_bgeu && _0205_;
+  assign _0238_ = is_beq_bne_blt_bge_bltu_bgeu && _0206_;
+  assign _0239_ = is_beq_bne_blt_bge_bltu_bgeu && _0207_;
+  assign _0240_ = is_lb_lh_lw_lbu_lhu && _0202_;
+  assign _0241_ = is_lb_lh_lw_lbu_lhu && _0203_;
+  assign _0242_ = is_lb_lh_lw_lbu_lhu && _0208_;
+  assign _0243_ = is_lb_lh_lw_lbu_lhu && _0204_;
+  assign _0244_ = is_lb_lh_lw_lbu_lhu && _0205_;
+  assign _0245_ = is_sb_sh_sw && _0202_;
+  assign _0246_ = is_sb_sh_sw && _0203_;
+  assign _0247_ = is_sb_sh_sw && _0208_;
+  assign _0248_ = is_alu_reg_imm && _0202_;
+  assign _0249_ = is_alu_reg_imm && _0208_;
+  assign _0250_ = is_alu_reg_imm && _0209_;
+  assign _0251_ = is_alu_reg_imm && _0204_;
+  assign _0252_ = is_alu_reg_imm && _0206_;
+  assign _0253_ = is_alu_reg_imm && _0207_;
+  assign _0254_ = is_alu_reg_imm && _0203_;
+  assign _0255_ = _0254_ && _0210_;
+  assign _0256_ = is_alu_reg_imm && _0205_;
+  assign _0257_ = _0256_ && _0210_;
+  assign _0258_ = _0256_ && _0211_;
+  assign _0259_ = is_alu_reg_reg && _0202_;
+  assign _0260_ = _0259_ && _0210_;
+  assign _0261_ = _0259_ && _0211_;
+  assign _0262_ = is_alu_reg_reg && _0203_;
+  assign _0263_ = _0262_ && _0210_;
+  assign _0264_ = is_alu_reg_reg && _0208_;
+  assign _0265_ = _0264_ && _0210_;
+  assign _0266_ = is_alu_reg_reg && _0209_;
+  assign _0267_ = _0266_ && _0210_;
+  assign _0268_ = is_alu_reg_reg && _0204_;
+  assign _0269_ = _0268_ && _0210_;
+  assign _0270_ = is_alu_reg_reg && _0205_;
+  assign _0271_ = _0270_ && _0210_;
+  assign _0272_ = _0270_ && _0211_;
+  assign _0273_ = is_alu_reg_reg && _0206_;
+  assign _0274_ = _0273_ && _0210_;
+  assign _0275_ = is_alu_reg_reg && _0207_;
+  assign _0276_ = _0275_ && _0210_;
+  assign _0277_ = _0212_ && _0213_;
+  assign _0279_ = _0212_ && _0214_;
+  assign _0280_ = _0212_ && _0215_;
+  assign _0282_ = _0212_ && _0216_;
+  assign _0283_ = _0212_ && _0217_;
+  assign _0284_ = _0212_ && _0218_;
+  assign _0285_ = _0212_ && _0312_;
+  assign _0286_ = _0285_ && _0313_;
+  assign _0287_ = is_alu_reg_imm && _0595_;
+  assign _0288_ = _0203_ && _0210_;
+  assign _0289_ = _0205_ && _0210_;
+  assign _0290_ = _0205_ && _0211_;
+  assign _0291_ = is_alu_reg_imm && _0596_;
+  assign _0292_ = latched_store && latched_branch;
+  assign _0295_ = latched_store && _0317_;
+  assign _0296_ = resetn && cpuregs_write;
+  assign _0297_ = _0296_ && latched_rd;
+  assign _0298_ = mem_do_rinst && mem_done;
+  assign _0300_ = _0318_ && _0319_;
+  assign _0301_ = _0320_ && mem_done;
+  assign _0302_ = decoder_trigger_q && _0321_;
+  assign _0303_ = _0302_ && instr_ecall_ebreak;
+  assign mem_xfer = mem_valid && mem_ready;
+  assign _0304_ = mem_xfer && _0597_;
+  assign _0305_ = _0304_ && _0335_;
+  assign _0306_ = _0593_ && mem_do_rinst;
+  assign mem_done = resetn && _0336_;
+  assign _0307_ = resetn && _0308_;
+  assign mem_la_write = _0307_ && mem_do_wdata;
+  assign mem_la_read = resetn && _0309_;
+  assign _0309_ = _0308_ && _0338_;
+  assign _0310_ = _0225_ && _0226_;
+  assign _0311_ = ! decoder_pseudo_trigger;
+  assign _0312_ = ! mem_rdata_q[31:21];
+  assign _0313_ = ! mem_rdata_q[19:7];
+  assign _0314_ = ! alu_eq;
+  assign _0315_ = ! alu_lts;
+  assign _0316_ = ! alu_ltu;
+  assign _0317_ = ! latched_branch;
+  assign _0299_ = ! decoder_trigger;
+  assign _0318_ = ! instr_jalr;
+  assign _0319_ = ! instr_retirq;
+  assign _0320_ = ! mem_do_prefetch;
+  assign _0321_ = ! decoder_pseudo_trigger_q;
+  assign _0322_ = ! resetn;
+  assign _0308_ = ! mem_state;
+  assign _0278_ = _0277_ || _0279_;
+  assign _0281_ = _0280_ || _0282_;
+  assign _0323_ = instr_jalr || _0291_;
+  assign _0324_ = instr_sra || instr_srai;
+  assign _0325_ = instr_xori || instr_xor;
+  assign _0326_ = instr_ori || instr_or;
+  assign _0327_ = instr_andi || instr_and;
+  assign _0293_ = instr_sll || instr_slli;
+  assign _0328_ = instr_srl || instr_srli;
+  assign _0329_ = _0328_ || instr_sra;
+  assign _0294_ = _0329_ || instr_srai;
+  assign _0330_ = _0320_ || mem_done;
+  assign _0331_ = instr_lb || instr_lbu;
+  assign _0332_ = instr_lh || instr_lhu;
+  assign _0333_ = _0322_ || mem_done;
+  assign _0334_ = mem_do_rinst || mem_do_rdata;
+  assign _0335_ = _0334_ || mem_do_wdata;
+  assign _0336_ = _0305_ || _0306_;
+  assign _0337_ = mem_do_rinst || mem_do_prefetch;
+  assign _0338_ = _0337_ || mem_do_rdata;
+  assign _0339_ = _0322_ || trap;
+  assign _0340_ = _0322_ || mem_ready;
+  assign _0341_ = mem_la_read || mem_la_write;
+  assign alu_lts = $signed(reg_op1) < $signed(reg_op2);
+  assign alu_ltu = reg_op1 < reg_op2;
+  assign _0436_ = decoded_rs[4] ? _0343_ : _0342_;
+  assign _0342_ = decoded_rs[3] ? _0345_ : _0344_;
+  assign _0343_ = decoded_rs[3] ? _0347_ : _0346_;
+  assign _0344_ = decoded_rs[2] ? _0349_ : _0348_;
+  assign _0345_ = decoded_rs[2] ? _0351_ : _0350_;
+  assign _0346_ = decoded_rs[2] ? _0353_ : _0352_;
+  assign _0347_ = decoded_rs[2] ? _0355_ : _0354_;
+  assign _0348_ = decoded_rs[1] ? _0357_ : _0356_;
+  assign _0349_ = decoded_rs[1] ? _0359_ : _0358_;
+  assign _0350_ = decoded_rs[1] ? _0361_ : _0360_;
+  assign _0351_ = decoded_rs[1] ? _0363_ : _0362_;
+  assign _0352_ = decoded_rs[1] ? _0365_ : _0364_;
+  assign _0353_ = decoded_rs[1] ? _0367_ : _0366_;
+  assign _0354_ = decoded_rs[1] ? _0369_ : _0368_;
+  assign _0355_ = decoded_rs[1] ? _0371_ : _0370_;
+  assign _0356_ = decoded_rs[0] ? \cpuregs[1] : \cpuregs[0] ;
+  assign _0366_ = decoded_rs[0] ? \cpuregs[21] : \cpuregs[20] ;
+  assign _0367_ = decoded_rs[0] ? \cpuregs[23] : \cpuregs[22] ;
+  assign _0368_ = decoded_rs[0] ? \cpuregs[25] : \cpuregs[24] ;
+  assign _0369_ = decoded_rs[0] ? \cpuregs[27] : \cpuregs[26] ;
+  assign _0370_ = decoded_rs[0] ? \cpuregs[29] : \cpuregs[28] ;
+  assign _0371_ = decoded_rs[0] ? \cpuregs[31] : \cpuregs[30] ;
+  assign _0357_ = decoded_rs[0] ? \cpuregs[3] : \cpuregs[2] ;
+  assign _0358_ = decoded_rs[0] ? \cpuregs[5] : \cpuregs[4] ;
+  assign _0359_ = decoded_rs[0] ? \cpuregs[7] : \cpuregs[6] ;
+  assign _0360_ = decoded_rs[0] ? \cpuregs[9] : \cpuregs[8] ;
+  assign _0361_ = decoded_rs[0] ? \cpuregs[11] : \cpuregs[10] ;
+  assign _0362_ = decoded_rs[0] ? \cpuregs[13] : \cpuregs[12] ;
+  assign _0363_ = decoded_rs[0] ? \cpuregs[15] : \cpuregs[14] ;
+  assign _0364_ = decoded_rs[0] ? \cpuregs[17] : \cpuregs[16] ;
+  assign _0365_ = decoded_rs[0] ? \cpuregs[19] : \cpuregs[18] ;
+  assign _0372_ = _0141_ & _0002_[31];
+  assign _0373_ = _0157_ & _0002_[31];
+  assign _0374_ = _0158_ & _0002_[31];
+  assign _0375_ = _0160_ & _0002_[31];
+  assign _0376_ = _0161_ & _0002_[31];
+  assign _0377_ = _0162_ & _0002_[31];
+  assign _0378_ = _0163_ & _0002_[31];
+  assign _0379_ = _0166_ & _0002_[31];
+  assign _0380_ = _0167_ & _0002_[31];
+  assign _0381_ = _0168_ & _0002_[31];
+  assign _0382_ = _0169_ & _0002_[31];
+  assign _0383_ = _0143_ & _0002_[31];
+  assign _0384_ = _0171_ & _0002_[31];
+  assign _0385_ = _0172_ & _0002_[31];
+  assign _0386_ = _0173_ & _0002_[31];
+  assign _0387_ = _0174_ & _0002_[31];
+  assign _0388_ = _0177_ & _0002_[31];
+  assign _0389_ = _0178_ & _0002_[31];
+  assign _0390_ = _0179_ & _0002_[31];
+  assign _0391_ = _0180_ & _0002_[31];
+  assign _0392_ = _0182_ & _0002_[31];
+  assign _0393_ = _0183_ & _0002_[31];
+  assign _0394_ = _0145_ & _0002_[31];
+  assign _0395_ = _0184_ & _0002_[31];
+  assign _0396_ = _0185_ & _0002_[31];
+  assign _0397_ = _0147_ & _0002_[31];
+  assign _0398_ = _0149_ & _0002_[31];
+  assign _0399_ = _0150_ & _0002_[31];
+  assign _0400_ = _0151_ & _0002_[31];
+  assign _0401_ = _0152_ & _0002_[31];
+  assign _0402_ = _0155_ & _0002_[31];
+  assign _0403_ = _0156_ & _0002_[31];
+  assign _0404_ = _0372_ ? _0001_ : \cpuregs[0] ;
+  assign _0405_ = _0373_ ? _0001_ : \cpuregs[10] ;
+  assign _0406_ = _0374_ ? _0001_ : \cpuregs[11] ;
+  assign _0407_ = _0375_ ? _0001_ : \cpuregs[12] ;
+  assign _0408_ = _0376_ ? _0001_ : \cpuregs[13] ;
+  assign _0409_ = _0377_ ? _0001_ : \cpuregs[14] ;
+  assign _0410_ = _0378_ ? _0001_ : \cpuregs[15] ;
+  assign _0411_ = _0379_ ? _0001_ : \cpuregs[16] ;
+  assign _0412_ = _0380_ ? _0001_ : \cpuregs[17] ;
+  assign _0413_ = _0381_ ? _0001_ : \cpuregs[18] ;
+  assign _0414_ = _0382_ ? _0001_ : \cpuregs[19] ;
+  assign _0415_ = _0383_ ? _0001_ : \cpuregs[1] ;
+  assign _0416_ = _0384_ ? _0001_ : \cpuregs[20] ;
+  assign _0417_ = _0385_ ? _0001_ : \cpuregs[21] ;
+  assign _0418_ = _0386_ ? _0001_ : \cpuregs[22] ;
+  assign _0419_ = _0387_ ? _0001_ : \cpuregs[23] ;
+  assign _0420_ = _0388_ ? _0001_ : \cpuregs[24] ;
+  assign _0421_ = _0389_ ? _0001_ : \cpuregs[25] ;
+  assign _0422_ = _0390_ ? _0001_ : \cpuregs[26] ;
+  assign _0423_ = _0391_ ? _0001_ : \cpuregs[27] ;
+  assign _0424_ = _0392_ ? _0001_ : \cpuregs[28] ;
+  assign _0425_ = _0393_ ? _0001_ : \cpuregs[29] ;
+  assign _0426_ = _0394_ ? _0001_ : \cpuregs[2] ;
+  assign _0427_ = _0395_ ? _0001_ : \cpuregs[30] ;
+  assign _0428_ = _0396_ ? _0001_ : \cpuregs[31] ;
+  assign _0429_ = _0397_ ? _0001_ : \cpuregs[3] ;
+  assign _0430_ = _0398_ ? _0001_ : \cpuregs[4] ;
+  assign _0431_ = _0399_ ? _0001_ : \cpuregs[5] ;
+  assign _0432_ = _0400_ ? _0001_ : \cpuregs[6] ;
+  assign _0433_ = _0401_ ? _0001_ : \cpuregs[7] ;
+  assign _0434_ = _0402_ ? _0001_ : \cpuregs[8] ;
+  assign _0435_ = _0403_ ? _0001_ : \cpuregs[9] ;
+  always @(posedge clk)
+    \cpuregs[0] <= _0404_;
+  always @(posedge clk)
+    \cpuregs[10] <= _0405_;
+  always @(posedge clk)
+    \cpuregs[11] <= _0406_;
+  always @(posedge clk)
+    \cpuregs[12] <= _0407_;
+  always @(posedge clk)
+    \cpuregs[13] <= _0408_;
+  always @(posedge clk)
+    \cpuregs[14] <= _0409_;
+  always @(posedge clk)
+    \cpuregs[15] <= _0410_;
+  always @(posedge clk)
+    \cpuregs[16] <= _0411_;
+  always @(posedge clk)
+    \cpuregs[17] <= _0412_;
+  always @(posedge clk)
+    \cpuregs[18] <= _0413_;
+  always @(posedge clk)
+    \cpuregs[19] <= _0414_;
+  always @(posedge clk)
+    \cpuregs[1] <= _0415_;
+  always @(posedge clk)
+    \cpuregs[20] <= _0416_;
+  always @(posedge clk)
+    \cpuregs[21] <= _0417_;
+  always @(posedge clk)
+    \cpuregs[22] <= _0418_;
+  always @(posedge clk)
+    \cpuregs[23] <= _0419_;
+  always @(posedge clk)
+    \cpuregs[24] <= _0420_;
+  always @(posedge clk)
+    \cpuregs[25] <= _0421_;
+  always @(posedge clk)
+    \cpuregs[26] <= _0422_;
+  always @(posedge clk)
+    \cpuregs[27] <= _0423_;
+  always @(posedge clk)
+    \cpuregs[28] <= _0424_;
+  always @(posedge clk)
+    \cpuregs[29] <= _0425_;
+  always @(posedge clk)
+    \cpuregs[2] <= _0426_;
+  always @(posedge clk)
+    \cpuregs[30] <= _0427_;
+  always @(posedge clk)
+    \cpuregs[31] <= _0428_;
+  always @(posedge clk)
+    \cpuregs[3] <= _0429_;
+  always @(posedge clk)
+    \cpuregs[4] <= _0430_;
+  always @(posedge clk)
+    \cpuregs[5] <= _0431_;
+  always @(posedge clk)
+    \cpuregs[6] <= _0432_;
+  always @(posedge clk)
+    \cpuregs[7] <= _0433_;
+  always @(posedge clk)
+    \cpuregs[8] <= _0434_;
+  always @(posedge clk)
+    \cpuregs[9] <= _0435_;
+  assign _0437_ = reg_op1 | reg_op2;
+  always @(posedge clk)
+    trap <= _0102_;
+  always @(posedge clk)
+    pcpi_valid <= _0092_;
+  always @(posedge clk)
+    eoi <= _0014_;
+  reg \trace_data_reg[0] ;
+  always @(posedge clk)
+    \trace_data_reg[0] <= 1'hx;
+  assign trace_data[0] = \trace_data_reg[0] ;
+  always @(posedge clk)
+    count_cycle <= _0004_;
+  always @(posedge clk)
+    count_instr <= _0005_;
+  always @(posedge clk)
+    reg_pc <= addedVar9;
+  wire [31:0] addedVar9;
+  assign addedVar9 = { _0097_[31:2], 2'h0 };
+  always @(posedge clk)
+    reg_next_pc <= addedVar10;
+  wire [31:0] addedVar10;
+  assign addedVar10 = { _0093_[31:2], 2'h0 };
+  always @(posedge clk)
+    reg_op1 <= _0094_;
+  always @(posedge clk)
+    reg_op2 <= _0095_;
+  always @(posedge clk)
+    reg_out <= _0096_;
+  always @(posedge clk)
+    reg_sh <= _0098_;
+  always @(posedge clk)
+    mem_wordsize <= _0089_;
+  always @(posedge clk)
+    mem_do_prefetch <= _0080_;
+  always @(posedge clk)
+    mem_do_rinst <= _0082_;
+  always @(posedge clk)
+    mem_do_rdata <= _0081_;
+  always @(posedge clk)
+    mem_do_wdata <= _0083_;
+  always @(posedge clk)
+    decoder_trigger <= _0013_;
+  always @(posedge clk)
+    decoder_trigger_q <= decoder_trigger;
+  always @(posedge clk)
+    decoder_pseudo_trigger <= _0012_;
+  always @(posedge clk)
+    decoder_pseudo_trigger_q <= decoder_pseudo_trigger;
+  always @(posedge clk)
+    cpu_state <= _0006_;
+  always @(posedge clk)
+    latched_store <= _0078_;
+  always @(posedge clk)
+    latched_stalu <= _0077_;
+  always @(posedge clk)
+    latched_branch <= _0071_;
+  always @(posedge clk)
+    latched_compr <= _0072_;
+  always @(posedge clk)
+    latched_is_lu <= _0075_;
+  always @(posedge clk)
+    latched_is_lh <= _0074_;
+  always @(posedge clk)
+    latched_is_lb <= _0073_;
+  always @(posedge clk)
+    latched_rd <= _0076_;
+  always @(posedge clk)
+    alu_out_q <= alu_out;
+  always @(posedge clk)
+    pcpi_insn <= _0091_;
+  always @(posedge clk)
+    instr_lui <= _0033_;
+  always @(posedge clk)
+    instr_auipc <= _0019_;
+  always @(posedge clk)
+    instr_jal <= _0027_;
+  always @(posedge clk)
+    instr_jalr <= _0028_;
+  always @(posedge clk)
+    instr_beq <= _0020_;
+  always @(posedge clk)
+    instr_bne <= _0025_;
+  always @(posedge clk)
+    instr_blt <= _0023_;
+  always @(posedge clk)
+    instr_bge <= _0021_;
+  always @(posedge clk)
+    instr_bltu <= _0024_;
+  always @(posedge clk)
+    instr_bgeu <= _0022_;
+  always @(posedge clk)
+    instr_lb <= _0029_;
+  always @(posedge clk)
+    instr_lh <= _0031_;
+  always @(posedge clk)
+    instr_lw <= _0034_;
+  always @(posedge clk)
+    instr_lbu <= _0030_;
+  always @(posedge clk)
+    instr_lhu <= _0032_;
+  always @(posedge clk)
+    instr_sb <= _0042_;
+  always @(posedge clk)
+    instr_sh <= _0043_;
+  always @(posedge clk)
+    instr_sw <= _0055_;
+  always @(posedge clk)
+    instr_addi <= _0016_;
+  always @(posedge clk)
+    instr_slti <= _0047_;
+  always @(posedge clk)
+    instr_sltiu <= _0048_;
+  always @(posedge clk)
+    instr_xori <= _0057_;
+  always @(posedge clk)
+    instr_ori <= _0036_;
+  always @(posedge clk)
+    instr_andi <= _0018_;
+  always @(posedge clk)
+    instr_slli <= _0045_;
+  always @(posedge clk)
+    instr_srli <= _0053_;
+  always @(posedge clk)
+    instr_srai <= _0051_;
+  always @(posedge clk)
+    instr_add <= _0015_;
+  always @(posedge clk)
+    instr_sub <= _0054_;
+  always @(posedge clk)
+    instr_sll <= _0044_;
+  always @(posedge clk)
+    instr_slt <= _0046_;
+  always @(posedge clk)
+    instr_sltu <= _0049_;
+  always @(posedge clk)
+    instr_xor <= _0056_;
+  always @(posedge clk)
+    instr_srl <= _0052_;
+  always @(posedge clk)
+    instr_sra <= _0050_;
+  always @(posedge clk)
+    instr_or <= _0035_;
+  always @(posedge clk)
+    instr_and <= _0017_;
+  always @(posedge clk)
+    instr_rdcycle <= _0037_;
+  always @(posedge clk)
+    instr_rdcycleh <= _0038_;
+  always @(posedge clk)
+    instr_rdinstr <= _0039_;
+  always @(posedge clk)
+    instr_rdinstrh <= _0040_;
+  always @(posedge clk)
+    instr_ecall_ebreak <= _0026_;
+  always @(posedge clk)
+    instr_retirq <= _0041_;
+  always @(posedge clk)
+    decoded_rd <= _0009_;
+  always @(posedge clk)
+    decoded_rs1 <= _0010_;
+  always @(posedge clk)
+    decoded_rs2 <= _0011_;
+  always @(posedge clk)
+    decoded_imm <= _0007_;
+  always @(posedge clk)
+    decoded_imm_j <= _0008_;
+  always @(posedge clk)
+    compressed_instr <= _0003_;
+  always @(posedge clk)
+    is_lui_auipc_jal <= _0065_;
+  always @(posedge clk)
+    is_lb_lh_lw_lbu_lhu <= _0063_;
+  always @(posedge clk)
+    is_slli_srli_srai <= _0068_;
+  always @(posedge clk)
+    is_jalr_addi_slti_sltiu_xori_ori_andi <= _0062_;
+  always @(posedge clk)
+    is_sb_sh_sw <= _0067_;
+  always @(posedge clk)
+    is_lui_auipc_jal_jalr_addi_add_sub <= _0066_;
+  always @(posedge clk)
+    is_slti_blt_slt <= _0069_;
+  always @(posedge clk)
+    is_sltiu_bltu_sltu <= _0070_;
+  always @(posedge clk)
+    is_beq_bne_blt_bge_bltu_bgeu <= _0060_;
+  always @(posedge clk)
+    is_lbu_lhu_lw <= _0064_;
+  always @(posedge clk)
+    is_alu_reg_imm <= _0058_;
+  always @(posedge clk)
+    is_alu_reg_reg <= _0059_;
+  always @(posedge clk)
+    is_compare <= _0061_;
+  always @(posedge clk)
+    mem_valid <= _0087_;
+  always @(posedge clk)
+    mem_instr <= _0084_;
+  always @(posedge clk)
+    mem_addr <= _0079_;
+  always @(posedge clk)
+    mem_wdata <= _0088_;
+  always @(posedge clk)
+    mem_wstrb <= _0090_;
+  always @(posedge clk)
+    mem_state <= _0086_;
+  always @(posedge clk)
+    mem_rdata_q <= _0085_;
+  assign _0116_ = alu_out_0 ? 1'h1 : 1'h0;
+  assign _0438_ = cpu_state == 4'h8;
+  assign _0439_ = latched_branch ? _0604_ : reg_next_pc;
+  assign _0440_ = _0219_ ? _0439_ : 32'hxxxxxxxx;
+  assign _0109_ = resetn ? _0440_ : 32'hxxxxxxxx;
+  function [0:0] _1069_;
+    input [0:0] a;
+    input [1:0] b;
+    input [1:0] s;
+    casez (s)
+      2'b?1:
+        _1069_ = b[0:0];
+      2'b1?:
+        _1069_ = b[1:1];
+      default:
+        _1069_ = a;
+    endcase
+  endfunction
+  wire [1:0] addedVar11;
+  assign addedVar11 = { _0113_, 1'h0 };
+  wire [1:0] addedVar12;
+  assign addedVar12 = { _0442_, _0130_ };
+  assign _0108_ = _1069_(1'hx, addedVar11, addedVar12);
+  assign _0441_ = cpu_state == 1'h1;
+  assign _0442_ = cpu_state == 2'h2;
+  assign _0443_ = cpu_state == 3'h4;
+  assign _0444_ = cpu_state == 6'h20;
+  assign _0445_ = cpu_state == 8'h80;
+  function [0:0] _1075_;
+    input [0:0] a;
+    input [1:0] b;
+    input [1:0] s;
+    casez (s)
+      2'b?1:
+        _1075_ = b[0:0];
+      2'b1?:
+        _1075_ = b[1:1];
+      default:
+        _1075_ = a;
+    endcase
+  endfunction
+  wire [1:0] addedVar13;
+  assign addedVar13 = { 1'h0, _0111_ };
+  wire [1:0] addedVar14;
+  assign addedVar14 = { _0131_, _0441_ };
+  assign _0106_ = _1075_(1'hx, addedVar13, addedVar14);
+  function [0:0] _1076_;
+    input [0:0] a;
+    input [1:0] b;
+    input [1:0] s;
+    casez (s)
+      2'b?1:
+        _1076_ = b[0:0];
+      2'b1?:
+        _1076_ = b[1:1];
+      default:
+        _1076_ = a;
+    endcase
+  endfunction
+  wire [1:0] addedVar15;
+  assign addedVar15 = { _0112_, 1'h0 };
+  wire [1:0] addedVar16;
+  assign addedVar16 = { _0438_, _0132_ };
+  assign _0107_ = _1076_(1'hx, addedVar15, addedVar16);
+  assign _0101_ = resetn ? _0108_ : 1'h0;
+  assign _0099_ = resetn ? _0106_ : 1'h0;
+  assign _0100_ = resetn ? _0107_ : 1'h0;
+  assign _0446_ = _0301_ ? 1'h1 : 1'h0;
+  assign _0447_ = _0330_ ? _0446_ : 1'h0;
+  assign _0448_ = _0136_ ? _0447_ : 1'h0;
+  assign _0012_ = resetn ? _0448_ : 1'h0;
+  assign _0449_ = _0301_ ? 1'h1 : _0298_;
+  assign _0450_ = _0330_ ? _0449_ : _0298_;
+  function [0:0] _1086_;
+    input [0:0] a;
+    input [1:0] b;
+    input [1:0] s;
+    casez (s)
+      2'b?1:
+        _1086_ = b[0:0];
+      2'b1?:
+        _1086_ = b[1:1];
+      default:
+        _1086_ = a;
+    endcase
+  endfunction
+  wire [1:0] addedVar17;
+  assign addedVar17 = { _0453_, _0450_ };
+  wire [1:0] addedVar18;
+  assign addedVar18 = { _0438_, _0136_ };
+  assign _0451_ = _1086_(_0298_, addedVar17, addedVar18);
+  assign _0452_ = alu_out_0 ? 1'h0 : _0298_;
+  assign _0453_ = is_beq_bne_blt_bge_bltu_bgeu ? _0452_ : _0298_;
+  assign _0013_ = resetn ? _0451_ : _0298_;
+  function [31:0] _1090_;
+    input [31:0] a;
+    input [95:0] b;
+    input [2:0] s;
+    casez (s)
+      3'b??1:
+        _1090_ = b[31:0];
+      3'b?1?:
+        _1090_ = b[63:32];
+      3'b1??:
+        _1090_ = b[95:64];
+      default:
+        _1090_ = a;
+    endcase
+  endfunction
+  wire [95:0] addedVar19;
+  assign addedVar19 = { mem_rdata_word, mem_rdata_word[15], mem_rdata_word[15], mem_rdata_word[15], mem_rdata_word[15], mem_rdata_word[15], mem_rdata_word[15], mem_rdata_word[15], mem_rdata_word[15], mem_rdata_word[15], mem_rdata_word[15], mem_rdata_word[15], mem_rdata_word[15], mem_rdata_word[15], mem_rdata_word[15], mem_rdata_word[15], mem_rdata_word[15], mem_rdata_word[15:0], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7], mem_rdata_word[7:0] };
+  wire [2:0] addedVar20;
+  assign addedVar20 = { latched_is_lu, latched_is_lh, latched_is_lb };
+  assign _0454_ = _1090_(32'hxxxxxxxx, addedVar19, addedVar20);
+  assign _0455_ = _0301_ ? _0454_ : 32'hxxxxxxxx;
+  assign _0456_ = _0330_ ? _0455_ : 32'hxxxxxxxx;
+  function [31:0] _1093_;
+    input [31:0] a;
+    input [127:0] b;
+    input [3:0] s;
+    casez (s)
+      4'b???1:
+        _1093_ = b[31:0];
+      4'b??1?:
+        _1093_ = b[63:32];
+      4'b?1??:
+        _1093_ = b[95:64];
+      4'b1???:
+        _1093_ = b[127:96];
+      default:
+        _1093_ = a;
+    endcase
+  endfunction
+  wire [127:0] addedVar21;
+  assign addedVar21 = { _0459_, _0123_, _0458_, _0456_ };
+  wire [3:0] addedVar22;
+  assign addedVar22 = { _0444_, _0438_, _0443_, _0441_ };
+  assign _0457_ = _1093_(32'hxxxxxxxx, addedVar21, addedVar22);
+  assign _0458_ = _0221_ ? reg_op1 : 32'hxxxxxxxx;
+  assign _0459_ = is_rdcycle_rdcycleh_rdinstr_rdinstrh ? _0460_ : 32'hxxxxxxxx;
+  function [31:0] _1096_;
+    input [31:0] a;
+    input [127:0] b;
+    input [3:0] s;
+    casez (s)
+      4'b???1:
+        _1096_ = b[31:0];
+      4'b??1?:
+        _1096_ = b[63:32];
+      4'b?1??:
+        _1096_ = b[95:64];
+      4'b1???:
+        _1096_ = b[127:96];
+      default:
+        _1096_ = a;
+    endcase
+  endfunction
+  wire [127:0] addedVar23;
+  assign addedVar23 = { count_cycle[31:0], count_cycle[63:32], count_instr[31:0], count_instr[63:32] };
+  wire [3:0] addedVar24;
+  assign addedVar24 = { instr_rdcycle, instr_rdcycleh, instr_rdinstr, instr_rdinstrh };
+  assign _0460_ = _1096_(32'hxxxxxxxx, addedVar23, addedVar24);
+  assign _0096_ = resetn ? _0457_ : 32'hxxxxxxxx;
+  assign _0461_ = _0232_ ? _0198_[4:0] : _0199_[4:0];
+  assign _0462_ = _0221_ ? 5'hxx : _0461_;
+  function [4:0] _1100_;
+    input [4:0] a;
+    input [9:0] b;
+    input [1:0] s;
+    casez (s)
+      2'b?1:
+        _1100_ = b[4:0];
+      2'b1?:
+        _1100_ = b[9:5];
+      default:
+        _1100_ = a;
+    endcase
+  endfunction
+  wire [9:0] addedVar25;
+  assign addedVar25 = { cpuregs_rs1[4:0], _0462_ };
+  wire [1:0] addedVar26;
+  assign addedVar26 = { _0220_, _0443_ };
+  assign _0463_ = _1100_(5'hxx, addedVar25, addedVar26);
+  assign _0098_ = resetn ? _0463_ : 5'hxx;
+  assign _0464_ = _0445_ ? 1'h1 : 1'h0;
+  assign _0102_ = resetn ? _0464_ : 1'h0;
+  assign _0465_ = is_beq_bne_blt_bge_bltu_bgeu ? 5'h00 : latched_rd;
+  function [4:0] _1105_;
+    input [4:0] a;
+    input [9:0] b;
+    input [1:0] s;
+    casez (s)
+      2'b?1:
+        _1105_ = b[4:0];
+      2'b1?:
+        _1105_ = b[9:5];
+      default:
+        _1105_ = a;
+    endcase
+  endfunction
+  wire [9:0] addedVar27;
+  assign addedVar27 = { decoded_rd, _0465_ };
+  wire [1:0] addedVar28;
+  assign addedVar28 = { _0219_, _0438_ };
+  assign _0466_ = _1105_(latched_rd, addedVar27, addedVar28);
+  assign _0076_ = resetn ? _0466_ : latched_rd;
+  assign _0467_ = mem_do_rdata ? latched_is_lb : instr_lb;
+  assign _0468_ = _0330_ ? _0467_ : latched_is_lb;
+  function [0:0] _1109_;
+    input [0:0] a;
+    input [1:0] b;
+    input [1:0] s;
+    casez (s)
+      2'b?1:
+        _1109_ = b[0:0];
+      2'b1?:
+        _1109_ = b[1:1];
+      default:
+        _1109_ = a;
+    endcase
+  endfunction
+  wire [1:0] addedVar29;
+  assign addedVar29 = { 1'h0, _0468_ };
+  wire [1:0] addedVar30;
+  assign addedVar30 = { _0219_, _0441_ };
+  assign _0469_ = _1109_(latched_is_lb, addedVar29, addedVar30);
+  assign _0073_ = resetn ? _0469_ : 1'h0;
+  assign _0470_ = mem_do_rdata ? latched_is_lh : instr_lh;
+  assign _0471_ = _0330_ ? _0470_ : latched_is_lh;
+  function [0:0] _1113_;
+    input [0:0] a;
+    input [1:0] b;
+    input [1:0] s;
+    casez (s)
+      2'b?1:
+        _1113_ = b[0:0];
+      2'b1?:
+        _1113_ = b[1:1];
+      default:
+        _1113_ = a;
+    endcase
+  endfunction
+  wire [1:0] addedVar31;
+  assign addedVar31 = { 1'h0, _0471_ };
+  wire [1:0] addedVar32;
+  assign addedVar32 = { _0219_, _0441_ };
+  assign _0472_ = _1113_(latched_is_lh, addedVar31, addedVar32);
+  assign _0074_ = resetn ? _0472_ : 1'h0;
+  assign _0473_ = mem_do_rdata ? latched_is_lu : is_lbu_lhu_lw;
+  assign _0474_ = _0330_ ? _0473_ : latched_is_lu;
+  function [0:0] _1117_;
+    input [0:0] a;
+    input [1:0] b;
+    input [1:0] s;
+    casez (s)
+      2'b?1:
+        _1117_ = b[0:0];
+      2'b1?:
+        _1117_ = b[1:1];
+      default:
+        _1117_ = a;
+    endcase
+  endfunction
+  wire [1:0] addedVar33;
+  assign addedVar33 = { 1'h0, _0474_ };
+  wire [1:0] addedVar34;
+  assign addedVar34 = { _0219_, _0441_ };
+  assign _0475_ = _1117_(latched_is_lu, addedVar33, addedVar34);
+  assign _0075_ = resetn ? _0475_ : 1'h0;
+  assign _0476_ = _0219_ ? compressed_instr : latched_compr;
+  assign _0072_ = resetn ? _0476_ : latched_compr;
+  assign _0477_ = is_beq_bne_blt_bge_bltu_bgeu ? alu_out_0 : instr_jalr;
+  function [0:0] _1122_;
+    input [0:0] a;
+    input [1:0] b;
+    input [1:0] s;
+    casez (s)
+      2'b?1:
+        _1122_ = b[0:0];
+      2'b1?:
+        _1122_ = b[1:1];
+      default:
+        _1122_ = a;
+    endcase
+  endfunction
+  wire [1:0] addedVar35;
+  assign addedVar35 = { _0480_, _0477_ };
+  wire [1:0] addedVar36;
+  assign addedVar36 = { _0219_, _0438_ };
+  assign _0478_ = _1122_(latched_branch, addedVar35, addedVar36);
+  assign _0479_ = instr_jal ? 1'h1 : 1'h0;
+  assign _0480_ = decoder_trigger ? _0479_ : 1'h0;
+  assign _0071_ = resetn ? _0478_ : 1'h0;
+  assign _0481_ = is_beq_bne_blt_bge_bltu_bgeu ? latched_stalu : 1'h1;
+  function [0:0] _1127_;
+    input [0:0] a;
+    input [1:0] b;
+    input [1:0] s;
+    casez (s)
+      2'b?1:
+        _1127_ = b[0:0];
+      2'b1?:
+        _1127_ = b[1:1];
+      default:
+        _1127_ = a;
+    endcase
+  endfunction
+  wire [1:0] addedVar37;
+  assign addedVar37 = { 1'h0, _0481_ };
+  wire [1:0] addedVar38;
+  assign addedVar38 = { _0219_, _0438_ };
+  assign _0482_ = _1127_(latched_stalu, addedVar37, addedVar38);
+  assign _0077_ = resetn ? _0482_ : 1'h0;
+  function [0:0] _1129_;
+    input [0:0] a;
+    input [3:0] b;
+    input [3:0] s;
+    casez (s)
+      4'b???1:
+        _1129_ = b[0:0];
+      4'b??1?:
+        _1129_ = b[1:1];
+      4'b?1??:
+        _1129_ = b[2:2];
+      4'b1???:
+        _1129_ = b[3:3];
+      default:
+        _1129_ = a;
+    endcase
+  endfunction
+  wire [3:0] addedVar39;
+  assign addedVar39 = { 1'h0, _0485_, _0484_, 1'h1 };
+  wire [3:0] addedVar40;
+  assign addedVar40 = { _0219_, _0444_, _0438_, _0133_ };
+  assign _0483_ = _1129_(latched_store, addedVar39, addedVar40);
+  assign _0484_ = is_beq_bne_blt_bge_bltu_bgeu ? alu_out_0 : 1'h1;
+  assign _0485_ = is_rdcycle_rdcycleh_rdinstr_rdinstrh ? 1'h1 : latched_store;
+  assign _0078_ = resetn ? _0483_ : 1'h0;
+  assign _0486_ = _0301_ ? 8'h40 : cpu_state;
+  assign _0487_ = _0330_ ? _0486_ : cpu_state;
+  function [7:0] _1135_;
+    input [7:0] a;
+    input [47:0] b;
+    input [5:0] s;
+    casez (s)
+      6'b?????1:
+        _1135_ = b[7:0];
+      6'b????1?:
+        _1135_ = b[15:8];
+      6'b???1??:
+        _1135_ = b[23:16];
+      6'b??1???:
+        _1135_ = b[31:24];
+      6'b?1????:
+        _1135_ = b[39:32];
+      6'b1?????:
+        _1135_ = b[47:40];
+      default:
+        _1135_ = a;
+    endcase
+  endfunction
+  wire [47:0] addedVar41;
+  assign addedVar41 = { _0494_, 1'h0, _0197_[6:0], 4'h0, _0196_[3:0], _0491_, _0489_, _0487_ };
+  wire [5:0] addedVar42;
+  assign addedVar42 = { _0219_, _0444_, _0220_, _0438_, _0443_, _0136_ };
+  assign _0488_ = _1135_(cpu_state, addedVar41, addedVar42);
+  assign _0489_ = _0221_ ? 8'h40 : cpu_state;
+  assign _0490_ = mem_done ? 8'h40 : cpu_state;
+  assign _0491_ = is_beq_bne_blt_bge_bltu_bgeu ? _0490_ : 8'h40;
+  assign _0196_[3:0] = is_sb_sh_sw ? 4'h2 : 4'h8;
+  function [6:0] _1140_;
+    input [6:0] a;
+    input [20:0] b;
+    input [2:0] s;
+    casez (s)
+      3'b??1:
+        _1140_ = b[6:0];
+      3'b?1?:
+        _1140_ = b[13:7];
+      3'b1??:
+        _1140_ = b[20:14];
+      default:
+        _1140_ = a;
+    endcase
+  endfunction
+  wire [2:0] addedVar43;
+  assign addedVar43 = { is_rdcycle_rdcycleh_rdinstr_rdinstrh, is_lb_lh_lw_lbu_lhu, _0134_ };
+  assign _0197_[6:0] = _1140_(7'h10, 21'h100088, addedVar43);
+  wire [1:0] addedVar44;
+  assign addedVar44 = { is_jalr_addi_slti_sltiu_xori_ori_andi, is_slli_srli_srai };
+  assign _0492_ = | addedVar44;
+  assign _0493_ = instr_jal ? cpu_state : 8'h20;
+  assign _0494_ = decoder_trigger ? _0493_ : cpu_state;
+  assign _0495_ = resetn ? _0488_ : 8'h40;
+  assign _0006_ = _0303_ ? 8'h80 : _0495_;
+  assign _0496_ = _0333_ ? 1'h0 : mem_do_wdata;
+  assign _0083_ = _0101_ ? 1'h1 : _0496_;
+  assign _0497_ = _0333_ ? 1'h0 : mem_do_rdata;
+  assign _0081_ = _0099_ ? 1'h1 : _0497_;
+  assign _0498_ = _0221_ ? mem_do_prefetch : mem_do_rinst;
+  function [0:0] _1151_;
+    input [0:0] a;
+    input [3:0] b;
+    input [3:0] s;
+    casez (s)
+      4'b???1:
+        _1151_ = b[0:0];
+      4'b??1?:
+        _1151_ = b[1:1];
+      4'b?1??:
+        _1151_ = b[2:2];
+      4'b1???:
+        _1151_ = b[3:3];
+      default:
+        _1151_ = a;
+    endcase
+  endfunction
+  wire [3:0] addedVar45;
+  assign addedVar45 = { _0502_, _0501_, _0500_, _0498_ };
+  wire [3:0] addedVar46;
+  assign addedVar46 = { _0219_, _0444_, _0220_, _0443_ };
+  assign _0499_ = _1151_(mem_do_rinst, addedVar45, addedVar46);
+  assign _0500_ = is_sb_sh_sw ? 1'h1 : mem_do_prefetch;
+  function [0:0] _1153_;
+    input [0:0] a;
+    input [1:0] b;
+    input [1:0] s;
+    casez (s)
+      2'b?1:
+        _1153_ = b[0:0];
+      2'b1?:
+        _1153_ = b[1:1];
+      default:
+        _1153_ = a;
+    endcase
+  endfunction
+  wire [1:0] addedVar47;
+  assign addedVar47 = { 1'h1, mem_do_prefetch };
+  wire [1:0] addedVar48;
+  assign addedVar48 = { is_lb_lh_lw_lbu_lhu, _0134_ };
+  assign _0501_ = _1153_(mem_do_rinst, addedVar47, addedVar48);
+  assign _0502_ = decoder_trigger ? _0479_ : _0299_;
+  assign _0503_ = resetn ? _0499_ : mem_do_rinst;
+  assign _0504_ = _0333_ ? 1'h0 : _0503_;
+  assign _0082_ = _0100_ ? 1'h1 : _0504_;
+  assign _0505_ = instr_jal ? mem_do_prefetch : _0300_;
+  assign _0506_ = decoder_trigger ? _0505_ : mem_do_prefetch;
+  assign _0507_ = _0219_ ? _0506_ : mem_do_prefetch;
+  assign _0508_ = resetn ? _0507_ : mem_do_prefetch;
+  assign _0080_ = _0333_ ? 1'h0 : _0508_;
+  function [1:0] _1163_;
+    input [1:0] a;
+    input [5:0] b;
+    input [2:0] s;
+    casez (s)
+      3'b??1:
+        _1163_ = b[1:0];
+      3'b?1?:
+        _1163_ = b[3:2];
+      3'b1??:
+        _1163_ = b[5:4];
+      default:
+        _1163_ = a;
+    endcase
+  endfunction
+  wire [2:0] addedVar49;
+  assign addedVar49 = { _0331_, _0332_, instr_lw };
+  assign _0509_ = _1163_(2'hx, 6'h24, addedVar49);
+  assign _0510_ = mem_do_rdata ? mem_wordsize : _0509_;
+  assign _0511_ = _0330_ ? _0510_ : mem_wordsize;
+  function [1:0] _1166_;
+    input [1:0] a;
+    input [5:0] b;
+    input [2:0] s;
+    casez (s)
+      3'b??1:
+        _1166_ = b[1:0];
+      3'b?1?:
+        _1166_ = b[3:2];
+      3'b1??:
+        _1166_ = b[5:4];
+      default:
+        _1166_ = a;
+    endcase
+  endfunction
+  wire [5:0] addedVar50;
+  assign addedVar50 = { 2'h0, _0515_, _0511_ };
+  wire [2:0] addedVar51;
+  assign addedVar51 = { _0219_, _0442_, _0441_ };
+  assign _0512_ = _1166_(mem_wordsize, addedVar50, addedVar51);
+  function [1:0] _1167_;
+    input [1:0] a;
+    input [5:0] b;
+    input [2:0] s;
+    casez (s)
+      3'b??1:
+        _1167_ = b[1:0];
+      3'b?1?:
+        _1167_ = b[3:2];
+      3'b1??:
+        _1167_ = b[5:4];
+      default:
+        _1167_ = a;
+    endcase
+  endfunction
+  wire [2:0] addedVar52;
+  assign addedVar52 = { instr_sb, instr_sh, instr_sw };
+  assign _0513_ = _1167_(2'hx, 6'h24, addedVar52);
+  assign _0514_ = mem_do_wdata ? mem_wordsize : _0513_;
+  assign _0515_ = _0330_ ? _0514_ : mem_wordsize;
+  assign _0089_ = resetn ? _0512_ : mem_wordsize;
+  function [31:0] _1171_;
+    input [31:0] a;
+    input [63:0] b;
+    input [1:0] s;
+    casez (s)
+      2'b?1:
+        _1171_ = b[31:0];
+      2'b1?:
+        _1171_ = b[63:32];
+      default:
+        _1171_ = a;
+    endcase
+  endfunction
+  wire [63:0] addedVar53;
+  assign addedVar53 = { _0517_, cpuregs_rs1 };
+  wire [1:0] addedVar54;
+  assign addedVar54 = { _0444_, _0220_ };
+  assign _0516_ = _1171_(reg_op2, addedVar53, addedVar54);
+  function [31:0] _1172_;
+    input [31:0] a;
+    input [63:0] b;
+    input [1:0] s;
+    casez (s)
+      2'b?1:
+        _1172_ = b[31:0];
+      2'b1?:
+        _1172_ = b[63:32];
+      default:
+        _1172_ = a;
+    endcase
+  endfunction
+  wire [63:0] addedVar55;
+  assign addedVar55 = { decoded_imm, _0606_ };
+  wire [1:0] addedVar56;
+  assign addedVar56 = { is_lui_auipc_jal, _0492_ };
+  assign _0517_ = _1172_(32'hxxxxxxxx, addedVar55, addedVar56);
+  assign _0095_ = resetn ? _0516_ : reg_op2;
+  assign _0518_ = mem_do_rdata ? reg_op1 : _0124_;
+  assign _0519_ = _0330_ ? _0518_ : reg_op1;
+  function [31:0] _1176_;
+    input [31:0] a;
+    input [127:0] b;
+    input [3:0] s;
+    casez (s)
+      4'b???1:
+        _1176_ = b[31:0];
+      4'b??1?:
+        _1176_ = b[63:32];
+      4'b?1??:
+        _1176_ = b[95:64];
+      4'b1???:
+        _1176_ = b[127:96];
+      default:
+        _1176_ = a;
+    endcase
+  endfunction
+  wire [127:0] addedVar57;
+  assign addedVar57 = { _0527_, _0526_, _0522_, _0519_ };
+  wire [3:0] addedVar58;
+  assign addedVar58 = { _0444_, _0443_, _0442_, _0441_ };
+  assign _0520_ = _1176_(reg_op1, addedVar57, addedVar58);
+  assign _0521_ = mem_do_wdata ? reg_op1 : _0124_;
+  assign _0522_ = _0330_ ? _0521_ : reg_op1;
+  function [31:0] _1179_;
+    input [31:0] a;
+    input [95:0] b;
+    input [2:0] s;
+    casez (s)
+      3'b??1:
+        _1179_ = b[31:0];
+      3'b?1?:
+        _1179_ = b[63:32];
+      3'b1??:
+        _1179_ = b[95:64];
+      default:
+        _1179_ = a;
+    endcase
+  endfunction
+  wire [95:0] addedVar59;
+  assign addedVar59 = { reg_op1[30:0], 2'h0, reg_op1[31:1], reg_op1[31], reg_op1[31:1] };
+  wire [2:0] addedVar60;
+  assign addedVar60 = { _0293_, _0328_, _0324_ };
+  assign _0523_ = _1179_(32'hxxxxxxxx, addedVar59, addedVar60);
+  function [31:0] _1180_;
+    input [31:0] a;
+    input [95:0] b;
+    input [2:0] s;
+    casez (s)
+      3'b??1:
+        _1180_ = b[31:0];
+      3'b?1?:
+        _1180_ = b[63:32];
+      3'b1??:
+        _1180_ = b[95:64];
+      default:
+        _1180_ = a;
+    endcase
+  endfunction
+  wire [95:0] addedVar61;
+  assign addedVar61 = { reg_op1[27:0], 8'h00, reg_op1[31:4], reg_op1[31], reg_op1[31], reg_op1[31], reg_op1[31], reg_op1[31:4] };
+  wire [2:0] addedVar62;
+  assign addedVar62 = { _0293_, _0328_, _0324_ };
+  assign _0524_ = _1180_(32'hxxxxxxxx, addedVar61, addedVar62);
+  assign _0525_ = _0232_ ? _0524_ : _0523_;
+  assign _0526_ = _0221_ ? reg_op1 : _0525_;
+  function [31:0] _1183_;
+    input [31:0] a;
+    input [63:0] b;
+    input [1:0] s;
+    casez (s)
+      2'b?1:
+        _1183_ = b[31:0];
+      2'b1?:
+        _1183_ = b[63:32];
+      default:
+        _1183_ = a;
+    endcase
+  endfunction
+  wire [63:0] addedVar63;
+  assign addedVar63 = { 16'hxxxx, 16'hxxxx, _0605_ };
+  wire [1:0] addedVar64;
+  assign addedVar64 = { is_rdcycle_rdcycleh_rdinstr_rdinstrh, is_lui_auipc_jal };
+  assign _0527_ = _1183_(cpuregs_rs1, addedVar63, addedVar64);
+  assign _0094_ = resetn ? _0520_ : reg_op1;
+  assign _0528_ = _0219_ ? _0109_[31:2] : reg_pc[31:2];
+  assign _0097_[31:2] = resetn ? _0528_ : 30'h00000000;
+  assign _0529_ = decoder_trigger ? _0121_ : count_instr;
+  assign _0530_ = _0219_ ? _0529_ : count_instr;
+  assign _0005_ = resetn ? _0530_ : 64'h0000000000000000;
+  assign _0014_ = resetn ? eoi : 32'h00000000;
+  assign _0092_ = resetn ? pcpi_valid : 1'h0;
+  assign _0002_[31] = _0297_ ? 1'h1 : 1'h0;
+  assign _0001_ = _0297_ ? cpuregs_wrdata : 32'hxxxxxxxx;
+  assign _0000_ = _0297_ ? latched_rd : 5'hxx;
+  assign _0104_ = _0135_ ? 1'h1 : 1'h0;
+  function [31:0] _1196_;
+    input [31:0] a;
+    input [63:0] b;
+    input [1:0] s;
+    casez (s)
+      2'b?1:
+        _1196_ = b[31:0];
+      2'b1?:
+        _1196_ = b[63:32];
+      default:
+        _1196_ = a;
+    endcase
+  endfunction
+  wire [63:0] addedVar65;
+  assign addedVar65 = { _0118_, _0603_ };
+  wire [1:0] addedVar66;
+  assign addedVar66 = { latched_branch, _0295_ };
+  assign _0103_ = _1196_(32'hxxxxxxxx, addedVar65, addedVar66);
+  assign cpuregs_wrdata = _0219_ ? _0103_ : 32'hxxxxxxxx;
+  assign cpuregs_write = _0219_ ? _0104_ : 1'h0;
+  function [31:0] _1199_;
+    input [31:0] a;
+    input [223:0] b;
+    input [6:0] s;
+    casez (s)
+      7'b??????1:
+        _1199_ = b[31:0];
+      7'b?????1?:
+        _1199_ = b[63:32];
+      7'b????1??:
+        _1199_ = b[95:64];
+      7'b???1???:
+        _1199_ = b[127:96];
+      7'b??1????:
+        _1199_ = b[159:128];
+      7'b?1?????:
+        _1199_ = b[191:160];
+      7'b1??????:
+        _1199_ = b[223:192];
+      default:
+        _1199_ = a;
+    endcase
+  endfunction
+  wire [223:0] addedVar67;
+  assign addedVar67 = { alu_add_sub, 31'h00000000, alu_out_0, _0608_, _0437_, _0127_, alu_shl, alu_shr };
+  wire [6:0] addedVar68;
+  assign addedVar68 = { is_lui_auipc_jal_jalr_addi_add_sub, is_compare, _0325_, _0326_, _0327_, _0293_, _0294_ };
+  assign alu_out = _1199_(32'hxxxxxxxx, addedVar67, addedVar68);
+  function [0:0] _1200_;
+    input [0:0] a;
+    input [5:0] b;
+    input [5:0] s;
+    casez (s)
+      6'b?????1:
+        _1200_ = b[0:0];
+      6'b????1?:
+        _1200_ = b[1:1];
+      6'b???1??:
+        _1200_ = b[2:2];
+      6'b??1???:
+        _1200_ = b[3:3];
+      6'b?1????:
+        _1200_ = b[4:4];
+      6'b1?????:
+        _1200_ = b[5:5];
+      default:
+        _1200_ = a;
+    endcase
+  endfunction
+  wire [5:0] addedVar69;
+  assign addedVar69 = { alu_eq, _0314_, _0315_, _0316_, alu_lts, alu_ltu };
+  wire [5:0] addedVar70;
+  assign addedVar70 = { instr_beq, instr_bne, instr_bge, instr_bgeu, is_slti_blt_slt, is_sltiu_bltu_sltu };
+  assign alu_out_0 = _1200_(1'hx, addedVar69, addedVar70);
+  assign _0010_[4] = _0298_ ? mem_rdata_latched[19] : decoded_rs1[4];
+  assign _0008_[10] = _0298_ ? mem_rdata_latched[30] : decoded_imm_j[10];
+  assign _0008_[7] = _0298_ ? mem_rdata_latched[27] : decoded_imm_j[7];
+  assign _0008_[6] = _0298_ ? mem_rdata_latched[26] : decoded_imm_j[6];
+  assign _0008_[3:1] = _0298_ ? mem_rdata_latched[23:21] : decoded_imm_j[3:1];
+  assign _0008_[5] = _0298_ ? mem_rdata_latched[25] : decoded_imm_j[5];
+  assign _0008_[9:8] = _0298_ ? mem_rdata_latched[29:28] : decoded_imm_j[9:8];
+  wire [11:0] addedVar71;
+  assign addedVar71 = { mem_rdata_latched[31], mem_rdata_latched[31], mem_rdata_latched[31], mem_rdata_latched[31], mem_rdata_latched[31], mem_rdata_latched[31], mem_rdata_latched[31], mem_rdata_latched[31], mem_rdata_latched[31], mem_rdata_latched[31], mem_rdata_latched[31], mem_rdata_latched[31] };
+  assign _0008_[31:20] = _0298_ ? addedVar71 : decoded_imm_j[31:20];
+  assign _0008_[4] = _0298_ ? mem_rdata_latched[24] : decoded_imm_j[4];
+  assign _0008_[11] = _0298_ ? mem_rdata_latched[20] : decoded_imm_j[11];
+  assign _0008_[0] = _0298_ ? 1'h0 : decoded_imm_j[0];
+  assign _0010_[3:0] = _0298_ ? mem_rdata_latched[18:15] : decoded_rs1[3:0];
+  assign _0066_ = _0233_ ? 1'h0 : _0598_;
+  assign _0059_ = _0298_ ? _0231_ : is_alu_reg_reg;
+  assign _0058_ = _0298_ ? _0230_ : is_alu_reg_imm;
+  assign _0531_ = _0298_ ? _0227_ : is_beq_bne_blt_bge_bltu_bgeu;
+  assign _0060_ = resetn ? _0531_ : 1'h0;
+  assign _0067_ = _0298_ ? _0229_ : is_sb_sh_sw;
+  assign _0062_ = _0233_ ? _0323_ : is_jalr_addi_slti_sltiu_xori_ori_andi;
+  assign _0068_ = _0233_ ? _0287_ : is_slli_srli_srai;
+  assign _0063_ = _0298_ ? _0228_ : is_lb_lh_lw_lbu_lhu;
+  assign _0003_ = _0298_ ? 1'h0 : compressed_instr;
+  assign _0532_ = _0233_ ? 1'h0 : _0599_;
+  assign _0061_ = resetn ? _0532_ : 1'h0;
+  function [31:0] _1225_;
+    input [31:0] a;
+    input [159:0] b;
+    input [4:0] s;
+    casez (s)
+      5'b????1:
+        _1225_ = b[31:0];
+      5'b???1?:
+        _1225_ = b[63:32];
+      5'b??1??:
+        _1225_ = b[95:64];
+      5'b?1???:
+        _1225_ = b[127:96];
+      5'b1????:
+        _1225_ = b[159:128];
+      default:
+        _1225_ = a;
+    endcase
+  endfunction
+  wire [159:0] addedVar72;
+  assign addedVar72 = { decoded_imm_j, mem_rdata_q[31:12], 12'h000, mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31:20], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[7], mem_rdata_q[30:25], mem_rdata_q[11:8], 1'h0, mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31], mem_rdata_q[31:25], mem_rdata_q[11:7] };
+  wire [4:0] addedVar73;
+  assign addedVar73 = { instr_jal, _0535_, _0534_, is_beq_bne_blt_bge_bltu_bgeu, is_sb_sh_sw };
+  assign _0533_ = _1225_(32'b0000000000000000000000000000000x, addedVar72, addedVar73);
+  assign _0007_ = _0233_ ? _0533_ : decoded_imm;
+  assign _0011_ = _0298_ ? mem_rdata_latched[24:20] : decoded_rs2;
+  assign _0008_[19:12] = _0298_ ? mem_rdata_latched[19:12] : decoded_imm_j[19:12];
+  assign _0009_ = _0298_ ? mem_rdata_latched[11:7] : decoded_rd;
+  assign _0041_ = _0298_ ? 1'h0 : instr_retirq;
+  assign _0026_ = _0233_ ? _0286_ : instr_ecall_ebreak;
+  assign _0040_ = _0233_ ? _0284_ : instr_rdinstrh;
+  assign _0039_ = _0233_ ? _0283_ : instr_rdinstr;
+  assign _0038_ = _0233_ ? _0281_ : instr_rdcycleh;
+  assign _0037_ = _0233_ ? _0278_ : instr_rdcycle;
+  assign _0536_ = _0233_ ? _0276_ : instr_and;
+  assign _0017_ = resetn ? _0536_ : 1'h0;
+  assign _0537_ = _0233_ ? _0274_ : instr_or;
+  assign _0035_ = resetn ? _0537_ : 1'h0;
+  assign _0538_ = _0233_ ? _0272_ : instr_sra;
+  assign _0050_ = resetn ? _0538_ : 1'h0;
+  assign _0539_ = _0233_ ? _0271_ : instr_srl;
+  assign _0052_ = resetn ? _0539_ : 1'h0;
+  assign _0540_ = _0233_ ? _0269_ : instr_xor;
+  assign _0056_ = resetn ? _0540_ : 1'h0;
+  assign _0541_ = _0233_ ? _0267_ : instr_sltu;
+  assign _0049_ = resetn ? _0541_ : 1'h0;
+  assign _0542_ = _0233_ ? _0265_ : instr_slt;
+  assign _0046_ = resetn ? _0542_ : 1'h0;
+  assign _0543_ = _0233_ ? _0263_ : instr_sll;
+  assign _0044_ = resetn ? _0543_ : 1'h0;
+  assign _0544_ = _0233_ ? _0261_ : instr_sub;
+  assign _0054_ = resetn ? _0544_ : 1'h0;
+  assign _0545_ = _0233_ ? _0260_ : instr_add;
+  assign _0015_ = resetn ? _0545_ : 1'h0;
+  assign _0051_ = _0233_ ? _0258_ : instr_srai;
+  assign _0053_ = _0233_ ? _0257_ : instr_srli;
+  assign _0045_ = _0233_ ? _0255_ : instr_slli;
+  assign _0546_ = _0233_ ? _0253_ : instr_andi;
+  assign _0018_ = resetn ? _0546_ : 1'h0;
+  assign _0547_ = _0233_ ? _0252_ : instr_ori;
+  assign _0036_ = resetn ? _0547_ : 1'h0;
+  assign _0548_ = _0233_ ? _0251_ : instr_xori;
+  assign _0057_ = resetn ? _0548_ : 1'h0;
+  assign _0549_ = _0233_ ? _0250_ : instr_sltiu;
+  assign _0048_ = resetn ? _0549_ : 1'h0;
+  assign _0550_ = _0233_ ? _0249_ : instr_slti;
+  assign _0047_ = resetn ? _0550_ : 1'h0;
+  assign _0551_ = _0233_ ? _0248_ : instr_addi;
+  assign _0016_ = resetn ? _0551_ : 1'h0;
+  assign _0055_ = _0233_ ? _0247_ : instr_sw;
+  assign _0043_ = _0233_ ? _0246_ : instr_sh;
+  assign _0042_ = _0233_ ? _0245_ : instr_sb;
+  assign _0032_ = _0233_ ? _0244_ : instr_lhu;
+  assign _0030_ = _0233_ ? _0243_ : instr_lbu;
+  assign _0034_ = _0233_ ? _0242_ : instr_lw;
+  assign _0031_ = _0233_ ? _0241_ : instr_lh;
+  assign _0029_ = _0233_ ? _0240_ : instr_lb;
+  assign _0552_ = _0233_ ? _0239_ : instr_bgeu;
+  assign _0022_ = resetn ? _0552_ : 1'h0;
+  assign _0553_ = _0233_ ? _0238_ : instr_bltu;
+  assign _0024_ = resetn ? _0553_ : 1'h0;
+  assign _0554_ = _0233_ ? _0237_ : instr_bge;
+  assign _0021_ = resetn ? _0554_ : 1'h0;
+  assign _0555_ = _0233_ ? _0236_ : instr_blt;
+  assign _0023_ = resetn ? _0555_ : 1'h0;
+  assign _0556_ = _0233_ ? _0235_ : instr_bne;
+  assign _0025_ = resetn ? _0556_ : 1'h0;
+  assign _0557_ = _0233_ ? _0234_ : instr_beq;
+  assign _0020_ = resetn ? _0557_ : 1'h0;
+  assign _0028_ = _0298_ ? _0310_ : instr_jalr;
+  assign _0027_ = _0298_ ? _0224_ : instr_jal;
+  assign _0019_ = _0298_ ? _0223_ : instr_auipc;
+  assign _0033_ = _0298_ ? _0222_ : instr_lui;
+  assign _0091_ = _0233_ ? 32'hxxxxxxxx : pcpi_insn;
+  assign _0558_ = mem_do_rinst ? 2'h0 : mem_state;
+  function [1:0] _1297_;
+    input [1:0] a;
+    input [7:0] b;
+    input [3:0] s;
+    casez (s)
+      4'b???1:
+        _1297_ = b[1:0];
+      4'b??1?:
+        _1297_ = b[3:2];
+      4'b?1??:
+        _1297_ = b[5:4];
+      4'b1???:
+        _1297_ = b[7:6];
+      default:
+        _1297_ = a;
+    endcase
+  endfunction
+  wire [7:0] addedVar74;
+  assign addedVar74 = { _0567_, _0564_, _0561_, _0558_ };
+  wire [3:0] addedVar75;
+  assign addedVar75 = { _0308_, _0565_, _0562_, _0560_ };
+  assign _0559_ = _1297_(mem_state, addedVar74, addedVar75);
+  assign _0560_ = mem_state == 2'h3;
+  assign _0561_ = mem_xfer ? 2'h0 : mem_state;
+  assign _0562_ = mem_state == 2'h2;
+  assign _0564_ = mem_xfer ? _0563_ : mem_state;
+  assign _0565_ = mem_state == 1'h1;
+  assign _0566_ = _0338_ ? 2'h1 : mem_state;
+  assign _0567_ = mem_do_wdata ? 2'h2 : _0566_;
+  assign _0568_ = resetn ? mem_state : 2'h0;
+  assign _0086_ = _0339_ ? _0568_ : _0559_;
+  assign _0569_ = _0341_ ? _0129_ : mem_wstrb;
+  assign _0570_ = _0338_ ? 4'h0 : _0569_;
+  assign _0571_ = _0308_ ? _0570_ : _0569_;
+  assign _0090_ = _0339_ ? mem_wstrb : _0571_;
+  assign _0572_ = mem_la_write ? mem_la_wdata : mem_wdata;
+  assign _0088_ = _0339_ ? mem_wdata : _0572_;
+  assign _0573_ = _0341_ ? mem_la_addr : mem_addr;
+  assign _0079_ = _0339_ ? mem_addr : _0573_;
+  assign _0574_ = _0338_ ? _0337_ : mem_instr;
+  assign _0575_ = mem_do_wdata ? 1'h0 : _0574_;
+  assign _0576_ = _0308_ ? _0575_ : mem_instr;
+  assign _0084_ = _0339_ ? mem_instr : _0576_;
+  assign _0577_ = mem_xfer ? 1'h0 : mem_valid;
+  function [0:0] _1320_;
+    input [0:0] a;
+    input [1:0] b;
+    input [1:0] s;
+    casez (s)
+      2'b?1:
+        _1320_ = b[0:0];
+      2'b1?:
+        _1320_ = b[1:1];
+      default:
+        _1320_ = a;
+    endcase
+  endfunction
+  wire [1:0] addedVar76;
+  assign addedVar76 = { _0580_, _0577_ };
+  wire [1:0] addedVar77;
+  assign addedVar77 = { _0308_, _0137_ };
+  assign _0578_ = _1320_(mem_valid, addedVar76, addedVar77);
+  assign _0579_ = _0338_ ? 1'h1 : mem_valid;
+  assign _0580_ = mem_do_wdata ? 1'h1 : _0579_;
+  assign _0581_ = _0340_ ? 1'h0 : mem_valid;
+  assign _0087_ = _0339_ ? _0581_ : _0578_;
+  assign _0085_[31] = mem_xfer ? mem_rdata[31] : mem_rdata_q[31];
+  assign _0085_[7] = mem_xfer ? mem_rdata[7] : mem_rdata_q[7];
+  assign _0085_[24:20] = mem_xfer ? mem_rdata[24:20] : mem_rdata_q[24:20];
+  assign _0085_[19:15] = mem_xfer ? mem_rdata[19:15] : mem_rdata_q[19:15];
+  assign _0085_[6:0] = mem_xfer ? mem_rdata[6:0] : mem_rdata_q[6:0];
+  assign _0085_[14:12] = mem_xfer ? mem_rdata[14:12] : mem_rdata_q[14:12];
+  assign _0085_[11:8] = mem_xfer ? mem_rdata[11:8] : mem_rdata_q[11:8];
+  assign _0085_[30:25] = mem_xfer ? mem_rdata[30:25] : mem_rdata_q[30:25];
+  function [31:0] _1333_;
+    input [31:0] a;
+    input [127:0] b;
+    input [3:0] s;
+    casez (s)
+      4'b???1:
+        _1333_ = b[31:0];
+      4'b??1?:
+        _1333_ = b[63:32];
+      4'b?1??:
+        _1333_ = b[95:64];
+      4'b1???:
+        _1333_ = b[127:96];
+      default:
+        _1333_ = a;
+    endcase
+  endfunction
+  wire [127:0] addedVar78;
+  assign addedVar78 = { 24'h000000, mem_rdata[7:0], 24'h000000, mem_rdata[15:8], 24'h000000, mem_rdata[23:16], 24'h000000, mem_rdata[31:24] };
+  wire [3:0] addedVar79;
+  assign addedVar79 = { _0585_, _0584_, _0583_, _0582_ };
+  assign _0110_ = _1333_(32'hxxxxxxxx, addedVar78, addedVar79);
+  assign _0582_ = reg_op1[1:0] == 2'h3;
+  assign _0583_ = reg_op1[1:0] == 2'h2;
+  assign _0584_ = reg_op1[1:0] == 1'h1;
+  assign _0585_ = ! reg_op1[1:0];
+  assign _0586_ = mem_wordsize == 2'h2;
+  function [31:0] _1339_;
+    input [31:0] a;
+    input [63:0] b;
+    input [1:0] s;
+    casez (s)
+      2'b?1:
+        _1339_ = b[31:0];
+      2'b1?:
+        _1339_ = b[63:32];
+      default:
+        _1339_ = a;
+    endcase
+  endfunction
+  wire [63:0] addedVar80;
+  assign addedVar80 = { 16'h0000, mem_rdata[15:0], 16'h0000, mem_rdata[31:16] };
+  wire [1:0] addedVar81;
+  assign addedVar81 = { _0587_, reg_op1[1] };
+  assign _0105_ = _1339_(32'hxxxxxxxx, addedVar80, addedVar81);
+  assign _0587_ = ~ reg_op1[1];
+  assign _0588_ = mem_wordsize == 1'h1;
+  function [31:0] _1342_;
+    input [31:0] a;
+    input [95:0] b;
+    input [2:0] s;
+    casez (s)
+      3'b??1:
+        _1342_ = b[31:0];
+      3'b?1?:
+        _1342_ = b[63:32];
+      3'b1??:
+        _1342_ = b[95:64];
+      default:
+        _1342_ = a;
+    endcase
+  endfunction
+  wire [95:0] addedVar82;
+  assign addedVar82 = { mem_rdata, _0105_, _0110_ };
+  wire [2:0] addedVar83;
+  assign addedVar83 = { _0589_, _0588_, _0586_ };
+  assign mem_rdata_word = _1342_(32'hxxxxxxxx, addedVar82, addedVar83);
+  assign _0589_ = ! mem_wordsize;
+  function [3:0] _1344_;
+    input [3:0] a;
+    input [11:0] b;
+    input [2:0] s;
+    casez (s)
+      3'b??1:
+        _1344_ = b[3:0];
+      3'b?1?:
+        _1344_ = b[7:4];
+      3'b1??:
+        _1344_ = b[11:8];
+      default:
+        _1344_ = a;
+    endcase
+  endfunction
+  wire [11:0] addedVar84;
+  assign addedVar84 = { 4'hf, _0607_, _0600_ };
+  wire [2:0] addedVar85;
+  assign addedVar85 = { _0589_, _0588_, _0586_ };
+  assign mem_la_wstrb = _1344_(4'hx, addedVar84, addedVar85);
+  function [31:0] _1345_;
+    input [31:0] a;
+    input [95:0] b;
+    input [2:0] s;
+    casez (s)
+      3'b??1:
+        _1345_ = b[31:0];
+      3'b?1?:
+        _1345_ = b[63:32];
+      3'b1??:
+        _1345_ = b[95:64];
+      default:
+        _1345_ = a;
+    endcase
+  endfunction
+  wire [95:0] addedVar86;
+  assign addedVar86 = { reg_op2, reg_op2[15:0], reg_op2[15:0], reg_op2[7:0], reg_op2[7:0], reg_op2[7:0], reg_op2[7:0] };
+  wire [2:0] addedVar87;
+  assign addedVar87 = { _0589_, _0588_, _0586_ };
+  assign mem_la_wdata = _1345_(32'hxxxxxxxx, addedVar86, addedVar87);
+  assign _0590_ = instr_jal ? _0122_[31:2] : _0120_[31:2];
+  assign _0591_ = decoder_trigger ? _0590_ : _0109_[31:2];
+  assign _0592_ = _0219_ ? _0591_ : reg_next_pc[31:2];
+  assign _0093_[31:2] = resetn ? _0592_ : 30'h00000000;
+  assign _0111_ = _0330_ ? _0114_ : 1'h0;
+  assign _0113_ = _0330_ ? _0115_ : 1'h0;
+  assign _0112_ = is_beq_bne_blt_bge_bltu_bgeu ? _0116_ : 1'h0;
+  assign _0115_ = mem_do_wdata ? 1'h0 : 1'h1;
+  assign _0114_ = mem_do_rdata ? 1'h0 : 1'h1;
+  assign _0593_ = & mem_state;
+  assign _0594_ = | decoded_rs;
+  wire [2:0] addedVar88;
+  assign addedVar88 = { _0288_, _0289_, _0290_ };
+  assign _0595_ = | addedVar88;
+  wire [5:0] addedVar89;
+  assign addedVar89 = { _0209_, _0208_, _0207_, _0206_, _0204_, _0202_ };
+  assign _0596_ = | addedVar89;
+  wire [1:0] addedVar90;
+  assign addedVar90 = { instr_auipc, instr_lui };
+  assign _0535_ = | addedVar90;
+  wire [2:0] addedVar91;
+  assign addedVar91 = { is_alu_reg_imm, is_lb_lh_lw_lbu_lhu, instr_jalr };
+  assign _0534_ = | addedVar91;
+  assign _0597_ = | mem_state;
+  wire [3:0] addedVar92;
+  assign addedVar92 = { instr_rdinstrh, instr_rdinstr, instr_rdcycleh, instr_rdcycle };
+  assign is_rdcycle_rdcycleh_rdinstr_rdinstrh = | addedVar92;
+  wire [2:0] addedVar93;
+  assign addedVar93 = { instr_jal, instr_auipc, instr_lui };
+  assign _0065_ = | addedVar93;
+  wire [6:0] addedVar94;
+  assign addedVar94 = { instr_sub, instr_add, instr_addi, instr_jalr, instr_jal, instr_auipc, instr_lui };
+  assign _0598_ = | addedVar94;
+  wire [2:0] addedVar95;
+  assign addedVar95 = { instr_slt, instr_slti, instr_blt };
+  assign _0069_ = | addedVar95;
+  wire [2:0] addedVar96;
+  assign addedVar96 = { instr_sltu, instr_sltiu, instr_bltu };
+  assign _0070_ = | addedVar96;
+  wire [2:0] addedVar97;
+  assign addedVar97 = { instr_lhu, instr_lbu, instr_lw };
+  assign _0064_ = | addedVar97;
+  wire [4:0] addedVar98;
+  assign addedVar98 = { is_beq_bne_blt_bge_bltu_bgeu, instr_sltu, instr_slt, instr_sltiu, instr_slti };
+  assign _0599_ = | addedVar98;
+  assign alu_shl = reg_op1 << reg_op2[4:0];
+  assign _0600_ = 1'h1 << reg_op1[1:0];
+  wire [32:0] addedVar99;
+  assign addedVar99 = { _0602_, reg_op1 };
+  assign alu_shr = $signed(addedVar99) >>> reg_op2[4:0];
+  assign _0601_ = reg_op1 - reg_op2;
+  assign _0198_[4:0] = reg_sh - 3'h4;
+  assign _0199_[4:0] = reg_sh - 1'h1;
+  assign next_pc = _0292_ ? _0126_ : reg_next_pc;
+  assign alu_add_sub = instr_sub ? _0601_ : _0117_;
+  assign _0602_ = _0324_ ? reg_op1[31] : 1'h0;
+  assign _0200_[2:0] = latched_compr ? 3'h2 : 3'h4;
+  assign _0603_ = latched_stalu ? alu_out_q : reg_out;
+  assign decoded_rs = _0220_ ? decoded_rs2 : decoded_rs1;
+  assign cpuregs_rs1 = _0594_ ? _0436_ : 32'h00000000;
+  assign _0004_ = resetn ? _0119_ : 64'h0000000000000000;
+  assign _0604_ = latched_store ? _0128_ : reg_next_pc;
+  assign _0201_[2:0] = compressed_instr ? 3'h2 : 3'h4;
+  assign _0605_ = instr_lui ? 32'h00000000 : reg_pc;
+  wire [31:0] addedVar100;
+  assign addedVar100 = { 27'h0000000, decoded_rs2 };
+  assign _0606_ = is_slli_srli_srai ? addedVar100 : decoded_imm;
+  wire [31:0] addedVar101;
+  assign addedVar101 = { _0125_, 2'h0 };
+  wire [31:0] addedVar102;
+  assign addedVar102 = { reg_op1[31:2], 2'h0 };
+  assign mem_la_addr = _0337_ ? addedVar101 : addedVar102;
+  assign mem_rdata_latched = mem_xfer ? mem_rdata : mem_rdata_q;
+  assign _0607_ = reg_op1[1] ? 4'hc : 4'h3;
+  assign _0563_ = _0334_ ? 2'h0 : 2'h3;
+  assign _0608_ = reg_op1 ^ reg_op2;
+  assign _0002_[30:0] = { _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31], _0002_[31] };
+  assign _0093_[1:0] = 2'h0;
+  assign _0097_[1:0] = 2'h0;
+  assign _0196_[7:4] = 4'h0;
+  assign _0197_[7] = 1'h0;
+  assign _0200_[31:3] = 29'h00000000;
+  assign _0201_[31:3] = 29'h00000000;
+  assign cpuregs_rs2 = cpuregs_rs1;
+  assign dbg_mem_addr = mem_addr;
+  assign dbg_mem_instr = mem_instr;
+  assign dbg_mem_rdata = mem_rdata;
+  assign dbg_mem_ready = mem_ready;
+  assign dbg_mem_valid = mem_valid;
+  assign dbg_mem_wdata = mem_wdata;
+  assign dbg_mem_wstrb = mem_wstrb;
+  assign dbg_reg_x0 = 32'h00000000;
+  assign do_waitirq = 1'h0;
+  assign instr_trap = 1'h0;
+  assign mem_la_firstword = 1'h0;
+  assign mem_la_firstword_xfer = 1'h0;
+  assign mem_la_use_prefetched_high_word = 1'h0;
+  assign mem_rdata_latched_noshuffle = mem_rdata_latched;
+  assign pcpi_div_rd = 32'hxxxxxxxx;
+  assign pcpi_div_ready = 1'h0;
+  assign pcpi_div_wait = 1'h0;
+  assign pcpi_div_wr = 1'h0;
+  assign pcpi_int_ready = 1'h0;
+  assign pcpi_int_wait = 1'h0;
+  assign pcpi_mul_rd = 32'hxxxxxxxx;
+  assign pcpi_mul_ready = 1'h0;
+  assign pcpi_mul_wait = 1'h0;
+  assign pcpi_mul_wr = 1'h0;
+  assign pcpi_rs1 = reg_op1;
+  assign pcpi_rs2 = reg_op2;
+  assign trace_data[35:1] = { trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0], trace_data[0] };
+  assign trace_valid = 1'h0;
+endmodule
