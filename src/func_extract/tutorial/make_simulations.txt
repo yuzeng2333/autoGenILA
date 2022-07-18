@@ -1,37 +1,24 @@
-=== Here are the steps for generating ILA update functions and simulation files
-
-1. prepare the instr.txt in the test directory. If there is fifo, must make $FIFO
-   prepare the necessary visited_target.txt file to skip target, and allowed_target.txt.
-   prepare the rst.vcd or norm.vcd file
-   prepare the config.txt file
-   
-
-2. run ./build/func_extract, multiple will be generated:
-    *.ll and *_tmp.ll
-    all_regs.txt
-    asv_info.txt (some "asvs" may need to be deleted for simplicity)
-    func_info.txt: target and dependent registers for each function -- used to generate function declare and call
-    link.sh: script for compile and link llvm ir files)
-
-    All these files are appended, so need manual check (!!! So need to remove legacy txt in the above files)
-
-
 === Making simulation files
 
-3. move *.ll and link.sh into ILA_SIM folder
+Basically we will use the other executable programs generated during the build process to help automating the process of making simulation files.
+Readers are encouraged to read the programs in func_extract/app to undertand how to use these executables.
 
-4. run ./build/test_gen (with arg: instrNum), it takes the instr.txt file and
+1. move *.ll and link.sh into ILA_SIM folder
+
+2. Generate the random instructions to be tested:
+   run ./build/test_gen (with arg: instrNum), it takes the instr.txt file and
    generate tb.txt file, which includes instructions to be 
    used in rtl and ila simulations.
    ATTENTIOM: change the g_design before using it!
 
-5. run ./build/sim_gen (with arg: instrNum), generate ila.cpp and ila.h file
+3. Generate the ILA simulation model based on the update functions
+   run ./build/sim_gen (with arg: instrNum), generate ila.cpp and ila.h file
    may need to modify the mem_rdata and mem_addr in ila.cpp
    !!! specify the mem_addr for each instruction
 
-6. copy ila.cpp and ila.h to ILA_SIM folder
+4. copy ila.cpp and ila.h to ILA_SIM folder
 
-7. (1) option1: run ./build/tb_gen (with arg: instrNum) to generate rtl testbench
+5. (1) option1: run ./build/tb_gen (with arg: instrNum) to generate rtl testbench
    (2) option2: update the memd.txt file (needs to be manually extracted from ila.c, the assignment to mem), and generate mem.txt with /app/util/a.out
 
-8. run ./build/cmp to compare the ila_results.txt and rtl_results.txt. "ignore_asv.txt" will be read, which specified some asvs that can be ignored for comparison.
+6. run ./build/cmp to compare the ila_results.txt and rtl_results.txt. "ignore_asv.txt" will be read, which specified some asvs that can be ignored for comparison.
