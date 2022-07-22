@@ -7,7 +7,7 @@ This is a tutorial for how to generate update functions from RTL designs. We use
 - allowed_target.txt: (I know this may not be a good name, bear with me): it specifies the target register that you want to generate update functions for. If it is a single register, the format is: *name*: *cycle*, where *name* is the register name, and *cycle* is the upper bound of the exection cycles of this instruction. You can find out more about why the upper bound is used in the paper.
 - config.txt: this contains some configurations for the update function generation program. This is only for experimental purpose, usually you do not need to modify it.
 - instr.txt: this contains information for the instruction we are interested in. See the comments in the files for details.
-5. How to run: in the func_extract directory, the first time you need to type "make tutorial_clean". Later, you only need to type "make tutorial". Then you will see the generated LLVM-IR based update functions in "files" folder.
+5. How to run: in the func_extract directory, the first time you need to type "make tutorial_clean". Then you will see the generated LLVM-IR based update functions in "files" folder. tutorial_clean does some file cleaning, which only needs to be done once. Later, you only need to type "make tutorial" to generate the update functions.
 6. In the generated files you can find these files:
 - 'add_cpuregs[1]_Arr_8_tmp.ll': a temporal file, just ignore it.
 - 'add_cpuregs[1]_Arr_8.ll': the original llvm-based update function for the array of cpuregs by the add instruction, without being optimized by LLVM
