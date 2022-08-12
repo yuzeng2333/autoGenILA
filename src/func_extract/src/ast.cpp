@@ -1118,7 +1118,7 @@ bool check_two_op(std::string line,
   //line = remove_signed(line);
   if(line.find("compute.tensorGemm.mvc_0.add_0_15") 
        != std::string::npos)
-    toCout("Find it!");
+    toCoutVerb("Find it!");
   isReduceOp = false;
   std::smatch m;
   if ( std::regex_match(line, m, pAdd)) {

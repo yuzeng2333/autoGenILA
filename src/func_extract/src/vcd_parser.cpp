@@ -99,7 +99,7 @@ void vcd_parser(std::string fileName) {
 
 
 void print_rst_val() {
-  std::ofstream output("./rst_vals.txt");
+  std::ofstream output(g_path+"/rst_vals.txt");
   for(auto pair : g_rstVal) {
     output << pair.first + "\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + pair.second << std::endl;
   }

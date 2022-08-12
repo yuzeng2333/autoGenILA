@@ -295,7 +295,7 @@ UpdateFunctionGen::input_constraint(astNode* const node, uint32_t timeIdx,
           uint32_t width = std::stoi(m.str(1));
           if(width > 64) {
             toCout("Error: input width larger than 64: "+localVal);
-            abort();
+            //abort();  Doug
           }
         }
         toCoutVerb("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%B Give "+localVal+" to "+timed_name(dest, timeIdx));
@@ -582,7 +582,7 @@ UpdateFunctionGen::two_op_constraint(astNode* const node, uint32_t timeIdx, cont
   }
 
   if(curMod->name == "hls_target_Loop_1_proc")
-    toCout("Find it!");
+    toCoutVerb("Find it!");
   toCoutVerb("go to make_llvm_instr from two-op: "+op1AndSlice+", "+op2AndSlice);
   if(op1AndSlice == "\\compute.inst_q.value")
     toCoutVerb("Find it!");
@@ -628,7 +628,7 @@ UpdateFunctionGen::one_op_constraint(astNode* const node, uint32_t timeIdx,
 
   //if(curMod->name == "hls_target_Loop_1_proc")
   if(destAndSlice.find("\\compute.tensorAlu.AluVector.f_15.alu.io_b") != std::string::npos)
-    toCout("Find it!");
+    toCoutVerb("Find it!");
   return make_llvm_instr(b, c, node->op, op1Expr, op1WidthNum, llvm::Twine(destTimed));
 }
 
@@ -1029,7 +1029,7 @@ UpdateFunctionGen::ite_op_constraint(astNode* const node, uint32_t timeIdx, cont
 //
 //  std::string destAndSlice = node->dest;
 //  if(destAndSlice == "_0458_")
-//    toCout("Find it!");
+//    toCoutVerb("Find it!");
 //  uint32_t destWidthNum = get_var_slice_width_simp(destAndSlice);
 //  std::string caseVarAndSlice = node->srcVec[0];
 //  uint32_t caseHi = get_lgc_hi(caseVarAndSlice);

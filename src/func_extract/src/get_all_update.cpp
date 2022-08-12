@@ -1,3 +1,7 @@
+//#include "llvm/AsmParser/Parser.h"
+//#include "llvm/IR/Verifier.h"
+#include "llvm/IRReader/IRReader.h"
+
 #include "ins_context_stack.h"
 #include "get_all_update.h"
 #include "parse_fill.h"
@@ -9,8 +13,6 @@
 
 namespace funcExtract {
 
-// TODO: configurations
-bool g_use_multi_thread = true;
 
 std::mutex g_dependVarMapMtx;
 std::mutex g_TimeFileMtx;
@@ -104,14 +106,14 @@ void get_all_update() {
     std::vector<std::pair<std::vector<std::string>, uint32_t>> allowedTgtVec = g_allowedTgtVec;    
     while(!g_workSet.empty() || !allowedTgtVec.empty() ) {
       bool isVec;
-      bool doSingleTgt = false;
-      bool doVecTgt = false;
+      //bool doSingleTgt = false;
+      //bool doVecTgt = false;
       std::string target;
       std::vector<std::string> tgtVec;
       // work on single register target first
       if(!g_workSet.empty()) {
         isVec = false;
-        doSingleTgt = true;
+        //doSingleTgt = true;
         auto targetIt = g_workSet.begin();
         target = *targetIt;
         g_workSet.mtxErase(targetIt);
@@ -120,7 +122,7 @@ void get_all_update() {
           continue;
       }
       else if(!allowedTgtVec.empty()){
-        doVecTgt = true;
+        //doVecTgt = true;
         isVec = true;
         tgtVec = allowedTgtVec.back().first;
         allowedTgtVec.pop_back();
@@ -176,14 +178,14 @@ void get_all_update() {
         threadVec.clear();
         while(!localWorkSet.empty() || !localWorkVec.empty()) {
           bool isVec;
-          bool doSingleTgt = false;
-          bool doVecTgt = false;
+          //bool doSingleTgt = false;
+          //bool doVecTgt = false;
           std::string target;
           std::vector<std::string> tgtVec;      
 
           if(!localWorkSet.empty()) {
             isVec = false;
-            doSingleTgt = true;
+            //doSingleTgt = true;
             auto targetIt = localWorkSet.begin();
             target = *targetIt;
             localWorkSet.erase(targetIt);
@@ -192,7 +194,7 @@ void get_all_update() {
               continue;
           }
           else if(!localWorkVec.empty()){
-            doVecTgt = true;
+            //doVecTgt = true;
             isVec = true;
             tgtVec = localWorkVec.back().first;
             localWorkVec.pop_back();
@@ -361,10 +363,15 @@ void get_update_function(std::string target,
   time_t upGenEndTime = time(NULL);  
 
   std::string clean("opt --instsimplify --deadargelim --instsimplify "+fileName+"_tmp.ll -S -o="+fileName+"_clean.ll");
-  std::string opto3("opt -O1 "+fileName+"_clean.ll -S -o="+fileName+"_tmp.o3.ll; opt -passes=deadargelim "+fileName+"_tmp.o3.ll -S -o="+fileName+"_clean.o3.ll; rm "+fileName+"_tmp.o3.ll");
+  
+  // Doug 8/10/22: Added a --deadargelim to get the new C wrapper functions cleaned up
+  std::string opto3("opt -O1 "+fileName+"_clean.ll -S -o="+fileName+"_tmp.o3.ll; opt -passes=deadargelim,deadargelim "+fileName+"_tmp.o3.ll -S -o="+fileName+"_clean.o3.ll; rm "+fileName+"_tmp.o3.ll");
+
   toCout("** Begin clean update function");
+  toCoutVerb(clean);
   system(clean.c_str());
   toCout("** Begin simplify update function");
+  toCoutVerb(opto3);
   system(opto3.c_str());
   toCout("** End simplify update function");
 
@@ -385,7 +392,10 @@ void get_update_function(std::string target,
 
   std::string llvmFileName = instrInfo.name+"_"+destInfo.get_dest_name()
                              +"_"+toStr(delayBound)+".ll";
-  system(("mv "+fileName+"_clean.simp.ll "+g_path+"/"+llvmFileName).c_str());
+  std::string move("mv "+fileName+"_clean.simp.ll "+g_path+"/"+llvmFileName);
+  toCoutVerb(move);
+  system(move.c_str());
+
   if(usefulFunc) {
     g_fileNameVec.push_back(llvmFileName);        
     toCout("----- For instr "+instrInfo.name+", "+target+" is affected!");
@@ -484,7 +494,7 @@ uint32_t get_delay_bound(std::string var, std::vector<std::string> tgtVec,
 // returned argVec is empty if the update function just returns 0
 // generate a new file
 // Assune: if no internal function is found, then this function is discarded
-bool read_clean_o3(std::string fileName, 
+bool read_clean_o3_old(std::string fileName, 
                    std::vector<std::pair<std::string, uint32_t>> &argVec,
                    std::string outFileName,
                    std::string funcNameIn) {
@@ -494,8 +504,8 @@ bool read_clean_o3(std::string fileName,
   std::smatch m;
   std::string argList;
   bool seeFuncDef = false;
-  bool seeReturn = false;
-  bool returnConst = false;
+  //bool seeReturn = false;
+  //bool returnConst = false;
   std::regex pDef("^define internal fastcc (\\S+) @(\\S+)\\((.*)\\) unnamed_addr #1 \\{$");  
   std::regex pVecDef(
     "^define internal fastcc \\[(\\d+) x i(\\d+)\\] @(\\S+)\\((.*)\\) unnamed_addr #1 \\{$"
@@ -565,7 +575,7 @@ bool read_clean_o3(std::string fileName,
     else attributeLine = line;
   }
   if(internalExist) {
-    uint32_t pos = 0;
+    //uint32_t pos = 0;
     uint32_t startPos = 0;
     while(startPos < argList.size()) {
       uint32_t dotPos = argList.find(",", startPos);
@@ -637,6 +647,62 @@ bool read_clean_o3(std::string fileName,
   output.close();  
   return internalExist;
 }
+
+
+
+
+
+
+
+
+
+
+
+// returned argVec is empty if the update function just returns 0
+// generate a new file
+// Assune: if no internal function is found, then this function is discarded
+bool read_clean_o3(std::string fileName, 
+                   std::vector<std::pair<std::string, uint32_t>> &argVec,
+                   std::string outFileName,
+                   std::string funcNameIn) {
+
+  // Load in the input LLVM file
+  llvm::SMDiagnostic Err;
+  llvm::LLVMContext Context;
+  std::unique_ptr<llvm::Module> M = llvm::parseIRFile(fileName, Err, Context);
+  if (!M) {
+    Err.print("func_extract", llvm::errs());
+    return false;
+  }
+
+  llvm::Function *top_func = M->getFunction("top_function");
+  if (top_func) {
+    // Check that the main function wasn't accidentally optimized away.  If it
+    // doesn't exist, rename top_function to serve as a replacement.
+    llvm::Function *main_func = M->getFunction(funcNameIn);
+    if (!main_func) {
+      top_func->setName("funcNameIn");
+      toCout("Renamed top_function to "+funcNameIn);
+    } else {
+      // top_function is unneeded - delete it.
+      top_func->eraseFromParent();
+      toCout("Erased top_function");
+    }
+  } else {
+    toCout("Can't find top_function!");
+    return false;
+  }
+
+  // Write out the modified IR data to a new file.
+  std::error_code EC;
+  llvm::raw_fd_ostream OS(outFileName, EC);
+  OS << *M;
+  OS.close();
+
+  return true;
+}
+
+
 
 
 void print_func_info(std::ofstream &output) {

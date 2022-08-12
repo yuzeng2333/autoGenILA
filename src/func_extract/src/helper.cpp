@@ -1302,7 +1302,7 @@ parse_name_idx(const std::string &name) {
   //toErrs("parse name: "+name);
   std::regex pTimed("^(.*)"+DELIM+"(\\d+)(\\S*)$");  
   if(name.empty()) {
-    toCout("Warning: variable name is empty");
+    toCoutVerb("Warning: variable name is empty");
   }
   size_t pos = name.rfind(DELIM);
   if(pos == std::string::npos)

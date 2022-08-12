@@ -22,9 +22,9 @@ uint32_t simulatedInstrNum = 20;
 bool reset_regs = true;
 bool use_protect_signal = false;
 
-enum DESIGN{AES, PICO};
+enum DESIGN{AES, PICO, OTHER};
 // TODO: specify the design name
-enum DESIGN g_design = AES;
+enum DESIGN g_design = OTHER;
 
 
 int main(int argc, char *argv[]) {

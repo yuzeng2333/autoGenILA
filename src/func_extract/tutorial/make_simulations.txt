@@ -3,20 +3,30 @@
 Basically we will use the other executable programs generated during the build process to help automating the process of making simulation files.
 Readers are encouraged to read the programs in func_extract/app to undertand how to use these executables.
 
-1. move *.ll and link.sh into ILA_SIM folder
+1. Move the final LLVM files for each instruction (<instr>_<ASV>_<cyclecount>.ll) and link.sh into a
+   new ILA_SIM folder.
 
 2. Generate the random instructions to be tested:
-   run ./build/test_gen (with arg: instrNum), it takes the instr.txt file and
-   generate tb.txt file, which includes instructions to be 
+   Run ./build/test_gen with args: path instrNum.
+   This program takes the instr.txt file and
+   generates a tb.txt file, which includes instructions to be 
    used in rtl and ila simulations.
-   ATTENTIOM: change the g_design before using it!
+   "instrNum" is the total number of instructions that will be executed in the simulation run.
+   For some test cases, the program will also generated a dmem.txt
+   file, which contains memory data.
+   ATTENTION: change the global variable "g_design" in func_extract/app/rand_test_gen.cpp
+   before using test_gen!
 
 3. Generate the ILA simulation model based on the update functions
-   run ./build/sim_gen (with arg: instrNum), generate ila.cpp and ila.h file
-   may need to modify the mem_rdata and mem_addr in ila.cpp
+   Run ./build/sim_gen (with args: path instrNum).
+   ATTENTION: As you did for test_gen, change the global variable "g_design"
+   in func_extract/app/sim_gen.cpp before using sim_gen!
+   This program reads the files instr.txt, asv_info.txt, func_info.txt, tb.txt,
+   refinement.txt, and skipped_target.txt, and generates the files ila.c, ila.h,
+   and rst_vals.txt.  (refinement.txt and skipped_target.txt are optional).
    !!! specify the mem_addr for each instruction
 
-4. copy ila.cpp and ila.h to ILA_SIM folder
+4. Copy ila.c and ila.h to the ILA_SIM folder.
 
 5. (1) option1: run ./build/tb_gen (with arg: instrNum) to generate rtl testbench
    (2) option2: update the memd.txt file (needs to be manually extracted from ila.c, the assignment to mem), and generate mem.txt with /app/util/a.out
