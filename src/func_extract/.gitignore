@@ -1,2 +1,3 @@
 *.ll
-./build
+build
+FT816Float*
