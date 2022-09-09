@@ -7,11 +7,11 @@ namespace funcExtract {
 // parse instr.txt file
 // parsed result is in g_instrInfo
 void read_in_instructions(std::string fileName) {
-  toCout("### Begin read in instr info");
+  toCout("### Begin read in instr info: "+fileName);
   g_instrInfo.clear();
   std::ifstream input(fileName);
   if(!input.is_open()) {
-    toCout("Error: cannot open file: "+fileName);
+    toCout("Error: cannot open "+fileName);
     abort();
   }
   std::string line;
@@ -25,7 +25,7 @@ void read_in_instructions(std::string fileName) {
   bool firstSignalSeen = false;
   std::string lastMemReadAddr;
   while(std::getline(input, line)) {
-    //toCout(line);
+    toCoutVerb(line);
     if(line.empty())
       continue;
     if(line.substr(0, 2) == "//")
@@ -84,7 +84,7 @@ void read_in_instructions(std::string fileName) {
       continue;
     }
     if(line.substr(0, 8) == "#memAddr") {
-      std::string instrAddr = line.substr(11);
+      std::string instrAddr = line.substr(9);
       remove_two_end_space(instrAddr);
       g_instrInfo.back().instrAddr = instrAddr;
       continue;
@@ -247,10 +247,15 @@ void read_in_instructions(std::string fileName) {
                                         std::vector<std::string>{}, 0, 0, 0, 1, g_instrName};
               //info.instrEncoding.emplace(signalName, encoding);
               g_instrInfo.push_back(info);
+              toCout("Reading instruction "+info.name);
             }
             else {
               g_instrInfo.back().instrEncoding[signalName].push_back(encoding);
               g_instrInfo.back().instrLen++;
+              toCout("Reading data for cycle " +
+                  std::to_string(g_instrInfo.back().instrLen) +
+                  " of instruction " +
+                  g_instrInfo.back().name);
             }
             state = OtherSignal;
             firstSignalSeen = true;
@@ -413,6 +418,7 @@ void read_in_instructions(std::string fileName) {
     toCout("Error: name of top module is not set!");
     abort();
   }
+  toCout("### End read in instr info");
 }
 
 

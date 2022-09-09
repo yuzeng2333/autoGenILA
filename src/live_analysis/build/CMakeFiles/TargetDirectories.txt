@@ -1,4 +1,0 @@
-/home/yuzeng/workspace/research/autoGenILA/src/live_analysis/build/CMakeFiles/rebuild_cache.dir
-/home/yuzeng/workspace/research/autoGenILA/src/live_analysis/build/CMakeFiles/edit_cache.dir
-/home/yuzeng/workspace/research/autoGenILA/src/live_analysis/build/CMakeFiles/TaintGenLib.dir
-/home/yuzeng/workspace/research/autoGenILA/src/live_analysis/build/CMakeFiles/taint_gen.dir

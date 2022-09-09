@@ -18,9 +18,9 @@ using namespace syntaxPatterns;
 
 namespace funcExtract {
 
-std::regex pHex("^(\\d+)'h([\\dabcdefx\\?]+)$");
-std::regex pDec("^(\\d+)'d([\\dx\\?]+)$");
-std::regex pBin("^(\\d+)'b([01x\\?]+)$");
+const std::regex pHex("^(\\d+)'h([\\dabcdefx\\?]+)$");
+const std::regex pDec("^(\\d+)'d([\\dx\\?]+)$");
+const std::regex pBin("^(\\d+)'b([01x\\?]+)$");
 
 llvm::IntegerType* llvmWidth(uint32_t width, std::shared_ptr<llvm::LLVMContext> &c) { 
   return llvm::IntegerType::get(*c, width);
@@ -48,14 +48,14 @@ bool is_formed_num(std::string num) {
 }
 
 
-// convert a string number, in hex|decimal|binary form, into uint32_t
+// convert a string number, in hex|decimal|binary form, into uint64_t
 uint64_t hdb2int(std::string num) {
   if(num.find("x") != std::string::npos) {
     replace_with(num, "x", "0");
   }
   num = remove_signed(num);
   std::smatch m;
-  std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");  
+  static const std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");  
   if(std::regex_match(num, m, pNum)) {
     uint32_t width = std::stoi(m.str(1));
     if(width > 64) {
@@ -79,6 +79,44 @@ uint64_t hdb2int(std::string num) {
   }
   else 
     return try_stoi(num);
+}
+
+
+// convert a string number, in hex|decimal|binary form, into a llvm::APInt
+llvm::APInt hdb2apint(std::string num) {
+  if(num.find("x") != std::string::npos) {
+    replace_with(num, "x", "0");
+  }
+  num = remove_signed(num);
+
+  uint32_t width = 64; // Default width
+  std::smatch m;
+  static const std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");  
+  if(std::regex_match(num, m, pNum)) {
+    width = std::stoi(m.str(1));
+  }
+
+  int radix = 10;  // Default
+  std::string digits;
+
+  if(std::regex_match(num, m, pDec)) {
+    radix = 10;
+    digits = m.str(2);
+  }
+  else if(std::regex_match(num, m, pHex)) {
+    radix = 16;
+    digits = m.str(2);
+  }
+  else if(std::regex_match(num, m, pBin)){
+    radix = 2;
+    digits = m.str(2);
+  } else  {
+    toCout("Ill-formed number: "+num);
+    return llvm::APInt(64, try_stoi(num));
+  }
+
+  toCout("Making APInt width "+toStr(width)+" digits "+digits);
+  return llvm::APInt(width, digits, radix);
 }
 
 
@@ -503,7 +541,7 @@ uint32_t get_num_len(std::string num) {
 
 
 std::string zero_extend_num(std::string num) {
-  std::regex pBin("^(\\d+)'b([01x\\?]+)$"); 
+  static const std::regex pBin("^(\\d+)'b([01x\\?]+)$"); 
   std::smatch m;
   if(std::regex_match(num, m, pBin)) {
     int width = try_stoi(m.str(1));
@@ -700,7 +738,7 @@ bool is_comment_line(std::string &line) {
 
 
 StrPair_t split_module_asv(const std::string &writeAsvLine) {
-  std::regex pModuleAs  ("^(\\s*)([a-zA-Z0-9\\\\\\$\\#]+)\\.([a-zA-Z0-9\\\\\\$\\#]+)$");
+  static const std::regex pModuleAs  ("^(\\s*)([a-zA-Z0-9\\\\\\$\\#]+)\\.([a-zA-Z0-9\\\\\\$\\#]+)$");
   if(writeAsvLine.find(".") == std::string::npos)
     return std::make_pair(g_topModule, writeAsvLine);
   
@@ -1081,8 +1119,8 @@ void check_no_slice(std::string varAndSlice) {
 std::string remove_paramod(std::string modName) {
   remove_two_end_space(modName);
   std::smatch m;
-  std::regex pParamod1("^\\\\\\$paramod\\\\([_0-9a-zA-Z]+)(\\\\(\\S+)=(\\d+))+$");
-  std::regex pParamod2("^\\\\\\$paramod\\$(?:[_0-9a-zA-Z]+)(\\S+)$");
+  static const std::regex pParamod1("^\\\\\\$paramod\\\\([_0-9a-zA-Z]+)(\\\\(\\S+)=(\\d+))+$");
+  static const std::regex pParamod2("^\\\\\\$paramod\\$(?:[_0-9a-zA-Z]+)(\\S+)$");
   if(modName.find("paramod") != std::string::npos) {
     if(std::regex_match(modName, m, pParamod1)
        || std::regex_match(modName, m, pParamod2) ) {
@@ -1288,7 +1326,7 @@ void replace_with(std::string &str, std::string subStr, std::string newSubStr) {
 
 std::string remove_unsigned(std::string &line) {
   std::smatch m;
-  std::regex pSigned("\\$unsigned\\((.*)\\)");
+  static const std::regex pSigned("\\$unsigned\\((.*)\\)");
   if(line.find("$unsigned") != std::string::npos) {
     return std::regex_replace(line, pSigned, "$1");
     //toCout("line to be matched: "+line);
@@ -1300,7 +1338,7 @@ std::string remove_unsigned(std::string &line) {
 std::pair<std::string, std::pair<uint32_t, std::string>>
 parse_name_idx(const std::string &name) {
   //toErrs("parse name: "+name);
-  std::regex pTimed("^(.*)"+DELIM+"(\\d+)(\\S*)$");  
+  static const std::regex pTimed("^(.*)"+DELIM+"(\\d+)(\\S*)$");  
   if(name.empty()) {
     toCoutVerb("Warning: variable name is empty");
   }

@@ -26,7 +26,7 @@ bool isNum(std::string name) {
   std::smatch m;
   while(name.back() == ' ')
     name.pop_back();
-  std::regex p("^(\\s*)(.*)$");
+  static const std::regex p("^(\\s*)(.*)$");
   if(!std::regex_match(name, m, p)) {
     toCout("Error: var not matched in isNum: "+name);
   }
@@ -108,23 +108,23 @@ bool isMem(std::string varAndSlice) {
 
 
 std::string to_re(std::string input) {
-  std::regex pNameBraces("\\(NAME\\)");
+  static const std::regex pNameBraces("\\(NAME\\)");
   // Below is the old varNameBraces. It has been used without errors for many designs.
   // The reason I replace it with the new one is because it failed in the ultra_riscv case
   //std::string varNameBraces("([\a\ba-zA-Z0-9_=\\.\\$\\\\'\\[\\]\\(\\)\\/\\:]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?)(?:\\s)?");
   std::string varNameBraces("((?:\\\\\\S+|[0-9a-zA-Z_]+|[0-9]+\\'[bdh][0-9a-fx]+|\\$(?:un)?signed\\([0-9]+\\'[bdh][0-9a-fx]+\\)|\\$(?:un)?signed\\([0-9a-zA-Z_]+\\)|\\$(?:un)?signed\\(\\\\\\S+ \\))(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?)(?:\\s)?");  
   auto res = std::regex_replace(input, pNameBraces, varNameBraces);
 
-  std::regex pName("NAME");
+  static const std::regex pName("NAME");
   //std::string varName("[\a\ba-zA-Z0-9_=\\.\\$\\\\'\\[\\]\\(\\)\\/\\:]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?(?:\\s)?");
   std::string varName("(?:\\\\\\S+|[0-9a-zA-Z_]+|[0-9]+\\'[bdh][0-9a-fx]+|\\$(?:un)?signed\\([0-9]+\\'[bdh][0-9a-fx]+\\)|\\$(?:un)?signed\\([0-9a-zA-Z_]+\\)|\\$(?:un)?signed\\(\\\\\\S+ \\))(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?(?:\\s)?");
 
   res = std::regex_replace(res, pName, varName);
 
-  std::regex pNUM("NUM");
+  static const std::regex pNUM("NUM");
   std::string regexNum("\\d+'(?:h|b)[\\dabcdef]+");
   res = std::regex_replace(res, pNUM, regexNum);
-  std::regex pInt("INT");
+  static const std::regex pInt("INT");
   std::string regexInt("\\d+");
   res = std::regex_replace(res, pInt, regexInt);
   //std::cout << res << std::endl;
@@ -133,7 +133,7 @@ std::string to_re(std::string input) {
 
 
 std::string remove_bracket(std::string name) {
-  std::regex pName("^([a-zA-Z0-9_.]+)\\[(\\d+)\\:(\\d+)\\]$");
+  static const std::regex pName("^([a-zA-Z0-9_.]+)\\[(\\d+)\\:(\\d+)\\]$");
   std::smatch match;
   if (std::regex_match(name, match, pName)) {
     // FIXME: how to deal with this more appropriately?
@@ -145,7 +145,7 @@ std::string remove_bracket(std::string name) {
 
 
 uint32_t cut_pos(std::string name) {
-  std::regex pOpenBackSlash("^(\\s*)\\\\");
+  static const std::regex pOpenBackSlash("^(\\s*)\\\\");
   std::smatch m;
   if(std::regex_search(name, m, pOpenBackSlash)) {
     bool nameStart = false;
@@ -172,7 +172,7 @@ uint32_t cut_pos(std::string name) {
 
 // the returned name and slice may contain blanks
 bool split_slice(std::string slicedName, std::string &name, std::string &slice) {
-  std::regex pLocal("^(\\s*)(\\S+)(\\s*)$");
+  static const std::regex pLocal("^(\\s*)(\\S+)(\\s*)$");
   std::smatch m;
   uint32_t pos = cut_pos(slicedName);
   if (pos == slicedName.length()) {
@@ -203,8 +203,8 @@ bool split_slice(std::string slicedName, std::string &name, std::string &slice) 
 
 // no matter leftIdx or rightIdx is bigger, always return a positive width
 uint32_t get_width(std::string slice) {
-  std::regex pSlice("^(?:\\s?)\\[(\\d+)\\:(\\d+)\\](?:\\s)?$");
-  std::regex pSingleBit("^(?:\\s)?\\[\\d+\\](?:\\s)?$");
+  static const std::regex pSlice("^(?:\\s?)\\[(\\d+)\\:(\\d+)\\](?:\\s)?$");
+  static const std::regex pSingleBit("^(?:\\s)?\\[\\d+\\](?:\\s)?$");
   std::smatch m;
   if (slice.empty())
     return 1;
@@ -226,7 +226,7 @@ uint32_t get_width(std::string slice) {
 
 // return low index
 uint32_t get_begin(std::string slice) {
-  std::regex pSlice("^(?:\\s?)\\[(?:(\\d+)\\:)?(\\d+)\\](\\s)?$");
+  static const std::regex pSlice("^(?:\\s?)\\[(?:(\\d+)\\:)?(\\d+)\\](\\s)?$");
   std::smatch m;
   if( !std::regex_match(slice, m, pSlice) )
     std::cout << "Wrong input to get_begin:|" + slice << "|" << std::endl;
@@ -236,7 +236,7 @@ uint32_t get_begin(std::string slice) {
 
 // return the high index
 uint32_t get_end(std::string slice) {
-  std::regex pSlice("^(?:\\s?)\\[(\\d+)(?:\\:(\\d+))?\\](\\s)?$");
+  static const std::regex pSlice("^(?:\\s?)\\[(\\d+)(?:\\:(\\d+))?\\](\\s)?$");
   std::smatch m;
   if( !std::regex_match(slice, m, pSlice) ) {
     std::cout << "Wrong input to get_end:|" + slice << "|" << std::endl;
@@ -329,7 +329,7 @@ bool check_bits(std::string op, std::string opSlice, const std::vector<bool> &bi
     return false;
   }
   else {
-    std::regex pSlice("^(?:\\s*)\\[(\\d+)(?:\\:(\\d+))?\\](?:\\s*)$");
+    static const std::regex pSlice("^(?:\\s*)\\[(\\d+)(?:\\:(\\d+))?\\](?:\\s*)$");
     std::smatch m;
     if(!std::regex_match(opSlice, m, pSlice)) {
       toCout("Error: does not match slice: "+ opSlice);
@@ -376,7 +376,7 @@ void merge_bits(std::string op, std::string opSlice, std::vector<bool> &bitVec) 
     lowIdx = idxPair.second;
   }
   else {
-    std::regex pSlice("^(?:\\s*)\\[(\\d+)(?:\\:(\\d+))?\\](?:\\s*)$");
+    static const std::regex pSlice("^(?:\\s*)\\[(\\d+)(?:\\:(\\d+))?\\](?:\\s*)$");
     std::smatch m;
     if(!std::regex_match(opSlice, m, pSlice)) {
       toCout("Error: does not match slice: "+ opSlice);
@@ -540,7 +540,7 @@ std::string get_nth_var_in_list(std::string list, uint32_t idx) {
     arg = list.substr(previous+1, current-previous-1);
     i++;
     //std::regex pLocal("^(\\s)*(\\S+)(\\s)*$");
-    std::regex pLocal("^(?:\\s)*([\aa-zA-Z0-9_\\.:\\\\'\\[\\]]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?)(?:\\s)*$");
+    static const std::regex pLocal("^(?:\\s)*([\aa-zA-Z0-9_\\.:\\\\'\\[\\]]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?)(?:\\s)*$");
     std::smatch m;
     std::regex_match(arg, m, pLocal);
     if(i == idx)
@@ -561,11 +561,11 @@ uint32_t get_var_slice_width( std::string varAndSlice, VarWidth &varWidthIn) {
     uint32_t width = str2int(m.str(1), "get_var_slice width("+varAndSlice+")");
     return width;
   }
-  std::regex pSlice("\\[(\\d+)(:)?(\\d+)?\\]");
+  static const std::regex pSlice("\\[(\\d+)(:)?(\\d+)?\\]");
   std::smatch m;
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
-  std::regex pName("(\\s*)(\\S+)(\\s*)");
+  static const std::regex pName("(\\s*)(\\S+)(\\s*)");
   std::regex_match(var, m, pName);
   var = m.str(2);
   if(isMem(var)) {
@@ -946,7 +946,7 @@ void toCoutVerb(std::string line) {
 
 
 bool isSingleBit(std::string slice) {
-  std::regex pSingleBit("\\[\\d+\\]");
+  static const std::regex pSingleBit("\\[\\d+\\]");
   std::smatch m;
   if(std::regex_search( slice, m, pSingleBit ))
     return true;
@@ -956,7 +956,7 @@ bool isSingleBit(std::string slice) {
 
 
 std::string further_clean_line(std::string line) {
-  std::regex pSigned("\\$signed");
+  static const std::regex pSigned("\\$signed");
   std::smatch m;
   if( !std::regex_search(line, m, pSigned) )
     return line;
@@ -986,7 +986,7 @@ std::string further_clean_line(std::string line) {
     line.replace(closeBracePos, 1, "");
     cur = line.find('$', cur);
   }
-  std::regex pBlanks("( )+");
+  static const std::regex pBlanks("( )+");
   line = std::regex_replace(line, pBlanks, " " );
   return line;
 }
@@ -1030,7 +1030,7 @@ std::string get_rst() {
 
 
 bool isRFlag(std::string var) {
-  std::regex pRFlag("_r_flag");
+  static const std::regex pRFlag("_r_flag");
   std::smatch m;
   return std::regex_search(var, m, pRFlag);
 }
@@ -1544,7 +1544,7 @@ std::string split_long_bit_vec(std::string varList) {
 
 std::string remove_signed(std::string &line) {
   std::smatch m;
-  std::regex pSigned("\\$signed\\((.*)\\)");
+  static const std::regex pSigned("\\$signed\\((.*)\\)");
   if(line.find("$signed") != std::string::npos) {
     return std::regex_replace(line, pSigned, "$1");
     //toCout("line to be matched: "+line);
@@ -1751,7 +1751,7 @@ bool is_srcConcat(const std::string &line) {
   }
   else return false;
   if(line.find("[") != std::string::npos)
-    toCout("Find it!");
+    toCoutVerb("Find it!");
   std::smatch m;
   //if(!std::regex_match(line, m, pSrcConcat))
   //  return false;
@@ -1773,7 +1773,7 @@ bool is_srcConcat(const std::string &line) {
 
 
 bool is_destConcat(const std::string &line) {
-  std::regex pLocalName("[a-zA-Z0-9_=\\.\\$\\\\'\\[\\]\\(\\)]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?");  
+  static const std::regex pLocalName("[a-zA-Z0-9_=\\.\\$\\\\'\\[\\]\\(\\)]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?");  
   std::smatch m;
   if(!std::regex_match(line, m, pDestConcat))
     return false;
@@ -1785,7 +1785,7 @@ bool is_destConcat(const std::string &line) {
 
 
 bool is_srcDestConcat(const std::string &line) {
-  std::regex pLocalName("[a-zA-Z0-9_=\\.\\$\\\\'\\[\\]\\(\\)]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?");  
+  static const std::regex pLocalName("[a-zA-Z0-9_=\\.\\$\\\\'\\[\\]\\(\\)]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?");  
   std::smatch m;
   if(!std::regex_match(line, m, pSrcDestBothConcat))
     return false;
@@ -1800,7 +1800,7 @@ bool is_srcDestConcat(const std::string &line) {
 
 
 bool vec_has_only_vars(const std::vector<std::string> &vec) {
-  std::regex pLocalName("[a-zA-Z0-9_=\\.\\$\\\\'\\[\\]\\(\\)]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?");  
+  static const std::regex pLocalName("[a-zA-Z0-9_=\\.\\$\\\\'\\[\\]\\(\\)]+(?:\\s*\\[\\d+(?:\\:\\d+)?\\])?");  
   std::smatch m;  
   for(std::string var: vec) {
     remove_two_end_space(var);
@@ -1845,7 +1845,7 @@ bool split_concat(std::string var, std::vector<std::string> &vec) {
 
 
 bool check_input_val(std::string value) {
-  std::regex pX("^(\\d+)'[b|h]x$");
+  static const std::regex pX("^(\\d+)'[b|h]x$");
   std::smatch m;
   if(value == "x" || is_number(value) 
       || value != "DIRTY" || std::regex_match(value, m, pX))

@@ -55,6 +55,7 @@ bool g_use_simple_func_name;
 bool g_push_new_target;
 bool g_read_rst_vcd;
 bool g_use_multi_thread;
+bool g_overwrite_existing_llvm = true;
 uint32_t g_do_instr_num;
 std::ofstream g_outFile;
 std::ofstream g_regValueFile;

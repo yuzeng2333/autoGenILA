@@ -234,7 +234,7 @@ void make_instr(uint32_t instrIdx, bool constantEncod=true) {
 
 void gen_rand_dmem(int width, int num) {
   std::ofstream output(g_path+"/dmem.txt");
-  uint32_t i = 0;
+  int i = 0;
   if(width == 32) {
     while(i++ < num) {
       uint32_t randNum = rand();
@@ -255,14 +255,15 @@ void gen_rand_dmem(int width, int num) {
 
 
 int main(int argc, char *argv[]) {
-  g_path = argv[1];
   if(argc < 3) {
-    toCout("Error: number of instructions is not set!");
+    toCout(std::string("Usage: ")+argv[0]+" <path> <instrNum>");
     abort();
   }
+  g_path = argv[1];
   InstrNum = std::stoi(argv[2]);
   g_verb = false;
   read_in_instructions(g_path+"/instr.txt");
+  toCout("Writing "+g_path+"/tb.txt");
   g_output.open(g_path+"/tb.txt", std::ios::out);
   srand(time(NULL));
   //srand(1);

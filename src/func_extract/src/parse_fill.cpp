@@ -559,6 +559,11 @@ void read_config(std::string fileName) {
         configNum++;
         toCout("read g_use_multi_thread: "+value);
       }
+      else if(config == "g_overwrite_existing_llvm") {
+        g_overwrite_existing_llvm = (value == "true");
+        configNum++;
+        toCout("read g_overwrite_existing_llvm: "+value);
+      }
     }
   }
   if(configNum < 6) {

@@ -160,9 +160,13 @@ class UpdateFunctionGen {
     std::shared_ptr<ModuleDynInfo_t>
     get_dyn_data(std::shared_ptr<ModuleInfo_t> curMod);
     
+    static std::string make_llvm_basename(DestInfo &destInfo,
+                                  const uint32_t bound);
+
     void print_llvm_ir(DestInfo &destInfo, 
                        const uint32_t bound, 
-                       uint32_t instrIdx);
+                       uint32_t instrIdx,
+                       std::string fileName);
     
     
     llvm::Value* var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, 

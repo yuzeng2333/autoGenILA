@@ -21,34 +21,34 @@ using namespace taintGen;
 // key is the asv name, value is its bit number
 
 // manually fix errors due to longer than 64 bits
-bool g_fix_long_bit = true;
-bool g_fetch_instr_from_mem = true;
+bool g_fix_long_bit = false; // Obsolete
+bool g_fetch_instr_from_mem = false;
 bool g_set_dmem = false;
 uint32_t g_dmem_width = 32;
+
 std::string g_instrValueVar = "mem_rdata";
 std::string g_instrAddrVar = "zy_instr_addr";
 std::string g_dataAddrVar = "zy_data_addr";
 std::string g_dataIn = "zy_data_in";
 std::string nxt = "_nxt";
 std::map<std::string, std::string> rstValMap;
-// first of pair is bit number, second is array size
+
+// first of pair is element bit width, second is array size
 std::map<std::string, std::pair<uint32_t, uint32_t>> g_global_arr;
+
 // key of map is var name, the value vector is the
 // vector of values for multiple cycles, since an
-// instruction might span numtiple cycles
+// instruction might span multiple cycles
 std::vector<std::map<std::string, 
                      std::vector<std::string>>> toDoList;
+
 std::map<std::string, std::map<std::string, 
                                std::string>> g_refineMap;
 std::set<std::string> g_skippedTgt;
 uint32_t memSize;
 
-// key is the asv name, value is its c data type name
-std::map<std::string, std::string> g_asvTy;
-std::string CNCT = "_";
-
-// if true, update all regs after each instruction's update functions
-// are called. Otherwise, only update regs that are assigned.
+// if true, update all regs after every instruction's update functions
+// have been called. Otherwise, only update regs that are assigned.
 // enable: pico
 // disable: aes
 bool g_update_all_regs = false;
@@ -81,11 +81,12 @@ int main(int argc, char *argv[]) {
   }
 
 
-  g_path = argv[1];
-  if(argc < 3) {
-    toCout("Error: did not specify the number of instructions!");
+  if(argc < 2) {
+    toCout("Error: did not specify path!");
     abort();
   }
+  g_path = argv[1];
+
   g_verb = false;
   read_in_instructions(g_path+"/instr.txt");
   read_asv_info(g_path+"/asv_info.txt");
@@ -95,15 +96,23 @@ int main(int argc, char *argv[]) {
   read_to_do_instr(g_path+"/tb.txt", toDoList);
   read_refinement(g_path+"/refinement.txt");
   read_skipped_target(g_path+"/skipped_target.txt");
-  uint32_t instrNum;
-  instrNum = std::stoi(argv[2]);
+  uint32_t instrNum = 0;
+  if (g_fetch_instr_from_mem) {
+    if(argc < 3) {
+      toCout("Error: did not specify the number of instructions!");
+      abort();
+    }
+    instrNum = std::stoi(argv[2]);
+  }
   memSize = toDoList.size();
 
   std::ofstream header(g_path+"/ila.h");
-  std::ofstream cpp(g_path+"/ila.c");
+  std::ofstream cpp(g_path+"/ila.cpp");
 
   // fill cpp file
   cpp << "#include <stdio.h>" << std::endl;
+  cpp << "#include <cstdint>" << std::endl;
+  cpp << "#include <array>" << std::endl;
   cpp << "#include \"ila.h\"\n" << std::endl;
 
   if(g_design == VTA) {
@@ -120,7 +129,7 @@ int main(int argc, char *argv[]) {
     for(auto pair: g_global_arr) {
       std::string arrName = pair.first;
       uint32_t size = pair.second.second;
-      std::string dataTy = asv_type(pair.second.first);
+      std::string dataTy = c_type(pair.second.first);
       cpp << dataTy+" "+arrName+"["+toStr(size)+"];" << std::endl;
     }
   }
@@ -148,12 +157,11 @@ int main(int argc, char *argv[]) {
     toCout(asv);
     std::string asvSimp = var_name_convert(asv, true);
     uint32_t width = pair.second;   
-    std::string asvTy = asv_type(width);
+    std::string asvTy = c_type(width);
     if(asvTy.empty()) {
-      toCout("Error happened in asv_type for "+asv);
+      toCout("Error happened in c_type for "+asv);
       abort();
     }
-    g_asvTy.emplace(asvSimp, asvTy);
     std::string rstVal;
     std::string noSlash = asv;
     if(asv.substr(0, 1) == "\\") noSlash = asv.substr(1);
@@ -164,7 +172,13 @@ int main(int argc, char *argv[]) {
     else {
       rstVal = g_rstVal[noSlash];
     }
-    rstVal = toStr(hdb2int(rstVal));
+
+    toCout("rst val of "+asv+"  "+rstVal);
+    llvm::APInt rstValAPInt = hdb2apint(rstVal);
+    rstVal = apint2initializer(rstValAPInt);
+
+    toCout("cleaned up rst val of "+asv+"  "+rstVal);
+
     rstValMap.emplace(asv, rstVal);    
     std::string ret = "  "+asvTy+" "+asvSimp+" = "+rstVal+";";
     cpp << ret << std::endl;    
@@ -194,21 +208,10 @@ int main(int argc, char *argv[]) {
 
   // ========= initialization of regs
   std::set<std::string> initializedReg;
-  cpp << "  if(PRINT_ALL) printf( \" // Initialization \\n\" );" << std::endl;
-  for(auto pair : rstValMap) {
-    std::string reg = var_name_convert(pair.first, true);
-    initializedReg.insert(reg);
-    cpp << "  if(PRINT_ALL) printf( \""+reg+": "+pair.second+"\\n\" );" << std::endl;
-  }
-  // ========  initialized rtlVars in the refinement map
-  for(auto pair1 : g_refineMap) {
-    for(auto pair2 : pair1.second) {
-      std::string rtlVar = pair2.second;
-      if(initializedReg.find(rtlVar) != initializedReg.end()) continue;
-      else initializedReg.insert(rtlVar);
-      cpp << "  if(PRINT_ALL) printf( \""+rtlVar+": 0\\n\" );" << std::endl;
-    }
-  }
+  cpp << "  if (PRINT_ALL) {" << std::endl;
+  cpp << "    printf( \" // Initialization \\n\" );" << std::endl;
+  print_asv_values(cpp);
+  cpp << "  }" << std::endl;
   cpp << std::endl;
 
 
@@ -280,24 +283,54 @@ int main(int argc, char *argv[]) {
     }
   }
   cpp << std::endl;
-  print_final_results(cpp);
+  // if not PRINT_ALL, then print values only at the end
+  cpp << "  if(!PRINT_ALL) {" << std::endl;
+  cpp << "    printf(\"//// the final results:\\n\");" << std::endl;
+  print_asv_values(cpp);
+  cpp << "  }" << std::endl;
   cpp << "}" << std::endl; // end of main function
   cpp.close();  
 
   // =========== generate header file for update functions
+  header << "#ifdef __cplusplus" << std::endl
+         << "extern \"C\" {" << std::endl
+         << "#endif" << std::endl << std::endl;
+
   for(auto instrInfo : g_instrInfo) {
     for(auto pair : instrInfo.funcTypes) {
       std::string writeASV = pair.first;
-      std::string funcName = instrInfo.name + CNCT + writeASV;
+      std::string funcName = update_function_name(instrInfo.name, writeASV);
+
       print_func_declare(pair.second, funcName, header);
       header << std::endl;
     }
   }
 
+  header << "#ifdef __cplusplus" << std::endl
+         << "}" << std::endl
+         << "#endif" << std::endl;
+
   header.close();
   return 0;
 }
 
+
+// Name used in the update function's LLVM file.
+std::string update_function_name(const std::string& instr, const std::string& asv) {
+  std::string f = instr + "_" + asv;
+
+  // Doug: obsolete?
+  if(g_fix_long_bit && f.find("_LOW") != std::string::npos) {
+    size_t pos = f.find("_LOW");
+    f = f.substr(0, pos);
+  }
+  if(g_fix_long_bit && f.find("_HIGH") != std::string::npos) {
+    size_t pos = f.find("_HIGH");
+    f = f.substr(0, pos);
+  }
+
+  return f + "_wrapper";
+}
 
 
 // if write target is array, then update memory
@@ -308,14 +341,20 @@ void print_instr_calls(std::map<std::string,
                        uint32_t memAddr) {
   std::string instrName = decode(encoding);
   uint32_t idx = get_instr_by_name(instrName);
-  auto instrInfo = g_instrInfo[idx];    
+  struct InstrInfo_t& instrInfo = g_instrInfo[idx];    
+
   cpp << prefix+"  // instr"+toStr(idx)+": "+instrInfo.name+"\n" << std::endl;
-  cpp << prefix+"  if(PRINT_ALL) printf( \"// instr"+toStr(idx)+": "
-               +instrInfo.name+", memAddr: "+toStr(memAddr)+" \\n \");" << std::endl;
-  bool instrAddrExist = true;
+  cpp << prefix+"  if (PRINT_ALL) printf( \"// instr"+toStr(idx)+": "
+               +instrInfo.name+", memAddr: "+toStr(memAddr)+"\\n\");" << std::endl;
+
+  if(instrInfo.funcTypes.empty()) {
+    toCout("Error: no func_info found for instruction: "+instrInfo.name);
+    abort();
+  }
 
 
   // =====  specify address for reading instructions
+  bool instrAddrExist = true;
   if(instrInfo.instrAddr.empty()) {
     if(g_design == PICO || g_design == URV) 
       toCout(" Warning: instrAddr is not specified for: "+instrInfo.name);
@@ -325,18 +364,14 @@ void print_instr_calls(std::map<std::string,
   std::string instrAddr;
   if(instrAddrExist)
     instrAddr = var_name_convert(instrInfo.instrAddr, true);
+
+  // ===== collect function types(return-type+argument-types), and re-order functions
   // reorder the funcTypes, which also reorder the sequence of calling update functions
   // put call for dataAddr at the first
   std::vector<std::pair<std::string, FuncTy_t>> thisInstrFuncTypes;
-  if(instrInfo.funcTypes.empty()) {
-    toCout("Error: no func_info found for instruction: "+instrInfo.name);
-    abort();
-  }
 
-
-  // ===== collect function types(return type+argument-type), and re-order functions
   for(auto pair: instrInfo.funcTypes) {
-    //if(pair.first == instrInfo.dataAddr) {
+    //if(pair.first == instrInfo.dataAddr) 
     if(instrInfo.memReadAddr2TgtMap.find(pair.first) != instrInfo.memReadAddr2TgtMap.end()) {
       thisInstrFuncTypes.insert(thisInstrFuncTypes.begin(), std::make_pair(pair.first, pair.second));
     }
@@ -345,102 +380,132 @@ void print_instr_calls(std::map<std::string,
     }
   }
 
-  // ===== use to collect mapped var, its original update functions are skipped
-  std::set<std::string> remappedVar;
-  bool updateMem = false;  
+  struct FuncCall_t {
+    std::string funcName;  // Actual C name to call
+    FuncTy_t funcTy;
+    std::string origASV; 
+    std::vector<std::string> varNames;  // Holds original variable or mapped variables to be updated
+  };
+
+  std::vector<FuncCall_t> funcCalls;
+
+  // ===== use to remember mapped vars - their original update functions are skipped
+  std::set<std::string> remappedVars;
+
+  // Build the final canonical list of update functions to call and vars to update.
   for(auto pair : thisInstrFuncTypes) {
     std::string origWriteASV = pair.first;
-    if(g_skippedTgt.find(origWriteASV) != g_skippedTgt.end()) continue;
-    if(remappedVar.find(origWriteASV) != remappedVar.end()) continue;
-    bool needData = (instrInfo.loadDataInfo.find(origWriteASV) != instrInfo.loadDataInfo.end()) ;
-    //std::string dataAddr = var_name_convert(instrInfo.dataAddr, true);    
+    const FuncTy_t& funcType = pair.second;
+
+
+    if(g_skippedTgt.count(origWriteASV)) continue;
+    if(remappedVars.count(origWriteASV)) continue;
+
+
+    FuncCall_t funcCall;
     std::string writeASV = var_name_convert(origWriteASV, true);
-    if(instrInfo.name == "lh" && writeASV == "_u0_cpuregs_1_")
-      toCout("Find it!");
-    std::string funcName = instrInfo.name + CNCT + writeASV;
-    if(g_fix_long_bit && funcName.find("_LOW") != std::string::npos) {
-      size_t pos = funcName.find("_LOW");
-      funcName = funcName.substr(0, pos);
-    }
-    if(g_fix_long_bit && funcName.find("_HIGH") != std::string::npos) {
-      size_t pos = funcName.find("_HIGH");
-      funcName = funcName.substr(0, pos);
-    }
+    funcCall.funcName = update_function_name(instrInfo.name, writeASV);
+    funcCall.funcTy = funcType;  // A lot of deep copying...
+    funcCall.origASV = origWriteASV;
 
-    // should replace the input-type arg in the function call with explicit values 
-    // in the instruction
-
-    std::string funcCall;
-    if(instrInfo.funcTgtMap.find(origWriteASV) != instrInfo.funcTgtMap.end()) {
+    if(instrInfo.funcTgtMap.count(origWriteASV)) {
       for(std::string origMappedVar : instrInfo.funcTgtMap[origWriteASV]) {
-        std::string mappedVar = var_name_convert(origMappedVar, true);
-        funcCall = func_call(mappedVar+nxt, funcName, pair.second.argTy, 
-                             encoding, instrInfo.loadDataInfo[origWriteASV]);
-        cpp << prefix+funcCall << std::endl;
-        if(mappedVar.find("_Arr") == std::string::npos) {
-          cpp << prefix+"  if(PRINT_ALL) printf( \""+mappedVar+": %ld\\n\", "+mappedVar+nxt+" );" << std::endl;
-          if(!g_update_all_regs) cpp << prefix+"  "+mappedVar+" = "+mappedVar+nxt+" ;\n" << std::endl;
-        }        
-        else {
-          print_array(mappedVar, cpp);
-          updateMem = true;
-        }
-        cpp << std::endl;
-        remappedVar.insert(origMappedVar);
+        // Gather all the mapped vars
+        remappedVars.insert(origMappedVar);
+        funcCall.varNames.push_back(var_name_convert(origMappedVar, true));
       }
+    } else {
+      // The normal unmapped case
+      funcCall.varNames.push_back(writeASV);
     }
-    else {
-      funcCall = func_call(writeASV+nxt, funcName, pair.second.argTy, 
-                           encoding, instrInfo.loadDataInfo[origWriteASV]);
-      cpp << prefix+funcCall << std::endl;
-      std::string printName = writeASV;
-      if(g_refineMap[instrName].find(writeASV) != g_refineMap[instrName].end())
-        printName = g_refineMap[instrName][writeASV];
-      if(writeASV.find("_Arr") == std::string::npos) {
-        cpp << prefix+"  if(PRINT_ALL) printf( \""+printName
-               +": %ld\\n\", "+writeASV+nxt+" );" << std::endl;
-        if(!g_update_all_regs) cpp << prefix+"  "+writeASV
-                                      +" = "+writeASV+nxt+" ;\n" << std::endl;
-      }
-      else {
-        print_array(writeASV, cpp);
-        updateMem = true;
-      }
-      cpp << std::endl;
-    }
+    funcCalls.push_back(funcCall);
+  }
 
 
-    // ==== update instrAddr
+  // Generate all the calls to the update functions
+  for (FuncCall_t& funcCall : funcCalls) {
+    for (std::string& varName : funcCall.varNames) {
 
-    if(!instrAddr.empty() && writeASV == instrAddr) {
-      funcCall = func_call(g_instrAddrVar, funcName, pair.second.argTy, 
-                           encoding, std::pair<std::string, uint32_t>{});
-      cpp << prefix+g_instrAddrVar+" = "+writeASV+nxt+" ;" << std::endl;
-      cpp << prefix+"  if(PRINT_ALL) printf( \""+g_instrAddrVar+": %ld\\n\", "+g_instrAddrVar+" );" << std::endl;
-      cpp << std::endl;
-    }
-    else if(instrInfo.funcTgtMap.find(writeASV) != instrInfo.funcTgtMap.end() ) {
-      funcCall = func_call(g_dataAddrVar, funcName, pair.second.argTy, 
-                           encoding, instrInfo.loadDataInfo[origWriteASV]);
-      cpp << prefix+funcCall << std::endl;
-      if(g_dataAddrVar.find("_Arr") == std::string::npos)
-        cpp << prefix+"  if(PRINT_ALL) printf( \""+g_dataAddrVar+": %ld\\n\", "+g_dataAddrVar+" );" << std::endl;      
-      cpp << std::endl;
-      cpp << prefix+"  data_byte_addr = ("+g_dataAddrVar+" >> 2) % "+toStr(memSize)+";" << std::endl;
-      cpp << prefix+"  "+g_dataIn+" = mem[data_byte_addr] ;" << std::endl;
-      cpp << prefix+"  if(PRINT_ALL) printf( \"load data addr : %d\\n\", data_byte_addr );" << std::endl;      
+      std::string funcCallStr = func_call(varName+nxt, funcCall.funcTy, funcCall.funcName, 
+                           encoding, instrInfo.loadDataInfo[funcCall.origASV]);
+      cpp << prefix+funcCallStr << std::endl;
+
+      // ==== update instrAddr or dataAddr
+      if(!instrAddr.empty() && varName == instrAddr) {
+        std::string funcCallStr = func_call(g_instrAddrVar, funcCall.funcTy, funcCall.funcName, 
+                             encoding, std::pair<std::string, uint32_t>{});
+        cpp << prefix+funcCallStr << std::endl;
+      }
+      else if(instrInfo.funcTgtMap.count(varName)) {
+        std::string funcCallStr = func_call(g_dataAddrVar, funcCall.funcTy, funcCall.funcName, 
+                             encoding, instrInfo.loadDataInfo[funcCall.origASV]);
+        cpp << prefix+funcCallStr << std::endl;
+      }
     }
   }
-  
+  cpp << std::endl;
+
+  // Generate code to update the ASVs.
+  bool updateMem = false;  
+
+  for (FuncCall_t& funcCall : funcCalls) {
+    for (std::string& varName : funcCall.varNames) {
+      if (!is_array_var(varName)) {
+        if(!g_update_all_regs) {
+          cpp << prefix+"  "+varName +" = "+varName+nxt+";" << std::endl;
+        }
+      } else {
+        updateMem = true;
+      }
+
+      // ==== do instrAddr or dataAddr
+      if(!instrAddr.empty() && varName == instrAddr) {
+        cpp << prefix+g_instrAddrVar+" = "+varName+nxt+" ;" << std::endl;
+        cpp << std::endl;
+      } else if(instrInfo.funcTgtMap.count(varName)) {
+        cpp << prefix+"  data_byte_addr = ("+g_dataAddrVar+" >> 2) % "+toStr(memSize)+";" << std::endl;
+        cpp << prefix+"  "+g_dataIn+" = mem[data_byte_addr] ;" << std::endl;
+      }
+    }
+  }
+  cpp << std::endl;
+
+  // Generate code to print the ASVs.
+  cpp << prefix+"if (PRINT_ALL) {" << std::endl;
+
+  for (FuncCall_t& funcCall : funcCalls) {
+    for (std::string& varName : funcCall.varNames) {
+      std::string printName = varName;
+      if(g_refineMap[instrName].count(varName))
+        printName = g_refineMap[instrName][varName];
+      print_var_value(cpp, varName, funcCall.funcTy.retTy, printName);
+
+      // ==== do instrAddr or dataAddr
+      if(!instrAddr.empty() && varName == instrAddr) {
+        print_var_value(cpp, g_instrAddrVar, 32);
+        cpp << std::endl;
+      }
+      else if(instrInfo.funcTgtMap.count(varName)) {
+        if(!is_array_var(g_dataAddrVar))
+          print_var_value(cpp, g_dataAddrVar, 32);
+        cpp << std::endl;
+        cpp << prefix+"printf( \"load data addr : %d\\n\", data_byte_addr );" << std::endl;      
+      }
+    }
+  }
+
   // update dmem for store instructions of URV
   if(g_design == URV
      && (instrInfo.name == "sb" || instrInfo.name == "sh"
      || instrInfo.name == "sw")) {
     print_urv_update_mem(cpp);
   }
+  cpp << prefix+"  printf(\"\\n\");" << std::endl;
 
-  cpp << prefix+"  if(PRINT_ALL) printf( \"\\n\" );" << std::endl;
+  cpp << prefix+"}" << std::endl;
+
   cpp << std::endl;
+
   if(updateMem && g_design == AES ) 
        //&& ( funcName == "start__data_fifo_out0_Arr"
        //     || funcName == "start_data_fifo_out0_Arr" ) ) 
@@ -448,13 +513,13 @@ void print_instr_calls(std::map<std::string,
 }
 
 
-std::string asv_type(uint32_t width) {
+std::string c_type(uint32_t width) {
   std::string ret;
   switch (width) {
     //case 1 ... 8:
     //  ret = "unsigned char";
     //  break;
-    case 1 ... 16:
+    case 1 ... 16:  // Note: the "..." is a GCC extension.
       ret = "unsigned short";
       break;
     case 17 ... 32:
@@ -463,10 +528,14 @@ std::string asv_type(uint32_t width) {
     case 33 ... 64:
       ret = "long int";
       break;
+    case 65 ... 8388607:  // Maximum width supported by LLVM.
+      {
+	int words = (width+63)/64;
+	ret = "std::array<uint64_t,"+toStr(words)+">";
+      }
+      break;
     default:
-      toCout("Larger than 64 bits is not supported yet: "+toStr(width));
-      toCout("Temporarily assign 64 bits to the long number, needs modifications\
-              for the final llvm ir file!!");
+      toCout("Size of "+toStr(width)+" bits is not supported.");
       ret = "long int";
       break;
   }
@@ -474,9 +543,20 @@ std::string asv_type(uint32_t width) {
 }
 
 
+// This can be different than the ASV variable type, since large variables
+// are passed by address instead of value.
+std::string asv_func_param_type(uint32_t width) {
+  std::string ret = c_type(width);
+  if (width > 64) {
+    ret += "*";
+  }
+    
+  return ret;
+}
+
+
 // currently only support one-cycle inputInstr
-std::string func_call(std::string writeASV, std::string funcName, 
-                      const std::vector<std::pair<uint32_t, std::string>> &argTy,
+std::string func_call(std::string writeVar, const FuncTy_t& funcTy, std::string funcName, 
                       std::map<std::string, std::vector<std::string>> &inputInstr,
                       std::pair<std::string, uint32_t> dataIn) {
 
@@ -493,17 +573,24 @@ std::string func_call(std::string writeASV, std::string funcName,
   }
 
   std::string ret;
-  if(writeASV.find("_Arr") == std::string::npos)
-    ret = "  "+writeASV+" = "+funcName+"( ";
-  else
+  if (is_array_var(writeVar)) {
     ret = "  "+funcName+"( ";
+  } else if (funcTy.retTy > 64) {
+    ret = "  "+funcName+"( ";  // The address of the return value is passed as the last arg.
+  } else {
+    ret = "  "+writeVar+" = "+funcName+"( ";
+  }
+
   std::map<std::string, uint32_t> varIdxMap; 
-  for(auto pair: argTy) {
+  for(auto pair: funcTy.argTy) {
     std::string arg = pair.second;
+    uint32_t width = pair.first;
+
     if(varIdxMap.find(arg) == varIdxMap.end())
       varIdxMap.emplace(arg, 0);
     else
       (varIdxMap[arg])++;
+
     std::string argValue;
     if( !dataIn.first.empty()
          && arg == dataIn.first 
@@ -516,32 +603,46 @@ std::string func_call(std::string writeASV, std::string funcName,
       }
       argValue = (inputInstr[arg]).front();
       //argValue = "7'h4+5'h7+5'h13+3'h2+5'h12+5'h8+2'b11";
+      // Doug: Could this be > 64 bits?
       uint32_t intValue = convert_to_single_num(argValue);
       argValue = toStr(intValue);
     }
     else {
-      argValue = var_name_convert(pair.second, true);
+      argValue = var_name_convert(arg, true);
+      if (width > 64) {
+        argValue = "&"+argValue;  // big arg passed by address
+      }
     }
     ret += argValue +", ";
   }
-  if(argTy.size() > 0) {
-    ret.pop_back();
+  if(funcTy.argTy.size() > 0) {
+    ret.pop_back(); // Get rid of extra ", "
     ret.pop_back();
   }
+
+  if (funcTy.retTy > 64) {
+    // The address of a big return value is passed as the last arg.
+    ret += ", &"+writeVar;
+  }
+
   ret += " );";
   return ret;
 }
 
 
-void print_func_declare(struct funcExtract::FuncTy_t funcTy, 
+void print_func_declare(const FuncTy_t& funcTy, 
                         std::string funcName, 
                         std::ofstream &header) {
   std::map<std::string, uint32_t> argIdx;
   std::string funcNameSimp = var_name_convert(funcName, true);
-  std::string ret = asv_type(funcTy.retTy) + " " + funcNameSimp + " ( ";
+
+  // Small variables are returned by value, but big ones are returned via an extra pointer arg.
+  std::string ret = funcTy.retTy <= 64 ? c_type(funcTy.retTy) : "void";
+  ret += " " + funcNameSimp + " ( ";
+
   for(auto pair : funcTy.argTy) {
     uint32_t width = pair.first;
-    std::string argType = asv_type(width);
+    std::string argType = asv_func_param_type(width);
     std::string argName = pair.second;
     std::string argNameSimp = var_name_convert(argName, true);
     std::string idx = "";
@@ -554,9 +655,15 @@ void print_func_declare(struct funcExtract::FuncTy_t funcTy,
     ret = ret + argType + " " + argNameSimp + idx + ", ";
   }
   if(funcTy.argTy.size() > 0) {
-    ret.pop_back();
+    ret.pop_back();  // Remove extra ", "
     ret.pop_back();
   }
+
+  if (funcTy.retTy > 64) {
+    // Add the extra arg for the big return value
+    ret += ", "+asv_func_param_type(funcTy.retTy)+" _return_val_ptr_";
+  }
+    
   ret = ret + " );";
   header << ret << std::endl;
 }
@@ -628,6 +735,71 @@ uint64_t convert_to_long_single_num(std::string numIn) {
 }
 
 
+llvm::APInt convert_to_single_apint(std::string numIn) {
+  std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");
+  std::smatch m;
+  if(numIn.find("+") == std::string::npos) {
+    // No concatenation
+    return hdb2apint(numIn);
+  } else {
+    std::vector<std::string> vec;
+    split_by(numIn, "+", vec);
+    llvm::APInt ret;
+
+    for(std::string num : vec) {
+      std::smatch m;
+      if(!std::regex_match(num, m, pNum)) {
+        toCout("Error: does not match pNum: "+num);
+        abort();
+      }
+      llvm::APInt localVal = hdb2apint(num);
+
+      // Sanity check
+      uint32_t w = std::stoi(m.str(1));
+      assert(w == localVal.getBitWidth());
+
+      llvm::APInt newRet(ret.getBitWidth() + localVal.getBitWidth(), 0);
+
+      // The existing bits (if any) go in the upper portion of newRet, and
+      // the new bits go in the lower portion.  BTW, the LLVM code
+      // is efficient for the first loop interation, where ret has no bits yet.
+      newRet.insertBits(ret, localVal.getBitWidth());
+      newRet.insertBits(localVal, 0);
+
+      ret = newRet;
+    }
+
+    return ret;
+  }
+}
+
+
+// For values <= 64 bits, this returns something like "1234".
+// For larger values, it returns an initializer string for a std::array<uint64_t>, like
+// "{12238671837, 23428734823, 23423490782390}"
+// I think it would better for all literals to be hex instead of decimal...
+std::string apint2initializer(const llvm::APInt& val) {
+  unsigned nw = val.getNumWords();
+  if (nw == 1) {
+    return toStr(val.getZExtValue());
+    //return llvm::toString(val, 10, false/*signed*/);
+  }
+
+  const uint64_t *p = val.getRawData();
+  std::string ret = "{";
+  for(unsigned j=0; j < nw; ++j) {
+    ret += toStr(*p++);
+    if (j < nw-1) {
+      ret += ", ";
+    }
+  }
+  ret += "}";
+
+  return ret;
+}
+
+
+
 
 void update_all_asvs(std::ofstream &cpp, std::string prefix) {
   // update asvs with their nxt counterparts
@@ -674,41 +846,85 @@ void read_skipped_target(std::string fileName) {
   }
 }
 
+// If the var is found in the g_global_arr table, it is an array.
+bool is_array_var(const std::string& varName) {
+  return g_global_arr.count(varName);
+}
 
-void print_final_results(std::ofstream &cpp) {
-  // if not PRINT_ALL, then print values only at the end
-  cpp << "  if(!PRINT_ALL) {" << std::endl;
-  cpp << "    printf(\"//// the final results:\");" << std::endl;
+
+// Generatres a printf statement to print just the value, not the name or newline.
+// Prefix is the first portion of the printf string.
+std::string build_printf(const std::string& prefix, const std::string& varName, uint32_t width) {
+  std::string s;
+  if (width <= 32) {
+    s = "printf(\""+prefix+"%d\\n\", "+varName+");";
+  } else if (width <= 64) {
+    s = "printf(\""+prefix+"%ld\\n\", "+varName+");";
+  } else {
+    s = "printf(\""+prefix+"{";
+    int words = (width+63)/64;
+    for (int j=0; j< words; ++j) {
+      s += "%ld";
+      if (j < words-1) {
+        s += ", ";
+      }
+    }
+    s += "}\\n\", ";
+    for (int j=0; j< words; ++j) {
+      s += varName+"["+toStr(j)+"]";
+      if (j < words-1) {
+        s += ", ";
+      }
+    }
+    s += ");";
+  }
+  return s;
+}
+
+// printName is optional, defaults to same as varName
+void print_var_value(std::ofstream &cpp, const std::string& varName,
+                     uint32_t width, const std::string& printName) {
+
+  if (is_array_var(varName)) {
+    print_array(varName, cpp);
+  } else {
+    std::string pname = printName.length()?printName:varName;
+    cpp << "    ";
+    cpp << build_printf(pname+": ", varName, width);
+    cpp << std::endl;
+  }
+
+}
+
+
+void print_asv_values(std::ofstream &cpp) {
   for(auto pair : g_asv) {
     std::string reg = var_name_convert(pair.first, true);
-    cpp << "    printf( \""+reg+": %ld\\n\", "+reg+" );" << std::endl;
+    print_var_value(cpp, reg, pair.second);
   }
+
   // initialized rtlVars in the refinement map
   for(auto pair1 : g_refineMap) {
     for(auto pair2 : pair1.second) {
-      std::string rtlVar = pair2.second;
-      cpp << "    printf( \""+rtlVar+": %ld\\n\", "+rtlVar+" );" << std::endl;
+      std::string varName = pair2.first;
+      std::string printName = pair2.second;
+      print_var_value(cpp, varName, 64, printName);  // TODO: use correct width
     }
   }
-  cpp << "  }" << std::endl;
 }
 
 
 void print_array(std::string arrName, std::ofstream &cpp) {
-  if(arrName.find("_Arr") == std::string::npos) {
-    toCout("Error: this name is not array: "+arrName);
-    abort();
-  }
-  if(g_global_arr.find(arrName) == g_global_arr.end()) {
+  if (!g_global_arr.count(arrName)) {
     toCout("Error: cannot find info for the array: "+arrName);
     abort();
   }
   auto bitDepthPair = g_global_arr[arrName];
+  uint32_t width = bitDepthPair.first;
   uint32_t depth = bitDepthPair.second;
-  cpp << "    if(PRINT_ALL) {" << std::endl;
-  cpp << "      for(int i = 0; i < "+toStr(depth)+"; i++) {" << std::endl;
-  cpp << "        printf( \""+arrName+"[\%d]: \%d \\n \", i, "+arrName+"[i] );" << std::endl;
-  cpp << "      }" << std::endl;
+  cpp << "    for(int i = 0; i < "+toStr(depth)+"; i++) {" << std::endl;
+  // Doug: this assumes that the element width is <= 32 bits...
+  cpp << "      printf( \""+arrName+"[\%d]: \%d \\n \", i, "+arrName+"[i] );" << std::endl;
   cpp << "    }" << std::endl;
 }
 
