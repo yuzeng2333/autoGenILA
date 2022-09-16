@@ -56,6 +56,10 @@ llvm::IntegerType* llvmWidth(uint32_t width, std::shared_ptr<llvm::LLVMContext> 
 llvm::Value* llvmInt(uint32_t value, uint32_t width, 
                      std::shared_ptr<llvm::LLVMContext> &c);
 
+llvm::Value* llvmInt(llvm::APInt value,
+                     std::shared_ptr<llvm::LLVMContext> &c);
+
+
 llvm::Value* zext(llvm::Value* v1, uint32_t width,
                  std::shared_ptr<llvm::LLVMContext> &c,
                  std::shared_ptr<llvm::IRBuilder<>> &b);
@@ -72,7 +76,7 @@ bool is_formed_num(std::string num);
 
 uint64_t hdb2int(std::string num);
 
-llvm::APInt hdb2apint(std::string num);
+llvm::APInt hdb2apint(std::string num, unsigned widthOverride=0);
 
 uint32_t get_formed_width(std::string num);
 

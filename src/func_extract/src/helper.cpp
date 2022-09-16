@@ -33,6 +33,12 @@ llvm::Value* llvmInt(uint32_t value, uint32_t width,
 }
 
 
+llvm::Value* llvmInt(llvm::APInt value, 
+                     std::shared_ptr<llvm::LLVMContext> &c) {
+  return llvm::ConstantInt::get(*c, value);
+}
+
+
 //bool isAs(std::string var, HierCtx_t &insContextStk) {
 //  auto curMod = get_curMod(insContextStk);
 //  auto it = std::find( curMod->moduleAs.begin(), curMod->moduleAs.end(), var );
@@ -59,8 +65,7 @@ uint64_t hdb2int(std::string num) {
   if(std::regex_match(num, m, pNum)) {
     uint32_t width = std::stoi(m.str(1));
     if(width > 64) {
-      toCout("Error: too long number, use convert_to_long_single_num:"
-            +num);
+      toCout("Error: too long number, use llvm::APInt and hdb2apint()"+num);
       abort();
     }
   }
@@ -83,17 +88,22 @@ uint64_t hdb2int(std::string num) {
 
 
 // convert a string number, in hex|decimal|binary form, into a llvm::APInt
-llvm::APInt hdb2apint(std::string num) {
+llvm::APInt hdb2apint(std::string num, unsigned widthOverride) {
   if(num.find("x") != std::string::npos) {
     replace_with(num, "x", "0");
   }
   num = remove_signed(num);
 
-  uint32_t width = 64; // Default width
+  unsigned parsedWidth = 0;
   std::smatch m;
   static const std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");  
   if(std::regex_match(num, m, pNum)) {
-    width = std::stoi(m.str(1));
+    parsedWidth = std::stoi(m.str(1));
+  }
+
+  if (parsedWidth>0 && widthOverride>0 && parsedWidth != widthOverride) {
+    toCout("hdb2apint() width clash: num "+num+"  widthOverride "+toStr(widthOverride));
+    abort();
   }
 
   int radix = 10;  // Default
@@ -111,11 +121,21 @@ llvm::APInt hdb2apint(std::string num) {
     radix = 2;
     digits = m.str(2);
   } else  {
-    toCout("Ill-formed number: "+num);
-    return llvm::APInt(64, try_stoi(num));
+    // Simple number without width spec
+    // Use widthOverride if given , otherwise default width of 64
+    unsigned width = widthOverride > 0 ? widthOverride : 64;
+    return llvm::APInt(width, num, 10);
   }
 
-  toCout("Making APInt width "+toStr(width)+" digits "+digits);
+  if (parsedWidth==0 && widthOverride==0) {
+    // malformed numeric string?
+    toCout("hdb2apint() unknown width: num "+num+"  widthOverride "+toStr(widthOverride));
+    abort();
+  }
+
+  unsigned width = widthOverride > 0 ? widthOverride : 
+                     (parsedWidth > 0 ? parsedWidth : 64);
+
   return llvm::APInt(width, digits, radix);
 }
 

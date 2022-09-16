@@ -82,10 +82,11 @@ int main(int argc, char *argv[]) {
 
 
   if(argc < 2) {
-    toCout("Error: did not specify path!");
-    abort();
+    toCout("No path specified, current directory will be used.");
+    g_path = ".";
+  } else {
+    g_path = argv[1];
   }
-  g_path = argv[1];
 
   g_verb = false;
   read_in_instructions(g_path+"/instr.txt");
@@ -177,7 +178,7 @@ int main(int argc, char *argv[]) {
     llvm::APInt rstValAPInt = hdb2apint(rstVal);
     rstVal = apint2initializer(rstValAPInt);
 
-    toCout("cleaned up rst val of "+asv+"  "+rstVal);
+    toCoutVerb("cleaned up rst val of "+asv+"  "+rstVal);
 
     rstValMap.emplace(asv, rstVal);    
     std::string ret = "  "+asvTy+" "+asvSimp+" = "+rstVal+";";
@@ -544,11 +545,18 @@ std::string c_type(uint32_t width) {
 
 
 // This can be different than the ASV variable type, since large variables
-// are passed by address instead of value.
-std::string asv_func_param_type(uint32_t width) {
-  std::string ret = c_type(width);
+// are passed by const reference instead of value.  An exception is
+// teh extra parameter for a large return value, which is a non-const reference.
+std::string asv_func_param_type(uint32_t width, bool is_const=true) {
+  std::string ret;
+
+  if (is_const && width > 64) {
+   ret = "const ";
+  }
+
+  ret += c_type(width);
   if (width > 64) {
-    ret += "*";
+     ret += "&";
   }
     
   return ret;
@@ -576,7 +584,7 @@ std::string func_call(std::string writeVar, const FuncTy_t& funcTy, std::string 
   if (is_array_var(writeVar)) {
     ret = "  "+funcName+"( ";
   } else if (funcTy.retTy > 64) {
-    ret = "  "+funcName+"( ";  // The address of the return value is passed as the last arg.
+    ret = "  "+funcName+"( ";  // A reference to the return value is passed as the last arg.
   } else {
     ret = "  "+writeVar+" = "+funcName+"( ";
   }
@@ -603,15 +611,12 @@ std::string func_call(std::string writeVar, const FuncTy_t& funcTy, std::string 
       }
       argValue = (inputInstr[arg]).front();
       //argValue = "7'h4+5'h7+5'h13+3'h2+5'h12+5'h8+2'b11";
-      // Doug: Could this be > 64 bits?
-      uint32_t intValue = convert_to_single_num(argValue);
-      argValue = toStr(intValue);
+      // Doug: this could be > 64 bits.  Such big parameters are passed by const reference.
+      llvm::APInt apValue = convert_to_single_apint(argValue);
+      argValue = apint2literal(apValue);
     }
     else {
       argValue = var_name_convert(arg, true);
-      if (width > 64) {
-        argValue = "&"+argValue;  // big arg passed by address
-      }
     }
     ret += argValue +", ";
   }
@@ -621,8 +626,8 @@ std::string func_call(std::string writeVar, const FuncTy_t& funcTy, std::string 
   }
 
   if (funcTy.retTy > 64) {
-    // The address of a big return value is passed as the last arg.
-    ret += ", &"+writeVar;
+    // A reference to a big return value is passed as the last arg.
+    ret += ", "+writeVar;
   }
 
   ret += " );";
@@ -636,7 +641,7 @@ void print_func_declare(const FuncTy_t& funcTy,
   std::map<std::string, uint32_t> argIdx;
   std::string funcNameSimp = var_name_convert(funcName, true);
 
-  // Small variables are returned by value, but big ones are returned via an extra pointer arg.
+  // Small variables are returned by value, but big ones are returned via an extra reference arg.
   std::string ret = funcTy.retTy <= 64 ? c_type(funcTy.retTy) : "void";
   ret += " " + funcNameSimp + " ( ";
 
@@ -661,7 +666,7 @@ void print_func_declare(const FuncTy_t& funcTy,
 
   if (funcTy.retTy > 64) {
     // Add the extra arg for the big return value
-    ret += ", "+asv_func_param_type(funcTy.retTy)+" _return_val_ptr_";
+    ret += ", "+asv_func_param_type(funcTy.retTy, false /*is_const*/)+" _return_val_ptr_";
   }
     
   ret = ret + " );";
@@ -797,6 +802,20 @@ std::string apint2initializer(const llvm::APInt& val) {
 
   return ret;
 }
+
+
+// This returns a literal value that can be used as a function parameter.
+// For values <= 64 bits, this returns something like "1234".
+// For larger values, it returns the address of a std::array temporary, like
+// "std::array<uint64_t>{12238671837, 23428734823, 23423490782390}"
+std::string apint2literal(const llvm::APInt& val) {
+  std::string s = apint2initializer(val);
+  if (val.getBitWidth() > 64) {
+    s = "std::array<uint64_t,"+toStr(val.getNumWords())+">" + s;
+  }
+  return s;
+}
+
 
 
 

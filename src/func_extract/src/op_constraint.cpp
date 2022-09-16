@@ -144,8 +144,9 @@ UpdateFunctionGen::var_expr(std::string varAndSlice, uint32_t timeIdx, context &
 llvm::Value* UpdateFunctionGen::bv_val(std::string var, context &c) {
   assert(is_pure_num(var));
   auto curMod = insContextStk.get_curMod();
-  return llvmInt(hdb2int(var), get_var_slice_width_simp(var, curMod), c);
-  //return c.bv_val(hdb2int(var), get_var_slice_width_simp(var));
+  return llvmInt(hdb2apint(var, get_var_slice_width_simp(var, curMod)), c);
+  //return llvmInt(hdb2int(var), get_var_slice_width_simp(var, curMod), c);
+  ////return c.bv_val(hdb2int(var), get_var_slice_width_simp(var));
 }
 
 
@@ -289,18 +290,9 @@ UpdateFunctionGen::input_constraint(astNode* const node, uint32_t timeIdx,
     std::smatch m;
     if(localVal != "x" && localVal != "DIRTY" && !std::regex_match(localVal, m, pX) ) {
       if(is_pure_num(localVal)) {
-        std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");
-        std::smatch m;
-        if(std::regex_match(localVal, m, pNum)) {
-          uint32_t width = std::stoi(m.str(1));
-          if(width > 64) {
-            toCout("Error: input width larger than 64: "+localVal);
-            //abort();  Doug
-          }
-        }
         toCoutVerb("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%B Give "+localVal+" to "+timed_name(dest, timeIdx));
         g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
-        return llvmInt(hdb2int(localVal), localWidth, c);
+        return llvmInt(hdb2apint(localVal, localWidth), c);  // Use the width of the destination, not the value.
       }
       else if(localVal.find("+") != std::string::npos) {
         /// if the value is a combination of x and numbers
@@ -327,7 +319,7 @@ UpdateFunctionGen::input_constraint(astNode* const node, uint32_t timeIdx,
         assert(is_number(localVal));
         toCoutVerb("%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give "+localVal+" to "+timed_name(dest, timeIdx));
         g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
-        return llvmInt(hdb2int(localVal), localWidth, c);
+        return llvmInt(hdb2apint(localVal, localWidth), c);  // Use the width of the destination, not the value.
       }
     }
     /// localVal = x
@@ -347,7 +339,7 @@ UpdateFunctionGen::input_constraint(astNode* const node, uint32_t timeIdx,
       else if(is_pure_num(localVal)) {
         toCoutVerb("%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Give "+localVal+" to "+timed_name(dest, timeIdx));
         g_outFile << "Give "+localVal+" to "+timed_name(dest, timeIdx) << std::endl;
-        return llvmInt(hdb2int(localVal), localWidth, c);
+        return llvmInt(hdb2apint(localVal, localWidth), c);  // Use the width of the destination, not the value.
       }
       else if(localVal.find("+") != std::string::npos){
         toCoutVerb("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%B Give "+localVal+" to "+timed_name(dest, timeIdx));
@@ -402,7 +394,7 @@ UpdateFunctionGen::single_expr(std::string value, context &c, std::string varNam
   std::string prefix = "";
   if(!curDynData->isFunctionedSubMod) prefix = insContextStk.get_hier_name(false);
 
-  std::regex pX("^(\\d+)'[hb]x$");
+  static const std::regex pX("^(\\d+)'[hb]x$");
   std::smatch m;
   if(std::regex_match(value, m, pX)) {
     std::string widthStr = m.str(1);
@@ -418,8 +410,9 @@ UpdateFunctionGen::single_expr(std::string value, context &c, std::string varNam
     uint32_t pos = value.find("'");
     std::string widthStr = value.substr(0, pos);
     uint32_t width = std::stoi(widthStr);
-    return llvmInt(hdb2int(value), width, c);
-    //return c.bv_val(hdb2int(value), width);
+    return llvmInt(hdb2apint(value), c);  // Parse the width from the value string
+    //return llvmInt(hdb2int(value), width, c);
+    ////return c.bv_val(hdb2int(value), width);
   }
   else {
     toCout("Error: unexpected value for mixed_value_expr: "+value);

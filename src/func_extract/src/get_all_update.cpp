@@ -355,7 +355,7 @@ void get_update_function(std::string target,
   remove_front_backslash(destNameSimp);
   std::string funcName = instrInfo.name+"_"+destNameSimp;
   std::string fileName = UpdateFunctionGen::make_llvm_basename(destInfo, delayBound);
-  std::string cleanO3FileName = fileName+"_clean.o3.ll";
+  std::string cleanOptoFileName = fileName+"_clean.o3.ll";
 
   toCout("---  BEGIN INSTRUCTION #"+toStr(instrIdx)+": "+instrInfo.name+
          "  ASV: "+destNameSimp+"  delay bound: "+toStr(delayBound)+" ---");
@@ -365,8 +365,8 @@ void get_update_function(std::string target,
   // generate just the missing update functions. 
 
   struct stat statbuf;
-  if ((!g_overwrite_existing_llvm) && stat(cleanO3FileName.c_str(), &statbuf) == 0) {
-    toCout("Skipping re-generation of existing file "+cleanO3FileName);
+  if ((!g_overwrite_existing_llvm) && stat(cleanOptoFileName.c_str(), &statbuf) == 0) {
+    toCout("Skipping re-generation of existing file "+cleanOptoFileName);
   } else {
 
     // generate update function
@@ -379,14 +379,15 @@ void get_update_function(std::string target,
 
     std::string clean("opt --instsimplify --deadargelim --instsimplify "+fileName+"_tmp.ll -S -o="+fileName+"_clean.ll");
     
-    std::string opto3("opt -O1 "+fileName+"_clean.ll -S -o="+fileName+"_tmp.o3.ll; opt -passes=deadargelim "+fileName+"_tmp.o3.ll -S -o="+cleanO3FileName+"; rm "+fileName+"_tmp.o3.ll");
+    //std::string opto_cmd("opt -O1 "+fileName+"_clean.ll -S -o="+fileName+"_tmp.o3.ll; opt -passes=deadargelim "+fileName+"_tmp.o3.ll -S -o="+cleanOptoFileName+"; rm "+fileName+"_tmp.o3.ll");
+    std::string opto_cmd("opt -O3 "+fileName+"_clean.ll -S -o="+fileName+"_tmp.o3.ll; opt -passes=deadargelim "+fileName+"_tmp.o3.ll -S -o="+cleanOptoFileName+"; rm "+fileName+"_tmp.o3.ll");
 
     toCout("** Begin clean update function");
     toCoutVerb(clean);
     system(clean.c_str());
     toCout("** Begin simplify update function");
-    toCoutVerb(opto3);
-    system(opto3.c_str());
+    toCoutVerb(opto_cmd);
+    system(opto_cmd.c_str());
     toCout("** End simplify update function");
 
     time_t simplifyEndTime = time(NULL);
@@ -403,7 +404,7 @@ void get_update_function(std::string target,
   }
 
   std::vector<std::pair<std::string, uint32_t>> argVec;
-  bool usefulFunc = read_clean_o3(cleanO3FileName, argVec, fileName+"_clean.simp.ll", funcName);
+  bool usefulFunc = read_clean_optimized(cleanOptoFileName, argVec, fileName+"_clean.simp.ll", funcName);
 
   std::string llvmFileName = instrInfo.name+"_"+destInfo.get_dest_name()
                              +"_"+toStr(delayBound)+".ll";
@@ -509,7 +510,7 @@ uint32_t get_delay_bound(std::string var, std::vector<std::string> tgtVec,
 // returned argVec is empty if the update function just returns 0
 // generate a new file
 // Assune: if no internal function is found, then this function is discarded
-bool read_clean_o3_old(std::string fileName, 
+bool read_clean_optimized_old(std::string fileName, 
                    std::vector<std::pair<std::string, uint32_t>> &argVec,
                    std::string outFileName,
                    std::string funcNameIn) {
@@ -732,6 +733,9 @@ create_wrapper_function(llvm::Function *mainFunc) {
     } else {
       // Give the pointer args a special name
       wrapperArg->setName(mainArg.getName()+"ptr_");
+      // Specify that they can never be null (actually in C++, they will be const references).
+      wrapperArg->addAttr(llvm::Attribute::NonNull);
+
     }
   }
 
@@ -740,6 +744,8 @@ create_wrapper_function(llvm::Function *mainFunc) {
   // Deal with the extra wrapper arg that handles big return types
   if (!isSmallType(mainRetTy)) {
     wrapperLastArg->setName(llvm::Twine("_return_val_ptr_"));
+    // Specify that it can never be null (actually in C++, it will be a (non-const) reference).
+    wrapperLastArg->addAttr(llvm::Attribute::NonNull);
   }
 
 
@@ -790,7 +796,7 @@ create_wrapper_function(llvm::Function *mainFunc) {
 // returned argVec is empty if the update function just returns 0
 // generate a new file
 // Assune: if no internal function is found, then this function is discarded
-bool read_clean_o3(std::string fileName, 
+bool read_clean_optimized(std::string fileName, 
                    std::vector<std::pair<std::string, uint32_t>> &argVec,
                    std::string outFileName,
                    std::string funcNameIn) {
@@ -811,8 +817,9 @@ bool read_clean_o3(std::string fileName,
     // doesn't exist, rename topFunc to serve as a replacement.
     if (!mainFunc) {
       topFunc->setName(funcNameIn);
-      toCout("Renamed top_function to "+funcNameIn);
+      toCout("Warning: main function apparently optimized away, top_function renamed to "+funcNameIn);
       mainFunc = topFunc;
+      mainFunc->setCallingConv(llvm::CallingConv::Fast); 
     } else {
       // top_function is unneeded - delete it.
       topFunc->eraseFromParent();
@@ -827,6 +834,17 @@ bool read_clean_o3(std::string fileName,
     toCout("Can't find main function!");
     return false;
   }
+
+  // It is possible for there to be dead args in mainFunc, especially if topFunc
+  // was re-purposed as the mainFunc.  This is despite all the LLVM optimizations we do...
+  for (llvm::Argument& arg : mainFunc->args()) {
+    if (arg.getNumUses() == 0) {
+      std::string argname = arg.getName().str();
+      toCout(funcNameIn+" arg "+argname+" is usused!");
+      // TODO: get rid of them
+    }
+  }
+
 
   // Push information about the mainFunc args to argVec.
   for (llvm::Argument& arg : mainFunc->args()) {

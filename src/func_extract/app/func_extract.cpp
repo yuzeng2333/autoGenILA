@@ -62,19 +62,23 @@ int main(int argc, char *argv[]) {
   google::InitGoogleLogging(argv[0]);
   FLAGS_log_dir = "/workspace/research/ILA/autoGenILA/src/func_extract/log";
 
-  if(argc < 3) {
-    toCout(std::string("usage: ")+argv[0]+" <clean_flag> <path> [-reg]");
-    abort();
+  if(argc == 2 || argc > 4) {
+    toCout(std::string("usage: ")+argv[0]+" [<path> <clean_flag> [-reg]]");
+    exit(-1);
   }
 
-  g_path = argv[1];
-  // if argv[2] is 1, clean the file
-  std::string doClean = argv[2];
+  g_path = argc > 1 ? argv[1] : ".";   // Default path is current dir
+
+  // If argv[2] is the input file cleaning spec: 1 to clean, 0 to not clean, or '-' for auto-clean.
+  // Default mode is auto-clean
+  std::string doClean = argc > 2 ? argv[2] : "-";
+
   bool printRegInfo = false;
   if(argc > 3) {
     std::string argv3 = argv[3];
     if( argv3 == "-reg") printRegInfo = true ;
   }
+
   time_t my_time = time(NULL);
   g_outFile.open(g_path+"/result.txt");
   g_regValueFile.open(g_path+"/reg_values.txt");

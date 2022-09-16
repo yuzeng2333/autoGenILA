@@ -25,10 +25,11 @@ void print_func_declare(const FuncTy_t& funcTy,
                         std::ofstream &header);
 
 uint32_t convert_to_single_num(std::string numIn);
-
 uint64_t convert_to_long_single_num(std::string numIn);
+llvm::APInt convert_to_single_apint(std::string numIn);
 
 std::string apint2initializer(const llvm::APInt& val);
+std::string apint2literal(const llvm::APInt& val);
 
 void print_instr_calls(std::map<std::string, 
                                 std::vector<std::string>> &encoding,

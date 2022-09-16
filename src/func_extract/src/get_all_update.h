@@ -34,10 +34,10 @@ extern struct ThreadSafeVector_t g_fileNameVec;
 
 void get_all_update();
 
-bool read_clean_o3(std::string fileName, 
-                   std::vector<std::pair<std::string, uint32_t>> &argVec,
-                   std::string outFileName,
-                   std::string funcNameIn);                   
+bool read_clean_optimized(std::string fileName, 
+                           std::vector<std::pair<std::string, uint32_t>> &argVec,
+                           std::string outFileName,
+                           std::string funcNameIn);                   
 
 uint32_t get_delay_bound(std::string var, std::vector<std::string> tgtVec, 
                          struct InstrInfo_t &instrInfo, 

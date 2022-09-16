@@ -295,28 +295,31 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 
   std::string destSimpleName = funcExtract::var_name_convert(destName, true);
 
-  // if target is vector, declare global array before creating
-  // the top function
-  llvm::Value* retArrPtr;
   std::vector<std::string> destVec = destInfo.get_no_slice_name();  
 
+  // if target is vector, declare global array before creating
+  // the top function
+  // These will be non-null only for a vector return type
+  llvm::Type* retArrayElementTy = nullptr;
+  llvm::ArrayType* retArrayTy = nullptr;
+  llvm::GlobalVariable* retArray = nullptr;
+
   if(destInfo.isVector && !destInfo.isMemVec) {
-    // Doug changed 9/8 llvm::Type* elementTy = llvm::cast<llvm::PointerType>(retTy)->getElementType();
-    llvm::Type* elementTy = llvm::cast<llvm::PointerType>(retTy)->getPointerElementType();
-    llvm::ArrayType* arrayType = llvm::ArrayType::get(elementTy, destVec.size());
+    retArrayElementTy = destInfo.get_ret_element_type(TheContext);
+
+    // Doug changed 9/8: LLVM  pointers are all opaque now.
+    retArrayTy = llvm::ArrayType::get(retArrayElementTy, destVec.size());
+
     // zero initializer
-    llvm::ConstantAggregateZero* zeroInit = llvm::ConstantAggregateZero::get(arrayType);
-    if(destInfo.isVector) {
-      llvm::GlobalVariable* globalArr = new llvm::GlobalVariable(
-          *TheModule, 
-          arrayType, false, 
-          //llvm::GlobalValue::InternalLinkage,
-          llvm::GlobalValue::LinkOnceAnyLinkage,
-          zeroInit,
-          "RET_ARRAY_PTR"
-        );
-      retArrPtr = value(globalArr);
-    }
+    llvm::ConstantAggregateZero* zeroInit = llvm::ConstantAggregateZero::get(retArrayTy);
+    retArray = new llvm::GlobalVariable(
+        *TheModule, 
+        retArrayTy, false, 
+        //llvm::GlobalValue::InternalLinkage,
+        llvm::GlobalValue::LinkOnceAnyLinkage,
+        zeroInit,
+        "RET_ARRAY_PTR"
+    );
   }
 
   // make a top function
@@ -545,14 +548,16 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     //      );
 
     // store values in retVec to memory of global array
-    llvm::Value* arrPtr = retArrPtr;
     uint32_t i = 0;
     if (!retVec.empty()) {
+      assert(retArrayElementTy);
+      std::cout << "just before crash\n";
+      retArrayElementTy->dump();
       for (llvm::Value* val : retVec) {
         llvm::GetElementPtrInst* ptr 
           = llvm::GetElementPtrInst::Create(
-              nullptr,
-              arrPtr,
+              retArrayTy,
+              retArray,
               std::vector<llvm::Value*>{
                 llvm::ConstantInt::get(
                   llvm::IntegerType::get(*TheContext, bitNum), 
@@ -570,20 +575,20 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
         //auto ty1 = val->getType();
         //auto ty2 = llvm::cast<llvm::ArrayType>(retTy)->getElementType();
         //auto ty3 = llvm::cast<llvm::PointerType>(ptr->getType())->getElementType();
-        //auto ty4 = arrPtr->getType();
+        //auto ty4 = retArrPtr->getType();
 	Builder->CreateStore(val, value(ptr));  
       }
     }
     else assert(destInfo.isMemVec);
 
-    //llvm::LoadInst *retArr = Builder->CreateLoad(retTy, arrPtr, llvm::Twine("retArr"));
+    //llvm::LoadInst *retArr = Builder->CreateLoad(retTy, retArrPtr, llvm::Twine("retArr"));
     //Builder->CreateRet(value(retArr));
 
     if (!retVec.empty()) {
       llvm::GetElementPtrInst* retPtr 
         = llvm::GetElementPtrInst::Create(
-            nullptr,
-            arrPtr,
+            retArrayTy,
+            retArray,
             std::vector<llvm::Value*>{
               llvm::ConstantInt::get(
                 llvm::IntegerType::get(*TheContext, bitNum), 
@@ -1576,30 +1581,49 @@ std::string DestInfo::get_dest_name() {
 
 
 // if is vector, return a pointer of the array-element type
+// In the latest release of LLVM, this will be an opaque pointer
 llvm::Type* DestInfo::get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext) {
   if(!isVector) {
     return llvm::IntegerType::get(*TheContext, 
                                   destWidth);
   }
   else if(isVector && !isMemVec){
-    // if is reg vector, return an array type pointer
+    // if is reg vector, return an opaque pointer type
     // first, check if every reg is of the same size
     uint32_t size = get_var_slice_width_cmplx(destVec.front());
     for(auto dest: destVec) {
       uint32_t elmtSize = get_var_slice_width_cmplx(dest);
       assert(size == elmtSize);
     }
-    llvm::Type* I = llvm::IntegerType::get(*TheContext, size);    
-    llvm::PointerType* pointerTy = llvm::PointerType::get(I, 0);
-    //llvm::ArrayType* arrayType = llvm::ArrayType::get(I, destVec.size());
-    ////auto ptrTy = llvm::PointerType::get(arrayType, 0);
-    //return arrayType;
+    // An opaque pointer
+    llvm::PointerType* pointerTy = llvm::PointerType::getUnqual(*TheContext);
     return pointerTy;
   }
   // TODO: implement the else case: the destVar is either single memory
   // or an array of memory
   else { // isVector && isMemVec
-    return llvm::Type::getVoidTy(*TheContext);
+    return nullptr;
+  }
+}
+
+
+// if is vector, return the array-element type
+// Otherwise return null;
+llvm::Type* DestInfo::get_ret_element_type(std::shared_ptr<llvm::LLVMContext> TheContext) {
+  if(isVector && !isMemVec){
+    // if is reg vector, return an array element type 
+    // first, check if every reg is of the same size
+    uint32_t size = get_var_slice_width_cmplx(destVec.front());
+    for(auto dest: destVec) {
+      uint32_t elmtSize = get_var_slice_width_cmplx(dest);
+      assert(size == elmtSize);
+    }
+    return llvm::IntegerType::get(*TheContext, size);    
+  }
+  // TODO: implement the else case: the destVar is either single memory
+  // or an array of memory
+  else { 
+    return nullptr;
   }
 }
 
