@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 project (func-extract)
 
 find_package (glog 0.4.0 REQUIRED)
-find_package (LLVM 14 REQUIRED)
+find_package (LLVM 13 REQUIRED)
 #find_package (LLVM REQUIRED CONFIG)
 
 
