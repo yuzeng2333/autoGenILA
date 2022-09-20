@@ -563,6 +563,10 @@ void read_config(std::string fileName) {
         g_overwrite_existing_llvm = (value == "true");
         configNum++;
         toCout("read g_overwrite_existing_llvm: "+value);
+      } else if(config == "g_llvm_path") {
+        g_llvm_path = value;
+        configNum++;
+        toCout("read g_llvm_path: "+value);
       }
     }
   }

@@ -7,8 +7,6 @@ find_package (glog 0.4.0 REQUIRED)
 
 #add_subdirectory(./verilog-parser)
 set(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS}-O0 -Wall -g ")
-set(CPPFLAGS "$ENV{CXXFLAGS}-O0 -Wall -g ")
-set(LDFLAGS "-g ")
 set(CMAKE_BUILD_TYPE Debug)
 aux_source_directory(./src SRC_DIR)
 aux_source_directory(./app MAIN)

@@ -56,6 +56,7 @@ bool g_push_new_target;
 bool g_read_rst_vcd;
 bool g_use_multi_thread;
 bool g_overwrite_existing_llvm = true;
+std::string g_llvm_path = "";
 uint32_t g_do_instr_num;
 std::ofstream g_outFile;
 std::ofstream g_regValueFile;

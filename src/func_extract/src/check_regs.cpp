@@ -307,7 +307,6 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   if(destInfo.isVector && !destInfo.isMemVec) {
     retArrayElementTy = destInfo.get_ret_element_type(TheContext);
 
-    // Doug changed 9/8: LLVM  pointers are all opaque now.
     retArrayTy = llvm::ArrayType::get(retArrayElementTy, destVec.size());
 
     // zero initializer
@@ -347,7 +346,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   llvm::FunctionType *wrapperFT = nullptr;
 
   if (makeWrapper) {
-    // Build a FunctionType for wrapperFunction:  it has opaque pointers for
+    // Build a FunctionType for wrapperFunction:  it has pointers for
     // every arg bigger than 64 bits.  If the return value is bigger than 64 bits,
     // one more pointer arg is added for it, and the function returns void.
 
@@ -551,8 +550,6 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     uint32_t i = 0;
     if (!retVec.empty()) {
       assert(retArrayElementTy);
-      std::cout << "just before crash\n";
-      retArrayElementTy->dump();
       for (llvm::Value* val : retVec) {
         llvm::GetElementPtrInst* ptr 
           = llvm::GetElementPtrInst::Create(
@@ -677,6 +674,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     } else {
       // Pass an additional pointer to something
       llvm::Value *retPtr = Builder->CreateAlloca(retTy);
+      // In release 15 of LLVM, this will become an opaque pointer
       //llvm::Value *retOpaquePtr = Builder->CreateBitCast(retPtr, llvm::PointerType::getUnqual(*TheContext));
       wrapperArgs.push_back(retPtr);
 
@@ -1581,22 +1579,22 @@ std::string DestInfo::get_dest_name() {
 
 
 // if is vector, return a pointer of the array-element type
-// In the latest release of LLVM, this will be an opaque pointer
+// In release 15 of LLVM, this will become an opaque pointer
 llvm::Type* DestInfo::get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext) {
   if(!isVector) {
     return llvm::IntegerType::get(*TheContext, 
                                   destWidth);
   }
   else if(isVector && !isMemVec){
-    // if is reg vector, return an opaque pointer type
+    // if is reg vector, return a pointer type
     // first, check if every reg is of the same size
     uint32_t size = get_var_slice_width_cmplx(destVec.front());
     for(auto dest: destVec) {
       uint32_t elmtSize = get_var_slice_width_cmplx(dest);
       assert(size == elmtSize);
     }
-    // An opaque pointer
-    llvm::PointerType* pointerTy = llvm::PointerType::getUnqual(*TheContext);
+    llvm::Type* I = llvm::IntegerType::get(*TheContext, size);    
+    llvm::PointerType* pointerTy = llvm::PointerType::getUnqual(I);
     return pointerTy;
   }
   // TODO: implement the else case: the destVar is either single memory

@@ -377,10 +377,14 @@ void get_update_function(std::string target,
 
     time_t upGenEndTime = time(NULL);  
 
-    std::string clean("opt --instsimplify --deadargelim --instsimplify "+fileName+"_tmp.ll -S -o="+fileName+"_clean.ll");
+    // Default g_llvm_path is blank, which means the shell will use $PATH in the usual way.
+    std::string optCmd = (g_llvm_path.length() ? g_llvm_path+"/" : "") + "opt";
+
+    std::string clean(optCmd+" --instsimplify --deadargelim --instsimplify "+fileName+"_tmp.ll -S -o="+fileName+"_clean.ll");
     
-    //std::string opto_cmd("opt -O1 "+fileName+"_clean.ll -S -o="+fileName+"_tmp.o3.ll; opt -passes=deadargelim "+fileName+"_tmp.o3.ll -S -o="+cleanOptoFileName+"; rm "+fileName+"_tmp.o3.ll");
-    std::string opto_cmd("opt -O3 "+fileName+"_clean.ll -S -o="+fileName+"_tmp.o3.ll; opt -passes=deadargelim "+fileName+"_tmp.o3.ll -S -o="+cleanOptoFileName+"; rm "+fileName+"_tmp.o3.ll");
+    //std::string opto_cmd(optCmd+" -O1 "+fileName+"_clean.ll -S -o="+fileName+"_tmp.o3.ll; opt -passes=deadargelim "+fileName+"_tmp.o3.ll -S -o="+cleanOptoFileName+"; rm "+fileName+"_tmp.o3.ll");
+
+    std::string opto_cmd(optCmd+" -O3 "+fileName+"_clean.ll -S -o="+fileName+"_tmp.o3.ll; opt -passes=deadargelim "+fileName+"_tmp.o3.ll -S -o="+cleanOptoFileName+"; rm "+fileName+"_tmp.o3.ll");
 
     toCout("** Begin clean update function");
     toCoutVerb(clean);
@@ -681,7 +685,7 @@ create_wrapper_function(llvm::Function *mainFunc) {
 
   llvm::LLVMContext& Context = mainFunc->getContext();
 
-  // First build a FunctionType for the wrapper function: it has opaque pointers for
+  // First build a FunctionType for the wrapper function: it has pointers for
   // every arg bigger than 64 bits.  If the return value is bigger than 64 bits,
   // one more pointer arg is added for it, and the wrapper function returns void.
 
@@ -705,7 +709,6 @@ create_wrapper_function(llvm::Function *mainFunc) {
     wrapperRetTy = mainRetTy;
   } else {
     // Add one more pointer argument for return value.
-    // This pointer is typed - using an opaque pointer here caused a LLVM crash during optimization...
     wrapperArgTy.push_back(llvm::PointerType::getUnqual(mainRetTy));
     wrapperRetTy = llvm::Type::getVoidTy(Context);
   }
@@ -835,12 +838,12 @@ bool read_clean_optimized(std::string fileName,
     return false;
   }
 
-  // It is possible for there to be dead args in mainFunc, especially if topFunc
-  // was re-purposed as the mainFunc.  This is despite all the LLVM optimizations we do...
+  // It is possible for there to be dead args in mainFunc, normally because topFunc
+  // has been re-purposed as the mainFunc.  This is despite all the LLVM optimizations we do...
   for (llvm::Argument& arg : mainFunc->args()) {
     if (arg.getNumUses() == 0) {
       std::string argname = arg.getName().str();
-      toCout(funcNameIn+" arg "+argname+" is usused!");
+      toCout(funcNameIn+" arg "+argname+" is unused!");
       // TODO: get rid of them
     }
   }
