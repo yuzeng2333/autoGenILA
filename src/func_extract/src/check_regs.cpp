@@ -49,6 +49,16 @@ bool g_seeInputs;
 uint32_t g_maxDelay = 0;
 uint32_t g_pushNum = 0;
 
+    
+    
+// Check if this type is small enough to be passed in a register.
+// BTW, we don't use floats and doubles...
+static bool
+isSmallType(const llvm::Type *type) {
+  return (type->isIntegerTy() && type->getIntegerBitWidth() <= 64);
+}
+
+
 
 // assume ssaTable and nbTable have been filled
 void check_all_regs() {
@@ -109,7 +119,9 @@ void check_all_regs() {
         destInfo.set_dest_and_slice(writeVar, width);
         destInfo.set_module_name(subMod->name);
       }
-      UFGen.print_llvm_ir(destInfo, cycleCnt, i-1);
+
+      std::string fileName = UFGen.make_llvm_basename(destInfo, cycleCnt) + "_tmp.ll";
+      UFGen.print_llvm_ir(destInfo, cycleCnt, i-1, fileName);
       //print_llvm_ir_without_submodules(oneWriteAsv, cycleCnt-1, i-1);
       g_maxDelay = cycleCnt;
     }
@@ -124,7 +136,9 @@ void check_all_regs() {
         destInfo.set_module_name(modName);
       else
         destInfo.set_module_name(g_topModule);
-      UFGen.print_llvm_ir(destInfo, cycleCnt, i-1);
+
+      std::string fileName = UFGen.make_llvm_basename(destInfo, cycleCnt) + "_tmp.ll";
+      UFGen.print_llvm_ir(destInfo, cycleCnt, i-1, fileName);
       g_maxDelay = cycleCnt;    
     }
 
@@ -141,11 +155,31 @@ void UpdateFunctionGen::clean_data() {
 }
 
 
+
+// To get a full filename, add something like ".ll" to this.
+// Static function.
+std::string
+UpdateFunctionGen::make_llvm_basename(DestInfo &destInfo, 
+                                     const uint32_t bound) {
+  std::string destNameSimp = destInfo.get_dest_name();
+  remove_front_backslash(destNameSimp);
+  std::string fileName = g_path+"/"+destInfo.get_instr_name()+"_"
+                         +destNameSimp+"_"+toStr(bound);
+  return fileName;
+}
+
+
 /// bound is the number of regs from input to output
 /// timeIdx start from 0, max value = bound
 void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo, 
                                       const uint32_t bound, 
-                                      uint32_t instrIdx) {
+                                      uint32_t instrIdx,
+                                      std::string fileName) {
+
+  // Creating the wrapper function here is not so robust - the optimization tends to
+  // damage it.  Instead there is code to make the wrapper function in the final
+  // post-processing after optimization.
+  bool makeWrapper = false;
 
   // FIXME: change the following model name
   std::string destName = destInfo.get_dest_name();
@@ -255,32 +289,36 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     abort();
   }
 
-  std::string destSimpleName = funcExtract::var_name_convert(destName, true);
-
+  // This function type definition is suitable for TheFunction and topFunction
   llvm::FunctionType *FT =
     llvm::FunctionType::get(retTy, argTy, false);
 
-  // if target is vector, delcare global array before creating
-  // the top function
-  llvm::Value* retArrPtr;
+  std::string destSimpleName = funcExtract::var_name_convert(destName, true);
+
   std::vector<std::string> destVec = destInfo.get_no_slice_name();  
 
+  // if target is vector, declare global array before creating
+  // the top function
+  // These will be non-null only for a vector return type
+  llvm::Type* retArrayElementTy = nullptr;
+  llvm::ArrayType* retArrayTy = nullptr;
+  llvm::GlobalVariable* retArray = nullptr;
+
   if(destInfo.isVector && !destInfo.isMemVec) {
-    llvm::Type* elementTy = llvm::cast<llvm::PointerType>(retTy)->getElementType();
-    llvm::ArrayType* arrayType = llvm::ArrayType::get(elementTy, destVec.size());
+    retArrayElementTy = destInfo.get_ret_element_type(TheContext);
+
+    retArrayTy = llvm::ArrayType::get(retArrayElementTy, destVec.size());
+
     // zero initializer
-    llvm::ConstantAggregateZero* zeroInit = llvm::ConstantAggregateZero::get(arrayType);
-    if(destInfo.isVector) {
-      llvm::GlobalVariable* globalArr = new llvm::GlobalVariable(
-          *TheModule, 
-          arrayType, false, 
-          //llvm::GlobalValue::InternalLinkage,
-          llvm::GlobalValue::LinkOnceAnyLinkage,
-          zeroInit,
-          "RET_ARRAY_PTR"
-        );
-      retArrPtr = value(globalArr);
-    }
+    llvm::ConstantAggregateZero* zeroInit = llvm::ConstantAggregateZero::get(retArrayTy);
+    retArray = new llvm::GlobalVariable(
+        *TheModule, 
+        retArrayTy, false, 
+        //llvm::GlobalValue::InternalLinkage,
+        llvm::GlobalValue::LinkOnceAnyLinkage,
+        zeroInit,
+        "RET_ARRAY_PTR"
+    );
   }
 
   // make a top function
@@ -288,11 +326,11 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     = llvm::Function::Create(FT, llvm::Function::ExternalLinkage, 
                              "top_function", TheModule.get());
 
+  // Create the main function
   TheFunction = llvm::Function::Create(
     FT, llvm::Function::InternalLinkage, 
     destInfo.get_instr_name()+"_"+destSimpleName, TheModule.get());
   TheFunction->addFnAttr(llvm::Attribute::NoInline);
-  //g_curFunc = TheFunction;
 
   for(auto it = insContextStk.begin();
       it != insContextStk.end(); it++) {
@@ -303,50 +341,134 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     initialize_min_delay(it->ModInfo, destName);
   }
 
-  // set arg name for the function
+  // Optionally make the wrapper function for C/C++ interfacing
+  llvm::Function *wrapperFunction = nullptr;
+  llvm::FunctionType *wrapperFT = nullptr;
+
+  if (makeWrapper) {
+    // Build a FunctionType for wrapperFunction:  it has pointers for
+    // every arg bigger than 64 bits.  If the return value is bigger than 64 bits,
+    // one more pointer arg is added for it, and the function returns void.
+
+    std::vector<llvm::Type *> wrapperArgTy;
+    for (size_t i=0; i < argTy.size(); ++i) {
+      llvm::Type *type = argTy[i];
+      if (isSmallType(type)) {
+        wrapperArgTy.push_back(type);
+      } else {
+        wrapperArgTy.push_back(llvm::PointerType::getUnqual(type));
+      }
+    }
+
+    // Deal with small vs large return values
+    llvm::Type* wrapperRetTy = nullptr;
+    if (isSmallType(retTy)) {
+      wrapperRetTy = retTy;
+    } else {
+      // Add one more pointer argument for return value.
+      // This pointer is typed - using an opaque pointer here caused a LLVM crash during optimization...
+      wrapperArgTy.push_back(llvm::PointerType::getUnqual(retTy));
+      wrapperRetTy = llvm::Type::getVoidTy(*TheContext);
+    }
+
+    wrapperFT = llvm::FunctionType::get(wrapperRetTy, wrapperArgTy, false);
+
+    // Like the main function, the wrapper function must have internal linkage so
+    // that the unneeded args can be optimized away.
+    wrapperFunction = llvm::Function::Create(wrapperFT, llvm::Function::InternalLinkage, 
+                       destInfo.get_instr_name()+"_"+destSimpleName+"_wrapper_old", TheModule.get());
+    wrapperFunction->addFnAttr(llvm::Attribute::NoInline);
+  }
+
+  // set arg names for the functions
   uint32_t idx = 0;
-  for(auto it = regWidth.begin(); it != regWidth.end(); it++) {
-    std::string regName = it->first;
+  
+  // First, do the reg-type args
+  for (auto w : regWidth) {
+    std::string regName = w.first;
     std::string regNameBound = regName+post_fix(bound);
     toCoutVerb("set reg-type func arg: "+regNameBound);
-    (TheFunction->args().begin()+idx)->setName(regNameBound);
-    (topFunction->args().begin()+idx)->setName(regNameBound);
+    TheFunction->getArg(idx)->setName(regNameBound);
+    topFunction->getArg(idx)->setName(regNameBound);
+
+    // Some wrapper function args are pointers, not values
+    if (wrapperFunction) {
+      if (isSmallType(TheFunction->getArg(idx)->getType())) {
+        wrapperFunction->getArg(idx)->setName(regNameBound);
+      } else {
+        wrapperFunction->getArg(idx)->setName(regNameBound+"ptr_");
+      }
+    }
+
     argNum--;
-    topFuncArgMp.emplace(regNameBound, TheFunction->args().begin()+idx++);
+    topFuncArgMp.emplace(regNameBound, TheFunction->args().begin()+idx);
+    idx++;
   }
 
   toCout("=== Finished setting reg-type arg name!");
 
-  for(auto it = memInstances.begin(); it != memInstances.end(); it++) {
-    std::string pathInsName = it->first;
-    std::string modName = it->second;
+  // Now do memory-output args
+  for(auto inst : memInstances) {
+    std::string pathInsName = inst.first;
+    std::string modName = inst.second;
     auto memMod = g_moduleInfoMap[modName];
-    for(uint32_t i = 0; i <= bound; i++)  
+    for(uint32_t i = 0; i <= bound; i++) {
       for( auto output : memMod->moduleOutputs ) {
         std::string portName = pathInsName+"."+output+post_fix(i);
         toCoutVerb("set mem ouput func arg, mem: "+pathInsName+", output: "+output);
-        (TheFunction->args().begin()+idx)->setName(portName);
-        (topFunction->args().begin()+idx)->setName(portName);
+        TheFunction->getArg(idx)->setName(portName);
+        topFunction->getArg(idx)->setName(portName);
+	
+        if (wrapperFunction) {
+          // Some wrapper function args are pointers, not values
+          if (isSmallType(TheFunction->getArg(idx)->getType())) {
+            wrapperFunction->getArg(idx)->setName(portName);
+          } else {
+            wrapperFunction->getArg(idx)->setName(portName+"ptr_");
+          }
+        }
+
         argNum--;
-        topFuncArgMp.emplace(portName, TheFunction->args().begin()+idx++);
+        topFuncArgMp.emplace(portName, TheFunction->args().begin()+idx);
+	idx++;
       }
+    }
   }
 
   toCout("=== Finished setting memory output arg name!");
 
+  // Now do module-input args
   uint32_t argSize = TheFunction->arg_size();
   toCoutVerb("Function arg size is: "+toStr(argSize));
-  for(uint32_t i = 0; i <= bound; i++)  
-    for(auto it = curMod->moduleInputs.begin(); it != curMod->moduleInputs.end(); it++) {
-      if(*it == curMod->clk) continue;    
-      uint32_t width = get_var_slice_width_simp(*it, curMod);
-      toCoutVerb("set func arg: "+*it+post_fix(i));
-      (TheFunction->args().begin()+idx)->setName(*it+post_fix(i));
-      (topFunction->args().begin()+idx++)->setName(*it+post_fix(i));
+  for (uint32_t i = 0; i <= bound; i++) {
+    for (std::string inp : curMod->moduleInputs) {
+      if(inp == curMod->clk) continue;    
+      //uint32_t width = get_var_slice_width_simp(inp, curMod);
+      std::string argName = inp+post_fix(i);
+      toCoutVerb("set func arg: "+argName);
+      (TheFunction->args().begin()+idx)->setName(argName);
+      (topFunction->args().begin()+idx)->setName(argName);
+
+      if (wrapperFunction) {
+        // Some wrapper function args are pointers, not values
+        if (isSmallType(TheFunction->getArg(idx)->getType())) {
+          wrapperFunction->getArg(idx)->setName(argName);
+        } else {
+          wrapperFunction->getArg(idx)->setName(argName+"ptr_");
+        }
+      }
+
+      idx++;
       argNum--;
     }
+  }
 
   toCout("=== Finished setting module input arg name!");
+
+  // If it exists, set the name of the extra wrapper function arg
+  if (wrapperFunction && !isSmallType(retTy)) {
+    wrapperFunction->getArg(idx)->setName("_return_val_ptr_");
+  }
 
   // basic block
   BB = llvm::BasicBlock::Create(*TheContext, "bb_;_"+destName, TheFunction);
@@ -361,10 +483,10 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 
   curMod = g_moduleInfoMap[curModName];
   llvm::Instruction* retInst;
-  if(!destInfo.isVector) {
+  if (!destInfo.isVector) {
     std::string dest = destVec.front();
-    if(is_output(destName, curMod)) initialize_min_delay(curMod, destName);
-    if(curMod->visitedNode.find(dest) == curMod->visitedNode.end()
+    if (is_output(destName, curMod)) initialize_min_delay(curMod, destName);
+    if (curMod->visitedNode.find(dest) == curMod->visitedNode.end()
         && curMod->reg2Slices.find(dest) == curMod->reg2Slices.end()) {
       toCout("Error: ast node is not found for this var: |"+dest+"|"
               +", curMod: "+curMod->name);
@@ -381,13 +503,13 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     std::vector<llvm::Value*> retVec;
     std::string modName = destInfo.get_mod_name();
     std::string insName = destInfo.get_ins_name();
-    if(insName.empty()) insName = modName;
+    if (insName.empty()) insName = modName;
     check_mod_name(modName);
     llvm::Value* destNextExpr;
     //FIXME: currently do not support vector in submodules
-    for(std::string dest: destVec) {
-      if(is_output(dest, curMod)) initialize_min_delay(curMod, dest);      
-      if(dest == "buff10")
+    for (std::string dest: destVec) {
+      if (is_output(dest, curMod)) initialize_min_delay(curMod, dest);      
+      if (dest == "buff10")
         toCoutVerb("Find it!");
       curMod = g_moduleInfoMap[modName];
 
@@ -397,7 +519,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
       Context_t insCntxt(insName, dest, curMod, nullptr, TheFunction);
       insContextStk.push_back(insCntxt);
       print_context_info(insCntxt);      
-      if(curMod->visitedNode.find(dest) == curMod->visitedNode.end()
+      if (curMod->visitedNode.find(dest) == curMod->visitedNode.end()
           && curMod->reg2Slices.find(dest) == curMod->reg2Slices.end()) {
         toCout("Error: ast node is not found for this var: |"+dest+"|"
                 +", curMod: "+curMod->name);
@@ -406,7 +528,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
       else {
         destNextExpr = add_constraint(dest, 
                                       0, TheContext, Builder, bound);
-        if(!destInfo.isMemVec)
+        if (!destInfo.isMemVec)
           retVec.push_back(destNextExpr);
       }
     }
@@ -425,14 +547,14 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     //      );
 
     // store values in retVec to memory of global array
-    llvm::Value* arrPtr = retArrPtr;
     uint32_t i = 0;
-    if(!retVec.empty()) {
-      for(llvm::Value* val : retVec) {
+    if (!retVec.empty()) {
+      assert(retArrayElementTy);
+      for (llvm::Value* val : retVec) {
         llvm::GetElementPtrInst* ptr 
           = llvm::GetElementPtrInst::Create(
-              nullptr,
-              arrPtr,
+              retArrayTy,
+              retArray,
               std::vector<llvm::Value*>{
                 llvm::ConstantInt::get(
                   llvm::IntegerType::get(*TheContext, bitNum), 
@@ -450,20 +572,20 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
         //auto ty1 = val->getType();
         //auto ty2 = llvm::cast<llvm::ArrayType>(retTy)->getElementType();
         //auto ty3 = llvm::cast<llvm::PointerType>(ptr->getType())->getElementType();
-        //auto ty4 = arrPtr->getType();
-        llvm::StoreInst* store = Builder->CreateStore(val, value(ptr));  
+        //auto ty4 = retArrPtr->getType();
+	Builder->CreateStore(val, value(ptr));  
       }
     }
     else assert(destInfo.isMemVec);
 
-    //llvm::LoadInst *retArr = Builder->CreateLoad(retTy, arrPtr, llvm::Twine("retArr"));
+    //llvm::LoadInst *retArr = Builder->CreateLoad(retTy, retArrPtr, llvm::Twine("retArr"));
     //Builder->CreateRet(value(retArr));
 
-    if(!retVec.empty()) {
+    if (!retVec.empty()) {
       llvm::GetElementPtrInst* retPtr 
         = llvm::GetElementPtrInst::Create(
-            nullptr,
-            arrPtr,
+            retArrayTy,
+            retArray,
             std::vector<llvm::Value*>{
               llvm::ConstantInt::get(
                 llvm::IntegerType::get(*TheContext, bitNum), 
@@ -487,20 +609,20 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   // if the top module contains memories, add the additional memory
   // writes from lastMemReadAddr+1 to bound-1
   uint32_t i = 0;
-  if(!curMod->moduleMems.empty()) {
+  if (!curMod->moduleMems.empty()) {
     Builder->SetInsertPoint(retInst);  
-    for(auto pair : curDynData->memDynInfo) {
+    for (auto pair : curDynData->memDynInfo) {
       std::string mem = pair.first;
       toCoutVerb("check mem: "+mem);
-      if(i == 48)
+      if (i == 48)
         toCoutVerb("Find i!");
       toCoutVerb("i: "+toStr(i++));
-      if(mem.find("\\store.tensorStore.tensorFile_0_0") != std::string::npos)
+      if (mem.find("\\store.tensorStore.tensorFile_0_0") != std::string::npos)
         toCoutVerb("Find it!");
       astNode* node = memNodeMap[mem];
-      if(!pair.second.hasBeenWritten) continue;      
+      if (!pair.second.hasBeenWritten) continue;      
       uint32_t lastWriteTimeIdx = pair.second.lastWriteTimeIdx;
-      for(uint32_t i = lastWriteTimeIdx+1; i < bound; i++) {
+      for (uint32_t i = lastWriteTimeIdx+1; i < bound; i++) {
         mem_assign_constraint(node, i, TheContext, Builder, bound);
       }
     }
@@ -508,23 +630,108 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 
   llvm::verifyFunction(*TheFunction);
 
-  // call TheFunction in topFunction
+
+  // Fill in the contents of topFunction
+
   auto topBB = llvm::BasicBlock::Create(*TheContext, "top_bb", topFunction);
   Builder->SetInsertPoint(topBB);  
+
+
+  // call TheFunction in topFunction: same args that topFunction has
   std::vector<llvm::Value*> args;
-  idx = 0;
-  while(idx < argSize) {
-    args.push_back(topFunction->args().begin()+idx++);
+  for (size_t i=0; i < argSize; ++i) {
+    args.push_back(topFunction->getArg(i));
   }
-  auto topRet = Builder->CreateCall(FT, TheFunction, args);
-  Builder->CreateRet(value(topRet));
+
+  llvm::Value *theRet = Builder->CreateCall(FT, TheFunction, args);
+
+
+  if (wrapperFunction) {
+    // call wrapperFunction (if any) in topFunction.
+    // This prevents the wrapperFunction from being optimized away.
+    // Remember: topFunction will eventually get removed.
+    //
+    std::vector<llvm::Value*> wrapperArgs;
+    for (size_t i=0; i < argSize; ++i) {
+      llvm::Type *type = argTy[i];
+      if (isSmallType(type)) {
+        // Pass the value
+        wrapperArgs.push_back(topFunction->getArg(i));
+      } else {
+        // Create a pointer that points to some memory 
+        llvm::Value *tmpPtr = Builder->CreateAlloca(type);
+        // store the arg value into that memory
+        Builder->CreateStore(topFunction->getArg(i), tmpPtr);
+        //wrapperArgs.push_back(llvm::ConstantPointerNull::get(llvm::PointerType::getUnqual(type)));
+        wrapperArgs.push_back(tmpPtr);
+      }
+    }
+
+    llvm::Value *wrapperRet = nullptr;
+    if (isSmallType(retTy)) {
+      // the wrapper returns by value
+      wrapperRet = Builder->CreateCall(wrapperFT, wrapperFunction, wrapperArgs);
+    } else {
+      // Pass an additional pointer to something
+      llvm::Value *retPtr = Builder->CreateAlloca(retTy);
+      // In release 15 of LLVM, this will become an opaque pointer
+      //llvm::Value *retOpaquePtr = Builder->CreateBitCast(retPtr, llvm::PointerType::getUnqual(*TheContext));
+      wrapperArgs.push_back(retPtr);
+
+      // Call the wrapper - it will fill in the additional pointer
+      Builder->CreateCall(wrapperFT, wrapperFunction, wrapperArgs);
+
+      // Dereference that pointer to get the return value
+      wrapperRet = Builder->CreateLoad(retTy, retPtr);
+    }
+
+    // Do a calculation with both return values, so that the functions will not get optimized away.
+    llvm::Value *finalRet = Builder->CreateAdd(theRet, wrapperRet);
+    Builder->CreateRet(finalRet);
+
+  } else {
+    Builder->CreateRet(theRet);
+  }
+
+
   llvm::verifyFunction(*topFunction);
 
+
+  // Fill in the contents of wrapperFunction (if any)
+  if (wrapperFunction) {
+    auto wrapperBB = llvm::BasicBlock::Create(*TheContext, "wrapper_bb", wrapperFunction);
+    Builder->SetInsertPoint(wrapperBB);  
+
+    // Pass the wrapper args down to the main function. For ones that
+    // are provided via pointers, dereference the pointers.
+    std::vector<llvm::Value*> wrappedArgs;
+    for (size_t i=0; i < argSize; ++i) {
+      llvm::Value *argVal = nullptr;
+      if (isSmallType(argTy[i])) {
+        // Pass the arg by value
+        argVal = wrapperFunction->getArg(i);
+      } else {
+        // Dereference the pointer
+        argVal = Builder->CreateLoad(argTy[i], wrapperFunction->getArg(i));
+      }
+      wrappedArgs.push_back(argVal);
+    }
+    
+    // call TheFunction from wrapperFunction
+    llvm::Value *call = Builder->CreateCall(FT, TheFunction, wrappedArgs);
+
+    if (isSmallType(retTy)) {
+      Builder->CreateRet(call);
+    } else {
+      // Add store of return value to last pointer arg
+      Builder->CreateStore(call, wrapperFunction->getArg(argSize));
+      Builder->CreateRetVoid();
+    }
+
+    llvm::verifyFunction(*wrapperFunction);
+  }
+
   llvm::verifyModule(*TheModule);
-  std::string destNameSimp = destInfo.get_dest_name();
-  remove_front_backslash(destNameSimp);
-  std::string fileName = g_path+"/"+destInfo.get_instr_name()+"_"
-                         +destNameSimp+"_"+toStr(bound)+"_tmp.ll";
   std::string Str;
   llvm::raw_string_ostream OS(Str);
   OS << *TheModule;
@@ -532,7 +739,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   std::ofstream output(fileName);
   output << Str << std::endl;
   output.close();
-  if(true) {
+  if (true) {
     std::ofstream output("./tmp.ll");
     output << Str << std::endl;
     output.close();    
@@ -674,7 +881,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 //        assert(v.arity() == 0);
 //        std::string var = v.name().str();
 //        if(var == "instr_bne___#1_T") {
-//          toCout("Find it");
+//          toCoutVerb("Find it");
 //        }
 //        assert(var == pair.first);
 //        // check if current is reg and has reset value
@@ -798,35 +1005,35 @@ llvm::Value*
 UpdateFunctionGen::add_constraint(std::string varAndSlice, uint32_t timeIdx, context &c,
                                    std::shared_ptr<llvm::IRBuilder<>> &b,
                                    const uint32_t bound ) {
-  if(varAndSlice.find("hls_target_linebuffer_1_U0_out_stream_V_value_V_write") 
+  if (varAndSlice.find("hls_target_linebuffer_1_U0_out_stream_V_value_V_write") 
        != std::string::npos)
        //&& timeIdx == 17)
     toCoutVerb("Find it!");
   auto curMod = insContextStk.get_curMod();
-  if(curMod->name == "hls_target_Loop_1_proc")
-    toCout("Find it!");
+  if (curMod->name == "hls_target_Loop_1_proc")
+    toCoutVerb("Find it!");
   llvm::Value* ret;
   bool retIsEmpty = true;
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
   const std::string curTgt = insContextStk.get_target();
   //assert(curMod->visitedNode.find(curTgt) != curMod->visitedNode.end());
-  if(curMod->reg2Slices.find(var) == curMod->reg2Slices.end()) {
-    if(curMod->visitedNode.find(var) == curMod->visitedNode.end()) {
+  if (curMod->reg2Slices.find(var) == curMod->reg2Slices.end()) {
+    if (curMod->visitedNode.find(var) == curMod->visitedNode.end()) {
       toCout("Error: cannot find node for: "+varAndSlice);
       abort();
     }
     return add_constraint(curMod->visitedNode[var], timeIdx, c, b, bound);
   }
   else {
-    for(std::string varSlice : curMod->reg2Slices[var]) {
-      if(curMod->visitedNode.find(varSlice) == curMod->visitedNode.end()) {
+    for (std::string varSlice : curMod->reg2Slices[var]) {
+      if (curMod->visitedNode.find(varSlice) == curMod->visitedNode.end()) {
         toCout("!!! Error: cannot find node for: "+varSlice);
         abort();
       }
       llvm::Value* tmpSlice = add_constraint(curMod->visitedNode[varSlice], 
                                              timeIdx, c, b, bound);
-      if(retIsEmpty) {
+      if (retIsEmpty) {
         retIsEmpty = false;
         ret = tmpSlice;
       }
@@ -848,37 +1055,37 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
                             const uint32_t bound ) {
   // Attention: varAndSlice might have a slice, a directly-assigned varAndSlice
   std::string varAndSlice = node->dest;
-  if(varAndSlice.find("\\fetch.xsize") 
+  if (varAndSlice.find("\\fetch.xsize") 
        != std::string::npos)
     toCoutVerb("Find it!");
 
   auto curMod = insContextStk.get_curMod();
-  if(curMod->name == "hls_target_Loop_1_proc")
-    toCout("Find it!");
+  if (curMod->name == "hls_target_Loop_1_proc")
+    toCoutVerb("Find it!");
 
   std::shared_ptr<ModuleDynInfo_t> curDynData = get_dyn_data(curMod);
   toCoutVerb("add_constraint for: "+varAndSlice+", timeIdx: "+toStr(timeIdx)
              +", bound: "+toStr(bound));
-  if(varAndSlice == "64'hxxxxxxxxxxxxxxxx" && timeIdx == 1) {
+  if (varAndSlice == "64'hxxxxxxxxxxxxxxxx" && timeIdx == 1) {
     toCoutVerb("find it");
   }
 
-  if(varAndSlice.find("compute.loadUop.sIdx") != std::string::npos
+  if (varAndSlice.find("compute.loadUop.sIdx") != std::string::npos
        && timeIdx == 4) {
     toCoutVerb("Find it!");
   }
 
-  if(timeIdx > bound) {
+  if (timeIdx > bound) {
     uint32_t width = insContextStk.get_var_slice_width_simp(varAndSlice);
     return llvmInt(0, width, c);
   }
 
   const std::string curTgt = insContextStk.get_target();
-  if(curDynData->existedExpr.find(curTgt) == curDynData->existedExpr.end() )
+  if (curDynData->existedExpr.find(curTgt) == curDynData->existedExpr.end() )
     curDynData->existedExpr.emplace(curTgt, 
                                     std::map<std::string, llvm::Value*>() );
 
-  if(curDynData->existedExpr[curTgt].find(timed_name(varAndSlice, timeIdx)) 
+  if (curDynData->existedExpr[curTgt].find(timed_name(varAndSlice, timeIdx)) 
       != curDynData->existedExpr[curTgt].end() ) {
     return curDynData->existedExpr[curTgt][timed_name(varAndSlice, timeIdx)];
   }
@@ -887,50 +1094,50 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
   if ( is_input(varAndSlice, curMod) ) { // input_t is always 0
     retExpr = input_constraint(node, timeIdx, c, b, bound);
   }
-  else if( is_reg_in_curMod(varAndSlice, curMod) 
+  else if ( is_reg_in_curMod(varAndSlice, curMod) 
              && node->type != SRC_CONCAT && node->type != SWITCH) { 
     // AS case is moved to add_nb_constraint
     retExpr = add_nb_constraint(node, timeIdx, c, b, bound);
   }
-  else if( is_number(varAndSlice) ) { // num_t is always 0
-    //if(varAndSlice.find("x") != std::string::npos) {
+  else if ( is_number(varAndSlice) ) { // num_t is always 0
+    //if (varAndSlice.find("x") != std::string::npos) {
     //  toCout("!! Warning: number in add_constraint should not have x: "
     //           +varAndSlice);
     //  //abort();
     //}
     retExpr = num_constraint(node, timeIdx, c, b);
   }
-  else if( is_case_dest(varAndSlice, curMod) ) {
+  else if ( is_case_dest(varAndSlice, curMod) ) {
     retExpr = case_constraint(node, timeIdx, c, b, bound);
   }
-  else if( is_switch_dest(varAndSlice, curMod) ) {
+  else if ( is_switch_dest(varAndSlice, curMod) ) {
     retExpr = switch_constraint(node, timeIdx, c, b, bound);
   }
 
-  //else if( is_func_output(varAndSlice) ) {
+  //else if ( is_func_output(varAndSlice) ) {
   //  retExpr = func_constraint(node, timeIdx, c, s, g, bound, isSolve);
   //}
-  else if( is_submod_output(varAndSlice, curMod) ) {
+  else if ( is_submod_output(varAndSlice, curMod) ) {
     auto pair = curMod->wire2InsPortMp[varAndSlice];
     std::string insName = pair.first;
     auto subMod = get_mod_info(insName, curMod);
     std::string modName = subMod->name;
-    if(modName == "aes_128")
+    if (modName == "aes_128")
       toCoutVerb("Find it!");
-    if(is_mem_module(modName))
+    if (is_mem_module(modName))
       retExpr = memMod_constraint(node, timeIdx, c, b, bound);
-    else if(g_blackBoxModSet.find(modName) != g_blackBoxModSet.end())
+    else if (g_blackBoxModSet.find(modName) != g_blackBoxModSet.end())
       retExpr = bbMod_constraint(node, timeIdx, c, b, bound);
     else
       retExpr = submod_constraint(node, timeIdx, c, b, bound);
   }
-  else if( node->type == MEM_IF_ASSIGN ) {
+  else if ( node->type == MEM_IF_ASSIGN ) {
     //toCout("Error: mem_if_assign should not appear in add_constraint:"
     //        +node->dest);
     //abort();
 
     std::string mem = node->dest;
-    if(curDynData->memDynInfo.find(mem) != curDynData->memDynInfo.end()) {
+    if (curDynData->memDynInfo.find(mem) != curDynData->memDynInfo.end()) {
       toCout("Error: the mem is already in curDynData->memDynInfo: "+mem);
       abort();
     }
@@ -940,7 +1147,7 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
     llvm::Type* elementTy = llvmWidth(lineWidth, c);
     llvm::ArrayType* arrayType = llvm::ArrayType::get(elementTy, lineNum);
     std::vector<llvm::Constant*> initList;  
-    for(uint32_t i = 0; i < lineNum; i++) {
+    for (uint32_t i = 0; i < lineNum; i++) {
       initList.push_back(
         llvm::ConstantInt::get(llvm::IntegerType::get(*c, lineWidth), 
                                0, false)
@@ -962,7 +1169,7 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
     mem_assign_constraint(node, timeIdx, c, b, bound);
     return nullptr;
   }
-  else if( node->type == DYNSEL ) {
+  else if ( node->type == DYNSEL ) {
     retExpr = dyn_sel_constraint(node, timeIdx, c, b, bound);
   }
   else { // it is wire
@@ -970,7 +1177,7 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
   }
   curDynData->existedExpr[curTgt].emplace(timed_name(varAndSlice, timeIdx), 
                                           retExpr);
-  if(curMod->name == "T" && curTgt == "out" 
+  if (curMod->name == "T" && curTgt == "out" 
        && varAndSlice == "in" && timeIdx == 1)
     toCoutVerb("push into expr!");
   return retExpr;
@@ -988,25 +1195,25 @@ UpdateFunctionGen::add_nb_constraint(astNode* const node,
   std::string destAndSlice = node->dest;
   std::string dest, destSlice;
   split_slice(destAndSlice, dest, destSlice);
-  if(destAndSlice.find("compute.loadUop.sIdx_reg[0]") != std::string::npos){
+  if (destAndSlice.find("compute.loadUop.sIdx_reg[0]") != std::string::npos){
        //&& timeIdx == 8) {
     //toCoutVerb("target reg found! time: "+toStr(timeIdx));
-    toCout("Find it");
+    toCoutVerb("Find it");
   }
   llvm::Value* destNextExpr;
   // assuming RHS of nonblocking is not number
-  if( node->childVec.front()->dest.empty() ) {
+  if ( node->childVec.front()->dest.empty() ) {
     toCout("Error: first child's dest is empty: "+node->dest);
     abort();
   }
 
   // why: when inputs havn't been seen, more unrolling is necessary
-  //if(!g_seeInputs && timeIdx == bound) bound++;
+  //if (!g_seeInputs && timeIdx == bound) bound++;
 
-  if(timeIdx < bound) {
+  if (timeIdx < bound) {
     toCoutVerb("Add nb constraint for: " + destAndSlice
                +" ------  time: "+toStr(timeIdx));
-    if(destAndSlice == "decoder_trigger_q" && timeIdx == 3)
+    if (destAndSlice == "decoder_trigger_q" && timeIdx == 3)
       toCoutVerb("Find it!");
     std::string destNext = node->srcVec.front();
 
@@ -1016,7 +1223,7 @@ UpdateFunctionGen::add_nb_constraint(astNode* const node,
     split_slice(srcAndSlice, src, srcSlice);
     uint32_t srcHi = get_lgc_hi(srcAndSlice, curMod);
     uint32_t srcLo = get_lgc_lo(srcAndSlice, curMod);
-    if(srcSlice.empty() || has_direct_assignment(srcAndSlice, curMod))
+    if (srcSlice.empty() || has_direct_assignment(srcAndSlice, curMod))
       destNextExpr = srcExpr;
     else
       destNextExpr = extract_func(srcExpr, srcHi, srcLo, 
@@ -1035,23 +1242,23 @@ UpdateFunctionGen::add_nb_constraint(astNode* const node,
   // if timeIdx = bound, then return function input or rst/norm value
   // TODO: adjust the following condition for different designs
 
-  //if(curMod->invarRegs.find(dest) == curMod->invarRegs.end()) {
-  if(dest.find("internal_empty_n") != std::string::npos) {
+  //if (curMod->invarRegs.find(dest) == curMod->invarRegs.end()) {
+  if (dest.find("internal_empty_n") != std::string::npos) {
     toCoutVerb("Find it!");
   }
-  if(g_use_read_ASV) {
-    if(is_read_asv(dest, insContextStk.get_curMod())) {
+  if (g_use_read_ASV) {
+    if (is_read_asv(dest, insContextStk.get_curMod())) {
         //&& curMod->moduleAs.find(dest) != curMod->moduleAs.end())
       //std::string prefix = get_hier_name(false);
-      //if(!prefix.empty()) prefix += ".";
-      if(curDynData->isFunctionedSubMod == false) {
+      //if (!prefix.empty()) prefix += ".";
+      if (curDynData->isFunctionedSubMod == false) {
         std::string prefix = insContextStk.get_hier_name(false);
-        if(!prefix.empty()) prefix += ".";
+        if (!prefix.empty()) prefix += ".";
         dest = prefix + dest;
       }
       std::string destTimed = timed_name(dest, timeIdx);
       auto destExpr = get_arg(destTimed, curFunc);
-      if(destSlice.empty())
+      if (destSlice.empty())
         return destExpr;
       else {
         uint32_t hi = get_end(destSlice);
@@ -1070,15 +1277,15 @@ UpdateFunctionGen::add_nb_constraint(astNode* const node,
     // if do not use read asv, then for invariant registers, return their
     // normal value(not rst value), and for other registers, set them symbolic
     std::string modName = curMod->name;
-    if(g_invarRegs.find(modName) == g_invarRegs.end()) {
+    if (g_invarRegs.find(modName) == g_invarRegs.end()) {
       return get_arg(timed_name(dest, timeIdx), curFunc);
     }
     else {
-      if(g_invarRegs[modName].find(dest) == g_invarRegs[modName].end()) {
-        if(is_top_module(curMod))
+      if (g_invarRegs[modName].find(dest) == g_invarRegs[modName].end()) {
+        if (is_top_module(curMod))
           return get_arg(timed_name(dest, timeIdx), curFunc);
         else {
-          if(curDynData->isFunctionedSubMod)
+          if (curDynData->isFunctionedSubMod)
             return get_arg(timed_name(dest, timeIdx), curFunc);
           else {
             std::string prefix = insContextStk.get_hier_name(false);
@@ -1372,13 +1579,14 @@ std::string DestInfo::get_dest_name() {
 
 
 // if is vector, return a pointer of the array-element type
+// In release 15 of LLVM, this will become an opaque pointer
 llvm::Type* DestInfo::get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext) {
   if(!isVector) {
     return llvm::IntegerType::get(*TheContext, 
                                   destWidth);
   }
   else if(isVector && !isMemVec){
-    // if is reg vector, return an array type pointer
+    // if is reg vector, return a pointer type
     // first, check if every reg is of the same size
     uint32_t size = get_var_slice_width_cmplx(destVec.front());
     for(auto dest: destVec) {
@@ -1386,16 +1594,34 @@ llvm::Type* DestInfo::get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext
       assert(size == elmtSize);
     }
     llvm::Type* I = llvm::IntegerType::get(*TheContext, size);    
-    llvm::PointerType* pointerTy = llvm::PointerType::get(I, 0);
-    //llvm::ArrayType* arrayType = llvm::ArrayType::get(I, destVec.size());
-    ////auto ptrTy = llvm::PointerType::get(arrayType, 0);
-    //return arrayType;
+    llvm::PointerType* pointerTy = llvm::PointerType::getUnqual(I);
     return pointerTy;
   }
   // TODO: implement the else case: the destVar is either single memory
   // or an array of memory
   else { // isVector && isMemVec
-    return llvm::Type::getVoidTy(*TheContext);
+    return nullptr;
+  }
+}
+
+
+// if is vector, return the array-element type
+// Otherwise return null;
+llvm::Type* DestInfo::get_ret_element_type(std::shared_ptr<llvm::LLVMContext> TheContext) {
+  if(isVector && !isMemVec){
+    // if is reg vector, return an array element type 
+    // first, check if every reg is of the same size
+    uint32_t size = get_var_slice_width_cmplx(destVec.front());
+    for(auto dest: destVec) {
+      uint32_t elmtSize = get_var_slice_width_cmplx(dest);
+      assert(size == elmtSize);
+    }
+    return llvm::IntegerType::get(*TheContext, size);    
+  }
+  // TODO: implement the else case: the destVar is either single memory
+  // or an array of memory
+  else { 
+    return nullptr;
   }
 }
 
@@ -1646,6 +1872,7 @@ UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
   //args.push_back(in);
   //return b->CreateCall(FT, func, args, 
   //                     llvm::Twine(timed_name(extValName, timeIdx)));
+  return nullptr;  // Not reached?
 }
 
 
@@ -1801,6 +2028,7 @@ UpdateFunctionGen::concat_func(llvm::Value* val1, llvm::Value* val2,
   //args.push_back(val1);
   //args.push_back(val2);
   //return b->CreateCall(FT, func, args, llvm::Twine(timed_name(cctValName, timeIdx)));
+  return nullptr;  // Not reached?
 }
 
 
@@ -1947,7 +2175,7 @@ void print_context_info(Context_t& insCntxt) {
 
   toCout("push mod("+toStr(g_pushNum)+"): "+modName+", func: "+funcName);
   if(modName == "hls_target_Loop_1_proc" && funcName == "top_function")
-    toCout("Find it!");
+    toCoutVerb("Find it!");
 }
 
 } // end of namespace funcExtract

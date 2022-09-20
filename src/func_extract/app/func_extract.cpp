@@ -15,6 +15,7 @@
 #include <string>
 #include <fstream>
 #include <time.h>
+#include <sys/stat.h>
 #include <glog/logging.h>
 
 #include "../../live_analysis/src/global_data.h"
@@ -60,14 +61,24 @@ using namespace taintGen;
 int main(int argc, char *argv[]) {
   google::InitGoogleLogging(argv[0]);
   FLAGS_log_dir = "/workspace/research/ILA/autoGenILA/src/func_extract/log";
-  g_path = argv[1];
-  // if argv[3] is 1, clean the file
-  std::string doClean = argv[2];
+
+  if(argc == 2 || argc > 4) {
+    toCout(std::string("usage: ")+argv[0]+" [<path> <clean_flag> [-reg]]");
+    exit(-1);
+  }
+
+  g_path = argc > 1 ? argv[1] : ".";   // Default path is current dir
+
+  // If argv[2] is the input file cleaning spec: 1 to clean, 0 to not clean, or '-' for auto-clean.
+  // Default mode is auto-clean
+  std::string doClean = argc > 2 ? argv[2] : "-";
+
   bool printRegInfo = false;
   if(argc > 3) {
     std::string argv3 = argv[3];
     if( argv3 == "-reg") printRegInfo = true ;
   }
+
   time_t my_time = time(NULL);
   g_outFile.open(g_path+"/result.txt");
   g_regValueFile.open(g_path+"/reg_values.txt");
@@ -97,13 +108,44 @@ int main(int argc, char *argv[]) {
   // instruction encodings, write/read ASV, NOP
   read_config(g_path+"/config.txt");
   read_in_instructions(g_path+"/instr.txt");
+
+
+  // A clear flag of "-" specifies "smart cleaning": it will be done only if
+  // design.v.clean does not exist or design.v is newer than design.v.clean.
+  if (doClean.compare("-") == 0) {
+    struct stat statbuf;
+    if (stat((g_path+"/design.v.clean").c_str(), &statbuf) != 0) {
+      doClean = "1";  // .v.clean file does not exist
+    } else {
+      struct timespec clean_mtim = statbuf.st_mtim;
+      if (stat((g_path+"/design.v").c_str(), &statbuf) != 0) {
+        doClean = "0";   // .v file does not exist
+      } else {
+        struct timespec v_mtim = statbuf.st_mtim;
+        if (v_mtim.tv_sec > clean_mtim.tv_sec) {
+          doClean = "1"; // .v file s newer
+        } else if (v_mtim.tv_sec < clean_mtim.tv_sec) {
+          doClean = "0"; // .v file is older
+        } else if (v_mtim.tv_nsec > clean_mtim.tv_nsec) {
+          doClean = "1"; // .v file is slightly newer
+        } else {
+          doClean = "0";
+        }
+      }
+    }
+  }
+
+
   if(doClean.compare("1") == 0) {
+    // This reads design.v and creates design.v.nocomment
     toCout("##### Begin clean_file");
     clean_file(g_path+"/design.v", false);
 
+    // This reads the given file, and writes nothing.
     toCout("##### Begin getting IO");
     get_io(g_path+"/design.v.nocomment");
 
+    // This reads design.v.nocomment and creates design.v.clean
     toCout("##### Begin remove_functions");
     funcExtract::remove_functions(g_path+"/design.v");
 
@@ -111,6 +153,8 @@ int main(int argc, char *argv[]) {
     parse_verilog(g_path+"/design.v.clean");
   }
   else {
+    toCout("##### Clean_file skipped");
+    toCout("##### Begin getting IO");
     get_io(g_path+"/design.v.clean");
     get_skipped_output(g_skippedOutput);    
     toCout("##### Begin parse_verilog");

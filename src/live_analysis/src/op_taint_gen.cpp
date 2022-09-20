@@ -1712,7 +1712,7 @@ void nonblockif_taint_gen(std::string line, std::string always_line, std::ifstre
     checkCond(false, "ERROR: encounter nonblockif whiling use zy_count! "+line);
 
   if(line.find("ap_CS_fsm") != std::string::npos)
-    toCout("Find it!");
+    toCoutVerb("Find it!");
 
   //output << always_line << std::endl;
   bool hasRst = false;
@@ -2207,7 +2207,7 @@ void always_taint_gen(std::string firstLine, std::ifstream &input, std::ofstream
   std::getline(input, line);
   output << line << std::endl;
   if(line.find("_lsu.u_lsu_request.ram_q") != std::string::npos)
-    toCout("Find it!");
+    toCoutVerb("Find it!");
   if( std::regex_match(line, m, pNonblock) ) {
     nonblock_taint_gen(line, output);  
   }

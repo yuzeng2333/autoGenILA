@@ -69,7 +69,7 @@ void parse_verilog(std::string fileName) {
       )
       continue;
     if(line.find("reg [7:0] out;") != std::string::npos) {
-      toCout("Find it!");
+      toCoutVerb("Find it!");
     }
     if(!g_insContextStk.empty()) {
       std::string modName = g_insContextStk.get_curMod()->name;
@@ -110,7 +110,7 @@ void parse_verilog(std::string fileName) {
         g_currentModuleName = m.str(2);
 
         if(m.str(3) == "t0" || g_currentModuleName == "table_lookup") {
-          toCout("Find it!!");
+          toCoutVerb("Find it!!");
         }
 
         toCout("=== Begin module: "+m.str(2));
@@ -333,7 +333,7 @@ void get_io(const std::string &fileName) {
   while( std::getline(input, line) ) {
     toCoutVerb(line);
     if(line.find("reg [7:0] out;") != std::string::npos)
-      toCout("Find it!");
+      toCoutVerb("Find it!");
     if(line.empty() 
           || line.find_first_not_of(' ') == std::string::npos
           || is_comment_line(line)
@@ -408,7 +408,7 @@ void clean_submod(std::ifstream &input,
   std::string modName = m.str(2);
 
   if(modName == "SRAM2S_1024X16")
-    toCout("Find it!");
+    toCoutVerb("Find it!");
 
   std::string insName = m.str(3);
   auto subMod = g_moduleInfoMap[modName];
@@ -553,6 +553,20 @@ void read_config(std::string fileName) {
         g_verb = (value == "true");
         configNum++;
         toCout("read g_verb: "+value);
+      }
+      else if(config == "g_use_multi_thread") {
+        g_use_multi_thread = (value == "true");
+        configNum++;
+        toCout("read g_use_multi_thread: "+value);
+      }
+      else if(config == "g_overwrite_existing_llvm") {
+        g_overwrite_existing_llvm = (value == "true");
+        configNum++;
+        toCout("read g_overwrite_existing_llvm: "+value);
+      } else if(config == "g_llvm_path") {
+        g_llvm_path = value;
+        configNum++;
+        toCout("read g_llvm_path: "+value);
       }
     }
   }

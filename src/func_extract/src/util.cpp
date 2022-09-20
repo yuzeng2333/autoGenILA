@@ -154,7 +154,7 @@ std::string decode(const std::map<std::string, std::vector<std::string>> &inputI
   bool isCompatible;
   for(auto instr: g_instrInfo) {
     if(instr.name == "lh")
-      toCout("Find it!");
+      toCoutVerb("Find it!");
     isCompatible = true;
     for(auto pair : inputInstr) {
       std::string varName = pair.first;
@@ -211,12 +211,10 @@ bool is_compatible(const std::vector<std::string> &multiCycleValue1,
 
 
 bool same_value(std::string val1, std::string val2) {
-  if(val1 == "5'hx" && val2 == "5'ha")
-    toCout("Find it!");
   std::smatch m;
-  std::regex pX("(\\d+)'(d|h|b)x");
-  std::regex pZ("(\\d+)'(d|h|b)(\\(Z\\S+\\)|Z)");
-  std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");
+  static const std::regex pX("(\\d+)'(d|h|b)x");
+  static const std::regex pZ("(\\d+)'(d|h|b)(\\(Z\\S+\\)|Z)");
+  static const std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");
   if(is_x(val1) || val1.find("Z") != std::string::npos) {
     if(std::regex_match(val1, m, pX)
        || std::regex_match(val1, m, pZ) ) {
@@ -282,9 +280,11 @@ bool same_value(std::string val1, std::string val2) {
   //std::string format2 = m.str(2);
   //std::string num2 = m.str(3);
 
-  uint32_t v1 = hdb2int(val1);
-  uint32_t v2 = hdb2int(val2);
-  return v1 == v2;
+  // Handle one or both values being > 64 bits.   Zero-extend the shorter one.
+  llvm::APInt v1 = hdb2apint(val1);
+  llvm::APInt v2 = hdb2apint(val2);
+  unsigned maxWidth = std::max(v1.getBitWidth(), v2.getBitWidth());
+  return v1.zext(maxWidth) == v2.zext(maxWidth);
 }
 
 }

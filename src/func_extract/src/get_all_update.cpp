@@ -1,3 +1,10 @@
+//#include "llvm/AsmParser/Parser.h"
+//#include "llvm/IR/Verifier.h"
+#include "llvm/IRReader/IRReader.h"
+#include "llvm/Support/SourceMgr.h"
+
+#include <sys/stat.h>
+
 #include "ins_context_stack.h"
 #include "get_all_update.h"
 #include "parse_fill.h"
@@ -9,8 +16,6 @@
 
 namespace funcExtract {
 
-// TODO: configurations
-bool g_use_multi_thread = true;
 
 std::mutex g_dependVarMapMtx;
 std::mutex g_TimeFileMtx;
@@ -32,11 +37,11 @@ struct WorkSet_t g_visitedTgt;
 // for each of it update function, what are the arguments
 void get_all_update() {
   toCout("### Begin get_all_update ");
-  std::ofstream genTimeFile(g_path+"/up_gen_time.txt", std::ios::app);
+  std::ofstream genTimeFile(g_path+"/up_gen_time.txt");
   genTimeFile << "\n===== Begin a new run!" << std::endl;
   genTimeFile.close();
 
-  std::ofstream simplifyTimeFile(g_path+"/simplify_time.txt", std::ios::app);
+  std::ofstream simplifyTimeFile(g_path+"/simplify_time.txt");
   simplifyTimeFile <<"\n===== Begin a new run!"  << std::endl;
   simplifyTimeFile.close();
 
@@ -92,8 +97,8 @@ void get_all_update() {
   }
 
   // declaration for llvm
-  std::ofstream funcInfo(g_path+"/func_info.txt", std::ios::app);
-  std::ofstream asvInfo(g_path+"/asv_info.txt", std::ios::app);
+  std::ofstream funcInfo(g_path+"/func_info.txt");
+  std::ofstream asvInfo(g_path+"/asv_info.txt");
   //std::vector<std::string> g_fileNameVec;
   struct ThreadSafeVector_t g_fileNameVec;
   std::vector<std::thread> threadVec;
@@ -104,14 +109,14 @@ void get_all_update() {
     std::vector<std::pair<std::vector<std::string>, uint32_t>> allowedTgtVec = g_allowedTgtVec;    
     while(!g_workSet.empty() || !allowedTgtVec.empty() ) {
       bool isVec;
-      bool doSingleTgt = false;
-      bool doVecTgt = false;
+      //bool doSingleTgt = false;
+      //bool doVecTgt = false;
       std::string target;
       std::vector<std::string> tgtVec;
       // work on single register target first
       if(!g_workSet.empty()) {
         isVec = false;
-        doSingleTgt = true;
+        //doSingleTgt = true;
         auto targetIt = g_workSet.begin();
         target = *targetIt;
         g_workSet.mtxErase(targetIt);
@@ -120,7 +125,7 @@ void get_all_update() {
           continue;
       }
       else if(!allowedTgtVec.empty()){
-        doVecTgt = true;
+        //doVecTgt = true;
         isVec = true;
         tgtVec = allowedTgtVec.back().first;
         allowedTgtVec.pop_back();
@@ -176,14 +181,14 @@ void get_all_update() {
         threadVec.clear();
         while(!localWorkSet.empty() || !localWorkVec.empty()) {
           bool isVec;
-          bool doSingleTgt = false;
-          bool doVecTgt = false;
+          //bool doSingleTgt = false;
+          //bool doVecTgt = false;
           std::string target;
           std::vector<std::string> tgtVec;      
 
           if(!localWorkSet.empty()) {
             isVec = false;
-            doSingleTgt = true;
+            //doSingleTgt = true;
             auto targetIt = localWorkSet.begin();
             target = *targetIt;
             localWorkSet.erase(targetIt);
@@ -192,7 +197,7 @@ void get_all_update() {
               continue;
           }
           else if(!localWorkVec.empty()){
-            doVecTgt = true;
+            //doVecTgt = true;
             isVec = true;
             tgtVec = localWorkVec.back().first;
             localWorkVec.pop_back();
@@ -342,50 +347,75 @@ void get_update_function(std::string target,
                                      std::vector<std::pair<std::string, 
                                                            uint32_t>>>{} );
   g_dependVarMapMtx.unlock();
-  ///instrIdx++;
   g_currInstrInfo = instrInfo;
   destInfo.set_instr_name(instrInfo.name);      
   assert(!instrInfo.name.empty());
-  toCout("---  BEGIN INSTRUCTION #"+toStr(instrIdx)+" ---");
+
   std::string destNameSimp = destInfo.get_dest_name();
   remove_front_backslash(destNameSimp);
   std::string funcName = instrInfo.name+"_"+destNameSimp;
-  std::string fileName = g_path+"/"+instrInfo.name+"_"
-                         +destNameSimp+"_"+toStr(delayBound);
+  std::string fileName = UpdateFunctionGen::make_llvm_basename(destInfo, delayBound);
+  std::string cleanOptoFileName = fileName+"_clean.o3.ll";
 
-  // generate update function
-  UpdateFunctionGen UFGen;
-  UFGen.TheContext = std::make_unique<llvm::LLVMContext>();
-  UFGen.print_llvm_ir(destInfo, delayBound, instrIdx);
+  toCout("---  BEGIN INSTRUCTION #"+toStr(instrIdx)+": "+instrInfo.name+
+         "  ASV: "+destNameSimp+"  delay bound: "+toStr(delayBound)+" ---");
 
-  time_t upGenEndTime = time(NULL);  
+  // Optionally avoid the time-consuming re-generation of an existing LLVM function.
+  // This lets you incrementally add data to instr.txt and rerun this program to
+  // generate just the missing update functions. 
 
-  std::string clean("opt --instsimplify --deadargelim --instsimplify "+fileName+"_tmp.ll -S -o="+fileName+"_clean.ll");
-  std::string opto3("opt -O1 "+fileName+"_clean.ll -S -o="+fileName+"_tmp.o3.ll; opt -passes=deadargelim "+fileName+"_tmp.o3.ll -S -o="+fileName+"_clean.o3.ll; rm "+fileName+"_tmp.o3.ll");
-  toCout("** Begin clean update function");
-  system(clean.c_str());
-  toCout("** Begin simplify update function");
-  system(opto3.c_str());
-  toCout("** End simplify update function");
+  struct stat statbuf;
+  if ((!g_overwrite_existing_llvm) && stat(cleanOptoFileName.c_str(), &statbuf) == 0) {
+    toCout("Skipping re-generation of existing file "+cleanOptoFileName);
+  } else {
 
-  time_t simplifyEndTime = time(NULL);
-  uint32_t upGenTime = upGenEndTime - startTime;
-  uint32_t simplifyTime = simplifyEndTime - upGenEndTime;
-  g_TimeFileMtx.lock();
-  std::ofstream genTimeFile(g_path+"/up_gen_time.txt", std::ios::app);
-  genTimeFile << funcName+":\t"+toStr(upGenTime) << std::endl;
-  genTimeFile.close();
-  std::ofstream simplifyTimeFile(g_path+"/simplify_time.txt", std::ios::app);
-  simplifyTimeFile << funcName+":\t"+toStr(simplifyTime) << std::endl;
-  simplifyTimeFile.close();
-  g_TimeFileMtx.unlock();
+    // generate update function
+    UpdateFunctionGen UFGen;
+    UFGen.TheContext = std::make_unique<llvm::LLVMContext>();
+
+    UFGen.print_llvm_ir(destInfo, delayBound, instrIdx, fileName+"_tmp.ll");
+
+    time_t upGenEndTime = time(NULL);  
+
+    // Default g_llvm_path is blank, which means the shell will use $PATH in the usual way.
+    std::string optCmd = (g_llvm_path.length() ? g_llvm_path+"/" : "") + "opt";
+
+    std::string clean(optCmd+" --instsimplify --deadargelim --instsimplify "+fileName+"_tmp.ll -S -o="+fileName+"_clean.ll");
+    
+    //std::string opto_cmd(optCmd+" -O1 "+fileName+"_clean.ll -S -o="+fileName+"_tmp.o3.ll; opt -passes=deadargelim "+fileName+"_tmp.o3.ll -S -o="+cleanOptoFileName+"; rm "+fileName+"_tmp.o3.ll");
+
+    std::string opto_cmd(optCmd+" -O3 "+fileName+"_clean.ll -S -o="+fileName+"_tmp.o3.ll; opt -passes=deadargelim "+fileName+"_tmp.o3.ll -S -o="+cleanOptoFileName+"; rm "+fileName+"_tmp.o3.ll");
+
+    toCout("** Begin clean update function");
+    toCoutVerb(clean);
+    system(clean.c_str());
+    toCout("** Begin simplify update function");
+    toCoutVerb(opto_cmd);
+    system(opto_cmd.c_str());
+    toCout("** End simplify update function");
+
+    time_t simplifyEndTime = time(NULL);
+    uint32_t upGenTime = upGenEndTime - startTime;
+    uint32_t simplifyTime = simplifyEndTime - upGenEndTime;
+    g_TimeFileMtx.lock();
+    std::ofstream genTimeFile(g_path+"/up_gen_time.txt");
+    genTimeFile << funcName+":\t"+toStr(upGenTime) << std::endl;
+    genTimeFile.close();
+    std::ofstream simplifyTimeFile(g_path+"/simplify_time.txt");
+    simplifyTimeFile << funcName+":\t"+toStr(simplifyTime) << std::endl;
+    simplifyTimeFile.close();
+    g_TimeFileMtx.unlock();
+  }
 
   std::vector<std::pair<std::string, uint32_t>> argVec;
-  bool usefulFunc = read_clean_o3(fileName+"_clean.o3.ll", argVec, fileName+"_clean.simp.ll", funcName);
+  bool usefulFunc = read_clean_optimized(cleanOptoFileName, argVec, fileName+"_clean.simp.ll", funcName);
 
   std::string llvmFileName = instrInfo.name+"_"+destInfo.get_dest_name()
                              +"_"+toStr(delayBound)+".ll";
-  system(("mv "+fileName+"_clean.simp.ll "+g_path+"/"+llvmFileName).c_str());
+  std::string move("mv "+fileName+"_clean.simp.ll "+g_path+"/"+llvmFileName);
+  toCoutVerb(move);
+  system(move.c_str());
+
   if(usefulFunc) {
     g_fileNameVec.push_back(llvmFileName);        
     toCout("----- For instr "+instrInfo.name+", "+target+" is affected!");
@@ -401,6 +431,7 @@ void get_update_function(std::string target,
   else {
     toCout("----- For instr "+instrInfo.name+", "+target+" is NOT affected!");
   }
+
   for(auto pair : argVec) {
     std::string reg = pair.first;
     //if(reg.find("cpuregs[3]") != std::string::npos
@@ -446,11 +477,6 @@ uint32_t get_delay_bound(std::string var, std::vector<std::string> tgtVec,
                                                uint32_t>> allowedTgtVec,
                          std::map<std::string, std::vector<uint32_t>> allowedTgt) {
   assert(var.empty() || tgtVec.empty());
-  if(allowedTgt[var].size() != 1) {
-    toCout("Error: delay number size is not 1: "+var);
-    for(uint32_t delay: allowedTgt[var])
-      toCout(delay);
-  }
   uint32_t delayBound = instrInfo.delayBound;
   if(var.empty() && !tgtVec.empty()) {
     for(auto pair : allowedTgtVec) {
@@ -469,12 +495,16 @@ uint32_t get_delay_bound(std::string var, std::vector<std::string> tgtVec,
     }
   }
   // if is not array
-  else if(instrInfo.delayExceptions.find(var) != instrInfo.delayExceptions.end() ) {
+  else if(!var.empty() && instrInfo.delayExceptions.count(var)) {
     delayBound = instrInfo.delayExceptions[var];
   }
-  else if(allowedTgt.find(var) != allowedTgt.end() 
-          && !allowedTgt[var].empty()) {
+  else if(!var.empty() && allowedTgt.count(var) && !allowedTgt[var].empty()) {
     delayBound = g_allowedTgt[var].front();
+    if(allowedTgt[var].size() > 1) {
+      toCout("Error: delay number size is not 1: "+var);
+      for(uint32_t delay: allowedTgt[var])
+        toCout(delay);
+    }
   }
   return delayBound;
 }
@@ -484,7 +514,7 @@ uint32_t get_delay_bound(std::string var, std::vector<std::string> tgtVec,
 // returned argVec is empty if the update function just returns 0
 // generate a new file
 // Assune: if no internal function is found, then this function is discarded
-bool read_clean_o3(std::string fileName, 
+bool read_clean_optimized_old(std::string fileName, 
                    std::vector<std::pair<std::string, uint32_t>> &argVec,
                    std::string outFileName,
                    std::string funcNameIn) {
@@ -494,8 +524,8 @@ bool read_clean_o3(std::string fileName,
   std::smatch m;
   std::string argList;
   bool seeFuncDef = false;
-  bool seeReturn = false;
-  bool returnConst = false;
+  //bool seeReturn = false;
+  //bool returnConst = false;
   std::regex pDef("^define internal fastcc (\\S+) @(\\S+)\\((.*)\\) unnamed_addr #1 \\{$");  
   std::regex pVecDef(
     "^define internal fastcc \\[(\\d+) x i(\\d+)\\] @(\\S+)\\((.*)\\) unnamed_addr #1 \\{$"
@@ -565,7 +595,7 @@ bool read_clean_o3(std::string fileName,
     else attributeLine = line;
   }
   if(internalExist) {
-    uint32_t pos = 0;
+    //uint32_t pos = 0;
     uint32_t startPos = 0;
     while(startPos < argList.size()) {
       uint32_t dotPos = argList.find(",", startPos);
@@ -639,6 +669,213 @@ bool read_clean_o3(std::string fileName,
 }
 
 
+// Check if this type is small enough to be passed in a register.
+// BTW, we don't use LLVM floats and doubles...
+static bool
+isSmallType(const llvm::Type *type) {
+  return (type->isIntegerTy() && type->getIntegerBitWidth() <= 64);
+}
+
+
+
+
+// Make the wrapper function for C/C++ interfacing
+static llvm::Function*
+create_wrapper_function(llvm::Function *mainFunc) {
+
+  llvm::LLVMContext& Context = mainFunc->getContext();
+
+  // First build a FunctionType for the wrapper function: it has pointers for
+  // every arg bigger than 64 bits.  If the return value is bigger than 64 bits,
+  // one more pointer arg is added for it, and the wrapper function returns void.
+
+  std::vector<llvm::Type *> wrapperArgTy;
+
+  for (const llvm::Argument& arg : mainFunc->args()) {
+    llvm::Type *type = arg.getType();
+    if (isSmallType(type)) {
+      wrapperArgTy.push_back(type);
+    } else {
+      wrapperArgTy.push_back(llvm::PointerType::getUnqual(type));
+    }
+  }
+
+  llvm::Type* mainRetTy = mainFunc->getReturnType();
+
+  // Deal with small vs large return values
+  llvm::Type* wrapperRetTy = nullptr;
+
+  if (isSmallType(mainRetTy)) {
+    wrapperRetTy = mainRetTy;
+  } else {
+    // Add one more pointer argument for return value.
+    wrapperArgTy.push_back(llvm::PointerType::getUnqual(mainRetTy));
+    wrapperRetTy = llvm::Type::getVoidTy(Context);
+  }
+
+  llvm::FunctionType *wrapperFT =
+    llvm::FunctionType::get(wrapperRetTy, wrapperArgTy, false);
+
+  llvm::Function *wrapperFunc =
+    llvm::Function::Create(wrapperFT, llvm::Function::ExternalLinkage, 
+                             mainFunc->getName()+"_wrapper", mainFunc->getParent());
+
+  // This is what the LLVM optimization would do if it ran on the wrapper function.
+  // But we need to be sure that it is consistent with the top-level C/C++ compiler.
+  wrapperFunc->setCallingConv(mainFunc->getCallingConv());
+
+  // Probably unnecessary, since all optimization has been done.
+  wrapperFunc->addFnAttr(llvm::Attribute::NoInline);
+
+  // Set the names of the wrapper function args, based on the main function arg names
+  for (const llvm::Argument& mainArg : mainFunc->args()) {
+    llvm::Argument* wrapperArg = wrapperFunc->getArg(mainArg.getArgNo());
+
+    if (isSmallType(mainArg.getType())) {
+      wrapperArg->setName(mainArg.getName());
+    } else {
+      // Give the pointer args a special name
+      wrapperArg->setName(mainArg.getName()+"ptr_");
+      // Specify that they can never be null (actually in C++, they will be const references).
+      wrapperArg->addAttr(llvm::Attribute::NonNull);
+
+    }
+  }
+
+  llvm::Argument* wrapperLastArg = wrapperFunc->arg_end()-1;
+
+  // Deal with the extra wrapper arg that handles big return types
+  if (!isSmallType(mainRetTy)) {
+    wrapperLastArg->setName(llvm::Twine("_return_val_ptr_"));
+    // Specify that it can never be null (actually in C++, it will be a (non-const) reference).
+    wrapperLastArg->addAttr(llvm::Attribute::NonNull);
+  }
+
+
+  // Fill in the contents of wrapperFunc
+  std::shared_ptr<llvm::IRBuilder<>> Builder = std::make_unique<llvm::IRBuilder<>>(Context);
+  auto wrapperBB = llvm::BasicBlock::Create(Context, "wrapper_bb", wrapperFunc);
+  Builder->SetInsertPoint(wrapperBB);  
+
+  // Pass the wrapper args down to the main function. For ones that
+  // are provided via pointers, dereference the pointers.
+  std::vector<llvm::Value*> callArgs;
+  for (llvm::Argument& mainArg : mainFunc->args()) {
+    llvm::Type *mainArgType = mainArg.getType();
+    llvm::Argument* wrapperArg = wrapperFunc->getArg(mainArg.getArgNo());
+
+    llvm::Value *argVal = nullptr;
+    if (isSmallType(mainArgType)) {
+      // Pass the arg by value
+      argVal = wrapperArg;
+    } else {
+      // Dereference the pointer
+      argVal = Builder->CreateLoad(mainArgType, wrapperArg);
+    }
+    callArgs.push_back(argVal);
+  }
+  
+  // call mainFunc from wrapperFunc
+  llvm::CallInst *call = Builder->CreateCall(mainFunc->getFunctionType(), mainFunc, callArgs);
+  call->setCallingConv(mainFunc->getCallingConv());
+
+  if (isSmallType(mainRetTy)) {
+    // Return the return value of the call to mainFunc
+    Builder->CreateRet(call);
+  } else {
+    // Add store of return value to last pointer arg
+    Builder->CreateStore(call, wrapperLastArg);
+    Builder->CreateRetVoid();
+  }
+
+  llvm::verifyFunction(*wrapperFunc);
+
+  return wrapperFunc;
+}
+
+
+
+
+// returned argVec is empty if the update function just returns 0
+// generate a new file
+// Assune: if no internal function is found, then this function is discarded
+bool read_clean_optimized(std::string fileName, 
+                   std::vector<std::pair<std::string, uint32_t>> &argVec,
+                   std::string outFileName,
+                   std::string funcNameIn) {
+
+  // Load in the input LLVM file
+  llvm::SMDiagnostic Err;
+  llvm::LLVMContext Context;
+  std::unique_ptr<llvm::Module> M = llvm::parseIRFile(fileName, Err, Context);
+  if (!M) {
+    Err.print("func_extract", llvm::errs());
+    return false;
+  }
+
+  llvm::Function *topFunc = M->getFunction("top_function");
+  llvm::Function *mainFunc = M->getFunction(funcNameIn);
+  if (topFunc) {
+    // Check that the main function wasn't accidentally optimized away.  If it
+    // doesn't exist, rename topFunc to serve as a replacement.
+    if (!mainFunc) {
+      topFunc->setName(funcNameIn);
+      toCout("Warning: main function apparently optimized away, top_function renamed to "+funcNameIn);
+      mainFunc = topFunc;
+      mainFunc->setCallingConv(llvm::CallingConv::Fast); 
+    } else {
+      // top_function is unneeded - delete it.
+      topFunc->eraseFromParent();
+      toCoutVerb("Erased unneeded top_function");
+    }
+  } else {
+    // Not a problem, but how did it happen?
+    toCout("Curious: can't find top_function!");
+  }
+
+  if (!mainFunc) {
+    toCout("Can't find main function!");
+    return false;
+  }
+
+  // It is possible for there to be dead args in mainFunc, normally because topFunc
+  // has been re-purposed as the mainFunc.  This is despite all the LLVM optimizations we do...
+  for (llvm::Argument& arg : mainFunc->args()) {
+    if (arg.getNumUses() == 0) {
+      std::string argname = arg.getName().str();
+      toCout(funcNameIn+" arg "+argname+" is unused!");
+      // TODO: get rid of them
+    }
+  }
+
+
+  // Push information about the mainFunc args to argVec.
+  for (llvm::Argument& arg : mainFunc->args()) {
+    std::string argname = arg.getName().str();
+
+    // Extract the ASV name from the argument name.
+    // Note that the name will not have quotes or backslashes, like you would see in the textual IR.
+    uint32_t pos = argname.find(DELIM, 0);
+    std::string var = argname.substr(0, pos);
+
+    argVec.push_back(std::make_pair(var, arg.getType()->getPrimitiveSizeInBits()));
+  }
+
+  // Add a C-compatible wrapper function that calls the main function.
+  create_wrapper_function(mainFunc);
+
+  // Write out the modified IR data to a new file.
+  std::error_code EC;
+  llvm::raw_fd_ostream OS(outFileName, EC);
+  OS << *M;
+  OS.close();
+
+  return true;
+}
+
+
+
+
 void print_func_info(std::ofstream &output) {
   g_dependVarMapMtx.lock();
   for(auto pair1 : g_dependVarMap) {
@@ -663,8 +900,8 @@ void print_asv_info(std::ofstream &output) {
 
 
 void print_llvm_script( std::string fileName) {
-  std::ofstream output(fileName, std::ios::app);
-  output << "clang ila.c -emit-llvm -S -o main.ll" << std::endl;
+  std::ofstream output(fileName);
+  output << "clang ila.cpp -emit-llvm -S -o main.ll" << std::endl;
   std::string line = "llvm-link -v main.ll \\";
   output << line << std::endl;
   for(auto it = g_fileNameVec.begin(); it != g_fileNameVec.end(); it++) {

@@ -308,7 +308,7 @@ void clean_file(std::string fileName, bool useLogic) {
   while( std::getline(cleanFileInput, line) ) {
     toCoutVerb(line);
     if(line.find("tmp_div") != std::string::npos) {
-      toCout("FIND IT!");
+      toCoutVerb("FIND IT!");
     }
 
     /// skipe comment line
@@ -657,7 +657,7 @@ void analyze_reg_path( std::string fileName ) {
   while( std::getline(input, line) ) {
     //toCout(line);
     if(line.find("27'b000000000000000000000000000, of, 32'b00000000000000000000000000000000") != std::string::npos) {
-      toCout("FIND IT!");
+      toCoutVerb("FIND IT!");
     }
     uint32_t choice = parse_verilog_line(line, true);
     switch(choice) {
@@ -1100,7 +1100,7 @@ void add_file_taints(std::string fileName, std::map<std::string, std::vector<std
   while( std::getline(input, line) ) {
     toCout(line);
     if(line.find("assign NewNBIte13 = ap_rst_n ? ap_NS_fsm : 4'h1;") != std::string::npos)
-      toCout("Find it!");
+      toCoutVerb("Find it!");
     lineNo++;
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       add_case_taints_limited(input, output, line);
@@ -1987,7 +1987,7 @@ void convert_nb_if_to_ite(std::ifstream &input,
   std::string line2;
   std::getline(input, line2);
   if(line2.find("ap_CS_fsm") != std::string::npos)
-    toCout("Find it!");
+    toCoutVerb("Find it!");
   std::smatch m;
   if(!std::regex_match(line2, m, pNonblockIf)) {
     output << line << std::endl;  

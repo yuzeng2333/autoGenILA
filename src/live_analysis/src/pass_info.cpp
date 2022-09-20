@@ -239,7 +239,7 @@ void process_pass_info(std::string fileName) {
   while(std::getline(input, line)) {
     //toCout(line);
     if(line.find("27'b000000000000000000000000000, of, 32'b00000000000000000000000000000000") != std::string::npos) {
-      toCout("FIND IT!");
+      toCoutVerb("FIND IT!");
     }
     uint32_t choice = parse_verilog_line(line, true);
     switch (choice) {
@@ -571,7 +571,7 @@ void go_forward(std::string startVarAndSlice, std::vector<std::pair<std::string,
   //toCout("GO_FORWARD from: "+startVarAndSlice);
   //assert(frontCondPairVec.empty());
   if(startVarAndSlice.compare("fangyuan88") == 0) {
-    toCout("Find it!");
+    toCoutVerb("Find it!");
   }
   std::string startVar, startVarSlice;
   split_slice(startVarAndSlice, startVar, startVarSlice);

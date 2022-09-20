@@ -237,7 +237,7 @@ void clean_file(std::string fileName, bool useLogic) {
   while( std::getline(cleanFileInput, line) ) {
     //toCout(line);
     if(line.find("S4 S4_0 (") != std::string::npos) {
-      toCout("FIND IT!");
+      toCoutVerb("FIND IT!");
     }
 
     /// skipe comment line
@@ -603,7 +603,7 @@ void analyze_reg_path( std::string fileName ) {
   while( std::getline(input, line) ) {
     //toCout(line);
     if(line.find("27'b000000000000000000000000000, of, 32'b00000000000000000000000000000000") != std::string::npos) {
-      toCout("FIND IT!");
+      toCoutVerb("FIND IT!");
     }
     uint32_t choice = parse_verilog_line(line, true);
     switch(choice) {
@@ -825,7 +825,7 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   if(line.empty())
     return NONE;
   if(line.find("addedVar0") != std::string::npos)
-    toCout("Find it!");
+    toCoutVerb("Find it!");
   if(line.substr(0, 1) == "X") {
     toCout("begin debug");
     ignoreWrongOp = true;
@@ -1076,7 +1076,7 @@ void add_file_taints(std::string fileName,
   while( std::getline(input, line) ) {
     toCoutVerb(line);
     if(line.find("_000_") != std::string::npos)
-      toCout("Find it!");
+      toCoutVerb("Find it!");
     lineNo++;
     if ( std::regex_match(line, match, pAlwaysComb) ) {
       add_case_taints_limited(input, output, line);
@@ -1312,7 +1312,7 @@ void add_module_name(std::string fileName,
   g_use_end_sig = g_use_end_sig && !g_use_jasper;
   if(g_use_end_sig) moduleInputs.push_back(END_SIG);  
   if(moduleName == "hls_target_Loop_1_proc") {
-    toCout("Find it!");
+    toCoutVerb("Find it!");
   }
   if(g_check_invariance == CheckTwoVal) moduleInputs.push_back(ASSERT_PROTECT);  
   if(!isTop) moduleInputs.push_back("rst_zy");
@@ -2058,11 +2058,11 @@ void extend_module_instantiation(std::ifstream &input,
   }
   std::string localModuleName = m.str(2);
   if(localModuleName.compare("hls_target_Loop_1_proc") == 0)
-    toCout("find it!");
+    toCoutVerb("find it!");
 
   std::string instanceName = m.str(3);
   if(instanceName.find("buffer") != std::string::npos) {
-    toCout("Find it!");
+    toCoutVerb("Find it!");
   }
   if(g_mod2instMap.find(moduleName) != g_mod2instMap.end()) {
     g_mod2instMap[moduleName].emplace(instanceName, localModuleName);
@@ -2312,7 +2312,7 @@ bool extract_concat(std::string line,
                     std::string &addedVarAssign, 
                     bool isFuncCall) {
   if(line.find("alu_out") != std::string::npos) {
-    toCout("find it");
+    toCoutVerb("find it");
   }
   std::string retStr = "";
   std::smatch m;
@@ -2444,7 +2444,7 @@ void gen_assert_property(std::ofstream &output) {
       if(std::regex_search(out, m, pRFlag)) {
         std::string var = m.str(1);        
         if(var == "cpu_state") {
-          toCout("Find it!");
+          toCoutVerb("Find it!");
         }
         g_mod2assertMap[moduleName].push_back(var);
 

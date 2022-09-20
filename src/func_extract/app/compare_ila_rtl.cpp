@@ -114,7 +114,7 @@ void compare_results() {
   while(idx < len) {
     for(auto pair : rtlValues) {
       if(idx == 10 && pair.first == "mem_wdata")
-        toCout("Find it!");
+        toCoutVerb("Find it!");
       uint32_t rtlVal = pair.second[idx];
       if(ignoredASV.find(pair.first) != ignoredASV.end()) continue;
       if(ilaValues.find(pair.first) == ilaValues.end()) {

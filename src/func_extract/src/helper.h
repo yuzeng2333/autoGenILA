@@ -9,6 +9,7 @@
 #include "types.h"
 #include "global_data_struct.h"
 #include <cctype>
+#include "llvm/ADT/APInt.h"
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/IR/BasicBlock.h"
@@ -46,14 +47,18 @@ using namespace taintGen;
 
 namespace funcExtract {
 
-extern std::regex pHex;
-extern std::regex pDec;
-extern std::regex pBin;
+extern const std::regex pHex;
+extern const std::regex pDec;
+extern const std::regex pBin;
 
 llvm::IntegerType* llvmWidth(uint32_t width, std::shared_ptr<llvm::LLVMContext> &c);
 
 llvm::Value* llvmInt(uint32_t value, uint32_t width, 
                      std::shared_ptr<llvm::LLVMContext> &c);
+
+llvm::Value* llvmInt(llvm::APInt value,
+                     std::shared_ptr<llvm::LLVMContext> &c);
+
 
 llvm::Value* zext(llvm::Value* v1, uint32_t width,
                  std::shared_ptr<llvm::LLVMContext> &c,
@@ -70,6 +75,8 @@ llvm::Value* long_bv_val(std::string formedBinVar, context &c,
 bool is_formed_num(std::string num);
 
 uint64_t hdb2int(std::string num);
+
+llvm::APInt hdb2apint(std::string num, unsigned widthOverride=0);
 
 uint32_t get_formed_width(std::string num);
 

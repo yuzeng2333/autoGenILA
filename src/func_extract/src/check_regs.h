@@ -40,6 +40,7 @@ class DestInfo {
     bool isSingleMem;
     std::string get_dest_name();
     llvm::Type* get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext);
+    llvm::Type* get_ret_element_type(std::shared_ptr<llvm::LLVMContext> TheContext);
     std::vector<std::string> get_no_slice_name();
     std::string get_mod_name();
     std::string get_ins_name();
@@ -160,9 +161,13 @@ class UpdateFunctionGen {
     std::shared_ptr<ModuleDynInfo_t>
     get_dyn_data(std::shared_ptr<ModuleInfo_t> curMod);
     
+    static std::string make_llvm_basename(DestInfo &destInfo,
+                                  const uint32_t bound);
+
     void print_llvm_ir(DestInfo &destInfo, 
                        const uint32_t bound, 
-                       uint32_t instrIdx);
+                       uint32_t instrIdx,
+                       std::string fileName);
     
     
     llvm::Value* var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, 

@@ -13,7 +13,7 @@ namespace taintGen {
 
 bool VarWidth::var_width_insert(std::string var, uint32_t begin, uint32_t end) {
   // remove all blanks
-  std::regex pName("(\\s*)?(\\S+)(\\s*)?");
+  static const std::regex pName("(\\s*)?(\\S+)(\\s*)?");
   std::smatch m;
   if(!std::regex_match(var, m, pName)) {
     std::cout << "Not a valid key for insert:" + var << std::endl;
@@ -35,7 +35,7 @@ uint32_t VarWidth::get_from_var_width(std::string var, std::string line) {
   if( var.front() == ' '
       || var.back() == ' ' ) {
     //std::cout << "the key: " + var + " does not exist!" << std::endl;
-    std::regex pName("(\\s*)?(\\S+)(\\s*)?");
+    static const std::regex pName("(\\s*)?(\\S+)(\\s*)?");
     std::smatch m;
     if(!std::regex_match(var, m, pName)) {
       std::cout << "Not a valid key for read: |" + var + "|" << std::endl;
@@ -63,7 +63,7 @@ uint32_t VarWidth::get_high_idx(std::string var, std::string line) {
   if( var.front() == ' '
       || var.back() == ' ' ) {
     //std::cout << "the key: " + var + " does not exist!" << std::endl;
-    std::regex pName("(\\s*)?(\\S+)(\\s*)?");
+    static const std::regex pName("(\\s*)?(\\S+)(\\s*)?");
     std::smatch m;
     if(!std::regex_match(var, m, pName)) {
       std::cout << "Not a valid key for read:" + var << std::endl;
@@ -93,7 +93,7 @@ uint32_t VarWidth::get_low_idx(std::string var, std::string line) {
   if( var.front() == ' '
       || var.back() == ' ' ) {
     //std::cout << "the key: " + var + " does not exist!" << std::endl;
-    std::regex pName("(\\s*)?(\\S+)(\\s*)?");
+    static const std::regex pName("(\\s*)?(\\S+)(\\s*)?");
     std::smatch m;
     if(!std::regex_match(var, m, pName)) {
       std::cout << "Not a valid key for read:" + var << std::endl;
@@ -123,7 +123,7 @@ std::pair<uint32_t, uint32_t> VarWidth::get_idx_pair(std::string var, std::strin
   if( var.front() == ' '
       || var.back() == ' ' ) {
     //std::cout << "the key: " + var + " does not exist!" << std::endl;
-    std::regex pName("(\\s*)?(\\S+)(\\s*)?");
+    static const std::regex pName("(\\s*)?(\\S+)(\\s*)?");
     std::smatch m;
     if(!std::regex_match(var, m, pName)) {
       std::cout << "Not a valid key for read:" + var << std::endl;
@@ -141,7 +141,7 @@ std::pair<uint32_t, uint32_t> VarWidth::get_idx_pair(std::string var, std::strin
 
 
 bool VarWidth::force_insert(std::string var, uint32_t begin, uint32_t end) {
-  std::regex pName("(\\s*)?(\\S+)(\\s*)?");
+  static const std::regex pName("(\\s*)?(\\S+)(\\s*)?");
   std::smatch m;
   if(!std::regex_match(var, m, pName)) {
     std::cout << "Not a valid key for insert:" + var << std::endl;

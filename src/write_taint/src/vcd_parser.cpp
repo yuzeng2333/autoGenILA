@@ -30,7 +30,7 @@ void hierarchical_vcd_parser(std::string fileName) {
   bool isFirstInstance = true;
   while(std::getline(input, line)) {
     if(line == "bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n240")
-      toCout("Find it!");
+      toCoutVerb("Find it!");
     toCout(line);
     if(line.substr(0, 6).compare("$scope") == 0) {
       if(!std::regex_match(line, m, pScope)) {
@@ -73,7 +73,7 @@ void hierarchical_vcd_parser(std::string fileName) {
       std::string name = m.str(2);
       std::string var = m.str(3);
       if(var == "state_out")
-        toCout("Find it");
+        toCoutVerb("Find it");
       nameVarMap.emplace(name, std::make_pair(moduleNameStack.top(), var));
     }
     else if(state == readValue) {
@@ -98,7 +98,7 @@ void hierarchical_vcd_parser(std::string fileName) {
       std::string modName = moduleVarPair.first;
       std::string varName = moduleVarPair.second;
       if(modName == "final_round" && varName == "state_out")
-        toCout("Find it");
+        toCoutVerb("Find it");
       if(g_rstValMap.find(modName) == g_rstValMap.end())
         g_rstValMap.emplace(modName, std::unordered_map<std::string, std::string>{{varName, rstVal}});
       else if(g_rstValMap[modName].find(varName) == g_rstValMap[modName].end())
