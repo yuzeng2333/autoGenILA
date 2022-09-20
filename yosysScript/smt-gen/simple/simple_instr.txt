@@ -1,3 +1,0 @@
-1: rstn = 0, in = D
-2: rstn = 1, in = D
-

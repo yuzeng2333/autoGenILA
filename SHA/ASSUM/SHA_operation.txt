@@ -1,7 +1,0 @@
-reset_n
-block
-512
-init, next
-1, 1
-ready_r, digest_r, digest_valid
-1, 160, 1

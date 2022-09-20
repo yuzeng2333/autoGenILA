@@ -1,2 +1,0 @@
-diff:
-	iverilog tb.v
