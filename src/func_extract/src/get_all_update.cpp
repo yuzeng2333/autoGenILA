@@ -355,7 +355,7 @@ void get_update_function(std::string target,
 
   std::string funcName = instrInfo.name+"_"+destSimpleName;
   std::string fileName = UpdateFunctionGen::make_llvm_basename(destInfo, delayBound);
-  std::string cleanOptoFileName = fileName+"_clean.o3.ll";
+  std::string cleanOptoFileName = fileName+".clean.o3.ll";
   //std::string llvmFileName = instrInfo.name+"_"+destInfo.get_dest_name()
                              //+"_"+toStr(delayBound)+".ll";
   std::string llvmFileName = fileName+".ll";
@@ -376,18 +376,18 @@ void get_update_function(std::string target,
     UpdateFunctionGen UFGen;
     UFGen.TheContext = std::make_unique<llvm::LLVMContext>();
 
-    UFGen.print_llvm_ir(destInfo, delayBound, instrIdx, fileName+"_tmp.ll");
+    UFGen.print_llvm_ir(destInfo, delayBound, instrIdx, fileName+".tmp.ll");
 
     time_t upGenEndTime = time(NULL);  
 
     // Default g_llvm_path is blank, which means the shell will use $PATH in the usual way.
     std::string optCmd = (g_llvm_path.length() ? g_llvm_path+"/" : "") + "opt";
 
-    std::string clean(optCmd+" --instsimplify --deadargelim --instsimplify "+fileName+"_tmp.ll -S -o="+fileName+"_clean.ll");
+    std::string clean(optCmd+" --instsimplify --deadargelim --instsimplify "+fileName+".tmp.ll -S -o="+fileName+".clean.ll");
     
-    //std::string opto_cmd(optCmd+" -O1 "+fileName+"_clean.ll -S -o="+fileName+"_tmp.o3.ll; opt -passes=deadargelim "+fileName+"_tmp.o3.ll -S -o="+cleanOptoFileName+"; rm "+fileName+"_tmp.o3.ll");
+    //std::string opto_cmd(optCmd+" -O1 "+fileName+".clean.ll -S -o="+fileName+".tmp.o3.ll; opt -passes=deadargelim "+fileName+".tmp.o3.ll -S -o="+cleanOptoFileName+"; rm "+fileName+".tmp.o3.ll");
 
-    std::string opto_cmd(optCmd+" -O3 "+fileName+"_clean.ll -S -o="+fileName+"_tmp.o3.ll; opt -passes=deadargelim "+fileName+"_tmp.o3.ll -S -o="+cleanOptoFileName+"; rm "+fileName+"_tmp.o3.ll");
+    std::string opto_cmd(optCmd+" -O3 "+fileName+".clean.ll -S -o="+fileName+".tmp.o3.ll; opt -passes=deadargelim "+fileName+".tmp.o3.ll -S -o="+cleanOptoFileName+"; rm "+fileName+".tmp.o3.ll");
 
     toCout("** Begin clean update function");
     toCoutVerb(clean);
@@ -422,10 +422,10 @@ void get_update_function(std::string target,
   } else {
 
     toCout("** Begin read_clean_optimize");
-    usefulFunc = read_clean_optimized(cleanOptoFileName, argVec, fileName+"_clean.simp.ll", funcName);
+    usefulFunc = read_clean_optimized(cleanOptoFileName, argVec, fileName+".clean.simp.ll", funcName);
     toCout("** End read_clean_optimize");
 
-    std::string move("mv "+fileName+"_clean.simp.ll "+g_path+"/"+llvmFileName);
+    std::string move("mv "+fileName+".clean.simp.ll "+g_path+"/"+llvmFileName);
     toCoutVerb(move);
     system(move.c_str());
   }

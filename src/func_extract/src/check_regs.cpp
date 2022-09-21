@@ -120,7 +120,7 @@ void check_all_regs() {
         destInfo.set_module_name(subMod->name);
       }
 
-      std::string fileName = UFGen.make_llvm_basename(destInfo, cycleCnt) + "_tmp.ll";
+      std::string fileName = UFGen.make_llvm_basename(destInfo, cycleCnt) + ".tmp.ll";
       UFGen.print_llvm_ir(destInfo, cycleCnt, i-1, fileName);
       //print_llvm_ir_without_submodules(oneWriteAsv, cycleCnt-1, i-1);
       g_maxDelay = cycleCnt;
@@ -137,7 +137,7 @@ void check_all_regs() {
       else
         destInfo.set_module_name(g_topModule);
 
-      std::string fileName = UFGen.make_llvm_basename(destInfo, cycleCnt) + "_tmp.ll";
+      std::string fileName = UFGen.make_llvm_basename(destInfo, cycleCnt) + ".tmp.ll";
       UFGen.print_llvm_ir(destInfo, cycleCnt, i-1, fileName);
       g_maxDelay = cycleCnt;    
     }
