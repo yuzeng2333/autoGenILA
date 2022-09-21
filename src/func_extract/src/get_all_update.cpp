@@ -251,15 +251,6 @@ void get_update_function(std::string target,
                          bool isVec,
                          InstrInfo_t instrInfo,
                          uint32_t instrIdx) {
-                         //std::map<std::string,
-                         //         std::map<std::string,
-                         //                  std::vector<std::pair<std::string,
-                         //                                        uint32_t>>>> &dependVarMap,
-                         //std::map<std::string, uint32_t> &asvSet,
-                         //std::ofstream addedWorkSetFile, 
-                         //struct WorkSet_t &g_workSet,
-                         //std::shared_ptr<ModuleInfo_t> g_topModuleInfo) {
-                         //struct ThreadSafeVector_t &g_fileNameVec) {
 
   time_t startTime = time(NULL);
 
@@ -270,11 +261,7 @@ void get_update_function(std::string target,
     toCout("---  BEGIN Target: "+target+" ---");
     if(target.find("puregs[2]") != std::string::npos)
       toCoutVerb("Find it!");
-    ///else continue;
-    ///g_workSet.erase(targetIt);
-    ///if(g_visitedTgt.find(target) != g_visitedTgt.end()
-    ///   || g_skippedOutput.find(target) != g_skippedOutput.end())
-    ///  continue;
+
     if(target.find(".") == std::string::npos 
        || target.substr(0, 1) == "\\") {
       uint32_t width = get_var_slice_width_simp(target, 
@@ -305,11 +292,17 @@ void get_update_function(std::string target,
     destInfo.isVector = false;
   }
   else {
-    // when g_workSet is done, work on the vector of target registers
+    // work on the vector of target registers
     destInfo.isVector = true;
+
+    assert(vecWorkSet.size() > 1);
+
+    // Build a string to represent the target vector in messages, func_info.txt, etc.
+    // It must be possible to parse the first element's name from the string.
     target = "{ ";
     for(std::string tgt: vecWorkSet) target = target + tgt + ", ";
     target += "}";
+
     destInfo.set_dest_vec(vecWorkSet);
     std::string firstASV = vecWorkSet.front();
     if(isMem(firstASV)) destInfo.isMemVec = true;
@@ -809,6 +802,80 @@ create_wrapper_function(llvm::Function *mainFunc) {
 }
 
 
+static llvm::Function *remove_dead_args(llvm::Function *func) {
+  // It is possible for there to be dead args in mainFunc, normally because topFunc
+  // has been re-purposed as the mainFunc.  This is despite all the LLVM optimizations we do...
+  // This function removes any unused args from the given function.
+  //
+  // This task is greatly simplified by the fact that the function is not being called, 
+  // and it does not have any unusual or complex characteristics.
+  // For a solution to the more general dead argument elimination problem, see:
+  // llvm/lib/Transforms/IPO/DeadArgumentElimination.cpp
+
+  // First build a new FunctionType that does not contain the dead args.
+
+  std::vector<llvm::Type *> newArgTy;
+
+  bool hasDeadArgs = false;
+
+  for (const llvm::Argument& arg : func->args()) {
+    if (arg.getNumUses() > 0) {
+      llvm::Type *type = arg.getType();
+      newArgTy.push_back(type);
+    } else {
+      hasDeadArgs = true; 
+    }
+  }
+
+  if (!hasDeadArgs) {
+    return func;  // No dead args, nothing to do
+  }
+
+  // We're commited to creating a new function to replace the original
+
+  llvm::Type* retTy = func->getReturnType();
+  llvm::FunctionType *newFT =
+    llvm::FunctionType::get(retTy, newArgTy, false);
+
+  // Create the new function body and insert it into the module...
+  llvm::Function *newFunc =
+    llvm::Function::Create(newFT, func->getLinkage(), func->getAddressSpace(),
+                           "", func->getParent());
+  newFunc->copyAttributesFrom(func);
+
+  // Steal the orignal function's name
+  newFunc->takeName(func);
+
+  // Handled by copying of attributes?
+  //newFunc->setCallingConv(func->getCallingConv());
+
+  // Now move the contents of the original function into the new one.
+  newFunc->getBasicBlockList().splice(newFunc->begin(), func->getBasicBlockList());
+
+  // Set the names of the new function args, based on the original function arg names
+  int newArgNo = 0;
+  for (llvm::Argument& origArg : func->args()) {
+    if (origArg.getNumUses() > 0) {
+      // Create corresponding arg in the new function.
+      llvm::Argument* newArg = newFunc->getArg(newArgNo++);
+      // Make the usages of the original arg refer to the new one.
+      origArg.replaceAllUsesWith(newArg);
+
+      // Steal the original arg's name
+      newArg->takeName(&origArg);
+
+      // TODO: Copy arg attributes?  (Sort of tricky)
+    }
+  }
+
+  // Get rid of the stripped remains of the original function.
+  func->eraseFromParent();
+
+  return newFunc;
+
+}
+
+
 
 
 // returned argVec is empty if the update function just returns 0
@@ -835,9 +902,14 @@ bool read_clean_optimized(std::string fileName,
     // doesn't exist, rename topFunc to serve as a replacement.
     if (!mainFunc) {
       topFunc->setName(funcNameIn);
+      topFunc->setCallingConv(llvm::CallingConv::Fast); 
+
+      // There are likely to be many dead args in topFunc. 
+      topFunc = remove_dead_args(topFunc);
+
       toCout("Warning: main function apparently optimized away, top_function renamed to "+funcNameIn);
       mainFunc = topFunc;
-      mainFunc->setCallingConv(llvm::CallingConv::Fast); 
+      topFunc = nullptr;
     } else {
       // top_function is unneeded - delete it.
       topFunc->eraseFromParent();
@@ -853,13 +925,11 @@ bool read_clean_optimized(std::string fileName,
     return false;
   }
 
-  // It is possible for there to be dead args in mainFunc, normally because topFunc
-  // has been re-purposed as the mainFunc.  This is despite all the LLVM optimizations we do...
+  // See if any dead arg elimination actually worked.
   for (llvm::Argument& arg : mainFunc->args()) {
     if (arg.getNumUses() == 0) {
       std::string argname = arg.getName().str();
       toCout(funcNameIn+" arg "+argname+" is unused!");
-      // TODO: get rid of them
     }
   }
 

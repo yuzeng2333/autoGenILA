@@ -103,6 +103,10 @@ void read_func_info(std::string fileName,
           g_instrInfo[idx].funcTypes.emplace(target, type);
       }
       else { // target is an array
+        // Pick the first variable name from the string. its name and width will
+        // be used to represent the entire array.
+
+        // The string is of the form: "Target:{ var0, var1, var2, var3, varN, }"
         std::string targetArr = line.substr(8);
         targetArr.pop_back(); // remove the last }
         targetArr.pop_back();
@@ -110,10 +114,21 @@ void read_func_info(std::string fileName,
         std::vector<std::string> targetVec;
         split_by(targetArr, ", ", targetVec);
         std::string firstVarName = targetVec.front();
+
+        assert(g_asv.count(firstVarName));    
         uint32_t targetWidth = g_asv[firstVarName];    
+
+        // Make a more elegant name to represent the entire array.  For example,
+        // cpuregs[1] gets mapped to cpuregs_Arr.
+#if 0
         firstVarName = var_name_convert(firstVarName, true);
         //firstVarName = convert_to_c_var(firstVarName);
         target = firstVarName+"_Arr";
+#else
+        target = name_for_array(firstVarName);
+        target = var_name_convert(target, true);
+#endif
+
         if(global_arr.find(target) == global_arr.end()) {
           global_arr.emplace(target, std::make_pair(targetWidth, targetVec.size()));
         }
@@ -285,6 +300,16 @@ bool same_value(std::string val1, std::string val2) {
   llvm::APInt v2 = hdb2apint(val2);
   unsigned maxWidth = std::max(v1.getBitWidth(), v2.getBitWidth());
   return v1.zext(maxWidth) == v2.zext(maxWidth);
+}
+
+
+// Create a new name to represent an array of variables, based on the first element's name,
+// in an aesthetically pleasing way.
+// A name like "cpuregs[0]" will get mapped to "cpuregs_Arr".
+std::string name_for_array(std::string firstVarName) {
+    static const std::regex e("\\[[0-9]*\\]");
+    std::string result = std::regex_replace(firstVarName, e, "") + "_Arr";
+    return result;
 }
 
 }

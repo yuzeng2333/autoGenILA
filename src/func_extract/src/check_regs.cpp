@@ -2,6 +2,7 @@
 #include "check_regs.h"
 #include "op_constraint.h"
 #include "helper.h"
+#include "util.h"
 #include "global_data_struct.h"
 #include "ins_context_stack.h"
 
@@ -1575,7 +1576,7 @@ std::string DestInfo::get_dest_name() {
     return destAndSlice;
   }
   else {
-    return destVec.front()+"_Arr";
+    return funcExtract::name_for_array(destVec.front());
   }
 }
 

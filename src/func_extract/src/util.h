@@ -29,6 +29,7 @@ bool is_compatible(const std::vector<std::string> &multiCycleValue1,
 
 bool same_value(std::string val1, std::string val2);
 
+std::string name_for_array(std::string firstVarName);
 
 }
 #endif
