@@ -554,6 +554,7 @@ std::string asv_func_param_type(uint32_t width, bool is_const=true) {
    ret = "const ";
   }
 
+  assert(width > 0);
   ret += c_type(width);
   if (width > 64) {
      ret += "&";
@@ -607,7 +608,7 @@ std::string func_call(std::string writeVar, const FuncTy_t& funcTy, std::string 
     }
     else if(inputInstr.find(arg) != inputInstr.end()) {
       if((inputInstr.at(arg)).size() > 1) {
-        toCout("Warning: instruction spans mulitple cycles!");
+        toCout("Warning: instruction spans multiple cycles!");
       }
       argValue = (inputInstr[arg]).front();
       //argValue = "7'h4+5'h7+5'h13+3'h2+5'h12+5'h8+2'b11";
@@ -642,7 +643,8 @@ void print_func_declare(const FuncTy_t& funcTy,
   std::string funcNameSimp = var_name_convert(funcName, true);
 
   // Small variables are returned by value, but big ones are returned via an extra reference arg.
-  std::string ret = funcTy.retTy <= 64 ? c_type(funcTy.retTy) : "void";
+  // Functions for register arrays may return void (represented as a width of 0).
+  std::string ret = (funcTy.retTy > 0 && funcTy.retTy <= 64) ? c_type(funcTy.retTy) : "void";
   ret += " " + funcNameSimp + " ( ";
 
   for(auto pair : funcTy.argTy) {

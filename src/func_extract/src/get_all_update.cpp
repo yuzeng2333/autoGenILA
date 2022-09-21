@@ -351,14 +351,17 @@ void get_update_function(std::string target,
   destInfo.set_instr_name(instrInfo.name);      
   assert(!instrInfo.name.empty());
 
-  std::string destNameSimp = destInfo.get_dest_name();
-  remove_front_backslash(destNameSimp);
-  std::string funcName = instrInfo.name+"_"+destNameSimp;
+  std::string destSimpleName = funcExtract::var_name_convert(destInfo.get_dest_name(), true);
+
+  std::string funcName = instrInfo.name+"_"+destSimpleName;
   std::string fileName = UpdateFunctionGen::make_llvm_basename(destInfo, delayBound);
   std::string cleanOptoFileName = fileName+"_clean.o3.ll";
+  //std::string llvmFileName = instrInfo.name+"_"+destInfo.get_dest_name()
+                             //+"_"+toStr(delayBound)+".ll";
+  std::string llvmFileName = fileName+".ll";
 
   toCout("---  BEGIN INSTRUCTION #"+toStr(instrIdx)+": "+instrInfo.name+
-         "  ASV: "+destNameSimp+"  delay bound: "+toStr(delayBound)+" ---");
+         "  ASV: "+destSimpleName+"  delay bound: "+toStr(delayBound)+" ---");
 
   // Optionally avoid the time-consuming re-generation of an existing LLVM function.
   // This lets you incrementally add data to instr.txt and rerun this program to
@@ -408,13 +411,24 @@ void get_update_function(std::string target,
   }
 
   std::vector<std::pair<std::string, uint32_t>> argVec;
-  bool usefulFunc = read_clean_optimized(cleanOptoFileName, argVec, fileName+"_clean.simp.ll", funcName);
+  bool usefulFunc = false;
 
-  std::string llvmFileName = instrInfo.name+"_"+destInfo.get_dest_name()
-                             +"_"+toStr(delayBound)+".ll";
-  std::string move("mv "+fileName+"_clean.simp.ll "+g_path+"/"+llvmFileName);
-  toCoutVerb(move);
-  system(move.c_str());
+  if ((!g_overwrite_existing_llvm) && stat(llvmFileName.c_str(), &statbuf) == 0) {
+
+    // In any case, we have to scan the optimized file to build argVec
+    toCout("Skipping re-generation of existing file "+llvmFileName);
+    usefulFunc = read_clean_optimized(cleanOptoFileName, argVec, "", funcName);
+
+  } else {
+
+    toCout("** Begin read_clean_optimize");
+    usefulFunc = read_clean_optimized(cleanOptoFileName, argVec, fileName+"_clean.simp.ll", funcName);
+    toCout("** End read_clean_optimize");
+
+    std::string move("mv "+fileName+"_clean.simp.ll "+g_path+"/"+llvmFileName);
+    toCoutVerb(move);
+    system(move.c_str());
+  }
 
   if(usefulFunc) {
     g_fileNameVec.push_back(llvmFileName);        
@@ -513,7 +527,7 @@ uint32_t get_delay_bound(std::string var, std::vector<std::string> tgtVec,
 
 // returned argVec is empty if the update function just returns 0
 // generate a new file
-// Assune: if no internal function is found, then this function is discarded
+// Assume: if no internal function is found, then this function is discarded
 bool read_clean_optimized_old(std::string fileName, 
                    std::vector<std::pair<std::string, uint32_t>> &argVec,
                    std::string outFileName,
@@ -669,12 +683,14 @@ bool read_clean_optimized_old(std::string fileName,
 }
 
 
-// Check if this type is small enough to be passed in a register.
-// BTW, we don't use LLVM floats and doubles...
+// Check if this type is too big to be passed in a register.
+// Pointers and void are not considered big.
+// Except in special cases, all parameters to update functions are integer types.
 static bool
-isSmallType(const llvm::Type *type) {
-  return (type->isIntegerTy() && type->getIntegerBitWidth() <= 64);
+isBigType(const llvm::Type *type) {
+  return (type->isIntegerTy() && type->getIntegerBitWidth() > 64);
 }
+
 
 
 
@@ -693,10 +709,10 @@ create_wrapper_function(llvm::Function *mainFunc) {
 
   for (const llvm::Argument& arg : mainFunc->args()) {
     llvm::Type *type = arg.getType();
-    if (isSmallType(type)) {
-      wrapperArgTy.push_back(type);
-    } else {
+    if (isBigType(type)) {
       wrapperArgTy.push_back(llvm::PointerType::getUnqual(type));
+    } else {
+      wrapperArgTy.push_back(type);
     }
   }
 
@@ -705,12 +721,12 @@ create_wrapper_function(llvm::Function *mainFunc) {
   // Deal with small vs large return values
   llvm::Type* wrapperRetTy = nullptr;
 
-  if (isSmallType(mainRetTy)) {
-    wrapperRetTy = mainRetTy;
-  } else {
+  if (isBigType(mainRetTy)) {
     // Add one more pointer argument for return value.
     wrapperArgTy.push_back(llvm::PointerType::getUnqual(mainRetTy));
     wrapperRetTy = llvm::Type::getVoidTy(Context);
+  } else {
+    wrapperRetTy = mainRetTy;
   }
 
   llvm::FunctionType *wrapperFT =
@@ -731,21 +747,20 @@ create_wrapper_function(llvm::Function *mainFunc) {
   for (const llvm::Argument& mainArg : mainFunc->args()) {
     llvm::Argument* wrapperArg = wrapperFunc->getArg(mainArg.getArgNo());
 
-    if (isSmallType(mainArg.getType())) {
-      wrapperArg->setName(mainArg.getName());
-    } else {
+    if (isBigType(mainArg.getType())) {
       // Give the pointer args a special name
       wrapperArg->setName(mainArg.getName()+"ptr_");
       // Specify that they can never be null (actually in C++, they will be const references).
       wrapperArg->addAttr(llvm::Attribute::NonNull);
-
+    } else {
+      wrapperArg->setName(mainArg.getName());
     }
   }
 
   llvm::Argument* wrapperLastArg = wrapperFunc->arg_end()-1;
 
   // Deal with the extra wrapper arg that handles big return types
-  if (!isSmallType(mainRetTy)) {
+  if (isBigType(mainRetTy)) {
     wrapperLastArg->setName(llvm::Twine("_return_val_ptr_"));
     // Specify that it can never be null (actually in C++, it will be a (non-const) reference).
     wrapperLastArg->addAttr(llvm::Attribute::NonNull);
@@ -765,12 +780,12 @@ create_wrapper_function(llvm::Function *mainFunc) {
     llvm::Argument* wrapperArg = wrapperFunc->getArg(mainArg.getArgNo());
 
     llvm::Value *argVal = nullptr;
-    if (isSmallType(mainArgType)) {
-      // Pass the arg by value
-      argVal = wrapperArg;
-    } else {
+    if (isBigType(mainArgType)) {
       // Dereference the pointer
       argVal = Builder->CreateLoad(mainArgType, wrapperArg);
+    } else {
+      // Pass the arg by value
+      argVal = wrapperArg;
     }
     callArgs.push_back(argVal);
   }
@@ -779,13 +794,13 @@ create_wrapper_function(llvm::Function *mainFunc) {
   llvm::CallInst *call = Builder->CreateCall(mainFunc->getFunctionType(), mainFunc, callArgs);
   call->setCallingConv(mainFunc->getCallingConv());
 
-  if (isSmallType(mainRetTy)) {
-    // Return the return value of the call to mainFunc
-    Builder->CreateRet(call);
-  } else {
+  if (isBigType(mainRetTy)) {
     // Add store of return value to last pointer arg
     Builder->CreateStore(call, wrapperLastArg);
     Builder->CreateRetVoid();
+  } else {
+    // Return the return value of the call to mainFunc
+    Builder->CreateRet(call);
   }
 
   llvm::verifyFunction(*wrapperFunc);
@@ -798,7 +813,7 @@ create_wrapper_function(llvm::Function *mainFunc) {
 
 // returned argVec is empty if the update function just returns 0
 // generate a new file
-// Assune: if no internal function is found, then this function is discarded
+// Assume: if no internal function is found, then this function is discarded
 bool read_clean_optimized(std::string fileName, 
                    std::vector<std::pair<std::string, uint32_t>> &argVec,
                    std::string outFileName,
@@ -861,14 +876,17 @@ bool read_clean_optimized(std::string fileName,
     argVec.push_back(std::make_pair(var, arg.getType()->getPrimitiveSizeInBits()));
   }
 
-  // Add a C-compatible wrapper function that calls the main function.
-  create_wrapper_function(mainFunc);
+  // If no output file name was given, the purpose of calling this was simply to fill in argVec.
+  if (!outFileName.empty()) {
+    // Add a C-compatible wrapper function that calls the main function.
+    create_wrapper_function(mainFunc);
 
-  // Write out the modified IR data to a new file.
-  std::error_code EC;
-  llvm::raw_fd_ostream OS(outFileName, EC);
-  OS << *M;
-  OS.close();
+    // Write out the modified IR data to a new file.
+    std::error_code EC;
+    llvm::raw_fd_ostream OS(outFileName, EC);
+    OS << *M;
+    OS.close();
+  }
 
   return true;
 }

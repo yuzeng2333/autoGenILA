@@ -161,10 +161,13 @@ void UpdateFunctionGen::clean_data() {
 std::string
 UpdateFunctionGen::make_llvm_basename(DestInfo &destInfo, 
                                      const uint32_t bound) {
-  std::string destNameSimp = destInfo.get_dest_name();
-  remove_front_backslash(destNameSimp);
+  //std::string destSimpleName = destInfo.get_dest_name();
+  //remove_front_backslash(destNameSimp);
+
+  std::string destSimpleName = funcExtract::var_name_convert(destInfo.get_dest_name(), true);
+
   std::string fileName = g_path+"/"+destInfo.get_instr_name()+"_"
-                         +destNameSimp+"_"+toStr(bound);
+                         +destSimpleName+"_"+toStr(bound);
   return fileName;
 }
 
