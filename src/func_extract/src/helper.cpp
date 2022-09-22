@@ -211,6 +211,7 @@ std::string get_pure_num(std::string formedNum) {
   }
   else {
     toCout("Error: not expected formed number: "+formedNum);
+    abort();
   }
 }
 
@@ -369,7 +370,7 @@ bool is_read_asv(std::string var, const std::shared_ptr<ModuleInfo_t> &curMod) {
 
 // FIXME: not sure if this is true for multi-cycle word
 bool has_explicit_value(std::string input) {
-  uint32_t encodingSize = g_currInstrInfo.instrEncoding.begin()->second.size();
+  //uint32_t encodingSize = g_currInstrInfo.instrEncoding.begin()->second.size();
   if(g_currInstrInfo.instrEncoding.find(input) == g_currInstrInfo.instrEncoding.end())
     return false;
   for(auto it = g_currInstrInfo.instrEncoding[input].begin(); 
@@ -1298,9 +1299,9 @@ std::string var_name_convert(std::string varName, bool replaceSlash) {
 
 
 bool is_letter(char c) {
-  if(c <= 'z' && c >= 'a'
-     || c <= 'Z' && c >= 'A'
-     || c == '_')
+  if((c <= 'z' && c >= 'a')
+     || (c <= 'Z' && c >= 'A')
+     || (c == '_'))
      return true;
   else return false;
 }
@@ -1393,7 +1394,7 @@ uint64_t str2int64(std::string str, std::string info) {
   try{
     res = std::stol(str);
   }
-  catch(std::invalid_argument arg) {
+  catch(const std::invalid_argument& arg) {
     std::cout << "Wrong input to stoi:" + str << std::endl;
     std::cout << "Info:" + info << std::endl;
     abort();

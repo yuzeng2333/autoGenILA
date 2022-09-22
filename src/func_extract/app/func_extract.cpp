@@ -167,7 +167,6 @@ int main(int argc, char *argv[]) {
   // get update function hierarchically
   std::vector<std::string> modules;  
   std::map<std::string, std::vector<std::string>> childModules;
-  uint32_t _dummyRegCnt;
   std::unordered_map<std::string, Str2StrUmap_t> _dummyMap;
 
   if(printRegInfo) {  

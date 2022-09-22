@@ -68,12 +68,12 @@ void input_expr(std::string line) {
   if(var != g_recentClk)
     curMod->moduleInputs.insert(var);
 
-  bool insertDone;
   if(!slice.empty())
-    insertDone = curMod->varWidth.var_width_insert(var, get_end(slice), 
+    curMod->varWidth.var_width_insert(var, get_end(slice), 
                                                      get_begin(slice));
   else
-    insertDone = curMod->varWidth.var_width_insert(var, 0, 0);
+    curMod->varWidth.var_width_insert(var, 0, 0);
+
   //if (!insertDone) {
   //  std::cout << "insert failed in input case:" + line << std::endl;
   //  std::cout << "m.str(2):" + m.str(2) << std::endl;
@@ -98,12 +98,12 @@ void reg_expr(std::string line) {
 
   moduleRegs.push_back(var);
 
-  bool insertDone;
   if(!slice.empty())
-    insertDone = curMod->varWidth.var_width_insert(var, get_end(slice),
+    curMod->varWidth.var_width_insert(var, get_end(slice),
                                                      get_begin(slice));
   else
-    insertDone = curMod->varWidth.var_width_insert(var, 0, 0);
+    curMod->varWidth.var_width_insert(var, 0, 0);
+
   //if (!insertDone) {
   //  std::cout << "insert failed in reg case:" + line << std::endl;
   //  std::cout << "m.str(2):" + m.str(2) << std::endl;
@@ -125,11 +125,11 @@ void wire_expr(std::string line) {
   if(var == "outAssign")
     toCoutVerb("Find it!");
 
-  bool insertDone;
   if(!slice.empty())
-    insertDone = curMod->varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+    curMod->varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
   else
-    insertDone = curMod->varWidth.var_width_insert(var, 0, 0);
+    curMod->varWidth.var_width_insert(var, 0, 0);
+
   //if (!insertDone) {
   //  std::cout << "insert failed in wire case:" + line << std::endl;
   //  std::cout << "m.str(2):" + m.str(2) << std::endl;
@@ -156,12 +156,12 @@ void mem_expr(std::string line) {
   curMod->moduleMems.emplace(var, std::make_pair(lineWidth, varLen));  
   assert(!is_output(var, curMod));
 
-  bool insertDone;
   if(!slice.empty())
-    insertDone = curMod->varWidth.var_width_insert(var, get_end(slice), 
+    curMod->varWidth.var_width_insert(var, get_end(slice), 
                                                    get_begin(slice));
   else
-    insertDone = curMod->varWidth.var_width_insert(var, 0, 0);
+    curMod->varWidth.var_width_insert(var, 0, 0);
+
   //if (!insertDone) {
   //  std::cout << "insert failed in mem case:" + line << std::endl;
   //  std::cout << "m.str(2):" + m.str(2) << std::endl;
@@ -218,11 +218,11 @@ void output_expr(std::string line) {
   else 
     curMod->moduleOutputs.insert(var);
 
-  bool insertDone;
   if(!slice.empty())
-    insertDone = curMod->varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
+    curMod->varWidth.var_width_insert(var, get_end(slice), get_begin(slice));
   else
-    insertDone = curMod->varWidth.var_width_insert(var, 0, 0);
+    curMod->varWidth.var_width_insert(var, 0, 0);
+
   //if (!insertDone) {
   //  std::cout << "insert failed in output case:" + line << std::endl;
   //  std::cout << "m.str(2):" + m.str(2) << std::endl;
@@ -465,7 +465,6 @@ std::pair<std::string, std::string> nonblockif_expr(std::string line,
   }
 
   const auto curMod = g_insContextStk.get_curMod();
-  bool hasRst = false;
   std::string rst;
   std::string blank;
   std::string condAndSlice;

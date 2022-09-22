@@ -21,7 +21,6 @@ using namespace taintGen;
 // key is the asv name, value is its bit number
 
 // manually fix errors due to longer than 64 bits
-bool g_fix_long_bit = false; // Obsolete
 bool g_fetch_instr_from_mem = false;
 bool g_set_dmem = false;
 uint32_t g_dmem_width = 32;
@@ -242,7 +241,7 @@ int main(int argc, char *argv[]) {
 
   if(g_fetch_instr_from_mem) {
     // declare memories
-    uint32_t instrNumBits = ceil(log2(instrNum));
+    //uint32_t instrNumBits = ceil(log2(instrNum));
     // actually the declaration and initialization of mem is not necessarily
     // but for convenience of reference, I keep thse code
     cpp << "  unsigned int mem["+toStr(memSize)+"];" << std::endl;
@@ -319,16 +318,6 @@ int main(int argc, char *argv[]) {
 // Name used in the update function's LLVM file.
 std::string update_function_name(const std::string& instr, const std::string& asv) {
   std::string f = instr + "_" + asv;
-
-  // Doug: obsolete?
-  if(g_fix_long_bit && f.find("_LOW") != std::string::npos) {
-    size_t pos = f.find("_LOW");
-    f = f.substr(0, pos);
-  }
-  if(g_fix_long_bit && f.find("_HIGH") != std::string::npos) {
-    size_t pos = f.find("_HIGH");
-    f = f.substr(0, pos);
-  }
 
   return f + "_wrapper";
 }
@@ -593,7 +582,6 @@ std::string func_call(std::string writeVar, const FuncTy_t& funcTy, std::string 
   std::map<std::string, uint32_t> varIdxMap; 
   for(auto pair: funcTy.argTy) {
     std::string arg = pair.second;
-    uint32_t width = pair.first;
 
     if(varIdxMap.find(arg) == varIdxMap.end())
       varIdxMap.emplace(arg, 0);
@@ -941,7 +929,6 @@ void print_array(std::string arrName, std::ofstream &cpp) {
     abort();
   }
   auto bitDepthPair = g_global_arr[arrName];
-  uint32_t width = bitDepthPair.first;
   uint32_t depth = bitDepthPair.second;
   cpp << "    for(int i = 0; i < "+toStr(depth)+"; i++) {" << std::endl;
   // Doug: this assumes that the element width is <= 32 bits...
@@ -1078,7 +1065,6 @@ void vta_ila_model(std::ofstream &cpp) {
     imem << secondByteHex << std::endl;
 
     std::string instrName = decode(encoding);
-    uint32_t idx = get_instr_by_name(instrName);    
     cpp << "  // instr "+toStr(instrIdx++)+": "+instrName+"\n" << std::endl;
     if(instrName.find("gemm") != std::string::npos) {
       cpp << "  writeValue = gemm__store_tensorStore_tensorFile_0_0( 0, 0, 0, 0, 0, 0, 0, "

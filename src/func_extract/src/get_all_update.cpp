@@ -46,14 +46,6 @@ void get_all_update() {
   simplifyTimeFile.close();
 
   std::string line;  
-  //std::ifstream g_visitedTgtInFile(g_path+"/visited_target.txt");
-  //while(std::getline(g_visitedTgtInFile, line)) {
-  //  remove_two_end_space(line);
-  //  g_visitedTgt.insert(line);
-  //}
-  //g_visitedTgtInFile.close();
-  //std::ofstream g_visitedTgtFile;
-  //g_visitedTgtFile.open(g_path+"/visited_target.txt", std::ios_base::app);
 
   std::ifstream addedWorkSetInFile(g_path+"/added_work_set.txt");
   g_topModuleInfo = g_moduleInfoMap[g_topModule];
@@ -109,14 +101,11 @@ void get_all_update() {
     std::vector<std::pair<std::vector<std::string>, uint32_t>> allowedTgtVec = g_allowedTgtVec;    
     while(!g_workSet.empty() || !allowedTgtVec.empty() ) {
       bool isVec;
-      //bool doSingleTgt = false;
-      //bool doVecTgt = false;
       std::string target;
       std::vector<std::string> tgtVec;
       // work on single register target first
       if(!g_workSet.empty()) {
         isVec = false;
-        //doSingleTgt = true;
         auto targetIt = g_workSet.begin();
         target = *targetIt;
         g_workSet.mtxErase(targetIt);
@@ -125,7 +114,6 @@ void get_all_update() {
           continue;
       }
       else if(!allowedTgtVec.empty()){
-        //doVecTgt = true;
         isVec = true;
         tgtVec = allowedTgtVec.back().first;
         allowedTgtVec.pop_back();
@@ -144,24 +132,18 @@ void get_all_update() {
         else { 
           uint32_t delayBound = get_delay_bound(target, tgtVec, instrInfo, 
                                                 g_allowedTgtVec, g_allowedTgt);
-          //std::thread th(get_update_function, target, tgtVec, isVec,
-          //               instrInfo, instrIdx);
-          //threadVec.push_back(std::move(th));
           get_update_function(target, delayBound, tgtVec, isVec,
                               instrInfo, instrIdx);
         }
       }
-      //for(auto &th: threadVec) th.join();
       if(isVec) {
         for(auto reg: tgtVec) {
           g_visitedTgt.mtxInsert(reg);
-          //g_visitedTgtFile << target << std::endl;
         }
         tgtVec.clear();
       }
       else {
         g_visitedTgt.mtxInsert(target);
-        //g_visitedTgtFile << target << std::endl;
       }
     } // end of while loop
   }
@@ -181,14 +163,11 @@ void get_all_update() {
         threadVec.clear();
         while(!localWorkSet.empty() || !localWorkVec.empty()) {
           bool isVec;
-          //bool doSingleTgt = false;
-          //bool doVecTgt = false;
           std::string target;
           std::vector<std::string> tgtVec;      
 
           if(!localWorkSet.empty()) {
             isVec = false;
-            //doSingleTgt = true;
             auto targetIt = localWorkSet.begin();
             target = *targetIt;
             localWorkSet.erase(targetIt);
@@ -197,7 +176,6 @@ void get_all_update() {
               continue;
           }
           else if(!localWorkVec.empty()){
-            //doVecTgt = true;
             isVec = true;
             tgtVec = localWorkVec.back().first;
             localWorkVec.pop_back();
@@ -226,7 +204,6 @@ void get_all_update() {
       for(auto pair: g_allowedTgtVec) {
         for(std::string reg: pair.first) {
           g_visitedTgt.mtxInsert(reg);
-          //g_visitedTgtFile << target << std::endl;
         }
       }
       for(std::string target: oldWorkSet) {
@@ -240,7 +217,6 @@ void get_all_update() {
   print_llvm_script(g_path+"/link.sh");
   print_func_info(funcInfo);
   print_asv_info(asvInfo);
-  //g_visitedTgtFile.close();
   addedWorkSetFile.close();
 }
 
@@ -349,8 +325,6 @@ void get_update_function(std::string target,
   std::string funcName = instrInfo.name+"_"+destSimpleName;
   std::string fileName = UpdateFunctionGen::make_llvm_basename(destInfo, delayBound);
   std::string cleanOptoFileName = fileName+".clean.o3.ll";
-  //std::string llvmFileName = instrInfo.name+"_"+destInfo.get_dest_name()
-                             //+"_"+toStr(delayBound)+".ll";
   std::string llvmFileName = fileName+".ll";
 
   toCout("---  BEGIN INSTRUCTION #"+toStr(instrIdx)+": "+instrInfo.name+
@@ -441,39 +415,9 @@ void get_update_function(std::string target,
 
   for(auto pair : argVec) {
     std::string reg = pair.first;
-    //if(reg.find("cpuregs[3]") != std::string::npos
-    //   || reg.find("cpuregs[4]") != std::string::npos
-    //   || reg.find("cpuregs[5]") != std::string::npos
-    //   || reg.find("cpuregs[6]") != std::string::npos
-    //   || reg.find("cpuregs[7]") != std::string::npos
-    //   || reg.find("cpuregs[8]") != std::string::npos
-    //   || reg.find("cpuregs[9]") != std::string::npos
-    //   || reg.find("cpuregs[10]") != std::string::npos
-    //   || reg.find("cpuregs[11]") != std::string::npos
-    //   || reg.find("cpuregs[12]") != std::string::npos
-    //   || reg.find("cpuregs[13]") != std::string::npos
-    //   || reg.find("cpuregs[14]") != std::string::npos
-    //   || reg.find("cpuregs[15]") != std::string::npos
-    //   || reg.find("cpuregs[16]") != std::string::npos
-    //   || reg.find("cpuregs[17]") != std::string::npos
-    //   || reg.find("cpuregs[18]") != std::string::npos
-    //   || reg.find("cpuregs[19]") != std::string::npos
-    //   || reg.find("cpuregs[20]") != std::string::npos
-    //   || reg.find("cpuregs[21]") != std::string::npos
-    //   || reg.find("cpuregs[22]") != std::string::npos
-    //   || reg.find("cpuregs[23]") != std::string::npos
-    //   || reg.find("cpuregs[24]") != std::string::npos
-    //   || reg.find("cpuregs[25]") != std::string::npos
-    //   || reg.find("cpuregs[26]") != std::string::npos
-    //   || reg.find("cpuregs[27]") != std::string::npos
-    //   || reg.find("cpuregs[28]") != std::string::npos
-    //   || reg.find("cpuregs[29]") != std::string::npos
-    //   || reg.find("cpuregs[30]") != std::string::npos)
-    //    continue;
     if(g_push_new_target && !g_visitedTgt.mtxExist(reg)) 
       g_workSet.mtxInsert(reg);
     g_asvSet.emplace(reg, pair.second);
-    //addedWorkSetFile << reg << std::endl;
   }
 }
 
@@ -531,8 +475,6 @@ bool read_clean_optimized_old(std::string fileName,
   std::smatch m;
   std::string argList;
   bool seeFuncDef = false;
-  //bool seeReturn = false;
-  //bool returnConst = false;
   std::regex pDef("^define internal fastcc (\\S+) @(\\S+)\\((.*)\\) unnamed_addr #1 \\{$");  
   std::regex pVecDef(
     "^define internal fastcc \\[(\\d+) x i(\\d+)\\] @(\\S+)\\((.*)\\) unnamed_addr #1 \\{$"
@@ -585,24 +527,12 @@ bool read_clean_optimized_old(std::string fileName,
         line = "define "+line.substr(16);
       }
     }
-    //else if(line.size() > 9 && line.substr(2, 3) == "ret") {
-    //  if(!seeReturn) {
-    //    seeReturn = true;
-    //    if(std::regex_match(line, m, pRetZero)) {
-    //      returnConst = true;
-    //    }
-    //  }
-    //  else {
-    //    if(std::regex_match(line, m, pRetZero)) returnConst = true;
-    //  }
-    //}
     // make sure the attributes line is at the end of this file
     if(line.substr(0, 10) != "attributes")
       output << line << std::endl;
     else attributeLine = line;
   }
   if(internalExist) {
-    //uint32_t pos = 0;
     uint32_t startPos = 0;
     while(startPos < argList.size()) {
       uint32_t dotPos = argList.find(",", startPos);

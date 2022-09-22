@@ -335,7 +335,6 @@ void read_in_instructions(std::string fileName) {
           break;
         case ReadASV:
           {
-            size_t pos = line.find(".");
             g_readASV.insert(line);
             moduleAs.insert(line);
           }
@@ -406,6 +405,8 @@ void read_in_instructions(std::string fileName) {
             remove_two_end_space(line);
             g_topModule = line;
           }
+          break;
+        default:
           break;
       }
     }

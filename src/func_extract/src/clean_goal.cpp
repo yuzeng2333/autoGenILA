@@ -20,10 +20,10 @@ void clean_goal_file(std::string fileName, std::string outFileName) {
   std::ifstream input(fileName);
   std::ofstream output(outFileName);
   std::string line;
-  uint32_t instrIdx;
+  //uint32_t instrIdx;
   std::string writeASV;
-  uint32_t bound;
-  uint32_t assumIdx = 0;
+  //uint32_t bound;
+  //uint32_t assumIdx = 0;
   while(std::getline(input, line)) {
     if(line.front() == '#') {
       size_t pos2 = line.find("#", 1);
@@ -33,9 +33,9 @@ void clean_goal_file(std::string fileName, std::string outFileName) {
         toCout("Error: more than 3 # found: "+line);
         abort();
       }
-      instrIdx = std::stoi(line.substr(1, pos2-1));
+      //instrIdx = std::stoi(line.substr(1, pos2-1));
       writeASV = line.substr(pos2+1, pos3-pos2-1);
-      bound = std::stoi(line.substr(pos3+1));
+      //bound = std::stoi(line.substr(pos3+1));
     }
     else {
       while(line.find("___#") != std::string::npos) {
