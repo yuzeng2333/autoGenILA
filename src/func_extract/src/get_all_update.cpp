@@ -122,18 +122,12 @@ void get_all_update() {
       uint32_t instrIdx = 0;
       for(auto instrInfo : g_instrInfo) {
         instrIdx++;
-        if(!target.empty()
-           && g_allowedTgt.find(target) != g_allowedTgt.end()
-           && g_allowedTgt[target].size() > 1) {
-          for(uint32_t delayBound : g_allowedTgt[target])
-            get_update_function(target, delayBound, tgtVec, isVec,
-                                instrInfo, instrIdx);
-        }
-        else { 
-          uint32_t delayBound = get_delay_bound(target, tgtVec, instrInfo, 
-                                                g_allowedTgtVec, g_allowedTgt);
+        std::vector<uint32_t> delayBounds = get_delay_bounds(target, tgtVec, instrInfo);
+        for (auto delayBound : delayBounds) {
+          // If allowed_target.txt specifies multiple delays for a non-vector target,
+          // generate update functions for each one.
           get_update_function(target, delayBound, tgtVec, isVec,
-                              instrInfo, instrIdx);
+                            instrInfo, instrIdx);
         }
       }
       if(isVec) {
@@ -180,18 +174,11 @@ void get_all_update() {
             tgtVec = localWorkVec.back().first;
             localWorkVec.pop_back();
           }
-          if(!target.empty()
-             && g_allowedTgt.find(target) != g_allowedTgt.end()
-             && g_allowedTgt[target].size() > 1) {
-            for(uint32_t delayBound : g_allowedTgt[target]) {
-              std::thread th(get_update_function, target, delayBound, tgtVec, 
-                             isVec, instrInfo, instrIdx);
-              threadVec.push_back(std::move(th));              
-            }
-          }
-          else {
-            uint32_t delayBound = get_delay_bound(target, tgtVec, instrInfo, 
-                                                  g_allowedTgtVec, g_allowedTgt);
+
+          std::vector<uint32_t> delayBounds = get_delay_bounds(target, tgtVec, instrInfo);
+          for (auto delayBound : delayBounds) {
+            // If allowed_target.txt specifies multiple delays for a non-vector target,
+            // generate update functions for each one.
             std::thread th(get_update_function, target, delayBound, tgtVec, 
                            isVec, instrInfo, instrIdx);
             threadVec.push_back(std::move(th));            
@@ -228,6 +215,7 @@ void get_update_function(std::string target,
                          InstrInfo_t instrInfo,
                          uint32_t instrIdx) {
 
+  assert(delayBound > 0);
   time_t startTime = time(NULL);
 
   // set the destInfo according to the target
@@ -271,13 +259,15 @@ void get_update_function(std::string target,
     // work on the vector of target registers
     destInfo.isVector = true;
 
-    assert(vecWorkSet.size() > 1);
+    assert(vecWorkSet.size() > 0);  // A vector of size 1 is acceptable...
 
     // Build a string to represent the target vector in messages, func_info.txt, etc.
     // It must be possible to parse the first element's name from the string.
     target = "{ ";
     for(std::string tgt: vecWorkSet) target = target + tgt + ", ";
     target += "}";
+
+    toCout("---  BEGIN Vector Target: "+target+" ---");
 
     destInfo.set_dest_vec(vecWorkSet);
     std::string firstASV = vecWorkSet.front();
@@ -422,42 +412,65 @@ void get_update_function(std::string target,
 }
 
 
-uint32_t get_delay_bound(std::string var, std::vector<std::string> tgtVec,
-                         struct InstrInfo_t &instrInfo, 
-                         std::vector<std::pair<std::vector<std::string>, 
-                                               uint32_t>> allowedTgtVec,
-                         std::map<std::string, std::vector<uint32_t>> allowedTgt) {
+// This returns a list of one or more delays to use for update function generation
+// of the given scalar or vector ASV.
+// Note priority of data sources for delays:
+//
+// 1: Multiple per-ASV delays from allowed_target.txt (not available for vector ASVs)
+// 2: A per-instruction delay exception from instr.txt (not available for vector ASVs)
+// 3: A single per-ASV delay from allowed_target.txt
+// 4: A per-instruction delay from instr.txt
+//
+//  If no delays can be found, the program will fail.
+
+std::vector<uint32_t>
+get_delay_bounds(std::string var, const std::vector<std::string>& tgtVec,
+                         const struct InstrInfo_t &instrInfo) {
   assert(var.empty() || tgtVec.empty());
+
+  // Highest priority is multiple delays from allowed_target.txt
+  if(!var.empty() && g_allowedTgt.count(var) 
+     && g_allowedTgt[var].size() > 1) {
+    return g_allowedTgt[var];  // Copies vector
+  }
+
+  // Default delay is per-instruction from instr.txt
   uint32_t delayBound = instrInfo.delayBound;
+
   if(var.empty() && !tgtVec.empty()) {
-    for(auto pair : allowedTgtVec) {
-      if(pair.first.front() != tgtVec.front()
-         || pair.first.size() != tgtVec.size() ) continue;
-      else {
-        uint32_t i;
-        for(i = 0 ; i < tgtVec.size(); i++)
-          if(pair.first[i] != tgtVec[i]) break;
-        if(i == tgtVec.size()) {
-          delayBound = pair.second;
-          break;
-        }
-        else continue;
+    // array target
+    for(auto pair : g_allowedTgtVec) {
+      // This efficiently tests that pair.first and tgtVec have the same contents
+      if (pair.first == tgtVec && pair.second > 0) {
+        delayBound = pair.second;
+        break;
       }
     }
   }
-  // if is not array
-  else if(!var.empty() && instrInfo.delayExceptions.count(var)) {
-    delayBound = instrInfo.delayExceptions[var];
-  }
-  else if(!var.empty() && allowedTgt.count(var) && !allowedTgt[var].empty()) {
-    delayBound = g_allowedTgt[var].front();
-    if(allowedTgt[var].size() > 1) {
-      toCout("Error: delay number size is not 1: "+var);
-      for(uint32_t delay: allowedTgt[var])
-        toCout(delay);
+  else if(!var.empty()) {
+    // not array target
+    auto pos = instrInfo.delayExceptions.find(var);
+    if (pos != instrInfo.delayExceptions.end()) {
+      // per-instruction delay exception from instr.txt
+      delayBound = pos->second;
+      assert(delayBound>0);
     }
+    else if(g_allowedTgt.count(var) && !g_allowedTgt[var].empty()) {
+      // Data from allowed_target.txt
+      delayBound = g_allowedTgt[var].front();
+      if(g_allowedTgt[var].size() > 1) {
+        toCout("Error: delay number size is not 1: "+var);
+        for(uint32_t delay: g_allowedTgt[var])
+          toCout(delay);
+      }
+    } else {
+      assert(delayBound>0);
+    }
+  } else {
+    abort();  // Tested by above assert
   }
-  return delayBound;
+
+  return std::vector<uint32_t>{delayBound};  // Return a vector of one delay value
 }
 
 
@@ -720,6 +733,8 @@ create_wrapper_function(llvm::Function *mainFunc) {
   if (isBigType(mainRetTy)) {
     // Add store of return value to last pointer arg
     Builder->CreateStore(call, wrapperLastArg);
+    Builder->CreateRetVoid();
+  } else if (mainRetTy->isVoidTy()) {
     Builder->CreateRetVoid();
   } else {
     // Return the return value of the call to mainFunc

@@ -51,16 +51,6 @@ uint32_t g_maxDelay = 0;
 uint32_t g_pushNum = 0;
 
     
-    
-// Check if this type is small enough to be passed in a register.
-// BTW, we don't use floats and doubles...
-static bool
-isSmallType(const llvm::Type *type) {
-  return (type->isIntegerTy() && type->getIntegerBitWidth() <= 64);
-}
-
-
-
 // assume ssaTable and nbTable have been filled
 void check_all_regs() {
   toCout("### Begin check_all_regs");
@@ -179,11 +169,6 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
                                       const uint32_t bound, 
                                       uint32_t instrIdx,
                                       std::string fileName) {
-
-  // Creating the wrapper function here is not so robust - the optimization tends to
-  // damage it.  Instead there is code to make the wrapper function in the final
-  // post-processing after optimization.
-  bool makeWrapper = false;
 
   // FIXME: change the following model name
   std::string destName = destInfo.get_dest_name();
@@ -345,45 +330,6 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     initialize_min_delay(it->ModInfo, destName);
   }
 
-  // Optionally make the wrapper function for C/C++ interfacing
-  llvm::Function *wrapperFunction = nullptr;
-  llvm::FunctionType *wrapperFT = nullptr;
-
-  if (makeWrapper) {
-    // Build a FunctionType for wrapperFunction:  it has pointers for
-    // every arg bigger than 64 bits.  If the return value is bigger than 64 bits,
-    // one more pointer arg is added for it, and the function returns void.
-
-    std::vector<llvm::Type *> wrapperArgTy;
-    for (size_t i=0; i < argTy.size(); ++i) {
-      llvm::Type *type = argTy[i];
-      if (isSmallType(type)) {
-        wrapperArgTy.push_back(type);
-      } else {
-        wrapperArgTy.push_back(llvm::PointerType::getUnqual(type));
-      }
-    }
-
-    // Deal with small vs large return values
-    llvm::Type* wrapperRetTy = nullptr;
-    if (isSmallType(retTy)) {
-      wrapperRetTy = retTy;
-    } else {
-      // Add one more pointer argument for return value.
-      // This pointer is typed - using an opaque pointer here caused a LLVM crash during optimization...
-      wrapperArgTy.push_back(llvm::PointerType::getUnqual(retTy));
-      wrapperRetTy = llvm::Type::getVoidTy(*TheContext);
-    }
-
-    wrapperFT = llvm::FunctionType::get(wrapperRetTy, wrapperArgTy, false);
-
-    // Like the main function, the wrapper function must have internal linkage so
-    // that the unneeded args can be optimized away.
-    wrapperFunction = llvm::Function::Create(wrapperFT, llvm::Function::InternalLinkage, 
-                       destInfo.get_instr_name()+"_"+destSimpleName+"_wrapper_old", TheModule.get());
-    wrapperFunction->addFnAttr(llvm::Attribute::NoInline);
-  }
-
   // set arg names for the functions
   uint32_t idx = 0;
   
@@ -394,15 +340,6 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     toCoutVerb("set reg-type func arg: "+regNameBound);
     TheFunction->getArg(idx)->setName(regNameBound);
     topFunction->getArg(idx)->setName(regNameBound);
-
-    // Some wrapper function args are pointers, not values
-    if (wrapperFunction) {
-      if (isSmallType(TheFunction->getArg(idx)->getType())) {
-        wrapperFunction->getArg(idx)->setName(regNameBound);
-      } else {
-        wrapperFunction->getArg(idx)->setName(regNameBound+"ptr_");
-      }
-    }
 
     argNum--;
     topFuncArgMp.emplace(regNameBound, TheFunction->args().begin()+idx);
@@ -423,15 +360,6 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
         TheFunction->getArg(idx)->setName(portName);
         topFunction->getArg(idx)->setName(portName);
 	
-        if (wrapperFunction) {
-          // Some wrapper function args are pointers, not values
-          if (isSmallType(TheFunction->getArg(idx)->getType())) {
-            wrapperFunction->getArg(idx)->setName(portName);
-          } else {
-            wrapperFunction->getArg(idx)->setName(portName+"ptr_");
-          }
-        }
-
         argNum--;
         topFuncArgMp.emplace(portName, TheFunction->args().begin()+idx);
 	idx++;
@@ -453,26 +381,12 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
       (TheFunction->args().begin()+idx)->setName(argName);
       (topFunction->args().begin()+idx)->setName(argName);
 
-      if (wrapperFunction) {
-        // Some wrapper function args are pointers, not values
-        if (isSmallType(TheFunction->getArg(idx)->getType())) {
-          wrapperFunction->getArg(idx)->setName(argName);
-        } else {
-          wrapperFunction->getArg(idx)->setName(argName+"ptr_");
-        }
-      }
-
       idx++;
       argNum--;
     }
   }
 
   toCoutVerb("=== Finished setting module input arg name!");
-
-  // If it exists, set the name of the extra wrapper function arg
-  if (wrapperFunction && !isSmallType(retTy)) {
-    wrapperFunction->getArg(idx)->setName("_return_val_ptr_");
-  }
 
   // basic block
   BB = llvm::BasicBlock::Create(*TheContext, "bb_;_"+destName, TheFunction);
@@ -624,91 +538,9 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 
   llvm::Value *theRet = Builder->CreateCall(FT, TheFunction, args);
 
-
-  if (wrapperFunction) {
-    // call wrapperFunction (if any) in topFunction.
-    // This prevents the wrapperFunction from being optimized away.
-    // Remember: topFunction will eventually get removed.
-    //
-    std::vector<llvm::Value*> wrapperArgs;
-    for (size_t i=0; i < argSize; ++i) {
-      llvm::Type *type = argTy[i];
-      if (isSmallType(type)) {
-        // Pass the value
-        wrapperArgs.push_back(topFunction->getArg(i));
-      } else {
-        // Create a pointer that points to some memory 
-        llvm::Value *tmpPtr = Builder->CreateAlloca(type);
-        // store the arg value into that memory
-        Builder->CreateStore(topFunction->getArg(i), tmpPtr);
-        //wrapperArgs.push_back(llvm::ConstantPointerNull::get(llvm::PointerType::getUnqual(type)));
-        wrapperArgs.push_back(tmpPtr);
-      }
-    }
-
-    llvm::Value *wrapperRet = nullptr;
-    if (isSmallType(retTy)) {
-      // the wrapper returns by value
-      wrapperRet = Builder->CreateCall(wrapperFT, wrapperFunction, wrapperArgs);
-    } else {
-      // Pass an additional pointer to something
-      llvm::Value *retPtr = Builder->CreateAlloca(retTy);
-      // In release 15 of LLVM, this will become an opaque pointer
-      //llvm::Value *retOpaquePtr = Builder->CreateBitCast(retPtr, llvm::PointerType::getUnqual(*TheContext));
-      wrapperArgs.push_back(retPtr);
-
-      // Call the wrapper - it will fill in the additional pointer
-      Builder->CreateCall(wrapperFT, wrapperFunction, wrapperArgs);
-
-      // Dereference that pointer to get the return value
-      wrapperRet = Builder->CreateLoad(retTy, retPtr);
-    }
-
-    // Do a calculation with both return values, so that the functions will not get optimized away.
-    llvm::Value *finalRet = Builder->CreateAdd(theRet, wrapperRet);
-    Builder->CreateRet(finalRet);
-
-  } else {
-    Builder->CreateRet(theRet);
-  }
-
+  Builder->CreateRet(theRet);
 
   llvm::verifyFunction(*topFunction);
-
-
-  // Fill in the contents of wrapperFunction (if any)
-  if (wrapperFunction) {
-    auto wrapperBB = llvm::BasicBlock::Create(*TheContext, "wrapper_bb", wrapperFunction);
-    Builder->SetInsertPoint(wrapperBB);  
-
-    // Pass the wrapper args down to the main function. For ones that
-    // are provided via pointers, dereference the pointers.
-    std::vector<llvm::Value*> wrappedArgs;
-    for (size_t i=0; i < argSize; ++i) {
-      llvm::Value *argVal = nullptr;
-      if (isSmallType(argTy[i])) {
-        // Pass the arg by value
-        argVal = wrapperFunction->getArg(i);
-      } else {
-        // Dereference the pointer
-        argVal = Builder->CreateLoad(argTy[i], wrapperFunction->getArg(i));
-      }
-      wrappedArgs.push_back(argVal);
-    }
-    
-    // call TheFunction from wrapperFunction
-    llvm::Value *call = Builder->CreateCall(FT, TheFunction, wrappedArgs);
-
-    if (isSmallType(retTy)) {
-      Builder->CreateRet(call);
-    } else {
-      // Add store of return value to last pointer arg
-      Builder->CreateStore(call, wrapperFunction->getArg(argSize));
-      Builder->CreateRetVoid();
-    }
-
-    llvm::verifyFunction(*wrapperFunction);
-  }
 
   llvm::verifyModule(*TheModule);
   std::string Str;

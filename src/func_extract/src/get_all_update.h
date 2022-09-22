@@ -39,11 +39,9 @@ bool read_clean_optimized(std::string fileName,
                            std::string outFileName,
                            std::string funcNameIn);                   
 
-uint32_t get_delay_bound(std::string var, std::vector<std::string> tgtVec, 
-                         struct InstrInfo_t &instrInfo, 
-                         std::vector<std::pair<std::vector<std::string>, 
-                                               uint32_t>> allowedTgtVec,
-                         std::map<std::string, std::vector<uint32_t>> allowedTgt);
+std::vector<uint32_t>
+get_delay_bounds(std::string var, const std::vector<std::string>& tgtVec, 
+                         const struct InstrInfo_t& instrInfo);
 
 void print_func_info(std::ofstream &output);
 
