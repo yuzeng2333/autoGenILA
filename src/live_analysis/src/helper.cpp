@@ -547,6 +547,7 @@ std::string get_nth_var_in_list(std::string list, uint32_t idx) {
       return m.str(1);
     previous = current;
   }
+  abort();
 }
 
 
@@ -1862,6 +1863,7 @@ bool check_input_val(std::string value) {
 void split_by(std::string str, std::string separator, std::vector<std::string> &vec) {
   assert(vec.empty());
   if(str.find(separator) == std::string::npos) {
+    remove_two_end_space(str);
     vec.push_back(str);
     return;
   }
@@ -1878,6 +1880,29 @@ void split_by(std::string str, std::string separator, std::vector<std::string> &
   remove_two_end_space(singleVal);
   vec.push_back(singleVal);
 }
+
+// A cooler version of split_by()
+void split_by_regex(const std::string& str, const std::regex& re, std::vector<std::string> &vec) {
+
+    auto words_begin =
+        std::sregex_iterator(str.begin(), str.end(), re);
+    auto words_end = std::sregex_iterator();
+
+    for (std::sregex_iterator i = words_begin; i != words_end; ++i) {
+        std::smatch match = *i;
+        std::string match_str = match.str();
+        remove_two_end_space(match_str);
+        vec.push_back(match_str);
+    }
+}
+
+
+// A slightly easier to use (but slower) version of split_by_regex()
+void split_by_regex(const std::string& str, const std::string& re_str, std::vector<std::string> &vec) {
+  std::regex re(re_str);
+  split_by_regex(str, re, vec);
+}
+
 
 
 std::string merge_with(const std::vector<std::string> &vec, std::string connector) {

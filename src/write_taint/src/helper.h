@@ -1,5 +1,5 @@
-#ifndef HELPER
-#define HELPER
+#ifndef WRITE_TAINT_HELPER
+#define WRITE_TAINT_HELPER
 
 #include <string>
 #include "global_data.h"

@@ -952,7 +952,7 @@ std::string DestInfo::get_dest_name() {
     return destAndSlice;
   }
   else {
-    return funcExtract::name_for_array(destVec.front());
+    return funcExtract::name_for_array(destVec);
   }
 }
 

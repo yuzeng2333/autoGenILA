@@ -67,9 +67,7 @@ void read_asv_info(std::string fileName, bool convertName) {
 }
 
 
-void read_func_info(std::string fileName, 
-                    std::map<std::string, 
-                             std::pair<uint32_t, uint32_t>> &global_arr) {
+void read_func_info(std::string fileName) { 
   std::ifstream input(fileName);
   std::string instrName, target;
   std::string line;
@@ -103,35 +101,30 @@ void read_func_info(std::string fileName,
           g_instrInfo[idx].funcTypes.emplace(target, type);
       }
       else { // target is an array
-        // Pick the first variable name from the string. its name and width will
-        // be used to represent the entire array.
-
         // The string is of the form: "Target:{ var0, var1, var2, var3, varN, }"
-        std::string targetArr = line.substr(8);
-        targetArr.pop_back(); // remove the last }
-        targetArr.pop_back();
-        targetArr.pop_back();
+
+        // Get everything between the curly brackets
+        const static std::regex re("\\{(.*)\\}");
+        std::smatch m;
+        std::regex_search(line, m, re);
+        std::string targetList = m.str(1);
+
+        // Parse out the list into a vector
         std::vector<std::string> targetVec;
-        split_by(targetArr, ", ", targetVec);
+        split_by_regex(targetList, "[^,\\s]+", targetVec);  // Separators are start of line, commas or whitespace
         std::string firstVarName = targetVec.front();
 
         assert(g_asv.count(firstVarName));    
         uint32_t targetWidth = g_asv[firstVarName];    
 
         // Make a more elegant name to represent the entire array.  For example,
-        // cpuregs[1] gets mapped to cpuregs_Arr.
-#if 0
-        firstVarName = var_name_convert(firstVarName, true);
-        //firstVarName = convert_to_c_var(firstVarName);
-        target = firstVarName+"_Arr";
-#else
-        target = name_for_array(firstVarName);
-        target = var_name_convert(target, true);
-#endif
+        // cpuregs[5] ... cpuregs[31] gets mapped to cpuregs_5_31_Arr.
+        target = name_for_array(targetVec);
 
-        if(global_arr.find(target) == global_arr.end()) {
-          global_arr.emplace(target, std::make_pair(targetWidth, targetVec.size()));
+        if(g_globalArr.find(target) == g_globalArr.end()) {
+          g_globalArr.emplace(target, std::make_pair(targetWidth, targetVec.size()));
         }
+
         // 0 target width means return type is void
         struct FuncTy_t type = { 0, std::vector<std::pair<uint32_t, std::string>>{} };      
         if(g_instrInfo[idx].funcTypes.find(target) 
@@ -303,13 +296,30 @@ bool same_value(std::string val1, std::string val2) {
 }
 
 
-// Create a new name to represent an array of variables, based on the first element's name,
+// Create a new,clean name to represent an array of variables, based on the elements' names,
 // in an aesthetically pleasing way.
-// A name like "cpuregs[0]" will get mapped to "cpuregs_Arr".
-std::string name_for_array(std::string firstVarName) {
-    static const std::regex e("\\[[0-9]*\\]");
-    std::string result = std::regex_replace(firstVarName, e, "") + "_Arr";
-    return result;
+// A vector like "cpuregs[5],...,cpuregs[31]" will get mapped to "cpuregs_5_31_Arr".
+std::string name_for_array(const std::vector<std::string>& varNames) {
+  static const std::regex bracketRegex("\\[([0-9]+)\\]");
+  std::smatch m;
+
+  std::string replacement;
+  if (std::regex_search(varNames.front(), m, bracketRegex)) {
+    replacement = ("_" + m.str(1));
+    if (std::regex_search(varNames.back(), m, bracketRegex)) {
+      replacement += ("_" + m.str(1));
+    }
+  }
+
+  std::string result;
+  if (replacement.length()) {
+    result = std::regex_replace(varNames[0], bracketRegex, replacement) + "_Arr";
+  } else {
+    result = varNames[0] + "_Arr";  // Array elements do not have consistent names.
+  }
+
+  return var_name_convert(result, true);
 }
 
 }
+

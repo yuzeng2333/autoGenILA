@@ -88,6 +88,16 @@ void get_all_update() {
     g_workSet.mtxClear();
   }
 
+  // The members of register arrays have to go in g_asvSet (and
+  // get written out in asv_info.txt), so that the downstream flow
+  // knows their width values.
+  for(auto pair: g_allowedTgtVec) {
+    for(std::string reg : pair.first) {
+      uint32_t width = get_var_slice_width_cmplx(reg);
+      g_asvSet.emplace(reg, width);
+    }
+  }
+
   // declaration for llvm
   std::ofstream funcInfo(g_path+"/func_info.txt");
   std::ofstream asvInfo(g_path+"/asv_info.txt");

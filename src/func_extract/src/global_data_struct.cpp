@@ -16,11 +16,19 @@ StrSet_t moduleAs;
 std::set<std::string> g_mem;
 std::map<std::string, uint32_t> g_fifo;
 uint32_t g_new_var;
+
 //std::unordered_map<std::string, astNode*> g_asSliceRoot;
 std::map<std::string, astNode*> g_varNode;
-// each element is a map from input signal to its value
-// x means the value can be arbitrary
+
+// In func_extract and sim_gen, read_instructions() builds this from instr.txt.
+// In sim_gen, read_func_info() populates the funcTypes fields from func_info.txt.
 std::vector<struct InstrInfo_t> g_instrInfo;
+
+// In sim_Gen, read_func_info() builds this from func_info.txt.
+// Key is array name.
+// First of pair is array element bit width, second is array size
+std::map<std::string, std::pair<uint32_t, uint32_t>> g_globalArr;
+
 std::unordered_map<std::string, std::string> g_nopInstr;
 std::map<std::string, std::string> g_rstVal;
 // first key is instance name, second key is wire name
@@ -34,6 +42,11 @@ std::map<std::string, uint32_t> g_asv;
 Str2StrVecMap_t g_moduleInputsMap;
 Str2StrVecMap_t g_moduleOutputsMap;
 std::map<std::string, std::vector<uint32_t>> g_allowedTgt;
+
+// Vector targets, as read from allowed_target.txt.
+// The string vector holds the element names, and the uint32_t holds the 
+// cycle count.
+
 std::vector<std::pair<std::vector<std::string>, uint32_t>> g_allowedTgtVec;
 //VarWidth g_varWidth;
 

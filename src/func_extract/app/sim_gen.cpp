@@ -32,9 +32,6 @@ std::string g_dataIn = "zy_data_in";
 std::string nxt = "_nxt";
 std::map<std::string, std::string> rstValMap;
 
-// first of pair is element bit width, second is array size
-std::map<std::string, std::pair<uint32_t, uint32_t>> g_global_arr;
-
 // key of map is var name, the value vector is the
 // vector of values for multiple cycles, since an
 // instruction might span multiple cycles
@@ -92,7 +89,7 @@ int main(int argc, char *argv[]) {
   read_asv_info(g_path+"/asv_info.txt");
   // fill the funcTypes in g_instrInfo
   if(g_design != VTA)
-    read_func_info(g_path+"/func_info.txt", g_global_arr);
+    read_func_info(g_path+"/func_info.txt");
   read_to_do_instr(g_path+"/tb.txt", toDoList);
   read_refinement(g_path+"/refinement.txt");
   read_skipped_target(g_path+"/skipped_target.txt");
@@ -126,7 +123,7 @@ int main(int argc, char *argv[]) {
   // c file. Put them only in the llvm-ir file
 
   if(g_design != VTA) {
-    for(auto pair: g_global_arr) {
+    for(auto pair: g_globalArr) {
       std::string arrName = pair.first;
       uint32_t size = pair.second.second;
       std::string dataTy = c_type(pair.second.first);
@@ -855,9 +852,9 @@ void read_skipped_target(std::string fileName) {
   }
 }
 
-// If the var is found in the g_global_arr table, it is an array.
+// If the var is found in the g_globalArr table, it is an array.
 bool is_array_var(const std::string& varName) {
-  return g_global_arr.count(varName);
+  return g_globalArr.count(varName);
 }
 
 
@@ -924,11 +921,11 @@ void print_asv_values(std::ofstream &cpp) {
 
 
 void print_array(std::string arrName, std::ofstream &cpp) {
-  if (!g_global_arr.count(arrName)) {
+  if (!g_globalArr.count(arrName)) {
     toCout("Error: cannot find info for the array: "+arrName);
     abort();
   }
-  auto bitDepthPair = g_global_arr[arrName];
+  auto bitDepthPair = g_globalArr[arrName];
   uint32_t depth = bitDepthPair.second;
   cpp << "    for(int i = 0; i < "+toStr(depth)+"; i++) {" << std::endl;
   // Doug: this assumes that the element width is <= 32 bits...

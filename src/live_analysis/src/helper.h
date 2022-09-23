@@ -1,10 +1,11 @@
-#ifndef HELPER
-#define HELPER
+#ifndef LIVE_ANALYSIS_HELPER
+#define LIVE_ANALYSIS_HELPER
 
 #include <string>
 #include <sstream>
 #include <bitset>
 #include <iostream>
+#include <regex>
 #include "global_data.h"
 
 namespace taintGen {
@@ -186,6 +187,9 @@ bool split_concat(std::string var, std::vector<std::string> &vec);
 bool check_input_val(std::string value);
 
 void split_by(std::string str, std::string separator, std::vector<std::string> &vec);
+void split_by_regex(const std::string& str, const std::regex& re, std::vector<std::string> &vec);
+void split_by_regex(const std::string& str, const std::string& re_str, std::vector<std::string> &vec);
+
 
 std::string merge_with(const std::vector<std::string> &vec, std::string connector);
 

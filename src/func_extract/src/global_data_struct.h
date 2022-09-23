@@ -214,6 +214,8 @@ extern std::map<std::string, expr*> TIMED_VAR2EXPR;
 extern std::set<std::string> INT_EXPR_SET;
 
 extern std::vector<struct InstrInfo_t> g_instrInfo;
+extern std::map<std::string, std::pair<uint32_t, uint32_t>> g_globalArr;
+
 extern bool g_print_solver;
 extern bool g_skipCheck;
 extern bool g_use_read_ASV;
