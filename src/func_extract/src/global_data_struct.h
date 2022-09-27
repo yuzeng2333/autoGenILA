@@ -42,8 +42,6 @@
 #include "llvm/Analysis/LoopInfo.h"
 #define DELAY_MAX  (0x7fffffff)
 
-using namespace z3;
-using namespace taintGen;
 
 namespace funcExtract {
 
@@ -209,8 +207,8 @@ extern std::ofstream g_outFile;
 extern std::ofstream g_regValueFile;
 extern std::map<astNode*, uint32_t> CLEAN_QUEUE;
 extern std::map<astNode*, uint32_t> DIRTY_QUEUE;
-extern std::map<std::string, expr*> INPUT_EXPR_VAL;
-extern std::map<std::string, expr*> TIMED_VAR2EXPR;
+extern std::map<std::string, z3::expr*> INPUT_EXPR_VAL;
+extern std::map<std::string, z3::expr*> TIMED_VAR2EXPR;
 extern std::set<std::string> INT_EXPR_SET;
 
 extern std::vector<struct InstrInfo_t> g_instrInfo;
@@ -253,8 +251,8 @@ extern std::map<std::string, llvm::Function*> g_concatFunc;
 extern std::map<std::string, std::string> g_fifoIns;
 extern std::map<std::string, uint32_t> g_asv;
 
-extern Str2StrVecMap_t g_moduleInputsMap;
-extern Str2StrVecMap_t g_moduleOutputsMap;
+extern taintGen::Str2StrVecMap_t g_moduleInputsMap;
+extern taintGen::Str2StrVecMap_t g_moduleOutputsMap;
 extern std::map<std::string, std::vector<uint32_t>> g_allowedTgt;
 extern std::vector<std::pair<std::vector<std::string>, uint32_t>> g_allowedTgtVec;
 extern std::queue<std::pair<std::string, uint32_t>> g_goalVars;

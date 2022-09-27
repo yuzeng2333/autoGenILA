@@ -28,14 +28,14 @@ std::string CURRENT_VAR;
 
 // DIRTY_QUEUE is mainly not-current AS
 
-std::map<std::string, expr*> INPUT_EXPR_VAL;
-std::map<std::string, expr*> TIMED_VAR2EXPR;
+std::map<std::string, z3::expr*> INPUT_EXPR_VAL;
+std::map<std::string, z3::expr*> TIMED_VAR2EXPR;
 
 std::map<std::string, uint32_t> g_allRegs;
 std::set<std::string> g_regWithFunc;
 HierCtx g_insContextStk;
 
-//std::unordered_map<std::string, expr*> INT_EXPR_VAL;
+//std::unordered_map<std::string, z3::expr*> INT_EXPR_VAL;
 std::set<std::string> INT_EXPR_SET;
 std::set<std::string> g_readASV;
 // remaining variables to be built goal for

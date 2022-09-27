@@ -20,7 +20,6 @@
 #define context std::shared_ptr<llvm::LLVMContext>
 #define builder std::shared_ptr<llvm::IRBuilder<>>
 
-using namespace z3;
 
 namespace funcExtract {
 
@@ -130,7 +129,7 @@ class UpdateFunctionGen {
                                     std::shared_ptr<llvm::IRBuilder<>> &b, const uint32_t bound);
     
     void add_child_constraint(astNode* const parentNode, uint32_t timeIdx, 
-                              context &c, solver &s, goal &g, 
+                              context &c, z3::solver &s, z3::goal &g, 
                               const uint32_t bound, bool isSolve);
 
     void push_clean_queue(astNode* node, uint32_t timeIdx);
@@ -315,21 +314,21 @@ void print_llvm_ir_without_submodules(std::string destAndSlice,
 
 
 //void add_clean_constraint(astNode* const node, uint32_t timeIdx, context &c, 
-//                          solver &s, goal &g, const uint32_t bound, bool isSolve);
+//                          z3::solver &s, z3::goal &g, const uint32_t bound, bool isSolve);
 
 
-//void add_all_clean_constraints(context &c, solver &s, goal &g, 
+//void add_all_clean_constraints(context &c, z3::solver &s, z3::goal &g, 
 //                               const uint32_t bound, bool isSolve=true);
 
 //void add_dirty_constraint(astNode* const node, uint32_t timeIdx, 
-//                          context &c, solver &s, const uint32_t bound);
+//                          context &c, z3::solver &s, const uint32_t bound);
 
 
-//void add_all_dirty_constraints(context &c, solver &s, const uint32_t bound);
+//void add_all_dirty_constraints(context &c, z3::solver &s, const uint32_t bound);
 
-//void add_input_values(context &c, solver &s, const uint32_t bound);
+//void add_input_values(context &c, z3::solver &s, const uint32_t bound);
 
-//void add_nop(context &c, solver &s, const uint32_t bound);
+//void add_nop(context &c, z3::solver &s, const uint32_t bound);
 
 void print_time(); 
 

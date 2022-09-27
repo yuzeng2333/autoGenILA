@@ -4,6 +4,8 @@
 
 namespace funcExtract {
 
+using namespace taintGen;
+
 // parse instr.txt file
 // parsed result is in g_instrInfo
 void read_in_instructions(std::string fileName) {

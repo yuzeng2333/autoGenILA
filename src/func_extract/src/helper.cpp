@@ -39,14 +39,14 @@ llvm::Value* llvmInt(llvm::APInt value,
 }
 
 
-//bool isAs(std::string var, HierCtx_t &insContextStk) {
+//bool isAs(const std::string& var, HierCtx_t &insContextStk) {
 //  auto curMod = get_curMod(insContextStk);
 //  auto it = std::find( curMod->moduleAs.begin(), curMod->moduleAs.end(), var );
 //  return it != curMod->moduleAs.end();
 //}
 
 
-bool is_formed_num(std::string num) {
+bool is_formed_num(const std::string& num) {
   std::smatch m;
   return std::regex_match(num, m, pHex)
           || std::regex_match(num, m, pBin)
@@ -156,7 +156,7 @@ uint32_t get_formed_width(std::string num) {
 }
 
 
-uint64_t hex2int(std::string num) {
+uint64_t hex2int(const std::string& num) {
   uint64_t res = 0;
   for(auto it = num.begin(); it != num.end(); it++) {
     res = res * 16;
@@ -179,7 +179,7 @@ uint64_t hex2int(std::string num) {
 }
 
 // dec2hex is already defined in taint_gen
-//std::string dec2hex(std::string dec) {
+//std::string dec2hex(const std::string& dec) {
 //  std::stringstream ss;
 //  ss << std::hex << dec; // int decimal_value
 //  std::string res ( ss.str() );
@@ -188,7 +188,7 @@ uint64_t hex2int(std::string num) {
 //}
 
 
-std::string longDec2hex(std::string decimalValue) {
+std::string longDec2hex(const std::string& decimalValue) {
   uint64_t val = std::stol(decimalValue);
   return longDec2hex(val);
 }
@@ -202,7 +202,7 @@ std::string longDec2hex(uint64_t decimalValue) {
 }
 
 
-std::string get_pure_num(std::string formedNum) {
+std::string get_pure_num(const std::string& formedNum) {
   std::smatch m;
   if (std::regex_match(formedNum, m, pHex)
       || std::regex_match(formedNum, m, pBin )
@@ -216,7 +216,7 @@ std::string get_pure_num(std::string formedNum) {
 }
 
 
-std::string formedHex2bin(std::string num) {
+std::string formedHex2bin(const std::string& num) {
   std::smatch m;
   if(!std::regex_match(num, m, pHex)) {
     toCout("Error: input to hex2bin is not hex:" +num);
@@ -224,7 +224,7 @@ std::string formedHex2bin(std::string num) {
   uint32_t width = try_stoi(m.str(1));
   std::string pureNum = m.str(2);
   std::string ret="";
-  for(char &c: pureNum) {
+  for(char c: pureNum) {
     switch(c) {
       case 'f':
         ret += "1111";
@@ -283,22 +283,22 @@ std::string formedHex2bin(std::string num) {
 }
 
 
-bool is_hex(std::string num) {
+bool is_hex(const std::string& num) {
   std::smatch m;
   return std::regex_match(num, m, pHex);
 }
 
 
-uint64_t bin2int(std::string num) {
+uint64_t bin2int(const std::string& num) {
   uint64_t res = 0;
-  for(char &c: num) {
+  for(char c: num) {
     res = (res << 1) + (c - '0');
   }
   return res;
 }
 
 
-std::string timed_name(std::string name, uint32_t timeIdx) {
+std::string timed_name(const std::string& name, uint32_t timeIdx) {
   return name + post_fix(timeIdx);
 }
 
@@ -334,12 +334,12 @@ void record_expr(expr varExpr) {
 //}
 
 
-bool is_root(std::string var) {
+bool is_root(const std::string& var) {
   return var.compare(g_rootNode) == 0;
 }
 
 
-std::string pure(std::string var) {
+std::string pure(const std::string& var) {
   if(var.find("_#") == std::string::npos)
     return var;
   size_t pos = var.find_last_of("#");
@@ -347,12 +347,12 @@ std::string pure(std::string var) {
 }
 
 
-bool is_taint(std::string var) {
+bool is_taint(const std::string& var) {
   return var.back() == 'T';
 }
 
 
-bool is_clean(std::string var, const std::shared_ptr<ModuleInfo_t> &modInfo) {
+bool is_clean(const std::string& var, const std::shared_ptr<ModuleInfo_t> &modInfo) {
   return !is_taint(var) && ( is_input(pure(var), modInfo) || is_read_asv(pure(var), modInfo) );
 }
 
@@ -362,14 +362,14 @@ std::string get_name(expr expression) {
 }
 
 
-bool is_read_asv(std::string var, const std::shared_ptr<ModuleInfo_t> &curMod) {
+bool is_read_asv(const std::string& var, const std::shared_ptr<ModuleInfo_t> &curMod) {
   return g_readASV.find(pure(var)) != g_readASV.end() 
          || g_readASV.find(curMod->name+"."+pure(var)) != g_readASV.end();
 }
 
 
 // FIXME: not sure if this is true for multi-cycle word
-bool has_explicit_value(std::string input) {
+bool has_explicit_value(const std::string& input) {
   //uint32_t encodingSize = g_currInstrInfo.instrEncoding.begin()->second.size();
   if(g_currInstrInfo.instrEncoding.find(input) == g_currInstrInfo.instrEncoding.end())
     return false;
@@ -394,7 +394,7 @@ bool comparePair(const std::pair<std::string, uint32_t> &p1,
 }
 
 
-uint32_t get_time(std::string var) {
+uint32_t get_time(const std::string& var) {
   if(var.find(DELIM) == std::string::npos) {
     toCout("Error: the var's Name has no time: "+var);
     abort();
@@ -408,17 +408,17 @@ uint32_t get_time(std::string var) {
 }
 
 
-bool is_case_dest(std::string var, const std::shared_ptr<ModuleInfo_t> &curMod) {
+bool is_case_dest(const std::string& var, const std::shared_ptr<ModuleInfo_t> &curMod) {
   return curMod->caseTable.find(var) != curMod->caseTable.end();
 }
 
 
-bool is_switch_dest(std::string var, const std::shared_ptr<ModuleInfo_t> &curMod) {
+bool is_switch_dest(const std::string& var, const std::shared_ptr<ModuleInfo_t> &curMod) {
   return curMod->switchTable.find(var) != curMod->switchTable.end();
 }
 
 
-bool is_func_output(std::string var, 
+bool is_func_output(const std::string& var, 
                     const std::shared_ptr<ModuleInfo_t> &curMod) {
   if(curMod->funcTable.find(var) != curMod->funcTable.end())
     return true;
@@ -427,7 +427,7 @@ bool is_func_output(std::string var,
   return false;
 }
 
-uint32_t get_pos_of_one(std::string value) {
+uint32_t get_pos_of_one(const std::string& value) {
   if(value.compare("default") == 0) {
     toCout("Error: try to find 1 in default: "+value);
     abort();
@@ -530,7 +530,7 @@ uint32_t get_ltr_lo(std::string varAndSlice, const std::shared_ptr<ModuleInfo_t>
 
 // summary: check if a variable's slice is assigned directly
 // input: varAndSlice must have slice
-bool has_direct_assignment(std::string varAndSlice, const std::shared_ptr<ModuleInfo_t> &curMod) {
+bool has_direct_assignment(const std::string& varAndSlice, const std::shared_ptr<ModuleInfo_t> &curMod) {
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
   bool withinReg2Slices = curMod->reg2Slices.find(var) != curMod->reg2Slices.end();
@@ -561,7 +561,7 @@ uint32_t get_num_len(std::string num) {
 }
 
 
-std::string zero_extend_num(std::string num) {
+std::string zero_extend_num(const std::string& num) {
   static const std::regex pBin("^(\\d+)'b([01x\\?]+)$"); 
   std::smatch m;
   if(std::regex_match(num, m, pBin)) {
@@ -576,8 +576,8 @@ std::string zero_extend_num(std::string num) {
 }
 
 
-bool is_bin(std::string bv) {
-  for(char &c : bv) {
+bool is_bin(const std::string& bv) {
+  for(char c : bv) {
     if(c != '0' && c != '1')
       return false;
   }
@@ -585,8 +585,8 @@ bool is_bin(std::string bv) {
 }
 
 
-bool is_all_zero(std::string str) {
-  for(auto &c: str) {
+bool is_all_zero(const std::string& str) {
+  for(char c: str) {
     if(c != '0')
       return false;
   }
@@ -626,8 +626,8 @@ bool is_written_ASV(const std::string &reg) {
 }
 
 
-bool is_all_x(std::string strIn) {
-  for(char &c: strIn) {
+bool is_all_x(const std::string& strIn) {
+  for(char c: strIn) {
     if(c != 'x')
       return false;
   }
@@ -635,14 +635,14 @@ bool is_all_x(std::string strIn) {
 }
 
 
-void add_front_backslash(std::string &line) {
+void add_front_backslash(std::string line) {
   if(line.substr(0, 1) == "\\" && line.substr(0, 2) != "\\\\") {
     line = "\\"+line;
   }
 }
 
 
-void remove_front_backslash(std::string &line) {
+void remove_front_backslash(std::string line) {
   while(line.substr(0, 1) == "\\" ) {
     line = line.substr(1);
   }
@@ -687,7 +687,7 @@ bool isLetter(const char &c) {
 }
 
 
-std::string purify_line(const std::string &line) {
+std::string purify_line(std::string line) {
   if(line.find("|") == std::string::npos)
     return line;
   uint32_t pos = line.find("|");
@@ -701,7 +701,7 @@ std::string purify_line(const std::string &line) {
 }
 
 
-int try_stoi(std::string num) {
+int try_stoi(const std::string& num) {
   int ret;
   try {
     ret = std::stoi(num);
@@ -712,7 +712,7 @@ int try_stoi(std::string num) {
 }
 
 
-uint64_t try_stol(std::string num) {
+uint64_t try_stol(const std::string& num) {
   uint64_t ret;
   try {
     ret = std::stol(num);
@@ -725,7 +725,7 @@ uint64_t try_stol(std::string num) {
 
 // ATTENTION: for func_extract, you can only use get_var_slice_width_simp
 // get_var_slice_width cannot be used!!
-uint32_t get_var_slice_width_simp(std::string varAndSlice, 
+uint32_t get_var_slice_width_simp(const std::string& varAndSlice, 
                                   const std::shared_ptr<ModuleInfo_t> &mod) {
   return get_var_slice_width( varAndSlice, mod->varWidth);
 }
@@ -733,7 +733,7 @@ uint32_t get_var_slice_width_simp(std::string varAndSlice,
 
 // varAndSlice might have a module name prefix. This function
 // parse the module name and get corresponding module information
-uint32_t get_var_slice_width_cmplx(std::string varAndSlice) {
+uint32_t get_var_slice_width_cmplx(const std::string& varAndSlice) {
   if(varAndSlice.find(".") == std::string::npos 
      || varAndSlice.substr(0, 1) == "\\")
     return get_var_slice_width_simp(varAndSlice, g_moduleInfoMap[g_topModule]);
@@ -752,7 +752,7 @@ uint32_t get_var_slice_width_cmplx(std::string varAndSlice) {
 }
 
 
-bool is_comment_line(std::string &line) {
+bool is_comment_line(const std::string& line) {
   uint32_t pos = line.find_first_not_of(" ", 0);
   return line.substr(pos, 2) == "//";
 }
@@ -836,7 +836,7 @@ bool is_reg(std::string var) {
 }
 
 
-bool is_reg_in_curMod(std::string varAndSlice,
+bool is_reg_in_curMod(const std::string& varAndSlice,
                       const std::shared_ptr<ModuleInfo_t> &curMod) {
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
@@ -860,7 +860,7 @@ bool is_submod_output(const std::string &var,
 }
 
 
-std::shared_ptr<ModuleInfo_t> get_mod_info(std::string insName, 
+std::shared_ptr<ModuleInfo_t> get_mod_info(const std::string& insName, 
                                            std::shared_ptr<ModuleInfo_t> curMod) {
   if(curMod->ins2modMap.find(insName) == curMod->ins2modMap.end()) {
     toCout("Error: cannot find submod instance: "+insName+" for module: "+curMod->name);
@@ -915,7 +915,7 @@ void collect_regs_iter(std::shared_ptr<ModuleInfo_t> &curMod,
                        RegWidthVec_t &regWidth ) {
   if(!regPrefix.empty())
     regPrefix = regPrefix + ".";
-  for(std::string reg : curMod->moduleTrueRegs) {
+  for(const std::string& reg : curMod->moduleTrueRegs) {
     uint32_t width = get_var_slice_width_simp(reg, curMod);
     regWidth.push_back(std::make_pair(regPrefix+reg, width));
     std::string fullRegName = regPrefix+reg;
@@ -975,7 +975,7 @@ void collect_mem_ins(std::shared_ptr<ModuleInfo_t> &curMod,
 }
 
 
-void check_mod_name(std::string modName) {
+void check_mod_name(const std::string& modName) {
   if(g_moduleInfoMap.find(modName) == g_moduleInfoMap.end()) {
     toCout("Error: module is not in g_moduleInfoMap: "+modName);
     abort();
@@ -983,7 +983,7 @@ void check_mod_name(std::string modName) {
 }
 
 
-std::string get_mod_name(std::string name) {
+std::string get_mod_name(const std::string& name) {
   size_t pos = name.find(".");
   if(pos == std::string::npos) {
     return "";
@@ -996,7 +996,7 @@ std::string get_mod_name(std::string name) {
 }
 
 
-std::string get_var_name(std::string name) {
+std::string get_var_name(const std::string& name) {
   size_t pos = name.find(".");
   if(pos == std::string::npos) {
     return name;
@@ -1009,7 +1009,7 @@ std::string get_var_name(std::string name) {
 }
 
 
-std::pair<std::string, std::string> split_prefix_var(std::string var) {
+std::pair<std::string, std::string> split_prefix_var(const std::string& var) {
   size_t pos = var.find(".");
   if(var.substr(0, 1) == "\\" || pos == std::string::npos) {
     return std::make_pair("", var);
@@ -1044,7 +1044,7 @@ std::string ask_for_my_ins_name(const std::shared_ptr<ModuleInfo_t> &curMod) {
 }
 
 
-std::string ask_parent_my_ins_name(std::string myModName, 
+std::string ask_parent_my_ins_name(const std::string& myModName, 
                                    std::shared_ptr<ModuleInfo_t> parentMod) {
   std::string insName = "";
   for(auto pair : parentMod->ins2modMap) {
@@ -1059,7 +1059,7 @@ std::string ask_parent_my_ins_name(std::string myModName,
 }
 
 
-void check_no_slice(std::string varAndSlice) {
+void check_no_slice(const std::string& varAndSlice) {
   if(varAndSlice.empty()) return;
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
@@ -1248,7 +1248,7 @@ std::string get_rst_value(const std::string &destAndSlice,
 }
 
 
-bool is_fifo_output(std::string wire) {
+bool is_fifo_output(const std::string& wire) {
   auto topMod = g_moduleInfoMap[g_topModule];
   if(topMod->wire2InsPortMp.find(wire) == topMod->wire2InsPortMp.end())
     return false;
@@ -1263,7 +1263,7 @@ bool is_fifo_output(std::string wire) {
 }
 
 
-bool is_fifo_module(std::string modName) {
+bool is_fifo_module(const std::string& modName) {
   if(g_fifo.find(modName) != g_fifo.end()) return true;
   if(modName.find("\\$paramod\\mem_fifo\\WIDTH=") != std::string::npos)
     return true;
@@ -1279,7 +1279,7 @@ void print_all_regs(const std::vector<std::pair<std::string, uint32_t>> &regWidt
   output.close();
 }
 
-std::string var_name_convert(std::string varName, bool replaceSlash) {
+std::string var_name_convert(const std::string& varName, bool replaceSlash) {
   std::string ret;
   for(char c : varName) {
     if(std::isdigit(c)
@@ -1321,14 +1321,14 @@ void print_reg_info(RegWidthVec_t &regWidth) {
 
 
 // return if var is purely number -- no x
-bool is_pure_num(std::string var) {
+bool is_pure_num(const std::string& var) {
   if(!is_number(var)) return false;
   if(var.find("x") == std::string::npos) return true;
   else return false;
 }
 
 
-void replace_with(std::string &str, std::string subStr, std::string newSubStr) {
+void replace_with(std::string str, std::string subStr, std::string newSubStr) {
   size_t index = 0;
   uint32_t len = subStr.size();
   while (true) {
@@ -1345,7 +1345,7 @@ void replace_with(std::string &str, std::string subStr, std::string newSubStr) {
 }
 
 
-std::string remove_unsigned(std::string &line) {
+std::string remove_unsigned(const std::string& line) {
   std::smatch m;
   static const std::regex pSigned("\\$unsigned\\((.*)\\)");
   if(line.find("$unsigned") != std::string::npos) {
@@ -1386,7 +1386,7 @@ std::string post_fix(uint32_t timeIdx) {
 }
 
 
-uint64_t str2int64(std::string str, std::string info) {
+uint64_t str2int64(const std::string& str, std::string info) {
   if(str.length() > 16) {
     toCout("Error: too large int found: "+str);
   }

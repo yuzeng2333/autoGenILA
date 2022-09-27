@@ -5,9 +5,6 @@
 #include <vector>
 #include "../src/parse_fill.h"
 
-using namespace funcExtract;
-using namespace taintGen;
-
 
 extern std::map<std::string, std::string> g_aes_special_func_call;
 extern std::map<std::string, std::string> g_urv_special_func_call;
@@ -16,11 +13,11 @@ std::string update_function_name(const std::string& instr, const std::string& as
 
 std::string c_type(uint32_t width);
 
-std::string func_call(std::string writeASV, const FuncTy_t& funcTy, std::string funcName, 
+std::string func_call(std::string writeASV, const funcExtract::FuncTy_t& funcTy, std::string funcName, 
                       std::map<std::string, std::vector<std::string>> &inputInstr,
                       std::pair<std::string, uint32_t> dataIn);                      
 
-void print_func_declare(const FuncTy_t& funcTy, 
+void print_func_declare(const funcExtract::FuncTy_t& funcTy, 
                         std::string funcName, 
                         std::ofstream &header);
 

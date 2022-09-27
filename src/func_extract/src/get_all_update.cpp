@@ -16,6 +16,8 @@
 
 namespace funcExtract {
 
+using namespace taintGen;
+
 
 std::mutex g_dependVarMapMtx;
 std::mutex g_TimeFileMtx;

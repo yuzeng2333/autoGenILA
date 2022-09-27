@@ -3,6 +3,8 @@
 
 namespace funcExtract {
 
+using namespace taintGen;
+
 // global variables
 std::map<std::string, std::shared_ptr<ModuleInfo_t>> g_moduleInfoMap;
 std::shared_ptr<ModuleInfo_t> g_curMod;
