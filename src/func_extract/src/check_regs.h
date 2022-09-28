@@ -90,7 +90,7 @@ class UpdateFunctionGen {
     uint32_t ext_cnt = 0;
     std::map<std::string, uint32_t> cctNameIdxMap;
     std::map<std::string, uint32_t> extNameIdxMap;
-    std::vector<std::pair<std::string, uint32_t>> regWidth;
+//    std::vector<std::pair<std::string, uint32_t>> regWidth;
     std::vector<std::pair<std::string, std::string>> memInstances;
     struct InstrInfo_t currInstrInfo;
     std::map<std::string, llvm::Function::arg_iterator> topFuncArgMp;

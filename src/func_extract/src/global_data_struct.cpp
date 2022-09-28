@@ -26,10 +26,14 @@ std::map<std::string, astNode*> g_varNode;
 // In sim_gen, read_func_info() populates the funcTypes fields from func_info.txt.
 std::vector<struct InstrInfo_t> g_instrInfo;
 
-// In sim_Gen, read_func_info() builds this from func_info.txt.
+// In sim_gen, read_func_info() builds this from func_info.txt.
 // Key is array name.
-// First of pair is array element bit width, second is array size
-std::map<std::string, std::pair<uint32_t, uint32_t>> g_globalArr;
+std::map<std::string, registerArray_t> g_registerArrays;
+
+// Constructor
+registerArray_t::registerArray_t(const std::vector<std::string>& m, uint32_t w) :
+ members(m), width(w)
+ {} 
 
 std::unordered_map<std::string, std::string> g_nopInstr;
 std::map<std::string, std::string> g_rstVal;

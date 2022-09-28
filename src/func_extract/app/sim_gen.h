@@ -54,11 +54,12 @@ void print_urv_update_mem(std::ofstream &cpp);
 
 void vta_ila_model(std::ofstream &cpp);
 
-void print_asv_values(std::ofstream &cpp);
+void print_asv_values(std::ofstream &cpp, const std::string& bannerLine="", bool always=false);
 
 bool is_array_var(const std::string& varName);
 
-std::string build_printf(const std::string& prefix, const std::string& varName, uint32_t width);
+std::string build_printf(const std::string& prefix, const std::string& varName,
+                          uint32_t width, std::string index="");
 
 // printName is optional, defaults to same as varName
 void print_var_value(std::ofstream &cpp, const std::string& varName,

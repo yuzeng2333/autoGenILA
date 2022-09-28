@@ -192,6 +192,19 @@ struct Context_t {
 };
 
 
+class registerArray_t {
+  public:
+  const std::vector<std::string> members;  // Size of members is array length
+  const uint32_t width;
+
+  registerArray_t() = delete;
+  registerArray_t(const std::vector<std::string>& m, uint32_t w);
+  const std::vector<std::string>& getMembers() const { return members; }
+  uint32_t getWidth() const { return width; }
+  uint32_t getLength() const { return members.size(); }
+};
+
+
 extern std::shared_ptr<ModuleInfo_t> g_curMod;
 extern uint32_t g_new_var;
 //extern taintGen::VarWidth g_varWidth;
@@ -212,7 +225,9 @@ extern std::map<std::string, z3::expr*> TIMED_VAR2EXPR;
 extern std::set<std::string> INT_EXPR_SET;
 
 extern std::vector<struct InstrInfo_t> g_instrInfo;
-extern std::map<std::string, std::pair<uint32_t, uint32_t>> g_globalArr;
+
+
+extern std::map<std::string, registerArray_t> g_registerArrays;
 
 extern bool g_print_solver;
 extern bool g_skipCheck;

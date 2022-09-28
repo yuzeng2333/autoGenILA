@@ -226,13 +226,14 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   // input types
   std::vector<llvm::Type *> argTy;
   std::shared_ptr<ModuleInfo_t> topModInfo = g_moduleInfoMap[g_topModule];
-  regWidth.clear();
+
+  RegWidthVec_t regWidth;
   collect_regs(topModInfo, "", regWidth);
   funcExtract::print_all_regs(regWidth);
 
   funcExtract::collect_mem_ins(topModInfo, "", memInstances);
 
-  // push regs
+  // push reg types
   // add regs from all instances of sub-modules to the args
   uint32_t argNum = 0;
   for(auto it = regWidth.begin(); it != regWidth.end(); it++) {
@@ -243,7 +244,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 
   toCoutVerb("=== Finished adding reg-type args!");
 
-  // push output ports of memory modules
+  // push output port types of memory modules
   for(auto it = memInstances.begin(); it != memInstances.end(); it++) {
     std::string pathInsName = it->first;
     std::string modName = it->second;
@@ -258,7 +259,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 
   toCoutVerb("=== Finished adding memory-output args!");
 
-  // push inputs
+  // push input types
   // bound = (delay in instr.txt) - 1
   for(uint32_t i = 0; i <= bound; i++)  
     for(auto it = curMod->moduleInputs.begin(); 
@@ -397,33 +398,38 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   clean_data();
   std::ofstream goalFile;
   goalFile.open(g_path+"/goal.txt", std::ofstream::app);
-  llvm::Value* destNextExpr;
 
   curMod = g_moduleInfoMap[curModName];
   llvm::Instruction* retInst;
+
   if (!destInfo.isVector) {
-    std::string dest = destVec.front();
+    // A scalar destination: calculate its value, and return it.
     if (is_output(destName, curMod)) initialize_min_delay(curMod, destName);
+
+    std::string dest = destVec.front();
     if (curMod->visitedNode.find(dest) == curMod->visitedNode.end()
         && curMod->reg2Slices.find(dest) == curMod->reg2Slices.end()) {
       toCout("Error: ast node is not found for this var: |"+dest+"|"
               +", curMod: "+curMod->name);
       abort();
+      retInst = Builder->CreateRetVoid();
     } 
-    // The return value for the function
-    else 
-      destNextExpr = add_constraint(dest, 
+    else {
+      // The return value for the function
+      llvm::Value *destExpr = add_constraint(dest, 
                                     0, TheContext, Builder, bound);
-    retInst = Builder->CreateRet(destNextExpr);
+      retInst = Builder->CreateRet(destExpr);
+    }
   }
   else {
-    // if destName is a vector, return an array
+    // if destName is a vector, store the updated values of each element into the global array,
+    // and return it.
     std::vector<llvm::Value*> retVec;
     std::string modName = destInfo.get_mod_name();
     std::string insName = destInfo.get_ins_name();
     if (insName.empty()) insName = modName;
     check_mod_name(modName);
-    llvm::Value* destNextExpr;
+
     //FIXME: currently do not support vector in submodules
     for (std::string dest: destVec) {
       if (is_output(dest, curMod)) initialize_min_delay(curMod, dest);      
@@ -442,20 +448,22 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
         abort();
       } 
       else {
-        destNextExpr = add_constraint(dest, 
+        llvm::Value* destExpr = add_constraint(dest, 
                                       0, TheContext, Builder, bound);
         if (!destInfo.isMemVec)
-          retVec.push_back(destNextExpr);
+          retVec.push_back(destExpr);
       }
     }
 
-    uint32_t size = destVec.size();
-    uint32_t bitNum = log2(size) + 2;
-
-    // store values in retVec to memory of global array
-    uint32_t i = 0;
     if (!retVec.empty()) {
+      // store values in retVec to memory of global array
+      uint32_t size = destVec.size();
+      uint32_t bitNum = log2(size) + 2;
+      uint32_t i = 0;
+
       assert(retArrayElementTy);
+
+      // Store each element to the global array.
       for (llvm::Value* val : retVec) {
         llvm::GetElementPtrInst* ptr 
           = llvm::GetElementPtrInst::Create(
@@ -475,10 +483,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 
 	Builder->CreateStore(val, value(ptr));  
       }
-    }
-    else assert(destInfo.isMemVec);
 
-    if (!retVec.empty()) {
       llvm::GetElementPtrInst* retPtr 
         = llvm::GetElementPtrInst::Create(
             retArrayTy,
@@ -494,6 +499,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
             BB
           );
 
+      // Return a pointer to the global array
       retInst = Builder->CreateRet(value(retPtr));
     }
     else {
@@ -774,7 +780,7 @@ UpdateFunctionGen::add_nb_constraint(astNode* const node,
         dest = prefix + dest;
       }
       std::string destTimed = timed_name(dest, timeIdx);
-      auto destExpr = get_arg(destTimed, curFunc);
+      llvm::Value* destExpr = get_arg(destTimed, curFunc);
       if (destSlice.empty())
         return destExpr;
       else {
