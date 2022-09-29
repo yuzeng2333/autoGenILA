@@ -1328,7 +1328,8 @@ bool is_pure_num(const std::string& var) {
 }
 
 
-void replace_with(std::string str, std::string subStr, std::string newSubStr) {
+// This modifies the given string
+void replace_with(std::string& str, std::string subStr, std::string newSubStr) {
   size_t index = 0;
   uint32_t len = subStr.size();
   while (true) {

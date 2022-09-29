@@ -288,7 +288,7 @@ void print_reg_info(RegWidthVec_t &regWidth);
 
 bool is_pure_num(const std::string& var);
 
-void replace_with(std::string str, std::string subStr, std::string newSubStr);
+void replace_with(std::string& str, std::string subStr, std::string newSubStr);
 
 std::string remove_unsigned(const std::string& line);
 
