@@ -202,6 +202,8 @@ class registerArray_t {
   const std::vector<std::string>& getMembers() const { return members; }
   uint32_t getWidth() const { return width; }
   uint32_t getLength() const { return members.size(); }
+  const std::string& getElement(uint32_t idx) const;
+  int findElement(const std::string& element) const;
 };
 
 

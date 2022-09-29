@@ -30,7 +30,6 @@ std::string g_instrAddrVar = "zy_instr_addr";
 std::string g_dataAddrVar = "zy_data_addr";
 std::string g_dataIn = "zy_data_in";
 std::string nxt = "_nxt";
-std::map<std::string, std::string> rstValMap;
 
 // key of map is var name, the value vector is the
 // vector of values for multiple cycles, since an
@@ -191,35 +190,43 @@ int main(int argc, char *argv[]) {
     std::string asv = pair.first;
     toCout(asv);
     std::string asvSimp = var_name_convert(asv, true);
+
     uint32_t width = pair.second;   
     std::string asvTy = c_type(width);
     if(asvTy.empty()) {
       toCout("Error happened in c_type for "+asv);
       abort();
     }
-    std::string rstVal;
-    std::string noSlash = asv;
-    if(asv.substr(0, 1) == "\\") noSlash = asv.substr(1);
-    if(g_rstVal.find(noSlash) == g_rstVal.end()) {
-      toCout("Warning: cannot find rst value for: "+noSlash);
-      rstVal = "0";
+
+    std::string cRstVal = get_c_rst_val(asv);
+    toCoutVerb("cleaned up rst val of "+asv+"  "+cRstVal);
+
+    // Process ASVs in register arrays separately
+    if (!is_in_array(asv)) {
+      std::string ret = "  "+asvTy+" "+asvSimp+" = "+cRstVal+";";
+      cpp << ret << std::endl;    
+      ret = "  "+asvTy+" "+asvSimp+nxt+" = "+cRstVal+";";
+      cpp << ret << std::endl;
     }
-    else {
-      rstVal = g_rstVal[noSlash];
-    }
-
-    toCout("rst val of "+asv+"  "+rstVal);
-    llvm::APInt rstValAPInt = hdb2apint(rstVal);
-    rstVal = apint2initializer(rstValAPInt);
-
-    toCoutVerb("cleaned up rst val of "+asv+"  "+rstVal);
-
-    rstValMap.emplace(asv, rstVal);    
-    std::string ret = "  "+asvTy+" "+asvSimp+" = "+rstVal+";";
-    cpp << ret << std::endl;    
-    ret = "  "+asvTy+" "+asvSimp+nxt+" = "+rstVal+";";
-    cpp << ret << std::endl;
   }
+
+  // Initialize the ASVs in register arrays
+  // ASVs in a register array are not declared, just initialized.
+  // And they have no associated "nxt" variable
+  for(auto pair: g_registerArrays) {
+    std::string arrayName = pair.first;
+    uint32_t len = pair.second.getLength();
+    for (uint32_t idx = 0; idx < len; ++idx) {
+      std::string asv = pair.second.getElement(idx);
+      std::string asvSimp = var_name_convert(asv, true);
+      std::string cRstVal = get_c_rst_val(asv);
+      toCoutVerb("cleaned up rst val of "+asv+"  "+cRstVal);
+
+      std::string ret = "  "+arrayName+"["+toStr(idx)+"] = "+cRstVal+";  // "+asvSimp;
+      cpp << ret << std::endl;    
+    }
+  }
+
   cpp << "  unsigned int "+g_instrAddrVar+" = 0;" << std::endl;
   cpp << "  unsigned int "+g_dataAddrVar+" = 0;" << std::endl;
   cpp << "  unsigned int "+g_dataIn+" = 0;" << std::endl;
@@ -360,9 +367,9 @@ void print_instr_calls(std::map<std::string,
   uint32_t idx = get_instr_by_name(instrName);
   struct InstrInfo_t& instrInfo = g_instrInfo[idx];    
 
-  cpp << indent+"  // instr"+toStr(idx)+": "+instrInfo.name+"\n" << std::endl;
-  cpp << indent+"  if (PRINT_ALL) printf( \"// instr"+toStr(idx)+": "
-               +instrInfo.name+", memAddr: "+toStr(memAddr)+"\\n\");" << std::endl;
+  cpp << indent+"// instr"+toStr(idx)+": "+instrInfo.name << std::endl;
+  cpp << indent+"if (PRINT_ALL) printf( \"// instr"+toStr(idx)+": "
+               +instrInfo.name+", memAddr: "+toStr(memAddr)+"\\n\");" << std::endl << std::endl;
 
   if(instrInfo.funcTypes.empty()) {
     toCout("Error: no func_info found for instruction: "+instrInfo.name);
@@ -446,22 +453,23 @@ void print_instr_calls(std::map<std::string,
       // TODO: If multiple vars need to be updated, use one function call and multiple assignments:
       // x = y = x = func(..);
 
-      std::string funcCallStr = func_call(varName+nxt, funcCall.funcTy, funcCall.funcName, 
+      std::string funcCallStr = func_call(indent, varName+nxt, funcCall.funcTy, funcCall.funcName, 
                            encoding, instrInfo.loadDataInfo[funcCall.origASV]);
-      cpp << indent+funcCallStr << std::endl;
+      cpp << funcCallStr << std::endl;
 
       // ==== update instrAddr or dataAddr
       if(!instrAddr.empty() && varName == instrAddr) {
-        std::string funcCallStr = func_call(g_instrAddrVar, funcCall.funcTy, funcCall.funcName, 
+        std::string funcCallStr = func_call(indent, g_instrAddrVar, funcCall.funcTy, funcCall.funcName, 
                              encoding, std::pair<std::string, uint32_t>{});
-        cpp << indent+funcCallStr << std::endl;
+        cpp << funcCallStr << std::endl;
       }
       else if(instrInfo.funcTgtMap.count(varName)) {
-        std::string funcCallStr = func_call(g_dataAddrVar, funcCall.funcTy, funcCall.funcName, 
+        std::string funcCallStr = func_call(indent, g_dataAddrVar, funcCall.funcTy, funcCall.funcName, 
                              encoding, instrInfo.loadDataInfo[funcCall.origASV]);
-        cpp << indent+funcCallStr << std::endl;
+        cpp << funcCallStr << std::endl;
       }
     }
+    cpp << std::endl;
   }
   cpp << std::endl;
 
@@ -473,7 +481,7 @@ void print_instr_calls(std::map<std::string,
     for (std::string& varName : funcCall.varNames) {
       if (!is_array_var(varName)) {
         if(!g_update_all_regs) {
-          cpp << indent+"  "+varName +" = "+varName+nxt+";" << std::endl;
+          cpp << indent+varName +" = "+varName+nxt+";" << std::endl;
         }
       } else {
         updateMem = true;
@@ -484,8 +492,8 @@ void print_instr_calls(std::map<std::string,
         cpp << indent+g_instrAddrVar+" = "+varName+nxt+" ;" << std::endl;
         cpp << std::endl;
       } else if(instrInfo.funcTgtMap.count(varName)) {
-        cpp << indent+"  data_byte_addr = ("+g_dataAddrVar+" >> 2) % "+toStr(memSize)+";" << std::endl;
-        cpp << indent+"  "+g_dataIn+" = mem[data_byte_addr] ;" << std::endl;
+        cpp << indent+"data_byte_addr = ("+g_dataAddrVar+" >> 2) % "+toStr(memSize)+";" << std::endl;
+        cpp << indent+g_dataIn+" = mem[data_byte_addr] ;" << std::endl;
       }
     }
   }
@@ -562,7 +570,8 @@ std::string asv_func_param_type(uint32_t width, bool is_const=true) {
 
 
 // currently only support one-cycle inputInstr
-std::string func_call(std::string writeVar, const FuncTy_t& funcTy, std::string funcName, 
+std::string func_call(std::string indent, std::string writeVar,
+                      const FuncTy_t& funcTy, std::string funcName, 
                       std::map<std::string, std::vector<std::string>> &inputInstr,
                       std::pair<std::string, uint32_t> dataIn) {
 
@@ -579,15 +588,17 @@ std::string func_call(std::string writeVar, const FuncTy_t& funcTy, std::string 
   }
 
   // Note: writeVar could have any name, e.g. "asv_nxt"
-  std::string ret;
+  std::string ret = indent;
   if (writeVar.empty() || funcTy.retTy == 0) {
-    ret = "  "+funcName+"( ";  // No writeVar, or function returns void (probably for an array)
+    ret += funcName+"( ";  // No writeVar, or function returns void (probably for an array)
   } else if (funcTy.retTy > 64) {
-    ret = "  "+funcName+"( ";  // A reference to the return value is passed as the last arg.
+    ret += funcName+"( ";  // A reference to the return value is passed as the last arg.
   } else {
-    ret = "  "+writeVar+" = "+funcName+"( ";
+    ret += writeVar+" = "+funcName+"( ";
   }
 
+  unsigned argCnt = 0;
+  int argIndent = 0;
   std::map<std::string, uint32_t> varIdxMap; 
   for(auto pair: funcTy.argTy) {
     std::string arg = pair.second;
@@ -614,18 +625,35 @@ std::string func_call(std::string writeVar, const FuncTy_t& funcTy, std::string 
       argValue = apint2literal(apValue);
     }
     else {
-      argValue = var_name_convert(arg, true);
+      // The arg is an ASV: Either a scalar or en element of a register array.
+      if (is_in_array(arg)) {
+        // The arg value is a member of the array.
+        int idx = 0;
+        std::string arrayName = get_array_position(arg, &idx);
+        assert(!arrayName.empty());
+        argValue = arrayName+"["+toStr(idx)+"]";
+      } else {
+        argValue = var_name_convert(arg, true);
+      }
     }
-    ret += argValue +", ";
-  }
-  if(funcTy.argTy.size() > 0) {
-    ret.pop_back(); // Get rid of extra ", "
-    ret.pop_back();
+
+    if (argCnt == 0) {
+      argIndent = ret.length();  // For indenting subsequent args
+    } else {
+      ret += ",\n";
+      ret += std::string(argIndent, ' ');
+    }
+    ret += argValue;
+    argCnt++;;
   }
 
   if (funcTy.retTy > 64) {
+    if (argCnt > 0) {
+      ret += ",\n";
+      ret += std::string(argIndent, ' ');
+    }
     // A reference to a big return value is passed as the last arg.
-    ret += ", "+writeVar;
+    ret += writeVar;
   }
 
   ret += " );";
@@ -869,15 +897,38 @@ bool is_array_var(const std::string& varName) {
   return g_registerArrays.count(varName);
 }
 
-// Return true if the var is a member of a register array
+// Return true if the var is a member of a register array.
+// This will test against both the var's original Verilog name and its cleaned-up name.
+// Presumably the cleaned-up name of one var will never be the same
+// as the orignal name of a different var...
 bool is_in_array(const std::string& varName) {
   for(auto pair : g_registerArrays) {
     for(auto element : pair.second.getMembers()) {
-      if (var_name_convert(element, true) == varName) return true;
+      if (element == varName ||
+          var_name_convert(element, true) == varName) return true;
     }
   }
   return false;
 }
+
+// Return the array name and index if the var is a member of a register array.
+// This will test against both the var's original Verilog name and its cleaned-up name.
+std::string get_array_position(const std::string& varName, int* idxp) {
+
+  for(auto pair : g_registerArrays) {
+    uint32_t len = pair.second.getLength();
+    for (uint32_t idx = 0; idx < len; ++idx) {
+      std::string element = pair.second.getElement(idx);
+      if (element == varName ||
+          var_name_convert(element, true) == varName) {
+        if (idxp) *idxp = idx;
+        return pair.first;  // Array name
+      }
+    }
+  }
+  return "";  // not in any array
+}
+
 
 
 // Generates a printf statement to print just the value, not the name or newline.
@@ -919,14 +970,17 @@ std::string build_printf(const std::string& prefix, const std::string& varName,
 
 // printName is optional, defaults to same as varName
 // This does the right thing with register arrays.
-void print_var_value(std::ofstream &cpp, const std::string& varName,
+// This should be given a converted variable name, not the original Verilog name.
+// Note that all register array names are converted: they have no
+// corresponding object in Verilog.
+void print_var_value(std::string indent, std::ofstream &cpp, const std::string& varName,
                      uint32_t width, const std::string& printName) {
 
   if (is_array_var(varName)) {
-    print_array(varName, cpp);
+    print_array(indent, varName, cpp);
   } else {
     std::string pname = printName.length()?printName:varName;
-    cpp << "    ";
+    cpp << indent;
     cpp << build_printf(pname+": ", varName, width);
     cpp << std::endl;
   }
@@ -936,10 +990,15 @@ void print_var_value(std::ofstream &cpp, const std::string& varName,
 
 void print_asv_values(std::ofstream &cpp, const std::string& bannerLine, bool always) {
 
-  if (!always) cpp << "  if (PRINT_ALL) {" << std::endl;
+  std::string indent = "  ";
+
+  if (!always) {
+    cpp << "  if (PRINT_ALL) {" << std::endl;
+    indent = "    ";
+  }
 
   if (!bannerLine.empty()) {
-    cpp << "    printf(\""+bannerLine+"\\n\");" << std::endl;
+    cpp << indent << "printf(\""+bannerLine+"\\n\");" << std::endl;
   }
 
 
@@ -947,7 +1006,7 @@ void print_asv_values(std::ofstream &cpp, const std::string& bannerLine, bool al
   for(auto pair : g_asv) {
     std::string reg = var_name_convert(pair.first, true);
     if (!is_in_array(reg)) {
-      print_var_value(cpp, reg, pair.second);
+      print_var_value(indent, cpp, reg, pair.second);
     }
   }
 
@@ -955,7 +1014,7 @@ void print_asv_values(std::ofstream &cpp, const std::string& bannerLine, bool al
   for(auto pair: g_registerArrays) {
     std::string arrName = pair.first;
     assert(is_array_var(arrName));
-    print_array(arrName, cpp);
+    print_array(indent, arrName, cpp);
   }
 
   // initialized rtlVars in the refinement map
@@ -963,7 +1022,7 @@ void print_asv_values(std::ofstream &cpp, const std::string& bannerLine, bool al
     for(auto pair2 : pair1.second) {
       std::string varName = pair2.first;
       std::string printName = pair2.second;
-      print_var_value(cpp, varName, 64, printName);  // TODO: use correct width
+      print_var_value(indent, cpp, varName, 64, printName);  // TODO: use correct width
     }
   }
 
@@ -972,7 +1031,7 @@ void print_asv_values(std::ofstream &cpp, const std::string& bannerLine, bool al
 }
 
 
-void print_array(std::string arrName, std::ofstream &cpp) {
+void print_array(std::string indent, std::string arrName, std::ofstream &cpp) {
   auto itr = g_registerArrays.find(arrName);
   if (itr == g_registerArrays.end()) {
     toCout("Error: cannot find info for the array: "+arrName);
@@ -981,16 +1040,38 @@ void print_array(std::string arrName, std::ofstream &cpp) {
 
   uint32_t depth = itr->second.getLength();
   uint32_t width = itr->second.getWidth();
-  cpp << "    for(int i = 0; i < "+toStr(depth)+"; i++) {" << std::endl;
+  cpp << indent << "for(int i = 0; i < "+toStr(depth)+"; i++) {" << std::endl;
   std::string printName = arrName+"[%d]";
   std::string elementName = arrName+"[i]";
-  cpp << "      "+build_printf(printName+": ", elementName, width, "i") << std::endl;
-
-  // Doug: this assumes that the element width is <= 32 bits...
-  //cpp << "      printf( \""+arrName+"[\%d]: \%d \\n \", i, "+arrName+"[i] );" << std::endl;
-
-  cpp << "    }" << std::endl;
+  cpp << indent << "  " << build_printf(printName+": ", elementName, width, "i") << std::endl;
+  cpp << indent << "}" << std::endl;
 }
+
+
+
+// Return a C-compatible value for the given asv's reset value.
+// Either a single number, or a std::array initializer for >64 bits.
+std::string get_c_rst_val(const std::string& asv) {
+
+  std::string noSlash = asv;
+  if(asv.substr(0, 1) == "\\") noSlash = asv.substr(1);
+
+  std::string rstVal;
+  if(g_rstVal.find(noSlash) == g_rstVal.end()) {
+    toCout("Warning: cannot find rst value for: "+noSlash);
+    rstVal = "0";
+  }
+  else {
+    rstVal = g_rstVal[noSlash];
+  }
+
+  toCout("rst val of "+asv+"  "+rstVal);
+  llvm::APInt rstValAPInt = hdb2apint(rstVal);
+  std::string cRstVal = apint2initializer(rstValAPInt);
+
+  return cRstVal;
+}
+
 
 
 std::string initialize_mem(std::string fileName) {

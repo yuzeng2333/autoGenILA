@@ -30,11 +30,6 @@ std::vector<struct InstrInfo_t> g_instrInfo;
 // Key is array name.
 std::map<std::string, registerArray_t> g_registerArrays;
 
-// Constructor
-registerArray_t::registerArray_t(const std::vector<std::string>& m, uint32_t w) :
- members(m), width(w)
- {} 
-
 std::unordered_map<std::string, std::string> g_nopInstr;
 std::map<std::string, std::string> g_rstVal;
 // first key is instance name, second key is wire name
@@ -104,6 +99,30 @@ astNode* ModuleInfo_t::get_outport_node(const std::string &outPort) {
     abort();
   }
   return out2RootNodeMp[outPort];
+}
+
+
+// Constructor
+registerArray_t::registerArray_t(const std::vector<std::string>& m, uint32_t w) :
+  members(m), width(w) {} 
+
+const std::string& registerArray_t::getElement(uint32_t idx) const {
+  static std::string blankStr;
+  if (idx < members.size()) 
+    return members[idx];
+  else 
+    return blankStr;
+}
+
+
+// Return index of the given asv in the array, or -1 if it is not present.
+// Don't forget that the element names are the orignal Verilog names, not 
+// cleaned-up C-style names.
+int registerArray_t::findElement(const std::string& element) const {
+  auto pos = std::find(members.begin(), members.end(), element);
+  if (pos == members.end())
+    return -1;
+  return (pos - members.begin());
 }
 
 } // end of namespace

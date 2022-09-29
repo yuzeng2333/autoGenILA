@@ -13,7 +13,8 @@ std::string update_function_name(const std::string& instr, const std::string& as
 
 std::string c_type(uint32_t width);
 
-std::string func_call(std::string writeASV, const funcExtract::FuncTy_t& funcTy, std::string funcName, 
+std::string func_call(std::string indent, std::string writeASV,
+                      const funcExtract::FuncTy_t& funcTy, std::string funcName, 
                       std::map<std::string, std::vector<std::string>> &inputInstr,
                       std::pair<std::string, uint32_t> dataIn);                      
 
@@ -42,7 +43,7 @@ void read_skipped_target(std::string fileName);
 
 void print_final_results(std::ofstream &cpp);
 
-void print_array(std::string arrName, std::ofstream &cpp);
+void print_array(std::string indent, std::string arrName, std::ofstream &cpp);
 
 std::string initialize_mem(std::string fileName);
 
@@ -57,10 +58,14 @@ void vta_ila_model(std::ofstream &cpp);
 void print_asv_values(std::ofstream &cpp, const std::string& bannerLine="", bool always=false);
 
 bool is_array_var(const std::string& varName);
+std::string get_array_position(const std::string& varName, int* idxp);
 
 std::string build_printf(const std::string& prefix, const std::string& varName,
                           uint32_t width, std::string index="");
 
 // printName is optional, defaults to same as varName
-void print_var_value(std::ofstream &cpp, const std::string& varName,
+void print_var_value(std::string indent, std::ofstream &cpp, const std::string& varName,
                      uint32_t width, const std::string& printName = "");
+
+bool is_in_array(const std::string& varName);
+std::string get_c_rst_val(const std::string& asv);
