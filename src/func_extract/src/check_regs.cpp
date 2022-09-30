@@ -311,22 +311,30 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     );
   }
 
-  // make a top function
-  llvm::Function *topFunction 
-    = llvm::Function::Create(FT, llvm::Function::ExternalLinkage, 
-                             "top_function", TheModule.get());
+  // The top funcion is probably no longer necessary, if we make the main
+  // function external, and do a final post-ropcioessing to remove dead args.
+  llvm::Function *topFunction = nullptr;
+  if (false) {
+    // make a top function
+    topFunction = llvm::Function::Create(FT, llvm::Function::ExternalLinkage, 
+                                         "top_function", TheModule.get());
+  }
 
   // Create the main function
-  TheFunction = llvm::Function::Create(
-    FT, llvm::Function::InternalLinkage, 
-    destInfo.get_instr_name()+"_"+destSimpleName, TheModule.get());
+  // A new flow is to skip the topFunction, make the mainFunction external, and
+  // do a final post-processing to remove dead args.
+  llvm::Function::LinkageTypes linkage = topFunction ?
+                                            llvm::Function::InternalLinkage :
+                                            llvm::Function::ExternalLinkage;
+
+  TheFunction = llvm::Function::Create( FT, linkage,
+                  destInfo.get_instr_name()+"_"+destSimpleName, TheModule.get());
+
   TheFunction->addFnAttr(llvm::Attribute::NoInline);
 
   for(auto it = insContextStk.begin();
       it != insContextStk.end(); it++) {
     it->Target = destName;
-    // FIXME: change topFunction to TheFunction
-    //it->Func = topFunction;
     it->Func = TheFunction;
     initialize_min_delay(it->ModInfo, destName);
   }
@@ -340,10 +348,12 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     std::string regNameBound = regName+post_fix(bound);
     toCoutVerb("set reg-type func arg: "+regNameBound);
     TheFunction->getArg(idx)->setName(regNameBound);
-    topFunction->getArg(idx)->setName(regNameBound);
+
+    if (topFunction) {
+      topFunction->getArg(idx)->setName(regNameBound);
+    }
 
     argNum--;
-    topFuncArgMp.emplace(regNameBound, TheFunction->args().begin()+idx);
     idx++;
   }
 
@@ -359,10 +369,12 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
         std::string portName = pathInsName+"."+output+post_fix(i);
         toCoutVerb("set mem ouput func arg, mem: "+pathInsName+", output: "+output);
         TheFunction->getArg(idx)->setName(portName);
-        topFunction->getArg(idx)->setName(portName);
+
+        if (topFunction) {
+          topFunction->getArg(idx)->setName(portName);
+        }
 	
         argNum--;
-        topFuncArgMp.emplace(portName, TheFunction->args().begin()+idx);
 	idx++;
       }
     }
@@ -379,8 +391,11 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
       //uint32_t width = get_var_slice_width_simp(inp, curMod);
       std::string argName = inp+post_fix(i);
       toCoutVerb("set func arg: "+argName);
-      (TheFunction->args().begin()+idx)->setName(argName);
-      (topFunction->args().begin()+idx)->setName(argName);
+      TheFunction->getArg(idx)->setName(argName);
+
+      if (topFunction) {
+        topFunction->getArg(idx)->setName(argName);
+      }
 
       idx++;
       argNum--;
@@ -530,23 +545,25 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   llvm::verifyFunction(*TheFunction);
 
 
-  // Fill in the contents of topFunction
+  if (topFunction) {
+    // Fill in the contents of topFunction, if any
 
-  auto topBB = llvm::BasicBlock::Create(*TheContext, "top_bb", topFunction);
-  Builder->SetInsertPoint(topBB);  
+    auto topBB = llvm::BasicBlock::Create(*TheContext, "top_bb", topFunction);
+    Builder->SetInsertPoint(topBB);  
 
 
-  // call TheFunction in topFunction: same args that topFunction has
-  std::vector<llvm::Value*> args;
-  for (size_t i=0; i < argSize; ++i) {
-    args.push_back(topFunction->getArg(i));
+    // call TheFunction in topFunction: same args that topFunction has
+    std::vector<llvm::Value*> args;
+    for (size_t i=0; i < argSize; ++i) {
+      args.push_back(topFunction->getArg(i));
+    }
+
+    llvm::Value *theRet = Builder->CreateCall(FT, TheFunction, args);
+
+    Builder->CreateRet(theRet);
+
+    llvm::verifyFunction(*topFunction);
   }
-
-  llvm::Value *theRet = Builder->CreateCall(FT, TheFunction, args);
-
-  Builder->CreateRet(theRet);
-
-  llvm::verifyFunction(*topFunction);
 
   llvm::verifyModule(*TheModule);
   std::string Str;

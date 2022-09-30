@@ -873,8 +873,10 @@ bool read_clean_optimized(std::string fileName,
       toCoutVerb("Erased unneeded top_function");
     }
   } else {
-    // Not a problem, but how did it happen?
-    toCout("Curious: can't find top_function!");
+    // Newer algorithm in check_regs.cpp: don't create a top_function,
+    // make mainFunc external, and depend on us to remove dead args.
+    toCoutVerb("A top_function was not created");
+    mainFunc = remove_dead_args(mainFunc);
   }
 
   if (!mainFunc) {
