@@ -17,3 +17,11 @@ add_executable(${VERILOG_EXE} ${SRC_DIR} ${MAIN})
 add_library(TaintGenLib ${SRC_DIR})
 target_link_libraries(${VERILOG_EXE} glog::glog)
 target_link_libraries(TaintGenLib glog::glog)
+
+
+# Add "tags" target 
+set_source_files_properties(tags PROPERTIES GENERATED true)
+add_custom_target(tags
+    COMMAND ctags -R  --extra=+f .
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+

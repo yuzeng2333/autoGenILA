@@ -66,8 +66,6 @@ bool isOutput(std::string var);
 
 bool isReg(std::string var);
 
-std::string to_re(std::string input);
-
 int parse_verilog_line(std::string line, bool ignoreWrongOp=false);
 
 void add_func_taints(std::ifstream &input, std::ofstream &output, std::string funcDefinition);

@@ -2,6 +2,8 @@
 
 namespace funcExtract {
 
+using namespace taintGen;
+
 void HierCtx::push_back(Context_t ctx) {
   insContextStk.push_back(ctx);
 }

@@ -83,4 +83,12 @@ include_directories(${Z3_INCLUDE_DIR})
 #    VERBATIM
 #)
 
+
+# Add "tags" target 
+set_source_files_properties(tags PROPERTIES GENERATED true)
+add_custom_target(tags
+    COMMAND ctags -R  --extra=+f .
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+
+
 enable_testing()

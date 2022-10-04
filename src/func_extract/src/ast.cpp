@@ -243,7 +243,7 @@ void build_tree_for_single_as(std::string regAndSlice) {
   std::string curTgt = g_insContextStk.get_target();
   // FIXME: previously used get_var_slice_width_cmplx
   // for GB, replace with get_var_slice_width_simp
-  uint32_t regWidth = get_var_slice_width_simp(regAndSlice, curMod);
+  //uint32_t regWidth = get_var_slice_width_simp(regAndSlice, curMod);
   astNode* root;
 
   if(curMod->visitedNode.find(regAndSlice) 
@@ -440,8 +440,8 @@ void add_nb_node(std::string regAndSlice, uint32_t timeIdx, astNode* const node)
     std::string destNext = m.str(3);
     remove_two_end_space(destNext);
     auto curMod = g_insContextStk.get_curMod();
-    uint32_t destNextWidth = get_var_slice_width_simp(destNext, curMod);
-    uint32_t destWidth = get_var_slice_width_simp(regAndSlice, curMod);
+    //uint32_t destNextWidth = get_var_slice_width_simp(destNext, curMod);
+    //uint32_t destWidth = get_var_slice_width_simp(regAndSlice, curMod);
 
     node->type = NONBLOCK;
     node->dest = regAndSlice;
@@ -681,8 +681,8 @@ void add_two_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   remove_two_end_space(op2AndSlice);
   auto curMod = g_insContextStk.get_curMod();
   uint32_t destAndSliceWidth = get_var_slice_width_simp(destAndSlice, curMod);
-  uint32_t op1AndSliceWidth = get_var_slice_width_simp(op1AndSlice, curMod);
-  uint32_t op2AndSliceWidth = get_var_slice_width_simp(op2AndSlice, curMod);
+  //uint32_t op1AndSliceWidth = get_var_slice_width_simp(op1AndSlice, curMod);
+  //uint32_t op2AndSliceWidth = get_var_slice_width_simp(op2AndSlice, curMod);
 
   node->type = TWO_OP;
   node->dest = destAndSlice;
@@ -885,7 +885,6 @@ void add_reduce_op_node(std::string line, uint32_t timeIdx, astNode* const node)
 
 void add_sel_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   toCoutVerb("Process Sel op for :"+line);
-  bool isReduceOp;
   std::string op;
   std::string destAndSlice;
   std::string op1AndSlice;
@@ -904,7 +903,7 @@ void add_sel_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   split_slice(op1AndSlice, op1, op1Slice);
   split_slice(op2AndSlice, op2, op2Slice);
   auto curMod = g_insContextStk.get_curMod();  
-  uint32_t destAndSliceWidth = get_var_slice_width_simp(destAndSlice, curMod);
+  //uint32_t destAndSliceWidth = get_var_slice_width_simp(destAndSlice, curMod);
   remove_two_end_space(op1AndSlice);
   remove_two_end_space(op2AndSlice);
 

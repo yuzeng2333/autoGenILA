@@ -115,7 +115,7 @@ int main(int argc, char *argv[]) {
       }
       else {
         rstVal = g_rstVal[regRst];        
-        if(is_x) {
+        if(is_x(rstVal)) {
           value = 0;
         }
         else {
@@ -204,7 +204,6 @@ void assign_instr(uint32_t instrIdx, bool printVltr) {
 
   // then assign nop instruction
   uint32_t nopLen = instrInfo.delayBound - instrLen;
-  uint32_t i = 0;
   for(auto pair : g_nopInstr) {
     assign_value(pair.first, pair.second, printVltr);
   }
@@ -214,7 +213,7 @@ void assign_instr(uint32_t instrIdx, bool printVltr) {
   to_file("    $display( \"// "+instrInfo.name+"\" );");
   for(auto pair : g_asv) {
     std::string asv = pair.first;
-    uint32_t width = pair.second;
+    //uint32_t width = pair.second;
     to_file("    $display( \""+asv+": %d\", u0."+asv+" );");
   }
   to_file("    $display(\"\\n\");");
@@ -248,7 +247,6 @@ void assign_instr(const std::map<std::string, std::vector<std::string>> &inputIn
   if(!g_use_event_driven) {
     // then assign nop instruction
     uint32_t nopLen = instrInfo.delayBound - instrLen;
-    uint32_t i = 0;
     for(auto pair : g_nopInstr) {
       assign_value(pair.first, pair.second, printVltr);
     }
@@ -259,7 +257,7 @@ void assign_instr(const std::map<std::string, std::vector<std::string>> &inputIn
     //to_file("    instr_name = "+instrInfo.name+" ;");
     for(auto pair : g_asv) {
       std::string asv = pair.first;
-      uint32_t width = pair.second;
+      //uint32_t width = pair.second;
       to_file("    $display( \""+asv+": %d\", u0."+asv+" );");
     }
  

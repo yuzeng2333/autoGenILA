@@ -3,6 +3,8 @@
 
 namespace funcExtract {
 
+using namespace taintGen;
+
 // global variables
 std::map<std::string, std::shared_ptr<ModuleInfo_t>> g_moduleInfoMap;
 std::shared_ptr<ModuleInfo_t> g_curMod;
@@ -16,11 +18,18 @@ StrSet_t moduleAs;
 std::set<std::string> g_mem;
 std::map<std::string, uint32_t> g_fifo;
 uint32_t g_new_var;
+
 //std::unordered_map<std::string, astNode*> g_asSliceRoot;
 std::map<std::string, astNode*> g_varNode;
-// each element is a map from input signal to its value
-// x means the value can be arbitrary
+
+// In func_extract and sim_gen, read_instructions() builds this from instr.txt.
+// In sim_gen, read_func_info() populates the funcTypes fields from func_info.txt.
 std::vector<struct InstrInfo_t> g_instrInfo;
+
+// In sim_gen, read_func_info() builds this from func_info.txt.
+// Key is array name.
+std::map<std::string, registerArray_t> g_registerArrays;
+
 std::unordered_map<std::string, std::string> g_nopInstr;
 std::map<std::string, std::string> g_rstVal;
 // first key is instance name, second key is wire name
@@ -34,6 +43,11 @@ std::map<std::string, uint32_t> g_asv;
 Str2StrVecMap_t g_moduleInputsMap;
 Str2StrVecMap_t g_moduleOutputsMap;
 std::map<std::string, std::vector<uint32_t>> g_allowedTgt;
+
+// Vector targets, as read from allowed_target.txt.
+// The string vector holds the element names, and the uint32_t holds the 
+// cycle count.
+
 std::vector<std::pair<std::vector<std::string>, uint32_t>> g_allowedTgtVec;
 //VarWidth g_varWidth;
 
@@ -85,6 +99,30 @@ astNode* ModuleInfo_t::get_outport_node(const std::string &outPort) {
     abort();
   }
   return out2RootNodeMp[outPort];
+}
+
+
+// Constructor
+registerArray_t::registerArray_t(const std::vector<std::string>& m, uint32_t w) :
+  members(m), width(w) {} 
+
+const std::string& registerArray_t::getElement(uint32_t idx) const {
+  static std::string blankStr;
+  if (idx < members.size()) 
+    return members[idx];
+  else 
+    return blankStr;
+}
+
+
+// Return index of the given asv in the array, or -1 if it is not present.
+// Don't forget that the element names are the orignal Verilog names, not 
+// cleaned-up C-style names.
+int registerArray_t::findElement(const std::string& element) const {
+  auto pos = std::find(members.begin(), members.end(), element);
+  if (pos == members.end())
+    return -1;
+  return (pos - members.begin());
 }
 
 } // end of namespace

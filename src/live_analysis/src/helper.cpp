@@ -64,7 +64,7 @@ bool is_all_digits(const std::string& num) {
 }
 
 
-bool isOutput(std::string varAndSlice) {
+bool isOutput(const std::string& varAndSlice) {
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
   auto it = std::find( moduleOutputs.begin(), moduleOutputs.end(), var );
@@ -72,7 +72,7 @@ bool isOutput(std::string varAndSlice) {
 }
 
 
-bool isInput(std::string var) {
+bool isInput(const std::string& var) {
   auto it = std::find( moduleInputs.begin(), moduleInputs.end(), var );
   return it != moduleInputs.end();
 }
@@ -87,19 +87,19 @@ bool isReg(std::string var) {
 
 
 // belongs to over-approximated reg set
-bool isOAReg(std::string var) {
+bool isOAReg(const std::string& var) {
   auto it = std::find( moduleRegs.begin(), moduleRegs.end(), var );
   return it != moduleRegs.end();
 }
 
 
-bool isWire(std::string var) {
+bool isWire(const std::string& var) {
   auto it = std::find( moduleWires.begin(), moduleWires.end(), var );
   return it != moduleWires.end();
 }
 
 
-bool isMem(std::string varAndSlice) {
+bool isMem(const std::string& varAndSlice) {
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
   //auto it = std::find( moduleMems.begin(), moduleMems.end(), var );
@@ -107,7 +107,7 @@ bool isMem(std::string varAndSlice) {
 }
 
 
-std::string to_re(std::string input) {
+std::string to_re(const std::string& input) {
   static const std::regex pNameBraces("\\(NAME\\)");
   // Below is the old varNameBraces. It has been used without errors for many designs.
   // The reason I replace it with the new one is because it failed in the ultra_riscv case
@@ -132,7 +132,7 @@ std::string to_re(std::string input) {
 }
 
 
-std::string remove_bracket(std::string name) {
+std::string remove_bracket(const std::string& name) {
   static const std::regex pName("^([a-zA-Z0-9_.]+)\\[(\\d+)\\:(\\d+)\\]$");
   std::smatch match;
   if (std::regex_match(name, match, pName)) {
@@ -144,18 +144,21 @@ std::string remove_bracket(std::string name) {
 }
 
 
-uint32_t cut_pos(std::string name) {
-  static const std::regex pOpenBackSlash("^(\\s*)\\\\");
-  std::smatch m;
-  if(std::regex_search(name, m, pOpenBackSlash)) {
+uint32_t cut_pos(const std::string& name) {
+  static const std::regex pOpenBackSlash("\\s*\\\\.*");
+  if(std::regex_match(name, pOpenBackSlash)) {
+  //static const std::regex pOpenBackSlash("^(\\s*)\\\\");
+  //std::smatch m;
+  //if(std::regex_search(name, m, pOpenBackSlash)) {
+  //if(std::regex_search(name, pOpenBackSlash)) {
     bool nameStart = false;
     bool nameEnd = false;
     for(size_t i = 0; i < name.length(); ++i) {
-      if(name.substr(i,1).compare("\\") == 0)
+      if(name[i] == '\\')
         nameStart = true;
-      if(nameStart && name.substr(i,1).compare(" ") == 0)
+      if(nameStart && name[i] == ' ')
         nameEnd = true;
-      if(nameEnd && name.substr(i, 1).compare("[") == 0)
+      if(nameEnd && name[i] == '[')
         return i;
     }
     return name.length();
@@ -171,7 +174,7 @@ uint32_t cut_pos(std::string name) {
 
 
 // the returned name and slice may contain blanks
-bool split_slice(std::string slicedName, std::string &name, std::string &slice) {
+bool split_slice(const std::string& slicedName, std::string &name, std::string &slice) {
   static const std::regex pLocal("^(\\s*)(\\S+)(\\s*)$");
   std::smatch m;
   uint32_t pos = cut_pos(slicedName);
@@ -202,7 +205,7 @@ bool split_slice(std::string slicedName, std::string &name, std::string &slice) 
 
 
 // no matter leftIdx or rightIdx is bigger, always return a positive width
-uint32_t get_width(std::string slice) {
+uint32_t get_width(const std::string& slice) {
   static const std::regex pSlice("^(?:\\s?)\\[(\\d+)\\:(\\d+)\\](?:\\s)?$");
   static const std::regex pSingleBit("^(?:\\s)?\\[\\d+\\](?:\\s)?$");
   std::smatch m;
@@ -225,7 +228,7 @@ uint32_t get_width(std::string slice) {
 
 
 // return low index
-uint32_t get_begin(std::string slice) {
+uint32_t get_begin(const std::string& slice) {
   static const std::regex pSlice("^(?:\\s?)\\[(?:(\\d+)\\:)?(\\d+)\\](\\s)?$");
   std::smatch m;
   if( !std::regex_match(slice, m, pSlice) )
@@ -235,7 +238,7 @@ uint32_t get_begin(std::string slice) {
 
 
 // return the high index
-uint32_t get_end(std::string slice) {
+uint32_t get_end(const std::string& slice) {
   static const std::regex pSlice("^(?:\\s?)\\[(\\d+)(?:\\:(\\d+))?\\](\\s)?$");
   std::smatch m;
   if( !std::regex_match(slice, m, pSlice) ) {
@@ -247,7 +250,7 @@ uint32_t get_end(std::string slice) {
 
 
 // the input op may contain slices
-uint32_t find_version_num(std::string opAndSlice, bool &isNew, std::ofstream &output, bool forceNewVer) {
+uint32_t find_version_num(const std::string& opAndSlice, bool &isNew, std::ofstream &output, bool forceNewVer) {
   uint32_t verNum;
   std::string op, opSlice;
   split_slice(opAndSlice, op, opSlice);
@@ -288,7 +291,7 @@ uint32_t find_version_num(std::string opAndSlice, bool &isNew, std::ofstream &ou
 }
 
 
-void free_bits(std::string op, std::vector<std::string> &freeBitsVec) {
+void free_bits(const std::string& op, std::vector<std::string> &freeBitsVec) {
   assert(freeBitsVec.empty());
   auto idxPairs = varWidth.get_idx_pair(op, "find_version_num for: "+op);
   size_t usedVerBitsSize = nxtVerBits[op].size();
@@ -322,7 +325,7 @@ void free_bits(std::string op, std::vector<std::string> &freeBitsVec) {
 
 
 // returns bool: noConflict
-bool check_bits(std::string op, std::string opSlice, const std::vector<bool> &bitVec) {
+bool check_bits(const std::string& op, std::string opSlice, const std::vector<bool> &bitVec) {
   // if opSlice is empty, must be conflict
   uint32_t highIdx, lowIdx;
   if(opSlice.empty()) {
@@ -367,7 +370,7 @@ bool check_bits(std::string op, std::string opSlice, const std::vector<bool> &bi
 
 // opSlice is merged to bitVec(although sometimes this is not 
 // needed, because the bitVec should be cleared)
-void merge_bits(std::string op, std::string opSlice, std::vector<bool> &bitVec) {
+void merge_bits(const std::string& op, std::string opSlice, std::vector<bool> &bitVec) {
   // if opSlice is empty, must be conflict
   uint32_t highIdx, lowIdx;
   if(opSlice.empty()) {
@@ -422,7 +425,7 @@ void merge_bits(std::string op, std::string opSlice, std::vector<bool> &bitVec) 
 
 
 // taintBits include t,r,x,c
-void parse_taintBits(std::string taintBits, bool &tExist, bool &rExist, bool &xExist, bool &cExist) {
+void parse_taintBits(const std::string& taintBits, bool &tExist, bool &rExist, bool &xExist, bool &cExist) {
   for(int i = 0; i < taintBits.length(); i++) {
     if( taintBits.compare(i, 1, "t") == 0 )
         tExist = true;
@@ -438,7 +441,7 @@ void parse_taintBits(std::string taintBits, bool &tExist, bool &rExist, bool &xE
 }
 
 
-void collapse_bits(std::string varName, uint32_t bound1, uint32_t bound2, std::ofstream &output) {
+void collapse_bits(const std::string& varName, uint32_t bound1, uint32_t bound2, std::ofstream &output) {
   uint32_t begin = std::min(bound1, bound2);
   uint32_t end = std::max(bound1, bound2);
   for (uint32_t i = begin; i + 1 < end; ++i) {
@@ -448,18 +451,18 @@ void collapse_bits(std::string varName, uint32_t bound1, uint32_t bound2, std::o
 }
 
 
-std::string extend(std::string in, uint32_t length) {
+std::string extend(const std::string& in, uint32_t length) {
   return "{ " + std::to_string(length) + "{ " + in + " }}";
 }
 
 
-void debug_line(std::string line) {
+void debug_line(const std::string& line) {
   std::cout << "get_width() for " + line << std::endl;
 }
 
 
 // input slice might be empty
-void ground_wires(std::string wireName, std::pair<uint32_t, uint32_t> idxPair, std::string slice, std::string blank, std::ofstream &output) {
+void ground_wires(const std::string& wireName, std::pair<uint32_t, uint32_t> idxPair, std::string slice, std::string blank, std::ofstream &output) {
   if (slice.empty())
     return;
   uint32_t sliceBegin = get_begin(slice);
@@ -547,6 +550,7 @@ std::string get_nth_var_in_list(std::string list, uint32_t idx) {
       return m.str(1);
     previous = current;
   }
+  abort();
 }
 
 
@@ -633,7 +637,7 @@ std::string get_rhs_taint_list(std::string updateList, std::string taint, bool n
 
 
 // used for output ports in module instantiation
-std::string insert_taint(std::string signalAndSlice, std::string taint, std::string ver) {
+std::string insert_taint(const std::string& signalAndSlice, std::string taint, std::string ver) {
   std::string signal, signalSlice;
   split_slice(signalAndSlice, signal, signalSlice);
   return signal + taint + ver + signalSlice;
@@ -917,7 +921,7 @@ std::string get_lhs_taint_list_no_slice(std::string destList, std::string taint,
 }
 
 
-int str2int(std::string str, std::string info) {
+int str2int(const std::string& str, std::string info) {
   if(str.length() > 8) {
     toCout("Error: too large int found: "+str);
   }
@@ -934,18 +938,18 @@ int str2int(std::string str, std::string info) {
 }
 
 
-void toCout(std::string line) {
+void toCout(const std::string& line) {
   std::cout << line << std::endl;
 }
 
 
-void toCoutVerb(std::string line) {
+void toCoutVerb(const std::string& line) {
   if(g_verb)
     std::cout << line << std::endl;
 }
 
 
-bool isSingleBit(std::string slice) {
+bool isSingleBit(const std::string& slice) {
   static const std::regex pSingleBit("\\[\\d+\\]");
   std::smatch m;
   if(std::regex_search( slice, m, pSingleBit ))
@@ -1029,7 +1033,7 @@ std::string get_rst() {
 }
 
 
-bool isRFlag(std::string var) {
+bool isRFlag(const std::string& var) {
   static const std::regex pRFlag("_r_flag");
   std::smatch m;
   return std::regex_search(var, m, pRFlag);
@@ -1137,7 +1141,7 @@ std::string max_num(uint32_t width) {
 }
 
 
-std::string max_num(std::string widthStr) {
+std::string max_num(const std::string& widthStr) {
   uint32_t width = str2int(widthStr, "In max_mum function with input: "+widthStr);
   return max_num(width);
 }
@@ -1162,7 +1166,7 @@ std::string dec2bin(uint32_t inNum) {
 
 
 // input is a string of binary-format number
-std::string get_bits(std::string inNum, uint32_t highIdx, uint32_t lowIdx) {
+std::string get_bits(const std::string& inNum, uint32_t highIdx, uint32_t lowIdx) {
   if(inNum == "0") return "0";
   // input number must be binary
   uint32_t len = inNum.length();
@@ -1293,7 +1297,7 @@ void merge_vec(std::vector<std::string> &srcVec, std::vector<std::string> &destV
 
 // assume the input must be a reset signal, 
 // otherwise abort
-bool is_neg_rst(std::string var) {
+bool is_neg_rst(const std::string& var) {
   if ( var.compare("reset_n") == 0
          || var.compare("resetn") == 0
          || var.compare("rstn") == 0 ) {
@@ -1309,7 +1313,7 @@ bool is_neg_rst(std::string var) {
 }
 
 
-void printAndAbort(std::string in) {
+void printAndAbort(const std::string& in) {
   toCout(in);
   abort();
 }
@@ -1322,7 +1326,7 @@ void checkCond(bool cond, std::string in) {
 }
 
 
-std::string expand_slice(std::string slice) {
+std::string expand_slice(const std::string& slice) {
   uint32_t highIdx = get_end(slice);
   uint32_t lowIdx = get_begin(slice);
   return " [" + toStr(highIdx * g_sig_width-1) + ":" + toStr(lowIdx*g_sig_width) + "]";
@@ -1330,7 +1334,7 @@ std::string expand_slice(std::string slice) {
 
 
 // assume the pure fileName is after the last "/"
-std::string extract_path(std::string fullFileName) {
+std::string extract_path(const std::string& fullFileName) {
   std::size_t pos = fullFileName.find_last_of("/");
   if(pos == std::string::npos) {
     toCout("Error: the fileName does not contain path!");
@@ -1340,7 +1344,7 @@ std::string extract_path(std::string fullFileName) {
 }
 
 
-uint32_t get_dest_ver(std::string destAndSlice) {
+uint32_t get_dest_ver(const std::string& destAndSlice) {
   std::string dest, destSlice;
   split_slice(destAndSlice, dest, destSlice);
   if(g_destVersion.find(dest) == g_destVersion.end()) {
@@ -1408,7 +1412,7 @@ bool is_srcConcat(std::string line) {
 //}
 
 
-std::string extract_bin(std::string num, uint32_t highIdx, uint32_t lowIdx) {
+std::string extract_bin(const std::string& num, uint32_t highIdx, uint32_t lowIdx) {
   std::smatch m;
   if(std::regex_match(num, m, pBin)) {
     uint32_t width = std::stoi(m.str(1));
@@ -1433,9 +1437,9 @@ std::string extract_bin(std::string num, uint32_t highIdx, uint32_t lowIdx) {
 }
 
 
-std::string hex2bin(std::string hexNum) {
+std::string hex2bin(const std::string& hexNum) {
   std::string res = "";
-  for(char &c: hexNum) {
+  for(char c: hexNum) {
     if(c == 'f')
       res += "1111";
     else if(c == 'e')
@@ -1478,7 +1482,7 @@ std::string hex2bin(std::string hexNum) {
 
 
 // input string might contain variables besides bit-vectors
-std::string split_long_bit_vec(std::string varList) {
+std::string split_long_bit_vec(const std::string& varList) {
   size_t lastPos = 0;
   std::smatch m;
   std::string ret;
@@ -1542,7 +1546,7 @@ std::string split_long_bit_vec(std::string varList) {
 }
 
 
-std::string remove_signed(std::string &line) {
+std::string remove_signed(const std::string &line) {
   std::smatch m;
   static const std::regex pSigned("\\$signed\\((.*)\\)");
   if(line.find("$signed") != std::string::npos) {
@@ -1553,7 +1557,7 @@ std::string remove_signed(std::string &line) {
 }
 
 
-std::string split_long_hex(std::string var, uint32_t width, std::string num, std::string strToConcat) {
+std::string split_long_hex(const std::string& var, uint32_t width, std::string num, std::string strToConcat) {
   if(width < 32) {
     strToConcat = strToConcat + var + ", ";
     return strToConcat;
@@ -1574,7 +1578,7 @@ std::string split_long_hex(std::string var, uint32_t width, std::string num, std
 }
 
 
-std::string split_long_bin(std::string var, uint32_t width, std::string num, std::string strToConcat) {
+std::string split_long_bin(const std::string& var, uint32_t width, std::string num, std::string strToConcat) {
   if(width < 31) {
     strToConcat = strToConcat + var + ", ";
     return strToConcat;
@@ -1844,7 +1848,7 @@ bool split_concat(std::string var, std::vector<std::string> &vec) {
 }
 
 
-bool check_input_val(std::string value) {
+bool check_input_val(const std::string& value) {
   static const std::regex pX("^(\\d+)'[b|h]x$");
   std::smatch m;
   if(value == "x" || is_number(value) 
@@ -1862,6 +1866,7 @@ bool check_input_val(std::string value) {
 void split_by(std::string str, std::string separator, std::vector<std::string> &vec) {
   assert(vec.empty());
   if(str.find(separator) == std::string::npos) {
+    remove_two_end_space(str);
     vec.push_back(str);
     return;
   }
@@ -1879,6 +1884,29 @@ void split_by(std::string str, std::string separator, std::vector<std::string> &
   vec.push_back(singleVal);
 }
 
+// A cooler version of split_by()
+void split_by_regex(const std::string& str, const std::regex& re, std::vector<std::string> &vec) {
+
+    auto words_begin =
+        std::sregex_iterator(str.begin(), str.end(), re);
+    auto words_end = std::sregex_iterator();
+
+    for (std::sregex_iterator i = words_begin; i != words_end; ++i) {
+        std::smatch match = *i;
+        std::string match_str = match.str();
+        remove_two_end_space(match_str);
+        vec.push_back(match_str);
+    }
+}
+
+
+// A slightly easier to use (but slower) version of split_by_regex()
+void split_by_regex(const std::string& str, const std::string& re_str, std::vector<std::string> &vec) {
+  std::regex re(re_str);
+  split_by_regex(str, re, vec);
+}
+
+
 
 std::string merge_with(const std::vector<std::string> &vec, std::string connector) {
   std::string ret = vec.front();
@@ -1889,7 +1917,7 @@ std::string merge_with(const std::vector<std::string> &vec, std::string connecto
 }
 
 
-std::string dec2hex(std::string decimalValue) {
+std::string dec2hex(const std::string& decimalValue) {
   uint32_t val = std::stoi(decimalValue);
   return dec2hex(val);
 }
@@ -1903,7 +1931,7 @@ std::string dec2hex(uint32_t decimalValue) {
 }
 
 
-void print_reg_list(std::string moduleName) {
+void print_reg_list(const std::string& moduleName) {
   if(moduleTrueRegs.empty()) return;
   std::ofstream output;
   output.open(g_path+"/reg_list.txt", std::ios::app);
