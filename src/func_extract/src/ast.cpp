@@ -87,57 +87,14 @@ void build_ast_tree() {
       set_stk_build_tree(writeASV);
     } // end of for loop
   }
-  std::string line;
-  std::ifstream allowedTgtInFile(g_path+"/allowed_target.txt");
-  while(std::getline(allowedTgtInFile, line)) {
-    if(line.substr(0, 2) == "//"
-        || line.empty())  continue;
-    if(line != "[") {
-      if(line.find(":") == std::string::npos) {
-        remove_two_end_space(line);
-        g_allowedTgt.emplace(line, std::vector<uint32_t>{});
-      }
-      else {
-        size_t pos = line.find(":");
-        std::string var = line.substr(0, pos);
-        remove_two_end_space(var);
-        std::string delayStr = line.substr(pos+1);
-        remove_two_end_space(delayStr);
-        uint32_t delay = std::stoi(delayStr);
-        if(g_allowedTgt.find(var) == g_allowedTgt.end())
-          g_allowedTgt.emplace(var, std::vector<uint32_t>{delay});
-        else
-          g_allowedTgt[var].push_back(delay);
-      }
-    }
-    // collecting vector of target registers
-    else {
-      StrVec_t tgtVec;
-      std::getline(allowedTgtInFile, line);
-      while(line[0] != ']') {
-        if(line.substr(0, 2) == "//"
-           || line.empty() )
-          continue;
-        tgtVec.push_back(line);
-        moduleAs.insert(line);
-        std::getline(allowedTgtInFile, line);
-      }
-      uint32_t delay = 0;
-      if(line.find(":") != std::string::npos) {
-        size_t pos = line.find(":");
-        std::string delayStr = line.substr(pos+1);
-        remove_two_end_space(delayStr);
-        delay = std::stoi(delayStr);
-      }
-      g_allowedTgtVec.push_back(std::make_pair(tgtVec, delay));
-    }
-  } // end of while loop
-  allowedTgtInFile.close();
+
+  assert(!(g_allowedTgt.empty() && g_allowedTgtVec.empty())); // Forgot to read the file?
+
   for(auto tgtDelayPair: g_allowedTgt) {
     set_stk_build_tree(tgtDelayPair.first);
   }
   for(auto pair: g_allowedTgtVec) {
-    for(std::string tgt: pair.first)
+    for(std::string tgt: pair.members)
       set_stk_build_tree(tgt);
   }
 }

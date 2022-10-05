@@ -89,7 +89,6 @@ int main(int argc, char *argv[]) {
   g_verb = false;
   g_print_solver = false;
   g_remove_adff = true;
-  g_split_long_num = true;
   g_clean_submod = true;
   g_use_concat_extract_func = false;
   g_use_simple_func_name = true;
@@ -108,6 +107,8 @@ int main(int argc, char *argv[]) {
   // instruction encodings, write/read ASV, NOP
   read_config(g_path+"/config.txt");
   read_in_instructions(g_path+"/instr.txt");
+
+  read_allowed_targets(g_path+"/allowed_target.txt");
 
 
   // A clear flag of "-" specifies "smart cleaning": it will be done only if

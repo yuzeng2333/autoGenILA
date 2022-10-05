@@ -50,6 +50,12 @@ bool g_seeInputs;
 uint32_t g_maxDelay = 0;
 uint32_t g_pushNum = 0;
 
+// This controls the calling convention for register array destinations.
+// True means that the update function returns a pointer to a locally-declared array.
+// False means that the destination array is managed by the caller, and its address is passed in
+// an additional function argument.
+
+static constexpr bool g_use_ret_array = false;
     
 // assume ssaTable and nbTable have been filled
 void check_all_regs() {
@@ -222,6 +228,33 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   );
   Builder = std::make_unique<llvm::IRBuilder<>>(*TheContext);
 
+  std::vector<std::string> destVec = destInfo.get_no_slice_name();  
+
+  // These will be non-null only for a vector return type
+  llvm::Type* retArrayElementTy = nullptr;  // Something like i32
+  llvm::ArrayType* retArrayTy = nullptr;    // Something like [64 x i32]
+  llvm::GlobalVariable* retArray = nullptr;
+
+  // if target is vector, set the above variables, and possibly declare global array before creating
+  // the top function.
+  if(destInfo.isVector && !destInfo.isMemVec) {
+    retArrayElementTy = destInfo.get_ret_element_type(TheContext);
+    retArrayTy = llvm::ArrayType::get(retArrayElementTy, destVec.size());
+
+    if (g_use_ret_array) {
+      // zero initializer
+      llvm::ConstantAggregateZero* zeroInit = llvm::ConstantAggregateZero::get(retArrayTy);
+      retArray = new llvm::GlobalVariable(
+          *TheModule, 
+          retArrayTy, false, 
+          //llvm::GlobalValue::InternalLinkage,
+          llvm::GlobalValue::LinkOnceAnyLinkage,
+          zeroInit,
+          "RET_ARRAY"
+      );
+    }
+  }
+
   /// declare function
   // input types
   std::vector<llvm::Type *> argTy;
@@ -272,12 +305,22 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     }
 
   toCoutVerb("=== Finished adding module input args!");
-  // return types
+
+  if (!g_use_ret_array) {
+    // If the target is a register array, add one more arg that is a pointer to its storage
+    if(destInfo.isVector && !destInfo.isMemVec) {
+      assert(retArrayElementTy);
+      argTy.push_back(llvm::PointerType::getUnqual(retArrayElementTy));
+    }
+  }
+
+  // The function's return type
   llvm::Type* retTy = destInfo.get_ret_type(TheContext);
   if(retTy == nullptr) {
     toCout("Error: retTy is nullptr");
     abort();
   }
+
 
   // This function type definition is suitable for TheFunction and topFunction
   llvm::FunctionType *FT =
@@ -285,31 +328,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 
   std::string destSimpleName = funcExtract::var_name_convert(destName, true);
 
-  std::vector<std::string> destVec = destInfo.get_no_slice_name();  
 
-  // if target is vector, declare global array before creating
-  // the top function
-  // These will be non-null only for a vector return type
-  llvm::Type* retArrayElementTy = nullptr;
-  llvm::ArrayType* retArrayTy = nullptr;
-  llvm::GlobalVariable* retArray = nullptr;
-
-  if(destInfo.isVector && !destInfo.isMemVec) {
-    retArrayElementTy = destInfo.get_ret_element_type(TheContext);
-
-    retArrayTy = llvm::ArrayType::get(retArrayElementTy, destVec.size());
-
-    // zero initializer
-    llvm::ConstantAggregateZero* zeroInit = llvm::ConstantAggregateZero::get(retArrayTy);
-    retArray = new llvm::GlobalVariable(
-        *TheModule, 
-        retArrayTy, false, 
-        //llvm::GlobalValue::InternalLinkage,
-        llvm::GlobalValue::LinkOnceAnyLinkage,
-        zeroInit,
-        "RET_ARRAY_PTR"
-    );
-  }
 
   // The top funcion is probably no longer necessary, if we make the main
   // function external, and do a final post-ropcioessing to remove dead args.
@@ -330,7 +349,9 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   TheFunction = llvm::Function::Create( FT, linkage,
                   destInfo.get_instr_name()+"_"+destSimpleName, TheModule.get());
 
-  TheFunction->addFnAttr(llvm::Attribute::NoInline);
+  if (topFunction) {
+    TheFunction->addFnAttr(llvm::Attribute::NoInline);
+  }
 
   for(auto it = insContextStk.begin();
       it != insContextStk.end(); it++) {
@@ -352,6 +373,8 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     if (topFunction) {
       topFunction->getArg(idx)->setName(regNameBound);
     }
+
+    //retArray = TheFunction->getArg(idx);
 
     argNum--;
     idx++;
@@ -403,6 +426,21 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   }
 
   toCoutVerb("=== Finished setting module input arg name!");
+
+  llvm::Value *retArrayPtr = nullptr;
+
+  if (!g_use_ret_array) {
+    // If the target is a register array, add one more arg that is a pointer to its storage
+    if(destInfo.isVector && !destInfo.isMemVec) {
+      const char *argName = "_RET_ARRAY_PTR_";  // sim_get will recognize this name in func_info.txt
+      TheFunction->getArg(idx)->setName(argName);
+      retArrayPtr = TheFunction->getArg(idx);
+
+      if (topFunction) {
+        topFunction->getArg(idx)->setName(argName);
+      }
+    }
+  }
 
   // basic block
   BB = llvm::BasicBlock::Create(*TheContext, "bb_;_"+destName, TheFunction);
@@ -478,9 +516,29 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 
       assert(retArrayElementTy);
 
-      // Store each element to the global array.
-      for (llvm::Value* val : retVec) {
-        llvm::GetElementPtrInst* ptr 
+      if (g_use_ret_array) {
+        // Store each element to the global array.
+        for (llvm::Value* val : retVec) {
+          llvm::GetElementPtrInst* ptr 
+            = llvm::GetElementPtrInst::Create(
+                retArrayTy,
+                retArray,
+                std::vector<llvm::Value*>{
+                  llvm::ConstantInt::get(
+                    llvm::IntegerType::get(*TheContext, bitNum), 
+                    0, false),
+                  llvm::ConstantInt::get(
+                    llvm::IntegerType::get(*TheContext, bitNum), 
+                    i++, false) },
+                llvm::Twine(val->getName().str()+"_mem"),
+                BB
+              );
+          Builder->SetInsertPoint(BB);
+
+          Builder->CreateStore(val, value(ptr));  
+        }
+
+        llvm::GetElementPtrInst* retPtr 
           = llvm::GetElementPtrInst::Create(
               retArrayTy,
               retArray,
@@ -490,34 +548,35 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
                   0, false),
                 llvm::ConstantInt::get(
                   llvm::IntegerType::get(*TheContext, bitNum), 
-                  i++, false) },
-              llvm::Twine(val->getName().str()+"_mem"),
+                  0, false) },
+              llvm::Twine("RET_PTR"),
               BB
             );
-        Builder->SetInsertPoint(BB);
 
-	Builder->CreateStore(val, value(ptr));  
+        // Return a pointer to the array
+        retInst = Builder->CreateRet(value(retPtr));
+      } else {
+        // A pointer the the array was passed in
+        // Store each element to that array.
+        for (llvm::Value* val : retVec) {
+          llvm::GetElementPtrInst* ptr 
+            = llvm::GetElementPtrInst::Create(
+                retArrayElementTy,
+                retArrayPtr,
+                std::vector<llvm::Value*>{
+                  llvm::ConstantInt::get(
+                    llvm::IntegerType::get(*TheContext, bitNum), 
+                    i++, false) },
+                llvm::Twine(val->getName().str()+"_mem"),
+                BB
+              );
+          Builder->SetInsertPoint(BB);
+
+          Builder->CreateStore(val, value(ptr));  
+        }
+        retInst = Builder->CreateRetVoid();
       }
-
-      llvm::GetElementPtrInst* retPtr 
-        = llvm::GetElementPtrInst::Create(
-            retArrayTy,
-            retArray,
-            std::vector<llvm::Value*>{
-              llvm::ConstantInt::get(
-                llvm::IntegerType::get(*TheContext, bitNum), 
-                0, false),
-              llvm::ConstantInt::get(
-                llvm::IntegerType::get(*TheContext, bitNum), 
-                0, false) },
-            llvm::Twine("RET_PTR"),
-            BB
-          );
-
-      // Return a pointer to the global array
-      retInst = Builder->CreateRet(value(retPtr));
-    }
-    else {
+    } else {
       assert(destInfo.isMemVec);    
       retInst = Builder->CreateRetVoid();
     }
@@ -989,16 +1048,26 @@ llvm::Type* DestInfo::get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext
                                   destWidth);
   }
   else if(isVector && !isMemVec){
-    // if is reg vector, return a pointer type
-    // first, check if every reg is of the same size
+    // if is reg vector, first check if every reg is of the same size.
     uint32_t size = get_var_slice_width_cmplx(destVec.front());
     for(auto dest: destVec) {
       uint32_t elmtSize = get_var_slice_width_cmplx(dest);
       assert(size == elmtSize);
     }
-    llvm::Type* I = llvm::IntegerType::get(*TheContext, size);    
-    llvm::PointerType* pointerTy = llvm::PointerType::getUnqual(I);
-    return pointerTy;
+
+    if (g_use_ret_array) {
+      // Return a pointer to a locally-declared array.
+      uint32_t size = get_var_slice_width_cmplx(destVec.front());
+      for(auto dest: destVec) {
+        uint32_t elmtSize = get_var_slice_width_cmplx(dest);
+        assert(size == elmtSize);
+      }
+      llvm::Type* I = llvm::IntegerType::get(*TheContext, size);    
+      return llvm::PointerType::getUnqual(I);
+    } else {
+      // Return void, since the return array is provided by the caller.
+      return llvm::Type::getVoidTy(*TheContext);
+    }
   }
   // TODO: implement the else case: the destVar is either single memory
   // or an array of memory
@@ -1032,13 +1101,7 @@ llvm::Type* DestInfo::get_ret_element_type(std::shared_ptr<llvm::LLVMContext> Th
 llvm::Type* DestInfo::get_arr_type(std::shared_ptr<llvm::LLVMContext> TheContext) {
   assert(isVector);
   // if is reg vector, return an array type pointer
-  // first, check if every reg is of the same size
-  uint32_t size = get_var_slice_width_cmplx(destVec.front());
-  for(auto dest: destVec) {
-    uint32_t elmtSize = get_var_slice_width_cmplx(dest);
-    assert(size = elmtSize);
-  }
-  llvm::Type* I = llvm::IntegerType::get(*TheContext, size);
+  llvm::Type* I = get_ret_element_type(TheContext);
   llvm::ArrayType* arrayType = llvm::ArrayType::get(I, destVec.size());
   return arrayType;
 }

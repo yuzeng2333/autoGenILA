@@ -21,12 +21,17 @@ using namespace taintGen;
 
 std::mutex g_dependVarMapMtx;
 std::mutex g_TimeFileMtx;
-// the first key is instr name, the second key is target name
+
+// Gathers data to be written to func_info.txt and asv_info.txt,
+// which later get read by sim_gen.
+// The first key is instr name, the second key is target name (scalar or vector)
 std::map<std::string, 
          std::map<std::string, 
                   std::vector<std::pair<std::string, 
                                         uint32_t>>>> g_dependVarMap;
+// Also used to write asv_info.txt
 struct ThreadSafeMap_t g_asvSet;
+
 //struct RunningThreadCnt_t g_threadCnt;
 struct WorkSet_t g_workSet;
 struct ThreadSafeVector_t g_fileNameVec;
@@ -90,16 +95,6 @@ void get_all_update() {
     g_workSet.mtxClear();
   }
 
-  // The members of register arrays have to go in g_asvSet (and
-  // get written out in asv_info.txt), so that the downstream flow
-  // knows their width values.
-  for(auto pair: g_allowedTgtVec) {
-    for(std::string reg : pair.first) {
-      uint32_t width = get_var_slice_width_cmplx(reg);
-      g_asvSet.emplace(reg, width);
-    }
-  }
-
   // declaration for llvm
   std::ofstream funcInfo(g_path+"/func_info.txt");
   std::ofstream asvInfo(g_path+"/asv_info.txt");
@@ -109,8 +104,8 @@ void get_all_update() {
 
   if(!g_use_multi_thread) {
     // schedule 1: outer loop is workSet/target, inner loop is instructions,
-    // suitbale for design with many instructions
-    std::vector<std::pair<std::vector<std::string>, uint32_t>> allowedTgtVec = g_allowedTgtVec;    
+    // suitable for design with many instructions
+    std::vector<TgtVec_t> allowedTgtVec = g_allowedTgtVec;    // Deep copy...
     while(!g_workSet.empty() || !allowedTgtVec.empty() ) {
       bool isVec;
       std::string target;
@@ -127,7 +122,7 @@ void get_all_update() {
       }
       else if(!allowedTgtVec.empty()){
         isVec = true;
-        tgtVec = allowedTgtVec.back().first;
+        tgtVec = allowedTgtVec.back().members;
         allowedTgtVec.pop_back();
       }
 
@@ -155,7 +150,8 @@ void get_all_update() {
   }
   else {
     // schedule 2: outer loop is instructions, inner loop is workSet/target
-    while(!g_workSet.empty() || !g_allowedTgtVec.empty()) {
+    bool doneFirstRound = false;
+    while(!g_workSet.empty() || (!doneFirstRound && !g_allowedTgtVec.empty())) {
       uint32_t instrIdx = 0;
       StrSet_t localWorkSet;
       StrSet_t oldWorkSet;
@@ -163,8 +159,7 @@ void get_all_update() {
       g_workSet.mtxClear();
       for(auto instrInfo : g_instrInfo) {
         localWorkSet = oldWorkSet;
-        std::vector<std::pair<std::vector<std::string>, 
-                              uint32_t>> localWorkVec = g_allowedTgtVec;
+        std::vector<TgtVec_t> localWorkVec = g_allowedTgtVec;  // Deep copy...
         instrIdx++;
         threadVec.clear();
         while(!localWorkSet.empty() || !localWorkVec.empty()) {
@@ -183,7 +178,7 @@ void get_all_update() {
           }
           else if(!localWorkVec.empty()){
             isVec = true;
-            tgtVec = localWorkVec.back().first;
+            tgtVec = localWorkVec.back().members;
             localWorkVec.pop_back();
           }
 
@@ -200,8 +195,8 @@ void get_all_update() {
         for(auto &th: threadVec) th.join();
       } // end of for-lopp: for each instruction
 
-      for(auto pair: g_allowedTgtVec) {
-        for(std::string reg: pair.first) {
+      for(auto vec: g_allowedTgtVec) {
+        for(std::string reg: vec.members) {
           g_visitedTgt.mtxInsert(reg);
         }
       }
@@ -209,7 +204,7 @@ void get_all_update() {
         g_visitedTgt.mtxInsert(target);
       }
       // targetVectors only executed for one round
-      g_allowedTgtVec.clear();
+      doneFirstRound = true;
     } // end of while loop
   }
 
@@ -417,9 +412,17 @@ void get_update_function(std::string target,
 
   for(auto pair : argVec) {
     std::string reg = pair.first;
+    int width = pair.second;
     if(g_push_new_target && !g_visitedTgt.mtxExist(reg)) 
       g_workSet.mtxInsert(reg);
-    g_asvSet.emplace(reg, pair.second);
+
+    // Add any discovered registers that had not already been identified as ASVs.
+    // But ignore any special non-ASV/non-register function args, indicated by a zero
+    // width (those go in func_info.txt).
+    // And skip args already known to be in a register array.
+    if (width > 0 && g_allowedTgt.count(reg) == 0 && get_vector_of_target(reg, nullptr).empty()) {
+      g_asvSet.emplace(reg, width);
+    }
   }
 }
 
@@ -451,10 +454,10 @@ get_delay_bounds(std::string var, const std::vector<std::string>& tgtVec,
 
   if(var.empty() && !tgtVec.empty()) {
     // array target
-    for(auto pair : g_allowedTgtVec) {
+    for(auto vec : g_allowedTgtVec) {
       // This efficiently tests that pair.first and tgtVec have the same contents
-      if (pair.first == tgtVec && pair.second > 0) {
-        delayBound = pair.second;
+      if (vec.members == tgtVec && vec.delay > 0) {
+        delayBound = vec.delay;
         break;
       }
     }
@@ -893,17 +896,35 @@ bool read_clean_optimized(std::string fileName,
   }
 
 
-  // Push information about the mainFunc args to argVec.
+  // Push information about the mainFunc args to argVec, to be written out to func_info.txt
+  // TODO: What we really want is a description of the args of the wrapper function,
+  // since that is what sim_gen will work with.  If we do that, the pointer/value
+  // status of the args will also have to be recorded in func_info.txt.
+  
   for (llvm::Argument& arg : mainFunc->args()) {
     std::string argname = arg.getName().str();
+    if (argname == "_RET_ARRAY_PTR_") {
+      // Special arg name indicates a pointer to register array storage.
+      // Mark it with a zero width to indicate its special status
+      argVec.push_back(std::make_pair(argname, 0));
+    } else {
+      // Extract the ASV name from the argument name (by removing the cycle count).
+      // Note that the name will not have quotes or backslashes, like you would see in the textual IR.
+      uint32_t pos = argname.find(DELIM, 0);
+      std::string var = argname.substr(0, pos);
 
-    // Extract the ASV name from the argument name.
-    // Note that the name will not have quotes or backslashes, like you would see in the textual IR.
-    uint32_t pos = argname.find(DELIM, 0);
-    std::string var = argname.substr(0, pos);
-
-    argVec.push_back(std::make_pair(var, arg.getType()->getPrimitiveSizeInBits()));
+      uint32_t size = arg.getType()->getPrimitiveSizeInBits();
+      assert(size > 0);
+      argVec.push_back(std::make_pair(var, size));
+    }
   }
+
+  // If the return type is big, add to argVec the extra pointer arg that 
+  // the wrapper functon will have.
+  if (isBigType(mainFunc->getReturnType())) {
+    argVec.push_back(std::make_pair("_RETURN_VAL_PTR_", 0));
+  }
+  
 
   // If no output file name was given, the purpose of calling this was simply to fill in argVec.
   if (!outFileName.empty()) {
@@ -918,6 +939,27 @@ bool read_clean_optimized(std::string fileName,
   }
 
   return true;
+}
+
+
+// Return the vector name and position if the given register is a member of a target vector.
+std::string get_vector_of_target(const std::string& reg, int *idxp) {
+
+  for(auto vec : g_allowedTgtVec) {
+    uint32_t len = vec.members.size();
+    for (uint32_t idx = 0; idx < len; ++idx) {
+      std::string element = vec.members[idx];
+      // Sanity check on consistency of g_allowedTgt and g_allowedTgtVec
+      assert(!g_allowedTgt.count(element));
+      if (element == reg) {
+        if (idxp) *idxp = idx;
+        assert(!vec.name.empty());  // The vectors were all supposed to have been named.
+        return vec.name;  // Array name
+      }
+    }
+  }
+
+  return "";  // not in any vector
 }
 
 
@@ -941,8 +983,30 @@ void print_func_info(std::ofstream &output) {
 
 
 void print_asv_info(std::ofstream &output) {
-  for(auto it = g_asvSet.begin(); it != g_asvSet.end(); it++)
-    output << it->first+":"+toStr(it->second) << std::endl;
+  for(auto it = g_asvSet.begin(); it != g_asvSet.end(); it++) {
+    const std::string& reg = it->first;
+    uint32_t width = it->second;
+
+    // g_asvSet is not supposed to have ASVs in registers
+    assert(get_vector_of_target(reg, nullptr).empty());
+
+    if (!get_vector_of_target(reg, nullptr).empty()) {
+      continue;  // Skip the ASVs in registers - handle below.
+    }
+
+    output << reg << ":" << width << std::endl; // Write name and width
+  }
+
+  // Write the contents of register arrays separately, including the array name
+  for(auto vec: g_allowedTgtVec) {
+    output << "[" << std::endl;
+    for(std::string reg : vec.members) {
+      uint32_t width = get_var_slice_width_cmplx(reg);
+      output << reg << ":" << width; // Write name and width
+      output << std::endl;
+    }
+    output << "]:" << vec.name << std::endl;
+  }
 }
 
 

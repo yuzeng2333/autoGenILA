@@ -58,5 +58,7 @@ void get_skipped_output(std::set<std::string> &skippedOutput);
 
 void read_config(std::string fileName);
 
+void read_allowed_targets(std::string fileName);
+
 } // end of namespace funcExtract
 #endif

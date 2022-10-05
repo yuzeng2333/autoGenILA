@@ -270,8 +270,17 @@ extern std::map<std::string, uint32_t> g_asv;
 
 extern taintGen::Str2StrVecMap_t g_moduleInputsMap;
 extern taintGen::Str2StrVecMap_t g_moduleOutputsMap;
+
 extern std::map<std::string, std::vector<uint32_t>> g_allowedTgt;
-extern std::vector<std::pair<std::vector<std::string>, uint32_t>> g_allowedTgtVec;
+
+struct TgtVec_t {
+  std::vector<std::string> members;
+  uint32_t delay;
+  std::string name;  // Synthesized from member names
+};
+
+extern std::vector<TgtVec_t> g_allowedTgtVec;
+
 extern std::queue<std::pair<std::string, uint32_t>> g_goalVars;
 extern std::ofstream g_outFil;
 extern std::string g_pj_path; 

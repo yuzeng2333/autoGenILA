@@ -453,7 +453,10 @@ void print_instr_calls(std::map<std::string,
       // TODO: If multiple vars need to be updated, use one function call and multiple assignments:
       // x = y = x = func(..);
 
-      std::string funcCallStr = func_call(indent, varName+nxt, funcCall.funcTy, funcCall.funcName, 
+      if (!is_array_var(varName))
+        varName += nxt;
+
+      std::string funcCallStr = func_call(indent, varName, funcCall.funcTy, funcCall.funcName, 
                            encoding, instrInfo.loadDataInfo[funcCall.origASV]);
       cpp << funcCallStr << std::endl;
 
@@ -551,7 +554,7 @@ std::string c_type(uint32_t width) {
 
 // This can be different than the ASV variable type, since large variables
 // are passed by const reference instead of value.  An exception is
-// teh extra parameter for a large return value, which is a non-const reference.
+// the extra parameter for a large return value, which is a non-const reference.
 std::string asv_func_param_type(uint32_t width, bool is_const=true) {
   std::string ret;
 
@@ -614,6 +617,16 @@ std::string func_call(std::string indent, std::string writeVar,
          && varIdxMap[arg] == dataIn.second-1 ) {
       argValue = g_dataIn;      
     }
+
+    if (arg == "_RETURN_VAL_PTR_") {
+      // This arg takes a reference to the big return value.
+      assert(funcTy.retTy > 64);
+      argValue = writeVar;
+    }
+    else if (arg == "_RET_ARRAY_PTR_") {
+      // We need to provide a pointer to the result storage of the result's register array.
+      argValue = "&"+writeVar;
+    }
     else if(inputInstr.find(arg) != inputInstr.end()) {
       if((inputInstr.at(arg)).size() > 1) {
         toCout("Warning: instruction spans multiple cycles!");
@@ -625,7 +638,7 @@ std::string func_call(std::string indent, std::string writeVar,
       argValue = apint2literal(apValue);
     }
     else {
-      // The arg is an ASV: Either a scalar or en element of a register array.
+      // The arg is an ASV: Either a scalar or an element of a register array.
       if (is_in_array(arg)) {
         // The arg value is a member of the array.
         int idx = 0;
@@ -644,16 +657,7 @@ std::string func_call(std::string indent, std::string writeVar,
       ret += std::string(argIndent, ' ');
     }
     ret += argValue;
-    argCnt++;;
-  }
-
-  if (funcTy.retTy > 64) {
-    if (argCnt > 0) {
-      ret += ",\n";
-      ret += std::string(argIndent, ' ');
-    }
-    // A reference to a big return value is passed as the last arg.
-    ret += writeVar;
+    argCnt++;
   }
 
   ret += " );";
@@ -674,28 +678,39 @@ void print_func_declare(const FuncTy_t& funcTy,
 
   for(auto pair : funcTy.argTy) {
     uint32_t width = pair.first;
-    std::string argType = asv_func_param_type(width);
     std::string argName = pair.second;
-    std::string argNameSimp = var_name_convert(argName, true);
-    std::string idx = "";
-    if(argIdx.find(argNameSimp) == argIdx.end()) {
-      argIdx.emplace(argNameSimp, 0);
+    if (width > 0) {
+      // A scalar ASV argument (passed by value or reference)
+      std::string argType = asv_func_param_type(width);
+      std::string argNameSimp = var_name_convert(argName, true);
+      std::string idx = "";
+      if(argIdx.find(argNameSimp) == argIdx.end()) {
+        argIdx.emplace(argNameSimp, 0);
+      }
+      else {
+        idx = std::to_string(++argIdx[argNameSimp]);
+      }
+      ret = ret + argType + " " + argNameSimp + idx + ", ";
+    } else {
+      // A special pointer arg, for passing/returning a register array, or 
+      // returning a big scalar. 
+      if (argName == "_RETURN_VAL_PTR_") {
+        // This arg points to a caller-provided space for returning a big scalar.
+        assert (funcTy.retTy > 64);
+        ret += asv_func_param_type(funcTy.retTy, false /*is_const*/)+" "+ argName+", ";
+      }
+      else if (argName == "_RET_ARRAY_PTR_") {
+        // This arg points to a caller-provided array for returning a register array
+        // TODO: get correct type, not void.
+        ret += "void* "+ argName+", ";
+      }
     }
-    else {
-      idx = std::to_string(++argIdx[argNameSimp]);
-    }
-    ret = ret + argType + " " + argNameSimp + idx + ", ";
   }
   if(funcTy.argTy.size() > 0) {
     ret.pop_back();  // Remove extra ", "
     ret.pop_back();
   }
 
-  if (funcTy.retTy > 64) {
-    // Add the extra arg for the big return value
-    ret += ", "+asv_func_param_type(funcTy.retTy, false /*is_const*/)+" _return_val_ptr_";
-  }
-    
   ret = ret + " );";
   header << ret << std::endl;
 }

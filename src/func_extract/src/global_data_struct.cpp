@@ -22,13 +22,19 @@ uint32_t g_new_var;
 //std::unordered_map<std::string, astNode*> g_asSliceRoot;
 std::map<std::string, astNode*> g_varNode;
 
+// In sim_gen and other back-end programs,
+// read_asv_info() builds this from asv_info.txt
+// Key is ASV name..
+std::map<std::string, uint32_t> g_asv;
+
 // In func_extract and sim_gen, read_instructions() builds this from instr.txt.
 // In sim_gen, read_func_info() populates the funcTypes fields from func_info.txt.
 std::vector<struct InstrInfo_t> g_instrInfo;
 
-// In sim_gen, read_func_info() builds this from func_info.txt.
+// In sim_gen, read_Asv_info and/or read_func_info() build this from func_info.txt.
 // Key is array name.
 std::map<std::string, registerArray_t> g_registerArrays;
+
 
 std::unordered_map<std::string, std::string> g_nopInstr;
 std::map<std::string, std::string> g_rstVal;
@@ -39,17 +45,17 @@ std::map<std::string,
 std::map<std::string, std::string> g_ins2modMap;
 std::map<std::string, uint32_t> g_moduleOutportTime;
 std::map<std::string, uint32_t> g_moduleInportTime;
-std::map<std::string, uint32_t> g_asv;
+
 Str2StrVecMap_t g_moduleInputsMap;
 Str2StrVecMap_t g_moduleOutputsMap;
+
 std::map<std::string, std::vector<uint32_t>> g_allowedTgt;
 
 // Vector targets, as read from allowed_target.txt.
 // The string vector holds the element names, and the uint32_t holds the 
 // cycle count.
 
-std::vector<std::pair<std::vector<std::string>, uint32_t>> g_allowedTgtVec;
-//VarWidth g_varWidth;
+std::vector<TgtVec_t> g_allowedTgtVec;
 
 std::string g_mem2acclData;
 std::string g_accl2memAddr;

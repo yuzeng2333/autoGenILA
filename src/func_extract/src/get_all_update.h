@@ -43,6 +43,8 @@ std::vector<uint32_t>
 get_delay_bounds(std::string var, const std::vector<std::string>& tgtVec, 
                          const struct InstrInfo_t& instrInfo);
 
+std::string get_vector_of_target(const std::string& reg, int *idxp);
+
 void print_func_info(std::ofstream &output);
 
 void print_asv_info(std::ofstream &output);
