@@ -52,8 +52,8 @@ Str2StrVecMap_t g_moduleOutputsMap;
 std::map<std::string, std::vector<uint32_t>> g_allowedTgt;
 
 // Vector targets, as read from allowed_target.txt.
-// The string vector holds the element names, and the uint32_t holds the 
-// cycle count.
+// TgtVec_t contains the vector name, the cycle count, and a vector of element names.
+// TODO: Make this a map, like g_allowedTgt
 
 std::vector<TgtVec_t> g_allowedTgtVec;
 

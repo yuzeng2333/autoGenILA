@@ -434,6 +434,13 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     if(destInfo.isVector && !destInfo.isMemVec) {
       const char *argName = "_RET_ARRAY_PTR_";  // sim_get will recognize this name in func_info.txt
       TheFunction->getArg(idx)->setName(argName);
+
+      // Add a byRef attribute to the pointer arg to explicitly indicate the pointee type.
+      // This will be vital in LLVM 14+, when typed pointers go away.
+      assert(retArrayElementTy);
+      TheFunction->addParamAttr(idx,
+                      llvm::Attribute::getWithByRefType(*TheContext, retArrayElementTy));
+
       retArrayPtr = TheFunction->getArg(idx);
 
       if (topFunction) {

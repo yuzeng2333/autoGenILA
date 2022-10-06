@@ -604,7 +604,7 @@ std::string func_call(std::string indent, std::string writeVar,
   int argIndent = 0;
   std::map<std::string, uint32_t> varIdxMap; 
   for(auto pair: funcTy.argTy) {
-    std::string arg = pair.second;
+    std::string arg = pair.first;
 
     if(varIdxMap.find(arg) == varIdxMap.end())
       varIdxMap.emplace(arg, 0);
@@ -677,8 +677,8 @@ void print_func_declare(const FuncTy_t& funcTy,
   ret += " " + funcNameSimp + " ( ";
 
   for(auto pair : funcTy.argTy) {
-    uint32_t width = pair.first;
-    std::string argName = pair.second;
+    std::string argName = pair.first;
+    int width = pair.second;
     if (width > 0) {
       // A scalar ASV argument (passed by value or reference)
       std::string argType = asv_func_param_type(width);

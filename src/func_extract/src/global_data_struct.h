@@ -53,9 +53,15 @@ namespace funcExtract {
 //};
 
 
+//vector of arg names/bitwidths. (width < 0 means pointer)
+typedef std::vector<std::pair<std::string, int>> ArgVec_t;
+
+
 struct FuncTy_t {
-  uint32_t retTy;
-  std::vector<std::pair<uint32_t, std::string>> argTy;
+  // Bitwidth of return type. 0 means void, <0 means a pointer to width -retTy
+  int retTy;
+  // Names and bitwidths of args. <0 means a pointer, 0 means something special.
+  ArgVec_t argTy;
 };
 
 
@@ -195,7 +201,7 @@ struct Context_t {
 class registerArray_t {
   public:
   const std::vector<std::string> members;  // Size of members is array length
-  const uint32_t width;
+  const uint32_t width;  // Should always be > 0.
 
   registerArray_t() = delete;
   registerArray_t(const std::vector<std::string>& m, uint32_t w);
