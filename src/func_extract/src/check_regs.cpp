@@ -55,7 +55,7 @@ uint32_t g_pushNum = 0;
 // False means that the destination array is managed by the caller, and its address is passed in
 // an additional function argument.
 
-static constexpr bool g_use_ret_array = false;
+static constexpr bool g_local_ret_array = false;
     
 // assume ssaTable and nbTable have been filled
 void check_all_regs() {
@@ -241,7 +241,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     retArrayElementTy = destInfo.get_ret_element_type(TheContext);
     retArrayTy = llvm::ArrayType::get(retArrayElementTy, destVec.size());
 
-    if (g_use_ret_array) {
+    if (g_local_ret_array) {
       // zero initializer
       llvm::ConstantAggregateZero* zeroInit = llvm::ConstantAggregateZero::get(retArrayTy);
       retArray = new llvm::GlobalVariable(
@@ -306,7 +306,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 
   toCoutVerb("=== Finished adding module input args!");
 
-  if (!g_use_ret_array) {
+  if (!g_local_ret_array) {
     // If the target is a register array, add one more arg that is a pointer to its storage
     if(destInfo.isVector && !destInfo.isMemVec) {
       assert(retArrayElementTy);
@@ -429,10 +429,10 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 
   llvm::Value *retArrayPtr = nullptr;
 
-  if (!g_use_ret_array) {
+  if (!g_local_ret_array) {
     // If the target is a register array, add one more arg that is a pointer to its storage
     if(destInfo.isVector && !destInfo.isMemVec) {
-      const char *argName = "_RET_ARRAY_PTR_";  // sim_get will recognize this name in func_info.txt
+      const char *argName = RETURN_ARRAY_PTR_ID;  // sim_get will recognize this name in func_info.txt
       TheFunction->getArg(idx)->setName(argName);
 
       // Add a byRef attribute to the pointer arg to explicitly indicate the pointee type.
@@ -523,7 +523,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 
       assert(retArrayElementTy);
 
-      if (g_use_ret_array) {
+      if (g_local_ret_array) {
         // Store each element to the global array.
         for (llvm::Value* val : retVec) {
           llvm::GetElementPtrInst* ptr 
@@ -1062,7 +1062,7 @@ llvm::Type* DestInfo::get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext
       assert(size == elmtSize);
     }
 
-    if (g_use_ret_array) {
+    if (g_local_ret_array) {
       // Return a pointer to a locally-declared array.
       uint32_t size = get_var_slice_width_cmplx(destVec.front());
       for(auto dest: destVec) {

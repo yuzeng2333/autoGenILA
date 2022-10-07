@@ -25,7 +25,7 @@ std::mutex g_TimeFileMtx;
 std::map<std::string, 
          std::map<std::string, ArgVec_t>> g_dependVarMap;
 
-// Also used to write asv_info.txt
+// Used to write asv_info.txt
 struct ThreadSafeMap_t g_asvSet;
 
 //struct RunningThreadCnt_t g_threadCnt;
@@ -101,7 +101,7 @@ void get_all_update() {
   if(!g_use_multi_thread) {
     // schedule 1: outer loop is workSet/target, inner loop is instructions,
     // suitable for design with many instructions
-    std::vector<TgtVec_t> allowedTgtVec = g_allowedTgtVec;    // Deep copy...
+    std::map<std::string, TgtVec_t> allowedTgtVec = g_allowedTgtVec;    // Deep copy...
     while(!g_workSet.empty() || !allowedTgtVec.empty() ) {
       bool isVec;
       std::string target;
@@ -118,9 +118,9 @@ void get_all_update() {
       }
       else if(!allowedTgtVec.empty()){
         isVec = true;
-        target = allowedTgtVec.back().name;  // Name of vector (previously auto-generated)
-        tgtVec = allowedTgtVec.back().members;
-        allowedTgtVec.pop_back();
+        target = allowedTgtVec.begin()->first;  // Name of vector (previously auto-generated)
+        tgtVec = allowedTgtVec.begin()->second.members;  // Deep copy
+        allowedTgtVec.erase(allowedTgtVec.begin());
       }
 
       uint32_t instrIdx = 0;
@@ -156,7 +156,7 @@ void get_all_update() {
       g_workSet.mtxClear();
       for(auto instrInfo : g_instrInfo) {
         localWorkSet = oldWorkSet;
-        std::vector<TgtVec_t> localWorkVec = g_allowedTgtVec;  // Deep copy...
+        std::map<std::string, TgtVec_t> localWorkVec = g_allowedTgtVec;  // Deep copy...
         instrIdx++;
         threadVec.clear();
         while(!localWorkSet.empty() || !localWorkVec.empty()) {
@@ -174,8 +174,8 @@ void get_all_update() {
           }
           else if(!localWorkVec.empty()){
             isVec = true;
-            target = localWorkVec.back().name;
-            localWorkVec.pop_back();
+            target = localWorkVec.begin()->first;
+            localWorkVec.erase(localWorkVec.begin());
           }
 
           std::vector<uint32_t> delayBounds = get_delay_bounds(target, instrInfo);
@@ -191,8 +191,8 @@ void get_all_update() {
         for(auto &th: threadVec) th.join();
       } // end of for-lopp: for each instruction
 
-      for(auto vec: g_allowedTgtVec) {
-        for(std::string reg: vec.members) {
+      for(auto pair: g_allowedTgtVec) {
+        for(std::string reg: pair.second.members) {
           g_visitedTgt.mtxInsert(reg);
         }
       }
@@ -262,9 +262,9 @@ void get_update_function(std::string target,
     destInfo.isVector = true;
 
     std::vector<std::string> vecWorkSet;
-    for(auto vec : g_allowedTgtVec) {
-      if (vec.name == target) {
-        vecWorkSet = vec.members;  // Deep copy
+    for(auto pair : g_allowedTgtVec) {
+      if (pair.first == target) {
+        vecWorkSet = pair.second.members;  // Deep copy
       }
     }
 
@@ -383,10 +383,10 @@ void get_update_function(std::string target,
     if (usefulFunc) {
       
       // Add a C-compatible wrapper function that calls the main function.
-      create_wrapper_func(*M, funcName);
+      std::string wrapperFuncName = create_wrapper_func(*M, funcName);
 
       // Get the data needed to create func_info.txt
-      gather_func_args(*M, funcName, argVec);
+      gather_wrapper_func_args(*M, wrapperFuncName, argVec);
 
       if ((!g_overwrite_existing_llvm) && stat(llvmFileName.c_str(), &statbuf) == 0) {
         toCout("Skipping re-generation of existing file "+llvmFileName);
@@ -430,11 +430,14 @@ void get_update_function(std::string target,
 
     width = std::abs(width);  // For pointers, we want the pointee width.
 
-    // Add any discovered registers that had not already been identified as ASVs.
-    // But ignore any special non-ASV/non-register function args, indicated by a zero
-    // width (those go in func_info.txt).
+    // Add any discovered registers that had not already been identified as ASVs
+    // or register arrays.
+    // Ignore any special non-ASV/non-register function args, indicated by a 
+    // reserved name (those go in func_info.txt).
     // And skip args already known to be in a register array.
-    if (width > 0 && g_allowedTgt.count(reg) == 0 && get_vector_of_target(reg, nullptr).empty()) {
+    if (!is_special_arg_name(reg) && g_allowedTgt.count(reg) == 0 &&
+        g_allowedTgtVec.count(reg) == 0 &&
+        get_vector_of_target(reg, nullptr).empty()) {
       g_asvSet.emplace(reg, width);
     }
   }
@@ -462,11 +465,10 @@ get_delay_bounds(std::string var, const InstrInfo_t &instrInfo) {
   }
 
   // See if the given name represents a target vector. If so, use its delay
-  for(auto vec : g_allowedTgtVec) {
-    if (vec.name == var) {
-      uint32_t delay = (vec.delay > 0) ? vec.delay : instrInfo.delayBound;
-      return std::vector<uint32_t>{delay};  // Return a vector of one delay value
-    }
+  if(g_allowedTgtVec.count(var)) {
+    const TgtVec_t& vec = g_allowedTgtVec[var];
+    uint32_t delay = (vec.delay > 0) ? vec.delay : instrInfo.delayBound;
+    return std::vector<uint32_t>{delay};  // Return a vector of one delay value
   }
 
   // Default delay is per-instruction from instr.txt
@@ -506,13 +508,12 @@ isBigType(const llvm::Type *type) {
 
 
 
+// Make the wrapper function for C/C++ interfacing.
+// Return its name
+std::string create_wrapper_func(llvm::Module& M,
+                         std::string wrapperFuncName) {
 
-
-// Make the wrapper function for C/C++ interfacing
-bool create_wrapper_func(llvm::Module& M,
-                         std::string funcNameIn) {
-
-  llvm::Function *mainFunc = M.getFunction(funcNameIn);
+  llvm::Function *mainFunc = M.getFunction(wrapperFuncName);
   assert(mainFunc);
 
   llvm::LLVMContext& Context = mainFunc->getContext();
@@ -528,6 +529,7 @@ bool create_wrapper_func(llvm::Module& M,
     if (isBigType(type)) {
       wrapperArgTy.push_back(llvm::PointerType::getUnqual(type));
     } else {
+      // This handles small args, as well as pointers to register arrays.
       wrapperArgTy.push_back(type);
     }
   }
@@ -581,17 +583,17 @@ bool create_wrapper_func(llvm::Module& M,
 
   llvm::Argument* wrapperLastArg = wrapperFunc->arg_end()-1;
 
-  // Deal with the extra wrapper arg that handles big return types
+  // If needed, add an extra arg that handles big return types
   if (isBigType(mainRetTy)) {
-    wrapperLastArg->setName(llvm::Twine("_return_val_ptr_"));
+    wrapperLastArg->setName(llvm::Twine(RETURN_VAL_PTR_ID));
 
     // Specify that it can never be null (actually in C++, it will be a (non-const) reference).
     wrapperLastArg->addAttr(llvm::Attribute::NonNull);
 
-    // Add a byRef attribute to the pointer arg to explicitly indicate the pointee type.
+    // Add a sret attribute to the pointer arg to explicitly indicate the pointee type.
     // This will be vital in LLVM 14+, when typed pointers go away.
     wrapperFunc->addParamAttr(wrapperLastArg->getArgNo(),
-                    llvm::Attribute::getWithByRefType(Context, mainRetTy));
+                    llvm::Attribute::getWithStructRetType(Context, mainRetTy));
   }
 
 
@@ -635,7 +637,7 @@ bool create_wrapper_func(llvm::Module& M,
 
   llvm::verifyFunction(*wrapperFunc);
 
-  return true;;
+  return wrapperFunc->getName().str();
 }
 
 
@@ -723,46 +725,24 @@ static llvm::Function *remove_dead_args(llvm::Function *func) {
 
 // Make sure the main function exists, and remove any unused args.
 bool clean_main_func(llvm::Module& M,
-                     std::string funcNameIn) {
+                     std::string funcName) {
 
-  llvm::Function *topFunc = M.getFunction("top_function");
-  llvm::Function *mainFunc = M.getFunction(funcNameIn);
-  if (topFunc) {
-    // Check that the main function wasn't accidentally optimized away.  If it
-    // doesn't exist, rename topFunc to serve as a replacement.
-    // BTW, newer algorithm in check_regs.cpp doesn't create a top_function,
-    if (!mainFunc) {
-      topFunc->setName(funcNameIn);
-      topFunc->setCallingConv(llvm::CallingConv::Fast); 
-
-      // There are likely to be many dead args in topFunc. 
-      topFunc = remove_dead_args(topFunc);
-
-      toCout("Warning: main function apparently optimized away, top_function renamed to "+funcNameIn);
-      mainFunc = topFunc;
-      topFunc = nullptr;
-    } else {
-      // top_function is unneeded - delete it.
-      topFunc->eraseFromParent();
-      toCoutVerb("Erased unneeded top_function");
-    }
-  } else {
-    // Newer algorithm in check_regs.cpp: don't create a top_function,
-    // make mainFunc external, and depend on us to remove dead args.
-    toCoutVerb("A top_function was not created");
-    mainFunc = remove_dead_args(mainFunc);
-  }
+  llvm::Function *mainFunc = M.getFunction(funcName);
 
   if (!mainFunc) {
     toCout("Can't find main function!");
     return false;
   }
 
+  // Newer algorithm in check_regs.cpp: don't create a top_function,
+  // make mainFunc external, and depend on us to remove dead args.
+  mainFunc = remove_dead_args(mainFunc);
+
   // See if any dead arg elimination actually worked.
   for (llvm::Argument& arg : mainFunc->args()) {
     if (arg.getNumUses() == 0) {
       std::string argname = arg.getName().str();
-      toCout(funcNameIn+" arg "+argname+" is unused!");
+      toCout(funcName+" arg "+argname+" is unused!");
     }
   }
 
@@ -770,16 +750,71 @@ bool clean_main_func(llvm::Module& M,
 }
 
 
+// Push information about the wrapperFunc args to argVec, to be written out to func_info.txt
+  
+bool gather_wrapper_func_args(llvm::Module& M,
+                      std::string wrapperFuncName,
+                      ArgVec_t &argVec) {
+
+  llvm::Function *mainFunc = M.getFunction(wrapperFuncName);
+  assert(mainFunc);
+
+  for (llvm::Argument& arg : mainFunc->args()) {
+    std::string argname = arg.getName().str();
+
+    llvm::Type *argType = arg.getType();
+    bool isPointer = argType && argType->isPointerTy();
+
+    // In LLVM version 15, all pointers are untyped, so it is not possible to
+    // get the size of the object they point to.  We work around this by adding
+    // a byref or sret attribute to the pointer args, which indicates what type they point to.
+
+    int size;
+    if (!isPointer) {
+      size = arg.getType()->getPrimitiveSizeInBits();
+    } else {
+      if (arg.hasByRefAttr()) {
+        size = arg.getParamByRefType()->getPrimitiveSizeInBits();
+      } else if (arg.hasStructRetAttr()) {
+        size = arg.getParamStructRetType()->getPrimitiveSizeInBits();
+      } else if (!llvm::cast<llvm::PointerType>(argType)->isOpaque()) {
+        // getElementType() will disappear in LLVM 15, where all pointers will be opaque
+        size = llvm::cast<llvm::PointerType>(argType)->getElementType()->getPrimitiveSizeInBits();
+      } else {
+        assert(false);
+        size = 0;
+      }
+      size = -size;  // Negative size means a pointer 
+    }
+
+
+    if (argname == RETURN_ARRAY_PTR_ID || argname == RETURN_VAL_PTR_ID) {
+      assert(isPointer);
+      // Special arg name indicates a pointer to register array storage, or a big scalar
+      argVec.push_back(std::make_pair(argname, size));
+    } else {
+      // Extract the ASV name from the argument name (by removing the cycle count).
+      // Note that the name will not have quotes or backslashes, like you would see in the textual IR.
+      uint32_t pos = argname.find(DELIM, 0);
+      std::string var = argname.substr(0, pos);
+
+      argVec.push_back(std::make_pair(var, size));
+    }
+  }
+
+  return true;
+}
+
   // Push information about the mainFunc args to argVec, to be written out to func_info.txt
   // TODO: What we really want is a description of the args of the wrapper function,
   // since that is what sim_gen will work with.  If we do that, the pointer/value
   // status of the args will also have to be recorded in func_info.txt.
   
-bool gather_func_args(llvm::Module& M,
-                      std::string funcNameIn,
+bool gather_main_func_args(llvm::Module& M,
+                      std::string mainFuncName,
                       ArgVec_t &argVec) {
 
-  llvm::Function *mainFunc = M.getFunction(funcNameIn);
+  llvm::Function *mainFunc = M.getFunction(mainFuncName);
   assert(mainFunc);
 
   for (llvm::Argument& arg : mainFunc->args()) {
@@ -795,9 +830,10 @@ bool gather_func_args(llvm::Module& M,
     int size;
     if (!isPointer) {
       size = arg.getType()->getPrimitiveSizeInBits();
-    } else {
       if (arg.hasByRefAttr()) {
         size = arg.getParamByRefType()->getPrimitiveSizeInBits();
+      } else if (arg.hasStructRetAttr()) {
+        size = arg.getParamStructRetType()->getPrimitiveSizeInBits();
       } else if (!llvm::cast<llvm::PointerType>(argType)->isOpaque()) {
         // getElementType() will disappear in LLVM 15, where all pointers will be opaque
         size = llvm::cast<llvm::PointerType>(argType)->getElementType()->getPrimitiveSizeInBits();
@@ -809,10 +845,9 @@ bool gather_func_args(llvm::Module& M,
     }
 
 
-    if (argname == "_RET_ARRAY_PTR_") {
+    if (argname == RETURN_ARRAY_PTR_ID) {
       assert(isPointer);
       // Special arg name indicates a pointer to register array storage.
-      // Mark it with a zero width to indicate its special status
       argVec.push_back(std::make_pair(argname, size));
     } else {
       // Extract the ASV name from the argument name (by removing the cycle count).
@@ -836,7 +871,7 @@ bool gather_func_args(llvm::Module& M,
   if (isBigType(mainFunc->getReturnType())) {
     int size =  mainFunc->getReturnType()->getIntegerBitWidth();
     // A negative size implies a pointer to something of abs(size).
-    argVec.push_back(std::make_pair("_RETURN_VAL_PTR_", -size));
+    argVec.push_back(std::make_pair(RETURN_VAL_PTR_ID, -size));
   }
 
   return true;
@@ -846,17 +881,17 @@ bool gather_func_args(llvm::Module& M,
 // Return the vector name and position if the given register is a member of a target vector.
 std::string get_vector_of_target(const std::string& reg, int *idxp) {
 
-  for(auto vec : g_allowedTgtVec) {
-    uint32_t len = vec.members.size();
-    for (uint32_t idx = 0; idx < len; ++idx) {
-      std::string element = vec.members[idx];
-      // Sanity check on consistency of g_allowedTgt and g_allowedTgtVec
-      assert(!g_allowedTgt.count(element));
-      if (element == reg) {
+  for(auto pair : g_allowedTgtVec) {
+    uint32_t idx = 0;
+    for (const std::string& member : pair.second.members) {
+      // Sanity check on consistency of g_allowedTgt and g_allowedTgtVec (no duplicated names)
+      assert(!g_allowedTgt.count(member));
+      if (member == reg) {
         if (idxp) *idxp = idx;
-        assert(!vec.name.empty());  // The vectors were all supposed to have been named.
-        return vec.name;  // Array name
+        assert(!pair.first.empty());  // The vectors were all supposed to have been named.
+        return pair.first;  // Vector name
       }
+      idx++;
     }
   }
 
@@ -890,6 +925,7 @@ void print_asv_info(std::ofstream &output) {
 
     // g_asvSet is not supposed to have ASVs in registers
     assert(get_vector_of_target(reg, nullptr).empty());
+    assert(!is_special_arg_name(reg));
 
     if (!get_vector_of_target(reg, nullptr).empty()) {
       continue;  // Skip the ASVs in registers - handle below.
@@ -899,14 +935,14 @@ void print_asv_info(std::ofstream &output) {
   }
 
   // Write the contents of register arrays separately, including the array name
-  for(auto vec: g_allowedTgtVec) {
+  for(auto pair: g_allowedTgtVec) {
     output << "[" << std::endl;
-    for(std::string reg : vec.members) {
+    for(std::string reg : pair.second.members) {
       uint32_t width = get_var_slice_width_cmplx(reg);
       output << reg << ":" << width; // Write name and width
       output << std::endl;
     }
-    output << "]:" << vec.name << std::endl;
+    output << "]:" << pair.first << std::endl;
   }
 }
 

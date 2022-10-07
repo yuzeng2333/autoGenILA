@@ -94,7 +94,7 @@ void build_ast_tree() {
     set_stk_build_tree(tgtDelayPair.first);
   }
   for(auto pair: g_allowedTgtVec) {
-    for(std::string tgt: pair.members)
+    for(std::string tgt: pair.second.members)
       set_stk_build_tree(tgt);
   }
 }

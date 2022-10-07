@@ -36,13 +36,17 @@ void get_all_update();
 
 
 bool clean_main_func(llvm::Module& M,
-                     std::string funcNameIn);
+                     std::string funcName);
 
-bool create_wrapper_func(llvm::Module& M,
-                         std::string funcNameIn);
+std::string create_wrapper_func(llvm::Module& M,
+                         std::string wrapperFuncName);
 
-bool gather_func_args(llvm::Module& M,
-                      std::string funcNameIn,
+bool gather_wrapper_func_args(llvm::Module& M,
+                      std::string wrapperFuncName,
+                      ArgVec_t &argVec);
+
+bool gather_main_func_args(llvm::Module& M,
+                      std::string mainFuncName,
                       ArgVec_t &argVec);
 
 std::vector<uint32_t>

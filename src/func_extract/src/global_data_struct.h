@@ -45,6 +45,15 @@
 
 namespace funcExtract {
 
+// Names of special args added to update functions and/or their wrappers.
+constexpr const char *RETURN_VAL_PTR_ID = "*RETURN_VAL_PTR*";  // Not a legal Verilog identifier.
+constexpr const char *RETURN_ARRAY_PTR_ID = "*RETURN_ARRAY_PTR*";  // Not a legal Verilog identifier.
+
+inline bool is_special_arg_name(const std::string& name) {
+  return name == RETURN_VAL_PTR_ID || name == RETURN_ARRAY_PTR_ID;
+}
+
+
 //struct LoadDataInfo_t {
 //    // only load instruction has dataAddr: to get data from dmem
 //  std::string dataAddr;
@@ -282,10 +291,10 @@ extern std::map<std::string, std::vector<uint32_t>> g_allowedTgt;
 struct TgtVec_t {
   std::vector<std::string> members;
   uint32_t delay;
-  std::string name;  // Synthesized from member names
 };
 
-extern std::vector<TgtVec_t> g_allowedTgtVec;
+// Key is (synthesized) name of target vector
+extern std::map<std::string, TgtVec_t> g_allowedTgtVec;
 
 extern std::queue<std::pair<std::string, uint32_t>> g_goalVars;
 extern std::ofstream g_outFil;

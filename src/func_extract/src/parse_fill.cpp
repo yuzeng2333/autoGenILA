@@ -627,8 +627,8 @@ void read_allowed_targets(std::string fileName) {
         delay = std::stoi(delayStr);
       }
       std::string name = name_for_array(members);
-      // Pass an initializer list for a TgtVec_t
-      g_allowedTgtVec.push_back({members, delay, name});
+      // Pass the vector name and an initializer list for a TgtVec_t
+      g_allowedTgtVec.emplace(name, TgtVec_t{members, delay});
     }
   } // end of while loop
 

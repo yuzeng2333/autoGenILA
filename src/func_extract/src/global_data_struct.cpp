@@ -49,13 +49,15 @@ std::map<std::string, uint32_t> g_moduleInportTime;
 Str2StrVecMap_t g_moduleInputsMap;
 Str2StrVecMap_t g_moduleOutputsMap;
 
+// A map of target ASVs to a list (typically of size 1) of allowed cycle counts.
 std::map<std::string, std::vector<uint32_t>> g_allowedTgt;
 
 // Vector targets, as read from allowed_target.txt.
-// TgtVec_t contains the vector name, the cycle count, and a vector of element names.
-// TODO: Make this a map, like g_allowedTgt
+// TgtVec_t contains the cycle count and a vector of element names.
+// The vector name is the key.  Note that the elements are not duplicated
+// in g_allowedTgt!  Also, the all vector, element, and scalar names should be unique.
 
-std::vector<TgtVec_t> g_allowedTgtVec;
+std::map<std::string, TgtVec_t> g_allowedTgtVec;
 
 std::string g_mem2acclData;
 std::string g_accl2memAddr;

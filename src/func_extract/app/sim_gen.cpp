@@ -618,12 +618,12 @@ std::string func_call(std::string indent, std::string writeVar,
       argValue = g_dataIn;      
     }
 
-    if (arg == "_RETURN_VAL_PTR_") {
+    if (arg == RETURN_VAL_PTR_ID) {
       // This arg takes a reference to the big return value.
       assert(funcTy.retTy > 64);
       argValue = writeVar;
     }
-    else if (arg == "_RET_ARRAY_PTR_") {
+    else if (arg == RETURN_ARRAY_PTR_ID) {
       // We need to provide a pointer to the result storage of the result's register array.
       argValue = "&"+writeVar;
     }
@@ -678,31 +678,48 @@ void print_func_declare(const FuncTy_t& funcTy,
 
   for(auto pair : funcTy.argTy) {
     std::string argName = pair.first;
+    std::string argNameSimp = var_name_convert(argName, true);
+      
+    // If for some reason the same arg name is repeated, uniquify the name (really needed?)
+    std::string idx = "";
+    if(argIdx.find(argNameSimp) == argIdx.end()) {
+      argIdx.emplace(argNameSimp, 0);
+    }
+    else {
+      argNameSimp += std::to_string(++argIdx[argNameSimp]);
+    }
+
     int width = pair.second;
-    if (width > 0) {
-      // A scalar ASV argument (passed by value or reference)
-      std::string argType = asv_func_param_type(width);
-      std::string argNameSimp = var_name_convert(argName, true);
-      std::string idx = "";
-      if(argIdx.find(argNameSimp) == argIdx.end()) {
-        argIdx.emplace(argNameSimp, 0);
-      }
-      else {
-        idx = std::to_string(++argIdx[argNameSimp]);
-      }
-      ret = ret + argType + " " + argNameSimp + idx + ", ";
-    } else {
-      // A special pointer arg, for passing/returning a register array, or 
+
+    if (is_special_arg_name(argName)) {
+      // A special arg, for passing/returning a register array, or 
       // returning a big scalar. 
-      if (argName == "_RETURN_VAL_PTR_") {
+      if (argName == RETURN_VAL_PTR_ID) {
         // This arg points to a caller-provided space for returning a big scalar.
-        assert (funcTy.retTy > 64);
-        ret += asv_func_param_type(funcTy.retTy, false /*is_const*/)+" "+ argName+", ";
+        assert(funcTy.retTy > 64);  
+        assert(width < 0);
+        ret += c_type(-width)+"& "+argNameSimp+", ";
+        //ret += asv_func_param_type(funcTy.retTy, false /*is_const*/)+" "+ argNameSimp+", ";
       }
-      else if (argName == "_RET_ARRAY_PTR_") {
+      else if (argName == RETURN_ARRAY_PTR_ID) {
         // This arg points to a caller-provided array for returning a register array
+        assert(width < 0);
+        ret += c_type(-width)+" *"+argNameSimp+", ";
         // TODO: get correct type, not void.
-        ret += "void* "+ argName+", ";
+        //ret += asv_func_param_type(funcTy.retTy, false /*is_const*/)+" "+ argNameSimp+", ";
+      } else {
+        abort();  // Unknown special arg?
+      }
+    } else {
+      // A scalar ASV argument (passed by value or reference)
+      if (width > 0) {
+        // Arg passed by value
+        ret += c_type(width)+" "+argNameSimp+", ";
+      } else if (width < 0) {
+        // Arg passed by const reference
+        ret += "const "+c_type(-width)+"& "+argNameSimp+", ";
+      } else {
+        abort();  // 0 width?
       }
     }
   }
