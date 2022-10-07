@@ -192,6 +192,7 @@ int main(int argc, char *argv[]) {
     std::string asvSimp = var_name_convert(asv, true);
 
     uint32_t width = pair.second;   
+    assert(width > 0);
     std::string asvTy = c_type(width);
     if(asvTy.empty()) {
       toCout("Error happened in c_type for "+asv);
@@ -594,10 +595,11 @@ std::string func_call(std::string indent, std::string writeVar,
   std::string ret = indent;
   if (writeVar.empty() || funcTy.retTy == 0) {
     ret += funcName+"( ";  // No writeVar, or function returns void (probably for an array)
-  } else if (funcTy.retTy > 64) {
-    ret += funcName+"( ";  // A reference to the return value is passed as the last arg.
-  } else {
+  } else if (funcTy.retTy <= 64) {
     ret += writeVar+" = "+funcName+"( ";
+  } else {
+    toCout("Function returns a pointer to something!");
+    assert(false);
   }
 
   unsigned argCnt = 0;
@@ -620,7 +622,8 @@ std::string func_call(std::string indent, std::string writeVar,
 
     if (arg == RETURN_VAL_PTR_ID) {
       // This arg takes a reference to the big return value.
-      assert(funcTy.retTy > 64);
+      // The function itself return void.
+      assert(funcTy.retTy == 0);
       argValue = writeVar;
     }
     else if (arg == RETURN_ARRAY_PTR_ID) {
@@ -671,9 +674,10 @@ void print_func_declare(const FuncTy_t& funcTy,
   std::map<std::string, uint32_t> argIdx;
   std::string funcNameSimp = var_name_convert(funcName, true);
 
-  // Small variables are returned by value, but big ones are returned via an extra reference arg.
-  // Functions for register arrays may return void (represented as a width of 0).
-  std::string ret = (funcTy.retTy > 0 && funcTy.retTy <= 64) ? c_type(funcTy.retTy) : "void";
+  // Small variables are returned by value, but big ones and arrays typically are returned via
+  // an extra reference arg.  Currently the functions never return pointers.
+  assert(funcTy.retTy >= 0);
+  std::string ret = (funcTy.retTy > 0) ? c_type(funcTy.retTy) : "void";
   ret += " " + funcNameSimp + " ( ";
 
   for(auto pair : funcTy.argTy) {
@@ -696,7 +700,7 @@ void print_func_declare(const FuncTy_t& funcTy,
       // returning a big scalar. 
       if (argName == RETURN_VAL_PTR_ID) {
         // This arg points to a caller-provided space for returning a big scalar.
-        assert(funcTy.retTy > 64);  
+        assert(funcTy.retTy == 0);  
         assert(width < 0);
         ret += c_type(-width)+"& "+argNameSimp+", ";
         //ret += asv_func_param_type(funcTy.retTy, false /*is_const*/)+" "+ argNameSimp+", ";

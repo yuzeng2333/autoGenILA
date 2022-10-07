@@ -68,6 +68,7 @@ typedef std::vector<std::pair<std::string, int>> ArgVec_t;
 
 struct FuncTy_t {
   // Bitwidth of return type. 0 means void, <0 means a pointer to width -retTy
+  // This is not the same as the width of the target!
   int retTy;
   // Names and bitwidths of args. <0 means a pointer, 0 means something special.
   ArgVec_t argTy;

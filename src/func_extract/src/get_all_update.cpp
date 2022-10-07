@@ -386,7 +386,7 @@ void get_update_function(std::string target,
       std::string wrapperFuncName = create_wrapper_func(*M, funcName);
 
       // Get the data needed to create func_info.txt
-      gather_wrapper_func_args(*M, wrapperFuncName, argVec);
+      gather_wrapper_func_args(*M, wrapperFuncName, target, argVec);
 
       if ((!g_overwrite_existing_llvm) && stat(llvmFileName.c_str(), &statbuf) == 0) {
         toCout("Skipping re-generation of existing file "+llvmFileName);
@@ -571,11 +571,6 @@ std::string create_wrapper_func(llvm::Module& M,
       // For big args, the wrapper arg is a pointer.
       // Specify that it can never be null (actually in C++, it will be a const reference).
       wrapperArg->addAttr(llvm::Attribute::NonNull);
-
-      // Add a byRef attribute to the pointer arg to explicitly indicate the pointee type.
-      // This will be vital in LLVM 14+, when typed pointers go away.
-      wrapperFunc->addParamAttr(wrapperArg->getArgNo(),
-                      llvm::Attribute::getWithByRefType(Context, mainArg.getType()));
     }
     // Copy parameter attributes (important for pointer args).
     wrapperFunc->addParamAttrs(argNo, mainFunc->getAttributes().getParamAttributes(argNo));
@@ -589,11 +584,6 @@ std::string create_wrapper_func(llvm::Module& M,
 
     // Specify that it can never be null (actually in C++, it will be a (non-const) reference).
     wrapperLastArg->addAttr(llvm::Attribute::NonNull);
-
-    // Add a sret attribute to the pointer arg to explicitly indicate the pointee type.
-    // This will be vital in LLVM 14+, when typed pointers go away.
-    wrapperFunc->addParamAttr(wrapperLastArg->getArgNo(),
-                    llvm::Attribute::getWithStructRetType(Context, mainRetTy));
   }
 
 
@@ -753,101 +743,46 @@ bool clean_main_func(llvm::Module& M,
 // Push information about the wrapperFunc args to argVec, to be written out to func_info.txt
   
 bool gather_wrapper_func_args(llvm::Module& M,
-                      std::string wrapperFuncName,
+                      std::string wrapperFuncName, std::string target,
                       ArgVec_t &argVec) {
 
-  llvm::Function *mainFunc = M.getFunction(wrapperFuncName);
-  assert(mainFunc);
+  llvm::Function *wrapperFunc = M.getFunction(wrapperFuncName);
+  assert(wrapperFunc);
 
-  for (llvm::Argument& arg : mainFunc->args()) {
+  for (llvm::Argument& arg : wrapperFunc->args()) {
     std::string argname = arg.getName().str();
 
     llvm::Type *argType = arg.getType();
     bool isPointer = argType && argType->isPointerTy();
 
     // In LLVM version 15, all pointers are untyped, so it is not possible to
-    // get the size of the object they point to.  We work around this by adding
-    // a byref or sret attribute to the pointer args, which indicates what type they point to.
+    // get the size of the object they point to.  This complicates things here.
 
-    int size;
-    if (!isPointer) {
-      size = arg.getType()->getPrimitiveSizeInBits();
-    } else {
-      if (arg.hasByRefAttr()) {
-        size = arg.getParamByRefType()->getPrimitiveSizeInBits();
-      } else if (arg.hasStructRetAttr()) {
-        size = arg.getParamStructRetType()->getPrimitiveSizeInBits();
-      } else if (!llvm::cast<llvm::PointerType>(argType)->isOpaque()) {
-        // getElementType() will disappear in LLVM 15, where all pointers will be opaque
-        size = llvm::cast<llvm::PointerType>(argType)->getElementType()->getPrimitiveSizeInBits();
-      } else {
-        assert(false);
-        size = 0;
-      }
-      size = -size;  // Negative size means a pointer 
-    }
-
-
-    if (argname == RETURN_ARRAY_PTR_ID || argname == RETURN_VAL_PTR_ID) {
-      assert(isPointer);
-      // Special arg name indicates a pointer to register array storage, or a big scalar
-      argVec.push_back(std::make_pair(argname, size));
-    } else {
-      // Extract the ASV name from the argument name (by removing the cycle count).
-      // Note that the name will not have quotes or backslashes, like you would see in the textual IR.
-      uint32_t pos = argname.find(DELIM, 0);
-      std::string var = argname.substr(0, pos);
-
-      argVec.push_back(std::make_pair(var, size));
-    }
-  }
-
-  return true;
-}
-
-  // Push information about the mainFunc args to argVec, to be written out to func_info.txt
-  // TODO: What we really want is a description of the args of the wrapper function,
-  // since that is what sim_gen will work with.  If we do that, the pointer/value
-  // status of the args will also have to be recorded in func_info.txt.
-  
-bool gather_main_func_args(llvm::Module& M,
-                      std::string mainFuncName,
-                      ArgVec_t &argVec) {
-
-  llvm::Function *mainFunc = M.getFunction(mainFuncName);
-  assert(mainFunc);
-
-  for (llvm::Argument& arg : mainFunc->args()) {
-    std::string argname = arg.getName().str();
-
-    llvm::Type *argType = arg.getType();
-    bool isPointer = argType && argType->isPointerTy();
-
-    // In LLVM version 15, all pointers are untyped, so it is not possible to
-    // get the size of the object they point to.  We work around this by adding
-    // a byref attribute to the pointer args, which indicates what type they point to.
-
-    int size;
-    if (!isPointer) {
-      size = arg.getType()->getPrimitiveSizeInBits();
-      if (arg.hasByRefAttr()) {
-        size = arg.getParamByRefType()->getPrimitiveSizeInBits();
-      } else if (arg.hasStructRetAttr()) {
-        size = arg.getParamStructRetType()->getPrimitiveSizeInBits();
-      } else if (!llvm::cast<llvm::PointerType>(argType)->isOpaque()) {
-        // getElementType() will disappear in LLVM 15, where all pointers will be opaque
-        size = llvm::cast<llvm::PointerType>(argType)->getElementType()->getPrimitiveSizeInBits();
-      } else {
-        assert(false);
-        size = 0;
-      }
-      size = -size;  // Negative size means a pointer 
-    }
-
+    int size = 0;
 
     if (argname == RETURN_ARRAY_PTR_ID) {
       assert(isPointer);
-      // Special arg name indicates a pointer to register array storage.
+      // Special arg name indicates a pointer to the register array that is the target of this function.
+      if(g_allowedTgtVec.count(target)) {
+        // Get the bitwidth of the first member of the register array (and negate it)
+        std::string firstMember = g_allowedTgtVec[target].members[0];
+        size = -get_var_slice_width_cmplx(firstMember);
+      } else {
+        toCout("Function "+wrapperFuncName+" has arg "+argname+", but its target is not a vector!");
+        size = 0;
+        assert(false);
+      }
+      argVec.push_back(std::make_pair(argname, size));
+    } else if (argname == RETURN_VAL_PTR_ID) {
+      // Special arg name indicates a pointer a big scalar that is the target of this function
+      assert(isPointer);
+      if(g_asvSet.contains(target)) {
+        size = -g_asvSet.at(target);  // Instead get size from get_var_slice_width_cmplx()?
+      } else {
+        toCout("Function "+wrapperFuncName+" has arg "+argname+", but its target is not a known ASV!");
+        size = 0;
+        assert(false);
+      }
       argVec.push_back(std::make_pair(argname, size));
     } else {
       // Extract the ASV name from the argument name (by removing the cycle count).
@@ -855,23 +790,28 @@ bool gather_main_func_args(llvm::Module& M,
       uint32_t pos = argname.find(DELIM, 0);
       std::string var = argname.substr(0, pos);
 
-      assert(size > 0);
-
-      // If the arg is big, the wrapper function will have a pointer to it.
-      // TODO: maybe we should just build argVec directly from the wrapper function?
-      if (isBigType(arg.getType())) {
-        size = -size;
+      if (!isPointer) {
+        // A small thing (presumably a scalar ASV) passed by value
+        size = arg.getType()->getPrimitiveSizeInBits();
+      } else if (g_allowedTgtVec.count(var)) {
+        // A pointer to a regster array
+        // Get the bitwidth of the first member of the register array
+        std::string firstMember = g_allowedTgtVec[var].members[0];
+        size = -get_var_slice_width_cmplx(firstMember);
+      } else if (g_asvSet.contains(var)) {
+        // A big scalar ASV passed by ref
+        size = -g_asvSet.at(var);  // Instead get size from get_var_slice_width_cmplx()?
+      } else if (!get_vector_of_target(var, nullptr).empty()) {
+        // A reference to a big scalar ASV that is a member of a register array (and thus not in g_asvSet)
+        size = get_var_slice_width_cmplx(var);
+      } else {
+        toCout("Function "+wrapperFuncName+" has arg "+var+
+                  ", but its target is not a known register or register array!");
+        size = 0;
+        assert(false);
       }
       argVec.push_back(std::make_pair(var, size));
     }
-  }
-
-  // If the return type is big, add to argVec the extra pointer arg that 
-  // the wrapper functon will have.
-  if (isBigType(mainFunc->getReturnType())) {
-    int size =  mainFunc->getReturnType()->getIntegerBitWidth();
-    // A negative size implies a pointer to something of abs(size).
-    argVec.push_back(std::make_pair(RETURN_VAL_PTR_ID, -size));
   }
 
   return true;
@@ -1069,6 +1009,28 @@ void ThreadSafeMap_t::emplace(std::string var, uint32_t width) {
   mtx.lock();
   mp.emplace(var, width);
   mtx.unlock();
+}
+
+
+bool ThreadSafeMap_t::contains(const std::string& var) {
+  mtx.lock();
+  bool ret = mp.count(var) > 0;
+  mtx.unlock();
+  return ret;
+}
+
+
+uint32_t ThreadSafeMap_t::at(const std::string& var) {
+  mtx.lock();
+  uint32_t ret = 0;
+  auto pos = mp.find(var);
+  if (pos == mp.end()) {
+    ret = 0;  // Invalid value
+  } else {
+    ret = pos->second;
+  }
+  mtx.unlock();
+  return ret;
 }
 
 

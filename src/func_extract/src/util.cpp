@@ -136,7 +136,7 @@ void read_func_info(std::string fileName) {
     toCout(line);
     if(line.substr(0, 2) == "\\\\") {
       toCout("Error: find \\\\: "+line);
-      abort();
+      assert(false);
     }
     if(line.substr(0, 2) == "//") continue;
     if(line.substr(0, 6) == "Instr:") {
@@ -145,25 +145,24 @@ void read_func_info(std::string fileName) {
     }
     else if(line.substr(0, 7) == "Target:") {
       target = line.substr(7);
-      int targetWidth = 0;
+      int retValWidth = 0; // TODO: encode the function return value explicitly in func_info.txt
 
       if(g_asv.count(target)) {
         // Target is a single ASV
-        targetWidth = (int)g_asv[target];
-        assert(targetWidth > 0);
+        retValWidth = (int)g_asv[target];
+        assert(retValWidth > 0);
+        // Big values are returned via a pointer arg, and the function itself returns void.
+        if (retValWidth > 64) 
+          retValWidth = 0;
+      } else if (g_registerArrays.count(target)) {
+        // Target is a register array. These are always returned via a pointer arg.
+        retValWidth = 0;
       } else {
-        auto pos = g_registerArrays.find(target);
-        if (pos != g_registerArrays.end()) {
-          // Target is a register array
-          targetWidth = pos->second.width;
-          assert(targetWidth > 0);  
-        } else {
-          toCout("Unknown target "+target);
-          abort();
-        }
+        toCout("Unknown target "+target);
+        assert(false);
       } 
 
-      struct FuncTy_t type = { targetWidth, ArgVec_t{} };      
+      struct FuncTy_t type = { retValWidth, ArgVec_t{} };      
       if(g_instrInfo[idx].funcTypes.find(target) 
            != g_instrInfo[idx].funcTypes.end()) {
         toCout("Warning: target: "+target+" already existed for: "+g_instrInfo[idx].name);
@@ -197,7 +196,7 @@ uint32_t get_instr_by_name(std::string instrName) {
     idx++;
   }
   toCout("Error: cannot find instrInfo for: "+instrName);
-  abort();
+  assert(false);
 }
 
 
@@ -225,7 +224,7 @@ std::string decode(const std::map<std::string, std::vector<std::string>> &inputI
   for(auto pair : inputInstr) {
     toCout(pair.first+": "+pair.second.front());
   }
-  abort();
+  assert(false);
 }
 
 
@@ -275,12 +274,12 @@ bool same_value(std::string val1, std::string val2) {
         if(val2 == "1") return width1 == "1";
         if(!is_number(val2)) {
           toCout("Error: val2 is not number:"+val2);
-          abort();
+          assert(false);
         }
         if(val2 == "0") return true;
         else {
           toCout("Error: unexpected val2: "+val2);
-          abort();
+          assert(false);
         }
       }
       else {
@@ -289,48 +288,7 @@ bool same_value(std::string val1, std::string val2) {
         else return false;
       }
     }
-    //else {
-    //  if(val1 == "1" || val1 == "0") {
-    //    if(val2 == "1" || val2 == "0")
-    //      return val1 == val2;
-    //    else {
-    //      toCout("Error: Unexpected, val1: "+val1+"val2: "+val2);
-    //      abort();
-    //    }
-    //  }
-    //  else {
-    //    toCout("Error: unexpected val1: "+val1);
-    //    abort();
-    //  }
-    //}
   }
-
-  //bool isZero = false;
-  //if(!std::regex_match(val1, m, pNum)) {
-  //  if(val1 == "0") {
-  //    isZero = true;
-  //  }
-  //  else {
-  //    toCout("Error: val1 is not of correct format: "+val1);
-  //    abort();
-  //  }
-  //}
-  //std::string width1 = m.str(1);
-  //std::string format1 = m.str(2);
-  //std::string num1 = m.str(3);
-
-  //if(!std::regex_match(val2, m, pNum)) {
-  //  if(val1 == "0") {
-  //    isZero = true;
-  //  }
-  //  else {
-  //    toCout("Error: val2 is not of correct format: "+val2);
-  //    abort();
-  //  }
-  //}
-  //std::string width2 = m.str(1);
-  //std::string format2 = m.str(2);
-  //std::string num2 = m.str(3);
 
   // Handle one or both values being > 64 bits.   Zero-extend the shorter one.
   llvm::APInt v1 = hdb2apint(val1);

@@ -43,10 +43,7 @@ std::string create_wrapper_func(llvm::Module& M,
 
 bool gather_wrapper_func_args(llvm::Module& M,
                       std::string wrapperFuncName,
-                      ArgVec_t &argVec);
-
-bool gather_main_func_args(llvm::Module& M,
-                      std::string mainFuncName,
+                      std::string target,
                       ArgVec_t &argVec);
 
 std::vector<uint32_t>
@@ -126,6 +123,8 @@ struct ThreadSafeMap_t {
     void emplace(std::string var, uint32_t width);
     std::map<std::string, uint32_t>::iterator begin();
     std::map<std::string, uint32_t>::iterator end();
+    bool contains(const std::string& var);
+    uint32_t at(const std::string& var);
 
   private:
     std::mutex mtx;
