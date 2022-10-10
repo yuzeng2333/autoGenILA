@@ -818,29 +818,6 @@ bool gather_wrapper_func_args(llvm::Module& M,
 }
 
 
-// Return the vector name and position if the given register is a member of a target vector.
-std::string get_vector_of_target(const std::string& reg, int *idxp) {
-
-  for(auto pair : g_allowedTgtVec) {
-    uint32_t idx = 0;
-    for (const std::string& member : pair.second.members) {
-      // Sanity check on consistency of g_allowedTgt and g_allowedTgtVec (no duplicated names)
-      assert(!g_allowedTgt.count(member));
-      if (member == reg) {
-        if (idxp) *idxp = idx;
-        assert(!pair.first.empty());  // The vectors were all supposed to have been named.
-        return pair.first;  // Vector name
-      }
-      idx++;
-    }
-  }
-
-  return "";  // not in any vector
-}
-
-
-
-
 void print_func_info(std::ofstream &output) {
   g_dependVarMapMtx.lock();
   for(auto pair1 : g_dependVarMap) {

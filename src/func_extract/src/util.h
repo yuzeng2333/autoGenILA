@@ -30,5 +30,9 @@ bool same_value(std::string val1, std::string val2);
 
 std::string name_for_array(const std::vector<std::string>& firstVarName);
 
+std::string get_vector_of_target(const std::string& reg, int *idxp = nullptr);
+
+
+
 }
 #endif

@@ -160,11 +160,11 @@ int main(int argc, char *argv[]) {
   if(g_design != VTA) {
     for(auto pair: g_registerArrays) {
       // This works for register arrays wider than 64 bits
-      // Note: most of the system cannot handle more than one register array
       std::string arrName = pair.first;
       uint32_t size = pair.second.getLength();
       std::string dataTy = c_type(pair.second.getWidth());
       cpp << dataTy+" "+arrName+"["+toStr(size)+"];" << std::endl;
+      cpp << dataTy+" "+arrName+nxt+"["+toStr(size)+"];" << std::endl;
     }
   }
 
@@ -213,7 +213,6 @@ int main(int argc, char *argv[]) {
 
   // Initialize the ASVs in register arrays
   // ASVs in a register array are not declared, just initialized.
-  // And they have no associated "nxt" variable
   for(auto pair: g_registerArrays) {
     std::string arrayName = pair.first;
     uint32_t len = pair.second.getLength();
@@ -224,6 +223,8 @@ int main(int argc, char *argv[]) {
       toCoutVerb("cleaned up rst val of "+asv+"  "+cRstVal);
 
       std::string ret = "  "+arrayName+"["+toStr(idx)+"] = "+cRstVal+";  // "+asvSimp;
+      cpp << ret << std::endl;    
+      ret = "  "+arrayName+nxt+"["+toStr(idx)+"] = "+cRstVal+";  // "+asvSimp;
       cpp << ret << std::endl;    
     }
   }
@@ -454,10 +455,7 @@ void print_instr_calls(std::map<std::string,
       // TODO: If multiple vars need to be updated, use one function call and multiple assignments:
       // x = y = x = func(..);
 
-      if (!is_array_var(varName))
-        varName += nxt;
-
-      std::string funcCallStr = func_call(indent, varName, funcCall.funcTy, funcCall.funcName, 
+      std::string funcCallStr = func_call(indent, varName+nxt, funcCall.funcTy, funcCall.funcName, 
                            encoding, instrInfo.loadDataInfo[funcCall.origASV]);
       cpp << funcCallStr << std::endl;
 
@@ -483,12 +481,23 @@ void print_instr_calls(std::map<std::string,
   // It is expected that each variable is updated by at most one function call.
   for (FuncCall_t& funcCall : funcCalls) {
     for (std::string& varName : funcCall.varNames) {
-      if (!is_array_var(varName)) {
+      if (is_array_var(varName)) {
+        if(!g_update_all_regs) {  
+
+          auto itr = g_registerArrays.find(varName);
+          assert(itr != g_registerArrays.end());
+
+          uint32_t depth = itr->second.getLength();
+          cpp << indent << "for (int i = 0; i < "+toStr(depth)+"; i++) {" << std::endl;
+          cpp << indent << "  " << varName+"[i] = "+varName+nxt+"[i];";
+          cpp << indent << "}" << std::endl;
+        }
+      } else if (!is_array_var(varName)) {
         if(!g_update_all_regs) {
           cpp << indent+varName +" = "+varName+nxt+";" << std::endl;
         }
       } else {
-        updateMem = true;
+        updateMem = true;  // Doug: ????
       }
 
       // ==== do instrAddr or dataAddr
@@ -553,26 +562,6 @@ std::string c_type(uint32_t width) {
 }
 
 
-// This can be different than the ASV variable type, since large variables
-// are passed by const reference instead of value.  An exception is
-// the extra parameter for a large return value, which is a non-const reference.
-std::string asv_func_param_type(uint32_t width, bool is_const=true) {
-  std::string ret;
-
-  if (is_const && width > 64) {
-   ret = "const ";
-  }
-
-  assert(width > 0);
-  ret += c_type(width);
-  if (width > 64) {
-     ret += "&";
-  }
-    
-  return ret;
-}
-
-
 // currently only support one-cycle inputInstr
 std::string func_call(std::string indent, std::string writeVar,
                       const FuncTy_t& funcTy, std::string funcName, 
@@ -627,8 +616,8 @@ std::string func_call(std::string indent, std::string writeVar,
       argValue = writeVar;
     }
     else if (arg == RETURN_ARRAY_PTR_ID) {
-      // We need to provide a pointer to the result storage of the result's register array.
-      argValue = "&"+writeVar;
+      // We need to provide teh address of the result storage of the result's register array.
+      argValue = writeVar;
     }
     else if(inputInstr.find(arg) != inputInstr.end()) {
       if((inputInstr.at(arg)).size() > 1) {
@@ -640,10 +629,14 @@ std::string func_call(std::string indent, std::string writeVar,
       llvm::APInt apValue = convert_to_single_apint(argValue);
       argValue = apint2literal(apValue);
     }
-    else {
+    else if (is_array_var(arg)) {
+      // The arg is a pointer to ASV register array, so pass the array's address
+      argValue = var_name_convert(arg, true);
+    } else {
       // The arg is an ASV: Either a scalar or an element of a register array.
       if (is_in_array(arg)) {
         // The arg value is a member of the array.
+        // Normally the entire array will be passed, so this may never be reached.
         int idx = 0;
         std::string arrayName = get_array_position(arg, &idx);
         assert(!arrayName.empty());
@@ -703,17 +696,20 @@ void print_func_declare(const FuncTy_t& funcTy,
         assert(funcTy.retTy == 0);  
         assert(width < 0);
         ret += c_type(-width)+"& "+argNameSimp+", ";
-        //ret += asv_func_param_type(funcTy.retTy, false /*is_const*/)+" "+ argNameSimp+", ";
       }
       else if (argName == RETURN_ARRAY_PTR_ID) {
         // This arg points to a caller-provided array for returning a register array
         assert(width < 0);
         ret += c_type(-width)+" *"+argNameSimp+", ";
         // TODO: get correct type, not void.
-        //ret += asv_func_param_type(funcTy.retTy, false /*is_const*/)+" "+ argNameSimp+", ";
       } else {
         abort();  // Unknown special arg?
       }
+    } else if (is_array_var(argName)) {
+      // A ASV register array argment, passed as a const pointer
+      assert(width < 0);
+      // Arg passed by const reference
+      ret += "const "+c_type(-width)+" *"+argNameSimp+", ";
     } else {
       // A scalar ASV argument (passed by value or reference)
       if (width > 0) {
@@ -889,6 +885,15 @@ void update_all_asvs(std::ofstream &cpp, std::string indent) {
     std::string asv = pair.first;
     std::string asvSimp = var_name_convert(asv, true);
     cpp << indent+asvSimp +" = "+asvSimp+nxt+" ;" << std::endl;
+  }
+
+  for (auto pair : g_registerArrays) {
+    const std::string& varName = pair.first;
+    uint32_t depth = pair.second.getLength();
+
+    cpp << indent << "for (int i = 0; i < "+toStr(depth)+"; i++) {" << std::endl;
+    cpp << indent << "  " << varName+"[i] = "+varName+nxt+"[i];";
+    cpp << indent << "}" << std::endl;
   }
 }
 
@@ -1076,7 +1081,7 @@ void print_array(std::string indent, std::string arrName, std::ofstream &cpp) {
 
   uint32_t depth = itr->second.getLength();
   uint32_t width = itr->second.getWidth();
-  cpp << indent << "for(int i = 0; i < "+toStr(depth)+"; i++) {" << std::endl;
+  cpp << indent << "for (int i = 0; i < "+toStr(depth)+"; i++) {" << std::endl;
   std::string printName = arrName+"[%d]";
   std::string elementName = arrName+"[i]";
   cpp << indent << "  " << build_printf(printName+": ", elementName, width, "i") << std::endl;

@@ -301,7 +301,7 @@ bool same_value(std::string val1, std::string val2) {
 // Create a new, clean name to represent an array of variables, based on the elements' names,
 // in an aesthetically pleasing way.
 // A vector like "cpuregs[5],...,cpuregs[31]" will get mapped to "cpuregs_5_31_Arr".
-// TODO: Ensure tha the name is unique among all other register erray and ASV names!
+// TODO: Ensure that the name is unique among all other register erray and ASV names!
 
 std::string name_for_array(const std::vector<std::string>& varNames) {
   static const std::regex bracketRegex("\\[([0-9]+)\\]");
@@ -324,6 +324,29 @@ std::string name_for_array(const std::vector<std::string>& varNames) {
 
   return var_name_convert(result, true);
 }
+
+
+// Return the vector name and position if the given register is a member of a target vector.
+std::string get_vector_of_target(const std::string& reg, int *idxp) {
+
+  for(auto pair : g_allowedTgtVec) {
+    uint32_t idx = 0;
+    for (const std::string& member : pair.second.members) {
+      // Sanity check on consistency of g_allowedTgt and g_allowedTgtVec (no duplicated names)
+      assert(!g_allowedTgt.count(member));
+      if (member == reg) {
+        if (idxp) *idxp = idx;
+        assert(!pair.first.empty());  // The vectors were all supposed to have been named.
+        return pair.first;  // Vector name
+      }
+      idx++;
+    }
+  }
+
+  return "";  // not in any vector
+}
+
+
 
 }
 
