@@ -39,6 +39,21 @@ llvm::Value* llvmInt(llvm::APInt value,
 }
 
 
+// Return the padded bitwidth that a C/C++ compiler will use when making arrays.
+// This must be consistent with c_type() in sim_gen.cpp
+uint32_t get_padded_width(uint32_t width) {
+
+  if (width <= 16) return 16;
+  if (width <= 32) return 32;
+
+  assert(width <= 8388607);  // Maximum width supported by LLVM.
+
+  return 64 * ((width+63) / 64);  
+}
+
+
+
+
 //bool isAs(const std::string& var, HierCtx_t &insContextStk) {
 //  auto curMod = get_curMod(insContextStk);
 //  auto it = std::find( curMod->moduleAs.begin(), curMod->moduleAs.end(), var );

@@ -71,6 +71,8 @@ llvm::Value* long_bv_val(const std::string& formedBinVar,
                          std::shared_ptr<llvm::LLVMContext> &c,
                          std::shared_ptr<llvm::IRBuilder<>> &b );
 
+uint32_t get_padded_width(uint32_t width);
+
 bool is_formed_num(const std::string& num);
 
 uint64_t hdb2int(std::string num);

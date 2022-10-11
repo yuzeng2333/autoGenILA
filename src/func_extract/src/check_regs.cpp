@@ -21,7 +21,6 @@ namespace funcExtract {
 #define value(a) llvm::dyn_cast<llvm::Value>(a)
 #define instr(a) llvm::dyn_cast<llvm::Instruction>(a)
 
-
 //static std::shared_ptr<KaleidoscopeJIT> TheJIT;
 //static std::map<std::string, std::shared_ptr<llvm::PrototypeAST>> FunctionProtos;
 
@@ -52,13 +51,6 @@ bool g_seeInputs;
 uint32_t g_maxDelay = 0;
 uint32_t g_pushNum = 0;
 
-// This controls the calling convention for register array destinations.
-// True means that the update function returns a pointer to a locally-declared array.
-// False means that the destination array is managed by the caller, and its address is passed in
-// an additional function argument.
-
-static constexpr bool g_local_ret_array = false;
-    
 // assume ssaTable and nbTable have been filled
 void check_all_regs() {
   toCout("### Begin check_all_regs");
@@ -232,29 +224,13 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 
   std::vector<std::string> destVec = destInfo.get_no_slice_name();  
 
-  // These will be non-null only for a vector return type
-  llvm::Type* retArrayElementTy = nullptr;  // Something like i32
-  llvm::ArrayType* retArrayTy = nullptr;    // Something like [64 x i32]
-  llvm::GlobalVariable* retArray = nullptr;
+  // This will be non-null only for a vector return type.
+  // For indexing the array, it is vital to use the padded element size!
+  llvm::Type* paddedRetArrayElementTy = nullptr;  // Something like i32
 
-  // if target is vector, set the above variables, and possibly declare global array before creating
-  // the top function.
+  // if target is vector, set the above variable
   if(destInfo.isVector && !destInfo.isMemVec) {
-    retArrayElementTy = destInfo.get_ret_element_type(TheContext);
-    retArrayTy = llvm::ArrayType::get(retArrayElementTy, destVec.size());
-
-    if (g_local_ret_array) {
-      // zero initializer
-      llvm::ConstantAggregateZero* zeroInit = llvm::ConstantAggregateZero::get(retArrayTy);
-      retArray = new llvm::GlobalVariable(
-          *TheModule, 
-          retArrayTy, false, 
-          //llvm::GlobalValue::InternalLinkage,
-          llvm::GlobalValue::LinkOnceAnyLinkage,
-          zeroInit,
-          "RET_ARRAY"
-      );
-    }
+    paddedRetArrayElementTy = destInfo.get_padded_ret_element_type(TheContext);
   }
 
   /// declare function
@@ -282,8 +258,15 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     // Get the width of the first element of the array (all elements have the same width).
     uint32_t width = get_var_slice_width_simp(pair.second.members[0], curMod);
 
-    llvm::Type *arrayElementTy = llvm::IntegerType::get(*TheContext, width);    
-    argTy.push_back(llvm::PointerType::getUnqual(arrayElementTy));
+    // The array element width is the padded width of the individual elements!
+    // Note that this will be irrelevant in LLVM 14, since all pointers will be untyped.
+    uint32_t paddedWidth = get_padded_width(width);
+
+    llvm::Type *paddedArrayElementTy = llvm::IntegerType::get(*TheContext, paddedWidth);    
+    argTy.push_back(llvm::PointerType::getUnqual(paddedArrayElementTy));
+    
+    // Unfortunately in LLVM 13.0.1, 'opt -O3' crashes if we use an opaque pointer here.
+    //argTy.push_back(llvm::PointerType::getUnqual(*TheContext));
   }
 
 
@@ -318,12 +301,13 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 
   toCoutVerb("=== Finished adding module input args!");
 
-  if (!g_local_ret_array) {
-    // If the target is a register array, add one more arg that is a pointer to its storage
-    if(destInfo.isVector && !destInfo.isMemVec) {
-      assert(retArrayElementTy);
-      argTy.push_back(llvm::PointerType::getUnqual(retArrayElementTy));
-    }
+  // If the target is a register array, add one more arg that is a pointer to its storage
+  if(destInfo.isVector && !destInfo.isMemVec) {
+    assert(paddedRetArrayElementTy);
+    argTy.push_back(llvm::PointerType::getUnqual(paddedRetArrayElementTy));
+
+    // Unfortunately in LLVM 13.0.1, 'opt -O3' crashes if we use an opaque pointer here.
+    // argTy.push_back(llvm::PointerType::getUnqual(*TheContext));
   }
 
   // The function's return type
@@ -334,36 +318,17 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   }
 
 
-  // This function type definition is suitable for TheFunction and topFunction
+  // This function type definition is suitable for TheFunction 
   llvm::FunctionType *FT =
     llvm::FunctionType::get(retTy, argTy, false);
 
   std::string destSimpleName = funcExtract::var_name_convert(destName, true);
 
-
-
-  // The top funcion is probably no longer necessary, if we make the main
-  // function external, and do a final post-processing to remove dead args.
-  llvm::Function *topFunction = nullptr;
-  if (false) {
-    // make a top function
-    topFunction = llvm::Function::Create(FT, llvm::Function::ExternalLinkage, 
-                                         "top_function", TheModule.get());
-  }
-
   // Create the main function
-  // A new flow is to skip the topFunction, make the mainFunction external, and
-  // do a final post-processing to remove dead args.
-  llvm::Function::LinkageTypes linkage = topFunction ?
-                                            llvm::Function::InternalLinkage :
-                                            llvm::Function::ExternalLinkage;
+  llvm::Function::LinkageTypes linkage = llvm::Function::ExternalLinkage;
 
   TheFunction = llvm::Function::Create( FT, linkage,
                   destInfo.get_instr_name()+"_"+destSimpleName, TheModule.get());
-
-  if (topFunction) {
-    TheFunction->addFnAttr(llvm::Attribute::NoInline);
-  }
 
   for(auto it = insContextStk.begin();
       it != insContextStk.end(); it++) {
@@ -384,9 +349,6 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
       toCoutVerb("set reg-type func arg: "+regNameBound);
       TheFunction->getArg(idx)->setName(regNameBound);
 
-      if (topFunction) {
-        topFunction->getArg(idx)->setName(regNameBound);
-      }
       idx++;
     }
   }
@@ -413,10 +375,6 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
         toCoutVerb("set mem ouput func arg, mem: "+pathInsName+", output: "+output);
         TheFunction->getArg(idx)->setName(portName);
 
-        if (topFunction) {
-          topFunction->getArg(idx)->setName(portName);
-        }
-	
 	idx++;
       }
     }
@@ -434,10 +392,6 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
       toCoutVerb("set func arg: "+argName);
       TheFunction->getArg(idx)->setName(argName);
 
-      if (topFunction) {
-        topFunction->getArg(idx)->setName(argName);
-      }
-
       idx++;
     }
   }
@@ -446,19 +400,14 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 
   llvm::Value *retArrayPtr = nullptr;
 
-  if (!g_local_ret_array) {
-    // If the target is a register array, add one more arg that is a pointer to its storage
-    if(destInfo.isVector && !destInfo.isMemVec) {
-      const char *argName = RETURN_ARRAY_PTR_ID;  // sim_get will recognize this name in func_info.txt
-      TheFunction->getArg(idx)->setName(argName);
+  // If the target is a register array, add one more arg that is a pointer to its storage
+  if(destInfo.isVector && !destInfo.isMemVec) {
+    const char *argName = RETURN_ARRAY_PTR_ID;  // sim_get will recognize this name in func_info.txt
+    TheFunction->getArg(idx)->setName(argName);
 
-      retArrayPtr = TheFunction->getArg(idx);
+    retArrayPtr = TheFunction->getArg(idx);
 
-      if (topFunction) {
-        topFunction->getArg(idx)->setName(argName);
-      }
-      idx++;
-    }
+    idx++;
   }
 
   uint32_t argSize = TheFunction->arg_size();
@@ -483,7 +432,9 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     // Get the width of the array elements (all elements have the same width).
     // Post LLVM 14, it will not be possible to get this from the pointer.
     uint32_t width = get_var_slice_width_simp(pair.second.members[0], curMod);
-    llvm::Type *elementTy = llvm::IntegerType::get(*TheContext, width);
+    uint32_t paddedWidth = get_padded_width(width);
+
+    llvm::Type *paddedElementTy = llvm::IntegerType::get(*TheContext, get_padded_width(width));
 
     uint32_t arraySize = pair.second.members.size();
 
@@ -496,7 +447,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
       // Add a GetElementPtr instruction to calculate the address
       llvm::GetElementPtrInst* ptr 
         = llvm::GetElementPtrInst::Create(
-            elementTy,
+            paddedElementTy,
             array,
             std::vector<llvm::Value*>{
               llvm::ConstantInt::get(
@@ -506,7 +457,17 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
             BB
           );
 
-      Builder->CreateLoad(elementTy, value(ptr), llvm::Twine(memberNameBound));
+      if (paddedWidth == width) {
+        // No width issues: create a load instruction with the correct name.
+        Builder->CreateLoad(paddedElementTy, value(ptr), llvm::Twine(memberNameBound));
+      } else {
+        // De-padding necessary: create a load fiollowed by a trunc instruction with the correct name.
+        // Note that CreateZExtOrTrunc() will ignore the supplied name and simply return the
+        // input value if no conversion is needed.
+        llvm::Value *paddedVal = Builder->CreateLoad(paddedElementTy, value(ptr));
+        llvm::Type *elementTy = llvm::IntegerType::get(*TheContext, width);
+        Builder->CreateTrunc(paddedVal, elementTy, llvm::Twine(memberNameBound));
+      }
 
       idx++;
     }
@@ -576,73 +537,37 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
     }
 
     if (!retVec.empty()) {
-      // store values in retVec to memory of global array
+      // store values in retVec to memory of return array
       uint32_t size = destVec.size();
       uint32_t bitNum = log2(size) + 2; // LLVM optimization just switches this to i64...
       uint32_t i = 0;
 
-      assert(retArrayElementTy);
+      assert(paddedRetArrayElementTy);
 
-      if (g_local_ret_array) {
-        // Store each element to the global array.
-        for (llvm::Value* val : retVec) {
-          llvm::GetElementPtrInst* ptr 
-            = llvm::GetElementPtrInst::Create(
-                retArrayTy,
-                retArray,
-                std::vector<llvm::Value*>{
-                  llvm::ConstantInt::get(
-                    llvm::IntegerType::get(*TheContext, bitNum), 
-                    0, false),
-                  llvm::ConstantInt::get(
-                    llvm::IntegerType::get(*TheContext, bitNum), 
-                    i++, false) },
-                llvm::Twine(val->getName().str()+"_mem"),
-                BB
-              );
-          Builder->SetInsertPoint(BB);
+      // A pointer to the array was passed in
+      // Store each element to that array.
+      for (llvm::Value* val : retVec) {
+        std::string name = val->getName().str();
 
-          Builder->CreateStore(val, value(ptr));  
-        }
-
-        llvm::GetElementPtrInst* retPtr 
+        llvm::GetElementPtrInst* ptr 
           = llvm::GetElementPtrInst::Create(
-              retArrayTy,
-              retArray,
+              paddedRetArrayElementTy,
+              retArrayPtr,
               std::vector<llvm::Value*>{
                 llvm::ConstantInt::get(
                   llvm::IntegerType::get(*TheContext, bitNum), 
-                  0, false),
-                llvm::ConstantInt::get(
-                  llvm::IntegerType::get(*TheContext, bitNum), 
-                  0, false) },
-              llvm::Twine("RET_PTR"),
+                  i++, false) },
+              llvm::Twine(name+"_addr"),
               BB
             );
+        Builder->SetInsertPoint(BB);
 
-        // Return a pointer to the array
-        retInst = Builder->CreateRet(value(retPtr));
-      } else {
-        // A pointer the the array was passed in
-        // Store each element to that array.
-        for (llvm::Value* val : retVec) {
-          llvm::GetElementPtrInst* ptr 
-            = llvm::GetElementPtrInst::Create(
-                retArrayElementTy,
-                retArrayPtr,
-                std::vector<llvm::Value*>{
-                  llvm::ConstantInt::get(
-                    llvm::IntegerType::get(*TheContext, bitNum), 
-                    i++, false) },
-                llvm::Twine(val->getName().str()+"_mem"),
-                BB
-              );
-          Builder->SetInsertPoint(BB);
-
-          Builder->CreateStore(val, value(ptr));  
-        }
-        retInst = Builder->CreateRetVoid();
+        // If no width conversion is needed, no zext or trunc instruction will be generated here.
+        llvm::Value *paddedVal = Builder->CreateZExtOrTrunc(val, paddedRetArrayElementTy);
+        Builder->CreateStore(paddedVal, value(ptr));  
       }
+      retInst = Builder->CreateRetVoid();
+      
     } else {
       assert(destInfo.isMemVec);    
       retInst = Builder->CreateRetVoid();
@@ -669,27 +594,6 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   }
 
   llvm::verifyFunction(*TheFunction);
-
-
-  if (topFunction) {
-    // Fill in the contents of topFunction, if any
-
-    auto topBB = llvm::BasicBlock::Create(*TheContext, "top_bb", topFunction);
-    Builder->SetInsertPoint(topBB);  
-
-
-    // call TheFunction in topFunction: same args that topFunction has
-    std::vector<llvm::Value*> args;
-    for (size_t i=0; i < argSize; ++i) {
-      args.push_back(topFunction->getArg(i));
-    }
-
-    llvm::Value *theRet = Builder->CreateCall(FT, TheFunction, args);
-
-    Builder->CreateRet(theRet);
-
-    llvm::verifyFunction(*topFunction);
-  }
 
   llvm::verifyModule(*TheModule);
   std::string Str;
@@ -1107,8 +1011,7 @@ std::string DestInfo::get_dest_name() {
 
 
 
-// if is vector, return a pointer of the array-element type
-// In release 15 of LLVM, this will become an opaque pointer
+// Return the correct return type for the function
 llvm::Type* DestInfo::get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext) {
   if(!isVector) {
     return llvm::IntegerType::get(*TheContext, 
@@ -1122,19 +1025,8 @@ llvm::Type* DestInfo::get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext
       assert(size == elmtSize);
     }
 
-    if (g_local_ret_array) {
-      // Return a pointer to a locally-declared array.
-      uint32_t size = get_var_slice_width_cmplx(destVec.front());
-      for(auto dest: destVec) {
-        uint32_t elmtSize = get_var_slice_width_cmplx(dest);
-        assert(size == elmtSize);
-      }
-      llvm::Type* I = llvm::IntegerType::get(*TheContext, size);    
-      return llvm::PointerType::getUnqual(I);
-    } else {
-      // Return void, since the return array is provided by the caller.
-      return llvm::Type::getVoidTy(*TheContext);
-    }
+    // Return void, since the return array is provided by the caller.
+    return llvm::Type::getVoidTy(*TheContext);
   }
   // TODO: implement the else case: the destVar is either single memory
   // or an array of memory
@@ -1164,11 +1056,32 @@ llvm::Type* DestInfo::get_ret_element_type(std::shared_ptr<llvm::LLVMContext> Th
   }
 }
 
+// if is vector, return the padded array element type (which is what is actually used.
+// Otherwise return null;
+llvm::Type* DestInfo::get_padded_ret_element_type(std::shared_ptr<llvm::LLVMContext> TheContext) {
+  if(isVector && !isMemVec){
+    // if is reg vector, return an array element type 
+    // first, check if every reg is of the same size
+    uint32_t size = get_var_slice_width_cmplx(destVec.front());
+    for(auto dest: destVec) {
+      uint32_t elmtSize = get_var_slice_width_cmplx(dest);
+      assert(size == elmtSize);
+    }
+    return llvm::IntegerType::get(*TheContext, get_padded_width(size));    
+  }
+  // TODO: implement the else case: the destVar is either single memory
+  // or an array of memory
+  else { 
+    return nullptr;
+  }
+}
+
+
 
 llvm::Type* DestInfo::get_arr_type(std::shared_ptr<llvm::LLVMContext> TheContext) {
   assert(isVector);
   // if is reg vector, return an array type pointer
-  llvm::Type* I = get_ret_element_type(TheContext);
+  llvm::Type* I = get_padded_ret_element_type(TheContext);
   llvm::ArrayType* arrayType = llvm::ArrayType::get(I, destVec.size());
   return arrayType;
 }
