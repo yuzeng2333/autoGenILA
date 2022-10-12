@@ -217,7 +217,6 @@ void get_update_function(std::string target,
                          InstrInfo_t instrInfo,
                          uint32_t instrIdx) {
 
-  assert(delayBound > 0);
   time_t startTime = time(NULL);
 
   // set the destInfo according to the target
@@ -453,7 +452,7 @@ void get_update_function(std::string target,
 // 3: A single per-ASV delay from allowed_target.txt
 // 4: A per-instruction delay from instr.txt
 //
-//  If no delays can be found, the program will fail.
+//  If no delays can be found, the program will fail.  Note that 0 is a legal delay value.
 
 std::vector<uint32_t>
 get_delay_bounds(std::string var, const InstrInfo_t &instrInfo) {
@@ -479,20 +478,15 @@ get_delay_bounds(std::string var, const InstrInfo_t &instrInfo) {
   if (pos != instrInfo.delayExceptions.end()) {
     // per-instruction delay exception from instr.txt
     delayBound = pos->second;
-    assert(delayBound>0);
   }
   else if(g_allowedTgt.count(var) && !g_allowedTgt[var].empty()) {
     // Data from allowed_target.txt
     uint32_t dly = g_allowedTgt[var].front();
-    if (dly > 0) {  // Silently ignore a delay of 0.
-      delayBound = dly;
-      if(g_allowedTgt[var].size() > 1) {
-        toCout("Error: Target "+var+" has multiple delays. Only the first ("+toStr(dly)+") will be used.");
-      }
+    delayBound = dly;
+    if(g_allowedTgt[var].size() > 1) {
+      toCout("Error: Target "+var+" has multiple delays. Only the first ("+toStr(dly)+") will be used.");
     }
   }
-
-  assert(delayBound>0);
 
   return std::vector<uint32_t>{delayBound};  // Return a vector of one delay value
 }
