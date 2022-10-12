@@ -133,7 +133,7 @@ void read_func_info(std::string fileName) {
   assert(!g_asv.empty());
 
   while(std::getline(input, line)) {
-    toCout(line);
+    toCoutVerb(line);
     if(line.substr(0, 2) == "\\\\") {
       toCout("Error: find \\\\: "+line);
       assert(false);

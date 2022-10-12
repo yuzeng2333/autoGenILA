@@ -88,7 +88,7 @@ void build_ast_tree() {
     } // end of for loop
   }
 
-  assert(!(g_allowedTgt.empty() && g_allowedTgtVec.empty())); // Forgot to read the file?
+//  assert(!(g_allowedTgt.empty() && g_allowedTgtVec.empty())); // Forgot to read the file?
 
   for(auto tgtDelayPair: g_allowedTgt) {
     set_stk_build_tree(tgtDelayPair.first);

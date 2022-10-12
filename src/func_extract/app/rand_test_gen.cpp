@@ -16,12 +16,10 @@ using namespace taintGen;
 
 
 std::ofstream g_output;
-uint32_t InstrNum = 10;
 std::regex pX("(\\d+)'[b|h][x|X]$");
 std::map<std::string, std::string> regValueMap;
 
 enum DESIGN{AES, PICO, URV, VTA, BI, OTHER};
-// TODO: set the current design!
 enum DESIGN g_design = OTHER;
 
 void to_file(std::string line) {
@@ -255,13 +253,55 @@ void gen_rand_dmem(int width, int num) {
 
 
 int main(int argc, char *argv[]) {
-  if(argc < 3) {
-    toCout(std::string("Usage: ")+argv[0]+" <path> <instrNum>");
+
+  if(argc < 2) {
+    toCout("No path specified, current directory will be used.");
+    g_path = ".";
+  } else {
+    g_path = argv[1];
+  }
+
+  // Scan additional args for design type, etc.
+  g_verb = false;
+  g_design = OTHER;
+  uint32_t instrNum = 10;
+
+
+  int ndesopts = 0;
+  for (int n=2; n<argc; ++n) {
+    if (!strcmp(argv[n], "-aes")) {
+      ndesopts++;
+      g_design = AES;
+    } else if (!strcmp(argv[n], "-pico")) {
+      ndesopts++;
+      g_design = PICO;
+    } else if (!strcmp(argv[n], "-urv")) {
+      ndesopts++;
+      g_design = URV;
+    } else if (!strcmp(argv[n], "-vta")) {
+      ndesopts++;
+      g_design = VTA;
+    } else if (!strcmp(argv[n], "-bi")) {
+      ndesopts++;
+      g_design = BI;
+    } else if (!strcmp(argv[n], "-other")) {
+      ndesopts++;
+      g_design = OTHER;
+    } else if (isdigit(argv[n][0])) {
+      instrNum = std::stoi(argv[n]);
+    } else if (!strcmp(argv[n], "-verbose")) {
+      g_verb = true;
+    }
+  }
+
+  if (ndesopts > 1) {
+    toCout("Multiple design options specified!");
     abort();
   }
-  g_path = argv[1];
-  InstrNum = std::stoi(argv[2]);
-  g_verb = false;
+
+
+
+
   read_in_instructions(g_path+"/instr.txt");
   toCout("Writing "+g_path+"/tb.txt");
   g_output.open(g_path+"/tb.txt", std::ios::out);
@@ -270,7 +310,7 @@ int main(int argc, char *argv[]) {
 
   if(g_design == PICO) {
     uint32_t idx = 0;
-    while(idx++ < InstrNum) {
+    while(idx++ < instrNum) {
       uint32_t instrIdx = rand() % g_instrInfo.size();
       make_instr(instrIdx);
     }
@@ -279,7 +319,7 @@ int main(int argc, char *argv[]) {
     // for AES, execute start instr. every two instructions
     bool doStart = false;
     uint32_t idx = 0;
-    while(idx++ < InstrNum) {
+    while(idx++ < instrNum) {
       toCout("Make instr: "+toStr(idx));
       if(doStart) {
         make_instr(0);
@@ -296,29 +336,25 @@ int main(int argc, char *argv[]) {
           g_design == BI) {
     gen_rand_dmem(32, 64);
     uint32_t idx = 0;
-    while(idx++ < InstrNum) {
+    while(idx++ < instrNum) {
       uint32_t instrIdx = rand() % g_instrInfo.size();
       make_instr(instrIdx);
     }
   }
   else if(g_design == VTA) {
     uint32_t idx = 0;
-    while(idx++ < InstrNum) {
+    while(idx++ < instrNum) {
       uint32_t instrIdx = rand() % g_instrInfo.size();
       make_instr(instrIdx, false);
     }
   }
   else if(g_design == OTHER) {
     uint32_t idx = 0;
-    while(idx++ < InstrNum) {
+    while(idx++ < instrNum) {
       uint32_t instrIdx = rand() % g_instrInfo.size();
       make_instr(instrIdx, false);
     }
   }
 }
 
-//int main(int argc, char *argv[]) {
-//  std::cout << "yes!!!" << std::endl;
-//  return 0;
-//}
 

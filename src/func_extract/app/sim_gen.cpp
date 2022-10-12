@@ -133,7 +133,7 @@ int main(int argc, char *argv[]) {
   if (g_fetch_instr_from_mem) {
     if (instrNum < 0) {
       toCout("Error: did not specify the number of instructions to be executed!");
-      abort();
+      exit(-1);
     }
   }
   memSize = toDoList.size();
@@ -199,7 +199,7 @@ int main(int argc, char *argv[]) {
       abort();
     }
 
-    std::string cRstVal = get_c_rst_val(asv);
+    std::string cRstVal = get_c_rst_val(asv, width);
     toCoutVerb("cleaned up rst val of "+asv+"  "+cRstVal);
 
     // Process ASVs in register arrays separately
@@ -218,8 +218,9 @@ int main(int argc, char *argv[]) {
     uint32_t len = pair.second.getLength();
     for (uint32_t idx = 0; idx < len; ++idx) {
       std::string asv = pair.second.getElement(idx);
+      uint32_t width = pair.second.getWidth();
       std::string asvSimp = var_name_convert(asv, true);
-      std::string cRstVal = get_c_rst_val(asv);
+      std::string cRstVal = get_c_rst_val(asv, width);
       toCoutVerb("cleaned up rst val of "+asv+"  "+cRstVal);
 
       std::string ret = "  "+arrayName+"["+toStr(idx)+"] = "+cRstVal+";  // "+asvSimp;
@@ -305,8 +306,8 @@ int main(int argc, char *argv[]) {
     idx = 0;
     for(auto encoding: toDoList) {
     cpp << "      case "+toStr(idx++)+" :" << std::endl;
-    print_instr_calls(encoding, "      ", cpp, idx-1);
-    cpp << "        break;" << std::endl;
+      print_instr_calls(encoding, "      ", cpp, idx-1);
+      cpp << "        break;" << std::endl;
     }
     cpp << "    }" <<std::endl;
     update_all_asvs(cpp, "    ");
@@ -568,10 +569,11 @@ std::string func_call(std::string indent, std::string writeVar,
                       std::map<std::string, std::vector<std::string>> &inputInstr,
                       std::pair<std::string, uint32_t> dataIn) {
 
+  const char *special_comment = " /*special call*/";
   // TODO: check if need to use special funcCall
   if(g_design == AES 
      && g_aes_special_func_call.find(funcName) != g_aes_special_func_call.end()) {
-    return g_aes_special_func_call[funcName];
+    return g_aes_special_func_call[funcName] + special_comment;
   }
 
   if(g_design == URV
@@ -1092,15 +1094,15 @@ void print_array(std::string indent, std::string arrName, std::ofstream &cpp) {
 
 // Return a C-compatible value for the given asv's reset value.
 // Either a single number, or a std::array initializer for >64 bits.
-std::string get_c_rst_val(const std::string& asv) {
+std::string get_c_rst_val(const std::string& asv, uint32_t width) {
 
   std::string noSlash = asv;
   if(asv.substr(0, 1) == "\\") noSlash = asv.substr(1);
 
   std::string rstVal;
   if(g_rstVal.find(noSlash) == g_rstVal.end()) {
-    toCout("Warning: cannot find rst value for: "+noSlash);
-    rstVal = "0";
+    rstVal = toStr(width)+"'b0";
+    toCout("Warning: cannot find rst value for "+noSlash+", using "+rstVal);
   }
   else {
     rstVal = g_rstVal[noSlash];
@@ -1108,6 +1110,7 @@ std::string get_c_rst_val(const std::string& asv) {
 
   toCout("rst val of "+asv+"  "+rstVal);
   llvm::APInt rstValAPInt = hdb2apint(rstVal);
+  assert(rstValAPInt.getBitWidth() == width);  // Sanity check
   std::string cRstVal = apint2initializer(rstValAPInt);
 
   return cRstVal;
@@ -1138,7 +1141,7 @@ std::string initialize_mem(std::string fileName) {
 void print_update_mem(std::ofstream &cpp) {
   cpp << "void update_mem() {"                                               << std::endl;
   cpp << "  for(int i = 0; i < 16; i++) {"                                   << std::endl;
-  cpp << "    mem[ _write_addr_fifo_out0_Arr[i] ] = _data_fifo_out0_Arr[i];" << std::endl;
+  cpp << "    mem[ _write_addr_fifo_out0_Arr[i] ] = data_fifo_out0_Arr[i];"  << std::endl;
   cpp << "  }"                                                               << std::endl;
   cpp << "}\n"                                                               << std::endl;
 }
@@ -1150,19 +1153,20 @@ void print_update_mem_call(std::ofstream &cpp) {
 
 
 
-// key is funcName, value is function call statement
-std::map<std::string, std::string> g_aes_special_func_call 
-= { {"start__data_fifo_out0_Arr", "    start__data_fifo_out0_Arr( 0, _aes_top_0_aes_reg_ctr_i_reg_out_LOW, 0,  _aes_top_0_aes_reg_key0_i_reg_out_LOW, mem[_read_addr_fifo_out0_Arr[15]], mem[_read_addr_fifo_out0_Arr[14]], mem[_read_addr_fifo_out0_Arr[13]], mem[_read_addr_fifo_out0_Arr[12]], mem[_read_addr_fifo_out0_Arr[11]], mem[_read_addr_fifo_out0_Arr[10]], mem[_read_addr_fifo_out0_Arr[9]], mem[_read_addr_fifo_out0_Arr[8]], mem[_read_addr_fifo_out0_Arr[7]], mem[_read_addr_fifo_out0_Arr[6]], mem[_read_addr_fifo_out0_Arr[5]], mem[_read_addr_fifo_out0_Arr[4]], mem[_read_addr_fifo_out0_Arr[3]], mem[_read_addr_fifo_out0_Arr[2]], mem[_read_addr_fifo_out0_Arr[1]], mem[_read_addr_fifo_out0_Arr[0]] );\n"},
-{"start_data_fifo_out0_Arr", "    start__data_fifo_out0_Arr( 0, _aes_top_0_aes_reg_ctr_i_reg_out_LOW, 0,  _aes_top_0_aes_reg_key0_i_reg_out_LOW, mem[_read_addr_fifo_out0_Arr[15]], mem[_read_addr_fifo_out0_Arr[14]], mem[_read_addr_fifo_out0_Arr[13]], mem[_read_addr_fifo_out0_Arr[12]], mem[_read_addr_fifo_out0_Arr[11]], mem[_read_addr_fifo_out0_Arr[10]], mem[_read_addr_fifo_out0_Arr[9]], mem[_read_addr_fifo_out0_Arr[8]], mem[_read_addr_fifo_out0_Arr[7]], mem[_read_addr_fifo_out0_Arr[6]], mem[_read_addr_fifo_out0_Arr[5]], mem[_read_addr_fifo_out0_Arr[4]], mem[_read_addr_fifo_out0_Arr[3]], mem[_read_addr_fifo_out0_Arr[2]], mem[_read_addr_fifo_out0_Arr[1]], mem[_read_addr_fifo_out0_Arr[0]] );\n"}
+const std::string aes_special_call =  "    start_data_fifo_out0_Arr_wrapper(_aes_top_0_aes_reg_ctr_i_reg_out, _aes_top_0_aes_reg_key0_i_reg_out, mem[_read_addr_fifo_out0_Arr[15]], mem[_read_addr_fifo_out0_Arr[14]], mem[_read_addr_fifo_out0_Arr[13]], mem[_read_addr_fifo_out0_Arr[12]], mem[_read_addr_fifo_out0_Arr[11]], mem[_read_addr_fifo_out0_Arr[10]], mem[_read_addr_fifo_out0_Arr[9]], mem[_read_addr_fifo_out0_Arr[8]], mem[_read_addr_fifo_out0_Arr[7]], mem[_read_addr_fifo_out0_Arr[6]], mem[_read_addr_fifo_out0_Arr[5]], mem[_read_addr_fifo_out0_Arr[4]], mem[_read_addr_fifo_out0_Arr[3]], mem[_read_addr_fifo_out0_Arr[2]], mem[_read_addr_fifo_out0_Arr[1]], mem[_read_addr_fifo_out0_Arr[0]], data_fifo_out0_Arr_nxt);";
 
+// key is funcName, value is function call statement
+std::map<std::string, std::string> g_aes_special_func_call = {
+  {"start__data_fifo_out0_Arr_wrapper", aes_special_call},  // Two alternative spellings...
+  {"start_data_fifo_out0_Arr_wrapper", aes_special_call}
 };
 
 
 
 std::map<std::string, std::string> g_vta_special_func_call
-= { {"gemm__store_tensorStore_tensorFile_0_0", "    gemm__store_tensorStore_tensorFile_0_0( 0, 0, 0, 0, 0, 0, 0,  );\n"},
+= { {"gemm__store_tensorStore_tensorFile_0_0", "    gemm__store_tensorStore_tensorFile_0_0( 0, 0, 0, 0, 0, 0, 0,  );"},
 
-{"start_data_fifo_out0_Arr", "    start__data_fifo_out0_Arr( 0, _aes_top_0_aes_reg_ctr_i_reg_out_LOW, 0,  _aes_top_0_aes_reg_key0_i_reg_out_LOW, mem[_read_addr_fifo_out0_Arr[15]], mem[_read_addr_fifo_out0_Arr[14]], mem[_read_addr_fifo_out0_Arr[13]], mem[_read_addr_fifo_out0_Arr[12]], mem[_read_addr_fifo_out0_Arr[11]], mem[_read_addr_fifo_out0_Arr[10]], mem[_read_addr_fifo_out0_Arr[9]], mem[_read_addr_fifo_out0_Arr[8]], mem[_read_addr_fifo_out0_Arr[7]], mem[_read_addr_fifo_out0_Arr[6]], mem[_read_addr_fifo_out0_Arr[5]], mem[_read_addr_fifo_out0_Arr[4]], mem[_read_addr_fifo_out0_Arr[3]], mem[_read_addr_fifo_out0_Arr[2]], mem[_read_addr_fifo_out0_Arr[1]], mem[_read_addr_fifo_out0_Arr[0]] );\n"}
+{"start_data_fifo_out0_Arr", "    start__data_fifo_out0_Arr( 0, _aes_top_0_aes_reg_ctr_i_reg_out_LOW, 0,  _aes_top_0_aes_reg_key0_i_reg_out_LOW, mem[_read_addr_fifo_out0_Arr[15]], mem[_read_addr_fifo_out0_Arr[14]], mem[_read_addr_fifo_out0_Arr[13]], mem[_read_addr_fifo_out0_Arr[12]], mem[_read_addr_fifo_out0_Arr[11]], mem[_read_addr_fifo_out0_Arr[10]], mem[_read_addr_fifo_out0_Arr[9]], mem[_read_addr_fifo_out0_Arr[8]], mem[_read_addr_fifo_out0_Arr[7]], mem[_read_addr_fifo_out0_Arr[6]], mem[_read_addr_fifo_out0_Arr[5]], mem[_read_addr_fifo_out0_Arr[4]], mem[_read_addr_fifo_out0_Arr[3]], mem[_read_addr_fifo_out0_Arr[2]], mem[_read_addr_fifo_out0_Arr[1]], mem[_read_addr_fifo_out0_Arr[0]] );"}
 
 };
 

@@ -483,11 +483,12 @@ get_delay_bounds(std::string var, const InstrInfo_t &instrInfo) {
   }
   else if(g_allowedTgt.count(var) && !g_allowedTgt[var].empty()) {
     // Data from allowed_target.txt
-    delayBound = g_allowedTgt[var].front();
-    if(g_allowedTgt[var].size() > 1) {
-      toCout("Error: delay number size is not 1: "+var);
-      for(uint32_t delay: g_allowedTgt[var])
-        toCout(delay);
+    uint32_t dly = g_allowedTgt[var].front();
+    if (dly > 0) {  // Silently ignore a delay of 0.
+      delayBound = dly;
+      if(g_allowedTgt[var].size() > 1) {
+        toCout("Error: Target "+var+" has multiple delays. Only the first ("+toStr(dly)+") will be used.");
+      }
     }
   }
 
@@ -804,11 +805,13 @@ bool gather_wrapper_func_args(llvm::Module& M,
       } else if (!get_vector_of_target(var, nullptr).empty()) {
         // A reference to a big scalar ASV that is a member of a register array (and thus not in g_asvSet)
         size = get_var_slice_width_cmplx(var);
-      } else {
         toCout("Function "+wrapperFuncName+" has arg "+var+
-                  ", but its target is not a known register or register array!");
-        size = 0;
-        assert(false);
+                  " of size "+toStr(size)+" which belongs to a register array");
+      } else {
+        // A big scalar, but not found in g_asvSet
+        size = get_var_slice_width_cmplx(var);
+        toCout("Function "+wrapperFuncName+" has arg "+var+
+                  " of size "+toStr(size)+" which is not a known ASV or register array!");
       }
       argVec.push_back(std::make_pair(var, size));
     }
@@ -840,8 +843,6 @@ void print_asv_info(std::ofstream &output) {
     const std::string& reg = it->first;
     uint32_t width = it->second;
 
-    // g_asvSet is not supposed to have ASVs in registers
-    assert(get_vector_of_target(reg, nullptr).empty());
     assert(!is_special_arg_name(reg));
 
     if (!get_vector_of_target(reg, nullptr).empty()) {

@@ -68,4 +68,4 @@ void print_var_value(std::string indent, std::ofstream &cpp, const std::string& 
                      uint32_t width, const std::string& printName = "");
 
 bool is_in_array(const std::string& varName);
-std::string get_c_rst_val(const std::string& asv);
+std::string get_c_rst_val(const std::string& asv, uint32_t width);
