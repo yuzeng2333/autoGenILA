@@ -313,7 +313,7 @@ void get_update_function(std::string target,
 
   std::string funcName = instrInfo.name+"_"+destSimpleName;
   std::string fileName = UpdateFunctionGen::make_llvm_basename(destInfo, delayBound);
-  std::string cleanOptoFileName = fileName+".clean.o3.ll";
+  std::string cleanOptoFileName = fileName+".clean-o3-ll";
   std::string llvmFileName = fileName+".ll";
 
   toCout("---  BEGIN INSTRUCTION #"+toStr(instrIdx)+": "+instrInfo.name+
@@ -332,18 +332,18 @@ void get_update_function(std::string target,
     UpdateFunctionGen UFGen;
     UFGen.TheContext = std::make_unique<llvm::LLVMContext>();
 
-    UFGen.print_llvm_ir(destInfo, delayBound, instrIdx, fileName+".tmp.ll");
+    UFGen.print_llvm_ir(destInfo, delayBound, instrIdx, fileName+".tmp-ll");
 
     time_t upGenEndTime = time(NULL);  
 
     // Default g_llvm_path is blank, which means the shell will use $PATH in the usual way.
     std::string optCmd = (g_llvm_path.length() ? g_llvm_path+"/" : "") + "opt";
 
-    std::string clean(optCmd+" --instsimplify --deadargelim --instsimplify "+fileName+".tmp.ll -S -o="+fileName+".clean.ll");
+    std::string clean(optCmd+" --instsimplify --deadargelim --instsimplify "+fileName+".tmp-ll -S -o="+fileName+".clean-ll");
     
-    //std::string opto_cmd(optCmd+" -O1 "+fileName+".clean.ll -S -o="+fileName+".tmp.o3.ll; opt -passes=deadargelim "+fileName+".tmp.o3.ll -S -o="+cleanOptoFileName+"; rm "+fileName+".tmp.o3.ll");
+    //std::string opto_cmd(optCmd+" -O1 "+fileName+".clean-ll -S -o="+fileName+".tmp-o3-ll; opt -passes=deadargelim "+fileName+".tmp-o3-ll -S -o="+cleanOptoFileName+"; rm "+fileName+".tmp-o3-ll");
 
-    std::string opto_cmd(optCmd+" -O3 "+fileName+".clean.ll -S -o="+fileName+".tmp.o3.ll; opt -passes=deadargelim "+fileName+".tmp.o3.ll -S -o="+cleanOptoFileName+"; rm "+fileName+".tmp.o3.ll");
+    std::string opto_cmd(optCmd+" -O3 "+fileName+".clean-ll -S -o="+fileName+".tmp-o3-ll; opt -passes=deadargelim "+fileName+".tmp-o3-ll -S -o="+cleanOptoFileName+"; rm "+fileName+".tmp-o3-ll");
 
     toCout("** Begin clean update function");
     toCoutVerb(clean);
@@ -384,6 +384,10 @@ void get_update_function(std::string target,
       // Add a C-compatible wrapper function that calls the main function.
       std::string wrapperFuncName = create_wrapper_func(*M, funcName);
 
+      // Annotate the standard x86-64 Clang data layout to the module, to prevent warnings when linking
+      // to C/C++ code.
+      M->setDataLayout("e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128");
+
       // Get the data needed to create func_info.txt
       gather_wrapper_func_args(*M, wrapperFuncName, target, argVec);
 
@@ -392,12 +396,12 @@ void get_update_function(std::string target,
       } else {
         // Write out the modified IR data to a new file.
         std::error_code EC;
-        llvm::raw_fd_ostream OS(fileName+".clean.simp.ll", EC);
+        llvm::raw_fd_ostream OS(fileName+".clean-simp-ll", EC);
         OS << *M;
         OS.close();
 
         // Rename that file to be the final .ll file
-        std::string move("mv "+fileName+".clean.simp.ll "+g_path+"/"+llvmFileName);
+        std::string move("mv "+fileName+".clean-simp-ll "+g_path+"/"+llvmFileName);
         toCoutVerb(move);
         system(move.c_str());
       }

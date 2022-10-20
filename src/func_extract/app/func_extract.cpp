@@ -141,6 +141,7 @@ int main(int argc, char *argv[]) {
     // This reads design.v and creates design.v.nocomment
     toCout("##### Begin clean_file");
     clean_file(g_path+"/design.v", false);
+    toCout("##### End clean_file");
 
     // This reads the given file, and writes nothing.
     toCout("##### Begin getting IO");
@@ -161,6 +162,7 @@ int main(int argc, char *argv[]) {
     toCout("##### Begin parse_verilog");
     parse_verilog(g_path+"/design.v.clean");
   }
+  toCout("##### End parse_verilog");
 
   if(g_read_rst_vcd) vcd_parser(g_path+"/rst.vcd");
   else vcd_parser(g_path+"/norm.vcd");
