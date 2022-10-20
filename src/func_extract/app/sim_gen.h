@@ -5,6 +5,11 @@
 #include <vector>
 #include "../src/parse_fill.h"
 
+// key of map is var name, the value vector is the
+// vector of values for multiple cycles, since an
+// instruction might span multiple cycles
+typedef std::map<std::string, 
+                     std::vector<std::string>> InstEncoding_t;
 
 extern std::map<std::string, std::string> g_aes_special_func_call;
 extern std::map<std::string, std::string> g_urv_special_func_call;
@@ -55,7 +60,14 @@ void print_urv_update_mem(std::ofstream &cpp);
 
 void vta_ila_model(std::ofstream &cpp);
 
-void print_asv_values(std::ofstream &cpp, const std::string& bannerLine="", bool always=false);
+// Generate a call to the function to print ASV values.
+void print_asvs(std::ofstream &cpp, const std::string& bannerLine="", bool always=false);
+
+// Generate the declaration of the function to print ASV values.
+void print_asvs_printer_decl(std::ofstream &stream);
+
+// Generate the body of the function to print ASV values.
+void print_asvs_printer_func(std::ofstream &cpp);
 
 bool is_array_var(const std::string& varName);
 std::string get_array_position(const std::string& varName, int* idxp);
@@ -69,3 +81,21 @@ void print_var_value(std::string indent, std::ofstream &cpp, const std::string& 
 
 bool is_in_array(const std::string& varName);
 std::string get_c_rst_val(const std::string& asv, uint32_t width);
+
+
+// Create a single function that does all the work for a particular instruction:
+// calling each relevant update function, updating the ASVs, and printing debug info.
+void print_instr_wrapper_func(InstEncoding_t& encoding,
+                       std::ofstream &cpp,
+                       uint32_t memAddr);
+
+// Print the declaration for the instruction wrapper function.
+void print_instr_wrapper_decl(const std::string &instrName,
+                              const std::string &indent,
+                              std::ofstream &stream);
+
+// Call the single function that does all the work for a particular instruction.
+void print_instr_wrapper_call(const std::string &instrName,
+                              const std::string &indent,
+                              std::ofstream &cpp);
+

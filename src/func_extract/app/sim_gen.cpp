@@ -31,11 +31,7 @@ std::string g_dataAddrVar = "zy_data_addr";
 std::string g_dataIn = "zy_data_in";
 std::string nxt = "_nxt";
 
-// key of map is var name, the value vector is the
-// vector of values for multiple cycles, since an
-// instruction might span multiple cycles
-std::vector<std::map<std::string, 
-                     std::vector<std::string>>> toDoList;
+std::vector<InstEncoding_t> toDoList;
 
 std::map<std::string, std::map<std::string, 
                                std::string>> g_refineMap;
@@ -130,6 +126,7 @@ int main(int argc, char *argv[]) {
   read_to_do_instr(g_path+"/tb.txt", toDoList);
   read_refinement(g_path+"/refinement.txt");
   read_skipped_target(g_path+"/skipped_target.txt");
+  vcd_parser(g_path+"/rst.vcd");
   if (g_fetch_instr_from_mem) {
     if (instrNum < 0) {
       toCout("Error: did not specify the number of instructions to be executed!");
@@ -151,7 +148,6 @@ int main(int argc, char *argv[]) {
     vta_ila_model(cpp);
     return 0;
   }
-
 
   // ========== global array declarations
   // Do not put declarations of arrays in the
@@ -179,11 +175,7 @@ int main(int argc, char *argv[]) {
 
   if(g_design == AES) print_update_mem(cpp);
 
-  cpp << "int main(int argc, char *argv[]) {\n" << std::endl;
 
-
-
-  vcd_parser(g_path+"/rst.vcd");
 
   // ==========  asv declarations
   for(auto pair : g_asv) {
@@ -211,35 +203,13 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  // Initialize the ASVs in register arrays
-  // ASVs in a register array are not declared, just initialized.
-  for(auto pair: g_registerArrays) {
-    std::string arrayName = pair.first;
-    uint32_t len = pair.second.getLength();
-    for (uint32_t idx = 0; idx < len; ++idx) {
-      std::string asv = pair.second.getElement(idx);
-      uint32_t width = pair.second.getWidth();
-      std::string asvSimp = var_name_convert(asv, true);
-      std::string cRstVal = get_c_rst_val(asv, width);
-      toCoutVerb("cleaned up rst val of "+asv+"  "+cRstVal);
-
-      std::string ret = "  "+arrayName+"["+toStr(idx)+"] = "+cRstVal+";  // "+asvSimp;
-      cpp << ret << std::endl;    
-      ret = "  "+arrayName+nxt+"["+toStr(idx)+"] = "+cRstVal+";  // "+asvSimp;
-      cpp << ret << std::endl;    
-    }
-  }
-
   cpp << "  unsigned int "+g_instrAddrVar+" = 0;" << std::endl;
   cpp << "  unsigned int "+g_dataAddrVar+" = 0;" << std::endl;
   cpp << "  unsigned int "+g_dataIn+" = 0;" << std::endl;
   cpp << "  unsigned int data_byte_addr = 0; " << std::endl;  
-  cpp << "  int PRINT_ALL = argc > 1 ? 1 : 0;" << std::endl;
-  cpp << std::endl;
 
-
-  // ======== add alias from memory array to registers
   if(g_design == URV) {
+    // ======== add alias from memory array to registers
     for(int i = 1; i < 32; i++) {
       // FIXME:
       if(i == 1 || i == 2)
@@ -248,11 +218,59 @@ int main(int argc, char *argv[]) {
       cpp << "unsigned int& _u_issue_u_regfile_REGFILE_reg_r"+toStr(i)+"_q = _u_issue_u_regfile_REGFILE_reg_r3_q_Arr["+toStr(i-3)+"] ;" << std::endl;
     }
   }
+
+  cpp << std::endl;
+
+  print_asvs_printer_func(cpp);
+
+  // If needed, generate the function that initializes register arrays
+  if (!g_registerArrays.empty()) {
+    cpp << "void init_register_arrays() {" << std::endl;
+
+    // Initialize the ASVs in register arrays
+    // ASVs in a register array are not declared, just initialized.
+    for(auto pair: g_registerArrays) {
+      std::string arrayName = pair.first;
+      uint32_t len = pair.second.getLength();
+      for (uint32_t idx = 0; idx < len; ++idx) {
+        std::string asv = pair.second.getElement(idx);
+        uint32_t width = pair.second.getWidth();
+        std::string asvSimp = var_name_convert(asv, true);
+        std::string cRstVal = get_c_rst_val(asv, width);
+        toCoutVerb("cleaned up rst val of "+asv+"  "+cRstVal);
+
+        std::string ret = "  "+arrayName+"["+toStr(idx)+"] = "+cRstVal+";  // "+asvSimp;
+        cpp << ret << std::endl;    
+        ret = "  "+arrayName+nxt+"["+toStr(idx)+"] = "+cRstVal+";  // "+asvSimp;
+        cpp << ret << std::endl;    
+      }
+    }
+    cpp << "}" << std::endl << std::endl;
+  }
+
+
+  // Generate the wrapper functions for each instruction.
+  for(auto instrInfo : g_instrInfo) {
+    cpp << std::endl;
+    print_instr_wrapper_func(instrInfo.instrEncoding, cpp, 0);
+    cpp << std::endl;
+  }
+
+  cpp << "int main(int argc, char *argv[]) {\n" << std::endl;
+
+  cpp << std::endl << "  PRINT_ALL = argc > 1 ? 1 : 0;" << std::endl;
+
+  // Initialize the ASVs in register arrays
+  // ASVs in a register array are not declared, just initialized.
+  if (!g_registerArrays.empty()) {
+    cpp << "  init_register_arrays();" << std::endl;
+  }
   cpp << std::endl;
 
 
-  // ========= initialization of regs
-  print_asv_values(cpp, "Initialization:");
+
+  // ========= print initialization of regs
+  print_asvs(cpp, "Initialization:");
 
 
   // ========== initialize dmem
@@ -318,16 +336,19 @@ int main(int argc, char *argv[]) {
     uint32_t idx = 0;
     for(auto encoding : toDoList) {
       toCout("Instr: "+toStr(idx++));
-      print_instr_calls(encoding, "  ", cpp, 0);
+      //print_instr_calls(encoding, "  ", cpp, 0);
+      std::string instrName = decode(encoding);
+      print_instr_wrapper_call(instrName, "  ", cpp);
       if(g_update_all_regs) update_all_asvs(cpp, "  ");
     }
   }
   cpp << std::endl;
-  print_asv_values(cpp, "The final results:", true /*always*/);
+  print_asvs(cpp, "The final results:", true /*always*/);
 
   cpp << "}" << std::endl; // end of main function
 
   cpp.close();  
+
 
   // =========== generate header file for update functions
   header << "#ifdef __cplusplus" << std::endl
@@ -348,11 +369,23 @@ int main(int argc, char *argv[]) {
          << "}" << std::endl
          << "#endif" << std::endl;
 
+  // Global variable declaration.
+  header << "  int PRINT_ALL;" << std::endl;
+
+  print_asvs_printer_decl(header);
+
+  for(auto instrInfo : g_instrInfo) {
+    header << std::endl;
+    print_instr_wrapper_decl(instrInfo.name, "", header);
+  }
+
   header.close();
+
   return 0;
 }
 
 // Name used in the update function's LLVM file.
+// This must be consistent with the code in funcExtract that actually creates the LLVM code!
 std::string update_function_name(const std::string& instr, const std::string& asv) {
   std::string f = instr + "_" + asv;
 
@@ -360,9 +393,48 @@ std::string update_function_name(const std::string& instr, const std::string& as
 }
 
 
-// if write target is array, then update memory
-void print_instr_calls(std::map<std::string, 
-                         std::vector<std::string>> &encoding,
+std::string instruction_function_name(const std::string &instrName) {
+  return "execute_" + instrName;
+}
+
+// Create a single function that does all the work for a particular instruction:
+// calling each relevant update function, updating the ASVs, and printing debug info.
+void print_instr_wrapper_func(InstEncoding_t& encoding,
+                       std::ofstream &cpp,
+                       uint32_t memAddr) {
+
+  std::string instrName = decode(encoding);
+  std::string wrapperFuncName = instruction_function_name(instrName);
+
+  cpp << "void "+wrapperFuncName+"() {" << std::endl;
+  print_instr_calls(encoding, "  ", cpp, memAddr);
+  cpp << "}" << std::endl;
+}
+
+// Print the declaration for the instruction wrapper function.
+void print_instr_wrapper_decl(const std::string &instrName,
+                              const std::string &indent,
+                              std::ofstream &stream) {
+
+  std::string wrapperFuncName = instruction_function_name(instrName);
+  stream << "void "+wrapperFuncName+"();" << std::endl;
+}
+
+// Call the single function that does all the work for a particular instruction.
+void print_instr_wrapper_call(const std::string &instrName,
+                              const std::string &indent,
+                              std::ofstream &cpp) {
+
+  std::string wrapperFuncName = instruction_function_name(instrName);
+
+  cpp << indent+wrapperFuncName+"();" << std::endl;
+}
+
+
+// Create a series of C++ statements that do all the work for a particular instruction:
+// calling each relevant update function, updating the ASVs, and printing debug info.
+// If write target is array, then update memory
+void print_instr_calls(InstEncoding_t& encoding,
                        std::string indent,
                        std::ofstream &cpp,
                        uint32_t memAddr) {
@@ -513,7 +585,7 @@ void print_instr_calls(std::map<std::string,
   }
   cpp << std::endl;
 
-  print_asv_values(cpp, "Updated ASV values:");
+  print_asvs(cpp, "Updated ASV values:");
 
   // update dmem for store instructions of URV
   if(g_design == URV
@@ -1031,19 +1103,34 @@ void print_var_value(std::string indent, std::ofstream &cpp, const std::string& 
 }
 
 
-void print_asv_values(std::ofstream &cpp, const std::string& bannerLine, bool always) {
+void print_asvs(std::ofstream &cpp, const std::string& bannerLine, bool always) {
 
-  std::string indent = "  ";
-
-  if (!always) {
-    cpp << "  if (PRINT_ALL) {" << std::endl;
-    indent = "    ";
+  if (bannerLine.empty()) {
+    cpp << "  print_asvs(nullptr, "+toStr(always)+");";
+  } else {
+    cpp << "  print_asvs(\""+bannerLine+"\", "+toStr(always)+");";
   }
+  cpp << std::endl;
+}
 
-  if (!bannerLine.empty()) {
-    cpp << indent << "printf(\""+bannerLine+"\\n\");" << std::endl;
-  }
 
+// Generate the declaration of the function to print ASV values.
+void print_asvs_printer_decl(std::ofstream &stream) {
+  stream << "  void print_asvs(const char *bannerLine, bool always);" << std::endl;
+}
+
+
+// Generate the body of the function to print ASV values.
+void print_asvs_printer_func(std::ofstream &cpp) {
+
+  cpp << "void print_asvs(const char *bannerLine, bool always) {" << std::endl;
+
+
+  cpp << "  if (always || PRINT_ALL) {" << std::endl;
+
+  cpp << "    if (bannerLine != nullptr) printf(\"%s\\n\", bannerLine);" << std::endl;
+
+  std::string indent = "    ";
 
   // Print plain ASVs, skipping those in register arrays.
   for(auto pair : g_asv) {
@@ -1069,9 +1156,11 @@ void print_asv_values(std::ofstream &cpp, const std::string& bannerLine, bool al
     }
   }
 
-  if (!always) cpp << "  }" << std::endl;
+  cpp << "  }" << std::endl;
+  cpp << "}" << std::endl;
   cpp << std::endl;
 }
+
 
 
 void print_array(std::string indent, std::string arrName, std::ofstream &cpp) {
