@@ -4,6 +4,8 @@
 #include "../src/util.h"
 #include "../src/vcd_parser.h"
 #include "../src/global_data_struct.h"
+#include <sys/stat.h>
+
 #define toCout(a) std::cout << a << std::endl
 #define toStr(a) std::to_string(a)
 
@@ -31,8 +33,9 @@ std::string g_dataAddrVar = "zy_data_addr";
 std::string g_dataIn = "zy_data_in";
 std::string nxt = "_nxt";
 
-std::vector<InstEncoding_t> toDoList;
+bool g_separate_main = false;
 
+std::vector<InstEncoding_t> toDoList;
 std::map<std::string, std::map<std::string, 
                                std::string>> g_refineMap;
 std::set<std::string> g_skippedTgt;
@@ -90,12 +93,17 @@ int main(int argc, char *argv[]) {
       instrNum = std::stoi(argv[n]);
     } else if (!strcmp(argv[n], "-verbose")) {
       g_verb = true;
+    } else if (!strcmp(argv[n], "-separate_main")) {
+      g_separate_main = true;
+    } else {
+      toCout("Usage: sim_gen <path> [<design_opt>] [-verbose] [-separate_main]");
+      exit(-1);
     }
   }
 
   if (ndesopts > 1) {
     toCout("Multiple design options specified!");
-    abort();
+    exit(-1);
   }
 
 
@@ -133,6 +141,7 @@ int main(int argc, char *argv[]) {
       exit(-1);
     }
   }
+
   memSize = toDoList.size();
 
   std::ofstream header(g_path+"/ila.h");
@@ -149,27 +158,12 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-  // ========== global array declarations
-  // Do not put declarations of arrays in the
-  // c file. Put them only in the llvm-ir file
-
-  if(g_design != VTA) {
-    for(auto pair: g_registerArrays) {
-      // This works for register arrays wider than 64 bits
-      std::string arrName = pair.first;
-      uint32_t size = pair.second.getLength();
-      std::string dataTy = c_type(pair.second.getWidth());
-      cpp << dataTy+" "+arrName+"["+toStr(size)+"];" << std::endl;
-      cpp << dataTy+" "+arrName+nxt+"["+toStr(size)+"];" << std::endl;
-    }
-  }
-
   cpp << std::endl;
   std::string initValue = initialize_mem(g_path+"/mem.txt");
   if(initValue.empty())
-    cpp << "unsigned short mem[1024];\n" << std::endl;
+    cpp << "  unsigned short mem[1024];\n" << std::endl;
   else
-    cpp << "unsigned short mem[1024] = { "+initValue+" };\n" << std::endl;
+    cpp << "  unsigned short mem[1024] = { "+initValue+" };\n" << std::endl;
 
   toCout("Remember to change the data type of mem !!");
 
@@ -177,7 +171,21 @@ int main(int argc, char *argv[]) {
 
 
 
-  // ==========  asv declarations
+  // ==========  asv declarations and initializations
+
+  if(g_design != VTA) {
+    // Register arrays are initialized separately at runtime.
+    for(auto pair: g_registerArrays) {
+      // This works for register arrays wider than 64 bits
+      std::string arrName = pair.first;
+      uint32_t size = pair.second.getLength();
+      std::string dataTy = c_type(pair.second.getWidth());
+      cpp << "  "+dataTy+" "+arrName+"["+toStr(size)+"];" << std::endl;
+      cpp << "  "+dataTy+" "+arrName+nxt+"["+toStr(size)+"];" << std::endl;
+    }
+    cpp << std::endl;
+  }
+
   for(auto pair : g_asv) {
     std::string asv = pair.first;
     toCout(asv);
@@ -194,7 +202,7 @@ int main(int argc, char *argv[]) {
     std::string cRstVal = get_c_rst_val(asv, width);
     toCoutVerb("cleaned up rst val of "+asv+"  "+cRstVal);
 
-    // Process ASVs in register arrays separately
+    // ASVs in register arrays were handled separately above
     if (!is_in_array(asv)) {
       std::string ret = "  "+asvTy+" "+asvSimp+" = "+cRstVal+";";
       cpp << ret << std::endl;    
@@ -223,134 +231,167 @@ int main(int argc, char *argv[]) {
 
   print_asvs_printer_func(cpp);
 
-  // If needed, generate the function that initializes register arrays
-  if (!g_registerArrays.empty()) {
-    cpp << "void init_register_arrays() {" << std::endl;
+  // Generate the function that initializes register arrays
+  // It will be empty if there are no register arrays.
+  cpp << "void init_register_arrays() {" << std::endl;
 
-    // Initialize the ASVs in register arrays
-    // ASVs in a register array are not declared, just initialized.
-    for(auto pair: g_registerArrays) {
-      std::string arrayName = pair.first;
-      uint32_t len = pair.second.getLength();
-      for (uint32_t idx = 0; idx < len; ++idx) {
-        std::string asv = pair.second.getElement(idx);
-        uint32_t width = pair.second.getWidth();
-        std::string asvSimp = var_name_convert(asv, true);
-        std::string cRstVal = get_c_rst_val(asv, width);
-        toCoutVerb("cleaned up rst val of "+asv+"  "+cRstVal);
+  // Initialize the ASVs in register arrays
+  // ASVs in a register array are declared and initialized separately.
+  for(auto pair: g_registerArrays) {
+    std::string arrayName = pair.first;
+    uint32_t len = pair.second.getLength();
+    for (uint32_t idx = 0; idx < len; ++idx) {
+      std::string asv = pair.second.getElement(idx);
+      uint32_t width = pair.second.getWidth();
+      std::string asvSimp = var_name_convert(asv, true);
+      std::string cRstVal = get_c_rst_val(asv, width);
+      toCoutVerb("cleaned up rst val of "+asv+"  "+cRstVal);
 
-        std::string ret = "  "+arrayName+"["+toStr(idx)+"] = "+cRstVal+";  // "+asvSimp;
-        cpp << ret << std::endl;    
-        ret = "  "+arrayName+nxt+"["+toStr(idx)+"] = "+cRstVal+";  // "+asvSimp;
-        cpp << ret << std::endl;    
-      }
+      std::string ret = "  "+arrayName+"["+toStr(idx)+"] = "+cRstVal+";  // "+asvSimp;
+      cpp << ret << std::endl;    
+      ret = "  "+arrayName+nxt+"["+toStr(idx)+"] = "+cRstVal+";  // "+asvSimp;
+      cpp << ret << std::endl;    
     }
-    cpp << "}" << std::endl << std::endl;
   }
+  cpp << "}" << std::endl << std::endl;
 
 
   // Generate the wrapper functions for each instruction.
   for(auto instrInfo : g_instrInfo) {
     cpp << std::endl;
-    print_instr_wrapper_func(instrInfo.instrEncoding, cpp, 0);
+    print_instr_wrapper_func(instrInfo, cpp, 0);
     cpp << std::endl;
   }
 
-  cpp << "int main(int argc, char *argv[]) {\n" << std::endl;
+  bool write_main = true;
 
-  cpp << std::endl << "  PRINT_ALL = argc > 1 ? 1 : 0;" << std::endl;
+  if (g_separate_main) {
+    // Close the current cpp file, and write out the main() code to a second .cpp file.
+    // But don't overwrite an existing main file!!!
+    // The secnd .cpp file is included by the first one, so that the original
+    // link.sh script still works.
 
-  // Initialize the ASVs in register arrays
-  // ASVs in a register array are not declared, just initialized.
-  if (!g_registerArrays.empty()) {
+    std::string file2("ila_main.cpp");
+    cpp << "#include \""+file2+"\"\n" << std::endl;
+
+    struct stat statbuf;
+    if (stat((g_path+"/"+file2).c_str(), &statbuf) != 0) {
+      // File does not already exist
+      toCout("Generating ila_main.cpp.");
+      
+      cpp.close();
+      cpp.open(g_path+"/"+file2);
+      cpp << "// This file is included by ila.cpp." << std::endl;
+      cpp << std::endl;
+    } else {
+      toCout("ila_main.cpp already exists, will not overwrite.");
+      write_main = false;
+    }
+  }
+
+  if (write_main) {
+
+    cpp << "int main(int argc, char *argv[]) {\n" << std::endl;
+
+    cpp << std::endl << "  PRINT_ALL = argc > 1 ? 1 : 0;" << std::endl;
+
+    // Initialize the ASVs (if any) in register arrays
+    // ASVs in a register array are declared and initialized separately.
     cpp << "  init_register_arrays();" << std::endl;
-  }
-  cpp << std::endl;
+
+    // ========= print initialization of regs
+    print_asvs(cpp, "Initialization:");
 
 
-
-  // ========= print initialization of regs
-  print_asvs(cpp, "Initialization:");
-
-
-  // ========== initialize dmem
-  if(g_set_dmem) {
-    std::string type;
-    if(g_dmem_width == 32) {
-      type = "unsigned int";
-    }
-    else if(g_dmem_width == 16) {
-      type = "unsigned short";
-    }
-    else {
-      toCout("Error: unexpected dmem width: "+toStr(g_dmem_width));
-      abort();
-    }
-    cpp << "  "+type +" dmem[64];" << std::endl;
-    uint32_t i = 0;
-    std::ifstream input(g_path+"/dmem.txt");
-    std::string line;
-    while(std::getline(input, line)) {
-      cpp << "  dmem["+toStr(i++)+"] = "+line+" ;" << std::endl;
-    }
-    cpp << std::endl;
-  }
-
-
-  if(g_fetch_instr_from_mem) {
-    // declare memories
-    //uint32_t instrNumBits = ceil(log2(instrNum));
-    // actually the declaration and initialization of mem is not necessarily
-    // but for convenience of reference, I keep thse code
-    cpp << "  unsigned int mem["+toStr(memSize)+"];" << std::endl;
-    uint32_t idx = 0;
-    for(auto encoding: toDoList) {
-      if(encoding.find(g_instrValueVar) == encoding.end()) {
-        toCout("Error: the instr value variables is not expected: "+g_instrValueVar);
+    // ========== initialize dmem
+    if(g_set_dmem) {
+      std::string type;
+      if(g_dmem_width == 32) {
+        type = "unsigned int";
+      }
+      else if(g_dmem_width == 16) {
+        type = "  unsigned short";
+      }
+      else {
+        toCout("Error: unexpected dmem width: "+toStr(g_dmem_width));
         abort();
       }
-      uint32_t intValue = convert_to_single_num(encoding[g_instrValueVar].front());    
-      cpp << "  mem["+toStr(idx++)+"] = "+toStr(intValue)+" ;" << std::endl;
+      cpp << "  "+type +" dmem[64];" << std::endl;
+      uint32_t i = 0;
+      std::ifstream input(g_path+"/dmem.txt");
+      std::string line;
+      while(std::getline(input, line)) {
+        cpp << "  dmem["+toStr(i++)+"] = "+line+" ;" << std::endl;
+      }
+      cpp << std::endl;
     }
+
     cpp << std::endl;
 
-    // by default, execute number of 'instrNum' instructions
-    cpp << "  int addr ;" << std::endl;
-    cpp << std::endl;
-    cpp << "  for(int i = 0; i < "+toStr(instrNum)+"; i++) {" << std::endl;
-    cpp << "    addr = ("+g_instrAddrVar+" >> 2) % "+toStr(memSize)+";" << std::endl;
-    //cpp << "    mem_rdata = mem[addr];" << std::endl;
-    cpp << "    switch(addr) {" <<std::endl;
-    idx = 0;
-    for(auto encoding: toDoList) {
-    cpp << "      case "+toStr(idx++)+" :" << std::endl;
-      print_instr_calls(encoding, "      ", cpp, idx-1);
-      cpp << "        break;" << std::endl;
-    }
-    cpp << "    }" <<std::endl;
-    update_all_asvs(cpp, "    ");
-    cpp << "  }" << std::endl;
-  }
-  else {
-    // ========== update asvs according to instructions
-    uint32_t idx = 0;
-    for(auto encoding : toDoList) {
-      toCout("Instr: "+toStr(idx++));
-      //print_instr_calls(encoding, "  ", cpp, 0);
-      std::string instrName = decode(encoding);
-      print_instr_wrapper_call(instrName, "  ", cpp);
-      if(g_update_all_regs) update_all_asvs(cpp, "  ");
-    }
-  }
-  cpp << std::endl;
-  print_asvs(cpp, "The final results:", true /*always*/);
+    if(g_fetch_instr_from_mem) {
+      if (memSize == 0) {
+        toCout("Warning: no instruction list could be read");
+      }
 
-  cpp << "}" << std::endl; // end of main function
+      // declare memories
+      //uint32_t instrNumBits = ceil(log2(instrNum));
+      // actually the declaration and initialization of mem is not necessarily
+      // but for convenience of reference, I keep thse code
+      cpp << "  unsigned int mem["+toStr(memSize)+"];" << std::endl;
+      uint32_t idx = 0;
+      for(auto encoding: toDoList) {
+        if(encoding.find(g_instrValueVar) == encoding.end()) {
+          toCout("Error: the instr value variables is not expected: "+g_instrValueVar);
+          abort();
+        }
+        uint32_t intValue = convert_to_single_num(encoding[g_instrValueVar].front());    
+        cpp << "  mem["+toStr(idx++)+"] = "+toStr(intValue)+" ;" << std::endl;
+      }
+      cpp << std::endl;
+
+      // by default, execute number of 'instrNum' instructions
+      cpp << "  int addr ;" << std::endl;
+      cpp << std::endl;
+      cpp << "  for(int i = 0; i < "+toStr(instrNum)+"; i++) {" << std::endl;
+      cpp << "    addr = ("+g_instrAddrVar+" >> 2) % "+toStr(memSize)+";" << std::endl;
+      //cpp << "    mem_rdata = mem[addr];" << std::endl;
+      cpp << "    switch(addr) {" <<std::endl;
+      idx = 0;
+      for(auto encoding: toDoList) {
+      cpp << "      case "+toStr(idx++)+" :" << std::endl;
+        print_instr_calls(encoding, "      ", cpp, idx-1);
+        cpp << "        break;" << std::endl;
+      }
+      cpp << "    }" <<std::endl;
+      update_all_asvs(cpp, "    ");
+      cpp << "  }" << std::endl;
+    }
+    else {
+      // ========== update asvs according to instructions
+      uint32_t idx = 0;
+      for(auto encoding : toDoList) {
+        toCout("Instr: "+toStr(idx++));
+        //print_instr_calls(encoding, "  ", cpp, 0);
+        print_instr_wrapper_call(encoding, "  ", cpp);
+        if(g_update_all_regs) update_all_asvs(cpp, "  ");
+      }
+    }
+    cpp << std::endl;
+    print_asvs(cpp, "The final results:", true /*always*/);
+
+    cpp << std::endl << "  return 0;" << std::endl;
+
+    cpp << "}" << std::endl; // end of main function
+  }
 
   cpp.close();  
 
 
   // =========== generate header file for update functions
+  header << "#ifndef _ILA_H_" << std::endl;
+  header << "#define _ILA_H_" << std::endl;
+  header << std::endl;
+
   header << "#ifdef __cplusplus" << std::endl
          << "extern \"C\" {" << std::endl
          << "#endif" << std::endl << std::endl;
@@ -369,15 +410,21 @@ int main(int argc, char *argv[]) {
          << "}" << std::endl
          << "#endif" << std::endl;
 
-  // Global variable declaration.
-  header << "  int PRINT_ALL;" << std::endl;
+  header  << std::endl;
 
-  print_asvs_printer_decl(header);
+  // Global variable declaration.
+  header << "int PRINT_ALL;" << std::endl;
+
+  header << "void init_register_arrays();" << std::endl;
+  header << "void print_asvs(const char *bannerLine, bool always);" << std::endl;
 
   for(auto instrInfo : g_instrInfo) {
     header << std::endl;
     print_instr_wrapper_decl(instrInfo.name, "", header);
   }
+
+  header << std::endl;
+  header << "#endif" << std::endl;
 
   header.close();
 
@@ -399,15 +446,16 @@ std::string instruction_function_name(const std::string &instrName) {
 
 // Create a single function that does all the work for a particular instruction:
 // calling each relevant update function, updating the ASVs, and printing debug info.
-void print_instr_wrapper_func(InstEncoding_t& encoding,
+void print_instr_wrapper_func(InstrInfo_t& instr,
                        std::ofstream &cpp,
                        uint32_t memAddr) {
 
-  std::string instrName = decode(encoding);
-  std::string wrapperFuncName = instruction_function_name(instrName);
+  uint32_t idx = get_instr_by_name(instr.name);
+  cpp << "// instr"+toStr(idx)+": "+instr.name << std::endl;
 
+  std::string wrapperFuncName = instruction_function_name(instr.name);
   cpp << "void "+wrapperFuncName+"() {" << std::endl;
-  print_instr_calls(encoding, "  ", cpp, memAddr);
+  print_instr_calls(instr.instrEncoding, "  ", cpp, memAddr);
   cpp << "}" << std::endl;
 }
 
@@ -421,13 +469,18 @@ void print_instr_wrapper_decl(const std::string &instrName,
 }
 
 // Call the single function that does all the work for a particular instruction.
-void print_instr_wrapper_call(const std::string &instrName,
+// But first set any ASVs whose values are specified in the encoding and used by the instruction.
+void print_instr_wrapper_call(InstEncoding_t& encoding,
                               const std::string &indent,
                               std::ofstream &cpp) {
 
+  print_var_assignments(cpp, indent, encoding);
+
+  std::string instrName = decode(encoding);
   std::string wrapperFuncName = instruction_function_name(instrName);
 
   cpp << indent+wrapperFuncName+"();" << std::endl;
+  cpp << std::endl;
 }
 
 
@@ -442,7 +495,6 @@ void print_instr_calls(InstEncoding_t& encoding,
   uint32_t idx = get_instr_by_name(instrName);
   struct InstrInfo_t& instrInfo = g_instrInfo[idx];    
 
-  cpp << indent+"// instr"+toStr(idx)+": "+instrInfo.name << std::endl;
   cpp << indent+"if (PRINT_ALL) printf( \"// instr"+toStr(idx)+": "
                +instrInfo.name+", memAddr: "+toStr(memAddr)+"\\n\");" << std::endl << std::endl;
 
@@ -562,7 +614,7 @@ void print_instr_calls(InstEncoding_t& encoding,
 
           uint32_t depth = itr->second.getLength();
           cpp << indent << "for (int i = 0; i < "+toStr(depth)+"; i++) {" << std::endl;
-          cpp << indent << "  " << varName+"[i] = "+varName+nxt+"[i];";
+          cpp << indent << "  " << varName+"[i] = "+varName+nxt+"[i];" << std::endl;
           cpp << indent << "}" << std::endl;
         }
       } else if (!is_array_var(varName)) {
@@ -635,10 +687,62 @@ std::string c_type(uint32_t width) {
 }
 
 
+// Find all variables that are parameters of any of the given
+// instruction's update functions (as read from func_info.txt),
+// and set their values based on any values found in the 
+// instruction encoding (as read from tb.txt).
+// An example might be a load-type instruction that uses
+// a data value from an input data bus, or a register instruction
+// where the specific register is encoded by some bits of the
+// instruction's opcode.
+//
+// This situation is less common than you may think, because any
+// port/register value that is completely specified in instr.txt
+// will be treated as a constant by the LLVM optimization.
+// Only values with some undefined ("x") bits should need
+// to be dealt with here.  BTW, if some random internal register shows
+// up as a function parameter without being mentioned in instr.txt,
+// allowed_target.txt, or tb.txt, something has gone wrong.
+//
+// currently only support one-cycle inputInstr
+void print_var_assignments(std::ofstream &cpp, std::string indent, 
+                      InstEncoding_t &inputInstr) {
+
+  std::string instrName = decode(inputInstr);
+  uint32_t idx = get_instr_by_name(instrName);
+  struct InstrInfo_t& instrInfo = g_instrInfo[idx];    
+
+  for(auto pair: instrInfo.funcTypes) {
+    const FuncTy_t& funcTy = pair.second;
+    for(auto pair: funcTy.argTy) {
+      // Consider each arg of each update function.
+      // Skip the special args, e.g. those for returning wide values.
+      std::string arg = pair.first;
+      if (is_special_arg_name(arg)) {
+        continue;
+      }
+      if(inputInstr.find(arg) != inputInstr.end()) {
+        // The argument was found in the instruction encoding.
+        if((inputInstr.at(arg)).size() > 1) {
+          toCout("Warning: instruction spans multiple cycles!");
+        }
+        std::string argValue = (inputInstr[arg]).front();
+        // argValue could look like this: "7'h4+5'h7+5'h13+3'h2+5'h12+5'h8+2'b11";
+        llvm::APInt apValue = convert_to_single_apint(argValue);
+        // Doug: this could be > 64 bits.  Such big parameters are passed by const reference.
+        argValue = apint2literal(apValue);
+        cpp << indent << arg << " = " << argValue << ";" << std::endl;
+
+      }
+    }
+  }
+}
+
+
 // currently only support one-cycle inputInstr
 std::string func_call(std::string indent, std::string writeVar,
                       const FuncTy_t& funcTy, std::string funcName, 
-                      std::map<std::string, std::vector<std::string>> &inputInstr,
+                      InstEncoding_t& inputInstr,
                       std::pair<std::string, uint32_t> dataIn) {
 
   const char *special_comment = " /*special call*/";
@@ -690,10 +794,13 @@ std::string func_call(std::string indent, std::string writeVar,
       argValue = writeVar;
     }
     else if (arg == RETURN_ARRAY_PTR_ID) {
-      // We need to provide teh address of the result storage of the result's register array.
+      // We need to provide the address of the result storage of the result's register array.
       argValue = writeVar;
     }
     else if(inputInstr.find(arg) != inputInstr.end()) {
+      // The argument value is a constant, specified by the instruction encoding.
+      // If an empty encoding was specified, the value will be taken from the register
+      // (handled below).
       if((inputInstr.at(arg)).size() > 1) {
         toCout("Warning: instruction spans multiple cycles!");
       }
@@ -707,7 +814,7 @@ std::string func_call(std::string indent, std::string writeVar,
       // The arg is a pointer to ASV register array, so pass the array's address
       argValue = var_name_convert(arg, true);
     } else {
-      // The arg is an ASV: Either a scalar or an element of a register array.
+      // The arg is a register: Either a scalar or an element of a register array.
       if (is_in_array(arg)) {
         // The arg value is a member of the array.
         // Normally the entire array will be passed, so this may never be reached.
@@ -1111,12 +1218,6 @@ void print_asvs(std::ofstream &cpp, const std::string& bannerLine, bool always) 
     cpp << "  print_asvs(\""+bannerLine+"\", "+toStr(always)+");";
   }
   cpp << std::endl;
-}
-
-
-// Generate the declaration of the function to print ASV values.
-void print_asvs_printer_decl(std::ofstream &stream) {
-  stream << "  void print_asvs(const char *bannerLine, bool always);" << std::endl;
 }
 
 

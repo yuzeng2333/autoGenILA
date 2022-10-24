@@ -20,12 +20,15 @@ std::string c_type(uint32_t width);
 
 std::string func_call(std::string indent, std::string writeASV,
                       const funcExtract::FuncTy_t& funcTy, std::string funcName, 
-                      std::map<std::string, std::vector<std::string>> &inputInstr,
+                      InstEncoding_t &inputInstr,
                       std::pair<std::string, uint32_t> dataIn);                      
 
 void print_func_declare(const funcExtract::FuncTy_t& funcTy, 
                         std::string funcName, 
                         std::ofstream &header);
+
+void print_var_assignments(std::ofstream &cpp, std::string indent, 
+                      InstEncoding_t &inputInstr);
 
 uint32_t convert_to_single_num(std::string numIn);
 uint64_t convert_to_long_single_num(std::string numIn);
@@ -34,8 +37,7 @@ llvm::APInt convert_to_single_apint(std::string numIn);
 std::string apint2initializer(const llvm::APInt& val);
 std::string apint2literal(const llvm::APInt& val);
 
-void print_instr_calls(std::map<std::string, 
-                                std::vector<std::string>> &encoding,
+void print_instr_calls(InstEncoding_t &encoding,
                        std::string prefix,
                        std::ofstream &cpp,
                        uint32_t instrAddr);
@@ -63,9 +65,6 @@ void vta_ila_model(std::ofstream &cpp);
 // Generate a call to the function to print ASV values.
 void print_asvs(std::ofstream &cpp, const std::string& bannerLine="", bool always=false);
 
-// Generate the declaration of the function to print ASV values.
-void print_asvs_printer_decl(std::ofstream &stream);
-
 // Generate the body of the function to print ASV values.
 void print_asvs_printer_func(std::ofstream &cpp);
 
@@ -85,7 +84,7 @@ std::string get_c_rst_val(const std::string& asv, uint32_t width);
 
 // Create a single function that does all the work for a particular instruction:
 // calling each relevant update function, updating the ASVs, and printing debug info.
-void print_instr_wrapper_func(InstEncoding_t& encoding,
+void print_instr_wrapper_func(funcExtract::InstrInfo_t& instr,
                        std::ofstream &cpp,
                        uint32_t memAddr);
 
@@ -95,7 +94,8 @@ void print_instr_wrapper_decl(const std::string &instrName,
                               std::ofstream &stream);
 
 // Call the single function that does all the work for a particular instruction.
-void print_instr_wrapper_call(const std::string &instrName,
+// Also set any necessary register values specified by the encoding
+void print_instr_wrapper_call(InstEncoding_t& encoding,
                               const std::string &indent,
                               std::ofstream &cpp);
 

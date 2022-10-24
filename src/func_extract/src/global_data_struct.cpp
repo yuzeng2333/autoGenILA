@@ -29,7 +29,7 @@ std::map<std::string, uint32_t> g_asv;
 
 // In func_extract and sim_gen, read_instructions() builds this from instr.txt.
 // In sim_gen, read_func_info() populates the funcTypes fields from func_info.txt.
-std::vector<struct InstrInfo_t> g_instrInfo;
+std::vector<InstrInfo_t> g_instrInfo;
 
 // In sim_gen, read_Asv_info and/or read_func_info() build this from func_info.txt.
 // Key is array name.
