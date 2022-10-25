@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
     } else if (!strcmp(argv[n], "-separate_main")) {
       g_separate_main = true;
     } else {
-      toCout("Usage: sim_gen <path> [<design_opt>] [-verbose] [-separate_main]");
+      toCout("Usage: sim_gen <path> [<instr_num>] [<design_opt>] [-verbose] [-separate_main]");
       exit(-1);
     }
   }
@@ -259,7 +259,7 @@ int main(int argc, char *argv[]) {
   // Generate the wrapper functions for each instruction.
   for(auto instrInfo : g_instrInfo) {
     cpp << std::endl;
-    print_instr_wrapper_func(instrInfo, cpp, 0);
+    print_instr_wrapper_func(instrInfo, cpp);
     cpp << std::endl;
   }
 
@@ -358,8 +358,9 @@ int main(int argc, char *argv[]) {
       cpp << "    switch(addr) {" <<std::endl;
       idx = 0;
       for(auto encoding: toDoList) {
-      cpp << "      case "+toStr(idx++)+" :" << std::endl;
-        print_instr_calls(encoding, "      ", cpp, idx-1);
+        cpp << "      case "+toStr(idx++)+" :" << std::endl;
+        //print_instr_calls(encoding, "      ", cpp);
+        print_instr_wrapper_call(encoding, "        ", cpp);
         cpp << "        break;" << std::endl;
       }
       cpp << "    }" <<std::endl;
@@ -371,7 +372,7 @@ int main(int argc, char *argv[]) {
       uint32_t idx = 0;
       for(auto encoding : toDoList) {
         toCout("Instr: "+toStr(idx++));
-        //print_instr_calls(encoding, "  ", cpp, 0);
+        //print_instr_calls(encoding, "  ", cpp);
         print_instr_wrapper_call(encoding, "  ", cpp);
         if(g_update_all_regs) update_all_asvs(cpp, "  ");
       }
@@ -447,15 +448,14 @@ std::string instruction_function_name(const std::string &instrName) {
 // Create a single function that does all the work for a particular instruction:
 // calling each relevant update function, updating the ASVs, and printing debug info.
 void print_instr_wrapper_func(InstrInfo_t& instr,
-                       std::ofstream &cpp,
-                       uint32_t memAddr) {
+                       std::ofstream &cpp) {
 
   uint32_t idx = get_instr_by_name(instr.name);
   cpp << "// instr"+toStr(idx)+": "+instr.name << std::endl;
 
   std::string wrapperFuncName = instruction_function_name(instr.name);
   cpp << "void "+wrapperFuncName+"() {" << std::endl;
-  print_instr_calls(instr.instrEncoding, "  ", cpp, memAddr);
+  print_instr_calls(instr.instrEncoding, "  ", cpp);
   cpp << "}" << std::endl;
 }
 
@@ -489,14 +489,13 @@ void print_instr_wrapper_call(InstEncoding_t& encoding,
 // If write target is array, then update memory
 void print_instr_calls(InstEncoding_t& encoding,
                        std::string indent,
-                       std::ofstream &cpp,
-                       uint32_t memAddr) {
+                       std::ofstream &cpp) {
   std::string instrName = decode(encoding);
   uint32_t idx = get_instr_by_name(instrName);
   struct InstrInfo_t& instrInfo = g_instrInfo[idx];    
 
   cpp << indent+"if (PRINT_ALL) printf( \"// instr"+toStr(idx)+": "
-               +instrInfo.name+", memAddr: "+toStr(memAddr)+"\\n\");" << std::endl << std::endl;
+               +instrInfo.name+"\\n\");" << std::endl << std::endl;
 
   if(instrInfo.funcTypes.empty()) {
     toCout("Error: no func_info found for instruction: "+instrInfo.name);
@@ -646,7 +645,6 @@ void print_instr_calls(InstEncoding_t& encoding,
     print_urv_update_mem(cpp);
   }
 
-  cpp << indent+"printf(\"\\n\");" << std::endl;
 
   cpp << std::endl;
 
@@ -1256,6 +1254,8 @@ void print_asvs_printer_func(std::ofstream &cpp) {
       print_var_value(indent, cpp, varName, 64, printName);  // TODO: use correct width
     }
   }
+
+  cpp << indent+"printf(\"\\n\");" << std::endl;
 
   cpp << "  }" << std::endl;
   cpp << "}" << std::endl;

@@ -39,8 +39,7 @@ std::string apint2literal(const llvm::APInt& val);
 
 void print_instr_calls(InstEncoding_t &encoding,
                        std::string prefix,
-                       std::ofstream &cpp,
-                       uint32_t instrAddr);
+                       std::ofstream &cpp);
 
 void update_all_asvs(std::ofstream &cpp, std::string prefix);
 
@@ -85,8 +84,7 @@ std::string get_c_rst_val(const std::string& asv, uint32_t width);
 // Create a single function that does all the work for a particular instruction:
 // calling each relevant update function, updating the ASVs, and printing debug info.
 void print_instr_wrapper_func(funcExtract::InstrInfo_t& instr,
-                       std::ofstream &cpp,
-                       uint32_t memAddr);
+                       std::ofstream &cpp);
 
 // Print the declaration for the instruction wrapper function.
 void print_instr_wrapper_decl(const std::string &instrName,
