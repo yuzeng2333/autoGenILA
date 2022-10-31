@@ -1216,9 +1216,10 @@ std::string build_printf(const std::string& prefix, const std::string& varName,
       }
     }
     s += "}\\n\", "+index;
-    for (int j=0; j< words; ++j) {
+    // Print the words in reverse order, so the MS word is first.
+    for (int j=words-1; j >= 0; --j) {
       s += varName+"["+toStr(j)+"]";
-      if (j < words-1) {
+      if (j > 0) {
         s += ", ";
       }
     }
