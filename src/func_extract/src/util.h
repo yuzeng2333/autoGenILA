@@ -23,10 +23,10 @@ uint32_t get_instr_by_name(std::string instrName);
 
 std::string decode(const std::map<std::string, std::vector<std::string>> &inputInstr);
 
-bool is_compatible(const std::vector<std::string> &multiCycleValue1,
-                   const std::vector<std::string> &multiCycleValue2);
+bool is_compatible(const std::vector<std::string> &multiCycleInstrVal,
+                   const std::vector<std::string> &multiCycleInputVal);
 
-bool same_value(std::string val1, std::string val2);
+bool same_value(const std::string& instrVal, const std::string& inputVal);
 
 std::string name_for_array(const std::vector<std::string>& firstVarName);
 

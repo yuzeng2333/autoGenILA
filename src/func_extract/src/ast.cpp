@@ -224,7 +224,7 @@ void add_node(std::string varAndSlice,
   //toCout("Add node for: "+varAndSlice);
   if(varAndSlice.find("xram_ack") != std::string::npos) {
        //&& timeIdx == 25) {
-    toCout("Found it!");
+    toCoutVerb("Found it!");
     s_node = node;
   }
 
@@ -322,7 +322,7 @@ void add_child_node(std::string varAndSlice,
   std::string iName = g_insContextStk.get_target();  
   if(varAndSlice.find("yuzeng34") != std::string::npos
        && timeIdx == 7) {
-    toCout("Found it!");
+    toCoutVerb("Found it!");
   }
   if(curMod->visitedNode.find(childName) == curMod->visitedNode.end()) {
     astNode* nextNode = new astNode;      
@@ -379,7 +379,7 @@ void add_sliced_node(std::string varAndSlice,
 void add_nb_node(std::string regAndSlice, uint32_t timeIdx, astNode* const node) {
   const auto curMod = g_insContextStk.get_curMod();
   if(regAndSlice.find("aes_reg_key0_i.reg_out") != std::string::npos) {
-    toCout("Found it!");
+    toCoutVerb("Found it!");
   }
   toCoutVerb("Add nb node for :" + regAndSlice);
   std::string iName = g_insContextStk.get_target();  
@@ -389,7 +389,7 @@ void add_nb_node(std::string regAndSlice, uint32_t timeIdx, astNode* const node)
     abort();
   }
   if(regAndSlice == "outAssign") {
-    toCout("Found it!");
+    toCoutVerb("Found it!");
   }
   std::string destAssign = curMod->nbTable[regAndSlice];
   std::smatch m;
@@ -597,7 +597,7 @@ void add_two_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   }
 
   if(op == ">>>") {
-    toCout("Found it!");
+    toCoutVerb("Found it!");
   }
 
   uint32_t op1Ext = 0;
@@ -625,7 +625,7 @@ void add_two_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   }
 
   //if(destAndSlice.compare("adr_check") == 0) {
-  //  toCout("Found adr_check");
+  //  toCoutVerb("Found adr_check");
   //}
   std::string dest, destSlice;
   std::string op1, op1Slice;

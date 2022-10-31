@@ -19,7 +19,7 @@ std::ofstream g_output;
 std::regex pX("(\\d+)'[b|h][x|X]$");
 std::map<std::string, std::string> regValueMap;
 
-enum DESIGN{AES, PICO, URV, VTA, BI, OTHER};
+enum DESIGN{AES, PICO, URV, VTA, BI, OTHER, NON_RANDOM};
 enum DESIGN g_design = OTHER;
 
 void to_file(std::string line) {
@@ -287,16 +287,22 @@ int main(int argc, char *argv[]) {
     } else if (!strcmp(argv[n], "-other")) {
       ndesopts++;
       g_design = OTHER;
+    } else if (!strcmp(argv[n], "-non_random")) {
+      ndesopts++;
+      g_design = NON_RANDOM;
     } else if (isdigit(argv[n][0])) {
       instrNum = std::stoi(argv[n]);
     } else if (!strcmp(argv[n], "-verbose")) {
       g_verb = true;
+    } else {
+      toCout(std::string("Unknown option ")+argv[n]);
+      exit(-1);
     }
   }
 
   if (ndesopts > 1) {
     toCout("Multiple design options specified!");
-    abort();
+    exit(-1);
   }
 
 
@@ -353,6 +359,12 @@ int main(int argc, char *argv[]) {
     while(idx++ < instrNum) {
       uint32_t instrIdx = rand() % g_instrInfo.size();
       make_instr(instrIdx, false);
+    }
+  }
+  else if(g_design == NON_RANDOM) {
+    // Do all instructions once, in order.
+    for (uint32_t idx = 0; idx < g_instrInfo.size(); ++idx) {
+      make_instr(idx, false);
     }
   }
 }

@@ -62,31 +62,63 @@ int main(int argc, char *argv[]) {
   google::InitGoogleLogging(argv[0]);
   FLAGS_log_dir = "/workspace/research/ILA/autoGenILA/src/func_extract/log";
 
-  if(argc == 2 || argc > 4) {
-    toCout(std::string("usage: ")+argv[0]+" [<path> <clean_flag> [-reg]]");
-    exit(-1);
-  }
+  std::string usageStr = std::string("usage: ")+argv[0]+" [<path> [<clean_flag>]] [-reg|-verbose|-quiet]]";
 
-  g_path = argc > 1 ? argv[1] : ".";   // Default path is current dir
+  g_path = ".";   // Default path is current dir
 
-  // If argv[2] is the input file cleaning spec: 1 to clean, 0 to not clean, or '-' for auto-clean.
+  // The input file cleaning spec: 1 to clean, 0 to not clean, or '-' for auto-clean.
   // Default mode is auto-clean
-  std::string doClean = argc > 2 ? argv[2] : "-";
+  std::string doClean = "-";  
 
   bool printRegInfo = false;
-  if(argc > 3) {
-    std::string argv3 = argv[3];
-    if( argv3 == "-reg") printRegInfo = true ;
+
+  bool userVerbose = false;
+  bool userQuiet = false;
+
+
+  for (int n = 1; n < argc; ++n) {
+    const char *arg = argv[n];
+
+    if (n == 1 && arg[0] != '-') {
+      // If the first arg does not begin with '-', it is assumed to be the path
+      g_path = arg; 
+    } else if (n == 2 && strlen(arg) == 1 &&
+               (arg[0] == '-' || arg[0] == '0' || arg[0] == '1')) {
+      // The second arg can be the auto-clean spec
+      doClean = arg;
+    } else if (!strcmp(arg, "-verbose")) {
+      userVerbose = true;
+    } else if (!strcmp(arg, "-quiet")) {
+      userQuiet = true;
+    } else if (!strcmp(arg, "-reg")) {
+      printRegInfo = true;
+    } else {
+      toCout(usageStr);
+      exit(-1);
+    }
+  }
+
+  // Can't give both -verbose and -quiet
+  if (userVerbose && userQuiet) {
+    toCout(usageStr);
+    exit(-1);
   }
 
   time_t my_time = time(NULL);
   g_outFile.open(g_path+"/result.txt");
-  g_regValueFile.open(g_path+"/reg_values.txt");
   g_outFile << "Begin main!" << std::endl;
+  toCout("Begin main!");
+
+  read_config(g_path+"/config.txt");
+
+  // Override any g_verb setting from the config file with any setting from the command line.
+  if (userVerbose) g_verb = true;
+  if (userQuiet) g_verb = false;
+
+  g_regValueFile.open(g_path+"/reg_values.txt");
   std::string time(ctime(&my_time));
   g_outFile << "Start time: "+time << std::endl;
-  toCout("Begin main!");
-  g_verb = false;
+
   g_print_solver = false;
   g_remove_adff = true;
   g_clean_submod = true;
@@ -94,7 +126,7 @@ int main(int argc, char *argv[]) {
   g_use_simple_func_name = true;
 
   // Needs to be changed!
-  // Set these in config.txt
+  // These are set in config.txt
   //g_use_read_ASV = false;
   //g_get_all_update = true;
   //g_do_instr_num = 1;
@@ -105,7 +137,6 @@ int main(int argc, char *argv[]) {
   read_module_info();
   // read instr.txt, result in g_instrInfo
   // instruction encodings, write/read ASV, NOP
-  read_config(g_path+"/config.txt");
   read_in_instructions(g_path+"/instr.txt");
 
   read_allowed_targets(g_path+"/allowed_target.txt");

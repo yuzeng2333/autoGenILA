@@ -108,6 +108,7 @@ extern std::regex pVarAndSlice;
 extern std::regex pVarName;
 extern std::regex pVarNameGroup;
 extern std::regex pNum;
+extern std::regex pNumNoGroup;
 extern std::regex pNumExist;
 extern std::regex pBin;
 extern std::regex pBinX;

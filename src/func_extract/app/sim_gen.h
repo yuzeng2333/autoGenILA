@@ -20,8 +20,11 @@ std::string c_type(uint32_t width);
 
 std::string func_call(std::string indent, std::string writeASV,
                       const funcExtract::FuncTy_t& funcTy, std::string funcName, 
-                      InstEncoding_t &inputInstr,
+                      InstEncoding_t &encoding,
                       std::pair<std::string, uint32_t> dataIn);                      
+
+std::string get_arg_value(const std::string& arg, const InstEncoding_t& encoding);
+
 
 void print_func_declare(const funcExtract::FuncTy_t& funcTy, 
                         std::string funcName, 

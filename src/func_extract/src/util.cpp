@@ -203,7 +203,7 @@ uint32_t get_instr_by_name(std::string instrName) {
 // return the corresponding instruction's name
 std::string decode(const std::map<std::string, std::vector<std::string>> &inputInstr) {
   bool isCompatible;
-  for(auto instr: g_instrInfo) {
+  for(const auto instr: g_instrInfo) {
     if(instr.name == "lh")
       toCoutVerb("Find it!");
     isCompatible = true;
@@ -211,8 +211,13 @@ std::string decode(const std::map<std::string, std::vector<std::string>> &inputI
       std::string varName = pair.first;
       if(varName == "io_vme_rd_0_data_bits")
         toCoutVerb("Find it!");
-      auto inputValue = pair.second;
-      auto instrValue = instr.instrEncoding[varName];
+      const std::vector<std::string>& inputValue = pair.second;
+      auto pos = instr.instrEncoding.find(varName);
+      if (pos == instr.instrEncoding.end()) {
+        // If input has a value that is not specified by the instruction, it is OK.
+        continue;
+      }
+      const std::vector<std::string>& instrValue = pos->second;
       if(!is_compatible(instrValue, inputValue)) {
         isCompatible = false;
         break;
@@ -230,28 +235,28 @@ std::string decode(const std::map<std::string, std::vector<std::string>> &inputI
 
 // inputs are vectors of input values in multiple cycles
 // first vector is instruction, second is input
-bool is_compatible(const std::vector<std::string> &multiCycleValue1,
-                   const std::vector<std::string> &multiCycleValue2) {
-  std::vector<std::string> valueVec1;
-  std::vector<std::string> valueVec2;
-  valueVec1.clear();
-  valueVec2.clear();
-  if(multiCycleValue1.size() != multiCycleValue2.size()) return false;
-  uint32_t size = multiCycleValue1.size();
+bool is_compatible(const std::vector<std::string> &multiCycleInstrVal,
+                   const std::vector<std::string> &multiCycleInputVal) {
+  std::vector<std::string> instrValueVec;
+  std::vector<std::string> inputValueVec;
+  instrValueVec.clear();
+  inputValueVec.clear();
+  if(multiCycleInstrVal.size() != multiCycleInputVal.size()) return false;
+  uint32_t size = multiCycleInstrVal.size();
   for(uint32_t i = 0; i < size; i++) {
-    valueVec1.clear();
-    valueVec2.clear();
-    std::string singleValue1 = multiCycleValue1[i];
-    std::string singleValue2 = multiCycleValue2[i];
-    split_by(singleValue1, "+", valueVec1);
-    split_by(singleValue2, "+", valueVec2);
-    if(valueVec1.size() != valueVec2.size()) return false;
-    uint32_t num = valueVec1.size();
+    instrValueVec.clear();
+    inputValueVec.clear();
+    std::string singleInstrVal = multiCycleInstrVal[i];
+    std::string singleInputVal = multiCycleInputVal[i];
+    split_by(singleInstrVal, "+", instrValueVec);
+    split_by(singleInputVal, "+", inputValueVec);
+    if(instrValueVec.size() != inputValueVec.size()) return false;
+    uint32_t num = instrValueVec.size();
     for(uint32_t j = 0; j < num; j++) {
-      if(!same_value(valueVec1[j], valueVec2[j])) {
-        //toCout("valueVec1: "+toStr(j));
-        //for(auto val: valueVec1) toCout(val);
-        //for(auto val: valueVec2) toCout(val);
+      if(!same_value(instrValueVec[j], inputValueVec[j])) {
+        //toCout("instrValueVec: "+toStr(j));
+        //for(auto val: instrValueVec) toCout(val);
+        //for(auto val: inputValueVec) toCout(val);
         //toCout("\n");
         return false;
       }
@@ -261,40 +266,42 @@ bool is_compatible(const std::vector<std::string> &multiCycleValue1,
 }
 
 
-bool same_value(std::string val1, std::string val2) {
+// If instrVal is x, any inputVal of the same width matches.
+bool same_value(const std::string& instrVal, const std::string& inputVal) {
   std::smatch m;
   static const std::regex pX("(\\d+)'(d|h|b)x");
   static const std::regex pZ("(\\d+)'(d|h|b)(\\(Z\\S+\\)|Z)");
   static const std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");
-  if(is_x(val1) || val1.find("Z") != std::string::npos) {
-    if(std::regex_match(val1, m, pX)
-       || std::regex_match(val1, m, pZ) ) {
-      std::string width1 = m.str(1);
-      if(!std::regex_match(val2, m, pNum)) {
-        if(val2 == "1") return width1 == "1";
-        if(!is_number(val2)) {
-          toCout("Error: val2 is not number:"+val2);
+
+  if(is_x(instrVal) || instrVal.find("Z") != std::string::npos) {
+    if(std::regex_match(instrVal, m, pX)
+       || std::regex_match(instrVal, m, pZ) ) {
+      std::string instrWidth = m.str(1);
+      if(!std::regex_match(inputVal, m, pNum)) {
+        if(inputVal == "1") return instrWidth == "1";
+        if(!is_number(inputVal)) {
+          toCout("Error: inputVal is not number:"+inputVal);
           assert(false);
         }
-        if(val2 == "0") return true;
+        if(inputVal == "0") return true;
         else {
-          toCout("Error: unexpected val2: "+val2);
+          toCout("Error: unexpected inputVal: "+inputVal);
           assert(false);
         }
       }
       else {
-        std::string width2 = m.str(1);
-        if(width1 == width2) return true;
+        std::string inputWidth = m.str(1);
+        if(instrWidth == inputWidth) return true;
         else return false;
       }
     }
   }
 
   // Handle one or both values being > 64 bits.   Zero-extend the shorter one.
-  llvm::APInt v1 = hdb2apint(val1);
-  llvm::APInt v2 = hdb2apint(val2);
-  unsigned maxWidth = std::max(v1.getBitWidth(), v2.getBitWidth());
-  return v1.zext(maxWidth) == v2.zext(maxWidth);
+  llvm::APInt instrV = hdb2apint(instrVal);
+  llvm::APInt inputV = hdb2apint(inputVal);
+  unsigned maxWidth = std::max(instrV.getBitWidth(), inputV.getBitWidth());
+  return instrV.zext(maxWidth) == inputV.zext(maxWidth);
 }
 
 

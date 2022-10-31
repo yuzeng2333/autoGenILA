@@ -213,10 +213,10 @@ void clean_file(std::string fileName, bool useLogic) {
   std::string line;
   std::string cleanLine;
   std::smatch match;
-  std::regex pureComment("^\\s*\\(\\*.*\\*\\)$");
-  std::regex partialComment("\\(\\*.*\\*\\) ");
-  std::regex redundentBlank("(\\S)(\\s+)(\\S)");
-  std::regex extraBlank("([a-zA-Z0-9_\\.'])(\\s)(\\[)");
+  static const std::regex pureComment("^\\s*\\(\\*.*\\*\\)$");
+  static const std::regex partialComment("\\(\\*.*\\*\\) ");
+  static const std::regex redundentBlank("(\\S)(\\s+)(\\S)");
+  static const std::regex extraBlank("([a-zA-Z0-9_\\.'])(\\s)(\\[)");
   bool inFunc = false;
   std::string rsvdLine; // reserved line, not printed in last iteration
   if(g_moduleClk.find(moduleName) != g_moduleClk.end()) {
@@ -821,152 +821,153 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   // for the purpose of parse, remove potential $sign()
   //line = remove_signed(line);
   remove_back_space(line);
-  std::smatch m;
-  if(line.empty())
+  if(line.empty()) {
     return NONE;
+  }
   if(line.find("addedVar0") != std::string::npos)
     toCoutVerb("Find it!");
   if(line.substr(0, 1) == "X") {
     toCout("begin debug");
     ignoreWrongOp = true;
   }
+  std::smatch m;
   if ( std::regex_match(line, m, pModule) ) {
     moduleName = m.str(2);
     return MODULE;
   }
-  else if (std::regex_match(line, m, pInput)) {
+  else if (std::regex_match(line, pInput)) {
     return INPUT;
   }
-  else if (std::regex_match(line, m, pOutput)) {
+  else if (std::regex_match(line, pOutput)) {
     return OUTPUT;
   }
-  else if (std::regex_match(line, m, pMem)) {
+  else if (std::regex_match(line, pMem)) {
     return MEM;
   }
-  else if (std::regex_match(line, m, pReg)
-            || std::regex_match(line, m, pRegConst)) {
+  else if (std::regex_match(line, pReg)
+            || std::regex_match(line, pRegConst)) {
     return REG;
   }
   /* every wire type also needs _t and _r, both are wires */
   /* The reason why these wires are named _t, _r not _t_ */
-  else if (std::regex_match(line, m, pWire)) {
+  else if (std::regex_match(line, pWire)) {
     return WIRE;
   }
   /* 2-operator assignment */
-  else if (std::regex_match(line, m, pAdd)
-            || std::regex_match(line, m, pSub)
-            || std::regex_match(line, m, pMult)
-            || std::regex_match(line, m, pMod)
-            || std::regex_match(line, m, pDvd)
-            || std::regex_match(line, m, pAnd)
-            || std::regex_match(line, m, pEq)
-            || std::regex_match(line, m, pEq3)
-            || std::regex_match(line, m, pNeq)
-            || std::regex_match(line, m, pLt)
-            || std::regex_match(line, m, pLe)
-            || std::regex_match(line, m, pSt)
-            || std::regex_match(line, m, pSe)
-            || std::regex_match(line, m, pSignedLt)
-            || std::regex_match(line, m, pSignedLe)
-            || std::regex_match(line, m, pSignedSt)
-            || std::regex_match(line, m, pSignedSe)
-            || std::regex_match(line, m, pOr)
-            || std::regex_match(line, m, pBitOr)
-            || std::regex_match(line, m, pBitExOr)
-            || std::regex_match(line, m, pBitAnd)
-            || std::regex_match(line, m, pBitXnor1)
-            || std::regex_match(line, m, pBitXnor2)
-            || std::regex_match(line, m, pLeftShift)
-            || std::regex_match(line, m, pRightShift)
-            || std::regex_match(line, m, pSignedRightShift)
-            || std::regex_match(line, m, pSignedLeftShift)
-            || std::regex_match(line, m, pBitOrRed2) ) {
+  else if (std::regex_match(line, pAdd)
+            || std::regex_match(line, pSub)
+            || std::regex_match(line, pMult)
+            || std::regex_match(line, pMod)
+            || std::regex_match(line, pDvd)
+            || std::regex_match(line, pAnd)
+            || std::regex_match(line, pEq)
+            || std::regex_match(line, pEq3)
+            || std::regex_match(line, pNeq)
+            || std::regex_match(line, pLt)
+            || std::regex_match(line, pLe)
+            || std::regex_match(line, pSt)
+            || std::regex_match(line, pSe)
+            || std::regex_match(line, pSignedLt)
+            || std::regex_match(line, pSignedLe)
+            || std::regex_match(line, pSignedSt)
+            || std::regex_match(line, pSignedSe)
+            || std::regex_match(line, pOr)
+            || std::regex_match(line, pBitOr)
+            || std::regex_match(line, pBitExOr)
+            || std::regex_match(line, pBitAnd)
+            || std::regex_match(line, pBitXnor1)
+            || std::regex_match(line, pBitXnor2)
+            || std::regex_match(line, pLeftShift)
+            || std::regex_match(line, pRightShift)
+            || std::regex_match(line, pSignedRightShift)
+            || std::regex_match(line, pSignedLeftShift)
+            || std::regex_match(line, pBitOrRed2) ) {
     return TWO_OP;
   } // end of 2-operator
   /* 1-operator assignment */
-  else if (std::regex_match(line, m, pInvert) 
-            || std::regex_match(line, m, pPlus) 
-            || std::regex_match(line, m, pMinus) 
-            || std::regex_match(line, m, pNone)) {
+  else if (std::regex_match(line, pInvert) 
+            || std::regex_match(line, pPlus) 
+            || std::regex_match(line, pMinus) 
+            || std::regex_match(line, pNone)) {
     return ONE_OP;
   }
-  else if ( std::regex_match(line, m, pRedOr)
-            || std::regex_match(line, m, pNot)
-            || std::regex_match(line, m, pRedAnd)
-            || std::regex_match(line, m, pRedNand)
-            || std::regex_match(line, m, pRedNor)
-            || std::regex_match(line, m, pRedXor)
-            || std::regex_match(line, m, pRedXnor) ) {
+  else if ( std::regex_match(line, pRedOr)
+            || std::regex_match(line, pNot)
+            || std::regex_match(line, pRedAnd)
+            || std::regex_match(line, pRedNand)
+            || std::regex_match(line, pRedNor)
+            || std::regex_match(line, pRedXor)
+            || std::regex_match(line, pRedXnor) ) {
     return REDUCE1;
   }
-  else if (std::regex_match(line, m, pSel1)
-            || std::regex_match(line, m, pSel2)
-            || std::regex_match(line, m, pSel3)
-            || std::regex_match(line, m, pSel4)
-            || std::regex_match(line, m, pSel5)) {
+  else if (std::regex_match(line, pSel1)
+            || std::regex_match(line, pSel2)
+            || std::regex_match(line, pSel3)
+            || std::regex_match(line, pSel4)
+            || std::regex_match(line, pSel5)) {
     return SEL;
   }
-  //else if (std::regex_match(line, m, pSrcConcat)) {
+  //else if (std::regex_match(line, pSrcConcat)) {
   else if (is_srcConcat(line)) {
     return SRC_CONCAT;
   }
-  //else if (std::regex_match(line, m, pSrcDestBothConcat)) {
+  //else if (std::regex_match(line, pSrcDestBothConcat)) {
   else if (is_srcDestConcat(line)) {
     return BOTH_CONCAT;
   }
   else if (is_destConcat(line)) {
     return DEST_CONCAT;
   }
-  else if (std::regex_match(line, m, pIte)) { // if cond is rst, then does not add any taint
+  else if (std::regex_match(line, pIte)) { // if cond is rst, then does not add any taint
     return ITE;
   } // end of ite
-  else if( std::regex_match(line, m, pEnd)
-            || std::regex_match(line, m, pEndmodule) ){
+  else if( std::regex_match(line, pEnd)
+            || std::regex_match(line, pEndmodule) ){
     return NONE;
   }
-  else if( std::regex_match(line, m, pAlwaysClk) ) {
+  else if( std::regex_match(line, pAlwaysClk) ) {
     return ALWAYS;
   }
-  else if( std::regex_match(line, m, pAlwaysClkRst) ) {
+  else if( std::regex_match(line, pAlwaysClkRst) ) {
     return ALWAYS_CLKRST;
   }
-  else if( std::regex_match(line, m, pAlwaysFake) ) {
+  else if( std::regex_match(line, pAlwaysFake) ) {
     return ALWAYS_FAKE;
   }
-  else if( line.find("always @*") != std::string::npos || std::regex_match(line, m, pAlwaysStar) ) {
+  else if( line.find("always @*") != std::string::npos || std::regex_match(line, pAlwaysStar) ) {
     return ALWAYS_STAR;
   }
-  else if( std::regex_match(line, m, pAlwaysNeg) ) {
+  else if( std::regex_match(line, pAlwaysNeg) ) {
     return ALWAYS_NEG;
   }
-  else if( std::regex_match(line, m, pNonblockIf) ) {
+  else if( std::regex_match(line, pNonblockIf) ) {
     return NONBLOCKIF;
   }
-  else if( std::regex_match(line, m, pNonblock) ) {
+  else if( std::regex_match(line, pNonblock) ) {
     return NONBLOCK;
   }
-  else if( std::regex_match(line, m, pNonblockConcat) ) {
+  else if( std::regex_match(line, pNonblockConcat) ) {
     return NONBLOCKCONCAT;
   }
-  else if( std::regex_match(line, m, pCase) ) {
+  else if( std::regex_match(line, pCase) ) {
     return CASE;
   }
-  else if( std::regex_match(line, m, pFunctionDef) ) {
+  else if( std::regex_match(line, pFunctionDef) ) {
     return FUNCDEF;
   }
-  else if( std::regex_match(line, m, pEndfunction) ) {
+  else if( std::regex_match(line, pEndfunction) ) {
     return FUNCEND;
   }
-  else if( std::regex_match(line, m, pInstanceBegin) ) {
+  else if( std::regex_match(line, pInstanceBegin) ) {
     return INSTANCEBEGIN;
   }
-  else if( std::regex_match(line, m, pIf) ) {
+  else if( std::regex_match(line, pIf) ) {
     return IF;
   }
-  else if( std::regex_match(line, m, pElse) ) {
+  else if( std::regex_match(line, pElse) ) {
     return ELSE;
   }
-  else if( std::regex_match(line, m, pDynSel) ) {
+  else if( std::regex_match(line, pDynSel) ) {
     return DYNSEL;
   }
   else if(line.find("(*") == std::string::npos){
@@ -974,8 +975,9 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
       std::cout << "!! Unsupported operator:" + line << std::endl;
       if(g_use_jasper) abort();
     }
-    return UNSUPPORT;
-  }
+  } 
+
+  return UNSUPPORT; // ???
 }
 
 
@@ -990,10 +992,10 @@ void read_in_clkrst(std::string filePath, std::string fileName) {
   std::string line;
   std::string localModName;
   std::smatch match;
-  std::regex pClk("^clk\\:\\s*([a-zA-Z0-9_:'\\[\\]]+)\\s*$");
-  std::regex pRst("^rst\\:\\s*([a-zA-Z0-9_:'\\[\\]!]+)\\s*$");
-  std::regex pSign("^sign\\:\\s*([a-zA-Z0-9_:'\\[\\]]+)\\s*$");
-  std::regex pModuleLocal("^module\\:\\s*([a-zA-Z0-9_:'\\[\\]\\$\\\\]+)\\s*$");
+  static const std::regex pClk("^clk\\:\\s*([a-zA-Z0-9_:'\\[\\]]+)\\s*$");
+  static const std::regex pRst("^rst\\:\\s*([a-zA-Z0-9_:'\\[\\]!]+)\\s*$");
+  static const std::regex pSign("^sign\\:\\s*([a-zA-Z0-9_:'\\[\\]]+)\\s*$");
+  static const std::regex pModuleLocal("^module\\:\\s*([a-zA-Z0-9_:'\\[\\]\\$\\\\]+)\\s*$");
   while( std::getline(in, line) ) {
     if ( line.substr(0, 7) == "module:" ) {
       if( !std::regex_match(line, match, pModuleLocal) ) {
@@ -2018,7 +2020,7 @@ void add_func_taints_call_limited(std::string line, std::ofstream &output) {
   std::string funcName = m.str(3);
   std::string arguments = m.str(4);
 
-  std::regex pArgComb("\\(.*\\)");
+  static const std::regex pArgComb("\\(.*\\)");
   if( !std::regex_search(line, m, pArgComb) ) {
     std::cout << "!! Error in parsing func args !!" << std::endl;
     abort();
@@ -2317,9 +2319,9 @@ bool extract_concat(std::string line,
   std::string retStr = "";
   std::smatch m;
   int blankNo = line.find('a', 0);  
-  std::regex pAssign("assign ");
-  std::regex pBraces(to_re("\\{ ((?:NAME(?:\\s)?, )+NAME) \\}"));
-  std::regex pSlice("\\[(\\d+)(:)?(\\d+)?\\]");
+  static const std::regex pAssign("assign ");
+  static const std::regex pBraces(to_re("\\{ ((?:NAME(?:\\s)?, )+NAME) \\}"));
+  static const std::regex pSlice("\\[(\\d+)(:)?(\\d+)?\\]");
 
   // check if dest is {}
   uint32_t openBracePos = line.find("{");
@@ -2433,7 +2435,7 @@ bool extract_concat(std::string line,
 
 
 void gen_assert_property(std::ofstream &output) {
-  std::regex pRFlag("(\\S*)_r_flag");
+  static const std::regex pRFlag("(\\S*)_r_flag");
   std::smatch m;
   g_mod2assertMap.emplace(moduleName, std::vector<std::string>{});
   std::string DOES_KEEP = "";

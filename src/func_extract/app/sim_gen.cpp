@@ -188,7 +188,7 @@ int main(int argc, char *argv[]) {
 
   for(auto pair : g_asv) {
     std::string asv = pair.first;
-    toCout(asv);
+    toCoutVerb(asv);
     std::string asvSimp = var_name_convert(asv, true);
 
     uint32_t width = pair.second;   
@@ -737,10 +737,10 @@ void print_var_assignments(std::ofstream &cpp, std::string indent,
 }
 
 
-// currently only support one-cycle inputInstr
+// currently only support one-cycle encoding
 std::string func_call(std::string indent, std::string writeVar,
                       const FuncTy_t& funcTy, std::string funcName, 
-                      InstEncoding_t& inputInstr,
+                      InstEncoding_t& encoding,
                       std::pair<std::string, uint32_t> dataIn) {
 
   const char *special_comment = " /*special call*/";
@@ -752,23 +752,25 @@ std::string func_call(std::string indent, std::string writeVar,
 
   if(g_design == URV
      && g_urv_special_func_call.find(funcName) != g_urv_special_func_call.end()) {
-    uint32_t instrValue = convert_to_single_num( inputInstr["mem_i_inst_i"].front() );
+    uint32_t instrValue = convert_to_single_num( encoding["mem_i_inst_i"].front() );
     return g_urv_special_func_call[funcName]+toStr(instrValue)+" );";
   }
 
   // Note: writeVar could have any name, e.g. "asv_nxt"
   std::string ret = indent;
+  int argIndent = 0;
   if (writeVar.empty() || funcTy.retTy == 0) {
     ret += funcName+"( ";  // No writeVar, or function returns void (probably for an array)
+    argIndent = ret.length();  // For indenting subsequent args
   } else if (funcTy.retTy <= 64) {
-    ret += writeVar+" = "+funcName+"( ";
+    ret += writeVar+" =\n  "+indent+funcName+"( ";
+    argIndent = indent.length() + funcName.length() + 4;
   } else {
     toCout("Function returns a pointer to something!");
     assert(false);
   }
 
   unsigned argCnt = 0;
-  int argIndent = 0;
   std::map<std::string, uint32_t> varIdxMap; 
   for(auto pair: funcTy.argTy) {
     std::string arg = pair.first;
@@ -795,39 +797,11 @@ std::string func_call(std::string indent, std::string writeVar,
       // We need to provide the address of the result storage of the result's register array.
       argValue = writeVar;
     }
-    else if(inputInstr.find(arg) != inputInstr.end()) {
-      // The argument value is a constant, specified by the instruction encoding.
-      // If an empty encoding was specified, the value will be taken from the register
-      // (handled below).
-      if((inputInstr.at(arg)).size() > 1) {
-        toCout("Warning: instruction spans multiple cycles!");
-      }
-      argValue = (inputInstr[arg]).front();
-      //argValue = "7'h4+5'h7+5'h13+3'h2+5'h12+5'h8+2'b11";
-      // Doug: this could be > 64 bits.  Such big parameters are passed by const reference.
-      llvm::APInt apValue = convert_to_single_apint(argValue);
-      argValue = apint2literal(apValue);
-    }
-    else if (is_array_var(arg)) {
-      // The arg is a pointer to ASV register array, so pass the array's address
-      argValue = var_name_convert(arg, true);
-    } else {
-      // The arg is a register: Either a scalar or an element of a register array.
-      if (is_in_array(arg)) {
-        // The arg value is a member of the array.
-        // Normally the entire array will be passed, so this may never be reached.
-        int idx = 0;
-        std::string arrayName = get_array_position(arg, &idx);
-        assert(!arrayName.empty());
-        argValue = arrayName+"["+toStr(idx)+"]";
-      } else {
-        argValue = var_name_convert(arg, true);
-      }
+    else {
+      argValue = get_arg_value(arg, encoding);
     }
 
-    if (argCnt == 0) {
-      argIndent = ret.length();  // For indenting subsequent args
-    } else {
+    if (argCnt > 0) {
       ret += ",\n";
       ret += std::string(argIndent, ' ');
     }
@@ -837,6 +811,49 @@ std::string func_call(std::string indent, std::string writeVar,
 
   ret += " );";
   return ret;
+}
+
+
+std::string get_arg_value(const std::string& arg, const InstEncoding_t& encoding) {
+
+  // The argument value may be specified by the instruction encoding.
+  // If an empty encoding was given or the encoding specifies 'x', the value
+  // will be taken from the register (handled below).
+  // TODO: What about a partially-specified value?
+
+  auto pos = encoding.find(arg);
+  if (pos != encoding.end()) {
+    
+    if(pos->second.size() > 1) {
+      toCout("Warning: instruction spans multiple cycles!");
+    }
+
+    std::string argValue = pos->second.front();
+    if (!is_x(argValue)) {
+      //argValue = "7'h4+5'h7+5'h13+3'h2+5'h12+5'h8+2'b11";
+      // Doug: this could be > 64 bits.  Such big parameters are passed by const reference.
+      llvm::APInt apValue = convert_to_single_apint(argValue);
+      return apint2literal(apValue);
+    }
+  }
+
+  if (is_array_var(arg)) {
+    // The arg is a pointer to an ASV register array, so pass the array's address
+    return var_name_convert(arg, true);
+  }
+
+  // The arg is a register: Either a scalar or an element of a register array.
+  if (is_in_array(arg)) {
+    // The arg value is a member of the array.
+    // Normally the entire array will be passed, so this may never be reached.
+    int idx = 0;
+    std::string arrayName = get_array_position(arg, &idx);
+    assert(!arrayName.empty());
+    return arrayName+"["+toStr(idx)+"]";
+  } 
+
+  // Default case: a reference to a register
+  return var_name_convert(arg, true);
 }
 
 
@@ -1298,7 +1315,7 @@ std::string get_c_rst_val(const std::string& asv, uint32_t width) {
     rstVal = g_rstVal[noSlash];
   }
 
-  toCout("rst val of "+asv+"  "+rstVal);
+  toCoutVerb("rst val of "+asv+"  "+rstVal);
   llvm::APInt rstValAPInt = hdb2apint(rstVal);
   assert(rstValAPInt.getBitWidth() == width);  // Sanity check
   std::string cRstVal = apint2initializer(rstValAPInt);
