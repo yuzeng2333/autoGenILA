@@ -53,58 +53,78 @@ enum DESIGN g_design;
 // the second argument is the number of instructions, but only for fetch_instr_from_mem mode
 int main(int argc, char *argv[]) {
 
-  if(argc < 2) {
-    toCout("No path specified, current directory will be used.");
-    g_path = ".";
-  } else {
-    g_path = argv[1];
-  }
+  std::string usageStr = std::string("usage: ")+argv[0]+ " [<path>] [<instr_num>] [<design_opt>] [-verbose] [-separate_main]";
 
-  // Scan additional args for design type, etc.
-   
+  g_path = ".";   // Default path is current dir
   g_verb = false;
   g_design = OTHER;
-  int instrNum = -1;
+
+  bool userVerbose = false;
+  bool userQuiet = false;
 
   int ndesopts = 0;
-  for (int n=2; n<argc; ++n) {
-    if (!strcmp(argv[n], "-aes")) {
+
+  int instrNum = -1;
+
+
+  for (int n = 1; n < argc; ++n) {
+    const char *arg = argv[n];
+
+    if (n == 1 && arg[0] != '-') {
+      // If the first arg does not begin with '-', it is assumed to be the path
+      g_path = arg; 
+    } else if (n == 2 && isdigit(arg[0])) {
+      // The second arg can be the instruction count
+      instrNum = std::stoi(arg);
+      g_verb = true;
+    } else if (!strcmp(arg, "-verbose")) {
+      userVerbose = true;
+    } else if (!strcmp(arg, "-quiet")) {
+      userQuiet = true;
+    } else if (!strcmp(arg, "-separate_main")) {
+      g_separate_main = true;
+    } else if (!strcmp(arg, "-aes")) {
       ndesopts++;
       g_design = AES;
-    } else if (!strcmp(argv[n], "-pico")) {
+    } else if (!strcmp(arg, "-pico")) {
       ndesopts++;
       g_design = PICO;
-    } else if (!strcmp(argv[n], "-gb")) {
+    } else if (!strcmp(arg, "-gb")) {
       ndesopts++;
       g_design = GB;
-    } else if (!strcmp(argv[n], "-urv")) {
+    } else if (!strcmp(arg, "-urv")) {
       ndesopts++;
       g_design = URV;
-    } else if (!strcmp(argv[n], "-vta")) {
+    } else if (!strcmp(arg, "-vta")) {
       ndesopts++;
       g_design = VTA;
-    } else if (!strcmp(argv[n], "-bi")) {
+    } else if (!strcmp(arg, "-bi")) {
       ndesopts++;
       g_design = BI;
-    } else if (!strcmp(argv[n], "-other")) {
+    } else if (!strcmp(arg, "-other")) {
       ndesopts++;
       g_design = OTHER;
-    } else if (isdigit(argv[n][0])) {
-      instrNum = std::stoi(argv[n]);
-    } else if (!strcmp(argv[n], "-verbose")) {
-      g_verb = true;
-    } else if (!strcmp(argv[n], "-separate_main")) {
-      g_separate_main = true;
     } else {
-      toCout("Usage: sim_gen <path> [<instr_num>] [<design_opt>] [-verbose] [-separate_main]");
+      toCout(usageStr);
       exit(-1);
     }
   }
 
-  if (ndesopts > 1) {
-    toCout("Multiple design options specified!");
+  // Can't give both -verbose and -quiet
+  if (userVerbose && userQuiet) {
+    toCout(usageStr);
     exit(-1);
   }
+
+  if (ndesopts > 1) {
+    toCout("Multiple design options specified!");
+    toCout(usageStr);
+    exit(-1);
+  }
+
+  // Override any g_verb setting from the config file with any setting from the command line.
+  if (userVerbose) g_verb = true;
+  if (userQuiet) g_verb = false;
 
 
   // set global variables according to chosen design
