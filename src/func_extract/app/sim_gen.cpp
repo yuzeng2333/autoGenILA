@@ -34,6 +34,7 @@ std::string g_dataIn = "zy_data_in";
 std::string nxt = "_nxt";
 
 bool g_separate_main = false;
+std::string g_radix = "d";  // Optionally "h" for hex
 
 std::vector<InstEncoding_t> toDoList;
 std::map<std::string, std::map<std::string, 
@@ -53,7 +54,7 @@ enum DESIGN g_design;
 // the second argument is the number of instructions, but only for fetch_instr_from_mem mode
 int main(int argc, char *argv[]) {
 
-  std::string usageStr = std::string("usage: ")+argv[0]+ " [<path>] [<instr_num>] [<design_opt>] [-verbose] [-separate_main]";
+  std::string usageStr = std::string("usage: ")+argv[0]+ " [<path>] [<instr_num>] [<design_opt>] [-verbose] [-separate_main] [-hex]";
 
   g_path = ".";   // Default path is current dir
   g_verb = false;
@@ -83,6 +84,8 @@ int main(int argc, char *argv[]) {
       userQuiet = true;
     } else if (!strcmp(arg, "-separate_main")) {
       g_separate_main = true;
+    } else if (!strcmp(arg, "-hex")) {
+      g_radix = "x";
     } else if (!strcmp(arg, "-aes")) {
       ndesopts++;
       g_design = AES;
@@ -1192,7 +1195,7 @@ std::string get_array_position(const std::string& varName, int* idxp) {
 // Prefix is the first portion of the printf string.
 // Works for vars wider than 64 bits
 // The index parameter is meant for printing array members, and should be something like "i".
-// If it is given, varName needs to contain "%d".
+// If it is given, varName needs to contain "%d" or "%x".
 std::string build_printf(const std::string& prefix, const std::string& varName,
                           uint32_t width, std::string index) {
   if (!index.empty())
@@ -1200,14 +1203,14 @@ std::string build_printf(const std::string& prefix, const std::string& varName,
 
   std::string s;
   if (width <= 32) {
-    s = "printf(\""+prefix+"%d\\n\", "+index+varName+");";
+    s = "printf(\""+prefix+"%"+g_radix+"\\n\", "+index+varName+");";
   } else if (width <= 64) {
-    s = "printf(\""+prefix+"%ld\\n\", "+index+varName+");";
+    s = "printf(\""+prefix+"%l"+g_radix+"\\n\", "+index+varName+");";
   } else {
     s = "printf(\""+prefix+"{";
     int words = (width+63)/64;
     for (int j=0; j< words; ++j) {
-      s += "%ld";
+      s += "%l"+g_radix;
       if (j < words-1) {
         s += ", ";
       }
@@ -1311,7 +1314,7 @@ void print_array(std::string indent, std::string arrName, std::ofstream &cpp) {
   uint32_t depth = itr->second.getLength();
   uint32_t width = itr->second.getWidth();
   cpp << indent << "for (int i = 0; i < "+toStr(depth)+"; i++) {" << std::endl;
-  std::string printName = arrName+"[%d]";
+  std::string printName = arrName+"[%"+g_radix+"]";
   std::string elementName = arrName+"[i]";
   cpp << indent << "  " << build_printf(printName+": ", elementName, width, "i") << std::endl;
   cpp << indent << "}" << std::endl;
