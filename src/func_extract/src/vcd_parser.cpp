@@ -26,7 +26,9 @@ void vcd_parser(std::string fileName) {
   static const std::regex pEndDefinitions("^\\$enddefinitions\\s+\\$end$");
   static const std::regex pScope("^\\$scope\\s+module\\s+(\\S+)\\s+\\$end$");
   static const std::regex pUpscope("^\\$upscope\\s+\\$end$");
-  static const std::regex pVersion("^\\$version\\s+(\\S+)\\s+\\$end$");
+  static const std::regex pVersion("^\\$version\\s+.+\\s+\\$end$");
+  static const std::regex pDate("^\\$date\\s+.+\\s+\\$end$");
+  static const std::regex pSomething("^\\$\\S+\\s+.+\\s+\\$end$");
 
   std::string line;
   std::ifstream input(fileName);
@@ -112,6 +114,13 @@ void vcd_parser(std::string fileName) {
       }
       else if(std::regex_match(line, pVersion)) {
         // No action needed.
+      }
+      else if(std::regex_match(line, pDate)) {
+        // No action needed.
+      }
+      else if(std::regex_match(line, pSomething)) {
+        // A syntactically valid, but unknown line
+        toCout("Unknown format at line "+std::to_string(lineNum)+": "+line);
       } else {
         toCout("Syntax error at line "+std::to_string(lineNum)+": "+line);
       }
