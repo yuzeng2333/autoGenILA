@@ -208,6 +208,8 @@ llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low,
 
 bool is_x(const std::string &var);
 
+bool contains_x(const std::string &var);
+
 bool is_input(const std::string &var, const std::shared_ptr<ModuleInfo_t> &modInfo);
 
 bool is_output(const std::string &var, 

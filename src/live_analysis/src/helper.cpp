@@ -22,6 +22,7 @@ using namespace syntaxPatterns;
 
 namespace taintGen {
 
+// This recognizes concatenation (e.g. 5'x1f+9'x1dd+8'x0) only if contained in curly braces.
 bool isNum(std::string name) {
   remove_two_end_space(name);
   if(name.empty()) {
@@ -51,34 +52,6 @@ bool isNum(std::string name) {
     return true;
   }
 }
-
-#if 0
-bool isNum(std::string name) {
-  std::smatch m;
-  while(name.back() == ' ')
-    name.pop_back();
-  static const std::regex p("^(\\s*)(.*)$");
-  if(!std::regex_match(name, m, p)) {
-    toCout("Error: var not matched in isNum: "+name);
-  }
-  name = m.str(2);
-  size_t bracePos = name.find('{');
-  if (bracePos == name.npos) {
-    return std::regex_match(name, m, pNum);
-  } else {
-    bool allAreNum = true;
-    std::string singleVar;
-    std::regex_token_iterator<std::string::iterator> rend;
-    std::regex_token_iterator<std::string::iterator> it(name.begin(), name.end(), pVarName, 0);
-    while( it != rend ) {
-      singleVar = *it++;
-      if(!isNum(singleVar))
-        return false;
-    }
-    return true;
-  }
-}
-#endif
 
 
 bool is_number(const std::string& s) {
@@ -201,37 +174,6 @@ uint32_t cut_pos(const std::string& name) {
 }
 
 
-#if 0
-uint32_t cut_pos(const std::string& name) {
-  static const std::regex pOpenBackSlash("\\s*\\\\.*");
-  if(std::regex_match(name, pOpenBackSlash)) {
-  //static const std::regex pOpenBackSlash("^(\\s*)\\\\");
-  //std::smatch m;
-  //if(std::regex_search(name, m, pOpenBackSlash)) {
-  //if(std::regex_search(name, pOpenBackSlash)) {
-    bool nameStart = false;
-    bool nameEnd = false;
-    for(size_t i = 0; i < name.length(); ++i) {
-      if(name[i] == '\\')
-        nameStart = true;
-      if(nameStart && name[i] == ' ')
-        nameEnd = true;
-      if(nameEnd && name[i] == '[')
-        return i;
-    }
-    return name.length();
-  }
-  else {
-    for (uint32_t i = 0; i < name.length(); ++i) {
-      if (name.substr(i, 1).compare("[") == 0)
-        return i;
-    }
-    return name.length();
-  }
-}
-#endif
-
-
 // The returned name and slice may contain blanks,
 // but the name's leading and trailing blanks will be removed.
 bool split_slice(const std::string& slicedName, std::string &name, std::string &slice) {
@@ -258,38 +200,6 @@ bool split_slice(const std::string& slicedName, std::string &name, std::string &
     return true;
   }
 }
-
-#if 0
-// the returned name and slice may contain blanks
-bool split_slice(const std::string& slicedName, std::string &name, std::string &slice) {
-  static const std::regex pLocal("^\\s*(\\S+)\\s*$");
-  std::smatch m;
-  uint32_t pos = cut_pos(slicedName);
-  if (pos == slicedName.length()) {
-    name = slicedName;
-    if(name.empty()) {
-      toCout("Error: name is empty in split_slice, input is: "+slicedName);
-      abort();
-    }
-    std::regex_match(name, m, pLocal);
-    name = m.str(1);
-    slice = "";
-    return false;
-  }
-  else {
-    name = slicedName.substr(0, pos);
-    std::regex_match(name, m, pLocal);
-    name = m.str(1);
-    if(name.empty()) {
-      toCout("Error: name is empty in split_slice, input is: "+slicedName);
-      abort();
-    }
-    slice = slicedName.substr(pos);
-    slice = " " + slice;
-    return true;
-  }
-}
-#endif
 
 
 // no matter leftIdx or rightIdx is bigger, always return a positive width

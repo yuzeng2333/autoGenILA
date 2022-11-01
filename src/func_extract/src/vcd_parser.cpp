@@ -74,13 +74,13 @@ void vcd_parser(std::string fileName) {
 
         if (g_allRegs.empty()) {
           // If g_allRegs is empty, assume we want everything.
-          nameVarMap.emplace(name, var);
+          nameVarMap.emplace(name, hierVar);
           nameWidthMap.emplace(name, width);
-        } else if (is_reg(var)) {
-          nameVarMap.emplace(name, var);
+        } else if (is_reg(hierVar)) {
+          nameVarMap.emplace(name, hierVar);
           nameWidthMap.emplace(name, width);
-        } else if (is_reg("\\"+var)) {
-          nameVarMap.emplace(name, "\\"+var);
+        } else if (is_reg("\\"+hierVar)) {
+          nameVarMap.emplace(name, "\\"+hierVar);
           nameWidthMap.emplace(name, width);
         }
       }

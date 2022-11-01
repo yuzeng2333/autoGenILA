@@ -825,11 +825,19 @@ llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low,
 
 
 
-
-
 bool is_x(const std::string &var) {
   size_t quotePos = var.find("'");
   return quotePos != std::string::npos && var.substr(quotePos+2, 1) == "x";
+}
+
+
+// See if the given string is a numeric constant, and contains any 'x' values.
+// For example: 5'h3c+6'hx+9'h0
+// The parsing ought to be more robust
+bool contains_x(const std::string &var) {
+
+  if (var.find('\'') == std::string::npos) return false;
+  return var.find('x') != std::string::npos;
 }
 
 
@@ -845,6 +853,7 @@ bool is_output(const std::string &var, std::shared_ptr<ModuleInfo_t> curMod) {
 }
 
 
+// Only useful if g_allRegs has been built.
 bool is_reg(std::string var) {
   remove_two_end_space(var);
   return g_allRegs.find(var) != g_allRegs.end();

@@ -852,9 +852,15 @@ std::string get_arg_value(const std::string& arg, const InstEncoding_t& encoding
     }
 
     std::string argValue = pos->second.front();
-    if (!is_x(argValue)) {
-      //argValue = "7'h4+5'h7+5'h13+3'h2+5'h12+5'h8+2'b11";
-      // Doug: this could be > 64 bits.  Such big parameters are passed by const reference.
+
+    // If the arg value is fully defined (no 'x' in it), we pass it to the function.
+    // Otherwise the value is taken from the register.
+    // It is bad if the register value is not consistent with the defined bits of the encoding.
+    // Detecting this would require a runtime test.
+
+    if (!contains_x(argValue)) {
+      // e.g. "7'h4+5'h7+5'h13+3'h2+5'h12+5'h8+2'b11"
+      // The value could be > 64 bits.  Such big parameters are passed by const reference.
       llvm::APInt apValue = convert_to_single_apint(argValue);
       return apint2literal(apValue);
     }
@@ -953,7 +959,7 @@ void print_func_declare(const FuncTy_t& funcTy,
 
 
 uint32_t convert_to_single_num(std::string numIn) {
-  std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");
+  static const std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");
   std::smatch m;
   if(numIn.find("+") == std::string::npos) {
     if(std::regex_match(numIn, m, pNum)) {
@@ -986,7 +992,7 @@ uint32_t convert_to_single_num(std::string numIn) {
 
 
 uint64_t convert_to_long_single_num(std::string numIn) {
-  std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");
+  static const std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");
   std::smatch m;
   if(numIn.find("+") == std::string::npos) {
     if(std::regex_match(numIn, m, pNum)) {
@@ -1019,7 +1025,7 @@ uint64_t convert_to_long_single_num(std::string numIn) {
 
 
 llvm::APInt convert_to_single_apint(std::string numIn) {
-  std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");
+  static const std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");
   std::smatch m;
   if(numIn.find("+") == std::string::npos) {
     // No concatenation
@@ -1426,7 +1432,7 @@ std::map<std::string, std::string> g_urv_special_func_call
 
 void convert_concat_to_hex(std::string line, std::ofstream &imem) {
   std::vector<std::string> numVec;
-  std::regex pNum("(\\d+)'b([01]+)");  
+  static const std::regex pNum("(\\d+)'b([01]+)");  
   if(line.find("//") != std::string::npos) abort();
   if(line.empty()) abort();
   boost::split(numVec, line, boost::is_any_of("+"));
