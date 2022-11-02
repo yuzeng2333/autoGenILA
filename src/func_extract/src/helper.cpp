@@ -43,6 +43,7 @@ llvm::Value* llvmInt(llvm::APInt value,
 // This must be consistent with c_type() in sim_gen.cpp
 uint32_t get_padded_width(uint32_t width) {
 
+  if (width <= 8) return 8;
   if (width <= 16) return 16;
   if (width <= 32) return 32;
 

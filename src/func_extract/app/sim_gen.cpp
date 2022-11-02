@@ -328,17 +328,11 @@ int main(int argc, char *argv[]) {
 
     // ========== initialize dmem
     if(g_set_dmem) {
-      std::string type;
-      if(g_dmem_width == 32) {
-        type = "unsigned int";
-      }
-      else if(g_dmem_width == 16) {
-        type = "  unsigned short";
-      }
-      else {
+      if(g_dmem_width != 16 && g_dmem_width != 32) {
         toCout("Error: unexpected dmem width: "+toStr(g_dmem_width));
         abort();
       }
+      std::string type=c_type(g_dmem_width);
       cpp << "  "+type +" dmem[64];" << std::endl;
       uint32_t i = 0;
       std::ifstream input(g_path+"/dmem.txt");
@@ -681,17 +675,17 @@ void print_instr_calls(InstEncoding_t& encoding,
 std::string c_type(uint32_t width) {
   std::string ret;
   switch (width) {
-    //case 1 ... 8:
-    //  ret = "unsigned char";
-    //  break;
-    case 1 ... 16:  // Note: the "..." is a GCC extension.
-      ret = "unsigned short";
+    case 1 ... 8:
+      ret = "uint8_t";
+      break;
+    case 9 ... 16:  // Note: the "..." is a GCC extension.
+      ret = "uint16_t";
       break;
     case 17 ... 32:
-      ret = "unsigned int";
+      ret = "uint32_t";
       break;
     case 33 ... 64:
-      ret = "long int";
+      ret = "uint64_t";
       break;
     case 65 ... 8388607:  // Maximum width supported by LLVM.
       {
@@ -701,7 +695,7 @@ std::string c_type(uint32_t width) {
       break;
     default:
       toCout("Size of "+toStr(width)+" bits is not supported.");
-      ret = "long int";
+      ret = "uint64_t";
       break;
   }
   return ret;
