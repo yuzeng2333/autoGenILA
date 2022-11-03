@@ -14,27 +14,6 @@ using namespace funcExtract;
 using namespace taintGen;
 
 
-// Function for putting numeric literals in generated C++ code, in desired radix
-template <typename T>
-std::string toLiteral(T a, bool hex = true) {
-  // Don't print single-digit or negative numbers in hex.
-  if (!hex || a < 9) {
-    return std::to_string(a);
-  } 
-
-  std::ostringstream ss;
-  ss << "0x" << std::hex << a;
-  return ss.str();
-}
-
-// Specializaiton to avoid warning about comparing bool to 9
-template<>
-std::string toLiteral<bool>(bool a, bool hex) {
-  return std::string(a ? "true" : "false");
-}
-
-
-
 // TODO: automatically order :
 // (1) addr to mem (2) data from mem (3) data to mem
 
@@ -57,7 +36,8 @@ std::string g_dataIn = "zy_data_in";
 std::string nxt = "_nxt";
 
 bool g_separate_main = false;
-std::string g_radix = "d";  // Optionally "h" for hex
+std::string g_radixChar = "d";  // Optionally "h" for hex
+bool g_hex = false;             // Optionally true for hex
 
 std::vector<InstEncoding_t> toDoList;
 std::map<std::string, std::map<std::string, 
@@ -108,7 +88,8 @@ int main(int argc, char *argv[]) {
     } else if (!strcmp(arg, "-separate_main")) {
       g_separate_main = true;
     } else if (!strcmp(arg, "-hex")) {
-      g_radix = "x";
+      g_radixChar = "x";
+      g_hex = true;
     } else if (!strcmp(arg, "-aes")) {
       ndesopts++;
       g_design = AES;
@@ -985,6 +966,30 @@ void print_func_declare(const FuncTy_t& funcTy,
 
 
 
+// Function for putting numeric literals in generated C++ code, in desired radix.
+// Don't bother using for things like loop counter values, which are easy to understand
+// in decimal.
+// Controlled by global flag, which is controlled by command-line option.
+template <typename T>
+std::string toLiteral(T a) {
+  // Don't print single-digit or negative numbers in hex.
+  if (!g_hex || a < 9) {
+    return std::to_string(a);
+  } 
+
+  std::ostringstream ss;
+  ss << "0x" << std::hex << a;
+  return ss.str();
+}
+
+// Specialization to avoid warning about comparing bool to 9
+template<>
+std::string toLiteral<bool>(bool a) {
+  return std::string(a ? "true" : "false");
+}
+
+
+
 // For values <= 64 bits, this returns something like "1234".
 // For larger values, it returns an initializer string for a std::array<uint64_t>, like
 // "{12238671837, 23428734823, 23423490782390}"
@@ -992,14 +997,14 @@ void print_func_declare(const FuncTy_t& funcTy,
 std::string apint2initializer(const llvm::APInt& val) {
   unsigned nw = val.getNumWords();
   if (nw == 1) {
-    return toStr(val.getZExtValue());
+    return toLiteral(val.getZExtValue());
     //return llvm::toString(val, 10, false/*signed*/);
   }
 
   const uint64_t *p = val.getRawData();
   std::string ret = "{";
   for(unsigned j=0; j < nw; ++j) {
-    ret += toStr(*p++);
+    ret += toLiteral(*p++);
     if (j < nw-1) {
       ret += ", ";
     }
@@ -1017,7 +1022,7 @@ std::string apint2initializer(const llvm::APInt& val) {
 std::string apint2literal(const llvm::APInt& val) {
   std::string s = apint2initializer(val);
   if (val.getBitWidth() > 64) {
-    s = "std::array<uint64_t,"+toStr(val.getNumWords())+">" + s;
+    s = "std::array<uint64_t,"+toLiteral(val.getNumWords())+">" + s;
   }
   return s;
 }
@@ -1131,14 +1136,14 @@ std::string build_printf(const std::string& prefix, const std::string& varName,
 
   std::string s;
   if (width <= 32) {
-    s = "printf(\""+prefix+"%"+g_radix+"\\n\", "+index+varName+");";
+    s = "printf(\""+prefix+"%"+g_radixChar+"\\n\", "+index+varName+");";
   } else if (width <= 64) {
-    s = "printf(\""+prefix+"%l"+g_radix+"\\n\", "+index+varName+");";
+    s = "printf(\""+prefix+"%l"+g_radixChar+"\\n\", "+index+varName+");";
   } else {
     s = "printf(\""+prefix+"{";
     int words = (width+63)/64;
     for (int j=0; j< words; ++j) {
-      s += "%l"+g_radix;
+      s += "%l"+g_radixChar;
       if (j < words-1) {
         s += ", ";
       }
@@ -1243,7 +1248,7 @@ void print_array(std::string indent, std::string arrName, std::ofstream &cpp) {
   uint32_t depth = itr->second.getLength();
   uint32_t width = itr->second.getWidth();
   cpp << indent << "for (int i = 0; i < "+toStr(depth)+"; i++) {" << std::endl;
-  std::string printName = arrName+"[%"+g_radix+"]";
+  std::string printName = arrName+"[%"+g_radixChar+"]";
   std::string elementName = arrName+"[i]";
   cpp << indent << "  " << build_printf(printName+": ", elementName, width, "i") << std::endl;
   cpp << indent << "}" << std::endl;
