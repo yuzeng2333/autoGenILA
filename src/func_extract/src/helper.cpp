@@ -71,6 +71,7 @@ bool is_formed_num(const std::string& num) {
 
 
 // convert a string number, in hex|decimal|binary form, into uint64_t
+// Bummer if the value is wider than 64 bits: use hdb2apint() instead.
 uint64_t hdb2int(std::string num) {
   if(num.find("x") != std::string::npos) {
     replace_with(num, "x", "0");
@@ -103,11 +104,68 @@ uint64_t hdb2int(std::string num) {
 }
 
 
+
+// Create an APInt that has 1-bits for all non-x bits, and
+// 0 bits for all x-bits. Radix must be 2, 10, or 16.
+// (Octal could be supoprted, but that radix is not used by Verilog.)
+// This properly handles x-extension,
+// e.g. for any radix "0" all ones will be returned, for hex "xc" 
+// ...0001111 will be returned, and for hex "5x", ...1110000 will be returned.
+// Decimal "x" of course returns all zeros, but something like decimal "23x"
+// is not meaningful.
+
+llvm::APInt gen_x_mask(unsigned numBits, const std::string& str, unsigned radix) {
+
+  // Sanity checks
+  assert(!str.empty() && "Invalid string length");
+  assert((radix == 10 || radix == 16 || radix == 2) &&
+         "Radix should be 2, 10, or 16!");
+
+  size_t slen = str.size();
+  assert((slen <= numBits || radix != 2) && "Insufficient bit width");
+  assert(((slen-1)*4 <= numBits || radix != 16) && "Insufficient bit width");
+  assert((((slen-1)*64)/22 <= numBits || radix != 10) &&
+         "Insufficient bit width");
+
+  llvm::APInt val(numBits, 0);
+
+  if (std::tolower(str[0]) != 'x') {
+    // If the first digit is x, we must x-extend, which is equivalent
+    // to non-x-extending all ones.
+    val.flipAllBits();
+  }
+
+  if (radix == 10) {
+    return val;  // for base 10, only all-x and all-digit makes sense.
+  }
+
+  // Maximum digit value: all ones for base 2 or 16.
+  unsigned digitVal = radix == 16 ? 0x0f : radix == 2 ? 1 : 0;
+
+  for (char c : str) {
+    val *= radix;  // Unfortunately the shl operator asserts if the shift amount >= numBits
+    if (std::tolower(c) != 'x') {
+      val += digitVal;  // Add in all ones to represent the non-x digit.
+    }
+  }
+
+  return val;
+}
+
+
 // convert a string number, in hex|decimal|binary form, into a llvm::APInt
-llvm::APInt hdb2apint(std::string num, unsigned widthOverride) {
-  if(num.find("x") != std::string::npos) {
+// Normally x bits are translated to 0.
+// But if xmask is true, the returned value will have a 0 for every bit
+// that is x, and a 1 for every 0/1 bit.
+// Note that if widthOverride conflicts with an explicitly-given width, this
+// function will abort.
+
+llvm::APInt hdb2apint(std::string num, unsigned widthOverride, bool xmask) {
+
+  if(!xmask && num.find("x") != std::string::npos) {
     replace_with(num, "x", "0");
   }
+
   num = remove_signed(num);
 
   unsigned parsedWidth = 0;
@@ -136,11 +194,14 @@ llvm::APInt hdb2apint(std::string num, unsigned widthOverride) {
   else if(std::regex_match(num, m, pBin)){
     radix = 2;
     digits = m.str(2);
-  } else  {
+  } else if(is_all_digits(num)) {
     // Simple number without width spec
     // Use widthOverride if given , otherwise default width of 64
     unsigned width = widthOverride > 0 ? widthOverride : 64;
     return llvm::APInt(width, num, 10);
+  } else {
+    toCout("Error: Malformed number: "+num);
+    abort();
   }
 
   if (parsedWidth==0 && widthOverride==0) {
@@ -152,7 +213,53 @@ llvm::APInt hdb2apint(std::string num, unsigned widthOverride) {
   unsigned width = widthOverride > 0 ? widthOverride : 
                      (parsedWidth > 0 ? parsedWidth : 64);
 
-  return llvm::APInt(width, digits, radix);
+  return xmask ? gen_x_mask(width, digits, radix) : llvm::APInt(width, digits, radix);
+}
+
+
+// This handles an input string like "7'h4+5'h7+5'h13+3'hx+5'h12+5'h8+2'b11"
+// Normally x bits are translated to 0.
+// But if xmask is true, the returned value will have a 0 for every bit
+// that is x, and a 1 for every 0/1 bit.
+llvm::APInt convert_to_single_apint(std::string numIn, bool xmask) {
+  static const std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");
+  std::smatch m;
+  if(numIn.find("+") == std::string::npos) {
+    // No concatenation
+    return hdb2apint(numIn, 0, xmask);
+  } else {
+    std::vector<std::string> vec;
+    split_by(numIn, "+", vec);
+    llvm::APInt ret;
+    bool first = true;
+
+    for(std::string num : vec) {
+      std::smatch m;
+      if(!std::regex_match(num, m, pNum)) {
+        toCout("Error: does not match pNum: "+num);
+        abort();
+      }
+      llvm::APInt localVal = hdb2apint(num, 0, xmask);
+
+      // Sanity check
+      uint32_t w = std::stoi(m.str(1));
+      assert(w == localVal.getBitWidth());
+
+      if (first) {
+        ret = localVal;
+        first = false;
+      } else {
+        llvm::APInt newRet(ret.getBitWidth() + localVal.getBitWidth(), 0);
+        // The existing bits go in the upper portion of newRet, and
+        // the new bits go in the lower portion.
+        newRet.insertBits(ret, localVal.getBitWidth());
+        newRet.insertBits(localVal, 0);
+        ret = newRet;
+      }
+    }
+
+    return ret;
+  }
 }
 
 

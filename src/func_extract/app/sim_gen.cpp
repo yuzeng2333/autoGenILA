@@ -7,13 +7,36 @@
 #include <sys/stat.h>
 
 #define toCout(a) std::cout << a << std::endl
-#define toStr(a) std::to_string(a)
 
-// TODO: automatically order :
-// (1) addr to mem (2) data from mem (3) data to mem
+#define toStr(a) std::to_string(a)
 
 using namespace funcExtract;
 using namespace taintGen;
+
+
+// Function for putting numeric literals in generated C++ code, in desired radix
+template <typename T>
+std::string toLiteral(T a, bool hex = true) {
+  // Don't print single-digit or negative numbers in hex.
+  if (!hex || a < 9) {
+    return std::to_string(a);
+  } 
+
+  std::ostringstream ss;
+  ss << "0x" << std::hex << a;
+  return ss.str();
+}
+
+// Specializaiton to avoid warning about comparing bool to 9
+template<>
+std::string toLiteral<bool>(bool a, bool hex) {
+  return std::string(a ? "true" : "false");
+}
+
+
+
+// TODO: automatically order :
+// (1) addr to mem (2) data from mem (3) data to mem
 
 
 // This function will generate a c++ simulation file
@@ -361,8 +384,10 @@ int main(int argc, char *argv[]) {
           toCout("Error: the instr value variables is not expected: "+g_instrValueVar);
           abort();
         }
-        uint32_t intValue = convert_to_single_num(encoding[g_instrValueVar].front());    
-        cpp << "  mem["+toStr(idx++)+"] = "+toStr(intValue)+" ;" << std::endl;
+        llvm::APInt intValue = convert_to_single_apint(encoding[g_instrValueVar].front());    
+        // Doug: this could be > 64 bits.  Such big parameters are passed by const reference.
+        std::string intValueStr = apint2literal(intValue);
+        cpp << "  mem["+toStr(idx++)+"] = "+intValueStr+" ;" << std::endl;
       }
       cpp << std::endl;
 
@@ -386,6 +411,12 @@ int main(int argc, char *argv[]) {
     }
     else {
       // ========== update asvs according to instructions
+      if (toDoList.empty()) {
+        cpp << "  // tb.txt missing or empty: no instructions to execute" << std::endl;
+      } else {
+        cpp << "  // Instruction execution based on tb.txt" << std::endl;
+      }
+
       uint32_t idx = 0;
       for(auto encoding : toDoList) {
         toCout("Instr: "+toStr(idx++));
@@ -742,7 +773,7 @@ void print_var_assignments(std::ofstream &cpp, std::string indent,
           toCout("Warning: instruction spans multiple cycles!");
         }
         std::string argValue = (inputInstr[arg]).front();
-        // argValue could look like this: "7'h4+5'h7+5'h13+3'h2+5'h12+5'h8+2'b11";
+        // argValue could look like this: "7'h4+5'h7+5'h13+3'h2+5'h12+5'h8+2'b11"
         llvm::APInt apValue = convert_to_single_apint(argValue);
         // Doug: this could be > 64 bits.  Such big parameters are passed by const reference.
         argValue = apint2literal(apValue);
@@ -769,8 +800,9 @@ std::string func_call(std::string indent, std::string writeVar,
 
   if(g_design == URV
      && g_urv_special_func_call.find(funcName) != g_urv_special_func_call.end()) {
-    uint32_t instrValue = convert_to_single_num( encoding["mem_i_inst_i"].front() );
-    return g_urv_special_func_call[funcName]+toStr(instrValue)+" );";
+    llvm::APInt instrValue = convert_to_single_apint( encoding["mem_i_inst_i"].front() );
+    std::string instrValueStr = apint2literal(instrValue);
+    return g_urv_special_func_call[funcName]+instrValueStr+" );";
   }
 
   // Note: writeVar could have any name, e.g. "asv_nxt"
@@ -951,110 +983,6 @@ void print_func_declare(const FuncTy_t& funcTy,
   header << ret << std::endl;
 }
 
-
-uint32_t convert_to_single_num(std::string numIn) {
-  static const std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");
-  std::smatch m;
-  if(numIn.find("+") == std::string::npos) {
-    if(std::regex_match(numIn, m, pNum)) {
-      uint32_t width = std::stoi(m.str(1));
-      if(width > 32) {
-        toCout("Error: too long number, use convert_to_long_single_num:"
-              +numIn);
-        abort();
-      }
-    }
-    return hdb2int(numIn);
-  }
-  else {
-    std::vector<std::string> vec;
-    split_by(numIn, "+", vec);
-    uint32_t ret = 0;
-    for(std::string num : vec) {
-      std::smatch m;
-      if(!std::regex_match(num, m, pNum)) {
-        toCout("Error: does not match pNum: "+num);
-        abort();
-      }
-      uint32_t width = std::stoi(m.str(1));
-      uint32_t localVal = hdb2int(num);
-      ret = (ret << width) + localVal;
-    }
-    return ret;
-  }
-}
-
-
-uint64_t convert_to_long_single_num(std::string numIn) {
-  static const std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");
-  std::smatch m;
-  if(numIn.find("+") == std::string::npos) {
-    if(std::regex_match(numIn, m, pNum)) {
-      uint32_t width = std::stoi(m.str(1));
-      if(width > 32) {
-        toCout("Error: too long number:"
-              +numIn);
-        abort();
-      }
-    }
-    return hdb2int(numIn);
-  }
-  else {
-    std::vector<std::string> vec;
-    split_by(numIn, "+", vec);
-    uint64_t ret = 0;
-    for(std::string num : vec) {
-      std::smatch m;
-      if(!std::regex_match(num, m, pNum)) {
-        toCout("Error: does not match pNum: "+num);
-        abort();
-      }
-      uint32_t width = std::stoi(m.str(1));
-      uint32_t localVal = hdb2int(num);
-      ret = (ret << width) + localVal;
-    }
-    return ret;
-  }
-}
-
-
-llvm::APInt convert_to_single_apint(std::string numIn) {
-  static const std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");
-  std::smatch m;
-  if(numIn.find("+") == std::string::npos) {
-    // No concatenation
-    return hdb2apint(numIn);
-  } else {
-    std::vector<std::string> vec;
-    split_by(numIn, "+", vec);
-    llvm::APInt ret;
-
-    for(std::string num : vec) {
-      std::smatch m;
-      if(!std::regex_match(num, m, pNum)) {
-        toCout("Error: does not match pNum: "+num);
-        abort();
-      }
-      llvm::APInt localVal = hdb2apint(num);
-
-      // Sanity check
-      uint32_t w = std::stoi(m.str(1));
-      assert(w == localVal.getBitWidth());
-
-      llvm::APInt newRet(ret.getBitWidth() + localVal.getBitWidth(), 0);
-
-      // The existing bits (if any) go in the upper portion of newRet, and
-      // the new bits go in the lower portion.  BTW, the LLVM code
-      // is efficient for the first loop interation, where ret has no bits yet.
-      newRet.insertBits(ret, localVal.getBitWidth());
-      newRet.insertBits(localVal, 0);
-
-      ret = newRet;
-    }
-
-    return ret;
-  }
-}
 
 
 // For values <= 64 bits, this returns something like "1234".
@@ -1464,11 +1392,24 @@ void vta_ila_model(std::ofstream &cpp) {
     toCout("instr "+toStr(instrIdx));
     std::string firstByte = encoding["io_vme_rd_0_data_bits"][2];
     std::string secondByte = encoding["io_vme_rd_0_data_bits"][3];
-    uint64_t firstByteNum = convert_to_long_single_num(firstByte);    
-    uint64_t secondByteNum = convert_to_long_single_num(secondByte);
 
-    std::string firstByteHex = longDec2hex(toStr(firstByteNum));
-    std::string secondByteHex = longDec2hex(toStr(secondByteNum));
+    llvm::APInt firstByteAP = convert_to_single_apint(firstByte);    
+    llvm::APInt secondByteAP = convert_to_single_apint(secondByte);
+
+    if (firstByteAP.getBitWidth() > 32) {
+      toCout("Error: too long number: "+firstByte);
+      abort();
+    }
+    if (secondByteAP.getBitWidth() > 32) {
+      toCout("Error: too long number: "+secondByte);
+      abort();
+    }
+
+    // TODO: simplify, perhaps with APInt::toStringUnsigned()?
+    std::string firstByteDec = toStr(firstByteAP.getZExtValue());
+    std::string secondByteDec = toStr(secondByteAP.getZExtValue());
+    std::string firstByteHex = longDec2hex(firstByteDec);
+    std::string secondByteHex = longDec2hex(secondByteDec);
 
     if(firstByteHex.size() < 16) 
       firstByteHex = std::string(16-firstByteHex.size(), '0') + firstByteHex;
@@ -1481,21 +1422,21 @@ void vta_ila_model(std::ofstream &cpp) {
     cpp << "  // instr "+toStr(instrIdx++)+": "+instrName+"\n" << std::endl;
     if(instrName.find("gemm") != std::string::npos) {
       cpp << "  writeValue = gemm__store_tensorStore_tensorFile_0_0( 0, 0, 0, 0, 0, 0, 0, "
-             +toStr(firstByteNum)+", "+toStr(secondByteNum)+" );" << std::endl;
+             +firstByteDec+", "+secondByteDec+" );" << std::endl;
       cpp << "  if(PRINT_ALL) printf( \"write value for gemm: %d \", writeValue );\n"<< std::endl;
 
       cpp << "  writeValue = gemm__store_tensorStore_tensorFile_0_1( 0, 0, 0, 0, 0, 0, 0, "
-             +toStr(firstByteNum)+", "+toStr(secondByteNum)+" );" << std::endl;
+             +firstByteDec+", "+secondByteDec+" );" << std::endl;
       cpp << "  if(PRINT_ALL) printf( \"write value for gemm: %d \", writeValue );\n"<< std::endl;
 
     }
     else if(instrName.find("alu") != std::string::npos ) {
       cpp << "  writeValue = alu_add_imme1__store_tensorStore_tensorFile_0_0( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "
-             +toStr(firstByteNum)+", "+toStr(secondByteNum)+" );" << std::endl;
+             +firstByteDec+", "+secondByteDec+" );" << std::endl;
       cpp << "  if(PRINT_ALL) printf( \"write value for alu: %d \", writeValue );\n"<< std::endl;
 
       cpp << "  writeValue = alu_add_imme1__store_tensorStore_tensorFile_0_1( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "
-             +toStr(firstByteNum)+", "+toStr(secondByteNum)+" );" << std::endl;
+             +firstByteDec+", "+secondByteDec+" );" << std::endl;
       cpp << "  if(PRINT_ALL) printf( \"write value for alu: %d \", writeValue );\n"<< std::endl;
     }
     else {

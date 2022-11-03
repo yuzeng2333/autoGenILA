@@ -77,7 +77,9 @@ bool is_formed_num(const std::string& num);
 
 uint64_t hdb2int(std::string num);
 
-llvm::APInt hdb2apint(std::string num, unsigned widthOverride=0);
+llvm::APInt hdb2apint(std::string num, unsigned widthOverride=0, bool xmask=false);
+
+llvm::APInt convert_to_single_apint(std::string numIn, bool xmask = false);
 
 uint32_t get_formed_width(std::string num);
 

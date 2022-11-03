@@ -223,7 +223,9 @@ std::string decode(const std::map<std::string, std::vector<std::string>> &inputI
         break;
       }
     }
-    if(isCompatible) return instr.name;
+    if(isCompatible) {
+      return instr.name;
+    }
   }
   toCout("Error: input instruction cannot be decoded!");
   for(auto pair : inputInstr) {
@@ -231,6 +233,48 @@ std::string decode(const std::map<std::string, std::vector<std::string>> &inputI
   }
   assert(false);
 }
+
+
+#if 1
+// inputs are vectors of input values in multiple cycles
+// first vector is instruction, second is input
+// Cheeck that for each cycle, the input bits match the non-x bits
+// of the instruction.
+// This supports > 64 bits, and is flexible about the structure of the strings.
+
+bool is_compatible(const std::vector<std::string> &multiCycleInstrVal,
+                   const std::vector<std::string> &multiCycleInputVal) {
+
+  if(multiCycleInstrVal.size() != multiCycleInputVal.size()) return false;
+
+  uint32_t size = multiCycleInstrVal.size();
+  for(uint32_t i = 0; i < size; i++) {
+    const std::string& instrStr = multiCycleInstrVal[i];
+    const std::string& inputStr = multiCycleInputVal[i];
+
+    llvm::APInt instr = convert_to_single_apint(instrStr);
+    llvm::APInt input = convert_to_single_apint(inputStr);
+    llvm::APInt instrMask = convert_to_single_apint(instrStr, true/*xmask*/);
+    assert(instr.getBitWidth() == instrMask.getBitWidth());
+
+    // Zero-extend as necessary to get the widths to match.
+    // Note that a simple input value like "0" will get a default width
+    // of 64 bits, which will probably not match the actual instruction width.
+    unsigned maxWidth = std::max(instr.getBitWidth(), input.getBitWidth());
+    instr = instr.zext(maxWidth);
+    input = input.zext(maxWidth);
+    instrMask = instrMask.zext(maxWidth);
+
+    // Check that in instr the x bits are already zeroed.
+    assert((instr & instrMask) == instr);
+
+    // Before comparing, mask away the input bits that were originally 'x' in instr.
+    if (instr != (input & instrMask)) return false;
+  } 
+  return true;
+}
+
+#else
 
 
 // inputs are vectors of input values in multiple cycles
@@ -304,6 +348,7 @@ bool same_value(const std::string& instrVal, const std::string& inputVal) {
   return instrV.zext(maxWidth) == inputV.zext(maxWidth);
 }
 
+#endif
 
 // Create a new, clean name to represent an array of variables, based on the elements' names,
 // in an aesthetically pleasing way.
