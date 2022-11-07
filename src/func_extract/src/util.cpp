@@ -204,13 +204,9 @@ uint32_t get_instr_by_name(std::string instrName) {
 std::string decode(const std::map<std::string, std::vector<std::string>> &inputInstr) {
   bool isCompatible;
   for(const auto instr: g_instrInfo) {
-    if(instr.name == "lh")
-      toCoutVerb("Find it!");
     isCompatible = true;
     for(auto pair : inputInstr) {
       std::string varName = pair.first;
-      if(varName == "io_vme_rd_0_data_bits")
-        toCoutVerb("Find it!");
       const std::vector<std::string>& inputValue = pair.second;
       auto pos = instr.instrEncoding.find(varName);
       if (pos == instr.instrEncoding.end()) {

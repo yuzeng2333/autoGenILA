@@ -288,6 +288,8 @@ UpdateFunctionGen::input_constraint(astNode* const node, uint32_t timeIdx,
     std::string localVal = g_currInstrInfo.instrEncoding[dest][wordIdx];
     uint32_t localWidth = get_var_slice_width_simp(dest, curMod);
     std::smatch m;
+    // Doug: this could handle the instruction encoding more robustly with convert_to_single_apint()
+    // and its new x_mask feature.
     if(localVal != "x" && localVal != "DIRTY" && !std::regex_match(localVal, m, pX) ) {
       if(is_pure_num(localVal)) {
         toCoutVerb("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%B Give "+localVal+" to "+timed_name(dest, timeIdx));

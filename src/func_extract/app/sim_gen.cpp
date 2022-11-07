@@ -28,8 +28,10 @@ using namespace taintGen;
 bool g_fetch_instr_from_mem = false;
 bool g_set_dmem = false;
 uint32_t g_dmem_width = 32;
+uint32_t g_memSize = 0;
 
-std::string g_instrValueVar = "mem_rdata";
+
+std::string g_instrValueVar = "zy_instr_value";
 std::string g_instrAddrVar = "zy_instr_addr";
 std::string g_dataAddrVar = "zy_data_addr";
 std::string g_dataIn = "zy_data_in";
@@ -43,7 +45,6 @@ std::vector<InstEncoding_t> toDoList;
 std::map<std::string, std::map<std::string, 
                                std::string>> g_refineMap;
 std::set<std::string> g_skippedTgt;
-uint32_t memSize;
 
 // if true, update all regs after every instruction's update functions
 // have been called. Otherwise, only update regs that are assigned.
@@ -138,6 +139,7 @@ int main(int argc, char *argv[]) {
   if(g_design == PICO) {
     g_fetch_instr_from_mem = true;
     g_instrValueVar = "mem_rdata";
+    g_instrAddrVar = "reg_next_pc";
   }
   else if(g_design == AES) {
     g_fetch_instr_from_mem = false;
@@ -169,8 +171,6 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  memSize = toDoList.size();
-
   std::ofstream header(g_path+"/ila.h");
   std::ofstream cpp(g_path+"/ila.cpp");
 
@@ -185,16 +185,68 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-  cpp << std::endl;
-  std::string initValue = initialize_mem(g_path+"/mem.txt");
-  if(initValue.empty())
-    cpp << "  unsigned short mem[1024];\n" << std::endl;
-  else
-    cpp << "  unsigned short mem[1024] = { "+initValue+" };\n" << std::endl;
+  // Define and initialize a memory array, if needed.
+  
+  if (g_fetch_instr_from_mem) {
+    // First, see if there is a mem.txt file to use for the memory contents
+    std::vector<llvm::APInt> memVals;
+    read_mem_vals(g_path+"/mem.txt", memVals);
+    if (!memVals.empty()) {
 
-  toCout("Remember to change the data type of mem !!");
+      g_memSize = memVals.size();
 
-  if(g_design == AES) print_update_mem(cpp);
+      cpp << std::endl;
+      cpp << "  // Memory initialized from mem.txt" << std::endl;
+      cpp << "  uint32_t mem["+toStr(g_memSize)+"] = {" << std::endl;
+      bool first = true;
+      for(const llvm::APInt &val: memVals) {
+        assert(val.getBitWidth() <= 32);  // We assume 32-bit memory words.
+
+        // Doug: this could be > 64 bits, in which case you will get an initialized std::array 
+        std::string valStr = apint2literal(val);
+        if (first) {
+          cpp << "    ";
+          first = false;
+        } else {
+          cpp << "," << std::endl << "    ";
+        }
+        cpp << valStr;
+      }
+      cpp << "};" << std::endl;
+
+    } else if (!toDoList.empty()) {
+      // Otherwise use the data from tb.txt to initialize memory
+
+      g_memSize = toDoList.size();
+
+      cpp << "  // Memory initialized from tb.txt" << std::endl;
+      cpp << "  uint32_t mem["+toStr(g_memSize)+"] = {" << std::endl;
+      bool first = true;
+      for(auto encoding: toDoList) {
+        if(encoding.find(g_instrValueVar) == encoding.end()) {
+          toCout("Error: the instr value variable is not recognized: "+g_instrValueVar);
+          abort();
+        }
+        llvm::APInt val = convert_to_single_apint(encoding[g_instrValueVar].front());    
+        assert(val.getBitWidth() <= 32);  // We assume 32-bit memory words.
+
+        // Doug: this could be > 64 bits, in which case you will get an initialized std::array 
+        std::string valStr = apint2literal(val);
+        if (first) {
+          cpp << "    ";
+          first = false;
+        } else {
+          cpp << "," << std::endl << "    ";
+        }
+        cpp << valStr;
+      }
+      cpp << "};" << std::endl;
+    }
+
+    // Special case for AES with fifos.
+    if(g_design == AES) print_update_mem(cpp);
+    cpp << std::endl;
+  }
 
 
 
@@ -238,7 +290,6 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  cpp << "  unsigned int "+g_instrAddrVar+" = 0;" << std::endl;
   cpp << "  unsigned int "+g_dataAddrVar+" = 0;" << std::endl;
   cpp << "  unsigned int "+g_dataIn+" = 0;" << std::endl;
   cpp << "  unsigned int data_byte_addr = 0; " << std::endl;  
@@ -342,7 +393,7 @@ int main(int argc, char *argv[]) {
       std::ifstream input(g_path+"/dmem.txt");
       std::string line;
       while(std::getline(input, line)) {
-        cpp << "  dmem["+toStr(i++)+"] = "+line+" ;" << std::endl;
+        cpp << "  dmem["+toStr(i++)+"] = "+line+";" << std::endl;
       }
       cpp << std::endl;
     }
@@ -350,48 +401,71 @@ int main(int argc, char *argv[]) {
     cpp << std::endl;
 
     if(g_fetch_instr_from_mem) {
-      if (memSize == 0) {
-        toCout("Warning: no instruction list could be read");
+      if (g_memSize == 0) {
+        toCout("Error: no memory data could be read");
+        abort();
       }
 
-      // declare memories
-      //uint32_t instrNumBits = ceil(log2(instrNum));
-      // actually the declaration and initialization of mem is not necessarily
-      // but for convenience of reference, I keep thse code
-      cpp << "  unsigned int mem["+toStr(memSize)+"];" << std::endl;
-      uint32_t idx = 0;
-      for(auto encoding: toDoList) {
-        if(encoding.find(g_instrValueVar) == encoding.end()) {
-          toCout("Error: the instr value variables is not expected: "+g_instrValueVar);
-          abort();
-        }
-        llvm::APInt intValue = convert_to_single_apint(encoding[g_instrValueVar].front());    
-        // Doug: this could be > 64 bits.  Such big parameters are passed by const reference.
-        std::string intValueStr = apint2literal(intValue);
-        cpp << "  mem["+toStr(idx++)+"] = "+intValueStr+" ;" << std::endl;
-      }
-      cpp << std::endl;
-
-      // by default, execute number of 'instrNum' instructions
-      cpp << "  int addr ;" << std::endl;
+      // By default, execute number of 'instrNum' instructions
+      // This number is arbitrary, and can be bigger or smaller than the memory size.
+      cpp << "  uint32_t addr ;" << std::endl;
       cpp << std::endl;
       cpp << "  for(int i = 0; i < "+toStr(instrNum)+"; i++) {" << std::endl;
-      cpp << "    addr = ("+g_instrAddrVar+" >> 2) % "+toStr(memSize)+";" << std::endl;
-      //cpp << "    mem_rdata = mem[addr];" << std::endl;
-      cpp << "    switch(addr) {" <<std::endl;
-      idx = 0;
-      for(auto encoding: toDoList) {
-        cpp << "      case "+toStr(idx++)+" :" << std::endl;
-        //print_instr_calls(encoding, "      ", cpp);
-        print_instr_wrapper_call(encoding, "        ", cpp);
-        cpp << "        break;" << std::endl;
+
+      // We assume the memory is byte-addressable, but we store it as an array of 32-bit values.
+      // But unaligned reads are not supported.
+      cpp << "    addr = ("+g_instrAddrVar+" >> 2) % "+toStr(g_memSize)+";" << std::endl;
+
+      cpp << "    "+g_instrValueVar+" = mem[addr];" << std::endl;
+
+      // Do a simplified runtime instruction encoding, based in g_instrValueVar and
+      // any per-instruction x-mask values.
+
+      bool first = true;
+      for (const auto instr: g_instrInfo) {
+        auto pos = instr.instrEncoding.find(g_instrValueVar);
+        if (pos == instr.instrEncoding.end()) {
+          // If input has a value that is not specified by the instruction, it is OK.
+          toCout("Warning: instruction "+instr.name+"Cannot be decoded by register "+g_instrValueVar);
+          continue;
+        }
+
+        // Consider only the register value for the first clock cycle.
+        const std::string& instrValueStr = pos->second.front();
+
+        llvm::APInt instrVal = convert_to_single_apint(instrValueStr);
+        llvm::APInt instrMask = convert_to_single_apint(instrValueStr, true/*xmask*/);
+        assert(instrVal.getBitWidth() == instrMask.getBitWidth());
+        assert((instrVal & instrMask) == instrVal);
+
+        // Example generated code:
+        // if ((data_in & 0xfff0f3) == 0x045ab49d) {
+        //    execute_some_instr();
+
+        if (!first) {
+          cpp << "    } else ";
+        } else {
+          cpp << "    ";
+          first = false;
+        }
+        cpp << "if (("+g_instrValueVar+" & "+apint2literal(instrMask)+") == "+
+                  apint2literal(instrVal)+") {" << std::endl;
+
+        // Skip variable assignments, to avoid overwriting the value from mem.
+        print_instr_wrapper_call(instr.instrEncoding, "      ", cpp);
       }
-      cpp << "    }" <<std::endl;
-      update_all_asvs(cpp, "    ");
+      cpp << "    } else {" << std::endl;
+      cpp << "      printf(\"Cannot decode instruction!\\n\");" << std::endl;
+      cpp << "      return -1;" << std::endl;
+      cpp << "    }" << std::endl;
+
+      // If the instruction does not update g_instrAddrVar, the same instruction will
+      // get executed over and over.
       cpp << "  }" << std::endl;
-    }
-    else {
-      // ========== update asvs according to instructions
+
+    } else {
+      // Execute instructions and update asvs according to instruction list (if any).
+      // Memory is not used.
       if (toDoList.empty()) {
         cpp << "  // tb.txt missing or empty: no instructions to execute" << std::endl;
       } else {
@@ -401,9 +475,9 @@ int main(int argc, char *argv[]) {
       uint32_t idx = 0;
       for(auto encoding : toDoList) {
         toCout("Instr: "+toStr(idx++));
-        //print_instr_calls(encoding, "  ", cpp);
+        print_var_assignments(cpp, "  ", encoding);
         print_instr_wrapper_call(encoding, "  ", cpp);
-        if(g_update_all_regs) update_all_asvs(cpp, "  ");
+        cpp << std::endl;
       }
     }
     cpp << std::endl;
@@ -476,7 +550,7 @@ std::string instruction_function_name(const std::string &instrName) {
 
 // Create a single function that does all the work for a particular instruction:
 // calling each relevant update function, updating the ASVs, and printing debug info.
-void print_instr_wrapper_func(InstrInfo_t& instr,
+void print_instr_wrapper_func(const InstrInfo_t& instr,
                        std::ofstream &cpp) {
 
   uint32_t idx = get_instr_by_name(instr.name);
@@ -499,24 +573,21 @@ void print_instr_wrapper_decl(const std::string &instrName,
 
 // Call the single function that does all the work for a particular instruction.
 // But first set any ASVs whose values are specified in the encoding and used by the instruction.
-void print_instr_wrapper_call(InstEncoding_t& encoding,
+void print_instr_wrapper_call(const InstEncoding_t& encoding,
                               const std::string &indent,
                               std::ofstream &cpp) {
-
-  print_var_assignments(cpp, indent, encoding);
 
   std::string instrName = decode(encoding);
   std::string wrapperFuncName = instruction_function_name(instrName);
 
   cpp << indent+wrapperFuncName+"();" << std::endl;
-  cpp << std::endl;
 }
 
 
 // Create a series of C++ statements that do all the work for a particular instruction:
 // calling each relevant update function, updating the ASVs, and printing debug info.
 // If write target is array, then update memory
-void print_instr_calls(InstEncoding_t& encoding,
+void print_instr_calls(const InstEncoding_t& encoding,
                        std::string indent,
                        std::ofstream &cpp) {
   std::string instrName = decode(encoding);
@@ -655,14 +726,17 @@ void print_instr_calls(InstEncoding_t& encoding,
 
       // ==== do instrAddr or dataAddr
       if(!instrAddr.empty() && varName == instrAddr) {
-        cpp << indent+g_instrAddrVar+" = "+varName+nxt+" ;" << std::endl;
+        cpp << indent+g_instrAddrVar+" = "+varName+nxt+";" << std::endl;
         cpp << std::endl;
       } else if(instrInfo.funcTgtMap.count(varName)) {
-        cpp << indent+"data_byte_addr = ("+g_dataAddrVar+" >> 2) % "+toStr(memSize)+";" << std::endl;
+        cpp << indent+"data_byte_addr = ("+g_dataAddrVar+" >> 2) % "+toStr(g_memSize)+";" << std::endl;
         cpp << indent+g_dataIn+" = mem[data_byte_addr] ;" << std::endl;
       }
     }
   }
+
+  if(g_update_all_regs) update_all_asvs(cpp, "    "); 
+
   cpp << std::endl;
 
   print_asvs(cpp, "Updated ASV values:");
@@ -733,7 +807,7 @@ std::string c_type(uint32_t width) {
 //
 // currently only support one-cycle inputInstr
 void print_var_assignments(std::ofstream &cpp, std::string indent, 
-                      InstEncoding_t &inputInstr) {
+                      const InstEncoding_t &inputInstr) {
 
   std::string instrName = decode(inputInstr);
   uint32_t idx = get_instr_by_name(instrName);
@@ -748,12 +822,13 @@ void print_var_assignments(std::ofstream &cpp, std::string indent,
       if (is_special_arg_name(arg)) {
         continue;
       }
-      if(inputInstr.find(arg) != inputInstr.end()) {
+      auto pos = inputInstr.find(arg);
+      if(pos != inputInstr.end()) {
         // The argument was found in the instruction encoding.
         if((inputInstr.at(arg)).size() > 1) {
           toCout("Warning: instruction spans multiple cycles!");
         }
-        std::string argValue = (inputInstr[arg]).front();
+        std::string argValue = pos->second.front();
         // argValue could look like this: "7'h4+5'h7+5'h13+3'h2+5'h12+5'h8+2'b11"
         llvm::APInt apValue = convert_to_single_apint(argValue);
         // Doug: this could be > 64 bits.  Such big parameters are passed by const reference.
@@ -769,7 +844,7 @@ void print_var_assignments(std::ofstream &cpp, std::string indent,
 // currently only support one-cycle encoding
 std::string func_call(std::string indent, std::string writeVar,
                       const FuncTy_t& funcTy, std::string funcName, 
-                      InstEncoding_t& encoding,
+                      const InstEncoding_t& encoding,
                       std::pair<std::string, uint32_t> dataIn) {
 
   const char *special_comment = " /*special call*/";
@@ -781,8 +856,12 @@ std::string func_call(std::string indent, std::string writeVar,
 
   if(g_design == URV
      && g_urv_special_func_call.find(funcName) != g_urv_special_func_call.end()) {
-    llvm::APInt instrValue = convert_to_single_apint( encoding["mem_i_inst_i"].front() );
-    std::string instrValueStr = apint2literal(instrValue);
+    std::string instrValueStr;
+    auto pos = encoding.find("mem_i_inst_i");
+    if (pos != encoding.end()) {
+      llvm::APInt instrValue = convert_to_single_apint( pos->second.front() );
+      instrValueStr = apint2literal(instrValue);
+    }
     return g_urv_special_func_call[funcName]+instrValueStr+" );";
   }
 
@@ -1032,13 +1111,17 @@ std::string apint2literal(const llvm::APInt& val) {
 
 
 void update_all_asvs(std::ofstream &cpp, std::string indent) {
-  // update asvs with their nxt counterparts
+
+  // update non-array asvs with their nxt counterparts
   for(auto pair : g_asv) {
     std::string asv = pair.first;
-    std::string asvSimp = var_name_convert(asv, true);
-    cpp << indent+asvSimp +" = "+asvSimp+nxt+" ;" << std::endl;
+    if (!is_array_var(asv)) {
+      std::string asvSimp = var_name_convert(asv, true);
+      cpp << indent+asvSimp +" = "+asvSimp+nxt+";" << std::endl;
+    }
   }
 
+  // Now do the register arrays.
   for (auto pair : g_registerArrays) {
     const std::string& varName = pair.first;
     uint32_t depth = pair.second.getLength();
@@ -1282,21 +1365,15 @@ std::string get_c_rst_val(const std::string& asv, uint32_t width) {
 
 
 
-std::string initialize_mem(std::string fileName) {
+void read_mem_vals(std::string fileName, std::vector<llvm::APInt>& vals) {
   std::ifstream input(fileName);
-  std::string ret;
   if(input.good()) {
     std::string line;
     while(std::getline(input, line)) {
-      uint32_t dec = hex2int(line);
-      ret = ret + toStr(dec) + ", ";
-    }
-    if(ret.size() > 2) {
-      ret.pop_back();
-      ret.pop_back();
+      remove_two_end_space(line);
+      vals.push_back(convert_to_single_apint(line));
     }
   }
-  return ret;
 }
 
 

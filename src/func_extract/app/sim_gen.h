@@ -20,7 +20,7 @@ std::string c_type(uint32_t width);
 
 std::string func_call(std::string indent, std::string writeASV,
                       const funcExtract::FuncTy_t& funcTy, std::string funcName, 
-                      InstEncoding_t &encoding,
+                      const InstEncoding_t &encoding,
                       std::pair<std::string, uint32_t> dataIn);                      
 
 std::string get_arg_value(const std::string& arg, const InstEncoding_t& encoding);
@@ -31,12 +31,12 @@ void print_func_declare(const funcExtract::FuncTy_t& funcTy,
                         std::ofstream &header);
 
 void print_var_assignments(std::ofstream &cpp, std::string indent, 
-                      InstEncoding_t &inputInstr);
+                      const InstEncoding_t &inputInstr);
 
 std::string apint2initializer(const llvm::APInt& val);
 std::string apint2literal(const llvm::APInt& val);
 
-void print_instr_calls(InstEncoding_t &encoding,
+void print_instr_calls(const InstEncoding_t &encoding,
                        std::string prefix,
                        std::ofstream &cpp);
 
@@ -50,7 +50,8 @@ void print_final_results(std::ofstream &cpp);
 
 void print_array(std::string indent, std::string arrName, std::ofstream &cpp);
 
-std::string initialize_mem(std::string fileName);
+void read_mem_vals(std::string fileName, std::vector<llvm::APInt>& vals);
+
 
 void print_update_mem(std::ofstream &cpp);
 
@@ -82,7 +83,7 @@ std::string get_c_rst_val(const std::string& asv, uint32_t width);
 
 // Create a single function that does all the work for a particular instruction:
 // calling each relevant update function, updating the ASVs, and printing debug info.
-void print_instr_wrapper_func(funcExtract::InstrInfo_t& instr,
+void print_instr_wrapper_func(const funcExtract::InstrInfo_t& instr,
                        std::ofstream &cpp);
 
 // Print the declaration for the instruction wrapper function.
@@ -92,7 +93,7 @@ void print_instr_wrapper_decl(const std::string &instrName,
 
 // Call the single function that does all the work for a particular instruction.
 // Also set any necessary register values specified by the encoding
-void print_instr_wrapper_call(InstEncoding_t& encoding,
+void print_instr_wrapper_call(const InstEncoding_t& encoding,
                               const std::string &indent,
                               std::ofstream &cpp);
 
