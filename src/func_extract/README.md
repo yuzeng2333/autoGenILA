@@ -93,7 +93,7 @@ to control the behavior of the sumulation, for example setting or reading ASV re
 
 * If the first argument does not begin with `-`, it will specify the data file path.  All input and output files will be read from or written to this directory.
 
-* If the second arg is an integer, it will specify the number of instructions that the simulation should execute. This is needed only for certain types of simulations.
+* If any arg besides the first is an integer, that arg will specify the number of instructions that the simulation should execute. This is needed only for certain types of simulations.
 
 Any other command-line argument is interpreted as follows:
 
@@ -141,7 +141,7 @@ and generate text file with a list of instrucitons to be executed that can be gi
 
 * If the first argument does not begin with `-`, it will specify the data file path.  All input and output files will be read from or written to this directory.
 
-* If the second arg is an integer, it will specify the number of instructions that the generated instruction list will contain.
+* If any arg besides the first is an integer, that arg will specify the number of instructions that the generated instruction list will contain.
 
 Any other command-line argument is interpreted as follows:
 

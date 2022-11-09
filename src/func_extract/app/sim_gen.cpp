@@ -78,10 +78,15 @@ int main(int argc, char *argv[]) {
     if (n == 1 && arg[0] != '-') {
       // If the first arg does not begin with '-', it is assumed to be the path
       g_path = arg; 
-    } else if (n == 2 && isdigit(arg[0])) {
-      // The second arg can be the instruction count
+    } else if (isdigit(arg[0])) {
+      // Any numeric arg is the instruction count
+      if (instrNum > 0) {
+        toCout("Error: Instruction count specified more than once!");
+        toCout(usageStr);
+        exit(-1);
+      }
       instrNum = std::stoi(arg);
-      g_verb = true;
+
     } else if (!strcmp(arg, "-verbose")) {
       userVerbose = true;
     } else if (!strcmp(arg, "-quiet")) {
@@ -167,6 +172,7 @@ int main(int argc, char *argv[]) {
   if (g_fetch_instr_from_mem) {
     if (instrNum < 0) {
       toCout("Error: did not specify the number of instructions to be executed!");
+      toCout(usageStr);
       exit(-1);
     }
   }

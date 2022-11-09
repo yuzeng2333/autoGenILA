@@ -17,7 +17,6 @@ using namespace taintGen;
 
 std::ofstream g_output;
 std::regex pX("(\\d+)'[b|h][x|X]$");
-std::map<std::string, std::string> regValueMap;
 
 enum DESIGN{AES, PICO, URV, VTA, BI, OTHER, NON_RANDOM};
 enum DESIGN g_design = OTHER;
@@ -189,17 +188,11 @@ std::string replace_x(std::string val) {
 void assign_instr_value(std::string var, std::string value, bool rand) {
   value = replace_x(value);
   to_file(""+var+" = "+value);
-  if(regValueMap.find(var) == regValueMap.end()) {
-    regValueMap.emplace(var, value);
-  }
-  else {
-    regValueMap[var] = value;
-  }
 }
 
 
 void make_instr(uint32_t instrIdx, bool constantEncod=true) {
-  auto instrInfo = g_instrInfo[instrIdx];
+   const struct InstrInfo_t& instrInfo = g_instrInfo[instrIdx];
 
   // FIXME: currently assume 
   // first assign instruction encodings
@@ -216,16 +209,22 @@ void make_instr(uint32_t instrIdx, bool constantEncod=true) {
       //}
       //else {
       if(constantEncod) {
-        if(i == 0)
-          assign_instr_value(var, pair.second[i], true);
-        else
-          assign_instr_value(var, regValueMap[pair.first], true);
-      }
-      else {
+        // Always use the first clock cycle's value
+        assign_instr_value(var, pair.second[0], true);
+      } else {
         assign_instr_value(var, pair.second[i], true);        
       }
       //}
     }
+  }
+  to_file("");
+}
+
+
+void make_rand_instrs(int instrNum, bool constantEncod=true) {
+  for (int idx = 0; idx < instrNum; ++idx) {
+    uint32_t instrIdx = rand() % g_instrInfo.size();
+    make_instr(instrIdx, constantEncod);
   }
 }
 
@@ -254,22 +253,39 @@ void gen_rand_dmem(int width, int num) {
 
 int main(int argc, char *argv[]) {
 
-  if(argc < 2) {
-    toCout("No path specified, current directory will be used.");
-    g_path = ".";
-  } else {
-    g_path = argv[1];
-  }
+  std::string usageStr = std::string("usage: ")+argv[0]+ " [<path>] [<instr_num>] [<design_opt>] [-verbose]";
 
-  // Scan additional args for design type, etc.
+  g_path = ".";   // Default path is current dir
   g_verb = false;
   g_design = OTHER;
-  uint32_t instrNum = 10;
 
+  bool userVerbose = false;
+  bool userQuiet = false;
 
   int ndesopts = 0;
-  for (int n=2; n<argc; ++n) {
-    if (!strcmp(argv[n], "-aes")) {
+
+  int instrNum = -1;
+
+
+  for (int n = 1; n < argc; ++n) {
+    const char *arg = argv[n];
+
+    if (n == 1 && arg[0] != '-') {
+      // If the first arg does not begin with '-', it is assumed to be the path
+      g_path = arg; 
+    } else if (isdigit(arg[0])) {
+      // Any numeric arg is the instruction count
+      if (instrNum > 0) {
+        toCout("Error: Instruction count specified more than once!");
+        toCout(usageStr);
+        exit(-1);
+      }
+      instrNum = std::stoi(arg);
+    } else if (!strcmp(arg, "-verbose")) {
+      userVerbose = true;
+    } else if (!strcmp(arg, "-quiet")) {
+      userQuiet = true;
+    } else if (!strcmp(argv[n], "-aes")) {
       ndesopts++;
       g_design = AES;
     } else if (!strcmp(argv[n], "-pico")) {
@@ -290,23 +306,33 @@ int main(int argc, char *argv[]) {
     } else if (!strcmp(argv[n], "-non_random")) {
       ndesopts++;
       g_design = NON_RANDOM;
-    } else if (isdigit(argv[n][0])) {
-      instrNum = std::stoi(argv[n]);
-    } else if (!strcmp(argv[n], "-verbose")) {
-      g_verb = true;
     } else {
       toCout(std::string("Unknown option ")+argv[n]);
       exit(-1);
     }
   }
 
-  if (ndesopts > 1) {
-    toCout("Multiple design options specified!");
+  // Can't give both -verbose and -quiet
+  if (userVerbose && userQuiet) {
+    toCout(usageStr);
     exit(-1);
   }
 
+  if (ndesopts > 1) {
+    toCout("Multiple design options specified!");
+    toCout(usageStr);
+    exit(-1);
+  }
 
+  if (g_design != NON_RANDOM && instrNum < 0) {
+    toCout("Error: did not specify the number of instructions to be executed!");
+    toCout(usageStr);
+    exit(-1);
+  }
 
+  // Override any g_verb setting from the config file with any setting from the command line.
+  if (userVerbose) g_verb = true;
+  if (userQuiet) g_verb = false;
 
   read_in_instructions(g_path+"/instr.txt");
   toCout("Writing "+g_path+"/tb.txt");
@@ -315,16 +341,12 @@ int main(int argc, char *argv[]) {
   //srand(1);
 
   if(g_design == PICO) {
-    uint32_t idx = 0;
-    while(idx++ < instrNum) {
-      uint32_t instrIdx = rand() % g_instrInfo.size();
-      make_instr(instrIdx);
-    }
+    make_rand_instrs(instrNum, true);
   }
   else if(g_design == AES) {
     // for AES, execute start instr. every two instructions
     bool doStart = false;
-    uint32_t idx = 0;
+    int idx = 0;
     while(idx++ < instrNum) {
       toCout("Make instr: "+toStr(idx));
       if(doStart) {
@@ -341,25 +363,11 @@ int main(int argc, char *argv[]) {
   else if(g_design == URV ||
           g_design == BI) {
     gen_rand_dmem(32, 64);
-    uint32_t idx = 0;
-    while(idx++ < instrNum) {
-      uint32_t instrIdx = rand() % g_instrInfo.size();
-      make_instr(instrIdx);
-    }
+    make_rand_instrs(instrNum, true);
   }
-  else if(g_design == VTA) {
-    uint32_t idx = 0;
-    while(idx++ < instrNum) {
-      uint32_t instrIdx = rand() % g_instrInfo.size();
-      make_instr(instrIdx, false);
-    }
-  }
-  else if(g_design == OTHER) {
-    uint32_t idx = 0;
-    while(idx++ < instrNum) {
-      uint32_t instrIdx = rand() % g_instrInfo.size();
-      make_instr(instrIdx, false);
-    }
+  else if(g_design == VTA ||
+          g_design == OTHER) {
+    make_rand_instrs(instrNum, false);
   }
   else if(g_design == NON_RANDOM) {
     // Do all instructions once, in order.
