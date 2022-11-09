@@ -1,3 +1,11 @@
 *.ll
 build
 FT816Float*
+my_tut*
+pico_doug*
+tags
+aes_128_*
+aes_fifo*
+picorv32*
+aes_256*
+
