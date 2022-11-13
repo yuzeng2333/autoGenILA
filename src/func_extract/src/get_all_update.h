@@ -19,11 +19,11 @@ namespace funcExtract {
 
 
 extern std::mutex g_dependVarMapMtx;
+
 // the first key is instr name, the second key is target name
 extern std::map<std::string, 
-                std::map<std::string, 
-                         std::vector<std::pair<std::string, 
-                                               uint32_t>>>> g_dependVarMap;
+                std::map<std::string, ArgVec_t>> g_dependVarMap;
+
 extern struct ThreadSafeMap_t g_asvSet;
 extern struct RunningThreadCnt_t g_threadCnt;
 extern struct WorkSet_t g_workSet;
@@ -34,14 +34,22 @@ extern struct ThreadSafeVector_t g_fileNameVec;
 
 void get_all_update();
 
-bool read_clean_optimized(std::string fileName, 
-                           std::vector<std::pair<std::string, uint32_t>> &argVec,
-                           std::string outFileName,
-                           std::string funcNameIn);                   
+
+bool clean_main_func(llvm::Module& M,
+                     std::string funcName);
+
+std::string create_wrapper_func(llvm::Module& M,
+                         std::string wrapperFuncName);
+
+bool gather_wrapper_func_args(llvm::Module& M,
+                      std::string wrapperFuncName,
+                      std::string target,
+                      ArgVec_t &argVec);
 
 std::vector<uint32_t>
-get_delay_bounds(std::string var, const std::vector<std::string>& tgtVec, 
-                         const struct InstrInfo_t& instrInfo);
+get_delay_bounds(std::string var, const InstrInfo_t& instrInfo);
+
+std::string get_vector_of_target(const std::string& reg, int *idxp);
 
 void print_func_info(std::ofstream &output);
 
@@ -51,7 +59,6 @@ void print_llvm_script( std::string fileName);
 
 void get_update_function(std::string target,
                          uint32_t delayBound,
-                         std::vector<std::string> vecWorkSet,
                          bool isVec,
                          InstrInfo_t instrInfo,
                          uint32_t instrIdx);
@@ -116,6 +123,8 @@ struct ThreadSafeMap_t {
     void emplace(std::string var, uint32_t width);
     std::map<std::string, uint32_t>::iterator begin();
     std::map<std::string, uint32_t>::iterator end();
+    bool contains(const std::string& var);
+    uint32_t at(const std::string& var);
 
   private:
     std::mutex mtx;

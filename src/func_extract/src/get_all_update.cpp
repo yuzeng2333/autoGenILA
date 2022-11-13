@@ -1,5 +1,3 @@
-//#include "llvm/AsmParser/Parser.h"
-//#include "llvm/IR/Verifier.h"
 #include "llvm/IRReader/IRReader.h"
 #include "llvm/Support/SourceMgr.h"
 
@@ -18,15 +16,18 @@ namespace funcExtract {
 
 using namespace taintGen;
 
-
 std::mutex g_dependVarMapMtx;
 std::mutex g_TimeFileMtx;
-// the first key is instr name, the second key is target name
+
+// Gathers data to be written to func_info.txt and asv_info.txt,
+// which later get read by sim_gen.
+// The first key is instr name, the second key is target name (scalar or vector)
 std::map<std::string, 
-         std::map<std::string, 
-                  std::vector<std::pair<std::string, 
-                                        uint32_t>>>> g_dependVarMap;
+         std::map<std::string, ArgVec_t>> g_dependVarMap;
+
+// Used to write asv_info.txt
 struct ThreadSafeMap_t g_asvSet;
+
 //struct RunningThreadCnt_t g_threadCnt;
 struct WorkSet_t g_workSet;
 struct ThreadSafeVector_t g_fileNameVec;
@@ -90,16 +91,6 @@ void get_all_update() {
     g_workSet.mtxClear();
   }
 
-  // The members of register arrays have to go in g_asvSet (and
-  // get written out in asv_info.txt), so that the downstream flow
-  // knows their width values.
-  for(auto pair: g_allowedTgtVec) {
-    for(std::string reg : pair.first) {
-      uint32_t width = get_var_slice_width_cmplx(reg);
-      g_asvSet.emplace(reg, width);
-    }
-  }
-
   // declaration for llvm
   std::ofstream funcInfo(g_path+"/func_info.txt");
   std::ofstream asvInfo(g_path+"/asv_info.txt");
@@ -109,8 +100,8 @@ void get_all_update() {
 
   if(!g_use_multi_thread) {
     // schedule 1: outer loop is workSet/target, inner loop is instructions,
-    // suitbale for design with many instructions
-    std::vector<std::pair<std::vector<std::string>, uint32_t>> allowedTgtVec = g_allowedTgtVec;    
+    // suitable for design with many instructions
+    std::map<std::string, TgtVec_t> allowedTgtVec = g_allowedTgtVec;    // Deep copy...
     while(!g_workSet.empty() || !allowedTgtVec.empty() ) {
       bool isVec;
       std::string target;
@@ -127,18 +118,19 @@ void get_all_update() {
       }
       else if(!allowedTgtVec.empty()){
         isVec = true;
-        tgtVec = allowedTgtVec.back().first;
-        allowedTgtVec.pop_back();
+        target = allowedTgtVec.begin()->first;  // Name of vector (previously auto-generated)
+        tgtVec = allowedTgtVec.begin()->second.members;  // Deep copy
+        allowedTgtVec.erase(allowedTgtVec.begin());
       }
 
       uint32_t instrIdx = 0;
       for(auto instrInfo : g_instrInfo) {
         instrIdx++;
-        std::vector<uint32_t> delayBounds = get_delay_bounds(target, tgtVec, instrInfo);
+        std::vector<uint32_t> delayBounds = get_delay_bounds(target, instrInfo);
         for (auto delayBound : delayBounds) {
           // If allowed_target.txt specifies multiple delays for a non-vector target,
           // generate update functions for each one.
-          get_update_function(target, delayBound, tgtVec, isVec,
+          get_update_function(target, delayBound, isVec,
                             instrInfo, instrIdx);
         }
       }
@@ -155,7 +147,8 @@ void get_all_update() {
   }
   else {
     // schedule 2: outer loop is instructions, inner loop is workSet/target
-    while(!g_workSet.empty() || !g_allowedTgtVec.empty()) {
+    bool doneFirstRound = false;
+    while(!g_workSet.empty() || (!doneFirstRound && !g_allowedTgtVec.empty())) {
       uint32_t instrIdx = 0;
       StrSet_t localWorkSet;
       StrSet_t oldWorkSet;
@@ -163,14 +156,12 @@ void get_all_update() {
       g_workSet.mtxClear();
       for(auto instrInfo : g_instrInfo) {
         localWorkSet = oldWorkSet;
-        std::vector<std::pair<std::vector<std::string>, 
-                              uint32_t>> localWorkVec = g_allowedTgtVec;
+        std::map<std::string, TgtVec_t> localWorkVec = g_allowedTgtVec;  // Deep copy...
         instrIdx++;
         threadVec.clear();
         while(!localWorkSet.empty() || !localWorkVec.empty()) {
           bool isVec;
           std::string target;
-          std::vector<std::string> tgtVec;      
 
           if(!localWorkSet.empty()) {
             isVec = false;
@@ -183,15 +174,15 @@ void get_all_update() {
           }
           else if(!localWorkVec.empty()){
             isVec = true;
-            tgtVec = localWorkVec.back().first;
-            localWorkVec.pop_back();
+            target = localWorkVec.begin()->first;
+            localWorkVec.erase(localWorkVec.begin());
           }
 
-          std::vector<uint32_t> delayBounds = get_delay_bounds(target, tgtVec, instrInfo);
+          std::vector<uint32_t> delayBounds = get_delay_bounds(target, instrInfo);
           for (auto delayBound : delayBounds) {
             // If allowed_target.txt specifies multiple delays for a non-vector target,
             // generate update functions for each one.
-            std::thread th(get_update_function, target, delayBound, tgtVec, 
+            std::thread th(get_update_function, target, delayBound, 
                            isVec, instrInfo, instrIdx);
             threadVec.push_back(std::move(th));            
           }
@@ -201,7 +192,7 @@ void get_all_update() {
       } // end of for-lopp: for each instruction
 
       for(auto pair: g_allowedTgtVec) {
-        for(std::string reg: pair.first) {
+        for(std::string reg: pair.second.members) {
           g_visitedTgt.mtxInsert(reg);
         }
       }
@@ -209,7 +200,7 @@ void get_all_update() {
         g_visitedTgt.mtxInsert(target);
       }
       // targetVectors only executed for one round
-      g_allowedTgtVec.clear();
+      doneFirstRound = true;
     } // end of while loop
   }
 
@@ -222,12 +213,10 @@ void get_all_update() {
 
 void get_update_function(std::string target,
                          uint32_t delayBound,
-                         std::vector<std::string> vecWorkSet,
                          bool isVec,
                          InstrInfo_t instrInfo,
                          uint32_t instrIdx) {
 
-  assert(delayBound > 0);
   time_t startTime = time(NULL);
 
   // set the destInfo according to the target
@@ -268,16 +257,17 @@ void get_update_function(std::string target,
     destInfo.isVector = false;
   }
   else {
-    // work on the vector of target registers
+    // work on the vector of target registers defined by target
     destInfo.isVector = true;
 
-    assert(vecWorkSet.size() > 0);  // A vector of size 1 is acceptable...
+    std::vector<std::string> vecWorkSet;
+    for(auto pair : g_allowedTgtVec) {
+      if (pair.first == target) {
+        vecWorkSet = pair.second.members;  // Deep copy
+      }
+    }
 
-    // Build a string to represent the target vector in messages, func_info.txt, etc.
-    // It must be possible to parse the first element's name from the string.
-    target = "{ ";
-    for(std::string tgt: vecWorkSet) target = target + tgt + ", ";
-    target += "}";
+    assert(vecWorkSet.size() > 0);  // A vector of size 1 is acceptable...
 
     toCout("---  BEGIN Vector Target: "+target+" ---");
 
@@ -313,10 +303,7 @@ void get_update_function(std::string target,
   std::string instrName = instrInfo.name;
   g_dependVarMapMtx.lock();
   if(g_dependVarMap.find(instrName) == g_dependVarMap.end())
-    g_dependVarMap.emplace( instrName, 
-                            std::map<std::string, 
-                                     std::vector<std::pair<std::string, 
-                                                           uint32_t>>>{} );
+    g_dependVarMap.emplace( instrName, std::map<std::string, ArgVec_t>());
   g_dependVarMapMtx.unlock();
   g_currInstrInfo = instrInfo;
   destInfo.set_instr_name(instrInfo.name);      
@@ -326,7 +313,7 @@ void get_update_function(std::string target,
 
   std::string funcName = instrInfo.name+"_"+destSimpleName;
   std::string fileName = UpdateFunctionGen::make_llvm_basename(destInfo, delayBound);
-  std::string cleanOptoFileName = fileName+".clean.o3.ll";
+  std::string cleanOptoFileName = fileName+".clean-o3-ll";
   std::string llvmFileName = fileName+".ll";
 
   toCout("---  BEGIN INSTRUCTION #"+toStr(instrIdx)+": "+instrInfo.name+
@@ -345,18 +332,18 @@ void get_update_function(std::string target,
     UpdateFunctionGen UFGen;
     UFGen.TheContext = std::make_unique<llvm::LLVMContext>();
 
-    UFGen.print_llvm_ir(destInfo, delayBound, instrIdx, fileName+".tmp.ll");
+    UFGen.print_llvm_ir(destInfo, delayBound, instrIdx, fileName+".tmp-ll");
 
     time_t upGenEndTime = time(NULL);  
 
     // Default g_llvm_path is blank, which means the shell will use $PATH in the usual way.
     std::string optCmd = (g_llvm_path.length() ? g_llvm_path+"/" : "") + "opt";
 
-    std::string clean(optCmd+" --instsimplify --deadargelim --instsimplify "+fileName+".tmp.ll -S -o="+fileName+".clean.ll");
+    std::string clean(optCmd+" --instsimplify --deadargelim --instsimplify "+fileName+".tmp-ll -S -o="+fileName+".clean-ll");
     
-    //std::string opto_cmd(optCmd+" -O1 "+fileName+".clean.ll -S -o="+fileName+".tmp.o3.ll; opt -passes=deadargelim "+fileName+".tmp.o3.ll -S -o="+cleanOptoFileName+"; rm "+fileName+".tmp.o3.ll");
+    //std::string opto_cmd(optCmd+" -O1 "+fileName+".clean-ll -S -o="+fileName+".tmp-o3-ll; opt -passes=deadargelim "+fileName+".tmp-o3-ll -S -o="+cleanOptoFileName+"; rm "+fileName+".tmp-o3-ll");
 
-    std::string opto_cmd(optCmd+" -O3 "+fileName+".clean.ll -S -o="+fileName+".tmp.o3.ll; opt -passes=deadargelim "+fileName+".tmp.o3.ll -S -o="+cleanOptoFileName+"; rm "+fileName+".tmp.o3.ll");
+    std::string opto_cmd(optCmd+" -O3 "+fileName+".clean-ll -S -o="+fileName+".tmp-o3-ll; opt -passes=deadargelim "+fileName+".tmp-o3-ll -S -o="+cleanOptoFileName+"; rm "+fileName+".tmp-o3-ll");
 
     toCout("** Begin clean update function");
     toCoutVerb(clean);
@@ -379,24 +366,46 @@ void get_update_function(std::string target,
     g_TimeFileMtx.unlock();
   }
 
-  std::vector<std::pair<std::string, uint32_t>> argVec;
+  ArgVec_t argVec;
   bool usefulFunc = false;
 
-  if ((!g_overwrite_existing_llvm) && stat(llvmFileName.c_str(), &statbuf) == 0) {
 
-    // In any case, we have to scan the optimized file to build argVec
-    toCout("Skipping re-generation of existing file "+llvmFileName);
-    usefulFunc = read_clean_optimized(cleanOptoFileName, argVec, "", funcName);
+  // Load in the optimized LLVM file
+  llvm::SMDiagnostic Err;
+  llvm::LLVMContext Context;
+  std::unique_ptr<llvm::Module> M = llvm::parseIRFile(cleanOptoFileName, Err, Context);
 
+  if (!M) {
+    Err.print("func_extract", llvm::errs());
   } else {
+    usefulFunc = clean_main_func(*M, funcName);
+    if (usefulFunc) {
+      
+      // Add a C-compatible wrapper function that calls the main function.
+      std::string wrapperFuncName = create_wrapper_func(*M, funcName);
 
-    toCout("** Begin read_clean_optimize");
-    usefulFunc = read_clean_optimized(cleanOptoFileName, argVec, fileName+".clean.simp.ll", funcName);
-    toCout("** End read_clean_optimize");
+      // Annotate the standard x86-64 Clang data layout to the module, to prevent warnings when linking
+      // to C/C++ code.
+      M->setDataLayout("e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128");
 
-    std::string move("mv "+fileName+".clean.simp.ll "+g_path+"/"+llvmFileName);
-    toCoutVerb(move);
-    system(move.c_str());
+      // Get the data needed to create func_info.txt
+      gather_wrapper_func_args(*M, wrapperFuncName, target, argVec);
+
+      if ((!g_overwrite_existing_llvm) && stat(llvmFileName.c_str(), &statbuf) == 0) {
+        toCout("Skipping re-generation of existing file "+llvmFileName);
+      } else {
+        // Write out the modified IR data to a new file.
+        std::error_code EC;
+        llvm::raw_fd_ostream OS(fileName+".clean-simp-ll", EC);
+        OS << *M;
+        OS.close();
+
+        // Rename that file to be the final .ll file
+        std::string move("mv "+fileName+".clean-simp-ll "+g_path+"/"+llvmFileName);
+        toCoutVerb(move);
+        system(move.c_str());
+      }
+    }
   }
 
   if(usefulFunc) {
@@ -417,9 +426,23 @@ void get_update_function(std::string target,
 
   for(auto pair : argVec) {
     std::string reg = pair.first;
-    if(g_push_new_target && !g_visitedTgt.mtxExist(reg)) 
+    int width = pair.second;
+    if(g_push_new_target && !g_visitedTgt.mtxExist(reg)) {
       g_workSet.mtxInsert(reg);
-    g_asvSet.emplace(reg, pair.second);
+    }
+
+    width = std::abs(width);  // For pointers, we want the pointee width.
+
+    // Add any discovered registers that had not already been identified as ASVs
+    // or register arrays.
+    // Ignore any special non-ASV/non-register function args, indicated by a 
+    // reserved name (those go in func_info.txt).
+    // And skip args already known to be in a register array.
+    if (!is_special_arg_name(reg) && g_allowedTgt.count(reg) == 0 &&
+        g_allowedTgtVec.count(reg) == 0 &&
+        get_vector_of_target(reg, nullptr).empty()) {
+      g_asvSet.emplace(reg, width);
+    }
   }
 }
 
@@ -433,202 +456,45 @@ void get_update_function(std::string target,
 // 3: A single per-ASV delay from allowed_target.txt
 // 4: A per-instruction delay from instr.txt
 //
-//  If no delays can be found, the program will fail.
+//  If no delays can be found, the program will fail.  Note that 0 is a legal delay value.
 
 std::vector<uint32_t>
-get_delay_bounds(std::string var, const std::vector<std::string>& tgtVec,
-                         const struct InstrInfo_t &instrInfo) {
-  assert(var.empty() || tgtVec.empty());
+get_delay_bounds(std::string var, const InstrInfo_t &instrInfo) {
+  assert(!var.empty());
 
   // Highest priority is multiple delays from allowed_target.txt
-  if(!var.empty() && g_allowedTgt.count(var) 
-     && g_allowedTgt[var].size() > 1) {
+  if(g_allowedTgt.count(var) && g_allowedTgt[var].size() > 1) {
     return g_allowedTgt[var];  // Copies vector
+  }
+
+  // See if the given name represents a target vector. If so, use its delay
+  if(g_allowedTgtVec.count(var)) {
+    const TgtVec_t& vec = g_allowedTgtVec[var];
+    uint32_t delay = (vec.delay > 0) ? vec.delay : instrInfo.delayBound;
+    return std::vector<uint32_t>{delay};  // Return a vector of one delay value
   }
 
   // Default delay is per-instruction from instr.txt
   uint32_t delayBound = instrInfo.delayBound;
 
-  if(var.empty() && !tgtVec.empty()) {
-    // array target
-    for(auto pair : g_allowedTgtVec) {
-      // This efficiently tests that pair.first and tgtVec have the same contents
-      if (pair.first == tgtVec && pair.second > 0) {
-        delayBound = pair.second;
-        break;
-      }
-    }
+  // not array target
+  auto pos = instrInfo.delayExceptions.find(var);
+  if (pos != instrInfo.delayExceptions.end()) {
+    // per-instruction delay exception from instr.txt
+    delayBound = pos->second;
   }
-  else if(!var.empty()) {
-    // not array target
-    auto pos = instrInfo.delayExceptions.find(var);
-    if (pos != instrInfo.delayExceptions.end()) {
-      // per-instruction delay exception from instr.txt
-      delayBound = pos->second;
-      assert(delayBound>0);
+  else if(g_allowedTgt.count(var) && !g_allowedTgt[var].empty()) {
+    // Data from allowed_target.txt
+    uint32_t dly = g_allowedTgt[var].front();
+    delayBound = dly;
+    if(g_allowedTgt[var].size() > 1) {
+      toCout("Error: Target "+var+" has multiple delays. Only the first ("+toStr(dly)+") will be used.");
     }
-    else if(g_allowedTgt.count(var) && !g_allowedTgt[var].empty()) {
-      // Data from allowed_target.txt
-      delayBound = g_allowedTgt[var].front();
-      if(g_allowedTgt[var].size() > 1) {
-        toCout("Error: delay number size is not 1: "+var);
-        for(uint32_t delay: g_allowedTgt[var])
-          toCout(delay);
-      }
-    } else {
-      assert(delayBound>0);
-    }
-  } else {
-    abort();  // Tested by above assert
   }
 
   return std::vector<uint32_t>{delayBound};  // Return a vector of one delay value
 }
 
-
-
-// returned argVec is empty if the update function just returns 0
-// generate a new file
-// Assume: if no internal function is found, then this function is discarded
-bool read_clean_optimized_old(std::string fileName, 
-                   std::vector<std::pair<std::string, uint32_t>> &argVec,
-                   std::string outFileName,
-                   std::string funcNameIn) {
-  std::ifstream input(fileName);
-  std::ofstream output(outFileName);
-  std::string line;
-  std::smatch m;
-  std::string argList;
-  bool seeFuncDef = false;
-  std::regex pDef("^define internal fastcc (\\S+) @(\\S+)\\((.*)\\) unnamed_addr #1 \\{$");  
-  std::regex pVecDef(
-    "^define internal fastcc \\[(\\d+) x i(\\d+)\\] @(\\S+)\\((.*)\\) unnamed_addr #1 \\{$"
-  );  
-  std::regex pTopDef("^define i(\\d+) @top_function\\((.*)\\) local_unnamed_addr #0 \\{$");  
-  std::regex pTopPartialDef("^define i(\\d+) @top_function\\(");  
-  std::regex pTopVecDef(
-    "^define \\[(\\d+) x i(\\d+)\\] @top_function\\((.*)\\) local_unnamed_addr #0 \\{$"
-  );  
-  std::regex pRetZero("^\\s+ret i\\d+ 0$");
-  bool internalExist = false;
-  std::string topRet;
-  std::string attributeLine;
-  std::string topFuncLine;
-  while(std::getline(input, line)) {
-    if(line.substr(0, 6) == "define" && !internalExist) {
-      if(!seeFuncDef) {
-        topFuncLine = line;
-        seeFuncDef = true;
-        std::getline(input, line);
-        if(line.find("top_bb:") != std::string::npos) {
-          std::getline(input, topRet);
-        }        
-        while(line != "}") {
-          std::getline(input, line);
-        }
-        continue;
-      }
-      else if( line.substr(0, 24) == "define internal fastcc [" ) {
-        internalExist = true;
-        if(!std::regex_match(line, m, pVecDef)) {
-          toCout("Error: pVecDef is not matched: "+line);
-          abort();
-        }
-        std::string arrLen = m.str(1);
-        std::string retWidth = m.str(2);
-        std::string funcName = m.str(3);
-        argList = m.str(4);
-        line = "define "+line.substr(16);
-      }
-      else {
-        internalExist = true;
-        if(!std::regex_match(line, m, pDef)) {
-          toCout("Error: pDef is not matched: "+line);
-          abort();
-        }
-        std::string retWidth = m.str(1);
-        std::string funcName = m.str(2);
-        argList = m.str(3);
-        line = "define "+line.substr(16);
-      }
-    }
-    // make sure the attributes line is at the end of this file
-    if(line.substr(0, 10) != "attributes")
-      output << line << std::endl;
-    else attributeLine = line;
-  }
-  if(internalExist) {
-    uint32_t startPos = 0;
-    while(startPos < argList.size()) {
-      uint32_t dotPos = argList.find(",", startPos);
-      if(dotPos == std::string::npos || dotPos > argList.size()) {
-        dotPos = argList.size();
-      }
-      std::string widthAndArg = argList.substr(startPos, dotPos-startPos);
-      uint32_t blankPos = widthAndArg.find(" ");
-      uint32_t width = std::stoi(widthAndArg.substr(1, blankPos-1));
-      std::string arg = widthAndArg.substr(blankPos+3);
-      arg.pop_back();
-      uint32_t pos = arg.find(DELIM, 0);
-      if(arg.find("cpuregs[") != std::string::npos)
-        toCoutVerb("Find it!");
-      std::string var;
-      if(arg.substr(0, 2) == "\\\\")
-        var = arg.substr(1, pos-1);
-      else
-        var = arg.substr(0, pos);
-      argVec.push_back(std::make_pair(var, width));
-      startPos = dotPos + 2;
-      if(dotPos == argList.size()) break;
-    }
-  }
-  else if(!topRet.empty()){
-    // if internal function does not exist, but the top-level-return
-    // statement is not empty, then we make a simple function 
-    // with the top-level-return statement
-    if( topFuncLine.substr(0, 24) == "define [" ) {
-      if(!std::regex_match(topFuncLine, m, pTopVecDef)) {
-        toCout("Error: pTopVecDef is not matched: "+topFuncLine);
-        abort();
-      }
-      std::string arrLen = m.str(1);
-      std::string retWidth = m.str(2);
-      argList = m.str(3);
-      toCout("Error: not supported yet: vec-func with naive return: "+topFuncLine);
-      abort();
-    }
-    else {
-      // the following code caused segment error when the topFuncLine 
-      // is very long
-      //if(!std::regex_match(topFuncLine, m, pTopDef)) {
-      //  toCout("Error: pTopDef is not matched: "+topFuncLine);
-      //  abort();
-      //}
-      size_t pos = topFuncLine.find("(");
-      if(pos == std::string::npos) {
-        toCout("Error: cannot find open brace in top function define line: "
-               +topFuncLine);
-        abort();
-      }
-      std::string topFuncLineFirstPart = topFuncLine.substr(0, pos+1);
-      if(!std::regex_match(topFuncLineFirstPart, m, pTopPartialDef)) {
-        toCout("Error: pTopPartialDef is not matched: "+topFuncLineFirstPart);
-        abort();
-      }
-      std::string retWidth = m.str(1);
-      std::string newFuncLine = "define i"+retWidth+
-        " @"+funcNameIn+"() local_unnamed_addr #0 {";
-      output << newFuncLine << std::endl;
-      output << "top_bb:" << std::endl;
-      output << topRet << std::endl;
-      output << "}" << std::endl << std::endl;
-      argVec.clear();
-    }
-  }
-  output << attributeLine << std::endl;
-  output.close();  
-  return internalExist;
-}
 
 
 // Check if this type is too big to be passed in a register.
@@ -641,11 +507,13 @@ isBigType(const llvm::Type *type) {
 
 
 
+// Make the wrapper function for C/C++ interfacing.
+// Return its name
+std::string create_wrapper_func(llvm::Module& M,
+                         std::string wrapperFuncName) {
 
-
-// Make the wrapper function for C/C++ interfacing
-static llvm::Function*
-create_wrapper_function(llvm::Function *mainFunc) {
+  llvm::Function *mainFunc = M.getFunction(wrapperFuncName);
+  assert(mainFunc);
 
   llvm::LLVMContext& Context = mainFunc->getContext();
 
@@ -660,6 +528,7 @@ create_wrapper_function(llvm::Function *mainFunc) {
     if (isBigType(type)) {
       wrapperArgTy.push_back(llvm::PointerType::getUnqual(type));
     } else {
+      // This handles small args, as well as pointers to register arrays.
       wrapperArgTy.push_back(type);
     }
   }
@@ -693,23 +562,25 @@ create_wrapper_function(llvm::Function *mainFunc) {
 
   // Set the names of the wrapper function args, based on the main function arg names
   for (const llvm::Argument& mainArg : mainFunc->args()) {
-    llvm::Argument* wrapperArg = wrapperFunc->getArg(mainArg.getArgNo());
+    unsigned argNo = mainArg.getArgNo();
+    llvm::Argument* wrapperArg = wrapperFunc->getArg(argNo);
+    wrapperArg->setName(mainArg.getName());
 
     if (isBigType(mainArg.getType())) {
-      // Give the pointer args a special name
-      wrapperArg->setName(mainArg.getName()+"ptr_");
-      // Specify that they can never be null (actually in C++, they will be const references).
+      // For big args, the wrapper arg is a pointer.
+      // Specify that it can never be null (actually in C++, it will be a const reference).
       wrapperArg->addAttr(llvm::Attribute::NonNull);
-    } else {
-      wrapperArg->setName(mainArg.getName());
     }
+    // Copy parameter attributes (important for pointer args).
+    wrapperFunc->addParamAttrs(argNo, mainFunc->getAttributes().getParamAttributes(argNo));
   }
 
   llvm::Argument* wrapperLastArg = wrapperFunc->arg_end()-1;
 
-  // Deal with the extra wrapper arg that handles big return types
+  // If needed, add an extra arg that handles big return types
   if (isBigType(mainRetTy)) {
-    wrapperLastArg->setName(llvm::Twine("_return_val_ptr_"));
+    wrapperLastArg->setName(llvm::Twine(RETURN_VAL_PTR_ID));
+
     // Specify that it can never be null (actually in C++, it will be a (non-const) reference).
     wrapperLastArg->addAttr(llvm::Attribute::NonNull);
   }
@@ -755,7 +626,7 @@ create_wrapper_function(llvm::Function *mainFunc) {
 
   llvm::verifyFunction(*wrapperFunc);
 
-  return wrapperFunc;
+  return wrapperFunc->getName().str();
 }
 
 
@@ -809,20 +680,26 @@ static llvm::Function *remove_dead_args(llvm::Function *func) {
   // Now move the contents of the original function into the new one.
   newFunc->getBasicBlockList().splice(newFunc->begin(), func->getBasicBlockList());
 
-  // Set the names of the new function args, based on the original function arg names
+  // Set the names and attributes of the new function args, based on the original function args 
+
+  int origArgNo = 0;
   int newArgNo = 0;
   for (llvm::Argument& origArg : func->args()) {
     if (origArg.getNumUses() > 0) {
       // Create corresponding arg in the new function.
-      llvm::Argument* newArg = newFunc->getArg(newArgNo++);
+      llvm::Argument* newArg = newFunc->getArg(newArgNo);
       // Make the usages of the original arg refer to the new one.
       origArg.replaceAllUsesWith(newArg);
 
       // Steal the original arg's name
       newArg->takeName(&origArg);
 
-      // TODO: Copy arg attributes?  (Sort of tricky)
+      // Copy arg attributes
+      newFunc->addParamAttrs(newArgNo, func->getAttributes().getParamAttributes(origArgNo));
+
+      newArgNo++;
     }
+    origArgNo++;
   }
 
   // Get rid of the stripped remains of the original function.
@@ -835,92 +712,111 @@ static llvm::Function *remove_dead_args(llvm::Function *func) {
 
 
 
-// returned argVec is empty if the update function just returns 0
-// generate a new file
-// Assume: if no internal function is found, then this function is discarded
-bool read_clean_optimized(std::string fileName, 
-                   std::vector<std::pair<std::string, uint32_t>> &argVec,
-                   std::string outFileName,
-                   std::string funcNameIn) {
+// Make sure the main function exists, and remove any unused args.
+bool clean_main_func(llvm::Module& M,
+                     std::string funcName) {
 
-  // Load in the input LLVM file
-  llvm::SMDiagnostic Err;
-  llvm::LLVMContext Context;
-  std::unique_ptr<llvm::Module> M = llvm::parseIRFile(fileName, Err, Context);
-  if (!M) {
-    Err.print("func_extract", llvm::errs());
-    return false;
-  }
-
-  llvm::Function *topFunc = M->getFunction("top_function");
-  llvm::Function *mainFunc = M->getFunction(funcNameIn);
-  if (topFunc) {
-    // Check that the main function wasn't accidentally optimized away.  If it
-    // doesn't exist, rename topFunc to serve as a replacement.
-    if (!mainFunc) {
-      topFunc->setName(funcNameIn);
-      topFunc->setCallingConv(llvm::CallingConv::Fast); 
-
-      // There are likely to be many dead args in topFunc. 
-      topFunc = remove_dead_args(topFunc);
-
-      toCout("Warning: main function apparently optimized away, top_function renamed to "+funcNameIn);
-      mainFunc = topFunc;
-      topFunc = nullptr;
-    } else {
-      // top_function is unneeded - delete it.
-      topFunc->eraseFromParent();
-      toCoutVerb("Erased unneeded top_function");
-    }
-  } else {
-    // Newer algorithm in check_regs.cpp: don't create a top_function,
-    // make mainFunc external, and depend on us to remove dead args.
-    toCoutVerb("A top_function was not created");
-    mainFunc = remove_dead_args(mainFunc);
-  }
+  llvm::Function *mainFunc = M.getFunction(funcName);
 
   if (!mainFunc) {
     toCout("Can't find main function!");
     return false;
   }
 
+  // Newer algorithm in check_regs.cpp: don't create a top_function,
+  // make mainFunc external, and depend on us to remove dead args.
+  mainFunc = remove_dead_args(mainFunc);
+
   // See if any dead arg elimination actually worked.
   for (llvm::Argument& arg : mainFunc->args()) {
     if (arg.getNumUses() == 0) {
       std::string argname = arg.getName().str();
-      toCout(funcNameIn+" arg "+argname+" is unused!");
+      toCout(funcName+" arg "+argname+" is unused!");
     }
-  }
-
-
-  // Push information about the mainFunc args to argVec.
-  for (llvm::Argument& arg : mainFunc->args()) {
-    std::string argname = arg.getName().str();
-
-    // Extract the ASV name from the argument name.
-    // Note that the name will not have quotes or backslashes, like you would see in the textual IR.
-    uint32_t pos = argname.find(DELIM, 0);
-    std::string var = argname.substr(0, pos);
-
-    argVec.push_back(std::make_pair(var, arg.getType()->getPrimitiveSizeInBits()));
-  }
-
-  // If no output file name was given, the purpose of calling this was simply to fill in argVec.
-  if (!outFileName.empty()) {
-    // Add a C-compatible wrapper function that calls the main function.
-    create_wrapper_function(mainFunc);
-
-    // Write out the modified IR data to a new file.
-    std::error_code EC;
-    llvm::raw_fd_ostream OS(outFileName, EC);
-    OS << *M;
-    OS.close();
   }
 
   return true;
 }
 
 
+// Push information about the wrapperFunc args to argVec, to be written out to func_info.txt
+  
+bool gather_wrapper_func_args(llvm::Module& M,
+                      std::string wrapperFuncName, std::string target,
+                      ArgVec_t &argVec) {
+
+  llvm::Function *wrapperFunc = M.getFunction(wrapperFuncName);
+  assert(wrapperFunc);
+
+  for (llvm::Argument& arg : wrapperFunc->args()) {
+    std::string argname = arg.getName().str();
+
+    llvm::Type *argType = arg.getType();
+    bool isPointer = argType && argType->isPointerTy();
+
+    // In LLVM version 15, all pointers are untyped, so it is not possible to
+    // get the size of the object they point to.  This complicates things here.
+
+    int size = 0;
+
+    if (argname == RETURN_ARRAY_PTR_ID) {
+      assert(isPointer);
+      // Special arg name indicates a pointer to the register array that is the target of this function.
+      if(g_allowedTgtVec.count(target)) {
+        // Get the bitwidth of the first member of the register array (and negate it)
+        std::string firstMember = g_allowedTgtVec[target].members[0];
+        size = -get_var_slice_width_cmplx(firstMember);
+      } else {
+        toCout("Function "+wrapperFuncName+" has arg "+argname+", but its target is not a vector!");
+        size = 0;
+        assert(false);
+      }
+      argVec.push_back(std::make_pair(argname, size));
+    } else if (argname == RETURN_VAL_PTR_ID) {
+      // Special arg name indicates a pointer a big scalar that is the target of this function
+      assert(isPointer);
+      if(g_asvSet.contains(target)) {
+        size = -g_asvSet.at(target);  // Instead get size from get_var_slice_width_cmplx()?
+      } else {
+        toCout("Function "+wrapperFuncName+" has arg "+argname+", but its target is not a known ASV!");
+        size = 0;
+        assert(false);
+      }
+      argVec.push_back(std::make_pair(argname, size));
+    } else {
+      // Extract the ASV name from the argument name (by removing the cycle count).
+      // Note that the name will not have quotes or backslashes, like you would see in the textual IR.
+      uint32_t pos = argname.find(DELIM, 0);
+      std::string var = argname.substr(0, pos);
+
+      if (!isPointer) {
+        // A small thing (presumably a scalar ASV) passed by value
+        size = arg.getType()->getPrimitiveSizeInBits();
+      } else if (g_allowedTgtVec.count(var)) {
+        // A pointer to a regster array
+        // Get the bitwidth of the first member of the register array
+        std::string firstMember = g_allowedTgtVec[var].members[0];
+        size = -get_var_slice_width_cmplx(firstMember);
+      } else if (g_asvSet.contains(var)) {
+        // A big scalar ASV passed by ref
+        size = -g_asvSet.at(var);  // Instead get size from get_var_slice_width_cmplx()?
+      } else if (!get_vector_of_target(var, nullptr).empty()) {
+        // A reference to a big scalar ASV that is a member of a register array (and thus not in g_asvSet)
+        size = get_var_slice_width_cmplx(var);
+        toCout("Function "+wrapperFuncName+" has arg "+var+
+                  " of size "+toStr(size)+" which belongs to a register array");
+      } else {
+        // A big scalar, but not found in g_asvSet
+        size = get_var_slice_width_cmplx(var);
+        toCout("Function "+wrapperFuncName+" has arg "+var+
+                  " of size "+toStr(size)+" which is not a known ASV or register array!");
+      }
+      argVec.push_back(std::make_pair(var, size));
+    }
+  }
+
+  return true;
+}
 
 
 void print_func_info(std::ofstream &output) {
@@ -941,8 +837,29 @@ void print_func_info(std::ofstream &output) {
 
 
 void print_asv_info(std::ofstream &output) {
-  for(auto it = g_asvSet.begin(); it != g_asvSet.end(); it++)
-    output << it->first+":"+toStr(it->second) << std::endl;
+  for(auto it = g_asvSet.begin(); it != g_asvSet.end(); it++) {
+    const std::string& reg = it->first;
+    uint32_t width = it->second;
+
+    assert(!is_special_arg_name(reg));
+
+    if (!get_vector_of_target(reg, nullptr).empty()) {
+      continue;  // Skip the ASVs in registers - handle below.
+    }
+
+    output << reg << ":" << width << std::endl; // Write name and width
+  }
+
+  // Write the contents of register arrays separately, including the array name
+  for(auto pair: g_allowedTgtVec) {
+    output << "[" << std::endl;
+    for(std::string reg : pair.second.members) {
+      uint32_t width = get_var_slice_width_cmplx(reg);
+      output << reg << ":" << width; // Write name and width
+      output << std::endl;
+    }
+    output << "]:" << pair.first << std::endl;
+  }
 }
 
 
@@ -1068,6 +985,28 @@ void ThreadSafeMap_t::emplace(std::string var, uint32_t width) {
   mtx.lock();
   mp.emplace(var, width);
   mtx.unlock();
+}
+
+
+bool ThreadSafeMap_t::contains(const std::string& var) {
+  mtx.lock();
+  bool ret = mp.count(var) > 0;
+  mtx.unlock();
+  return ret;
+}
+
+
+uint32_t ThreadSafeMap_t::at(const std::string& var) {
+  mtx.lock();
+  uint32_t ret = 0;
+  auto pos = mp.find(var);
+  if (pos == mp.end()) {
+    ret = 0;  // Invalid value
+  } else {
+    ret = pos->second;
+  }
+  mtx.unlock();
+  return ret;
 }
 
 

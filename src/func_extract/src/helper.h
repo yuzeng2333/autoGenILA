@@ -71,11 +71,15 @@ llvm::Value* long_bv_val(const std::string& formedBinVar,
                          std::shared_ptr<llvm::LLVMContext> &c,
                          std::shared_ptr<llvm::IRBuilder<>> &b );
 
+uint32_t get_padded_width(uint32_t width);
+
 bool is_formed_num(const std::string& num);
 
 uint64_t hdb2int(std::string num);
 
-llvm::APInt hdb2apint(std::string num, unsigned widthOverride=0);
+llvm::APInt hdb2apint(std::string num, unsigned widthOverride=0, bool xmask=false);
+
+llvm::APInt convert_to_single_apint(std::string numIn, bool xmask = false);
 
 uint32_t get_formed_width(std::string num);
 
@@ -205,6 +209,8 @@ llvm::Value* bit_mask(llvm::Value* in, uint32_t high, uint32_t low,
 
 
 bool is_x(const std::string &var);
+
+bool contains_x(const std::string &var);
 
 bool is_input(const std::string &var, const std::shared_ptr<ModuleInfo_t> &modInfo);
 

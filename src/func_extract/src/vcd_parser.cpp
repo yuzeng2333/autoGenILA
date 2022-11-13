@@ -2,12 +2,14 @@
 #include "helper.h"
 #include "global_data_struct.h"
 
+#include <forward_list>
+
 using namespace taintGen;
 
 namespace funcExtract {
 
 
-/// This function does not deal with hierarchial designs(with multiple scopes)
+/// This function now handles hierarchial designs(with multiple scopes)
 void vcd_parser(std::string fileName) {
   if(!g_rstVal.empty()) {
     toCout("Reset value is manually specified!");
@@ -20,74 +22,123 @@ void vcd_parser(std::string fileName) {
   std::map<std::string, uint32_t> nameWidthMap;
 
   // Example: "$var reg 8 n35 state_stk[0] $end"
-  std::regex pName("^\\$var (?:(?:reg)|(?:wire)) (\\d+) (\\S+) (\\S+) (\\[[0-9:]+\\] )?\\$end$");
+  static const std::regex pNameDef("^\\$var (?:(?:reg)|(?:wire)) (\\d+) (\\S+) (\\S+) (\\[[0-9:]+\\] )?\\$end$");
+  static const std::regex pEndDefinitions("^\\$enddefinitions\\s+\\$end$");
+  static const std::regex pScope("^\\$scope\\s+module\\s+(\\S+)\\s+\\$end$");
+  static const std::regex pUpscope("^\\$upscope\\s+\\$end$");
+  static const std::regex pVersion("^\\$version\\s+.+\\s+\\$end$");
+  static const std::regex pDate("^\\$date\\s+.+\\s+\\$end$");
+  static const std::regex pSomething("^\\$\\S+\\s+.+\\s+\\$end$");
+
   std::string line;
   std::ifstream input(fileName);
   if(!input.good()) {
     toCout("Error: "+fileName+" cannot be read!");
     abort();
   }
-  enum State {readName, readValue};
-  enum State state;
+
+  enum State {READ_NAME_DEFS, READ_VALUES};
+  enum State state = READ_NAME_DEFS;
+  int depth = 0;
+  std::forward_list<std::string> scopeStack;
   std::smatch m;
+
+  int lineNum = 0;
+
   while(std::getline(input, line)) {
+    ++lineNum;
     toCoutVerb(line);
-    if(line.find("ap_CS_fsm") != std::string::npos) {
-      toCoutVerb("Find it");
-    }
-    if(line.substr(0, 6).compare("$scope") == 0) {
-      state = readName;
-      continue;
-    }
-    else if(line.front() == '#') {
-      state = readValue;
-      continue;
-    }
-    else if(state == readName){
-      if(!std::regex_match(line, m, pName)) {
-        continue;
-      }
-      uint32_t width = std::stoi(m.str(1));
-      std::string name = m.str(2);
-      std::string var = m.str(3);
 
-      if(var.find("mem_valid") != std::string::npos) {
-        toCoutVerb("Find it");
-      }
-      if(var.find("u0.cpu_state") != std::string::npos) {
-        toCoutVerb("Find it");
-      }
+    if(state == READ_NAME_DEFS) {
+      if(std::regex_match(line, m, pNameDef)) {
+        uint32_t width = std::stoi(m.str(1));
+        std::string name = m.str(2);
+        std::string var = m.str(3);
 
-      if (g_allRegs.empty()) {
-        // If g_allRegs is empty, assume we want everything.
-        nameVarMap.emplace(name, var);
-        nameWidthMap.emplace(name, width);
-      } else if (is_reg(var)) {
-        nameVarMap.emplace(name, var);
-        nameWidthMap.emplace(name, width);
-      } else if (is_reg("\\"+var)) {
-        nameVarMap.emplace(name, "\\"+var);
-        nameWidthMap.emplace(name, width);
+        // Remove any backslashes
+        while (var[0] == '\\') {
+          var.erase(0,1);
+        }
+
+        // build hierarchical name
+        // For the top level of hierarchy, scopeStack.front() will be a blank string,
+        // and hierVar == var;
+        std::string hierVar;
+
+        assert(!scopeStack.empty());
+        if (!scopeStack.front().empty()) {
+          hierVar = scopeStack.front() + var;
+        } else {
+          hierVar = var;
+        }
+
+        toCoutVerb("Considering "+name+" = "+hierVar+"  "+var);
+
+        if (g_allRegs.empty()) {
+          // If g_allRegs is empty, assume we want everything.
+          nameVarMap.emplace(name, hierVar);
+          nameWidthMap.emplace(name, width);
+        } else if (is_reg(hierVar)) {
+          nameVarMap.emplace(name, hierVar);
+          nameWidthMap.emplace(name, width);
+        } else if (is_reg("\\"+hierVar)) {
+          nameVarMap.emplace(name, "\\"+hierVar);
+          nameWidthMap.emplace(name, width);
+        }
+      }
+      else if(std::regex_match(line, m, pScope)) {
+        if (depth == 0) {
+          // Very first scope: the top module.  No need to
+          // explicitly use its name.
+          assert(scopeStack.empty());
+          scopeStack.push_front("");
+        } else {
+          std::string modname = m.str(1);
+          // Strip off any leading backslashes
+          while (modname[0] == '\\') {
+            modname.erase(0,1);
+          }
+          scopeStack.push_front(scopeStack.front() + m.str(1) + ".");
+        }
+        depth++;
+      }
+      else if(std::regex_match(line, pUpscope)) {
+        assert(!scopeStack.empty());
+        scopeStack.pop_front();
+        depth--;
+      }
+      else if(std::regex_match(line, pEndDefinitions)) {
+        assert(scopeStack.empty());
+        assert(depth == 0);
+        state = READ_VALUES;
+      }
+      else if(std::regex_match(line, pVersion)) {
+        // No action needed.
+      }
+      else if(std::regex_match(line, pDate)) {
+        // No action needed.
+      }
+      else if(std::regex_match(line, pSomething)) {
+        // A syntactically valid, but unknown line
+        toCout("Unknown format at line "+std::to_string(lineNum)+": "+line);
+      } else {
+        toCout("Syntax error at line "+std::to_string(lineNum)+": "+line);
       }
     }
-    else if(state == readValue) {
-      if(line.front() == 'b') {
+    else if(state == READ_VALUES) {
+      if(line.front() == '#') {
+        // Clock cycle count - ignore
+      }
+      else if(line.front() == 'b') {
         uint32_t blankPos = line.find(" ");
         std::string rstVal = line.substr(1, blankPos-1);
         // add binary symbol prefix
         std::string name = line.substr(blankPos+1);
-        if(name == "6J") {
-          toCoutVerb("Find it");
-        }
         if(nameVarMap.find(name) == nameVarMap.end()) {
-          toCout(name+" is unknown!");  // File data error
+          toCoutVerb(name+" is irrelevant");  // Something that is not a reg we are interested in
           continue;
         }
         std::string var = nameVarMap[name];
-        if(var.find("branch_q") != std::string::npos) {
-          toCoutVerb("Find it");
-        }
-
         uint32_t rstValWidth = 0;
         if (g_allRegs.count(var)) {
           // If the var is in g_allRegs, consider that to be the authoritative width.
@@ -100,10 +151,6 @@ void vcd_parser(std::string fileName) {
         }
         rstVal = std::to_string(rstValWidth)+"'b"+rstVal;
 
-        if(var.find("fetch0_pc_i") != std::string::npos) {
-          toCout("Found it!");
-        }
-
         toCoutVerb(rstVal+" saved as rst value of "+var);
         g_rstVal[var] = rstVal;  // We end up keeping the final value of the var.
       }
@@ -114,9 +161,15 @@ void vcd_parser(std::string fileName) {
           continue;
         std::string var = nameVarMap[name];
         g_rstVal[var] = rstVal;
+      } else {
+        toCout("Syntax error at line "+std::to_string(lineNum)+": "+line);
       }
+    } else {
+      assert(false);  // Junk state
     }
   }
+  assert(scopeStack.empty());
+  assert(depth == 0);
   print_rst_val();
   toCout("### End vcd_parser");  
 }

@@ -116,6 +116,7 @@ std::regex pVarAndSlice("([\aa-zA-Z0-9_\\.\\$\\\\'\\[\\]]+)(\\s*\\[\\d+(\\:\\d+)
 std::regex pVarName("([\aa-zA-Z0-9_\\.\\$\\\\'\\[\\]]+)(\\s*\\[\\d+(\\:\\d+)?\\])?");
 std::regex pVarNameGroup("([\aa-zA-Z0-9_\\.\\$\\\\'\\[\\]]+)(?:(\\s*)(\\[\\d+(\\:\\d+)?\\]))?");
 std::regex pNum("^(\\d+)'(h|d|b)[\\dabcdefx\\?]+$");
+std::regex pNumNoGroup("^\\d+'(h|d|b)[\\dabcdefx\\?]+$");  // Same as pNum, but no capture groups
 std::regex pNumExist("(\\d+)'(h|d|b)[\\dabcdef\\?]+");
 std::regex pBin("(\\d+)'b([01]+)");
 std::regex pBinX("(\\d+)'b([01x]+)");

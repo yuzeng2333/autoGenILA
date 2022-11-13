@@ -87,57 +87,14 @@ void build_ast_tree() {
       set_stk_build_tree(writeASV);
     } // end of for loop
   }
-  std::string line;
-  std::ifstream allowedTgtInFile(g_path+"/allowed_target.txt");
-  while(std::getline(allowedTgtInFile, line)) {
-    if(line.substr(0, 2) == "//"
-        || line.empty())  continue;
-    if(line != "[") {
-      if(line.find(":") == std::string::npos) {
-        remove_two_end_space(line);
-        g_allowedTgt.emplace(line, std::vector<uint32_t>{});
-      }
-      else {
-        size_t pos = line.find(":");
-        std::string var = line.substr(0, pos);
-        remove_two_end_space(var);
-        std::string delayStr = line.substr(pos+1);
-        remove_two_end_space(delayStr);
-        uint32_t delay = std::stoi(delayStr);
-        if(g_allowedTgt.find(var) == g_allowedTgt.end())
-          g_allowedTgt.emplace(var, std::vector<uint32_t>{delay});
-        else
-          g_allowedTgt[var].push_back(delay);
-      }
-    }
-    // collecting vector of target registers
-    else {
-      StrVec_t tgtVec;
-      std::getline(allowedTgtInFile, line);
-      while(line[0] != ']') {
-        if(line.substr(0, 2) == "//"
-           || line.empty() )
-          continue;
-        tgtVec.push_back(line);
-        moduleAs.insert(line);
-        std::getline(allowedTgtInFile, line);
-      }
-      uint32_t delay = 0;
-      if(line.find(":") != std::string::npos) {
-        size_t pos = line.find(":");
-        std::string delayStr = line.substr(pos+1);
-        remove_two_end_space(delayStr);
-        delay = std::stoi(delayStr);
-      }
-      g_allowedTgtVec.push_back(std::make_pair(tgtVec, delay));
-    }
-  } // end of while loop
-  allowedTgtInFile.close();
+
+//  assert(!(g_allowedTgt.empty() && g_allowedTgtVec.empty())); // Forgot to read the file?
+
   for(auto tgtDelayPair: g_allowedTgt) {
     set_stk_build_tree(tgtDelayPair.first);
   }
   for(auto pair: g_allowedTgtVec) {
-    for(std::string tgt: pair.first)
+    for(std::string tgt: pair.second.members)
       set_stk_build_tree(tgt);
   }
 }
@@ -267,7 +224,7 @@ void add_node(std::string varAndSlice,
   //toCout("Add node for: "+varAndSlice);
   if(varAndSlice.find("xram_ack") != std::string::npos) {
        //&& timeIdx == 25) {
-    toCout("Found it!");
+    toCoutVerb("Found it!");
     s_node = node;
   }
 
@@ -365,7 +322,7 @@ void add_child_node(std::string varAndSlice,
   std::string iName = g_insContextStk.get_target();  
   if(varAndSlice.find("yuzeng34") != std::string::npos
        && timeIdx == 7) {
-    toCout("Found it!");
+    toCoutVerb("Found it!");
   }
   if(curMod->visitedNode.find(childName) == curMod->visitedNode.end()) {
     astNode* nextNode = new astNode;      
@@ -422,7 +379,7 @@ void add_sliced_node(std::string varAndSlice,
 void add_nb_node(std::string regAndSlice, uint32_t timeIdx, astNode* const node) {
   const auto curMod = g_insContextStk.get_curMod();
   if(regAndSlice.find("aes_reg_key0_i.reg_out") != std::string::npos) {
-    toCout("Found it!");
+    toCoutVerb("Found it!");
   }
   toCoutVerb("Add nb node for :" + regAndSlice);
   std::string iName = g_insContextStk.get_target();  
@@ -432,7 +389,7 @@ void add_nb_node(std::string regAndSlice, uint32_t timeIdx, astNode* const node)
     abort();
   }
   if(regAndSlice == "outAssign") {
-    toCout("Found it!");
+    toCoutVerb("Found it!");
   }
   std::string destAssign = curMod->nbTable[regAndSlice];
   std::smatch m;
@@ -640,7 +597,7 @@ void add_two_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   }
 
   if(op == ">>>") {
-    toCout("Found it!");
+    toCoutVerb("Found it!");
   }
 
   uint32_t op1Ext = 0;
@@ -668,7 +625,7 @@ void add_two_op_node(std::string line, uint32_t timeIdx, astNode* const node) {
   }
 
   //if(destAndSlice.compare("adr_check") == 0) {
-  //  toCout("Found adr_check");
+  //  toCoutVerb("Found adr_check");
   //}
   std::string dest, destSlice;
   std::string op1, op1Slice;

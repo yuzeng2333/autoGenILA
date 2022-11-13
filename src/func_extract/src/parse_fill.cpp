@@ -2,6 +2,7 @@
 #include "expr.h"
 #include "types.h"
 #include "helper.h"
+#include "util.h"
 #include "global_data_struct.h"
 #include "read_instr.h"
 #include "ins_context_stack.h"
@@ -575,5 +576,67 @@ void read_config(std::string fileName) {
     abort();
   }
 }
+
+
+
+// This reads the file "allowed_target.txt", which is prepared by the user and read by funct_extract.
+// It builds the global data structures g_allowedTgt and g_allowedTgtVec.
+void read_allowed_targets(std::string fileName) {
+
+  std::ifstream allowedTgtInFile(fileName);
+  std::string line;
+
+  while(std::getline(allowedTgtInFile, line)) {
+    if(line.substr(0, 2) == "//"
+        || line.empty())  continue;
+    if(line != "[") {
+      if(line.find(":") == std::string::npos) {
+        remove_two_end_space(line);
+        g_allowedTgt.emplace(line, std::vector<uint32_t>{});
+      }
+      else {
+        size_t pos = line.find(":");
+        std::string var = line.substr(0, pos);
+        remove_two_end_space(var);
+        std::string delayStr = line.substr(pos+1);
+        remove_two_end_space(delayStr);
+        uint32_t delay = std::stoi(delayStr);
+        if(g_allowedTgt.find(var) == g_allowedTgt.end())
+          g_allowedTgt.emplace(var, std::vector<uint32_t>{delay});
+        else
+          g_allowedTgt[var].push_back(delay);
+      }
+    }
+    // collecting vector of target registers
+    else {
+      StrVec_t members;
+      std::getline(allowedTgtInFile, line);
+      while(line[0] != ']') {
+        if(line.substr(0, 2) == "//"
+           || line.empty() )
+          continue;
+        members.push_back(line);
+        moduleAs.insert(line);
+        std::getline(allowedTgtInFile, line);
+      }
+      uint32_t delay = 0;
+      if(line.find(":") != std::string::npos) {
+        size_t pos = line.find(":");
+        std::string delayStr = line.substr(pos+1);
+        remove_two_end_space(delayStr);
+        delay = std::stoi(delayStr);
+      }
+      std::string name = name_for_array(members);
+      // Pass the vector name and an initializer list for a TgtVec_t
+      g_allowedTgtVec.emplace(name, TgtVec_t{members, delay});
+    }
+  } // end of while loop
+
+
+
+}
+
+
+
 
 } // end of namespace funcExtract

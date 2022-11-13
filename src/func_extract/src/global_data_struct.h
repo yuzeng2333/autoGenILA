@@ -45,6 +45,15 @@
 
 namespace funcExtract {
 
+// Names of special args added to update functions and/or their wrappers.
+constexpr const char *RETURN_VAL_PTR_ID = "*RETURN_VAL_PTR*";  // Not a legal Verilog identifier.
+constexpr const char *RETURN_ARRAY_PTR_ID = "*RETURN_ARRAY_PTR*";  // Not a legal Verilog identifier.
+
+inline bool is_special_arg_name(const std::string& name) {
+  return name == RETURN_VAL_PTR_ID || name == RETURN_ARRAY_PTR_ID;
+}
+
+
 //struct LoadDataInfo_t {
 //    // only load instruction has dataAddr: to get data from dmem
 //  std::string dataAddr;
@@ -53,9 +62,16 @@ namespace funcExtract {
 //};
 
 
+//vector of arg names/bitwidths. (width < 0 means pointer)
+typedef std::vector<std::pair<std::string, int>> ArgVec_t;
+
+
 struct FuncTy_t {
-  uint32_t retTy;
-  std::vector<std::pair<uint32_t, std::string>> argTy;
+  // Bitwidth of return type. 0 means void, <0 means a pointer to width -retTy
+  // This is not the same as the width of the target!
+  int retTy;
+  // Names and bitwidths of args. <0 means a pointer, 0 means something special.
+  ArgVec_t argTy;
 };
 
 
@@ -195,7 +211,7 @@ struct Context_t {
 class registerArray_t {
   public:
   const std::vector<std::string> members;  // Size of members is array length
-  const uint32_t width;
+  const uint32_t width;  // Should always be > 0.
 
   registerArray_t() = delete;
   registerArray_t(const std::vector<std::string>& m, uint32_t w);
@@ -270,8 +286,17 @@ extern std::map<std::string, uint32_t> g_asv;
 
 extern taintGen::Str2StrVecMap_t g_moduleInputsMap;
 extern taintGen::Str2StrVecMap_t g_moduleOutputsMap;
+
 extern std::map<std::string, std::vector<uint32_t>> g_allowedTgt;
-extern std::vector<std::pair<std::vector<std::string>, uint32_t>> g_allowedTgtVec;
+
+struct TgtVec_t {
+  std::vector<std::string> members;
+  uint32_t delay;
+};
+
+// Key is (synthesized) name of target vector
+extern std::map<std::string, TgtVec_t> g_allowedTgtVec;
+
 extern std::queue<std::pair<std::string, uint32_t>> g_goalVars;
 extern std::ofstream g_outFil;
 extern std::string g_pj_path; 

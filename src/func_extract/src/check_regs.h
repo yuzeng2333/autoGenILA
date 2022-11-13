@@ -40,6 +40,7 @@ class DestInfo {
     std::string get_dest_name();
     llvm::Type* get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext);
     llvm::Type* get_ret_element_type(std::shared_ptr<llvm::LLVMContext> TheContext);
+    llvm::Type* get_padded_ret_element_type(std::shared_ptr<llvm::LLVMContext> TheContext);
     std::vector<std::string> get_no_slice_name();
     std::string get_mod_name();
     std::string get_ins_name();

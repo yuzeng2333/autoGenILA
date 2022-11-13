@@ -4,14 +4,18 @@
 #include "../src/util.h"
 #include "../src/vcd_parser.h"
 #include "../src/global_data_struct.h"
-#define toCout(a) std::cout << a << std::endl
-#define toStr(a) std::to_string(a)
+#include <sys/stat.h>
 
-// TODO: automatically order :
-// (1) addr to mem (2) data from mem (3) data to mem
+#define toCout(a) std::cout << a << std::endl
+
+#define toStr(a) std::to_string(a)
 
 using namespace funcExtract;
 using namespace taintGen;
+
+
+// TODO: automatically order :
+// (1) addr to mem (2) data from mem (3) data to mem
 
 
 // This function will generate a c++ simulation file
@@ -24,23 +28,23 @@ using namespace taintGen;
 bool g_fetch_instr_from_mem = false;
 bool g_set_dmem = false;
 uint32_t g_dmem_width = 32;
+uint32_t g_memSize = 0;
 
-std::string g_instrValueVar = "mem_rdata";
+
+std::string g_instrValueVar = "zy_instr_value";
 std::string g_instrAddrVar = "zy_instr_addr";
 std::string g_dataAddrVar = "zy_data_addr";
 std::string g_dataIn = "zy_data_in";
 std::string nxt = "_nxt";
 
-// key of map is var name, the value vector is the
-// vector of values for multiple cycles, since an
-// instruction might span multiple cycles
-std::vector<std::map<std::string, 
-                     std::vector<std::string>>> toDoList;
+bool g_separate_main = false;
+std::string g_radixChar = "d";  // Optionally "h" for hex
+bool g_hex = false;             // Optionally true for hex
 
+std::vector<InstEncoding_t> toDoList;
 std::map<std::string, std::map<std::string, 
                                std::string>> g_refineMap;
 std::set<std::string> g_skippedTgt;
-uint32_t memSize;
 
 // if true, update all regs after every instruction's update functions
 // have been called. Otherwise, only update regs that are assigned.
@@ -54,59 +58,93 @@ enum DESIGN g_design;
 // the second argument is the number of instructions, but only for fetch_instr_from_mem mode
 int main(int argc, char *argv[]) {
 
-  if(argc < 2) {
-    toCout("No path specified, current directory will be used.");
-    g_path = ".";
-  } else {
-    g_path = argv[1];
-  }
+  std::string usageStr = std::string("usage: ")+argv[0]+ " [<path>] [<instr_num>] [<design_opt>] [-verbose] [-separate_main] [-hex]";
 
-  // Scan additional args for design type, etc.
-   
+  g_path = ".";   // Default path is current dir
   g_verb = false;
   g_design = OTHER;
-  int instrNum = -1;
+
+  bool userVerbose = false;
+  bool userQuiet = false;
 
   int ndesopts = 0;
-  for (int n=2; n<argc; ++n) {
-    if (!strcmp(argv[n], "-aes")) {
+
+  int instrNum = -1;
+
+
+  for (int n = 1; n < argc; ++n) {
+    const char *arg = argv[n];
+
+    if (n == 1 && arg[0] != '-') {
+      // If the first arg does not begin with '-', it is assumed to be the path
+      g_path = arg; 
+    } else if (isdigit(arg[0])) {
+      // Any numeric arg is the instruction count
+      if (instrNum > 0) {
+        toCout("Error: Instruction count specified more than once!");
+        toCout(usageStr);
+        exit(-1);
+      }
+      instrNum = std::stoi(arg);
+
+    } else if (!strcmp(arg, "-verbose")) {
+      userVerbose = true;
+    } else if (!strcmp(arg, "-quiet")) {
+      userQuiet = true;
+    } else if (!strcmp(arg, "-separate_main")) {
+      g_separate_main = true;
+    } else if (!strcmp(arg, "-hex")) {
+      g_radixChar = "x";
+      g_hex = true;
+    } else if (!strcmp(arg, "-aes")) {
       ndesopts++;
       g_design = AES;
-    } else if (!strcmp(argv[n], "-pico")) {
+    } else if (!strcmp(arg, "-pico")) {
       ndesopts++;
       g_design = PICO;
-    } else if (!strcmp(argv[n], "-gb")) {
+    } else if (!strcmp(arg, "-gb")) {
       ndesopts++;
       g_design = GB;
-    } else if (!strcmp(argv[n], "-urv")) {
+    } else if (!strcmp(arg, "-urv")) {
       ndesopts++;
       g_design = URV;
-    } else if (!strcmp(argv[n], "-vta")) {
+    } else if (!strcmp(arg, "-vta")) {
       ndesopts++;
       g_design = VTA;
-    } else if (!strcmp(argv[n], "-bi")) {
+    } else if (!strcmp(arg, "-bi")) {
       ndesopts++;
       g_design = BI;
-    } else if (!strcmp(argv[n], "-other")) {
+    } else if (!strcmp(arg, "-other")) {
       ndesopts++;
       g_design = OTHER;
-    } else if (isdigit(argv[n][0])) {
-      instrNum = std::stoi(argv[n]);
-    } else if (!strcmp(argv[n], "-verbose")) {
-      g_verb = true;
+    } else {
+      toCout(usageStr);
+      exit(-1);
     }
+  }
+
+  // Can't give both -verbose and -quiet
+  if (userVerbose && userQuiet) {
+    toCout(usageStr);
+    exit(-1);
   }
 
   if (ndesopts > 1) {
     toCout("Multiple design options specified!");
-    abort();
+    toCout(usageStr);
+    exit(-1);
   }
+
+  // Override any g_verb setting from the config file with any setting from the command line.
+  if (userVerbose) g_verb = true;
+  if (userQuiet) g_verb = false;
 
 
   // set global variables according to chosen design
   if(g_design == PICO) {
     g_fetch_instr_from_mem = true;
     g_instrValueVar = "mem_rdata";
+    g_instrAddrVar = "reg_next_pc";
   }
   else if(g_design == AES) {
     g_fetch_instr_from_mem = false;
@@ -130,13 +168,14 @@ int main(int argc, char *argv[]) {
   read_to_do_instr(g_path+"/tb.txt", toDoList);
   read_refinement(g_path+"/refinement.txt");
   read_skipped_target(g_path+"/skipped_target.txt");
+  vcd_parser(g_path+"/rst.vcd");
   if (g_fetch_instr_from_mem) {
     if (instrNum < 0) {
       toCout("Error: did not specify the number of instructions to be executed!");
-      abort();
+      toCout(usageStr);
+      exit(-1);
     }
   }
-  memSize = toDoList.size();
 
   std::ofstream header(g_path+"/ila.h");
   std::ofstream cpp(g_path+"/ila.cpp");
@@ -152,56 +191,103 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
+  // Define and initialize a memory array, if needed.
+  
+  if (g_fetch_instr_from_mem) {
+    // First, see if there is a mem.txt file to use for the memory contents
+    std::vector<llvm::APInt> memVals;
+    read_mem_vals(g_path+"/mem.txt", memVals);
+    if (!memVals.empty()) {
 
-  // ========== global array declarations
-  // Do not put declarations of arrays in the
-  // c file. Put them only in the llvm-ir file
+      g_memSize = memVals.size();
+
+      cpp << std::endl;
+      cpp << "  // Memory initialized from mem.txt" << std::endl;
+      cpp << "  uint32_t mem["+toStr(g_memSize)+"] = {" << std::endl;
+      bool first = true;
+      for(const llvm::APInt &val: memVals) {
+        assert(val.getBitWidth() <= 32);  // We assume 32-bit memory words.
+
+        // Doug: this could be > 64 bits, in which case you will get an initialized std::array 
+        std::string valStr = apint2literal(val);
+        if (first) {
+          cpp << "    ";
+          first = false;
+        } else {
+          cpp << "," << std::endl << "    ";
+        }
+        cpp << valStr;
+      }
+      cpp << "};" << std::endl;
+
+    } else if (!toDoList.empty()) {
+      // Otherwise use the data from tb.txt to initialize memory
+
+      g_memSize = toDoList.size();
+
+      cpp << "  // Memory initialized from tb.txt" << std::endl;
+      cpp << "  uint32_t mem["+toStr(g_memSize)+"] = {" << std::endl;
+      bool first = true;
+      for(auto encoding: toDoList) {
+        if(encoding.find(g_instrValueVar) == encoding.end()) {
+          toCout("Error: the instr value variable is not recognized: "+g_instrValueVar);
+          abort();
+        }
+        llvm::APInt val = convert_to_single_apint(encoding[g_instrValueVar].front());    
+        assert(val.getBitWidth() <= 32);  // We assume 32-bit memory words.
+
+        // Doug: this could be > 64 bits, in which case you will get an initialized std::array 
+        std::string valStr = apint2literal(val);
+        if (first) {
+          cpp << "    ";
+          first = false;
+        } else {
+          cpp << "," << std::endl << "    ";
+        }
+        cpp << valStr;
+      }
+      cpp << "};" << std::endl;
+    }
+
+    // Special case for AES with fifos.
+    if(g_design == AES) print_update_mem(cpp);
+    cpp << std::endl;
+  }
+
+
+
+  // ==========  asv declarations and initializations
 
   if(g_design != VTA) {
+    // Register arrays are initialized separately at runtime.
     for(auto pair: g_registerArrays) {
       // This works for register arrays wider than 64 bits
-      // Note: most of the system cannot handle more than one register array
       std::string arrName = pair.first;
       uint32_t size = pair.second.getLength();
       std::string dataTy = c_type(pair.second.getWidth());
-      cpp << dataTy+" "+arrName+"["+toStr(size)+"];" << std::endl;
+      cpp << "  "+dataTy+" "+arrName+"["+toStr(size)+"];" << std::endl;
+      cpp << "  "+dataTy+" "+arrName+nxt+"["+toStr(size)+"];" << std::endl;
     }
+    cpp << std::endl;
   }
 
-  cpp << std::endl;
-  std::string initValue = initialize_mem(g_path+"/mem.txt");
-  if(initValue.empty())
-    cpp << "unsigned short mem[1024];\n" << std::endl;
-  else
-    cpp << "unsigned short mem[1024] = { "+initValue+" };\n" << std::endl;
-
-  toCout("Remember to change the data type of mem !!");
-
-  if(g_design == AES) print_update_mem(cpp);
-
-  cpp << "int main(int argc, char *argv[]) {\n" << std::endl;
-
-
-
-  vcd_parser(g_path+"/rst.vcd");
-
-  // ==========  asv declarations
   for(auto pair : g_asv) {
     std::string asv = pair.first;
-    toCout(asv);
+    toCoutVerb(asv);
     std::string asvSimp = var_name_convert(asv, true);
 
     uint32_t width = pair.second;   
+    assert(width > 0);
     std::string asvTy = c_type(width);
     if(asvTy.empty()) {
       toCout("Error happened in c_type for "+asv);
       abort();
     }
 
-    std::string cRstVal = get_c_rst_val(asv);
+    std::string cRstVal = get_c_rst_val(asv, width);
     toCoutVerb("cleaned up rst val of "+asv+"  "+cRstVal);
 
-    // Process ASVs in register arrays separately
+    // ASVs in register arrays were handled separately above
     if (!is_in_array(asv)) {
       std::string ret = "  "+asvTy+" "+asvSimp+" = "+cRstVal+";";
       cpp << ret << std::endl;    
@@ -210,33 +296,12 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  // Initialize the ASVs in register arrays
-  // ASVs in a register array are not declared, just initialized.
-  // And they have no associated "nxt" variable
-  for(auto pair: g_registerArrays) {
-    std::string arrayName = pair.first;
-    uint32_t len = pair.second.getLength();
-    for (uint32_t idx = 0; idx < len; ++idx) {
-      std::string asv = pair.second.getElement(idx);
-      std::string asvSimp = var_name_convert(asv, true);
-      std::string cRstVal = get_c_rst_val(asv);
-      toCoutVerb("cleaned up rst val of "+asv+"  "+cRstVal);
-
-      std::string ret = "  "+arrayName+"["+toStr(idx)+"] = "+cRstVal+";  // "+asvSimp;
-      cpp << ret << std::endl;    
-    }
-  }
-
-  cpp << "  unsigned int "+g_instrAddrVar+" = 0;" << std::endl;
   cpp << "  unsigned int "+g_dataAddrVar+" = 0;" << std::endl;
   cpp << "  unsigned int "+g_dataIn+" = 0;" << std::endl;
   cpp << "  unsigned int data_byte_addr = 0; " << std::endl;  
-  cpp << "  int PRINT_ALL = argc > 1 ? 1 : 0;" << std::endl;
-  cpp << std::endl;
 
-
-  // ======== add alias from memory array to registers
   if(g_design == URV) {
+    // ======== add alias from memory array to registers
     for(int i = 1; i < 32; i++) {
       // FIXME:
       if(i == 1 || i == 2)
@@ -245,88 +310,198 @@ int main(int argc, char *argv[]) {
       cpp << "unsigned int& _u_issue_u_regfile_REGFILE_reg_r"+toStr(i)+"_q = _u_issue_u_regfile_REGFILE_reg_r3_q_Arr["+toStr(i-3)+"] ;" << std::endl;
     }
   }
+
   cpp << std::endl;
 
+  print_asvs_printer_func(cpp);
 
-  // ========= initialization of regs
-  print_asv_values(cpp, "Initialization:");
+  // Generate the function that initializes register arrays
+  // It will be empty if there are no register arrays.
+  cpp << "void init_register_arrays() {" << std::endl;
+
+  // Initialize the ASVs in register arrays
+  // ASVs in a register array are declared and initialized separately.
+  for(auto pair: g_registerArrays) {
+    std::string arrayName = pair.first;
+    uint32_t len = pair.second.getLength();
+    for (uint32_t idx = 0; idx < len; ++idx) {
+      std::string asv = pair.second.getElement(idx);
+      uint32_t width = pair.second.getWidth();
+      std::string asvSimp = var_name_convert(asv, true);
+      std::string cRstVal = get_c_rst_val(asv, width);
+      toCoutVerb("cleaned up rst val of "+asv+"  "+cRstVal);
+
+      std::string ret = "  "+arrayName+"["+toStr(idx)+"] = "+cRstVal+";  // "+asvSimp;
+      cpp << ret << std::endl;    
+      ret = "  "+arrayName+nxt+"["+toStr(idx)+"] = "+cRstVal+";  // "+asvSimp;
+      cpp << ret << std::endl;    
+    }
+  }
+  cpp << "}" << std::endl << std::endl;
 
 
-  // ========== initialize dmem
-  if(g_set_dmem) {
-    std::string type;
-    if(g_dmem_width == 32) {
-      type = "unsigned int";
-    }
-    else if(g_dmem_width == 16) {
-      type = "unsigned short";
-    }
-    else {
-      toCout("Error: unexpected dmem width: "+toStr(g_dmem_width));
-      abort();
-    }
-    cpp << "  "+type +" dmem[64];" << std::endl;
-    uint32_t i = 0;
-    std::ifstream input(g_path+"/dmem.txt");
-    std::string line;
-    while(std::getline(input, line)) {
-      cpp << "  dmem["+toStr(i++)+"] = "+line+" ;" << std::endl;
-    }
+  // Generate the wrapper functions for each instruction.
+  for(auto instrInfo : g_instrInfo) {
+    cpp << std::endl;
+    print_instr_wrapper_func(instrInfo, cpp);
     cpp << std::endl;
   }
 
+  bool write_main = true;
 
-  if(g_fetch_instr_from_mem) {
-    // declare memories
-    //uint32_t instrNumBits = ceil(log2(instrNum));
-    // actually the declaration and initialization of mem is not necessarily
-    // but for convenience of reference, I keep thse code
-    cpp << "  unsigned int mem["+toStr(memSize)+"];" << std::endl;
-    uint32_t idx = 0;
-    for(auto encoding: toDoList) {
-      if(encoding.find(g_instrValueVar) == encoding.end()) {
-        toCout("Error: the instr value variables is not expected: "+g_instrValueVar);
+  if (g_separate_main) {
+    // Close the current cpp file, and write out the main() code to a second .cpp file.
+    // But don't overwrite an existing main file!!!
+    // The secnd .cpp file is included by the first one, so that the original
+    // link.sh script still works.
+
+    std::string file2("ila_main.cpp");
+    cpp << "#include \""+file2+"\"\n" << std::endl;
+
+    struct stat statbuf;
+    if (stat((g_path+"/"+file2).c_str(), &statbuf) != 0) {
+      // File does not already exist
+      toCout("Generating ila_main.cpp.");
+      
+      cpp.close();
+      cpp.open(g_path+"/"+file2);
+      cpp << "// This file is included by ila.cpp." << std::endl;
+      cpp << std::endl;
+    } else {
+      toCout("ila_main.cpp already exists, will not overwrite.");
+      write_main = false;
+    }
+  }
+
+  if (write_main) {
+
+    cpp << "int main(int argc, char *argv[]) {\n" << std::endl;
+
+    cpp << std::endl << "  PRINT_ALL = argc > 1 ? 1 : 0;" << std::endl;
+
+    // Initialize the ASVs (if any) in register arrays
+    // ASVs in a register array are declared and initialized separately.
+    cpp << "  init_register_arrays();" << std::endl;
+
+    // ========= print initialization of regs
+    print_asvs(cpp, "Initialization:");
+
+
+    // ========== initialize dmem
+    if(g_set_dmem) {
+      if(g_dmem_width != 16 && g_dmem_width != 32) {
+        toCout("Error: unexpected dmem width: "+toStr(g_dmem_width));
         abort();
       }
-      uint32_t intValue = convert_to_single_num(encoding[g_instrValueVar].front());    
-      cpp << "  mem["+toStr(idx++)+"] = "+toStr(intValue)+" ;" << std::endl;
+      std::string type=c_type(g_dmem_width);
+      cpp << "  "+type +" dmem[64];" << std::endl;
+      uint32_t i = 0;
+      std::ifstream input(g_path+"/dmem.txt");
+      std::string line;
+      while(std::getline(input, line)) {
+        cpp << "  dmem["+toStr(i++)+"] = "+line+";" << std::endl;
+      }
+      cpp << std::endl;
     }
+
     cpp << std::endl;
 
-    // by default, execute number of 'instrNum' instructions
-    cpp << "  int addr ;" << std::endl;
-    cpp << std::endl;
-    cpp << "  for(int i = 0; i < "+toStr(instrNum)+"; i++) {" << std::endl;
-    cpp << "    addr = ("+g_instrAddrVar+" >> 2) % "+toStr(memSize)+";" << std::endl;
-    //cpp << "    mem_rdata = mem[addr];" << std::endl;
-    cpp << "    switch(addr) {" <<std::endl;
-    idx = 0;
-    for(auto encoding: toDoList) {
-    cpp << "      case "+toStr(idx++)+" :" << std::endl;
-    print_instr_calls(encoding, "      ", cpp, idx-1);
-    cpp << "        break;" << std::endl;
-    }
-    cpp << "    }" <<std::endl;
-    update_all_asvs(cpp, "    ");
-    cpp << "  }" << std::endl;
-  }
-  else {
-    // ========== update asvs according to instructions
-    uint32_t idx = 0;
-    for(auto encoding : toDoList) {
-      toCout("Instr: "+toStr(idx++));
-      print_instr_calls(encoding, "  ", cpp, 0);
-      if(g_update_all_regs) update_all_asvs(cpp, "  ");
-    }
-  }
-  cpp << std::endl;
-  print_asv_values(cpp, "The final results:", true /*always*/);
+    if(g_fetch_instr_from_mem) {
+      if (g_memSize == 0) {
+        toCout("Error: no memory data could be read");
+        abort();
+      }
 
-  cpp << "}" << std::endl; // end of main function
+      // By default, execute number of 'instrNum' instructions
+      // This number is arbitrary, and can be bigger or smaller than the memory size.
+      cpp << "  uint32_t addr ;" << std::endl;
+      cpp << std::endl;
+      cpp << "  for(int i = 0; i < "+toStr(instrNum)+"; i++) {" << std::endl;
+
+      // We assume the memory is byte-addressable, but we store it as an array of 32-bit values.
+      // But unaligned reads are not supported.
+      cpp << "    addr = ("+g_instrAddrVar+" >> 2) % "+toStr(g_memSize)+";" << std::endl;
+
+      cpp << "    "+g_instrValueVar+" = mem[addr];" << std::endl;
+
+      // Do a simplified runtime instruction encoding, based in g_instrValueVar and
+      // any per-instruction x-mask values.
+
+      bool first = true;
+      for (const auto instr: g_instrInfo) {
+        auto pos = instr.instrEncoding.find(g_instrValueVar);
+        if (pos == instr.instrEncoding.end()) {
+          // If input has a value that is not specified by the instruction, it is OK.
+          toCout("Warning: instruction "+instr.name+"Cannot be decoded by register "+g_instrValueVar);
+          continue;
+        }
+
+        // Consider only the register value for the first clock cycle.
+        const std::string& instrValueStr = pos->second.front();
+
+        llvm::APInt instrVal = convert_to_single_apint(instrValueStr);
+        llvm::APInt instrMask = convert_to_single_apint(instrValueStr, true/*xmask*/);
+        assert(instrVal.getBitWidth() == instrMask.getBitWidth());
+        assert((instrVal & instrMask) == instrVal);
+
+        // Example generated code:
+        // if ((data_in & 0xfff0f3) == 0x045ab49d) {
+        //    execute_some_instr();
+
+        if (!first) {
+          cpp << "    } else ";
+        } else {
+          cpp << "    ";
+          first = false;
+        }
+        cpp << "if (("+g_instrValueVar+" & "+apint2literal(instrMask)+") == "+
+                  apint2literal(instrVal)+") {" << std::endl;
+
+        // Skip variable assignments, to avoid overwriting the value from mem.
+        print_instr_wrapper_call(instr.instrEncoding, "      ", cpp);
+      }
+      cpp << "    } else {" << std::endl;
+      cpp << "      printf(\"Cannot decode instruction!\\n\");" << std::endl;
+      cpp << "      return -1;" << std::endl;
+      cpp << "    }" << std::endl;
+
+      // If the instruction does not update g_instrAddrVar, the same instruction will
+      // get executed over and over.
+      cpp << "  }" << std::endl;
+
+    } else {
+      // Execute instructions and update asvs according to instruction list (if any).
+      // Memory is not used.
+      if (toDoList.empty()) {
+        cpp << "  // tb.txt missing or empty: no instructions to execute" << std::endl;
+      } else {
+        cpp << "  // Instruction execution based on tb.txt" << std::endl;
+      }
+
+      uint32_t idx = 0;
+      for(auto encoding : toDoList) {
+        toCout("Instr: "+toStr(idx++));
+        print_var_assignments(cpp, "  ", encoding);
+        print_instr_wrapper_call(encoding, "  ", cpp);
+        cpp << std::endl;
+      }
+    }
+    cpp << std::endl;
+    print_asvs(cpp, "The final results:", true /*always*/);
+
+    cpp << std::endl << "  return 0;" << std::endl;
+
+    cpp << "}" << std::endl; // end of main function
+  }
 
   cpp.close();  
 
+
   // =========== generate header file for update functions
+  header << "#ifndef _ILA_H_" << std::endl;
+  header << "#define _ILA_H_" << std::endl;
+  header << std::endl;
+
   header << "#ifdef __cplusplus" << std::endl
          << "extern \"C\" {" << std::endl
          << "#endif" << std::endl << std::endl;
@@ -345,11 +520,29 @@ int main(int argc, char *argv[]) {
          << "}" << std::endl
          << "#endif" << std::endl;
 
+  header  << std::endl;
+
+  // Global variable declaration.
+  header << "int PRINT_ALL;" << std::endl;
+
+  header << "void init_register_arrays();" << std::endl;
+  header << "void print_asvs(const char *bannerLine, bool always);" << std::endl;
+
+  for(auto instrInfo : g_instrInfo) {
+    header << std::endl;
+    print_instr_wrapper_decl(instrInfo.name, "", header);
+  }
+
+  header << std::endl;
+  header << "#endif" << std::endl;
+
   header.close();
+
   return 0;
 }
 
 // Name used in the update function's LLVM file.
+// This must be consistent with the code in funcExtract that actually creates the LLVM code!
 std::string update_function_name(const std::string& instr, const std::string& asv) {
   std::string f = instr + "_" + asv;
 
@@ -357,19 +550,58 @@ std::string update_function_name(const std::string& instr, const std::string& as
 }
 
 
-// if write target is array, then update memory
-void print_instr_calls(std::map<std::string, 
-                         std::vector<std::string>> &encoding,
+std::string instruction_function_name(const std::string &instrName) {
+  return "execute_" + instrName;
+}
+
+// Create a single function that does all the work for a particular instruction:
+// calling each relevant update function, updating the ASVs, and printing debug info.
+void print_instr_wrapper_func(const InstrInfo_t& instr,
+                       std::ofstream &cpp) {
+
+  uint32_t idx = get_instr_by_name(instr.name);
+  cpp << "// instr"+toStr(idx)+": "+instr.name << std::endl;
+
+  std::string wrapperFuncName = instruction_function_name(instr.name);
+  cpp << "void "+wrapperFuncName+"() {" << std::endl;
+  print_instr_calls(instr.instrEncoding, "  ", cpp);
+  cpp << "}" << std::endl;
+}
+
+// Print the declaration for the instruction wrapper function.
+void print_instr_wrapper_decl(const std::string &instrName,
+                              const std::string &indent,
+                              std::ofstream &stream) {
+
+  std::string wrapperFuncName = instruction_function_name(instrName);
+  stream << "void "+wrapperFuncName+"();" << std::endl;
+}
+
+// Call the single function that does all the work for a particular instruction.
+// But first set any ASVs whose values are specified in the encoding and used by the instruction.
+void print_instr_wrapper_call(const InstEncoding_t& encoding,
+                              const std::string &indent,
+                              std::ofstream &cpp) {
+
+  std::string instrName = decode(encoding);
+  std::string wrapperFuncName = instruction_function_name(instrName);
+
+  cpp << indent+wrapperFuncName+"();" << std::endl;
+}
+
+
+// Create a series of C++ statements that do all the work for a particular instruction:
+// calling each relevant update function, updating the ASVs, and printing debug info.
+// If write target is array, then update memory
+void print_instr_calls(const InstEncoding_t& encoding,
                        std::string indent,
-                       std::ofstream &cpp,
-                       uint32_t memAddr) {
+                       std::ofstream &cpp) {
   std::string instrName = decode(encoding);
   uint32_t idx = get_instr_by_name(instrName);
   struct InstrInfo_t& instrInfo = g_instrInfo[idx];    
 
-  cpp << indent+"// instr"+toStr(idx)+": "+instrInfo.name << std::endl;
   cpp << indent+"if (PRINT_ALL) printf( \"// instr"+toStr(idx)+": "
-               +instrInfo.name+", memAddr: "+toStr(memAddr)+"\\n\");" << std::endl << std::endl;
+               +instrInfo.name+"\\n\");" << std::endl << std::endl;
 
   if(instrInfo.funcTypes.empty()) {
     toCout("Error: no func_info found for instruction: "+instrInfo.name);
@@ -479,27 +711,41 @@ void print_instr_calls(std::map<std::string,
   // It is expected that each variable is updated by at most one function call.
   for (FuncCall_t& funcCall : funcCalls) {
     for (std::string& varName : funcCall.varNames) {
-      if (!is_array_var(varName)) {
+      if (is_array_var(varName)) {
+        if(!g_update_all_regs) {  
+
+          auto itr = g_registerArrays.find(varName);
+          assert(itr != g_registerArrays.end());
+
+          uint32_t depth = itr->second.getLength();
+          cpp << indent << "for (int i = 0; i < "+toStr(depth)+"; i++) {" << std::endl;
+          cpp << indent << "  " << varName+"[i] = "+varName+nxt+"[i];" << std::endl;
+          cpp << indent << "}" << std::endl;
+        }
+      } else if (!is_array_var(varName)) {
         if(!g_update_all_regs) {
           cpp << indent+varName +" = "+varName+nxt+";" << std::endl;
         }
       } else {
-        updateMem = true;
+        updateMem = true;  // Doug: ????
       }
 
       // ==== do instrAddr or dataAddr
       if(!instrAddr.empty() && varName == instrAddr) {
-        cpp << indent+g_instrAddrVar+" = "+varName+nxt+" ;" << std::endl;
+        cpp << indent+g_instrAddrVar+" = "+varName+nxt+";" << std::endl;
         cpp << std::endl;
       } else if(instrInfo.funcTgtMap.count(varName)) {
-        cpp << indent+"data_byte_addr = ("+g_dataAddrVar+" >> 2) % "+toStr(memSize)+";" << std::endl;
+        cpp << indent+"data_byte_addr = ("+g_dataAddrVar+" >> 2) % "+toStr(g_memSize)+";" << std::endl;
         cpp << indent+g_dataIn+" = mem[data_byte_addr] ;" << std::endl;
       }
     }
   }
+
+  if(g_update_all_regs) update_all_asvs(cpp, "    "); 
+
   cpp << std::endl;
 
-  print_asv_values(cpp, "Updated ASV values:");
+  print_asvs(cpp, "Updated ASV values:");
 
   // update dmem for store instructions of URV
   if(g_design == URV
@@ -508,7 +754,6 @@ void print_instr_calls(std::map<std::string,
     print_urv_update_mem(cpp);
   }
 
-  cpp << indent+"printf(\"\\n\");" << std::endl;
 
   cpp << std::endl;
 
@@ -522,17 +767,17 @@ void print_instr_calls(std::map<std::string,
 std::string c_type(uint32_t width) {
   std::string ret;
   switch (width) {
-    //case 1 ... 8:
-    //  ret = "unsigned char";
-    //  break;
-    case 1 ... 16:  // Note: the "..." is a GCC extension.
-      ret = "unsigned short";
+    case 1 ... 8:
+      ret = "uint8_t";
+      break;
+    case 9 ... 16:  // Note: the "..." is a GCC extension.
+      ret = "uint16_t";
       break;
     case 17 ... 32:
-      ret = "unsigned int";
+      ret = "uint32_t";
       break;
     case 33 ... 64:
-      ret = "long int";
+      ret = "uint64_t";
       break;
     case 65 ... 8388607:  // Maximum width supported by LLVM.
       {
@@ -542,66 +787,108 @@ std::string c_type(uint32_t width) {
       break;
     default:
       toCout("Size of "+toStr(width)+" bits is not supported.");
-      ret = "long int";
+      ret = "uint64_t";
       break;
   }
   return ret;
 }
 
 
-// This can be different than the ASV variable type, since large variables
-// are passed by const reference instead of value.  An exception is
-// teh extra parameter for a large return value, which is a non-const reference.
-std::string asv_func_param_type(uint32_t width, bool is_const=true) {
-  std::string ret;
+// Find all variables that are parameters of any of the given
+// instruction's update functions (as read from func_info.txt),
+// and set their values based on any values found in the 
+// instruction encoding (as read from tb.txt).
+// An example might be a load-type instruction that uses
+// a data value from an input data bus, or a register instruction
+// where the specific register is encoded by some bits of the
+// instruction's opcode.
+//
+// This situation is less common than you may think, because any
+// port/register value that is completely specified in instr.txt
+// will be treated as a constant by the LLVM optimization.
+// Only values with some undefined ("x") bits should need
+// to be dealt with here.  BTW, if some random internal register shows
+// up as a function parameter without being mentioned in instr.txt,
+// allowed_target.txt, or tb.txt, something has gone wrong.
+//
+// currently only support one-cycle inputInstr
+void print_var_assignments(std::ofstream &cpp, std::string indent, 
+                      const InstEncoding_t &inputInstr) {
 
-  if (is_const && width > 64) {
-   ret = "const ";
-  }
+  std::string instrName = decode(inputInstr);
+  uint32_t idx = get_instr_by_name(instrName);
+  struct InstrInfo_t& instrInfo = g_instrInfo[idx];    
 
-  assert(width > 0);
-  ret += c_type(width);
-  if (width > 64) {
-     ret += "&";
+  for(auto pair: instrInfo.funcTypes) {
+    const FuncTy_t& funcTy = pair.second;
+    for(auto pair: funcTy.argTy) {
+      // Consider each arg of each update function.
+      // Skip the special args, e.g. those for returning wide values.
+      std::string arg = pair.first;
+      if (is_special_arg_name(arg)) {
+        continue;
+      }
+      auto pos = inputInstr.find(arg);
+      if(pos != inputInstr.end()) {
+        // The argument was found in the instruction encoding.
+        if((inputInstr.at(arg)).size() > 1) {
+          toCout("Warning: instruction spans multiple cycles!");
+        }
+        std::string argValue = pos->second.front();
+        // argValue could look like this: "7'h4+5'h7+5'h13+3'h2+5'h12+5'h8+2'b11"
+        llvm::APInt apValue = convert_to_single_apint(argValue);
+        // Doug: this could be > 64 bits.  Such big parameters are passed by const reference.
+        argValue = apint2literal(apValue);
+        cpp << indent << arg << " = " << argValue << ";" << std::endl;
+
+      }
+    }
   }
-    
-  return ret;
 }
 
 
-// currently only support one-cycle inputInstr
+// currently only support one-cycle encoding
 std::string func_call(std::string indent, std::string writeVar,
                       const FuncTy_t& funcTy, std::string funcName, 
-                      std::map<std::string, std::vector<std::string>> &inputInstr,
+                      const InstEncoding_t& encoding,
                       std::pair<std::string, uint32_t> dataIn) {
 
+  const char *special_comment = " /*special call*/";
   // TODO: check if need to use special funcCall
   if(g_design == AES 
      && g_aes_special_func_call.find(funcName) != g_aes_special_func_call.end()) {
-    return g_aes_special_func_call[funcName];
+    return g_aes_special_func_call[funcName] + special_comment;
   }
 
   if(g_design == URV
      && g_urv_special_func_call.find(funcName) != g_urv_special_func_call.end()) {
-    uint32_t instrValue = convert_to_single_num( inputInstr["mem_i_inst_i"].front() );
-    return g_urv_special_func_call[funcName]+toStr(instrValue)+" );";
+    std::string instrValueStr;
+    auto pos = encoding.find("mem_i_inst_i");
+    if (pos != encoding.end()) {
+      llvm::APInt instrValue = convert_to_single_apint( pos->second.front() );
+      instrValueStr = apint2literal(instrValue);
+    }
+    return g_urv_special_func_call[funcName]+instrValueStr+" );";
   }
 
   // Note: writeVar could have any name, e.g. "asv_nxt"
   std::string ret = indent;
+  int argIndent = 0;
   if (writeVar.empty() || funcTy.retTy == 0) {
     ret += funcName+"( ";  // No writeVar, or function returns void (probably for an array)
-  } else if (funcTy.retTy > 64) {
-    ret += funcName+"( ";  // A reference to the return value is passed as the last arg.
+    argIndent = ret.length();  // For indenting subsequent args
+  } else if (funcTy.retTy <= 64) {
+    ret += writeVar+" =\n  "+indent+funcName+"( ";
+    argIndent = indent.length() + funcName.length() + 4;
   } else {
-    ret += writeVar+" = "+funcName+"( ";
+    toCout("Function returns a pointer to something!");
+    assert(false);
   }
 
   unsigned argCnt = 0;
-  int argIndent = 0;
   std::map<std::string, uint32_t> varIdxMap; 
   for(auto pair: funcTy.argTy) {
-    std::string arg = pair.second;
+    std::string arg = pair.first;
 
     if(varIdxMap.find(arg) == varIdxMap.end())
       varIdxMap.emplace(arg, 0);
@@ -614,50 +901,80 @@ std::string func_call(std::string indent, std::string writeVar,
          && varIdxMap[arg] == dataIn.second-1 ) {
       argValue = g_dataIn;      
     }
-    else if(inputInstr.find(arg) != inputInstr.end()) {
-      if((inputInstr.at(arg)).size() > 1) {
-        toCout("Warning: instruction spans multiple cycles!");
-      }
-      argValue = (inputInstr[arg]).front();
-      //argValue = "7'h4+5'h7+5'h13+3'h2+5'h12+5'h8+2'b11";
-      // Doug: this could be > 64 bits.  Such big parameters are passed by const reference.
-      llvm::APInt apValue = convert_to_single_apint(argValue);
-      argValue = apint2literal(apValue);
+
+    if (arg == RETURN_VAL_PTR_ID) {
+      // This arg takes a reference to the big return value.
+      // The function itself return void.
+      assert(funcTy.retTy == 0);
+      argValue = writeVar;
+    }
+    else if (arg == RETURN_ARRAY_PTR_ID) {
+      // We need to provide the address of the result storage of the result's register array.
+      argValue = writeVar;
     }
     else {
-      // The arg is an ASV: Either a scalar or en element of a register array.
-      if (is_in_array(arg)) {
-        // The arg value is a member of the array.
-        int idx = 0;
-        std::string arrayName = get_array_position(arg, &idx);
-        assert(!arrayName.empty());
-        argValue = arrayName+"["+toStr(idx)+"]";
-      } else {
-        argValue = var_name_convert(arg, true);
-      }
+      argValue = get_arg_value(arg, encoding);
     }
 
-    if (argCnt == 0) {
-      argIndent = ret.length();  // For indenting subsequent args
-    } else {
-      ret += ",\n";
-      ret += std::string(argIndent, ' ');
-    }
-    ret += argValue;
-    argCnt++;;
-  }
-
-  if (funcTy.retTy > 64) {
     if (argCnt > 0) {
       ret += ",\n";
       ret += std::string(argIndent, ' ');
     }
-    // A reference to a big return value is passed as the last arg.
-    ret += writeVar;
+    ret += argValue;
+    argCnt++;
   }
 
   ret += " );";
   return ret;
+}
+
+
+std::string get_arg_value(const std::string& arg, const InstEncoding_t& encoding) {
+
+  // The argument value may be specified by the instruction encoding.
+  // If an empty encoding was given or the encoding specifies 'x', the value
+  // will be taken from the register (handled below).
+  // TODO: What about a partially-specified value?
+
+  auto pos = encoding.find(arg);
+  if (pos != encoding.end()) {
+    
+    if(pos->second.size() > 1) {
+      toCout("Warning: instruction spans multiple cycles!");
+    }
+
+    std::string argValue = pos->second.front();
+
+    // If the arg value is fully defined (no 'x' in it), we pass it to the function.
+    // Otherwise the value is taken from the register.
+    // It is bad if the register value is not consistent with the defined bits of the encoding.
+    // Detecting this would require a runtime test.
+
+    if (!contains_x(argValue)) {
+      // e.g. "7'h4+5'h7+5'h13+3'h2+5'h12+5'h8+2'b11"
+      // The value could be > 64 bits.  Such big parameters are passed by const reference.
+      llvm::APInt apValue = convert_to_single_apint(argValue);
+      return apint2literal(apValue);
+    }
+  }
+
+  if (is_array_var(arg)) {
+    // The arg is a pointer to an ASV register array, so pass the array's address
+    return var_name_convert(arg, true);
+  }
+
+  // The arg is a register: Either a scalar or an element of a register array.
+  if (is_in_array(arg)) {
+    // The arg value is a member of the array.
+    // Normally the entire array will be passed, so this may never be reached.
+    int idx = 0;
+    std::string arrayName = get_array_position(arg, &idx);
+    assert(!arrayName.empty());
+    return arrayName+"["+toStr(idx)+"]";
+  } 
+
+  // Default case: a reference to a register
+  return var_name_convert(arg, true);
 }
 
 
@@ -667,143 +984,95 @@ void print_func_declare(const FuncTy_t& funcTy,
   std::map<std::string, uint32_t> argIdx;
   std::string funcNameSimp = var_name_convert(funcName, true);
 
-  // Small variables are returned by value, but big ones are returned via an extra reference arg.
-  // Functions for register arrays may return void (represented as a width of 0).
-  std::string ret = (funcTy.retTy > 0 && funcTy.retTy <= 64) ? c_type(funcTy.retTy) : "void";
+  // Small variables are returned by value, but big ones and arrays typically are returned via
+  // an extra reference arg.  Currently the functions never return pointers.
+  assert(funcTy.retTy >= 0);
+  std::string ret = (funcTy.retTy > 0) ? c_type(funcTy.retTy) : "void";
   ret += " " + funcNameSimp + " ( ";
 
   for(auto pair : funcTy.argTy) {
-    uint32_t width = pair.first;
-    std::string argType = asv_func_param_type(width);
-    std::string argName = pair.second;
+    std::string argName = pair.first;
     std::string argNameSimp = var_name_convert(argName, true);
+      
+    // If for some reason the same arg name is repeated, uniquify the name (really needed?)
     std::string idx = "";
     if(argIdx.find(argNameSimp) == argIdx.end()) {
       argIdx.emplace(argNameSimp, 0);
     }
     else {
-      idx = std::to_string(++argIdx[argNameSimp]);
+      argNameSimp += std::to_string(++argIdx[argNameSimp]);
     }
-    ret = ret + argType + " " + argNameSimp + idx + ", ";
+
+    int width = pair.second;
+
+    if (is_special_arg_name(argName)) {
+      // A special arg, for passing/returning a register array, or 
+      // returning a big scalar. 
+      if (argName == RETURN_VAL_PTR_ID) {
+        // This arg points to a caller-provided space for returning a big scalar.
+        assert(funcTy.retTy == 0);  
+        assert(width < 0);
+        ret += c_type(-width)+"& "+argNameSimp+", ";
+      }
+      else if (argName == RETURN_ARRAY_PTR_ID) {
+        // This arg points to a caller-provided array for returning a register array
+        assert(width < 0);
+        ret += c_type(-width)+" *"+argNameSimp+", ";
+        // TODO: get correct type, not void.
+      } else {
+        abort();  // Unknown special arg?
+      }
+    } else if (is_array_var(argName)) {
+      // A ASV register array argment, passed as a const pointer
+      assert(width < 0);
+      // Arg passed by const reference
+      ret += "const "+c_type(-width)+" *"+argNameSimp+", ";
+    } else {
+      // A scalar ASV argument (passed by value or reference)
+      if (width > 0) {
+        // Arg passed by value
+        ret += c_type(width)+" "+argNameSimp+", ";
+      } else if (width < 0) {
+        // Arg passed by const reference
+        ret += "const "+c_type(-width)+"& "+argNameSimp+", ";
+      } else {
+        abort();  // 0 width?
+      }
+    }
   }
   if(funcTy.argTy.size() > 0) {
     ret.pop_back();  // Remove extra ", "
     ret.pop_back();
   }
 
-  if (funcTy.retTy > 64) {
-    // Add the extra arg for the big return value
-    ret += ", "+asv_func_param_type(funcTy.retTy, false /*is_const*/)+" _return_val_ptr_";
-  }
-    
   ret = ret + " );";
   header << ret << std::endl;
 }
 
 
-uint32_t convert_to_single_num(std::string numIn) {
-  std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");
-  std::smatch m;
-  if(numIn.find("+") == std::string::npos) {
-    if(std::regex_match(numIn, m, pNum)) {
-      uint32_t width = std::stoi(m.str(1));
-      if(width > 32) {
-        toCout("Error: too long number, use convert_to_long_single_num:"
-              +numIn);
-        abort();
-      }
-    }
-    return hdb2int(numIn);
-  }
-  else {
-    std::vector<std::string> vec;
-    split_by(numIn, "+", vec);
-    uint32_t ret = 0;
-    for(std::string num : vec) {
-      std::smatch m;
-      if(!std::regex_match(num, m, pNum)) {
-        toCout("Error: does not match pNum: "+num);
-        abort();
-      }
-      uint32_t width = std::stoi(m.str(1));
-      uint32_t localVal = hdb2int(num);
-      ret = (ret << width) + localVal;
-    }
-    return ret;
-  }
+
+// Function for putting numeric literals in generated C++ code, in desired radix.
+// Don't bother using for things like loop counter values, which are easy to understand
+// in decimal.
+// Controlled by global flag, which is controlled by command-line option.
+template <typename T>
+std::string toLiteral(T a) {
+  // Don't print single-digit or negative numbers in hex.
+  if (!g_hex || a < 9) {
+    return std::to_string(a);
+  } 
+
+  std::ostringstream ss;
+  ss << "0x" << std::hex << a;
+  return ss.str();
 }
 
-
-uint64_t convert_to_long_single_num(std::string numIn) {
-  std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");
-  std::smatch m;
-  if(numIn.find("+") == std::string::npos) {
-    if(std::regex_match(numIn, m, pNum)) {
-      uint32_t width = std::stoi(m.str(1));
-      if(width > 32) {
-        toCout("Error: too long number:"
-              +numIn);
-        abort();
-      }
-    }
-    return hdb2int(numIn);
-  }
-  else {
-    std::vector<std::string> vec;
-    split_by(numIn, "+", vec);
-    uint64_t ret = 0;
-    for(std::string num : vec) {
-      std::smatch m;
-      if(!std::regex_match(num, m, pNum)) {
-        toCout("Error: does not match pNum: "+num);
-        abort();
-      }
-      uint32_t width = std::stoi(m.str(1));
-      uint32_t localVal = hdb2int(num);
-      ret = (ret << width) + localVal;
-    }
-    return ret;
-  }
+// Specialization to avoid warning about comparing bool to 9
+template<>
+std::string toLiteral<bool>(bool a) {
+  return std::string(a ? "true" : "false");
 }
 
-
-llvm::APInt convert_to_single_apint(std::string numIn) {
-  std::regex pNum("(\\d+)'(d|h|b)([0-9a-fA-Fx]+)");
-  std::smatch m;
-  if(numIn.find("+") == std::string::npos) {
-    // No concatenation
-    return hdb2apint(numIn);
-  } else {
-    std::vector<std::string> vec;
-    split_by(numIn, "+", vec);
-    llvm::APInt ret;
-
-    for(std::string num : vec) {
-      std::smatch m;
-      if(!std::regex_match(num, m, pNum)) {
-        toCout("Error: does not match pNum: "+num);
-        abort();
-      }
-      llvm::APInt localVal = hdb2apint(num);
-
-      // Sanity check
-      uint32_t w = std::stoi(m.str(1));
-      assert(w == localVal.getBitWidth());
-
-      llvm::APInt newRet(ret.getBitWidth() + localVal.getBitWidth(), 0);
-
-      // The existing bits (if any) go in the upper portion of newRet, and
-      // the new bits go in the lower portion.  BTW, the LLVM code
-      // is efficient for the first loop interation, where ret has no bits yet.
-      newRet.insertBits(ret, localVal.getBitWidth());
-      newRet.insertBits(localVal, 0);
-
-      ret = newRet;
-    }
-
-    return ret;
-  }
-}
 
 
 // For values <= 64 bits, this returns something like "1234".
@@ -813,14 +1082,14 @@ llvm::APInt convert_to_single_apint(std::string numIn) {
 std::string apint2initializer(const llvm::APInt& val) {
   unsigned nw = val.getNumWords();
   if (nw == 1) {
-    return toStr(val.getZExtValue());
+    return toLiteral(val.getZExtValue());
     //return llvm::toString(val, 10, false/*signed*/);
   }
 
   const uint64_t *p = val.getRawData();
   std::string ret = "{";
   for(unsigned j=0; j < nw; ++j) {
-    ret += toStr(*p++);
+    ret += toLiteral(*p++);
     if (j < nw-1) {
       ret += ", ";
     }
@@ -838,7 +1107,7 @@ std::string apint2initializer(const llvm::APInt& val) {
 std::string apint2literal(const llvm::APInt& val) {
   std::string s = apint2initializer(val);
   if (val.getBitWidth() > 64) {
-    s = "std::array<uint64_t,"+toStr(val.getNumWords())+">" + s;
+    s = "std::array<uint64_t,"+toLiteral(val.getNumWords())+">" + s;
   }
   return s;
 }
@@ -848,11 +1117,24 @@ std::string apint2literal(const llvm::APInt& val) {
 
 
 void update_all_asvs(std::ofstream &cpp, std::string indent) {
-  // update asvs with their nxt counterparts
+
+  // update non-array asvs with their nxt counterparts
   for(auto pair : g_asv) {
     std::string asv = pair.first;
-    std::string asvSimp = var_name_convert(asv, true);
-    cpp << indent+asvSimp +" = "+asvSimp+nxt+" ;" << std::endl;
+    if (!is_array_var(asv)) {
+      std::string asvSimp = var_name_convert(asv, true);
+      cpp << indent+asvSimp +" = "+asvSimp+nxt+";" << std::endl;
+    }
+  }
+
+  // Now do the register arrays.
+  for (auto pair : g_registerArrays) {
+    const std::string& varName = pair.first;
+    uint32_t depth = pair.second.getLength();
+
+    cpp << indent << "for (int i = 0; i < "+toStr(depth)+"; i++) {" << std::endl;
+    cpp << indent << "  " << varName+"[i] = "+varName+nxt+"[i];";
+    cpp << indent << "}" << std::endl;
   }
 }
 
@@ -935,7 +1217,7 @@ std::string get_array_position(const std::string& varName, int* idxp) {
 // Prefix is the first portion of the printf string.
 // Works for vars wider than 64 bits
 // The index parameter is meant for printing array members, and should be something like "i".
-// If it is given, varName needs to contain "%d".
+// If it is given, varName needs to contain "%d" or "%x".
 std::string build_printf(const std::string& prefix, const std::string& varName,
                           uint32_t width, std::string index) {
   if (!index.empty())
@@ -943,22 +1225,23 @@ std::string build_printf(const std::string& prefix, const std::string& varName,
 
   std::string s;
   if (width <= 32) {
-    s = "printf(\""+prefix+"%d\\n\", "+index+varName+");";
+    s = "printf(\""+prefix+"%"+g_radixChar+"\\n\", "+index+varName+");";
   } else if (width <= 64) {
-    s = "printf(\""+prefix+"%ld\\n\", "+index+varName+");";
+    s = "printf(\""+prefix+"%l"+g_radixChar+"\\n\", "+index+varName+");";
   } else {
     s = "printf(\""+prefix+"{";
     int words = (width+63)/64;
     for (int j=0; j< words; ++j) {
-      s += "%ld";
+      s += "%l"+g_radixChar;
       if (j < words-1) {
         s += ", ";
       }
     }
     s += "}\\n\", "+index;
-    for (int j=0; j< words; ++j) {
+    // Print the words in reverse order, so the MS word is first.
+    for (int j=words-1; j >= 0; --j) {
       s += varName+"["+toStr(j)+"]";
-      if (j < words-1) {
+      if (j > 0) {
         s += ", ";
       }
     }
@@ -988,19 +1271,28 @@ void print_var_value(std::string indent, std::ofstream &cpp, const std::string& 
 }
 
 
-void print_asv_values(std::ofstream &cpp, const std::string& bannerLine, bool always) {
+void print_asvs(std::ofstream &cpp, const std::string& bannerLine, bool always) {
 
-  std::string indent = "  ";
-
-  if (!always) {
-    cpp << "  if (PRINT_ALL) {" << std::endl;
-    indent = "    ";
+  if (bannerLine.empty()) {
+    cpp << "  print_asvs(nullptr, "+toStr(always)+");";
+  } else {
+    cpp << "  print_asvs(\""+bannerLine+"\", "+toStr(always)+");";
   }
+  cpp << std::endl;
+}
 
-  if (!bannerLine.empty()) {
-    cpp << indent << "printf(\""+bannerLine+"\\n\");" << std::endl;
-  }
 
+// Generate the body of the function to print ASV values.
+void print_asvs_printer_func(std::ofstream &cpp) {
+
+  cpp << "void print_asvs(const char *bannerLine, bool always) {" << std::endl;
+
+
+  cpp << "  if (always || PRINT_ALL) {" << std::endl;
+
+  cpp << "    if (bannerLine != nullptr) printf(\"%s\\n\", bannerLine);" << std::endl;
+
+  std::string indent = "    ";
 
   // Print plain ASVs, skipping those in register arrays.
   for(auto pair : g_asv) {
@@ -1026,9 +1318,13 @@ void print_asv_values(std::ofstream &cpp, const std::string& bannerLine, bool al
     }
   }
 
-  if (!always) cpp << "  }" << std::endl;
+  cpp << indent+"printf(\"\\n\");" << std::endl;
+
+  cpp << "  }" << std::endl;
+  cpp << "}" << std::endl;
   cpp << std::endl;
 }
+
 
 
 void print_array(std::string indent, std::string arrName, std::ofstream &cpp) {
@@ -1040,8 +1336,8 @@ void print_array(std::string indent, std::string arrName, std::ofstream &cpp) {
 
   uint32_t depth = itr->second.getLength();
   uint32_t width = itr->second.getWidth();
-  cpp << indent << "for(int i = 0; i < "+toStr(depth)+"; i++) {" << std::endl;
-  std::string printName = arrName+"[%d]";
+  cpp << indent << "for (int i = 0; i < "+toStr(depth)+"; i++) {" << std::endl;
+  std::string printName = arrName+"[%"+g_radixChar+"]";
   std::string elementName = arrName+"[i]";
   cpp << indent << "  " << build_printf(printName+": ", elementName, width, "i") << std::endl;
   cpp << indent << "}" << std::endl;
@@ -1051,22 +1347,23 @@ void print_array(std::string indent, std::string arrName, std::ofstream &cpp) {
 
 // Return a C-compatible value for the given asv's reset value.
 // Either a single number, or a std::array initializer for >64 bits.
-std::string get_c_rst_val(const std::string& asv) {
+std::string get_c_rst_val(const std::string& asv, uint32_t width) {
 
   std::string noSlash = asv;
   if(asv.substr(0, 1) == "\\") noSlash = asv.substr(1);
 
   std::string rstVal;
   if(g_rstVal.find(noSlash) == g_rstVal.end()) {
-    toCout("Warning: cannot find rst value for: "+noSlash);
-    rstVal = "0";
+    rstVal = toStr(width)+"'b0";
+    toCout("Warning: cannot find rst value for "+noSlash+", using "+rstVal);
   }
   else {
     rstVal = g_rstVal[noSlash];
   }
 
-  toCout("rst val of "+asv+"  "+rstVal);
+  toCoutVerb("rst val of "+asv+"  "+rstVal);
   llvm::APInt rstValAPInt = hdb2apint(rstVal);
+  assert(rstValAPInt.getBitWidth() == width);  // Sanity check
   std::string cRstVal = apint2initializer(rstValAPInt);
 
   return cRstVal;
@@ -1074,21 +1371,15 @@ std::string get_c_rst_val(const std::string& asv) {
 
 
 
-std::string initialize_mem(std::string fileName) {
+void read_mem_vals(std::string fileName, std::vector<llvm::APInt>& vals) {
   std::ifstream input(fileName);
-  std::string ret;
   if(input.good()) {
     std::string line;
     while(std::getline(input, line)) {
-      uint32_t dec = hex2int(line);
-      ret = ret + toStr(dec) + ", ";
-    }
-    if(ret.size() > 2) {
-      ret.pop_back();
-      ret.pop_back();
+      remove_two_end_space(line);
+      vals.push_back(convert_to_single_apint(line));
     }
   }
-  return ret;
 }
 
 
@@ -1097,7 +1388,7 @@ std::string initialize_mem(std::string fileName) {
 void print_update_mem(std::ofstream &cpp) {
   cpp << "void update_mem() {"                                               << std::endl;
   cpp << "  for(int i = 0; i < 16; i++) {"                                   << std::endl;
-  cpp << "    mem[ _write_addr_fifo_out0_Arr[i] ] = _data_fifo_out0_Arr[i];" << std::endl;
+  cpp << "    mem[ _write_addr_fifo_out0_Arr[i] ] = data_fifo_out0_Arr[i];"  << std::endl;
   cpp << "  }"                                                               << std::endl;
   cpp << "}\n"                                                               << std::endl;
 }
@@ -1109,19 +1400,20 @@ void print_update_mem_call(std::ofstream &cpp) {
 
 
 
-// key is funcName, value is function call statement
-std::map<std::string, std::string> g_aes_special_func_call 
-= { {"start__data_fifo_out0_Arr", "    start__data_fifo_out0_Arr( 0, _aes_top_0_aes_reg_ctr_i_reg_out_LOW, 0,  _aes_top_0_aes_reg_key0_i_reg_out_LOW, mem[_read_addr_fifo_out0_Arr[15]], mem[_read_addr_fifo_out0_Arr[14]], mem[_read_addr_fifo_out0_Arr[13]], mem[_read_addr_fifo_out0_Arr[12]], mem[_read_addr_fifo_out0_Arr[11]], mem[_read_addr_fifo_out0_Arr[10]], mem[_read_addr_fifo_out0_Arr[9]], mem[_read_addr_fifo_out0_Arr[8]], mem[_read_addr_fifo_out0_Arr[7]], mem[_read_addr_fifo_out0_Arr[6]], mem[_read_addr_fifo_out0_Arr[5]], mem[_read_addr_fifo_out0_Arr[4]], mem[_read_addr_fifo_out0_Arr[3]], mem[_read_addr_fifo_out0_Arr[2]], mem[_read_addr_fifo_out0_Arr[1]], mem[_read_addr_fifo_out0_Arr[0]] );\n"},
-{"start_data_fifo_out0_Arr", "    start__data_fifo_out0_Arr( 0, _aes_top_0_aes_reg_ctr_i_reg_out_LOW, 0,  _aes_top_0_aes_reg_key0_i_reg_out_LOW, mem[_read_addr_fifo_out0_Arr[15]], mem[_read_addr_fifo_out0_Arr[14]], mem[_read_addr_fifo_out0_Arr[13]], mem[_read_addr_fifo_out0_Arr[12]], mem[_read_addr_fifo_out0_Arr[11]], mem[_read_addr_fifo_out0_Arr[10]], mem[_read_addr_fifo_out0_Arr[9]], mem[_read_addr_fifo_out0_Arr[8]], mem[_read_addr_fifo_out0_Arr[7]], mem[_read_addr_fifo_out0_Arr[6]], mem[_read_addr_fifo_out0_Arr[5]], mem[_read_addr_fifo_out0_Arr[4]], mem[_read_addr_fifo_out0_Arr[3]], mem[_read_addr_fifo_out0_Arr[2]], mem[_read_addr_fifo_out0_Arr[1]], mem[_read_addr_fifo_out0_Arr[0]] );\n"}
+const std::string aes_special_call =  "    start_data_fifo_out0_Arr_wrapper(_aes_top_0_aes_reg_ctr_i_reg_out, _aes_top_0_aes_reg_key0_i_reg_out, mem[_read_addr_fifo_out0_Arr[15]], mem[_read_addr_fifo_out0_Arr[14]], mem[_read_addr_fifo_out0_Arr[13]], mem[_read_addr_fifo_out0_Arr[12]], mem[_read_addr_fifo_out0_Arr[11]], mem[_read_addr_fifo_out0_Arr[10]], mem[_read_addr_fifo_out0_Arr[9]], mem[_read_addr_fifo_out0_Arr[8]], mem[_read_addr_fifo_out0_Arr[7]], mem[_read_addr_fifo_out0_Arr[6]], mem[_read_addr_fifo_out0_Arr[5]], mem[_read_addr_fifo_out0_Arr[4]], mem[_read_addr_fifo_out0_Arr[3]], mem[_read_addr_fifo_out0_Arr[2]], mem[_read_addr_fifo_out0_Arr[1]], mem[_read_addr_fifo_out0_Arr[0]], data_fifo_out0_Arr_nxt);";
 
+// key is funcName, value is function call statement
+std::map<std::string, std::string> g_aes_special_func_call = {
+  {"start__data_fifo_out0_Arr_wrapper", aes_special_call},  // Two alternative spellings...
+  {"start_data_fifo_out0_Arr_wrapper", aes_special_call}
 };
 
 
 
 std::map<std::string, std::string> g_vta_special_func_call
-= { {"gemm__store_tensorStore_tensorFile_0_0", "    gemm__store_tensorStore_tensorFile_0_0( 0, 0, 0, 0, 0, 0, 0,  );\n"},
+= { {"gemm__store_tensorStore_tensorFile_0_0", "    gemm__store_tensorStore_tensorFile_0_0( 0, 0, 0, 0, 0, 0, 0,  );"},
 
-{"start_data_fifo_out0_Arr", "    start__data_fifo_out0_Arr( 0, _aes_top_0_aes_reg_ctr_i_reg_out_LOW, 0,  _aes_top_0_aes_reg_key0_i_reg_out_LOW, mem[_read_addr_fifo_out0_Arr[15]], mem[_read_addr_fifo_out0_Arr[14]], mem[_read_addr_fifo_out0_Arr[13]], mem[_read_addr_fifo_out0_Arr[12]], mem[_read_addr_fifo_out0_Arr[11]], mem[_read_addr_fifo_out0_Arr[10]], mem[_read_addr_fifo_out0_Arr[9]], mem[_read_addr_fifo_out0_Arr[8]], mem[_read_addr_fifo_out0_Arr[7]], mem[_read_addr_fifo_out0_Arr[6]], mem[_read_addr_fifo_out0_Arr[5]], mem[_read_addr_fifo_out0_Arr[4]], mem[_read_addr_fifo_out0_Arr[3]], mem[_read_addr_fifo_out0_Arr[2]], mem[_read_addr_fifo_out0_Arr[1]], mem[_read_addr_fifo_out0_Arr[0]] );\n"}
+{"start_data_fifo_out0_Arr", "    start__data_fifo_out0_Arr( 0, _aes_top_0_aes_reg_ctr_i_reg_out_LOW, 0,  _aes_top_0_aes_reg_key0_i_reg_out_LOW, mem[_read_addr_fifo_out0_Arr[15]], mem[_read_addr_fifo_out0_Arr[14]], mem[_read_addr_fifo_out0_Arr[13]], mem[_read_addr_fifo_out0_Arr[12]], mem[_read_addr_fifo_out0_Arr[11]], mem[_read_addr_fifo_out0_Arr[10]], mem[_read_addr_fifo_out0_Arr[9]], mem[_read_addr_fifo_out0_Arr[8]], mem[_read_addr_fifo_out0_Arr[7]], mem[_read_addr_fifo_out0_Arr[6]], mem[_read_addr_fifo_out0_Arr[5]], mem[_read_addr_fifo_out0_Arr[4]], mem[_read_addr_fifo_out0_Arr[3]], mem[_read_addr_fifo_out0_Arr[2]], mem[_read_addr_fifo_out0_Arr[1]], mem[_read_addr_fifo_out0_Arr[0]] );"}
 
 };
 
@@ -1150,7 +1442,7 @@ std::map<std::string, std::string> g_urv_special_func_call
 
 void convert_concat_to_hex(std::string line, std::ofstream &imem) {
   std::vector<std::string> numVec;
-  std::regex pNum("(\\d+)'b([01]+)");  
+  static const std::regex pNum("(\\d+)'b([01]+)");  
   if(line.find("//") != std::string::npos) abort();
   if(line.empty()) abort();
   boost::split(numVec, line, boost::is_any_of("+"));
@@ -1188,11 +1480,24 @@ void vta_ila_model(std::ofstream &cpp) {
     toCout("instr "+toStr(instrIdx));
     std::string firstByte = encoding["io_vme_rd_0_data_bits"][2];
     std::string secondByte = encoding["io_vme_rd_0_data_bits"][3];
-    uint64_t firstByteNum = convert_to_long_single_num(firstByte);    
-    uint64_t secondByteNum = convert_to_long_single_num(secondByte);
 
-    std::string firstByteHex = longDec2hex(toStr(firstByteNum));
-    std::string secondByteHex = longDec2hex(toStr(secondByteNum));
+    llvm::APInt firstByteAP = convert_to_single_apint(firstByte);    
+    llvm::APInt secondByteAP = convert_to_single_apint(secondByte);
+
+    if (firstByteAP.getBitWidth() > 32) {
+      toCout("Error: too long number: "+firstByte);
+      abort();
+    }
+    if (secondByteAP.getBitWidth() > 32) {
+      toCout("Error: too long number: "+secondByte);
+      abort();
+    }
+
+    // TODO: simplify, perhaps with APInt::toStringUnsigned()?
+    std::string firstByteDec = toStr(firstByteAP.getZExtValue());
+    std::string secondByteDec = toStr(secondByteAP.getZExtValue());
+    std::string firstByteHex = longDec2hex(firstByteDec);
+    std::string secondByteHex = longDec2hex(secondByteDec);
 
     if(firstByteHex.size() < 16) 
       firstByteHex = std::string(16-firstByteHex.size(), '0') + firstByteHex;
@@ -1205,21 +1510,21 @@ void vta_ila_model(std::ofstream &cpp) {
     cpp << "  // instr "+toStr(instrIdx++)+": "+instrName+"\n" << std::endl;
     if(instrName.find("gemm") != std::string::npos) {
       cpp << "  writeValue = gemm__store_tensorStore_tensorFile_0_0( 0, 0, 0, 0, 0, 0, 0, "
-             +toStr(firstByteNum)+", "+toStr(secondByteNum)+" );" << std::endl;
+             +firstByteDec+", "+secondByteDec+" );" << std::endl;
       cpp << "  if(PRINT_ALL) printf( \"write value for gemm: %d \", writeValue );\n"<< std::endl;
 
       cpp << "  writeValue = gemm__store_tensorStore_tensorFile_0_1( 0, 0, 0, 0, 0, 0, 0, "
-             +toStr(firstByteNum)+", "+toStr(secondByteNum)+" );" << std::endl;
+             +firstByteDec+", "+secondByteDec+" );" << std::endl;
       cpp << "  if(PRINT_ALL) printf( \"write value for gemm: %d \", writeValue );\n"<< std::endl;
 
     }
     else if(instrName.find("alu") != std::string::npos ) {
       cpp << "  writeValue = alu_add_imme1__store_tensorStore_tensorFile_0_0( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "
-             +toStr(firstByteNum)+", "+toStr(secondByteNum)+" );" << std::endl;
+             +firstByteDec+", "+secondByteDec+" );" << std::endl;
       cpp << "  if(PRINT_ALL) printf( \"write value for alu: %d \", writeValue );\n"<< std::endl;
 
       cpp << "  writeValue = alu_add_imme1__store_tensorStore_tensorFile_0_1( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "
-             +toStr(firstByteNum)+", "+toStr(secondByteNum)+" );" << std::endl;
+             +firstByteDec+", "+secondByteDec+" );" << std::endl;
       cpp << "  if(PRINT_ALL) printf( \"write value for alu: %d \", writeValue );\n"<< std::endl;
     }
     else {
