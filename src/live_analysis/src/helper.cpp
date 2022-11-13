@@ -1938,4 +1938,8 @@ void print_reg_list(const std::string& moduleName) {
 }
 
 
+bool is_mem_if_assign(const std::string &line) {
+  return false;
+}
+
 } // end of namespace taintGen
