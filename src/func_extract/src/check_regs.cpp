@@ -1031,7 +1031,7 @@ llvm::Type* DestInfo::get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext
   // TODO: implement the else case: the destVar is either single memory
   // or an array of memory
   else { // isVector && isMemVec
-    return nullptr;
+    return llvm::Type::getVoidTy(*TheContext);
   }
 }
 
