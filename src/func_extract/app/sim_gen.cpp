@@ -52,7 +52,7 @@ std::set<std::string> g_skippedTgt;
 // disable: aes
 bool g_update_all_regs = false;
 
-enum DESIGN{AES, PICO, GB, URV, VTA, BI, OTHER};
+enum DESIGN{AES, PICO, URV, VTA, BI, ACCEL, PROC};
 enum DESIGN g_design;
 
 // the second argument is the number of instructions, but only for fetch_instr_from_mem mode
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
 
   g_path = ".";   // Default path is current dir
   g_verb = false;
-  g_design = OTHER;
+  g_design = ACCEL;
 
   bool userVerbose = false;
   bool userQuiet = false;
@@ -102,9 +102,6 @@ int main(int argc, char *argv[]) {
     } else if (!strcmp(arg, "-pico")) {
       ndesopts++;
       g_design = PICO;
-    } else if (!strcmp(arg, "-gb")) {
-      ndesopts++;
-      g_design = GB;
     } else if (!strcmp(arg, "-urv")) {
       ndesopts++;
       g_design = URV;
@@ -114,9 +111,12 @@ int main(int argc, char *argv[]) {
     } else if (!strcmp(arg, "-bi")) {
       ndesopts++;
       g_design = BI;
-    } else if (!strcmp(arg, "-other")) {
+    } else if (!strcmp(arg, "-accel")) {
       ndesopts++;
-      g_design = OTHER;
+      g_design = ACCEL;  // The default
+    } else if (!strcmp(arg, "-proc")) {
+      ndesopts++;
+      g_design = PROC;
     } else {
       toCout(usageStr);
       exit(-1);
@@ -156,8 +156,13 @@ int main(int argc, char *argv[]) {
     g_set_dmem = true;
     g_dmem_width = 32;
   }
-  else if(g_design == OTHER) {
+  else if(g_design == ACCEL) {
     g_fetch_instr_from_mem = false;
+  }
+  else if(g_design == PROC) {
+    g_fetch_instr_from_mem = true;
+    g_set_dmem = false;
+    // g_instrValueVar g_instrAddrVar have defaults, which are probably wrong...
   }
 
   read_in_instructions(g_path+"/instr.txt");

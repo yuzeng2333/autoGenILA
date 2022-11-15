@@ -1716,13 +1716,13 @@ void fill_var_width(const std::string &line, VarWidth &varWidth) {
 
 
 void remove_back_space(std::string &str) {
-  while(str.back() == ' ')
+  while(!str.empty() && std::isspace(str.back()))
     str.pop_back();
 }
 
 
 void remove_front_space(std::string &str) {
-  size_t pos = str.find_first_not_of(" ");
+  size_t pos = str.find_first_not_of(" \t");
   if(pos == std::string::npos) return; 
   str = str.substr(pos);
 }

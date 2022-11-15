@@ -1207,11 +1207,15 @@ UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
                       std::shared_ptr<llvm::IRBuilder<>> &b, uint32_t timeIdx, 
                       const llvm::Twine &name, bool noinline) {
   
+  assert(!(llvm::isa<llvm::PoisonValue>(in)));
+
   uint32_t len = high-low+1;  
   if(llvm::isa<llvm::ConstantInt>(in)) {
     auto lshrVal = b->CreateLShr( in, low, timed_name("CONST_LSHR", timeIdx));
+    assert(!(llvm::isa<llvm::PoisonValue>(lshrVal)));
     llvm::Value* ret = b->CreateTrunc(lshrVal, llvmWidth(len, c), 
                                       timed_name("CONST_TRUNC", timeIdx) );
+    assert(!(llvm::isa<llvm::PoisonValue>(ret)));
     return ret;
   }
 
@@ -1249,7 +1253,9 @@ UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
   const std::string curTgt = insContextStk.get_target();
   if(curDynData->existedExpr[curTgt].find(extValName) 
       != curDynData->existedExpr[curTgt].end() ) {
-    return curDynData->existedExpr[curTgt][extValName];
+    llvm::Value *ret = curDynData->existedExpr[curTgt][extValName];
+    assert(!(llvm::isa<llvm::PoisonValue>(ret)));
+    return ret;
   }
 
   if(!g_use_concat_extract_func) {
@@ -1267,6 +1273,7 @@ UpdateFunctionGen::extract_func(llvm::Value* in, uint32_t high, uint32_t low,
     }
 
     llvm::Value* ret = b->CreateTrunc(lshrVal, llvmWidth(len, c), llvm::Twine(extValName));
+    assert(!(llvm::isa<llvm::PoisonValue>(ret)));
     curDynData->existedExpr[curTgt].emplace(extValName, ret);
     return ret;
   }

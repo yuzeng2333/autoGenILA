@@ -256,10 +256,13 @@ bool is_compatible(const std::vector<std::string> &multiCycleInstrVal,
     // Zero-extend as necessary to get the widths to match.
     // Note that a simple input value like "0" will get a default width
     // of 64 bits, which will probably not match the actual instruction width.
-    unsigned maxWidth = std::max(instr.getBitWidth(), input.getBitWidth());
-    instr = instr.zext(maxWidth);
-    input = input.zext(maxWidth);
-    instrMask = instrMask.zext(maxWidth);
+    // BTW, zext() will assert if the widths are the same.
+    if (input.getBitWidth() < instr.getBitWidth()) {
+      input = input.zext(instr.getBitWidth());
+    } else if (input.getBitWidth() > instr.getBitWidth()) {
+      instr = instr.zext(input.getBitWidth());
+      instrMask = instrMask.zext(input.getBitWidth());
+    }
 
     // Check that in instr the x bits are already zeroed.
     assert((instr & instrMask) == instr);
