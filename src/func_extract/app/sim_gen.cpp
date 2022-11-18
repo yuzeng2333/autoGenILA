@@ -117,6 +117,14 @@ int main(int argc, char *argv[]) {
     } else if (!strcmp(arg, "-proc")) {
       ndesopts++;
       g_design = PROC;
+    } else if (!strcmp(arg, "-gdb")) {
+      // Exec into gdb with this executable
+      char exe_path[PATH_MAX];
+      realpath("/proc/self/exe", exe_path);
+      std::cout << "Running \"gdb " << exe_path << "\"..." << std::endl;
+      execlp("gdb", "gdb", exe_path, nullptr); // Normally does not return
+      toCout("Cannot start up gdb!");
+      exit(-1);
     } else {
       toCout(usageStr);
       exit(-1);

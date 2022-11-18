@@ -28,6 +28,8 @@ void read_in_instructions(std::string fileName) {
   std::string lastMemReadAddr;
   while(std::getline(input, line)) {
     toCoutVerb(line);
+    if (!line.empty())
+      remove_two_end_space(line);
     if(line.empty())
       continue;
     if(line.substr(0, 2) == "//")
@@ -44,8 +46,8 @@ void read_in_instructions(std::string fileName) {
       g_recentRst = rst;
       continue;
     }
-    if(line.substr(0, 4) == "#valid") {
-      std::string var = line.substr(5);
+    if(line.substr(0, 6) == "#valid") {
+      std::string var = line.substr(7);
       remove_two_end_space(var);
       g_inputValid = var;
       continue;
