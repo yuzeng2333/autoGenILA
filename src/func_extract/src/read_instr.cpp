@@ -22,7 +22,7 @@ void read_in_instructions(std::string fileName) {
               ReadNOP, ReadMEM, ResetVal, InvarRegs, TopMod, 
               DelayBound, ReadFIFO};
   enum State state;
-  unsigned  currentCycle = 0;
+  std::set<unsigned>  currentCycleSet;  // Clock cycles currnetly being processed
   std::string lastMemReadAddr;
   while(std::getline(input, line)) {
     toCoutVerb(line);
@@ -199,35 +199,54 @@ void read_in_instructions(std::string fileName) {
       g_instrInfo.push_back(info);
 
       state = FirstSignal;
-      currentCycle = 1;
+      currentCycleSet = {1};  // Default cycle if no (n) line is given
     }
-    https://regex101.com/r/yVh0Oj/1
 
     else if(line.front() == '(') { // (n) is used to express instr word in cycle n
-      std::string digitStr = line.substr(1, line.length()-2);
-      if(!is_all_digits(digitStr)) {
+      // Syntax check for comma-separated list of numbers or number ranges, surrounded by ().
+      // See https://regex101.com/r/MauUTY/1
+      const static std::regex numRangeListRegex(
+            "^\\((\\s*(\\d+)(\\s*-\\s*(\\d+))?)\\s*(,\\s*(\\d+)(\\s*-\\s*(\\d+))?\\s*)*\\)$");
+      if (!std::regex_match(line, numRangeListRegex)) {
         toCout("Error: Invalid clock cycle specifier: "+line);
         abort();
       }
-      unsigned newCycle = std::stoi(digitStr);
-      if (newCycle < 1 || newCycle > 99) {
-        toCout("Error: Invalid clock cycle value: "+line);
-        abort();
+
+      // Parse and process individual numbers and number ranges, gathering a set of cycle numbers.
+      currentCycleSet.clear();
+
+      const static std::regex numRangeRegex("(\\d+)(?:\\s*-\\s*(\\d+))?");
+      for (std::sregex_iterator i = std::sregex_iterator(line.begin(), line.end(), numRangeRegex);
+           i != std::sregex_iterator(); ++i) {
+        std::smatch match = *i;
+
+        unsigned startCycle = std::stoi(match.str(1));
+        unsigned endCycle = match.str(2).empty() ? startCycle : std::stoi(match.str(2));
+        if (startCycle < 1 || endCycle < startCycle || endCycle > 99) {
+          toCout("Error: Invalid clock cycle value: "+line);
+        }
+
+        for (unsigned cycle = startCycle; cycle <= endCycle; ++cycle) {
+          currentCycleSet.insert(cycle);
+        }
       }
-      if (newCycle > 1 && g_instrInfo.back().instrEncoding.empty() ) {
+
+      assert(!currentCycleSet.empty());
+
+      // First member of std::set is smallest
+      if (*currentCycleSet.begin() > 1 && g_instrInfo.back().instrEncoding.empty() ) {
         toCout("Error: First clock cycle of instruction "+
                   g_instrInfo.back().name+" must be number 1: "+line);
         abort();
       }
-      if (newCycle < currentCycle || newCycle < g_instrInfo.back().instrLen) {
-        toCout("Error: Clock cycle values must be increasing: "+line);
-        abort();
-      }
-      currentCycle = newCycle;
-      g_instrInfo.back().instrLen = newCycle;
 
-      toCout("Reading data for cycle " + std::to_string(currentCycle) +
-          " of instruction " + g_instrInfo.back().name);
+      // Last member of std::set is largest
+      if (*currentCycleSet.rbegin() > g_instrInfo.back().instrLen) {
+        g_instrInfo.back().instrLen = *currentCycleSet.rbegin();
+      }
+
+        toCout("Reading data for cycle(s) " + line +
+            " of instruction " + g_instrInfo.back().name);
 
       state = FirstSignal;
     }
@@ -270,18 +289,27 @@ void read_in_instructions(std::string fileName) {
               abort();
             }
 
-            // Vector of signal values, indexed by ccurrentCycle-1;
-            // An empty vector will be created in instrEncoding if this is the first time this
-            // signal has been encountered.
-            std::vector<std::string>& signalEncoding = g_instrInfo.back().instrEncoding[signalName];
+            // Process the signal for each member of currentCycleSet
+            for (unsigned cycle : currentCycleSet) {
 
-            // Grow the signal's vector as needed.  If it grows more than one cycle,
-            // the intermediate new slots will contain blank values, which we will fill in later.
-            if (signalEncoding.size() < currentCycle) {
-              signalEncoding.resize(currentCycle);
+              // Vector of signal values, indexed by cycle-1;
+              // An empty vector will be created in instrEncoding if this is the first time this
+              // signal has been encountered.
+              std::vector<std::string>& signalEncoding = g_instrInfo.back().instrEncoding[signalName];
+
+              // Grow the signal's vector as needed.  If it grows more than one cycle,
+              // the intermediate new slots will contain blank values, which we will fill in later.
+              if (signalEncoding.size() < cycle) {
+                signalEncoding.resize(cycle);
+              }
+
+              if (!signalEncoding[cycle-1].empty() && signalEncoding[cycle-1] != encoding) {
+                toCout("Warning: For cycle "+std::to_string(cycle)+", encoding \""+signalName+
+                        " = "+signalEncoding[cycle-1]+"\" is overwritten: "+line);
+              }
+
+              signalEncoding[cycle-1] = encoding;
             }
-
-            signalEncoding[currentCycle-1] = encoding;
 
             state = SubsequentSignal;
           }
@@ -427,7 +455,7 @@ void read_in_instructions(std::string fileName) {
     abort();
   }
 
-  for (auto instr : g_instrInfo) {
+  for (const auto& instr : g_instrInfo) {
     if (instr.instrEncoding.empty()) {
       toCout("Error: instruction "+instr.name+" has no encoding!");
       abort();
@@ -435,13 +463,17 @@ void read_in_instructions(std::string fileName) {
   }
 
 
-  for (auto instr : g_instrInfo) {
-    for (auto pair : instr.instrEncoding) {
-      // For each signal of each insruction, first
-      // extend the length of its per-cycle encoding vector to the 
-      // instruction length, and then propagate the
-      // encoding of cycle N to cycle N+1 if necessary.
-      // If a signal has no encoding for the first cycle, give it a value of "x".
+  // For each signal of each insruction, first
+  // extend the length of its per-cycle encoding vector to the 
+  // instruction length, and then propagate the
+  // encoding of cycle N to cycle N+1 if necessary.
+  // If a signal has no encoding for the first cycle, give it a value of "x".
+  // On second thought: better to not auto-propagate specified encodings
+  // But it is definitely necessary to make all the vectors long enough,
+  // or UpdateFunctionGen::input_constraint() will crash.
+  
+  for (auto& instr : g_instrInfo) {
+    for (auto& pair : instr.instrEncoding) {
 
       //const std::string& signalName = pair.first;
       std::vector<std::string>& signalEncoding = pair.second;
@@ -454,9 +486,11 @@ void read_in_instructions(std::string fileName) {
         signalEncoding[0] = "x";
       }
 
-      for (size_t x=1; x < signalEncoding.size(); ++x) {
-        if (signalEncoding[x].empty()) {
-          signalEncoding[x] = signalEncoding[x-1];
+      for (size_t n=1; n < signalEncoding.size(); ++n) {
+        if (signalEncoding[n].empty()) {
+          //signalEncoding[n] = signalEncoding[n-1];
+          // Better to not auto-propagate specified encodings
+          signalEncoding[n] = "x";
         }
       }
     }

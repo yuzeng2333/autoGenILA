@@ -195,10 +195,15 @@ llvm::APInt hdb2apint(std::string num, unsigned widthOverride, bool xmask) {
     radix = 2;
     digits = m.str(2);
   } else if(is_all_digits(num)) {
-    // Simple number without width spec
+    // Simple number without width or radix spec
     // Use widthOverride if given , otherwise default width of 64
     unsigned width = widthOverride > 0 ? widthOverride : 64;
     return llvm::APInt(width, num, 10);
+  } else if (num == "x")  {
+    assert(xmask);
+    radix = 2;
+    parsedWidth = 64;
+    digits = num;
   } else {
     toCout("Error: Malformed number: "+num);
     abort();
