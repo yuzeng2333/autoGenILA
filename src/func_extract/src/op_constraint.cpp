@@ -552,8 +552,6 @@ UpdateFunctionGen::two_op_constraint(astNode* const node, uint32_t timeIdx, cont
     toCout("Error: unexpected extVec value: "+toStr(node->extVec[0]));
     abort();
   }
-  assert(!(llvm::isa<llvm::PoisonValue>(op1ExtExpr)));
-  assert(!(llvm::isa<llvm::PoisonValue>(op2ExtExpr)));
 
   if( (node->extVec[0] == 1 && node->extVec[1] != 1) 
       || (node->extVec[0] != 1 && node->extVec[1] == 1) ) {
