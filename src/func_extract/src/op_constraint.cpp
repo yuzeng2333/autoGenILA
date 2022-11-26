@@ -446,7 +446,7 @@ UpdateFunctionGen::two_op_constraint(astNode* const node, uint32_t timeIdx, cont
   bool isReduceOp = node->isReduceOp;
   assert(node->srcVec.size() == 2);
   std::string destAndSlice = node->dest;
-  if(destAndSlice.find("compute.tensorAlu.AluVector.f_15.alu._T_17") 
+  if(destAndSlice.find("alu_shr") 
        != std::string::npos) {
     //&& timeIdx == 18) {
     toCoutVerb("find it!");
@@ -576,7 +576,7 @@ UpdateFunctionGen::two_op_constraint(astNode* const node, uint32_t timeIdx, cont
     assert(!is_x(op1AndSlice) && !is_x(op2AndSlice));
   }
 
-  if(curMod->name == "hls_target_Loop_1_proc")
+  if(op1AndSlice == "addedVar165")
     toCoutVerb("Find it!");
   toCoutVerb("go to make_llvm_instr from two-op: "+op1AndSlice+", "+op2AndSlice);
   if(op1AndSlice == "\\compute.inst_q.value")
@@ -2237,6 +2237,20 @@ UpdateFunctionGen::make_llvm_instr(std::shared_ptr<llvm::IRBuilder<>> &b,
   else if(op == ">>>") {
     std::string name1 = op1Expr->getName().str();
     std::string name2 = op2Expr->getName().str();
+    uint32_t width1 = llvm::dyn_cast<llvm::IntegerType>(op1Expr->getType())->getBitWidth();
+    uint32_t width2 = llvm::dyn_cast<llvm::IntegerType>(op2Expr->getType())->getBitWidth();
+    if(op1Width != width1) {
+      toCout("Error: op1Width != width1");
+      toCout("op1Width: " + toStr(op1Width));
+      toCout("width1: " + toStr(width1));
+      abort();
+    }
+    if(op2Width != width2) {
+      toCout("Error: op2Width != width2");
+      toCout("op2Width: " + toStr(op2Width));
+      toCout("width2: " + toStr(width2));
+      abort();
+    }
     if(destWidth >= op1Width)
       if(isSigned)
         return b->CreateAShr(sext(op1Expr, destWidth, c, b), zext(op2Expr, destWidth, c, b), name);
