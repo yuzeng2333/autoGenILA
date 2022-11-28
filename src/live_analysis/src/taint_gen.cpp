@@ -970,8 +970,6 @@ int parse_verilog_line(std::string line, bool ignoreWrongOp) {
   else if( std::regex_match(line, pDynSel) ) {
     return DYNSEL;
   }
-  else if( is_mem_if_assign(line) )
-    return MEM_IF_ASSIGN;
   else if(line.find("(*") == std::string::npos){
     if(!ignoreWrongOp) {
       std::cout << "!! Unsupported operator:" + line << std::endl;

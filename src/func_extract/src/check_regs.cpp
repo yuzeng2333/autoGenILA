@@ -374,8 +374,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
         std::string portName = pathInsName+"."+output+post_fix(i);
         toCoutVerb("set mem ouput func arg, mem: "+pathInsName+", output: "+output);
         TheFunction->getArg(idx)->setName(portName);
-
-	idx++;
+	      idx++;
       }
     }
   }
@@ -619,6 +618,7 @@ UpdateFunctionGen::add_constraint(std::string varAndSlice, uint32_t timeIdx, con
   auto curMod = insContextStk.get_curMod();
   llvm::Value* ret;
   bool retIsEmpty = true;
+
   std::string var, varSlice;
   split_slice(varAndSlice, var, varSlice);
   const std::string curTgt = insContextStk.get_target();
@@ -660,6 +660,10 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
                             const uint32_t bound ) {
   // Attention: varAndSlice might have a slice, a directly-assigned varAndSlice
   std::string varAndSlice = node->dest;
+  if(varAndSlice.find("reg_op1") != std::string::npos
+      && timeIdx == 8) {
+    toCout("Find it!");
+  }
 
   auto curMod = insContextStk.get_curMod();
 
@@ -1013,9 +1017,12 @@ std::string DestInfo::get_dest_name() {
 
 // Return the correct return type for the function
 llvm::Type* DestInfo::get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext) {
-  if(!isVector) {
+  if(!isVector && !isMem) {
     return llvm::IntegerType::get(*TheContext, 
                                   destWidth);
+  }
+  else if(!isVector && isMem) {
+    return llvm::Type::getVoidTy(*TheContext);    
   }
   else if(isVector && !isMemVec){
     // if is reg vector, first check if every reg is of the same size.

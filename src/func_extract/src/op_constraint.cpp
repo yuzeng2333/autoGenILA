@@ -460,7 +460,7 @@ UpdateFunctionGen::two_op_constraint(astNode* const node, uint32_t timeIdx, cont
   split_slice(op1AndSlice, op1, op1Slice);
   split_slice(op2AndSlice, op2, op2Slice);
  
-  if(op2 == "_05_") {
+  if(op1AndSlice == "addedVar165") { 
     toCoutVerb("find it!");
   }
 
@@ -530,6 +530,10 @@ UpdateFunctionGen::two_op_constraint(astNode* const node, uint32_t timeIdx, cont
     toCout("Error: unexpected extVec value: "+toStr(node->extVec[0]));
     abort();
   }
+
+
+  uint32_t width1 = llvm::dyn_cast<llvm::IntegerType>(op1Expr->getType())->getBitWidth();
+
 
   if(node->extVec.empty() || node->extVec[1] == 0) {
     op2ExtExpr = op2Expr;
@@ -839,7 +843,7 @@ UpdateFunctionGen::add_one_concat_expr(astNode* const node, uint32_t nxtIdx, uin
   uint32_t hi = get_lgc_hi(varAndSlice, curMod);
   uint32_t lo = get_lgc_lo(varAndSlice, curMod);
 
-  if(node->dest == "d_wr_addr_fifo_out0")
+  if(node->dest.find("reg_op1") != std::string::npos)
     toCoutVerb("Find it!");
 
   if(node->childVec.size() != node->srcVec.size()) {
