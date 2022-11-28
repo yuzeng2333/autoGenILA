@@ -1017,11 +1017,11 @@ std::string DestInfo::get_dest_name() {
 
 // Return the correct return type for the function
 llvm::Type* DestInfo::get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext) {
-  if(!isVector && !isMem) {
+  if(!isVector && !isSingleMem) {
     return llvm::IntegerType::get(*TheContext, 
                                   destWidth);
   }
-  else if(!isVector && isMem) {
+  else if(!isVector && isSingleMem) {
     return llvm::Type::getVoidTy(*TheContext);    
   }
   else if(isVector && !isMemVec){

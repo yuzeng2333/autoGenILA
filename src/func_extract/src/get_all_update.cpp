@@ -256,7 +256,7 @@ void get_update_function(std::string target,
     }
     destInfo.isVector = false;
     if(isMem(target))
-      destInfo.isMem = true;
+      destInfo.isSingleMem = true;
   }
   else {
     // work on the vector of target registers defined by target
