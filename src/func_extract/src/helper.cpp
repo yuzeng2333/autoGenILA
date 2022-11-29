@@ -949,6 +949,7 @@ bool is_x(const std::string &var) {
 // The parsing ought to be more robust
 bool contains_x(const std::string &var) {
 
+  if (var == "x") return true;
   if (var.find('\'') == std::string::npos) return false;
   return var.find('x') != std::string::npos;
 }

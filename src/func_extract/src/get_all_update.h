@@ -18,13 +18,73 @@
 namespace funcExtract {
 
 
+struct WorkSet_t {
+  public:
+    void mtxInsert(std::string reg);
+    void mtxErase(std::set<std::string>::iterator it);
+    void mtxAssign(std::set<std::string> &set);
+    void mtxClear();
+    bool empty();
+    std::set<std::string>::iterator begin();
+    void copy(std::set<std::string> &copySet);
+    bool mtxExist(std::string reg);
+
+  private:
+    std::mutex mtx;
+    std::set<std::string> workSet;
+    
+};
+
+
+struct RunningThreadCnt_t {
+  public:
+    void increase();
+    void decrease();
+    uint32_t get();
+    RunningThreadCnt_t() : cnt(0) {}
+
+  private:
+    std::mutex mtx;
+    uint32_t cnt;
+};
+
+
+struct ThreadSafeVector_t {
+  public:
+    void push_back(std::string var);
+    std::vector<std::string>::iterator begin();
+    std::vector<std::string>::iterator end();
+
+  private:
+    std::mutex mtx;
+    std::vector<std::string> vec;
+};
+
+
+
+template <typename T>
+struct ThreadSafeMap_t {
+  public:
+    void emplace(const std::string& var, const T& data);
+    typename std::map<std::string, T>::iterator begin();
+    typename std::map<std::string, T>::iterator end();
+    bool contains(const std::string& var);
+    T& at(const std::string& var);
+
+  private:
+    std::mutex mtx;
+    std::map<std::string, T> mp;
+};
+
+
+
 extern std::mutex g_dependVarMapMtx;
 
 // the first key is instr name, the second key is target name
 extern std::map<std::string, 
                 std::map<std::string, ArgVec_t>> g_dependVarMap;
 
-extern struct ThreadSafeMap_t g_asvSet;
+extern struct ThreadSafeMap_t<WidthCycles_t> g_asvSet;
 extern struct RunningThreadCnt_t g_threadCnt;
 extern struct WorkSet_t g_workSet;
 extern struct ThreadSafeVector_t g_fileNameVec;
@@ -72,65 +132,6 @@ void get_update_function(std::string target,
                          //struct RunningThreadCnt_t &threadCnt,
                          //std::shared_ptr<ModuleInfo_t> topModuleInfo);
                          //struct ThreadSafeVector_t &fileNameVec);
-
-
-struct WorkSet_t {
-  public:
-    void mtxInsert(std::string reg);
-    void mtxErase(std::set<std::string>::iterator it);
-    void mtxAssign(std::set<std::string> &set);
-    void mtxClear();
-    bool empty();
-    std::set<std::string>::iterator begin();
-    void copy(std::set<std::string> &copySet);
-    bool mtxExist(std::string reg);
-
-  private:
-    std::mutex mtx;
-    std::set<std::string> workSet;
-    
-};
-
-
-struct RunningThreadCnt_t {
-  public:
-    void increase();
-    void decrease();
-    uint32_t get();
-    RunningThreadCnt_t() : cnt(0) {}
-
-  private:
-    std::mutex mtx;
-    uint32_t cnt;
-};
-
-
-struct ThreadSafeVector_t {
-  public:
-    void push_back(std::string var);
-    std::vector<std::string>::iterator begin();
-    std::vector<std::string>::iterator end();
-
-  private:
-    std::mutex mtx;
-    std::vector<std::string> vec;
-};
-
-
-
-struct ThreadSafeMap_t {
-  public:
-    void emplace(std::string var, uint32_t width);
-    std::map<std::string, uint32_t>::iterator begin();
-    std::map<std::string, uint32_t>::iterator end();
-    bool contains(const std::string& var);
-    uint32_t at(const std::string& var);
-
-  private:
-    std::mutex mtx;
-    std::map<std::string, uint32_t> mp;
-};
-
 
 } // end of namespace
 #endif

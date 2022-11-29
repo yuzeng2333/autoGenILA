@@ -25,7 +25,7 @@ std::map<std::string, astNode*> g_varNode;
 // In sim_gen and other back-end programs,
 // read_asv_info() builds this from asv_info.txt
 // Key is ASV name..
-std::map<std::string, uint32_t> g_asv;
+std::map<std::string, WidthCycles_t> g_asv;
 
 // In func_extract and sim_gen, read_instructions() builds this from instr.txt.
 // In sim_gen, read_func_info() populates the funcTypes fields from func_info.txt.

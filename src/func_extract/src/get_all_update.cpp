@@ -1,10 +1,11 @@
+#include "get_all_update.h"
+
 #include "llvm/IRReader/IRReader.h"
 #include "llvm/Support/SourceMgr.h"
 
 #include <sys/stat.h>
 
 #include "ins_context_stack.h"
-#include "get_all_update.h"
 #include "parse_fill.h"
 #include "check_regs.h"
 #include "global_data_struct.h"
@@ -26,7 +27,8 @@ std::map<std::string,
          std::map<std::string, ArgVec_t>> g_dependVarMap;
 
 // Used to write asv_info.txt
-struct ThreadSafeMap_t g_asvSet;
+// Maps variable name to bitwidth and set of clock cycles
+struct ThreadSafeMap_t<WidthCycles_t> g_asvSet;
 
 //struct RunningThreadCnt_t g_threadCnt;
 struct WorkSet_t g_workSet;
@@ -56,7 +58,7 @@ void get_all_update() {
     if(is_fifo_output(out)) continue;
     g_workSet.mtxInsert(out);
     uint32_t width = get_var_slice_width_simp(out, g_topModuleInfo);
-    g_asvSet.emplace(out, width);
+    g_asvSet.emplace(out, {width});  // Default value (empty set) for cycles.
   }
   while(std::getline(addedWorkSetInFile, line)) {
     g_workSet.mtxInsert(line);
@@ -71,7 +73,7 @@ void get_all_update() {
       std::string reg = insName+".r"+toStr(i);
       g_workSet.mtxInsert(reg);
       uint32_t width = get_var_slice_width_simp(reg, g_topModuleInfo);
-      g_asvSet.emplace(reg, width);
+      g_asvSet.emplace(reg, {width});
     }
   }
   addedWorkSetInFile.close();
@@ -84,7 +86,7 @@ void get_all_update() {
       std::string tgt = tgtDelayPair.first;    
       g_workSet.mtxInsert(tgt);
       uint32_t width = get_var_slice_width_cmplx(tgt);
-      g_asvSet.emplace(tgt, width);
+      g_asvSet.emplace(tgt, {width});
     }
   }
   else if(!g_allowedTgtVec.empty()) {
@@ -424,14 +426,14 @@ void get_update_function(std::string target,
     toCout("----- For instr "+instrInfo.name+", "+target+" is NOT affected!");
   }
 
-  for(auto pair : argVec) {
-    std::string reg = pair.first;
-    int width = pair.second;
+  for(auto arg : argVec) {
+    std::string reg = arg.name;
+    int cycle = arg.cycle;
     if(g_push_new_target && !g_visitedTgt.mtxExist(reg)) {
       g_workSet.mtxInsert(reg);
     }
 
-    width = std::abs(width);  // For pointers, we want the pointee width.
+    uint32_t width = std::abs(arg.width);  // For pointers, we want the pointee width.
 
     // Add any discovered registers that had not already been identified as ASVs
     // or register arrays.
@@ -441,7 +443,15 @@ void get_update_function(std::string target,
     if (!is_special_arg_name(reg) && g_allowedTgt.count(reg) == 0 &&
         g_allowedTgtVec.count(reg) == 0 &&
         get_vector_of_target(reg, nullptr).empty()) {
-      g_asvSet.emplace(reg, width);
+      // If we have a specific clock cycle, we may need to update an existing entry in g_asvSet
+      if(!g_asvSet.contains(reg)) {
+        g_asvSet.emplace(reg, {width});
+      } 
+      WidthCycles_t& data = g_asvSet.at(reg);  // Possibly fetch what we just inserted.
+      assert(data.width == width);  // Check for inconsistent bitwidth
+      if (cycle > 0) {
+        data.cycles.insert(cycle);  // Cycles will be empty if no specific cycle is used.
+      }
     }
   }
 }
@@ -771,23 +781,31 @@ bool gather_wrapper_func_args(llvm::Module& M,
         size = 0;
         assert(false);
       }
-      argVec.push_back(std::make_pair(argname, size));
+      argVec.push_back({argname, size, 0});
     } else if (argname == RETURN_VAL_PTR_ID) {
       // Special arg name indicates a pointer a big scalar that is the target of this function
       assert(isPointer);
       if(g_asvSet.contains(target)) {
-        size = -g_asvSet.at(target);  // Instead get size from get_var_slice_width_cmplx()?
+        size = -(g_asvSet.at(target).width);  // Instead get size from get_var_slice_width_cmplx()?
       } else {
         toCout("Function "+wrapperFuncName+" has arg "+argname+", but its target is not a known ASV!");
         size = 0;
         assert(false);
       }
-      argVec.push_back(std::make_pair(argname, size));
+      argVec.push_back({argname, size, 0});
     } else {
       // Extract the ASV name from the argument name (by removing the cycle count).
       // Note that the name will not have quotes or backslashes, like you would see in the textual IR.
       uint32_t pos = argname.find(DELIM, 0);
       std::string var = argname.substr(0, pos);
+
+      int cycle = 0;
+      if (pos != std::string::npos) {
+        // Pick out the numeric portion of the arg name
+        // Doug TODO: Do register array vars have a cycle number in their name?
+        std::string cycleStr = argname.substr(pos + DELIM.size(), std::string::npos);
+        if (cycleStr.size() > 0) cycle = std::stoi(cycleStr);
+      }
 
       if (!isPointer) {
         // A small thing (presumably a scalar ASV) passed by value
@@ -799,7 +817,7 @@ bool gather_wrapper_func_args(llvm::Module& M,
         size = -get_var_slice_width_cmplx(firstMember);
       } else if (g_asvSet.contains(var)) {
         // A big scalar ASV passed by ref
-        size = -g_asvSet.at(var);  // Instead get size from get_var_slice_width_cmplx()?
+        size = -(g_asvSet.at(var).width);  // Instead get size from get_var_slice_width_cmplx()?
       } else if (!get_vector_of_target(var, nullptr).empty()) {
         // A reference to a big scalar ASV that is a member of a register array (and thus not in g_asvSet)
         size = get_var_slice_width_cmplx(var);
@@ -811,7 +829,7 @@ bool gather_wrapper_func_args(llvm::Module& M,
         toCout("Function "+wrapperFuncName+" has arg "+var+
                   " of size "+toStr(size)+" which is not a known ASV or register array!");
       }
-      argVec.push_back(std::make_pair(var, size));
+      argVec.push_back({var, size, cycle});
     }
   }
 
@@ -821,12 +839,16 @@ bool gather_wrapper_func_args(llvm::Module& M,
 
 void print_func_info(std::ofstream &output) {
   g_dependVarMapMtx.lock();
-  for(auto pair1 : g_dependVarMap) {
+  for (const auto pair1 : g_dependVarMap) {
     output << "Instr:"+pair1.first << std::endl;
-    for(auto pair2 : pair1.second) {
+    for (const auto pair2 : pair1.second) {
       output << "Target:"+pair2.first << std::endl;
-      for(auto pair3 : pair2.second) {
-        output << pair3.first+":"+toStr(pair3.second) << std::endl;
+      for (const auto arg : pair2.second) {
+        output << arg.name+":"+toStr(arg.width);
+        if (arg.cycle != 0) {
+          output << ":"+toStr(arg.cycle);
+        }
+        output << std::endl;
       }
       output << std::endl;
     }
@@ -839,7 +861,7 @@ void print_func_info(std::ofstream &output) {
 void print_asv_info(std::ofstream &output) {
   for(auto it = g_asvSet.begin(); it != g_asvSet.end(); it++) {
     const std::string& reg = it->first;
-    uint32_t width = it->second;
+    uint32_t width = it->second.width;
 
     assert(!is_special_arg_name(reg));
 
@@ -847,7 +869,13 @@ void print_asv_info(std::ofstream &output) {
       continue;  // Skip the ASVs in registers - handle below.
     }
 
-    output << reg << ":" << width << std::endl; // Write name and width
+    // Line format is: <name>:<width>[:<cycle1>,<cycle2>,...]
+    output << reg << ":" << width; // Write name and width
+    for (int cycle : it->second.cycles) {  // Write any clock cycles
+      output << ":" << cycle;
+    }
+    output << std::endl;
+
   }
 
   // Write the contents of register arrays separately, including the array name
@@ -981,14 +1009,16 @@ std::vector<std::string>::iterator ThreadSafeVector_t::end() {
 }
 
 
-void ThreadSafeMap_t::emplace(std::string var, uint32_t width) {
+template <typename T>
+void ThreadSafeMap_t<T>::emplace(const std::string& var, const T& data) {
   mtx.lock();
-  mp.emplace(var, width);
+  mp.emplace(var, data);
   mtx.unlock();
 }
 
 
-bool ThreadSafeMap_t::contains(const std::string& var) {
+template <typename T>
+bool ThreadSafeMap_t<T>::contains(const std::string& var) {
   mtx.lock();
   bool ret = mp.count(var) > 0;
   mtx.unlock();
@@ -996,26 +1026,25 @@ bool ThreadSafeMap_t::contains(const std::string& var) {
 }
 
 
-uint32_t ThreadSafeMap_t::at(const std::string& var) {
+template <typename T>
+T& ThreadSafeMap_t<T>::at(const std::string& var) {
   mtx.lock();
-  uint32_t ret = 0;
   auto pos = mp.find(var);
-  if (pos == mp.end()) {
-    ret = 0;  // Invalid value
-  } else {
-    ret = pos->second;
-  }
+  assert(pos != mp.end());
+  T& ret = pos->second;
   mtx.unlock();
   return ret;
 }
 
 
-std::map<std::string, uint32_t>::iterator ThreadSafeMap_t::begin() {
+template <typename T>
+typename std::map<std::string, T>::iterator ThreadSafeMap_t<T>::begin() {
   return mp.begin();
 }
 
 
-std::map<std::string, uint32_t>::iterator ThreadSafeMap_t::end() {
+template <typename T>
+typename std::map<std::string, T>::iterator ThreadSafeMap_t<T>::end() {
   return mp.end();
 }
 
