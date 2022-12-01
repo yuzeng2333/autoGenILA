@@ -1246,7 +1246,7 @@ UpdateFunctionGen::switch_constraint(astNode* const node, uint32_t timeIdx,
   llvm::BasicBlock *bb = b->GetInsertBlock();
   llvm::GetElementPtrInst* ptr 
     = llvm::GetElementPtrInst::Create(
-        elementTy,
+        assignArrValue->getType()->getPointerElementType(), /*elementTy,*/
         assignArrValue,
         std::vector<llvm::Value*>{
           llvm::ConstantInt::get(
@@ -1930,13 +1930,13 @@ void UpdateFunctionGen::mem_assign_constraint(
 
   llvm::GetElementPtrInst* ptr 
   = llvm::GetElementPtrInst::Create(
-      srcExpr->getType(),
+      memValue->getType()->getPointerElementType(),
       memValue,
       std::vector<llvm::Value*>{
         llvm::ConstantInt::get(
           llvm::IntegerType::get(*TheContext, addrWidth), 
           0, false),
-          addrExpr},
+        addrExpr},
       llvm::Twine(addrAndSlice+"_PTR"+post_fix(timeIdx)),
       BB
     );
@@ -2046,14 +2046,10 @@ UpdateFunctionGen::dyn_sel_constraint( astNode* const node, uint32_t timeIdx, co
   //  llvm::BasicBlock &BBlock = curFunc->getEntryBlock();
   //  bb = &BBlock;
   //}
-  toCout("doug");
-  elementTy->print(llvm::dbgs()); llvm::dbgs() << '\n';
-  memValue->print(llvm::dbgs()); llvm::dbgs() << '\n';
-  memValue->getType()->print(llvm::dbgs()); llvm::dbgs() << '\n';
 
   llvm::GetElementPtrInst* ptr 
     = llvm::GetElementPtrInst::Create(
-        elementTy,
+        arrayType, 
         memValue,
         std::vector<llvm::Value*>{
           llvm::ConstantInt::get(
