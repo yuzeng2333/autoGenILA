@@ -520,9 +520,9 @@ isBigType(const llvm::Type *type) {
 // Make the wrapper function for C/C++ interfacing.
 // Return its name
 std::string create_wrapper_func(llvm::Module& M,
-                         std::string wrapperFuncName) {
+                         std::string mainFuncName) {
 
-  llvm::Function *mainFunc = M.getFunction(wrapperFuncName);
+  llvm::Function *mainFunc = M.getFunction(mainFuncName);
   assert(mainFunc);
 
   llvm::LLVMContext& Context = mainFunc->getContext();

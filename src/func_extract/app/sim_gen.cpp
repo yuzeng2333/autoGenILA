@@ -1550,6 +1550,7 @@ void vta_ila_model(std::ofstream &cpp) {
   cpp << std::endl;
   cpp << "int PRINT_ALL = 0;\n" << std::endl;
   cpp << "int main(int argc, char *argv[]) {\n" << std::endl;
+  cpp << "int writeValue;\n" << std::endl;
   uint32_t instrIdx = 0;
   std::ofstream imem("./imem.txt");
   for(auto encoding: toDoList) {
@@ -1560,11 +1561,11 @@ void vta_ila_model(std::ofstream &cpp) {
     llvm::APInt firstByteAP = convert_to_single_apint(firstByte);    
     llvm::APInt secondByteAP = convert_to_single_apint(secondByte);
 
-    if (firstByteAP.getBitWidth() > 32) {
+    if (firstByteAP.getBitWidth() > 64) {
       toCout("Error: too long number: "+firstByte);
       abort();
     }
-    if (secondByteAP.getBitWidth() > 32) {
+    if (secondByteAP.getBitWidth() > 64) {
       toCout("Error: too long number: "+secondByte);
       abort();
     }
@@ -1586,21 +1587,21 @@ void vta_ila_model(std::ofstream &cpp) {
     cpp << "  // instr "+toStr(instrIdx++)+": "+instrName+"\n" << std::endl;
     if(instrName.find("gemm") != std::string::npos) {
       cpp << "  writeValue = gemm__store_tensorStore_tensorFile_0_0( 0, 0, 0, 0, 0, 0, 0, "
-             +firstByteDec+", "+secondByteDec+" );" << std::endl;
+             +apint2initializer(firstByteAP)+", "+apint2initializer(secondByteAP)+" );" << std::endl;
       cpp << "  if(PRINT_ALL) printf( \"write value for gemm: %d \", writeValue );\n"<< std::endl;
 
       cpp << "  writeValue = gemm__store_tensorStore_tensorFile_0_1( 0, 0, 0, 0, 0, 0, 0, "
-             +firstByteDec+", "+secondByteDec+" );" << std::endl;
+             +apint2initializer(firstByteAP)+", "+apint2initializer(secondByteAP)+" );" << std::endl;
       cpp << "  if(PRINT_ALL) printf( \"write value for gemm: %d \", writeValue );\n"<< std::endl;
 
     }
     else if(instrName.find("alu") != std::string::npos ) {
       cpp << "  writeValue = alu_add_imme1__store_tensorStore_tensorFile_0_0( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "
-             +firstByteDec+", "+secondByteDec+" );" << std::endl;
+             +apint2initializer(firstByteAP)+", "+apint2initializer(secondByteAP)+" );" << std::endl;
       cpp << "  if(PRINT_ALL) printf( \"write value for alu: %d \", writeValue );\n"<< std::endl;
 
       cpp << "  writeValue = alu_add_imme1__store_tensorStore_tensorFile_0_1( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "
-             +firstByteDec+", "+secondByteDec+" );" << std::endl;
+             +apint2initializer(firstByteAP)+", "+apint2initializer(secondByteAP)+" );" << std::endl;
       cpp << "  if(PRINT_ALL) printf( \"write value for alu: %d \", writeValue );\n"<< std::endl;
     }
     else {

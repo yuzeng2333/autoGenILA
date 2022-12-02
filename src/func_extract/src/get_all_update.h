@@ -99,7 +99,7 @@ bool clean_main_func(llvm::Module& M,
                      std::string funcName);
 
 std::string create_wrapper_func(llvm::Module& M,
-                         std::string wrapperFuncName);
+                         std::string mainFuncName);
 
 bool gather_wrapper_func_args(llvm::Module& M,
                       std::string wrapperFuncName,
