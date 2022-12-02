@@ -3,7 +3,9 @@
 #include <map>
 #include <cmath>
 #include <vector>
+#include "../src/global_data_struct.h"
 #include "../src/parse_fill.h"
+
 
 // key of map is var name, the value vector is the
 // vector of values for multiple cycles, since an
@@ -23,7 +25,7 @@ std::string func_call(std::string indent, std::string writeASV,
                       const InstEncoding_t &encoding,
                       std::pair<std::string, uint32_t> dataIn);                      
 
-std::string get_arg_value(const std::string& arg, const InstEncoding_t& encoding);
+std::string get_arg_value(const std::string& arg, int cycle, const InstEncoding_t& encoding);
 
 
 void print_func_declare(const funcExtract::FuncTy_t& funcTy, 
@@ -97,3 +99,5 @@ void print_instr_wrapper_call(const InstEncoding_t& encoding,
                               const std::string &indent,
                               std::ofstream &cpp);
 
+// Make a C-clean name for a cycle-specific variable.  A cycle of 0 means non-cycle-specific
+std::string var_name_cycle_convert(const std::string& varName, int cycle);

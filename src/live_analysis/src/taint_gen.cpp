@@ -281,7 +281,7 @@ void clean_file(std::string fileName, bool useLogic) {
         }
         std::string printedLine = line.substr(0, pos)+";";
         pos = printedLine.find("wire", 0);
-        if(g_use_jasper) printedLine.replace(pos, 4, "logic");
+        if(useLogic && g_use_jasper) printedLine.replace(pos, 4, "logic");
         output << printedLine << std::endl;
         std::string varName = match.str(3);
         std::string assignName = match.str(4);

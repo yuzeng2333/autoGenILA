@@ -103,7 +103,7 @@ Any other command-line argument is interpreted as follows:
 
 * `-hex` will cause the generated C++ code to used hexadecimal instead of decimal numbers for most numeric constants.  This will be the case for numeric literals in the generated simulation code, as well as any output from the simulation program itself.  
 
-* Several other options will adjust sim_gen's behavior for specific test cases.  These options include `-aes`, `-pico`, `-gb`, `-urv`, `-vta`, `-bi`, and `-other`.  The default is `-other`, which is suitable for most accelerator-type designs.
+* Several other options will adjust sim_gen's behavior for specific types of test cases.  The default setting is `-accel`, which is suitable for most accelerator-type designs.  The `-proc` setting is intended for processor-type designs, where instructions are fetched from a memory array.  Other settings include `-aes`, `-pico`, `-urv`, `-vta`, and `-bi`, which are intended for specific existing test cases.
 
 ## Sim_gen Data Files
 

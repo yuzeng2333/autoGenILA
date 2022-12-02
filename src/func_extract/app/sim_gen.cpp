@@ -3,7 +3,6 @@
 #include "../src/helper.h"
 #include "../src/util.h"
 #include "../src/vcd_parser.h"
-#include "../src/global_data_struct.h"
 #include <sys/stat.h>
 
 #define toCout(a) std::cout << a << std::endl
@@ -52,7 +51,7 @@ std::set<std::string> g_skippedTgt;
 // disable: aes
 bool g_update_all_regs = false;
 
-enum DESIGN{AES, PICO, GB, URV, VTA, BI, OTHER};
+enum DESIGN{AES, PICO, URV, VTA, BI, ACCEL, PROC};
 enum DESIGN g_design;
 
 // the second argument is the number of instructions, but only for fetch_instr_from_mem mode
@@ -62,7 +61,7 @@ int main(int argc, char *argv[]) {
 
   g_path = ".";   // Default path is current dir
   g_verb = false;
-  g_design = OTHER;
+  g_design = ACCEL;
 
   bool userVerbose = false;
   bool userQuiet = false;
@@ -102,9 +101,6 @@ int main(int argc, char *argv[]) {
     } else if (!strcmp(arg, "-pico")) {
       ndesopts++;
       g_design = PICO;
-    } else if (!strcmp(arg, "-gb")) {
-      ndesopts++;
-      g_design = GB;
     } else if (!strcmp(arg, "-urv")) {
       ndesopts++;
       g_design = URV;
@@ -114,9 +110,20 @@ int main(int argc, char *argv[]) {
     } else if (!strcmp(arg, "-bi")) {
       ndesopts++;
       g_design = BI;
-    } else if (!strcmp(arg, "-other")) {
+    } else if (!strcmp(arg, "-accel")) {
       ndesopts++;
-      g_design = OTHER;
+      g_design = ACCEL;  // The default
+    } else if (!strcmp(arg, "-proc")) {
+      ndesopts++;
+      g_design = PROC;
+    } else if (!strcmp(arg, "-gdb")) {
+      // Exec into gdb with this executable
+      char exe_path[PATH_MAX];
+      realpath("/proc/self/exe", exe_path);
+      std::cout << "Running \"gdb " << exe_path << "\"..." << std::endl;
+      execlp("gdb", "gdb", exe_path, nullptr); // Normally does not return
+      toCout("Cannot start up gdb!");
+      exit(-1);
     } else {
       toCout(usageStr);
       exit(-1);
@@ -156,8 +163,13 @@ int main(int argc, char *argv[]) {
     g_set_dmem = true;
     g_dmem_width = 32;
   }
-  else if(g_design == OTHER) {
+  else if(g_design == ACCEL) {
     g_fetch_instr_from_mem = false;
+  }
+  else if(g_design == PROC) {
+    g_fetch_instr_from_mem = true;
+    g_set_dmem = false;
+    // g_instrValueVar g_instrAddrVar have defaults, which are probably wrong...
   }
 
   read_in_instructions(g_path+"/instr.txt");
@@ -274,9 +286,8 @@ int main(int argc, char *argv[]) {
   for(auto pair : g_asv) {
     std::string asv = pair.first;
     toCoutVerb(asv);
-    std::string asvSimp = var_name_convert(asv, true);
 
-    uint32_t width = pair.second;   
+    uint32_t width = pair.second.width;   
     assert(width > 0);
     std::string asvTy = c_type(width);
     if(asvTy.empty()) {
@@ -289,10 +300,19 @@ int main(int argc, char *argv[]) {
 
     // ASVs in register arrays were handled separately above
     if (!is_in_array(asv)) {
-      std::string ret = "  "+asvTy+" "+asvSimp+" = "+cRstVal+";";
-      cpp << ret << std::endl;    
-      ret = "  "+asvTy+" "+asvSimp+nxt+" = "+cRstVal+";";
-      cpp << ret << std::endl;
+      if (pair.second.cycles.empty()) {
+        // One C variable, not cycle-specific
+        std::string asvSimp = var_name_convert(asv, true);
+        cpp <<  "  " << asvTy << " " << asvSimp << " = " << cRstVal << ";" << std::endl;
+        cpp <<  "  " << asvTy << " " << asvSimp << nxt << " = " << cRstVal << ";" << std::endl;
+      } else {
+        // Need multiple cycle-specific C variables
+        for(int cycle : pair.second.cycles) {
+          std::string asvSimp = var_name_cycle_convert(asv, cycle);
+          cpp <<  "  " << asvTy << " " << asvSimp << " = " << cRstVal << ";" << std::endl;
+          cpp <<  "  " << asvTy << " " << asvSimp << nxt << " = " << cRstVal << ";" << std::endl;
+        }
+      }
     }
   }
 
@@ -811,7 +831,6 @@ std::string c_type(uint32_t width) {
 // up as a function parameter without being mentioned in instr.txt,
 // allowed_target.txt, or tb.txt, something has gone wrong.
 //
-// currently only support one-cycle inputInstr
 void print_var_assignments(std::ofstream &cpp, std::string indent, 
                       const InstEncoding_t &inputInstr) {
 
@@ -819,27 +838,54 @@ void print_var_assignments(std::ofstream &cpp, std::string indent,
   uint32_t idx = get_instr_by_name(instrName);
   struct InstrInfo_t& instrInfo = g_instrInfo[idx];    
 
+  std::set<std::string> processedVars;
+
   for(auto pair: instrInfo.funcTypes) {
     const FuncTy_t& funcTy = pair.second;
-    for(auto pair: funcTy.argTy) {
+    for(auto arg: funcTy.argTy) {
       // Consider each arg of each update function.
       // Skip the special args, e.g. those for returning wide values.
-      std::string arg = pair.first;
-      if (is_special_arg_name(arg)) {
+      std::string argname = arg.name;
+      if (is_special_arg_name(argname)) {
         continue;
       }
-      auto pos = inputInstr.find(arg);
+
+      int cycle = arg.cycle;  // A cycle of zero means non-cycle-specific.
+
+      auto pos = inputInstr.find(argname);
       if(pos != inputInstr.end()) {
         // The argument was found in the instruction encoding.
-        if((inputInstr.at(arg)).size() > 1) {
-          toCout("Warning: instruction spans multiple cycles!");
+        if((inputInstr.at(argname)).size() > 1) {
+          toCout("Note: instruction spans multiple cycles!");
         }
-        std::string argValue = pos->second.front();
-        // argValue could look like this: "7'h4+5'h7+5'h13+3'h2+5'h12+5'h8+2'b11"
-        llvm::APInt apValue = convert_to_single_apint(argValue);
-        // Doug: this could be > 64 bits.  Such big parameters are passed by const reference.
-        argValue = apint2literal(apValue);
-        cpp << indent << arg << " = " << argValue << ";" << std::endl;
+
+        if (pos->second.size() < (uint32_t)cycle) {
+          toCout("Error: tb.txt not enough per-cycle data for arg "+
+                  argname+" of instruction "+instrName);
+          abort();
+        }
+
+        std::string varname;
+        std::string argValue;
+        if (cycle <= 0) {
+          varname = var_name_convert(argname, true); // Non-cycle-specific
+          argValue = pos->second[0];
+        } else {
+          varname = var_name_cycle_convert(argname, cycle);
+          argValue = pos->second[cycle-1];
+        }
+
+        // If one (cycle-specific) variable is used by multiple update functions of
+        // the instruction, avoid generating multiple assignments for it.
+        if (!processedVars.count(varname)) {
+          processedVars.insert(varname);
+
+          // argValue could look like this: "7'h4+5'h7+5'h13+3'h2+5'h12+5'h8+2'b11"
+          llvm::APInt apValue = convert_to_single_apint(argValue);
+          // Doug: this could be > 64 bits.  Such big parameters are passed by const reference.
+          argValue = apint2literal(apValue);
+          cpp << indent << varname << " = " << argValue << ";" << std::endl;
+        }
 
       }
     }
@@ -887,33 +933,38 @@ std::string func_call(std::string indent, std::string writeVar,
 
   unsigned argCnt = 0;
   std::map<std::string, uint32_t> varIdxMap; 
-  for(auto pair: funcTy.argTy) {
-    std::string arg = pair.first;
+  for(auto arg: funcTy.argTy) {
+    std::string argname = arg.name;
+    int cycle = arg.cycle;
 
-    if(varIdxMap.find(arg) == varIdxMap.end())
-      varIdxMap.emplace(arg, 0);
+    // Doug TODO: make varIdxMap handle cycle
+    if(varIdxMap.find(argname) == varIdxMap.end())
+      varIdxMap.emplace(argname, 0);
     else
-      (varIdxMap[arg])++;
+      (varIdxMap[argname])++;
 
     std::string argValue;
     if( !dataIn.first.empty()
-         && arg == dataIn.first 
-         && varIdxMap[arg] == dataIn.second-1 ) {
+         && argname == dataIn.first 
+         && varIdxMap[argname] == dataIn.second-1 ) {
       argValue = g_dataIn;      
     }
 
-    if (arg == RETURN_VAL_PTR_ID) {
-      // This arg takes a reference to the big return value.
+    if (argname == RETURN_VAL_PTR_ID) {
+      assert(cycle == 0);
+      // This argname takes a reference to the big return value.
       // The function itself return void.
       assert(funcTy.retTy == 0);
       argValue = writeVar;
     }
-    else if (arg == RETURN_ARRAY_PTR_ID) {
+    else if (argname == RETURN_ARRAY_PTR_ID) {
+      assert(cycle == 0);
       // We need to provide the address of the result storage of the result's register array.
       argValue = writeVar;
     }
     else {
-      argValue = get_arg_value(arg, encoding);
+      assert(cycle >= 0);
+      argValue = get_arg_value(argname, cycle, encoding);
     }
 
     if (argCnt > 0) {
@@ -929,7 +980,7 @@ std::string func_call(std::string indent, std::string writeVar,
 }
 
 
-std::string get_arg_value(const std::string& arg, const InstEncoding_t& encoding) {
+std::string get_arg_value(const std::string& arg, int cycle, const InstEncoding_t& encoding) {
 
   // The argument value may be specified by the instruction encoding.
   // If an empty encoding was given or the encoding specifies 'x', the value
@@ -939,11 +990,16 @@ std::string get_arg_value(const std::string& arg, const InstEncoding_t& encoding
   auto pos = encoding.find(arg);
   if (pos != encoding.end()) {
     
-    if(pos->second.size() > 1) {
+    assert((unsigned)cycle <= pos->second.size());
+
+    // Cycle numbers start at 1.  A cycle of 0 means non-cycle-specific, in
+    // that case pick the encoding's first cycle value.
+    
+    if(cycle==0 && pos->second.size() > 1) {
       toCout("Warning: instruction spans multiple cycles!");
     }
 
-    std::string argValue = pos->second.front();
+    std::string argValue = (cycle > 0) ? pos->second[cycle-1] : pos->second.front();
 
     // If the arg value is fully defined (no 'x' in it), we pass it to the function.
     // Otherwise the value is taken from the register.
@@ -960,6 +1016,7 @@ std::string get_arg_value(const std::string& arg, const InstEncoding_t& encoding
 
   if (is_array_var(arg)) {
     // The arg is a pointer to an ASV register array, so pass the array's address
+    // // Doug TODO: make cycle-specific?
     return var_name_convert(arg, true);
   }
 
@@ -974,7 +1031,7 @@ std::string get_arg_value(const std::string& arg, const InstEncoding_t& encoding
   } 
 
   // Default case: a reference to a register
-  return var_name_convert(arg, true);
+  return var_name_cycle_convert(arg, cycle);
 }
 
 
@@ -990,8 +1047,8 @@ void print_func_declare(const FuncTy_t& funcTy,
   std::string ret = (funcTy.retTy > 0) ? c_type(funcTy.retTy) : "void";
   ret += " " + funcNameSimp + " ( ";
 
-  for(auto pair : funcTy.argTy) {
-    std::string argName = pair.first;
+  for(auto arg : funcTy.argTy) {
+    std::string argName = arg.name;
     std::string argNameSimp = var_name_convert(argName, true);
       
     // If for some reason the same arg name is repeated, uniquify the name (really needed?)
@@ -1003,7 +1060,7 @@ void print_func_declare(const FuncTy_t& funcTy,
       argNameSimp += std::to_string(++argIdx[argNameSimp]);
     }
 
-    int width = pair.second;
+    int width = arg.width;
 
     if (is_special_arg_name(argName)) {
       // A special arg, for passing/returning a register array, or 
@@ -1122,8 +1179,17 @@ void update_all_asvs(std::ofstream &cpp, std::string indent) {
   for(auto pair : g_asv) {
     std::string asv = pair.first;
     if (!is_array_var(asv)) {
-      std::string asvSimp = var_name_convert(asv, true);
-      cpp << indent+asvSimp +" = "+asvSimp+nxt+";" << std::endl;
+      if (pair.second.cycles.empty()) {
+        // Update one C variable, not cycle-specific
+        std::string asvSimp = var_name_convert(asv, true);
+        cpp << indent+asvSimp +" = "+asvSimp+nxt+";" << std::endl;
+      } else {
+        // Update multiple cycle-specific C variables
+        for(int cycle : pair.second.cycles) {
+          std::string asvSimp = var_name_cycle_convert(asv, cycle);
+          cpp << indent+asvSimp +" = "+asvSimp+nxt+";" << std::endl;
+        }
+      }
     }
   }
 
@@ -1296,9 +1362,19 @@ void print_asvs_printer_func(std::ofstream &cpp) {
 
   // Print plain ASVs, skipping those in register arrays.
   for(auto pair : g_asv) {
-    std::string reg = var_name_convert(pair.first, true);
-    if (!is_in_array(reg)) {
-      print_var_value(indent, cpp, reg, pair.second);
+    std::string asv = pair.first;
+    if (!is_in_array(asv)) {
+      if (pair.second.cycles.empty()) {
+        // Print one C variable, not cycle-specific
+        std::string asvSimp = var_name_convert(asv, true);
+        print_var_value(indent, cpp, asvSimp, pair.second.width);
+      } else {
+        // Print multiple cycle-specific C variables
+        for(int cycle : pair.second.cycles) {
+          std::string asvSimp = var_name_cycle_convert(asv, cycle);
+          print_var_value(indent, cpp, asvSimp, pair.second.width);
+        }
+      }
     }
   }
 
@@ -1474,6 +1550,7 @@ void vta_ila_model(std::ofstream &cpp) {
   cpp << std::endl;
   cpp << "int PRINT_ALL = 0;\n" << std::endl;
   cpp << "int main(int argc, char *argv[]) {\n" << std::endl;
+  cpp << "int writeValue;\n" << std::endl;
   uint32_t instrIdx = 0;
   std::ofstream imem("./imem.txt");
   for(auto encoding: toDoList) {
@@ -1484,11 +1561,11 @@ void vta_ila_model(std::ofstream &cpp) {
     llvm::APInt firstByteAP = convert_to_single_apint(firstByte);    
     llvm::APInt secondByteAP = convert_to_single_apint(secondByte);
 
-    if (firstByteAP.getBitWidth() > 32) {
+    if (firstByteAP.getBitWidth() > 64) {
       toCout("Error: too long number: "+firstByte);
       abort();
     }
-    if (secondByteAP.getBitWidth() > 32) {
+    if (secondByteAP.getBitWidth() > 64) {
       toCout("Error: too long number: "+secondByte);
       abort();
     }
@@ -1510,21 +1587,21 @@ void vta_ila_model(std::ofstream &cpp) {
     cpp << "  // instr "+toStr(instrIdx++)+": "+instrName+"\n" << std::endl;
     if(instrName.find("gemm") != std::string::npos) {
       cpp << "  writeValue = gemm__store_tensorStore_tensorFile_0_0( 0, 0, 0, 0, 0, 0, 0, "
-             +firstByteDec+", "+secondByteDec+" );" << std::endl;
+             +apint2initializer(firstByteAP)+", "+apint2initializer(secondByteAP)+" );" << std::endl;
       cpp << "  if(PRINT_ALL) printf( \"write value for gemm: %d \", writeValue );\n"<< std::endl;
 
       cpp << "  writeValue = gemm__store_tensorStore_tensorFile_0_1( 0, 0, 0, 0, 0, 0, 0, "
-             +firstByteDec+", "+secondByteDec+" );" << std::endl;
+             +apint2initializer(firstByteAP)+", "+apint2initializer(secondByteAP)+" );" << std::endl;
       cpp << "  if(PRINT_ALL) printf( \"write value for gemm: %d \", writeValue );\n"<< std::endl;
 
     }
     else if(instrName.find("alu") != std::string::npos ) {
       cpp << "  writeValue = alu_add_imme1__store_tensorStore_tensorFile_0_0( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "
-             +firstByteDec+", "+secondByteDec+" );" << std::endl;
+             +apint2initializer(firstByteAP)+", "+apint2initializer(secondByteAP)+" );" << std::endl;
       cpp << "  if(PRINT_ALL) printf( \"write value for alu: %d \", writeValue );\n"<< std::endl;
 
       cpp << "  writeValue = alu_add_imme1__store_tensorStore_tensorFile_0_1( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "
-             +firstByteDec+", "+secondByteDec+" );" << std::endl;
+             +apint2initializer(firstByteAP)+", "+apint2initializer(secondByteAP)+" );" << std::endl;
       cpp << "  if(PRINT_ALL) printf( \"write value for alu: %d \", writeValue );\n"<< std::endl;
     }
     else {
@@ -1534,4 +1611,16 @@ void vta_ila_model(std::ofstream &cpp) {
   }
   imem.close();
   cpp << "}" << std::endl;
+}
+
+
+
+// For use with variables with multiple per-cycle values
+std::string var_name_cycle_convert(const std::string& varName, int cycle) {
+
+  std::string ret = var_name_convert(varName, true);
+  if (cycle > 0) {
+    ret += "_cycle"+toStr(cycle);
+  }
+  return ret;
 }

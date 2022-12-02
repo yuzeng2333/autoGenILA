@@ -31,6 +31,9 @@ std::string materialize_num(std::string val) {
     toCoutVerb("Find it!");
   assert(val.find("+") == std::string::npos);
   std::smatch m;
+
+  if (val == "x") return val;
+
   if(!is_x(val)) {
     if(val.find("x") != std::string::npos) {
       toCout("Error: x value is not correctly formatted: "+val);

@@ -587,8 +587,9 @@ void read_allowed_targets(std::string fileName) {
   std::string line;
 
   while(std::getline(allowedTgtInFile, line)) {
-    if(line.substr(0, 2) == "//"
-        || line.empty())  continue;
+    if (!line.empty())
+      remove_two_end_space(line);
+    if(line.empty() || line.substr(0, 2) == "//")  continue;
     if(line != "[") {
       if(line.find(":") == std::string::npos) {
         remove_two_end_space(line);

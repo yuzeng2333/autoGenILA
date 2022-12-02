@@ -62,8 +62,22 @@ inline bool is_special_arg_name(const std::string& name) {
 //};
 
 
-//vector of arg names/bitwidths. (width < 0 means pointer)
-typedef std::vector<std::pair<std::string, int>> ArgVec_t;
+// A bitwidth and a set of clock cycles.
+struct WidthCycles_t {
+  uint32_t width = 0;
+  std::set<int> cycles;
+};
+
+
+//arg name/bitwidth/cycle. (width < 0 means pointer)
+struct Arg_t {
+  std::string name;   // Arg name
+  int width = 0;     // Bitwidth ( <0 means a pointer)
+  int cycle = 0;     // Zero if not cycle-specific
+};
+
+// Vector of args of an update function.
+typedef std::vector<Arg_t> ArgVec_t;
 
 
 struct FuncTy_t {
@@ -75,15 +89,21 @@ struct FuncTy_t {
 };
 
 
+// key of map is var name, the value vector is the
+// vector of values for multiple cycles, since an
+// instruction might span multiple cycles
+typedef std::map<std::string, std::vector<std::string>> InstEncoding_t;
+
+
 struct InstrInfo_t {
-  std::map<std::string, std::vector<std::string>> instrEncoding;
+  InstEncoding_t instrEncoding;
   //std::set<std::string> readASV;
   std::set<std::pair<uint32_t, std::string>> writeASV;
   std::set<std::string> skipWriteASV;
   std::vector<std::string> writeASVVec;
-  uint32_t writeASVVecDelay;
-  uint32_t delayBound;
-  uint32_t extraDelay;
+  uint32_t writeASVVecDelay = 0;
+  uint32_t delayBound = 0;
+  uint32_t extraDelay = 0;
   uint32_t instrLen = 0;
   std::string name;
   // key is writeASV. Each instruction might update multiple ASVs
@@ -282,7 +302,7 @@ extern std::map<std::string, llvm::Function::arg_iterator> g_topFuncArgMp;
 extern std::map<std::string, llvm::Function*> g_extractFunc;
 extern std::map<std::string, llvm::Function*> g_concatFunc;
 extern std::map<std::string, std::string> g_fifoIns;
-extern std::map<std::string, uint32_t> g_asv;
+extern std::map<std::string, WidthCycles_t> g_asv;
 
 extern taintGen::Str2StrVecMap_t g_moduleInputsMap;
 extern taintGen::Str2StrVecMap_t g_moduleOutputsMap;

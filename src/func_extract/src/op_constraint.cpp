@@ -497,9 +497,12 @@ UpdateFunctionGen::two_op_constraint(astNode* const node, uint32_t timeIdx, cont
   }
   else
     op1Expr = var_expr(op1AndSlice, timeIdx, c, b, false, op1WidthNum);
+  assert(!(llvm::isa<llvm::PoisonValue>(op1Expr)));
 
   if(!op2IsNum) {
     llvm::Value* tmpExpr = add_constraint(node->childVec[1], timeIdx, c, b, bound);
+    assert(!(llvm::isa<llvm::PoisonValue>(tmpExpr)));
+
     if(op2Slice.empty() || has_direct_assignment(op2AndSlice, curMod))
       op2Expr = tmpExpr;
     else
@@ -507,6 +510,7 @@ UpdateFunctionGen::two_op_constraint(astNode* const node, uint32_t timeIdx, cont
   }
   else
     op2Expr = var_expr(op2AndSlice, timeIdx, c, b, false, op2WidthNum);
+  assert(!(llvm::isa<llvm::PoisonValue>(op2Expr)));
 
 
   // make new expr is the operands are sign/unsign extended
@@ -552,6 +556,7 @@ UpdateFunctionGen::two_op_constraint(astNode* const node, uint32_t timeIdx, cont
     toCout("Error: unexpected extVec value: "+toStr(node->extVec[0]));
     abort();
   }
+
   if( (node->extVec[0] == 1 && node->extVec[1] != 1) 
       || (node->extVec[0] != 1 && node->extVec[1] == 1) ) {
     toCout("Warning: only one op is signed: "+destAndSlice);
@@ -582,9 +587,7 @@ UpdateFunctionGen::two_op_constraint(astNode* const node, uint32_t timeIdx, cont
 
   if(op1AndSlice == "addedVar165")
     toCoutVerb("Find it!");
-  toCoutVerb("go to make_llvm_instr from two-op: "+op1AndSlice+", "+op2AndSlice);
-  if(op1AndSlice == "\\compute.inst_q.value")
-    toCoutVerb("Find it!");
+  toCoutVerb("go to make_llvm_instr from two-op: "+op1AndSlice+" "+node->op+" "+op2AndSlice);
   llvm::Value* ret = make_llvm_instr(b, c, node->op, op1Expr, op2Expr, destWidthNum, 
                          op1WidthNum, op2WidthNum, llvm::Twine(destTimed), isSigned);
   return ret;
@@ -1247,7 +1250,7 @@ UpdateFunctionGen::switch_constraint(astNode* const node, uint32_t timeIdx,
   llvm::BasicBlock *bb = b->GetInsertBlock();
   llvm::GetElementPtrInst* ptr 
     = llvm::GetElementPtrInst::Create(
-        nullptr,
+        assignArrValue->getType()->getPointerElementType(), /*elementTy,*/
         assignArrValue,
         std::vector<llvm::Value*>{
           llvm::ConstantInt::get(
@@ -1931,13 +1934,13 @@ void UpdateFunctionGen::mem_assign_constraint(
 
   llvm::GetElementPtrInst* ptr 
   = llvm::GetElementPtrInst::Create(
-      nullptr,
+      memValue->getType()->getPointerElementType(),
       memValue,
       std::vector<llvm::Value*>{
         llvm::ConstantInt::get(
           llvm::IntegerType::get(*TheContext, addrWidth), 
           0, false),
-          addrExpr},
+        addrExpr},
       llvm::Twine(addrAndSlice+"_PTR"+post_fix(timeIdx)),
       BB
     );
@@ -2047,9 +2050,10 @@ UpdateFunctionGen::dyn_sel_constraint( astNode* const node, uint32_t timeIdx, co
   //  llvm::BasicBlock &BBlock = curFunc->getEntryBlock();
   //  bb = &BBlock;
   //}
+
   llvm::GetElementPtrInst* ptr 
     = llvm::GetElementPtrInst::Create(
-        nullptr,
+        arrayType, 
         memValue,
         std::vector<llvm::Value*>{
           llvm::ConstantInt::get(
@@ -2306,6 +2310,28 @@ UpdateFunctionGen::make_llvm_instr(builder &b, context &c, std::string op,
   }
   else if(op == "-") {
     return b->CreateSub(llvmInt(0, width, c), op1Expr, name);
+  }
+  else if(op == "^") {
+    // A trickier operation: XOR, a parity calculation.
+    // Need to declare and use the llvm.ctpop intrinsic function.
+    std::vector<llvm::Type *> arg_type;
+    arg_type.push_back(llvmWidth(width, c));
+    llvm::Function *fun = llvm::Intrinsic::getDeclaration(TheModule.get(), llvm::Intrinsic::ctpop, arg_type);
+    llvm::Value *popcnt = b->CreateCall(fun, op1Expr);
+    return b->CreateTrunc(popcnt, llvmWidth(1, c), name);  // Return low-order bit
+  }
+  else if(op == "~|") {
+    // NOR
+    return b->CreateICmpEQ(op1Expr, llvmInt(0, width, c), name);
+  }
+  else if(op == "~&") {
+    // NAND
+    return b->CreateICmpNE(b->CreateNot(op1Expr), llvmInt(0, width, c), name);
+  }
+  else if(op == "~^") {
+    // XNOR: do an XOR followed by an invert
+    llvm::Value *xorRes = make_llvm_instr(b, c, "^", op1Expr, op1WidthNum, name);
+    return b->CreateNot(xorRes);
   }
   else {
     toCout("Not supported 1-op in make_llvm_instr, op is: "+op);
