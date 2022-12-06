@@ -576,21 +576,21 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
 
   // if the top module contains memories, add the additional memory
   // writes from lastMemReadAddr+1 to bound-1
-  uint32_t i = 0;
-  if (!curMod->moduleMems.empty()) {
-    Builder->SetInsertPoint(retInst);  
-    for (auto pair : curDynData->memDynInfo) {
-      std::string mem = pair.first;
-      toCoutVerb("check mem: "+mem);
-      toCoutVerb("i: "+toStr(i++));
-      astNode* node = memNodeMap[mem];
-      if (!pair.second.hasBeenWritten) continue;      
-      uint32_t lastWriteTimeIdx = pair.second.lastWriteTimeIdx;
-      for (uint32_t i = lastWriteTimeIdx+1; i < bound; i++) {
-        mem_assign_constraint(node, i, TheContext, Builder, bound);
-      }
-    }
-  }
+  //uint32_t i = 0;
+  //if (!curMod->moduleMems.empty()) {
+  //  Builder->SetInsertPoint(retInst->getPrevNonDebugInstruction());  
+  //  for (auto pair : curDynData->memDynInfo) {
+  //    std::string mem = pair.first;
+  //    toCoutVerb("check mem: "+mem);
+  //    toCoutVerb("i: "+toStr(i++));
+  //    astNode* node = memNodeMap[mem];
+  //    if (!pair.second.hasBeenWritten) continue;      
+  //    uint32_t lastWriteTimeIdx = pair.second.lastWriteTimeIdx;
+  //    for (uint32_t i = lastWriteTimeIdx+1; i < bound; i++) {
+  //      mem_assign_constraint(node, i, TheContext, Builder, bound);
+  //    }
+  //  }
+  //}
 
   llvm::verifyFunction(*TheFunction);
 
@@ -752,6 +752,23 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
     memValue = memArr;
     curDynData->memDynInfo.emplace(mem, MemDynInfo_t{0, false, memValue});
     mem_assign_constraint(node, timeIdx, c, b, bound);
+
+    uint32_t i = 0;
+    if (!curMod->moduleMems.empty()) {
+      //Builder->SetInsertPoint(retInst->getPrevNonDebugInstruction());  
+      for (auto pair : curDynData->memDynInfo) {
+        std::string mem = pair.first;
+        toCoutVerb("check mem: "+mem);
+        toCoutVerb("i: "+toStr(i++));
+        astNode* node = memNodeMap[mem];
+        if (!pair.second.hasBeenWritten) continue;      
+        uint32_t lastWriteTimeIdx = pair.second.lastWriteTimeIdx;
+        for (uint32_t i = lastWriteTimeIdx+1; i < bound; i++) {
+          mem_assign_constraint(node, i, TheContext, Builder, bound);
+        }
+      }
+    }
+
     return nullptr;
   }
   else if ( node->type == DYNSEL ) {
