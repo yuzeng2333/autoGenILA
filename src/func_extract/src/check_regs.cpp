@@ -578,7 +578,7 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   // writes from lastMemReadAddr+1 to bound-1
   //uint32_t i = 0;
   //if (!curMod->moduleMems.empty()) {
-  //  Builder->SetInsertPoint(retInst->getPrevNonDebugInstruction());  
+  //  Builder->SetInsertPoint(retInst);  
   //  for (auto pair : curDynData->memDynInfo) {
   //    std::string mem = pair.first;
   //    toCoutVerb("check mem: "+mem);
@@ -755,7 +755,7 @@ UpdateFunctionGen::add_constraint(astNode* const node, uint32_t timeIdx, context
 
     uint32_t i = 0;
     if (!curMod->moduleMems.empty()) {
-      //Builder->SetInsertPoint(retInst->getPrevNonDebugInstruction());  
+      //Builder->SetInsertPoint(retInst);  
       for (auto pair : curDynData->memDynInfo) {
         std::string mem = pair.first;
         toCoutVerb("check mem: "+mem);
