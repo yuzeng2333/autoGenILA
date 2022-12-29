@@ -1,3 +1,6 @@
+#ifndef LIVE_ANALYSIS_TYPES_H
+#define LIVE_ANALYSIS_TYPES_H
+
 #include <string>
 #include <utility>
 #include <map>
@@ -16,3 +19,6 @@ namespace taintGen {
 
   typedef std::set<std::string> StrSet_t;
 }
+
+
+#endif

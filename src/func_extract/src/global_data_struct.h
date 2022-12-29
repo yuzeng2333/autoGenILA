@@ -1,5 +1,6 @@
-#ifndef GLOBAL_DATA_STRUCT
-#define GLOBAL_DATA_STRUCT
+#ifndef FUNC_EXTRACT_GLOBAL_DATA_STRUCT_H
+#define FUNC_EXTRACT_GLOBAL_DATA_STRUCT_H
+
 #include "z3++.h"
 #include "ast.h"
 #include "types.h"

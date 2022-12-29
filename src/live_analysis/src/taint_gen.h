@@ -1,5 +1,5 @@
-#ifndef TAINT_GEN
-#define TAINT_GEN
+#ifndef LIVE_ANALYSIS_TAINT_GEN_H
+#define LIVE_ANALYSIS_TAINT_GEN_H
 
 #include <string>
 #include <iostream>

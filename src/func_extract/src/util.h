@@ -1,5 +1,5 @@
-#ifndef UTIL
-#define UTIL
+#ifndef FUNC_EXTRACT_UTIL_H
+#define FUNC_EXTRACT_UTIL_H
 
 #include <string>
 #include <cctype>

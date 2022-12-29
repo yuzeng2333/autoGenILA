@@ -1,5 +1,6 @@
-#ifndef VAR_WIDTH_H
-#define VAR_WIDTH_H
+#ifndef LIVE_ANALYSIS_VAR_WIDTH_H
+#define LIVE_ANALYSIS_VAR_WIDTH_H
+
 #include <unordered_map>
 #include <string>
 #include <utility>

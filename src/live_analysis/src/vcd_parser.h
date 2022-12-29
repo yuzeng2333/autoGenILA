@@ -1,3 +1,6 @@
+#ifndef LIVE_ANALYSIS_VCD_PARSER_H
+#define LIVE_ANALYSIS_VCD_PARSER_H
+
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -26,3 +29,5 @@ bool is_end_scope(std::string line);
 
 bool is_func_start(std::string line);
 } // end of namespace taintGen
+
+#endif

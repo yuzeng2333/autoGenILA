@@ -1,5 +1,5 @@
-#ifndef HIERCTX
-#define HIERCTX
+#ifndef FUNC_EXTRACT_INS_CONTEXT_STACK_H
+#define FUNC_EXTRACT_INS_CONTEXT_STACK_H
 
 #include <vector>
 #include "global_data_struct.h"

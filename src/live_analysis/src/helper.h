@@ -1,5 +1,5 @@
-#ifndef LIVE_ANALYSIS_HELPER
-#define LIVE_ANALYSIS_HELPER
+#ifndef LIVE_ANALYSIS_HELPER_H
+#define LIVE_ANALYSIS_HELPER_H
 
 #include <string>
 #include <sstream>

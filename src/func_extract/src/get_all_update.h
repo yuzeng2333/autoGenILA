@@ -1,5 +1,5 @@
-#ifndef GET_ALL_UPDATE
-#define GET_ALL_UPDATE
+#ifndef FUNC_EXTRACT_GET_ALL_UPDATE_H
+#define FUNC_EXTRACT_GET_ALL_UPDATE_H
 
 #include <set>
 #include <string>

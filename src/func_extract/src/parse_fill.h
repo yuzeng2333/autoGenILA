@@ -1,5 +1,5 @@
-#ifndef PARSE 
-#define PARSE
+#ifndef FUNC_EXTRACT_PARSE_FILL_H
+#define FUNC_EXTRACT_PARSE_FILL_H
 
 #include "types.h"
 #include "ast.h"

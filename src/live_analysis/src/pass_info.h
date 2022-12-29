@@ -1,5 +1,6 @@
-#ifndef PASS_INFO
-#define PASS_INFO
+#ifndef LIVE_ANALYSIS_PASS_INFO_H
+#define LIVE_ANALYSIS_PASS_INFO_H
+
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>

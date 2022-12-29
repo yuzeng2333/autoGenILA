@@ -1,5 +1,5 @@
-#ifndef VLG2Z3 
-#define VLG2Z3
+#ifndef FUNC_EXTRACT_CHECK_REGS_H 
+#define FUNC_EXTRACT_CHECK_REGS_H
 
 #include "../../live_analysis/src/varWidth.h"
 #include "../../live_analysis/src/taint_gen.h"

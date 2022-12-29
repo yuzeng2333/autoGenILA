@@ -1,5 +1,5 @@
-#ifndef AST
-#define AST
+#ifndef FUNC_EXTRACT_AST_H
+#define FUNC_EXTRACT_AST_H
 
 #include <string>
 #include <vector>
