@@ -198,7 +198,7 @@ llvm::APInt hdb2apint(std::string num, unsigned widthOverride, bool xmask) {
     // Simple number without width or radix spec
     // Use widthOverride if given , otherwise default width of 64
     unsigned width = widthOverride > 0 ? widthOverride : 64;
-    return llvm::APInt(width, num, 10);
+    return xmask ? gen_x_mask(width, num, 10) : llvm::APInt(width, num, 10);
   } else if (num == "x")  {
     assert(xmask);
     radix = 2;
