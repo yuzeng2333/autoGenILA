@@ -388,12 +388,12 @@ void get_update_function(std::string target,
       // Add a C-compatible wrapper function that calls the main function.
       std::string wrapperFuncName = create_wrapper_func(*M, funcName);
 
-      // Annotate the standard x86-64 Clang data layout to the module, to prevent warnings when linking
-      // to C/C++ code.
+      // Annotate the standard x86-64 Clang data layout to the module,
+      // to prevent warnings when linking to C/C++ code.
       M->setDataLayout("e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128");
 
       // Get the data needed to create func_info.txt
-      gather_wrapper_func_args(*M, wrapperFuncName, target, argVec);
+      gather_wrapper_func_args(*M, wrapperFuncName, target, delayBound, argVec);
 
       if ((!g_overwrite_existing_llvm) && stat(llvmFileName.c_str(), &statbuf) == 0) {
         toCout("Skipping re-generation of existing file "+llvmFileName);
@@ -757,7 +757,7 @@ bool clean_main_func(llvm::Module& M,
   
 bool gather_wrapper_func_args(llvm::Module& M,
                       std::string wrapperFuncName, std::string target,
-                      ArgVec_t &argVec) {
+                      int delayBound, ArgVec_t &argVec) {
 
   llvm::Function *wrapperFunc = M.getFunction(wrapperFuncName);
   assert(wrapperFunc);
@@ -808,7 +808,15 @@ bool gather_wrapper_func_args(llvm::Module& M,
         // Pick out the numeric portion of the arg name
         // Doug TODO: Do register array vars have a cycle number in their name?
         std::string cycleStr = argname.substr(pos + DELIM.size(), std::string::npos);
-        if (cycleStr.size() > 0) cycle = std::stoi(cycleStr);
+        if (cycleStr.size() > 0) {
+          cycle = std::stoi(cycleStr);
+
+          // The internal cycle numbering starts at the cycle count and
+          // decreases down to 0 at the final cycle.  We need to map this to the
+          // convention used in instr.txt, where the cycles numbering starts at 1,
+          // and goes upwards as time passes.
+          cycle = delayBound - cycle;
+        }
       }
 
       if (!isPointer) {
