@@ -584,7 +584,8 @@ std::string create_wrapper_func(llvm::Module& M,
       wrapperArg->addAttr(llvm::Attribute::NonNull);
     }
     // Copy parameter attributes (important for pointer args).
-    wrapperFunc->addParamAttrs(argNo, mainFunc->getAttributes().getParamAttributes(argNo));
+    llvm::AttrBuilder b(Context, mainFunc->getAttributes().getParamAttrs(argNo));
+    wrapperFunc->addParamAttrs(argNo, b);
   }
 
   llvm::Argument* wrapperLastArg = wrapperFunc->arg_end()-1;
@@ -707,7 +708,8 @@ static llvm::Function *remove_dead_args(llvm::Function *func) {
       newArg->takeName(&origArg);
 
       // Copy arg attributes
-      newFunc->addParamAttrs(newArgNo, func->getAttributes().getParamAttributes(origArgNo));
+      llvm::AttrBuilder b(func->getContext(), func->getAttributes().getParamAttrs(origArgNo));
+      newFunc->addParamAttrs(newArgNo, b);
 
       newArgNo++;
     }
