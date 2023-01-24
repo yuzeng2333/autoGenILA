@@ -77,62 +77,70 @@ struct ThreadSafeMap_t {
 };
 
 
+class FuncExtractFlow {
 
-extern std::mutex g_dependVarMapMtx;
-
-// the first key is instr name, the second key is target name
-extern std::map<std::string, 
-                std::map<std::string, ArgVec_t>> g_dependVarMap;
-
-extern struct ThreadSafeMap_t<WidthCycles_t> g_asvSet;
-extern struct RunningThreadCnt_t g_threadCnt;
-extern struct WorkSet_t g_workSet;
-extern struct ThreadSafeVector_t g_fileNameVec;
+private:
+  UFGenFactory& m_genFactory;
+  ModuleInfo& m_info;
+  bool m_innerLoopIsInstrs;
 
 
+  // Gathers data to be written to func_info.txt and asv_info.txt,
+  // which later get read by sim_gen.
+  // The first key is instr name, the second key is target name (scalar or vector)
+  std::map<std::string, std::map<std::string, ArgVec_t>> m_dependVarMap;
+  std::mutex m_dependVarMapMtx;
+
+  std::mutex m_TimeFileMtx;
+
+  ThreadSafeMap_t<WidthCycles_t> m_asvSet;
+
+  WorkSet_t m_workSet;
+  ThreadSafeVector_t m_fileNameVec;
+  std::shared_ptr<ModuleInfo_t> m_topModuleInfo;
+  WorkSet_t m_visitedTgt;
 
 
-void get_all_update();
+
+public:
+  FuncExtractFlow(UFGenFactory& genFactory, ModuleInfo& info, bool innerLoopIsInstrs);
+  FuncExtractFlow() = delete;
+
+  // Main entry point - calls the other functions.
+  void get_all_update();
 
 
-bool clean_main_func(llvm::Module& M,
-                     std::string funcName);
+  bool clean_main_func(llvm::Module& M,
+                       std::string funcName);
 
-std::string create_wrapper_func(llvm::Module& M,
-                         std::string mainFuncName);
+  std::string create_wrapper_func(llvm::Module& M,
+                           std::string mainFuncName);
 
-bool gather_wrapper_func_args(llvm::Module& M,
-                      std::string wrapperFuncName,
-                      std::string target,
-                      int delayBound,
-                      ArgVec_t &argVec);
+  bool gather_wrapper_func_args(llvm::Module& M,
+                        std::string wrapperFuncName,
+                        std::string target,
+                        int delayBound,
+                        ArgVec_t &argVec);
 
-std::vector<uint32_t>
-get_delay_bounds(std::string var, const InstrInfo_t& instrInfo);
+  std::vector<uint32_t>
+  get_delay_bounds(std::string var, const InstrInfo_t& instrInfo);
 
-std::string get_vector_of_target(const std::string& reg, int *idxp);
+  void print_func_info(std::ofstream &output);
 
-void print_func_info(std::ofstream &output);
+  void print_asv_info(std::ofstream &output);
 
-void print_asv_info(std::ofstream &output);
+  void print_llvm_script( std::string fileName);
 
-void print_llvm_script( std::string fileName);
+  void get_update_function(std::string target,
+                           uint32_t delayBound,
+                           bool isVec,
+                           InstrInfo_t instrInfo,
+                           uint32_t instrIdx);
 
-void get_update_function(std::string target,
-                         uint32_t delayBound,
-                         bool isVec,
-                         InstrInfo_t instrInfo,
-                         uint32_t instrIdx);
-                         //std::map<std::string,
-                         //         std::map<std::string,
-                         //                  std::vector<std::pair<std::string,
-                         //                                        uint32_t>>>> &dependVarMap,
-                         //std::map<std::string, uint32_t> &asvSet,
-                         //std::ofstream addedWorkSetFile,
-                         //struct WorkSet_t &workSet,
-                         //struct RunningThreadCnt_t &threadCnt,
-                         //std::shared_ptr<ModuleInfo_t> topModuleInfo);
-                         //struct ThreadSafeVector_t &fileNameVec);
+  llvm::Function *remove_dead_args(llvm::Function *func);
+
+
+};
 
 } // end of namespace
 #endif

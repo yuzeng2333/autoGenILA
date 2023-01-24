@@ -133,4 +133,19 @@ int registerArray_t::findElement(const std::string& element) const {
   return (pos - members.begin());
 }
 
+
+// Virtual destructor of abstract class
+UFGenerator::~UFGenerator()
+{
+}
+
+
+// Virtual destructor of abstract class
+UFGenFactory::~UFGenFactory()
+{
+}
+
+
+
+
 } // end of namespace
