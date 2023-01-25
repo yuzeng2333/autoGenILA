@@ -20,9 +20,11 @@ namespace funcExtract {
 using namespace taintGen;
 
 
-FuncExtractFlow::FuncExtractFlow(UFGenFactory& genFactory, ModuleInfo& info, bool innerLoopIsInstrs)
+FuncExtractFlow::FuncExtractFlow(UFGenFactory& genFactory, ModuleInfo& info,
+                                 bool innerLoopIsInstrs, bool reverseCycleOrder)
   : m_genFactory(genFactory), m_info(info),
-    m_innerLoopIsInstrs(innerLoopIsInstrs)
+    m_innerLoopIsInstrs(innerLoopIsInstrs),
+    m_reverseCycleOrder(reverseCycleOrder)
 {
 }
 
@@ -805,6 +807,7 @@ FuncExtractFlow::gather_wrapper_func_args(llvm::Module& M,
     } else {
       // Extract the ASV name from the argument name (by removing the cycle count).
       // Note that the name will not have quotes or backslashes, like you would see in the textual IR.
+      // TODO: have the client provide a parsing function for the arg name.
       uint32_t pos = argname.find(DELIM, 0);
       std::string var = argname.substr(0, pos);
 
@@ -816,11 +819,15 @@ FuncExtractFlow::gather_wrapper_func_args(llvm::Module& M,
         if (cycleStr.size() > 0) {
           cycle = std::stoi(cycleStr);
 
-          // The internal cycle numbering starts at the cycle count and
-          // decreases down to 0 at the final cycle.  We need to map this to the
-          // convention used in instr.txt, where the cycles numbering starts at 1,
+          // If the internal cycle numbering starts at the cycle count and decreases
+          // down to 0 at the final cycle, the cycle numbers must be mapped to the
+          // convention used in instr.txt, where the cycle numbering starts at 0
           // and goes upwards as time passes.
-          cycle = delayBound - cycle;
+          if (m_reverseCycleOrder) {
+            cycle = delayBound - cycle;
+          } else {
+            cycle = cycle - 1;
+          }
         }
       }
 

@@ -82,7 +82,8 @@ class FuncExtractFlow {
 private:
   UFGenFactory& m_genFactory;
   ModuleInfo& m_info;
-  bool m_innerLoopIsInstrs;
+  const bool m_innerLoopIsInstrs;
+  const bool m_reverseCycleOrder;
 
 
   // Gathers data to be written to func_info.txt and asv_info.txt,
@@ -103,7 +104,9 @@ private:
 
 
 public:
-  FuncExtractFlow(UFGenFactory& genFactory, ModuleInfo& info, bool innerLoopIsInstrs);
+  FuncExtractFlow(UFGenFactory& genFactory, ModuleInfo& info,
+                  bool innerLoopIsInstrs, bool reverseCycleOrder);
+
   FuncExtractFlow() = delete;
 
   // Main entry point - calls the other functions.
