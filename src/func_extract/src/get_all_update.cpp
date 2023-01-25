@@ -589,6 +589,9 @@ FuncExtractFlow::create_wrapper_func(llvm::Module& M,
     // Copy parameter attributes (important for pointer args).
     llvm::AttrBuilder b(Context, mainFunc->getAttributes().getParamAttrs(argNo));
     wrapperFunc->addParamAttrs(argNo, b);
+    // Remove the "returned" attribute, since it may no longer be correct.
+    wrapperFunc->removeParamAttr(argNo, llvm::Attribute::Returned);
+
   }
 
   llvm::Argument* wrapperLastArg = wrapperFunc->arg_end()-1;
