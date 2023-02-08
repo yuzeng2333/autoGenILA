@@ -317,7 +317,8 @@ FuncExtractFlow::get_update_function(std::string target,
 
   std::string destSimpleName = funcExtract::var_name_convert(destInfo.get_dest_name(), true);
 
-  std::string funcName = instrInfo.name+"_"+destSimpleName;
+  std::string funcName = destInfo.get_func_name();
+
   std::string fileName = UFGen->make_llvm_basename(destInfo, delayBound);
   std::string cleanOptoFileName = fileName+".clean-o3-ll";
   std::string llvmFileName = fileName+".ll";
@@ -714,7 +715,12 @@ FuncExtractFlow::remove_dead_args(llvm::Function *func) {
       // Steal the original arg's name
       newArg->takeName(&origArg);
 
-      // Copy arg attributes
+      // Remove any arg attributes created by above call to copyAttributesFrom().
+      newFunc->removeParamAttr(newArgNo, llvm::Attribute::WriteOnly);
+      newFunc->removeParamAttr(newArgNo, llvm::Attribute::ReadOnly);
+      newFunc->removeParamAttr(newArgNo, llvm::Attribute::Returned);
+
+      // Copy arg attributes from the corresponding arg of the original func.
       llvm::AttrBuilder b(func->getContext(), func->getAttributes().getParamAttrs(origArgNo));
       newFunc->addParamAttrs(newArgNo, b);
 

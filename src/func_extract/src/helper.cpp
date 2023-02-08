@@ -859,8 +859,11 @@ uint32_t get_var_slice_width_simp(const std::string& varAndSlice,
 }
 
 
-// varAndSlice might have a module name prefix. This function
-// parse the module name and get corresponding module information
+// varAndslice might have a module name prefix. This function parses the
+// module name and get corresponding module information This syntax is used
+// only in files like allowed_target.txt, and is different than a flattened
+// hierarchical name  of the form "\<instname>.<varname>"
+
 uint32_t get_var_slice_width_cmplx(const std::string& varAndSlice) {
   if(varAndSlice.find(".") == std::string::npos 
      || varAndSlice.substr(0, 1) == "\\")
@@ -870,7 +873,7 @@ uint32_t get_var_slice_width_cmplx(const std::string& varAndSlice) {
     std::string modName = varAndSlice.substr(0, pos);
     std::string varName = varAndSlice.substr(pos+1);
     if(g_moduleInfoMap.find(modName) == g_moduleInfoMap.end()) {
-      toCout("Error: mod not found");
+      toCout("Error: module "+modName+" not found");
       abort();
       //return get_var_slice_width_simp(varAndSlice, );
     }

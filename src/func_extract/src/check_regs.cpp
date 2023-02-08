@@ -111,10 +111,12 @@ void check_all_regs() {
       }
 
       std::string fileName = UFGen.make_llvm_basename(destInfo, cycleCnt) + ".tmp.ll";
+
       UFGen.print_llvm_ir(destInfo, cycleCnt, i-1, fileName);
       //print_llvm_ir_without_submodules(oneWriteAsv, cycleCnt-1, i-1);
       g_maxDelay = cycleCnt;
     }
+
     // print ir for reg vector
     if(!instrInfo.writeASVVec.empty()) {
       destInfo.isVector = true;
@@ -128,6 +130,7 @@ void check_all_regs() {
         destInfo.set_module_name(g_topModule);
 
       std::string fileName = UFGen.make_llvm_basename(destInfo, cycleCnt) + ".tmp.ll";
+
       UFGen.print_llvm_ir(destInfo, cycleCnt, i-1, fileName);
       g_maxDelay = cycleCnt;    
     }
@@ -327,13 +330,11 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   llvm::FunctionType *FT =
     llvm::FunctionType::get(retTy, argTy, false);
 
-  std::string destSimpleName = funcExtract::var_name_convert(destName, true);
-
   // Create the main function
   llvm::Function::LinkageTypes linkage = llvm::Function::ExternalLinkage;
+  std::string funcName = destInfo.get_func_name();
 
-  TheFunction = llvm::Function::Create( FT, linkage,
-                  destInfo.get_instr_name()+"_"+destSimpleName, TheModule.get());
+  TheFunction = llvm::Function::Create( FT, linkage, funcName, TheModule.get());
 
   for(auto it = insContextStk.begin();
       it != insContextStk.end(); it++) {
@@ -1035,6 +1036,12 @@ std::string DestInfo::get_dest_name() {
   }
 }
 
+
+// Build a name for the LLVM function we are going to make.
+std::string DestInfo::get_func_name() {
+  std::string destSimpleName = funcExtract::var_name_convert(get_dest_name(), true);
+  return get_instr_name()+"_"+destSimpleName;
+}
 
 
 // Return the correct return type for the function

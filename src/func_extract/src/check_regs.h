@@ -45,6 +45,7 @@ class DestInfo {
     std::string get_mod_name();
     std::string get_ins_name();
     std::string get_instr_name();
+    std::string get_func_name();
     void set_dest_and_slice(std::string var, uint32_t width);
     void set_module_name(std::string var);
     void set_instr_name(std::string var);
