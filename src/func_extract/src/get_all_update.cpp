@@ -349,7 +349,10 @@ void get_update_function(std::string target,
 
     std::string opto_cmd(optCmd+" -O3 "+fileName+".clean-ll -S -o="+fileName+".tmp-o3-ll; opt -passes=deadargelim "+fileName+".tmp-o3-ll -S -o="+cleanOptoFileName+"; rm "+fileName+".tmp-o3-ll");
 
-    // TODO: re-optimize
+    // re-optimization commands
+    std::string rewriteFileName = fileName + ".rewrite-ll";
+    std::string rewrite_cmd(optCmd + " -passes=rtl2ila " + cleanOptoFileName + " -S -o=" + rewriteFileName + ";");
+    std::string reopt_cmd(optCmd + " -O3 " + rewriteFileName + " -S -o=" + cleanOptoFileName + ";");
 
     toCout("** Begin clean update function");
     toCoutVerb(clean);
@@ -358,6 +361,16 @@ void get_update_function(std::string target,
     toCoutVerb(opto_cmd);
     system(opto_cmd.c_str());
     toCout("** End simplify update function");
+
+    // perform re-optimization
+    if (g_do_bitwise_opt)
+    {
+      toCout("** Performing bitwise optimization on LLVM IR file.");
+      system(rewrite_cmd.c_str());
+      toCout("** Re-optimizing the update function.");
+      system(reopt_cmd.c_str());
+      toCout("** Re-optimization ended.");
+    }
 
     time_t simplifyEndTime = time(NULL);
     uint32_t upGenTime = upGenEndTime - startTime;

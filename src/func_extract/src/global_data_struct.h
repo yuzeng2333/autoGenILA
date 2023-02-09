@@ -277,6 +277,7 @@ extern bool g_use_concat_extract_func;
 extern bool g_use_simple_func_name;
 extern bool g_use_multi_thread;
 extern bool g_overwrite_existing_llvm;
+extern bool g_do_bitwise_opt;
 extern std::string g_llvm_path;
 extern uint32_t g_do_instr_num;
 extern std::set<std::string> g_readASV;
