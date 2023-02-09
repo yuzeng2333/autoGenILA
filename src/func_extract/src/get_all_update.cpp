@@ -349,6 +349,8 @@ void get_update_function(std::string target,
 
     std::string opto_cmd(optCmd+" -O3 "+fileName+".clean-ll -S -o="+fileName+".tmp-o3-ll; opt -passes=deadargelim "+fileName+".tmp-o3-ll -S -o="+cleanOptoFileName+"; rm "+fileName+".tmp-o3-ll");
 
+    // TODO: re-optimize
+
     toCout("** Begin clean update function");
     toCoutVerb(clean);
     system(clean.c_str());

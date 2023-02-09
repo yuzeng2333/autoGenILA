@@ -1,6 +1,6 @@
 #ifndef GLOBAL_DATA_STRUCT
 #define GLOBAL_DATA_STRUCT
-#include "z3++.h"
+//#include "z3++.h"
 #include "ast.h"
 #include "types.h"
 #include "ins_context_stack.h"
@@ -258,8 +258,8 @@ extern std::ofstream g_outFile;
 extern std::ofstream g_regValueFile;
 extern std::map<astNode*, uint32_t> CLEAN_QUEUE;
 extern std::map<astNode*, uint32_t> DIRTY_QUEUE;
-extern std::map<std::string, z3::expr*> INPUT_EXPR_VAL;
-extern std::map<std::string, z3::expr*> TIMED_VAR2EXPR;
+//extern std::map<std::string, z3::expr*> INPUT_EXPR_VAL;
+//extern std::map<std::string, z3::expr*> TIMED_VAR2EXPR;
 extern std::set<std::string> INT_EXPR_SET;
 
 extern std::vector<struct InstrInfo_t> g_instrInfo;

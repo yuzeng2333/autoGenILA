@@ -16,7 +16,7 @@
 #include <fstream>
 #include <time.h>
 #include <math.h>
-#include "z3++.h"
+//#include "z3++.h"
 #define context std::shared_ptr<llvm::LLVMContext>
 #define builder std::shared_ptr<llvm::IRBuilder<>>
 
@@ -129,9 +129,9 @@ class UpdateFunctionGen {
     llvm::Value* add_ssa_constraint(astNode* const node, uint32_t timeIdx, context &c,  
                                     std::shared_ptr<llvm::IRBuilder<>> &b, const uint32_t bound);
     
-    void add_child_constraint(astNode* const parentNode, uint32_t timeIdx, 
-                              context &c, z3::solver &s, z3::goal &g, 
-                              const uint32_t bound, bool isSolve);
+    //void add_child_constraint(astNode* const parentNode, uint32_t timeIdx, 
+    //                          context &c, z3::solver &s, z3::goal &g, 
+    //                          const uint32_t bound, bool isSolve);
 
     void push_clean_queue(astNode* node, uint32_t timeIdx);
     

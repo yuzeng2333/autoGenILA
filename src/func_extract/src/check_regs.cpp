@@ -29,8 +29,8 @@ std::string CURRENT_VAR;
 
 // DIRTY_QUEUE is mainly not-current AS
 
-std::map<std::string, z3::expr*> INPUT_EXPR_VAL;
-std::map<std::string, z3::expr*> TIMED_VAR2EXPR;
+//std::map<std::string, z3::expr*> INPUT_EXPR_VAL;
+//std::map<std::string, z3::expr*> TIMED_VAR2EXPR;
 
 std::map<std::string, uint32_t> g_allRegs;
 std::set<std::string> g_regWithFunc;
