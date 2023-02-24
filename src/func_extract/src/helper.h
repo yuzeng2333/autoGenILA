@@ -1,5 +1,5 @@
-#ifndef FUNC_HELP
-#define FUNC_HELP
+#ifndef FUNC_EXTRACT_HELPER_H
+#define FUNC_EXTRACT_HELPER_H
 
 #include <string>
 #include <regex>

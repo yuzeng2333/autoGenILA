@@ -1,5 +1,5 @@
-#ifndef VLG2Z3 
-#define VLG2Z3
+#ifndef FUNC_EXTRACT_CHECK_REGS_H 
+#define FUNC_EXTRACT_CHECK_REGS_H
 
 #include "../../live_analysis/src/varWidth.h"
 #include "../../live_analysis/src/taint_gen.h"
@@ -45,6 +45,7 @@ class DestInfo {
     std::string get_mod_name();
     std::string get_ins_name();
     std::string get_instr_name();
+    std::string get_func_name();
     void set_dest_and_slice(std::string var, uint32_t width);
     void set_module_name(std::string var);
     void set_instr_name(std::string var);
@@ -80,8 +81,55 @@ struct ModuleDynInfo_t {
 };
 
 
-class UpdateFunctionGen {
+// An implementation of ModuleInfo which uses data from g_moduleInfoMap.
+class ModuleInfoImpl : public ModuleInfo {
+
+public:
+  // A blank modname implies the top module.
+  uint32_t get_var_width_simp(const std::string& varAndSlice,
+                              const std::string& modname) override;
+
+  uint32_t get_var_width_cmplx(const std::string& varAndSlice) override;
+
+  bool is_module(const std::string& modname) override;
+
+  // Return true if the given wire is an output port of the top module,
+  // and is driven by a fifo instance.
+  bool is_fifo_output(const std::string& wire) override;
+
+  // If instname names an instance in the given parent mod, return its module
+  // name.  Otherwise return a blank string.  A blank parentmod implies
+  // the top module.
+  std::string get_module_of_inst(const std::string& instname,
+                                 const std::string& parentmod) override;
+
+  // Fill in the provided (empty) vector with the output ports of the given module.
+  // Of course, a blank modname implies the top module.
+  void get_module_outputs(std::vector<std::string>& outputs,
+                          const std::string& modname) override;
+
+  // Fill in the provided (empty) vector with the fifo instance names in the given module.
+  // Of course, a blank modname implies the top module.
+  void get_fifo_insts(std::vector<std::string>& fifos,
+                          const std::string& modname) override;
+};
+
+
+// An implementation of UFGenerator which uses data from
+// g_moduleInfoMap and the design's AST.
+class UpdateFunctionGen : public UFGenerator {
   public:
+    UpdateFunctionGen();
+
+    void print_llvm_ir(DestInfo &destInfo, 
+                       const uint32_t bound, 
+                       uint32_t instrIdx,
+                       std::string fileName) override;
+
+    // make_llvm_basename() is inherited from the base class
+
+  private:
+    
     // first of pair is instance name, however, the first in the vector should be
     // module name, instead of instance name.
     // Currently there is a restriction: the first module in the vector can only
@@ -160,14 +208,6 @@ class UpdateFunctionGen {
 
     std::shared_ptr<ModuleDynInfo_t>
     get_dyn_data(std::shared_ptr<ModuleInfo_t> curMod);
-    
-    static std::string make_llvm_basename(DestInfo &destInfo,
-                                  const uint32_t bound);
-
-    void print_llvm_ir(DestInfo &destInfo, 
-                       const uint32_t bound, 
-                       uint32_t instrIdx,
-                       std::string fileName);
     
     
     llvm::Value* var_expr(std::string varAndSlice, uint32_t timeIdx, context &c, 

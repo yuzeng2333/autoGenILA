@@ -1,5 +1,5 @@
-#ifndef OP_TAINT_GEN_
-#define OP_TAINT_GEN_
+#ifndef LIVE_ANALYSIS_OP_TAINT_GEN_H
+#define LIVE_ANALYSIS_OP_TAINT_GEN_H
 
 #include <regex>
 #include "helper.h"

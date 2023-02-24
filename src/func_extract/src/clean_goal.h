@@ -1,5 +1,5 @@
-#ifndef CLEAN_GOAL 
-#define CLEAN_GOAL
+#ifndef FUNC_EXTRACT_CLEAN_GOAL_H
+#define FUNC_EXTRACT_CLEAN_GOAL_H
 
 #include <iostream>
 #include <fstream>

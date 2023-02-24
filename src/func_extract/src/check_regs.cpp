@@ -63,7 +63,6 @@ void check_all_regs() {
   uint32_t i = 1;
   DestInfo destInfo;
   UpdateFunctionGen UFGen;  
-  UFGen.TheContext = std::make_unique<llvm::LLVMContext>();
   for(auto instrInfo : g_instrInfo) {
     if(!instrInfo.writeASVVec.empty() && !instrInfo.writeASV.empty()) {
       toCout("Error: does not support single ASV and vector together");
@@ -112,10 +111,12 @@ void check_all_regs() {
       }
 
       std::string fileName = UFGen.make_llvm_basename(destInfo, cycleCnt) + ".tmp.ll";
+
       UFGen.print_llvm_ir(destInfo, cycleCnt, i-1, fileName);
       //print_llvm_ir_without_submodules(oneWriteAsv, cycleCnt-1, i-1);
       g_maxDelay = cycleCnt;
     }
+
     // print ir for reg vector
     if(!instrInfo.writeASVVec.empty()) {
       destInfo.isVector = true;
@@ -129,6 +130,7 @@ void check_all_regs() {
         destInfo.set_module_name(g_topModule);
 
       std::string fileName = UFGen.make_llvm_basename(destInfo, cycleCnt) + ".tmp.ll";
+
       UFGen.print_llvm_ir(destInfo, cycleCnt, i-1, fileName);
       g_maxDelay = cycleCnt;    
     }
@@ -136,6 +138,13 @@ void check_all_regs() {
     // if g_get_all_update=true, only do the first instruction
     if(i-1 >= g_do_instr_num) return;
   }
+}
+
+
+// Each generator instance must have its own LLVMContext,
+// since multiple threads may each be running their own generator.
+UpdateFunctionGen::UpdateFunctionGen() {
+  TheContext = std::make_unique<llvm::LLVMContext>();
 }
 
 
@@ -148,9 +157,8 @@ void UpdateFunctionGen::clean_data() {
 
 
 // To get a full filename, add something like ".ll" to this.
-// Static function.
 std::string
-UpdateFunctionGen::make_llvm_basename(DestInfo &destInfo, 
+UFGenerator::make_llvm_basename(DestInfo &destInfo, 
                                      const uint32_t bound) {
   //std::string destSimpleName = destInfo.get_dest_name();
   //remove_front_backslash(destNameSimp);
@@ -322,13 +330,11 @@ void UpdateFunctionGen::print_llvm_ir(DestInfo &destInfo,
   llvm::FunctionType *FT =
     llvm::FunctionType::get(retTy, argTy, false);
 
-  std::string destSimpleName = funcExtract::var_name_convert(destName, true);
-
   // Create the main function
   llvm::Function::LinkageTypes linkage = llvm::Function::ExternalLinkage;
+  std::string funcName = destInfo.get_func_name();
 
-  TheFunction = llvm::Function::Create( FT, linkage,
-                  destInfo.get_instr_name()+"_"+destSimpleName, TheModule.get());
+  TheFunction = llvm::Function::Create( FT, linkage, funcName, TheModule.get());
 
   for(auto it = insContextStk.begin();
       it != insContextStk.end(); it++) {
@@ -1031,6 +1037,12 @@ std::string DestInfo::get_dest_name() {
 }
 
 
+// Build a name for the LLVM function we are going to make.
+std::string DestInfo::get_func_name() {
+  std::string destSimpleName = funcExtract::var_name_convert(get_dest_name(), true);
+  return get_instr_name()+"_"+destSimpleName;
+}
+
 
 // Return the correct return type for the function
 llvm::Type* DestInfo::get_ret_type(std::shared_ptr<llvm::LLVMContext> TheContext) {
@@ -1509,5 +1521,85 @@ void print_context_info(Context_t& insCntxt) {
 
   toCoutVerb("push mod("+toStr(g_pushNum)+"): "+modName+", func: "+funcName);
 }
+
+
+// A blank modname implies the top module.
+uint32_t ModuleInfoImpl::get_var_width_simp(const std::string& var,
+                                             const std::string& modname)
+{
+  std::shared_ptr<ModuleInfo_t> moduleInfo =
+        g_moduleInfoMap[modname.empty() ? g_topModule : modname];
+
+  return get_var_slice_width_simp(var, moduleInfo);
+}
+
+
+uint32_t ModuleInfoImpl::get_var_width_cmplx(const std::string& var)
+{
+  return get_var_slice_width_cmplx(var);
+}
+
+
+bool ModuleInfoImpl::is_module(const std::string& modname)
+{
+  return g_moduleInfoMap.find(modname) != g_moduleInfoMap.end();
+}
+
+
+// Return true if the given wire is an output port of the top module,
+// and is driven by a fifo instance.
+bool ModuleInfoImpl::is_fifo_output(const std::string& wire)
+{
+  return funcExtract::is_fifo_output(wire);  // Call global function
+}
+
+
+// If instname names an instance in the given parent mod, return its module
+// name.  Otherwise return a blank string.  A blank parentmod implies
+// the top module.
+std::string ModuleInfoImpl::get_module_of_inst(const std::string& instname,
+                                                const std::string& parentmod)
+{
+  std::shared_ptr<ModuleInfo_t> moduleInfo =
+      g_moduleInfoMap[parentmod.empty() ? g_topModule : parentmod];
+  if (!moduleInfo) return "";
+
+  return moduleInfo->ins2modMap[instname];
+}
+
+
+// Fill in the provided (empty) vector with the output ports of the given module.
+// Of course, a blank modname implies the top module.
+void ModuleInfoImpl::get_module_outputs(std::vector<std::string>& outputs,
+                                         const std::string& modname)
+{
+  std::shared_ptr<ModuleInfo_t> moduleInfo =
+      g_moduleInfoMap[modname.empty() ? g_topModule : modname];
+  assert(moduleInfo);
+
+  // copy from set to vector
+  for (auto port : moduleInfo->moduleOutputs) {
+    outputs.push_back(port);
+  }
+}
+
+
+// Fill in the provided (empty) vector with the fifo instance names in the given module.
+// Of course, a blank modname implies the top module.
+void ModuleInfoImpl::get_fifo_insts(std::vector<std::string>& fifos,
+                                     const std::string& modname)
+{
+  // A bug in the verilog parser: g_fifoIns gets fifos from all
+  // levels of hierarchy, with potential instance name collisions.  
+  assert(modname.empty());  // Support only the top module.
+
+  // copy from set to vector
+  for (auto pair : g_fifoIns) {
+    fifos.push_back(pair.first);
+  }
+}
+
+
+
 
 } // end of namespace funcExtract

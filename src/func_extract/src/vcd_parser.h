@@ -1,3 +1,6 @@
+#ifndef FUNC_EXTRACT_VCD_PARSER_H
+#define FUNC_EXTRACT_VCD_PARSER_H
+
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -12,3 +15,6 @@ void vcd_parser(std::string fileName);
 void print_rst_val();
 
 } // end of namespace funcExtract
+
+
+#endif
