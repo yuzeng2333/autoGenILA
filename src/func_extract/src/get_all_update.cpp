@@ -517,6 +517,16 @@ FuncExtractFlow::get_delay_bounds(std::string var, const InstrInfo_t &instrInfo)
 // Except in special cases, all parameters to update functions are integer types.
 static bool
 isBigType(const llvm::Type *type) {
+
+  // Special case for LLVM Vector types.  Calculate total size.
+  if (type->isVectorTy()) {
+    const llvm::VectorType *vecTy = llvm::dyn_cast<const llvm::VectorType>(type);
+    unsigned totalWidth = vecTy->getElementType()->getIntegerBitWidth() *
+                          vecTy->getElementCount().getFixedValue();
+    return totalWidth > 64;
+  }
+  
+  // Normal scalar, or void.
   return (type->isIntegerTy() && type->getIntegerBitWidth() > 64);
 }
 
