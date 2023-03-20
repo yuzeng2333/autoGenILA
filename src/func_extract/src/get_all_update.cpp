@@ -11,6 +11,7 @@
 #include "global_data_struct.h"
 #include "helper.h"
 #include "util.h"
+#include "branch_mux.h"
 
 #define toStr(a) std::to_string(a)
 #define toCout(a) std::cout << a << std::endl
@@ -384,6 +385,11 @@ FuncExtractFlow::get_update_function(std::string target,
   } else {
     usefulFunc = clean_main_func(*M, funcName);
     if (usefulFunc) {
+
+      if (g_post_opto_mux_to_branch) {
+        toCout("Converting muxes to branches...");
+        BranchMux::convertSelectsToBranches(M.get(), g_post_opto_mux_to_branch_threshold);
+      }
       
       // Add a C-compatible wrapper function that calls the main function.
       std::string wrapperFuncName = create_wrapper_func(*M, funcName);
