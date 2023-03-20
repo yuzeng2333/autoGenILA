@@ -944,8 +944,9 @@ FuncExtractFlow::print_asv_info(std::ofstream &output) {
 
 void
 FuncExtractFlow::print_llvm_script( std::string fileName) {
+  // Any command-line args (e.g. -O3) will be given to clang.
   std::ofstream output(fileName);
-  output << "clang ila.cpp -emit-llvm -S -o main.ll" << std::endl;
+  output << "clang $* ila.cpp -emit-llvm -S -o main.ll" << std::endl;
   std::string line = "llvm-link -v main.ll \\";
   output << line << std::endl;
   for(auto it = m_fileNameVec.begin(); it != m_fileNameVec.end(); it++) {
@@ -954,8 +955,17 @@ FuncExtractFlow::print_llvm_script( std::string fileName) {
   }
   line = "-S -o linked.ll";
   output << line << std::endl;
-  output << "clang linked.ll" << std::endl;
+  output << "clang $* linked.ll" << std::endl;
   output.close();
+
+  // Make the new file executable, to the extent that it is readable.
+  struct stat statbuf;
+  stat(fileName.c_str(), &statbuf);
+  mode_t mode = statbuf.st_mode | S_IXUSR;
+  if (mode | S_IRGRP) mode |= S_IXGRP;
+  if (mode | S_IROTH) mode |= S_IXOTH;
+  chmod(fileName.c_str(), mode);
+
 }
 
 

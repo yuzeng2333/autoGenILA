@@ -221,6 +221,13 @@ void pruneFaninCone(InstSet& coneSet, InstList& coneList, const llvm::Use& root)
 
 bool convertSelectToBranch(llvm::SelectInst* select, int labelNum, int minSize)
 {
+  llvm::Value *condition = select->getCondition();
+  if (!condition->getType()->isIntegerTy()) {
+    // We don't support vectorized selects.
+    return false;
+  }
+
+
   if (minSize < 0) minSize = 10; // Default value
 
   //printf("Considering select %s: \n", instrToString(select).c_str());
@@ -238,7 +245,7 @@ bool convertSelectToBranch(llvm::SelectInst* select, int labelNum, int minSize)
 
   // Don't bother creating branches around a small number of instructions...
   // TODO: Make a tuneable parameter.
-  if (unprunedTrueSize + unprunedFalseSize < minSize) {
+  if (unprunedTrueSize + unprunedFalseSize < (unsigned)minSize) {
     return false;
   }
 
@@ -251,7 +258,7 @@ bool convertSelectToBranch(llvm::SelectInst* select, int labelNum, int minSize)
   pruneFaninCone(falseFaninCone, falseFaninList, select->getOperandUse(2));
 
   // Don't bother creating branches around a small number of instructions...
-  if (trueFaninCone.size() + falseFaninCone.size() < minSize) {
+  if (trueFaninCone.size() + falseFaninCone.size() < (unsigned)minSize) {
     return false;
   }
 
@@ -279,7 +286,7 @@ bool convertSelectToBranch(llvm::SelectInst* select, int labelNum, int minSize)
 
   // Add a new terminator branch instruction to the original BB that
   // jumps to either trueBB or falseBB based on the correct condition.
-  llvm::IRBuilder<>(bb).CreateCondBr(select->getCondition(), trueBB, falseBB);
+  llvm::IRBuilder<>(bb).CreateCondBr(condition, trueBB, falseBB);
 
   // Move all the True cone instructions into the True BB, in their existing order.
   for (auto it = trueFaninList.rbegin(); it != trueFaninList.rend(); ++it) {
