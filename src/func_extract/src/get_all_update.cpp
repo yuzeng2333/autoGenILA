@@ -660,7 +660,15 @@ FuncExtractFlow::create_wrapper_func(llvm::Module& M,
     Builder->CreateRet(call);
   }
 
-  llvm::verifyFunction(*wrapperFunc);
+  // Note that LLVM does its own output buffering, so we have to
+  // make sure that all the output shows up in the correct order.
+  llvm::outs() << "Verification of main function...\n";
+  bool v2 = llvm::verifyFunction(*mainFunc, &llvm::outs());
+  llvm::outs() << "Verification " << (v2 ? "failed!" : "passed.")  << "\n";
+  llvm::outs() << "Verification of wrapper function...\n";
+  bool v1 = llvm::verifyFunction(*wrapperFunc, &llvm::outs());
+  llvm::outs() << "Verification " << (v1 ? "failed!" : "passed.")  << "\n";
+  llvm::outs().flush();
 
   return wrapperFunc->getName().str();
 }
@@ -717,8 +725,19 @@ FuncExtractFlow::remove_dead_args(llvm::Function *func) {
   // Now move the contents of the original function into the new one.
   newFunc->getBasicBlockList().splice(newFunc->begin(), func->getBasicBlockList());
 
-  // Set the names and attributes of the new function args, based on the original function args 
 
+  // Remove all arg attributes created by above call to copyAttributesFrom(),
+  // since that function may have created trash out-of-range parameter
+  // attributes.
+  llvm::AttributeList oldAttrs = newFunc->getAttributes();
+  llvm::AttributeList newAttrs = llvm::AttributeList::get(
+                           newFunc->getContext(),
+                           oldAttrs.getFnAttrs(),
+                           oldAttrs.getRetAttrs(),
+                           llvm::ArrayRef<llvm::AttributeSet>());
+  newFunc->setAttributes(newAttrs);
+
+  // Set the names and attributes of the new function args, based on the original function args 
   int origArgNo = 0;
   int newArgNo = 0;
   for (llvm::Argument& origArg : func->args()) {
@@ -730,11 +749,6 @@ FuncExtractFlow::remove_dead_args(llvm::Function *func) {
 
       // Steal the original arg's name
       newArg->takeName(&origArg);
-
-      // Remove any arg attributes created by above call to copyAttributesFrom().
-      newFunc->removeParamAttr(newArgNo, llvm::Attribute::WriteOnly);
-      newFunc->removeParamAttr(newArgNo, llvm::Attribute::ReadOnly);
-      newFunc->removeParamAttr(newArgNo, llvm::Attribute::Returned);
 
       // Copy arg attributes from the corresponding arg of the original func.
       llvm::AttrBuilder b(func->getContext(), func->getAttributes().getParamAttrs(origArgNo));

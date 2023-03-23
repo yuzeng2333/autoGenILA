@@ -350,13 +350,15 @@ bool convertSelectsToBranches(llvm::Function *func, int threshold)
   }
 
   // This is too slow to do after every conversion
-  fflush(stdout);
+  llvm::outs() << "Post mux-to-branch verification of " << func->getName() << "\n";
   if (llvm::verifyFunction(*func, &llvm::outs())) {
+    llvm::outs() << "Verification failed!\n";
     llvm::outs().flush();
-    printf("\nVerification %d failed!\n", n);
     return false;
   }
 
+  llvm::outs() << "Verification passed.\n";
+  llvm::outs().flush();
   return true;
 }
 
