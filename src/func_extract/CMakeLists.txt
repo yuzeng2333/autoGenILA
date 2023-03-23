@@ -3,8 +3,10 @@ cmake_minimum_required(VERSION 2.8)
 project (func-extract)
 
 find_package (glog 0.4.0 REQUIRED)
+
 find_package (LLVM 14 REQUIRED)
-#find_package (LLVM REQUIRED CONFIG)
+# How to force use of a particular LLVM build:
+# find_package (LLVM 14 REQUIRED PATHS /my/llvm/installation/ NO_DEFAULT_PATH)
 
 
 aux_source_directory(./src SRC_DIR)
@@ -88,7 +90,7 @@ include_directories(${Z3_INCLUDE_DIR})
 # Add "tags" target 
 set_source_files_properties(tags PROPERTIES GENERATED true)
 add_custom_target(tags
-    COMMAND ctags -R  --extra=+f .
+    COMMAND ctags -R --tag-relative=yes  --extra=+f ${CMAKE_SOURCE_DIR}/app ${CMAKE_SOURCE_DIR}/src
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 

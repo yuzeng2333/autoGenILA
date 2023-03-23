@@ -11,6 +11,7 @@
 #include "global_data_struct.h"
 #include "helper.h"
 #include "util.h"
+#include "branch_mux.h"
 
 #define toStr(a) std::to_string(a)
 #define toCout(a) std::cout << a << std::endl
@@ -384,6 +385,11 @@ FuncExtractFlow::get_update_function(std::string target,
   } else {
     usefulFunc = clean_main_func(*M, funcName);
     if (usefulFunc) {
+
+      if (g_post_opto_mux_to_branch) {
+        toCout("Converting muxes to branches...");
+        BranchMux::convertSelectsToBranches(M.get(), g_post_opto_mux_to_branch_threshold);
+      }
       
       // Add a C-compatible wrapper function that calls the main function.
       std::string wrapperFuncName = create_wrapper_func(*M, funcName);
@@ -654,7 +660,15 @@ FuncExtractFlow::create_wrapper_func(llvm::Module& M,
     Builder->CreateRet(call);
   }
 
-  llvm::verifyFunction(*wrapperFunc);
+  // Note that LLVM does its own output buffering, so we have to
+  // make sure that all the output shows up in the correct order.
+  llvm::outs() << "Verification of main function...\n";
+  bool v2 = llvm::verifyFunction(*mainFunc, &llvm::outs());
+  llvm::outs() << "Verification " << (v2 ? "failed!" : "passed.")  << "\n";
+  llvm::outs() << "Verification of wrapper function...\n";
+  bool v1 = llvm::verifyFunction(*wrapperFunc, &llvm::outs());
+  llvm::outs() << "Verification " << (v1 ? "failed!" : "passed.")  << "\n";
+  llvm::outs().flush();
 
   return wrapperFunc->getName().str();
 }
@@ -711,8 +725,19 @@ FuncExtractFlow::remove_dead_args(llvm::Function *func) {
   // Now move the contents of the original function into the new one.
   newFunc->getBasicBlockList().splice(newFunc->begin(), func->getBasicBlockList());
 
-  // Set the names and attributes of the new function args, based on the original function args 
 
+  // Remove all arg attributes created by above call to copyAttributesFrom(),
+  // since that function may have created trash out-of-range parameter
+  // attributes.
+  llvm::AttributeList oldAttrs = newFunc->getAttributes();
+  llvm::AttributeList newAttrs = llvm::AttributeList::get(
+                           newFunc->getContext(),
+                           oldAttrs.getFnAttrs(),
+                           oldAttrs.getRetAttrs(),
+                           llvm::ArrayRef<llvm::AttributeSet>());
+  newFunc->setAttributes(newAttrs);
+
+  // Set the names and attributes of the new function args, based on the original function args 
   int origArgNo = 0;
   int newArgNo = 0;
   for (llvm::Argument& origArg : func->args()) {
@@ -724,11 +749,6 @@ FuncExtractFlow::remove_dead_args(llvm::Function *func) {
 
       // Steal the original arg's name
       newArg->takeName(&origArg);
-
-      // Remove any arg attributes created by above call to copyAttributesFrom().
-      newFunc->removeParamAttr(newArgNo, llvm::Attribute::WriteOnly);
-      newFunc->removeParamAttr(newArgNo, llvm::Attribute::ReadOnly);
-      newFunc->removeParamAttr(newArgNo, llvm::Attribute::Returned);
 
       // Copy arg attributes from the corresponding arg of the original func.
       llvm::AttrBuilder b(func->getContext(), func->getAttributes().getParamAttrs(origArgNo));
@@ -938,8 +958,9 @@ FuncExtractFlow::print_asv_info(std::ofstream &output) {
 
 void
 FuncExtractFlow::print_llvm_script( std::string fileName) {
+  // Any command-line args (e.g. -O3) will be given to clang.
   std::ofstream output(fileName);
-  output << "clang ila.cpp -emit-llvm -S -o main.ll" << std::endl;
+  output << "clang $* ila.cpp -emit-llvm -S -o main.ll" << std::endl;
   std::string line = "llvm-link -v main.ll \\";
   output << line << std::endl;
   for(auto it = m_fileNameVec.begin(); it != m_fileNameVec.end(); it++) {
@@ -948,8 +969,17 @@ FuncExtractFlow::print_llvm_script( std::string fileName) {
   }
   line = "-S -o linked.ll";
   output << line << std::endl;
-  output << "clang linked.ll" << std::endl;
+  output << "clang $* linked.ll" << std::endl;
   output.close();
+
+  // Make the new file executable, to the extent that it is readable.
+  struct stat statbuf;
+  stat(fileName.c_str(), &statbuf);
+  mode_t mode = statbuf.st_mode | S_IXUSR;
+  if (mode | S_IRGRP) mode |= S_IXGRP;
+  if (mode | S_IROTH) mode |= S_IXOTH;
+  chmod(fileName.c_str(), mode);
+
 }
 
 
