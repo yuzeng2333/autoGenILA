@@ -20,8 +20,10 @@
 #include "llvm/IR/ValueSymbolTable.h"
 
 #include <iostream>
-#include <set>
+#include <unordered_set>
 #include <list>
+#include <queue>
+#include <deque>
 
 
 namespace BranchMux {
@@ -33,11 +35,12 @@ struct InstrLess {
                   llvm::Instruction* const & b) const;
 };
 
-// A set with arbitrary ordering.
-typedef std::set<llvm::Instruction*> InstSet;
+// A set with arbitrary ordering (std::unordered_set definitely faster than std::set).
+typedef std::unordered_set<llvm::Instruction*> InstSet;
 
-// An ordered list that we can efficiently add and remove elements from.
+// An ordered sortable list that we can efficiently add and remove elements from.
 typedef std::list<llvm::Instruction*> InstList;
+//typedef std::deque<llvm::Instruction*> InstList;
 
 std::string instrToString(const llvm::Instruction* inst)
 {
@@ -130,6 +133,58 @@ void getFaninCone(const llvm::Use& root, InstSet& cone)
 }
 
 
+// Same as above, but uses a queue-based BFS instead of recursive DFS.
+void getFaninConeBFS(const llvm::Use& root, InstSet& cone)
+{
+  llvm::Value *val = root.get(); // What is being used: An Instruction or a constant
+
+  if (!val || !llvm::isa<llvm::Instruction>(val)) {
+    return;
+  }
+
+  llvm::Instruction *firstInst = llvm::cast<llvm::Instruction>(val);
+  llvm::Instruction *rootInst = getUserInst(root);
+  const llvm::BasicBlock *bb = rootInst->getParent();
+
+  std::queue<llvm::Instruction*> fifo;
+  fifo.push(firstInst);
+
+  while (!fifo.empty()) {
+    llvm::Instruction *inst = fifo.front();
+    fifo.pop();
+
+    if (cone.count(inst) != 0) {
+      continue;  // Already seen this inst
+    }
+
+    if (inst->getParent() != bb) {
+      continue;  // inst in wrong BB.
+    }
+
+    assert(inst->comesBefore(rootInst));
+
+    // Look at every usage of this inst.  If it is used
+    // by anything that cannot be in the cone, we must reject it.
+    for (const llvm::Use& use : inst->uses()) {
+      llvm::Instruction *userInst = getUserInst(use);
+      if (userInst->getParent() != bb || rootInst->comesBefore(userInst)) {
+        continue;  // The inst is used by something in another bb, or downstream of rootInst
+      }
+    }
+
+    cone.insert(inst);
+
+    for (const auto& faninUse : inst->operands()) {
+      llvm::Value* faninVal = faninUse.get();
+      if (faninVal && llvm::isa<llvm::Instruction>(faninVal)) {
+        llvm::Instruction *faninInst = llvm::cast<llvm::Instruction>(faninVal);
+        fifo.push(faninInst);
+      }
+    }
+  }
+}
+
+
 
 // Expel from the given fanin cone in (coneSet) any instruction that is also
 // used outside the cone and the given Use. (Presumably the root instruction
@@ -153,7 +208,8 @@ void pruneFaninCone(InstSet& coneSet, InstList& coneList, const llvm::Use& root)
   for (auto inst : coneSet) {
     coneList.push_back(inst);
   }
-  coneList.sort(InstrLess());
+  coneList.sort(InstrLess());  // Specific to std::list
+  //std::sort(coneList.begin(), coneList.end(), InstrLess());  // For anything besides std::list
 
   // Any Instruction belonging to a different BB cannot remain in the fanin cone.
   // We make this requirement to simplify the subseqent process of moving the true/false cone
