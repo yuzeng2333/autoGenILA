@@ -22,8 +22,7 @@
 #include <iostream>
 #include <unordered_set>
 #include <list>
-#include <queue>
-#include <deque>
+#include <set>
 
 
 namespace BranchMux {
@@ -47,7 +46,6 @@ typedef std::unordered_set<llvm::Instruction*> InstSet;
 // An ordered sortable list that we can efficiently add and remove elements from.
 // No obvious performance difference between std::list and std::deque.
 typedef std::list<llvm::Instruction*> InstList;
-//typedef std::deque<llvm::Instruction*> InstList;
 
 std::string instrToString(const llvm::Instruction* inst)
 {
@@ -159,136 +157,10 @@ void getFaninCone(const llvm::Use& root, InstSet& cone)
 }
 
 
-// Same as above, but uses a queue-based BFS instead of recursive DFS.
-void getFaninConeBFS(const llvm::Use& root, InstSet& cone)
-{
-  llvm::Value *val = root.get(); // What is being used: An Instruction or a constant
-
-  if (!val || !llvm::isa<llvm::Instruction>(val)) {
-    return;
-  }
-
-  llvm::Instruction *firstInst = llvm::cast<llvm::Instruction>(val);
-  llvm::Instruction *rootInst = getUserInst(root);
-  const llvm::BasicBlock *bb = rootInst->getParent();
-
-  std::queue<llvm::Instruction*> fifo;
-  fifo.push(firstInst);
-
-  while (!fifo.empty()) {
-    llvm::Instruction *inst = fifo.front();
-    fifo.pop();
-
-    if (cone.count(inst) != 0) {
-      continue;  // Already seen this inst
-    }
-
-    if (inst->getParent() != bb) {
-      continue;  // inst in wrong BB.
-    }
-
-    assert(inst->comesBefore(rootInst));
-
-    // Look at every usage of this inst.  If it is used
-    // by anything that cannot be in the cone, we must reject it.
-    for (const llvm::Use& use : inst->uses()) {
-      llvm::Instruction *userInst = getUserInst(use);
-      if (userInst->getParent() != bb || rootInst->comesBefore(userInst)) {
-        continue;  // The inst is used by something in another bb, or downstream of rootInst
-      }
-    }
-
-    cone.insert(inst);
-
-    for (const auto& faninUse : inst->operands()) {
-      llvm::Value* faninVal = faninUse.get();
-      if (faninVal && llvm::isa<llvm::Instruction>(faninVal)) {
-        llvm::Instruction *faninInst = llvm::cast<llvm::Instruction>(faninVal);
-        fifo.push(faninInst);
-      }
-    }
-  }
-}
-
-
 
 // Same as above, but uses a priority-queue-based BFS instead of recursive DFS.
+// Probably no pruning needed.
 void getFaninConePQ(const llvm::Use& root, InstSet& cone)
-{
-  llvm::Value *val = root.get(); // What is being used: An Instruction or a constant
-
-  if (!val || !llvm::isa<llvm::Instruction>(val)) {
-    return;
-  }
-
-  llvm::Instruction *firstInst = llvm::cast<llvm::Instruction>(val);
-  llvm::Instruction *rootInst = getUserInst(root);
-  const llvm::BasicBlock *bb = rootInst->getParent();
-
-  std::priority_queue<llvm::Instruction*, std::vector<llvm::Instruction*>, InstrLess> pq;
-  pq.push(firstInst);
-  printf("pushed inst %s\n", firstInst->getName().str().c_str());
-
-
-  //std::set<llvm::Instruction*> rejectedInsts;
-
-  while (!pq.empty()) {
-    llvm::Instruction *inst = pq.top();
-    pq.pop();
-
-    printf("popped inst %s  size %lu\n", inst->getName().str().c_str(), pq.size());
-
-    if (cone.count(inst) != 0) {
-      continue;  // Already seen this inst
-    }
-
-    if (inst->getParent() != bb) {
-      continue;  // inst in wrong BB.
-    }
-
-    //if (rejectedInsts.count(inst) {
-      //continue;  // Known-bad inst
-    //}
-
-    assert(inst->comesBefore(rootInst));
-
-    // Look at every usage of this inst.  If it is used
-    // by anything that cannot be in the cone, we must reject it.
-    for (const llvm::Use& use : inst->uses()) {
-      llvm::Instruction *userInst = getUserInst(use);
-
-      //if (rejectedInsts.count(userInst) {
-        //continue;  // Known-bad inst
-      //}
-
-      if (userInst->getParent() != bb) {
-        //rejectedInsts.insert(inst);
-        continue; // The inst is used by something in another bb.
-      }
-
-      if (cone.count(userInst) == 0) {
-        //rejectedInsts.insert(inst);
-        continue;  // The inst is used by something outside the cone.
-      }
-    }
-
-    cone.insert(inst);
-
-    for (const auto& faninUse : inst->operands()) {
-      llvm::Value* faninVal = faninUse.get();
-      if (faninVal && llvm::isa<llvm::Instruction>(faninVal)) {
-        llvm::Instruction *faninInst = llvm::cast<llvm::Instruction>(faninVal);
-        pq.push(faninInst);
-        printf("pushed inst %s\n", faninInst->getName().str().c_str());
-      }
-    }
-  }
-}
-
-
-
-// Same as above, but uses a priority-queue-based BFS instead of recursive DFS.
-void getFaninConePQ2(const llvm::Use& root, InstSet& cone)
 {
   llvm::Value *val = root.get(); // What is being used: An Instruction or a constant
 
@@ -302,6 +174,7 @@ void getFaninConePQ2(const llvm::Use& root, InstSet& cone)
 
   //printf("start with root inst %p %s\n", rootInst, rootInst->getName().str().c_str());
 
+  // TODO: would unordered_set be faster?
   std::set<llvm::Instruction*, InstrMore> pq;
   pq.insert(firstInst);
   //printf("pushed initial inst %p %s\n", firstInst, firstInst->getName().str().c_str());
@@ -322,10 +195,6 @@ void getFaninConePQ2(const llvm::Use& root, InstSet& cone)
       continue;  // inst in wrong BB.
     }
 
-    //if (rejectedInsts.count(inst) {
-      //continue;  // Known-bad inst
-    //}
-
     assert(inst->comesBefore(rootInst));
 
     // Look at every usage of this inst.  If it is used
@@ -334,22 +203,16 @@ void getFaninConePQ2(const llvm::Use& root, InstSet& cone)
     for (const llvm::Use& use : inst->uses()) {
       llvm::Instruction *userInst = getUserInst(use);
 
-      //if (rejectedInsts.count(userInst) {
-        //continue;  // Known-bad inst
-      //}
-
       if (userInst == rootInst && use == root) {
         continue;  // The usage by the correct input of the rootInst - ignore
       }
 
       if (userInst->getParent() != bb) {
-        //rejectedInsts.insert(inst);
         rejected = true;  // The inst is used by something in another bb.
         break;
       }
 
       if (cone.count(userInst) == 0) {
-        //rejectedInsts.insert(inst);
         //printf("inst %p %s used outside cone by %p %s\n", inst, inst->getName().str().c_str(),
                 //userInst, userInst->getName().str().c_str());
         rejected = true;  // The inst is used by something outside the cone.
@@ -484,11 +347,11 @@ bool convertSelectToBranch(llvm::SelectInst* select, int labelNum, int minSize)
   llvm::BasicBlock *bb = select->getParent();
 
   InstSet trueFaninCone;
-  getFaninConePQ2(select->getOperandUse(1), trueFaninCone);
+  getFaninConePQ(select->getOperandUse(1), trueFaninCone);
   size_t unprunedTrueSize = trueFaninCone.size();
 
   InstSet falseFaninCone;
-  getFaninConePQ2(select->getOperandUse(2), falseFaninCone);
+  getFaninConePQ(select->getOperandUse(2), falseFaninCone);
   size_t unprunedFalseSize = falseFaninCone.size();
 
   // Don't bother creating branches around a small number of instructions...
@@ -509,6 +372,9 @@ bool convertSelectToBranch(llvm::SelectInst* select, int labelNum, int minSize)
   if (trueFaninCone.size() + falseFaninCone.size() < (unsigned)minSize) {
     return false;
   }
+
+  assert(unprunedTrueSize == trueFaninCone.size());
+  assert(unprunedFalseSize == falseFaninCone.size());
 
   printf("Processing select %d: true fanin %lu/%lu  false fanin %lu/%lu\n",
           labelNum, unprunedTrueSize, trueFaninCone.size(),
