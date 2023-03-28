@@ -41,7 +41,8 @@ struct InstrMore {
 };
 
 // A set with arbitrary ordering (std::unordered_set definitely faster than std::set).
-typedef std::unordered_set<llvm::Instruction*> InstSet;
+//typedef std::unordered_set<llvm::Instruction*> InstSet;
+typedef std::set<llvm::Instruction*, InstrLess> InstSet;
 
 // An ordered sortable list that we can efficiently add and remove elements from.
 // No obvious performance difference between std::list and std::deque.
@@ -86,8 +87,8 @@ bool InstrMore::operator()(llvm::Instruction* const& a,
 
 
 
-// A compare function that compares Instructions in the same BB by 
-// their ordering. This lets us sort an Instruction list forwards, so that the list
+// A compare function that compares Instructions in the same BB by their ordering.
+// This lets us order an Instruction container forwards, so that the container
 // has the instructions in the same order as the BB.
 bool InstrLess::operator()(llvm::Instruction* const& a,
                            llvm::Instruction* const& b) const
@@ -104,63 +105,10 @@ bool InstrLess::operator()(llvm::Instruction* const& a,
 }
 
 
-// Add to the given fanin cone starting at the given instruction. Root is the
-// startpoint of the cone: if the given instruction is used by any other
-// instruction downstream from rootInst, do not consider it.
-// Also stay within the same BasicBlock.
-void getFaninConeRecur(llvm::Instruction* inst,
-                             const llvm::Instruction* rootInst, InstSet& cone)
-{
-  if (cone.count(inst) != 0) {
-    return;  // Already seen this inst
-  }
 
-  const llvm::BasicBlock *bb = rootInst->getParent();
-
-  if (inst->getParent() != bb) {
-    return;  // inst in wrong BB.
-  }
-
-  assert(inst->comesBefore(rootInst));
-
-  // Look at every usage of this inst.  If it is used
-  // by anything that cannot be in the cone, we must reject it.
-  for (const llvm::Use& use : inst->uses()) {
-    llvm::Instruction *userInst = getUserInst(use);
-    if (userInst->getParent() != bb || rootInst->comesBefore(userInst)) {
-      return;  // The inst is used by something in another bb, or downstream of rootInst
-    }
-  }
-
-  cone.insert(inst);
-
-  for (const auto& faninUse : inst->operands()) {
-    llvm::Value* faninVal = faninUse.get();
-    if (faninVal && llvm::isa<llvm::Instruction>(faninVal)) {
-      llvm::Instruction *faninInst = llvm::cast<llvm::Instruction>(faninVal);
-      getFaninConeRecur(faninInst, rootInst, cone);   // Recurse depth-first
-    }
-  }
-}
-
-
-// If the given Use's Value is not an Instruction, this does nothing.
+// Uses a priority-queue-based BFS instead of recursive DFS.
+// No pruning needed.
 void getFaninCone(const llvm::Use& root, InstSet& cone)
-{
-  llvm::Value *val = root.get(); // What is being used: An Instruction or a constant
-
-  if (val && llvm::isa<llvm::Instruction>(val)) {
-    llvm::Instruction *inst = llvm::cast<llvm::Instruction>(val);
-    llvm::Instruction *rootInst = getUserInst(root);
-    getFaninConeRecur(inst, rootInst, cone);
-  }
-}
-
-
-
-// Same as above, but uses a priority-queue-based BFS instead of recursive DFS.
-// Probably no pruning needed.
-void getFaninConePQ(const llvm::Use& root, InstSet& cone)
 {
   llvm::Value *val = root.get(); // What is being used: An Instruction or a constant
 
@@ -241,95 +189,6 @@ void getFaninConePQ(const llvm::Use& root, InstSet& cone)
 
 
 
-// Expel from the given fanin cone in (coneSet) any instruction that is also
-// used outside the cone and the given Use. (Presumably the root instruction
-// of the cone itself is the source of the Use.)  Also copy the remaining members
-// of the cone to coneList, sorted in the proper order.  Upon returning,
-// coneList and coneSet will have the same pruned contents.
-void pruneFaninCone(InstSet& coneSet, InstList& coneList, const llvm::Use& root)
-{
-  coneList.clear();
-
-  if (coneSet.empty())
-    return;
-
-  // Fill coneList with the instructions in coneSet, ordered last to first.
-  // We will work mostly on coneList, using coneSet just to
-  // efficiently tell us if a particular Instruction is in the cone.
-  // We keep the contents of the set and list in sync.
-  // The way the list is sorted, we will see an Instruction's
-  // fanins after the Instruction itself.
-  
-  for (auto inst : coneSet) {
-    coneList.push_back(inst);
-  }
-  coneList.sort(InstrMore());  // Specific to std::list
-  //std::sort(coneList.begin(), coneList.end(), InstrMore());  // For anything besides std::list
-
-  // Any Instruction belonging to a different BB cannot remain in the fanin cone.
-  // We make this requirement to simplify the subseqent process of moving the true/false cone
-  // to its own BB.
-  // This is acceptable because we process selects working backwards, so we will be less
-  // affected by hitting the BBs of a previously-processed select.
-
-  llvm::Instruction *rootInst = getUserInst(root);
-  llvm::BasicBlock *bb = rootInst->getParent();
-
-  // Repeatedly sweep over coneList, until nothing else can be expelled.
-  // When an instruction is expelled from the cone, its fanin 
-  // will get expelled too.
-
-  /* Proposed code
-   * see https://stackoverflow.com/questions/1830158/how-to-call-erase-with-a-reverse-iterator
-  auto it=vt.end();
-  while (it>vt.begin())
-  {
-    it--;
-    if (*it == pCursor) //{ delete *it;
-      it = vt.erase(it); //}
-  }
-  */
-
-  for (;;) {
-    int ndeleted = 0;
-
-    for (auto it = coneList.begin(); it != coneList.end(); ) {
-      llvm::Instruction *inst = *it;
-      assert(inst->getParent() == bb);
-
-      // Check if there is any usage of this Instruction outside of the cone
-      // (except for root, which is presumably one of the select's operands).
-      // We use coneSet to determine if an inst is in the cone.
-      bool deleteThis = false;
-      for (const llvm::Use& use : inst->uses()) {
-        llvm::Instruction *userInst = getUserInst(use);
-        if (userInst->getParent() != bb ||
-            ((use.getUser() != root.getUser() ||
-              use.getOperandNo() != root.getOperandNo())
-             && !coneSet.count(userInst))) {
-          // The current inst is used outside of the cone, so we will expel it.
-          deleteThis = true;
-          break;
-        }
-      }
-      if (deleteThis) {
-        ndeleted++;
-        it = coneList.erase(it);  // Properly advance the coneList iterator
-        coneSet.erase(inst);      // Also delete inst from coneSet
-      } else {
-        ++it;
-      }
-    }
-    if (ndeleted == 0)
-      break;
-  }
-
-  assert(coneList.size() == coneSet.size());
-}
-
-
-
-
 bool convertSelectToBranch(llvm::SelectInst* select, int labelNum, int minSize)
 {
   llvm::Value *condition = select->getCondition();
@@ -347,39 +206,20 @@ bool convertSelectToBranch(llvm::SelectInst* select, int labelNum, int minSize)
   llvm::BasicBlock *bb = select->getParent();
 
   InstSet trueFaninCone;
-  getFaninConePQ(select->getOperandUse(1), trueFaninCone);
-  size_t unprunedTrueSize = trueFaninCone.size();
+  getFaninCone(select->getOperandUse(1), trueFaninCone);
+  size_t trueSize = trueFaninCone.size();
 
   InstSet falseFaninCone;
-  getFaninConePQ(select->getOperandUse(2), falseFaninCone);
-  size_t unprunedFalseSize = falseFaninCone.size();
+  getFaninCone(select->getOperandUse(2), falseFaninCone);
+  size_t falseSize = falseFaninCone.size();
 
   // Don't bother creating branches around a small number of instructions...
-  // TODO: Make a tuneable parameter.
-  if (unprunedTrueSize + unprunedFalseSize < (unsigned)minSize) {
+  if (trueSize + falseSize < (unsigned)minSize) {
     return false;
   }
 
-  // Prune the cones, and produce properly sorted lists of their elements.
-
-  InstList trueFaninList;
-  pruneFaninCone(trueFaninCone, trueFaninList, select->getOperandUse(1));
-
-  InstList falseFaninList;
-  pruneFaninCone(falseFaninCone, falseFaninList, select->getOperandUse(2));
-
-  // Don't bother creating branches around a small number of instructions...
-  if (trueFaninCone.size() + falseFaninCone.size() < (unsigned)minSize) {
-    return false;
-  }
-
-  assert(unprunedTrueSize == trueFaninCone.size());
-  assert(unprunedFalseSize == falseFaninCone.size());
-
-  printf("Processing select %d: true fanin %lu/%lu  false fanin %lu/%lu\n",
-          labelNum, unprunedTrueSize, trueFaninCone.size(),
-          unprunedFalseSize, falseFaninCone.size());
-
+  //printf("Processing select %d: true fanin %lu  false fanin %lu\n",
+          //labelNum, trueSize, falseSize);
 
   // We make no assumptions about the ordering of the inputs to the select
 
@@ -403,12 +243,12 @@ bool convertSelectToBranch(llvm::SelectInst* select, int labelNum, int minSize)
   llvm::IRBuilder<>(bb).CreateCondBr(condition, trueBB, falseBB);
 
   // Move all the True cone instructions into the True BB, in their existing order.
-  for (auto it = trueFaninList.rbegin(); it != trueFaninList.rend(); ++it) {
+  for (auto it = trueFaninCone.begin(); it != trueFaninCone.end(); ++it) {
     (*it)->moveBefore(trueBB->getTerminator());
   }
 
   // Move all the False cone instructions into the False BB, in their existing order.
-  for (auto it = falseFaninList.rbegin(); it != falseFaninList.rend(); ++it) {
+  for (auto it = falseFaninCone.begin(); it != falseFaninCone.end(); ++it) {
     (*it)->moveBefore(falseBB->getTerminator());
   }
 
@@ -455,13 +295,17 @@ bool convertSelectsToBranches(llvm::Function *func, int threshold)
 
   // Convert them, starting from the end of the function and working backwards.
   // The backwards order is vital.
+  int tot = 0;
   int n = 1;
   for (llvm::SelectInst *select : selects) {
+    tot++;
     if (convertSelectToBranch(select, n, threshold)) {
       n++;
     }
     fflush(stdout);
   }
+
+  printf("Converted %d of %d muxes to branches\n", n-1, tot);
 
   // This is too slow to do after every conversion
   llvm::outs() << "Post mux-to-branch verification of " << func->getName() << "\n";
