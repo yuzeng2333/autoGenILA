@@ -104,6 +104,7 @@ std::string create_wrapper_func(llvm::Module& M,
 bool gather_wrapper_func_args(llvm::Module& M,
                       std::string wrapperFuncName,
                       std::string target,
+                      int delayBound,
                       ArgVec_t &argVec);
 
 std::vector<uint32_t>

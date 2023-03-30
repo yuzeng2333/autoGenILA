@@ -26,3 +26,6 @@ src/func_extract/*.ll
 src/func_extract/doc
 
 .vscode/
+
+aes_128/
+verilator-M8080/

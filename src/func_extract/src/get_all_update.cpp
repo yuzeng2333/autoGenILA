@@ -318,6 +318,8 @@ void get_update_function(std::string target,
   std::string funcName = instrInfo.name+"_"+destSimpleName;
   std::string fileName = UpdateFunctionGen::make_llvm_basename(destInfo, delayBound);
   std::string cleanOptoFileName = fileName+".clean-o3-ll";
+  std::string rewriteFileName = fileName + ".rewrite-ll";
+  std::string reoptFileName = fileName + ".reopt-ll";
   std::string llvmFileName = fileName+".ll";
 
   toCout("---  BEGIN INSTRUCTION #"+toStr(instrIdx)+": "+instrInfo.name+
@@ -350,9 +352,8 @@ void get_update_function(std::string target,
     std::string opto_cmd(optCmd+" -O3 "+fileName+".clean-ll -S -o="+fileName+".tmp-o3-ll; opt -passes=deadargelim "+fileName+".tmp-o3-ll -S -o="+cleanOptoFileName+"; rm "+fileName+".tmp-o3-ll");
 
     // re-optimization commands
-    std::string rewriteFileName = fileName + ".rewrite-ll";
     std::string rewrite_cmd(optCmd + " -passes=rtl2ila " + cleanOptoFileName + " -S -o=" + rewriteFileName + ";");
-    std::string reopt_cmd(optCmd + " -O3 " + rewriteFileName + " -S -o=" + cleanOptoFileName + ";");
+    std::string reopt_cmd(optCmd + " -O3 " + rewriteFileName + " -S -o=" + reoptFileName + ";");
 
     toCout("** Begin clean update function");
     toCoutVerb(clean);
@@ -392,8 +393,12 @@ void get_update_function(std::string target,
   // Load in the optimized LLVM file
   llvm::SMDiagnostic Err;
   llvm::LLVMContext Context;
-  std::unique_ptr<llvm::Module> M = llvm::parseIRFile(cleanOptoFileName, Err, Context);
-
+  std::unique_ptr<llvm::Module> M;
+  if (!g_do_bitwise_opt)
+    M = llvm::parseIRFile(cleanOptoFileName, Err, Context);
+  else
+    M = llvm::parseIRFile(reoptFileName, Err, Context);
+  
   if (!M) {
     Err.print("func_extract", llvm::errs());
   } else {
@@ -408,7 +413,7 @@ void get_update_function(std::string target,
       M->setDataLayout("e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128");
 
       // Get the data needed to create func_info.txt
-      gather_wrapper_func_args(*M, wrapperFuncName, target, argVec);
+      gather_wrapper_func_args(*M, wrapperFuncName, target, delayBound, argVec);
 
       if ((!g_overwrite_existing_llvm) && stat(llvmFileName.c_str(), &statbuf) == 0) {
         toCout("Skipping re-generation of existing file "+llvmFileName);
@@ -420,7 +425,7 @@ void get_update_function(std::string target,
         OS.close();
 
         // Rename that file to be the final .ll file
-        std::string move("mv "+fileName+".clean-simp-ll "+g_path+"/"+llvmFileName);
+        std::string move("mv " + fileName + ".clean-simp-ll " + llvmFileName);
         toCoutVerb(move);
         system(move.c_str());
       }
@@ -770,7 +775,7 @@ bool clean_main_func(llvm::Module& M,
   
 bool gather_wrapper_func_args(llvm::Module& M,
                       std::string wrapperFuncName, std::string target,
-                      ArgVec_t &argVec) {
+                      int delayBound, ArgVec_t &argVec) {
 
   llvm::Function *wrapperFunc = M.getFunction(wrapperFuncName);
   assert(wrapperFunc);
@@ -821,7 +826,15 @@ bool gather_wrapper_func_args(llvm::Module& M,
         // Pick out the numeric portion of the arg name
         // Doug TODO: Do register array vars have a cycle number in their name?
         std::string cycleStr = argname.substr(pos + DELIM.size(), std::string::npos);
-        if (cycleStr.size() > 0) cycle = std::stoi(cycleStr);
+        if (cycleStr.size() > 0) {
+          cycle = std::stoi(cycleStr);
+
+          // The internal cycle numbering starts at the cycle count and
+          // decreases down to 0 at the final cycle.  We need to map this to the
+          // convention used in instr.txt, where the cycles numbering starts at 1,
+          // and goes upwards as time passes.
+          cycle = delayBound - cycle;
+        }
       }
 
       if (!isPointer) {

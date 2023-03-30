@@ -235,7 +235,7 @@ void vcd_parser(std::string fileName) {
   toCout("### "+std::to_string(nameVarMap.size())+" useful variable definitions found");
   toCout("### "+std::to_string(g_rstVal.size())+" reset values found");
   print_rst_val();
-  toCout("### End vcd_parser");  
+  toCout("### End vcd_parser");
 }
 
 
