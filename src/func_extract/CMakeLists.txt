@@ -24,7 +24,7 @@ set(SIM_GEN sim_gen)
 set(CMP cmp)
 set(TEST_GEN test_gen)
 set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS}-O0 -Wall -g ")
+set(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -Og -Wall -g ")
 add_compile_options(-rdynamic -fPIC)
 
 
