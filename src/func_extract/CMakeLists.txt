@@ -11,7 +11,7 @@ find_package (LLVM 14 REQUIRED)
 
 aux_source_directory(./src SRC_DIR)
 
-find_package (Z3 4.8 REQUIRED)
+#find_package (Z3 4.8 REQUIRED)
 #aux_source_directory(/workspace/tools/z3-4.8.8/z3/src/api/c++ HEADER1)
 #aux_source_directory(/workspace/tools/z3-4.8.8/z3/src/api HEADER2)
 
@@ -39,6 +39,7 @@ target_link_libraries(FuncExtractLib glog::glog)
 target_link_libraries(FuncExtractLib ${llvm_libs})
 target_link_libraries(FuncExtractLib TaintGenLib)
 
+add_executable(${VERILOG_EXE} ./app/func_extract.cpp)
 #target_link_libraries(${VERILOG_EXE} ${Z3_LIBRARIES})
 target_link_libraries(${VERILOG_EXE} glog::glog)
 target_link_libraries(${VERILOG_EXE} ${llvm_libs})
