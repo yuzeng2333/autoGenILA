@@ -323,6 +323,8 @@ FuncExtractFlow::get_update_function(std::string target,
 
   std::string fileName = UFGen->make_llvm_basename(destInfo, delayBound);
   std::string cleanOptoFileName = fileName+".clean-o3-ll";
+  std::string rewriteFileName = fileName + ".rewrite-ll";
+  std::string reoptFileName = fileName + ".reopt-ll";
   std::string llvmFileName = fileName+".ll";
 
   toCout("---  BEGIN INSTRUCTION #"+toStr(instrIdx)+": "+instrInfo.name+
@@ -351,6 +353,10 @@ FuncExtractFlow::get_update_function(std::string target,
 
     std::string opto_cmd(optCmd+" -O3 "+fileName+".clean-ll -S -o="+fileName+".tmp-o3-ll; opt -passes=deadargelim "+fileName+".tmp-o3-ll -S -o="+cleanOptoFileName+"; rm "+fileName+".tmp-o3-ll");
 
+    // re-optimization commands
+    std::string rewrite_cmd(optCmd + " -passes=rtl2ila " + cleanOptoFileName + " -S -o=" + rewriteFileName + ";");
+    std::string reopt_cmd(optCmd + " -O3 " + rewriteFileName + " -S -o=" + reoptFileName + ";");
+
     toCout("** Begin clean update function");
     toCoutVerb(clean);
     system(clean.c_str());
@@ -358,6 +364,16 @@ FuncExtractFlow::get_update_function(std::string target,
     toCoutVerb(opto_cmd);
     system(opto_cmd.c_str());
     toCout("** End simplify update function");
+
+    // perform re-optimization
+    if (g_do_bitwise_opt)
+    {
+      toCout("** Performing bitwise optimization on LLVM IR file.");
+      system(rewrite_cmd.c_str());
+      toCout("** Re-optimizing the update function.");
+      system(reopt_cmd.c_str());
+      toCout("** Re-optimization ended.");
+    }
 
     time_t simplifyEndTime = time(NULL);
     uint32_t upGenTime = upGenEndTime - startTime;
@@ -379,8 +395,12 @@ FuncExtractFlow::get_update_function(std::string target,
   // Load in the optimized LLVM file
   llvm::SMDiagnostic Err;
   llvm::LLVMContext Context;
-  std::unique_ptr<llvm::Module> M = llvm::parseIRFile(cleanOptoFileName, Err, Context);
-
+  std::unique_ptr<llvm::Module> M;
+  if (!g_do_bitwise_opt)
+    M = llvm::parseIRFile(cleanOptoFileName, Err, Context);
+  else
+    M = llvm::parseIRFile(reoptFileName, Err, Context);
+  
   if (!M) {
     Err.print("func_extract", llvm::errs());
   } else {
@@ -412,7 +432,7 @@ FuncExtractFlow::get_update_function(std::string target,
         OS.close();
 
         // Rename that file to be the final .ll file
-        std::string move("mv "+fileName+".clean-simp-ll "+g_path+"/"+llvmFileName);
+        std::string move("mv " + fileName + ".clean-simp-ll " + llvmFileName);
         toCoutVerb(move);
         system(move.c_str());
       }
@@ -799,7 +819,7 @@ FuncExtractFlow::clean_main_func(llvm::Module& M,
 
 
 // Push information about the wrapperFunc args to argVec, to be written out to func_info.txt
-  
+
 bool
 FuncExtractFlow::gather_wrapper_func_args(llvm::Module& M,
                                               std::string wrapperFuncName,

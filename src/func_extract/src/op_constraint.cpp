@@ -28,7 +28,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-using namespace z3;
+//using namespace z3;
 using namespace taintGen;
 using namespace syntaxPatterns;
 
