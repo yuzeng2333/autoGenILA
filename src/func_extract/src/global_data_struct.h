@@ -1,6 +1,7 @@
-#ifndef GLOBAL_DATA_STRUCT
-#define GLOBAL_DATA_STRUCT
-//#include "z3++.h"
+#ifndef FUNC_EXTRACT_GLOBAL_DATA_STRUCT_H
+#define FUNC_EXTRACT_GLOBAL_DATA_STRUCT_H
+
+// #include "z3++.h"
 #include "ast.h"
 #include "types.h"
 #include "ins_context_stack.h"
@@ -228,6 +229,83 @@ struct Context_t {
 };
 
 
+
+class DestInfo;  // Defined in check_regs.h
+
+// This is a partially-abstract class that allow multiple LLVM
+// code generators to be used.  One such implementation is 
+// UpdateFunctionGen in check_regs.h.
+class UFGenerator {
+
+public:
+  virtual ~UFGenerator();
+  virtual void print_llvm_ir(DestInfo &destInfo, 
+                              const uint32_t bound,
+                              uint32_t instrIdx,
+                              std::string fileName) = 0;
+
+  virtual std::string make_llvm_basename(DestInfo &destInfo,
+                                         const uint32_t bound);
+
+};
+
+
+// This is an abstract class that allows FuncExtractFlow to create multiple code
+// generators of the correct type, to support multi-threaded code generation.
+class UFGenFactory {
+public:
+  virtual ~UFGenFactory();
+  virtual std::shared_ptr<UFGenerator> makeGenerator() = 0;
+};
+
+
+// This can provide a basic implementation of a Factory for any 
+// concrete UF generator class that has a default constructor.
+template <typename GEN_IMPL> class UFGenFactoryImpl : public UFGenFactory {
+public:
+  std::shared_ptr<UFGenerator> makeGenerator() override
+  {
+    return std::shared_ptr<UFGenerator>(new GEN_IMPL);
+  }
+};
+
+
+// A concrete instance of this class is used by FuncExtractFlow to
+// query the design for data it needs: mostly widths of signals.
+class ModuleInfo {
+public:
+  // A blank modname implies the top module.
+  virtual uint32_t get_var_width_simp(const std::string& var,
+                                            const std::string& modname = "") = 0;
+
+  virtual uint32_t get_var_width_cmplx(const std::string& var) = 0;
+
+  virtual bool is_module(const std::string& modname) = 0;
+
+  // Return true if the given wire is an output port of the top module,
+  // and is driven by a fifo instance.
+  virtual bool is_fifo_output(const std::string& wire) = 0;
+
+  // If instname names an instance in the given parent mod, return its module
+  // name.  Otherwise return a blank string.  A blank parentmod implies
+  // the top module.
+  virtual std::string get_module_of_inst(const std::string& instname,
+                                         const std::string& parentmod = "") = 0;
+
+  // Fill in the provided (empty) vector with the output ports of the given module.
+  // Of course, a blank modname implies the top module.
+  virtual void get_module_outputs(std::vector<std::string>& outputs,
+                                  const std::string& modname = "") = 0;
+
+  // Fill in the provided (empty) vector with the fifo instance
+  // names in the given module.
+  // Of course, a blank modname implies the top module.
+  virtual void get_fifo_insts(std::vector<std::string>& fifos,
+                              const std::string& modname = "") = 0;
+};
+
+
+
 class registerArray_t {
   public:
   const std::vector<std::string> members;  // Size of members is array length
@@ -278,6 +356,8 @@ extern bool g_use_simple_func_name;
 extern bool g_use_multi_thread;
 extern bool g_overwrite_existing_llvm;
 extern bool g_do_bitwise_opt;
+extern bool g_post_opto_mux_to_branch;
+extern int g_post_opto_mux_to_branch_threshold;
 extern std::string g_llvm_path;
 extern uint32_t g_do_instr_num;
 extern std::set<std::string> g_readASV;

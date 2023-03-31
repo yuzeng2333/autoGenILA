@@ -225,11 +225,29 @@ int main(int argc, char *argv[]) {
   }
   determine_clk_rst();
   build_ast_tree();
+
   //if(!g_get_all_update) {
   //  check_all_regs();
   //}
   //else {
-    get_all_update();
+
+    // Make an implementation of a UFGenFactory that provides
+    // instances of UpdateFunctionGen, which generates LLVM
+    // based on g_moduleInfoMap and the design's AST.
+    UFGenFactoryImpl<UpdateFunctionGen> factory;
+
+    // Make an implementation of ModuleInfo that FuncExtractFlow
+    // need to look up design data.
+    ModuleInfoImpl info;
+
+    // Give the factory and the query to the flow.
+    // The flow ordering is to iterate over instructions in the inner loop
+    // and ASVs in the outer loop.
+    FuncExtractFlow flow(factory, info, true /*innerLoopIsInstrs*/,
+                         true /*reverseCycleOrder*/);
+
+    flow.get_all_update();
+
   //}
   //print_time();  
   //clean_goal();

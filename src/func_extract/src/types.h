@@ -1,5 +1,5 @@
-#ifndef FUNC_TYPES
-#define FUNC_TYPES
+#ifndef FUNC_EXTRACT_TYPES_H
+#define FUNC_EXTRACT_TYPES_H
 
 #include <string>
 #include <utility>

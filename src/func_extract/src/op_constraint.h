@@ -1,5 +1,5 @@
-#ifndef OP 
-#define OP
+#ifndef FUNC_EXTRACT_OP_CONSTRAINT_H
+#define FUNC_EXTRACT_OP_CONSTRAINT_H
 
 #include <string>
 #include <regex>

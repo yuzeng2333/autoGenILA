@@ -10,6 +10,9 @@
 #include "check_regs.h"
 #include "global_data_struct.h"
 #include "helper.h"
+#include "util.h"
+#include "branch_mux.h"
+
 #define toStr(a) std::to_string(a)
 #define toCout(a) std::cout << a << std::endl
 
@@ -17,30 +20,23 @@ namespace funcExtract {
 
 using namespace taintGen;
 
-std::mutex g_dependVarMapMtx;
-std::mutex g_TimeFileMtx;
 
-// Gathers data to be written to func_info.txt and asv_info.txt,
-// which later get read by sim_gen.
-// The first key is instr name, the second key is target name (scalar or vector)
-std::map<std::string, 
-         std::map<std::string, ArgVec_t>> g_dependVarMap;
+FuncExtractFlow::FuncExtractFlow(UFGenFactory& genFactory, ModuleInfo& info,
+                                 bool innerLoopIsInstrs, bool reverseCycleOrder)
+  : m_genFactory(genFactory), m_info(info),
+    m_innerLoopIsInstrs(innerLoopIsInstrs),
+    m_reverseCycleOrder(reverseCycleOrder)
+{
+}
 
-// Used to write asv_info.txt
-// Maps variable name to bitwidth and set of clock cycles
-struct ThreadSafeMap_t<WidthCycles_t> g_asvSet;
 
-//struct RunningThreadCnt_t g_threadCnt;
-struct WorkSet_t g_workSet;
-struct ThreadSafeVector_t g_fileNameVec;
-std::shared_ptr<ModuleInfo_t> g_topModuleInfo;
-struct WorkSet_t g_visitedTgt;
+
 
 // A file should be generated, including:
 // 1. all the asvs and their bit numbers
 // 2. For each instruction, what ASVs they write, and 
 // for each of it update function, what are the arguments
-void get_all_update() {
+void FuncExtractFlow::get_all_update() {
   toCout("### Begin get_all_update ");
   std::ofstream genTimeFile(g_path+"/up_gen_time.txt");
   genTimeFile << "\n===== Begin a new run!" << std::endl;
@@ -50,71 +46,75 @@ void get_all_update() {
   simplifyTimeFile <<"\n===== Begin a new run!"  << std::endl;
   simplifyTimeFile.close();
 
-  std::string line;  
+  std::vector<std::string> outputs;
+  m_info.get_module_outputs(outputs);
+  for (auto out : outputs) {
+    if(m_info.is_fifo_output(out)) continue;
+    m_workSet.mtxInsert(out);
+    uint32_t width = m_info.get_var_width_simp(out);
+    m_asvSet.emplace(out, {width});  // Default value (empty set) for cycles.
+  }
+
 
   std::ifstream addedWorkSetInFile(g_path+"/added_work_set.txt");
-  g_topModuleInfo = g_moduleInfoMap[g_topModule];
-  for(std::string out: g_topModuleInfo->moduleOutputs) {
-    if(is_fifo_output(out)) continue;
-    g_workSet.mtxInsert(out);
-    uint32_t width = get_var_slice_width_simp(out, g_topModuleInfo);
-    g_asvSet.emplace(out, {width});  // Default value (empty set) for cycles.
-  }
+  std::string line;  
   while(std::getline(addedWorkSetInFile, line)) {
-    g_workSet.mtxInsert(line);
+    m_workSet.mtxInsert(line);
   }
+  addedWorkSetInFile.close();
+
   // insert regs in fifos
-  for(auto pair: g_fifoIns) {
-    std::string insName = pair.first;
-    std::string modName = pair.second;
+  std::vector<std::string> fifos;
+  m_info.get_fifo_insts(fifos);
+  for(auto insName: fifos) {
+    std::string modName = m_info.get_module_of_inst(insName);
+
+    // The data in g_fifo comes from instr.txt, not from the design.
     assert(g_fifo.find(modName) != g_fifo.end());
     uint32_t bound = g_fifo[modName];
     for(uint32_t i = 0; i < bound; i++) {
       std::string reg = insName+".r"+toStr(i);
-      g_workSet.mtxInsert(reg);
-      uint32_t width = get_var_slice_width_simp(reg, g_topModuleInfo);
-      g_asvSet.emplace(reg, {width});
+      m_workSet.mtxInsert(reg);
+      uint32_t width = m_info.get_var_width_simp(reg);
+      m_asvSet.emplace(reg, {width});
     }
   }
-  addedWorkSetInFile.close();
-  std::ofstream addedWorkSetFile;
-  addedWorkSetFile.open(g_path+"/added_work_set.txt", std::ios_base::app);
 
   if(!g_allowedTgt.empty()) {
-    g_workSet.mtxClear();    
+    m_workSet.mtxClear();    
     for(auto tgtDelayPair : g_allowedTgt) {
       std::string tgt = tgtDelayPair.first;    
-      g_workSet.mtxInsert(tgt);
-      uint32_t width = get_var_slice_width_cmplx(tgt);
-      g_asvSet.emplace(tgt, {width});
+      m_workSet.mtxInsert(tgt);
+      uint32_t width = m_info.get_var_width_cmplx(tgt);
+      m_asvSet.emplace(tgt, {width});
     }
   }
   else if(!g_allowedTgtVec.empty()) {
-    g_workSet.mtxClear();
+    m_workSet.mtxClear();
   }
 
   // declaration for llvm
   std::ofstream funcInfo(g_path+"/func_info.txt");
   std::ofstream asvInfo(g_path+"/asv_info.txt");
-  //std::vector<std::string> g_fileNameVec;
-  struct ThreadSafeVector_t g_fileNameVec;
+  //std::vector<std::string> m_fileNameVec;
+  struct ThreadSafeVector_t m_fileNameVec;
   std::vector<std::thread> threadVec;
 
-  if(!g_use_multi_thread) {
+  if(!g_use_multi_thread && m_innerLoopIsInstrs) {
     // schedule 1: outer loop is workSet/target, inner loop is instructions,
     // suitable for design with many instructions
     std::map<std::string, TgtVec_t> allowedTgtVec = g_allowedTgtVec;    // Deep copy...
-    while(!g_workSet.empty() || !allowedTgtVec.empty() ) {
+    while(!m_workSet.empty() || !allowedTgtVec.empty() ) {
       bool isVec;
       std::string target;
       std::vector<std::string> tgtVec;
       // work on single register target first
-      if(!g_workSet.empty()) {
+      if(!m_workSet.empty()) {
         isVec = false;
-        auto targetIt = g_workSet.begin();
+        auto targetIt = m_workSet.begin();
         target = *targetIt;
-        g_workSet.mtxErase(targetIt);
-        if(g_visitedTgt.mtxExist(target)
+        m_workSet.mtxErase(targetIt);
+        if(m_visitedTgt.mtxExist(target)
            || g_skippedOutput.find(target) != g_skippedOutput.end())
           continue;
       }
@@ -138,24 +138,24 @@ void get_all_update() {
       }
       if(isVec) {
         for(auto reg: tgtVec) {
-          g_visitedTgt.mtxInsert(reg);
+          m_visitedTgt.mtxInsert(reg);
         }
         tgtVec.clear();
       }
       else {
-        g_visitedTgt.mtxInsert(target);
+        m_visitedTgt.mtxInsert(target);
       }
     } // end of while loop
   }
   else {
     // schedule 2: outer loop is instructions, inner loop is workSet/target
     bool doneFirstRound = false;
-    while(!g_workSet.empty() || (!doneFirstRound && !g_allowedTgtVec.empty())) {
+    while(!m_workSet.empty() || (!doneFirstRound && !g_allowedTgtVec.empty())) {
       uint32_t instrIdx = 0;
       StrSet_t localWorkSet;
       StrSet_t oldWorkSet;
-      g_workSet.copy(oldWorkSet);
-      g_workSet.mtxClear();
+      m_workSet.copy(oldWorkSet);
+      m_workSet.mtxClear();
       for(auto instrInfo : g_instrInfo) {
         localWorkSet = oldWorkSet;
         std::map<std::string, TgtVec_t> localWorkVec = g_allowedTgtVec;  // Deep copy...
@@ -170,7 +170,7 @@ void get_all_update() {
             auto targetIt = localWorkSet.begin();
             target = *targetIt;
             localWorkSet.erase(targetIt);
-            if(g_visitedTgt.mtxExist(target)
+            if(m_visitedTgt.mtxExist(target)
                || g_skippedOutput.find(target) != g_skippedOutput.end())
               continue;
           }
@@ -183,23 +183,31 @@ void get_all_update() {
           std::vector<uint32_t> delayBounds = get_delay_bounds(target, instrInfo);
           for (auto delayBound : delayBounds) {
             // If allowed_target.txt specifies multiple delays for a non-vector target,
-            // generate update functions for each one.
-            std::thread th(get_update_function, target, delayBound, 
-                           isVec, instrInfo, instrIdx);
-            threadVec.push_back(std::move(th));            
+            // generate update functions for each one.  Note the correct way
+            // to use a pointer to a member function in this situation.
+            if (g_use_multi_thread) {
+              std::thread th(&FuncExtractFlow::get_update_function, this, target,
+                              delayBound, isVec, instrInfo, instrIdx);
+              threadVec.push_back(std::move(th));
+            } else {
+              // No thread created - threadVec remains empty.
+              get_update_function(target, delayBound, isVec,
+                                instrInfo, instrIdx);
+            }
           }
         }
-        // wait for update functions for all regs to finish
+        // wait for update functions of all targets of this instruction to finish
         for(auto &th: threadVec) th.join();
+
       } // end of for-lopp: for each instruction
 
       for(auto pair: g_allowedTgtVec) {
         for(std::string reg: pair.second.members) {
-          g_visitedTgt.mtxInsert(reg);
+          m_visitedTgt.mtxInsert(reg);
         }
       }
       for(std::string target: oldWorkSet) {
-        g_visitedTgt.mtxInsert(target);
+        m_visitedTgt.mtxInsert(target);
       }
       // targetVectors only executed for one round
       doneFirstRound = true;
@@ -209,21 +217,24 @@ void get_all_update() {
   print_llvm_script(g_path+"/link.sh");
   print_func_info(funcInfo);
   print_asv_info(asvInfo);
-  addedWorkSetFile.close();
 }
 
 
-void get_update_function(std::string target,
-                         uint32_t delayBound,
-                         bool isVec,
-                         InstrInfo_t instrInfo,
-                         uint32_t instrIdx) {
+void
+FuncExtractFlow::get_update_function(std::string target,
+                                         uint32_t delayBound,
+                                         bool isVec,
+                                         InstrInfo_t instrInfo,
+                                         uint32_t instrIdx) {
+
+  std::shared_ptr<UFGenerator> UFGen = m_genFactory.makeGenerator();
 
   time_t startTime = time(NULL);
 
   // set the destInfo according to the target
   DestInfo destInfo;
   destInfo.isMemVec = false;
+  destInfo.isSingleMem = false;
   if(!isVec) {
     toCout("---  BEGIN Target: "+target+" ---");
     if(target.find("puregs[2]") != std::string::npos)
@@ -231,28 +242,24 @@ void get_update_function(std::string target,
 
     if(target.find(".") == std::string::npos 
        || target.substr(0, 1) == "\\") {
-      uint32_t width = get_var_slice_width_simp(target, 
-                                         g_moduleInfoMap[g_topModule]);
+      uint32_t width = m_info.get_var_width_simp(target);
       destInfo.set_dest_and_slice(target, width);
     }
     else {
       auto pair = split_module_asv(target);
       std::string prefix = pair.first;
       std::string var = pair.second;
-      if(g_moduleInfoMap.find(prefix) != g_moduleInfoMap.end()) {
-        uint32_t width = get_var_slice_width_simp(var, 
-                                            g_moduleInfoMap[prefix]);
+      if(m_info.is_module(prefix)) {
+        uint32_t width = m_info.get_var_width_simp(var, prefix);
         destInfo.set_module_name(prefix);
         destInfo.set_dest_and_slice(var, width);
       }
       else {
-        assert(g_topModuleInfo->ins2modMap.find(prefix) 
-               != g_topModuleInfo->ins2modMap.end());
-        std::string modName = g_topModuleInfo->ins2modMap[prefix];
+        std::string modName = m_info.get_module_of_inst(prefix);
+        assert(!modName.empty());
         destInfo.set_module_name(modName);
         destInfo.set_instance_name(prefix);
-        uint32_t width = get_var_slice_width_simp(var, 
-                                            g_moduleInfoMap[modName]);
+        uint32_t width = m_info.get_var_width_simp(var, modName);
         destInfo.set_dest_and_slice(var, width);
       }
     }
@@ -283,20 +290,17 @@ void get_update_function(std::string target,
       auto pair = split_module_asv(firstASV);
       std::string prefix = pair.first;
       std::string var = pair.second;
-      if(g_moduleInfoMap.find(prefix) != g_moduleInfoMap.end()) {
+      if(m_info.is_module(prefix)) {
         destInfo.set_module_name(prefix);
-        uint32_t width = get_var_slice_width_simp(var, 
-                                    g_moduleInfoMap[prefix]);
+        uint32_t width = m_info.get_var_width_simp(var, prefix);
         destInfo.set_dest_and_slice(var, width);
       }
       else {
-        assert(g_topModuleInfo->ins2modMap.find(prefix)
-               != g_topModuleInfo->ins2modMap.end());
-        std::string modName = g_topModuleInfo->ins2modMap[prefix];
+        std::string modName = m_info.get_module_of_inst(prefix);
+        assert(!modName.empty());
         destInfo.set_module_name(modName);
         destInfo.set_instance_name(prefix);
-        uint32_t width = get_var_slice_width_simp(var, 
-                                    g_moduleInfoMap[modName]);
+        uint32_t width = m_info.get_var_width_simp(var, modName);
         destInfo.set_dest_and_slice(var, width);
       }
     }
@@ -305,18 +309,19 @@ void get_update_function(std::string target,
 
 
   std::string instrName = instrInfo.name;
-  g_dependVarMapMtx.lock();
-  if(g_dependVarMap.find(instrName) == g_dependVarMap.end())
-    g_dependVarMap.emplace( instrName, std::map<std::string, ArgVec_t>());
-  g_dependVarMapMtx.unlock();
+  m_dependVarMapMtx.lock();
+  if(m_dependVarMap.find(instrName) == m_dependVarMap.end())
+    m_dependVarMap.emplace( instrName, std::map<std::string, ArgVec_t>());
+  m_dependVarMapMtx.unlock();
   g_currInstrInfo = instrInfo;
   destInfo.set_instr_name(instrInfo.name);      
   assert(!instrInfo.name.empty());
 
   std::string destSimpleName = funcExtract::var_name_convert(destInfo.get_dest_name(), true);
 
-  std::string funcName = instrInfo.name+"_"+destSimpleName;
-  std::string fileName = UpdateFunctionGen::make_llvm_basename(destInfo, delayBound);
+  std::string funcName = destInfo.get_func_name();
+
+  std::string fileName = UFGen->make_llvm_basename(destInfo, delayBound);
   std::string cleanOptoFileName = fileName+".clean-o3-ll";
   std::string rewriteFileName = fileName + ".rewrite-ll";
   std::string reoptFileName = fileName + ".reopt-ll";
@@ -335,10 +340,7 @@ void get_update_function(std::string target,
   } else {
 
     // generate update function
-    UpdateFunctionGen UFGen;
-    UFGen.TheContext = std::make_unique<llvm::LLVMContext>();
-
-    UFGen.print_llvm_ir(destInfo, delayBound, instrIdx, fileName+".tmp-ll");
+    UFGen->print_llvm_ir(destInfo, delayBound, instrIdx, fileName+".tmp-ll");
 
     time_t upGenEndTime = time(NULL);  
 
@@ -376,14 +378,14 @@ void get_update_function(std::string target,
     time_t simplifyEndTime = time(NULL);
     uint32_t upGenTime = upGenEndTime - startTime;
     uint32_t simplifyTime = simplifyEndTime - upGenEndTime;
-    g_TimeFileMtx.lock();
+    m_TimeFileMtx.lock();
     std::ofstream genTimeFile(g_path+"/up_gen_time.txt");
     genTimeFile << funcName+":\t"+toStr(upGenTime) << std::endl;
     genTimeFile.close();
     std::ofstream simplifyTimeFile(g_path+"/simplify_time.txt");
     simplifyTimeFile << funcName+":\t"+toStr(simplifyTime) << std::endl;
     simplifyTimeFile.close();
-    g_TimeFileMtx.unlock();
+    m_TimeFileMtx.unlock();
   }
 
   ArgVec_t argVec;
@@ -404,12 +406,17 @@ void get_update_function(std::string target,
   } else {
     usefulFunc = clean_main_func(*M, funcName);
     if (usefulFunc) {
+
+      if (g_post_opto_mux_to_branch) {
+        toCout("Converting muxes to branches...");
+        BranchMux::convertSelectsToBranches(M.get(), g_post_opto_mux_to_branch_threshold);
+      }
       
       // Add a C-compatible wrapper function that calls the main function.
       std::string wrapperFuncName = create_wrapper_func(*M, funcName);
 
-      // Annotate the standard x86-64 Clang data layout to the module, to prevent warnings when linking
-      // to C/C++ code.
+      // Annotate the standard x86-64 Clang data layout to the module,
+      // to prevent warnings when linking to C/C++ code.
       M->setDataLayout("e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128");
 
       // Get the data needed to create func_info.txt
@@ -433,16 +440,16 @@ void get_update_function(std::string target,
   }
 
   if(usefulFunc) {
-    g_fileNameVec.push_back(llvmFileName);        
+    m_fileNameVec.push_back(llvmFileName);        
     toCout("----- For instr "+instrInfo.name+", "+target+" is affected!");
-    g_dependVarMapMtx.lock();
-    if(g_dependVarMap[instrName].find(target) == g_dependVarMap[instrName].end())
-      g_dependVarMap[instrName].emplace(target, argVec);
+    m_dependVarMapMtx.lock();
+    if(m_dependVarMap[instrName].find(target) == m_dependVarMap[instrName].end())
+      m_dependVarMap[instrName].emplace(target, argVec);
     else {
       toCout("Warning: for instruction "+instrInfo.name+", target: "+target+" is seen before");
       //abort();
     }
-    g_dependVarMapMtx.unlock();
+    m_dependVarMapMtx.unlock();
   }
   else {
     toCout("----- For instr "+instrInfo.name+", "+target+" is NOT affected!");
@@ -451,8 +458,8 @@ void get_update_function(std::string target,
   for(auto arg : argVec) {
     std::string reg = arg.name;
     int cycle = arg.cycle;
-    if(g_push_new_target && !g_visitedTgt.mtxExist(reg)) {
-      g_workSet.mtxInsert(reg);
+    if(g_push_new_target && !m_visitedTgt.mtxExist(reg)) {
+      m_workSet.mtxInsert(reg);
     }
 
     uint32_t width = std::abs(arg.width);  // For pointers, we want the pointee width.
@@ -465,11 +472,11 @@ void get_update_function(std::string target,
     if (!is_special_arg_name(reg) && g_allowedTgt.count(reg) == 0 &&
         g_allowedTgtVec.count(reg) == 0 &&
         get_vector_of_target(reg, nullptr).empty()) {
-      // If we have a specific clock cycle, we may need to update an existing entry in g_asvSet
-      if(!g_asvSet.contains(reg)) {
-        g_asvSet.emplace(reg, {width});
+      // If we have a specific clock cycle, we may need to update an existing entry in m_asvSet
+      if(!m_asvSet.contains(reg)) {
+        m_asvSet.emplace(reg, {width});
       } 
-      WidthCycles_t& data = g_asvSet.at(reg);  // Possibly fetch what we just inserted.
+      WidthCycles_t& data = m_asvSet.at(reg);  // Possibly fetch what we just inserted.
       assert(data.width == width);  // Check for inconsistent bitwidth
       if (cycle > 0) {
         data.cycles.insert(cycle);  // Cycles will be empty if no specific cycle is used.
@@ -477,6 +484,8 @@ void get_update_function(std::string target,
     }
   }
 }
+
+
 
 
 // This returns a list of one or more delays to use for update function generation
@@ -491,7 +500,8 @@ void get_update_function(std::string target,
 //  If no delays can be found, the program will fail.  Note that 0 is a legal delay value.
 
 std::vector<uint32_t>
-get_delay_bounds(std::string var, const InstrInfo_t &instrInfo) {
+FuncExtractFlow::get_delay_bounds(std::string var, const InstrInfo_t &instrInfo) {
+
   assert(!var.empty());
 
   // Highest priority is multiple delays from allowed_target.txt
@@ -534,6 +544,16 @@ get_delay_bounds(std::string var, const InstrInfo_t &instrInfo) {
 // Except in special cases, all parameters to update functions are integer types.
 static bool
 isBigType(const llvm::Type *type) {
+
+  // Special case for LLVM Vector types.  Calculate total size.
+  if (type->isVectorTy()) {
+    const llvm::VectorType *vecTy = llvm::dyn_cast<const llvm::VectorType>(type);
+    unsigned totalWidth = vecTy->getElementType()->getIntegerBitWidth() *
+                          vecTy->getElementCount().getFixedValue();
+    return totalWidth > 64;
+  }
+  
+  // Normal scalar, or void.
   return (type->isIntegerTy() && type->getIntegerBitWidth() > 64);
 }
 
@@ -541,8 +561,9 @@ isBigType(const llvm::Type *type) {
 
 // Make the wrapper function for C/C++ interfacing.
 // Return its name
-std::string create_wrapper_func(llvm::Module& M,
-                         std::string mainFuncName) {
+std::string
+FuncExtractFlow::create_wrapper_func(llvm::Module& M,
+                                         std::string mainFuncName) {
 
   llvm::Function *mainFunc = M.getFunction(mainFuncName);
   assert(mainFunc);
@@ -604,7 +625,11 @@ std::string create_wrapper_func(llvm::Module& M,
       wrapperArg->addAttr(llvm::Attribute::NonNull);
     }
     // Copy parameter attributes (important for pointer args).
-    wrapperFunc->addParamAttrs(argNo, mainFunc->getAttributes().getParamAttributes(argNo));
+    llvm::AttrBuilder b(Context, mainFunc->getAttributes().getParamAttrs(argNo));
+    wrapperFunc->addParamAttrs(argNo, b);
+    // Remove the "returned" attribute, since it may no longer be correct.
+    wrapperFunc->removeParamAttr(argNo, llvm::Attribute::Returned);
+
   }
 
   llvm::Argument* wrapperLastArg = wrapperFunc->arg_end()-1;
@@ -656,13 +681,22 @@ std::string create_wrapper_func(llvm::Module& M,
     Builder->CreateRet(call);
   }
 
-  llvm::verifyFunction(*wrapperFunc);
+  // Note that LLVM does its own output buffering, so we have to
+  // make sure that all the output shows up in the correct order.
+  llvm::outs() << "Verification of main function...\n";
+  bool v2 = llvm::verifyFunction(*mainFunc, &llvm::outs());
+  llvm::outs() << "Verification " << (v2 ? "failed!" : "passed.")  << "\n";
+  llvm::outs() << "Verification of wrapper function...\n";
+  bool v1 = llvm::verifyFunction(*wrapperFunc, &llvm::outs());
+  llvm::outs() << "Verification " << (v1 ? "failed!" : "passed.")  << "\n";
+  llvm::outs().flush();
 
   return wrapperFunc->getName().str();
 }
 
 
-static llvm::Function *remove_dead_args(llvm::Function *func) {
+llvm::Function *
+FuncExtractFlow::remove_dead_args(llvm::Function *func) {
   // It is possible for there to be dead args in mainFunc, normally because topFunc
   // has been re-purposed as the mainFunc.  This is despite all the LLVM optimizations we do...
   // This function removes any unused args from the given function.
@@ -712,8 +746,19 @@ static llvm::Function *remove_dead_args(llvm::Function *func) {
   // Now move the contents of the original function into the new one.
   newFunc->getBasicBlockList().splice(newFunc->begin(), func->getBasicBlockList());
 
-  // Set the names and attributes of the new function args, based on the original function args 
 
+  // Remove all arg attributes created by above call to copyAttributesFrom(),
+  // since that function may have created trash out-of-range parameter
+  // attributes.
+  llvm::AttributeList oldAttrs = newFunc->getAttributes();
+  llvm::AttributeList newAttrs = llvm::AttributeList::get(
+                           newFunc->getContext(),
+                           oldAttrs.getFnAttrs(),
+                           oldAttrs.getRetAttrs(),
+                           llvm::ArrayRef<llvm::AttributeSet>());
+  newFunc->setAttributes(newAttrs);
+
+  // Set the names and attributes of the new function args, based on the original function args 
   int origArgNo = 0;
   int newArgNo = 0;
   for (llvm::Argument& origArg : func->args()) {
@@ -726,8 +771,9 @@ static llvm::Function *remove_dead_args(llvm::Function *func) {
       // Steal the original arg's name
       newArg->takeName(&origArg);
 
-      // Copy arg attributes
-      newFunc->addParamAttrs(newArgNo, func->getAttributes().getParamAttributes(origArgNo));
+      // Copy arg attributes from the corresponding arg of the original func.
+      llvm::AttrBuilder b(func->getContext(), func->getAttributes().getParamAttrs(origArgNo));
+      newFunc->addParamAttrs(newArgNo, b);
 
       newArgNo++;
     }
@@ -745,8 +791,9 @@ static llvm::Function *remove_dead_args(llvm::Function *func) {
 
 
 // Make sure the main function exists, and remove any unused args.
-bool clean_main_func(llvm::Module& M,
-                     std::string funcName) {
+bool
+FuncExtractFlow::clean_main_func(llvm::Module& M,
+                                     std::string funcName) {
 
   llvm::Function *mainFunc = M.getFunction(funcName);
 
@@ -772,10 +819,12 @@ bool clean_main_func(llvm::Module& M,
 
 
 // Push information about the wrapperFunc args to argVec, to be written out to func_info.txt
-  
-bool gather_wrapper_func_args(llvm::Module& M,
-                      std::string wrapperFuncName, std::string target,
-                      int delayBound, ArgVec_t &argVec) {
+
+bool
+FuncExtractFlow::gather_wrapper_func_args(llvm::Module& M,
+                                              std::string wrapperFuncName,
+                                              std::string target,
+                                              int delayBound, ArgVec_t &argVec) {
 
   llvm::Function *wrapperFunc = M.getFunction(wrapperFuncName);
   assert(wrapperFunc);
@@ -797,7 +846,7 @@ bool gather_wrapper_func_args(llvm::Module& M,
       if(g_allowedTgtVec.count(target)) {
         // Get the bitwidth of the first member of the register array (and negate it)
         std::string firstMember = g_allowedTgtVec[target].members[0];
-        size = -get_var_slice_width_cmplx(firstMember);
+        size = -m_info.get_var_width_cmplx(firstMember);
       } else {
         toCout("Function "+wrapperFuncName+" has arg "+argname+", but its target is not a vector!");
         size = 0;
@@ -807,8 +856,8 @@ bool gather_wrapper_func_args(llvm::Module& M,
     } else if (argname == RETURN_VAL_PTR_ID) {
       // Special arg name indicates a pointer a big scalar that is the target of this function
       assert(isPointer);
-      if(g_asvSet.contains(target)) {
-        size = -(g_asvSet.at(target).width);  // Instead get size from get_var_slice_width_cmplx()?
+      if(m_asvSet.contains(target)) {
+        size = -(m_asvSet.at(target).width);  // Instead get size from get_var_width_cmplx()?
       } else {
         toCout("Function "+wrapperFuncName+" has arg "+argname+", but its target is not a known ASV!");
         size = 0;
@@ -818,6 +867,7 @@ bool gather_wrapper_func_args(llvm::Module& M,
     } else {
       // Extract the ASV name from the argument name (by removing the cycle count).
       // Note that the name will not have quotes or backslashes, like you would see in the textual IR.
+      // TODO: have the client provide a parsing function for the arg name.
       uint32_t pos = argname.find(DELIM, 0);
       std::string var = argname.substr(0, pos);
 
@@ -829,11 +879,15 @@ bool gather_wrapper_func_args(llvm::Module& M,
         if (cycleStr.size() > 0) {
           cycle = std::stoi(cycleStr);
 
-          // The internal cycle numbering starts at the cycle count and
-          // decreases down to 0 at the final cycle.  We need to map this to the
-          // convention used in instr.txt, where the cycles numbering starts at 1,
+          // If the internal cycle numbering starts at the cycle count and decreases
+          // down to 0 at the final cycle, the cycle numbers must be mapped to the
+          // convention used in instr.txt, where the cycle numbering starts at 0
           // and goes upwards as time passes.
-          cycle = delayBound - cycle;
+          if (m_reverseCycleOrder) {
+            cycle = delayBound - cycle;
+          } else {
+            cycle = cycle - 1;
+          }
         }
       }
 
@@ -844,18 +898,18 @@ bool gather_wrapper_func_args(llvm::Module& M,
         // A pointer to a regster array
         // Get the bitwidth of the first member of the register array
         std::string firstMember = g_allowedTgtVec[var].members[0];
-        size = -get_var_slice_width_cmplx(firstMember);
-      } else if (g_asvSet.contains(var)) {
+        size = -m_info.get_var_width_cmplx(firstMember);
+      } else if (m_asvSet.contains(var)) {
         // A big scalar ASV passed by ref
-        size = -(g_asvSet.at(var).width);  // Instead get size from get_var_slice_width_cmplx()?
+        size = -(m_asvSet.at(var).width);  // Instead get size from get_var_width_cmplx()?
       } else if (!get_vector_of_target(var, nullptr).empty()) {
-        // A reference to a big scalar ASV that is a member of a register array (and thus not in g_asvSet)
-        size = get_var_slice_width_cmplx(var);
+        // A reference to a big scalar ASV that is a member of a register array (and thus not in m_asvSet)
+        size = m_info.get_var_width_cmplx(var);
         toCout("Function "+wrapperFuncName+" has arg "+var+
                   " of size "+toStr(size)+" which belongs to a register array");
       } else {
-        // A big scalar, but not found in g_asvSet
-        size = get_var_slice_width_cmplx(var);
+        // A big scalar, but not found in m_asvSet
+        size = m_info.get_var_width_cmplx(var);
         toCout("Function "+wrapperFuncName+" has arg "+var+
                   " of size "+toStr(size)+" which is not a known ASV or register array!");
       }
@@ -867,9 +921,10 @@ bool gather_wrapper_func_args(llvm::Module& M,
 }
 
 
-void print_func_info(std::ofstream &output) {
-  g_dependVarMapMtx.lock();
-  for (const auto pair1 : g_dependVarMap) {
+void
+FuncExtractFlow::print_func_info(std::ofstream &output) {
+  m_dependVarMapMtx.lock();
+  for (const auto pair1 : m_dependVarMap) {
     output << "Instr:"+pair1.first << std::endl;
     for (const auto pair2 : pair1.second) {
       output << "Target:"+pair2.first << std::endl;
@@ -884,12 +939,13 @@ void print_func_info(std::ofstream &output) {
     }
     output << std::endl;
   }
-  g_dependVarMapMtx.unlock();  
+  m_dependVarMapMtx.unlock();  
 }
 
 
-void print_asv_info(std::ofstream &output) {
-  for(auto it = g_asvSet.begin(); it != g_asvSet.end(); it++) {
+void
+FuncExtractFlow::print_asv_info(std::ofstream &output) {
+  for(auto it = m_asvSet.begin(); it != m_asvSet.end(); it++) {
     const std::string& reg = it->first;
     uint32_t width = it->second.width;
 
@@ -912,7 +968,7 @@ void print_asv_info(std::ofstream &output) {
   for(auto pair: g_allowedTgtVec) {
     output << "[" << std::endl;
     for(std::string reg : pair.second.members) {
-      uint32_t width = get_var_slice_width_cmplx(reg);
+      uint32_t width = m_info.get_var_width_cmplx(reg);
       output << reg << ":" << width; // Write name and width
       output << std::endl;
     }
@@ -921,19 +977,30 @@ void print_asv_info(std::ofstream &output) {
 }
 
 
-void print_llvm_script( std::string fileName) {
+void
+FuncExtractFlow::print_llvm_script( std::string fileName) {
+  // Any command-line args (e.g. -O3) will be given to clang.
   std::ofstream output(fileName);
-  output << "clang ila.cpp -emit-llvm -S -o main.ll" << std::endl;
+  output << "clang $* ila.cpp -emit-llvm -S -o main.ll" << std::endl;
   std::string line = "llvm-link -v main.ll \\";
   output << line << std::endl;
-  for(auto it = g_fileNameVec.begin(); it != g_fileNameVec.end(); it++) {
+  for(auto it = m_fileNameVec.begin(); it != m_fileNameVec.end(); it++) {
     line = *it + " \\";
     output << line << std::endl;
   }
   line = "-S -o linked.ll";
   output << line << std::endl;
-  output << "clang linked.ll" << std::endl;
+  output << "clang $* linked.ll" << std::endl;
   output.close();
+
+  // Make the new file executable, to the extent that it is readable.
+  struct stat statbuf;
+  stat(fileName.c_str(), &statbuf);
+  mode_t mode = statbuf.st_mode | S_IXUSR;
+  if (mode | S_IRGRP) mode |= S_IXGRP;
+  if (mode | S_IROTH) mode |= S_IXOTH;
+  chmod(fileName.c_str(), mode);
+
 }
 
 

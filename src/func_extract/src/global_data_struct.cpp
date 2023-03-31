@@ -78,7 +78,9 @@ bool g_push_new_target;
 bool g_read_rst_vcd;
 bool g_use_multi_thread;
 bool g_overwrite_existing_llvm = true;
-bool g_do_bitwise_opt = true;
+bool g_do_bitwise_opt = false;
+bool g_post_opto_mux_to_branch = false; // disabled by default
+int g_post_opto_mux_to_branch_threshold = -1; // Use default threshold
 std::string g_llvm_path = "";
 uint32_t g_do_instr_num;
 std::ofstream g_outFile;
@@ -133,5 +135,20 @@ int registerArray_t::findElement(const std::string& element) const {
     return -1;
   return (pos - members.begin());
 }
+
+
+// Virtual destructor of abstract class
+UFGenerator::~UFGenerator()
+{
+}
+
+
+// Virtual destructor of abstract class
+UFGenFactory::~UFGenFactory()
+{
+}
+
+
+
 
 } // end of namespace

@@ -1,5 +1,5 @@
-#ifndef GLOBAL
-#define GLOBAL
+#ifndef LIVE_ANALYSIS_GLOBAL_DATA_H
+#define LIVE_ANALYSIS_GLOBAL_DATA_H
 #include "types.h"
 #include "varWidth.h"
 #include "pass_info.h"

@@ -1,3 +1,6 @@
+#ifndef LIVE_ANALYSIS_SYNTAX_PATTERNS_H
+#define LIVE_ANALYSIS_SYNTAX_PATTERNS_H
+
 #include <regex>
 
 namespace syntaxPatterns {
@@ -117,3 +120,4 @@ extern std::regex pX;
 
 } // end of namespace syntaxPatterns
 
+#endif

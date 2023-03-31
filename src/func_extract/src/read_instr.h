@@ -1,5 +1,5 @@
-#ifndef READ_INSTR
-#define READ_INSTR
+#ifndef FUNC_EXTRACT_READ_INSTR_H
+#define FUNC_EXTRACT_READ_INSTR_H
 
 #include <string>
 #include <regex>
