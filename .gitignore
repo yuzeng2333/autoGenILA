@@ -24,3 +24,8 @@ src/taint_method/build
 src/func_extract/build
 src/func_extract/*.ll
 src/func_extract/doc
+
+.vscode/
+
+aes_128/
+verilator-M8080/

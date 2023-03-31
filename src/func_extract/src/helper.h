@@ -5,7 +5,7 @@
 #include <regex>
 #include "../../live_analysis/src/global_data.h"
 #include "../../live_analysis/src/helper.h"
-#include "z3++.h"
+//#include "z3++.h"
 #include "types.h"
 #include "global_data_struct.h"
 #include <cctype>
@@ -95,13 +95,13 @@ uint64_t bin2int(const std::string& num);
 
 std::string timed_name(const std::string& name, uint32_t timeIdx);
 
-void record_expr(z3::expr varExpr);
+//void record_expr(z3::expr varExpr);
 
 //z3::expr sext(z3::expr const& e, uint32_t added_len);
 
-z3::expr sext_full(z3::expr const& e, uint32_t len);
+//z3::expr sext_full(z3::expr const& e, uint32_t len);
 
-z3::expr zext_full(z3::expr const& e, uint32_t destWidth, uint32_t opWidth);
+//z3::expr zext_full(z3::expr const& e, uint32_t destWidth, uint32_t opWidth);
 
 bool is_root(const std::string& var);
 
@@ -111,13 +111,13 @@ bool is_taint(const std::string& var);
 
 bool is_clean(const std::string& var, const std::shared_ptr<ModuleInfo_t> &modInfo);
 
-std::string get_name(z3::expr expression);
+//std::string get_name(z3::expr expression);
 
 bool is_read_asv(const std::string& var, const std::shared_ptr<ModuleInfo_t> &curMod);
 
 bool has_explicit_value(const std::string& input);
 
-uint32_t expr_len(z3::expr &e);
+//uint32_t expr_len(z3::expr &e);
 
 bool comparePair(const std::pair<std::string, uint32_t> &p1, 
                  const std::pair<std::string, uint32_t> &p2 );

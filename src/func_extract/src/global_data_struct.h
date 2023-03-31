@@ -1,7 +1,7 @@
 #ifndef FUNC_EXTRACT_GLOBAL_DATA_STRUCT_H
 #define FUNC_EXTRACT_GLOBAL_DATA_STRUCT_H
 
-#include "z3++.h"
+// #include "z3++.h"
 #include "ast.h"
 #include "types.h"
 #include "ins_context_stack.h"
@@ -336,8 +336,8 @@ extern std::ofstream g_outFile;
 extern std::ofstream g_regValueFile;
 extern std::map<astNode*, uint32_t> CLEAN_QUEUE;
 extern std::map<astNode*, uint32_t> DIRTY_QUEUE;
-extern std::map<std::string, z3::expr*> INPUT_EXPR_VAL;
-extern std::map<std::string, z3::expr*> TIMED_VAR2EXPR;
+//extern std::map<std::string, z3::expr*> INPUT_EXPR_VAL;
+//extern std::map<std::string, z3::expr*> TIMED_VAR2EXPR;
 extern std::set<std::string> INT_EXPR_SET;
 
 extern std::vector<struct InstrInfo_t> g_instrInfo;
@@ -355,6 +355,7 @@ extern bool g_use_concat_extract_func;
 extern bool g_use_simple_func_name;
 extern bool g_use_multi_thread;
 extern bool g_overwrite_existing_llvm;
+extern bool g_do_bitwise_opt;
 extern bool g_post_opto_mux_to_branch;
 extern int g_post_opto_mux_to_branch_threshold;
 extern std::string g_llvm_path;

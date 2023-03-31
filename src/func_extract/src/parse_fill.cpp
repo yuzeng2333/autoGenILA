@@ -568,6 +568,14 @@ void read_config(std::string fileName) {
         g_llvm_path = value;
         configNum++;
         toCout("read g_llvm_path: "+value);
+      } else if (config == "g_do_bitwise_opt")
+      {
+        g_do_bitwise_opt = (value == "true");
+        configNum++;
+        toCout("read g_do_bitwise_opt: " + value);
+      } else
+      {
+        toCout("Warning: variable " + config + " in config.txt is not defined!!!");
       }
     }
   }

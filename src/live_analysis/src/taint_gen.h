@@ -19,7 +19,8 @@ namespace taintGen {
 #define ITE             6
 #define NONBLOCK        7
 #define NONBLOCKCONCAT  8
-#define OUTPUT          9
+//#define OUTPUT          9
+const int OUTPUT      = 9;
 #define CASE            10
 #define SRC_CONCAT      11
 #define FUNCDEF         12

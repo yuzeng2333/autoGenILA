@@ -12,7 +12,7 @@
 //#define llvmInt(b, a, c) llvm::ConstantInt::get(llvmWidth(a, c), b, false)
 
 
-using namespace z3;
+//using namespace z3;
 using namespace taintGen;
 using namespace syntaxPatterns;
 
@@ -431,10 +431,10 @@ std::string timed_name(const std::string& name, uint32_t timeIdx) {
 }
 
 
-void record_expr(expr varExpr) {
-  expr *tmpPnt = new expr(varExpr);
-  TIMED_VAR2EXPR.emplace(varExpr.decl().name().str(), tmpPnt);
-}
+//void record_expr(expr varExpr) {
+//  expr *tmpPnt = new expr(varExpr);
+//  TIMED_VAR2EXPR.emplace(varExpr.decl().name().str(), tmpPnt);
+//}
 
 
 // extend e to added_len + len(e)
@@ -485,9 +485,9 @@ bool is_clean(const std::string& var, const std::shared_ptr<ModuleInfo_t> &modIn
 }
 
 
-std::string get_name(expr expression) {
-  return expression.decl().name().str();
-}
+//std::string get_name(expr expression) {
+//  return expression.decl().name().str();
+//}
 
 
 bool is_read_asv(const std::string& var, const std::shared_ptr<ModuleInfo_t> &curMod) {
