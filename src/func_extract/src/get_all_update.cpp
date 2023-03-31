@@ -234,6 +234,7 @@ FuncExtractFlow::get_update_function(std::string target,
   // set the destInfo according to the target
   DestInfo destInfo;
   destInfo.isMemVec = false;
+  destInfo.isSingleMem = false;
   if(!isVec) {
     toCout("---  BEGIN Target: "+target+" ---");
     if(target.find("puregs[2]") != std::string::npos)
