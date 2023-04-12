@@ -520,8 +520,8 @@ void read_config(std::string fileName) {
   uint32_t configNum = 0;
   while(std::getline(input, line)) {
     remove_front_space(line);
-    if (line[0] == '#') {
-      continue;  // Skip comment
+    if (line.empty() || line[0] == '#') {
+      continue;  // Skip blank lines and comments
     }
 
     if(line.find("=") != std::string::npos) {
