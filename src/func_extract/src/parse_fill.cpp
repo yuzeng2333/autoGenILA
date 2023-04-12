@@ -519,6 +519,11 @@ void read_config(std::string fileName) {
   std::string line;
   uint32_t configNum = 0;
   while(std::getline(input, line)) {
+    remove_front_space(line);
+    if (line.empty() || line[0] == '#') {
+      continue;  // Skip blank lines and comments
+    }
+
     if(line.find("=") != std::string::npos) {
       size_t pos = line.find("=");
       std::string config = line.substr(0, pos);
